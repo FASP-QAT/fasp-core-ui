@@ -55,6 +55,7 @@ export default class CommitTreeComponent extends React.Component {
             progressPer: 0
         }
         this.synchronize = this.synchronize.bind(this);
+        this.updateState = this.updateState.bind(this);
     }
 
     componentDidMount = function () {
@@ -83,7 +84,6 @@ export default class CommitTreeComponent extends React.Component {
             programRequest.onsuccess = function (e) {
                 var programList = [];
                 var myResult = programRequest.result;
-                console.log("myResult", myResult);
                 for (var i = 0; i < myResult.length; i++) {
                     var datasetDataBytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
                     var datasetData = datasetDataBytes.toString(CryptoJS.enc.Utf8);
@@ -341,7 +341,7 @@ export default class CommitTreeComponent extends React.Component {
                 var consumptionList = programData[0].datasetJson.actualConsumptionList;
                 var missingMonthList = [];
 
-                //Consumption : planning unit less 12 month
+                //Consumption : planning unit less 24 month
                 var consumptionListlessTwelve = [];
                 var noForecastSelectedList = [];
                 for (var dpu = 0; dpu < datasetPlanningUnit.length; dpu++) {
@@ -351,7 +351,7 @@ export default class CommitTreeComponent extends React.Component {
                         var puId = datasetPlanningUnit[dpu].planningUnit.id;
                         var regionId = datasetRegionList[drl].regionId;
                         var consumptionListFiltered = consumptionList.filter(c => c.planningUnit.id == puId && c.region.id == regionId);
-                        if (consumptionListFiltered.length < 12) {
+                        if (consumptionListFiltered.length < 24) {
                             consumptionListlessTwelve.push({
                                 planningUnitId: datasetPlanningUnit[dpu].planningUnit.id,
                                 planningUnitLabel: datasetPlanningUnit[dpu].planningUnit.label,
@@ -384,7 +384,7 @@ export default class CommitTreeComponent extends React.Component {
                     var selectedForecast = datasetPlanningUnit[dpu].selectedForecastMap;
                     var regionArray = [];
                     for (var drl = 0; drl < datasetRegionList.length; drl++) {
-                        if (datasetRegionList[drl].regionId != selectedForecast.key) {
+                        if (selectedForecast[datasetRegionList[drl].regionId] == undefined) {
                             regionArray.push(getLabelText(datasetRegionList[drl].label, this.state.lang));
                         }
                     }
@@ -405,6 +405,14 @@ export default class CommitTreeComponent extends React.Component {
         //*** */
     }
 
+
+    updateState(parameterName, value) {
+        this.setState({
+            [parameterName]: value
+        })
+    }
+
+
     buildJxl() {
         var treeScenarioList = this.state.treeScenarioList;
         var treeScenarioListFilter = treeScenarioList;
@@ -417,6 +425,7 @@ export default class CommitTreeComponent extends React.Component {
                 let startDate = this.state.startDate;
                 let stopDate = this.state.stopDate;
                 var curDate = startDate;
+                var nodeWithPercentageChildrenWithHundredCent = [];
                 for (var i = 0; curDate < stopDate; i++) {
                     curDate = moment(startDate).add(i, 'months').format("YYYY-MM-DD");
                     data = [];
@@ -424,6 +433,7 @@ export default class CommitTreeComponent extends React.Component {
                     for (var nwp = 0; nwp < nodeWithPercentageChildren.length; nwp++) {
                         var child = childrenList.filter(c => c.id == nodeWithPercentageChildren[nwp].id && c.month == curDate);
                         data[nwp + 1] = child.length > 0 ? (child[0].percentage).toFixed(2) : '';
+                        nodeWithPercentageChildrenWithHundredCent[nwp] = nodeWithPercentageChildrenWithHundredCent[nwp] != 1 ? (child.length > 0 && (child[0].percentage).toFixed(2) != 100) ? 1 : 0 : 1;
                     }
                     childrenArray.push(data);
                 }
@@ -440,7 +450,7 @@ export default class CommitTreeComponent extends React.Component {
                 for (var nwp = 0; nwp < nodeWithPercentageChildren.length; nwp++) {
                     columnsArray.push({
                         title: nodeWithPercentageChildren[nwp].label.label_en,
-                        type: 'numeric',
+                        type: nodeWithPercentageChildrenWithHundredCent[nwp] == 1 ? 'numeric' : 'hidden',
                         mask: '#,##.00%', decimal: '.'
                         // readOnly: true
                     });
@@ -468,7 +478,7 @@ export default class CommitTreeComponent extends React.Component {
                         }
                     },
 
-                    pagination: false,
+                    pagination: localStorage.getItem("sesRecordCount"),
                     search: false,
                     columnSorting: true,
                     tableOverflow: true,
@@ -516,17 +526,13 @@ export default class CommitTreeComponent extends React.Component {
     }
 
     redirectToDashbaord(commitRequestId) {
-        console.log(")))) Call for async api");
         this.setState({ loading: true });
-        console.log("method called", commitRequestId);
 
         const sendGetRequest = async () => {
             try {
                 AuthenticationService.setupAxiosInterceptors();
                 const resp = await ProgramService.sendNotificationAsync(commitRequestId);
-                console.log(")))) Supply plan rebuild completed");
                 var curUser = AuthenticationService.getLoggedInUserId();
-                console.log("Resposne.data+++", resp.data);
                 if (resp.data.createdBy.userId == curUser && resp.data.status == 2) {
                     this.setState({
                         progressPer: 75
@@ -546,7 +552,6 @@ export default class CommitTreeComponent extends React.Component {
 
     getLatestProgram(notificationDetails) {
         var updatedJson = [];
-        console.log(")))) inside getting latest version")
         this.setState({ loading: true });
         var checkboxesChecked = [];
         var programIdsToSyncArray = [];
@@ -559,11 +564,8 @@ export default class CommitTreeComponent extends React.Component {
                 checkboxesChecked.push({ programId: programIdsSuccessfullyCommitted[i].notificationDetails.program.id, versionId: -1 })
             }
         }
-        console.log(")))) Before calling get notification api")
         DatasetService.getAllDatasetData(checkboxesChecked)
             .then(response => {
-                console.log(")))) After calling get notification api")
-                console.log("Resposne+++", response);
                 var json = response.data;
 
                 var db1;
@@ -602,7 +604,6 @@ export default class CommitTreeComponent extends React.Component {
                                     // if (version == -1) {
                                     var version = json[r].currentVersion.versionId
                                     // }
-                                    console.log("version ++", version);
                                     var item = {
                                         id: json[r].programId + "_v" + version + "_uId_" + userId,
                                         programId: json[r].programId,
@@ -657,7 +658,6 @@ export default class CommitTreeComponent extends React.Component {
                                         //         var programQPLDetailsRequest = programQPLDetailsOs.put(programQPLDetailsJson);
                                         //     }
                                         //     programQPLDetailsTransaction.oncomplete = function (event) {
-                                        console.log(")))) Data saved successfully")
                                         this.setState({
                                             progressPer: 100
                                         })
@@ -674,9 +674,6 @@ export default class CommitTreeComponent extends React.Component {
     }
 
     goToMasterDataSync(programIds) {
-        console.log("ProgramIds++++", programIds);
-        console.log("this props++++", this)
-        console.log("this props++++", this.props)
         this.props.history.push({ pathname: `/syncProgram/green/` + i18n.t('static.message.commitSuccess'), state: { "programIds": programIds } });
     }
 
@@ -709,12 +706,10 @@ export default class CommitTreeComponent extends React.Component {
                 programJson.versionType = { id: document.getElementById("versionTypeId").value };
                 programJson.versionStatus = { id: 2 };
                 programJson.notes = document.getElementById("notesId").value;
-                console.log("ProgramJson+++", programJson);
 
                 //create saveDatasetData in ProgramService
                 DatasetService.saveDatasetData(programJson, this.state.comparedLatestVersion).then(response => {
                     if (response.status == 200) {
-                        console.log(")))) Commit Request generated successfully");
 
                         this.setState({
                             progressPer: 50
@@ -876,7 +871,7 @@ export default class CommitTreeComponent extends React.Component {
             var nodeWithPercentageChildren = this.state.nodeWithPercentageChildren.filter(c => c.treeId == item1.treeId && c.scenarioId == item1.scenarioId);
             if (nodeWithPercentageChildren.length > 0) {
                 return (<><span>{item1.treeLabel.label_en + " / " + item1.scenarioLabel.label_en}</span><div className="table-responsive">
-                    <div id={"tableDiv" + count} className="jexcelremoveReadonlybackground" />
+                    <div id={"tableDiv" + count} className="jexcelremoveReadonlybackground consumptionDataEntryTable" />
                 </div><br /></>)
             }
         }, this)
@@ -1014,7 +1009,7 @@ export default class CommitTreeComponent extends React.Component {
                             </div>
                             {(this.state.showCompare) &&
                                 <>
-                                    <CompareVersionTable page="commit" datasetData={this.state.programDataLocal} datasetData1={this.state.programDataServer} datasetData2={this.state.programDataDownloaded} versionLabel={"V" + this.state.programDataLocal.currentVersion.versionId + "(Local)"} versionLabel1={"V" + this.state.programDataServer.currentVersion.versionId + "(Server)"} />
+                                    <CompareVersionTable ref="conflictChild" page="commit" datasetData={this.state.programDataLocal} datasetData1={this.state.programDataServer} datasetData2={this.state.programDataDownloaded} versionLabel={"V" + this.state.programDataLocal.currentVersion.versionId + "(Local)"} versionLabel1={"V" + this.state.programDataServer.currentVersion.versionId + "(Server)"} updateState={this.updateState} />
                                     <div className="table-responsive RemoveStriped">
                                         <div id="tableDiv" />
                                     </div>
@@ -1039,7 +1034,7 @@ export default class CommitTreeComponent extends React.Component {
                                         value={this.state.versionTypeId}
                                         onChange={(e) => { this.setVersionTypeId(e); }}
                                     >
-                                        <option value="">{i18n.t('static.common.all')}</option>
+                                        <option value="">{i18n.t('static.common.select')}</option>
                                         <option value="1">Draft Version</option>
                                         <option value="2">Final Version</option>
                                     </Input>
@@ -1078,7 +1073,7 @@ export default class CommitTreeComponent extends React.Component {
                             <span><b>2. Consumption Forecast: </b>(<a href="/dataentry/consumptionDataEntryAndAdjustment" target="_blank">Data Entry & Adjustment</a>, <a href="/extrapolation/extrapolateData" target="_blank">Extrapolation</a>)</span><br />
                             <span>a. Months missing actual consumption values (gap) :</span><br />
                             <ul>{missingMonths}</ul>
-                            <span>b. Planning units that don’t have at least 12 months of actual consumption values:</span><br />
+                            <span>b. Planning units that don’t have at least 24 months of actual consumption values:</span><br />
                             <ul>{consumption}</ul>
 
                             <span><b>3. Tree Forecast(s) </b></span><br />
