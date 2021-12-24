@@ -15,7 +15,7 @@ import getLabelText from '../../CommonComponent/getLabelText';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { contrast } from '../../CommonComponent/JavascriptCommonFunctions';
 import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
-import { JEXCEL_PAGINATION_OPTION,SECRET_KEY,APPROVED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, CANCELLED_SHIPMENT_STATUS, DATE_FORMAT_CAP, DELIVERED_SHIPMENT_STATUS, INDEXED_DB_NAME, INDEXED_DB_VERSION, MONTHS_IN_PAST_FOR_SUPPLY_PLAN, NO_OF_MONTHS_ON_LEFT_CLICKED, NO_OF_MONTHS_ON_RIGHT_CLICKED, ON_HOLD_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, SHIPMENT_DATA_SOURCE_TYPE, SHIPPED_SHIPMENT_STATUS, SUBMITTED_SHIPMENT_STATUS, TBD_PROCUREMENT_AGENT_ID, TOTAL_MONTHS_TO_DISPLAY_IN_SUPPLY_PLAN, JEXCEL_PRO_KEY, NO_OF_MONTHS_ON_LEFT_CLICKED_REGION, NO_OF_MONTHS_ON_RIGHT_CLICKED_REGION, DATE_FORMAT_CAP_WITHOUT_DATE, JEXCEL_DATE_FORMAT, JEXCEL_DATE_FORMAT_SM } from '../../Constants.js';
+import { JEXCEL_PAGINATION_OPTION, SECRET_KEY, APPROVED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, CANCELLED_SHIPMENT_STATUS, DATE_FORMAT_CAP, DELIVERED_SHIPMENT_STATUS, INDEXED_DB_NAME, INDEXED_DB_VERSION, MONTHS_IN_PAST_FOR_SUPPLY_PLAN, NO_OF_MONTHS_ON_LEFT_CLICKED, NO_OF_MONTHS_ON_RIGHT_CLICKED, ON_HOLD_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, SHIPMENT_DATA_SOURCE_TYPE, SHIPPED_SHIPMENT_STATUS, SUBMITTED_SHIPMENT_STATUS, TBD_PROCUREMENT_AGENT_ID, TOTAL_MONTHS_TO_DISPLAY_IN_SUPPLY_PLAN, JEXCEL_PRO_KEY, NO_OF_MONTHS_ON_LEFT_CLICKED_REGION, NO_OF_MONTHS_ON_RIGHT_CLICKED_REGION, DATE_FORMAT_CAP_WITHOUT_DATE, JEXCEL_DATE_FORMAT, JEXCEL_DATE_FORMAT_SM } from '../../Constants.js';
 import i18n from '../../i18n';
 import ConsumptionInSupplyPlanComponent from "../SupplyPlan/ConsumptionInSupplyPlan";
 import InventoryInSupplyPlanComponent from "../SupplyPlan/InventoryInSupplyPlan";
@@ -514,20 +514,20 @@ class EditSupplyPlanStatus extends Component {
                 // var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
                 // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                 var programJson = this.state.program;
-                var programQPLDetails = [];
+                // var programQPLDetails = [];
                 var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
                 var userId = userBytes.toString(CryptoJS.enc.Utf8);
-                programQPLDetails.push({
-                    id: programJson.programId,
-                    programId: programJson.programId,
-                    version: programJson.currentVersion.versionId,
-                    userId: userId,
-                    programCode: programJson.programCode,
-                    openCount: 0,
-                    addressedCount: 0,
-                    programModified: 0,
-                    readonly: 0
-                })
+                // programQPLDetails.push({
+                //     id: programJson.programId,
+                //     programId: programJson.programId,
+                //     version: programJson.currentVersion.versionId,
+                //     userId: userId,
+                //     programCode: programJson.programCode,
+                //     openCount: 0,
+                //     addressedCount: 0,
+                //     programModified: 0,
+                //     readonly: 0
+                // })
                 var batchInfoList = programJson.batchInfoList;
                 DataSourceService.getAllDataSourceList().then(response => {
                     var dataSourceList = [];
@@ -542,8 +542,8 @@ class EditSupplyPlanStatus extends Component {
                     })
                     this.setState({
                         dataSourceList: dataSourceList,
-                        programQPLDetails:programQPLDetails,
-                        programId:programJson.programId
+                        // programQPLDetails:programQPLDetails,
+                        // programId:programJson.programId
                     })
 
                     RealmCountryService.getRealmCountryPlanningUnitByProgramId([this.props.match.params.programId]).then(response1 => {
@@ -645,8 +645,22 @@ class EditSupplyPlanStatus extends Component {
             programRequest.onsuccess = function (event) {
                 // var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
                 // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                // var programQPLDetails=[];
                 var programJson = this.state.program;
                 var batchInfoList = programJson.batchInfoList;
+                var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                // programQPLDetails.push({
+                //     id: programJson.programId,
+                //     programId: programJson.programId,
+                //     version: programJson.currentVersion.versionId,
+                //     userId: userId,
+                //     programCode: programJson.programCode,
+                //     openCount: 0,
+                //     addressedCount: 0,
+                //     programModified: 0,
+                //     readonly: 0
+                // })
 
                 DataSourceService.getAllDataSourceList().then(response => {
                     var dataSourceList = [];
@@ -660,7 +674,8 @@ class EditSupplyPlanStatus extends Component {
                         })
                     })
                     this.setState({
-                        dataSourceList: dataSourceList
+                        dataSourceList: dataSourceList,
+                        // programQPLDetails:programQPLDetails
                     })
 
                     RealmCountryService.getRealmCountryPlanningUnitByProgramId([this.props.match.params.programId]).then(response1 => {
@@ -715,7 +730,8 @@ class EditSupplyPlanStatus extends Component {
                             inventoryType: inventoryType,
                             inventoryMonth: month,
                             inventoryEndDate: endDate,
-                            inventoryRegion: region
+                            inventoryRegion: region,
+
                         }, () => {
                             if (this.refs.inventoryChild != undefined) {
                                 this.refs.inventoryChild.showInventoryData();
@@ -765,10 +781,25 @@ class EditSupplyPlanStatus extends Component {
             programRequest.onsuccess = function (event) {
                 // var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
                 // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                // var programQPLDetails=[];
                 var programJson = this.state.program;
                 var shipmentListUnFiltered = programJson.shipmentList;
+                var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                // programQPLDetails.push({
+                //     id: programJson.programId,
+                //     programId: programJson.programId,
+                //     version: programJson.currentVersion.versionId,
+                //     userId: userId,
+                //     programCode: programJson.programCode,
+                //     openCount: 0,
+                //     addressedCount: 0,
+                //     programModified: 0,
+                //     readonly: 0
+                // })
                 this.setState({
-                    shipmentListUnFiltered: shipmentListUnFiltered
+                    shipmentListUnFiltered: shipmentListUnFiltered,
+                    // programQPLDetails:programQPLDetails
                 })
                 var shipmentList = programJson.shipmentList.filter(c => c.active.toString() == "true");
 
@@ -2085,8 +2116,25 @@ class EditSupplyPlanStatus extends Component {
 
                     }
                 });
+                var programQPLDetails = [];
+                var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                programQPLDetails.push({
+                    id: program.programId,
+                    programId: program.programId,
+                    version: program.currentVersion.versionId,
+                    userId: userId,
+                    programCode: program.programCode,
+                    openCount: 0,
+                    addressedCount: 0,
+                    programModified: 0,
+                    readonly: 0
+                })
+
                 this.setState({
                     program,
+                    programQPLDetails:programQPLDetails,
+                    programId:program.programId,
                     regionList: regionList,
                     data: response.data.problemReportList,
                     editable: program.currentVersion.versionType.id == 2 && program.currentVersion.versionStatus.id == 1 && hasRole ? true : false
@@ -3075,22 +3123,22 @@ class EditSupplyPlanStatus extends Component {
                                                         </tr>
                                                     </tbody>
                                                 </Table>
-                                                </div>
+                                            </div>
 
-                                                {
-                                                    this.state.jsonArrForGraph.length > 0
-                                                    &&
-                                                    <div className="" >
+                                            {
+                                                this.state.jsonArrForGraph.length > 0
+                                                &&
+                                                <div className="" >
 
-                                                        <div className="graphwidth">
-                                                            <div className="col-md-12">
-                                                                <div className="chart-wrapper chart-graph-report">
-                                                                    <Bar id="cool-canvas1" data={bar} options={chartOptions} />
-                                                                </div>
+                                                    <div className="graphwidth">
+                                                        <div className="col-md-12">
+                                                            <div className="chart-wrapper chart-graph-report">
+                                                                <Bar id="cool-canvas1" data={bar} options={chartOptions} />
                                                             </div>
                                                         </div>
-                                                        <div className="offset-4 col-md-8"> <span>{i18n.t('static.supplyPlan.noteBelowGraph')}</span></div>
-                                                    </div>}
+                                                    </div>
+                                                    <div className="offset-4 col-md-8"> <span>{i18n.t('static.supplyPlan.noteBelowGraph')}</span></div>
+                                                </div>}
                                         </div>
                                     </div>
                                     {/* {
@@ -3828,7 +3876,14 @@ class EditSupplyPlanStatus extends Component {
             regionIdArray[i] = regionId[i].value;
         }
         program.regionArray = regionIdArray;
-        this.setState({ program: program });
+
+
+
+        this.setState({
+            program: program,
+            // programQPLDetails:programQPLDetails, 
+            // programId:program.programId
+        });
     }
 
     touchAll(setTouched, errors) {
