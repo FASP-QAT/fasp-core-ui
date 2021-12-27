@@ -183,41 +183,67 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                             var map1 = new Map(Object.entries(tableJson[i]));
 
                             let selectedPlanningUnitObj = this.props.items.planningUnitList.filter(c => c.planningUnitId == map1.get("0"))[0];
-                            var forecastingUnitObj=selectedPlanningUnitObj.forecastingUnit;
-                            forecastingUnitObj.multiplier=map1.get("5");
+                            var forecastingUnitObj = selectedPlanningUnitObj.forecastingUnit;
+                            forecastingUnitObj.multiplier = map1.get("5");
                             if (map1.get("9") == 0 && map1.get("8") == true) { //not pink
+                                // let tempJson = {
+                                //     "forecastConsumptionId": '',
+                                //     "program": {
+                                //         "id": selectedForecastProgramObj.programId,
+                                //         "label": selectedForecastProgramObj.label,
+                                //         "code": selectedForecastProgramObj.programCode,
+                                //         "idString": "" + selectedForecastProgramObj.programId
+                                //     },
+                                //     "consumptionUnit": {
+                                //         "forecastConsumptionUnitId": '',
+                                //         "dataType": 1,
+                                //         "forecastingUnit": forecastingUnitObj,
+                                //         "planningUnit": {
+                                //             "id": selectedPlanningUnitObj.planningUnitId,
+                                //             "label": selectedPlanningUnitObj.label,
+                                //             "multiplier": selectedPlanningUnitObj.multiplier,
+                                //             "idString": '' + selectedPlanningUnitObj.planningUnitId,
+                                //         },
+                                //         "otherUnit": null
+                                //     },
+                                //     "region": {
+                                //         "id": map1.get("10"),
+                                //         "label": null,
+                                //         "idString": '' + map1.get("10")
+                                //     },
+                                //     "month": map1.get("3"),
+                                //     // "actualConsumption": map1.get("4"),
+                                //     "actualConsumption": this.el.getValue(`E${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                                //     "reportingRate": null,
+                                //     "daysOfStockOut": null,
+                                //     "exclude": false,
+                                //     "versionId": selectedForecastProgramObj.versionId,
+                                //     "createdBy": {
+                                //         "userId": userId,
+                                //         "username": username
+                                //     },
+                                //     "createdDate": new Date().toISOString().slice(0, 10) + " 19:43:38"
+                                // }
+
+                                let regionObj = selectedForecastProgramObj.regionList.filter(c => c.regionId == parseInt(map1.get("10")))[0];
+
                                 let tempJson = {
-                                    "forecastConsumptionId": '',
-                                    "program": {
-                                        "id": selectedForecastProgramObj.programId,
-                                        "label": selectedForecastProgramObj.label,
-                                        "code": selectedForecastProgramObj.programCode,
-                                        "idString": "" + selectedForecastProgramObj.programId
-                                    },
-                                    "consumptionUnit": {
-                                        "forecastConsumptionUnitId": '',
-                                        "dataType": 1,
-                                        "forecastingUnit": forecastingUnitObj,
-                                        "planningUnit": {
-                                            "id": selectedPlanningUnitObj.planningUnitId,
-                                            "label": selectedPlanningUnitObj.label,
-                                            "multiplier": selectedPlanningUnitObj.multiplier,
-                                            "idString": '' + selectedPlanningUnitObj.planningUnitId,
-                                        },
-                                        "otherUnit": null
+                                    "actualConsumptionId": '',
+                                    "planningUnit": {
+                                        "id": selectedPlanningUnitObj.planningUnitId,
+                                        "label": selectedPlanningUnitObj.label,
+                                        "idString": '' + selectedPlanningUnitObj.planningUnitId,
                                     },
                                     "region": {
                                         "id": map1.get("10"),
-                                        "label": null,
+                                        "label": regionObj.label,
                                         "idString": '' + map1.get("10")
                                     },
                                     "month": map1.get("3"),
-                                    // "actualConsumption": map1.get("4"),
-                                    "actualConsumption": this.el.getValue(`E${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                                    "amount": parseInt(this.el.getValue(`E${parseInt(i) + 1}`, true).toString().replaceAll(",", "")),
                                     "reportingRate": null,
                                     "daysOfStockOut": null,
                                     "exclude": false,
-                                    "versionId": selectedForecastProgramObj.versionId,
                                     "createdBy": {
                                         "userId": userId,
                                         "username": username
@@ -235,7 +261,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                                     planningUnitId: map1.get("0"),
                                     month: map1.get("3"),
                                     // actualConsumption: map1.get("4"),
-                                    actualConsumption: this.el.getValue(`E${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                                    amount: this.el.getValue(`E${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
                                 }
                                 ImportListPink.push(tempJsonPink);
                             }
@@ -262,15 +288,15 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                         // programData.currentVersion.forecastStartDate = startDate;
                         // programData.actionList = [1, 2]
 
-                        console.log("Final-------------->", programData.consumptionList);
-                        let originalConsumptionList = programData.consumptionList;
+                        console.log("Final-------------->", programData.actualConsumptionList);
+                        let originalConsumptionList = programData.actualConsumptionList;
                         for (var i = 0; i < ImportListPink.length; i++) {
                             // let match = originalConsumptionList.filter(c => new Date(c.month).getTime() == new Date(papuList[j].month).getTime() && c.region.id == papuList[j].region.id && c.consumptionUnit.planningUnit.id == stepOneSelectedObject.forecastPlanningUnitId)
                             let index = originalConsumptionList.findIndex(c => new Date(c.month).getTime() == new Date(ImportListPink[i].month).getTime() && c.region.id == ImportListPink[i].regionId && c.consumptionUnit.planningUnit.id == ImportListPink[i].planningUnitId)
 
                             if (index != -1) {
                                 let indexObj = originalConsumptionList[index];
-                                indexObj.actualConsumption = ImportListPink[i].actualConsumption;
+                                indexObj.amount = ImportListPink[i].amount;
                                 originalConsumptionList[index] = indexObj;
                             }
                         }
@@ -278,7 +304,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                         console.log("Final-------------->11", ImportListNotPink);
                         console.log("Final-------------->12", ImportListPink);
                         console.log("Final-------------->13", originalConsumptionList.concat(ImportListNotPink));
-                        programData.consumptionList = originalConsumptionList.concat(ImportListNotPink);
+                        programData.actualConsumptionList = originalConsumptionList.concat(ImportListNotPink);
 
 
                         programData = (CryptoJS.AES.encrypt(JSON.stringify(programData), SECRET_KEY)).toString();
@@ -483,6 +509,8 @@ export default class StepThreeImportMapPlanningUnits extends Component {
         var buildCSVTable = [];
 
         var count = 0;
+        console.log("match------>-1", this.props.items.stepOneData);
+        console.log("match------>0", papuList);
         if (papuList.length != 0) {
             for (var j = 0; j < papuList.length; j++) {
 
@@ -495,7 +523,10 @@ export default class StepThreeImportMapPlanningUnits extends Component {
 
                 // console.log("selectedForecastProgram-------->4", selectedForecastProgram);
 
-                let match = selectedForecastProgram.consumptionList.filter(c => new Date(c.month).getTime() == new Date(papuList[j].month).getTime() && c.region.id == papuList[j].region.id && c.consumptionUnit.planningUnit.id == stepOneSelectedObject.forecastPlanningUnitId)
+                // let match = selectedForecastProgram.actualConsumptionList.filter(c => new Date(c.month).getTime() == new Date(papuList[j].month).getTime() && c.region.id == papuList[j].region.id && c.planningUnit.id == stepOneSelectedObject.forecastPlanningUnitId)
+                let match = selectedForecastProgram.actualConsumptionList.filter(c => new Date(c.month).getTime() == new Date(papuList[j].month).getTime() && c.region.id == papuList[j].region.id && c.planningUnit.id == stepOneSelectedObject.supplyPlanPlanningUnitId)
+                console.log("match------>1", selectedForecastProgram.actualConsumptionList);
+                console.log("match------>2", match);
                 // let match = selectedForecastProgram.consumptionList.filter(c => new Date(c.month).getTime() == new Date(papuList[j].month).getTime() && c.region.id == papuList[j].region.id)
 
                 data = [];
@@ -507,7 +538,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                 data[4] = papuList[j].actualConsumption
                 data[5] = stepOneSelectedObject.multiplier
                 data[6] = (stepOneSelectedObject.multiplier * papuList[j].actualConsumption).toFixed(2)
-                data[7] = (match.length > 0 ? match[0].actualConsumption : '')
+                data[7] = (match.length > 0 ? match[0].amount : '')
                 data[8] = true
                 data[9] = (match.length > 0 ? 1 : 0)
                 data[10] = papuList[j].region.id
@@ -523,7 +554,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                     supplyPlanConsumption: papuList[j].actualConsumption,
                     multiplier: stepOneSelectedObject.multiplier,
                     convertedConsumption: (stepOneSelectedObject.multiplier * papuList[j].actualConsumption).toFixed(2),
-                    currentQATConsumption: (match.length > 0 ? match[0].actualConsumption : ''),
+                    currentQATConsumption: (match.length > 0 ? match[0].amount : ''),
                     import: true
 
                 })
