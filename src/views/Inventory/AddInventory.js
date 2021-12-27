@@ -888,9 +888,9 @@ export default class AddInventory extends Component {
                         {(this.state.programQPLDetails.filter(c => c.id == this.state.programId)).length > 0 && (this.state.programQPLDetails.filter(c => c.id == this.state.programId))[0].readonly == 1 && <h5 style={{ color: 'red' }}>{i18n.t('static.dataentry.readonly')}</h5>}
                         <div className="col-md-10 pb-3">
                             <ul className="legendcommitversion">
-                                <li><span className="redlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.emergencyOrder')}</span></li>
+                                {/* <li><span className="redlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.emergencyOrder')}</span></li> */}
                                 <li><span className=" greylegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.commit.inactiveData')} </span></li>
-                                <li><span className=" readonlylegend legendcolor"></span> <span className="legendcommitversionText">Read Only Data </span></li>
+                                <li><span className=" readonlylegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.common.readonlyData')} </span></li>
                             </ul>
                         </div>
                         <div style={{ display: this.state.loading ? "none" : "block" }}>
