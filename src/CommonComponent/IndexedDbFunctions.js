@@ -188,7 +188,7 @@ export function getDatabase() {
             storeOS = db1.createObjectStore('versionStatus', { keyPath: 'id'});
         }
         if(!db1.objectStoreNames.contains('equivalencyUnit')){
-            storeOS = db1.createObjectStore('equivalencyUnit', { keyPath: 'equivalencyUnitMappingId'});
+            storeOS = db1.createObjectStore('equivalencyUnit', { keyPath: 'equivalencyUnitMappingId', autoIncrement: true});
         }
         console.log("indexed db completed----------------------")
         

@@ -136,7 +136,7 @@ class ModelingValidation extends Component {
         })
         var versionId = this.state.versionId.toString();
         console.log("In get dataset data+++", versionId);
-        if (versionId != "") {
+        if (versionId != "" && versionId.includes("Local")) {
             var actualVersionId = (versionId.split('(')[0]).trim();
             var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
             var userId = userBytes.toString(CryptoJS.enc.Utf8);
@@ -169,6 +169,43 @@ class ModelingValidation extends Component {
                     })
                 }.bind(this)
             }.bind(this)
+        } else if (versionId != "" && !versionId.includes("Local")) {
+            var json = [{ programId: this.state.datasetId, versionId: versionId }]
+            DatasetService.getAllDatasetData(json).then(response => {
+                if (response.status == 200) {
+                    console.log("resp--------------------", response.data);
+                    var responseData = response.data[0];
+                    this.setState({
+                        datasetData: responseData,
+                        loading: false
+                    }, () => {
+                        this.getTreeList();
+                    })
+                } else {
+                    this.setState({
+                        message: response.data.messageCode, loading: false
+                    }, () => {
+                        this.hideSecondComponent();
+                    })
+                }
+            }).catch(
+                error => {
+                    this.setState({
+                        datasetData: {},
+                        treeList: [],
+                        treeId: "",
+                        scenarioList: [],
+                        scenarioId: "",
+                        levelList: [],
+                        levelId: "",
+                        levelUnit: "",
+                        nodeList: [],
+                        nodeVal: [],
+                        nodeIdArr: [],
+                        loading: false
+                    })
+                }
+            );
         } else {
             this.setState({
                 datasetData: {},
@@ -307,11 +344,11 @@ class ModelingValidation extends Component {
             for (var k = 0; k < nodeVal.length; k++) {
                 columns.push({ title: nodeVal[k].label, width: 100, readOnly: true, type: displayBy == 1 ? 'numeric' : 'hidden', mask: displayBy == 1 ? '#,##.00' : '#,##.00 %', decimal: '.' });
             }
-            columns.push({ title: i18n.t('static.supplyPlan.total'), width: 100, readOnly: true, type: displayBy == 1 ? 'numeric' : 'hidden', mask: displayBy == 1 ? '#,##.00' : '#,## %' });
+            columns.push({ title: i18n.t('static.supplyPlan.total'), width: 100, readOnly: true, type: displayBy == 1 ? 'numeric' : 'hidden', mask: displayBy == 1 ? '#,##.00 %' : '#,## %' });
             for (var k = 0; k < nodeVal.length; k++) {
                 columns.push({ title: nodeVal[k].label, width: 100, readOnly: true, type: displayBy == 2 ? 'numeric' : 'hidden', mask: displayBy == 1 ? '#,##.00' : '#,##.00 %', decimal: '.' });
             }
-            columns.push({ title: i18n.t('static.supplyPlan.total'), width: 100, readOnly: true, type: displayBy == 2 ? 'numeric' : 'hidden', mask: displayBy == 1 ? '#,##.00' : '#,## %' });
+            columns.push({ title: i18n.t('static.supplyPlan.total'), width: 100, readOnly: true, type: displayBy == 2 ? 'numeric' : 'hidden', mask: displayBy == 1 ? '#,##.00 %' : '#,## %' });
             var data = [];
             var dataArr = [];
             var nodeVal = this.state.nodeVal;
@@ -487,38 +524,38 @@ class ModelingValidation extends Component {
 
     componentDidMount() {
         this.setState({ loading: true });
-        this.getOfflineDatasetList();
-        // ProgramService.getDataSetList().then(response => {
-        //     if (response.status == 200) {
-        //         console.log("resp--------------------", response.data);
-        //         var responseData = response.data;
-        //         var datasetList = [];
-        //         for (var rd = 0; rd < responseData.length; rd++) {
-        //             var json = {
-        //                 id: responseData[rd].programId,
-        //                 name: getLabelText(responseData[rd].label, this.state.lang),
-        //                 versionList: responseData[rd].versionList
-        //             }
-        //             datasetList.push(json);
-        //         }
-        //         this.setState({
-        //             datasetList: datasetList,
-        //             loading: false
-        //         }, () => {
-        //             this.getOfflineDatasetList();
-        //         })
-        //     } else {
-        //         this.setState({
-        //             message: response.data.messageCode, loading: false
-        //         }, () => {
-        //             this.hideSecondComponent();
-        //         })
-        //     }
-        // }).catch(
-        //     error => {
-        //         this.getOfflineDatasetList();
-        //     }
-        // );
+        // this.getOfflineDatasetList();
+        ProgramService.getDataSetList().then(response => {
+            if (response.status == 200) {
+                console.log("resp--------------------", response.data);
+                var responseData = response.data;
+                var datasetList = [];
+                for (var rd = 0; rd < responseData.length; rd++) {
+                    var json = {
+                        id: responseData[rd].programId,
+                        name: getLabelText(responseData[rd].label, this.state.lang),
+                        versionList: responseData[rd].versionList
+                    }
+                    datasetList.push(json);
+                }
+                this.setState({
+                    datasetList: datasetList,
+                    loading: false
+                }, () => {
+                    this.getOfflineDatasetList();
+                })
+            } else {
+                this.setState({
+                    message: response.data.messageCode, loading: false
+                }, () => {
+                    this.hideSecondComponent();
+                })
+            }
+        }).catch(
+            error => {
+                this.getOfflineDatasetList();
+            }
+        );
     }
 
     getOfflineDatasetList() {
@@ -609,15 +646,43 @@ class ModelingValidation extends Component {
                     },
                     position: 'left',
                 }],
-                xAxes: [{
-                    ticks: {
-                        fontColor: 'black'
+                xAxes: [
+                    {
+                        id: 'xAxis1',
+                        gridLines: {
+                            color: "rgba(0, 0, 0, 0)",
+                        },
+                        ticks: {
+                            fontColor: 'black',
+                            autoSkip: false,
+                            callback: function (label) {
+                                var xAxis1 = label
+                                xAxis1 += '';
+                                var month = xAxis1.split('-')[0];
+                                return month;
+                            }
+                        }
                     },
-                    gridLines: {
-                        drawBorder: true, lineWidth: 0
-                    },
-                    stacked: true
-                }]
+                    {
+                        id: 'xAxis2',
+                        gridLines: {
+                            drawOnChartArea: false, // only want the grid lines for one axis to show up
+                        },
+                        ticks: {
+                            callback: function (label) {
+                                var xAxis2 = label
+                                xAxis2 += '';
+                                var month = xAxis2.split('-')[0];
+                                var year = xAxis2.split('-')[1];
+                                if (month === "Feb") {
+                                    return year;
+                                } else {
+                                    return "";
+                                }
+                            },
+                            autoSkip: false
+                        }
+                    }]
             },
             maintainAspectRatio: false,
             legend: {
@@ -654,7 +719,7 @@ class ModelingValidation extends Component {
         if (this.state.monthList.length > 0) {
             bar = {
 
-                labels: [...new Set(this.state.monthList.map(ele => moment(ele).format(DATE_FORMAT_CAP_WITHOUT_DATE)))],
+                labels: [...new Set(this.state.monthList.map(ele => moment(ele).format("MMM-YYYY")))],
                 datasets: datasetListForGraph
 
             };
