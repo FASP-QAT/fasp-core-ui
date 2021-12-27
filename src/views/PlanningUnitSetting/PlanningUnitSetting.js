@@ -1099,6 +1099,7 @@ export default class PlanningUnitSetting extends Component {
             data[9] = outPutList[j].programPlanningUnitId;
             data[10] = 0;
             data[11] = 0;
+            data[12] = outPutList[j].selectedForecastMap;
 
             // data[0] = outPutList[j].a1a;
             // data[1] = outPutList[j].a2a;
@@ -1210,6 +1211,11 @@ export default class PlanningUnitSetting extends Component {
                 },
                 {
                     title: 'isNewRowAdded',
+                    type: 'hidden',
+                    // readOnly: true //11L
+                },
+                {
+                    title: 'selected forecast map',
                     type: 'hidden',
                     // readOnly: true //11L
                 },
@@ -1459,6 +1465,7 @@ export default class PlanningUnitSetting extends Component {
                         "idString": "" + parseInt(map1.get("7"))
                     }),
                     "price": this.el.getValue(`I${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                    "selectedForecastMap":map1.get("12")
                 }
 
                 planningUnitList.push(tempJson);
@@ -1567,6 +1574,7 @@ export default class PlanningUnitSetting extends Component {
         data[9] = 0;
         data[10] = 1;
         data[11] = 1;
+        data[12] = null;
 
         this.el.insertRow(
             data, 0, 1

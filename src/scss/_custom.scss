@@ -5540,3 +5540,25 @@ border: 1px solid #eee;
   .jexcel_contextmenu>.header{
     display:none
   }
+
+  .compareAndSelect-larrow {
+  float: left;
+  color: #20a8d8;
+  font-size: 13px;
+}
+.compareAndSelect-rarrow {
+  float: right;
+  color: #20a8d8;
+  font-size: 13px;
+  // margin-right: 9%;
+}
+
+.compareAndSelect-larrowText {
+  float: left;  
+  font-size: 13px;
+}
+.compareAndSelect-rarrowText {
+  float: right;  
+  font-size: 13px;
+  // margin-right: 9%;
+}
