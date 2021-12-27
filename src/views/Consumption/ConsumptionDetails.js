@@ -934,6 +934,7 @@ export default class ConsumptionDetails extends React.Component {
                             <ul className="legendcommitversion">
                                 <li><span className="redlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.emergencyOrder')}</span></li>
                                 <li><span className=" greylegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.commit.inactiveData')} </span></li>
+                                <li><span className=" readonlylegend legendcolor"></span> <span className="legendcommitversionText">Read Only Data </span></li>
                             </ul>
                         </div>
 
