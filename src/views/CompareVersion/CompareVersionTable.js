@@ -166,9 +166,9 @@ export default class CompareVersion extends Component {
                 var rg1 = regionList1.filter(c => c.regionId == regionSet[k]);
                 var rg2 = regionList2.filter(c => c.regionId == regionSet[k]);
 
-                var selectedForecastData = pu[0].selectedForecastMap;
-                var selectedForecastData1 = pu1[0].selectedForecastMap;
-                var selectedForecastData2 = pu2[0].selectedForecastMap;
+                var selectedForecastData = pu.length > 0 ? pu[0].selectedForecastMap : '';
+                var selectedForecastData1 = pu1.length > 0 ? pu1[0].selectedForecastMap : '';
+                var selectedForecastData2 = pu2.length > 0 ? pu2[0].selectedForecastMap : '';
 
 
                 console.log("consumptionExtrapolation", consumptionExtrapolation);

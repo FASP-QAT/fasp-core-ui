@@ -67,7 +67,7 @@ export default class CommitTreeComponent extends React.Component {
         openRequest.onerror = function (event) {
             this.setState({
                 message: i18n.t('static.program.errortext'),
-                color: 'red'
+                color: '#BA0C2F'
             })
             // this.hideFirstComponent()
         }.bind(this);
@@ -79,7 +79,7 @@ export default class CommitTreeComponent extends React.Component {
             programRequest.onerror = function (event) {
                 this.setState({
                     message: i18n.t('static.program.errortext'),
-                    color: 'red'
+                    color: '#BA0C2F'
                 })
                 // this.hideFirstComponent()
             }.bind(this);
@@ -119,7 +119,7 @@ export default class CommitTreeComponent extends React.Component {
         openRequest.onerror = function (event) {
             this.setState({
                 message: i18n.t('static.program.errortext'),
-                color: 'red'
+                color: '#BA0C2F'
             })
             // this.hideFirstComponent()
         }.bind(this);
@@ -576,7 +576,7 @@ export default class CommitTreeComponent extends React.Component {
                 openRequest.onerror = function (event) {
                     this.setState({
                         message: i18n.t('static.program.errortext'),
-                        color: 'red'
+                        color: '#BA0C2F'
                     })
                     // this.hideFirstComponent()
                 }.bind(this);
@@ -625,10 +625,11 @@ export default class CommitTreeComponent extends React.Component {
                                     for (var r = 0; r < json.length; r++) {
                                         var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
                                         var userId = userBytes.toString(CryptoJS.enc.Utf8);
-                                        var version = json[r].requestedProgramVersion;
-                                        if (version == -1) {
-                                            version = json[r].currentVersion.versionId
-                                        }
+                                        // var version = json[r].requestedProgramVersion;
+                                        // if (version == -1) {
+                                        //     version = json[r].currentVersion.versionId
+                                        // }
+                                        var version = json[r].currentVersion.versionId
                                         var item = {
                                             id: json[r].programId + "_v" + version + "_uId_" + userId,
                                             programId: json[r].programId,
@@ -725,7 +726,7 @@ export default class CommitTreeComponent extends React.Component {
                     } else {
                         this.setState({
                             message: response.data.messageCode,
-                            color: "red",
+                            color: "#BA0C2F",
                             loading: false
                         })
                         // this.hideFirstComponent();
@@ -740,7 +741,7 @@ export default class CommitTreeComponent extends React.Component {
                                 console.log("+++in catch 7")
                                 this.setState({
                                     message: 'static.common.networkError',
-                                    color: "red",
+                                    color: "#BA0C2F",
                                     loading: false
                                 }, () => {
                                     // this.hideFirstComponent();
@@ -760,7 +761,7 @@ export default class CommitTreeComponent extends React.Component {
                                         }
                                         this.setState({
                                             message: error.response.data.messageCode,
-                                            color: "red",
+                                            color: "#BA0C2F",
                                             loading: false
                                         }, () => {
                                             // this.hideFirstComponent()
@@ -775,7 +776,7 @@ export default class CommitTreeComponent extends React.Component {
                                         this.setState({
                                             message: error.response.data.messageCode,
                                             loading: false,
-                                            color: "red"
+                                            color: "#BA0C2F"
                                         }, () => {
                                             // this.hideFirstComponent()
                                         });
@@ -785,7 +786,7 @@ export default class CommitTreeComponent extends React.Component {
                                         this.setState({
                                             message: 'static.unkownError',
                                             loading: false,
-                                            color: "red"
+                                            color: "#BA0C2F"
                                         }, () => {
                                             // this.hideFirstComponent()
                                         });
@@ -995,9 +996,9 @@ export default class CommitTreeComponent extends React.Component {
                             </ul>
                         </div>
                         <Form name='simpleForm'>
-                            <div className=" pl-0">
+                            <div className=" pl-0 pt-lg-3">
                                 <div className="row">
-                                    <FormGroup className="col-md-3 ">
+                                    <FormGroup className="col-md-3">
                                         <Label htmlFor="appendedInputButton">Program</Label>
                                         <div className="controls ">
                                             <Input
@@ -1017,10 +1018,6 @@ export default class CommitTreeComponent extends React.Component {
                             </div>
                             {(this.state.showCompare) &&
                                 <>
-                                    <CompareVersionTable ref="conflictChild" page="commit" datasetData={this.state.programDataLocal} datasetData1={this.state.programDataServer} datasetData2={this.state.programDataDownloaded} versionLabel={"V" + this.state.programDataLocal.currentVersion.versionId + "(Local)"} versionLabel1={"V" + this.state.programDataServer.currentVersion.versionId + "(Server)"} updateState={this.updateState} />
-                                    <div className="table-responsive RemoveStriped">
-                                        <div id="tableDiv" />
-                                    </div>
                                     <div className="col-md-10 pt-4 pb-3">
                                         <ul className="legendcommitversion">
                                             {/* <li><span className="lightpinklegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.commitVersion.conflicts')}</span></li> */}
@@ -1028,45 +1025,53 @@ export default class CommitTreeComponent extends React.Component {
                                             <li><span className="notawesome legendcolor"></span > <span className="legendcommitversionText">{i18n.t('static.commitVersion.changedInLatestVersion')}</span></li>
                                         </ul>
                                     </div>
+                                    <CompareVersionTable ref="conflictChild" page="commit" datasetData={this.state.programDataLocal} datasetData1={this.state.programDataServer} datasetData2={this.state.programDataDownloaded} versionLabel={"V" + this.state.programDataLocal.currentVersion.versionId + "(Local)"} versionLabel1={"V" + this.state.programDataServer.currentVersion.versionId + "(Server)"} updateState={this.updateState} />
+                                    <div className="table-responsive RemoveStriped commitversionTable">
+
+                                        <div id="tableDiv" />
+                                    </div>
                                 </>
                             }
+
 
                             {/* <div className="col-md-12">
                                 <Button type="button" size="md" color="warning" className="float-right mr-1" onClick={this.reset}><i className="fa fa-refresh"></i> Cancel</Button>
                                 <Button type="button" color="success" className="mr-1 float-right" size="md" onClick={() => { this.toggleShowValidation() }}><i className="fa fa-check"></i>Next</Button>
                             </div> */}
+
                         </Form>
-
-                        <div className="row">
-                            <FormGroup className="col-md-3 ">
-                                <Label htmlFor="appendedInputButton">Version Type</Label>
-                                <div className="controls ">
+                        <div>
+                            <div className="row pl-lg-0">
+                                <FormGroup className="col-md-4 pl-lg-0">
+                                    <Label htmlFor="appendedInputButton">Version Type</Label>
+                                    <div className="controls ">
+                                        <Input
+                                            type="select"
+                                            name="versionTypeId"
+                                            id="versionTypeId"
+                                            bsSize="sm"
+                                            value={this.state.versionTypeId}
+                                            onChange={(e) => { this.setVersionTypeId(e); }}
+                                        >
+                                            <option value="">{i18n.t('static.common.select')}</option>
+                                            <option value="1">Draft Version</option>
+                                            <option value="2">Final Version</option>
+                                        </Input>
+                                    </div>
+                                </FormGroup>
+                                <FormGroup className="col-md-6">
+                                    <Label htmlFor="appendedInputButton">Notes</Label>
                                     <Input
-                                        type="select"
-                                        name="versionTypeId"
-                                        id="versionTypeId"
-                                        bsSize="sm"
-                                        value={this.state.versionTypeId}
-                                        onChange={(e) => { this.setVersionTypeId(e); }}
-                                    >
-                                        <option value="">{i18n.t('static.common.select')}</option>
-                                        <option value="1">Draft Version</option>
-                                        <option value="2">Final Version</option>
-                                    </Input>
-                                </div>
-                            </FormGroup>
-                            <FormGroup className="col-md-4 ">
-                                <Label htmlFor="appendedInputButton">Notes</Label>
-                                <Input
-                                    className="controls"
-                                    type="textarea"
-                                    id="notesId"
-                                    name="notesId"
-                                />
-                            </FormGroup>
+                                        className="controls"
+                                        type="textarea"
+                                        id="notesId"
+                                        name="notesId"
+                                    />
+                                </FormGroup>
+                            </div>
 
-                            <div className="col-md-12">
-                                <Button type="button" size="md" color="warning" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-refresh"></i> Cancel</Button>
+                            <div className="col-md-12 pr-lg-0">
+                                <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-refresh"></i> Cancel</Button>
                                 {/* <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={this.synchronize}><i className="fa fa-check"></i>Commit</Button> */}
                                 <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => { this.toggleShowValidation() }}><i className="fa fa-check"></i>Commit</Button>
                             </div>
@@ -1083,20 +1088,20 @@ export default class CommitTreeComponent extends React.Component {
                             <span><b>{this.state.programName}</b></span><br />
                             <span><b>Forecast Period: </b> {moment(this.state.forecastStartDate).format('MMM-YYYY')} to {moment(this.state.forecastStopDate).format('MMM-YYYY')} </span><br /><br />
 
-                            <span><b>1. No forecast selected: </b>(<a href="/report/compareAndSelectScenario" target="_blank">Compare & Select</a>, <a href="#" target="_blank">Forecast Summary</a>)</span><br />
+                            <span><b>1. No forecast selected: </b>(<a href="/#/report/compareAndSelectScenario" target="_blank">Compare & Select</a>, <a href="/#/forecastReport/forecastSummary" target="_blank">Forecast Summary</a>)</span><br />
                             <ul>{noForecastSelected}</ul>
 
-                            <span><b>2. Consumption Forecast: </b>(<a href="/dataentry/consumptionDataEntryAndAdjustment" target="_blank">Data Entry & Adjustment</a>, <a href="/extrapolation/extrapolateData" target="_blank">Extrapolation</a>)</span><br />
+                            <span><b>2. Consumption Forecast: </b>(<a href="/#/dataentry/consumptionDataEntryAndAdjustment" target="_blank">Data Entry & Adjustment</a>, <a href="/#/extrapolation/extrapolateData" target="_blank">Extrapolation</a>)</span><br />
                             <span>a. Months missing actual consumption values (gap) :</span><br />
                             <ul>{missingMonths}</ul>
                             <span>b. Planning units that don’t have at least 24 months of actual consumption values:</span><br />
                             <ul>{consumption}</ul>
 
-                            <span><b>3. Tree Forecast(s) </b></span><br />
+                            <span><b>3. Tree Forecast(s) </b> (<a href="/#/dataset/listTree" target="_blank">Manage Tree</a>)</span><br />
                             <span>a. Planning unit that doesn’t appear on any Tree </span><br />
                             <ul>{pu}</ul>
 
-                            <span>b. Branches Missing Planning Unit (<a href="/dataset/listTree" target="_blank">Manage Tree</a>)</span><br />
+                            <span>b. Branches Missing Planning Unit </span><br />
                             {missingBranches}
 
                             <span>c. Nodes with children that don’t add up to 100%</span><br />
@@ -1152,7 +1157,7 @@ export default class CommitTreeComponent extends React.Component {
                                 </div>
                             </div><br />
                             <div className="col-md-12">
-                                <Button type="button" size="md" color="warning" className="float-right mr-1" onClick={() => { this.toggleShowValidation() }}><i className="fa fa-refresh"></i> Cancel</Button>
+                                <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={() => { this.toggleShowValidation() }}><i className="fa fa-times"></i> Cancel</Button>
                                 <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={this.synchronize}><i className="fa fa-check"></i>OK</Button>
                             </div>
                         </ModalBody>

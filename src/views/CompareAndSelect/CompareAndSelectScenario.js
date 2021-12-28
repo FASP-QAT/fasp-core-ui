@@ -78,7 +78,7 @@ class CompareAndSelectScenario extends Component {
             totalArray: [],
             actualDiff: [],
             countArray: [],
-            regionName:"",
+            regionName: "",
             singleValue2: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 },
             maxDateForSingleValue: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
         };
@@ -656,10 +656,10 @@ class CompareAndSelectScenario extends Component {
     }
 
     setRegionId(event) {
-        var regionName=this.state.regionList.filter(c=>c.regionId==event.target.value);
+        var regionName = this.state.regionList.filter(c => c.regionId == event.target.value);
         this.setState({
             regionId: event.target.value,
-            regionName:regionName.length>0?regionName[0].label.label_en:""
+            regionName: regionName.length > 0 ? regionName[0].label.label_en : ""
         }, () => {
             this.showData()
             // localStorage.setItem("sesVersionIdReport", '');
@@ -830,7 +830,7 @@ class CompareAndSelectScenario extends Component {
 
                 var pu = planningUnitList1[index];
                 console.log("pu.selectedForecastMap[this.state.regionId]$$$", pu.selectedForecastMap[this.state.regionId]);
-                pu.selectedForecastMap[this.state.regionId] = { "scenarioId": scenarioId, "consumptionExtrapolationId": consumptionExtrapolationId, "totalForecast": this.state.totalArray[0] / this.state.multiplier, notes: this.state.forecastNotes };
+                pu.selectedForecastMap[this.state.regionId] = { "scenarioId": scenarioId, "consumptionExtrapolationId": consumptionExtrapolationId, "totalForecast": Number(this.state.totalArray[0] / this.state.multiplier), notes: this.state.forecastNotes };
                 planningUnitList1[index] = pu;
                 datasetForEncryption.planningUnitList = planningUnitList1;
 
@@ -1049,10 +1049,10 @@ class CompareAndSelectScenario extends Component {
 
                 <Card>
                     <div className="Card-header-reporticon pb-2">
-                    <span className="compareAndSelect-larrow"> <i className="cui-arrow-left icons " > </i></span>
-                    <span className="compareAndSelect-rarrow"> <i className="cui-arrow-right icons " > </i></span>
-                    <span className="compareAndSelect-larrowText"> Back to <a href="/#/dataset/listTree/">Manage Tree</a> or <a href="/#/extrapolation/extrapolateData">Cons Extrapolation</a></span>
-                    <span className="compareAndSelect-rarrowText"> Continue to <a href="/#/forecastReport/forecastOutput">Monthly Forecast</a></span><br/>
+                        <span className="compareAndSelect-larrow"> <i className="cui-arrow-left icons " > </i></span>
+                        <span className="compareAndSelect-rarrow"> <i className="cui-arrow-right icons " > </i></span>
+                        <span className="compareAndSelect-larrowText"> Back to <a href="/#/dataset/listTree/">Manage Tree</a> or <a href="/#/extrapolation/extrapolateData">Cons Extrapolation</a></span>
+                        <span className="compareAndSelect-rarrowText"> Continue to <a href="/#/forecastReport/forecastOutput">Monthly Forecast</a></span><br />
                         {checkOnline === 'Online' &&
                             this.state.actualConsumptionList.length > 0 &&
                             <div className="card-header-actions">
@@ -1173,7 +1173,7 @@ class CompareAndSelectScenario extends Component {
                                         <ul className="legendcommitversion">
                                             <li><i class="fa fa-exclamation-triangle"></i><i> Missing Data</i></li>
                                         </ul><br />
-                                        <b>{"Select one forecast for "+this.state.planningUnitLabel.label_en+" and Region "+this.state.regionName}</b>
+                                        <b>{"Select one forecast for " + this.state.planningUnitLabel.label_en + " and Region " + this.state.regionName}</b>
                                         <br />
                                         <Table hover responsive className="table-outline mb-0 d-sm-table table-bordered">
                                             <thead><tr>
@@ -1215,21 +1215,21 @@ class CompareAndSelectScenario extends Component {
                                 }
                                 <br></br>
                                 {this.state.planningUnitId > 0 && <FormGroup className="col-md-12">
-                                        <Label htmlFor="appendedInputButton">Notes</Label>
-                                        <div className="controls">
-                                            <InputGroup>
-                                                <Input
-                                                    type="textarea"
-                                                    name="forecastNotes"
-                                                    id="forecastNotes"
-                                                    value={this.state.forecastNotes}
-                                                    onChange={(e) => { this.setForecastNotes(e); }}
-                                                    bsSize="sm"
-                                                >
-                                                </Input>
-                                            </InputGroup>
-                                        </div>
-                                    </FormGroup>}
+                                    <Label htmlFor="appendedInputButton">Notes</Label>
+                                    <div className="controls">
+                                        <InputGroup>
+                                            <Input
+                                                type="textarea"
+                                                name="forecastNotes"
+                                                id="forecastNotes"
+                                                value={this.state.forecastNotes}
+                                                onChange={(e) => { this.setForecastNotes(e); }}
+                                                bsSize="sm"
+                                            >
+                                            </Input>
+                                        </InputGroup>
+                                    </div>
+                                </FormGroup>}
                                 <br></br>
 
                                 <Col md="12 pl-0" style={{ display: this.state.loading ? "none" : "block" }}>

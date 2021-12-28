@@ -1465,7 +1465,7 @@ export default class PlanningUnitSetting extends Component {
                         "idString": "" + parseInt(map1.get("7"))
                     }),
                     "price": this.el.getValue(`I${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
-                    "selectedForecastMap":map1.get("12")
+                    "selectedForecastMap": map1.get("12")
                 }
 
                 planningUnitList.push(tempJson);
@@ -1574,7 +1574,7 @@ export default class PlanningUnitSetting extends Component {
         data[9] = 0;
         data[10] = 1;
         data[11] = 1;
-        data[12] = null;
+        data[12] = {};
 
         this.el.insertRow(
             data, 0, 1
