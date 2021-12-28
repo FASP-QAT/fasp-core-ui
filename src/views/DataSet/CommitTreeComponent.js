@@ -24,6 +24,7 @@ import "../../../node_modules/react-step-progress-bar/styles.css"
 import { ProgressBar, Step } from "react-step-progress-bar";
 import ProgramService from "../../api/ProgramService";
 import AuthenticationService from '../Common/AuthenticationService.js';
+const entityname = 'Commit';
 
 export default class CommitTreeComponent extends React.Component {
     constructor(props) {
@@ -56,6 +57,7 @@ export default class CommitTreeComponent extends React.Component {
         }
         this.synchronize = this.synchronize.bind(this);
         this.updateState = this.updateState.bind(this);
+        this.cancelClicked = this.cancelClicked.bind(this);
     }
 
     componentDidMount = function () {
@@ -679,6 +681,7 @@ export default class CommitTreeComponent extends React.Component {
 
 
     synchronize() {
+        this.toggleShowValidation();
         var db1;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
@@ -793,6 +796,11 @@ export default class CommitTreeComponent extends React.Component {
                     );
             }.bind(this)
         }.bind(this)
+    }
+
+    cancelClicked() {
+        let id = AuthenticationService.displayDashboardBasedOnRole();
+        this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.message.cancelled', { entityname }))
     }
 
     render() {
@@ -1013,13 +1021,20 @@ export default class CommitTreeComponent extends React.Component {
                                     <div className="table-responsive RemoveStriped">
                                         <div id="tableDiv" />
                                     </div>
+                                    <div className="col-md-10 pt-4 pb-3">
+                                        <ul className="legendcommitversion">
+                                            {/* <li><span className="lightpinklegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.commitVersion.conflicts')}</span></li> */}
+                                            <li><span className=" greenlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.commitVersion.changedInCurrentVersion')} </span></li>
+                                            <li><span className="notawesome legendcolor"></span > <span className="legendcommitversionText">{i18n.t('static.commitVersion.changedInLatestVersion')}</span></li>
+                                        </ul>
+                                    </div>
                                 </>
                             }
 
-                            <div className="col-md-12">
+                            {/* <div className="col-md-12">
                                 <Button type="button" size="md" color="warning" className="float-right mr-1" onClick={this.reset}><i className="fa fa-refresh"></i> Cancel</Button>
                                 <Button type="button" color="success" className="mr-1 float-right" size="md" onClick={() => { this.toggleShowValidation() }}><i className="fa fa-check"></i>Next</Button>
-                            </div>
+                            </div> */}
                         </Form>
 
                         <div className="row">
@@ -1051,8 +1066,9 @@ export default class CommitTreeComponent extends React.Component {
                             </FormGroup>
 
                             <div className="col-md-12">
-                                <Button type="button" size="md" color="warning" className="float-right mr-1" onClick={this.reset}><i className="fa fa-refresh"></i> Cancel</Button>
-                                <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={this.synchronize}><i className="fa fa-check"></i>Commit</Button>
+                                <Button type="button" size="md" color="warning" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-refresh"></i> Cancel</Button>
+                                {/* <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={this.synchronize}><i className="fa fa-check"></i>Commit</Button> */}
+                                <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => { this.toggleShowValidation() }}><i className="fa fa-check"></i>Commit</Button>
                             </div>
                         </div>
                     </CardBody>
@@ -1134,6 +1150,10 @@ export default class CommitTreeComponent extends React.Component {
                                         <tbody>{treeNodes}</tbody>
                                     </Table>
                                 </div>
+                            </div><br />
+                            <div className="col-md-12">
+                                <Button type="button" size="md" color="warning" className="float-right mr-1" onClick={() => { this.toggleShowValidation() }}><i className="fa fa-refresh"></i> Cancel</Button>
+                                <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={this.synchronize}><i className="fa fa-check"></i>OK</Button>
                             </div>
                         </ModalBody>
                     </div>

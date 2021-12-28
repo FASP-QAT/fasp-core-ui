@@ -199,7 +199,7 @@ export default class CompareVersion extends Component {
                 data[9] = regionalSelectedForecastData2 != undefined ? regionalSelectedForecastData2.totalForecast : "";
                 data[10] = regionalSelectedForecastData2 != undefined ? regionalSelectedForecastData2.notes : "";
 
-                data[11] = 1;
+                // data[11] = 1;
                 //     count += 3;
                 // }
 
@@ -211,8 +211,8 @@ export default class CompareVersion extends Component {
                 // data[5] = (langaugeList[j].lastModifiedDate ? moment(langaugeList[j].lastModifiedDate).format("YYYY-MM-DD") : null)
                 // data[6] = langaugeList[j].active;
 
-                data[12] = pu.length > 0 ? pu[0].planningUnit.id : pu1[0].planningUnit.id;
-                data[13] = rg.length > 0 ? rg[0].regionId : rg1[0].regionId;
+                // data[12] = pu.length > 0 ? pu[0].planningUnit.id : pu1[0].planningUnit.id;
+                // data[13] = rg.length > 0 ? rg[0].regionId : rg1[0].regionId;
 
                 dataArray.push(data);
             }
@@ -250,25 +250,25 @@ export default class CompareVersion extends Component {
             filters: true,
             editable: false,
             license: JEXCEL_PRO_KEY,
-            editable:false,
-            contextMenu: function (obj, x, y, e) {
-                var items = [];
-                //Resolve conflicts
-                var rowData = obj.getRowData(y)
-                // if (rowData[11].toString() == 2) {
-                items.push({
-                    title: "Resolve conflicts",
-                    onclick: function () {
-                        this.setState({ loading: true })
-                        this.toggleLarge(rowData, y);
-                    }.bind(this)
-                })
-                // } else {
-                //     return false;
-                // }
+            editable: false,
+            // contextMenu: function (obj, x, y, e) {
+            //     var items = [];
+            //     //Resolve conflicts
+            //     var rowData = obj.getRowData(y)
+            //     // if (rowData[11].toString() == 2) {
+            //     items.push({
+            //         title: "Resolve conflicts",
+            //         onclick: function () {
+            //             this.setState({ loading: true })
+            //             this.toggleLarge(rowData, y);
+            //         }.bind(this)
+            //     })
+            //     // } else {
+            //     //     return false;
+            //     // }
 
-                return items;
-            }.bind(this),
+            //     return items;
+            // }.bind(this),
         };
         var dataEl = jexcel(document.getElementById("tableDiv"), options);
         this.el = dataEl;
@@ -443,7 +443,7 @@ export default class CompareVersion extends Component {
                             var col = (colArr[7]).concat(parseInt(r) + 1);
                             elInstance.setStyle(col, "background-color", "transparent");
                             elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
-                            elInstance.setValueFromCoords(11, r, 2, true);
+                            // elInstance.setValueFromCoords(11, r, 2, true);
                         }
                     }
                     startPt += 1;
