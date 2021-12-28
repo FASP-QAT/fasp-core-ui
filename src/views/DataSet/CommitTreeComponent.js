@@ -1018,7 +1018,7 @@ export default class CommitTreeComponent extends React.Component {
                             </div>
                             {(this.state.showCompare) &&
                                 <>
-                                    <div className="col-md-10 pt-4 pb-3">
+                                    <div className="col-md-10 pt-lg-1 pb-lg-0 pl-lg-0">
                                         <ul className="legendcommitversion">
                                             {/* <li><span className="lightpinklegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.commitVersion.conflicts')}</span></li> */}
                                             <li><span className=" greenlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.commitVersion.changedInCurrentVersion')} </span></li>
@@ -1026,7 +1026,7 @@ export default class CommitTreeComponent extends React.Component {
                                         </ul>
                                     </div>
                                     <CompareVersionTable ref="conflictChild" page="commit" datasetData={this.state.programDataLocal} datasetData1={this.state.programDataServer} datasetData2={this.state.programDataDownloaded} versionLabel={"V" + this.state.programDataLocal.currentVersion.versionId + "(Local)"} versionLabel1={"V" + this.state.programDataServer.currentVersion.versionId + "(Server)"} updateState={this.updateState} />
-                                    <div className="table-responsive RemoveStriped commitversionTable">
+                                    <div className="table-responsive RemoveStriped commitversionTable CommitTableMarginTop">
 
                                         <div id="tableDiv" />
                                     </div>
@@ -1041,8 +1041,8 @@ export default class CommitTreeComponent extends React.Component {
 
                         </Form>
                         <div>
-                            <div className="row pl-lg-0">
-                                <FormGroup className="col-md-4 pl-lg-0">
+                            <div className="row">
+                                <FormGroup className="col-md-4">
                                     <Label htmlFor="appendedInputButton">Version Type</Label>
                                     <div className="controls ">
                                         <Input
@@ -1155,8 +1155,8 @@ export default class CommitTreeComponent extends React.Component {
                                         <tbody>{treeNodes}</tbody>
                                     </Table>
                                 </div>
-                            </div><br />
-                            <div className="col-md-12">
+                            </div>
+                            <div className="col-md-12 pb-lg-5 pt-lg-3">
                                 <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={() => { this.toggleShowValidation() }}><i className="fa fa-times"></i> Cancel</Button>
                                 <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={this.synchronize}><i className="fa fa-check"></i>OK</Button>
                             </div>
