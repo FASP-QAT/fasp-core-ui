@@ -1025,6 +1025,7 @@
     "static.user.validusername": "Enter Name",
     "static.report.mosfuture": "Months in Future for AMC",
     "static.country.language": "Language",
+    "static.common.readonlyData": "Readonly Data",
     "static.procurementUnit.onlyalphaNumericText": "GTIN must be zero or 13 digits",
     "static.common.addData": "Add Data",
     "static.accessDenied": "Access Denied",
