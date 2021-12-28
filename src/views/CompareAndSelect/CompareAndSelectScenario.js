@@ -74,13 +74,15 @@ class CompareAndSelectScenario extends Component {
             scenarioList: [],
             selectedTreeScenarioId: 0,
             actualConsumptionList: [],
+            showAllData: false,
             consumptionDataForTree: [],
             totalArray: [],
             actualDiff: [],
             countArray: [],
-            regionName:"",
-            singleValue2: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 },
+            regionName: "",
+            singleValue2: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
             maxDateForSingleValue: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
+            showForecastPeriod: false
         };
         this.getDatasets = this.getDatasets.bind(this);
         this.filterData = this.filterData.bind(this);
@@ -98,7 +100,9 @@ class CompareAndSelectScenario extends Component {
         this.toggleAccordionTotalDiffernce = this.toggleAccordionTotalDiffernce.bind(this);
         this.setPlanningUnitId = this.setPlanningUnitId.bind(this);
         this.setEquivalencyUnit = this.setEquivalencyUnit.bind(this);
-        this.submitScenario = this.submitScenario.bind(this)
+        this.submitScenario = this.submitScenario.bind(this);
+        this.loaded = this.loaded.bind(this)
+        this.onchangepage=this.onchangepage.bind(this)
 
     }
 
@@ -111,31 +115,50 @@ class CompareAndSelectScenario extends Component {
     }
     handleAMonthDissmis2 = (value) => {
         this.setState({ singleValue2: value, }, () => {
-            var singleValue2 = value;
-            var startDate = moment(new Date(singleValue2.year, singleValue2.month - 1, 1));
-            var stopDate = this.state.stopDate;
-            var curDate = moment(startDate).format("YYYY-MM-DD");
-            var monthList = [];
-            for (var i = 0; curDate < stopDate; i++) {
-                curDate = moment(startDate).add(i, 'months').format("YYYY-MM-DD");
-                monthList.push(curDate);
-            }
-            this.setState({
-                monthList1: monthList
-            }, () => {
-                this.showData();
-            })
+            this.setMonth1List()
         })
 
+    }
+
+    setShowForecastPeriod(e) {
+        this.setState({
+            showForecastPeriod: e.target.checked
+        }, () => {
+            this.setMonth1List()
+        })
+    }
+
+    setMonth1List() {
+        var rangeValue = this.state.singleValue2;
+        console.log("RangeValue+++",rangeValue)
+        let startDate = "";
+        let stopDate = ""
+        if (!this.state.showForecastPeriod) {
+            startDate = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
+            stopDate = rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
+        } else {
+            startDate = this.state.forecastStartDate;
+            stopDate = this.state.forecastStopDate
+        }
+        var curDate = moment(startDate).format("YYYY-MM-DD");
+        var monthList = [];
+        for (var i = 0; curDate < stopDate; i++) {
+            curDate = moment(startDate).add(i, 'months').format("YYYY-MM-DD");
+            monthList.push(curDate);
+        }
+        monthList.pop();
+        this.setState({
+            monthList1: monthList
+        }, () => {
+            this.showData();
+        })
     }
 
     showData() {
         if (this.state.planningUnitId != "") {
             var datasetJson = this.state.datasetJson;
             var multiplier = 1;
-            console.log("this.state.planningUnitList+++", this.state.planningUnitList)
             var selectedPlanningUnit = this.state.planningUnitList.filter(c => c.planningUnit.id == this.state.planningUnitId);
-            console.log("SelectedPlanningUnit+++", selectedPlanningUnit);
             if (this.state.viewById == 2) {
                 multiplier = selectedPlanningUnit.length > 0 ? selectedPlanningUnit[0].planningUnit.multiplier : 1;
             }
@@ -143,10 +166,20 @@ class CompareAndSelectScenario extends Component {
                 var selectedEquivalencyUnit = this.state.equivalencyUnitList.filter(c => c.equivalencyUnitMappingId == this.state.equivalencyUnitId);
                 multiplier = selectedEquivalencyUnit.length > 0 ? selectedEquivalencyUnit[0].convertToEu : 1;
             }
-            console.log("selectedPlanningUnit[0].selectedForecastMap&&&", selectedPlanningUnit[0].selectedForecastMap);
+            // let startDate = moment.min(datasetJson.actualConsumptionList.filter(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId).map(d => moment(d.month)));
+            // let curDate = moment(startDate).format("YYYY-MM-DD");
+            // let stopDate = this.state.stopDate;
+            // let monthList1 = []
+            // for (var i = 0; curDate < stopDate; i++) {
+                // curDate = moment(startDate).add(i, 'months').format("YYYY-MM-DD");
+                // monthList1.push(curDate);
+            // }
+            // monthList1.pop();
+            // if (this.state.showForecastPeriod) {
+            //     monthList1 = this.state.monthList1
+            // }
+            // var rangeValue = { from: { year: new Date(startDate).getFullYear(), month: new Date(startDate).getMonth() + 1 }, to: { year: new Date(stopDate).getFullYear(), month: new Date(stopDate).getMonth() + 1 } }
 
-
-            console.log("datasetJson+++", datasetJson)
             var treeScenarioList = [];
             var treeList = datasetJson.treeList;
             var colourArray = ["#002F6C", "#BA0C2F", "#65ID32", "#49A4A1", "#A7C6ED", "#212721", "#6C6463", "#49A4A1", "#EDB944", "#F48521"]
@@ -167,9 +200,7 @@ class CompareAndSelectScenario extends Component {
 
                 var scenarioList = treeList[tl].scenarioList;
                 for (var sl = 0; sl < scenarioList.length; sl++) {
-                    console.log("tree.tree.flatList.filter(c => c.payload.nodeDataMap[scenarioList[sl].id][0].puNode != null%%%", tree.tree.flatList.filter(c => c.payload.nodeDataMap[scenarioList[sl].id][0].puNode != null));
                     var flatList = tree.tree.flatList.filter(c => c.payload.nodeDataMap[scenarioList[sl].id][0].puNode != null && c.payload.nodeDataMap[scenarioList[sl].id][0].puNode.planningUnit.id == this.state.planningUnitId);
-                    console.log("FlatList%%%", flatList);
                     if (colourArrayCount > 9) {
                         colourArrayCount = 0;
                     }
@@ -181,16 +212,18 @@ class CompareAndSelectScenario extends Component {
                 }
             }
             if (selectedPlanningUnit.length > 0 && selectedPlanningUnit[0].selectedForecastMap != undefined) {
-                console.log("selectedPlanningUnit[0].selectedForecastMap[this.state.regionId]+++", selectedPlanningUnit[0].selectedForecastMap[this.state.regionId]);
             }
             var selectedTreeScenarioId = selectedPlanningUnit.length > 0 && selectedPlanningUnit[0].selectedForecastMap != undefined ? selectedPlanningUnit[0].selectedForecastMap[this.state.regionId] != undefined && selectedPlanningUnit[0].selectedForecastMap[this.state.regionId].scenarioId != null && selectedPlanningUnit[0].selectedForecastMap[this.state.regionId].scenarioId != "" ? treeScenarioList.filter(c => c.scenario.id == selectedPlanningUnit[0].selectedForecastMap[this.state.regionId].scenarioId)[0].id : selectedPlanningUnit[0].selectedForecastMap[this.state.regionId] != undefined ? selectedPlanningUnit[0].selectedForecastMap[this.state.regionId].consumptionExtrapolationId : 0 : 0;
             var forecastNotes = selectedPlanningUnit.length > 0 && selectedPlanningUnit[0].selectedForecastMap != undefined ? selectedPlanningUnit[0].selectedForecastMap[this.state.regionId] != undefined && selectedPlanningUnit[0].selectedForecastMap[this.state.regionId].notes != undefined ? selectedPlanningUnit[0].selectedForecastMap[this.state.regionId].notes : "" : "";
             this.setState({
                 treeScenarioList,
-                actualConsumptionList: datasetJson.actualConsumptionList,
+                actualConsumptionList: datasetJson.actualConsumptionList.filter(c => c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId),
                 multiplier: multiplier,
                 selectedTreeScenarioId: selectedTreeScenarioId,
-                forecastNotes: forecastNotes
+                forecastNotes: forecastNotes,
+                // singleValue2: rangeValue,
+                // monthList1: monthList1,
+                showAllData: true
             }, () => {
                 this.scenarioOrderChanged(selectedTreeScenarioId)
                 this.buildJexcel()
@@ -199,18 +232,17 @@ class CompareAndSelectScenario extends Component {
     }
 
     buildJexcel() {
-        console.log("&&&")
         this.el = jexcel(document.getElementById("tableDiv"), '');
         this.el.destroy();
         var columns = [];
         columns.push({ title: "Month", width: 100, type: 'calendar', options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker' } });
-        columns.push({ title: "Actuals (Adjusted)", width: 100, readOnly: true, type: 'numeric', mask: '#,##.00' });
+        columns.push({ title: "Actuals (Adjusted)", width: 100, type: 'numeric', mask: '#,##.00' });
         var treeScenarioList = this.state.treeScenarioList.filter(c => c.checked);
         for (var tsl = 0; tsl < treeScenarioList.length; tsl++) {
             if (treeScenarioList[tsl].type == "T") {
-                columns.push({ title: getLabelText(treeScenarioList[tsl].tree.label) + " - " + getLabelText(treeScenarioList[tsl].scenario.label), width: 100, readOnly: true, type: 'numeric', mask: '#,##.00', decimal: "." });
+                columns.push({ title: getLabelText(treeScenarioList[tsl].tree.label) + " - " + getLabelText(treeScenarioList[tsl].scenario.label), width: 100, type: 'numeric', mask: '#,##.00', decimal: "." });
             } else {
-                columns.push({ title: getLabelText(treeScenarioList[tsl].scenario.extrapolationMethod.label), width: 100, readOnly: true, type: 'numeric', mask: '#,##.00', decimal: "." });
+                columns.push({ title: getLabelText(treeScenarioList[tsl].scenario.extrapolationMethod.label), width: 100, type: 'numeric', mask: '#,##.00', decimal: "." });
             }
         }
         var data = [];
@@ -254,7 +286,6 @@ class CompareAndSelectScenario extends Component {
                 if (treeScenarioList[tsl].type == "T") {
                     var scenarioFilter = treeScenarioList[tsl].data.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArrayListWithoutFormat[m]).format("YYYY-MM"));
                     data[tsl + 2] = scenarioFilter.length > 0 ? Number(scenarioFilter[0].calculatedValue).toFixed(2) * multiplier : "";
-                    console.log()
                     totalArray[tsl] = (totalArray[tsl] != undefined ? totalArray[tsl] : 0) + (scenarioFilter.length > 0 ? Number(scenarioFilter[0].calculatedValue).toFixed(2) * multiplier : 0);
 
                     if (monthArrayForErrorFilter.length > 0) {
@@ -271,9 +302,6 @@ class CompareAndSelectScenario extends Component {
                     consumptionDataForTree.push({ id: treeScenarioList[tsl].id, value: scenarioFilter.length > 0 ? Number(scenarioFilter[0].calculatedValue).toFixed(2) * multiplier : null });
                 } else {
                     var scenarioFilter = treeScenarioList[tsl].data.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArrayListWithoutFormat[m]).format("YYYY-MM"));
-                    console.log("Scenario Filter+++", scenarioFilter);
-                    console.log("Scenario Filter+++", scenarioFilter.length > 0);
-                    console.log("Scenario Filter+++", scenarioFilter.length > 0 ? Number(scenarioFilter[0].amount).toFixed(2) : "");
 
                     data[tsl + 2] = scenarioFilter.length > 0 ? Number(scenarioFilter[0].amount).toFixed(2) * multiplier : "";
                     totalArray[tsl] = (totalArray[tsl] != undefined ? totalArray[tsl] : 0) + (scenarioFilter.length > 0 ? Number(scenarioFilter[0].amount).toFixed(2) * multiplier : 0);
@@ -297,7 +325,6 @@ class CompareAndSelectScenario extends Component {
         }
 
         var monthArrayListWithoutFormat = this.state.monthList1;
-        console.log("This.state.mutiplier++++", this.state.multiplier);
         for (var m = 0; m < monthArrayListWithoutFormat.length; m++) {
             data = [];
             data[0] = monthArrayListWithoutFormat[m];
@@ -316,9 +343,6 @@ class CompareAndSelectScenario extends Component {
                     data[tsl + 2] = scenarioFilter.length > 0 ? Number(scenarioFilter[0].calculatedValue).toFixed(2) * this.state.multiplier : "";
                 } else {
                     var scenarioFilter = treeScenarioList[tsl].data.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArrayListWithoutFormat[m]).format("YYYY-MM"));
-                    console.log("Scenario Filter+++", scenarioFilter);
-                    console.log("Scenario Filter+++", scenarioFilter.length > 0);
-                    console.log("Scenario Filter+++", scenarioFilter.length > 0 ? Number(scenarioFilter[0].amount).toFixed(2) : "");
 
                     data[tsl + 2] = scenarioFilter.length > 0 ? Number(scenarioFilter[0].amount).toFixed(2) * this.state.multiplier : "";
                 }
@@ -345,10 +369,6 @@ class CompareAndSelectScenario extends Component {
         higherThenConsumptionThresholdPU = this.state.planningUnitList.filter(c => c.planningUnit.id == this.state.planningUnitId)[0].higherThenConsumptionThreshold;
         lowerThenConsumptionThresholdPU = this.state.planningUnitList.filter(c => c.planningUnit.id == this.state.planningUnitId)[0].lowerThenConsumptionThreshold;
 
-        console.log("Highest consumption&&&", higherThenConsumptionThreshold)
-        console.log("lowest consumption&&&", lowerThenConsumptionThreshold)
-        console.log("Highest consumption&&&", higherThenConsumptionThresholdPU)
-        console.log("lowest consumption&&&", lowerThenConsumptionThresholdPU)
         var options = {
             data: dataArr,
             columnDrag: true,
@@ -376,6 +396,7 @@ class CompareAndSelectScenario extends Component {
             position: 'top',
             filters: true,
             license: JEXCEL_PRO_KEY,
+            onchangepage: this.onchangepage,
             editable: false,
             contextMenu: function (obj, x, y, e) {
                 return [];
@@ -579,6 +600,85 @@ class CompareAndSelectScenario extends Component {
 
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
+        var elInstance = instance.jexcel;
+        var json = elInstance.getJson(null, false);
+        var jsonLength;
+        if ((document.getElementsByClassName("jexcel_pagination_dropdown")[0] != undefined)) {
+            jsonLength = 1 * (document.getElementsByClassName("jexcel_pagination_dropdown")[0]).value;
+        }
+
+        if (jsonLength == undefined) {
+            jsonLength = 15
+        }
+        if (json.length < jsonLength) {
+            jsonLength = json.length;
+        }
+        var tList = this.state.treeScenarioList.filter(c => c.checked);
+        for (var y = 0; y < jsonLength; y++) {
+            var rowData = elInstance.getRowData(y);
+            var index = this.state.monthList.findIndex(c => moment(c).format("YYYY-MM") == moment(rowData[0]).format("YYYY-MM"))
+            console.log("rowData[0]****", this.state.monthList.includes(rowData[0]));
+            var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF', 'AG'];
+            if (index != -1) {
+                var cell = elInstance.getCell((colArr[0]).concat(parseInt(y) + 1))
+                cell.classList.add('jexcelBoldCell');
+                var cell = elInstance.getCell((colArr[1]).concat(parseInt(y) + 1))
+                cell.classList.add('jexcelBoldCell');
+                for (var c = 2; c <= tList.length + 1; c++) {
+                    var cell = elInstance.getCell((colArr[c]).concat(parseInt(y) + 1))
+                    cell.classList.add('jexcelBoldPurpleCell');
+                    // var element = document.getElementById("tableDiv");
+                    // element.classList.remove("jexcelremoveReadonlybackground");
+                }
+            } else {
+                for (var c = 2; c <= tList.length + 1; c++) {
+                    var cell = elInstance.getCell((colArr[c]).concat(parseInt(y) + 1))
+                    cell.classList.add('jexcelPurpleCell');
+                    // var element = document.getElementById("tableDiv");
+                    // element.classList.remove("jexcelremoveReadonlybackground");
+                }
+            }
+
+        }
+    }
+
+    onchangepage(el, pageNo, oldPageNo) {
+        var elInstance = el.jexcel;
+        var json = elInstance.getJson(null, false);
+        var jsonLength = (pageNo + 1) * (document.getElementsByClassName("jexcel_pagination_dropdown")[0]).value;
+        if (jsonLength == undefined) {
+            jsonLength = 15
+        }
+        if (json.length < jsonLength) {
+            jsonLength = json.length;
+        }
+        var start = pageNo * (document.getElementsByClassName("jexcel_pagination_dropdown")[0]).value;
+        var tList = this.state.treeScenarioList.filter(c => c.checked);
+        for (var y = start; y < jsonLength; y++) {
+            var rowData = elInstance.getRowData(y);
+            var index = this.state.monthList.findIndex(c => moment(c).format("YYYY-MM") == moment(rowData[0]).format("YYYY-MM"))
+            console.log("rowData[0]****", this.state.monthList.includes(rowData[0]));
+            var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF', 'AG'];
+            if (index != -1) {
+                var cell = elInstance.getCell((colArr[0]).concat(parseInt(y) + 1))
+                cell.classList.add('jexcelBoldCell');
+                var cell = elInstance.getCell((colArr[1]).concat(parseInt(y) + 1))
+                cell.classList.add('jexcelBoldCell');
+                for (var c = 2; c <= tList.length + 1; c++) {
+                    var cell = elInstance.getCell((colArr[c]).concat(parseInt(y) + 1))
+                    cell.classList.add('jexcelBoldPurpleCell');
+                    // var element = document.getElementById("tableDiv");
+                    // element.classList.remove("jexcelremoveReadonlybackground");
+                }
+            } else {
+                for (var c = 2; c <= tList.length + 1; c++) {
+                    var cell = elInstance.getCell((colArr[c]).concat(parseInt(y) + 1))
+                    cell.classList.add('jexcelPurpleCell');
+                    // var element = document.getElementById("tableDiv");
+                    // element.classList.remove("jexcelremoveReadonlybackground");
+                }
+            }
+        }
     }
 
     setDatasetId(event) {
@@ -594,7 +694,6 @@ class CompareAndSelectScenario extends Component {
                 var datasetJson = JSON.parse(datasetData);
                 var startDate = moment(datasetJson.currentVersion.forecastStartDate).format("YYYY-MM-DD");
                 var stopDate = moment(datasetJson.currentVersion.forecastStopDate).format("YYYY-MM-DD");
-                var singleValue2 = { year: new Date(startDate).getFullYear(), month: new Date(startDate).getMonth() + 1 };
 
                 var curDate = moment(startDate).format("YYYY-MM-DD");
                 var monthList = [];
@@ -602,17 +701,21 @@ class CompareAndSelectScenario extends Component {
                     curDate = moment(startDate).add(i, 'months').format("YYYY-MM-DD");
                     monthList.push(curDate);
                 }
-
+                monthList.pop();
                 var monthList1 = [];
-                startDate = moment(new Date(singleValue2.year, singleValue2.month - 1, 1));
+                // let rangeValue1=this.state.singleValue2;
+                // let startDate = rangeValue1.from.year + '-' + rangeValue1.from.month + '-01';
+                // let stopDate = rangeValue1.to.year + '-' + rangeValue1.to.month + '-' + new Date(rangeValue1.to.year, rangeValue1.to.month, 0).getDate();
+
                 curDate = moment(startDate).format("YYYY-MM-DD");
                 for (var i = 0; curDate < stopDate; i++) {
                     curDate = moment(startDate).add(i, 'months').format("YYYY-MM-DD");
                     monthList1.push(curDate);
                 }
+                monthList1.pop();
                 var rangeValue = { from: { year: new Date(startDate).getFullYear(), month: new Date(startDate).getMonth() + 1 }, to: { year: new Date(stopDate).getFullYear(), month: new Date(stopDate).getMonth() + 1 } }
 
-                var maxDateForSingleValue = { year: new Date(stopDate).getFullYear(), month: new Date(startDate).getMonth() + 1 }
+                var maxDateForSingleValue = { year: new Date(stopDate).getFullYear(), month: new Date(stopDate).getMonth() + 1 }
                 var regionList = datasetJson.regionList;
                 var forecastingUnitList = [];
                 var planningUnitList = datasetJson.planningUnitList
@@ -625,7 +728,7 @@ class CompareAndSelectScenario extends Component {
                 this.setState({
                     datasetJson: datasetJson,
                     rangeValue: rangeValue,
-                    singleValue2: singleValue2,
+                    singleValue2: rangeValue,
                     maxDateForSingleValue: maxDateForSingleValue,
                     regionList: regionList,
                     planningUnitList: datasetJson.planningUnitList,
@@ -634,6 +737,8 @@ class CompareAndSelectScenario extends Component {
                     monthList1: monthList1,
                     startDate: startDate,
                     stopDate: stopDate,
+                    forecastStartDate: moment(datasetJson.currentVersion.forecastStartDate).format("YYYY-MM-DD"),
+                    forecastStopDate: moment(datasetJson.currentVersion.forecastStopDate).format("YYYY-MM-DD"),
                     loading: false
                 }, () => {
                 })
@@ -656,10 +761,10 @@ class CompareAndSelectScenario extends Component {
     }
 
     setRegionId(event) {
-        var regionName=this.state.regionList.filter(c=>c.regionId==event.target.value);
+        var regionName = this.state.regionList.filter(c => c.regionId == event.target.value);
         this.setState({
             regionId: event.target.value,
-            regionName:regionName.length>0?regionName[0].label.label_en:""
+            regionName: regionName.length > 0 ? regionName[0].label.label_en : ""
         }, () => {
             this.showData()
             // localStorage.setItem("sesVersionIdReport", '');
@@ -790,7 +895,6 @@ class CompareAndSelectScenario extends Component {
 
     submitScenario() {
         this.setState({ loading: true })
-        console.log("This.state.selectedScenarioId(((", this.state.selectedTreeScenarioId);
         var scenarioId = this.state.selectedTreeScenarioId.toString().split("~")[1];
         if (scenarioId == undefined) {
             scenarioId = "";
@@ -829,7 +933,6 @@ class CompareAndSelectScenario extends Component {
                 map1.set(Number(this.state.regionId), { "scenarioId": scenarioId, "consumptionExtrapolationId": consumptionExtrapolationId, "totalForecast": this.state.totalArray[0] / this.state.multiplier })
 
                 var pu = planningUnitList1[index];
-                console.log("pu.selectedForecastMap[this.state.regionId]$$$", pu.selectedForecastMap[this.state.regionId]);
                 pu.selectedForecastMap[this.state.regionId] = { "scenarioId": scenarioId, "consumptionExtrapolationId": consumptionExtrapolationId, "totalForecast": this.state.totalArray[0] / this.state.multiplier, notes: this.state.forecastNotes };
                 planningUnitList1[index] = pu;
                 datasetForEncryption.planningUnitList = planningUnitList1;
@@ -859,7 +962,8 @@ class CompareAndSelectScenario extends Component {
     render() {
         var chartOptions = {
             title: {
-                display: false,
+                display: true,
+                text: this.state.planningUnitLabel.label_en + " ( " + this.state.regionName + " )"
             },
             scales: {
                 yAxes: [
@@ -867,7 +971,7 @@ class CompareAndSelectScenario extends Component {
                         id: 'A',
                         scaleLabel: {
                             display: true,
-                            labelString: "Units",
+                            labelString: this.state.viewById == 1 && this.state.planningUnitId > 0 ? this.state.planningUnitList.filter(c => c.planningUnit.id == this.state.planningUnitId)[0].planningUnit.unit.label.label_en : this.state.viewById == 2 && this.state.forecastingUnitId > 0 ? this.state.forecastingUnitList.filter(c => c.id == this.state.forecastingUnitId)[0].unit.label.label_en : this.state.equivalencyUnitId > 0 ? this.state.equivalencyUnitList.filter(c => c.equivalencyUnitMappingId == this.state.equivalencyUnitId)[0].unit.label.label_en : "",
                             fontColor: 'black'
                         },
                         stacked: false,
@@ -884,14 +988,45 @@ class CompareAndSelectScenario extends Component {
                         position: 'left',
                     }
                 ],
-                xAxes: [{
-                    ticks: {
-                        fontColor: 'black'
+                xAxes: [
+                    {
+                        id: 'xAxis1',
+                        gridLines: {
+                            color: "rgba(0, 0, 0, 0)",
+                        },
+                        ticks: {
+                            fontColor: 'black',
+                            autoSkip: false,
+                            callback: function (label) {
+                                var xAxis1 = label
+                                xAxis1 += '';
+                                var month = xAxis1.split('-')[0];
+                                return month;
+                            }
+                        }
                     },
-                    gridLines: {
-                        drawBorder: true, lineWidth: 0
-                    }
-                }]
+                    {
+                        id: 'xAxis2',
+                        gridLines: {
+                            drawOnChartArea: false, // only want the grid lines for one axis to show up
+                        },
+                        ticks: {
+                            callback: function (label) {
+                                var xAxis2 = label
+                                xAxis2 += '';
+                                var month = xAxis2.split('-')[0];
+                                var year = xAxis2.split('-')[1];
+                                if (month === "Jul") {
+                                    return year;
+                                } else {
+                                    return "";
+                                }
+                            },
+                            maxRotation: 0,
+                            minRotation: 0,
+                            autoSkip: false
+                        }
+                    }]
             },
             tooltips: {
                 enabled: false,
@@ -929,8 +1064,8 @@ class CompareAndSelectScenario extends Component {
 
 
         let bar = {}
-        if (this.state.actualConsumptionList.length > 0) {
-            var monthArrayList = [...new Set(this.state.monthList1.map(ele => moment(ele).format(DATE_FORMAT_CAP_WITHOUT_DATE)))];
+        if (this.state.showAllData) {
+            var monthArrayList = [...new Set(this.state.monthList1.map(ele => moment(ele).format("MMM-YYYY")))];
             var monthArrayListWithoutFormat = [...new Set(this.state.monthList1.map(ele => moment(ele).format("YYYY-MM-DD")))];
             var datasetsArr = [];
             datasetsArr.push(
@@ -1040,7 +1175,6 @@ class CompareAndSelectScenario extends Component {
             if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
             return '?'
         }
-
         return (
             <div className="animated fadeIn" >
                 <AuthenticationServiceComponent history={this.props.history} />
@@ -1049,12 +1183,12 @@ class CompareAndSelectScenario extends Component {
 
                 <Card>
                     <div className="Card-header-reporticon pb-2">
-                    <span className="compareAndSelect-larrow"> <i className="cui-arrow-left icons " > </i></span>
-                    <span className="compareAndSelect-rarrow"> <i className="cui-arrow-right icons " > </i></span>
-                    <span className="compareAndSelect-larrowText"> Back to <a href="/#/dataset/listTree/">Manage Tree</a> or <a href="/#/extrapolation/extrapolateData">Cons Extrapolation</a></span>
-                    <span className="compareAndSelect-rarrowText"> Continue to <a href="/#/forecastReport/forecastOutput">Monthly Forecast</a></span><br/>
+                        <span className="compareAndSelect-larrow"> <i className="cui-arrow-left icons " > </i></span>
+                        <span className="compareAndSelect-rarrow"> <i className="cui-arrow-right icons " > </i></span>
+                        <span className="compareAndSelect-larrowText"> Back to <a href="/#/dataset/listTree/">Manage Tree</a> or <a href="/#/extrapolation/extrapolateData">Cons Extrapolation</a></span>
+                        <span className="compareAndSelect-rarrowText"> Continue to <a href="/#/forecastReport/forecastOutput">Monthly Forecast</a></span><br />
                         {checkOnline === 'Online' &&
-                            this.state.actualConsumptionList.length > 0 &&
+                            this.state.showAllData &&
                             <div className="card-header-actions">
                                 <a className="card-header-action">
 
@@ -1083,7 +1217,7 @@ class CompareAndSelectScenario extends Component {
                                 <Form >
                                     <div className="pl-0">
                                         <div className="row">
-                                            <FormGroup className="col-md-3">
+                                            <FormGroup className="col-md-4">
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
                                                 <div className="controls ">
                                                     <InputGroup>
@@ -1104,7 +1238,7 @@ class CompareAndSelectScenario extends Component {
                                                     </InputGroup>
                                                 </div>
                                             </FormGroup>
-                                            <FormGroup className="col-md-3">
+                                            <FormGroup className="col-md-4">
                                                 <Label htmlFor="appendedInputButton">Forecast Period<span className="stock-box-icon fa fa-sort-desc ml-1"></span></Label>
                                                 <div className="controls edit">
 
@@ -1124,7 +1258,7 @@ class CompareAndSelectScenario extends Component {
                                                     </Picker>
                                                 </div>
                                             </FormGroup>
-                                            <FormGroup className="col-md-3">
+                                            <FormGroup className="col-md-4">
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.program.region')}</Label>
                                                 <div className="controls ">
                                                     <InputGroup>
@@ -1144,7 +1278,7 @@ class CompareAndSelectScenario extends Component {
                                                     </InputGroup>
                                                 </div>
                                             </FormGroup>
-                                            <FormGroup className="col-md-3">
+                                            <FormGroup className="col-md-4">
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.report.planningUnit')}</Label>
                                                 <div className="controls">
                                                     <InputGroup>
@@ -1155,6 +1289,7 @@ class CompareAndSelectScenario extends Component {
                                                             bsSize="sm"
                                                             onChange={(e) => this.setPlanningUnitId(e)}
                                                             value={this.state.planningUnitId}
+                                                            className="selectWrapText"
                                                         >
                                                             <option value="0">{i18n.t('static.common.select')}</option>
                                                             {planningUnits}
@@ -1168,21 +1303,21 @@ class CompareAndSelectScenario extends Component {
                                     </div>
                                 </Form>
                                 <br></br>
-                                {this.state.actualConsumptionList.length > 0 &&
+                                {this.state.showAllData &&
                                     <>
                                         <ul className="legendcommitversion">
                                             <li><i class="fa fa-exclamation-triangle"></i><i> Missing Data</i></li>
                                         </ul><br />
-                                        <b>{"Select one forecast for "+this.state.planningUnitLabel.label_en+" and Region "+this.state.regionName}</b>
+                                        <b>{"Select one forecast for " + this.state.planningUnitLabel.label_en + " and Region " + this.state.regionName}</b>
                                         <br />
                                         <Table hover responsive className="table-outline mb-0 d-sm-table table-bordered">
                                             <thead><tr>
                                                 <th style={{ "textAlign": "center" }}>Display?</th>
-                                                <th style={{ "textAlign": "center" }} title={"T - Tree\nC - Consumption"}>Type</th>
+                                                <th style={{ "textAlign": "center" }} title={"C indicates a consumption forecast, T indicates a Tree Forecast."}>Type</th>
                                                 <th style={{ "textAlign": "center" }}>Forecast</th>
                                                 <th style={{ "textAlign": "center" }}>Select as forecast?</th>
-                                                <th style={{ "textAlign": "center" }}>Total Forecast</th>
-                                                <th style={{ "textAlign": "center" }}>Forecast Error</th>
+                                                <th style={{ "textAlign": "center" }} title={"For the forecast period " + moment(this.state.forecastStartDate).format(DATE_FORMAT_CAP_WITHOUT_DATE) + " to " + moment(this.state.forecastStopDate).format(DATE_FORMAT_CAP_WITHOUT_DATE)}>Total Forecast</th>
+                                                <th style={{ "textAlign": "center" }}>Forecast Error (%)</th>
                                                 <th style={{ "textAlign": "center" }}>Forecast Error (# Months Used)</th>
                                                 <th style={{ "textAlign": "center" }}>Compare to Consumption Forecast</th>
                                             </tr></thead>
@@ -1200,13 +1335,13 @@ class CompareAndSelectScenario extends Component {
                                                 {this.state.treeScenarioList.map((item, idx) => (
                                                     <tr id="addr0" style={{ backgroundColor: item.readonly ? "#CFCDC9" : "" }}>
                                                         <td align="center"><input type="checkbox" id={"scenarioCheckbox" + item.id} checked={item.checked} onChange={() => this.scenarioCheckedChanged(item.id)} disabled={item.readonly} /></td>
-                                                        <td>{item.type}</td>
+                                                        <td style={{ "textAlign": "center" }} >{item.type}</td>
                                                         <td><i class="fa fa-circle" style={{ color: item.color }} aria-hidden="true"></i> {" "}{item.type == "T" ? getLabelText(item.tree.label, this.state.lang) + " - " + getLabelText(item.scenario.label, this.state.lang) : getLabelText(item.scenario.extrapolationMethod.label)}{"  "}{item.readonly && <i class="fa fa-exclamation-triangle"></i>}</td>
                                                         <td align="center"><input type="radio" id="selectAsForecast" name="selectAsForecast" checked={this.state.selectedTreeScenarioId == item.id ? true : false} onClick={() => this.scenarioOrderChanged(item.id)} disabled={item.readonly}></input></td>
                                                         <td align="center">{item.readonly ? "" : <NumberFormat displayType={'text'} thousandSeparator={true} value={Math.round(this.state.totalArray[idx])} />}</td>
-                                                        <td align="center">{item.readonly ? "NA" : <NumberFormat displayType={'text'} thousandSeparator={true} value={this.state.totalArray[idx] > 0 ? this.state.actualDiff.length > 0 ? ((this.state.actualDiff[idx]) / this.state.totalActual).toFixed(4) : "" : ""} />}</td>
+                                                        <td align="center" style={{ color: Math.min(...this.state.actualDiff.filter(c => c != 0)) == this.state.actualDiff[idx] ? "#118b70" : "#000000" }}>{item.readonly ? "NA" : this.state.totalArray[idx] > 0 && this.state.actualDiff.length > 0 ? <NumberFormat displayType={'text'} thousandSeparator={true} value={((this.state.actualDiff[idx]) / this.state.totalActual).toFixed(4)} /> : ""}</td>
                                                         <td align="center">{item.readonly ? "NA" : <NumberFormat displayType={'text'} thousandSeparator={true} value={this.state.countArray.length > 0 && this.state.countArray[idx] != undefined ? this.state.countArray[idx] + 1 : ""} />}</td>
-                                                        <td align="center" className={!item.readonly && this.state.totalArray[idx] > 0 && this.state.lowerThenConsumptionThreshold != "" && this.state.higherThenConsumptionThreshold != "" && this.state.lowerThenConsumptionThreshold > 0 && this.state.higherThenConsumptionThreshold > 0 ? this.state.totalArray[idx] < this.state.lowerThenConsumptionThreshold ? (((Number(this.state.lowerThenConsumptionThreshold) - Number(this.state.totalArray[idx])) / Number(this.state.lowerThenConsumptionThreshold)) * 100).toFixed(2) > this.state.lowerThenConsumptionThresholdPU && (((Number(this.state.lowerThenConsumptionThreshold) - Number(this.state.totalArray[idx])) / Number(this.state.lowerThenConsumptionThreshold)) * 100).toFixed(2) < this.state.higherThenConsumptionThresholdPU ? "" : "red" : this.state.totalArray[idx] > this.state.higherThenConsumptionThreshold ? (((Number(this.state.totalArray[idx]) - Number(this.state.higherThenConsumptionThreshold)) / Number(this.state.higherThenConsumptionThreshold)) * 100).toFixed(2) > this.state.lowerThenConsumptionThresholdPU && (((Number(this.state.totalArray[idx]) - Number(this.state.higherThenConsumptionThreshold)) / Number(this.state.higherThenConsumptionThreshold)) * 100).toFixed(2) < this.state.higherThenConsumptionThresholdPU ? "" : "red" : "" : ""}>{!item.readonly && this.state.totalArray[idx] > 0 && this.state.lowerThenConsumptionThreshold != "" && this.state.higherThenConsumptionThreshold != "" && this.state.lowerThenConsumptionThreshold > 0 && this.state.higherThenConsumptionThreshold > 0 ? this.state.totalArray[idx] < this.state.lowerThenConsumptionThreshold ? (((Number(this.state.lowerThenConsumptionThreshold) - Number(this.state.totalArray[idx])) / Number(this.state.lowerThenConsumptionThreshold)) * 100).toFixed(2) + "% below the lowest consumption forecast." : this.state.totalArray[idx] > this.state.higherThenConsumptionThreshold ? (((Number(this.state.totalArray[idx]) - Number(this.state.higherThenConsumptionThreshold)) / Number(this.state.higherThenConsumptionThreshold)) * 100).toFixed(2) + "% above the highest consumption forecast." : "" : ""}</td>
+                                                        {item.type == "T" ? <td align="center" className={!item.readonly && this.state.totalArray[idx] > 0 && this.state.lowerThenConsumptionThreshold != "" && this.state.higherThenConsumptionThreshold != "" && this.state.lowerThenConsumptionThreshold > 0 && this.state.higherThenConsumptionThreshold > 0 ? this.state.totalArray[idx] < this.state.lowerThenConsumptionThreshold ? (((Number(this.state.lowerThenConsumptionThreshold) - Number(this.state.totalArray[idx])) / Number(this.state.lowerThenConsumptionThreshold)) * 100).toFixed(2) > this.state.lowerThenConsumptionThresholdPU && (((Number(this.state.lowerThenConsumptionThreshold) - Number(this.state.totalArray[idx])) / Number(this.state.lowerThenConsumptionThreshold)) * 100).toFixed(2) < this.state.higherThenConsumptionThresholdPU ? "" : "red" : this.state.totalArray[idx] > this.state.higherThenConsumptionThreshold ? (((Number(this.state.totalArray[idx]) - Number(this.state.higherThenConsumptionThreshold)) / Number(this.state.higherThenConsumptionThreshold)) * 100).toFixed(2) > this.state.lowerThenConsumptionThresholdPU && (((Number(this.state.totalArray[idx]) - Number(this.state.higherThenConsumptionThreshold)) / Number(this.state.higherThenConsumptionThreshold)) * 100).toFixed(2) < this.state.higherThenConsumptionThresholdPU ? "" : "red" : "" : ""}>{!item.readonly && this.state.totalArray[idx] > 0 && this.state.lowerThenConsumptionThreshold != "" && this.state.higherThenConsumptionThreshold != "" && this.state.lowerThenConsumptionThreshold > 0 && this.state.higherThenConsumptionThreshold > 0 ? this.state.totalArray[idx] < this.state.lowerThenConsumptionThreshold ? (((Number(this.state.lowerThenConsumptionThreshold) - Number(this.state.totalArray[idx])) / Number(this.state.lowerThenConsumptionThreshold)) * 100).toFixed(2) + "% below the lowest consumption forecast." : this.state.totalArray[idx] > this.state.higherThenConsumptionThreshold ? (((Number(this.state.totalArray[idx]) - Number(this.state.higherThenConsumptionThreshold)) / Number(this.state.higherThenConsumptionThreshold)) * 100).toFixed(2) + "% above the highest consumption forecast." : "N/A" : "N/A"}</td> : <td align="center" >N/A</td>}
                                                     </tr>
                                                 ))}
                                             </tbody>
@@ -1215,65 +1350,82 @@ class CompareAndSelectScenario extends Component {
                                 }
                                 <br></br>
                                 {this.state.planningUnitId > 0 && <FormGroup className="col-md-12">
-                                        <Label htmlFor="appendedInputButton">Notes</Label>
-                                        <div className="controls">
-                                            <InputGroup>
-                                                <Input
-                                                    type="textarea"
-                                                    name="forecastNotes"
-                                                    id="forecastNotes"
-                                                    value={this.state.forecastNotes}
-                                                    onChange={(e) => { this.setForecastNotes(e); }}
-                                                    bsSize="sm"
-                                                >
-                                                </Input>
-                                            </InputGroup>
-                                        </div>
-                                    </FormGroup>}
+                                    <Label htmlFor="appendedInputButton">Notes</Label>
+                                    <div className="controls">
+                                        <InputGroup>
+                                            <Input
+                                                type="textarea"
+                                                name="forecastNotes"
+                                                id="forecastNotes"
+                                                value={this.state.forecastNotes}
+                                                onChange={(e) => { this.setForecastNotes(e); }}
+                                                bsSize="sm"
+                                            >
+                                            </Input>
+                                        </InputGroup>
+                                    </div>
+                                </FormGroup>}
                                 <br></br>
 
                                 <Col md="12 pl-0" style={{ display: this.state.loading ? "none" : "block" }}>
                                     <div className="row">
-                                        {this.state.actualConsumptionList.length > 0
+                                        {this.state.showAllData
                                             &&
                                             <>
-                                                <FormGroup className="col-md-3">
-                                                    <Label htmlFor="appendedInputButton">Start Month for Graph/Table<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
-                                                    <div className="controls edit">
-                                                        <Picker
-                                                            ref="pickAMonth2"
-                                                            years={{ min: this.state.minDate, max: this.state.maxDateForSingleValue }}
-                                                            value={this.state.singleValue2}
-                                                            lang={pickerLang.months}
-                                                            theme="dark"
-                                                            onChange={this.handleAMonthChange2}
-                                                            onDismiss={this.handleAMonthDissmis2}
-                                                        >
-                                                            <MonthBox value={this.makeText(this.state.singleValue2)} onClick={this.handleClickMonthBox2} />
-                                                        </Picker>
-                                                    </div>
+                                                <FormGroup>
 
+                                                    <Label className="P-absltRadio">Y-axis in&nbsp;&nbsp;</Label>
+
+                                                    <FormGroup check inline>
+                                                        <Input
+                                                            className="form-check-input"
+                                                            type="radio"
+                                                            id="viewById1"
+                                                            name="viewById"
+                                                            value={1}
+                                                            checked={this.state.viewById == 1}
+                                                            onChange={this.setViewById}
+                                                        />
+                                                        <Label
+                                                            className="form-check-label"
+                                                            check htmlFor="inline-active1">
+                                                            {i18n.t('static.report.planningUnit')}
+                                                        </Label>
+                                                    </FormGroup><br />
+                                                    <FormGroup check inline>
+                                                        <Input
+                                                            className="form-check-input"
+                                                            type="radio"
+                                                            id="viewById2"
+                                                            name="viewById"
+                                                            value={2}
+                                                            checked={this.state.viewById == 2}
+                                                            onChange={this.setViewById}
+                                                        />
+                                                        <Label
+                                                            className="form-check-label"
+                                                            check htmlFor="inline-active1">
+                                                            {i18n.t('static.dashboard.forecastingunit')}
+                                                        </Label>
+                                                    </FormGroup><br />
+                                                    <FormGroup check inline>
+                                                        <Input
+                                                            className="form-check-input"
+                                                            type="radio"
+                                                            id="viewById3"
+                                                            name="viewById"
+                                                            value={3}
+                                                            checked={this.state.viewById == 3}
+                                                            onChange={this.setViewById}
+                                                        />
+                                                        <Label
+                                                            className="form-check-label"
+                                                            check htmlFor="inline-active1">
+                                                            {"Equivalency Unit"}
+                                                        </Label>
+                                                    </FormGroup>
                                                 </FormGroup>
-                                                <FormGroup className="col-md-3">
-                                                    <Label htmlFor="appendedInputButton">Y-axis in</Label>
-                                                    <div className="controls">
-                                                        <InputGroup>
-                                                            <Input
-                                                                type="select"
-                                                                name="viewById"
-                                                                id="viewById"
-                                                                bsSize="sm"
-                                                                value={this.state.viewById}
-                                                                onChange={this.setViewById}
-                                                            >
-                                                                <option value="1">{i18n.t('static.report.planningUnit')}</option>
-                                                                <option value="2">{i18n.t('static.dashboard.forecastingunit')}</option>
-                                                                <option value="3">Equivalency Unit</option>
-                                                            </Input>
-                                                        </InputGroup>
-                                                    </div>
-                                                </FormGroup>
-                                                <FormGroup className="col-md-3" id="forecastingUnitDiv" style={{ display: "none" }}>
+                                                <FormGroup className="col-md-4" id="forecastingUnitDiv" style={{ display: "none" }}>
                                                     <Label htmlFor="appendedInputButton">{i18n.t('static.product.unit1')}</Label>
                                                     <div className="controls">
                                                         <InputGroup>
@@ -1285,6 +1437,7 @@ class CompareAndSelectScenario extends Component {
                                                                 disabled={true}
                                                                 onChange={this.setForecastingUnit}
                                                                 bsSize="sm"
+                                                                className="selectWrapText"
                                                             >
                                                                 <option value="0">{i18n.t('static.common.select')}</option>
                                                                 {forecastingUnits}
@@ -1293,12 +1446,13 @@ class CompareAndSelectScenario extends Component {
                                                         </InputGroup>
                                                     </div>
                                                 </FormGroup>
-                                                <FormGroup className="col-md-3" id="equivalencyUnitDiv" style={{ display: "none" }}>
+                                                <FormGroup className="col-md-4" id="equivalencyUnitDiv" style={{ display: "none" }}>
                                                     <Label htmlFor="appendedInputButton">Equivalency Unit</Label>
                                                     <div className="controls">
                                                         <InputGroup>
                                                             <Input
                                                                 type="select"
+                                                                className="selectWrapText"
                                                                 name="equivalencyUnitId"
                                                                 id="equivalencyUnitId"
                                                                 disabled={true}
@@ -1313,9 +1467,42 @@ class CompareAndSelectScenario extends Component {
                                                         </InputGroup>
                                                     </div>
                                                 </FormGroup>
+                                                <FormGroup className="col-md-3">
+                                                    <Input
+                                                        className="form-check-input"
+                                                        type="checkbox"
+                                                        id="showForecastPeriod"
+                                                        name="showForecastPeriod"
+                                                        checked={this.state.showForecastPeriod}
+                                                        onClick={(e) => { this.setShowForecastPeriod(e); }}
+                                                    />
+                                                    <Label
+                                                        className="form-check-label"
+                                                        check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                        <b>Show only Forecast Period</b>
+                                                    </Label>
+                                                </FormGroup>
+                                                <FormGroup className="col-md-3">
+                                                    <Label htmlFor="appendedInputButton">Start Month for Graph/Table<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
+                                                    <div className="controls edit">
+                                                        <Picker
+                                                            ref="pickAMonth2"
+                                                            years={{ min: this.state.minDate, max: this.state.maxDateForSingleValue }}
+                                                            value={this.state.singleValue2}
+                                                            lang={pickerLang}
+                                                            onChange={this.handleAMonthChange2}
+                                                            onDismiss={this.handleAMonthDissmis2}
+                                                        //theme="light"
+                                                        // onChange={this.handleRangeChange}
+                                                        // onDismiss={this.handleRangeDissmis}
+                                                        >
+                                                            <MonthBox value={makeText(this.state.singleValue2.from) + ' ~ ' + makeText(this.state.singleValue2.to)} onClick={this.handleClickMonthBox2} />
+                                                        </Picker>
+                                                    </div>
+                                                </FormGroup>
                                                 <div className="col-md-12 p-0">
                                                     <div className="col-md-12">
-                                                        <div className="chart-wrapper chart-graph-report pl-5 ml-3" style={{ marginLeft: '50px' }}>
+                                                        <div className="chart-wrapper chart-graph-report">
                                                             <Bar id="cool-canvas" data={bar} options={chartOptions} />
                                                             <div>
 
