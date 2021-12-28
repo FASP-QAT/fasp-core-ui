@@ -19,6 +19,11 @@ module.exports = {
         compress: true, 
         disableHostCheck: true
     },
+    // resolve: {
+    //     fallback: {
+    //         "fs": false
+    //     },
+    // },
     module: {
         rules: [
             {

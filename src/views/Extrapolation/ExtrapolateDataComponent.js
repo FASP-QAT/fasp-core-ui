@@ -1,6 +1,7 @@
 import React from "react";
 import ReactDOM from 'react-dom';
 import regression from 'regression';
+import arima from 'arima';
 import {
     Card, CardBody,
     Label, Input, FormGroup,
@@ -320,7 +321,94 @@ export default class ExtrapolateDataComponent extends React.Component {
             }
         }
         console.log("inputDataRegression", inputDataRegression);
+        //arima
+        // const dataArima = [
+        //     { "month": 1, "actual": 1807.37, "forecast": null },
+        //     { "month": 1, "actual": 2355.32, "forecast": null },
+        //     { "month": 1, "actual": 2591.83, "forecast": null },
+        //     { "month": 1, "actual": 2236.39, "forecast": null },
+        //     { "month": 1, "actual": 1549.14, "forecast": null },
+        //     { "month": 1, "actual": 2105.79, "forecast": null },
+        //     { "month": 1, "actual": 2041.32, "forecast": null },
+        //     { "month": 1, "actual": 2021.01, "forecast": null },
+        //     { "month": 1, "actual": 1870.46, "forecast": null },
+        //     { "month": 1, "actual": 2390.56, "forecast": null },
+        //     { "month": 1, "actual": 2198.03, "forecast": null },
+        //     { "month": 1, "actual": 2046.83, "forecast": null },
+        //     { "month": 1, "actual": 1934.19, "forecast": null },
+        //     { "month": 1, "actual": 2406.41, "forecast": null },
+        //     { "month": 1, "actual": 2249.06, "forecast": null },
+        //     { "month": 1, "actual": 2211.56, "forecast": null },
+        //     { "month": 1, "actual": 2237.05, "forecast": null },
+        //     { "month": 1, "actual": 2856.43, "forecast": null },
+        //     { "month": 1, "actual": 2799.57, "forecast": null },
+        //     { "month": 1, "actual": 2645.33, "forecast": null },
+        //     { "month": 1, "actual": 2563.59, "forecast": null },
+        //     { "month": 1, "actual": 3146.52, "forecast": null },
+        //     { "month": 1, "actual": 3196.68, "forecast": null },
+        //     { "month": 1, "actual": 2930.48, "forecast": null },
+        //     { "month": 1, "actual": 2878.96, "forecast": null },
+        //     { "month": 1, "actual": 3687.85, "forecast": null },
+        //     { "month": 1, "actual": 3608.33, "forecast": null },
+        //     { "month": 1, "actual": 3288.26, "forecast": null },
+        //     { "month": 1, "actual": 3178.23, "forecast": null },
+        //     { "month": 1, "actual": 3939.69, "forecast": null },
+        //     { "month": 1, "actual": 3680.11, "forecast": null },
+        //     { "month": 1, "actual": 3516.65, "forecast": null },
+        //     { "month": 1, "actual": 3354.76, "forecast": null },
+        //     { "month": 1, "actual": 4490.02, "forecast": null },
+        //     { "month": 1, "actual": 4678.97, "forecast": null },
+        //     { "month": 1, "actual": 4148.56, "forecast": null },
+        //     { "month": 1, "actual": 3995.07, "forecast": null },
+        //     { "month": 1, "actual": 5178.43, "forecast": null },
+        //     { "month": 1, "actual": 5010.64, "forecast": null },
+        //     { "month": 1, "actual": 4453.38, "forecast": null },
+        //     { "month": 1, "actual": 4306.70, "forecast": null },
+        //     { "month": 1, "actual": 5321.93, "forecast": null },
+        //     { "month": 1, "actual": 4888.10, "forecast": null },
+        //     { "month": 1, "actual": 4554.65, "forecast": null },
+        //     { "month": 1, "actual": 4176.79, "forecast": null },
+        //     { "month": 1, "actual": 5125.40, "forecast": null },
+        //     { "month": 1, "actual": 4962.65, "forecast": null },
+        //     { "month": 1, "actual": 4917.63, "forecast": null },
+        //     { "month": 1, "actual": 4542.60, "forecast": null },
+        //     { "month": 1, "actual": 5284.71, "forecast": null },
+        //     { "month": 1, "actual": 4817.43, "forecast": null },
+        //     { "month": 1, "actual": 4634.50, "forecast": null },
+        //     { "month": 1, "actual": 4431.36, "forecast": null },
+        //     { "month": 1, "actual": 5602.21, "forecast": null },
+        //     { "month": 1, "actual": 5349.85, "forecast": null },
+        //     { "month": 1, "actual": 5036.00, "forecast": null },
+        //     { "month": 1, "actual": 4534.61, "forecast": null },
+        //     { "month": 1, "actual": 5836.17, "forecast": null },
+        //     { "month": 1, "actual": 5818.28, "forecast": null },
+        //     { "month": 1, "actual": 5070.42, "forecast": null },
+        //     { "month": 1, "actual": 4497.47, "forecast": null },
+        //     { "month": 1, "actual": 6075.52, "forecast": null },
+        //     { "month": 1, "actual": 5868.67, "forecast": null },
+        //     { "month": 1, "actual": 5432.24, "forecast": null }
+        // ];
 
+        // const noOfMonthsForProjectionArima = 12;
+        // const p = 1, d = 1, q = 1;
+        // //let actualMonths  = dataArima[dataArima.length - 1].month;
+
+        // const ts = new Array();
+        // for (let x = 1; x <= dataArima.length; x++) {
+        //     ts.push(dataArima[x - 1].actual);
+        // }
+
+        // arima = new ARIMA({
+        //     p: p,
+        //     d: d,
+        //     q: q,
+        //     auto: false
+        // }).fit(ts);
+        // const [pred, errors] = arima.predict(noOfMonthsForProjectionArima);
+        // console.log(pred);
+
+
+        //Table
         for (var j = 0; j < monthArray.length; j++) {
             data = [];
             data[0] = monthArray[j];
@@ -674,7 +762,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                     }
                     consumptionExtrapolationList[consumptionExtrapolationRegression].extrapolationDataList = data;
                 }
-console.log('consumptionExtrapolationRegression',consumptionExtrapolationRegression);
+                console.log('consumptionExtrapolationRegression', consumptionExtrapolationRegression);
                 datasetJson.consumptionExtrapolation = consumptionExtrapolationList;
                 datasetData = (CryptoJS.AES.encrypt(JSON.stringify(datasetJson), SECRET_KEY)).toString()
                 myResult.programData = datasetData;

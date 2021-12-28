@@ -31,6 +31,7 @@
     "@material-ui/lab": "^4.0.0-alpha.56",
     "@types/nw.gui": "0.0.20",
     "antd": "^4.4.0",
+    "arima": "^0.2.2",
     "axios": "^0.19.0",
     "basicprimitivesreact": "^6.4.1",
     "bcryptjs": "^2.4.3",
@@ -113,6 +114,13 @@
     "simple-line-icons": "^2.4.1",
     "spinkit": "1.2.5",
     "yup": "^0.27.0"
+  },
+  "browser": {
+    "fs": false,
+    "path": false,
+    "os": false,
+    "net": false,
+    "tls": false
   },
   "devDependencies": {
     "@babel/core": "^7.9.0",
