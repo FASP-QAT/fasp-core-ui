@@ -5540,3 +5540,62 @@ border: 1px solid #eee;
   .jexcel_contextmenu>.header{
     display:none
   }
+ 
+  // .commitversionTable .RemoveStriped .jexcel > thead > tr > td:nth-child(2){
+  //   text-align:left !important;
+  // }
+  // .commitversionTable .jexcel_content .draggable tr td:nth-child(2) {
+  //   text-align:left !important;
+  // }
+  // .commitversionTable .RemoveStriped .jexcel > thead > tr > td:nth-child(3){
+  //   text-align:left !important;
+  // }
+  // .commitversionTable .jexcel_content .draggable tr td:nth-child(3) {
+  //   text-align:left !important;
+  // }
+  // .commitversionTable .jexcel_content .draggable .jexcel_filters_icon tr td:nth-child(3) {
+  //   text-align:left !important;
+  // }
+  .commitversionTable .jexcel>thead>tr>td:nth-child(2).jexcel_filters_icon {
+    text-align: left!important;
+}
+  .commitversionTable .jexcel>thead>tr>td:nth-child(3).jexcel_filters_icon {
+    text-align: left!important;
+}
+.commitversionTable .jexcel>thead>tr>td:nth-child(6).jexcel_filters_icon {
+  text-align: left!important;
+}
+.commitversionTable .jexcel>thead>tr>td:nth-child(9).jexcel_filters_icon {
+  text-align: left!important;
+}
+.commitversionTable .jexcel>thead>tr>td:nth-child(12).jexcel_filters_icon {
+  text-align: left!important;
+}
+.commitversionTable .jexcel>thead>tr>td:nth-child(15).jexcel_filters_icon {
+  text-align: left!important;
+}
+.commitversionTable .jexcel>thead>tr>td:nth-child(18).jexcel_filters_icon {
+  text-align: left!important;
+}
+.commitversionTable .jexcel>tbody>tr>td:nth-child(2) {
+  text-align: left!important;
+}
+.commitversionTable .jexcel>tbody>tr>td:nth-child(3) {
+  text-align: left!important;
+}
+.commitversionTable .jexcel>tbody>tr>td:nth-child(6) {
+  text-align: left!important;
+}
+.commitversionTable .jexcel>tbody>tr>td:nth-child(9) {
+  text-align: left!important;
+}
+.commitversionTable .jexcel>tbody>tr>td:nth-child(12) {
+  text-align: left!important;
+}
+.commitversionTable .jexcel>tbody>tr>td:nth-child(15) {
+  text-align: left!important;
+}
+.commitversionTable .jexcel>tbody>tr>td:nth-child(18) {
+  text-align: left!important;
+}
+  

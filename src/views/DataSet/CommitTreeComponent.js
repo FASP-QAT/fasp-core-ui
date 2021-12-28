@@ -64,7 +64,7 @@ export default class CommitTreeComponent extends React.Component {
         openRequest.onerror = function (event) {
             this.setState({
                 message: i18n.t('static.program.errortext'),
-                color: 'red'
+                color: '#BA0C2F'
             })
             // this.hideFirstComponent()
         }.bind(this);
@@ -76,7 +76,7 @@ export default class CommitTreeComponent extends React.Component {
             programRequest.onerror = function (event) {
                 this.setState({
                     message: i18n.t('static.program.errortext'),
-                    color: 'red'
+                    color: '#BA0C2F'
                 })
                 // this.hideFirstComponent()
             }.bind(this);
@@ -117,7 +117,7 @@ export default class CommitTreeComponent extends React.Component {
         openRequest.onerror = function (event) {
             this.setState({
                 message: i18n.t('static.program.errortext'),
-                color: 'red'
+                color: '#BA0C2F'
             })
             // this.hideFirstComponent()
         }.bind(this);
@@ -572,7 +572,7 @@ export default class CommitTreeComponent extends React.Component {
                 openRequest.onerror = function (event) {
                     this.setState({
                         message: i18n.t('static.program.errortext'),
-                        color: 'red'
+                        color: '#BA0C2F'
                     })
                     // this.hideFirstComponent()
                 }.bind(this);
@@ -727,7 +727,7 @@ export default class CommitTreeComponent extends React.Component {
                     } else {
                         this.setState({
                             message: response.data.messageCode,
-                            color: "red",
+                            color: "#BA0C2F",
                             loading: false
                         })
                         // this.hideFirstComponent();
@@ -742,7 +742,7 @@ export default class CommitTreeComponent extends React.Component {
                                 console.log("+++in catch 7")
                                 this.setState({
                                     message: 'static.common.networkError',
-                                    color: "red",
+                                    color: "#BA0C2F",
                                     loading: false
                                 }, () => {
                                     // this.hideFirstComponent();
@@ -762,7 +762,7 @@ export default class CommitTreeComponent extends React.Component {
                                         }
                                         this.setState({
                                             message: error.response.data.messageCode,
-                                            color: "red",
+                                            color: "#BA0C2F",
                                             loading: false
                                         }, () => {
                                             // this.hideFirstComponent()
@@ -777,7 +777,7 @@ export default class CommitTreeComponent extends React.Component {
                                         this.setState({
                                             message: error.response.data.messageCode,
                                             loading: false,
-                                            color: "red"
+                                            color: "#BA0C2F"
                                         }, () => {
                                             // this.hideFirstComponent()
                                         });
@@ -787,7 +787,7 @@ export default class CommitTreeComponent extends React.Component {
                                         this.setState({
                                             message: 'static.unkownError',
                                             loading: false,
-                                            color: "red"
+                                            color: "#BA0C2F"
                                         }, () => {
                                             // this.hideFirstComponent()
                                         });
@@ -992,9 +992,9 @@ export default class CommitTreeComponent extends React.Component {
                             </ul>
                         </div>
                         <Form name='simpleForm'>
-                            <div className=" pl-0">
+                            <div className=" pl-0 pt-lg-3">
                                 <div className="row">
-                                    <FormGroup className="col-md-3 ">
+                                    <FormGroup className="col-md-3">
                                         <Label htmlFor="appendedInputButton">Program</Label>
                                         <div className="controls ">
                                             <Input
@@ -1015,20 +1015,20 @@ export default class CommitTreeComponent extends React.Component {
                             {(this.state.showCompare) &&
                                 <>
                                     <CompareVersionTable page="commit" datasetData={this.state.programDataLocal} datasetData1={this.state.programDataServer} datasetData2={this.state.programDataDownloaded} versionLabel={"V" + this.state.programDataLocal.currentVersion.versionId + "(Local)"} versionLabel1={"V" + this.state.programDataServer.currentVersion.versionId + "(Server)"} />
-                                    <div className="table-responsive RemoveStriped">
+                                    <div className="table-responsive RemoveStriped commitversionTable">
                                         <div id="tableDiv" />
                                     </div>
                                 </>
                             }
 
-                            <div className="col-md-12">
-                                <Button type="button" size="md" color="warning" className="float-right mr-1" onClick={this.reset}><i className="fa fa-refresh"></i> Cancel</Button>
-                                <Button type="button" color="success" className="mr-1 float-right" size="md" onClick={() => { this.toggleShowValidation() }}><i className="fa fa-check"></i>Next</Button>
+                            <div className="col-md-12 pr-lg-0">
+                                <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.reset}><i className="fa fa-refresh"></i> Cancel</Button>
+                                <Button type="button" color="info" className="mr-1 float-right" size="md" onClick={() => { this.toggleShowValidation() }}><i className="fa fa-check"></i>Next</Button>
                             </div>
                         </Form>
-
-                        <div className="row">
-                            <FormGroup className="col-md-3 ">
+                            <div>
+                        <div className="row pl-lg-0">
+                            <FormGroup className="col-md-4 pl-lg-0">
                                 <Label htmlFor="appendedInputButton">Version Type</Label>
                                 <div className="controls ">
                                     <Input
@@ -1045,7 +1045,7 @@ export default class CommitTreeComponent extends React.Component {
                                     </Input>
                                 </div>
                             </FormGroup>
-                            <FormGroup className="col-md-4 ">
+                            <FormGroup className="col-md-6">
                                 <Label htmlFor="appendedInputButton">Notes</Label>
                                 <Input
                                     className="controls"
@@ -1054,12 +1054,13 @@ export default class CommitTreeComponent extends React.Component {
                                     name="notesId"
                                 />
                             </FormGroup>
+                        </div>
 
-                            <div className="col-md-12">
-                                <Button type="button" size="md" color="warning" className="float-right mr-1" onClick={this.reset}><i className="fa fa-refresh"></i> Cancel</Button>
+                        <div className="col-md-12 pr-lg-0">
+                                <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.reset}><i className="fa fa-refresh"></i> Cancel</Button>
                                 <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={this.synchronize}><i className="fa fa-check"></i>Commit</Button>
                             </div>
-                        </div>
+                            </div>
                     </CardBody>
                 </Card>
                 <Modal isOpen={this.state.showValidation}
