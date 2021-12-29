@@ -1826,7 +1826,7 @@ class EquivalancyUnit extends Component {
                                 case 406:
                                     this.setState({
                                         // message: error.response.data.messageCode,
-                                        message: i18n.t('static.region.duplicateGLN'),
+                                        message: 'Fail to add',
                                         color: "#BA0C2F", loading: false
                                     },
                                         () => {

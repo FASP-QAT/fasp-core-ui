@@ -284,10 +284,13 @@ const ExtrapolateData = React.lazy(() => import('../../views/Extrapolation/Extra
 
 const ListTree = React.lazy(() => import('../../views/DataSet/ListTreeComponent'));
 const ModelingValidation = React.lazy(() => import('../../views/Validations/ModelingValidations'))
+const CompareVersion = React.lazy(() => import('../../views/CompareVersion/CompareVersion'))
 const ProductValidation = React.lazy(() => import('../../views/Validations/ProductValidations'))
+const CompareAndSelectScenario = React.lazy(() => import('../../views/CompareAndSelect/CompareAndSelectScenario'))
 const ConsumptionDataEntryAndAdjustment = React.lazy(() => import('../../views/ConsumptionDataEntryandAdjustment/ConsumptionDataEntryAndAdjustment.js'))
 const BuildTree = React.lazy(() => import('../../views/DataSet/BuildTreeComponent'));
 const ListTreeTemplate = React.lazy(() => import('../../views/DataSet/ListTreeTemplateComponent'));
+const CommitTree = React.lazy(() => import('../../views/DataSet/CommitTreeComponent.js'));
 const CreateTreeTemplate = React.lazy(() => import('../../views/DataSet/CreateTreeTemplateComponent'));
 const LoadDeleteDataSet = React.lazy(() => import('../../views/DataSet/LoadDeleteDataSet'));
 const VersionSettingsComponent = React.lazy(() => import('../../views/DataSet/VersionSettingsComponent'));
@@ -300,6 +303,10 @@ const EditDataSet = React.lazy(() => import('../../views/DataSet/EditDataSet'));
 const ImportFromQATSupplyPlan = React.lazy(() => import('../../views/Consumption/ImportFromQATSupplyPlan'));
 const PlanningUnitSetting = React.lazy(() => import('../../views/PlanningUnitSetting/PlanningUnitSetting'));
 
+const ConsumptionForecastError = React.lazy(() => import('../../views/ForecastingReports/ConsumptionForecastError'));
+const ForecastOutput = React.lazy(() => import('../../views/ForecastingReports/ForecastOutput'));
+const ForecastSummary = React.lazy(() => import('../../views/ForecastingReports/ForecastSummary'));
+
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
   { path: '/dataset/versionSettings', name: 'static.versionSettings.versionSettings', component: VersionSettingsComponent },
@@ -308,7 +315,9 @@ const routes = [
   { path: '/dataset/listTreeTemplate/:color/:message', name: 'List Tree Template', component: ListTreeTemplate },
   { path: '/dataset/listTreeTemplate/', exact: true, name: 'List Tree Template', component: ListTreeTemplate },
   { path: '/validation/modelingValidation', exact: true, name: 'Modeling Validation', component: ModelingValidation },
+  { path: '/report/compareVersion', exact: true, name: 'Compare Version', component: CompareVersion },
   { path: '/validation/productValidation', exact: true, name: 'Product Validation', component: ProductValidation },
+  { path: '/report/compareAndSelectScenario', exact: true, name: 'Compare and Select Forecast', component: CompareAndSelectScenario },
   { path: '/dataentry/consumptionDataEntryAndAdjustment', exact: true, name: 'Data Entry & Adjustment ', component: ConsumptionDataEntryAndAdjustment },
   { path: '/dataset/createTreeTemplate/:templateId', name: 'Create Tree Template', component: CreateTreeTemplate },
   { path: '/dataSet/buildTree/', exact: true, name: 'static.common.managetree', component: BuildTree },
@@ -693,6 +702,7 @@ const routes = [
   { path: '/extrapolation/extrapolateData', exact: true, name: i18n.t('static.breadcrum.list', { entityname: 'Extrapolate Data' }), component: ExtrapolateData },
 
   { path: '/dataset/listTree/:color/:message', name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.common.managetree') }), component: ListTree },
+  { path: '/dataset/commitTree', exact: true, name: i18n.t('static.breadcrum.list', { entityname: 'Commit Tree' }), component: CommitTree },
   { path: '/dataset/listTree', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.common.managetree') }), component: ListTree },
 
   { path: '/dataset/addDataSet', name: 'static.breadcrum.add', entityname: 'static.dataset.manageProgram', component: AddDataSet },
@@ -706,6 +716,10 @@ const routes = [
 
   { path: '/planningUnitSetting/listPlanningUnitSetting/:color/:message', name: 'Planning Unit Settings', component: PlanningUnitSetting },
   { path: '/planningUnitSetting/listPlanningUnitSetting', exact: true, name: 'Planning Unit Settings', component: PlanningUnitSetting },
+
+  { path: '/forecastReport/consumptionForecastError', name: 'Consumption Forecast Error', component: ConsumptionForecastError },
+  { path: '/forecastReport/forecastOutput', name: 'Monthly Forecast', component: ForecastOutput },
+  { path: '/forecastReport/forecastSummary', name: 'Forecast Summary', component: ForecastSummary },
 
 ];
 
@@ -743,7 +757,7 @@ class DefaultLayout extends Component {
     // this.getDownloadedPrograms = this.getDownloadedPrograms.bind(this);
     // this.checkIfLocalProgramVersionChanged = this.checkIfLocalProgramVersionChanged.bind(this);
   }
-  
+
   checkEvent = (e) => {
     // console.log("checkEvent called---", e);
     if (e.type != "mousemove") {
@@ -1566,7 +1580,55 @@ class DefaultLayout extends Component {
                             icon: 'fa fa-th',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true) }
                           },
+                          {
+                            name: "Commit Version",
+                            url: '/dataset/commitTree',
+                            icon: 'fa fa-th',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true) }
+                          }
 
+                        ]
+                      },
+                      {
+                        name: "Reports",
+                        icon: 'fa fa-list',
+                        // attributes: {
+                        // hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true)
+                        // },
+                        attributes: {
+                          hidden: ((((this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_DATASET')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_EQUIVALENCY_UNIT_MAPPING')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_USAGE_TEMPLATE'))) && this.state.activeTab == 1) ? false : true)
+                        },
+                        children: [
+                          {
+                            name: 'Compare Version',
+                            url: '/report/compareVersion',
+                            icon: 'fa fa-th',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true) }
+                          },
+                          {
+                            name: 'Compare and Select Forecast',
+                            url: '/report/compareAndSelectScenario',
+                            icon: 'fa fa-th',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true) }
+                          },
+                          {
+                            name: "Forecast Summary",
+                            url: '/forecastReport/forecastSummary',
+                            icon: 'fa fa-exchange',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true) }
+                          },
+                          {
+                            name: "Forecast Output",
+                            url: '/forecastReport/forecastOutput',
+                            icon: 'fa fa-exchange',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true) }
+                          },
+                          {
+                            name: 'Consumption Forecast Error',
+                            url: '/forecastReport/consumptionForecastError',
+                            icon: 'fa fa-exchange',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true) }
+                          },
                         ]
                       },
                       // !this.state.businessFunctions.includes('ROLE_BF_VIEW_GUEST_SCREENS') &&

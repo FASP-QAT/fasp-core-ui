@@ -62,6 +62,7 @@ class ModelingValidation extends Component {
             nodeIdArr: [],
             nodeDataModelingList: [],
             loading: false,
+            monthList: [],
             show: false
         };
         this.setDatasetId = this.setDatasetId.bind(this);
@@ -134,8 +135,8 @@ class ModelingValidation extends Component {
             loading: true
         })
         var versionId = this.state.versionId.toString();
-        console.log("In get dataset data+++",versionId);
-        if (versionId != "") {
+        console.log("In get dataset data+++", versionId);
+        if (versionId != "" && versionId.includes("Local")) {
             var actualVersionId = (versionId.split('(')[0]).trim();
             var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
             var userId = userBytes.toString(CryptoJS.enc.Utf8);
@@ -168,6 +169,43 @@ class ModelingValidation extends Component {
                     })
                 }.bind(this)
             }.bind(this)
+        } else if (versionId != "" && !versionId.includes("Local")) {
+            var json = [{ programId: this.state.datasetId, versionId: versionId }]
+            DatasetService.getAllDatasetData(json).then(response => {
+                if (response.status == 200) {
+                    console.log("resp--------------------", response.data);
+                    var responseData = response.data[0];
+                    this.setState({
+                        datasetData: responseData,
+                        loading: false
+                    }, () => {
+                        this.getTreeList();
+                    })
+                } else {
+                    this.setState({
+                        message: response.data.messageCode, loading: false
+                    }, () => {
+                        this.hideSecondComponent();
+                    })
+                }
+            }).catch(
+                error => {
+                    this.setState({
+                        datasetData: {},
+                        treeList: [],
+                        treeId: "",
+                        scenarioList: [],
+                        scenarioId: "",
+                        levelList: [],
+                        levelId: "",
+                        levelUnit: "",
+                        nodeList: [],
+                        nodeVal: [],
+                        nodeIdArr: [],
+                        loading: false
+                    })
+                }
+            );
         } else {
             this.setState({
                 datasetData: {},
@@ -279,44 +317,59 @@ class ModelingValidation extends Component {
                 show: true
             })
             var datasetData = this.state.datasetData;
-            var nodeDataModelingList = datasetData.nodeDataModelingList;
+            var treeList = datasetData.treeList;
+            console.log("TreeList+++", treeList)
+            var tree = treeList.filter(c => c.treeId == this.state.treeId)[0];
+            console.log("Tree+++", tree)
+            var flatList = tree.tree.flatList;
+            console.log("TreeList+++", flatList);
+            // var nodeDataModelingList = datasetData.nodeDataModelingList;
             var nodeIdArr = this.state.nodeIdArr;
             var rangeValue = this.state.rangeValue;
             var displayBy = this.state.displayBy;
             let startDate = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
             let stopDate = rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
-            var nodeDataModelingListFilter = nodeDataModelingList.filter(c => nodeIdArr.includes(c.id) && c.scenarioId == this.state.scenarioId && moment(c.month).format("YYYY-MM-DD") >= moment(startDate).format("YYYY-MM-DD") && moment(c.month).format("YYYY-MM-DD") <= moment(stopDate).format("YYYY-MM-DD"));
-            console.log("NodeDataModelingList+++", nodeDataModelingListFilter);
-            var monthList = [...new Set(nodeDataModelingListFilter.map(ele => (ele.month)))];
+            // var nodeDataModelingListFilter = nodeDataModelingList.filter(c => nodeIdArr.includes(c.id) && c.scenarioId == this.state.scenarioId && moment(c.month).format("YYYY-MM-DD") >= moment(startDate).format("YYYY-MM-DD") && moment(c.month).format("YYYY-MM-DD") <= moment(stopDate).format("YYYY-MM-DD"));
+            // console.log("NodeDataModelingList+++", nodeDataModelingListFilter);
+            // var monthList = [...new Set(nodeDataModelingListFilter.map(ele => (ele.month)))];
+            var monthList = [];
+            var curDate = startDate;
+            for (var i = 0; curDate < stopDate; i++) {
+                curDate = moment(startDate).add(i, 'months').format("YYYY-MM-DD");
+                monthList.push(curDate)
+            }
             let columns = [];
             columns.push({ title: i18n.t('static.inventoryDate.inventoryReport'), type: 'calendar', options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker' }, width: 100, readOnly: true });
             var nodeVal = this.state.nodeVal;
             for (var k = 0; k < nodeVal.length; k++) {
                 columns.push({ title: nodeVal[k].label, width: 100, readOnly: true, type: displayBy == 1 ? 'numeric' : 'hidden', mask: displayBy == 1 ? '#,##.00' : '#,##.00 %', decimal: '.' });
             }
-            columns.push({ title: i18n.t('static.supplyPlan.total'), width: 100, readOnly: true, type: displayBy == 1 ? 'numeric' : 'hidden', mask: displayBy == 1 ? '#,##.00' : '#,## %' });
+            columns.push({ title: i18n.t('static.supplyPlan.total'), width: 100, readOnly: true, type: displayBy == 1 ? 'numeric' : 'hidden', mask: displayBy == 1 ? '#,##.00 %' : '#,## %' });
             for (var k = 0; k < nodeVal.length; k++) {
                 columns.push({ title: nodeVal[k].label, width: 100, readOnly: true, type: displayBy == 2 ? 'numeric' : 'hidden', mask: displayBy == 1 ? '#,##.00' : '#,##.00 %', decimal: '.' });
             }
-            columns.push({ title: i18n.t('static.supplyPlan.total'), width: 100, readOnly: true, type: displayBy == 2 ? 'numeric' : 'hidden', mask: displayBy == 1 ? '#,##.00' : '#,## %' });
+            columns.push({ title: i18n.t('static.supplyPlan.total'), width: 100, readOnly: true, type: displayBy == 2 ? 'numeric' : 'hidden', mask: displayBy == 1 ? '#,##.00 %' : '#,## %' });
             var data = [];
             var dataArr = [];
             var nodeVal = this.state.nodeVal;
             for (var j = 0; j < monthList.length; j++) {
                 data = [];
                 data[0] = moment(monthList[j]).format("YYYY-MM-DD");
-                var nodeDataListForMonth = nodeDataModelingListFilter.filter(c => moment(c.month).format("YYYY-MM-DD") == moment(monthList[j]).format("YYYY-MM-DD"));
+                // var nodeDataListForMonth = nodeDataModelingListFilter.filter(c => moment(c.month).format("YYYY-MM-DD") == moment(monthList[j]).format("YYYY-MM-DD"));
                 var total = 0;
                 var totalPer = 0;
                 for (var k = 0; k < nodeVal.length; k++) {
-                    var calculatedValue = nodeDataListForMonth.filter(c => c.id == nodeVal[k].value)[0].calculatedValue;
-                    data[k + 1] = Number(calculatedValue).toFixed(2);
+                    console.log("flatList.filter(c=>c.nodeId==nodeVal[k].value)[0]+++", flatList.filter(c => c.id == nodeVal[k].value)[0]);
+                    var flatListFiltered = flatList.filter(c => c.id == nodeVal[k].value)[0].payload.nodeDataMap[this.state.scenarioId][0].nodeDataMomList;
+                    var calculatedValue = flatListFiltered.length > 0 ? flatListFiltered.filter(c => moment(c.month).format("YYYY-MM-DD") == moment(monthList[j]).format("YYYY-MM-DD"))[0].calculatedValue : "";
+                    data[k + 1] = flatListFiltered.length > 0 ? Number(calculatedValue).toFixed(2) : "";
                     total += Number(calculatedValue);
                 }
                 data[nodeVal.length + 1] = Number(total).toFixed(2);
 
                 for (var k = 0; k < nodeVal.length; k++) {
-                    var calculatedValue = nodeDataListForMonth.filter(c => c.id == nodeVal[k].value)[0].calculatedValue;
+                    var flatListFiltered = flatList.filter(c => c.id == nodeVal[k].value)[0].payload.nodeDataMap[this.state.scenarioId][0].nodeDataMomList;
+                    var calculatedValue = flatListFiltered.length > 0 ? flatListFiltered.filter(c => moment(c.month).format("YYYY-MM-DD") == moment(monthList[j]).format("YYYY-MM-DD"))[0].calculatedValue : "";
                     var val = (Number(calculatedValue) / Number(total)) * 100;
                     data[nodeVal.length + 1 + k + 1] = calculatedValue != 0 ? Number(val).toFixed(2) : 0;
                     totalPer += calculatedValue != 0 ? val : 0;
@@ -362,7 +415,8 @@ class ModelingValidation extends Component {
             this.el = dataEl;
 
             this.setState({
-                nodeDataModelingList: nodeDataModelingListFilter,
+                nodeDataModelingList: [{}],
+                monthList: monthList,
                 dataEl: dataEl,
             })
             this.setState({
@@ -470,38 +524,38 @@ class ModelingValidation extends Component {
 
     componentDidMount() {
         this.setState({ loading: true });
-        this.getOfflineDatasetList();
-        // ProgramService.getDataSetList().then(response => {
-        //     if (response.status == 200) {
-        //         console.log("resp--------------------", response.data);
-        //         var responseData = response.data;
-        //         var datasetList = [];
-        //         for (var rd = 0; rd < responseData.length; rd++) {
-        //             var json = {
-        //                 id: responseData[rd].programId,
-        //                 name: getLabelText(responseData[rd].label, this.state.lang),
-        //                 versionList: responseData[rd].versionList
-        //             }
-        //             datasetList.push(json);
-        //         }
-        //         this.setState({
-        //             datasetList: datasetList,
-        //             loading: false
-        //         }, () => {
-        //             this.getOfflineDatasetList();
-        //         })
-        //     } else {
-        //         this.setState({
-        //             message: response.data.messageCode, loading: false
-        //         }, () => {
-        //             this.hideSecondComponent();
-        //         })
-        //     }
-        // }).catch(
-        //     error => {
-        //         this.getOfflineDatasetList();
-        //     }
-        // );
+        // this.getOfflineDatasetList();
+        ProgramService.getDataSetList().then(response => {
+            if (response.status == 200) {
+                console.log("resp--------------------", response.data);
+                var responseData = response.data;
+                var datasetList = [];
+                for (var rd = 0; rd < responseData.length; rd++) {
+                    var json = {
+                        id: responseData[rd].programId,
+                        name: getLabelText(responseData[rd].label, this.state.lang),
+                        versionList: responseData[rd].versionList
+                    }
+                    datasetList.push(json);
+                }
+                this.setState({
+                    datasetList: datasetList,
+                    loading: false
+                }, () => {
+                    this.getOfflineDatasetList();
+                })
+            } else {
+                this.setState({
+                    message: response.data.messageCode, loading: false
+                }, () => {
+                    this.hideSecondComponent();
+                })
+            }
+        }).catch(
+            error => {
+                this.getOfflineDatasetList();
+            }
+        );
     }
 
     getOfflineDatasetList() {
@@ -592,15 +646,43 @@ class ModelingValidation extends Component {
                     },
                     position: 'left',
                 }],
-                xAxes: [{
-                    ticks: {
-                        fontColor: 'black'
+                xAxes: [
+                    {
+                        id: 'xAxis1',
+                        gridLines: {
+                            color: "rgba(0, 0, 0, 0)",
+                        },
+                        ticks: {
+                            fontColor: 'black',
+                            autoSkip: false,
+                            callback: function (label) {
+                                var xAxis1 = label
+                                xAxis1 += '';
+                                var month = xAxis1.split('-')[0];
+                                return month;
+                            }
+                        }
                     },
-                    gridLines: {
-                        drawBorder: true, lineWidth: 0
-                    },
-                    stacked: true
-                }]
+                    {
+                        id: 'xAxis2',
+                        gridLines: {
+                            drawOnChartArea: false, // only want the grid lines for one axis to show up
+                        },
+                        ticks: {
+                            callback: function (label) {
+                                var xAxis2 = label
+                                xAxis2 += '';
+                                var month = xAxis2.split('-')[0];
+                                var year = xAxis2.split('-')[1];
+                                if (month === "Feb") {
+                                    return year;
+                                } else {
+                                    return "";
+                                }
+                            },
+                            autoSkip: false
+                        }
+                    }]
             },
             maintainAspectRatio: false,
             legend: {
@@ -616,7 +698,7 @@ class ModelingValidation extends Component {
         let bar = {}
         var datasetListForGraph = [];
         var colourArray = ["#002F6C", "#BA0C2F", "#65ID32", "#49A4A1", "#A7C6ED", "#212721", "#6C6463", "#49A4A1", "#EDB944", "#F48521"]
-        if (this.state.nodeDataModelingList.length > 0 && this.state.dataEl != undefined) {
+        if (this.state.monthList.length > 0 && this.state.dataEl != undefined) {
             var elInstance = this.state.dataEl;
             if (elInstance != undefined) {
                 var colourCount = 0;
@@ -634,10 +716,10 @@ class ModelingValidation extends Component {
                 })
             }
         }
-        if (this.state.nodeDataModelingList.length > 0) {
+        if (this.state.monthList.length > 0) {
             bar = {
 
-                labels: [...new Set(this.state.nodeDataModelingList.map(ele => moment(ele.month).format(DATE_FORMAT_CAP_WITHOUT_DATE)))],
+                labels: [...new Set(this.state.monthList.map(ele => moment(ele).format("MMM-YYYY")))],
                 datasets: datasetListForGraph
 
             };
@@ -910,7 +992,7 @@ class ModelingValidation extends Component {
                                 </Form>
                                 <Col md="12 pl-0" style={{ display: this.state.loading ? "none" : "block" }}>
                                     <div className="row">
-                                        {this.state.nodeDataModelingList.length > 0
+                                        {this.state.monthList.length > 0
                                             &&
                                             <div className="col-md-12 p-0">
                                                 <div className="col-md-12">
