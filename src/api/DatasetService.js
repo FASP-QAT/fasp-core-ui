@@ -46,6 +46,10 @@ class DatasetService {
         return axios.put(`${API_URL}/api/treeTemplate`, json, {
         });
     }
+    saveDatasetData(json, comparedVersionId) {
+        return axios.put(`${API_URL}/api/datasetData/${comparedVersionId}`, json, {}
+        );
+    }
 
 }
 export default new DatasetService()

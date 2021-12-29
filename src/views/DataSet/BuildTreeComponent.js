@@ -50,7 +50,7 @@ import { grey } from '@material-ui/core/colors';
 import docicon from '../../assets/img/doc.png'
 import { saveAs } from "file-saver";
 import { Document, ImageRun, Packer, Paragraph, ShadingType, TextRun } from "docx";
-import { calculateModelingData } from '../../views/DataSet/ModelingDataCalculations';
+import { calculateModelingData } from '../../views/DataSet/ModelingDataCalculation1';
 import AuthenticationService from '../Common/AuthenticationService';
 import SupplyPlanFormulas from "../SupplyPlan/SupplyPlanFormulas";
 import classNames from 'classnames';
@@ -500,11 +500,22 @@ export default class BuildTree extends Component {
     fetchTracerCategoryList(programData) {
         console.log("programData---%%%%%%%", programData);
         var planningUnitList = programData.planningUnitList.filter(x => x.treeForecast == true);
+        var updatedPlanningUnitList = [];
         var forecastingUnitList = [];
         var tracerCategoryList = [];
         planningUnitList.map(item => {
             forecastingUnitList.push({
-                label: item.planningUnit.forecastingUnit.label, id: item.planningUnit.forecastingUnit.id
+                label: item.planningUnit.forecastingUnit.label, id: item.planningUnit.forecastingUnit.id,
+                unit: item.planningUnit.forecastingUnit.unit
+            })
+        })
+
+        planningUnitList.map(item => {
+            updatedPlanningUnitList.push({
+                label: item.planningUnit.label, id: item.planningUnit.id,
+                unit: item.planningUnit.unit,
+                forecastingUnit: item.planningUnit.forecastingUnit,
+                multiplier: item.planningUnit.multiplier
             })
         })
         console.log("duplicate fu list--->", forecastingUnitList);
@@ -515,11 +526,13 @@ export default class BuildTree extends Component {
         })
         console.log("duplicate tc list--->", tracerCategoryList);
         forecastingUnitList = [...new Map(forecastingUnitList.map(v => [v.id, v])).values()];
-        // console.log("unique fu list--->", uniqueForecastingUnitList);
+        console.log("unique fu list--->", forecastingUnitList);
         tracerCategoryList = [...new Map(tracerCategoryList.map(v => [v.id, v])).values()];
         // console.log("unique tc list--->", tracerCategoryList);
         this.setState({
-            tracerCategoryList
+            tracerCategoryList,
+            forecastingUnitList,
+            planningUnitList: updatedPlanningUnitList
         });
     }
 
@@ -2467,7 +2480,20 @@ export default class BuildTree extends Component {
             } else {
                 if (type == 1) {
                     console.log("get payload 5");
-                    return addCommas((itemConfig.payload.nodeDataMap[scenarioId])[0].displayDataValue) + "% of parent";
+                    if (itemConfig.payload.nodeType.id == 4) {
+                        if ((itemConfig.payload.nodeDataMap[scenarioId])[0].fuNode.usageType.id == 2) {
+                            return addCommas((itemConfig.payload.nodeDataMap[scenarioId])[0].displayDataValue) + "% of parent, " + (itemConfig.payload.nodeDataMap[scenarioId])[0].fuNode.noOfForecastingUnitsPerPerson + "/" + (itemConfig.payload.nodeDataMap[scenarioId])[0].fuNode.usagePeriod.label.label_en;
+                        } else {
+                            return addCommas((itemConfig.payload.nodeDataMap[scenarioId])[0].displayDataValue) + "% of parent";
+                        }
+
+                    } else if (itemConfig.payload.nodeType.id == 5) {
+                        console.log("payload get puNode---", (itemConfig.payload.nodeDataMap[scenarioId])[0]);
+                        return addCommas((itemConfig.payload.nodeDataMap[scenarioId])[0].displayDataValue) + "% of parent, conversion = " + (itemConfig.payload.nodeDataMap[scenarioId])[0].puNode.planningUnit.multiplier;
+                    } else {
+                        return addCommas((itemConfig.payload.nodeDataMap[scenarioId])[0].displayDataValue) + "% of parent";
+                    }
+
                 } else if (type == 3) {
                     console.log("get payload 6");
                     var childList = this.state.items.filter(c => c.parent == itemConfig.id && (c.payload.nodeType.id == 3 || c.payload.nodeType.id == 4 || c.payload.nodeType.id == 5));
@@ -3064,86 +3090,30 @@ export default class BuildTree extends Component {
 
     getPlanningUnitListByFUId(forecastingUnitId) {
         console.log("forecastingUnitId---", forecastingUnitId);
-        PlanningUnitService.getActivePlanningUnitListByFUId(forecastingUnitId).then(response => {
-            console.log("response---", response.data)
-            var listArray = response.data;
-            listArray.sort((a, b) => {
-                var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-                var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
-                return itemLabelA > itemLabelB ? 1 : -1;
-            });
+        console.log("pl unit---", this.state.planningUnitList);
+        var planningUnitList = this.state.planningUnitList.filter(x => x.forecastingUnit.id == forecastingUnitId);
+        this.setState({
+            planningUnitList
+        }, () => {
+            console.log("filtered planning unit list---", this.state.planningUnitList);
+            if (this.state.currentItemConfig.context.payload.nodeType.id == 5 && this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario].puNode != null) {
+                console.log("test---", this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.planningUnit.id);
+                var conversionFactor = this.state.planningUnitList.filter(x => x.id == this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.planningUnit.id)[0].multiplier;
+                this.setState({
+                    conversionFactor
+                }, () => {
+                    this.getUsageText();
+                });
+            }
+        });
 
-            this.setState({
-                planningUnitList: listArray
-            }, () => {
-                console.log(" get uasge template--------------", response.data);
-                console.log("@@@", this.state.planningUnitList, "@@@", this.state.currentScenario.puNode.planningUnit.id);
-                if (this.state.currentItemConfig.context.payload.nodeType.id == 5 && this.state.currentScenario.puNode.planningUnit.id != undefined) {
-                    var conversionFactor = this.state.planningUnitList.filter(x => x.planningUnitId == this.state.currentScenario.puNode.planningUnit.id)[0].multiplier;
-                    this.setState({
-                        conversionFactor
-                    }, () => {
-                        this.getUsageText();
-                    });
-
-                } else {
-                    console.log("noOfMonthsInUsagePeriod---", this.state.noOfMonthsInUsagePeriod);
-                }
-                // const { currentItemConfig } = this.state;
-                // (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].puNode.planningUnit.unit.id = (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].puNode.planningUnit.unit.id;
-                // (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].puNode.planningUnit.id = (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].puNode.planningUnit.id;
-                // this.setState({
-                //     currentItemConfig
-                // })
-            })
-        })
-            .catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({
-                            message: 'static.unkownError',
-                            loading: false
-                        });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
-
-                            case 401:
-                                this.props.history.push(`/login/static.message.sessionExpired`)
-                                break;
-                            case 403:
-                                this.props.history.push(`/accessDenied`)
-                                break;
-                            case 500:
-                            case 404:
-                            case 406:
-                                this.setState({
-                                    message: error.response.data.messageCode,
-                                    loading: false
-                                });
-                                break;
-                            case 412:
-                                this.setState({
-                                    message: error.response.data.messageCode,
-                                    loading: false
-                                });
-                                break;
-                            default:
-                                this.setState({
-                                    message: 'static.unkownError',
-                                    loading: false
-                                });
-                                break;
-                        }
-                    }
-                }
-            );
     }
 
     getForecastingUnitUnitByFUId(forecastingUnitId) {
         console.log("forecastingUnitId---", forecastingUnitId);
         console.log("%%%this.state.forecastingUnitList---", this.state.forecastingUnitList);
         const { currentItemConfig } = this.state;
-        var forecastingUnit = (this.state.forecastingUnitList.filter(c => c.forecastingUnitId == forecastingUnitId))[0];
+        var forecastingUnit = (this.state.forecastingUnitList.filter(c => c.id == forecastingUnitId))[0];
         console.log("forecastingUnit---", forecastingUnit);
         (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.forecastingUnit.unit.id = forecastingUnit.unit.id;
         console.log("currentItemConfig---", currentItemConfig);
@@ -3455,7 +3425,7 @@ export default class BuildTree extends Component {
                 var planningUnitId = document.getElementById("planningUnitId");
                 var planningUnit = planningUnitId.options[planningUnitId.selectedIndex].text;
             } else {
-                var planningUnit = this.state.planningUnitList.filter(c => c.planningUnitId == this.state.currentScenario.puNode.planningUnit.id)[0].label.label_en;
+                var planningUnit = this.state.planningUnitList.filter(c => c.id == this.state.currentScenario.puNode.planningUnit.id)[0].label.label_en;
             }
             if ((this.state.currentItemConfig.parentItem.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.usageType.id == 1) {
                 var sharePu;
@@ -3489,63 +3459,96 @@ export default class BuildTree extends Component {
         var tracerCategoryId = this.state.currentScenario.fuNode.forecastingUnit.tracerCategory.id;
         var scenarioId = this.state.selectedScenario;
         console.log("%%%tracerCategoryId---", tracerCategoryId)
-        var db1;
-        getDatabase();
-        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-        openRequest.onsuccess = function (e) {
-            db1 = e.target.result;
-            var transaction = db1.transaction(['forecastingUnit'], 'readwrite');
-            var program = transaction.objectStore('forecastingUnit');
-            var getRequest = program.getAll();
-
-            getRequest.onerror = function (event) {
-                // Handle errors!
-            };
-            getRequest.onsuccess = function (event) {
-                var myResult = [];
-                myResult = getRequest.result;
-                console.log("%myResult---", myResult);
-                var newResult = myResult.filter(x => x.tracerCategory.id == this.state.currentScenario.fuNode.forecastingUnit.tracerCategory.id);
-                console.log("%newResult---", newResult);
-                console.log("");
-                var autocompleteData = [];
-                for (var i = 0; i < newResult.length; i++) {
-                    autocompleteData[i] = { value: newResult[i].forecastingUnitId, label: newResult[i].label.label_en + " [" + newResult[i].forecastingUnitId + "]" }
-                }
+        var forecastingUnitList = this.state.forecastingUnitList;
+        var autocompleteData = [];
+        for (var i = 0; i < forecastingUnitList.length; i++) {
+            autocompleteData[i] = { value: forecastingUnitList[i].id, label: forecastingUnitList[i].id + "|" + getLabelText(forecastingUnitList[i].label, this.state.lang) }
+        }
+        this.setState({
+            autocompleteData
+        }, () => {
+            console.log("my autocomplete data---", autocompleteData);
+            if (forecastingUnitList.length == 1) {
+                console.log("fu list 1---");
+                const currentItemConfig = this.state.currentItemConfig;
+                (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.forecastingUnit.id = forecastingUnitList[0].id;
+                (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.forecastingUnit.label.label_en = forecastingUnitList[0].id + "|" + getLabelText(forecastingUnitList[0].label, this.state.lang);
                 this.setState({
-                    autocompleteData,
-                    forecastingUnitList: myResult
+                    currentItemConfig: currentItemConfig,
+                    currentScenario: (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0]
                 }, () => {
-                    console.log("%%%autocompleteData----", this.state.autocompleteData);
-                    console.log("%%%forecastingUnitList----", this.state.forecastingUnitList);
-                    if (newResult.length == 1) {
-                        const currentItemConfig = this.state.currentItemConfig;
-                        (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.forecastingUnit.id = newResult[0].forecastingUnitId;
-                        (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.forecastingUnit.label.label_en = newResult[0].forecastingUnitId + " | " + newResult[0].label.label_en;
-                        this.setState({
-                            currentItemConfig: currentItemConfig
-                        }, () => {
-                            this.getForecastingUnitUnitByFUId(newResult[0].forecastingUnitId);
-                        })
-                    } else {
-                        const currentItemConfig = this.state.currentItemConfig;
-                        (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.forecastingUnit.id = "";
-                        (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.forecastingUnit.label.label_en = "";
-                        this.setState({
-                            currentItemConfig: currentItemConfig
+                    console.log("cur item config--- ", this.state.currentItemConfig);
+                    this.getForecastingUnitUnitByFUId(forecastingUnitList[0].id);
+                })
+            } else {
+                console.log("fu list 2---");
+                const currentItemConfig = this.state.currentItemConfig;
+                (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.forecastingUnit.id = "";
+                (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.forecastingUnit.label.label_en = "";
+                this.setState({
+                    currentItemConfig: currentItemConfig
 
-                        }, () => {
+                }, () => {
 
-                        })
-                    }
-                });
-                for (var i = 0; i < newResult.length; i++) {
-                    console.log("newResult--->", newResult[i])
+                })
+            }
+        });
+        // var db1;
+        // getDatabase();
+        // var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+        // openRequest.onsuccess = function (e) {
+        //     db1 = e.target.result;
+        //     var transaction = db1.transaction(['forecastingUnit'], 'readwrite');
+        //     var program = transaction.objectStore('forecastingUnit');
+        //     var getRequest = program.getAll();
 
-                }
+        //     getRequest.onerror = function (event) {
+        //     };
+        //     getRequest.onsuccess = function (event) {
+        //         var myResult = [];
+        //         myResult = getRequest.result;
+        //         console.log("%myResult---", myResult);
+        //         var newResult = myResult.filter(x => x.tracerCategory.id == this.state.currentScenario.fuNode.forecastingUnit.tracerCategory.id);
+        //         console.log("%newResult---", newResult);
+        //         console.log("");
+        //         var autocompleteData = [];
+        //         for (var i = 0; i < newResult.length; i++) {
+        //             autocompleteData[i] = { value: newResult[i].forecastingUnitId, label: newResult[i].label.label_en + " [" + newResult[i].forecastingUnitId + "]" }
+        //         }
+        //         this.setState({
+        //             autocompleteData,
+        //             forecastingUnitList: myResult
+        //         }, () => {
+        //             console.log("%%%autocompleteData----", this.state.autocompleteData);
+        //             console.log("%%%forecastingUnitList----", this.state.forecastingUnitList);
+        //             if (newResult.length == 1) {
+        //                 const currentItemConfig = this.state.currentItemConfig;
+        //                 (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.forecastingUnit.id = newResult[0].forecastingUnitId;
+        //                 (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.forecastingUnit.label.label_en = newResult[0].forecastingUnitId + " | " + newResult[0].label.label_en;
+        //                 this.setState({
+        //                     currentItemConfig: currentItemConfig
+        //                 }, () => {
+        //                     this.getForecastingUnitUnitByFUId(newResult[0].forecastingUnitId);
+        //                 })
+        //             } else {
+        //                 const currentItemConfig = this.state.currentItemConfig;
+        //                 (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.forecastingUnit.id = "";
+        //                 (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.forecastingUnit.label.label_en = "";
+        //                 this.setState({
+        //                     currentItemConfig: currentItemConfig
 
-            }.bind(this);
-        }.bind(this);
+        //                 }, () => {
+
+        //                 })
+        //             }
+        //         });
+        //         for (var i = 0; i < newResult.length; i++) {
+        //             console.log("newResult--->", newResult[i])
+
+        //         }
+
+        //     }.bind(this);
+        // }.bind(this);
     }
     hideTreeValidation(e) {
         this.setState({
@@ -4968,7 +4971,7 @@ export default class BuildTree extends Component {
         }
 
         if (event.target.name === "planningUnitId") {
-            var pu = (this.state.planningUnitList.filter(c => c.planningUnitId == event.target.value))[0];
+            var pu = (this.state.planningUnitList.filter(c => c.id == event.target.value))[0];
             (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].puNode.planningUnit.unit.id = pu.unit.id;
             (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].puNode.planningUnit.id = event.target.value;
             this.setState({
@@ -5200,7 +5203,6 @@ export default class BuildTree extends Component {
                 parentScenario: data.context.level == 0 ? [] : (data.parentItem.payload.nodeDataMap[this.state.selectedScenario])[0]
             }, () => {
                 var scenarioId = this.state.selectedScenario;
-                console.log("cursor change---", scenarioId);
                 console.log("cursor change current item config---", this.state.currentItemConfig);
                 if (data.context.level != 0) {
                     this.setState({
@@ -5211,7 +5213,7 @@ export default class BuildTree extends Component {
                 if (data.context.payload.nodeType.id == 4) {
                     console.log("on curso tracer category---", (data.context.payload.nodeDataMap[scenarioId])[0].fuNode.forecastingUnit.tracerCategory.id);
                     console.log("on curso tracer category list---", this.state.tracerCategoryList);
-                    this.getForecastingUnitListByTracerCategoryId((data.context.payload.nodeDataMap[scenarioId])[0].fuNode.forecastingUnit.tracerCategory.id);
+                    this.getForecastingUnitListByTracerCategoryId();
                     this.getNodeUnitOfPrent();
                     this.getNoOfFUPatient();
                     this.getNoOfMonthsInUsagePeriod();
@@ -5808,7 +5810,7 @@ export default class BuildTree extends Component {
                                                         {this.state.planningUnitList.length > 0
                                                             && this.state.planningUnitList.map((item, i) => {
                                                                 return (
-                                                                    <option key={i} value={item.planningUnitId}>
+                                                                    <option key={i} value={item.id}>
                                                                         {getLabelText(item.label, this.state.lang)}
                                                                     </option>
                                                                 )
@@ -7955,7 +7957,7 @@ export default class BuildTree extends Component {
                                                 <div className="col-md-6 pl-lg-0"> <h5 style={{ color: '#BA0C2F' }}>{i18n.t('static.tree.pleaseSaveAndDoARecalculateAfterDragAndDrop.')}</h5></div>
                                                 <div className="col-md-6 pr-lg-0"> <Button type="button" size="md" color="info" className="float-right mr-1" onClick={() => this.callAfterScenarioChange(this.state.selectedScenario)}><i className="fa fa-calculator"></i> {i18n.t('static.tree.calculated')}</Button>
                                                     {/* <Button type="button" size="md" color="warning" className="float-right mr-1" onClick={this.resetTree}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button> */}
-                                                    <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.onSaveClick()}><i className="fa fa-check"> </i>{i18n.t('static.pipeline.save')}</Button>
+                                                    <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.saveTreeData()}><i className="fa fa-check"> </i>{i18n.t('static.pipeline.save')}</Button>
                                                 </div>
                                             </div>
                                         </CardFooter>

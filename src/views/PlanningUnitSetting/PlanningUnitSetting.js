@@ -1098,6 +1098,8 @@ export default class PlanningUnitSetting extends Component {
             data[8] = outPutList[j].price;
             data[9] = outPutList[j].programPlanningUnitId;
             data[10] = 0;
+            data[11] = 0;
+            data[12] = outPutList[j].selectedForecastMap;
 
             // data[0] = outPutList[j].a1a;
             // data[1] = outPutList[j].a2a;
@@ -1207,6 +1209,16 @@ export default class PlanningUnitSetting extends Component {
                     type: 'hidden',
                     // readOnly: true //10K
                 },
+                {
+                    title: 'isNewRowAdded',
+                    type: 'hidden',
+                    // readOnly: true //11L
+                },
+                {
+                    title: 'selected forecast map',
+                    type: 'hidden',
+                    // readOnly: true //11L
+                },
                 //-----------------
                 // {
                 //     title: 'Planning Unit Category',
@@ -1267,8 +1279,8 @@ export default class PlanningUnitSetting extends Component {
             updateTable: function (el, cell, x, y, source, value, id) {
                 var elInstance = el.jexcel;
                 var rowData = elInstance.getRowData(y);
-                var programPlanningUnitId = rowData[9];
-                if (programPlanningUnitId == 0) {
+                var programPlanningUnitId = rowData[11];
+                if (programPlanningUnitId == 1) {
                     var cell = elInstance.getCell(`B${parseInt(y) + 1}`)
                     var cellA = elInstance.getCell(`A${parseInt(y) + 1}`)
                     cell.classList.remove('readonly');
@@ -1453,6 +1465,7 @@ export default class PlanningUnitSetting extends Component {
                         "idString": "" + parseInt(map1.get("7"))
                     }),
                     "price": this.el.getValue(`I${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                    "selectedForecastMap":map1.get("12")
                 }
 
                 planningUnitList.push(tempJson);
@@ -1560,6 +1573,8 @@ export default class PlanningUnitSetting extends Component {
         data[8] = "";
         data[9] = 0;
         data[10] = 1;
+        data[11] = 1;
+        data[12] = null;
 
         this.el.insertRow(
             data, 0, 1

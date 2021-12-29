@@ -1177,6 +1177,7 @@ export default class CreateTreeTemplate extends Component {
     buildModelingJexcel() {
         var scalingList = this.state.scalingList;
         console.log("scalingList---", scalingList);
+        console.log("scalingList length---", scalingList.length);
         var dataArray = [];
         let count = 0;
 
@@ -1912,7 +1913,7 @@ export default class CreateTreeTemplate extends Component {
         (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.noOfPersons = usageTemplate.noOfPatients;
         (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.noOfForecastingUnitsPerPerson = usageTemplate.noOfForecastingUnits;
         (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageFrequency = usageTemplate.usageFrequencyCount;
-        (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usagePeriod.usagePeriodId = usageTemplate.usageFrequencyUsagePeriod.usagePeriodId;
+        (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usagePeriod.usagePeriodId = usageTemplate.usageFrequencyUsagePeriod != null ? usageTemplate.usageFrequencyUsagePeriod.usagePeriodId : '';
         (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.unit.id = usageTemplate.unit.id;
         if ((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageType.id == 1) {
             (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.oneTimeUsage = usageTemplate.oneTimeUsage;
@@ -1964,7 +1965,7 @@ export default class CreateTreeTemplate extends Component {
                 }
             } else {
                 // var noOfFUPatient = this.state.noOfFUPatient;
-                var convertToMontRepeat = (this.state.usagePeriodList.filter(c => c.usagePeriodId == document.getElementById("repeatUsagePeriodId").value))[0].convertToMonth;
+                // var convertToMontRepeat = (this.state.usagePeriodList.filter(c => c.usagePeriodId == document.getElementById("repeatUsagePeriodId").value))[0].convertToMonth;
                 var noOfFUPatient;
                 if (this.state.currentItemConfig.context.payload.nodeType.id == 4) {
                     noOfFUPatient = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.noOfForecastingUnitsPerPerson / (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.noOfPersons;
@@ -1979,7 +1980,7 @@ export default class CreateTreeTemplate extends Component {
             // console.log("convertToMontRepeat>>>", convertToMontRepeat);
             // console.log(">>>", (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.repeatCount);
             // console.log(">>>", noOfMonthsInUsagePeriod);
-            var noFURequired = ((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.repeatCount / convertToMontRepeat) * noOfMonthsInUsagePeriod;
+            var noFURequired = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.repeatCount / (convertToMonth * noOfMonthsInUsagePeriod);
             console.log("noFURequired---", noFURequired);
             this.setState({
                 noFURequired
@@ -2078,15 +2079,7 @@ export default class CreateTreeTemplate extends Component {
 
 
             if ((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageType.id == 2 || (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.oneTimeUsage != "true") {
-                if (this.state.addNodeFlag) {
-                    var usagePeriodId = document.getElementById("usagePeriodId");
-                    selectedText2 = usagePeriodId.options[usagePeriodId.selectedIndex].text;
-                } else {
-                    // console.log("usagePeriodList>>>", this.state.usagePeriodList);
-                    // var usagePeriodId = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usagePeriod.usagePeriodId;
-                    // console.log("usagePeriodId>>>", usagePeriodId);
-                    selectedText2 = this.state.usagePeriodList.filter(c => c.usagePeriodId == (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usagePeriod.usagePeriodId)[0].label.label_en;
-                }
+                selectedText2 = this.state.usagePeriodList.filter(c => c.usagePeriodId == (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usagePeriod.usagePeriodId)[0].label.label_en;
             }
         }
         // FU
@@ -2995,7 +2988,7 @@ export default class CreateTreeTemplate extends Component {
         });
         if (tab == 2) {
             console.log("***>>>", this.state.currentItemConfig);
-            if (this.state.currentItemConfig.context.payload.nodeType.id == 2 || this.state.currentItemConfig.context.payload.nodeType.id == 3) {
+            if (this.state.currentItemConfig.context.payload.nodeType.id != 1) {
                 var curDate = (moment(Date.now()).utcOffset('-0500').format('YYYY-MM-DD'));
                 var month = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].month;
                 var minMonth = moment(month).subtract(this.state.treeTemplate.monthsInPast, 'months').startOf('month').format("YYYY-MM-DD");
@@ -3413,7 +3406,7 @@ export default class CreateTreeTemplate extends Component {
                 level0: (data.context.level == 0 ? false : true),
                 numberNode: (data.context.payload.nodeType.id == 2 ? false : true),
                 aggregationNode: (data.context.payload.nodeType.id == 1 ? false : true),
-                scalingList: (data.context.payload.nodeDataMap[0])[0].nodeDataModelingList,
+                scalingList: (data.context.payload.nodeDataMap[0])[0].nodeDataModelingList != null ? (data.context.payload.nodeDataMap[0])[0].nodeDataModelingList : [],
                 //         title: item.title,
                 //         config: {
                 //             ...config,
@@ -4308,8 +4301,8 @@ export default class CreateTreeTemplate extends Component {
                                                 <>
                                                     <FormGroup className="col-md-1">
                                                         <Label for="isSync">Single Use </Label>
-                                                       </FormGroup>
-                                                       <div className="col-md-10" style={{marginLeft:'4%'}}>
+                                                    </FormGroup>
+                                                    <div className="col-md-10" style={{ marginLeft: '4%' }}>
                                                         <FormGroup className="ml-lg-3" check inline >
                                                             <Input
                                                                 className="form-check-input"
