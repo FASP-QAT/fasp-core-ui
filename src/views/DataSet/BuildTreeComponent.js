@@ -7808,7 +7808,7 @@ export default class BuildTree extends Component {
                                                                     />
                                                                 </div>
                                                             </FormGroup>
-                                                            <FormGroup className="col-md-6">
+                                                            <FormGroup className="col-md-5">
                                                                 <Label htmlFor="currencyId">{i18n.t('static.common.note')}</Label>
                                                                 <Input type="textarea"
                                                                     id="treeNotes"
@@ -7817,7 +7817,7 @@ export default class BuildTree extends Component {
                                                                     value={this.state.curTreeObj.notes != "" ? this.state.curTreeObj.notes : ''}
                                                                 ></Input>
                                                             </FormGroup>
-                                                            <FormGroup className="col-md-6 pt-lg-4">
+                                                            <FormGroup className="col-md-4 pt-lg-4">
                                                                 <Label className="P-absltRadio">{i18n.t('static.common.status')}</Label>
                                                                 <FormGroup check inline>
                                                                     <Input
@@ -7852,7 +7852,7 @@ export default class BuildTree extends Component {
                                                                     </Label>
                                                                 </FormGroup>
                                                             </FormGroup>
-                                                            <FormGroup className="col-md-6">
+                                                            <FormGroup className="col-md-3 pt-lg-4">
                                                                 <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setState({ showDiv: false })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                                                 <Button type="submit" size="md" onClick={(e) => { this.createOrUpdateTree() }} color="success" className="submitBtn float-right mr-1"> <i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
                                                             </FormGroup>
