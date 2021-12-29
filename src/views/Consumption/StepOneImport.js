@@ -441,12 +441,12 @@ export default class StepOneImportMapPlanningUnits extends Component {
                     var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                     var programJson1 = JSON.parse(programData);
                     console.log("programJson1-------->1", programJson1);
-                    let dupForecastingUnitObj = programJson1.consumptionList.map(ele => ele.consumptionUnit.forecastingUnit);
+                    let dupForecastingUnitObj = programJson1.planningUnitList.map(ele => ele.planningUnit.forecastingUnit);
                     const ids = dupForecastingUnitObj.map(o => o.id)
                     const filtered = dupForecastingUnitObj.filter(({ id }, index) => !ids.includes(id, index + 1))
                     // console.log("programJson1-------->2", filtered);
 
-                    let dupPlanningUnitObjwithNull = programJson1.consumptionList.map(ele => ele.consumptionUnit.planningUnit);
+                    let dupPlanningUnitObjwithNull = programJson1.planningUnitList.map(ele => ele.planningUnit);
                     let dupPlanningUnitObj = dupPlanningUnitObjwithNull.filter(c => c != null);
                     const idsPU = dupPlanningUnitObj.map(o => o.id)
                     const filteredPU = dupPlanningUnitObj.filter(({ id }, index) => !idsPU.includes(id, index + 1))
@@ -461,7 +461,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                         forecastStartDate: (programJson1.currentVersion.forecastStartDate ? moment(programJson1.currentVersion.forecastStartDate).format(`MMM-YYYY`) : ''),
                         forecastStopDate: (programJson1.currentVersion.forecastStopDate ? moment(programJson1.currentVersion.forecastStopDate).format(`MMM-YYYY`) : ''),
                         healthAreaList: programJson1.healthAreaList,
-                        consumptionList: programJson1.consumptionList,
+                        actualConsumptionList: programJson1.actualConsumptionList,
                         filteredForecastingUnit: filtered,
                         filteredPlanningUnit: filteredPU,
                         regionList: programJson1.regionList,

@@ -5,7 +5,7 @@ import {
     Card,
     CardBody,
     Col,
-    Table, FormGroup, Input, InputGroup, Label, Form
+    Table, FormGroup, Input, InputGroup, Label, Form, Button, CardFooter
 } from 'reactstrap';
 import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
 import i18n from '../../i18n'
@@ -100,6 +100,7 @@ class ForecastSummary extends Component {
             endDateDisplay: '',
             beforeEndDateDisplay: '',
             totalProductCost: 0,
+            regPlanningUnitList: []
 
         };
         this.getPrograms = this.getPrograms.bind(this);
@@ -120,6 +121,9 @@ class ForecastSummary extends Component {
         this.toggleAccordionTotalDiffernce = this.toggleAccordionTotalDiffernce.bind(this);
         this.storeProduct = this.storeProduct.bind(this)
         this.hideCalculation = this.hideCalculation.bind(this);
+        this.filterTsList = this.filterTsList.bind(this);
+        this.saveSelectedForecast = this.saveSelectedForecast.bind(this);
+        this.forecastChanged = this.forecastChanged.bind(this)
 
     }
 
@@ -228,7 +232,10 @@ class ForecastSummary extends Component {
     filterData() {
         let programId = document.getElementById("programId").value;
         let versionId = document.getElementById("versionId").value;
-        let planningUnitId = document.getElementById("displayId").value;
+        let displayId = document.getElementById("displayId").value;
+        this.setState({
+            displayId: displayId
+        })
         let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
         let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate();
 
@@ -239,7 +246,6 @@ class ForecastSummary extends Component {
 
         if (versionId != 0 && programId > 0) {
             if (versionId.includes('Local')) {
-
                 var db1;
                 getDatabase();
                 var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
@@ -476,19 +482,188 @@ class ForecastSummary extends Component {
                             console.log("Test------------>3", summeryData);
                             this.setState({
                                 summeryData: summeryData,
-                                totalProductCost: totalProductCost
+                                totalProductCost: totalProductCost,
+                                regDatasetJson: filteredProgram,
+                                regPlanningUnitList: planningUnitList,
+                                regRegionList: filteredProgram.regionList,
+                                tracerCategoryList: [...new Set(planningUnitList.map(ele => (ele.planningUnit.forecastingUnit.tracerCategory.id)))]
+                            }, () => {
+                                if (displayId == 2) {
+                                    // console.log("langaugeList---->", langaugeList);
+                                    let dataArray = [];
+                                    var treeList = this.state.regDatasetJson.treeList;
+                                    console.log("TreeList+++", treeList)
+                                    var consumptionExtrapolation = this.state.regDatasetJson.consumptionExtrapolation;
+                                    var tsList = [];
+                                    let startDate = this.state.regDatasetJson.forecastStartDate;
+                                    let endDate = this.state.regDatasetJson.forecastStopDate;
+                                    for (var tl = 0; tl < treeList.length; tl++) {
+                                        var scenarioList = treeList[tl].scenarioList;
+                                        for (var sl = 0; sl < scenarioList.length; sl++) {
+                                            tsList.push({ id: "T" + scenarioList[sl].id, name: treeList[tl].label.label_en + " - " + scenarioList[sl].label.label_en, flatList: treeList[tl].tree.flatList, planningUnitId: "", type: "T", id1: scenarioList[sl].id, totalForecast: 0 });
+                                        }
+                                    }
+                                    for (var ce = 0; ce < consumptionExtrapolation.length; ce++) {
+                                        var total = 0;
+                                        console.log("consumptionExtrapolation[ce].extrapolationDataList+++", consumptionExtrapolation[ce].extrapolationDataList)
+                                        consumptionExtrapolation[ce].extrapolationDataList.filter(c => moment(c.month).format("YYYY-MM-DD") >= moment(startDate).format("YYYY-MM-DD") && moment(c.month).format("YYYY-MM-DD") <= moment(endDate).format("YYYY-MM-DD")).map(ele => {
+                                            total += ele.amount;
+                                        });
+                                        console.log("total+++", total);
+                                        tsList.push({ id: "C" + consumptionExtrapolation[ce].consumptionExtrapolationId, name: consumptionExtrapolation[ce].extrapolationMethod.label.label_en, planningUnitId: consumptionExtrapolation[ce].planningUnit.id, type: "C", id1: consumptionExtrapolation[ce].consumptionExtrapolationId, totalForecast: total });
+                                    }
+                                    this.setState({
+                                        tsList: tsList
+                                    })
+                                    var data = []
+                                    var tcList = this.state.tracerCategoryList;
+                                    console.log("tcList+++", tcList);
+                                    var puList = this.state.regPlanningUnitList;
+                                    console.log("PuList+++", puList);
+                                    var regRegionList = this.state.regRegionList;
+                                    for (var tc = 0; tc < tcList.length; tc++) {
+                                        data = [];
+                                        data[0] = puList.filter(c => c.planningUnit.forecastingUnit.tracerCategory.id == tcList[tc])[0].planningUnit.forecastingUnit.tracerCategory.label.label_en;
+                                        data[1] = "";
+                                        data[2] = "";
+                                        for (var k = 0; k < this.state.regRegionList.length; k++) {
+                                            data[k + 3] = "";
+                                            data[k + 4] = "";
+                                            data[k + 5] = "";
+                                        }
+                                        data[(regRegionList.length * 3) + 3] = 1
+                                        data[(regRegionList.length * 3) + 4] = ""
+
+                                        dataArray.push(data);
+                                        var puListFiltered = puList.filter(c => c.planningUnit.forecastingUnit.tracerCategory.id == tcList[tc]);
+                                        for (var j = 0; j < puListFiltered.length; j++) {
+                                            data = [];
+                                            data[0] = puListFiltered[j].planningUnit.forecastingUnit.label.label_en;
+                                            data[1] = puListFiltered[j].planningUnit;
+                                            data[2] = puListFiltered[j].planningUnit.label.label_en;
+                                            var total = 0;
+                                            for (var k = 0; k < regRegionList.length; k++) {
+                                                var filterForecastSelected = puListFiltered[j].selectedForecastMap[regRegionList[k].regionId]
+                                                console.log("filterForecastSelected+++", filterForecastSelected);
+                                                console.log("filterForecastSelected != undefined ? filterForecastSelected.notes : +++", filterForecastSelected != undefined ? filterForecastSelected.notes : "");
+                                                data[(k + 1) * 3] = (filterForecastSelected != undefined) ? (filterForecastSelected.scenarioId > 0) ? "T" + filterForecastSelected.scenarioId : (filterForecastSelected.consumptionExtrapolationId > 0) ? "C" + filterForecastSelected.consumptionExtrapolationId : "" : "";
+                                                data[((k + 1) * 3) + 1] = filterForecastSelected != undefined ? filterForecastSelected.totalForecast : "";
+                                                total += Number(filterForecastSelected != undefined ? filterForecastSelected.totalForecast : 0);
+                                                data[((k + 1) * 3) + 2] = filterForecastSelected != undefined ? filterForecastSelected.notes : "";
+                                            }
+                                            data[(regRegionList.length * 3) + 3] = 2
+                                            data[(regRegionList.length * 3) + 4] = total;
+                                            dataArray.push(data);
+                                        }
+                                    }
+                                    var columns = [];
+                                    columns.push({ title: "Forecasting Unit", type: 'text', width: 100, readOnly: true });
+                                    columns.push({ title: "Planning Unit", type: 'hidden', width: 100, readOnly: true });
+                                    columns.push({ title: "Planning Unit", type: 'text', width: 100, readOnly: true });
+                                    for (var k = 0; k < regRegionList.length; k++) {
+                                        columns.push({ title: "Selected Forecast", type: 'dropdown', width: 100, source: tsList, filter: this.filterTsList });
+                                        columns.push({ title: "Forecast Quantity", type: 'numeric', textEditor: true, mask: '#,##.00', decimal: '.', width: 100, readOnly: true });
+                                        columns.push({ title: "Notes", type: 'text', width: 100 });
+                                    }
+                                    columns.push({ title: "type", type: 'hidden', width: 100, readOnly: true });
+                                    columns.push({ title: "Total Forecasted Qunatity", type: 'numeric', textEditor: true, mask: '#,##.00', decimal: '.', width: 100, readOnly: true });
+                                    let nestedHeaders = [];
+                                    nestedHeaders.push(
+                                        {
+                                            title: '',
+                                            colspan: '1'
+                                        },
+
+                                    );
+                                    nestedHeaders.push(
+                                        {
+                                            title: '',
+                                            colspan: '1'
+                                        },
+                                    );
+                                    for (var k = 0; k < regRegionList.length; k++) {
+                                        nestedHeaders.push(
+                                            {
+                                                title: regRegionList[k].label.label_en,
+                                                colspan: '3'
+                                            },
+
+                                        );
+
+                                    }
+                                    nestedHeaders.push(
+                                        {
+                                            title: 'All Regions',
+                                            colspan: '1'
+                                        },
+                                    );
+                                    // if (langaugeList.length == 0) {
+                                    //     data = [];
+                                    //     languageArray[0] = data;
+                                    // }
+                                    // console.log("languageArray---->", languageArray);
+                                    this.el = jexcel(document.getElementById("tableDiv"), '');
+                                    this.el.destroy();
+                                    console.log("DataArray+++", dataArray)
+                                    var options = {
+                                        data: dataArray,
+                                        columnDrag: true,
+                                        columns: columns,
+                                        nestedHeaders: [nestedHeaders],
+                                        text: {
+                                            // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                                            showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                                            show: '',
+                                            entries: '',
+                                        },
+                                        pagination: false,
+                                        search: false,
+                                        columnSorting: true,
+                                        tableOverflow: true,
+                                        wordWrap: true,
+                                        allowInsertColumn: false,
+                                        allowManualInsertColumn: false,
+                                        allowDeleteRow: false,
+                                        onselection: this.selected,
+                                        oneditionend: this.onedit,
+                                        copyCompatibility: true,
+                                        allowExport: false,
+                                        paginationOptions: JEXCEL_PAGINATION_OPTION,
+                                        position: 'top',
+                                        filters: true,
+                                        onchange: this.forecastChanged,
+                                        onload: function (instance, cell, x, y, value) {
+                                            jExcelLoadedFunctionOnlyHideRow(instance);
+                                            var elInstance = instance.jexcel;
+                                            var json = elInstance.getJson(null, false);
+                                            var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF']
+                                            for (var y = 0; y < json.length; y++) {
+                                                var rowData = elInstance.getRowData(y);
+                                                if (rowData[12] == 1) {
+                                                    for (var r = 0; r < rowData.length; r++) {
+                                                        var cell = elInstance.getCell((colArr[r]).concat(parseInt(y) + 1))
+                                                        cell.classList.add('readonly');
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        license: JEXCEL_PRO_KEY,
+                                        contextMenu: function (obj, x, y, e) {
+                                            return false;
+                                        }.bind(this),
+                                    };
+                                    var dataEl = jexcel(document.getElementById("tableDiv"), options);
+                                    this.el = dataEl;
+                                    this.setState({
+                                        dataEl: dataEl
+                                    })
+                                }
                             });
-
-
-
-
-
                         })
 
 
                     }.bind(this);
                 }.bind(this);
-
 
 
             } else {//api call
@@ -499,6 +674,42 @@ class ForecastSummary extends Component {
         } else {//validation message
 
         }
+    }
+
+    forecastChanged = function (instance, cell, x, y, value) {
+        var elInstance = this.state.dataEl;
+        var rowData = elInstance.getRowData(y);
+        var possiblex = [];
+        for (var r = 0; r < this.state.regRegionList.length; r++) {
+            possiblex.push((r + 1) * 3);
+        }
+        var index = possiblex.findIndex(c => c == x);
+        if (index != -1) {
+            if (value != "") {
+                var tsListFilter = this.state.tsList.filter(c => c.id == value)[0]
+                var totalForecast = 0;
+                if (tsListFilter.type == "C") {
+                    totalForecast = tsListFilter.totalForecast;
+                } else {
+                    var flatList = tsListFilter.flatList;
+                    var flatListFilter = flatList.filter(c => c.payload.nodeDataMap[tsListFilter.id1][0].puNode != null && c.payload.nodeDataMap[tsListFilter.id1][0].puNode.planningUnit.id == rowData[1].id);
+
+                    var nodeDataMomList = flatListFilter[0].payload.nodeDataMap[tsListFilter.id1][0].nodeDataMomList.filter(c => moment(c.month).format("YYYY-MM-DD") >= moment(this.state.regDatasetJson.forecastStartDate).format("YYYY-MM-DD") && moment(c.month).format("YYYY-MM-DD") <= moment(this.state.regDatasetJson.forecastStopDate).format("YYYY-MM-DD"));
+                    nodeDataMomList.map(ele => {
+                        totalForecast += Number(ele.calculatedValue);
+                    });
+                }
+                elInstance.setValueFromCoords((Number(x) + 1), y, totalForecast.toFixed(2), true);
+            }
+        }
+    }
+
+    filterTsList(instance, cell, c, r, source) {
+        var tsList = this.state.tsList;
+        var mylist = [];
+        var value = (instance.jexcel.getJson(null, false)[r])[1].id;
+        mylist = tsList.filter(e => (e.type == "T" && e.flatList.filter(c => c.payload.nodeDataMap[e.id1][0].puNode != null && c.payload.nodeDataMap[e.id1][0].puNode.planningUnit.id == value).length > 0) || (e.type == "C" && e.planningUnitId == value));
+        return mylist;
     }
 
     checkedChanged(tempTracerCategoryId) {
@@ -1015,6 +1226,82 @@ class ForecastSummary extends Component {
         })
     }
 
+    saveSelectedForecast() {
+        var id = this.state.regDatasetJson.id;
+        var json = this.state.dataEl.getJson(null, false).filter(c => c[12] == 2);
+        console.log("Json+++", json);
+        var dataList = [];
+        for (var j = 0; j < json.length; j++) {
+            for (var k = 0; k < this.state.regRegionList.length; k++) {
+                console.log("(k + 1) * 3+++", (k + 1) * 3);
+                console.log("json[(k + 1) * 3]+++", json[j][(k + 1) * 3]);
+                if (json[j][(k + 1) * 3] != "") {
+                    var tsList = this.state.tsList.filter(c => c.id == json[j][(k + 1) * 3]);
+                    dataList.push({
+                        planningUnit: json[j][1],
+                        scenarioId: tsList[0].type == "T" ? tsList[0].id1 : null,
+                        consumptionExtrapolationId: tsList[0].type == "C" ? tsList[0].id1 : null,
+                        totalForecast: json[j][((k + 1) * 3) + 1],
+                        notes: json[j][((k + 1) * 3) + 2],
+                        region: this.state.regRegionList[k]
+                    })
+                }
+            }
+
+        }
+        console.log("DataList+++", dataList)
+        var db1;
+        var storeOS;
+        getDatabase();
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+        openRequest.onerror = function (event) {
+        }.bind(this);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+
+            var transaction = db1.transaction(['datasetData'], 'readwrite');
+            var programTransaction = transaction.objectStore('datasetData');
+
+            var programRequest = programTransaction.get(id);
+            programRequest.onerror = function (event) {
+            }.bind(this);
+            programRequest.onsuccess = function (event) {
+                var dataset = programRequest.result;
+                var programDataJson = programRequest.result.programData;
+                var datasetDataBytes = CryptoJS.AES.decrypt(programDataJson, SECRET_KEY);
+                var datasetData = datasetDataBytes.toString(CryptoJS.enc.Utf8);
+                var datasetJson = JSON.parse(datasetData);
+                var datasetForEncryption = datasetJson;
+                var planningUnitList = datasetJson.planningUnitList;
+                var planningUnitList1 = planningUnitList;
+                for (var dl = 0; dl < dataList.length; dl++) {
+                    console.log("dataList[dl].planningUnit.id+++", dataList[dl].planningUnit.id);
+                    var index = planningUnitList.findIndex(c => c.planningUnit.id == dataList[dl].planningUnit.id);
+                    console.log("Index+++", index)
+                    console.log("Reg+++", dataList[dl].region.regionId)
+                    var pu = planningUnitList1[index];
+                    pu.selectedForecastMap[dataList[dl].region.regionId] = { "scenarioId": dataList[dl].scenarioId, "consumptionExtrapolationId": dataList[dl].consumptionExtrapolationId, "totalForecast": dataList[dl].totalForecast, notes: dataList[dl].notes };
+                    planningUnitList1[index] = pu;
+                }
+                console.log("PlanningUnitList1+++", planningUnitList1);
+                datasetForEncryption.planningUnitList = planningUnitList1;
+
+                var encryptedDatasetJson = (CryptoJS.AES.encrypt(JSON.stringify(datasetForEncryption), SECRET_KEY)).toString();
+                dataset.programData = encryptedDatasetJson;
+
+                var datasetTransaction = db1.transaction(['datasetData'], 'readwrite');
+                var datasetOs = datasetTransaction.objectStore('datasetData');
+                var putRequest = datasetOs.put(dataset);
+                putRequest.onerror = function (event) {
+                }.bind(this);
+                putRequest.onsuccess = function (event) {
+                    let id = AuthenticationService.displayDashboardBasedOnRole();
+                    this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/green/' + "Data saved successfully");
+                }.bind(this)
+            }.bind(this)
+        }.bind(this)
+    }
+
     render() {
         const { programs } = this.state;
         let programList = programs.length > 0
@@ -1220,7 +1507,7 @@ class ForecastSummary extends Component {
                                                 </div>
                                             </div> */}
                                             <div className="table-responsive">
-                                                {this.state.summeryData.length > 0 &&
+                                                {this.state.summeryData.length > 0 && this.state.displayId == 1 &&
                                                     <Table className="table-striped table-bordered text-center mt-2">
                                                         {/* <Table className="table-bordered text-center mt-2 overflowhide main-table "> */}
 
@@ -1300,128 +1587,6 @@ class ForecastSummary extends Component {
 
                                                                 </>
                                                             ))}
-
-
-                                                            {/* <tr>
-                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1">
-                                                                <i className="fa fa-minus-square-o supplyPlanIcon" ></i> ARVs
-                                                            </td>
-                                                            <td></td>
-                                                            <td></td>
-                                                            <td></td>
-                                                            <td></td>
-                                                            <td></td>
-                                                            <td></td>
-                                                            <td></td>
-                                                            <td></td>
-                                                            <td></td>
-                                                            <td></td>
-                                                            <td></td>
-                                                            <td></td>
-                                                            <td></td>
-
-                                                        </tr>
-                                                        <tr>
-                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
-                                                            <td>Abacavir 300 mg Tablet</td>
-                                                            <td>Abacavir 300 mg Tablet, 60 Tablets</td>
-                                                            <td>191,593</td>
-                                                            <td>42,576</td>
-                                                            <td>206,920</td>
-                                                            <td>57,904</td>
-                                                            <td>5</td>
-                                                            <td>26,610</td>
-                                                            <td>31,294 </td>
-                                                            <td>Custom</td>
-                                                            <td>$1.04</td>
-                                                            <td></td>
-                                                            <td></td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
-                                                            <td>Benzylpenicillin 5 MU Vial</td>
-                                                            <td>Benzylpenicillin 5 MU Vial, 10 Vials</td>
-                                                            <td>259,051</td>
-                                                            <td>50,371</td>
-                                                            <td>248,689</td>
-                                                            <td>40,009</td>
-                                                            <td>5</td>
-                                                            <td>35,979</td>
-                                                            <td>4,030  </td>
-                                                            <td>no price type available</td>
-                                                            <td></td>
-                                                            <td></td>
-                                                            <td></td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
-                                                            <td>Lamivudine 150 mg Tablet</td>
-                                                            <td>Lamivudine 150 mg Tablet, 30 Tablets</td>
-                                                            <td>202,179</td>
-                                                            <td>27,638</td>
-                                                            <td>204,963</td>
-                                                            <td>30,422</td>
-                                                            <td>5</td>
-                                                            <td>28,080</td>
-                                                            <td>2,341  </td>
-                                                            <td>GHSC-PSM*</td>
-                                                            <td>$3.00</td>
-                                                            <td></td>
-                                                            <td></td>
-                                                        </tr>
-
-                                                        <tr>
-                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1">
-                                                                <i className="fa fa-minus-square-o supplyPlanIcon" ></i> Condoms
-                                                            </td>
-                                                            <td></td>
-                                                            <td></td>
-                                                            <td></td>
-                                                            <td></td>
-                                                            <td></td>
-                                                            <td></td>
-                                                            <td></td>
-                                                            <td></td>
-                                                            <td></td>
-                                                            <td></td>
-                                                            <td></td>
-                                                            <td></td>
-                                                            <td></td>
-                                                        </tr>
-
-                                                        <tr>
-                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
-                                                            <td>Male Condom (Latex) Lubricated, No Logo, 49 mm Male Condom</td>
-                                                            <td>Male Condom (Latex) Lubricated, No Logo, 49 mm, 1 Each</td>
-                                                            <td>229,205</td>
-                                                            <td>38,698</td>
-                                                            <td>215,933</td>
-                                                            <td>25,426</td>
-                                                            <td>5</td>
-                                                            <td>31,834</td>
-                                                            <td>(6,408)</td>
-                                                            <td>GHSC-PSM*</td>
-                                                            <td>$3.00</td>
-                                                            <td>$19,225.14</td>
-                                                            <td></td>
-                                                        </tr>
-
-                                                        <tr>
-                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
-                                                            <td>Male Condom (Latex) Lubricated, Ultimate Blue, 53 mm Male Condom</td>
-                                                            <td>Male Condom (Latex) Lubricated, Ultimate Blue, 53 mm, 4320 Pieces</td>
-                                                            <td>223,136</td>
-                                                            <td>43,388</td>
-                                                            <td>236,524</td>
-                                                            <td>56,776</td>
-                                                            <td>5</td>
-                                                            <td>30,991</td>
-                                                            <td>25,785 </td>
-                                                            <td>Global Fund*</td>
-                                                            <td>$4.00</td>
-                                                            <td></td>
-                                                            <td></td>
-                                                        </tr> */}
                                                         </tbody>
                                                         <tfoot>
                                                             <tr>
@@ -1475,6 +1640,11 @@ class ForecastSummary extends Component {
                                                         </tfoot>
                                                     </Table>
                                                 }
+                                                {this.state.regPlanningUnitList.length > 0 && this.state.displayId == 2 &&
+                                                    <div id="tableDiv">
+                                                    </div>
+
+                                                }
                                             </div>
                                         </div>
                                     </div>
@@ -1495,6 +1665,14 @@ class ForecastSummary extends Component {
                             </div>
                         </div>
                     </CardBody>
+                    {this.state.regPlanningUnitList.length > 0 && this.state.displayId == 2 && <CardFooter>
+                        <FormGroup>
+                            <FormGroup>
+                                <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                <Button type="submit" size="md" color="success" className="submitBtn float-right mr-1" onClick={this.saveSelectedForecast}> <i className="fa fa-check"></i> {i18n.t('static.common.submit')}</Button>
+                            </FormGroup>
+                        </FormGroup>
+                    </CardFooter>}
                 </Card>
             </div >
         );
