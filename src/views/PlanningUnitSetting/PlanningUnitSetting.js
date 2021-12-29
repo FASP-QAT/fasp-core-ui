@@ -76,6 +76,7 @@ export default class PlanningUnitSetting extends Component {
             allowAdd: false,
             allTracerCategoryList: [],
             allPlanningUnitList: [],
+            originalPlanningUnitList: [],
             allProcurementAgentList: [],
             selectedForecastProgram: '',
             filterProcurementAgent: '',
@@ -694,6 +695,7 @@ export default class PlanningUnitSetting extends Component {
             }
             this.setState({
                 allPlanningUnitList: tempList,
+                originalPlanningUnitList: response.data
             }, () => {
                 console.log("List------->pu", this.state.allPlanningUnitList)
                 this.tracerCategoryList();
@@ -1083,6 +1085,7 @@ export default class PlanningUnitSetting extends Component {
         // console.log("outPutList---->", outPutList);
         let outPutListArray = [];
         let count = 0;
+        let indexVar = 0;
 
         for (var j = 0; j < outPutList.length; j++) {
             data = [];
@@ -1100,6 +1103,7 @@ export default class PlanningUnitSetting extends Component {
             data[10] = 0;
             data[11] = 0;
             data[12] = outPutList[j].selectedForecastMap;
+            data[13] = indexVar;
 
             // data[0] = outPutList[j].a1a;
             // data[1] = outPutList[j].a2a;
@@ -1115,6 +1119,7 @@ export default class PlanningUnitSetting extends Component {
 
             outPutListArray[count] = data;
             count++;
+            indexVar++;
         }
         // if (costOfInventory.length == 0) {
         //     data = [];
@@ -1217,7 +1222,12 @@ export default class PlanningUnitSetting extends Component {
                 {
                     title: 'selected forecast map',
                     type: 'hidden',
-                    // readOnly: true //11L
+                    // readOnly: true //12M
+                },
+                {
+                    title: 'indexVar',
+                    type: 'hidden',
+                    // readOnly: true //13N
                 },
                 //-----------------
                 // {
@@ -1423,56 +1433,8 @@ export default class PlanningUnitSetting extends Component {
             var programs = [];
             var count = 0;
             var planningUnitList = [];
+            let indexVar = 0;
 
-            for (var i = 0; i < tableJson.length; i++) {
-                var map1 = new Map(Object.entries(tableJson[i]));
-
-                let planningUnitObj = this.state.allPlanningUnitList.filter(c => c.id == parseInt(map1.get("1")))[0];
-                let procurementAgentObj = "";
-                if (parseInt(map1.get("7")) === -1) {
-                    procurementAgentObj = null
-                } else {
-                    procurementAgentObj = this.state.allProcurementAgentList.filter(c => c.id == parseInt(map1.get("7")))[0];
-                }
-
-
-                let tempJson = {
-                    "programPlanningUnitId": parseInt(map1.get("9")),
-                    "planningUnit": {
-                        "id": parseInt(map1.get("1")),
-                        "label": planningUnitObj.label,
-                        "forecastingUnit": {
-                            "id": planningUnitObj.forecastingUnit.forecastingUnitId,
-                            "label": planningUnitObj.forecastingUnit.label,
-                            "tracerCategory": {
-                                "id": planningUnitObj.forecastingUnit.tracerCategory.id,
-                                "label": planningUnitObj.forecastingUnit.tracerCategory.label,
-                                "idString": planningUnitObj.forecastingUnit.tracerCategory.idString
-                            },
-                            "idString": "" + planningUnitObj.forecastingUnit.forecastingUnitId
-                        },
-                        "idString": "" + parseInt(map1.get("1"))
-                    },
-                    "consuptionForecast": map1.get("2"),
-                    "treeForecast": map1.get("3"),
-                    "stock": map1.get("4"),
-                    "existingShipments": map1.get("5"),
-                    "monthsOfStock": map1.get("6"),
-                    "procurementAgent": (procurementAgentObj == null ? null : {
-                        "id": parseInt(map1.get("7")),
-                        "label": procurementAgentObj.label,
-                        "code": procurementAgentObj.code,
-                        "idString": "" + parseInt(map1.get("7"))
-                    }),
-                    "price": this.el.getValue(`I${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
-                    "selectedForecastMap":map1.get("12")
-                }
-
-                planningUnitList.push(tempJson);
-
-            }
-
-            console.log("Final-------------->1", planningUnitList);
             console.log("Final-------------->00", this.state.datasetList);
             console.log("Final-------------->01", this.state.forecastProgramId);
             console.log("Final-------------->02", this.state.forecastProgramVersionId);
@@ -1480,8 +1442,145 @@ export default class PlanningUnitSetting extends Component {
             var program = (this.state.datasetList1.filter(x => x.programId == this.state.forecastProgramId && x.version == this.state.forecastProgramVersionId)[0]);
             var databytes = CryptoJS.AES.decrypt(program.programData, SECRET_KEY);
             var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
-
             console.log("Final-------------->2", programData.planningUnitList);
+
+            let originalPlanningUnitList = programData.planningUnitList;
+
+
+            for (var i = 0; i < tableJson.length; i++) {
+                var map1 = new Map(Object.entries(tableJson[i]));
+
+                // let planningUnitObj = this.state.allPlanningUnitList.filter(c => c.id == parseInt(map1.get("1")))[0];
+                let planningUnitObj = this.state.originalPlanningUnitList.filter(c => c.planningUnitId == parseInt(map1.get("1")))[0];
+                let procurementAgentObj = "";
+                if (parseInt(map1.get("7")) === -1) {
+                    procurementAgentObj = null
+                } else {
+                    procurementAgentObj = this.state.allProcurementAgentList.filter(c => c.id == parseInt(map1.get("7")))[0];
+                }
+
+                if (parseInt(map1.get("11")) == 1) {//new row added
+                    let tempJson = {
+                        "programPlanningUnitId": parseInt(map1.get("9")),
+                        "planningUnit": {
+                            "id": parseInt(map1.get("1")),
+                            "label": planningUnitObj.label,
+                            "unit": planningUnitObj.unit,
+                            "multiplier": planningUnitObj.multiplier,
+                            "forecastingUnit": {
+                                "id": planningUnitObj.forecastingUnit.forecastingUnitId,
+                                "label": planningUnitObj.forecastingUnit.label,
+                                "unit": planningUnitObj.forecastingUnit.unit,
+                                "tracerCategory": planningUnitObj.forecastingUnit.tracerCategory,
+                                "idString": "" + planningUnitObj.forecastingUnit.forecastingUnitId
+                            },
+                            "idString": "" + parseInt(map1.get("1"))
+                        },
+                        "consuptionForecast": map1.get("2"),
+                        "treeForecast": map1.get("3"),
+                        "stock": map1.get("4"),
+                        "existingShipments": map1.get("5"),
+                        "monthsOfStock": map1.get("6"),
+                        "procurementAgent": (procurementAgentObj == null ? null : {
+                            "id": parseInt(map1.get("7")),
+                            "label": procurementAgentObj.label,
+                            "code": procurementAgentObj.code,
+                            "idString": "" + parseInt(map1.get("7"))
+                        }),
+                        "price": this.el.getValue(`I${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                        "higherThenConsumptionThreshold": null,
+                        "lowerThenConsumptionThreshold": null,
+                        "consumptionNotes": null,
+                        "consumptionDataType": 2,
+                        "otherUnit": null,
+                        "selectedForecastMap": map1.get("12"),
+                        "createdBy": null,
+                        "createdDate": null
+                    }
+                    planningUnitList.push(tempJson);
+                } else {
+
+                    let planningUnitobj1 = originalPlanningUnitList[indexVar];
+                    let tempJson = {
+                        "programPlanningUnitId": parseInt(map1.get("9")),
+                        "planningUnit": {
+                            "id": parseInt(map1.get("1")),
+                            "label": planningUnitObj.label,
+                            "unit": planningUnitObj.unit,
+                            "multiplier": planningUnitObj.multiplier,
+                            "forecastingUnit": {
+                                "id": planningUnitObj.forecastingUnit.forecastingUnitId,
+                                "label": planningUnitObj.forecastingUnit.label,
+                                "unit": planningUnitObj.forecastingUnit.unit,
+                                "tracerCategory": planningUnitObj.forecastingUnit.tracerCategory,
+                                "idString": "" + planningUnitObj.forecastingUnit.forecastingUnitId
+                            },
+                            "idString": "" + parseInt(map1.get("1"))
+                        },
+                        "consuptionForecast": map1.get("2"),
+                        "treeForecast": map1.get("3"),
+                        "stock": map1.get("4"),
+                        "existingShipments": map1.get("5"),
+                        "monthsOfStock": map1.get("6"),
+                        "procurementAgent": (procurementAgentObj == null ? null : {
+                            "id": parseInt(map1.get("7")),
+                            "label": procurementAgentObj.label,
+                            "code": procurementAgentObj.code,
+                            "idString": "" + parseInt(map1.get("7"))
+                        }),
+                        "price": this.el.getValue(`I${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                        "higherThenConsumptionThreshold": planningUnitobj1.higherThenConsumptionThreshold,
+                        "lowerThenConsumptionThreshold": planningUnitobj1.lowerThenConsumptionThreshold,
+                        "consumptionNotes": planningUnitobj1.consumptionNotes,
+                        "consumptionDataType": planningUnitobj1.consumptionDataType,
+                        "otherUnit": planningUnitobj1.otherUnit,
+                        "selectedForecastMap": map1.get("12"),
+                        "createdBy": planningUnitobj1.createdBy,
+                        "createdDate": planningUnitobj1.createdDate
+                    }
+                    planningUnitList.push(tempJson);
+
+
+                    indexVar = indexVar + 1;
+                }
+
+
+                // let tempJson = {
+                //     "programPlanningUnitId": parseInt(map1.get("9")),
+                //     "planningUnit": {
+                //         "id": parseInt(map1.get("1")),
+                //         "label": planningUnitObj.label,
+                //         "forecastingUnit": {
+                //             "id": planningUnitObj.forecastingUnit.forecastingUnitId,
+                //             "label": planningUnitObj.forecastingUnit.label,
+                //             "tracerCategory": {
+                //                 "id": planningUnitObj.forecastingUnit.tracerCategory.id,
+                //                 "label": planningUnitObj.forecastingUnit.tracerCategory.label,
+                //                 "idString": planningUnitObj.forecastingUnit.tracerCategory.idString
+                //             },
+                //             "idString": "" + planningUnitObj.forecastingUnit.forecastingUnitId
+                //         },
+                //         "idString": "" + parseInt(map1.get("1"))
+                //     },
+                //     "consuptionForecast": map1.get("2"),
+                //     "treeForecast": map1.get("3"),
+                //     "stock": map1.get("4"),
+                //     "existingShipments": map1.get("5"),
+                //     "monthsOfStock": map1.get("6"),
+                //     "procurementAgent": (procurementAgentObj == null ? null : {
+                //         "id": parseInt(map1.get("7")),
+                //         "label": procurementAgentObj.label,
+                //         "code": procurementAgentObj.code,
+                //         "idString": "" + parseInt(map1.get("7"))
+                //     }),
+                //     "price": this.el.getValue(`I${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                //     "selectedForecastMap":map1.get("12")
+                // }
+
+
+            }
+
+            console.log("Final-------------->1", planningUnitList);
 
             programData.planningUnitList = planningUnitList;
 
