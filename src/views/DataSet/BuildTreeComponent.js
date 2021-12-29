@@ -50,7 +50,7 @@ import { grey } from '@material-ui/core/colors';
 import docicon from '../../assets/img/doc.png'
 import { saveAs } from "file-saver";
 import { Document, ImageRun, Packer, Paragraph, ShadingType, TextRun } from "docx";
-import { calculateModelingData } from '../../views/DataSet/ModelingDataCalculation1';
+import { calculateModelingData } from '../../views/DataSet/ModelingDataCalculations';
 import AuthenticationService from '../Common/AuthenticationService';
 import SupplyPlanFormulas from "../SupplyPlan/SupplyPlanFormulas";
 
@@ -856,7 +856,7 @@ export default class BuildTree extends Component {
                 }
             }
             this.state.modelingEl.setValueFromCoords(8, i, calculatedChangeForMonth, true);
-            scalingTotal = scalingTotal + calculatedChangeForMonth;
+            scalingTotal = parseFloat(scalingTotal) + parseFloat(calculatedChangeForMonth);
         }
         this.setState({ scalingTotal });
 
@@ -1230,6 +1230,7 @@ export default class BuildTree extends Component {
 
     buildMomJexcel() {
         var momList = this.state.momList;
+        console.log("momList--->",momList);
         var dataArray = [];
         let count = 0;
         for (var j = 0; j < momList.length; j++) {
@@ -1365,51 +1366,62 @@ export default class BuildTree extends Component {
     }
 
     showMomData() {
-        // if (this.state.currentItemConfig.context.payload.nodeType.id == 3) {
-        //     this.setState({ showMomDataPercent: true }, () => {
-        //         this.buildMomJexcelPercent();
-        //     });
-        // } else {
-        var db1;
-        getDatabase();
-        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-        openRequest.onsuccess = function (e) {
-            var programId = this.state.programId;
-            db1 = e.target.result;
-            var transaction = db1.transaction(['datasetData'], 'readwrite');
-            var program = transaction.objectStore('datasetData');
-            var getRequest = program.get(programId.toString());
-            getRequest.onerror = function (event) {
-                this.setState({
-                    supplyPlanError: i18n.t('static.program.errortext')
-                });
-            };
-            getRequest.onsuccess = function (event) {
-                // console.log("hi",getRequest.result);
-                var programDataBytes = CryptoJS.AES.decrypt(getRequest.result.programData, SECRET_KEY);
-                var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                var programJson = JSON.parse(programData);
-                // console.log("hi bro", programJson.nodeDataModelingList)
-                var getMomDataForCurrentNode = programJson.nodeDataModelingList.filter(c => c.id == this.state.currentItemConfig.context.id && c.nodeDataId == this.state.currentScenario.nodeDataId);
-                console.log("getMomDataForCurrentNode>>>", getMomDataForCurrentNode);
-                // getMomDataForCurrentNode.filter(c=>c.month <= '2022-12-01')
-                if (this.state.currentItemConfig.context.payload.nodeType.id > 2) {
-                    var getMomDataForCurrentNodeParent = programJson.nodeDataModelingList.filter(c => c.id == this.state.currentItemConfig.parentItem.id && c.nodeDataId == this.state.parentScenario.nodeDataId);
-                    console.log("in if>>>>", getMomDataForCurrentNodeParent);
+        console.log("show mom data---",this.state.currentScenario);
+        var getMomDataForCurrentNode = this.state.currentScenario.nodeDataMomList;
+        console.log("getMomDataForCurrentNode>>>", getMomDataForCurrentNode);
+        if (this.state.currentItemConfig.context.payload.nodeType.id > 2) {
+            var getMomDataForCurrentNodeParent = this.state.parentScenario.nodeDataMomList;
+            console.log("in if>>>>", getMomDataForCurrentNodeParent);
 
-                    this.setState({ showMomDataPercent: true, showMomData: false, momListPer: getMomDataForCurrentNode, momListPerParent: getMomDataForCurrentNodeParent }, () => {
-                        this.buildMomJexcelPercent();
-                    });
-                } else {
-                    console.log("in else>>>>");
-                    this.setState({ showMomDataPercent: false, showMomData: true, momList: getMomDataForCurrentNode }, () => {
-                        this.buildMomJexcel();
-                    });
-                }
-            }.bind(this)
-        }.bind(this)
+            this.setState({ showMomDataPercent: true, showMomData: false, momListPer: getMomDataForCurrentNode, momListPerParent: getMomDataForCurrentNodeParent }, () => {
+                this.buildMomJexcelPercent();
+            });
+        } else {
+            console.log("in else>>>>");
+            this.setState({ showMomDataPercent: false, showMomData: true, momList: getMomDataForCurrentNode }, () => {
+                this.buildMomJexcel();
+            });
+        }
+        // var db1;
+        // getDatabase();
+        // var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+        // openRequest.onsuccess = function (e) {
+        //     var programId = this.state.programId;
+        //     db1 = e.target.result;
+        //     var transaction = db1.transaction(['datasetData'], 'readwrite');
+        //     var program = transaction.objectStore('datasetData');
+        //     var getRequest = program.get(programId.toString());
+        //     getRequest.onerror = function (event) {
+        //         this.setState({
+        //             supplyPlanError: i18n.t('static.program.errortext')
+        //         });
+        //     };
+        //     getRequest.onsuccess = function (event) {
+        //         // console.log("hi",getRequest.result);
+        //         var programDataBytes = CryptoJS.AES.decrypt(getRequest.result.programData, SECRET_KEY);
+        //         var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+        //         var programJson = JSON.parse(programData);
+        //         // console.log("hi bro", programJson.nodeDataModelingList)
+        //         var getMomDataForCurrentNode = programJson.nodeDataModelingList.filter(c => c.id == this.state.currentItemConfig.context.id && c.nodeDataId == this.state.currentScenario.nodeDataId);
+        //         console.log("getMomDataForCurrentNode>>>", getMomDataForCurrentNode);
+                
+        //         if (this.state.currentItemConfig.context.payload.nodeType.id > 2) {
+        //             var getMomDataForCurrentNodeParent = programJson.nodeDataModelingList.filter(c => c.id == this.state.currentItemConfig.parentItem.id && c.nodeDataId == this.state.parentScenario.nodeDataId);
+        //             console.log("in if>>>>", getMomDataForCurrentNodeParent);
 
-        // }
+        //             this.setState({ showMomDataPercent: true, showMomData: false, momListPer: getMomDataForCurrentNode, momListPerParent: getMomDataForCurrentNodeParent }, () => {
+        //                 this.buildMomJexcelPercent();
+        //             });
+        //         } else {
+        //             console.log("in else>>>>");
+        //             this.setState({ showMomDataPercent: false, showMomData: true, momList: getMomDataForCurrentNode }, () => {
+        //                 this.buildMomJexcel();
+        //             });
+        //         }
+        //     }.bind(this)
+        // }.bind(this)
+
+        
     }
     setStartAndStopDateOfProgram(programId) {
         console.log("programId>>>", programId);
@@ -2060,11 +2072,13 @@ export default class BuildTree extends Component {
             data[8] = scalingList[j].modelingType.id == 2 ? calculatedChangeForMonth : calculatedChangeForMonth.toFixed(2)
             data[9] = scalingList[j].nodeDataModelingId
             data[10] = 0
-            scalingTotal = scalingTotal + calculatedChangeForMonth;
+            scalingTotal = parseFloat(scalingTotal) + parseFloat(calculatedChangeForMonth);
             dataArray[count] = data;
             count++;
         }
-        this.setState({ scalingTotal });
+        this.setState({ scalingTotal }, () => {
+            console.log("scalingTotal 1---", scalingTotal);
+        });
         this.el = jexcel(document.getElementById("modelingJexcel"), '');
         this.el.destroy();
         var data = dataArray;
@@ -6794,12 +6808,14 @@ export default class BuildTree extends Component {
                     var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                     var programJson = JSON.parse(programData);
                     // console.log("hi bro", programJson.nodeDataModelingList)
-                    var getMomDataForNodes = programJson.nodeDataModelingList.filter(c => c.treeId == this.state.treeId && c.scenarioId == this.state.selectedScenario && moment(c.month).format('YYYY-MM') == moment(date).format('YYYY-MM'));
-                    console.log("$$$>>>", getMomDataForNodes);
+                    // var getMomDataForNodes = programJson.nodeDataModelingList.filter(c => c.treeId == this.state.treeId && c.scenarioId == this.state.selectedScenario && moment(c.month).format('YYYY-MM') == moment(date).format('YYYY-MM'));
+                    // console.log("$$$>>>", getMomDataForNodes);
                     this.setState({
-                        modelinDataForScenario: getMomDataForNodes
+                        // modelinDataForScenario: getMomDataForNodes
                     }, () => {
-                        if (getMomDataForNodes.length > 0) { this.updateTreeData() } else { };
+                        // if (getMomDataForNodes.length > 0) { 
+                        this.updateTreeData(date);
+                        // } else { };
                     });
                     // getMomDataForCurrentNode.filter(c=>c.month <= '2022-12-01')
 
@@ -6852,16 +6868,17 @@ export default class BuildTree extends Component {
 
     }
 
-    updateTreeData() {
+    updateTreeData(date) {
         var items = this.state.items;
         console.log("items>>>", items);
         console.log("get payload 111");
         for (let i = 0; i < items.length; i++) {
             console.log("get payload 12");
-            console.log("this.state.modelinDataForScenario---", this.state.modelinDataForScenario);
+            // console.log("this.state.modelinDataForScenario---", this.state.modelinDataForScenario);
             console.log("items[i]---", items[i]);
             console.log("items[i].payload.nodeDataMap[this.state.selectedScenario][0].nodeDataId---", items[i].payload.nodeDataMap[this.state.selectedScenario][0].nodeDataId);
-            var nodeDataModelingMap = this.state.modelinDataForScenario.filter(c => c.nodeDataId == items[i].payload.nodeDataMap[this.state.selectedScenario][0].nodeDataId);
+            console.log("items[i].payload.nodeDataMap[this.state.selectedScenario][0].modelling---", items[i].payload.nodeDataMap[this.state.selectedScenario][0]);
+            var nodeDataModelingMap = items[i].payload.nodeDataMap[this.state.selectedScenario][0].nodeDataMomList.filter(x => moment(x.month).format('YYYY-MM') == moment(date).format('YYYY-MM'));
             console.log("nodeDataModelingMap>>>", nodeDataModelingMap);
             if (nodeDataModelingMap.length > 0) {
                 console.log("get payload 13");
