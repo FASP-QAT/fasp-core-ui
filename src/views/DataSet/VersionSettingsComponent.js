@@ -189,6 +189,23 @@ class VersionSettingsComponent extends Component {
                     }
                 }
 
+                // Version notes
+
+                var col = ("E").concat(parseInt(y) + 1);
+                value = this.el.getValue(`E${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+                if (value != "") {
+                    if (value.length > 1000) {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setStyle(col, "background-color", "yellow");
+                        this.el.setComments(col, i18n.t('static.message.invalidStringLength'));
+                        valid = false;
+                    } else {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setComments(col, "");
+                    }
+                }
+
+
             }
         }
         return valid;
@@ -342,6 +359,22 @@ class VersionSettingsComponent extends Component {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+            }
+        }
+
+        // Version notes
+        if (x == 4) {
+            var col = ("E").concat(parseInt(y) + 1);
+            value = this.el.getValue(`E${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+            if (value != "") {
+                if (value.length > 1000) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.invalidStringLength'));
                 } else {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
@@ -718,7 +751,8 @@ class VersionSettingsComponent extends Component {
                 },
                 {
                     title: i18n.t('static.program.programDiscription'),
-                    type: 'text'//4 E
+                    type: 'text',
+                    maxlength: 1000//4 E
                 },
                 {
                     title: i18n.t('static.program.dateCommitted'),
@@ -857,6 +891,7 @@ class VersionSettingsComponent extends Component {
             }.bind(this),
             onchange: this.changed,
             oneditionend: this.oneditionend,
+            oncreateeditor: this.oncreateeditor,
             copyCompatibility: true,
             allowExport: false,
             paginationOptions: JEXCEL_PAGINATION_OPTION,
@@ -883,7 +918,12 @@ class VersionSettingsComponent extends Component {
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
     }
-
+    oncreateeditor = function (el, cell, x, y) {
+        if (x == 4) {
+            var config = el.jexcel.options.columns[x].maxlength;
+            cell.children[0].setAttribute('maxlength', config);
+        }
+    }
 
     componentDidMount() {
         this.getVersionTypeList();
