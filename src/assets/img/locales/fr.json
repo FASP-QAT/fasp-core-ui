@@ -1466,7 +1466,7 @@
     "static.dataSource.program": "Programme",
     "static.dashboard.supplierheader": "Fabricant",
     "static.shipment.rate": "Tarif (USD)",
-    "static.program.programDiscription": "Description du programme",
+    "static.program.programDiscription": "Notes de version",
     "static.report.planningUnit/ForecastingUnit": "Produit (planification) / Produit (prévision)",
     "static.tree.#OfFURequiredForPeriod": "# dUF requis pour la période",
     "static.organisation.organisationtext": "Entrez le nom de l`organisation",

@@ -292,7 +292,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                         let originalConsumptionList = programData.actualConsumptionList;
                         for (var i = 0; i < ImportListPink.length; i++) {
                             // let match = originalConsumptionList.filter(c => new Date(c.month).getTime() == new Date(papuList[j].month).getTime() && c.region.id == papuList[j].region.id && c.consumptionUnit.planningUnit.id == stepOneSelectedObject.forecastPlanningUnitId)
-                            let index = originalConsumptionList.findIndex(c => new Date(c.month).getTime() == new Date(ImportListPink[i].month).getTime() && c.region.id == ImportListPink[i].regionId && c.consumptionUnit.planningUnit.id == ImportListPink[i].planningUnitId)
+                            let index = originalConsumptionList.findIndex(c => new Date(c.month).getTime() == new Date(ImportListPink[i].month).getTime() && c.region.id == ImportListPink[i].regionId && c.planningUnit.id == ImportListPink[i].planningUnitId)
 
                             if (index != -1) {
                                 let indexObj = originalConsumptionList[index];
