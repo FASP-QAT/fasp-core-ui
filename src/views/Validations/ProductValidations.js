@@ -54,10 +54,13 @@ class ProductValidation extends Component {
     }
 
     setVersionId(e) {
+        this.setState({ loading: true })
         var versionId = e.target.value;
+        localStorage.setItem("sesDatasetVersionId", versionId);
         if (versionId != "") {
             this.setState({
-                versionId: versionId
+                versionId: versionId,
+                loading: false
             }, () => {
                 this.getDatasetData()
             })
@@ -67,7 +70,8 @@ class ProductValidation extends Component {
                 treeList: [],
                 treeId: "",
                 scenarioList: [],
-                scenarioId: ""
+                scenarioId: "",
+                loading: false
             }, () => {
                 this.getData()
             })
@@ -158,17 +162,37 @@ class ProductValidation extends Component {
     }
 
     getTreeList() {
+        this.setState({ loading: true })
         var datasetJson = this.state.datasetData;
         console.log("datasetJson+++", datasetJson);
         var treeList = datasetJson.treeList;
+        var treeId = "";
+        var event = {
+            target: {
+                value: ""
+            }
+        };
+        if (treeList.length == 1) {
+            treeId = treeList[0].treeId;
+            event.target.value = treeList[0].treeId;
+        } else if (localStorage.getItem("sesTreeId") != "") {
+            treeId = localStorage.getItem("sesTreeId");
+            event.target.value = localStorage.getItem("sesTreeId");
+        }
         this.setState({
             treeList: treeList,
+            loading: false
+        }, () => {
+            if (treeId != "") {
+                this.setTreeId(event);
+            }
         })
 
     }
 
     setTreeId(e) {
         var treeId = e.target.value;
+        localStorage.setItem("sesTreeId", treeId);
         if (treeId > 0) {
             this.setState({
                 treeId: treeId
@@ -189,12 +213,32 @@ class ProductValidation extends Component {
     getScenarioList() {
         var treeList = this.state.treeList;
         if (this.state.treeId > 0) {
+            this.setState({ loading: true })
             var treeListFiltered = treeList.filter(c => c.treeId == this.state.treeId)[0];
             // var levelList = [...new Set(treeListFiltered.tree.flatList.map(ele => (ele.level)))]
+            var scenarioList = treeListFiltered.scenarioList;
+            var scenarioId = "";
+            var event = {
+                target: {
+                    value: ""
+                }
+            };
+            if (scenarioList.length == 1) {
+                scenarioId = scenarioList[0].id;
+                event.target.value = scenarioList[0].id;
+            } else if (localStorage.getItem("sesScenarioId") != "") {
+                scenarioId = localStorage.getItem("sesScenarioId");
+                event.target.value = localStorage.getItem("sesScenarioId");
+            }
             this.setState({
                 scenarioList: treeListFiltered.scenarioList,
                 // levelList: levelList,
-                treeListFiltered: treeListFiltered
+                treeListFiltered: treeListFiltered,
+                loading: false
+            }, () => {
+                if (scenarioId != "") {
+                    this.setScenarioId(event);
+                }
             })
         } else {
             this.setState({
@@ -206,6 +250,7 @@ class ProductValidation extends Component {
 
     setScenarioId(e) {
         var scenarioId = e.target.value;
+        localStorage.setItem("sesScenarioId", scenarioId);
         this.setState({
             scenarioId: scenarioId
         }, () => {
@@ -216,6 +261,7 @@ class ProductValidation extends Component {
     setDatasetId(e) {
 
         var datasetId = e.target.value;
+        localStorage.setItem("sesLiveDatasetId", datasetId);
         if (datasetId > 0) {
             this.setState({
                 datasetId: datasetId
@@ -428,7 +474,7 @@ class ProductValidation extends Component {
                     data[2] = "";
                     data[3] = "";
                     data[4] = "";
-                    data[5] = "SubTotal";
+                    data[5] = i18n.t('static.productValidation.subTotal');
                     data[6] = totalCost.toFixed(2);
                     data[7] = 1;
                     totalCost = 0;
@@ -445,11 +491,11 @@ class ProductValidation extends Component {
                 colHeaderClasses: ["Reqasterisk"],
                 columns: [
                     {
-                        title: 'Level',
+                        title: i18n.t('static.common.level'),
                         type: 'text'
                     },
                     {
-                        title: 'Type',
+                        title: i18n.t('static.supplyPlan.type'),
                         type: 'text'
                     },
                     {
@@ -457,7 +503,7 @@ class ProductValidation extends Component {
                         type: 'text'
                     },
                     {
-                        title: i18n.t('static.forecastingunit.forecastingunit') + " Text",
+                        title: i18n.t('static.forecastingunit.forecastingunit') + " " + i18n.t('static.common.text'),
                         type: 'text'
                     },
                     {
@@ -465,11 +511,11 @@ class ProductValidation extends Component {
                         type: 'text'
                     },
                     {
-                        title: i18n.t('static.common.product') + " Text",
+                        title: i18n.t('static.common.product') + " " + i18n.t('static.common.text'),
                         type: 'text'
                     },
                     {
-                        title: "Cost",
+                        title: i18n.t('static.productValidation.cost'),
                         type: 'numeric'
                     },
                     {
@@ -508,12 +554,12 @@ class ProductValidation extends Component {
 
             this.setState({
                 dataEl: dataEl,
-                dataList: finalData
-            })
-            this.setState({
+                dataList: finalData,
                 loading: false
             })
         } else {
+            this.el = jexcel(document.getElementById("tableDiv"), '');
+            this.el.destroy();
             this.setState({
                 loading: false,
                 dataEl: ""
@@ -548,9 +594,26 @@ class ProductValidation extends Component {
             for (var v = 0; v < vList.length; v++) {
                 versionList.push(vList[v].versionId)
             }
+            var versionId = "";
+            var event = {
+                target: {
+                    value: ""
+                }
+            };
+            if (versionList.length == 1) {
+                versionId = versionList[0];
+                event.target.value = versionList[0];
+            } else if (localStorage.getItem("sesVersionId") != "") {
+                versionId = localStorage.getItem("sesDatasetVersionId");
+                event.target.value = localStorage.getItem("sesDatasetVersionId");
+            }
             this.setState({
                 versionList: versionList,
                 loading: false
+            }, () => {
+                if (versionId != "") {
+                    this.setVersionId(event)
+                }
             })
         } else {
             this.setState({
@@ -656,10 +719,28 @@ class ProductValidation extends Component {
                             datasetList[index].versionList = existingVersionList
                         }
                     }
+                    var datasetId = "";
+                    var event = {
+                        target: {
+                            value: ""
+                        }
+                    };
+                    if (datasetList.length == 1) {
+                        console.log("in if%%%", datasetList.length)
+                        datasetId = datasetList[0].id;
+                        event.target.value = datasetList[0].id;
+                    } else if (localStorage.getItem("sesLiveDatasetId") != "") {
+                        datasetId = localStorage.getItem("sesLiveDatasetId");
+                        event.target.value = localStorage.getItem("sesLiveDatasetId");
+                    }
                     this.setState({
                         datasetList: datasetList,
                         currencyList: currencyList,
                         loading: false
+                    }, () => {
+                        if (datasetId != "") {
+                            this.setDatasetId(event);
+                        }
                     })
                 }.bind(this)
             }.bind(this)
@@ -667,9 +748,13 @@ class ProductValidation extends Component {
     }
 
     setCurrencyId(e) {
-        var currencyId = "";
+        var currencyId = e.target.value;
         this.setState({
             currencyId: currencyId
+        }, () => {
+            if (currencyId > 0) {
+                this.getData();
+            }
         })
     }
 
@@ -736,7 +821,7 @@ class ProductValidation extends Component {
                         <div className="card-header-actions">
                             <a className="card-header-action">
 
-                                <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => this.exportPDF()} />
+                                <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.exportPDF()} />
 
 
                             </a>
@@ -792,7 +877,7 @@ class ProductValidation extends Component {
                                             </div>
                                         </FormGroup>
                                         <FormGroup className="col-md-3">
-                                            <Label htmlFor="appendedInputButton">Tree Name</Label>
+                                            <Label htmlFor="appendedInputButton">{i18n.t('static.common.treeName')}</Label>
                                             <div className="controls ">
                                                 <InputGroup>
                                                     <Input
@@ -813,7 +898,7 @@ class ProductValidation extends Component {
                                             </div>
                                         </FormGroup>
                                         <FormGroup className="col-md-3">
-                                            <Label htmlFor="appendedInputButton">Scenario</Label>
+                                            <Label htmlFor="appendedInputButton">{i18n.t('static.whatIf.scenario')}</Label>
                                             <div className="controls ">
                                                 <InputGroup>
                                                     <Input
@@ -834,7 +919,7 @@ class ProductValidation extends Component {
                                             </div>
                                         </FormGroup>
                                         <FormGroup className="col-md-3">
-                                            <Label htmlFor="appendedInputButton">Currency</Label>
+                                            <Label htmlFor="appendedInputButton">{i18n.t('static.country.currency')}</Label>
                                             <div className="controls ">
                                                 <InputGroup>
                                                     <Input

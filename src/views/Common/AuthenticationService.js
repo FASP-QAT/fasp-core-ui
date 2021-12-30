@@ -1312,9 +1312,24 @@ class AuthenticationService {
                             return true;
                         }
                         break;
+                    case "/report/compareAndSelectScenario":    
+                        if (bfunction.includes("ROLE_BF_COMPARE_AND_SELECT")) {
+                            return true;
+                        }
+                    break;
                     case "/validation/productValidation":
+                        if (bfunction.includes("ROLE_BF_PRODUCT_VALIDATION")) {
+                                    return true;
+                                }
+                            break;
                     case "/validation/modelingValidation":
-                    case "/report/compareAndSelectScenario":
+                        if (bfunction.includes("ROLE_BF_MODELING_VALIDATION")) {
+                                    return true;
+                                }
+                            break;
+                    // case "/report/compareAndSelectScenario":
+                    // case "/validation/productValidation":
+                    // case "/validation/modelingValidation":
                     case "/report/compareVersion":
                     case "/dataentry/consumptionDataEntryAndAdjustment":
                     case "/dataset/listTree":
@@ -1457,9 +1472,9 @@ class AuthenticationService {
         console.log("timeout going to clear cache");
         let keysToRemove;
         if (localStorage.getItem('curUser') != null && localStorage.getItem('curUser') != "") {
-            keysToRemove = ["token-" + this.getLoggedInUserId(), "curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken", "sesRecordCount", "sesRangeValue", "sesProgramId", "sesPlanningUnitId", "sesLocalVersionChange", "sesLatestProgram", "sesProblemStatus", "sesProblemType", "sesProblemCategory", "sesReviewed", "sesStartDate", "sesProgramIdReport", "sesVersionIdReport", "sessionType", "sesBudPro", "sesBudFs", "sesBudStatus", "sesForecastProgramIds"];
+            keysToRemove = ["token-" + this.getLoggedInUserId(), "curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken", "sesRecordCount", "sesRangeValue", "sesProgramId", "sesPlanningUnitId", "sesLocalVersionChange", "sesLatestProgram", "sesProblemStatus", "sesProblemType", "sesProblemCategory", "sesReviewed", "sesStartDate", "sesProgramIdReport", "sesVersionIdReport", "sessionType", "sesBudPro", "sesBudFs", "sesBudStatus", "sesForecastProgramIds", "sesDatasetId", "sesDatasetPlanningUnitId", "sesDatasetRegionId", "sesLiveDatasetId", "sesDatasetVersionId", "sesTreeId", "sesScenarioId", "sesLevelId"];
         } else {
-            keysToRemove = ["curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken", "sesRecordCount", "sesRangeValue", "sesProgramId", "sesPlanningUnitId", "sesLocalVersionChange", "sesLatestProgram", "sesProblemStatus", "sesProblemType", "sesProblemCategory", "sesReviewed", "sesStartDate", "sesProgramIdReport", "sesVersionIdReport", "sessionType", "sesBudPro", "sesBudFs", "sesBudStatus", "sesForecastProgramIds"];
+            keysToRemove = ["curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken", "sesRecordCount", "sesRangeValue", "sesProgramId", "sesPlanningUnitId", "sesLocalVersionChange", "sesLatestProgram", "sesProblemStatus", "sesProblemType", "sesProblemCategory", "sesReviewed", "sesStartDate", "sesProgramIdReport", "sesVersionIdReport", "sessionType", "sesBudPro", "sesBudFs", "sesBudStatus", "sesForecastProgramIds", "sesDatasetId", "sesDatasetPlanningUnitId", "sesDatasetRegionId", "sesLiveDatasetId", "sesDatasetVersionId", "sesTreeId", "sesScenarioId", "sesLevelId"];
         }
         keysToRemove.forEach(k => localStorage.removeItem(k));
     }
@@ -1482,6 +1497,14 @@ class AuthenticationService {
         localStorage.setItem('sesRecordCount', count);
         localStorage.setItem('sesRangeValue', JSON.stringify({ from: { year: new Date(startDate).getFullYear(), month: new Date(startDate).getMonth() + 1 }, to: { year: new Date(endDate).getFullYear(), month: new Date(endDate).getMonth() + 1 } }));
         localStorage.setItem('sesProgramId', "");
+        localStorage.setItem('sesDatasetId', "");
+        localStorage.setItem('sesLevelId', "");
+        localStorage.setItem('sesLiveDatasetId', "");
+        localStorage.setItem('sesTreeId', "");
+        localStorage.setItem('sesScenarioId', "");
+        localStorage.setItem('sesDatasetVersionId', "");
+        localStorage.setItem('sesDatasetPlanningUnitId', "");
+        localStorage.setItem('sesDatasetRegionId', "");
         localStorage.setItem('sesPlanningUnitId', "");
         // localStorage.setItem('sesLocalVersionChange', false);
         localStorage.setItem("sesLatestProgram", false);
