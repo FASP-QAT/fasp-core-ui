@@ -102,6 +102,7 @@ export default class PlanningUnitSetting extends Component {
         this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
+        this.disablePUNode = this.disablePUNode.bind(this);
     }
 
     hideSecondComponent() {
@@ -891,6 +892,7 @@ export default class PlanningUnitSetting extends Component {
                         label: programJson1.label,
                         realmCountry: programJson1.realmCountry,
                         planningUnitList: programJson1.planningUnitList,
+                        treeList: programJson1.treeList
                     });
                     datasetList1.push(filteredGetRequestList[i])
                     // }
@@ -1104,6 +1106,7 @@ export default class PlanningUnitSetting extends Component {
             data[11] = 0;
             data[12] = outPutList[j].selectedForecastMap;
             data[13] = indexVar;
+            data[14] = outPutList[j].treeForecast;
 
             // data[0] = outPutList[j].a1a;
             // data[1] = outPutList[j].a2a;
@@ -1228,6 +1231,11 @@ export default class PlanningUnitSetting extends Component {
                     title: 'indexVar',
                     type: 'hidden',
                     // readOnly: true //13N
+                },
+                {
+                    title: 'treeForecast',
+                    type: 'hidden',
+                    // readOnly: true //14O
                 },
                 //-----------------
                 // {
@@ -1446,6 +1454,8 @@ export default class PlanningUnitSetting extends Component {
 
             let originalPlanningUnitList = programData.planningUnitList;
 
+            let listOfDisablePuNode = [];
+
 
             for (var i = 0; i < tableJson.length; i++) {
                 var map1 = new Map(Object.entries(tableJson[i]));
@@ -1577,6 +1587,12 @@ export default class PlanningUnitSetting extends Component {
                 //     "selectedForecastMap":map1.get("12")
                 // }
 
+                //logic for null PU Node
+                if (map1.get("3") == false && map1.get("14") == true) {
+                    listOfDisablePuNode.push(parseInt(map1.get("1")));
+                }
+
+
 
             }
 
@@ -1590,7 +1606,7 @@ export default class PlanningUnitSetting extends Component {
 
             programs.push(program);
 
-            console.log("programs to update---", programs);
+            console.log("programs to update---1", programs);
 
             var db1;
             getDatabase();
@@ -1601,7 +1617,6 @@ export default class PlanningUnitSetting extends Component {
                     color: 'red'
                 })
                 this.hideFirstComponent()
-                this.props.updateStepOneData("loading", false);
             }.bind(this);
             openRequest.onsuccess = function (e) {
                 db1 = e.target.result;
@@ -1629,10 +1644,126 @@ export default class PlanningUnitSetting extends Component {
                         color: "green",
                         // allowAdd: false
                     }, () => {
+                        listOfDisablePuNode = [...new Set(listOfDisablePuNode)];
+                        if (listOfDisablePuNode.length > 0) {
+                            this.disablePUNode(listOfDisablePuNode);
+                        }
+
+
                         this.hideSecondComponent();
                         // this.filterData();
                         // this.setProgramId();
                         this.getDatasetList();
+                    });
+                    console.log("Data update success1");
+                    // alert("success");
+
+
+                }.bind(this);
+                transaction.onerror = function (event) {
+                    this.setState({
+                        loading: false,
+                        // message: 'Error occured.',
+                        color: "red",
+                    }, () => {
+                        this.hideSecondComponent();
+                    });
+                    console.log("Data update errr");
+                }.bind(this);
+            }.bind(this);
+
+
+
+        }
+    }
+
+    disablePUNode(listOfDisablePuNode) {
+        console.log("Test---------------->1", listOfDisablePuNode);
+        // var program = (this.state.datasetList1.filter(x => x.programId == this.state.forecastProgramId && x.version == this.state.forecastProgramVersionId)[0]);
+        let datasetList1 = this.state.datasetList1;
+        for (var i = 0; i < datasetList1.length; i++) {
+            var programs = [];
+            var program = datasetList1[i];
+
+            var databytes = CryptoJS.AES.decrypt(program.programData, SECRET_KEY);
+            var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
+
+            let treeListForSelectedProgram = programData.treeList;
+
+            for (var j = 0; j < listOfDisablePuNode.length; j++) {
+                for (var k = 0; k < treeListForSelectedProgram.length; k++) {
+                    let flatlist = treeListForSelectedProgram[k].tree.flatList;
+                    let listContainNodeType5 = flatlist.filter(c => c.payload.nodeType.id == 5);
+                    console.log("Test---------------->2", listContainNodeType5);
+                    for (var l = 0; l < listContainNodeType5.length; l++) {
+                        let nodeDataMap = listContainNodeType5[l].payload.nodeDataMap;
+                        let nodeDataMapKeys = Object.keys(listContainNodeType5[l].payload.nodeDataMap);
+                        console.log("Test---------------->3", nodeDataMap + ' ----- ' + nodeDataMapKeys);
+                        for (var m = 0; m < nodeDataMapKeys.length; m++) {
+                            let insideArrayOfNodeDataMap = nodeDataMap[nodeDataMapKeys[m]];
+                            console.log("Test---------------->4", insideArrayOfNodeDataMap);
+                            for (var n = 0; n < insideArrayOfNodeDataMap.length; n++) {
+                                if (insideArrayOfNodeDataMap[n].puNode.planningUnit.id == parseInt(listOfDisablePuNode[j])) {
+                                    console.log("Test---------------->5", insideArrayOfNodeDataMap[n]);
+                                    console.log("Test---------------->6", insideArrayOfNodeDataMap[n].puNode.planningUnit.id);
+                                    insideArrayOfNodeDataMap[n].puNode.planningUnit.id = null;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            console.log("Test---------------->7", treeListForSelectedProgram);
+
+            programData.treeList = treeListForSelectedProgram;
+
+            programData = (CryptoJS.AES.encrypt(JSON.stringify(programData), SECRET_KEY)).toString();
+            program.programData = programData;
+
+            programs.push(program);
+
+            console.log("programs to update---", programs);
+
+            var db1;
+            getDatabase();
+            var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+            openRequest.onerror = function (event) {
+                this.setState({
+                    message: i18n.t('static.program.errortext'),
+                    color: 'red'
+                })
+                this.hideFirstComponent()
+            }.bind(this);
+            openRequest.onsuccess = function (e) {
+                db1 = e.target.result;
+                var transaction = db1.transaction(['datasetData'], 'readwrite');
+                var programTransaction = transaction.objectStore('datasetData');
+                programs.forEach(program => {
+                    var programRequest = programTransaction.put(program);
+                    console.log("---hurrey---");
+                })
+                transaction.oncomplete = function (event) {
+                    // this.props.updateStepOneData("message", i18n.t('static.mt.dataUpdateSuccess'));
+                    // this.props.updateStepOneData("color", "green");
+                    // this.setState({
+                    //     message: i18n.t('static.mt.dataUpdateSuccess'),
+                    //     color: "green",
+                    // }, () => {
+                    //     this.props.hideSecondComponent();
+                    //     this.props.finishedStepThree();
+                    //     // this.buildJExcel();
+                    // });
+
+                    this.setState({
+                        // loading: false,
+                        // message: i18n.t('static.mt.dataUpdateSuccess'),
+                        // color: "green",
+                        // allowAdd: false
+                    }, () => {
+                        // this.hideSecondComponent();
+                        // this.filterData();
+                        // this.setProgramId();
+                        // this.getDatasetList();
                     });
                     console.log("Data update success");
                     // alert("success");
@@ -1646,15 +1777,12 @@ export default class PlanningUnitSetting extends Component {
                         color: "red",
                     }, () => {
                         this.hideSecondComponent();
-                        this.props.updateStepOneData("loading", false);
                     });
                     console.log("Data update errr");
                 }.bind(this);
             }.bind(this);
-
-
-
         }
+
     }
 
     addRow = function () {
@@ -1674,6 +1802,8 @@ export default class PlanningUnitSetting extends Component {
         data[10] = 1;
         data[11] = 1;
         data[12] = null;
+        data[13] = -1;
+        data[14] = true;
 
         this.el.insertRow(
             data, 0, 1
