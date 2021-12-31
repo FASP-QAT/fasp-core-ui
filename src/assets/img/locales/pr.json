@@ -1466,7 +1466,7 @@
     "static.dataSource.program": "Programa",
     "static.dashboard.supplierheader": "Fabricante",
     "static.shipment.rate": "Taxa (USD)",
-    "static.program.programDiscription": "descripción del programa",
+    "static.program.programDiscription": "Notas de versão",
     "static.report.planningUnit/ForecastingUnit": "Unidade de Planeamento / Unidade de Previsão",
     "static.tree.#OfFURequiredForPeriod": "# de FU necessário para o período",
     "static.organisation.organisationtext": "Insira o nome da organização",

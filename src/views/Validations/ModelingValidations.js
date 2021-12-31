@@ -78,23 +78,26 @@ class ModelingValidation extends Component {
     }
 
     setNodeVal(e) {
-        console.log("e+++", e);
+        this.setState({loading:true})
         var nodeIdArr = [];
         for (var i = 0; i < e.length; i++) {
             nodeIdArr.push(e[i].value);
         }
         this.setState({
             nodeVal: e,
-            nodeIdArr
+            nodeIdArr,
+            loading:false
         }, () => {
             this.getData()
         })
     }
 
     setDisplayBy(e) {
+        this.setState({loading:true})
         var displayBy = e.target.value;
         this.setState({
-            displayBy: displayBy
+            displayBy: displayBy,
+            loading:false
         }, () => {
             this.getData()
         })
@@ -113,35 +116,49 @@ class ModelingValidation extends Component {
     }
 
     setVersionId(e) {
+        this.setState({loading:true})
         var versionId = e.target.value;
+        localStorage.setItem("sesDatasetVersionId", versionId);
         if (versionId != "") {
             this.setState({
-                versionId: versionId
+                versionId: versionId,
+                loading:false
             }, () => {
                 this.getDatasetData()
             })
         } else {
+            this.el = jexcel(document.getElementById("tableDiv"), '');
+            this.el.destroy();
             this.setState({
-                versionId: versionId
-            }, () => {
-                this.getData()
+                versionId: versionId,
+                datasetData: {},
+                treeList: [],
+                treeId: "",
+                scenarioList: [],
+                scenarioId: "",
+                levelList: [],
+                dataEl: "",
+                levelId: "",
+                levelUnit: "",
+                nodeList: [],
+                nodeVal: [],
+                nodeIdArr: [],
+                loading: false
+
             })
         }
     }
 
     getDatasetData() {
-        console.log("In get dataset data+++")
         this.setState({
             loading: true
         })
         var versionId = this.state.versionId.toString();
-        console.log("In get dataset data+++", versionId);
         if (versionId != "" && versionId.includes("Local")) {
             var actualVersionId = (versionId.split('(')[0]).trim();
             var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
             var userId = userBytes.toString(CryptoJS.enc.Utf8);
             var datasetId = this.state.datasetId + "_v" + actualVersionId + "_uId_" + userId;
-            console.log("DatasetId+++", datasetId);
             var db1;
             getDatabase();
             var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
@@ -157,7 +174,6 @@ class ModelingValidation extends Component {
                 getRequest.onsuccess = function (event) {
                     var myResult = [];
                     myResult = getRequest.result;
-                    console.log("MyResult+++", myResult);
                     var datasetDataBytes = CryptoJS.AES.decrypt(myResult.programData, SECRET_KEY);
                     var datasetData = datasetDataBytes.toString(CryptoJS.enc.Utf8);
                     var datasetJson = JSON.parse(datasetData);
@@ -173,7 +189,6 @@ class ModelingValidation extends Component {
             var json = [{ programId: this.state.datasetId, versionId: versionId }]
             DatasetService.getAllDatasetData(json).then(response => {
                 if (response.status == 200) {
-                    console.log("resp--------------------", response.data);
                     var responseData = response.data[0];
                     this.setState({
                         datasetData: responseData,
@@ -190,6 +205,8 @@ class ModelingValidation extends Component {
                 }
             }).catch(
                 error => {
+                    this.el = jexcel(document.getElementById("tableDiv"), '');
+                    this.el.destroy();
                     this.setState({
                         datasetData: {},
                         treeList: [],
@@ -197,6 +214,7 @@ class ModelingValidation extends Component {
                         scenarioList: [],
                         scenarioId: "",
                         levelList: [],
+                        dataEl: "",
                         levelId: "",
                         levelUnit: "",
                         nodeList: [],
@@ -207,6 +225,8 @@ class ModelingValidation extends Component {
                 }
             );
         } else {
+            this.el = jexcel(document.getElementById("tableDiv"), '');
+            this.el.destroy();
             this.setState({
                 datasetData: {},
                 treeList: [],
@@ -219,73 +239,161 @@ class ModelingValidation extends Component {
                 nodeList: [],
                 nodeVal: [],
                 nodeIdArr: [],
+                dataEl: "",
                 loading: false
             })
         }
     }
 
     getTreeList() {
+        this.setState({loading:true})
         var datasetJson = this.state.datasetData;
-        console.log("datasetJson+++", datasetJson);
         var treeList = datasetJson.treeList;
         var startDate = moment(datasetJson.currentVersion.forecastStartDate).format("YYYY-MM-DD");
         var stopDate = moment(datasetJson.currentVersion.forecastStopDate).format("YYYY-MM-DD");
         var rangeValue = { from: { year: new Date(startDate).getFullYear(), month: new Date(startDate).getMonth() + 1 }, to: { year: new Date(stopDate).getFullYear(), month: new Date(stopDate).getMonth() + 1 } }
+        var treeId = "";
+        var event = {
+            target: {
+                value: ""
+            }
+        };
+        if (treeList.length == 1) {
+            treeId = treeList[0].treeId;
+            event.target.value = treeList[0].treeId;
+        } else if (localStorage.getItem("sesTreeId") != "") {
+            treeId = localStorage.getItem("sesTreeId");
+            event.target.value = localStorage.getItem("sesTreeId");
+        }
         this.setState({
             treeList: treeList,
-            rangeValue: rangeValue
+            rangeValue: rangeValue,
+            loading:false
+        }, () => {
+            if (treeId != "") {
+                this.setTreeId(event);
+            }
         })
 
     }
 
     setTreeId(e) {
+        this.setState({loading:true})
         var treeId = e.target.value;
+        localStorage.setItem("sesTreeId", treeId);
         if (treeId > 0) {
             this.setState({
-                treeId: treeId
+                treeId: treeId,
+                loading:false,
             }, () => {
                 this.getScenarioList()
             })
         } else {
+            this.el = jexcel(document.getElementById("tableDiv"), '');
+            this.el.destroy();
             this.setState({
-                treeId: treeId
-            }, () => {
-                this.getData()
+                treeId: treeId,
+                scenarioList: [],
+                scenarioId: "",
+                levelList: [],
+                dataEl: "",
+                levelId: "",
+                levelUnit: "",
+                nodeList: [],
+                nodeVal: [],
+                nodeIdArr: [],
+                loading:false
             })
         }
     }
 
     getScenarioList() {
+        this.setState({loading:true})
         var treeList = this.state.treeList;
         if (this.state.treeId > 0) {
             var treeListFiltered = treeList.filter(c => c.treeId == this.state.treeId)[0];
             var levelList = [...new Set(treeListFiltered.tree.flatList.map(ele => (ele.level)))]
+            var scenarioList = treeListFiltered.scenarioList;
+            var scenarioId = "";
+            var event = {
+                target: {
+                    value: ""
+                }
+            };
+            if (scenarioList.length == 1) {
+                scenarioId = scenarioList[0].id;
+                event.target.value = scenarioList[0].id;
+            } else if (localStorage.getItem("sesScenarioId") != "") {
+                scenarioId = localStorage.getItem("sesScenarioId");
+                event.target.value = localStorage.getItem("sesScenarioId");
+            }
+
+            var levelId = "";
+            var levelEvent = {
+                target: {
+                    value: ""
+                }
+            };
+            if (levelList.length == 1) {
+                levelId = levelList[0];
+                levelEvent.target.value = levelList[0];
+            } else if (localStorage.getItem("sesLevelId") != "") {
+                levelId = localStorage.getItem("sesLevelId");
+                levelEvent.target.value = localStorage.getItem("sesLevelId");
+            }
+
             this.setState({
                 scenarioList: treeListFiltered.scenarioList,
                 levelList: levelList,
-                treeListFiltered: treeListFiltered
+                treeListFiltered: treeListFiltered,
+                loading:false
+            }, () => {
+                if (scenarioId != "") {
+                    this.setScenarioId(event);
+                }
+                if (levelId != "") {
+                    this.setLevelId(levelEvent);
+                }
+
             })
         } else {
+            this.el = jexcel(document.getElementById("tableDiv"), '');
+            this.el.destroy();
             this.setState({
                 scenarioList: [],
                 scenarioId: "",
                 levelList: [],
+                dataEl: "",
                 levelId: "",
                 levelUnit: "",
                 nodeList: [],
                 nodeVal: [],
-                nodeIdArr: []
+                nodeIdArr: [],
+                loading:false,
             })
         }
     }
 
     setScenarioId(e) {
+        this.setState({loading:true})
         var scenarioId = e.target.value;
-        this.setState({
-            scenarioId: scenarioId
-        }, () => {
-            this.getData()
-        })
+        localStorage.setItem("sesScenarioId", scenarioId);
+        if (scenarioId != "") {
+            this.setState({
+                scenarioId: scenarioId,
+                loading:false
+            }, () => {
+                this.getData()
+            })
+        } else {
+            this.el = jexcel(document.getElementById("tableDiv"), '');
+            this.el.destroy();
+            this.setState({
+                scenarioId: scenarioId,
+                loading:false,
+                dataEl: ""
+            })
+        }
     }
 
     getOtherFiltersData() {
@@ -293,19 +401,35 @@ class ModelingValidation extends Component {
     }
 
     setDatasetId(e) {
-
+        this.setState({loading:true})
         var datasetId = e.target.value;
+        localStorage.setItem("sesLiveDatasetId", datasetId);
         if (datasetId > 0) {
             this.setState({
-                datasetId: datasetId
+                datasetId: datasetId,
+                loading:false
             }, () => {
                 this.getVersionList();
             })
         } else {
+            this.el = jexcel(document.getElementById("tableDiv"), '');
+            this.el.destroy();
             this.setState({
-                datasetId: datasetId
-            }, () => {
-                this.getData();
+                datasetId: datasetId,
+                scenarioList: [],
+                scenarioId: "",
+                levelList: [],
+                dataEl: "",
+                levelId: "",
+                levelUnit: "",
+                nodeList: [],
+                nodeVal: [],
+                nodeIdArr: [],
+                treeList: [],
+                treeId: "",
+                versionList: [],
+                versionId: "",
+                loading:false
             })
         }
     }
@@ -318,11 +442,8 @@ class ModelingValidation extends Component {
             })
             var datasetData = this.state.datasetData;
             var treeList = datasetData.treeList;
-            console.log("TreeList+++", treeList)
             var tree = treeList.filter(c => c.treeId == this.state.treeId)[0];
-            console.log("Tree+++", tree)
             var flatList = tree.tree.flatList;
-            console.log("TreeList+++", flatList);
             // var nodeDataModelingList = datasetData.nodeDataModelingList;
             var nodeIdArr = this.state.nodeIdArr;
             var rangeValue = this.state.rangeValue;
@@ -330,11 +451,10 @@ class ModelingValidation extends Component {
             let startDate = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
             let stopDate = rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
             // var nodeDataModelingListFilter = nodeDataModelingList.filter(c => nodeIdArr.includes(c.id) && c.scenarioId == this.state.scenarioId && moment(c.month).format("YYYY-MM-DD") >= moment(startDate).format("YYYY-MM-DD") && moment(c.month).format("YYYY-MM-DD") <= moment(stopDate).format("YYYY-MM-DD"));
-            // console.log("NodeDataModelingList+++", nodeDataModelingListFilter);
             // var monthList = [...new Set(nodeDataModelingListFilter.map(ele => (ele.month)))];
             var monthList = [];
             var curDate = startDate;
-            for (var i = 0; curDate < stopDate; i++) {
+            for (var i = 0; moment(curDate).format("YYYY-MM") < moment(stopDate).format("YYYY-MM"); i++) {
                 curDate = moment(startDate).add(i, 'months').format("YYYY-MM-DD");
                 monthList.push(curDate)
             }
@@ -359,7 +479,6 @@ class ModelingValidation extends Component {
                 var total = 0;
                 var totalPer = 0;
                 for (var k = 0; k < nodeVal.length; k++) {
-                    console.log("flatList.filter(c=>c.nodeId==nodeVal[k].value)[0]+++", flatList.filter(c => c.id == nodeVal[k].value)[0]);
                     var flatListFiltered = flatList.filter(c => c.id == nodeVal[k].value)[0].payload.nodeDataMap[this.state.scenarioId][0].nodeDataMomList;
                     var calculatedValue = flatListFiltered.length > 0 ? flatListFiltered.filter(c => moment(c.month).format("YYYY-MM-DD") == moment(monthList[j]).format("YYYY-MM-DD"))[0].calculatedValue : "";
                     data[k + 1] = flatListFiltered.length > 0 ? Number(calculatedValue).toFixed(2) : "";
@@ -418,12 +537,12 @@ class ModelingValidation extends Component {
                 nodeDataModelingList: [{}],
                 monthList: monthList,
                 dataEl: dataEl,
-            })
-            this.setState({
                 loading: false,
                 show: false
             })
         } else {
+            this.el = jexcel(document.getElementById("tableDiv"), '');
+            this.el.destroy();
             this.setState({
                 nodeDataModelingList: [],
                 loading: false,
@@ -437,17 +556,15 @@ class ModelingValidation extends Component {
     }
 
     setLevelId(e) {
+        this.setState({loading:true})
         var levelId = e.target.value;
-        console.log("Level Id+++", levelId);
+        localStorage.setItem("sesLevelId", levelId);
         var levelUnit = "";
         if (levelId != "") {
             var treeListFiltered = this.state.treeListFiltered;
-            console.log("TreeListFiltered+++", treeListFiltered)
             var flatDataForLevel = treeListFiltered.tree.flatList.filter(c => c.level == levelId);
             var flatData = flatDataForLevel[0];
-            console.log("FlatData+++", flatData)
             levelUnit = getLabelText(flatData.payload.nodeUnit.label, this.state.lang)
-            console.log("LevelUnit+++", levelUnit)
             var nodeList = [];
             var nodeVal = [];
             var nodeIdArr = [];
@@ -467,7 +584,8 @@ class ModelingValidation extends Component {
                 levelUnit: levelUnit != null ? levelUnit : "",
                 nodeList: nodeList,
                 nodeIdArr: nodeIdArr,
-                nodeVal: nodeVal
+                nodeVal: nodeVal,
+                loading:false
             }, () => {
                 this.getData();
             })
@@ -478,7 +596,8 @@ class ModelingValidation extends Component {
                 levelUnit: "",
                 nodeList: [],
                 nodeIdArr: [],
-                nodeVal: []
+                nodeVal: [],
+                loading:false
             }, () => {
                 this.getData()
             })
@@ -490,8 +609,6 @@ class ModelingValidation extends Component {
             loading: true
         })
         var datasetList = this.state.datasetList;
-        console.log("datsetlist+++", datasetList);
-        console.log("this.state.datasetId+++", this.state.datasetId)
         if (this.state.datasetId > 0) {
             var selectedDataset = datasetList.filter(c => c.id == this.state.datasetId)[0];
             var versionList = [];
@@ -499,11 +616,30 @@ class ModelingValidation extends Component {
             for (var v = 0; v < vList.length; v++) {
                 versionList.push(vList[v].versionId)
             }
+            var versionId = "";
+            var event = {
+                target: {
+                    value: ""
+                }
+            };
+            if (versionList.length == 1) {
+                versionId = versionList[0];
+                event.target.value = versionList[0];
+            } else if (localStorage.getItem("sesVersionId") != "") {
+                versionId = localStorage.getItem("sesDatasetVersionId");
+                event.target.value = localStorage.getItem("sesDatasetVersionId");
+            }
             this.setState({
                 versionList: versionList,
                 loading: false
+            }, () => {
+                if (versionId != "") {
+                    this.setVersionId(event)
+                }
             })
         } else {
+            this.el = jexcel(document.getElementById("tableDiv"), '');
+            this.el.destroy();
             this.setState({
                 versionList: [],
                 versionId: "",
@@ -513,6 +649,7 @@ class ModelingValidation extends Component {
                 scenarioList: [],
                 scenarioId: "",
                 levelList: [],
+                dataEl: "",
                 levelId: "",
                 levelUnit: "",
                 nodeList: [],
@@ -527,7 +664,6 @@ class ModelingValidation extends Component {
         // this.getOfflineDatasetList();
         ProgramService.getDataSetList().then(response => {
             if (response.status == 200) {
-                console.log("resp--------------------", response.data);
                 var responseData = response.data;
                 var datasetList = [];
                 for (var rd = 0; rd < responseData.length; rd++) {
@@ -577,14 +713,12 @@ class ModelingValidation extends Component {
             getRequest.onsuccess = function (event) {
                 var myResult = [];
                 myResult = getRequest.result;
-                console.log("MyResult+++", myResult);
                 var datasetList = this.state.datasetList;
                 for (var mr = 0; mr < myResult.length; mr++) {
                     var index = datasetList.findIndex(c => c.id == myResult[mr].programId);
                     if (index == -1) {
                         var programNameBytes = CryptoJS.AES.decrypt(myResult[mr].programName, SECRET_KEY);
                         var programNameLabel = programNameBytes.toString(CryptoJS.enc.Utf8);
-                        console.log("programNamelabel+++", programNameLabel);
                         var programNameJson = JSON.parse(programNameLabel)
                         var json = {
                             id: myResult[mr].programId,
@@ -594,14 +728,30 @@ class ModelingValidation extends Component {
                         datasetList.push(json)
                     } else {
                         var existingVersionList = datasetList[index].versionList;
-                        console.log("existingVersionList+++", datasetList[index].versionList)
                         existingVersionList.push({ versionId: myResult[mr].version + "  (Local)" })
                         datasetList[index].versionList = existingVersionList
                     }
                 }
+                var datasetId = "";
+                var event = {
+                    target: {
+                        value: ""
+                    }
+                };
+                if (datasetList.length == 1) {
+                    datasetId = datasetList[0].id;
+                    event.target.value = datasetList[0].id;
+                } else if (localStorage.getItem("sesLiveDatasetId") != "") {
+                    datasetId = localStorage.getItem("sesLiveDatasetId");
+                    event.target.value = localStorage.getItem("sesLiveDatasetId");
+                }
                 this.setState({
                     datasetList: datasetList,
                     loading: false
+                }, () => {
+                    if (datasetId != "") {
+                        this.setDatasetId(event);
+                    }
                 })
             }.bind(this)
         }.bind(this)
@@ -674,12 +824,14 @@ class ModelingValidation extends Component {
                                 xAxis2 += '';
                                 var month = xAxis2.split('-')[0];
                                 var year = xAxis2.split('-')[1];
-                                if (month === "Feb") {
+                                if (month === "Jul") {
                                     return year;
                                 } else {
                                     return "";
                                 }
                             },
+                            maxRotation: 0,
+                            minRotation: 0,
                             autoSkip: false
                         }
                     }]
@@ -692,31 +844,53 @@ class ModelingValidation extends Component {
                     usePointStyle: true,
                     fontColor: 'black'
                 }
-            }
+            },
+            tooltips: {
+                enabled: false,
+                custom: CustomTooltips,
+                callbacks: {
+                    label: function (tooltipItem, data) {
+
+                        let label = data.labels[tooltipItem.index];
+                        let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
+
+                        var cell1 = value
+                        cell1 += '';
+                        var x = cell1.split('.');
+                        var x1 = x[0];
+                        var x2 = x.length > 1 ? '.' + x[1] : '';
+                        var rgx = /(\d+)(\d{3})/;
+                        while (rgx.test(x1)) {
+                            x1 = x1.replace(rgx, '$1' + ',' + '$2');
+                        }
+                        return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
+                    }
+                }
+            },
         }
 
         let bar = {}
         var datasetListForGraph = [];
         var colourArray = ["#002F6C", "#BA0C2F", "#65ID32", "#49A4A1", "#A7C6ED", "#212721", "#6C6463", "#49A4A1", "#EDB944", "#F48521"]
-        if (this.state.monthList.length > 0 && this.state.dataEl != undefined) {
+        if (this.state.monthList.length > 0 && this.state.dataEl != undefined && this.state.dataEl != "") {
             var elInstance = this.state.dataEl;
-            if (elInstance != undefined) {
+            if (elInstance != undefined && this.state.dataEl != "") {
                 var colourCount = 0;
                 this.state.nodeVal.map((item, count) => {
                     if (colourCount > 10) {
                         colourCount = 0;
                     }
-                    console.log("elInstance.getColumnData([count+1])+++", elInstance.getColumnData([count + 1]));
                     datasetListForGraph.push({
                         label: item.label,
                         data: this.state.displayBy == 1 ? elInstance.getColumnData([count + 1]) : elInstance.getColumnData([count + this.state.nodeVal.length + 1 + 1]),
-                        backgroundColor: colourArray[colourCount]
+                        backgroundColor: colourArray[colourCount],
+                        stack: 1,
                     })
                     colourCount++;
                 })
             }
         }
-        if (this.state.monthList.length > 0) {
+        if (this.state.monthList.length > 0 && this.state.dataEl != undefined && this.state.dataEl != "") {
             bar = {
 
                 labels: [...new Set(this.state.monthList.map(ele => moment(ele).format("MMM-YYYY")))],
@@ -800,7 +974,7 @@ class ModelingValidation extends Component {
                         <div className="card-header-actions">
                             <a className="card-header-action">
 
-                                <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => this.exportPDF()} />
+                                <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.exportPDF()} />
 
 
                             </a>
@@ -857,7 +1031,7 @@ class ModelingValidation extends Component {
                                                 </div>
                                             </FormGroup>
                                             <FormGroup className="col-md-3">
-                                                <Label htmlFor="appendedInputButton">Tree Name</Label>
+                                                <Label htmlFor="appendedInputButton">{i18n.t('static.forecastMethod.tree')}</Label>
                                                 <div className="controls ">
                                                     <InputGroup>
                                                         <Input
@@ -878,7 +1052,7 @@ class ModelingValidation extends Component {
                                                 </div>
                                             </FormGroup>
                                             <FormGroup className="col-md-3">
-                                                <Label htmlFor="appendedInputButton">Scenario</Label>
+                                                <Label htmlFor="appendedInputButton">{i18n.t('static.whatIf.scenario')}</Label>
                                                 <div className="controls ">
                                                     <InputGroup>
                                                         <Input
@@ -916,7 +1090,7 @@ class ModelingValidation extends Component {
                                                 </div>
                                             </FormGroup>
                                             <FormGroup className="col-md-3">
-                                                <Label htmlFor="appendedInputButton">Levels</Label>
+                                                <Label htmlFor="appendedInputButton">{i18n.t('static.common.level')}</Label>
                                                 <div className="controls ">
                                                     <InputGroup>
                                                         <Input
@@ -936,7 +1110,7 @@ class ModelingValidation extends Component {
                                                 </div>
                                             </FormGroup>
                                             <FormGroup className="col-md-3">
-                                                <Label htmlFor="appendedInputButton">Level Unit</Label>
+                                                <Label htmlFor="appendedInputButton">{i18n.t('static.modelingValidation.levelUnit')}</Label>
                                                 <div className="controls">
                                                     <InputGroup>
                                                         <Input
@@ -952,7 +1126,7 @@ class ModelingValidation extends Component {
                                                 </div>
                                             </FormGroup>
                                             <FormGroup className="col-md-3">
-                                                <Label htmlFor="appendedInputButton">Node</Label>
+                                                <Label htmlFor="appendedInputButton">{i18n.t('static.common.node')}</Label>
                                                 <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
                                                 <div className="controls ">
                                                     {/* <InputGroup className="box"> */}
@@ -969,7 +1143,7 @@ class ModelingValidation extends Component {
                                                 </div>
                                             </FormGroup>
                                             <FormGroup className="col-md-3">
-                                                <Label htmlFor="appendedInputButton">Display By</Label>
+                                                <Label htmlFor="appendedInputButton">{i18n.t('static.modelingValidation.displayBy')}</Label>
                                                 <div className="controls ">
                                                     <InputGroup>
                                                         <Input
@@ -980,8 +1154,8 @@ class ModelingValidation extends Component {
                                                             value={this.state.displayBy}
                                                             onChange={(e) => { this.setDisplayBy(e); }}
                                                         >
-                                                            <option value="1">Number</option>
-                                                            <option value="2">Percentage</option>
+                                                            <option value="1">{i18n.t('static.modelingValidation.number')}</option>
+                                                            <option value="2">{i18n.t('static.whatIf.percentage')}</option>
                                                         </Input>
 
                                                     </InputGroup>
@@ -992,7 +1166,7 @@ class ModelingValidation extends Component {
                                 </Form>
                                 <Col md="12 pl-0" style={{ display: this.state.loading ? "none" : "block" }}>
                                     <div className="row">
-                                        {this.state.monthList.length > 0
+                                        {this.state.monthList.length > 0 && this.state.dataEl != undefined && this.state.dataEl != ""
                                             &&
                                             <div className="col-md-12 p-0">
                                                 <div className="col-md-12">
