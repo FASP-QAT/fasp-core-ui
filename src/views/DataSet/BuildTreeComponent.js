@@ -1235,7 +1235,7 @@ export default class BuildTree extends Component {
 
     buildMomJexcel() {
         var momList = this.state.momList;
-        console.log("momList--->",momList);
+        console.log("momList--->", momList);
         var dataArray = [];
         let count = 0;
         for (var j = 0; j < momList.length; j++) {
@@ -1371,7 +1371,7 @@ export default class BuildTree extends Component {
     }
 
     showMomData() {
-        console.log("show mom data---",this.state.currentScenario);
+        console.log("show mom data---", this.state.currentScenario);
         var getMomDataForCurrentNode = this.state.currentScenario.nodeDataMomList;
         console.log("getMomDataForCurrentNode>>>", getMomDataForCurrentNode);
         if (this.state.currentItemConfig.context.payload.nodeType.id > 2) {
@@ -1409,7 +1409,7 @@ export default class BuildTree extends Component {
         //         // console.log("hi bro", programJson.nodeDataModelingList)
         //         var getMomDataForCurrentNode = programJson.nodeDataModelingList.filter(c => c.id == this.state.currentItemConfig.context.id && c.nodeDataId == this.state.currentScenario.nodeDataId);
         //         console.log("getMomDataForCurrentNode>>>", getMomDataForCurrentNode);
-                
+
         //         if (this.state.currentItemConfig.context.payload.nodeType.id > 2) {
         //             var getMomDataForCurrentNodeParent = programJson.nodeDataModelingList.filter(c => c.id == this.state.currentItemConfig.parentItem.id && c.nodeDataId == this.state.parentScenario.nodeDataId);
         //             console.log("in if>>>>", getMomDataForCurrentNodeParent);
@@ -1426,7 +1426,7 @@ export default class BuildTree extends Component {
         //     }.bind(this)
         // }.bind(this)
 
-        
+
     }
     setStartAndStopDateOfProgram(programId) {
         console.log("programId>>>", programId);
@@ -2495,7 +2495,9 @@ export default class BuildTree extends Component {
                     console.log("get payload 5");
                     if (itemConfig.payload.nodeType.id == 4) {
                         if ((itemConfig.payload.nodeDataMap[scenarioId])[0].fuNode.usageType.id == 2) {
-                            return addCommas((itemConfig.payload.nodeDataMap[scenarioId])[0].displayDataValue) + "% of parent, " + (itemConfig.payload.nodeDataMap[scenarioId])[0].fuNode.noOfForecastingUnitsPerPerson + "/" + (itemConfig.payload.nodeDataMap[scenarioId])[0].fuNode.usagePeriod.label.label_en;
+                            console.log("test---",(itemConfig.payload.nodeDataMap[scenarioId])[0].fuNode.usagePeriod.usagePeriodId);
+                            console.log("this.state.usagePeriodList---",this.state.usagePeriodList);
+                            return addCommas((itemConfig.payload.nodeDataMap[scenarioId])[0].displayDataValue) + "% of parent, " + (itemConfig.payload.nodeDataMap[scenarioId])[0].fuNode.noOfForecastingUnitsPerPerson + "/" + this.state.usagePeriodList.filter(x => x.usagePeriodId == (itemConfig.payload.nodeDataMap[scenarioId])[0].fuNode.usagePeriod.usagePeriodId)[0].label.label_en;
                         } else {
                             return addCommas((itemConfig.payload.nodeDataMap[scenarioId])[0].displayDataValue) + "% of parent";
                         }
@@ -6061,7 +6063,7 @@ export default class BuildTree extends Component {
                                                     id="noOfPersons"
                                                     name="noOfPersons"
                                                     bsSize="sm"
-                                                    readOnly={!this.state.addNodeFlag ? this.state.currentScenario.fuNode.usageType.id == 2 ? true : false : ''}
+                                                    readOnly={this.state.currentScenario.fuNode.usageType.id == 2 ? true : false}
                                                     onChange={(e) => { this.dataChange(e) }}
                                                     value={addCommas(this.state.currentScenario.fuNode.noOfPersons)}>
 
@@ -6889,15 +6891,20 @@ export default class BuildTree extends Component {
             console.log("items[i]---", items[i]);
             console.log("items[i].payload.nodeDataMap[this.state.selectedScenario][0].nodeDataId---", items[i].payload.nodeDataMap[this.state.selectedScenario][0].nodeDataId);
             console.log("items[i].payload.nodeDataMap[this.state.selectedScenario][0].modelling---", items[i].payload.nodeDataMap[this.state.selectedScenario][0]);
-            var nodeDataModelingMap = items[i].payload.nodeDataMap[this.state.selectedScenario][0].nodeDataMomList.filter(x => moment(x.month).format('YYYY-MM') == moment(date).format('YYYY-MM'));
-            console.log("nodeDataModelingMap>>>", nodeDataModelingMap);
-            if (nodeDataModelingMap.length > 0) {
-                console.log("get payload 13");
-                if (nodeDataModelingMap[0].calculatedValue != null && nodeDataModelingMap[0].endValue != null) {
-                    (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].displayCalculatedDataValue = nodeDataModelingMap[0].calculatedValue;
-                    (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].displayDataValue = nodeDataModelingMap[0].endValue;
+            if (items[i].payload.nodeDataMap[this.state.selectedScenario][0].nodeDataMomList != null) {
+                var nodeDataModelingMap = items[i].payload.nodeDataMap[this.state.selectedScenario][0].nodeDataMomList.filter(x => moment(x.month).format('YYYY-MM') == moment(date).format('YYYY-MM'));
+                console.log("nodeDataModelingMap>>>", nodeDataModelingMap);
+                if (nodeDataModelingMap.length > 0) {
+                    console.log("get payload 13");
+                    if (nodeDataModelingMap[0].calculatedValue != null && nodeDataModelingMap[0].endValue != null) {
+                        (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].displayCalculatedDataValue = nodeDataModelingMap[0].calculatedValue;
+                        (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].displayDataValue = nodeDataModelingMap[0].endValue;
+                    } else {
+                        console.log("get payload 14");
+                        (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].displayCalculatedDataValue = (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].calculatedDataValue;
+                        (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].displayDataValue = (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].dataValue;
+                    }
                 } else {
-                    console.log("get payload 14");
                     (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].displayCalculatedDataValue = (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].calculatedDataValue;
                     (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].displayDataValue = (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].dataValue;
                 }
