@@ -5,7 +5,6 @@ import { JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, LATEST_VERSION_COLOUR, LOCAL_
 import jexcel from 'jexcel-pro';
 import "../../../node_modules/jexcel-pro/dist/jexcel.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
-import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions';
 import getLabelText from '../../CommonComponent/getLabelText'
 import {
     Col, Row, Card, CardBody, Form,
@@ -63,6 +62,7 @@ export default class CompareVersion extends Component {
         this.state.columns.filter(c => c.type != 'hidden').map((item, idx) => { headers[idx] = (item.title).replaceAll(' ', '%20') });
 
         var A = [this.addDoubleQuoteToRowContent(headers)];
+        var C = [this.addDoubleQuoteToRowContent(["","",this.props.versionLabel,this.props.versionLabel,this.props.versionLabel,this.props.versionLabel1,this.props.versionLabel1,this.props.versionLabel1])];
         var B = []
         this.state.dataEl.getJson(null, false).map(ele => {
             B = [];
@@ -74,10 +74,13 @@ export default class CompareVersion extends Component {
             A.push(this.addDoubleQuoteToRowContent(B));
         })
 
-
+        for (var i = 0; i < C.length; i++) {
+            csvRow.push(C[i].join(","))
+        }
         for (var i = 0; i < A.length; i++) {
             csvRow.push(A[i].join(","))
         }
+
         var csvString = csvRow.join("%0A")
         var a = document.createElement("a")
         a.href = 'data:attachment/csv,' + csvString
@@ -238,8 +241,7 @@ export default class CompareVersion extends Component {
                 // for (var r = 0; r < regionList.length; r++) {
                 var regionalSelectedForecastData = selectedForecastData[regionSet[k]];
                 console.log("regionalSelectedForecastData", regionalSelectedForecastData);
-
-                data[2] = regionalSelectedForecastData != undefined ? regionalSelectedForecastData.scenarioId != "" && regionalSelectedForecastData.scenarioId != null ? treeScenarioList.filter(c => c.scenarioId == regionalSelectedForecastData.scenarioId)[0].treeLabel + " ~ " + (scenarioList.filter(c => c.id == regionalSelectedForecastData.scenarioId)[0].label,this.state.lang) : regionalSelectedForecastData.consumptionExtrapolationId != "" && regionalSelectedForecastData.consumptionExtrapolationId != null ? getLabelText(consumptionExtrapolation.filter(c => c.consumptionExtrapolationId == regionalSelectedForecastData.consumptionExtrapolationId)[0].extrapolationMethod.label,this.state.lang) : "" : ""
+                data[2] = regionalSelectedForecastData != undefined ? regionalSelectedForecastData.scenarioId != "" && regionalSelectedForecastData.scenarioId != null ? treeScenarioList.filter(c => c.scenarioId == regionalSelectedForecastData.scenarioId)[0].treeLabel + " ~ " + getLabelText(scenarioList.filter(c => c.id == regionalSelectedForecastData.scenarioId)[0].label,this.state.lang) : regionalSelectedForecastData.consumptionExtrapolationId != "" && regionalSelectedForecastData.consumptionExtrapolationId != null ? getLabelText(consumptionExtrapolation.filter(c => c.consumptionExtrapolationId == regionalSelectedForecastData.consumptionExtrapolationId)[0].extrapolationMethod.label,this.state.lang) : "" : ""
                 data[3] = regionalSelectedForecastData != undefined ? regionalSelectedForecastData.totalForecast : "";
                 data[4] = regionalSelectedForecastData != undefined ? regionalSelectedForecastData.notes : "";
                 // count += 3;
@@ -253,7 +255,7 @@ export default class CompareVersion extends Component {
                 // }
                 // for (var r = 0; r < regionList2.length; r++) {
                 var regionalSelectedForecastData2 = selectedForecastData2[regionSet[k]];
-                data[8] = regionalSelectedForecastData2 != undefined ? regionalSelectedForecastData2.scenarioId != "" && regionalSelectedForecastData2.scenarioId != null ? treeScenarioList2.filter(c => c.scenarioId == regionalSelectedForecastData2.scenarioId)[0].treeLabel + " ~ " + getLabelText(scenarioList2.filter(c => c.id == regionalSelectedForecastData2.scenarioId)[0].label,this.state.lang) : regionalSelectedForecastData2.consumptionExtrapolationId != "" && regionalSelectedForecastData2.consumptionExtrapolationId != null ? (consumptionExtrapolation2.filter(c => c.consumptionExtrapolationId == regionalSelectedForecastData2.consumptionExtrapolationId)[0].extrapolationMethod.label,this.state.lang) : "" : ""
+                data[8] = regionalSelectedForecastData2 != undefined ? regionalSelectedForecastData2.scenarioId != "" && regionalSelectedForecastData2.scenarioId != null ? treeScenarioList2.filter(c => c.scenarioId == regionalSelectedForecastData2.scenarioId)[0].treeLabel + " ~ " + getLabelText(scenarioList2.filter(c => c.id == regionalSelectedForecastData2.scenarioId)[0].label,this.state.lang) : regionalSelectedForecastData2.consumptionExtrapolationId != "" && regionalSelectedForecastData2.consumptionExtrapolationId != null ? getLabelText(consumptionExtrapolation2.filter(c => c.consumptionExtrapolationId == regionalSelectedForecastData2.consumptionExtrapolationId)[0].extrapolationMethod.label,this.state.lang) : "" : ""
                 data[9] = regionalSelectedForecastData2 != undefined ? regionalSelectedForecastData2.totalForecast : "";
                 data[10] = regionalSelectedForecastData2 != undefined ? regionalSelectedForecastData2.notes : "";
 

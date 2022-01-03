@@ -1327,15 +1327,15 @@ class AuthenticationService {
                                     return true;
                                 }
                             break;
-                    // case "/report/compareVersion":        
-                    //     if (bfunction.includes("ROLE_BF_COMPARE_VERSION")) {
-                    //         return true;
-                    //     }
-                    //     break;
+                    case "/report/compareVersion":        
+                        if (bfunction.includes("ROLE_BF_COMPARE_VERSION")) {
+                            return true;
+                        }
+                        break;
                     // case "/report/compareAndSelectScenario":
                     // case "/validation/productValidation":
                     // case "/validation/modelingValidation":
-                    case "/report/compareVersion":
+                    // case "/report/compareVersion":
                     case "/dataentry/consumptionDataEntryAndAdjustment":
                     case "/dataset/listTree":
                     case "/dataset/commitTree":

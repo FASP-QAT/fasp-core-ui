@@ -1801,13 +1801,9 @@ export default class PlanningUnitSetting extends Component {
         data[9] = 0;
         data[10] = 1;
         data[11] = 1;
-<<<<<<< HEAD
         data[12] = null;
         data[13] = -1;
         data[14] = true;
-=======
-        data[12] = {};
->>>>>>> devMod2Shrutika
 
         this.el.insertRow(
             data, 0, 1
