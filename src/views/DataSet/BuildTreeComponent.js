@@ -495,7 +495,6 @@ export default class BuildTree extends Component {
         this.resetNodeData = this.resetNodeData.bind(this);
         this.toggleDropdown = this.toggleDropdown.bind(this);
         this.fetchTracerCategoryList = this.fetchTracerCategoryList.bind(this);
-        this.onSaveClick = this.onSaveClick.bind(this);
     }
     fetchTracerCategoryList(programData) {
         console.log("programData---%%%%%%%", programData);
