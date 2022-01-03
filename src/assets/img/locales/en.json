@@ -1467,7 +1467,7 @@
     "static.dataSource.program": "Program",
     "static.dashboard.supplierheader": "Manufacturer",
     "static.shipment.rate": "Rate (USD)",
-    "static.program.programDiscription": "Program Description",
+    "static.program.programDiscription": "Version Notes",
     "static.report.planningUnit/ForecastingUnit": "Planning Unit/Forecasting Unit",
     "static.tree.#OfFURequiredForPeriod": "# of FU required for period",
     "static.organisation.organisationtext": "Enter Organization Name",
@@ -1985,5 +1985,6 @@
     "static.organisation.organisationheader": "Organization",
     "static.supplyPlanFormula.maxMonthOfStockEx5": "Max = 7",
     "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18 )",
-    "static.report.exportWordDoc":"Export to word doc"
+    "static.report.exportWordDoc":"Export to word doc",
+    "static.message.invalidStringLength":"Version Notes should not exceed 1000 characters"
 }
