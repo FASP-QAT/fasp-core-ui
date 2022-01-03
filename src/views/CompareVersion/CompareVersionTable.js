@@ -9,6 +9,7 @@ import jexcel from 'jexcel-pro';
 import "../../../node_modules/jexcel-pro/dist/jexcel.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions';
+import getLabelText from '../../CommonComponent/getLabelText'
 
 export default class CompareVersion extends Component {
     constructor(props) {
@@ -20,12 +21,68 @@ export default class CompareVersion extends Component {
             regionList1: [],
             regionList2: []
         }
-        this.loaded = this.loaded.bind(this)
+        this.loaded = this.loaded.bind(this);
+        this.exportCSV = this.exportCSV.bind(this);
+    }
+
+    addDoubleQuoteToRowContent = (arr) => {
+        return arr.map(ele => '"' + ele + '"')
+    }
+
+    exportCSV() {
+        var csvRow = [];
+        csvRow.push('"' + (i18n.t('static.dashboard.programheader') + ' : ' + document.getElementById("datasetId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+        csvRow.push('')
+        csvRow.push('"' + (i18n.t('static.report.version') + ' : ' + document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+        csvRow.push('')
+        csvRow.push('"' + (i18n.t('static.compareVersion.compareWithVersion') + ' : ' + document.getElementById("versionId1").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+        csvRow.push('')
+
+
+        csvRow.push('')
+        csvRow.push('"' + (i18n.t('static.common.youdatastart')).replaceAll(' ', '%20') + '"')
+        csvRow.push('')
+        var re;
+        var columns = [];
+        // columns.push(i18n.t('static.common.level'));
+        // columns.push(i18n.t('static.supplyPlan.type'));
+        // columns.push(i18n.t('static.forecastingunit.forecastingunit'));
+        // columns.push(i18n.t('static.forecastingunit.forecastingunit') + " " + i18n.t('static.common.text'));
+        // columns.push(i18n.t('static.common.product'));
+        // columns.push(i18n.t('static.common.product') + " " + i18n.t('static.common.text'));
+        // columns.push(i18n.t('static.productValidation.cost'));
+        const headers = [];
+        this.state.columns.filter(c => c.type != 'hidden').map((item, idx) => { headers[idx] = (item.title).replaceAll(' ', '%20') });
+
+        var A = [this.addDoubleQuoteToRowContent(headers)];
+        var B = []
+        this.state.dataEl.getJson(null, false).map(ele => {
+            B = [];
+            this.state.columns.map((item, idx) => {
+                if (item.type != 'hidden') {
+                    B.push(ele[idx].toString().replaceAll(',', ' ').replaceAll(' ', '%20'));
+                }
+            })
+            A.push(this.addDoubleQuoteToRowContent(B));
+        })
+
+
+        for (var i = 0; i < A.length; i++) {
+            csvRow.push(A[i].join(","))
+        }
+        var csvString = csvRow.join("%0A")
+        var a = document.createElement("a")
+        a.href = 'data:attachment/csv,' + csvString
+        a.target = "_Blank"
+        a.download = i18n.t('static.dashboard.compareVersion') + ".csv"
+        document.body.appendChild(a)
+        a.click()
     }
 
     componentDidMount() {
         console.log("DatasetData+++", this.props.datasetData);
         console.log("DatasetData1+++", this.props.datasetData1);
+        this.props.updateState("loading", true);
         var datasetData = this.props.datasetData;
         var datasetData1 = this.props.datasetData1;
         var datasetData2 = this.props.datasetData2;
@@ -66,13 +123,13 @@ export default class CompareVersion extends Component {
         })
         for (var r = 0; r < regionList.length; r++) {
             regionJson.push({
-                title: regionList[r].label.label_en,
+                title: getLabelText(regionList[r].label),
                 colspan: 3
             })
         }
         for (var r = 0; r < regionList1.length; r++) {
             regionJson.push({
-                title: regionList1[r].label.label_en,
+                title: getLabelText(regionList1[r].label),
                 colspan: 3
             })
         }
@@ -87,21 +144,21 @@ export default class CompareVersion extends Component {
             return { title: item.title, colspan: 3 }
         }).join(',')
         nestedHeaders.push(regionJson);
-        columns.push({ title: "Planning Unit", width: 300 })
+        columns.push({ title: i18n.t('static.consumption.planningunit'), width: 300 })
         for (var r = 0; r < regionList.length; r++) {
-            columns.push({ title: "Selected Forecast", width: 200 })
-            columns.push({ title: "Forecast Qty", width: 100 })
-            columns.push({ title: "Notes", width: 200 })
+            columns.push({ title: i18n.t('static.compareVersion.selectedForecast'), width: 200 })
+            columns.push({ title: i18n.t('static.compareVersion.forecastQty'), width: 100 })
+            columns.push({ title: i18n.t('static.program.notes'), width: 200 })
         }
         for (var r = 0; r < regionList1.length; r++) {
-            columns.push({ title: "Selected Forecast", width: 200 })
-            columns.push({ title: "Forecast Qty", width: 100 })
-            columns.push({ title: "Notes", width: 200 })
+            columns.push({ title: i18n.t('static.compareVersion.selectedForecast'), width: 200 })
+            columns.push({ title: i18n.t('static.compareVersion.forecastQty'), width: 100 })
+            columns.push({ title: i18n.t('static.program.notes'), width: 200 })
         }
         for (var r = 0; r < regionList2.length; r++) {
-            columns.push({ title: "Selected Forecast", width: 200, type: 'hidden' })
-            columns.push({ title: "Forecast Qty", width: 100, type: 'hidden' })
-            columns.push({ title: "Notes", width: 200, type: 'hidden' })
+            columns.push({ title: i18n.t('static.compareVersion.selectedForecast'), width: 200, type: 'hidden' })
+            columns.push({ title: i18n.t('static.compareVersion.forecastQty'), width: 100, type: 'hidden' })
+            columns.push({ title: i18n.t('static.program.notes'), width: 200, type: 'hidden' })
         }
         var scenarioList = [];
         var treeScenarioList = [];
@@ -109,7 +166,7 @@ export default class CompareVersion extends Component {
             scenarioList = scenarioList.concat(datasetData.treeList[t].scenarioList);
             var sl = datasetData.treeList[t].scenarioList;
             for (var s = 0; s < sl.length; s++) {
-                treeScenarioList.push({ treeLabel: datasetData.treeList[t].label.label_en, scenarioId: sl[s].id, scenarioLabel: sl[s].label.label_en })
+                treeScenarioList.push({ treeLabel: getLabelText(datasetData.treeList[t].label), scenarioId: sl[s].id, scenarioLabel: getLabelText(sl[s].label) })
             }
 
         }
@@ -120,7 +177,7 @@ export default class CompareVersion extends Component {
             scenarioList1 = scenarioList1.concat(datasetData1.treeList[t].scenarioList);
             var sl = datasetData1.treeList[t].scenarioList;
             for (var s = 0; s < sl.length; s++) {
-                treeScenarioList1.push({ treeLabel: datasetData1.treeList[t].label.label_en, scenarioId: sl[s].id, scenarioLabel: sl[s].label.label_en })
+                treeScenarioList1.push({ treeLabel: getLabelText(datasetData1.treeList[t].label), scenarioId: sl[s].id, scenarioLabel: getLabelText(sl[s].label) })
             }
         }
 
@@ -130,7 +187,7 @@ export default class CompareVersion extends Component {
             scenarioList2 = scenarioList2.concat(datasetData2.treeList[t].scenarioList);
             var sl = datasetData2.treeList[t].scenarioList;
             for (var s = 0; s < sl.length; s++) {
-                treeScenarioList2.push({ treeLabel: datasetData2.treeList[t].label.label_en, scenarioId: sl[s].id, scenarioLabel: sl[s].label.label_en })
+                treeScenarioList2.push({ treeLabel: getLabelText(datasetData2.treeList[t].label), scenarioId: sl[s].id, scenarioLabel: getLabelText(sl[s].label) })
             }
         }
 
@@ -148,26 +205,26 @@ export default class CompareVersion extends Component {
             var selectedForecastData1 = pu1[0].selectedForecastMap;
             var selectedForecastData2 = pu2[0].selectedForecastMap;
 
-            data[0] = pu.length > 0 ? pu[0].planningUnit.label.label_en : pu1[0].planningUnit.label.label_en;
+            data[0] = pu.length > 0 ? getLabelText(pu[0].planningUnit.label) : getLabelText(pu1[0].planningUnit.label);
             var count = 1;
             for (var r = 0; r < regionList.length; r++) {
                 var regionalSelectedForecastData = selectedForecastData[regionList[r].regionId];
 
-                data[count] = regionalSelectedForecastData != undefined ? regionalSelectedForecastData.scenarioId != "" && regionalSelectedForecastData.scenarioId != null ? treeScenarioList.filter(c => c.scenarioId == regionalSelectedForecastData.scenarioId)[0].treeLabel + " ~ " + scenarioList.filter(c => c.id == regionalSelectedForecastData.scenarioId)[0].label.label_en : regionalSelectedForecastData.consumptionExtrapolationId != "" && regionalSelectedForecastData.consumptionExtrapolationId != null ? consumptionExtrapolation.filter(c => c.consumptionExtrapolationId == regionalSelectedForecastData.consumptionExtrapolationId)[0].extrapolationMethod.label.label_en : "" : ""
+                data[count] = regionalSelectedForecastData != undefined ? regionalSelectedForecastData.scenarioId != "" && regionalSelectedForecastData.scenarioId != null ? treeScenarioList.filter(c => c.scenarioId == regionalSelectedForecastData.scenarioId)[0].treeLabel + " ~ " + getLabelText(scenarioList.filter(c => c.id == regionalSelectedForecastData.scenarioId)[0].label) : regionalSelectedForecastData.consumptionExtrapolationId != "" && regionalSelectedForecastData.consumptionExtrapolationId != null ? getLabelText(consumptionExtrapolation.filter(c => c.consumptionExtrapolationId == regionalSelectedForecastData.consumptionExtrapolationId)[0].extrapolationMethod.label) : "" : ""
                 data[count + 1] = regionalSelectedForecastData != undefined ? regionalSelectedForecastData.totalForecast : "";
                 data[count + 2] = regionalSelectedForecastData != undefined ? regionalSelectedForecastData.notes : "";
                 count += 3;
             }
             for (var r = 0; r < regionList1.length; r++) {
                 var regionalSelectedForecastData1 = selectedForecastData1[regionList1[r].regionId];
-                data[count] = regionalSelectedForecastData1 != undefined ? regionalSelectedForecastData1.scenarioId != "" && regionalSelectedForecastData1.scenarioId != null ? treeScenarioList1.filter(c => c.scenarioId == regionalSelectedForecastData1.scenarioId)[0].treeLabel + " ~ " + scenarioList1.filter(c => c.id == regionalSelectedForecastData1.scenarioId)[0].label.label_en : regionalSelectedForecastData1.consumptionExtrapolationId != "" && regionalSelectedForecastData1.consumptionExtrapolationId != null ? consumptionExtrapolation1.filter(c => c.consumptionExtrapolationId == regionalSelectedForecastData1.consumptionExtrapolationId)[0].extrapolationMethod.label.label_en : "" : ""
+                data[count] = regionalSelectedForecastData1 != undefined ? regionalSelectedForecastData1.scenarioId != "" && regionalSelectedForecastData1.scenarioId != null ? treeScenarioList1.filter(c => c.scenarioId == regionalSelectedForecastData1.scenarioId)[0].treeLabel + " ~ " + getLabelText(scenarioList1.filter(c => c.id == regionalSelectedForecastData1.scenarioId)[0].label) : regionalSelectedForecastData1.consumptionExtrapolationId != "" && regionalSelectedForecastData1.consumptionExtrapolationId != null ? getLabelText(consumptionExtrapolation1.filter(c => c.consumptionExtrapolationId == regionalSelectedForecastData1.consumptionExtrapolationId)[0].extrapolationMethod.label) : "" : ""
                 data[count + 1] = regionalSelectedForecastData1 != undefined ? regionalSelectedForecastData1.totalForecast : "";
                 data[count + 2] = regionalSelectedForecastData1 != undefined ? regionalSelectedForecastData1.notes : "";
                 count += 3;
             }
             for (var r = 0; r < regionList2.length; r++) {
                 var regionalSelectedForecastData2 = selectedForecastData2[regionList2[r].regionId];
-                data[count] = regionalSelectedForecastData2 != undefined ? regionalSelectedForecastData2.scenarioId != "" && regionalSelectedForecastData2.scenarioId != null ? treeScenarioList2.filter(c => c.scenarioId == regionalSelectedForecastData2.scenarioId)[0].treeLabel + " ~ " + scenarioList2.filter(c => c.id == regionalSelectedForecastData2.scenarioId)[0].label.label_en : regionalSelectedForecastData2.consumptionExtrapolationId != "" && regionalSelectedForecastData2.consumptionExtrapolationId != null ? consumptionExtrapolation2.filter(c => c.consumptionExtrapolationId == regionalSelectedForecastData2.consumptionExtrapolationId)[0].extrapolationMethod.label.label_en : "" : ""
+                data[count] = regionalSelectedForecastData2 != undefined ? regionalSelectedForecastData2.scenarioId != "" && regionalSelectedForecastData2.scenarioId != null ? treeScenarioList2.filter(c => c.scenarioId == regionalSelectedForecastData2.scenarioId)[0].treeLabel + " ~ " + getLabelText(scenarioList2.filter(c => c.id == regionalSelectedForecastData2.scenarioId)[0].label) : regionalSelectedForecastData2.consumptionExtrapolationId != "" && regionalSelectedForecastData2.consumptionExtrapolationId != null ? getLabelText(consumptionExtrapolation2.filter(c => c.consumptionExtrapolationId == regionalSelectedForecastData2.consumptionExtrapolationId)[0].extrapolationMethod.label) : "" : ""
                 data[count + 1] = regionalSelectedForecastData2 != undefined ? regionalSelectedForecastData2.totalForecast : "";
                 data[count + 2] = regionalSelectedForecastData2 != undefined ? regionalSelectedForecastData2.notes : "";
                 count += 3;
@@ -215,7 +272,7 @@ export default class CompareVersion extends Component {
             position: 'top',
             filters: true,
             license: JEXCEL_PRO_KEY,
-            editable:false,
+            editable: false,
             contextMenu: function (obj, x, y, e) {
                 return [];
             }.bind(this),
@@ -223,8 +280,10 @@ export default class CompareVersion extends Component {
         var dataEl = jexcel(document.getElementById("tableDiv"), options);
         this.el = dataEl;
         this.setState({
-            dataEl: dataEl, loading: false
+            dataEl: dataEl,
+            columns: columns
         })
+        this.props.updateState("loading", false);
     }
 
     loaded = function (instance, cell, x, y, value) {
