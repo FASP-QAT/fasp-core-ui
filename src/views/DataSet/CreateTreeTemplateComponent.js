@@ -5491,6 +5491,7 @@ export default class CreateTreeTemplate extends Component {
                                                                 fuNode: (item.payload.nodeDataMap[0])[0].fuNode,
                                                                 puNode: (item.payload.nodeDataMap[0])[0].puNode,
                                                                 notes: (item.payload.nodeDataMap[0])[0].notes,
+                                                                manualChangesEffectFuture : true,
                                                                 nodeDataModelingList: (item.payload.nodeDataMap[0])[0].nodeDataModelingList
                                                             }
                                                         ]

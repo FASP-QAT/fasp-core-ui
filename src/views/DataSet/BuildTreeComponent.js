@@ -50,7 +50,7 @@ import { grey } from '@material-ui/core/colors';
 import docicon from '../../assets/img/doc.png'
 import { saveAs } from "file-saver";
 import { Document, ImageRun, Packer, Paragraph, ShadingType, TextRun } from "docx";
-import { calculateModelingData } from '../../views/DataSet/ModelingDataCalculations';
+import { calculateModelingData } from '../../views/DataSet/ModelingDataCalculation2';
 import AuthenticationService from '../Common/AuthenticationService';
 import SupplyPlanFormulas from "../SupplyPlan/SupplyPlanFormulas";
 import classNames from 'classnames';
