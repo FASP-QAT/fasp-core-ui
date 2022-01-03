@@ -703,7 +703,7 @@ const routes = [
   { path: '/extrapolation/extrapolateData', exact: true, name: i18n.t('static.breadcrum.list', { entityname: 'Extrapolate Data' }), component: ExtrapolateData },
 
   { path: '/dataset/listTree/:color/:message', name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.common.managetree') }), component: ListTree },
-  { path: '/dataset/commitTree', exact: true, name: i18n.t('static.breadcrum.list', { entityname: 'Commit Tree' }), component: CommitTree },
+  { path: '/dataset/commitTree', exact: true, name: i18n.t('static.breadcrum.list', { entityname: 'Commit' }), component: CommitTree },
   { path: '/dataset/listTree', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.common.managetree') }), component: ListTree },
 
   { path: '/dataset/addDataSet', name: 'static.breadcrum.add', entityname: 'static.dataset.manageProgram', component: AddDataSet },
@@ -1584,7 +1584,7 @@ class DefaultLayout extends Component {
                             // attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true) }
                           },
                           {
-                            name: "Commit Version",
+                            name: "Commit",
                             url: '/dataset/commitTree',
                             icon: 'fa fa-th',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true) }

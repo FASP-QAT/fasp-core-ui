@@ -398,7 +398,7 @@ class ProductValidation extends Component {
                 }
                 var usageTextPU = "";
                 if (finalData[i].nodeDataMap != "") {
-                    var planningUnit = getLabelText(finalData[i].nodeDataMap.puNode.planningUnit.label);
+                    var planningUnit = getLabelText(finalData[i].nodeDataMap.puNode.planningUnit.label,this.state.lang);
                     var usagePeriodId;
                     var usageTypeId;
                     var usageFrequency;
@@ -700,7 +700,7 @@ class ProductValidation extends Component {
                     currencyResult = currencyRequest.result;
                     var currencyList = [];
                     currencyResult.map(item => {
-                        currencyList.push({ id: item.currencyId, name: getLabelText(item.label), currencyCode: item.currencyCode, conversionRateToUsd: item.conversionRateToUsd })
+                        currencyList.push({ id: item.currencyId, name: getLabelText(item.label,this.state.lang), currencyCode: item.currencyCode, conversionRateToUsd: item.conversionRateToUsd })
                     })
                     console.log("MyResult+++", myResult);
                     var datasetList = this.state.datasetList;

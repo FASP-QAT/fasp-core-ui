@@ -242,9 +242,9 @@ class CompareAndSelectScenario extends Component {
         var treeScenarioList = this.state.treeScenarioList.filter(c => c.checked);
         for (var tsl = 0; tsl < treeScenarioList.length; tsl++) {
             if (treeScenarioList[tsl].type == "T") {
-                columns.push({ title: getLabelText(treeScenarioList[tsl].tree.label) + " - " + getLabelText(treeScenarioList[tsl].scenario.label), width: 100, type: 'numeric', mask: '#,##.00', decimal: "." });
+                columns.push({ title: getLabelText(treeScenarioList[tsl].tree.label,this.state.lang) + " - " + getLabelText(treeScenarioList[tsl].scenario.label,this.state.lang), width: 100, type: 'numeric', mask: '#,##.00', decimal: "." });
             } else {
-                columns.push({ title: getLabelText(treeScenarioList[tsl].scenario.extrapolationMethod.label), width: 100, type: 'numeric', mask: '#,##.00', decimal: "." });
+                columns.push({ title: getLabelText(treeScenarioList[tsl].scenario.extrapolationMethod.label,this.state.lang), width: 100, type: 'numeric', mask: '#,##.00', decimal: "." });
             }
         }
         var data = [];
@@ -1087,7 +1087,7 @@ class CompareAndSelectScenario extends Component {
             this.state.treeScenarioList.filter(c => c.checked).map((item, idx) => {
                 datasetsArr.push(
                     {
-                        label: item.type == "T" ? getLabelText(item.tree.label) + " - " + getLabelText(item.scenario.label) : getLabelText(item.scenario.extrapolationMethod.label),
+                        label: item.type == "T" ? getLabelText(item.tree.label,this.state.lang) + " - " + getLabelText(item.scenario.label,this.state.lang) : getLabelText(item.scenario.extrapolationMethod.label,this.state.lang),
                         type: 'line',
                         stack: idx + 2,
                         backgroundColor: 'transparent',
@@ -1324,7 +1324,7 @@ class CompareAndSelectScenario extends Component {
                                                         <tr id="addr0" style={{ backgroundColor: item.readonly ? "#CFCDC9" : "" }}>
                                                             <td align="center"><input type="checkbox" id={"scenarioCheckbox" + item.id} checked={item.checked} onChange={() => this.scenarioCheckedChanged(item.id)} disabled={item.readonly} /></td>
                                                             <td align="center" >{item.type == "T" ? i18n.t('static.forecastMethod.tree') : i18n.t('static.compareAndSelect.cons')}</td>
-                                                            <td><i class="fa fa-circle" style={{ color: item.color }} aria-hidden="true"></i> {" "}{item.type == "T" ? getLabelText(item.tree.label, this.state.lang) + " - " + getLabelText(item.scenario.label, this.state.lang) : getLabelText(item.scenario.extrapolationMethod.label)}{"  "}{item.readonly && <i class="fa fa-exclamation-triangle"></i>}</td>
+                                                            <td><i class="fa fa-circle" style={{ color: item.color }} aria-hidden="true"></i> {" "}{item.type == "T" ? getLabelText(item.tree.label, this.state.lang) + " - " + getLabelText(item.scenario.label, this.state.lang) : getLabelText(item.scenario.extrapolationMethod.label,this.state.lang)}{"  "}{item.readonly && <i class="fa fa-exclamation-triangle"></i>}</td>
                                                             <td align="center"><input type="radio" id="selectAsForecast" name="selectAsForecast" checked={this.state.selectedTreeScenarioId == item.id ? true : false} onClick={() => this.scenarioOrderChanged(item.id)} disabled={item.readonly}></input></td>
                                                             <td align="center">{item.readonly ? "" : <NumberFormat displayType={'text'} thousandSeparator={true} value={Math.round(this.state.totalArray[idx])} />}</td>
                                                             <td align="center" style={{ color: Math.min(...this.state.actualDiff.filter(c => c != 0)) == this.state.actualDiff[idx] ? "#118b70" : "#000000" }}>{item.readonly ? i18n.t('static.supplyPlanFormula.na') : this.state.totalArray[idx] > 0 && this.state.actualDiff.length > 0 ? <NumberFormat displayType={'text'} thousandSeparator={true} value={((this.state.actualDiff[idx]) / this.state.totalActual).toFixed(4)} /> : ""}</td>
