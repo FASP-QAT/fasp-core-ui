@@ -1327,16 +1327,22 @@ class AuthenticationService {
                                     return true;
                                 }
                             break;
+                    case "/report/compareVersion":        
+                        if (bfunction.includes("ROLE_BF_COMPARE_VERSION")) {
+                            return true;
+                        }
+                        break;
                     // case "/report/compareAndSelectScenario":
                     // case "/validation/productValidation":
                     // case "/validation/modelingValidation":
-                    case "/report/compareVersion":
+                    // case "/report/compareVersion":
                     case "/dataentry/consumptionDataEntryAndAdjustment":
                     case "/dataset/listTree":
                     case "/dataset/commitTree":
                     case "/dataset/loadDeleteDataSet":
                     case "/dataset/loadDeleteDataSet/:message":
                     case "/dataSet/buildTree/tree/:treeId/:programId":
+                    case "/dataSet/buildTree/tree/:treeId/:programId/:scenarioId":
                     case "/dataSet/buildTree/":
                     case "/dataset/createTreeTemplate/:templateId":
                     case "/dataset/listTreeTemplate/":
@@ -1472,9 +1478,9 @@ class AuthenticationService {
         console.log("timeout going to clear cache");
         let keysToRemove;
         if (localStorage.getItem('curUser') != null && localStorage.getItem('curUser') != "") {
-            keysToRemove = ["token-" + this.getLoggedInUserId(), "curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken", "sesRecordCount", "sesRangeValue", "sesProgramId", "sesPlanningUnitId", "sesLocalVersionChange", "sesLatestProgram", "sesProblemStatus", "sesProblemType", "sesProblemCategory", "sesReviewed", "sesStartDate", "sesProgramIdReport", "sesVersionIdReport", "sessionType", "sesBudPro", "sesBudFs", "sesBudStatus", "sesForecastProgramIds", "sesDatasetId", "sesDatasetPlanningUnitId", "sesDatasetRegionId", "sesLiveDatasetId", "sesDatasetVersionId", "sesTreeId", "sesScenarioId", "sesLevelId"];
+            keysToRemove = ["token-" + this.getLoggedInUserId(), "curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken", "sesRecordCount", "sesRangeValue", "sesProgramId", "sesPlanningUnitId", "sesLocalVersionChange", "sesLatestProgram", "sesProblemStatus", "sesProblemType", "sesProblemCategory", "sesReviewed", "sesStartDate", "sesProgramIdReport", "sesVersionIdReport", "sessionType", "sesBudPro", "sesBudFs", "sesBudStatus", "sesForecastProgramIds", "sesDatasetId", "sesDatasetPlanningUnitId", "sesDatasetRegionId", "sesLiveDatasetId", "sesDatasetVersionId", "sesTreeId", "sesScenarioId", "sesLevelId","sesDatasetCompareVersionId"];
         } else {
-            keysToRemove = ["curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken", "sesRecordCount", "sesRangeValue", "sesProgramId", "sesPlanningUnitId", "sesLocalVersionChange", "sesLatestProgram", "sesProblemStatus", "sesProblemType", "sesProblemCategory", "sesReviewed", "sesStartDate", "sesProgramIdReport", "sesVersionIdReport", "sessionType", "sesBudPro", "sesBudFs", "sesBudStatus", "sesForecastProgramIds", "sesDatasetId", "sesDatasetPlanningUnitId", "sesDatasetRegionId", "sesLiveDatasetId", "sesDatasetVersionId", "sesTreeId", "sesScenarioId", "sesLevelId"];
+            keysToRemove = ["curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken", "sesRecordCount", "sesRangeValue", "sesProgramId", "sesPlanningUnitId", "sesLocalVersionChange", "sesLatestProgram", "sesProblemStatus", "sesProblemType", "sesProblemCategory", "sesReviewed", "sesStartDate", "sesProgramIdReport", "sesVersionIdReport", "sessionType", "sesBudPro", "sesBudFs", "sesBudStatus", "sesForecastProgramIds", "sesDatasetId", "sesDatasetPlanningUnitId", "sesDatasetRegionId", "sesLiveDatasetId", "sesDatasetVersionId", "sesTreeId", "sesScenarioId", "sesLevelId","sesDatasetCompareVersionId"];
         }
         keysToRemove.forEach(k => localStorage.removeItem(k));
     }
@@ -1503,6 +1509,7 @@ class AuthenticationService {
         localStorage.setItem('sesTreeId', "");
         localStorage.setItem('sesScenarioId', "");
         localStorage.setItem('sesDatasetVersionId', "");
+        localStorage.setItem('sesDatasetCompareVersionId', "");
         localStorage.setItem('sesDatasetPlanningUnitId', "");
         localStorage.setItem('sesDatasetRegionId', "");
         localStorage.setItem('sesPlanningUnitId', "");
