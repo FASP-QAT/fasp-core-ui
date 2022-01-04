@@ -1640,13 +1640,13 @@ export default class AddProcurementAgentPlanningUnit extends Component {
         tr.children[2].classList.add('AsteriskTheadtrTd');
         tr.children[3].classList.add('AsteriskTheadtrTd');
         tr.children[4].classList.add('AsteriskTheadtrTd');
-        tr.children[5].classList.add('AsteriskTheadtrTd');
-        tr.children[6].classList.add('AsteriskTheadtrTd');
-        tr.children[7].classList.add('AsteriskTheadtrTd');
-        tr.children[8].classList.add('AsteriskTheadtrTd');
-        tr.children[9].classList.add('AsteriskTheadtrTd');
-        tr.children[10].classList.add('AsteriskTheadtrTd');
-        tr.children[11].classList.add('AsteriskTheadtrTd');
+        // tr.children[5].classList.add('AsteriskTheadtrTd');
+        // tr.children[6].classList.add('AsteriskTheadtrTd');
+        // tr.children[7].classList.add('AsteriskTheadtrTd');
+        // tr.children[8].classList.add('AsteriskTheadtrTd');
+        // tr.children[9].classList.add('AsteriskTheadtrTd');
+        // tr.children[10].classList.add('AsteriskTheadtrTd');
+        // tr.children[11].classList.add('AsteriskTheadtrTd');
     }
 
     // -----------start of changed function
@@ -1714,123 +1714,123 @@ export default class AddProcurementAgentPlanningUnit extends Component {
             }
         }
 
-        //moq
-        if (x == 4) {
-            var col = ("E").concat(parseInt(y) + 1);
-            value = this.el.getValue(`E${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-            // var reg = /^[0-9\b]+$/;
-            var reg = JEXCEL_INTEGER_REGEX;
-            if (value != "") {
-                if (isNaN(parseInt(value)) || !(reg.test(value))) {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
-                } else {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setComments(col, "");
-                }
-            }
-        }
+        // //moq
+        // if (x == 4) {
+        //     var col = ("E").concat(parseInt(y) + 1);
+        //     value = this.el.getValue(`E${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+        //     // var reg = /^[0-9\b]+$/;
+        //     var reg = JEXCEL_INTEGER_REGEX;
+        //     if (value != "") {
+        //         if (isNaN(parseInt(value)) || !(reg.test(value))) {
+        //             this.el.setStyle(col, "background-color", "transparent");
+        //             this.el.setStyle(col, "background-color", "yellow");
+        //             this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+        //         } else {
+        //             this.el.setStyle(col, "background-color", "transparent");
+        //             this.el.setComments(col, "");
+        //         }
+        //     }
+        // }
 
-        //unit per pallet euro1
-        if (x == 5) {
-            var col = ("F").concat(parseInt(y) + 1);
-            value = this.el.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-            // var reg = /^[0-9\b]+$/;
-            var reg = JEXCEL_INTEGER_REGEX;
-            if (value != "") {
-                if (isNaN(parseInt(value)) || !(reg.test(value))) {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
-                } else {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setComments(col, "");
-                }
-            }
-        }
+        // //unit per pallet euro1
+        // if (x == 5) {
+        //     var col = ("F").concat(parseInt(y) + 1);
+        //     value = this.el.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+        //     // var reg = /^[0-9\b]+$/;
+        //     var reg = JEXCEL_INTEGER_REGEX;
+        //     if (value != "") {
+        //         if (isNaN(parseInt(value)) || !(reg.test(value))) {
+        //             this.el.setStyle(col, "background-color", "transparent");
+        //             this.el.setStyle(col, "background-color", "yellow");
+        //             this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+        //         } else {
+        //             this.el.setStyle(col, "background-color", "transparent");
+        //             this.el.setComments(col, "");
+        //         }
+        //     }
+        // }
 
-        //unit per pallet euro2
-        if (x == 6) {
-            var col = ("G").concat(parseInt(y) + 1);
-            value = this.el.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-            // var reg = /^[0-9\b]+$/;
-            var reg = JEXCEL_INTEGER_REGEX;
-            if (value != "") {
-                if (isNaN(parseInt(value)) || !(reg.test(value))) {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
-                } else {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setComments(col, "");
-                }
-            }
-        }
+        // //unit per pallet euro2
+        // if (x == 6) {
+        //     var col = ("G").concat(parseInt(y) + 1);
+        //     value = this.el.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+        //     // var reg = /^[0-9\b]+$/;
+        //     var reg = JEXCEL_INTEGER_REGEX;
+        //     if (value != "") {
+        //         if (isNaN(parseInt(value)) || !(reg.test(value))) {
+        //             this.el.setStyle(col, "background-color", "transparent");
+        //             this.el.setStyle(col, "background-color", "yellow");
+        //             this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+        //         } else {
+        //             this.el.setStyle(col, "background-color", "transparent");
+        //             this.el.setComments(col, "");
+        //         }
+        //     }
+        // }
 
-        //unit per container
-        if (x == 7) {
-            var col = ("H").concat(parseInt(y) + 1);
-            value = this.el.getValue(`H${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-            // var reg = /^[0-9\b]+$/;
-            var reg = JEXCEL_INTEGER_REGEX;
-            if (value != "") {
-                if (isNaN(parseInt(value)) || !(reg.test(value))) {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
-                } else {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setComments(col, "");
-                }
-            }
-        }
+        // //unit per container
+        // if (x == 7) {
+        //     var col = ("H").concat(parseInt(y) + 1);
+        //     value = this.el.getValue(`H${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+        //     // var reg = /^[0-9\b]+$/;
+        //     var reg = JEXCEL_INTEGER_REGEX;
+        //     if (value != "") {
+        //         if (isNaN(parseInt(value)) || !(reg.test(value))) {
+        //             this.el.setStyle(col, "background-color", "transparent");
+        //             this.el.setStyle(col, "background-color", "yellow");
+        //             this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+        //         } else {
+        //             this.el.setStyle(col, "background-color", "transparent");
+        //             this.el.setComments(col, "");
+        //         }
+        //     }
+        // }
 
-        //volume
-        if (x == 8) {
-            var reg = JEXCEL_DECIMAL_NO_REGEX_NEW;
-            var col = ("I").concat(parseInt(y) + 1);
-            value = this.el.getValue(`I${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-            if (value == "") {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-            } else {
-                // if (isNaN(Number.parseInt(value)) || value < 0 || !(reg.test(value))) {
-                if (!(reg.test(value))) {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
-                } else {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setComments(col, "");
-                }
+        // //volume
+        // if (x == 8) {
+        //     var reg = JEXCEL_DECIMAL_NO_REGEX_NEW;
+        //     var col = ("I").concat(parseInt(y) + 1);
+        //     value = this.el.getValue(`I${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+        //     if (value == "") {
+        //         this.el.setStyle(col, "background-color", "transparent");
+        //         this.el.setStyle(col, "background-color", "yellow");
+        //         this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+        //     } else {
+        //         // if (isNaN(Number.parseInt(value)) || value < 0 || !(reg.test(value))) {
+        //         if (!(reg.test(value))) {
+        //             this.el.setStyle(col, "background-color", "transparent");
+        //             this.el.setStyle(col, "background-color", "yellow");
+        //             this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+        //         } else {
+        //             this.el.setStyle(col, "background-color", "transparent");
+        //             this.el.setComments(col, "");
+        //         }
 
-            }
-        }
+        //     }
+        // }
 
-        //weight
-        if (x == 9) {
-            var reg = JEXCEL_DECIMAL_NO_REGEX_NEW;
-            var col = ("J").concat(parseInt(y) + 1);
-            value = this.el.getValue(`J${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-            if (value == "") {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-            } else {
-                // if (isNaN(Number.parseInt(value)) || value < 0 || !(reg.test(value))) {
-                if (!(reg.test(value))) {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
-                } else {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setComments(col, "");
-                }
+        // //weight
+        // if (x == 9) {
+        //     var reg = JEXCEL_DECIMAL_NO_REGEX_NEW;
+        //     var col = ("J").concat(parseInt(y) + 1);
+        //     value = this.el.getValue(`J${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+        //     if (value == "") {
+        //         this.el.setStyle(col, "background-color", "transparent");
+        //         this.el.setStyle(col, "background-color", "yellow");
+        //         this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+        //     } else {
+        //         // if (isNaN(Number.parseInt(value)) || value < 0 || !(reg.test(value))) {
+        //         if (!(reg.test(value))) {
+        //             this.el.setStyle(col, "background-color", "transparent");
+        //             this.el.setStyle(col, "background-color", "yellow");
+        //             this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+        //         } else {
+        //             this.el.setStyle(col, "background-color", "transparent");
+        //             this.el.setComments(col, "");
+        //         }
 
-            }
-        }
+        //     }
+        // }
 
         //IS Change
         if (x != 12) {
@@ -1933,161 +1933,161 @@ export default class AddProcurementAgentPlanningUnit extends Component {
 
 
 
-                //MOQ
-                var col = ("E").concat(parseInt(y) + 1);
-                var value = this.el.getValue(`E${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-                var reg = JEXCEL_INTEGER_REGEX;
-                if (value == "") {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                    valid = false;
-                } else {
-                    if (isNaN(parseInt(value)) || !(reg.test(value))) {
-                        this.el.setStyle(col, "background-color", "transparent");
-                        this.el.setStyle(col, "background-color", "yellow");
-                        this.el.setComments(col, i18n.t('static.message.invalidnumber'));
-                        valid = false;
-                    } else {
-                        this.el.setStyle(col, "background-color", "transparent");
-                        this.el.setComments(col, "");
-                    }
-                }
-
-                //unitPerPalletEuro1
-                var col = ("F").concat(parseInt(y) + 1);
-                var value = this.el.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-                var reg = JEXCEL_INTEGER_REGEX;
-                if (value == "") {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                    valid = false;
-                } else {
-                    if (isNaN(parseInt(value)) || !(reg.test(value))) {
-                        this.el.setStyle(col, "background-color", "transparent");
-                        this.el.setStyle(col, "background-color", "yellow");
-                        this.el.setComments(col, i18n.t('static.message.invalidnumber'));
-                        valid = false;
-                    } else {
-                        this.el.setStyle(col, "background-color", "transparent");
-                        this.el.setComments(col, "");
-                    }
-                }
-
-                //unitPerPalletEuro2
-                var col = ("G").concat(parseInt(y) + 1);
-                var value = this.el.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-                var reg = JEXCEL_INTEGER_REGEX;
-                if (value == "") {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                    valid = false;
-                } else {
-                    if (isNaN(parseInt(value)) || !(reg.test(value))) {
-                        this.el.setStyle(col, "background-color", "transparent");
-                        this.el.setStyle(col, "background-color", "yellow");
-                        this.el.setComments(col, i18n.t('static.message.invalidnumber'));
-                        valid = false;
-                    } else {
-                        this.el.setStyle(col, "background-color", "transparent");
-                        this.el.setComments(col, "");
-                    }
-                }
-
-                //unitPerContainer
-                var col = ("H").concat(parseInt(y) + 1);
-                var value = this.el.getValue(`H${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-                var reg = JEXCEL_INTEGER_REGEX;
-                if (value == "") {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                    valid = false;
-                } else {
-                    if (isNaN(parseInt(value)) || !(reg.test(value))) {
-                        this.el.setStyle(col, "background-color", "transparent");
-                        this.el.setStyle(col, "background-color", "yellow");
-                        this.el.setComments(col, i18n.t('static.message.invalidnumber'));
-                        valid = false;
-                    } else {
-                        this.el.setStyle(col, "background-color", "transparent");
-                        this.el.setComments(col, "");
-                    }
-                }
-
-                //volume
-                var col = ("I").concat(parseInt(y) + 1);
-                var value = this.el.getValue(`I${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-                var reg = JEXCEL_DECIMAL_NO_REGEX_NEW;
-                // if (value == "" || isNaN(Number.parseFloat(value)) || value < 0) {
-                //     this.el.setStyle(col, "background-color", "transparent");
-                //     this.el.setStyle(col, "background-color", "yellow");
-                //     valid = false;
-                //     if (isNaN(Number.parseInt(value)) || value < 0) {
-                //         this.el.setComments(col, i18n.t('static.message.invalidnumber'));
-                //     } else {
+                //     //MOQ
+                //     var col = ("E").concat(parseInt(y) + 1);
+                //     var value = this.el.getValue(`E${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+                //     var reg = JEXCEL_INTEGER_REGEX;
+                //     if (value == "") {
+                //         this.el.setStyle(col, "background-color", "transparent");
+                //         this.el.setStyle(col, "background-color", "yellow");
                 //         this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                //     }
-                // } else {
-                //     this.el.setStyle(col, "background-color", "transparent");
-                //     this.el.setComments(col, "");
-                // }
-                if (value == "") {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                    valid = false;
-                } else {
-                    // if (isNaN(Number.parseInt(value)) || value < 0 || !(reg.test(value))) {
-                    if (!(reg.test(value))) {
-                        this.el.setStyle(col, "background-color", "transparent");
-                        this.el.setStyle(col, "background-color", "yellow");
-                        this.el.setComments(col, i18n.t('static.message.invalidnumber'));
-                        valid = false;
-                    } else {
-                        this.el.setStyle(col, "background-color", "transparent");
-                        this.el.setComments(col, "");
-                    }
-
-                }
-
-                //weight
-                var col = ("J").concat(parseInt(y) + 1);
-                var value = this.el.getValue(`J${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-                var reg = JEXCEL_DECIMAL_NO_REGEX_NEW;
-                // if (value == "" || isNaN(Number.parseFloat(value)) || value < 0) {
-                //     this.el.setStyle(col, "background-color", "transparent");
-                //     this.el.setStyle(col, "background-color", "yellow");
-                //     valid = false;
-                //     if (isNaN(Number.parseInt(value)) || value < 0) {
-                //         this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                //         valid = false;
                 //     } else {
-                //         this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                //         if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                //             this.el.setStyle(col, "background-color", "transparent");
+                //             this.el.setStyle(col, "background-color", "yellow");
+                //             this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                //             valid = false;
+                //         } else {
+                //             this.el.setStyle(col, "background-color", "transparent");
+                //             this.el.setComments(col, "");
+                //         }
                 //     }
-                // } else {
-                //     this.el.setStyle(col, "background-color", "transparent");
-                //     this.el.setComments(col, "");
-                // }
-                if (value == "") {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                    valid = false;
-                } else {
-                    // if (isNaN(Number.parseInt(value)) || value < 0 || !(reg.test(value))) {
-                    if (!(reg.test(value))) {
-                        this.el.setStyle(col, "background-color", "transparent");
-                        this.el.setStyle(col, "background-color", "yellow");
-                        this.el.setComments(col, i18n.t('static.message.invalidnumber'));
-                        valid = false;
-                    } else {
-                        this.el.setStyle(col, "background-color", "transparent");
-                        this.el.setComments(col, "");
-                    }
 
-                }
+                //     //unitPerPalletEuro1
+                //     var col = ("F").concat(parseInt(y) + 1);
+                //     var value = this.el.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+                //     var reg = JEXCEL_INTEGER_REGEX;
+                //     if (value == "") {
+                //         this.el.setStyle(col, "background-color", "transparent");
+                //         this.el.setStyle(col, "background-color", "yellow");
+                //         this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                //         valid = false;
+                //     } else {
+                //         if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                //             this.el.setStyle(col, "background-color", "transparent");
+                //             this.el.setStyle(col, "background-color", "yellow");
+                //             this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                //             valid = false;
+                //         } else {
+                //             this.el.setStyle(col, "background-color", "transparent");
+                //             this.el.setComments(col, "");
+                //         }
+                //     }
+
+                //     //unitPerPalletEuro2
+                //     var col = ("G").concat(parseInt(y) + 1);
+                //     var value = this.el.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+                //     var reg = JEXCEL_INTEGER_REGEX;
+                //     if (value == "") {
+                //         this.el.setStyle(col, "background-color", "transparent");
+                //         this.el.setStyle(col, "background-color", "yellow");
+                //         this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                //         valid = false;
+                //     } else {
+                //         if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                //             this.el.setStyle(col, "background-color", "transparent");
+                //             this.el.setStyle(col, "background-color", "yellow");
+                //             this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                //             valid = false;
+                //         } else {
+                //             this.el.setStyle(col, "background-color", "transparent");
+                //             this.el.setComments(col, "");
+                //         }
+                //     }
+
+                //     //unitPerContainer
+                //     var col = ("H").concat(parseInt(y) + 1);
+                //     var value = this.el.getValue(`H${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+                //     var reg = JEXCEL_INTEGER_REGEX;
+                //     if (value == "") {
+                //         this.el.setStyle(col, "background-color", "transparent");
+                //         this.el.setStyle(col, "background-color", "yellow");
+                //         this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                //         valid = false;
+                //     } else {
+                //         if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                //             this.el.setStyle(col, "background-color", "transparent");
+                //             this.el.setStyle(col, "background-color", "yellow");
+                //             this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                //             valid = false;
+                //         } else {
+                //             this.el.setStyle(col, "background-color", "transparent");
+                //             this.el.setComments(col, "");
+                //         }
+                //     }
+
+                //     //volume
+                //     var col = ("I").concat(parseInt(y) + 1);
+                //     var value = this.el.getValue(`I${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+                //     var reg = JEXCEL_DECIMAL_NO_REGEX_NEW;
+                //     // if (value == "" || isNaN(Number.parseFloat(value)) || value < 0) {
+                //     //     this.el.setStyle(col, "background-color", "transparent");
+                //     //     this.el.setStyle(col, "background-color", "yellow");
+                //     //     valid = false;
+                //     //     if (isNaN(Number.parseInt(value)) || value < 0) {
+                //     //         this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                //     //     } else {
+                //     //         this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                //     //     }
+                //     // } else {
+                //     //     this.el.setStyle(col, "background-color", "transparent");
+                //     //     this.el.setComments(col, "");
+                //     // }
+                //     if (value == "") {
+                //         this.el.setStyle(col, "background-color", "transparent");
+                //         this.el.setStyle(col, "background-color", "yellow");
+                //         this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                //         valid = false;
+                //     } else {
+                //         // if (isNaN(Number.parseInt(value)) || value < 0 || !(reg.test(value))) {
+                //         if (!(reg.test(value))) {
+                //             this.el.setStyle(col, "background-color", "transparent");
+                //             this.el.setStyle(col, "background-color", "yellow");
+                //             this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                //             valid = false;
+                //         } else {
+                //             this.el.setStyle(col, "background-color", "transparent");
+                //             this.el.setComments(col, "");
+                //         }
+
+                //     }
+
+                //     //weight
+                //     var col = ("J").concat(parseInt(y) + 1);
+                //     var value = this.el.getValue(`J${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+                //     var reg = JEXCEL_DECIMAL_NO_REGEX_NEW;
+                //     // if (value == "" || isNaN(Number.parseFloat(value)) || value < 0) {
+                //     //     this.el.setStyle(col, "background-color", "transparent");
+                //     //     this.el.setStyle(col, "background-color", "yellow");
+                //     //     valid = false;
+                //     //     if (isNaN(Number.parseInt(value)) || value < 0) {
+                //     //         this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                //     //     } else {
+                //     //         this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                //     //     }
+                //     // } else {
+                //     //     this.el.setStyle(col, "background-color", "transparent");
+                //     //     this.el.setComments(col, "");
+                //     // }
+                //     if (value == "") {
+                //         this.el.setStyle(col, "background-color", "transparent");
+                //         this.el.setStyle(col, "background-color", "yellow");
+                //         this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                //         valid = false;
+                //     } else {
+                //         // if (isNaN(Number.parseInt(value)) || value < 0 || !(reg.test(value))) {
+                //         if (!(reg.test(value))) {
+                //             this.el.setStyle(col, "background-color", "transparent");
+                //             this.el.setStyle(col, "background-color", "yellow");
+                //             this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                //             valid = false;
+                //         } else {
+                //             this.el.setStyle(col, "background-color", "transparent");
+                //             this.el.setComments(col, "");
+                //         }
+
+                //     }
             }
         }
         return valid;
