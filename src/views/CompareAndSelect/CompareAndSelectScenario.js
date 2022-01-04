@@ -569,7 +569,7 @@ class CompareAndSelectScenario extends Component {
         columns.push(i18n.t('static.compareAndSelect.selectAsForecast'));
         columns.push(i18n.t('static.compareAndSelect.totalForecast'));
         columns.push(i18n.t('static.compareAndSelect.forecastError'));
-        columns.push(i18n.t('static.compareAndSelect.forecastErrorMonths'));
+        columns.push(i18n.t('static.compareAndSelect.forecastErrorMonths').replaceAll('#', '%23'));
         columns.push(i18n.t('compareToConsumptionForecast'));
         let headers = [];
         columns.map((item, idx) => { headers[idx] = (item).replaceAll(' ', '%20') });
@@ -679,7 +679,7 @@ class CompareAndSelectScenario extends Component {
                         console.log("in if%%%", datasetList.length)
                         datasetId = datasetList[0].id;
                         event.target.value = datasetList[0].id;
-                    } else if (localStorage.getItem("sesDatasetId") != "") {
+                    } else if (localStorage.getItem("sesDatasetId") != "" && datasetList.filter(c=>c.id==localStorage.getItem("sesDatasetId")).length>0) {
                         datasetId = localStorage.getItem("sesDatasetId");
                         event.target.value = localStorage.getItem("sesDatasetId");
                     }
@@ -841,7 +841,7 @@ class CompareAndSelectScenario extends Component {
                 if (planningUnitList.length == 1) {
                     planningUnitId = planningUnitList[0].planningUnit.id;
                     event.target.value = planningUnitList[0].planningUnit.id;
-                } else if (localStorage.getItem("sesDatasetPlanningUnitId") != "") {
+                } else if (localStorage.getItem("sesDatasetPlanningUnitId") != "" && planningUnitList.filter(c=>c.planningUnit.id==localStorage.getItem("sesDatasetPlanningUnitId")).length>0) {
                     planningUnitId = localStorage.getItem("sesDatasetPlanningUnitId");
                     event.target.value = localStorage.getItem("sesDatasetPlanningUnitId");
                 }
@@ -855,7 +855,7 @@ class CompareAndSelectScenario extends Component {
                 if (regionList.length == 1) {
                     regionId = regionList[0].regionId;
                     regionEvent.target.value = regionList[0].regionId;
-                } else if (localStorage.getItem("sesDatasetRegionId") != "") {
+                } else if (localStorage.getItem("sesDatasetRegionId") != "" && regionList.filter(c=>c.regionId==localStorage.getItem("sesDatasetRegionId")).length>0) {
                     regionId = localStorage.getItem("sesDatasetRegionId");
                     regionEvent.target.value = localStorage.getItem("sesDatasetRegionId");
                 }
