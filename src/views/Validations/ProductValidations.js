@@ -37,6 +37,7 @@ class ProductValidation extends Component {
             versionId: "",
             versionList: [],
             datasetData: {},
+            localProgramId: '',
             treeList: [],
             treeId: "",
             scenarioList: [],
@@ -112,6 +113,7 @@ class ProductValidation extends Component {
                     var datasetJson = JSON.parse(datasetData);
                     this.setState({
                         datasetData: datasetJson,
+                        localProgramId: datasetId,
                         loading: false
                     }, () => {
                         this.getTreeList();
@@ -126,6 +128,7 @@ class ProductValidation extends Component {
                     var responseData = response.data[0];
                     this.setState({
                         datasetData: responseData,
+                        localProgramId: "",
                         loading: false
                     }, () => {
                         this.getTreeList();
@@ -141,6 +144,7 @@ class ProductValidation extends Component {
                 error => {
                     this.setState({
                         datasetData: {},
+                        localProgramId: "",
                         treeList: [],
                         treeId: "",
                         scenarioList: [],
@@ -152,6 +156,7 @@ class ProductValidation extends Component {
         } else {
             this.setState({
                 datasetData: {},
+                localProgramId: "",
                 treeList: [],
                 treeId: "",
                 scenarioList: [],
@@ -393,7 +398,7 @@ class ProductValidation extends Component {
                 }
                 var usageTextPU = "";
                 if (finalData[i].nodeDataMap != "") {
-                    var planningUnit = getLabelText(finalData[i].nodeDataMap.puNode.planningUnit.label);
+                    var planningUnit = getLabelText(finalData[i].nodeDataMap.puNode.planningUnit.label,this.state.lang);
                     var usagePeriodId;
                     var usageTypeId;
                     var usageFrequency;
@@ -603,7 +608,7 @@ class ProductValidation extends Component {
             if (versionList.length == 1) {
                 versionId = versionList[0];
                 event.target.value = versionList[0];
-            } else if (localStorage.getItem("sesVersionId") != "") {
+            } else if (localStorage.getItem("sesDatasetVersionId") != "") {
                 versionId = localStorage.getItem("sesDatasetVersionId");
                 event.target.value = localStorage.getItem("sesDatasetVersionId");
             }
@@ -695,7 +700,7 @@ class ProductValidation extends Component {
                     currencyResult = currencyRequest.result;
                     var currencyList = [];
                     currencyResult.map(item => {
-                        currencyList.push({ id: item.currencyId, name: getLabelText(item.label), currencyCode: item.currencyCode, conversionRateToUsd: item.conversionRateToUsd })
+                        currencyList.push({ id: item.currencyId, name: getLabelText(item.label,this.state.lang), currencyCode: item.currencyCode, conversionRateToUsd: item.conversionRateToUsd })
                     })
                     console.log("MyResult+++", myResult);
                     var datasetList = this.state.datasetList;
@@ -745,6 +750,53 @@ class ProductValidation extends Component {
                 }.bind(this)
             }.bind(this)
         }.bind(this)
+    }
+
+    addDoubleQuoteToRowContent = (arr) => {
+        return arr.map(ele => '"' + ele + '"')
+    }
+
+    exportCSV() {
+        var csvRow = [];
+        csvRow.push('"' + (i18n.t('static.dashboard.programheader') + ' : ' + document.getElementById("datasetId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+        csvRow.push('')
+        csvRow.push('"' + (i18n.t('static.report.version') + ' : ' + document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+        csvRow.push('')
+        csvRow.push('"' + (i18n.t('static.common.treeName') + ' : ' + document.getElementById("treeId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+        csvRow.push('')
+        csvRow.push('"' + (i18n.t('static.whatIf.scenario') + ' : ' + document.getElementById("scenarioId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+        csvRow.push('')
+        csvRow.push('"' + (i18n.t('static.country.currency') + ' : ' + document.getElementById("currencyId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+        csvRow.push('')
+
+        csvRow.push('')
+        csvRow.push('"' + (i18n.t('static.common.youdatastart')).replaceAll(' ', '%20') + '"')
+        csvRow.push('')
+        var re;
+        var columns=[];
+        columns.push(i18n.t('static.common.level'));
+        columns.push(i18n.t('static.supplyPlan.type'));
+        columns.push(i18n.t('static.forecastingunit.forecastingunit'));
+        columns.push(i18n.t('static.forecastingunit.forecastingunit') + " " + i18n.t('static.common.text'));
+        columns.push(i18n.t('static.common.product'));
+        columns.push(i18n.t('static.common.product') + " " + i18n.t('static.common.text'));
+        columns.push(i18n.t('static.productValidation.cost'));
+        const headers = [];
+        columns.map((item, idx) => { headers[idx] = (item).replaceAll(' ', '%20') });
+
+        var A = [this.addDoubleQuoteToRowContent(headers)];
+        this.state.dataEl.getJson(null,false).map(ele => A.push(this.addDoubleQuoteToRowContent([ele[0].replaceAll(',', ' ').replaceAll(' ', '%20'),ele[1].replaceAll(',', ' ').replaceAll(' ', '%20'),ele[2].replaceAll(',', ' ').replaceAll(' ', '%20'),ele[3].replaceAll(',', ' ').replaceAll(' ', '%20'),ele[4].replaceAll(',', ' ').replaceAll(' ', '%20'),ele[5].replaceAll(',', ' ').replaceAll(' ', '%20'),ele[6].replaceAll(',', ' ').replaceAll(' ', '%20') ])));
+
+        for (var i = 0; i < A.length; i++) {
+            csvRow.push(A[i].join(","))
+        }
+        var csvString = csvRow.join("%0A")
+        var a = document.createElement("a")
+        a.href = 'data:attachment/csv,' + csvString
+        a.target = "_Blank"
+        a.download = i18n.t('static.dashboard.productValidation') + ".csv"
+        document.body.appendChild(a)
+        a.click()
     }
 
     setCurrencyId(e) {
@@ -819,13 +871,13 @@ class ProductValidation extends Component {
                     <div className="Card-header-reporticon pb-2">
                         {/* {this.state.dataList.length > 0 && */}
                         <div className="card-header-actions">
+                            {this.state.treeId > 0 && this.state.scenarioId > 0 && this.state.localProgramId != "" && <a className="card-header-action">
+                                <a href={`/#/dataSet/buildTree/tree/` + this.state.treeId + `/` + this.state.localProgramId + `/` + this.state.scenarioId}><span style={{ cursor: 'pointer' }}><small className="supplyplanformulas">{i18n.t('static.common.managetree')}</small></span></a>
+                            </a>}
                             <a className="card-header-action">
-
                                 <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.exportPDF()} />
-
-
                             </a>
-                            <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
+                            {this.state.dataEl!="" && <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />}
                         </div>
                         {/* } */}
                     </div>
@@ -932,7 +984,7 @@ class ProductValidation extends Component {
                                                         value={this.state.currencyId}
 
                                                     >
-                                                        <option value="">{i18n.t('static.common.select')}</option>
+                                                        {/* <option value="">{i18n.t('static.common.select')}</option> */}
                                                         {currencies}
                                                     </Input>
 

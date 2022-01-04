@@ -146,7 +146,7 @@ class CompareAndSelectScenario extends Component {
     showData() {
         console.log("this.state.loading****", this.state.loading)
         if (this.state.planningUnitId != "" && this.state.regionId != "") {
-            this.setState({loading:true})
+            this.setState({ loading: true })
             var datasetJson = this.state.datasetJson;
             var multiplier = 1;
             var selectedPlanningUnit = this.state.planningUnitList.filter(c => c.planningUnit.id == this.state.planningUnitId);
@@ -216,7 +216,7 @@ class CompareAndSelectScenario extends Component {
                 // singleValue2: rangeValue,
                 // monthList1: monthList1,
                 showAllData: true,
-                loading:false
+                loading: false
             }, () => {
                 this.scenarioOrderChanged(selectedTreeScenarioId)
                 // this.buildJexcel()
@@ -242,9 +242,9 @@ class CompareAndSelectScenario extends Component {
         var treeScenarioList = this.state.treeScenarioList.filter(c => c.checked);
         for (var tsl = 0; tsl < treeScenarioList.length; tsl++) {
             if (treeScenarioList[tsl].type == "T") {
-                columns.push({ title: getLabelText(treeScenarioList[tsl].tree.label) + " - " + getLabelText(treeScenarioList[tsl].scenario.label), width: 100, type: 'numeric', mask: '#,##.00', decimal: "." });
+                columns.push({ title: getLabelText(treeScenarioList[tsl].tree.label, this.state.lang) + " - " + getLabelText(treeScenarioList[tsl].scenario.label, this.state.lang), width: 100, type: 'numeric', mask: '#,##.00', decimal: "." });
             } else {
-                columns.push({ title: getLabelText(treeScenarioList[tsl].scenario.extrapolationMethod.label), width: 100, type: 'numeric', mask: '#,##.00', decimal: "." });
+                columns.push({ title: getLabelText(treeScenarioList[tsl].scenario.extrapolationMethod.label, this.state.lang), width: 100, type: 'numeric', mask: '#,##.00', decimal: "." });
             }
         }
         var data = [];
@@ -370,6 +370,47 @@ class CompareAndSelectScenario extends Component {
 
         higherThenConsumptionThresholdPU = this.state.planningUnitList.filter(c => c.planningUnit.id == this.state.planningUnitId)[0].higherThenConsumptionThreshold;
         lowerThenConsumptionThresholdPU = this.state.planningUnitList.filter(c => c.planningUnit.id == this.state.planningUnitId)[0].lowerThenConsumptionThreshold;
+        var finalData = [];
+        var min = Math.min(...actualDiff.filter(c => c != 0))
+        var treeScenarioList = this.state.treeScenarioList;
+        for (var tsList = 0; tsList < treeScenarioList.length; tsList++) {
+            finalData.push({
+                type: treeScenarioList[tsList].type,
+                id: treeScenarioList[tsList].id,
+                checked: treeScenarioList[tsList].checked,
+                readonly: treeScenarioList[tsList].readonly,
+                color: treeScenarioList[tsList].color,
+                tree: treeScenarioList[tsList].tree,
+                scenario: treeScenarioList[tsList].scenario,
+                totalForecast: Math.round(totalArray[tsList]),
+                isLowest: min == actualDiff[tsList] ? 1 : 0,
+                forecastError: treeScenarioList[tsList].readonly ? i18n.t('static.supplyPlanFormula.na') : totalArray[tsList] > 0 && actualDiff.length > 0 ? ((actualDiff[tsList]) / totalActual).toFixed(4) : "",
+                noOfMonths: treeScenarioList[tsList].readonly ? i18n.t('static.supplyPlanFormula.na') : countArray.length > 0 && countArray[tsList] != undefined ? countArray[tsList] + 1 : "",
+                compareToConsumptionForecastClass:
+                    treeScenarioList[tsList].type == 'T' ?
+                        !treeScenarioList[tsList].readonly
+                            && totalArray[tsList] > 0
+                            && lowerThenConsumptionThreshold != ""
+                            && higherThenConsumptionThreshold != ""
+                            && lowerThenConsumptionThreshold > 0
+                            && higherThenConsumptionThreshold > 0 ?
+                            totalArray[tsList] < lowerThenConsumptionThreshold ? (((Number(lowerThenConsumptionThreshold) - Number(totalArray[tsList])) / Number(lowerThenConsumptionThreshold)) * 100).toFixed(2) > lowerThenConsumptionThresholdPU && (((Number(lowerThenConsumptionThreshold) - Number(totalArray[tsList])) / Number(lowerThenConsumptionThreshold)) * 100).toFixed(2) < higherThenConsumptionThresholdPU ? "" : "red" : totalArray[tsList] > higherThenConsumptionThreshold ? (((Number(totalArray[tsList]) - Number(higherThenConsumptionThreshold)) / Number(higherThenConsumptionThreshold)) * 100).toFixed(2) > lowerThenConsumptionThresholdPU && (((Number(totalArray[tsList]) - Number(higherThenConsumptionThreshold)) / Number(higherThenConsumptionThreshold)) * 100).toFixed(2) < higherThenConsumptionThresholdPU ? "" : "red" : "" : "" : "",
+                compareToConsumptionForecast:
+                    treeScenarioList[tsList].type == 'T' ?
+                        !treeScenarioList[tsList].readonly
+                            && totalArray[tsList] > 0
+                            && lowerThenConsumptionThreshold != ""
+                            && higherThenConsumptionThreshold != ""
+                            && lowerThenConsumptionThreshold > 0
+                            && higherThenConsumptionThreshold > 0 ?
+                            totalArray[tsList] < lowerThenConsumptionThreshold ?
+                                (((Number(lowerThenConsumptionThreshold) - Number(totalArray[tsList])) / Number(lowerThenConsumptionThreshold)) * 100).toFixed(2) + i18n.t('static.compareAndSelect.belowLowestConsumption') :
+                                totalArray[tsList] > higherThenConsumptionThreshold ? (((Number(totalArray[tsList]) - Number(higherThenConsumptionThreshold)) / Number(higherThenConsumptionThreshold)) * 100).toFixed(2) + i18n.t('static.compareAndSelect.aboveHighestConsumption') :
+                                    i18n.t('static.supplyPlanFormula.na') :
+                            i18n.t('static.supplyPlanFormula.na') :
+                        i18n.t('static.supplyPlanFormula.na')
+            })
+        }
 
         var options = {
             data: dataArr,
@@ -420,7 +461,9 @@ class CompareAndSelectScenario extends Component {
             lowerThenConsumptionThresholdPU: lowerThenConsumptionThresholdPU,
             higherThenConsumptionThreshold: higherThenConsumptionThreshold,
             higherThenConsumptionThresholdPU: higherThenConsumptionThresholdPU,
-            loading: false
+            finalData: finalData,
+            loading: false,
+            columns: columns
         })
     }
 
@@ -449,7 +492,7 @@ class CompareAndSelectScenario extends Component {
                 planningUnitLabel: name.length > 0 ? name[0].planningUnit.label : "",
                 forecastingUnitId: name.length > 0 ? name[0].planningUnit.forecastingUnit.id : "",
                 equivalencyUnitId: equivalencyUnit.length > 0 ? equivalencyUnit[0].equivalencyUnitMappingId : 0,
-                loading:false
+                loading: false
             }, () => {
                 if (planningUnitId > 0) {
                     this.showData();
@@ -485,7 +528,104 @@ class CompareAndSelectScenario extends Component {
 
     toggledata = () => this.setState((currentState) => ({ show: !currentState.show }));
 
+    addDoubleQuoteToRowContent = (arr) => {
+        return arr.map(ele => '"' + ele + '"')
+    }
+
     exportCSV() {
+        var csvRow = [];
+        csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + document.getElementById("datasetId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+        csvRow.push('')
+        csvRow.push('"' + (i18n.t('static.common.forecastPeriod') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ', '%20') + '"')
+        csvRow.push('')
+        csvRow.push('"' + (i18n.t('static.program.region') + ' : ' + document.getElementById("regionId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+        csvRow.push('')
+        csvRow.push('"' + (i18n.t('static.report.planningUnit') + ' : ' + document.getElementById("planningUnitId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+        csvRow.push('')
+        csvRow.push('"' + (i18n.t('static.compareAndSelect.yAxisIn') + ' : ' + (this.state.viewById == 1 ? i18n.t('static.report.planningUnit') : this.state.viewById == 2 ? i18n.t('static.dashboard.forecastingunit') : i18n.t('static.equivalancyUnit.equivalancyUnit')) + '"'))
+        csvRow.push('')
+        if (this.state.viewById == 2) {
+            csvRow.push('"' + (i18n.t('static.product.unit1') + ' : ' + document.getElementById("forecastingUnitId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+            csvRow.push('')
+        } else if (this.state.viewById == 3) {
+            csvRow.push('"' + (i18n.t('static.equivalancyUnit.equivalancyUnit') + ' : ' + document.getElementById("equivalencyUnitId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+            csvRow.push('')
+        }
+        csvRow.push('"' + (i18n.t('static.compareAndSelect.showOnlyForecastPeriod') + ' : ' + this.state.showForecastPeriod).replaceAll(' ', '%20') + '"')
+        csvRow.push('')
+
+        if (!this.state.showForecastPeriod) {
+            csvRow.push('"' + (i18n.t('static.compareAndSelect.startMonthForGraph') + ' : ' + this.makeText(this.state.singleValue2.from) + ' ~ ' + this.makeText(this.state.singleValue2.to)).replaceAll(' ', '%20') + '"')
+            csvRow.push('')
+        }
+
+        csvRow.push('')
+        csvRow.push('"' + (i18n.t('static.common.youdatastart')).replaceAll(' ', '%20') + '"')
+        csvRow.push('')
+        var re;
+        var columns = [];
+        columns.push(i18n.t('static.equivalancyUnit.type'));
+        columns.push(i18n.t('static.consumption.forcast'));
+        columns.push(i18n.t('static.compareAndSelect.selectAsForecast'));
+        columns.push(i18n.t('static.compareAndSelect.totalForecast'));
+        columns.push(i18n.t('static.compareAndSelect.forecastError'));
+        columns.push(i18n.t('static.compareAndSelect.forecastErrorMonths'));
+        columns.push(i18n.t('compareToConsumptionForecast'));
+        let headers = [];
+        columns.map((item, idx) => { headers[idx] = (item).replaceAll(' ', '%20') });
+
+        var A = [this.addDoubleQuoteToRowContent(headers)];
+        A.push(this.addDoubleQuoteToRowContent(["",
+            i18n.t('static.compareAndSelect.actuals'),
+            "",
+            "",
+            "",
+            "",
+            ""]))
+        this.state.finalData.map(ele =>
+            A.push(this.addDoubleQuoteToRowContent([ele.type == "T" ? i18n.t('static.forecastMethod.tree') : i18n.t('static.compareAndSelect.cons'),
+            ele.type == "T" ? (getLabelText(ele.tree.label, this.state.lang) + " - " + getLabelText(ele.scenario.label, this.state.lang)).replaceAll(',', ' ').replaceAll(' ', '%20') : getLabelText(ele.scenario.extrapolationMethod.label, this.state.lang).replaceAll(',', ' ').replaceAll(' ', '%20'),
+            ele.id == this.state.selectedTreeScenarioId ? i18n.t('static.dataEntry.True') : i18n.t('static.dataEntry.False'),
+            !ele.readonly ? ele.totalForecast.toString().replaceAll(',', ' ').replaceAll(' ', '%20') : "",
+            ele.forecastError.toString().replaceAll(',', ' ').replaceAll(' ', '%20'),
+            ele.noOfMonths.toString().replaceAll(',', ' ').replaceAll(' ', '%20'),
+            ele.compareToConsumptionForecast.toString().replaceAll(',', ' ').replaceAll(' ', '%20')])));
+
+        csvRow.push('')
+        csvRow.push('')
+
+        headers = [];
+        this.state.columns.filter(c => c.type != 'hidden').map((item, idx) => { headers[idx] = (item.title).replaceAll(' ', '%20') });
+
+        var C = []
+        C.push([this.addDoubleQuoteToRowContent(headers)]);
+        var B = []
+        this.state.dataEl.getJson(null, false).map(ele => {
+            B = [];
+            this.state.columns.map((item, idx) => {
+                if (item.type != 'hidden') {
+                    B.push(ele[idx].toString().replaceAll(',', ' ').replaceAll(' ', '%20'));
+                }
+            })
+            C.push(this.addDoubleQuoteToRowContent(B));
+        })
+
+        for (var i = 0; i < A.length; i++) {
+            csvRow.push(A[i].join(","))
+        }
+        csvRow.push('');
+        csvRow.push('');
+        for (var i = 0; i < C.length; i++) {
+            csvRow.push(C[i].join(","))
+        }
+
+        var csvString = csvRow.join("%0A")
+        var a = document.createElement("a")
+        a.href = 'data:attachment/csv,' + csvString
+        a.target = "_Blank"
+        a.download = i18n.t('static.dashboard.compareAndSelect') + ".csv"
+        document.body.appendChild(a)
+        a.click()
     }
 
 
@@ -805,7 +945,7 @@ class CompareAndSelectScenario extends Component {
         this.setState({
             treeScenarioList: finalList,
             selectedTreeScenarioId: id,
-            loading:false
+            loading: false
         }, () => {
             this.buildJexcel();
         })
@@ -1087,7 +1227,7 @@ class CompareAndSelectScenario extends Component {
             this.state.treeScenarioList.filter(c => c.checked).map((item, idx) => {
                 datasetsArr.push(
                     {
-                        label: item.type == "T" ? getLabelText(item.tree.label) + " - " + getLabelText(item.scenario.label) : getLabelText(item.scenario.extrapolationMethod.label),
+                        label: item.type == "T" ? getLabelText(item.tree.label, this.state.lang) + " - " + getLabelText(item.scenario.label, this.state.lang) : getLabelText(item.scenario.extrapolationMethod.label, this.state.lang),
                         type: 'line',
                         stack: idx + 2,
                         backgroundColor: 'transparent',
@@ -1324,7 +1464,7 @@ class CompareAndSelectScenario extends Component {
                                                         <tr id="addr0" style={{ backgroundColor: item.readonly ? "#CFCDC9" : "" }}>
                                                             <td align="center"><input type="checkbox" id={"scenarioCheckbox" + item.id} checked={item.checked} onChange={() => this.scenarioCheckedChanged(item.id)} disabled={item.readonly} /></td>
                                                             <td align="center" >{item.type == "T" ? i18n.t('static.forecastMethod.tree') : i18n.t('static.compareAndSelect.cons')}</td>
-                                                            <td><i class="fa fa-circle" style={{ color: item.color }} aria-hidden="true"></i> {" "}{item.type == "T" ? getLabelText(item.tree.label, this.state.lang) + " - " + getLabelText(item.scenario.label, this.state.lang) : getLabelText(item.scenario.extrapolationMethod.label)}{"  "}{item.readonly && <i class="fa fa-exclamation-triangle"></i>}</td>
+                                                            <td><i class="fa fa-circle" style={{ color: item.color }} aria-hidden="true"></i> {" "}{item.type == "T" ? getLabelText(item.tree.label, this.state.lang) + " - " + getLabelText(item.scenario.label, this.state.lang) : getLabelText(item.scenario.extrapolationMethod.label, this.state.lang)}{"  "}{item.readonly && <i class="fa fa-exclamation-triangle"></i>}</td>
                                                             <td align="center"><input type="radio" id="selectAsForecast" name="selectAsForecast" checked={this.state.selectedTreeScenarioId == item.id ? true : false} onClick={() => this.scenarioOrderChanged(item.id)} disabled={item.readonly}></input></td>
                                                             <td align="center">{item.readonly ? "" : <NumberFormat displayType={'text'} thousandSeparator={true} value={Math.round(this.state.totalArray[idx])} />}</td>
                                                             <td align="center" style={{ color: Math.min(...this.state.actualDiff.filter(c => c != 0)) == this.state.actualDiff[idx] ? "#118b70" : "#000000" }}>{item.readonly ? i18n.t('static.supplyPlanFormula.na') : this.state.totalArray[idx] > 0 && this.state.actualDiff.length > 0 ? <NumberFormat displayType={'text'} thousandSeparator={true} value={((this.state.actualDiff[idx]) / this.state.totalActual).toFixed(4)} /> : ""}</td>
