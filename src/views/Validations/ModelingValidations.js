@@ -1023,6 +1023,8 @@ class ModelingValidation extends Component {
                         } else {
                             dataArr.push(this.formatter(ele[idx]));
                         }
+                    } else if (item.type == 'calendar') {
+                        dataArr.push(moment(ele[idx]).format(DATE_FORMAT_CAP_WITHOUT_DATE));
                     } else {
                         dataArr.push(ele[idx]);
                     }
@@ -1101,6 +1103,8 @@ class ModelingValidation extends Component {
                 if (item.type != 'hidden') {
                     if (item.mask != undefined && item.mask.toString().includes("%")) {
                         B.push((ele[idx] + (" %")).toString().replaceAll(',', ' ').replaceAll(' ', '%20'));
+                    } else if (item.type == 'calendar') {
+                        B.push(moment(ele[idx]).format(DATE_FORMAT_CAP_WITHOUT_DATE).toString().replaceAll(',', ' ').replaceAll(' ', '%20'));
                     } else {
                         B.push(ele[idx].toString().replaceAll(',', ' ').replaceAll(' ', '%20'));
                     }
