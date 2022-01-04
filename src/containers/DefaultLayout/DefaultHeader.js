@@ -144,12 +144,19 @@ class DefaultHeader extends Component {
           {/* </Online> */}
           <NavItem className="">
             <span className="nav-link">
+              <a href={"/#/ShowGuidance/"} target="_blank">
+              <i class="nav-icon fa fa-compass ShowGuidanceIcon" title={'Show Guidance'}></i>
+              </a>
+            </span>
+          </NavItem>
+
+          <NavItem className="">
+            <span className="nav-link">
               <a href={`${API_URL}/file/qatUserGuide`}>
                 <img src={imageUsermanual} className="HelpIcon" title={i18n.t('static.user.usermanual')} style={{ width: '30px', height: '30px' }} />
               </a>
             </span>
           </NavItem>
-
 
           <NavItem className="">
             <NavLink to="#" className="nav-link">
