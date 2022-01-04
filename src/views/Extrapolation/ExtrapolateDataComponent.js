@@ -794,31 +794,38 @@ export default class ExtrapolateDataComponent extends React.Component {
                 },
                 {
                     title: 'Moving Averages',
-                    type: 'numeric', mask: '#,##.00', decimal: '.'
+                    type: this.state.movingAvgId ? 'numeric' : 'hidden',
+                    mask: '#,##.00', decimal: '.'
                 },
                 {
                     title: 'Semi-Averages',
-                    type: 'numeric', mask: '#,##.00', decimal: '.'
+                    type: this.state.semiAvgId ? 'numeric' : 'hidden',
+                    mask: '#,##.00', decimal: '.'
                 },
                 {
                     title: 'Linear Regression',
-                    type: 'numeric', mask: '#,##.00', decimal: '.'
+                    type: this.state.linearRegressionId ? 'numeric' : 'hidden',
+                    mask: '#,##.00', decimal: '.'
                 },
                 {
                     title: 'TES (Lower Confidence Bound)',
-                    type: 'numeric', mask: '#,##.00', decimal: '.'
+                    type: this.state.smoothingId ? 'numeric' : 'hidden',
+                    mask: '#,##.00', decimal: '.'
                 },
                 {
                     title: 'TES',
-                    type: 'numeric', mask: '#,##.00', decimal: '.'
+                    type: this.state.smoothingId ? 'numeric' : 'hidden',
+                    mask: '#,##.00', decimal: '.'
                 },
                 {
                     title: 'TES (Upper Confidence Bound)',
-                    type: 'numeric', mask: '#,##.00', decimal: '.'
+                    type: this.state.smoothingId ? 'numeric' : 'hidden',
+                    mask: '#,##.00', decimal: '.'
                 },
                 {
                     title: 'ARIMA',
-                    type: 'numeric', mask: '#,##.00', decimal: '.'
+                    type: this.state.arimaId ? 'numeric' : 'hidden',
+                    mask: '#,##.00', decimal: '.'
                 }
             ],
             text: {
@@ -1391,28 +1398,26 @@ export default class ExtrapolateDataComponent extends React.Component {
             }
         }
 
-
-        let line = "";
-        line = {
-            labels: this.state.dataList.map((item, index) => (item.months)),
-            datasets: [
-                {
-                    type: "line",
-                    pointRadius: 0,
-                    lineTension: 0,
-                    label: 'Adjusted Actuals',
-                    backgroundColor: 'transparent',
-                    borderColor: '#CFCDC9',
-                    ticks: {
-                        fontSize: 2,
-                        fontColor: 'transparent',
-                    },
-                    showInLegend: true,
-                    pointStyle: 'line',
-                    pointBorderWidth: 5,
-                    yValueFormatString: "###,###,###,###",
-                    data: this.state.consumptionData.map((item, index) => (item.amount > 0 ? item.amount : null))
-                },
+        let datasets = [];
+        datasets.push({
+            type: "line",
+            pointRadius: 0,
+            lineTension: 0,
+            label: 'Adjusted Actuals',
+            backgroundColor: 'transparent',
+            borderColor: '#CFCDC9',
+            ticks: {
+                fontSize: 2,
+                fontColor: 'transparent',
+            },
+            showInLegend: true,
+            pointStyle: 'line',
+            pointBorderWidth: 5,
+            yValueFormatString: "###,###,###,###",
+            data: this.state.consumptionData.map((item, index) => (item.amount > 0 ? item.amount : null))
+        })
+        if (this.state.movingAvgId) {
+            datasets.push(
                 {
                     type: "line",
                     pointRadius: 0,
@@ -1429,24 +1434,29 @@ export default class ExtrapolateDataComponent extends React.Component {
                     pointBorderWidth: 5,
                     yValueFormatString: "###,###,###,###",
                     data: this.state.inputDataAverageFilter.map((item, index) => (item.forecast > 0 ? item.forecast : null))
+                })
+        }
+        if (this.state.semiAvgId) {
+            datasets.push({
+                type: "line",
+                pointRadius: 0,
+                lineTension: 0,
+                label: 'Semi-Averages',
+                backgroundColor: 'transparent',
+                borderColor: '#49A4A1',
+                ticks: {
+                    fontSize: 2,
+                    fontColor: 'transparent',
                 },
-                {
-                    type: "line",
-                    pointRadius: 0,
-                    lineTension: 0,
-                    label: 'Semi-Averages',
-                    backgroundColor: 'transparent',
-                    borderColor: '#49A4A1',
-                    ticks: {
-                        fontSize: 2,
-                        fontColor: 'transparent',
-                    },
-                    showInLegend: true,
-                    pointStyle: 'line',
-                    pointBorderWidth: 5,
-                    yValueFormatString: "###,###,###,###",
-                    data: this.state.inputDataFilter.map((item, index) => (item.forecast > 0 ? item.forecast : null))
-                },
+                showInLegend: true,
+                pointStyle: 'line',
+                pointBorderWidth: 5,
+                yValueFormatString: "###,###,###,###",
+                data: this.state.inputDataFilter.map((item, index) => (item.forecast > 0 ? item.forecast : null))
+            })
+        }
+        if (this.state.linearRegressionId) {
+            datasets.push(
                 {
                     type: "line",
                     pointRadius: 0,
@@ -1463,85 +1473,102 @@ export default class ExtrapolateDataComponent extends React.Component {
                     pointBorderWidth: 5,
                     yValueFormatString: "###,###,###,###",
                     data: this.state.inputDataRegressionFilter.map((item, index) => (item.forecast > 0 ? item.forecast : null))
+                })
+        }
+        if (this.state.smoothingId) {
+            datasets.push({
+                type: "line",
+                pointRadius: 0,
+                lineTension: 0,
+                label: 'TES (Lower Confidence Bound)',
+                backgroundColor: 'transparent',
+                borderColor: '#002FC6',
+                ticks: {
+                    fontSize: 2,
+                    fontColor: 'transparent',
                 },
-                {
-                    type: "line",
-                    pointRadius: 0,
-                    lineTension: 0,
-                    label: 'TES (Lower Confidence Bound)',
-                    backgroundColor: 'transparent',
-                    borderColor: '#002FC6',
-                    ticks: {
-                        fontSize: 2,
-                        fontColor: 'transparent',
-                    },
-                    showInLegend: true,
-                    pointStyle: 'line',
-                    pointBorderWidth: 5,
-                    yValueFormatString: "###,###,###,###",
-                    data: this.state.tesdataFilter.map((item, index) => (item.forecast > 0 ? (item.forecast - this.state.CI) : null))
+                showInLegend: true,
+                pointStyle: 'line',
+                pointBorderWidth: 5,
+                yValueFormatString: "###,###,###,###",
+                data: this.state.tesdataFilter.map((item, index) => (item.forecast > 0 ? (item.forecast - this.state.CI) : null))
+            })
+        }
+        if (this.state.smoothingId) {
+            datasets.push({
+                type: "line",
+                pointRadius: 0,
+                lineTension: 0,
+                label: 'TES',
+                backgroundColor: 'transparent',
+                borderColor: '#651D32',
+                ticks: {
+                    fontSize: 2,
+                    fontColor: 'transparent',
                 },
-                {
-                    type: "line",
-                    pointRadius: 0,
-                    lineTension: 0,
-                    label: 'TES',
-                    backgroundColor: 'transparent',
-                    borderColor: '#651D32',
-                    ticks: {
-                        fontSize: 2,
-                        fontColor: 'transparent',
-                    },
-                    showInLegend: true,
-                    pointStyle: 'line',
-                    pointBorderWidth: 5,
-                    yValueFormatString: "###,###,###,###",
-                    data: this.state.tesdataFilter.map((item, index) => (item.forecast > 0 ? item.forecast : null))
+                showInLegend: true,
+                pointStyle: 'line',
+                pointBorderWidth: 5,
+                yValueFormatString: "###,###,###,###",
+                data: this.state.tesdataFilter.map((item, index) => (item.forecast > 0 ? item.forecast : null))
+            })
+        }
+        if (this.state.smoothingId) {
+            datasets.push({
+                type: "line",
+                pointRadius: 0,
+                lineTension: 0,
+                label: 'TES (Upper Confidence Bound)',
+                backgroundColor: 'transparent',
+                borderColor: '#6c6463',
+                ticks: {
+                    fontSize: 2,
+                    fontColor: 'transparent',
                 },
-                {
-                    type: "line",
-                    pointRadius: 0,
-                    lineTension: 0,
-                    label: 'TES (Upper Confidence Bound)',
-                    backgroundColor: 'transparent',
-                    borderColor: '#6c6463',
-                    ticks: {
-                        fontSize: 2,
-                        fontColor: 'transparent',
-                    },
-                    showInLegend: true,
-                    pointStyle: 'line',
-                    pointBorderWidth: 5,
-                    yValueFormatString: "###,###,###,###",
-                    data: this.state.tesdataFilter.map((item, index) => (item.forecast > 0 ? (item.forecast + this.state.CI) : null))
+                showInLegend: true,
+                pointStyle: 'line',
+                pointBorderWidth: 5,
+                yValueFormatString: "###,###,###,###",
+                data: this.state.tesdataFilter.map((item, index) => (item.forecast > 0 ? (item.forecast + this.state.CI) : null))
+            })
+        }
+        if (this.state.arimaId) {
+            datasets.push({
+                type: "line",
+                pointRadius: 0,
+                lineTension: 0,
+                label: 'ARIMA',
+                backgroundColor: 'transparent',
+                borderColor: '#BA0C2F',
+                ticks: {
+                    fontSize: 2,
+                    fontColor: 'transparent',
                 },
-                {
-                    type: "line",
-                    pointRadius: 0,
-                    lineTension: 0,
-                    label: 'ARIMA',
-                    backgroundColor: 'transparent',
-                    borderColor: '#BA0C2F',
-                    ticks: {
-                        fontSize: 2,
-                        fontColor: 'transparent',
-                    },
-                    showInLegend: true,
-                    pointStyle: 'line',
-                    pointBorderWidth: 5,
-                    yValueFormatString: "###,###,###,###",
-                    data: this.state.dataList.map((item, index) => (item.arimaForecast > 0 ? item.arimaForecast : null))
-                }
-            ]
+                showInLegend: true,
+                pointStyle: 'line',
+                pointBorderWidth: 5,
+                yValueFormatString: "###,###,###,###",
+                data: this.state.dataList.map((item, index) => (item.arimaForecast > 0 ? item.arimaForecast : null))
+            })
+        }
+        let line = "";
+        line = {
+            labels: this.state.dataList.map((item, index) => (item.months)),
+            datasets: datasets
         }
 
 
         return (
             <div className="animated fadeIn">
                 <Card>
+                <div className="card-header-actions">
                     <div className="Card-header-reporticon">
+                    <span className="compareAndSelect-larrow"> <i className="cui-arrow-left icons " > </i></span>
+                    <span className="compareAndSelect-rarrow"> <i className="cui-arrow-right icons " > </i></span>
+                    <span className="compareAndSelect-larrowText"> Back to <a href="/#">Consumption Entry & Adjustment</a></span>
+                    <span className="compareAndSelect-rarrowText"> Continue to <a href="/#">Campare & Select Forecast</a></span><br/>
                         {/* <strong>{i18n.t('static.dashboard.supplyPlan')}</strong> */}
-                        <div className="card-header-actions">
+                        
                             <a className="card-header-action">
                                 <span style={{ cursor: 'pointer' }} onClick={() => { this.toggleShowGuidance() }}><small className="supplyplanformulas">Show Guidance</small></span>
                             </a>
@@ -1641,10 +1668,14 @@ export default class ExtrapolateDataComponent extends React.Component {
                                             </Picker>
                                         </div>
                                     </FormGroup>
-
-
-                                    {this.state.planningUnitId} - {this.state.regionId}
-
+                                    <FormGroup className="col-md-12">
+                                    <h5>
+                                        {this.state.planningUnitId > 0 &&
+                                            document.getElementById("planningUnitId").selectedOptions[0].text }
+                                        {this.state.regionId > 0 &&
+                                           " and "+ document.getElementById("regionId").selectedOptions[0].text + " Region, Select your extrapolation parameters:"}
+                                    </h5>
+</FormGroup>
                                     <FormGroup className="col-md-3">
                                         <Label htmlFor="appendedInputButton">Select date range for historical data<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
                                         <div className="controls edit">
