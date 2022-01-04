@@ -1025,6 +1025,7 @@
     "static.user.validusername": "Ingresar su nombre",
     "static.report.mosfuture": "Meses en el futuro para calcular CMM",
     "static.country.language": "Idioma",
+    "static.common.readonlyData": "Datos de solo lectura",
     "static.procurementUnit.onlyalphaNumericText": "El número GTIN debe tener cero ó 13 dígitos",
     "static.common.addData": "Agregar datos",
     "static.accessDenied": "Acceso denegado",
