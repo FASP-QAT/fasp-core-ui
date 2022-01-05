@@ -97,8 +97,10 @@ export default class ListTreeComponent extends Component {
                 var myResult = [];
                 myResult = getRequest.result;
                 for (var i = 0; i < myResult.length; i++) {
+                    console.log("myResult[i].programData---",myResult[i].programData);
                     var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
                     var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
+                    console.log("myResult[i].programData after---",programData);
                     myResult[i].programData = programData;
                 }
                 this.setState({
@@ -377,7 +379,7 @@ export default class ListTreeComponent extends Component {
                         {/* <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong> */}
                         <div className="card-header-actions">
                             <div className="card-header-action">
-                                <Col md="12 pl-0">
+                                <Col md="12 pl-0 pr-lg-0">
                                     <div className="d-md-flex">
                                         {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_LIST_REALM_COUNTRY') &&
                                             // <Button type="submit" size="md" color="success" onClick={this.formSubmit} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.createTreeFromTemplate')}</Button>
