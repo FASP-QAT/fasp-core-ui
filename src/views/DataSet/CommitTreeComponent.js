@@ -24,7 +24,10 @@ import "../../../node_modules/react-step-progress-bar/styles.css"
 import { ProgressBar, Step } from "react-step-progress-bar";
 import ProgramService from "../../api/ProgramService";
 import AuthenticationService from '../Common/AuthenticationService.js';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
 const entityname = 'Commit';
+
 
 export default class CommitTreeComponent extends React.Component {
     constructor(props) {
@@ -53,7 +56,8 @@ export default class CommitTreeComponent extends React.Component {
             missingBranchesList: [],
             noForecastSelectedList: [],
             datasetPlanningUnit: [],
-            progressPer: 0
+            progressPer: 0,
+            cardStatus: true
         }
         this.synchronize = this.synchronize.bind(this);
         this.updateState = this.updateState.bind(this);
@@ -480,7 +484,8 @@ export default class CommitTreeComponent extends React.Component {
                         }
                     },
 
-                    pagination: localStorage.getItem("sesRecordCount"),
+                    // pagination: localStorage.getItem("sesRecordCount"),
+                    pagination: false,
                     search: false,
                     columnSorting: true,
                     tableOverflow: true,
@@ -569,7 +574,7 @@ export default class CommitTreeComponent extends React.Component {
         DatasetService.getAllDatasetData(checkboxesChecked)
             .then(response => {
                 var json = response.data;
-
+                console.log('json', json);
                 var db1;
                 getDatabase();
                 var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
@@ -625,10 +630,11 @@ export default class CommitTreeComponent extends React.Component {
                                     for (var r = 0; r < json.length; r++) {
                                         var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
                                         var userId = userBytes.toString(CryptoJS.enc.Utf8);
-                                        var version = json[r].requestedProgramVersion;
-                                        if (version == -1) {
-                                            version = json[r].currentVersion.versionId
-                                        }
+                                        // var version = json[r].requestedProgramVersion;
+                                        // if (version == -1) {
+                                        //     version = json[r].currentVersion.versionId
+                                        // }
+                                        var version = json[r].currentVersion.versionId
                                         var item = {
                                             id: json[r].programId + "_v" + version + "_uId_" + userId,
                                             programId: json[r].programId,
@@ -803,6 +809,38 @@ export default class CommitTreeComponent extends React.Component {
         this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.message.cancelled', { entityname }))
     }
 
+    print() {
+        var tableName = document.getElementsByName("jxlTableData")
+        for (var t = 0; t < tableName.length; t++) {
+            tableName[t].classList.remove('consumptionDataEntryTable');
+        }
+
+        var content = document.getElementById("divcontents").innerHTML;
+        const styleTags = Array.from(document.getElementsByTagName("style")).map(x => x.outerHTML).join("");
+        var pri = document.getElementById("ifmcontentstoprint").contentWindow;
+        pri.document.open();
+        pri.document.write(content);
+        pri.document.write(styleTags);
+        pri.document.close();
+        pri.focus();
+        pri.print();
+
+        for (var t = 0; t < tableName.length; t++) {
+            tableName[t].classList.add('consumptionDataEntryTable');
+        }
+
+
+        // var content = document.getElementById("divcontents")
+        // html2canvas(content)
+        //     .then((canvas) => {
+        //         const imgData = canvas.toDataURL('image/png');
+        //         const pdf = new jsPDF();
+        //         pdf.addImage(imgData, 'JPEG', 0, 0);
+        //         // pdf.output('dataurlnewwindow');
+        //         pdf.save("download.pdf");
+        //     });
+    }
+
     render() {
         const { programList } = this.state;
         let programs = programList.length > 0 && programList.map((item, i) => {
@@ -879,7 +917,7 @@ export default class CommitTreeComponent extends React.Component {
             var nodeWithPercentageChildren = this.state.nodeWithPercentageChildren.filter(c => c.treeId == item1.treeId && c.scenarioId == item1.scenarioId);
             if (nodeWithPercentageChildren.length > 0) {
                 return (<><span>{item1.treeLabel.label_en + " / " + item1.scenarioLabel.label_en}</span><div className="table-responsive">
-                    <div id={"tableDiv" + count} className="jexcelremoveReadonlybackground consumptionDataEntryTable" />
+                    <div id={"tableDiv" + count} className="jexcelremoveReadonlybackground consumptionDataEntryTable" name='jxlTableData' />
                 </div><br /></>)
             }
         }, this)
@@ -924,169 +962,174 @@ export default class CommitTreeComponent extends React.Component {
 
         return (
             <div className="animated fadeIn" >
-                <Card>
-                    <CardBody>
-                        <ProgressBar
-                            percent={this.state.progressPer}
-                            filledBackground="linear-gradient(to right, #fefb72, #f0bb31)"
-                            style={{ width: '75%' }}
-                        >
-                            <Step transition="scale">
-                                {({ accomplished }) => (
+                {(this.state.cardStatus) &&
+                    <Card id="noniframe">
+                        <CardBody>
+                            <ProgressBar
+                                percent={this.state.progressPer}
+                                filledBackground="linear-gradient(to right, #fefb72, #f0bb31)"
+                                style={{ width: '75%' }}
+                            >
+                                <Step transition="scale">
+                                    {({ accomplished }) => (
 
-                                    <img
-                                        style={{ filter: `grayscale(${accomplished ? 0 : 80}%)` }}
-                                        width="30"
-                                        src="../../../../public/assets/img/numbers/number1.png"
-                                    />
-                                )}
+                                        <img
+                                            style={{ filter: `grayscale(${accomplished ? 0 : 80}%)` }}
+                                            width="30"
+                                            src="../../../../public/assets/img/numbers/number1.png"
+                                        />
+                                    )}
 
-                            </Step>
+                                </Step>
 
-                            <Step transition="scale">
-                                {({ accomplished }) => (
-                                    <img
-                                        style={{ filter: `grayscale(${accomplished ? 0 : 80}%)` }}
-                                        width="30"
-                                        src="../../../../public/assets/img/numbers/number2.png"
-                                    />
-                                )}
-                            </Step>
-                            <Step transition="scale">
-                                {({ accomplished }) => (
-                                    <img
-                                        style={{ filter: `grayscale(${accomplished ? 0 : 80}%)` }}
-                                        width="30"
-                                        src="../../../../public/assets/img/numbers/number3.png"
-                                    />
-                                )}
+                                <Step transition="scale">
+                                    {({ accomplished }) => (
+                                        <img
+                                            style={{ filter: `grayscale(${accomplished ? 0 : 80}%)` }}
+                                            width="30"
+                                            src="../../../../public/assets/img/numbers/number2.png"
+                                        />
+                                    )}
+                                </Step>
+                                <Step transition="scale">
+                                    {({ accomplished }) => (
+                                        <img
+                                            style={{ filter: `grayscale(${accomplished ? 0 : 80}%)` }}
+                                            width="30"
+                                            src="../../../../public/assets/img/numbers/number3.png"
+                                        />
+                                    )}
 
-                            </Step>
+                                </Step>
 
-                            <Step transition="scale">
-                                {({ accomplished }) => (
-                                    <img
-                                        style={{ filter: `grayscale(${accomplished ? 0 : 80}%)` }}
-                                        width="30"
-                                        src="../../../../public/assets/img/numbers/number4.png"
-                                    />
-                                )}
+                                <Step transition="scale">
+                                    {({ accomplished }) => (
+                                        <img
+                                            style={{ filter: `grayscale(${accomplished ? 0 : 80}%)` }}
+                                            width="30"
+                                            src="../../../../public/assets/img/numbers/number4.png"
+                                        />
+                                    )}
 
-                            </Step>
+                                </Step>
 
-                            <Step transition="scale">
-                                {({ accomplished }) => (
-                                    <img
-                                        style={{ filter: `grayscale(${accomplished ? 0 : 80}%)` }}
-                                        width="30"
-                                        src="../../../../public/assets/img/numbers/number5.png"
-                                    />
-                                )}
+                                <Step transition="scale">
+                                    {({ accomplished }) => (
+                                        <img
+                                            style={{ filter: `grayscale(${accomplished ? 0 : 80}%)` }}
+                                            width="30"
+                                            src="../../../../public/assets/img/numbers/number5.png"
+                                        />
+                                    )}
 
-                            </Step>
-                        </ProgressBar>
-                        <div className="d-sm-down-none  progressbar">
-                            <ul>
-                                <li className="quantimedProgressbartext1">Compare Data</li>
-                                <li className="quantimedProgressbartext2">Resolve Conflicts</li>
-                                <li className="quantimedProgressbartext3">Sending data to server</li>
-                                <li className="quantimedProgressbartext4">Server processing</li>
-                                <li className="quantimedProgressbartext5">Upgrade local to latest version</li>
-                            </ul>
-                        </div>
-                        <Form name='simpleForm'>
-                            <div className=" pl-0">
-                                <div className="row">
-                                    <FormGroup className="col-md-3 ">
-                                        <Label htmlFor="appendedInputButton">Program</Label>
-                                        <div className="controls ">
-                                            <Input
-                                                type="select"
-                                                name="programId"
-                                                id="programId"
-                                                bsSize="sm"
-                                                value={this.state.programId}
-                                                onChange={(e) => { this.setProgramId(e); }}
-                                            >
-                                                <option value="">{i18n.t('static.common.select')}</option>
-                                                {programs}
-                                            </Input>
-                                        </div>
-                                    </FormGroup>
-                                </div>
+                                </Step>
+                            </ProgressBar>
+                            <div className="d-sm-down-none  progressbar">
+                                <ul>
+                                    <li className="quantimedProgressbartext1">Compare Data</li>
+                                    <li className="quantimedProgressbartext2">Resolve Conflicts</li>
+                                    <li className="quantimedProgressbartext3">Sending data to server</li>
+                                    <li className="quantimedProgressbartext4">Server processing</li>
+                                    <li className="quantimedProgressbartext5">Upgrade local to latest version</li>
+                                </ul>
                             </div>
-                            {(this.state.showCompare) &&
-                                <>
-                                    <CompareVersionTable ref="conflictChild" page="commit" datasetData={this.state.programDataLocal} datasetData1={this.state.programDataServer} datasetData2={this.state.programDataDownloaded} versionLabel={"V" + this.state.programDataLocal.currentVersion.versionId + "(Local)"} versionLabel1={"V" + this.state.programDataServer.currentVersion.versionId + "(Server)"} updateState={this.updateState} />
-                                    <div className="table-responsive RemoveStriped">
-                                        <div id="tableDiv" />
+                            <Form name='simpleForm'>
+                                <div className=" pl-0">
+                                    <div className="row">
+                                        <FormGroup className="col-md-3 ">
+                                            <Label htmlFor="appendedInputButton">Program</Label>
+                                            <div className="controls ">
+                                                <Input
+                                                    type="select"
+                                                    name="programId"
+                                                    id="programId"
+                                                    bsSize="sm"
+                                                    value={this.state.programId}
+                                                    onChange={(e) => { this.setProgramId(e); }}
+                                                >
+                                                    <option value="">{i18n.t('static.common.select')}</option>
+                                                    {programs}
+                                                </Input>
+                                            </div>
+                                        </FormGroup>
                                     </div>
-                                    <div className="col-md-10 pt-4 pb-3">
-                                        <ul className="legendcommitversion">
-                                            {/* <li><span className="lightpinklegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.commitVersion.conflicts')}</span></li> */}
-                                            <li><span className=" greenlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.commitVersion.changedInCurrentVersion')} </span></li>
-                                            <li><span className="notawesome legendcolor"></span > <span className="legendcommitversionText">{i18n.t('static.commitVersion.changedInLatestVersion')}</span></li>
-                                        </ul>
-                                    </div>
-                                </>
-                            }
+                                </div>
+                                {(this.state.showCompare) &&
+                                    <>
+                                        <div className="col-md-10 pt-lg-1 pb-lg-0 pl-lg-0">
+                                            <ul className="legendcommitversion">
+                                                {/* <li><span className="lightpinklegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.commitVersion.conflicts')}</span></li> */}
+                                                <li><span className=" greenlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.commitVersion.changedInCurrentVersion')} </span></li>
+                                                <li><span className="notawesome legendcolor"></span > <span className="legendcommitversionText">{i18n.t('static.commitVersion.changedInLatestVersion')}</span></li>
+                                            </ul>
+                                        </div>
+                                        <CompareVersionTable ref="conflictChild" page="commit" datasetData={this.state.programDataLocal} datasetData1={this.state.programDataServer} datasetData2={this.state.programDataDownloaded} versionLabel={"V" + this.state.programDataLocal.currentVersion.versionId + "(Local)"} versionLabel1={"V" + this.state.programDataServer.currentVersion.versionId + "(Server)"} updateState={this.updateState} />
+                                        <div className="table-responsive RemoveStriped commitversionTable CommitTableMarginTop">
+                                            <div id="tableDiv" />
+                                        </div>
+                                    </>
+                                }
 
-                            {/* <div className="col-md-12">
+                                {/* <div className="col-md-12">
                                 <Button type="button" size="md" color="warning" className="float-right mr-1" onClick={this.reset}><i className="fa fa-refresh"></i> Cancel</Button>
                                 <Button type="button" color="success" className="mr-1 float-right" size="md" onClick={() => { this.toggleShowValidation() }}><i className="fa fa-check"></i>Next</Button>
                             </div> */}
-                        </Form>
+                            </Form>
+                            <div>
+                                <div className="row">
+                                    <FormGroup className="col-md-4">
+                                        <Label htmlFor="appendedInputButton">Version Type</Label>
+                                        <div className="controls ">
+                                            <Input
+                                                type="select"
+                                                name="versionTypeId"
+                                                id="versionTypeId"
+                                                bsSize="sm"
+                                                value={this.state.versionTypeId}
+                                                onChange={(e) => { this.setVersionTypeId(e); }}
+                                            >
+                                                <option value="">{i18n.t('static.common.select')}</option>
+                                                <option value="1">Draft Version</option>
+                                                <option value="2">Final Version</option>
+                                            </Input>
+                                        </div>
+                                    </FormGroup>
+                                    <FormGroup className="col-md-6">
+                                        <Label htmlFor="appendedInputButton">Notes</Label>
+                                        <Input
+                                            className="controls"
+                                            type="textarea"
+                                            id="notesId"
+                                            name="notesId"
+                                        />
+                                    </FormGroup>
 
-                        <div className="row">
-                            <FormGroup className="col-md-3 ">
-                                <Label htmlFor="appendedInputButton">Version Type</Label>
-                                <div className="controls ">
-                                    <Input
-                                        type="select"
-                                        name="versionTypeId"
-                                        id="versionTypeId"
-                                        bsSize="sm"
-                                        value={this.state.versionTypeId}
-                                        onChange={(e) => { this.setVersionTypeId(e); }}
-                                    >
-                                        <option value="">{i18n.t('static.common.select')}</option>
-                                        <option value="1">Draft Version</option>
-                                        <option value="2">Final Version</option>
-                                    </Input>
+                                    <div className="col-md-12">
+                                        <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-refresh"></i> Cancel</Button>
+                                        {/* <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={this.synchronize}><i className="fa fa-check"></i>Commit</Button> */}
+                                        <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => { this.toggleShowValidation() }}><i className="fa fa-check"></i>Commit</Button>
+                                    </div>
                                 </div>
-                            </FormGroup>
-                            <FormGroup className="col-md-4 ">
-                                <Label htmlFor="appendedInputButton">Notes</Label>
-                                <Input
-                                    className="controls"
-                                    type="textarea"
-                                    id="notesId"
-                                    name="notesId"
-                                />
-                            </FormGroup>
-
-                            <div className="col-md-12">
-                                <Button type="button" size="md" color="warning" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-refresh"></i> Cancel</Button>
-                                {/* <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={this.synchronize}><i className="fa fa-check"></i>Commit</Button> */}
-                                <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => { this.toggleShowValidation() }}><i className="fa fa-check"></i>Commit</Button>
                             </div>
-                        </div>
-                    </CardBody>
-                </Card>
+                        </CardBody>
+                    </Card>
+                }
+                <iframe id="ifmcontentstoprint" style={{ height: '0px', width: '0px', position: 'absolute' }}></iframe>
                 <Modal isOpen={this.state.showValidation}
-                    className={'modal-lg ' + this.props.className} >
+                    className={'modal-lg ' + this.props.className} id='divcontents'>
                     <ModalHeader toggle={() => this.toggleShowValidation()} className="modalHeaderSupplyPlan">
-                        <h3><strong>Forecast Validation</strong></h3>
+                        <h3><strong>Forecast Validation</strong><i className="fa fa-print pull-right iconClass cursor" onClick={() => this.print()}></i></h3>
+
                     </ModalHeader>
                     <div>
                         <ModalBody>
                             <span><b>{this.state.programName}</b></span><br />
                             <span><b>Forecast Period: </b> {moment(this.state.forecastStartDate).format('MMM-YYYY')} to {moment(this.state.forecastStopDate).format('MMM-YYYY')} </span><br /><br />
 
-                            <span><b>1. No forecast selected: </b>(<a href="/report/compareAndSelectScenario" target="_blank">Compare & Select</a>, <a href="#" target="_blank">Forecast Summary</a>)</span><br />
+                            <span><b>1. No forecast selected: </b>(<a href="/#/report/compareAndSelectScenario" target="_blank">Compare & Select</a>, <a href="/#/forecastReport/forecastSummary" target="_blank">Forecast Summary</a>)</span><br />
                             <ul>{noForecastSelected}</ul>
 
-                            <span><b>2. Consumption Forecast: </b>(<a href="/dataentry/consumptionDataEntryAndAdjustment" target="_blank">Data Entry & Adjustment</a>, <a href="/extrapolation/extrapolateData" target="_blank">Extrapolation</a>)</span><br />
+                            <span><b>2. Consumption Forecast: </b>(<a href="/#/dataentry/consumptionDataEntryAndAdjustment" target="_blank">Data Entry & Adjustment</a>, <a href="/#/extrapolation/extrapolateData" target="_blank">Extrapolation</a>)</span><br />
                             <span>a. Months missing actual consumption values (gap) :</span><br />
                             <ul>{missingMonths}</ul>
                             <span>b. Planning units that don’t have at least 24 months of actual consumption values:</span><br />
@@ -1096,7 +1139,7 @@ export default class CommitTreeComponent extends React.Component {
                             <span>a. Planning unit that doesn’t appear on any Tree </span><br />
                             <ul>{pu}</ul>
 
-                            <span>b. Branches Missing Planning Unit (<a href="/dataset/listTree" target="_blank">Manage Tree</a>)</span><br />
+                            <span>b. Branches Missing Planning Unit (<a href="/#/dataset/listTree" target="_blank">Manage Tree</a>)</span><br />
                             {missingBranches}
 
                             <span>c. Nodes with children that don’t add up to 100%</span><br />
@@ -1150,14 +1193,14 @@ export default class CommitTreeComponent extends React.Component {
                                         <tbody>{treeNodes}</tbody>
                                     </Table>
                                 </div>
-                            </div><br />
-                            <div className="col-md-12">
-                                <Button type="button" size="md" color="warning" className="float-right mr-1" onClick={() => { this.toggleShowValidation() }}><i className="fa fa-refresh"></i> Cancel</Button>
+                            </div>
+                            <div className="col-md-12 pb-lg-5 pt-lg-3">
+                                <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={() => { this.toggleShowValidation() }}><i className="fa fa-times"></i> Cancel</Button>
                                 <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={this.synchronize}><i className="fa fa-check"></i>OK</Button>
                             </div>
                         </ModalBody>
                     </div>
-                </Modal>
+                </Modal >
             </div >
         )
     }

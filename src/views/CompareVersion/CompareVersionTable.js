@@ -103,21 +103,21 @@ export default class CompareVersion extends Component {
         // }).join(',')
         // nestedHeaders.push(regionJson);
         columns.push({ title: "Planning Unit", width: 300 })
-        columns.push({ title: "Region", width: 300 })
+        columns.push({ title: "Region", width: 100 })
         // for (var r = 0; r < regionList.length; r++) {
         columns.push({ title: "Selected Forecast", width: 200 })
-        columns.push({ title: "Forecast Qty", width: 100 })
-        columns.push({ title: "Notes", width: 200 })
+        columns.push({ title: "Forecast Qty", width: 120 })
+        columns.push({ title: "Notes", width: 210 })
         // }
         // for (var r = 0; r < regionList1.length; r++) {
         columns.push({ title: "Selected Forecast", width: 200 })
-        columns.push({ title: "Forecast Qty", width: 100 })
-        columns.push({ title: "Notes", width: 200 })
+        columns.push({ title: "Forecast Qty", width: 120 })
+        columns.push({ title: "Notes", width: 210 })
         // }
         // for (var r = 0; r < regionList2.length; r++) {
         columns.push({ title: "Selected Forecast", width: 200, type: 'hidden' })
-        columns.push({ title: "Forecast Qty", width: 100, type: 'hidden' })
-        columns.push({ title: "Notes", width: 200, type: 'hidden' })
+        columns.push({ title: "Forecast Qty", width: 120, type: 'hidden' })
+        columns.push({ title: "Notes", width: 210, type: 'hidden' })
         // }
 
         var scenarioList = [];
