@@ -120,7 +120,7 @@ class CompareVersion extends Component {
             if (versionList.length == 1) {
                 versionId = versionList[0];
                 event.target.value = versionList[0];
-            } else if (localStorage.getItem("sesDatasetVersionId") != "") {
+            } else if (localStorage.getItem("sesDatasetVersionId") != "" && versionList.filter(c => c == localStorage.getItem("sesDatasetVersionId")).length > 0) {
                 versionId = localStorage.getItem("sesDatasetVersionId");
                 event.target.value = localStorage.getItem("sesDatasetVersionId");
             }
@@ -134,7 +134,7 @@ class CompareVersion extends Component {
             if (versionList.length == 1) {
                 versionId1 = versionList[0];
                 event1.target.value = versionList[0];
-            } else if (localStorage.getItem("sesDatasetCompareVersionId") != "") {
+            } else if (localStorage.getItem("sesDatasetCompareVersionId") != "" && versionList.filter(c => c == localStorage.getItem("sesDatasetCompareVersionId")).length > 0) {
                 versionId1 = localStorage.getItem("sesDatasetCompareVersionId");
                 event1.target.value = localStorage.getItem("sesDatasetCompareVersionId");
             }
@@ -233,13 +233,13 @@ class CompareVersion extends Component {
                         var json = {
                             id: myResult[mr].programId,
                             name: getLabelText(programNameJson, this.state.lang),
-                            versionList: [{ versionId: myResult[mr].version + "  (Local)" }]
+                            versionList: [{ versionId: myResult[mr].version + " (Local)" }]
                         }
                         datasetList.push(json)
                     } else {
                         var existingVersionList = datasetList[index].versionList;
                         console.log("existingVersionList+++", datasetList[index].versionList)
-                        existingVersionList.push({ versionId: myResult[mr].version + "  (Local)" })
+                        existingVersionList.push({ versionId: myResult[mr].version + " (Local)" })
                         datasetList[index].versionList = existingVersionList
                     }
                 }
@@ -252,7 +252,7 @@ class CompareVersion extends Component {
                 if (datasetList.length == 1) {
                     datasetId = datasetList[0].id;
                     event.target.value = datasetList[0].id;
-                } else if (localStorage.getItem("sesLiveDatasetId") != "") {
+                } else if (localStorage.getItem("sesLiveDatasetId") != "" && datasetList.filter(c => c.id == localStorage.getItem("sesLiveDatasetId")).length > 0) {
                     datasetId = localStorage.getItem("sesLiveDatasetId");
                     event.target.value = localStorage.getItem("sesLiveDatasetId");
                 }
@@ -303,7 +303,7 @@ class CompareVersion extends Component {
                     this.setState({
                         datasetData: datasetJson,
                         firstDataSet: 1,
-                        loading: this.state.secondDataSet==0?false:true
+                        loading: this.state.secondDataSet == 0 ? false : true
                     }, () => {
                     })
                 }.bind(this)
@@ -317,7 +317,7 @@ class CompareVersion extends Component {
                     this.setState({
                         datasetData: responseData,
                         firstDataSet: 1,
-                        loading: this.state.secondDataSet==0?false:true
+                        loading: this.state.secondDataSet == 0 ? false : true
                     })
                 } else {
                     this.setState({
@@ -377,7 +377,7 @@ class CompareVersion extends Component {
                     this.setState({
                         datasetData1: datasetJson,
                         secondDataSet: 1,
-                        loading: this.state.firstDataSet==0?false:true
+                        loading: this.state.firstDataSet == 0 ? false : true
                     }, () => {
                     })
                 }.bind(this)
@@ -391,7 +391,7 @@ class CompareVersion extends Component {
                     this.setState({
                         datasetData1: responseData,
                         secondDataSet: 1,
-                        loading: this.state.firstDataSet==0?false:true
+                        loading: this.state.firstDataSet == 0 ? false : true
                     })
                 } else {
                     this.setState({
@@ -452,7 +452,7 @@ class CompareVersion extends Component {
                         <div className="card-header-actions">
                             <a className="card-header-action">
 
-                                <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.exportPDF()} />
+                            {(this.state.firstDataSet == 1 && this.state.secondDataSet == 1) && <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.refs.compareVersionTable.exportPDF()} />}
 
 
                             </a>
@@ -534,7 +534,7 @@ class CompareVersion extends Component {
                             <div style={{ display: !this.state.loading ? "block" : "none" }}>
                                 {(this.state.firstDataSet == 1 && this.state.secondDataSet == 1) &&
                                     <>
-                                        <CompareVersionTable  ref="compareVersionTable" datasetData={this.state.datasetData} datasetData1={this.state.datasetData1} datasetData2={this.state.datasetData} page="compareVersion" versionLabel={"V" + this.state.versionId} versionLabel1={"V" + this.state.versionId1} updateState={this.updateState} />
+                                        <CompareVersionTable ref="compareVersionTable" datasetData={this.state.datasetData} datasetData1={this.state.datasetData1} datasetData2={this.state.datasetData} page="compareVersion" versionLabel={"V" + this.state.versionId} versionLabel1={"V" + this.state.versionId1} updateState={this.updateState} />
                                         <div className="table-responsive">
                                             <div id="tableDiv" />
                                         </div>

@@ -25,6 +25,9 @@ import "../../../node_modules/jexcel-pro/dist/jexcel.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions';
 import NumberFormat from 'react-number-format';
+import jsPDF from "jspdf";
+import { LOGO } from '../../CommonComponent/Logo';
+
 const ref = React.createRef();
 const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
@@ -551,7 +554,7 @@ class CompareAndSelectScenario extends Component {
             csvRow.push('"' + (i18n.t('static.equivalancyUnit.equivalancyUnit') + ' : ' + document.getElementById("equivalencyUnitId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
             csvRow.push('')
         }
-        csvRow.push('"' + (i18n.t('static.compareAndSelect.showOnlyForecastPeriod') + ' : ' + this.state.showForecastPeriod).replaceAll(' ', '%20') + '"')
+        csvRow.push('"' + (i18n.t('static.compareAndSelect.showOnlyForecastPeriod') + ' : ' + (this.state.showForecastPeriod==1?i18n.t('static.dataEntry.True'):i18n.t('static.dataEntry.False'))).replaceAll(' ', '%20') + '"')
         csvRow.push('')
 
         if (!this.state.showForecastPeriod) {
@@ -569,7 +572,7 @@ class CompareAndSelectScenario extends Component {
         columns.push(i18n.t('static.compareAndSelect.selectAsForecast'));
         columns.push(i18n.t('static.compareAndSelect.totalForecast'));
         columns.push(i18n.t('static.compareAndSelect.forecastError'));
-        columns.push(i18n.t('static.compareAndSelect.forecastErrorMonths'));
+        columns.push(i18n.t('static.compareAndSelect.forecastErrorMonths').replaceAll('#', '%23'));
         columns.push(i18n.t('compareToConsumptionForecast'));
         let headers = [];
         columns.map((item, idx) => { headers[idx] = (item).replaceAll(' ', '%20') });
@@ -604,7 +607,11 @@ class CompareAndSelectScenario extends Component {
             B = [];
             this.state.columns.map((item, idx) => {
                 if (item.type != 'hidden') {
-                    B.push(ele[idx].toString().replaceAll(',', ' ').replaceAll(' ', '%20'));
+                    if (item.type == 'calendar') {
+                        B.push(moment(ele[idx]).format(DATE_FORMAT_CAP_WITHOUT_DATE).toString().replaceAll(',', ' ').replaceAll(' ', '%20'));
+                    } else {
+                        B.push(ele[idx].toString().replaceAll(',', ' ').replaceAll(' ', '%20'));
+                    }
                 }
             })
             C.push(this.addDoubleQuoteToRowContent(B));
@@ -628,8 +635,321 @@ class CompareAndSelectScenario extends Component {
         a.click()
     }
 
+    formatter = value => {
+
+        var cell1 = value
+        cell1 += '';
+        var x = cell1.split('.');
+        var x1 = x[0];
+        var x2 = x.length > 1 ? '.' + x[1] : '';
+        var rgx = /(\d+)(\d{3})/;
+        while (rgx.test(x1)) {
+            x1 = x1.replace(rgx, '$1' + ',' + '$2');
+        }
+        return x1 + x2;
+    }
+
 
     exportPDF = () => {
+        const addFooters = doc => {
+
+            const pageCount = doc.internal.getNumberOfPages()
+
+            doc.setFont('helvetica', 'bold')
+            doc.setFontSize(6)
+            for (var i = 1; i <= pageCount; i++) {
+                doc.setPage(i)
+
+                doc.setPage(i)
+                doc.text('Page ' + String(i) + ' of ' + String(pageCount), doc.internal.pageSize.width / 9, doc.internal.pageSize.height - 30, {
+                    align: 'center'
+                })
+                doc.text('Copyright © 2020 ' + i18n.t('static.footer'), doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
+                    align: 'center'
+                })
+
+
+            }
+        }
+        const addHeaders = doc => {
+
+            const pageCount = doc.internal.getNumberOfPages()
+
+
+            //  var file = new File('QAT-logo.png','../../../assets/img/QAT-logo.png');
+            // var reader = new FileReader();
+
+            //var data='';
+            // Use fs.readFile() method to read the file 
+            //fs.readFile('../../assets/img/logo.svg', 'utf8', function(err, data){ 
+            //}); 
+            for (var i = 1; i <= pageCount; i++) {
+                doc.setFontSize(12)
+                doc.setFont('helvetica', 'bold')
+                doc.setPage(i)
+                doc.addImage(LOGO, 'png', 0, 10, 180, 50, 'FAST');
+                /*doc.addImage(data, 10, 30, {
+                  align: 'justify'
+                });*/
+                doc.setTextColor("#002f6c");
+                doc.text(i18n.t('static.dashboard.compareAndSelect'), doc.internal.pageSize.width / 2, 60, {
+                    align: 'center'
+                })
+                if (i == 1) {
+                    doc.setFont('helvetica', 'normal')
+                    doc.setFontSize(8)
+                    doc.text(i18n.t('static.dashboard.programheader') + ' : ' + document.getElementById("datasetId").selectedOptions[0].text, doc.internal.pageSize.width / 20, 90, {
+                        align: 'left'
+                    })
+
+                }
+
+            }
+        }
+
+
+        const unit = "pt";
+        const size = "A4"; // Use A1, A2, A3 or A4
+        const orientation = "landscape"; // portrait or landscape
+
+        const marginLeft = 10;
+        const doc = new jsPDF(orientation, unit, size, true);
+
+        doc.setFontSize(8);
+        doc.setFont('helvetica', 'normal')
+        doc.setTextColor("#002f6c");
+
+
+        var y = 110;
+        var planningText = doc.splitTextToSize(i18n.t('static.common.forecastPeriod') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to), doc.internal.pageSize.width * 3 / 4);
+        // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+        for (var i = 0; i < planningText.length; i++) {
+            if (y > doc.internal.pageSize.height - 100) {
+                doc.addPage();
+                y = 80;
+
+            }
+            doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
+            y = y + 10;
+            console.log(y)
+        }
+
+        planningText = doc.splitTextToSize(i18n.t('static.program.region') + ' : ' + document.getElementById("regionId").selectedOptions[0].text, doc.internal.pageSize.width * 3 / 4);
+        // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+        y = y + 10;
+        for (var i = 0; i < planningText.length; i++) {
+            if (y > doc.internal.pageSize.height - 100) {
+                doc.addPage();
+                y = 80;
+
+            }
+            doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
+            y = y + 10;
+            console.log(y)
+        }
+
+        planningText = doc.splitTextToSize(i18n.t('static.report.planningUnit') + ' : ' + document.getElementById("planningUnitId").selectedOptions[0].text, doc.internal.pageSize.width * 3 / 4);
+        // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+        y = y + 10;
+        for (var i = 0; i < planningText.length; i++) {
+            if (y > doc.internal.pageSize.height - 100) {
+                doc.addPage();
+                y = 80;
+
+            }
+            doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
+            y = y + 10;
+            console.log(y)
+        }
+
+        planningText = doc.splitTextToSize(i18n.t('static.compareAndSelect.yAxisIn') + ' : ' + (this.state.viewById == 1 ? i18n.t('static.report.planningUnit') : this.state.viewById == 2 ? i18n.t('static.dashboard.forecastingunit') : i18n.t('static.equivalancyUnit.equivalancyUnit')), doc.internal.pageSize.width * 3 / 4);
+        // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+        y = y + 10;
+        for (var i = 0; i < planningText.length; i++) {
+            if (y > doc.internal.pageSize.height - 100) {
+                doc.addPage();
+                y = 80;
+
+            }
+            doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
+            y = y + 10;
+            console.log(y)
+        }
+
+        if (this.state.viewById == 2) {
+            planningText = doc.splitTextToSize(i18n.t('static.product.unit1') + ' : ' + document.getElementById("forecastingUnitId").selectedOptions[0].text, doc.internal.pageSize.width * 3 / 4);
+            // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+            y = y + 10;
+            for (var i = 0; i < planningText.length; i++) {
+                if (y > doc.internal.pageSize.height - 100) {
+                    doc.addPage();
+                    y = 80;
+
+                }
+                doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
+                y = y + 10;
+                console.log(y)
+            }
+        } else if (this.state.viewById == 3) {
+            planningText = doc.splitTextToSize(i18n.t('static.equivalancyUnit.equivalancyUnit') + ' : ' + document.getElementById("equivalancyUnitId").selectedOptions[0].text, doc.internal.pageSize.width * 3 / 4);
+            // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+            y = y + 10;
+            for (var i = 0; i < planningText.length; i++) {
+                if (y > doc.internal.pageSize.height - 100) {
+                    doc.addPage();
+                    y = 80;
+
+                }
+                doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
+                y = y + 10;
+                console.log(y)
+            }
+        }
+
+        planningText = doc.splitTextToSize(i18n.t('static.compareAndSelect.showOnlyForecastPeriod') + ' : ' + (this.state.showForecastPeriod==1?i18n.t('static.dataEntry.True'):i18n.t('static.dataEntry.False')), doc.internal.pageSize.width * 3 / 4);
+        // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+        y = y + 10;
+        for (var i = 0; i < planningText.length; i++) {
+            if (y > doc.internal.pageSize.height - 100) {
+                doc.addPage();
+                y = 80;
+
+            }
+            doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
+            y = y + 10;
+            console.log(y)
+        }
+        if (!this.state.showForecastPeriod) {
+            y = y + 10;
+            doc.text(i18n.t('static.compareAndSelect.startMonthForGraph') + ' : ' + this.makeText(this.state.singleValue2.from) + ' ~ ' + this.makeText(this.state.singleValue2.to), doc.internal.pageSize.width / 20, y, {
+                align: 'left'
+            })
+        }
+        y = y + 10;
+
+
+
+        //   const title = i18n.t('static.dashboard.globalconsumption');
+        var canvas = document.getElementById("cool-canvas");
+        //   //creates image
+
+        var canvasImg = canvas.toDataURL("image/png", 1.0);
+        var width = doc.internal.pageSize.width;
+        var height = doc.internal.pageSize.height;
+        var h1 = 50;
+        var aspectwidth1 = (width - h1);
+        let startY = y + 10
+        //   console.log('startY', startY)
+        let pages = Math.ceil(startY / height)
+        for (var j = 1; j < pages; j++) {
+            doc.addPage()
+        }
+        let startYtable = startY - ((height - h1) * (pages - 1))
+        doc.setTextColor("#fff");
+        // if (startYtable > (height - 400)) {
+        //     doc.addPage()
+        //     startYtable = 80
+        // }
+        let col1 = []
+        let dataArr2 = [];
+        let dataArr3 = [];
+        col1.push(i18n.t('static.common.display?'));
+        col1.push(i18n.t('static.equivalancyUnit.type'));
+        col1.push(i18n.t('static.equivalancyUnit.type'));
+        col1.push(i18n.t('static.consumption.forcast'));
+        col1.push(i18n.t('static.compareAndSelect.selectAsForecast'));
+        col1.push(i18n.t('static.compareAndSelect.totalForecast'));
+        col1.push(i18n.t('static.compareAndSelect.forecastError'));
+        col1.push(i18n.t('static.compareAndSelect.forecastErrorMonths').replaceAll('#', '%23'));
+        col1.push(i18n.t('compareToConsumptionForecast'));
+
+        dataArr2.push("");
+        dataArr2.push(i18n.t('static.compareAndSelect.actuals'))
+        dataArr2.push("");
+        dataArr2.push("");
+        dataArr2.push("");
+        dataArr2.push("");
+        dataArr2.push("");
+        dataArr3.push(["","",
+            i18n.t('static.compareAndSelect.actuals'),
+            "",
+            "",
+            "",
+            "",
+            ""])
+
+        this.state.finalData.map(ele =>
+            dataArr3.push([ele.checked==1?i18n.t('static.dataEntry.True'):i18n.t('static.dataEntry.False'),ele.type == "T" ? i18n.t('static.forecastMethod.tree') : i18n.t('static.compareAndSelect.cons'),
+            ele.type == "T" ? (getLabelText(ele.tree.label, this.state.lang) + " - " + getLabelText(ele.scenario.label, this.state.lang)) : getLabelText(ele.scenario.extrapolationMethod.label, this.state.lang),
+            ele.id == this.state.selectedTreeScenarioId ? i18n.t('static.dataEntry.True') : i18n.t('static.dataEntry.False'),
+            !ele.readonly ? ele.totalForecast!=i18n.t('static.supplyPlanFormula.na')?this.formatter(ele.totalForecast):ele.totalForecast : "",
+            ele.forecastError!=i18n.t('static.supplyPlanFormula.na')?this.formatter(ele.forecastError):ele.forecastError,
+            ele.noOfMonths.toString(),
+            ele.compareToConsumptionForecast!=i18n.t('static.supplyPlanFormula.na')?this.formatter(ele.compareToConsumptionForecast):ele.compareToConsumptionForecast])
+        )
+
+        let data2 = dataArr3;
+
+        let content1 = {
+            margin: { top: 80, bottom: 50 },
+            startY: startYtable,
+            head: [col1],
+            body: data2,
+            styles: { lineWidth: 1, fontSize: 8, halign: 'center' }
+
+        };
+        doc.autoTable(content1);
+        doc.addPage();
+        doc.addImage(canvasImg, 'png', 50, startYtable, 750, 260, 'CANVAS');
+        var columns = [];
+        this.state.columns.filter(c => c.type != 'hidden').map((item, idx) => { columns.push(item.title) });
+        var dataArr = [];
+        var dataArr1 = [];
+        console.log("this.state.dataEl.getJson(null, false)+++", this.state.dataEl.getJson(null, false))
+        this.state.dataEl.getJson(null, false).map(ele => {
+            dataArr = [];
+            this.state.columns.map((item, idx) => {
+                if (item.type != 'hidden') {
+                    console.log("ele[idx]+++", ele[idx])
+                    if (item.type == 'numeric') {
+                        if (item.mask != undefined && item.mask.toString().includes("%")) {
+                            dataArr.push(this.formatter(ele[idx]) + " %");
+                        } else {
+                            dataArr.push(this.formatter(ele[idx]));
+                        }
+                    } else if (item.type == 'calendar') {
+                        dataArr.push(moment(ele[idx]).format(DATE_FORMAT_CAP_WITHOUT_DATE));
+                    } else {
+                        dataArr.push(ele[idx]);
+                    }
+                }
+
+            })
+            dataArr1.push(dataArr);
+        })
+        const data = dataArr1;
+        doc.addPage()
+        startYtable = 80
+        let content = {
+            margin: { top: 80, bottom: 50 },
+            startY: startYtable,
+            head: [columns],
+            body: data,
+            styles: { lineWidth: 1, fontSize: 8, halign: 'center' }
+
+        };
+
+
+        //doc.text(title, marginLeft, 40);
+        doc.autoTable(content);
+        addHeaders(doc)
+        addFooters(doc)
+        doc.save(i18n.t('static.dashboard.compareAndSelect').concat('.pdf'));
+        //creates PDF from img
+        /*  var doc = new jsPDF('landscape');
+          doc.setFontSize(20);
+          doc.text(15, 15, "Cool Chart");
+          doc.save('canvas.pdf');*/
     }
 
     getDatasets() {
@@ -679,7 +999,7 @@ class CompareAndSelectScenario extends Component {
                         console.log("in if%%%", datasetList.length)
                         datasetId = datasetList[0].id;
                         event.target.value = datasetList[0].id;
-                    } else if (localStorage.getItem("sesDatasetId") != "") {
+                    } else if (localStorage.getItem("sesDatasetId") != "" && datasetList.filter(c => c.id == localStorage.getItem("sesDatasetId")).length > 0) {
                         datasetId = localStorage.getItem("sesDatasetId");
                         event.target.value = localStorage.getItem("sesDatasetId");
                     }
@@ -841,7 +1161,7 @@ class CompareAndSelectScenario extends Component {
                 if (planningUnitList.length == 1) {
                     planningUnitId = planningUnitList[0].planningUnit.id;
                     event.target.value = planningUnitList[0].planningUnit.id;
-                } else if (localStorage.getItem("sesDatasetPlanningUnitId") != "") {
+                } else if (localStorage.getItem("sesDatasetPlanningUnitId") != "" && planningUnitList.filter(c => c.planningUnit.id == localStorage.getItem("sesDatasetPlanningUnitId")).length > 0) {
                     planningUnitId = localStorage.getItem("sesDatasetPlanningUnitId");
                     event.target.value = localStorage.getItem("sesDatasetPlanningUnitId");
                 }
@@ -855,7 +1175,7 @@ class CompareAndSelectScenario extends Component {
                 if (regionList.length == 1) {
                     regionId = regionList[0].regionId;
                     regionEvent.target.value = regionList[0].regionId;
-                } else if (localStorage.getItem("sesDatasetRegionId") != "") {
+                } else if (localStorage.getItem("sesDatasetRegionId") != "" && regionList.filter(c => c.regionId == localStorage.getItem("sesDatasetRegionId")).length > 0) {
                     regionId = localStorage.getItem("sesDatasetRegionId");
                     regionEvent.target.value = localStorage.getItem("sesDatasetRegionId");
                 }

@@ -13,6 +13,8 @@ import {
     FormFeedback
 } from 'reactstrap';
 import { jExcelLoadedFunctionWithoutPagination, jExcelLoadedFunctionOnlyHideRow, inValid, inValidWithColor, jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js'
+import jsPDF from "jspdf";
+import { LOGO } from '../../CommonComponent/Logo';
 
 export default class CompareVersion extends Component {
     constructor(props) {
@@ -34,6 +36,183 @@ export default class CompareVersion extends Component {
 
     addDoubleQuoteToRowContent = (arr) => {
         return arr.map(ele => '"' + ele + '"')
+    }
+
+    formatter = value => {
+
+        var cell1 = value
+        cell1 += '';
+        var x = cell1.split('.');
+        var x1 = x[0];
+        var x2 = x.length > 1 ? '.' + x[1] : '';
+        var rgx = /(\d+)(\d{3})/;
+        while (rgx.test(x1)) {
+            x1 = x1.replace(rgx, '$1' + ',' + '$2');
+        }
+        return x1 + x2;
+    }
+
+    exportPDF() {
+        const addFooters = doc => {
+
+            const pageCount = doc.internal.getNumberOfPages()
+
+            doc.setFont('helvetica', 'bold')
+            doc.setFontSize(6)
+            for (var i = 1; i <= pageCount; i++) {
+                doc.setPage(i)
+
+                doc.setPage(i)
+                doc.text('Page ' + String(i) + ' of ' + String(pageCount), doc.internal.pageSize.width / 9, doc.internal.pageSize.height - 30, {
+                    align: 'center'
+                })
+                doc.text('Copyright © 2020 ' + i18n.t('static.footer'), doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
+                    align: 'center'
+                })
+
+
+            }
+        }
+        const addHeaders = doc => {
+
+            const pageCount = doc.internal.getNumberOfPages()
+
+
+            //  var file = new File('QAT-logo.png','../../../assets/img/QAT-logo.png');
+            // var reader = new FileReader();
+
+            //var data='';
+            // Use fs.readFile() method to read the file 
+            //fs.readFile('../../assets/img/logo.svg', 'utf8', function(err, data){ 
+            //}); 
+            for (var i = 1; i <= pageCount; i++) {
+                doc.setFontSize(12)
+                doc.setFont('helvetica', 'bold')
+                doc.setPage(i)
+                doc.addImage(LOGO, 'png', 0, 10, 180, 50, 'FAST');
+                /*doc.addImage(data, 10, 30, {
+                  align: 'justify'
+                });*/
+                doc.setTextColor("#002f6c");
+                doc.text(i18n.t('static.dashboard.compareVersion'), doc.internal.pageSize.width / 2, 60, {
+                    align: 'center'
+                })
+                if (i == 1) {
+                    doc.setFont('helvetica', 'normal')
+                    doc.setFontSize(8)
+                    doc.text(i18n.t('static.dashboard.programheader') + ' : ' + document.getElementById("datasetId").selectedOptions[0].text, doc.internal.pageSize.width / 20, 90, {
+                        align: 'left'
+                    })
+
+                }
+
+            }
+        }
+
+
+        const unit = "pt";
+        const size = "A4"; // Use A1, A2, A3 or A4
+        const orientation = "landscape"; // portrait or landscape
+
+        const marginLeft = 10;
+        const doc = new jsPDF(orientation, unit, size, true);
+
+        doc.setFontSize(8);
+        doc.setFont('helvetica', 'normal')
+        doc.setTextColor("#002f6c");
+
+
+        var y = 110;
+        var planningText = doc.splitTextToSize(i18n.t('static.report.version') + ' : ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width * 3 / 4);
+        // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+        for (var i = 0; i < planningText.length; i++) {
+            if (y > doc.internal.pageSize.height - 100) {
+                doc.addPage();
+                y = 80;
+
+            }
+            doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
+            y = y + 10;
+            console.log(y)
+        }
+
+        y = y + 10;
+        doc.text(i18n.t('static.compareVersion.compareWithVersion') + ' : ' + document.getElementById("versionId1").selectedOptions[0].text, doc.internal.pageSize.width / 20, y, {
+            align: 'left'
+        })
+        y = y + 10;
+
+
+
+
+
+        //   const title = i18n.t('static.dashboard.globalconsumption');
+        //   var canvas = document.getElementById("cool-canvas");
+        //   //creates image
+
+        //   var canvasImg = canvas.toDataURL("image/png", 1.0);
+        //   var width = doc.internal.pageSize.width;
+        var height = doc.internal.pageSize.height;
+        var h1 = 50;
+        //   var aspectwidth1 = (width - h1);
+        let startY = y + 10
+        //   console.log('startY', startY)
+        let pages = Math.ceil(startY / height)
+        for (var j = 1; j < pages; j++) {
+            doc.addPage()
+        }
+        let startYtable = startY - ((height - h1) * (pages - 1))
+        //   doc.setTextColor("#fff");
+        //   if (startYtable > (height - 400)) {
+        //     doc.addPage()
+        //     startYtable = 80
+        //   }
+        //   doc.addImage(canvasImg, 'png', 50, startYtable, 750, 260, 'CANVAS');
+        var columns = [];
+        this.state.columns.filter(c => c.type != 'hidden').map((item, idx) => { columns.push(item.title) });
+        const headers2 = [
+            { content: '', colSpan: 1 },
+            { content: '', colSpan: 1 },
+            { content: this.props.versionLabel, colSpan: 3 },
+            { content: this.props.versionLabel1, colSpan: 3 }
+        ];
+        var dataArr = [];
+        var dataArr1 = [];
+        this.state.dataEl.getJson(null, false).map(ele => {
+            dataArr = [];
+            this.state.columns.map((item, idx) => {
+                if (item.type != 'hidden') {
+                    if (item.type == 'numeric') {
+                        dataArr.push(this.formatter(ele[idx]));
+                    } else {
+                        dataArr.push(ele[idx]);
+                    }
+                }
+            })
+            dataArr1.push(dataArr);
+        })
+        const data = dataArr1;
+        // doc.addPage()
+        let content = {
+            margin: { top: 80, bottom: 50 },
+            startY: startYtable,
+            head: [headers2, columns],
+            body: data,
+            styles: { lineWidth: 1, fontSize: 8, halign: 'center' }
+
+        };
+
+
+        //doc.text(title, marginLeft, 40);
+        doc.autoTable(content);
+        addHeaders(doc)
+        addFooters(doc)
+        doc.save(i18n.t('static.dashboard.compareVersion').concat('.pdf'));
+        //creates PDF from img
+        /*  var doc = new jsPDF('landscape');
+          doc.setFontSize(20);
+          doc.text(15, 15, "Cool Chart");
+          doc.save('canvas.pdf');*/
     }
 
     exportCSV() {
@@ -62,7 +241,7 @@ export default class CompareVersion extends Component {
         this.state.columns.filter(c => c.type != 'hidden').map((item, idx) => { headers[idx] = (item.title).replaceAll(' ', '%20') });
 
         var A = [this.addDoubleQuoteToRowContent(headers)];
-        var C = [this.addDoubleQuoteToRowContent(["","",this.props.versionLabel,this.props.versionLabel,this.props.versionLabel,this.props.versionLabel1,this.props.versionLabel1,this.props.versionLabel1])];
+        var C = [this.addDoubleQuoteToRowContent(["", "", this.props.versionLabel, this.props.versionLabel, this.props.versionLabel, this.props.versionLabel1, this.props.versionLabel1, this.props.versionLabel1])];
         var B = []
         this.state.dataEl.getJson(null, false).map(ele => {
             B = [];
@@ -167,12 +346,12 @@ export default class CompareVersion extends Component {
         columns.push({ title: i18n.t('static.dashboard.regionreport'), width: 100 })
         // for (var r = 0; r < regionList.length; r++) {
         columns.push({ title: i18n.t('static.compareVersion.selectedForecast'), width: 200 })
-        columns.push({ title: i18n.t('static.compareVersion.forecastQty'), width: 120 })
+        columns.push({ title: i18n.t('static.compareVersion.forecastQty'), width: 120, type: 'numeric', mask: '#,##.00', decimal: '.' })
         columns.push({ title: i18n.t('static.program.notes'), width: 210 })
         // }
         // for (var r = 0; r < regionList1.length; r++) {
         columns.push({ title: i18n.t('static.compareVersion.selectedForecast'), width: 200 })
-        columns.push({ title: i18n.t('static.compareVersion.forecastQty'), width: 120 })
+        columns.push({ title: i18n.t('static.compareVersion.forecastQty'), width: 120, type: 'numeric', mask: '#,##.00', decimal: '.' })
         columns.push({ title: i18n.t('static.program.notes'), width: 210 })
         // }
         // for (var r = 0; r < regionList2.length; r++) {
@@ -234,28 +413,28 @@ export default class CompareVersion extends Component {
 
                 console.log("consumptionExtrapolation", consumptionExtrapolation);
 
-                data[0] = pu.length > 0 ? getLabelText(pu[0].planningUnit.label,this.state.lang) : getLabelText(pu1[0].planningUnit.label);
+                data[0] = pu.length > 0 ? getLabelText(pu[0].planningUnit.label, this.state.lang) : getLabelText(pu1[0].planningUnit.label);
                 data[1] = rg.length > 0 ? getLabelText(rg[0].label) : getLabelText(rg1[0].label);
 
                 // var count = 1;
                 // for (var r = 0; r < regionList.length; r++) {
                 var regionalSelectedForecastData = selectedForecastData[regionSet[k]];
                 console.log("regionalSelectedForecastData", regionalSelectedForecastData);
-                data[2] = regionalSelectedForecastData != undefined ? regionalSelectedForecastData.scenarioId != "" && regionalSelectedForecastData.scenarioId != null ? treeScenarioList.filter(c => c.scenarioId == regionalSelectedForecastData.scenarioId)[0].treeLabel + " ~ " + getLabelText(scenarioList.filter(c => c.id == regionalSelectedForecastData.scenarioId)[0].label,this.state.lang) : regionalSelectedForecastData.consumptionExtrapolationId != "" && regionalSelectedForecastData.consumptionExtrapolationId != null ? getLabelText(consumptionExtrapolation.filter(c => c.consumptionExtrapolationId == regionalSelectedForecastData.consumptionExtrapolationId)[0].extrapolationMethod.label,this.state.lang) : "" : ""
-                data[3] = regionalSelectedForecastData != undefined ? regionalSelectedForecastData.totalForecast : "";
+                data[2] = regionalSelectedForecastData != undefined ? regionalSelectedForecastData.scenarioId != "" && regionalSelectedForecastData.scenarioId != null ? treeScenarioList.filter(c => c.scenarioId == regionalSelectedForecastData.scenarioId)[0].treeLabel + " ~ " + getLabelText(scenarioList.filter(c => c.id == regionalSelectedForecastData.scenarioId)[0].label, this.state.lang) : regionalSelectedForecastData.consumptionExtrapolationId != "" && regionalSelectedForecastData.consumptionExtrapolationId != null ? getLabelText(consumptionExtrapolation.filter(c => c.consumptionExtrapolationId == regionalSelectedForecastData.consumptionExtrapolationId)[0].extrapolationMethod.label, this.state.lang) : "" : ""
+                data[3] = regionalSelectedForecastData != undefined ? regionalSelectedForecastData.totalForecast > 0 ? regionalSelectedForecastData.totalForecast.toFixed(2) : "" : "";
                 data[4] = regionalSelectedForecastData != undefined ? regionalSelectedForecastData.notes : "";
                 // count += 3;
                 // }
                 // for (var r = 0; r < regionList1.length; r++) {
                 var regionalSelectedForecastData1 = selectedForecastData1[regionSet[k]];
-                data[5] = regionalSelectedForecastData1 != undefined ? regionalSelectedForecastData1.scenarioId != "" && regionalSelectedForecastData1.scenarioId != null ? treeScenarioList1.filter(c => c.scenarioId == regionalSelectedForecastData1.scenarioId)[0].treeLabel + " ~ " + getLabelText(scenarioList1.filter(c => c.id == regionalSelectedForecastData1.scenarioId)[0].label,this.state.lang) : regionalSelectedForecastData1.consumptionExtrapolationId != "" && regionalSelectedForecastData1.consumptionExtrapolationId != null ? getLabelText(consumptionExtrapolation1.filter(c => c.consumptionExtrapolationId == regionalSelectedForecastData1.consumptionExtrapolationId)[0].extrapolationMethod.label,this.state.lang) : "" : ""
-                data[6] = regionalSelectedForecastData1 != undefined ? regionalSelectedForecastData1.totalForecast : "";
+                data[5] = regionalSelectedForecastData1 != undefined ? regionalSelectedForecastData1.scenarioId != "" && regionalSelectedForecastData1.scenarioId != null ? treeScenarioList1.filter(c => c.scenarioId == regionalSelectedForecastData1.scenarioId)[0].treeLabel + " ~ " + getLabelText(scenarioList1.filter(c => c.id == regionalSelectedForecastData1.scenarioId)[0].label, this.state.lang) : regionalSelectedForecastData1.consumptionExtrapolationId != "" && regionalSelectedForecastData1.consumptionExtrapolationId != null ? getLabelText(consumptionExtrapolation1.filter(c => c.consumptionExtrapolationId == regionalSelectedForecastData1.consumptionExtrapolationId)[0].extrapolationMethod.label, this.state.lang) : "" : ""
+                data[6] = regionalSelectedForecastData1 != undefined ? regionalSelectedForecastData1.totalForecast > 0 ? regionalSelectedForecastData1.totalForecast.toFixed(2) : "" : "";
                 data[7] = regionalSelectedForecastData1 != undefined ? regionalSelectedForecastData1.notes : "";
                 //     count += 3;
                 // }
                 // for (var r = 0; r < regionList2.length; r++) {
                 var regionalSelectedForecastData2 = selectedForecastData2[regionSet[k]];
-                data[8] = regionalSelectedForecastData2 != undefined ? regionalSelectedForecastData2.scenarioId != "" && regionalSelectedForecastData2.scenarioId != null ? treeScenarioList2.filter(c => c.scenarioId == regionalSelectedForecastData2.scenarioId)[0].treeLabel + " ~ " + getLabelText(scenarioList2.filter(c => c.id == regionalSelectedForecastData2.scenarioId)[0].label,this.state.lang) : regionalSelectedForecastData2.consumptionExtrapolationId != "" && regionalSelectedForecastData2.consumptionExtrapolationId != null ? getLabelText(consumptionExtrapolation2.filter(c => c.consumptionExtrapolationId == regionalSelectedForecastData2.consumptionExtrapolationId)[0].extrapolationMethod.label,this.state.lang) : "" : ""
+                data[8] = regionalSelectedForecastData2 != undefined ? regionalSelectedForecastData2.scenarioId != "" && regionalSelectedForecastData2.scenarioId != null ? treeScenarioList2.filter(c => c.scenarioId == regionalSelectedForecastData2.scenarioId)[0].treeLabel + " ~ " + getLabelText(scenarioList2.filter(c => c.id == regionalSelectedForecastData2.scenarioId)[0].label, this.state.lang) : regionalSelectedForecastData2.consumptionExtrapolationId != "" && regionalSelectedForecastData2.consumptionExtrapolationId != null ? getLabelText(consumptionExtrapolation2.filter(c => c.consumptionExtrapolationId == regionalSelectedForecastData2.consumptionExtrapolationId)[0].extrapolationMethod.label, this.state.lang) : "" : ""
                 data[9] = regionalSelectedForecastData2 != undefined ? regionalSelectedForecastData2.totalForecast : "";
                 data[10] = regionalSelectedForecastData2 != undefined ? regionalSelectedForecastData2.notes : "";
 

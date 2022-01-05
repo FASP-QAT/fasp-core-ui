@@ -26,6 +26,8 @@ import "../../../node_modules/jexcel-pro/dist/jexcel.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import ProgramService from '../../api/ProgramService';
 import DatasetService from '../../api/DatasetService';
+import jsPDF from "jspdf";
+import { LOGO } from '../../CommonComponent/Logo';
 
 class ProductValidation extends Component {
     constructor(props) {
@@ -180,7 +182,7 @@ class ProductValidation extends Component {
         if (treeList.length == 1) {
             treeId = treeList[0].treeId;
             event.target.value = treeList[0].treeId;
-        } else if (localStorage.getItem("sesTreeId") != "") {
+        } else if (localStorage.getItem("sesTreeId") != "" && treeList.filter(c => c.treeId == localStorage.getItem("sesTreeId")).length > 0) {
             treeId = localStorage.getItem("sesTreeId");
             event.target.value = localStorage.getItem("sesTreeId");
         }
@@ -231,7 +233,7 @@ class ProductValidation extends Component {
             if (scenarioList.length == 1) {
                 scenarioId = scenarioList[0].id;
                 event.target.value = scenarioList[0].id;
-            } else if (localStorage.getItem("sesScenarioId") != "") {
+            } else if (localStorage.getItem("sesScenarioId") != "" && scenarioList.filter(c => c.id == localStorage.getItem("sesScenarioId")).length > 0) {
                 scenarioId = localStorage.getItem("sesScenarioId");
                 event.target.value = localStorage.getItem("sesScenarioId");
             }
@@ -398,7 +400,7 @@ class ProductValidation extends Component {
                 }
                 var usageTextPU = "";
                 if (finalData[i].nodeDataMap != "") {
-                    var planningUnit = getLabelText(finalData[i].nodeDataMap.puNode.planningUnit.label,this.state.lang);
+                    var planningUnit = getLabelText(finalData[i].nodeDataMap.puNode.planningUnit.label, this.state.lang);
                     var usagePeriodId;
                     var usageTypeId;
                     var usageFrequency;
@@ -608,7 +610,7 @@ class ProductValidation extends Component {
             if (versionList.length == 1) {
                 versionId = versionList[0];
                 event.target.value = versionList[0];
-            } else if (localStorage.getItem("sesDatasetVersionId") != "") {
+            } else if (localStorage.getItem("sesDatasetVersionId") != "" && versionList.filter(c => c == localStorage.getItem("sesDatasetVersionId")).length > 0) {
                 versionId = localStorage.getItem("sesDatasetVersionId");
                 event.target.value = localStorage.getItem("sesDatasetVersionId");
             }
@@ -700,7 +702,7 @@ class ProductValidation extends Component {
                     currencyResult = currencyRequest.result;
                     var currencyList = [];
                     currencyResult.map(item => {
-                        currencyList.push({ id: item.currencyId, name: getLabelText(item.label,this.state.lang), currencyCode: item.currencyCode, conversionRateToUsd: item.conversionRateToUsd })
+                        currencyList.push({ id: item.currencyId, name: getLabelText(item.label, this.state.lang), currencyCode: item.currencyCode, conversionRateToUsd: item.conversionRateToUsd })
                     })
                     console.log("MyResult+++", myResult);
                     var datasetList = this.state.datasetList;
@@ -734,7 +736,7 @@ class ProductValidation extends Component {
                         console.log("in if%%%", datasetList.length)
                         datasetId = datasetList[0].id;
                         event.target.value = datasetList[0].id;
-                    } else if (localStorage.getItem("sesLiveDatasetId") != "") {
+                    } else if (localStorage.getItem("sesLiveDatasetId") != "" && datasetList.filter(c => c.id == localStorage.getItem("sesLiveDatasetId")).length > 0) {
                         datasetId = localStorage.getItem("sesLiveDatasetId");
                         event.target.value = localStorage.getItem("sesLiveDatasetId");
                     }
@@ -756,6 +758,195 @@ class ProductValidation extends Component {
         return arr.map(ele => '"' + ele + '"')
     }
 
+    formatter = value => {
+
+        var cell1 = value
+        cell1 += '';
+        var x = cell1.split('.');
+        var x1 = x[0];
+        var x2 = x.length > 1 ? '.' + x[1] : '';
+        var rgx = /(\d+)(\d{3})/;
+        while (rgx.test(x1)) {
+          x1 = x1.replace(rgx, '$1' + ',' + '$2');
+        }
+        return x1 + x2;
+      }
+
+    exportPDF() {
+        const addFooters = doc => {
+
+            const pageCount = doc.internal.getNumberOfPages()
+
+            doc.setFont('helvetica', 'bold')
+            doc.setFontSize(6)
+            for (var i = 1; i <= pageCount; i++) {
+                doc.setPage(i)
+
+                doc.setPage(i)
+                doc.text('Page ' + String(i) + ' of ' + String(pageCount), doc.internal.pageSize.width / 9, doc.internal.pageSize.height - 30, {
+                    align: 'center'
+                })
+                doc.text('Copyright © 2020 ' + i18n.t('static.footer'), doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
+                    align: 'center'
+                })
+
+
+            }
+        }
+        const addHeaders = doc => {
+
+            const pageCount = doc.internal.getNumberOfPages()
+
+
+            //  var file = new File('QAT-logo.png','../../../assets/img/QAT-logo.png');
+            // var reader = new FileReader();
+
+            //var data='';
+            // Use fs.readFile() method to read the file 
+            //fs.readFile('../../assets/img/logo.svg', 'utf8', function(err, data){ 
+            //}); 
+            for (var i = 1; i <= pageCount; i++) {
+                doc.setFontSize(12)
+                doc.setFont('helvetica', 'bold')
+                doc.setPage(i)
+                doc.addImage(LOGO, 'png', 0, 10, 180, 50, 'FAST');
+                /*doc.addImage(data, 10, 30, {
+                  align: 'justify'
+                });*/
+                doc.setTextColor("#002f6c");
+                doc.text(i18n.t('static.dashboard.productValidation'), doc.internal.pageSize.width / 2, 60, {
+                    align: 'center'
+                })
+                if (i == 1) {
+                    doc.setFont('helvetica', 'normal')
+                    doc.setFontSize(8)
+                    doc.text(i18n.t('static.dashboard.programheader') + ' : ' + document.getElementById("datasetId").selectedOptions[0].text, doc.internal.pageSize.width / 20, 90, {
+                        align: 'left'
+                    })
+
+                }
+
+            }
+        }
+
+
+        const unit = "pt";
+        const size = "A4"; // Use A1, A2, A3 or A4
+        const orientation = "landscape"; // portrait or landscape
+
+        const marginLeft = 10;
+        const doc = new jsPDF(orientation, unit, size, true);
+
+        doc.setFontSize(8);
+        doc.setFont('helvetica', 'normal')
+        doc.setTextColor("#002f6c");
+
+
+        var y = 110;
+        var planningText = doc.splitTextToSize(i18n.t('static.report.version') + ' : ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width * 3 / 4);
+        // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+        for (var i = 0; i < planningText.length; i++) {
+            if (y > doc.internal.pageSize.height - 100) {
+                doc.addPage();
+                y = 80;
+
+            }
+            doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
+            y = y + 10;
+            console.log(y)
+        }
+        planningText = doc.splitTextToSize(i18n.t('static.common.treeName') + ' : ' + document.getElementById("treeId").selectedOptions[0].text, doc.internal.pageSize.width * 3 / 4);
+        //  doc.text(doc.internal.pageSize.width / 8, 130, planningText)
+        y = y + 10;
+        for (var i = 0; i < planningText.length; i++) {
+            if (y > doc.internal.pageSize.height - 100) {
+                doc.addPage();
+                y = 80;
+
+            }
+            doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
+            y = y + 10;
+            console.log(y)
+        }
+
+        planningText = doc.splitTextToSize((i18n.t('static.whatIf.scenario') + ' : ' + document.getElementById("scenarioId").selectedOptions[0].text), doc.internal.pageSize.width * 3 / 4);
+        // doc.text(doc.internal.pageSize.width / 9, this.state.programLabels.size > 5 ? 190 : 150, planningText)
+        y = y + 10;
+        for (var i = 0; i < planningText.length; i++) {
+            if (y > doc.internal.pageSize.height - 100) {
+                doc.addPage();
+                y = 80;
+
+            }
+            doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
+            y = y + 10;
+            console.log(y)
+        }
+        y = y + 10;
+        doc.text(i18n.t('static.country.currency') + ' : ' + document.getElementById("currencyId").selectedOptions[0].text, doc.internal.pageSize.width / 20, y, {
+            align: 'left'
+        })
+        y = y + 10;
+
+
+
+
+
+        //   const title = i18n.t('static.dashboard.globalconsumption');
+        //   var canvas = document.getElementById("cool-canvas");
+        //   //creates image
+
+        //   var canvasImg = canvas.toDataURL("image/png", 1.0);
+        //   var width = doc.internal.pageSize.width;
+        var height = doc.internal.pageSize.height;
+        var h1 = 50;
+        //   var aspectwidth1 = (width - h1);
+        let startY = y + 10
+        //   console.log('startY', startY)
+        let pages = Math.ceil(startY / height)
+        for (var j = 1; j < pages; j++) {
+            doc.addPage()
+        }
+        let startYtable = startY - ((height - h1) * (pages - 1))
+        //   doc.setTextColor("#fff");
+        //   if (startYtable > (height - 400)) {
+        //     doc.addPage()
+        //     startYtable = 80
+        //   }
+        //   doc.addImage(canvasImg, 'png', 50, startYtable, 750, 260, 'CANVAS');
+        var columns = [];
+        columns.push(i18n.t('static.common.level'));
+        columns.push(i18n.t('static.supplyPlan.type'));
+        columns.push(i18n.t('static.forecastingunit.forecastingunit'));
+        columns.push(i18n.t('static.forecastingunit.forecastingunit') + " " + i18n.t('static.common.text'));
+        columns.push(i18n.t('static.common.product'));
+        columns.push(i18n.t('static.common.product') + " " + i18n.t('static.common.text'));
+        columns.push(i18n.t('static.productValidation.cost'));
+        const headers = [columns]
+        const data = this.state.dataEl.getJson(null, false).map(ele => [ele[0], ele[1], ele[2], ele[3], ele[4], ele[5], this.formatter(ele[6])]);
+        // doc.addPage()
+        let content = {
+            margin: { top: 80, bottom: 50 },
+            startY: startYtable,
+            head: headers,
+            body: data,
+            styles: { lineWidth: 1, fontSize: 8, halign: 'center' }
+
+        };
+
+
+        //doc.text(title, marginLeft, 40);
+        doc.autoTable(content);
+        addHeaders(doc)
+        addFooters(doc)
+        doc.save(i18n.t('static.dashboard.productValidation').concat('.pdf'));
+        //creates PDF from img
+        /*  var doc = new jsPDF('landscape');
+          doc.setFontSize(20);
+          doc.text(15, 15, "Cool Chart");
+          doc.save('canvas.pdf');*/
+    }
+
     exportCSV() {
         var csvRow = [];
         csvRow.push('"' + (i18n.t('static.dashboard.programheader') + ' : ' + document.getElementById("datasetId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
@@ -773,7 +964,7 @@ class ProductValidation extends Component {
         csvRow.push('"' + (i18n.t('static.common.youdatastart')).replaceAll(' ', '%20') + '"')
         csvRow.push('')
         var re;
-        var columns=[];
+        var columns = [];
         columns.push(i18n.t('static.common.level'));
         columns.push(i18n.t('static.supplyPlan.type'));
         columns.push(i18n.t('static.forecastingunit.forecastingunit'));
@@ -785,7 +976,7 @@ class ProductValidation extends Component {
         columns.map((item, idx) => { headers[idx] = (item).replaceAll(' ', '%20') });
 
         var A = [this.addDoubleQuoteToRowContent(headers)];
-        this.state.dataEl.getJson(null,false).map(ele => A.push(this.addDoubleQuoteToRowContent([ele[0].replaceAll(',', ' ').replaceAll(' ', '%20'),ele[1].replaceAll(',', ' ').replaceAll(' ', '%20'),ele[2].replaceAll(',', ' ').replaceAll(' ', '%20'),ele[3].replaceAll(',', ' ').replaceAll(' ', '%20'),ele[4].replaceAll(',', ' ').replaceAll(' ', '%20'),ele[5].replaceAll(',', ' ').replaceAll(' ', '%20'),ele[6].replaceAll(',', ' ').replaceAll(' ', '%20') ])));
+        this.state.dataEl.getJson(null, false).map(ele => A.push(this.addDoubleQuoteToRowContent([ele[0].replaceAll(',', ' ').replaceAll(' ', '%20'), ele[1].replaceAll(',', ' ').replaceAll(' ', '%20'), ele[2].replaceAll(',', ' ').replaceAll(' ', '%20'), ele[3].replaceAll(',', ' ').replaceAll(' ', '%20'), ele[4].replaceAll(',', ' ').replaceAll(' ', '%20'), ele[5].replaceAll(',', ' ').replaceAll(' ', '%20'), ele[6].replaceAll(',', ' ').replaceAll(' ', '%20')])));
 
         for (var i = 0; i < A.length; i++) {
             csvRow.push(A[i].join(","))
@@ -875,9 +1066,9 @@ class ProductValidation extends Component {
                                 <a href={`/#/dataSet/buildTree/tree/` + this.state.treeId + `/` + this.state.localProgramId + `/` + this.state.scenarioId}><span style={{ cursor: 'pointer' }}><small className="supplyplanformulas">{i18n.t('static.common.managetree')}</small></span></a>
                             </a>}
                             <a className="card-header-action">
-                                <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.exportPDF()} />
+                                {this.state.dataEl != "" && <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.exportPDF()} />}
                             </a>
-                            {this.state.dataEl!="" && <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />}
+                            {this.state.dataEl != "" && <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />}
                         </div>
                         {/* } */}
                     </div>

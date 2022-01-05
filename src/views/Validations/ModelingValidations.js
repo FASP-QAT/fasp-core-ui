@@ -26,6 +26,8 @@ import "../../../node_modules/jexcel-pro/dist/jexcel.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import ProgramService from '../../api/ProgramService';
 import DatasetService from '../../api/DatasetService';
+import jsPDF from "jspdf";
+import { LOGO } from '../../CommonComponent/Logo';
 
 const ref = React.createRef();
 const pickerLang = {
@@ -268,7 +270,7 @@ class ModelingValidation extends Component {
         if (treeList.length == 1) {
             treeId = treeList[0].treeId;
             event.target.value = treeList[0].treeId;
-        } else if (localStorage.getItem("sesTreeId") != "") {
+        } else if (localStorage.getItem("sesTreeId") != "" && treeList.filter(c => c.treeId == localStorage.getItem("sesTreeId")).length > 0) {
             treeId = localStorage.getItem("sesTreeId");
             event.target.value = localStorage.getItem("sesTreeId");
         }
@@ -331,7 +333,7 @@ class ModelingValidation extends Component {
             if (scenarioList.length == 1) {
                 scenarioId = scenarioList[0].id;
                 event.target.value = scenarioList[0].id;
-            } else if (localStorage.getItem("sesScenarioId") != "") {
+            } else if (localStorage.getItem("sesScenarioId") != "" && scenarioList.filter(c => c.id == localStorage.getItem("sesScenarioId")).length > 0) {
                 scenarioId = localStorage.getItem("sesScenarioId");
                 event.target.value = localStorage.getItem("sesScenarioId");
             }
@@ -345,7 +347,7 @@ class ModelingValidation extends Component {
             if (levelList.length == 1) {
                 levelId = levelList[0];
                 levelEvent.target.value = levelList[0];
-            } else if (localStorage.getItem("sesLevelId") != "") {
+            } else if (localStorage.getItem("sesLevelId") != "" && levelList.filter(c => c == localStorage.getItem("sesLevelId")).length > 0) {
                 levelId = localStorage.getItem("sesLevelId");
                 levelEvent.target.value = localStorage.getItem("sesLevelId");
             }
@@ -474,11 +476,11 @@ class ModelingValidation extends Component {
             for (var k = 0; k < nodeVal.length; k++) {
                 columns.push({ title: nodeVal[k].label, width: 100, readOnly: true, type: displayBy == 1 ? 'numeric' : 'hidden', mask: displayBy == 1 ? '#,##.00' : '#,##.00 %', decimal: '.' });
             }
-            columns.push({ title: i18n.t('static.supplyPlan.total'), width: 100, readOnly: true, type: displayBy == 1 ? 'numeric' : 'hidden', mask: displayBy == 1 ? '#,##.00 %' : '#,## %' });
+            columns.push({ title: i18n.t('static.supplyPlan.total'), width: 100, readOnly: true, type: displayBy == 1 ? 'numeric' : 'hidden', mask: displayBy == 1 ? '#,##.00' : '#,## %' });
             for (var k = 0; k < nodeVal.length; k++) {
                 columns.push({ title: nodeVal[k].label, width: 100, readOnly: true, type: displayBy == 2 ? 'numeric' : 'hidden', mask: displayBy == 1 ? '#,##.00' : '#,##.00 %', decimal: '.' });
             }
-            columns.push({ title: i18n.t('static.supplyPlan.total'), width: 100, readOnly: true, type: displayBy == 2 ? 'numeric' : 'hidden', mask: displayBy == 1 ? '#,##.00 %' : '#,## %' });
+            columns.push({ title: i18n.t('static.supplyPlan.total'), width: 100, readOnly: true, type: displayBy == 2 ? 'numeric' : 'hidden', mask: displayBy == 1 ? '#,##.00' : '#,## %' });
             var data = [];
             var dataArr = [];
             var nodeVal = this.state.nodeVal;
@@ -640,7 +642,7 @@ class ModelingValidation extends Component {
             if (versionList.length == 1) {
                 versionId = versionList[0];
                 event.target.value = versionList[0];
-            } else if (localStorage.getItem("sesDatasetVersionId") != "") {
+            } else if (localStorage.getItem("sesDatasetVersionId") != "" && versionList.filter(c => c == localStorage.getItem("sesDatasetVersionId")).length > 0) {
                 versionId = localStorage.getItem("sesDatasetVersionId");
                 event.target.value = localStorage.getItem("sesDatasetVersionId");
             }
@@ -757,7 +759,7 @@ class ModelingValidation extends Component {
                 if (datasetList.length == 1) {
                     datasetId = datasetList[0].id;
                     event.target.value = datasetList[0].id;
-                } else if (localStorage.getItem("sesLiveDatasetId") != "") {
+                } else if (localStorage.getItem("sesLiveDatasetId") != "" && datasetList.filter(c => c.id == localStorage.getItem("sesLiveDatasetId")).length > 0) {
                     datasetId = localStorage.getItem("sesLiveDatasetId");
                     event.target.value = localStorage.getItem("sesLiveDatasetId");
                 }
@@ -789,6 +791,270 @@ class ModelingValidation extends Component {
 
     addDoubleQuoteToRowContent = (arr) => {
         return arr.map(ele => '"' + ele + '"')
+    }
+
+    formatter = value => {
+
+        var cell1 = value
+        cell1 += '';
+        var x = cell1.split('.');
+        var x1 = x[0];
+        var x2 = x.length > 1 ? '.' + x[1] : '';
+        var rgx = /(\d+)(\d{3})/;
+        while (rgx.test(x1)) {
+            x1 = x1.replace(rgx, '$1' + ',' + '$2');
+        }
+        return x1 + x2;
+    }
+
+    exportPDF() {
+        const addFooters = doc => {
+
+            const pageCount = doc.internal.getNumberOfPages()
+
+            doc.setFont('helvetica', 'bold')
+            doc.setFontSize(6)
+            for (var i = 1; i <= pageCount; i++) {
+                doc.setPage(i)
+
+                doc.setPage(i)
+                doc.text('Page ' + String(i) + ' of ' + String(pageCount), doc.internal.pageSize.width / 9, doc.internal.pageSize.height - 30, {
+                    align: 'center'
+                })
+                doc.text('Copyright © 2020 ' + i18n.t('static.footer'), doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
+                    align: 'center'
+                })
+
+
+            }
+        }
+        const addHeaders = doc => {
+
+            const pageCount = doc.internal.getNumberOfPages()
+
+
+            //  var file = new File('QAT-logo.png','../../../assets/img/QAT-logo.png');
+            // var reader = new FileReader();
+
+            //var data='';
+            // Use fs.readFile() method to read the file 
+            //fs.readFile('../../assets/img/logo.svg', 'utf8', function(err, data){ 
+            //}); 
+            for (var i = 1; i <= pageCount; i++) {
+                doc.setFontSize(12)
+                doc.setFont('helvetica', 'bold')
+                doc.setPage(i)
+                doc.addImage(LOGO, 'png', 0, 10, 180, 50, 'FAST');
+                /*doc.addImage(data, 10, 30, {
+                  align: 'justify'
+                });*/
+                doc.setTextColor("#002f6c");
+                doc.text(i18n.t('static.dashboard.modelingValidation'), doc.internal.pageSize.width / 2, 60, {
+                    align: 'center'
+                })
+                if (i == 1) {
+                    doc.setFont('helvetica', 'normal')
+                    doc.setFontSize(8)
+                    doc.text(i18n.t('static.dashboard.programheader') + ' : ' + document.getElementById("datasetId").selectedOptions[0].text, doc.internal.pageSize.width / 20, 90, {
+                        align: 'left'
+                    })
+
+                }
+
+            }
+        }
+
+
+        const unit = "pt";
+        const size = "A4"; // Use A1, A2, A3 or A4
+        const orientation = "landscape"; // portrait or landscape
+
+        const marginLeft = 10;
+        const doc = new jsPDF(orientation, unit, size, true);
+
+        doc.setFontSize(8);
+        doc.setFont('helvetica', 'normal')
+        doc.setTextColor("#002f6c");
+
+
+        var y = 110;
+        var planningText = doc.splitTextToSize(i18n.t('static.report.version') + ' : ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width * 3 / 4);
+        // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+        for (var i = 0; i < planningText.length; i++) {
+            if (y > doc.internal.pageSize.height - 100) {
+                doc.addPage();
+                y = 80;
+
+            }
+            doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
+            y = y + 10;
+            console.log(y)
+        }
+
+        planningText = doc.splitTextToSize(i18n.t('static.common.treeName') + ' : ' + document.getElementById("treeId").selectedOptions[0].text, doc.internal.pageSize.width * 3 / 4);
+        // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+        y = y + 10;
+        for (var i = 0; i < planningText.length; i++) {
+            if (y > doc.internal.pageSize.height - 100) {
+                doc.addPage();
+                y = 80;
+
+            }
+            doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
+            y = y + 10;
+            console.log(y)
+        }
+
+        planningText = doc.splitTextToSize(i18n.t('static.whatIf.scenario') + ' : ' + document.getElementById("scenarioId").selectedOptions[0].text, doc.internal.pageSize.width * 3 / 4);
+        // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+        y = y + 10;
+        for (var i = 0; i < planningText.length; i++) {
+            if (y > doc.internal.pageSize.height - 100) {
+                doc.addPage();
+                y = 80;
+
+            }
+            doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
+            y = y + 10;
+            console.log(y)
+        }
+
+        planningText = doc.splitTextToSize(i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to), doc.internal.pageSize.width * 3 / 4);
+        // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+        y = y + 10;
+        for (var i = 0; i < planningText.length; i++) {
+            if (y > doc.internal.pageSize.height - 100) {
+                doc.addPage();
+                y = 80;
+
+            }
+            doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
+            y = y + 10;
+            console.log(y)
+        }
+
+        planningText = doc.splitTextToSize(i18n.t('static.common.level') + ' : ' + document.getElementById("levelId").selectedOptions[0].text, doc.internal.pageSize.width * 3 / 4);
+        // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+        y = y + 10;
+        for (var i = 0; i < planningText.length; i++) {
+            if (y > doc.internal.pageSize.height - 100) {
+                doc.addPage();
+                y = 80;
+
+            }
+            doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
+            y = y + 10;
+            console.log(y)
+        }
+
+        planningText = doc.splitTextToSize(i18n.t('static.modelingValidation.levelUnit') + ' : ' + document.getElementById("levelUnit").value, doc.internal.pageSize.width * 3 / 4);
+        // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+        y = y + 10;
+        for (var i = 0; i < planningText.length; i++) {
+            if (y > doc.internal.pageSize.height - 100) {
+                doc.addPage();
+                y = 80;
+
+            }
+            doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
+            y = y + 10;
+            console.log(y)
+        }
+
+        planningText = doc.splitTextToSize(i18n.t('static.common.node') + ' : ' + this.state.nodeLabelArr.join('; '), doc.internal.pageSize.width * 3 / 4);
+        // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+        y = y + 10;
+        for (var i = 0; i < planningText.length; i++) {
+            if (y > doc.internal.pageSize.height - 100) {
+                doc.addPage();
+                y = 80;
+
+            }
+            doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
+            y = y + 10;
+            console.log(y)
+        }
+
+        y = y + 10;
+        doc.text(i18n.t('static.modelingValidation.displayBy') + ' : ' + document.getElementById("displayBy").selectedOptions[0].text, doc.internal.pageSize.width / 20, y, {
+            align: 'left'
+        })
+        y = y + 10;
+
+
+
+
+
+        //   const title = i18n.t('static.dashboard.globalconsumption');
+        var canvas = document.getElementById("cool-canvas");
+        //   //creates image
+
+        var canvasImg = canvas.toDataURL("image/png", 1.0);
+        var width = doc.internal.pageSize.width;
+        var height = doc.internal.pageSize.height;
+        var h1 = 50;
+        var aspectwidth1 = (width - h1);
+        let startY = y + 10
+        //   console.log('startY', startY)
+        let pages = Math.ceil(startY / height)
+        for (var j = 1; j < pages; j++) {
+            doc.addPage()
+        }
+        let startYtable = startY - ((height - h1) * (pages - 1))
+        doc.setTextColor("#fff");
+        if (startYtable > (height - 400)) {
+            doc.addPage()
+            startYtable = 80
+        }
+        doc.addImage(canvasImg, 'png', 50, startYtable, 750, 260, 'CANVAS');
+        var columns = [];
+        this.state.columns.filter(c => c.type != 'hidden').map((item, idx) => { columns.push(item.title) });
+        var dataArr = [];
+        var dataArr1 = [];
+        console.log("this.state.dataEl.getJson(null, false)+++", this.state.dataEl.getJson(null, false))
+        this.state.dataEl.getJson(null, false).map(ele => {
+            dataArr = [];
+            this.state.columns.map((item, idx) => {
+                if (item.type != 'hidden') {
+                    console.log("ele[idx]+++", ele[idx])
+                    if (item.type == 'numeric') {
+                        if (item.mask != undefined && item.mask.toString().includes("%")) {
+                            dataArr.push(this.formatter(ele[idx]) + " %");
+                        } else {
+                            dataArr.push(this.formatter(ele[idx]));
+                        }
+                    } else if (item.type == 'calendar') {
+                        dataArr.push(moment(ele[idx]).format(DATE_FORMAT_CAP_WITHOUT_DATE));
+                    } else {
+                        dataArr.push(ele[idx]);
+                    }
+                }
+
+            })
+            dataArr1.push(dataArr);
+        })
+        const data = dataArr1;
+        doc.addPage()
+        let content = {
+            margin: { top: 80, bottom: 50 },
+            startY: startYtable,
+            head: [columns],
+            body: data,
+            styles: { lineWidth: 1, fontSize: 8, halign: 'center' }
+
+        };
+
+
+        //doc.text(title, marginLeft, 40);
+        doc.autoTable(content);
+        addHeaders(doc)
+        addFooters(doc)
+        doc.save(i18n.t('static.dashboard.modelingValidation').concat('.pdf'));
+        //creates PDF from img
+        /*  var doc = new jsPDF('landscape');
+          doc.setFontSize(20);
+          doc.text(15, 15, "Cool Chart");
+          doc.save('canvas.pdf');*/
     }
 
     exportCSV() {
@@ -837,6 +1103,8 @@ class ModelingValidation extends Component {
                 if (item.type != 'hidden') {
                     if (item.mask != undefined && item.mask.toString().includes("%")) {
                         B.push((ele[idx] + (" %")).toString().replaceAll(',', ' ').replaceAll(' ', '%20'));
+                    } else if (item.type == 'calendar') {
+                        B.push(moment(ele[idx]).format(DATE_FORMAT_CAP_WITHOUT_DATE).toString().replaceAll(',', ' ').replaceAll(' ', '%20'));
                     } else {
                         B.push(ele[idx].toString().replaceAll(',', ' ').replaceAll(' ', '%20'));
                     }
@@ -1061,7 +1329,7 @@ class ModelingValidation extends Component {
                         <div className="card-header-actions">
                             <a className="card-header-action">
 
-                                <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.exportPDF()} />
+                                {this.state.monthList.length > 0 && this.state.dataEl != undefined && this.state.dataEl != "" && <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.exportPDF()} />}
 
 
                             </a>
