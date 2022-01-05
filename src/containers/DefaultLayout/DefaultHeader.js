@@ -94,6 +94,15 @@ class DefaultHeader extends Component {
               <DropdownItem onClick={this.changeLanguage.bind(this, 'pr')}> {i18n.t('static.language.Portuguese')}</DropdownItem>
             </DropdownMenu>
           </UncontrolledDropdown> */}
+          
+           <NavItem className="">
+            <span className="nav-link">
+              <a href={"../../../../src/ShowGuidanceHtmlFile/ShowGuidance.html"} target="_blank">
+              <i class="nav-icon fa fa-compass ShowGuidanceIcon" title={'Show Guidance'}></i>
+              </a>
+            </span>
+          </NavItem>
+
           {checkOnline === 'Online' && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANUAL_TAGGING') && this.props.activeModule == 2 &&
             <NavItem className="">
               <NavLink to="#" className="nav-link">
@@ -142,13 +151,13 @@ class DefaultHeader extends Component {
             </NavItem>
           }
           {/* </Online> */}
-          <NavItem className="">
+          {/* <NavItem className="">
             <span className="nav-link">
               <a href={"../../../../src/ShowGuidanceHtmlFile/ShowGuidance.html"} target="_blank">
               <i class="nav-icon fa fa-compass ShowGuidanceIcon" title={'Show Guidance'}></i>
               </a>
             </span>
-          </NavItem>
+          </NavItem> */}
 
           <NavItem className="">
             <span className="nav-link">
