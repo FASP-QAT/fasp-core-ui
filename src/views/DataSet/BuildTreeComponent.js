@@ -778,7 +778,7 @@ export default class BuildTree extends Component {
         this.setState({
             [parameterName]: value
         }, () => {
-            if (parameterName == 'nodeId' && (value != null || value != 0)) {
+            if (parameterName == 'nodeId' && (value != null && value != 0)) {
                 var items = this.state.items;
                 var node = items.filter(n => n.id == value)[0];
                 (node.payload.nodeDataMap[this.state.selectedScenario])[0].nodeDataMomList = this.state.nodeDataMomList;
@@ -1720,7 +1720,7 @@ export default class BuildTree extends Component {
         var validation = this.checkValidation();
         if (validation == true) {
             this.setState({
-                loading: true
+                // loading: true
             })
             var tableJson = this.el.getJson(null, false);
             var data = this.state.currentScenario.nodeDataModelingList;
@@ -1783,15 +1783,9 @@ export default class BuildTree extends Component {
             curTreeObj.tree.flatList = items;
             var findTreeIndex = treeData.findIndex(n => n.treeId == curTreeObj.treeId);
             treeData[findTreeIndex] = curTreeObj;
-
-            // var databytes = CryptoJS.AES.decrypt(dataSetObj.programData, SECRET_KEY);
-            // var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
             var programData = dataSetObj.programData;
             programData.treeList = treeData;
             console.log("dataSetDecrypt>>>", programData);
-
-
-            // programData = (CryptoJS.AES.encrypt(JSON.stringify(programData), SECRET_KEY)).toString();
             dataSetObj.programData = programData;
 
             console.log("encpyDataSet>>>", dataSetObj)
@@ -1802,6 +1796,7 @@ export default class BuildTree extends Component {
                 // openAddNodeModal: false,
                 // activeTab1: new Array(2).fill('1')
             }, () => {
+                console.log("going to call MOM data");
                 this.calculateMOMData(0, 0);
             });
             // store update object in indexdb
