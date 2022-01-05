@@ -2644,8 +2644,8 @@ export default class BuildTree extends Component {
                     console.log("get payload 5", (itemConfig.payload.nodeDataMap[scenarioId])[0].fuNode);
                     if (itemConfig.payload.nodeType.id == 4) {
                         if ((itemConfig.payload.nodeDataMap[scenarioId])[0].fuNode.usageType.id == 2) {
-                            console.log("test---",(itemConfig.payload.nodeDataMap[scenarioId])[0].fuNode.usagePeriod.usagePeriodId);
-                            console.log("this.state.usagePeriodList---",this.state.usagePeriodList);
+                            console.log("test---", (itemConfig.payload.nodeDataMap[scenarioId])[0].fuNode.usagePeriod.usagePeriodId);
+                            console.log("this.state.usagePeriodList---", this.state.usagePeriodList);
                             return addCommas((itemConfig.payload.nodeDataMap[scenarioId])[0].displayDataValue) + "% of parent, " + (itemConfig.payload.nodeDataMap[scenarioId])[0].fuNode.noOfForecastingUnitsPerPerson + "/" + this.state.usagePeriodList.filter(x => x.usagePeriodId == (itemConfig.payload.nodeDataMap[scenarioId])[0].fuNode.usagePeriod.usagePeriodId)[0].label.label_en;
                         } else {
                             return addCommas((itemConfig.payload.nodeDataMap[scenarioId])[0].displayDataValue) + "% of parent";
@@ -6302,7 +6302,7 @@ export default class BuildTree extends Component {
                                                     valid={!errors.noOfPersons && this.state.currentItemConfig.context.payload.nodeType.id == 4 ? this.state.currentScenario.fuNode.noOfPersons != '' : !errors.noOfPersons}
                                                     invalid={touched.noOfPersons && !!errors.noOfPersons}
                                                     onBlur={handleBlur}
-                                                    readOnly={this.state.currentScenario.fuNode.usageType.id == 2 ? true : false}
+                                                    readOnly={this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentScenario.fuNode.usageType.id == 2 ? true : false}
                                                     onChange={(e) => {
                                                         handleChange(e);
                                                         this.dataChange(e)
@@ -6495,9 +6495,10 @@ export default class BuildTree extends Component {
                                                         // valid={!errors.usageFrequency && (this.state.currentItemConfig.context.payload.nodeType.id == 4 ? this.state.currentScenario.fuNode.usageFrequency != "" : false)}
                                                         // invalid={touched.usageFrequency && !!errors.usageFrequency}
                                                         // onBlur={handleBlur}
-                                                        onChange={(e) => { 
+                                                        onChange={(e) => {
                                                             // handleChange(e); 
-                                                            this.dataChange(e) }}
+                                                            this.dataChange(e)
+                                                        }}
                                                         value={this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentScenario.fuNode.usageType.id == 2 ? this.state.currentScenario.fuNode.usageFrequency : ""}></Input>
                                                     {/* <FormFeedback className="red">{errors.usageFrequency}</FormFeedback> */}
                                                 </FormGroup>
