@@ -407,7 +407,9 @@ export default class BuildTree extends Component {
             dataSetObj: {
                 programData: ''
             },
-            loading: false
+            loading: false,
+            modelingJexcelLoader: false,
+            momJexcelLoader: false,
         }
         this.onRemoveItem = this.onRemoveItem.bind(this);
         this.canDropItem = this.canDropItem.bind(this);
@@ -869,6 +871,9 @@ export default class BuildTree extends Component {
     }
 
     updateMomDataPerInDataSet() {
+        this.setState({
+            momJexcelLoader: true
+        });
         var json = this.state.momElPer.getJson(null, false);
         console.log("momData>>>", json);
         var overrideListArray = [];
@@ -962,6 +967,9 @@ export default class BuildTree extends Component {
         // nodeDataId,month,manualChangeValue,seconalityPer
     }
     updateMomDataInDataSet() {
+        this.setState({
+            momJexcelLoader: true
+        });
         var json = this.state.momEl.getJson(null, false);
         console.log("momData>>>", json);
         var overrideListArray = [];
@@ -1519,7 +1527,8 @@ export default class BuildTree extends Component {
         var validation = this.checkValidation();
         if (validation == true) {
             this.setState({
-                loading: true
+                loading: true,
+                modelingJexcelLoader: true
             })
             var tableJson = this.el.getJson(null, false);
             var data = this.state.currentScenario.nodeDataModelingList;
@@ -6329,7 +6338,18 @@ export default class BuildTree extends Component {
                         <div>
                             {this.state.showModelingJexcelNumber &&
                                 <> <div className="calculatorimg">
-                                    <div id="modelingJexcel" className={"RowClickable ScalingTable"}>
+                                    <div id="modelingJexcel" className={"RowClickable ScalingTable"} style={{ display: this.state.modelingJexcel ? "none" : "block" }}>
+                                    </div>
+                                    <div style={{ display: this.state.modelingJexcel ? "block" : "none" }}>
+                                        <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                            <div class="align-items-center">
+                                                <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+
+                                                <div class="spinner-border blue ml-4" role="status">
+
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                                     <div style={{ 'float': 'right', 'fontSize': '18px' }}><b>{i18n.t('static.supplyPlan.total')} : {this.state.scalingTotal != "" && addCommas(parseFloat(this.state.scalingTotal).toFixed(2))}</b></div><br /><br />
@@ -6633,7 +6653,18 @@ export default class BuildTree extends Component {
                                         </FormGroup>
                                     </div>
                                 </div>
-                                <div id="momJexcel">
+                                <div id="momJexcel" style={{ display: this.state.momJexcelLoader ? "none" : "block" }}>
+                                </div>
+                                <div style={{ display: this.state.momJexcelLoader ? "block" : "none" }}>
+                                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                        <div class="align-items-center">
+                                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+
+                                            <div class="spinner-border blue ml-4" role="status">
+
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div className="col-md-12 pr-lg-0">
                                     <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={() => {
@@ -6690,7 +6721,18 @@ export default class BuildTree extends Component {
                                 </div>
                                 <div className="pt-lg-2 pl-lg-0"><i>{i18n.t('static.tree.tableDisplays')} <b>{this.state.currentItemConfig.context.payload.nodeUnit.label != null ? getLabelText(this.state.currentItemConfig.context.payload.nodeUnit.label, this.state.lang) : ''}</b> {i18n.t('static.tree.forNode')} <b>{this.state.currentItemConfig.context.payload.label != null ? getLabelText(this.state.currentItemConfig.context.payload.label, this.state.lang) : ''}</b> {i18n.t('static.tree.asA%OfParent')} <b>{this.state.currentItemConfig.parentItem.payload.label != null ? getLabelText(this.state.currentItemConfig.parentItem.payload.label, this.state.lang) : ''}</b></i></div>
                                 {/* <div className="pt-lg-2 pl-lg-0"><i>Table displays <b>{getLabelText(this.state.currentItemConfig.context.payload.nodeUnit.label, this.state.lang)}</b></div> */}
-                                <div id="momJexcelPer" className={"RowClickable perNodeData FiltermomjexcelPer"}>
+                                <div id="momJexcelPer" className={"RowClickable perNodeData FiltermomjexcelPer"} style={{ display: this.state.momJexcelLoader ? "none" : "block" }}>
+                                </div>
+                                <div style={{ display: this.state.momJexcelLoader ? "block" : "none" }}>
+                                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                        <div class="align-items-center">
+                                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+
+                                            <div class="spinner-border blue ml-4" role="status">
+
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div className="col-md-12 pr-lg-0">
                                     <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={() => {
