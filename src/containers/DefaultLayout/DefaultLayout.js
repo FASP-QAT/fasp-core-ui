@@ -716,8 +716,8 @@ const routes = [
   { path: '/importFromQATSupplyPlan/listImportFromQATSupplyPlan/:color/:message', name: i18n.t('static.importFromQATSupplyPlan.importFromQATSupplyPlan'), component: ImportFromQATSupplyPlan },
   { path: '/importFromQATSupplyPlan/listImportFromQATSupplyPlan', exact: true, name: i18n.t('static.importFromQATSupplyPlan.importFromQATSupplyPlan'), component: ImportFromQATSupplyPlan },
 
-  { path: '/importIntoQATSupplyPlan/listImportIntoQATSupplyPlan/:color/:message', name: i18n.t('static.importIntoQATSupplyPlan.importIntoQATSupplyPlan'), component: ImportIntoQATSupplyPlan },
-  { path: '/importIntoQATSupplyPlan/listImportIntoQATSupplyPlan', exact: true, name: i18n.t('static.importIntoQATSupplyPlan.importIntoQATSupplyPlan'), component: ImportIntoQATSupplyPlan },
+  { path: '/importIntoQATSupplyPlan/listImportIntoQATSupplyPlan/:color/:message', name: 'Import Into Supply Plan', component: ImportIntoQATSupplyPlan },
+  { path: '/importIntoQATSupplyPlan/listImportIntoQATSupplyPlan', exact: true, name: 'Import Into Supply Plan', component: ImportIntoQATSupplyPlan },
 
   { path: '/planningUnitSetting/listPlanningUnitSetting/:color/:message', name: 'Planning Unit Settings', component: PlanningUnitSetting },
   { path: '/planningUnitSetting/listPlanningUnitSetting', exact: true, name: 'Planning Unit Settings', component: PlanningUnitSetting },

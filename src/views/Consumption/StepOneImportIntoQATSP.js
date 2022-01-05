@@ -561,9 +561,9 @@ export default class StepOneImportMapPlanningUnits extends Component {
     filterData() {
         let tempList = [];
         tempList.push({ id: 1, v1: "Condoms", v2: "Male Condom (Latex) Lubricated, No Logo, 53 mm, 4320 Pieces [6357]", v3: "Male Condom (Latex) Lubricated, No Logo, 53 mm, 3000 Pieces [4182]", v4: "0.6944" });
-        tempList.push({ id: 1, v1: "Condoms", v2: "Male Condom (Latex) Lubricated, No Logo, 53 mm, 1 Each [4181]", v3: "Male Condom (Latex) Lubricated, No Logo Red Strawberry, 53 mm, 3000 Pieces [4177]", v4: "3000" });
-        tempList.push({ id: 1, v1: "Condoms", v2: "Male Condom (Latex) Lubricated, Hot Pink No Logo, 53 mm, 1 Each [4850]", v3: "Do not import", v4: "" });
-
+        tempList.push({ id: 2, v1: "Condoms", v2: "Male Condom (Latex) Lubricated, No Logo, 53 mm, 1 Each [4181]", v3: "Male Condom (Latex) Lubricated, No Logo Red Strawberry, 53 mm, 3000 Pieces [4177]", v4: "3000" });
+        tempList.push({ id: 3, v1: "Condoms", v2: "Male Condom (Latex) Lubricated, Hot Pink No Logo, 53 mm, 1 Each [4850]", v3: "Do not import", v4: "" });
+        document.getElementById("stepOneBtn").disabled = false;
 
 
         this.setState({
@@ -874,7 +874,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 },
                 {
                     title: 'Id',
-                    type: 'text',
+                    type: 'hidden',
                     // readOnly: true//0 A
                 },
 
@@ -942,15 +942,18 @@ export default class StepOneImportMapPlanningUnits extends Component {
                     var elInstance = el.jexcel;
                     var rowData = elInstance.getRowData(y);
 
-                    // var id = rowData[9];
-                    // // console.log("addRowId------>", addRowId);
-                    // if (id == 1) {// grade out
-                    //     var cell1 = elInstance.getCell(`I${parseInt(y) + 1}`)
-                    //     cell1.classList.add('readonly');
-                    // } else {
-                    //     var cell1 = elInstance.getCell(`I${parseInt(y) + 1}`)
-                    //     cell1.classList.remove('readonly');
-                    // }
+                    var doNotImport = rowData[4];
+                    if (doNotImport == 3) {// grade out
+
+                        elInstance.setStyle(`C${parseInt(y) + 1}`, 'background-color', 'transparent');
+                        elInstance.setStyle(`C${parseInt(y) + 1}`, 'background-color', '#f48282');
+                        let textColor = contrast('#f48282');
+                        elInstance.setStyle(`C${parseInt(y) + 1}`, 'color', textColor);
+
+                        elInstance.setStyle(`D${parseInt(y) + 1}`, 'background-color', 'transparent');
+                        elInstance.setStyle(`D${parseInt(y) + 1}`, 'background-color', '#f48282');
+                        elInstance.setStyle(`D${parseInt(y) + 1}`, 'color', textColor);
+                    }
 
                     //     var match = rowData[9];
                     //     // console.log("addRowId------>", addRowId);
@@ -1004,7 +1007,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
             allowInsertColumn: false,
             allowManualInsertColumn: false,
             // allowDeleteRow: true,
-            onchange: this.changed,
+            // onchange: this.changed,
             // oneditionend: this.onedit,
             copyCompatibility: true,
             allowManualInsertRow: false,
@@ -1193,87 +1196,87 @@ export default class StepOneImportMapPlanningUnits extends Component {
 
 
     formSubmit = function () {
+        // var validation = this.checkValidation();
+        // console.log("validation------->", validation)
+        // if (validation == true) {
+        //     // this.setState({ loading: true })
+        //     var tableJson = this.el.getJson(null, false);
+        //     console.log("tableJson---", tableJson);
+        //     let changedpapuList = [];
+        //     for (var i = 0; i < tableJson.length; i++) {
+        //         var map1 = new Map(Object.entries(tableJson[i]));
 
-        var validation = this.checkValidation();
-        console.log("validation------->", validation)
-        if (validation == true) {
-            // this.setState({ loading: true })
-            var tableJson = this.el.getJson(null, false);
-            console.log("tableJson---", tableJson);
-            let changedpapuList = [];
-            for (var i = 0; i < tableJson.length; i++) {
-                var map1 = new Map(Object.entries(tableJson[i]));
+        //         let json = {
 
-                let json = {
-
-                    supplyPlanPlanningUnitId: parseInt(map1.get("0")),
-                    forecastPlanningUnitId: parseInt(map1.get("6")),
-                    multiplier: map1.get("8").toString().replace(/,/g, ""),
+        //             supplyPlanPlanningUnitId: parseInt(map1.get("0")),
+        //             forecastPlanningUnitId: parseInt(map1.get("6")),
+        //             multiplier: map1.get("8").toString().replace(/,/g, ""),
 
 
-                    // capacityCbm: map1.get("2").replace(",", ""),
-                    // capacityCbm: map1.get("2").replace(/,/g, ""),
-                    // capacityCbm: this.el.getValueFromCoords(2, i).toString().replace(/,/g, ""),
-                    // capacityCbm: this.el.getValue(`C${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
-                    // gln: (map1.get("3") === '' ? null : map1.get("3")),
-                    // active: map1.get("4"),
-                    // realmCountry: {
-                    //     realmCountryId: parseInt(map1.get("5"))
-                    // },
-                    // regionId: parseInt(map1.get("6"))
-                }
-                changedpapuList.push(json);
+        //             // capacityCbm: map1.get("2").replace(",", ""),
+        //             // capacityCbm: map1.get("2").replace(/,/g, ""),
+        //             // capacityCbm: this.el.getValueFromCoords(2, i).toString().replace(/,/g, ""),
+        //             // capacityCbm: this.el.getValue(`C${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+        //             // gln: (map1.get("3") === '' ? null : map1.get("3")),
+        //             // active: map1.get("4"),
+        //             // realmCountry: {
+        //             //     realmCountryId: parseInt(map1.get("5"))
+        //             // },
+        //             // regionId: parseInt(map1.get("6"))
+        //         }
+        //         changedpapuList.push(json);
 
-            }
-            this.setState({
-                stepOneData: changedpapuList,
+        //     }
+        //     this.setState({
+        //         stepOneData: changedpapuList,
 
-            }, () => {
-                this.props.finishedStepOne();
-            })
-            console.log("FINAL SUBMIT changedpapuList---", changedpapuList);
-            this.props.updateStepOneData("stepOneData", changedpapuList);
+        //     }, () => {
+        //         this.props.finishedStepOne();
+        //     })
+        //     console.log("FINAL SUBMIT changedpapuList---", changedpapuList);
+        //     this.props.updateStepOneData("stepOneData", changedpapuList);
 
-        } else {
-            console.log("Something went wrong");
-        }
+        // } else {
+        //     console.log("Something went wrong");
+        // }
+        this.props.finishedStepOne();
     }
 
     render() {
         const { rangeValue } = this.state
 
-        const { programs } = this.state;
-        let programList = programs.length > 0
-            && programs.map((item, i) => {
-                return (
-                    <option key={i} value={item.programId}>
-                        {getLabelText(item.label, this.state.lang)}
-                    </option>
-                )
-            }, this);
+        // const { programs } = this.state;
+        // let programList = programs.length > 0
+        //     && programs.map((item, i) => {
+        //         return (
+        //             <option key={i} value={item.programId}>
+        //                 {getLabelText(item.label, this.state.lang)}
+        //             </option>
+        //         )
+        //     }, this);
 
 
-        const { versions } = this.state;
-        let versionList = versions.length > 0
-            && versions.map((item, i) => {
-                return (
-                    <option key={i} value={item.versionId}>
-                        {/* {item.versionId} */}
-                        {((item.versionStatus.id == 2 && item.versionType.id == 2) ? item.versionId + '*' : item.versionId)}
-                    </option>
-                )
-            }, this);
+        // const { versions } = this.state;
+        // let versionList = versions.length > 0
+        //     && versions.map((item, i) => {
+        //         return (
+        //             <option key={i} value={item.versionId}>
+        //                 {/* {item.versionId} */}
+        //                 {((item.versionStatus.id == 2 && item.versionType.id == 2) ? item.versionId + '*' : item.versionId)}
+        //             </option>
+        //         )
+        //     }, this);
 
 
-        const { datasetList } = this.state;
-        let datasets = datasetList.length > 0
-            && datasetList.map((item, i) => {
-                return (
-                    <option key={i} value={item.programId}>
-                        {item.programCode + '~' + item.versionId}
-                    </option>
-                )
-            }, this);
+        // const { datasetList } = this.state;
+        // let datasets = datasetList.length > 0
+        //     && datasetList.map((item, i) => {
+        //         return (
+        //             <option key={i} value={item.programId}>
+        //                 {item.programCode + '~' + item.versionId}
+        //             </option>
+        //         )
+        //     }, this);
 
         return (
             <>
@@ -1282,7 +1285,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
 
                 <div style={{ display: this.props.items.loading ? "none" : "block" }} >
                     <div className="row ">
-                        <FormGroup className="col-md-4">                            
+                        <FormGroup className="col-md-4">
                             {/* <Label htmlFor="appendedInputButton">{i18n.t('static.importFromQATSupplyPlan.supplyPlanProgram')}</Label> */}
                             <Label htmlFor="appendedInputButton">Forecast Program</Label>
                             <div className="controls ">
@@ -1292,10 +1295,11 @@ export default class StepOneImportMapPlanningUnits extends Component {
                                         name="programId"
                                         id="programId"
                                         bsSize="sm"
-                                        // onChange={(e) => { this.setProgramId(e); }}
-                                        // value={this.state.programId}
+                                    // onChange={(e) => { this.setProgramId(e); }}
+                                    // value={this.state.programId}
                                     >
                                         <option value="0">{i18n.t('static.common.select')}</option>
+                                        <option value="1">TZA-CON/ARV-MOH</option>
                                         {/* {programList} */}
 
                                     </Input>
@@ -1314,10 +1318,11 @@ export default class StepOneImportMapPlanningUnits extends Component {
                                         name="versionId"
                                         id="versionId"
                                         bsSize="sm"
-                                        // onChange={(e) => { this.setVersionId(e); }}
-                                        // value={this.state.versionId}
+                                    // onChange={(e) => { this.setVersionId(e); }}
+                                    // value={this.state.versionId}
                                     >
                                         <option value="0">{i18n.t('static.common.select')}</option>
+                                        <option value="1">1</option>
                                         {/* {versionList} */}
                                     </Input>
 
@@ -1335,10 +1340,11 @@ export default class StepOneImportMapPlanningUnits extends Component {
                                         name="forecastProgramId"
                                         id="forecastProgramId"
                                         bsSize="sm"
-                                        // onChange={(e) => { this.setForecastProgramId(e); }}
-                                        // value={this.state.forecastProgramId}
+                                    // onChange={(e) => { this.setForecastProgramId(e); }}
+                                    // value={this.state.forecastProgramId}
                                     >
                                         <option value="0">{i18n.t('static.common.select')}</option>
+                                        <option value="1">Tanzania ARV</option>
                                         {/* {datasets} */}
                                     </Input>
 
