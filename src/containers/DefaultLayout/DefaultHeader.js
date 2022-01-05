@@ -144,7 +144,7 @@ class DefaultHeader extends Component {
           {/* </Online> */}
           <NavItem className="">
             <span className="nav-link">
-              <a href={"/#/ShowGuidance/"} target="_blank">
+              <a href={"../../../../src/ShowGuidanceHtmlFile/ShowGuidance.html"} target="_blank">
               <i class="nav-icon fa fa-compass ShowGuidanceIcon" title={'Show Guidance'}></i>
               </a>
             </span>
