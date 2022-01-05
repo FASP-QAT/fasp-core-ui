@@ -3,7 +3,7 @@ import moment from 'moment';
 import { getDatabase } from '../../CommonComponent/IndexedDbFunctions.js';
 import { SECRET_KEY, CANCELLED_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, SUBMITTED_SHIPMENT_STATUS, APPROVED_SHIPMENT_STATUS, SHIPPED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, DELIVERED_SHIPMENT_STATUS, ON_HOLD_SHIPMENT_STATUS, FIRST_DATA_ENTRY_DATE, TBD_PROCUREMENT_AGENT_ID, ACTUAL_CONSUMPTION_TYPE, FORCASTED_CONSUMPTION_TYPE, INDEXED_DB_NAME, INDEXED_DB_VERSION, QAT_DATA_SOURCE_ID, NOTES_FOR_QAT_ADJUSTMENTS, ACTUAL_CONSUMPTION_DATA_SOURCE_TYPE, BATCH_PREFIX } from '../../Constants.js'
 
-export function calculateModelingData(dataset, props, page, nodeId, scenarioId,type) {
+export function calculateModelingData(dataset, props, page, nodeId, scenarioId,type,treeId) {
     console.log("modelling dataset---",dataset);
     console.log("modelling scenarioId---",scenarioId);
     
@@ -21,6 +21,9 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId,t
         var startDate = moment(datasetJson.currentVersion.forecastStartDate).format("YYYY-MM-DD");
         var stopDate = moment(datasetJson.currentVersion.forecastStopDate).format("YYYY-MM-DD");
         var treeList = datasetJson.treeList;
+        if(treeId!=-1){
+            treeList=treeList.filter(c=>c.treeId==treeId);
+        }
         for (var tl = 0; tl < treeList.length; tl++) {
             var tree = treeList[tl];
             var flatListUnsorted = tree.tree.flatList;
