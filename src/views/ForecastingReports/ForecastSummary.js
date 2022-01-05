@@ -1549,7 +1549,7 @@ class ForecastSummary extends Component {
                                             </div> */}
                                             <div className="table-responsive">
                                                 {this.state.summeryData.length > 0 && this.state.displayId == 1 &&
-                                                    <Table className="table-striped table-bordered text-center mt-2">
+                                                    <Table className="table-bordered text-center mt-2">
                                                         {/* <Table className="table-bordered text-center mt-2 overflowhide main-table "> */}
 
                                                         <thead>
