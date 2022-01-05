@@ -5545,7 +5545,7 @@ export default class CreateTreeTemplate extends Component {
                                                         this.setState({
                                                             treeTemplate: response.data,
                                                             items,
-                                                            message: i18n.t(response.data.messageCode, { entityname }),
+                                                            message: i18n.t('static.message.addTreeTemplate'),
                                                             loading: false
                                                         }, () => {
                                                             console.log(">>>", new Date('2021-01-01').getFullYear(), "+", ("0" + (new Date('2021-12-01').getMonth() + 1)).slice(-2));
@@ -5605,8 +5605,9 @@ export default class CreateTreeTemplate extends Component {
                                             console.log("templateObj for update>>>", templateObj);
                                             DatasetService.updateTreeTemplate(templateObj)
                                                 .then(response => {
-                                                    console.log("after updating tree---", response.data);
+                                                    console.log("after updating tree---", response);
                                                     if (response.status == 200) {
+                                                        console.log("message---",i18n.t(response.data.messageCode, { entityname }));
                                                         var items = response.data.flatList;
                                                         var arr = [];
                                                         for (let i = 0; i < items.length; i++) {
@@ -5624,10 +5625,11 @@ export default class CreateTreeTemplate extends Component {
                                                             console.log("load---", items[i])
                                                             // arr.push(items[i]);
                                                         }
+                                                        console.log("message---",i18n.t(response.data.messageCode, { entityname }));
                                                         this.setState({
                                                             treeTemplate: response.data,
                                                             items,
-                                                            message: i18n.t(response.data.messageCode, { entityname }),
+                                                            message: i18n.t('static.message.editTreeTemplate'),
                                                             loading: false
                                                         }, () => {
                                                             console.log(">>>", new Date('2021-01-01').getFullYear(), "+", ("0" + (new Date('2021-12-01').getMonth() + 1)).slice(-2));

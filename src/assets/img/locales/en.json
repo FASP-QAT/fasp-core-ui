@@ -1986,5 +1986,7 @@
     "static.supplyPlanFormula.maxMonthOfStockEx5": "Max = 7",
     "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18 )",
     "static.report.exportWordDoc":"Export to word doc",
-    "static.message.invalidStringLength":"Version Notes should not exceed 1000 characters"
+    "static.message.invalidStringLength":"Version Notes should not exceed 1000 characters",
+    "static.message.addTreeTemplate":"Tree Template Added Successfully",
+    "static.message.editTreeTemplate":"Tree Template Updated Successfully"
 }
