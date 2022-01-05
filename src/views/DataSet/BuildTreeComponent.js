@@ -409,7 +409,7 @@ export default class BuildTree extends Component {
             scenarioList: [],
             regionList: [],
             curTreeObj: {
-                forecastMethod: { id: '' },
+                forecastMethod: { id: "" },
                 label: { label_en: '' },
                 notes: '',
                 regionList: [],
@@ -550,7 +550,9 @@ export default class BuildTree extends Component {
             dataSetObj: {
                 programData: ''
             },
-            loading: false
+            loading: false,
+            modelingJexcelLoader: false,
+            momJexcelLoader: false,
         }
         this.onRemoveItem = this.onRemoveItem.bind(this);
         this.canDropItem = this.canDropItem.bind(this);
@@ -659,7 +661,7 @@ export default class BuildTree extends Component {
         programData.treeList = treeData;
         dataSetObj.programData = programData;
         console.log("dataSetDecrypt>>>", dataSetObj);
-        calculateModelingData(dataSetObj, this, '', (nodeId != 0 ? nodeId : this.state.currentItemConfig.context.id), this.state.selectedScenario, type);
+        calculateModelingData(dataSetObj, this, '', (nodeId != 0 ? nodeId : this.state.currentItemConfig.context.id), this.state.selectedScenario, type, this.state.treeId);
     }
     fetchTracerCategoryList(programData) {
         console.log("programData---%%%%%%%", programData);
@@ -942,7 +944,7 @@ export default class BuildTree extends Component {
             var tempArray = [];
             var tempJson = {
                 notes: '',
-                month: '',
+                month: new Date(),
                 dataValue: "",
                 calculatedDataValue: '',
                 displayDataValue: '',
@@ -1171,14 +1173,18 @@ export default class BuildTree extends Component {
     //     // nodeDataId,month,manualChangeValue,seconalityPer
     // }
     updateMomDataInDataSet() {
+        this.setState({
+            momJexcelLoader: true
+        });
         let { dataSetObj } = this.state;
-        var programData = dataSetObj.programData;
+        var dataSetObjCopy = JSON.parse(JSON.stringify(dataSetObj));
+        var programData = dataSetObjCopy.programData;
         console.log("dataSetDecrypt>>>", programData);
 
         programData = (CryptoJS.AES.encrypt(JSON.stringify(programData), SECRET_KEY)).toString();
-        dataSetObj.programData = programData;
+        dataSetObjCopy.programData = programData;
 
-        console.log("encpyDataSet>>>", dataSetObj)
+        console.log("encpyDataSet>>>", dataSetObjCopy)
         // store update object in indexdb
         var db1;
         getDatabase();
@@ -1195,22 +1201,16 @@ export default class BuildTree extends Component {
             var transaction = db1.transaction(['datasetData'], 'readwrite');
             var programTransaction = transaction.objectStore('datasetData');
             // programs.forEach(program => {
-            var programRequest = programTransaction.put(dataSetObj);
+            var programRequest = programTransaction.put(dataSetObjCopy);
             console.log("---hurrey---");
             // })
             transaction.oncomplete = function (event) {
                 // calculateModelingData(dataSetObj,'');
                 console.log("all good >>>>");
 
-                // this.setState({
-                //     loading: false,
-                //     message: i18n.t('static.mt.dataUpdateSuccess'),
-                //     color: "green",
-                //     isChanged: false
-                // }, () => {
-                //     this.hideSecondComponent();
-                //     this.buildJExcel();
-                // });
+                this.setState({
+                    momJexcelLoader: false
+                });
                 console.log("Data update success");
             }.bind(this);
             transaction.onerror = function (event) {
@@ -1720,7 +1720,7 @@ export default class BuildTree extends Component {
         var validation = this.checkValidation();
         if (validation == true) {
             this.setState({
-                // loading: true
+                modelingJexcelLoader: true
             })
             var tableJson = this.el.getJson(null, false);
             var data = this.state.currentScenario.nodeDataModelingList;
@@ -1971,6 +1971,8 @@ export default class BuildTree extends Component {
         console.log("scalingTotal---", scalingTotal);
         this.setState({
             scalingTotal
+        },()=>{
+            // this.filterScalingDataByMonth(this.state.scalingMonth);
         });
     }
     acceptValue() {
@@ -2568,7 +2570,7 @@ export default class BuildTree extends Component {
             programData.treeList = treeData;
             // dataSetObj.programData = programData;
             console.log("dataSetDecrypt>>>", programData);
-            calculateModelingData(dataSetObj, this, '', currentItemConfig.context.id, this.state.selectedScenario, 1);
+            calculateModelingData(dataSetObj, this, '', currentItemConfig.context.id, this.state.selectedScenario, 1, this.state.treeId);
         });
 
     }.bind(this);
@@ -2618,7 +2620,7 @@ export default class BuildTree extends Component {
             //  dataSetObj.programData = programData;
 
             console.log("encpyDataSet>>>", dataSetObj)
-            calculateModelingData(dataSetObj, this, '', currentItemConfig.context.id, this.state.selectedScenario, 1);
+            calculateModelingData(dataSetObj, this, '', currentItemConfig.context.id, this.state.selectedScenario, 1, this.state.treeId);
         });
     }.bind(this);
     changed = function (instance, cell, x, y, value) {
@@ -3203,7 +3205,13 @@ export default class BuildTree extends Component {
             });
         } else {
             this.setState({
-                curTreeObj: [],
+                curTreeObj: {
+                    forecastMethod: { id: "" },
+                    label: { label_en: '' },
+                    notes: '',
+                    regionList: [],
+                    active: true
+                },
                 scenarioList: [],
                 // regionList: [],
                 items: [],
@@ -6790,7 +6798,18 @@ export default class BuildTree extends Component {
                         <div>
                             {this.state.showModelingJexcelNumber &&
                                 <> <div className="calculatorimg">
-                                    <div id="modelingJexcel" className={"RowClickable ScalingTable"}>
+                                    <div id="modelingJexcel" className={"RowClickable ScalingTable"} style={{ display: this.state.modelingJexcelLoader ? "none" : "block" }}>
+                                    </div>
+                                    <div style={{ display: this.state.modelingJexcelLoader ? "block" : "none" }}>
+                                        <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                            <div class="align-items-center">
+                                                <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+
+                                                <div class="spinner-border blue ml-4" role="status">
+
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                                     <div style={{ 'float': 'right', 'fontSize': '18px' }}><b>{i18n.t('static.supplyPlan.total')} : {this.state.scalingTotal != "" && addCommas(parseFloat(this.state.scalingTotal).toFixed(2))}</b></div><br /><br />
@@ -7094,7 +7113,18 @@ export default class BuildTree extends Component {
                                         </FormGroup>
                                     </div>
                                 </div>
-                                <div id="momJexcel">
+                                <div id="momJexcel" style={{ display: this.state.momJexcelLoader ? "none" : "block" }}>
+                                </div>
+                                <div style={{ display: this.state.momJexcelLoader ? "block" : "none" }}>
+                                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                        <div class="align-items-center">
+                                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+
+                                            <div class="spinner-border blue ml-4" role="status">
+
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div className="col-md-12 pr-lg-0">
                                     <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={() => {
@@ -7151,7 +7181,18 @@ export default class BuildTree extends Component {
                                 </div>
                                 <div className="pt-lg-2 pl-lg-0"><i>{i18n.t('static.tree.tableDisplays')} <b>{this.state.currentItemConfig.context.payload.nodeUnit.label != null ? getLabelText(this.state.currentItemConfig.context.payload.nodeUnit.label, this.state.lang) : ''}</b> {i18n.t('static.tree.forNode')} <b>{this.state.currentItemConfig.context.payload.label != null ? getLabelText(this.state.currentItemConfig.context.payload.label, this.state.lang) : ''}</b> {i18n.t('static.tree.asA%OfParent')} <b>{this.state.currentItemConfig.parentItem.payload.label != null ? getLabelText(this.state.currentItemConfig.parentItem.payload.label, this.state.lang) : ''}</b></i></div>
                                 {/* <div className="pt-lg-2 pl-lg-0"><i>Table displays <b>{getLabelText(this.state.currentItemConfig.context.payload.nodeUnit.label, this.state.lang)}</b></div> */}
-                                <div id="momJexcelPer" className={"RowClickable perNodeData FiltermomjexcelPer"}>
+                                <div id="momJexcelPer" className={"RowClickable perNodeData FiltermomjexcelPer"} style={{ display: this.state.momJexcelLoader ? "none" : "block" }}>
+                                </div>
+                                <div style={{ display: this.state.momJexcelLoader ? "block" : "none" }}>
+                                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                        <div class="align-items-center">
+                                            <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+
+                                            <div class="spinner-border blue ml-4" role="status">
+
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div className="col-md-12 pr-lg-0">
                                     <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={() => {
