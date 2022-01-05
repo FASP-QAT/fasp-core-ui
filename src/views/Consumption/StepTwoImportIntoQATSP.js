@@ -193,10 +193,10 @@ export default class StepTwoImportMapPlanningUnits extends Component {
 
     filterData() {
         let tempList = [];
-        tempList.push({ id: 1, v1: 'North', v2: '50%', v3: 'North' });
-        tempList.push({ id: 2, v1: 'North', v2: '50%', v3: 'North' });
-        tempList.push({ id: 3, v1: 'South', v2: '100%', v3: 'South' });
-        tempList.push({ id: 4, v1: 'South', v2: '100%', v3: 'South' });
+        tempList.push({ id: 1, v1: 'North - province 1', v2: '50%', v3: 'North' });
+        tempList.push({ id: 2, v1: 'North - province 2', v2: '50%', v3: 'North' });
+        tempList.push({ id: 3, v1: 'South - province 3', v2: '100%', v3: 'South' });
+        tempList.push({ id: 4, v1: 'South - province 4', v2: '100%', v3: 'South' });
 
 
 
