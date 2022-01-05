@@ -1380,14 +1380,14 @@ class ForecastSummary extends Component {
                             </div>
                         }
                     </div>
-                    <div className="Card-header-reporticon">
-                        <div className="card-header-actions">
+                    <div className="Card-header-reporticon ">
+                        <div className="card-header-actions BacktoLink">
                             <a className="card-header-action">
-                                back to <span style={{ cursor: 'pointer' }} onClick={() => { this.backToMonthlyForecast() }}><small className="supplyplanformulas">Monthly Forecast</small></span>
+                                Back to <span style={{ cursor: 'pointer' }} onClick={() => { this.backToMonthlyForecast() }}><small className="supplyplanformulas">Monthly Forecast</small></span>
                             </a>
                         </div>
                     </div>
-                    <CardBody className="pb-lg-2 pt-lg-0 ">
+                    <CardBody className="pb-lg-2 pt-lg-1 ">
                         <div>
                             <div ref={ref}>
                                 <Form >
@@ -1534,12 +1534,12 @@ class ForecastSummary extends Component {
                                         </div>
                                     </div>
                                 </Form>
-                                <Col md="12 pl-0" style={{ display: this.state.loading ? "none" : "block" }}>
-                                    <div className="row">
+                                <Col md="12" className="pl-lg-0" style={{ display: this.state.loading ? "none" : "block" }}>
+                                    <div>
                                         <p>nbnnfjjdf</p>
                                     </div>
                                 </Col>
-                                <Col md="12 pl-0" style={{ display: this.state.loading ? "none" : "block" }}>
+                                <Col md="12" className='pl-lg-0' style={{ display: this.state.loading ? "none" : "block" }}>
                                     <div className="row">
                                         <div className="col-md-12 pl-0 pr-0">
                                             {/* <div className="shipmentconsumptionSearchMarginTop" style={{ display: this.state.loading ? "none" : "block" }}>
@@ -1549,7 +1549,7 @@ class ForecastSummary extends Component {
                                             </div> */}
                                             <div className="table-responsive">
                                                 {this.state.summeryData.length > 0 && this.state.displayId == 1 &&
-                                                    <Table className="table-striped table-bordered text-center mt-2">
+                                                    <Table className="table-bordered text-center mt-2">
                                                         {/* <Table className="table-bordered text-center mt-2 overflowhide main-table "> */}
 
                                                         <thead>
