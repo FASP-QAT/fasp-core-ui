@@ -464,7 +464,7 @@ class ForecastSummary extends Component {
                                 let tempProcurementGap = ((planningUnitList[j].stock + planningUnitList[j].existingShipments) - totalForecastedQuantity0ri) - (planningUnitList[j].monthsOfStock * totalForecastedQuantity0ri / total_months);
                                 let procurementGap = (tempProcurementGap < 0 ? '(' + tempProcurementGap + ')' : tempProcurementGap);
                                 let isProcurementGapRed = (procurementGap < 0 ? true : false)
-                                let priceType = (planningUnitList[j].procurementAgent == null && planningUnitList[j].price == null ? 'No price type available' : (planningUnitList[j].procurementAgent != null ? planningUnitList[j].procurementAgent.label.label_en : 'Custom'));
+                                let priceType = (planningUnitList[j].procurementAgent == null && planningUnitList[j].price == null ? 'No price type available' : (planningUnitList[j].procurementAgent != null ? planningUnitList[j].procurementAgent.code : 'Custom'));
                                 let isPriceTypeRed = (planningUnitList[j].procurementAgent == null && planningUnitList[j].price == null ? true : false);
                                 let unitPrice = planningUnitList[j].price;
                                 let procurementNeeded = (isProcurementGapRed == true ? '$ ' + tempProcurementGap * unitPrice : '');
@@ -567,7 +567,7 @@ class ForecastSummary extends Component {
                                         }
                                     }
                                     var columns = [];
-                                    columns.push({ title: "Forecasting Unit", type: 'text', width: 100, readOnly: true });
+                                    columns.push({ title: "Forecasting Unit", type: 'hidden', width: 100, readOnly: true });
                                     columns.push({ title: "Planning Unit", type: 'hidden', width: 100, readOnly: true });
                                     columns.push({ title: "Planning Unit", type: 'text', width: 100, readOnly: true });
                                     for (var k = 0; k < regRegionList.length; k++) {
@@ -578,13 +578,13 @@ class ForecastSummary extends Component {
                                     columns.push({ title: "type", type: 'hidden', width: 100, readOnly: true });
                                     columns.push({ title: "Total Forecasted Qunatity", type: 'numeric', textEditor: true, mask: '#,##.00', decimal: '.', width: 100, readOnly: true });
                                     let nestedHeaders = [];
-                                    nestedHeaders.push(
-                                        {
-                                            title: '',
-                                            colspan: '1'
-                                        },
+                                    // nestedHeaders.push(
+                                    //     {
+                                    //         title: '',
+                                    //         colspan: '1'
+                                    //     },
 
-                                    );
+                                    // );
                                     nestedHeaders.push(
                                         {
                                             title: '',
@@ -1014,8 +1014,8 @@ class ForecastSummary extends Component {
                 { title: "Desired End of Period Stock (in PU)", type: 'numeric', mask: '#,##', decimal: '.', readOnly: true, width: 100 },
                 { title: "Shipment gap", type: 'numeric', mask: '#,##', decimal: '.', readOnly: true, width: 100 },
                 { title: "Price type", type: 'dropdown', width: 100, source: [{ id: 1, name: "Dataset" }, { id: 2, name: "GHSC-PSM*" }, { id: 3, name: "Global Fund*" }] },
-                { title: "PU (unit $)", type: 'numeric', mask: '#,##.00', decimal: '.', readOnly: true, width: 100 },
-                { title: "Procurements Needed PU (total $)", type: 'numeric', mask: '#,##.00', decimal: '.', readOnly: true, width: 100 }
+                { title: "PU (unit USD)", type: 'numeric', mask: '#,##.00', decimal: '.', readOnly: true, width: 100 },
+                { title: "Procurements Needed PU (total USD)", type: 'numeric', mask: '#,##.00', decimal: '.', readOnly: true, width: 100 }
 
 
             ],
@@ -1571,10 +1571,10 @@ class ForecastSummary extends Component {
                                                                 {!this.state.hideColumn &&
                                                                     <>
                                                                         <th className="text-center" style={{}}>Price Type</th>
-                                                                        <th className="text-center" style={{}}>Unit Price ($)</th>
+                                                                        <th className="text-center" style={{}}>Unit Price (USD)</th>
                                                                     </>
                                                                 }
-                                                                <th className="text-center" style={{}}>Procurements Needed ($)</th>
+                                                                <th className="text-center" style={{}}>Procurements Needed (USD)</th>
                                                                 <th className="text-center" style={{ width: '20%' }}>Notes</th>
 
                                                             </tr>
