@@ -6801,7 +6801,7 @@ export default class BuildTree extends Component {
                             </Picker>
                         </FormGroup>
 
-                        <div>
+                        <div className="col-md-12">
                             {this.state.showModelingJexcelNumber &&
                                 <> <div className="calculatorimg">
                                     <div id="modelingJexcel" className={"RowClickable ScalingTable"} style={{ display: this.state.modelingJexcelLoader ? "none" : "block" }}>
@@ -7119,7 +7119,9 @@ export default class BuildTree extends Component {
                                         </FormGroup>
                                     </div>
                                 </div>
-                                <div id="momJexcel" style={{ display: this.state.momJexcelLoader ? "none" : "block" }}>
+                                <div className="col-md-12 pl-lg-0 pr-lg-0" style={{display:'inline-block'}}>
+                                <div id="momJexcel" className="RowClickable" style={{ display: this.state.momJexcelLoader ? "none" : "block" }}>
+                                </div>
                                 </div>
                                 <div style={{ display: this.state.momJexcelLoader ? "block" : "none" }}>
                                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
@@ -7132,6 +7134,7 @@ export default class BuildTree extends Component {
                                         </div>
                                     </div>
                                 </div>
+                            
                                 <div className="col-md-12 pr-lg-0">
                                     <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={() => {
                                         this.setState({ showMomData: false })
@@ -7187,7 +7190,9 @@ export default class BuildTree extends Component {
                                 </div>
                                 <div className="pt-lg-2 pl-lg-0"><i>{i18n.t('static.tree.tableDisplays')} <b>{this.state.currentItemConfig.context.payload.nodeUnit.label != null ? getLabelText(this.state.currentItemConfig.context.payload.nodeUnit.label, this.state.lang) : ''}</b> {i18n.t('static.tree.forNode')} <b>{this.state.currentItemConfig.context.payload.label != null ? getLabelText(this.state.currentItemConfig.context.payload.label, this.state.lang) : ''}</b> {i18n.t('static.tree.asA%OfParent')} <b>{this.state.currentItemConfig.parentItem.payload.label != null ? getLabelText(this.state.currentItemConfig.parentItem.payload.label, this.state.lang) : ''}</b></i></div>
                                 {/* <div className="pt-lg-2 pl-lg-0"><i>Table displays <b>{getLabelText(this.state.currentItemConfig.context.payload.nodeUnit.label, this.state.lang)}</b></div> */}
+                                <div className="col-md-12 pl-lg-0 pr-lg-0" style={{display:'inline-block'}}>
                                 <div id="momJexcelPer" className={"RowClickable perNodeData FiltermomjexcelPer"} style={{ display: this.state.momJexcelLoader ? "none" : "block" }}>
+                                </div>
                                 </div>
                                 <div style={{ display: this.state.momJexcelLoader ? "block" : "none" }}>
                                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >

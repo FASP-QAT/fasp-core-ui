@@ -239,7 +239,7 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                     props.updateState("nodeId", nodeId);
                     props.updateState("type", type);
                     props.updateState("loading", false);
-                    props.updateState("modelingJexcelLoader", false);
+                    // props.updateState("modelingJexcelLoader", false);
                     props.updateState("momJexcelLoader", false);
 
 
