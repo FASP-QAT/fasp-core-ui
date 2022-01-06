@@ -732,7 +732,7 @@ export default class BuildTree extends Component {
         var scenarioId = scenarioId;
         var arr = [];
         var currentScenario;
-        console.log("items***&---",items);
+        console.log("items***&---", items);
         for (let i = 0; i < items.length; i++) {
             console.log("&&&&item---", items[i]);
             console.log("current item --->", items[i].payload.nodeDataMap[scenarioId][0]);
@@ -1972,7 +1972,7 @@ export default class BuildTree extends Component {
         console.log("scalingTotal---", scalingTotal);
         this.setState({
             scalingTotal
-        },()=>{
+        }, () => {
             // this.filterScalingDataByMonth(this.state.scalingMonth);
         });
     }
@@ -2762,65 +2762,90 @@ export default class BuildTree extends Component {
         var scenarioId = document.getElementById('scenarioId').value;
         // this.state.selectedScenario;
         if (data != null && data[scenarioId] != null && (data[scenarioId])[0] != null) {
-            if (itemConfig.payload.nodeType.id == 1 || itemConfig.payload.nodeType.id == 2) {
-                if (type == 1) {
-                    console.log("get payload 1--->", (itemConfig.payload.nodeDataMap[scenarioId])[0]);
-                    console.log("get payload 1--->>>", (itemConfig.payload.nodeDataMap[scenarioId])[0].displayDataValue);
-                    return addCommas((itemConfig.payload.nodeDataMap[scenarioId])[0].displayDataValue);
-                } else if (type == 3) {
-                    console.log("get payload 2");
-                    var childList = this.state.items.filter(c => c.parent == itemConfig.id && (c.payload.nodeType.id == 3 || c.payload.nodeType.id == 4 || c.payload.nodeType.id == 5));
-                    console.log("Child List+++", childList);
-                    if (childList.length > 0) {
-                        var sum = 0;
-                        childList.map(c => {
-                            sum += Number((c.payload.nodeDataMap[scenarioId])[0].displayDataValue)
-                        })
-                        return sum.toFixed(2);
+            if (type == 4) {
+                var result = false;
+                if (itemConfig.payload.nodeDataMap[this.state.selectedScenario][0].nodeDataModelingList.length > 0) {
+                    result = true;
+                } else {
+                    var arr = this.state.items.filter(x => x.level == itemConfig.level && x.id != itemConfig.id && x.id < itemConfig.id);
+                    if (arr.length > 0) {
+                        for (var i = 0; i <= arr.length; i++) {
+                            if (arr[i] != null) {
+                                console.log("arr[i]---", arr[i])
+                                var nodeDataModelingList = arr[i].payload.nodeDataMap[this.state.selectedScenario][0].nodeDataModelingList;
+                                if (nodeDataModelingList.length > 0) {
+                                    var nodedata = nodeDataModelingList.filter(x => x.transferNodeDataId == itemConfig.id)[0];
+                                    if (nodedata != null && nodedata != "") {
+                                        result = true;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                return result;
+            } else {
+                if (itemConfig.payload.nodeType.id == 1 || itemConfig.payload.nodeType.id == 2) {
+                    if (type == 1) {
+                        console.log("get payload 1--->", (itemConfig.payload.nodeDataMap[scenarioId])[0]);
+                        console.log("get payload 1--->>>", (itemConfig.payload.nodeDataMap[scenarioId])[0].displayDataValue);
+                        return addCommas((itemConfig.payload.nodeDataMap[scenarioId])[0].displayDataValue);
+                    } else if (type == 3) {
+                        console.log("get payload 2");
+                        var childList = this.state.items.filter(c => c.parent == itemConfig.id && (c.payload.nodeType.id == 3 || c.payload.nodeType.id == 4 || c.payload.nodeType.id == 5));
+                        console.log("Child List+++", childList);
+                        if (childList.length > 0) {
+                            var sum = 0;
+                            childList.map(c => {
+                                sum += Number((c.payload.nodeDataMap[scenarioId])[0].displayDataValue)
+                            })
+                            return sum.toFixed(2);
+                        } else {
+                            console.log("get payload 3");
+                            return "";
+                        }
                     } else {
-                        console.log("get payload 3");
+                        console.log("get payload 4");
                         return "";
                     }
                 } else {
-                    console.log("get payload 4");
-                    return "";
-                }
-            } else {
-                if (type == 1) {
-                    console.log("get payload 5", (itemConfig.payload.nodeDataMap[scenarioId])[0].fuNode);
-                    if (itemConfig.payload.nodeType.id == 4) {
-                        if ((itemConfig.payload.nodeDataMap[scenarioId])[0].fuNode.usageType.id == 2) {
-                            console.log("test---", (itemConfig.payload.nodeDataMap[scenarioId])[0].fuNode.usagePeriod.usagePeriodId);
-                            console.log("this.state.usagePeriodList---", this.state.usagePeriodList);
-                            return addCommas((itemConfig.payload.nodeDataMap[scenarioId])[0].displayDataValue) + "% of parent, " + (itemConfig.payload.nodeDataMap[scenarioId])[0].fuNode.noOfForecastingUnitsPerPerson + "/" + this.state.usagePeriodList.filter(x => x.usagePeriodId == (itemConfig.payload.nodeDataMap[scenarioId])[0].fuNode.usagePeriod.usagePeriodId)[0].label.label_en;
+                    if (type == 1) {
+                        console.log("get payload 5", (itemConfig.payload.nodeDataMap[scenarioId])[0].fuNode);
+                        if (itemConfig.payload.nodeType.id == 4) {
+                            if ((itemConfig.payload.nodeDataMap[scenarioId])[0].fuNode.usageType.id == 2) {
+                                console.log("test---", (itemConfig.payload.nodeDataMap[scenarioId])[0].fuNode.usagePeriod.usagePeriodId);
+                                console.log("this.state.usagePeriodList---", this.state.usagePeriodList);
+                                return addCommas((itemConfig.payload.nodeDataMap[scenarioId])[0].displayDataValue) + "% of parent, " + (itemConfig.payload.nodeDataMap[scenarioId])[0].fuNode.noOfForecastingUnitsPerPerson + "/" + this.state.usagePeriodList.filter(x => x.usagePeriodId == (itemConfig.payload.nodeDataMap[scenarioId])[0].fuNode.usagePeriod.usagePeriodId)[0].label.label_en;
+                            } else {
+                                return addCommas((itemConfig.payload.nodeDataMap[scenarioId])[0].displayDataValue) + "% of parent";
+                            }
+
+                        } else if (itemConfig.payload.nodeType.id == 5) {
+                            console.log("payload get puNode---", (itemConfig.payload.nodeDataMap[scenarioId])[0]);
+                            return addCommas((itemConfig.payload.nodeDataMap[scenarioId])[0].displayDataValue) + "% of parent, conversion = " + (itemConfig.payload.nodeDataMap[scenarioId])[0].puNode.planningUnit.multiplier;
                         } else {
                             return addCommas((itemConfig.payload.nodeDataMap[scenarioId])[0].displayDataValue) + "% of parent";
                         }
 
-                    } else if (itemConfig.payload.nodeType.id == 5) {
-                        console.log("payload get puNode---", (itemConfig.payload.nodeDataMap[scenarioId])[0]);
-                        return addCommas((itemConfig.payload.nodeDataMap[scenarioId])[0].displayDataValue) + "% of parent, conversion = " + (itemConfig.payload.nodeDataMap[scenarioId])[0].puNode.planningUnit.multiplier;
+                    } else if (type == 3) {
+                        console.log("get payload 6");
+                        var childList = this.state.items.filter(c => c.parent == itemConfig.id && (c.payload.nodeType.id == 3 || c.payload.nodeType.id == 4 || c.payload.nodeType.id == 5));
+                        console.log("Child List+++", childList);
+                        if (childList.length > 0) {
+                            var sum = 0;
+                            childList.map(c => {
+                                sum += Number((c.payload.nodeDataMap[scenarioId])[0].displayDataValue)
+                            })
+                            return sum.toFixed(2);
+                        } else {
+                            console.log("get payload 7");
+                            return "";
+                        }
                     } else {
-                        return addCommas((itemConfig.payload.nodeDataMap[scenarioId])[0].displayDataValue) + "% of parent";
+                        console.log("get payload 8");
+                        return "= " + ((itemConfig.payload.nodeDataMap[scenarioId])[0].displayCalculatedDataValue != null ? addCommas((itemConfig.payload.nodeDataMap[scenarioId])[0].displayCalculatedDataValue) : "");
                     }
-
-                } else if (type == 3) {
-                    console.log("get payload 6");
-                    var childList = this.state.items.filter(c => c.parent == itemConfig.id && (c.payload.nodeType.id == 3 || c.payload.nodeType.id == 4 || c.payload.nodeType.id == 5));
-                    console.log("Child List+++", childList);
-                    if (childList.length > 0) {
-                        var sum = 0;
-                        childList.map(c => {
-                            sum += Number((c.payload.nodeDataMap[scenarioId])[0].displayDataValue)
-                        })
-                        return sum.toFixed(2);
-                    } else {
-                        console.log("get payload 7");
-                        return "";
-                    }
-                } else {
-                    console.log("get payload 8");
-                    return "= " + ((itemConfig.payload.nodeDataMap[scenarioId])[0].displayCalculatedDataValue != null ? addCommas((itemConfig.payload.nodeDataMap[scenarioId])[0].displayCalculatedDataValue) : "");
                 }
             }
         } else {
@@ -3154,7 +3179,7 @@ export default class BuildTree extends Component {
                     }
                 }
                 treeData.push(tempTree);
-                console.log("tempTree template---",tempTree);
+                console.log("tempTree template---", tempTree);
                 this.setState({
                     treeData,
                     treeId,
@@ -7119,9 +7144,9 @@ export default class BuildTree extends Component {
                                         </FormGroup>
                                     </div>
                                 </div>
-                                <div className="col-md-12 pl-lg-0 pr-lg-0" style={{display:'inline-block'}}>
-                                <div id="momJexcel" className="RowClickable" style={{ display: this.state.momJexcelLoader ? "none" : "block" }}>
-                                </div>
+                                <div className="col-md-12 pl-lg-0 pr-lg-0" style={{ display: 'inline-block' }}>
+                                    <div id="momJexcel" className="RowClickable" style={{ display: this.state.momJexcelLoader ? "none" : "block" }}>
+                                    </div>
                                 </div>
                                 <div style={{ display: this.state.momJexcelLoader ? "block" : "none" }}>
                                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
@@ -7134,7 +7159,7 @@ export default class BuildTree extends Component {
                                         </div>
                                     </div>
                                 </div>
-                            
+
                                 <div className="col-md-12 pr-lg-0">
                                     <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={() => {
                                         this.setState({ showMomData: false })
@@ -7190,9 +7215,9 @@ export default class BuildTree extends Component {
                                 </div>
                                 <div className="pt-lg-2 pl-lg-0"><i>{i18n.t('static.tree.tableDisplays')} <b>{this.state.currentItemConfig.context.payload.nodeUnit.label != null ? getLabelText(this.state.currentItemConfig.context.payload.nodeUnit.label, this.state.lang) : ''}</b> {i18n.t('static.tree.forNode')} <b>{this.state.currentItemConfig.context.payload.label != null ? getLabelText(this.state.currentItemConfig.context.payload.label, this.state.lang) : ''}</b> {i18n.t('static.tree.asA%OfParent')} <b>{this.state.currentItemConfig.parentItem.payload.label != null ? getLabelText(this.state.currentItemConfig.parentItem.payload.label, this.state.lang) : ''}</b></i></div>
                                 {/* <div className="pt-lg-2 pl-lg-0"><i>Table displays <b>{getLabelText(this.state.currentItemConfig.context.payload.nodeUnit.label, this.state.lang)}</b></div> */}
-                                <div className="col-md-12 pl-lg-0 pr-lg-0" style={{display:'inline-block'}}>
-                                <div id="momJexcelPer" className={"RowClickable perNodeData FiltermomjexcelPer"} style={{ display: this.state.momJexcelLoader ? "none" : "block" }}>
-                                </div>
+                                <div className="col-md-12 pl-lg-0 pr-lg-0" style={{ display: 'inline-block' }}>
+                                    <div id="momJexcelPer" className={"RowClickable perNodeData FiltermomjexcelPer"} style={{ display: this.state.momJexcelLoader ? "none" : "block" }}>
+                                    </div>
                                 </div>
                                 <div style={{ display: this.state.momJexcelLoader ? "block" : "none" }}>
                                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
@@ -7442,9 +7467,28 @@ export default class BuildTree extends Component {
             return connectDropTarget(connectDragSource(
                 // <div className="ContactTemplate" style={{ opacity, backgroundColor: Colors.White, borderColor: Colors.Black }}>
                 <div className="ContactTemplate boxContactTemplate">
-                    <div className={itemConfig.payload.nodeType.id == 5 || itemConfig.payload.nodeType.id == 4 ? "ContactTitleBackground TemplateTitleBgblue" : "ContactTitleBackground TemplateTitleBg"}
+                    <div className={itemConfig.payload.nodeType.id == 5
+                        || itemConfig.payload.nodeType.id == 4 ? "ContactTitleBackground TemplateTitleBgblue" :
+                        "ContactTitleBackground TemplateTitleBg"}
                     >
-                        <div className={itemConfig.payload.nodeType.id == 5 || itemConfig.payload.nodeType.id == 4 ? "ContactTitle TitleColorWhite" : "ContactTitle TitleColor"}><div title={itemConfig.payload.label.label_en} style={{ fontSize: '13px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', width: '158px', float: 'left', fontWeight: 'bold' }}>{itemConfig.payload.label.label_en}</div><b style={{ color: '#212721', float: 'right' }}>{itemConfig.payload.nodeType.id == 2 ? <i class="fa fa-hashtag" style={{ fontSize: '11px', color: '#002f6c' }}></i> : (itemConfig.payload.nodeType.id == 3 ? <i class="fa fa-percent " style={{ fontSize: '11px', color: '#002f6c' }} ></i> : (itemConfig.payload.nodeType.id == 4 ? <i class="fa fa-cube" style={{ fontSize: '11px', color: '#fff' }} ></i> : (itemConfig.payload.nodeType.id == 5 ? <i class="fa fa-cubes" style={{ fontSize: '11px', color: '#fff' }} ></i> : (itemConfig.payload.nodeType.id == 1 ? <i class="fa fa-plus" style={{ fontSize: '11px', color: '#002f6c' }} ></i> : ""))))}</b></div>
+                        <div className={itemConfig.payload.nodeType.id == 5 ||
+                            itemConfig.payload.nodeType.id == 4 ? "ContactTitle TitleColorWhite" :
+                            "ContactTitle TitleColor"}>
+                            <div title={itemConfig.payload.label.label_en} style={{ fontSize: '13px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', width: '157px', float: 'left', fontWeight: 'bold' }}>
+                                {itemConfig.payload.label.label_en}</div>
+                            {this.getPayloadData(itemConfig, 4) == true && <i class="fa fa-line-chart" style={{ fontSize: '11px', color: (itemConfig.payload.nodeType.id == 4 || itemConfig.payload.nodeType.id == 5 ? '#fff' : '#002f6c') }}></i>}
+                            <b style={{ color: '#212721', float: 'right' }}>
+                                {itemConfig.payload.nodeType.id == 2 ?
+                                    <i class="fa fa-hashtag" style={{ fontSize: '11px', color: '#002f6c' }}></i> :
+                                    (itemConfig.payload.nodeType.id == 3 ?
+                                        <i class="fa fa-percent " style={{ fontSize: '11px', color: '#002f6c' }} ></i> :
+                                        (itemConfig.payload.nodeType.id == 4 ?
+                                            <i class="fa fa-cube" style={{ fontSize: '11px', color: '#fff' }} ></i> :
+                                            (itemConfig.payload.nodeType.id == 5 ?
+                                                <i class="fa fa-cubes" style={{ fontSize: '11px', color: '#fff' }} ></i> :
+                                                (itemConfig.payload.nodeType.id == 1 ?
+                                                    <i class="fa fa-plus" style={{ fontSize: '11px', color: '#002f6c' }} ></i> : ""))))}</b>
+                        </div>
                     </div>
                     <div className="ContactPhone ContactPhoneValue">
                         <span style={{ textAlign: 'center', fontWeight: '500' }}>{this.getPayloadData(itemConfig, 1)}</span>
