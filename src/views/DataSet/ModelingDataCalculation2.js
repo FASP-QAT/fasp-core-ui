@@ -120,6 +120,7 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                         var nodeDataModelingList = (nodeDataModelingListWithTransfer).filter(c => moment(curDate).format("YYYY-MM-DD") >= moment(c.startDate).format("YYYY-MM-DD") && moment(curDate).format("YYYY-MM-DD") <= moment(c.stopDate).format("YYYY-MM-DD"));
                         var nodeDataOverrideList = ((nodeDataMap[scenarioList[ndm].id])[0].nodeDataOverrideList);
                         var startValue = 0;
+                        console.log("nodeDataMapForScenario---", nodeDataMapForScenario)
                         if (moment(curDate).format("YYYY-MM-DD") == moment(nodeDataMapForScenario.month).format("YYYY-MM-DD")) {
                             if (nodeDataMapForScenario.calculatedDataValue == null || payload.nodeType.id != 2) {
                                 console.log("modeling datavalue 1---", nodeDataMapForScenario.dataValue)
@@ -166,15 +167,18 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                 differenceWMC += Number((Number(dvWMC) * Number(nodeDataModeling.dataValue)) / 100);
                             }
                             //Exponential %
-                            else if (nodeDataModeling.modelingType.id == 4 && nodeDataModeling.transferNodeDataId == null) {
+                            else if (nodeDataModeling.modelingType.id == 4 && (nodeDataModeling.transferNodeDataId == null || nodeDataModeling.transferNodeDataId == "")) {
                                 difference += Number((Number(startValue) * Number(nodeDataModeling.dataValue)) / 100);
                                 differenceWMC += Number((Number(startValue) * Number(nodeDataModeling.dataValue)) / 100);
                             }
                             //Linear % point
-                            else if (nodeDataModeling.modelingType.id == 5 && nodeDataModeling.transferNodeDataId == null) {
+
+                            else if (nodeDataModeling.modelingType.id == 5 && (nodeDataModeling.transferNodeDataId == null || nodeDataModeling.transferNodeDataId == "")) {
+                                console.log("nodeDataModeling---", nodeDataModeling);
                                 difference += Number(nodeDataModeling.dataValue);
                                 differenceWMC += Number(nodeDataModeling.dataValue);
                             }
+                            console.log("nodeDataModeling 1---", nodeDataModeling);
 
                             //Linear # transfer
                             if (nodeDataModeling.modelingType.id == 2 && nodeDataModeling.transferNodeDataId != null && moment(curDate).format("YYYY-MM-DD") > moment(nodeDataMapForScenario.month).format("YYYY-MM-DD")) {
