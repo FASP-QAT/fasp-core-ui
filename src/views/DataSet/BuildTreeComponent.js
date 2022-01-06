@@ -732,6 +732,7 @@ export default class BuildTree extends Component {
         var scenarioId = scenarioId;
         var arr = [];
         var currentScenario;
+        console.log("items***&---",items);
         for (let i = 0; i < items.length; i++) {
             console.log("&&&&item---", items[i]);
             console.log("current item --->", items[i].payload.nodeDataMap[scenarioId][0]);
@@ -3143,20 +3144,24 @@ export default class BuildTree extends Component {
                     scenarioList: [{
                         id: 1,
                         label: {
-                            label_en: "Default"
-                        }
+                            label_en: i18n.t('static.realm.default')
+                        },
+                        active: true,
+                        notes: ''
                     }],
                     tree: {
                         flatList: flatList
                     }
                 }
                 treeData.push(tempTree);
+                console.log("tempTree template---",tempTree);
                 this.setState({
                     treeData,
                     treeId,
                     treeTemplateObj: tempTree
                 }, () => {
                     this.getTreeByTreeId(treeId);
+                    // this.updateTreeData(moment(new Date()).format("YYYY-MM-DD"));
                     console.log("tree template obj---", this.state.treeData)
 
                 });
@@ -7286,42 +7291,44 @@ export default class BuildTree extends Component {
         console.log("dismiss>>", value);
         var date = value.year + "-" + value.month + "-" + "01"
         this.setState({ singleValue2: value, }, () => {
+            this.updateTreeData(date);
             // this.fetchData();
             // console.log("$$$", this.state.treeData);
             // console.log("$$$", this.state.curTreeObj);
-            var db1;
-            getDatabase();
-            var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-            openRequest.onsuccess = function (e) {
-                var programId = this.state.programId;
-                db1 = e.target.result;
-                var transaction = db1.transaction(['datasetData'], 'readwrite');
-                var program = transaction.objectStore('datasetData');
-                var getRequest = program.get(programId.toString());
-                getRequest.onerror = function (event) {
-                    this.setState({
-                        supplyPlanError: i18n.t('static.program.errortext')
-                    });
-                };
-                getRequest.onsuccess = function (event) {
-                    // console.log("hi",getRequest.result);
-                    var programDataBytes = CryptoJS.AES.decrypt(getRequest.result.programData, SECRET_KEY);
-                    var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                    var programJson = JSON.parse(programData);
-                    // console.log("hi bro", programJson.nodeDataModelingList)
-                    // var getMomDataForNodes = programJson.nodeDataModelingList.filter(c => c.treeId == this.state.treeId && c.scenarioId == this.state.selectedScenario && moment(c.month).format('YYYY-MM') == moment(date).format('YYYY-MM'));
-                    // console.log("$$$>>>", getMomDataForNodes);
-                    this.setState({
-                        // modelinDataForScenario: getMomDataForNodes
-                    }, () => {
-                        // if (getMomDataForNodes.length > 0) { 
-                        this.updateTreeData(date);
-                        // } else { };
-                    });
-                    // getMomDataForCurrentNode.filter(c=>c.month <= '2022-12-01')
+            // var db1;
+            // getDatabase();
+            // var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+            // openRequest.onsuccess = function (e) {
+            //     var programId = this.state.programId;
+            //     db1 = e.target.result;
+            //     var transaction = db1.transaction(['datasetData'], 'readwrite');
+            //     var program = transaction.objectStore('datasetData');
+            //     var getRequest = program.get(programId.toString());
+            //     getRequest.onerror = function (event) {
+            //         this.setState({
+            //             supplyPlanError: i18n.t('static.program.errortext')
+            //         });
+            //     };
+            //     getRequest.onsuccess = function (event) {
+            //         // console.log("hi",getRequest.result);
+            //         var programDataBytes = CryptoJS.AES.decrypt(getRequest.result.programData, SECRET_KEY);
+            //         var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+            //         var programJson = JSON.parse(programData);
+            //         // console.log("hi bro", programJson.nodeDataModelingList)
+            //         // var getMomDataForNodes = programJson.nodeDataModelingList.filter(c => c.treeId == this.state.treeId && c.scenarioId == this.state.selectedScenario && moment(c.month).format('YYYY-MM') == moment(date).format('YYYY-MM'));
+            //         // console.log("$$$>>>", getMomDataForNodes);
+            //         console.log()
+            //         this.setState({
+            //             // modelinDataForScenario: getMomDataForNodes
+            //         }, () => {
+            //             // if (getMomDataForNodes.length > 0) { 
+            //             this.updateTreeData(date);
+            //             // } else { };
+            //         });
+            //         // getMomDataForCurrentNode.filter(c=>c.month <= '2022-12-01')
 
-                }.bind(this)
-            }.bind(this)
+            //     }.bind(this)
+            // }.bind(this)
 
         })
     }
