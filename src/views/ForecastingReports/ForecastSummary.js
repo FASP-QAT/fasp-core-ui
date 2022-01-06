@@ -56,7 +56,7 @@ class ForecastSummary extends Component {
             rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
             minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
             maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
-            loading: false,
+            loading: true,
             programId: '',
             versionId: '',
             planningUnitLabel: '',
@@ -266,8 +266,14 @@ class ForecastSummary extends Component {
                     var getRequest = program.getAll();
                     var datasetList = [];
                     var datasetList1 = [];
+                    this.setState({
+                        loading: true
+                    })
 
                     getRequest.onerror = function (event) {
+                        this.setState({
+                            loading: false
+                        })
                         // Handle errors!
                     };
                     getRequest.onsuccess = function (event) {
@@ -491,6 +497,7 @@ class ForecastSummary extends Component {
                             }
                             console.log("Test------------>3", summeryData);
                             this.setState({
+                                loading: (displayId == 2 ? true : false),
                                 summeryData: summeryData,
                                 totalProductCost: totalProductCost,
                                 regDatasetJson: filteredProgram,
@@ -620,6 +627,13 @@ class ForecastSummary extends Component {
                                         columnDrag: true,
                                         columns: columns,
                                         nestedHeaders: [nestedHeaders],
+                                        updateTable: function (el, cell, x, y, source, value, id) {
+                                            if (y != null) {
+                                                var elInstance = el.jexcel;
+                                                var rowData = elInstance.getRowData(y);
+                                                elInstance.setStyle(`C${parseInt(y) + 1}`, 'text-align', 'left');
+                                            }
+                                        }.bind(this),
                                         text: {
                                             // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
                                             showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
@@ -665,7 +679,8 @@ class ForecastSummary extends Component {
                                     var dataEl = jexcel(document.getElementById("tableDiv"), options);
                                     this.el = dataEl;
                                     this.setState({
-                                        dataEl: dataEl
+                                        dataEl: dataEl,
+                                        loading: false
                                     })
                                 }
                             });
@@ -853,7 +868,8 @@ class ForecastSummary extends Component {
                         a = getLabelText(a.label, lang).toLowerCase();
                         b = getLabelText(b.label, lang).toLowerCase();
                         return a < b ? -1 : a > b ? 1 : 0;
-                    })
+                    }),
+                    loading: false
                 }, () => {
                     console.log("programs------------------>", this.state.programs);
                 })
@@ -1382,9 +1398,12 @@ class ForecastSummary extends Component {
                     </div>
                     <div className="Card-header-reporticon ">
                         <div className="card-header-actions BacktoLink">
-                            <a className="card-header-action">
-                                Back to <span style={{ cursor: 'pointer' }} onClick={() => { this.backToMonthlyForecast() }}><small className="supplyplanformulas">Monthly Forecast</small></span>
+                            <a className="pr-lg-0 pt-lg-1">
+                                <span style={{ cursor: 'pointer' }} onClick={() => { this.backToMonthlyForecast() }}><i className="fa fa-long-arrow-left" style={{ color: '#20a8d8', fontSize: '13px' }}></i> <small className="supplyplanformulas">{'Return To Monthly Forecast'}</small></span>
                             </a>
+                            {/* <a className="card-header-action">
+                                Back to <span style={{ cursor: 'pointer' }} onClick={() => { this.backToMonthlyForecast() }}><small className="supplyplanformulas">Monthly Forecast</small></span>
+                            </a> */}
                         </div>
                     </div>
                     <CardBody className="pb-lg-2 pt-lg-1 ">
@@ -1536,7 +1555,7 @@ class ForecastSummary extends Component {
                                 </Form>
                                 <Col md="12" className="pl-lg-0" style={{ display: this.state.loading ? "none" : "block" }}>
                                     <div>
-                                        <p>nbnnfjjdf</p>
+                                        <p>Some text here to explain users this is not a detailed supply plan, Just high level estimate.</p>
                                     </div>
                                 </Col>
                                 <Col md="12" className='pl-lg-0' style={{ display: this.state.loading ? "none" : "block" }}>
@@ -1589,14 +1608,16 @@ class ForecastSummary extends Component {
                                                                                 <td className="BorderNoneSupplyPlan sticky-col first-col clone1">
                                                                                     {
                                                                                         item1.display == false ?
-                                                                                            <><i className="fa fa-plus-square-o supplyPlanIcon" onClick={() => this.checkedChanged(item1.tempTracerCategoryId)} ></i> <>{item1.tracerCategory.label.label_en}</></>
+                                                                                            // <><i className="fa fa-plus-square-o supplyPlanIcon" onClick={() => this.checkedChanged(item1.tempTracerCategoryId)} ></i> <>{item1.tracerCategory.label.label_en}</></>
+                                                                                            <><i className="fa fa-plus-square-o supplyPlanIcon" onClick={() => this.checkedChanged(item1.tempTracerCategoryId)} ></i> </>
                                                                                             :
-                                                                                            <><i className="fa fa-minus-square-o supplyPlanIcon" onClick={() => this.checkedChanged(item1.tempTracerCategoryId)} ></i> <>{item1.tracerCategory.label.label_en}</></>
+                                                                                            // <><i className="fa fa-minus-square-o supplyPlanIcon" onClick={() => this.checkedChanged(item1.tempTracerCategoryId)} ></i> <>{item1.tracerCategory.label.label_en}</></>
+                                                                                            <><i className="fa fa-minus-square-o supplyPlanIcon" onClick={() => this.checkedChanged(item1.tempTracerCategoryId)} ></i> </>
                                                                                     }
 
                                                                                 </td>
                                                                                 {/* <td></td> */}
-                                                                                <td></td>
+                                                                                <td><b>{item1.tracerCategory.label.label_en}</b></td>
                                                                                 <td></td>
                                                                                 {!this.state.hideColumn &&
                                                                                     <>
@@ -1767,6 +1788,7 @@ class ForecastSummary extends Component {
                         <FormGroup>
                             <FormGroup>
                                 <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                <Button type="reset" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.filterData}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                 <Button type="submit" size="md" color="success" className="submitBtn float-right mr-1" onClick={this.saveSelectedForecast}> <i className="fa fa-check"></i> {i18n.t('static.common.submit')}</Button>
                             </FormGroup>
                         </FormGroup>
