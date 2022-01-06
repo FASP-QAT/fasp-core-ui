@@ -732,6 +732,7 @@ export default class BuildTree extends Component {
         var scenarioId = scenarioId;
         var arr = [];
         var currentScenario;
+        console.log("items***&---",items);
         for (let i = 0; i < items.length; i++) {
             console.log("&&&&item---", items[i]);
             console.log("current item --->", items[i].payload.nodeDataMap[scenarioId][0]);
@@ -3143,20 +3144,24 @@ export default class BuildTree extends Component {
                     scenarioList: [{
                         id: 1,
                         label: {
-                            label_en: "Default"
-                        }
+                            label_en: i18n.t('static.realm.default')
+                        },
+                        active: true,
+                        notes: ''
                     }],
                     tree: {
                         flatList: flatList
                     }
                 }
                 treeData.push(tempTree);
+                console.log("tempTree template---",tempTree);
                 this.setState({
                     treeData,
                     treeId,
                     treeTemplateObj: tempTree
                 }, () => {
                     this.getTreeByTreeId(treeId);
+                    // this.updateTreeData(moment(new Date()).format("YYYY-MM-DD"));
                     console.log("tree template obj---", this.state.treeData)
 
                 });
@@ -5335,6 +5340,7 @@ export default class BuildTree extends Component {
         newItem.sortOrder = parentSortOrder.concat(".").concat(("0" + (Number(childList.length) + 1)).slice(-2));
         (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].displayDataValue = (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].dataValue;
         (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].displayCalculatedDataValue = (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].calculatedDataValue;
+        (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].month = moment((newItem.payload.nodeDataMap[this.state.selectedScenario])[0].month).startOf('month').format("YYYY-MM-DD")
         if (itemConfig.context.payload.nodeType.id == 4) {
             (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.forecastingUnit.label.label_en = (itemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.forecastingUnit.label.label_en;
         }
@@ -6795,7 +6801,7 @@ export default class BuildTree extends Component {
                             </Picker>
                         </FormGroup>
 
-                        <div>
+                        <div className="col-md-12">
                             {this.state.showModelingJexcelNumber &&
                                 <> <div className="calculatorimg">
                                     <div id="modelingJexcel" className={"RowClickable ScalingTable"} style={{ display: this.state.modelingJexcelLoader ? "none" : "block" }}>
@@ -7113,7 +7119,9 @@ export default class BuildTree extends Component {
                                         </FormGroup>
                                     </div>
                                 </div>
-                                <div id="momJexcel" style={{ display: this.state.momJexcelLoader ? "none" : "block" }}>
+                                <div className="col-md-12 pl-lg-0 pr-lg-0" style={{display:'inline-block'}}>
+                                <div id="momJexcel" className="RowClickable" style={{ display: this.state.momJexcelLoader ? "none" : "block" }}>
+                                </div>
                                 </div>
                                 <div style={{ display: this.state.momJexcelLoader ? "block" : "none" }}>
                                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
@@ -7126,6 +7134,7 @@ export default class BuildTree extends Component {
                                         </div>
                                     </div>
                                 </div>
+                            
                                 <div className="col-md-12 pr-lg-0">
                                     <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={() => {
                                         this.setState({ showMomData: false })
@@ -7181,7 +7190,9 @@ export default class BuildTree extends Component {
                                 </div>
                                 <div className="pt-lg-2 pl-lg-0"><i>{i18n.t('static.tree.tableDisplays')} <b>{this.state.currentItemConfig.context.payload.nodeUnit.label != null ? getLabelText(this.state.currentItemConfig.context.payload.nodeUnit.label, this.state.lang) : ''}</b> {i18n.t('static.tree.forNode')} <b>{this.state.currentItemConfig.context.payload.label != null ? getLabelText(this.state.currentItemConfig.context.payload.label, this.state.lang) : ''}</b> {i18n.t('static.tree.asA%OfParent')} <b>{this.state.currentItemConfig.parentItem.payload.label != null ? getLabelText(this.state.currentItemConfig.parentItem.payload.label, this.state.lang) : ''}</b></i></div>
                                 {/* <div className="pt-lg-2 pl-lg-0"><i>Table displays <b>{getLabelText(this.state.currentItemConfig.context.payload.nodeUnit.label, this.state.lang)}</b></div> */}
+                                <div className="col-md-12 pl-lg-0 pr-lg-0" style={{display:'inline-block'}}>
                                 <div id="momJexcelPer" className={"RowClickable perNodeData FiltermomjexcelPer"} style={{ display: this.state.momJexcelLoader ? "none" : "block" }}>
+                                </div>
                                 </div>
                                 <div style={{ display: this.state.momJexcelLoader ? "block" : "none" }}>
                                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
@@ -7285,42 +7296,44 @@ export default class BuildTree extends Component {
         console.log("dismiss>>", value);
         var date = value.year + "-" + value.month + "-" + "01"
         this.setState({ singleValue2: value, }, () => {
+            this.updateTreeData(date);
             // this.fetchData();
             // console.log("$$$", this.state.treeData);
             // console.log("$$$", this.state.curTreeObj);
-            var db1;
-            getDatabase();
-            var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-            openRequest.onsuccess = function (e) {
-                var programId = this.state.programId;
-                db1 = e.target.result;
-                var transaction = db1.transaction(['datasetData'], 'readwrite');
-                var program = transaction.objectStore('datasetData');
-                var getRequest = program.get(programId.toString());
-                getRequest.onerror = function (event) {
-                    this.setState({
-                        supplyPlanError: i18n.t('static.program.errortext')
-                    });
-                };
-                getRequest.onsuccess = function (event) {
-                    // console.log("hi",getRequest.result);
-                    var programDataBytes = CryptoJS.AES.decrypt(getRequest.result.programData, SECRET_KEY);
-                    var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                    var programJson = JSON.parse(programData);
-                    // console.log("hi bro", programJson.nodeDataModelingList)
-                    // var getMomDataForNodes = programJson.nodeDataModelingList.filter(c => c.treeId == this.state.treeId && c.scenarioId == this.state.selectedScenario && moment(c.month).format('YYYY-MM') == moment(date).format('YYYY-MM'));
-                    // console.log("$$$>>>", getMomDataForNodes);
-                    this.setState({
-                        // modelinDataForScenario: getMomDataForNodes
-                    }, () => {
-                        // if (getMomDataForNodes.length > 0) { 
-                        this.updateTreeData(date);
-                        // } else { };
-                    });
-                    // getMomDataForCurrentNode.filter(c=>c.month <= '2022-12-01')
+            // var db1;
+            // getDatabase();
+            // var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+            // openRequest.onsuccess = function (e) {
+            //     var programId = this.state.programId;
+            //     db1 = e.target.result;
+            //     var transaction = db1.transaction(['datasetData'], 'readwrite');
+            //     var program = transaction.objectStore('datasetData');
+            //     var getRequest = program.get(programId.toString());
+            //     getRequest.onerror = function (event) {
+            //         this.setState({
+            //             supplyPlanError: i18n.t('static.program.errortext')
+            //         });
+            //     };
+            //     getRequest.onsuccess = function (event) {
+            //         // console.log("hi",getRequest.result);
+            //         var programDataBytes = CryptoJS.AES.decrypt(getRequest.result.programData, SECRET_KEY);
+            //         var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+            //         var programJson = JSON.parse(programData);
+            //         // console.log("hi bro", programJson.nodeDataModelingList)
+            //         // var getMomDataForNodes = programJson.nodeDataModelingList.filter(c => c.treeId == this.state.treeId && c.scenarioId == this.state.selectedScenario && moment(c.month).format('YYYY-MM') == moment(date).format('YYYY-MM'));
+            //         // console.log("$$$>>>", getMomDataForNodes);
+            //         console.log()
+            //         this.setState({
+            //             // modelinDataForScenario: getMomDataForNodes
+            //         }, () => {
+            //             // if (getMomDataForNodes.length > 0) { 
+            //             this.updateTreeData(date);
+            //             // } else { };
+            //         });
+            //         // getMomDataForCurrentNode.filter(c=>c.month <= '2022-12-01')
 
-                }.bind(this)
-            }.bind(this)
+            //     }.bind(this)
+            // }.bind(this)
 
         })
     }
