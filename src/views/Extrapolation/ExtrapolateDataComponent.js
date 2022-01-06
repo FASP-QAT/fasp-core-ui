@@ -95,8 +95,9 @@ export default class ExtrapolateDataComponent extends React.Component {
             popoverOpenTes: false,
             popoverOpenArima: false,
             extrapolationMethodId: -1,
-            confidenceLevelId: -1,
-            showGuidance: false
+            confidenceLevelId: 80,
+            showGuidance: false,
+            showData: false
         }
         this.toggle = this.toggle.bind(this)
         this.reset = this.reset.bind(this)
@@ -143,7 +144,8 @@ export default class ExtrapolateDataComponent extends React.Component {
                         name: datasetJson.programCode,
                         id: myResult[i].id,
                         regionList: datasetJson.regionList,
-                        planningUnitList: datasetJson.planningUnitList
+                        planningUnitList: datasetJson.planningUnitList,
+                        datasetData: datasetJson
                     }
                     forecastProgramList.push(forecastProgramJson)
                 }
@@ -183,6 +185,15 @@ export default class ExtrapolateDataComponent extends React.Component {
                 var regionList = datasetJson.regionList;
                 var startDate = moment(datasetJson.currentVersion.forecastStartDate).format("YYYY-MM-DD");
                 var stopDate = moment(datasetJson.currentVersion.forecastStopDate).format("YYYY-MM-DD");
+                var consumptionExtrapolationList = datasetJson.consumptionExtrapolation;
+                var monthsForMovingAverage = 6;
+                var consumptionExtrapolationData = consumptionExtrapolationList.filter(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId && c.extrapolationMethod.id == 6)//Semi Averages
+                var consumptionExtrapolationMovingData = consumptionExtrapolationList.filter(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId && c.extrapolationMethod.id == 7)//Moving averages
+                console.log("consumptionExtrapolationMovingData+++", consumptionExtrapolationMovingData)
+                var consumptionExtrapolationRegression = consumptionExtrapolationList.filter(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId && c.extrapolationMethod.id == 5)//Linear Regression
+                if (consumptionExtrapolationMovingData.length > 0) {
+                    monthsForMovingAverage = consumptionExtrapolationMovingData[0].jsonProperties.months;
+                }
                 var monthArray = [];
                 var curDate = startDate;
                 for (var m = 0; curDate < moment(stopDate).add(-1, 'months').format("YYYY-MM-DD"); m++) {
@@ -199,6 +210,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                     // consumptionUnitList: consumptionUnitList,
                     monthArray: monthArray,
                     datasetJson: datasetJson,
+                    monthsForMovingAverage: monthsForMovingAverage
 
                     // planningUnitList: planningUnitList,
                     // forecastingUnitList: forecastingUnitList
@@ -278,7 +290,7 @@ export default class ExtrapolateDataComponent extends React.Component {
         console.log("inputData[inputData.length - 1]", inputData[inputData.length - 1])
         let actualMonths = inputData[inputData.length - 1].month;
 
-        //Semi Average 
+        //Semi Average
         if (inputData.length > 0) {
             console.log(inputData);
             let x1 = 0, x2 = 0, y1 = 0, y2 = 0;
@@ -313,7 +325,7 @@ export default class ExtrapolateDataComponent extends React.Component {
 
         if (inputDataAverage.length > 0) {
             // var actualMonths = inputDataAverage[inputDataAverage.length - 1].month;
-            var monthsForMovingAverage = document.getElementById("noOfMonthsId").value;
+            var monthsForMovingAverage = this.state.monthsForMovingAverage;
 
             for (let x = 1; x <= actualMonths + noOfMonthsForProjection; x++) {
                 console.log("x--->", x)
@@ -589,7 +601,7 @@ export default class ExtrapolateDataComponent extends React.Component {
         // console.log("mse",mse)
         // console.log("rSqd",rSqd)
 
-        // error Table for Semi 
+        // error Table for Semi
         let cntSemi = 0
         let xBarSemi = 0
         let yBarSemi = 0
@@ -697,7 +709,7 @@ export default class ExtrapolateDataComponent extends React.Component {
         var mseMovingAvg = e2BarMovingAvg
         var rSqdMovingAvg = 1 - (regressionSquaredErrorMovingAvg / totalSquaredErrorMovingAvg)
 
-        // error Table for Linear Reggreassion 
+        // error Table for Linear Reggreassion
         let cntLinearReg = 0
         let xBarLinearReg = 0
         let yBarLinearReg = 0
@@ -752,7 +764,7 @@ export default class ExtrapolateDataComponent extends React.Component {
         var rSqdLinearReg = 1 - (regressionSquaredErrorLinearReg / totalSquaredErrorLinearReg)
 
 
-        //Jexcel table 
+        //Jexcel table
         for (var j = 0; j < monthArray.length; j++) {
             data = [];
             data[0] = monthArray[j];
@@ -908,47 +920,35 @@ export default class ExtrapolateDataComponent extends React.Component {
     }
     getPlanningUnitList(e) {
         var forecastProgramId = e.target.value;
-        var db1;
-        getDatabase();
-        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-        openRequest.onerror = function (event) {
+        if (forecastProgramId != "") {
+            var forecastProgramListFilter = this.state.forecastProgramList.filter(c => c.id == forecastProgramId)[0]
+            var regionList = forecastProgramListFilter.regionList;
+            var startDate = forecastProgramListFilter.datasetData.currentVersion.forecastStartDate;
+            var stopDate = forecastProgramListFilter.datasetData.currentVersion.forecastStopDate;
+            var rangeValue = { from: { year: new Date(startDate).getFullYear(), month: new Date(startDate).getMonth() + 1 }, to: { year: new Date(stopDate).getFullYear(), month: new Date(stopDate).getMonth() + 1 } }
             this.setState({
-                message: i18n.t('static.program.errortext'),
-                color: 'red'
+                planningUnitList: forecastProgramListFilter.planningUnitList,
+                forecastProgramId: forecastProgramId,
+                regionList: regionList,
+                datasetJson: forecastProgramListFilter.datasetData,
+                rangeValue: rangeValue
             })
-            this.hideFirstComponent()
-        }.bind(this);
-        openRequest.onsuccess = function (e) {
-            db1 = e.target.result;
-            var programDataTransaction = db1.transaction(['planningUnit'], 'readwrite');
-            var programDataOs = programDataTransaction.objectStore('planningUnit');
-            var programRequest = programDataOs.getAll();
-            programRequest.onerror = function (event) {
-                this.setState({
-                    message: i18n.t('static.program.errortext'),
-                    color: 'red'
-                })
-                this.hideFirstComponent()
-            }.bind(this);
-            programRequest.onsuccess = function (e) {
-                var planningUnitList = [];
-                var myResult = programRequest.result;
-                var forecastProgramListFilter = this.state.forecastProgramList.filter(c => c.id == forecastProgramId)[0]
-                var regionList = forecastProgramListFilter.regionList;
-                for (var i = 0; i < myResult.length; i++) {
-                    var planningUnitDataJson = {
-                        name: getLabelText(myResult[i].label, this.state.lang),
-                        id: myResult[i].planningUnitId
-                    }
-                    planningUnitList.push(planningUnitDataJson)
-                } console.log("forecastProgramListFilter.planningUnitList===>" + forecastProgramListFilter);
-                this.setState({
-                    planningUnitList: forecastProgramListFilter.planningUnitList,
-                    forecastProgramId: forecastProgramId,
-                    regionList: regionList
-                })
-            }.bind(this)
-        }.bind(this)
+        } else {
+            this.setState({
+                forecastProgramId: forecastProgramId,
+                planningUnitList: [],
+                planningUnitId: "",
+                regionId: "",
+                regionList: [],
+                alpha: 0.2,
+                beta: 0.2,
+                gamma: 0.2,
+                noOfMonthsForASeason: 12,
+                confidence: 0.95,
+                monthsForMovingAverage: 6,
+                confidenceLevelId: 80
+            })
+        }
     }
 
 
@@ -979,14 +979,23 @@ export default class ExtrapolateDataComponent extends React.Component {
                 var datasetData = datasetDataBytes.toString(CryptoJS.enc.Utf8);
                 var datasetJson = JSON.parse(datasetData);
                 var consumptionExtrapolationList = datasetJson.consumptionExtrapolation;
-                var consumptionExtrapolationData = consumptionExtrapolationList.findIndex(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId && c.extrapolationMethod.id == 6)
-                var consumptionExtrapolationMovingData = consumptionExtrapolationList.findIndex(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId && c.extrapolationMethod.id == 7)
-                var consumptionExtrapolationRegression = consumptionExtrapolationList.findIndex(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId && c.extrapolationMethod.id == 5)
+                var consumptionExtrapolationData = consumptionExtrapolationList.findIndex(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId && c.extrapolationMethod.id == 6)//Semi Averages
+                var consumptionExtrapolationMovingData = consumptionExtrapolationList.findIndex(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId && c.extrapolationMethod.id == 7)//Moving averages
+                var consumptionExtrapolationRegression = consumptionExtrapolationList.findIndex(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId && c.extrapolationMethod.id == 5)//Linear Regression
+                var consumptionExtrapolationTESL = consumptionExtrapolationList.findIndex(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId && c.extrapolationMethod.id == 1)//TES L
+                console.log("consumptionExtrapolationTESL+++", consumptionExtrapolationTESL)
+                var consumptionExtrapolationTESM = consumptionExtrapolationList.findIndex(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId && c.extrapolationMethod.id == 2)//TES M
+                var consumptionExtrapolationTESH = consumptionExtrapolationList.findIndex(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId && c.extrapolationMethod.id == 3)//TES H
+
+                var tesData = this.state.tesdataFilter;
+                var CI = this.state.CI;
+
                 var inputDataFilter = this.state.inputDataFilter;
                 var inputDataAverageFilter = this.state.inputDataAverageFilter;
                 var inputDataRegressionFilter = this.state.inputDataRegressionFilter;
                 console.log("consumptionExtrapolationData", consumptionExtrapolationData);
                 console.log("inputDataFilter", inputDataFilter);
+                //Semi - averages
                 if (consumptionExtrapolationData == -1) {
                     var data = [];
                     for (var i = 0; i < inputDataFilter.length; i++) {
@@ -1037,6 +1046,9 @@ export default class ExtrapolateDataComponent extends React.Component {
                     }
                     consumptionExtrapolationList[consumptionExtrapolationData].extrapolationDataList = data;
                 }
+                console.log("this.state.monthsForMovingAverage+++", this.state.monthsForMovingAverage)
+                console.log("consumptionExtrapolationMovingData+++", consumptionExtrapolationMovingData);
+                //Moving Averages
                 if (consumptionExtrapolationMovingData == -1) {
                     var data = [];
                     for (var i = 0; i < inputDataAverageFilter.length; i++) {
@@ -1071,6 +1083,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                 }
                             },
                             "jsonProperties": {
+                                months: this.state.monthsForMovingAverage
                             },
                             "createdBy": {
                                 "userId": 1,
@@ -1081,14 +1094,14 @@ export default class ExtrapolateDataComponent extends React.Component {
                         })
                 }
                 else {
-                    consumptionExtrapolationList[consumptionExtrapolationMovingData].jsonProperties = {};
+                    consumptionExtrapolationList[consumptionExtrapolationMovingData].jsonProperties = { months: this.state.monthsForMovingAverage };
                     var data = [];
                     for (var i = 0; i < inputDataAverageFilter.length; i++) {
                         data.push({ month: moment(this.state.startMonthForExtrapolation).add(inputDataAverageFilter[i].month - 1, 'months').format("YYYY-MM-DD"), amount: inputDataAverageFilter[i].forecast })
                     }
                     consumptionExtrapolationList[consumptionExtrapolationMovingData].extrapolationDataList = data;
                 }
-
+                //Linear Regression
                 if (consumptionExtrapolationRegression == -1) {
                     var data = [];
                     for (var i = 0; i < inputDataRegressionFilter.length; i++) {
@@ -1139,8 +1152,201 @@ export default class ExtrapolateDataComponent extends React.Component {
                     }
                     consumptionExtrapolationList[consumptionExtrapolationRegression].extrapolationDataList = data;
                 }
+                //TES L
+                console.log("consumptionExtrapolationTESL@@@", consumptionExtrapolationTESL)
+                if (consumptionExtrapolationTESL == -1) {
+                    console.log("in if1")
+                    var data = [];
+                    for (var i = 0; i < tesData.length; i++) {
+                        data.push({ month: moment(this.state.startMonthForExtrapolation).add(tesData[i].month - 1, 'months').format("YYYY-MM-DD"), amount: (Number(tesData[i].forecast) - Number(CI)) })
+                    }
+                    consumptionExtrapolationList.push(
+                        {
+                            "consumptionExtrapolationId": consumptionExtrapolationList.length + 1,
+                            "planningUnit": {
+                                "id": this.state.planningUnitId,
+                                "label": {
+                                }
+                            },
+                            "region": {
+                                "id": this.state.regionId,
+                                "label": {
+                                }
+                            },
+                            "extrapolationMethod": {
+                                "id": 1,
+                                "label": {
+                                    "createdBy": null,
+                                    "createdDate": null,
+                                    "lastModifiedBy": null,
+                                    "lastModifiedDate": null,
+                                    "active": true,
+                                    "labelId": 34703,
+                                    "label_en": "TES Low Confidence",
+                                    "label_sp": null,
+                                    "label_fr": null,
+                                    "label_pr": null
+                                }
+                            },
+                            "jsonProperties": {
+                                confidenceLevel: this.state.confidenceLevelId,
+                                seasonality: this.state.noOfMonthsForASeason,
+                                alpha: this.state.alpha,
+                                beta: this.state.beta,
+                                gamma: this.state.gamma
+                            },
+                            "createdBy": {
+                                "userId": 1,
+                                "username": "Anchal C"
+                            },
+                            "createdDate": "2021-12-14 12:24:20",
+                            "extrapolationDataList": data
+                        })
+                } else {
+                    console.log("in else 1")
+                    consumptionExtrapolationList[consumptionExtrapolationTESL].jsonProperties = {
+                        confidenceLevel: this.state.confidenceLevelId,
+                        seasonality: this.state.noOfMonthsForASeason,
+                        alpha: this.state.alpha,
+                        beta: this.state.beta,
+                        gamma: this.state.gamma
+                    };
+                    var data = [];
+                    for (var i = 0; i < tesData.length; i++) {
+                        data.push({ month: moment(this.state.startMonthForExtrapolation).add(tesData[i].month - 1, 'months').format("YYYY-MM-DD"), amount: (Number(tesData[i].forecast) - Number(CI)) })
+                    }
+                    consumptionExtrapolationList[consumptionExtrapolationTESL].extrapolationDataList = data;
+                }
+                //TES M
+                if (consumptionExtrapolationTESM == -1) {
+                    console.log("in if2")
+                    var data = [];
+                    for (var i = 0; i < tesData.length; i++) {
+                        data.push({ month: moment(this.state.startMonthForExtrapolation).add(tesData[i].month - 1, 'months').format("YYYY-MM-DD"), amount: (Number(tesData[i].forecast)) })
+                    }
+                    consumptionExtrapolationList.push(
+                        {
+                            "consumptionExtrapolationId": consumptionExtrapolationList.length + 1,
+                            "planningUnit": {
+                                "id": this.state.planningUnitId,
+                                "label": {
+                                }
+                            },
+                            "region": {
+                                "id": this.state.regionId,
+                                "label": {
+                                }
+                            },
+                            "extrapolationMethod": {
+                                "id": 2,
+                                "label": {
+                                    "createdBy": null,
+                                    "createdDate": null,
+                                    "lastModifiedBy": null,
+                                    "lastModifiedDate": null,
+                                    "active": true,
+                                    "labelId": 34703,
+                                    "label_en": "TES Med Confidence",
+                                    "label_sp": null,
+                                    "label_fr": null,
+                                    "label_pr": null
+                                }
+                            },
+                            "jsonProperties": {
+                                confidenceLevel: this.state.confidenceLevelId,
+                                seasonality: this.state.noOfMonthsForASeason,
+                                alpha: this.state.alpha,
+                                beta: this.state.beta,
+                                gamma: this.state.gamma
+                            },
+                            "createdBy": {
+                                "userId": 1,
+                                "username": "Anchal C"
+                            },
+                            "createdDate": "2021-12-14 12:24:20",
+                            "extrapolationDataList": data
+                        })
+                } else {
+                    console.log("in else 2")
+                    consumptionExtrapolationList[consumptionExtrapolationTESM].jsonProperties = {
+                        confidenceLevel: this.state.confidenceLevelId,
+                        seasonality: this.state.noOfMonthsForASeason,
+                        alpha: this.state.alpha,
+                        beta: this.state.beta,
+                        gamma: this.state.gamma
+                    };
+                    var data = [];
+                    for (var i = 0; i < tesData.length; i++) {
+                        data.push({ month: moment(this.state.startMonthForExtrapolation).add(tesData[i].month - 1, 'months').format("YYYY-MM-DD"), amount: (Number(tesData[i].forecast)) })
+                    }
+                    consumptionExtrapolationList[consumptionExtrapolationTESM].extrapolationDataList = data;
+                }
+                //TES H
+                if (consumptionExtrapolationTESH == -1) {
+                    console.log("in if3")
+                    var data = [];
+                    for (var i = 0; i < tesData.length; i++) {
+                        data.push({ month: moment(this.state.startMonthForExtrapolation).add(tesData[i].month - 1, 'months').format("YYYY-MM-DD"), amount: (Number(tesData[i].forecast) + Number(CI)) })
+                    }
+                    consumptionExtrapolationList.push(
+                        {
+                            "consumptionExtrapolationId": consumptionExtrapolationList.length + 1,
+                            "planningUnit": {
+                                "id": this.state.planningUnitId,
+                                "label": {
+                                }
+                            },
+                            "region": {
+                                "id": this.state.regionId,
+                                "label": {
+                                }
+                            },
+                            "extrapolationMethod": {
+                                "id": 1,
+                                "label": {
+                                    "createdBy": null,
+                                    "createdDate": null,
+                                    "lastModifiedBy": null,
+                                    "lastModifiedDate": null,
+                                    "active": true,
+                                    "labelId": 34703,
+                                    "label_en": "TES High Confidence",
+                                    "label_sp": null,
+                                    "label_fr": null,
+                                    "label_pr": null
+                                }
+                            },
+                            "jsonProperties": {
+                                confidenceLevel: this.state.confidenceLevelId,
+                                seasonality: this.state.noOfMonthsForASeason,
+                                alpha: this.state.alpha,
+                                beta: this.state.beta,
+                                gamma: this.state.gamma
+                            },
+                            "createdBy": {
+                                "userId": 1,
+                                "username": "Anchal C"
+                            },
+                            "createdDate": "2021-12-14 12:24:20",
+                            "extrapolationDataList": data
+                        })
+                } else {
+                    consumptionExtrapolationList[consumptionExtrapolationTESH].jsonProperties = {
+                        confidenceLevel: this.state.confidenceLevelId,
+                        seasonality: this.state.noOfMonthsForASeason,
+                        alpha: this.state.alpha,
+                        beta: this.state.beta,
+                        gamma: this.state.gamma
+                    };
+                    var data = [];
+                    for (var i = 0; i < tesData.length; i++) {
+                        data.push({ month: moment(this.state.startMonthForExtrapolation).add(tesData[i].month - 1, 'months').format("YYYY-MM-DD"), amount: (Number(tesData[i].forecast) + Number(CI)) })
+                    }
+                    consumptionExtrapolationList[consumptionExtrapolationTESH].extrapolationDataList = data;
+                }
                 console.log('consumptionExtrapolationRegression', consumptionExtrapolationRegression);
                 datasetJson.consumptionExtrapolation = consumptionExtrapolationList;
+                console.log("consumptionExtrapolationList+++", consumptionExtrapolationList)
                 datasetData = (CryptoJS.AES.encrypt(JSON.stringify(datasetJson), SECRET_KEY)).toString()
                 myResult.programData = datasetData;
                 var putRequest = datasetTransaction.put(myResult);
@@ -1152,10 +1358,13 @@ export default class ExtrapolateDataComponent extends React.Component {
             }.bind(this);
         }.bind(this);
     }
+
     setPlanningUnitId(e) {
         var planningUnitId = e.target.value;
         this.setState({
             planningUnitId: planningUnitId
+        }, () => {
+            this.setExtrapolatedParameters();
         })
     }
 
@@ -1163,13 +1372,74 @@ export default class ExtrapolateDataComponent extends React.Component {
         var regionId = e.target.value;
         this.setState({
             regionId: regionId
+        }, () => {
+            this.setExtrapolatedParameters();
         })
+    }
+
+    setExtrapolatedParameters() {
+        if (this.state.planningUnitId > 0 && this.state.regionId > 0) {
+            var datasetJson = this.state.datasetJson;
+            var actualConsumptionList = datasetJson.actualConsumptionList;
+            var startDate = moment(datasetJson.currentVersion.forecastStartDate).format("YYYY-MM-DD");
+            var stopDate = moment(datasetJson.currentVersion.forecastStopDate).format("YYYY-MM-DD");
+            var consumptionExtrapolationList = datasetJson.consumptionExtrapolation;
+            var monthsForMovingAverage = this.state.monthsForMovingAverage;
+            var consumptionExtrapolationData = consumptionExtrapolationList.filter(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId && c.extrapolationMethod.id == 6)//Semi Averages
+            var consumptionExtrapolationMovingData = consumptionExtrapolationList.filter(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId && c.extrapolationMethod.id == 7)//Moving averages
+            console.log("consumptionExtrapolationMovingData+++", consumptionExtrapolationMovingData)
+            var consumptionExtrapolationRegression = consumptionExtrapolationList.filter(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId && c.extrapolationMethod.id == 5)//Linear Regression
+            var consumptionExtrapolationTESL = consumptionExtrapolationList.filter(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId && c.extrapolationMethod.id == 1)//TES L
+            if (consumptionExtrapolationMovingData.length > 0) {
+                monthsForMovingAverage = consumptionExtrapolationMovingData[0].jsonProperties.months;
+            }
+            var confidenceLevel = this.state.confidenceLevelId;
+            var seasonality = this.state.noOfMonthsForASeason;
+            var alpha = this.state.alpha;
+            var beta = this.state.beta;
+            var gamma = this.state.gamma;
+            console.log("consumptionExtrapolationTESL+++", consumptionExtrapolationTESL)
+            if (consumptionExtrapolationTESL.length > 0) {
+                confidenceLevel = consumptionExtrapolationTESL[0].jsonProperties.confidenceLevel;
+                seasonality = consumptionExtrapolationTESL[0].jsonProperties.seasonality;
+                alpha = consumptionExtrapolationTESL[0].jsonProperties.alpha;
+                beta = consumptionExtrapolationTESL[0].jsonProperties.beta;
+                gamma = consumptionExtrapolationTESL[0].jsonProperties.gamma;
+            }
+            var monthArray = [];
+            var curDate = startDate;
+            for (var m = 0; curDate < moment(stopDate).add(-1, 'months').format("YYYY-MM-DD"); m++) {
+                curDate = moment(startDate).add(m, 'months').format("YYYY-MM-DD");
+                monthArray.push(curDate)
+            }
+            this.setState({
+                actualConsumptionList: actualConsumptionList,
+                startDate: startDate,
+                stopDate: stopDate,
+                monthArray: monthArray,
+                monthsForMovingAverage: monthsForMovingAverage,
+                confidenceLevelId: confidenceLevel,
+                noOfMonthsForASeason: seasonality,
+                alpha: alpha,
+                beta: beta,
+                gamma: gamma,
+                showData: true
+            }, () => {
+                this.buildJxl();
+            })
+        } else {
+            this.setState({
+                showData: false
+            })
+        }
     }
 
     setAlpha(e) {
         var alpha = e.target.value;
         this.setState({
             alpha: alpha
+        }, () => {
+            this.buildJxl();
         })
     }
 
@@ -1177,6 +1447,8 @@ export default class ExtrapolateDataComponent extends React.Component {
         var beta = e.target.value;
         this.setState({
             beta: beta
+        }, () => {
+            this.buildJxl();
         })
     }
 
@@ -1184,6 +1456,8 @@ export default class ExtrapolateDataComponent extends React.Component {
         var gamma = e.target.value;
         this.setState({
             gamma: gamma
+        }, () => {
+            this.buildJxl();
         })
     }
 
@@ -1191,13 +1465,17 @@ export default class ExtrapolateDataComponent extends React.Component {
         var seasonals = e.target.value;
         this.setState({
             noOfMonthsForASeason: seasonals
+        }, () => {
+            this.buildJxl()
         })
     }
 
     setConfidenceLevelId(e) {
         var confidenceLevelId = e.target.value;
         this.setState({
-            confidence: confidenceLevelId
+            confidenceLevelId: confidenceLevelId
+        }, () => {
+            this.buildJxl()
         })
     }
 
@@ -1205,6 +1483,8 @@ export default class ExtrapolateDataComponent extends React.Component {
         var monthsForMovingAverage = e.target.value;
         this.setState({
             monthsForMovingAverage: monthsForMovingAverage
+        }, () => {
+            this.buildJxl()
         })
     }
     setMovingAvgId(e) {
@@ -1559,24 +1839,26 @@ export default class ExtrapolateDataComponent extends React.Component {
                 data: this.state.dataList.map((item, index) => (item.arimaForecast > 0 ? item.arimaForecast : null))
             })
         }
-        let line = "";
-        line = {
-            labels: this.state.dataList.map((item, index) => (item.months)),
-            datasets: datasets
+        let line = {};
+        if (this.state.showData) {
+            line = {
+                labels: this.state.dataList.map((item, index) => (item.months)),
+                datasets: datasets
+            }
         }
 
 
         return (
             <div className="animated fadeIn">
                 <Card>
-                <div className="card-header-actions">
-                    <div className="Card-header-reporticon">
-                    <span className="compareAndSelect-larrow"> <i className="cui-arrow-left icons " > </i></span>
-                    <span className="compareAndSelect-rarrow"> <i className="cui-arrow-right icons " > </i></span>
-                    <span className="compareAndSelect-larrowText"> Back to <a href="/#">Consumption Entry & Adjustment</a></span>
-                    <span className="compareAndSelect-rarrowText"> Continue to <a href="/#">Campare & Select Forecast</a></span><br/>
-                        {/* <strong>{i18n.t('static.dashboard.supplyPlan')}</strong> */}
-                        
+                    <div className="card-header-actions">
+                        <div className="Card-header-reporticon">
+                            <span className="compareAndSelect-larrow"> <i className="cui-arrow-left icons " > </i></span>
+                            <span className="compareAndSelect-rarrow"> <i className="cui-arrow-right icons " > </i></span>
+                            <span className="compareAndSelect-larrowText"> Back to <a href="/#">Consumption Entry & Adjustment</a></span>
+                            <span className="compareAndSelect-rarrowText"> Continue to <a href="/#">Campare & Select Forecast</a></span><br />
+                            {/* <strong>{i18n.t('static.dashboard.supplyPlan')}</strong> */}
+
                             <a className="card-header-action">
                                 <span style={{ cursor: 'pointer' }} onClick={() => { this.toggleShowGuidance() }}><small className="supplyplanformulas">Show Guidance</small></span>
                             </a>
@@ -1603,7 +1885,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                 value={this.state.forecastProgramId}
                                                 onChange={(e) => { this.getPlanningUnitList(e) }}
                                             >
-                                                <option value="">{i18n.t('static.common.all')}</option>
+                                                <option value="">{i18n.t('static.common.select')}</option>
                                                 {forecastPrograms}
                                             </Input>
                                         </div>
@@ -1619,7 +1901,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                 value={this.state.planningUnitId}
                                                 onChange={(e) => { this.setPlanningUnitId(e); }}
                                             >
-                                                <option value="">{i18n.t('static.common.all')}</option>
+                                                <option value="">{i18n.t('static.common.select')}</option>
                                                 {planningUnits}
                                             </Input>
                                         </div>
@@ -1633,9 +1915,9 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                 id="regionId"
                                                 bsSize="sm"
                                                 value={this.state.regionId}
-                                                onChange={(e) => { this.setRegionId(e); this.getDatasetData(e); }}
+                                                onChange={(e) => { this.setRegionId(e); }}
                                             >
-                                                <option value="">{i18n.t('static.common.all')}</option>
+                                                <option value="">{i18n.t('static.common.select')}</option>
                                                 {regions}
                                             </Input>
                                         </div>
@@ -1677,13 +1959,13 @@ export default class ExtrapolateDataComponent extends React.Component {
                                         </div>
                                     </FormGroup>
                                     <FormGroup className="col-md-12">
-                                    <h5>
-                                        {this.state.planningUnitId > 0 &&
-                                            document.getElementById("planningUnitId").selectedOptions[0].text }
-                                        {this.state.regionId > 0 &&
-                                           " and "+ document.getElementById("regionId").selectedOptions[0].text + " Region, Select your extrapolation parameters:"}
-                                    </h5>
-</FormGroup>
+                                        <h5>
+                                            {this.state.planningUnitId > 0 &&
+                                                document.getElementById("planningUnitId").selectedOptions[0].text}
+                                            {this.state.regionId > 0 &&
+                                                " and " + document.getElementById("regionId").selectedOptions[0].text + " Region, Select your extrapolation parameters:"}
+                                        </h5>
+                                    </FormGroup>
                                     <FormGroup className="col-md-3">
                                         <Label htmlFor="appendedInputButton">Select date range for historical data<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
                                         <div className="controls edit">
@@ -1739,7 +2021,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                         id="noOfMonthsId"
                                                         name="noOfMonthsId"
                                                         value={this.state.monthsForMovingAverage}
-                                                        onChange={(e) => { this.setMonthsForMovingAverage(e); this.getDatasetData(e); }}
+                                                        onChange={(e) => { this.setMonthsForMovingAverage(e); }}
                                                     />
                                                 </div>
                                             
@@ -1953,136 +2235,141 @@ export default class ExtrapolateDataComponent extends React.Component {
                                     </FormGroup>
                                 </div>
                             </div>
+                            {/* <div className="col-md-12">
+                                <Button type="button" size="md" color="warning" className="float-right mr-1" onClick={this.reset}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                                <Button type="submit" color="success" className="mr-1 float-right" size="md" ><i className="fa fa-check"> </i>Submit</Button>
+                            </div> */}
                         </Form>
 
                         {/* Graph */}
-                        <div className="col-md-12">
+                        {this.state.showData && <div className="col-md-12">
                             <div className="chart-wrapper chart-graph-report pl-5 ml-3" style={{ marginLeft: '50px' }}>
                                 <Line id="cool-canvas" data={line} options={options} />
                                 <div>
 
                                 </div>
                             </div>
-                        </div><br /><br />
-                        <div className="table-scroll">
-                            <div className="table-wrap table-responsive">
-                                <Table className="table-bordered text-center mt-2 overflowhide main-table " bordered size="sm" >
-                                    <thead>
-                                        <tr>
-                                            <td width="230px"><b>Errors</b></td>
-                                            {this.state.movingAvgId &&
-                                                <td width="110px"><b>Moving Averages</b></td>
-                                            }
-                                            {this.state.semiAvgId &&
-                                                <td width="110px"><b>Semi Averages</b></td>
-                                            }
-                                            {this.state.linearRegressionId &&
-                                                <td width="110px"><b>Linear Regression</b></td>
-                                            }
-                                            {this.state.smoothingId &&
-                                                <td width="110px"><b>TES</b></td>
-                                            }
-                                            {this.state.arimaId &&
-                                                <td width="110px"><b>ARIMA</b></td>
-                                            }
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td>RMSE</td>
-                                            {this.state.movingAvgId &&
-                                                <td>{this.state.rmseMovingAvg}</td>
-                                            }
-                                            {this.state.semiAvgId &&
-                                                <td>{this.state.rmseSemi}</td>
-                                            }
-                                            {this.state.linearRegressionId &&
-                                                <td bgcolor="#118B70">{this.state.rmseLinearReg}</td>
-                                            }
-                                            {this.state.smoothingId &&
-                                                <td>{this.state.rmse}</td>
-                                            }
-                                            {this.state.arimaId &&
-                                                <td></td>
-                                            }
-                                        </tr>
-                                        <tr>
-                                            <td>MAPE</td>
-                                            {this.state.movingAvgId &&
-                                                <td>{this.state.mapeMovingAvg}</td>
-                                            }
-                                            {this.state.semiAvgId &&
-                                                <td>{this.state.mapeSemi}</td>
-                                            }
-                                            {this.state.linearRegressionId &&
-                                                <td bgcolor="#118B70">{this.state.mapeLinearReg}</td>
-                                            }
-                                            {this.state.smoothingId &&
-                                                <td>{this.state.mape}</td>
-                                            }
-                                            {this.state.arimaId &&
-                                                <td></td>
-                                            }
-                                        </tr>
-                                        <tr>
-                                            <td>MSE</td>
-                                            {this.state.movingAvgId &&
-                                                <td>{this.state.mseMovingAvg}</td>
-                                            }
-                                            {this.state.semiAvgId &&
-                                                <td>{this.state.mseSemi}</td>
-                                            }
-                                            {this.state.linearRegressionId &&
-                                                <td bgcolor="#118B70">{this.state.mseLinearReg}</td>
-                                            }
-                                            {this.state.smoothingId &&
-                                                <td>{this.state.mse}</td>
-                                            }
-                                            {this.state.arimaId &&
-                                                <td></td>
-                                            }
-                                        </tr>
-                                        <tr>
-                                            <td>WAPE</td>
-                                            {this.state.movingAvgId &&
-                                                <td>{this.state.wapeMovingAvg}</td>
-                                            }
-                                            {this.state.semiAvgId &&
-                                                <td>{this.state.wapeSemi}</td>
-                                            }
-                                            {this.state.linearRegressionId &&
-                                                <td>{this.state.wapeLinearReg}</td>
-                                            }
-                                            {this.state.smoothingId &&
-                                                <td>{this.state.wape}</td>
-                                            }
-                                            {this.state.arimaId &&
-                                                <td></td>
-                                            }
-                                        </tr>
-                                        <tr>
-                                            <td>R^2</td>
-                                            {this.state.movingAvgId &&
-                                                <td>{this.state.rSqdMovingAvg}</td>
-                                            }
-                                            {this.state.semiAvgId &&
-                                                <td>{this.state.rSqdSemi}</td>
-                                            }
-                                            {this.state.linearRegressionId &&
-                                                <td>{this.state.rSqdLinearReg}</td>
-                                            }
-                                            {this.state.smoothingId &&
-                                                <td>{this.state.rSqd}</td>
-                                            }
-                                            {this.state.arimaId &&
-                                                <td></td>
-                                            }
-                                        </tr>
-                                    </tbody>
-                                </Table>
-                            </div>
-                        </div>
-                        <div id="tableDiv" className="extrapolateTable"></div>
+                        </div>}<br /><br />
+                        {this.state.showData &&
+                            <div className="table-scroll">
+                                <div className="table-wrap table-responsive">
+                                    <Table className="table-bordered text-center mt-2 overflowhide main-table " bordered size="sm" >
+                                        <thead>
+                                            <tr>
+                                                <td width="230px"><b>Errors</b></td>
+                                                {this.state.movingAvgId &&
+                                                    <td width="110px"><b>Moving Averages</b></td>
+                                                }
+                                                {this.state.semiAvgId &&
+                                                    <td width="110px"><b>Semi Averages</b></td>
+                                                }
+                                                {this.state.linearRegressionId &&
+                                                    <td width="110px"><b>Linear Regression</b></td>
+                                                }
+                                                {this.state.smoothingId &&
+                                                    <td width="110px"><b>TES</b></td>
+                                                }
+                                                {this.state.arimaId &&
+                                                    <td width="110px"><b>ARIMA</b></td>
+                                                }
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>RMSE</td>
+                                                {this.state.movingAvgId &&
+                                                    <td>{this.state.rmseMovingAvg}</td>
+                                                }
+                                                {this.state.semiAvgId &&
+                                                    <td>{this.state.rmseSemi}</td>
+                                                }
+                                                {this.state.linearRegressionId &&
+                                                    <td bgcolor="#118B70">{this.state.rmseLinearReg}</td>
+                                                }
+                                                {this.state.smoothingId &&
+                                                    <td>{this.state.rmse}</td>
+                                                }
+                                                {this.state.arimaId &&
+                                                    <td></td>
+                                                }
+                                            </tr>
+                                            <tr>
+                                                <td>MAPE</td>
+                                                {this.state.movingAvgId &&
+                                                    <td>{this.state.mapeMovingAvg}</td>
+                                                }
+                                                {this.state.semiAvgId &&
+                                                    <td>{this.state.mapeSemi}</td>
+                                                }
+                                                {this.state.linearRegressionId &&
+                                                    <td bgcolor="#118B70">{this.state.mapeLinearReg}</td>
+                                                }
+                                                {this.state.smoothingId &&
+                                                    <td>{this.state.mape}</td>
+                                                }
+                                                {this.state.arimaId &&
+                                                    <td></td>
+                                                }
+                                            </tr>
+                                            <tr>
+                                                <td>MSE</td>
+                                                {this.state.movingAvgId &&
+                                                    <td>{this.state.mseMovingAvg}</td>
+                                                }
+                                                {this.state.semiAvgId &&
+                                                    <td>{this.state.mseSemi}</td>
+                                                }
+                                                {this.state.linearRegressionId &&
+                                                    <td bgcolor="#118B70">{this.state.mseLinearReg}</td>
+                                                }
+                                                {this.state.smoothingId &&
+                                                    <td>{this.state.mse}</td>
+                                                }
+                                                {this.state.arimaId &&
+                                                    <td></td>
+                                                }
+                                            </tr>
+                                            <tr>
+                                                <td>WAPE</td>
+                                                {this.state.movingAvgId &&
+                                                    <td>{this.state.wapeMovingAvg}</td>
+                                                }
+                                                {this.state.semiAvgId &&
+                                                    <td>{this.state.wapeSemi}</td>
+                                                }
+                                                {this.state.linearRegressionId &&
+                                                    <td>{this.state.wapeLinearReg}</td>
+                                                }
+                                                {this.state.smoothingId &&
+                                                    <td>{this.state.wape}</td>
+                                                }
+                                                {this.state.arimaId &&
+                                                    <td></td>
+                                                }
+                                            </tr>
+                                            <tr>
+                                                <td>R^2</td>
+                                                {this.state.movingAvgId &&
+                                                    <td>{this.state.rSqdMovingAvg}</td>
+                                                }
+                                                {this.state.semiAvgId &&
+                                                    <td>{this.state.rSqdSemi}</td>
+                                                }
+                                                {this.state.linearRegressionId &&
+                                                    <td>{this.state.rSqdLinearReg}</td>
+                                                }
+                                                {this.state.smoothingId &&
+                                                    <td>{this.state.rSqd}</td>
+                                                }
+                                                {this.state.arimaId &&
+                                                    <td></td>
+                                                }
+                                            </tr>
+                                        </tbody>
+                                    </Table>
+                                </div>
+                            </div>}
+                        {this.state.showData && <div id="tableDiv" className="extrapolateTable"></div>}
                     </CardBody>
                     <CardFooter>
                         <FormGroup>
