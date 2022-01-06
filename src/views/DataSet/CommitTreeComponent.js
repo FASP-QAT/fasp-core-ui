@@ -26,7 +26,7 @@ import ProgramService from "../../api/ProgramService";
 import AuthenticationService from '../Common/AuthenticationService.js';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
-const entityname = 'Commit';
+const entityname = i18n.t('static.button.commit');
 
 
 export default class CommitTreeComponent extends React.Component {
@@ -449,13 +449,13 @@ export default class CommitTreeComponent extends React.Component {
 
                 var columnsArray = [];
                 columnsArray.push({
-                    title: "Month",
+                    title: i18n.t('static.inventoryDate.inventoryReport'),
                     type: 'calendar', options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker' }, width: 100,
                     // readOnly: true
                 });
                 for (var nwp = 0; nwp < nodeWithPercentageChildren.length; nwp++) {
                     columnsArray.push({
-                        title: nodeWithPercentageChildren[nwp].label.label_en,
+                        title: getLabelText(nodeWithPercentageChildren[nwp].label, this.state.lang),
                         type: nodeWithPercentageChildrenWithHundredCent[nwp] == 1 ? 'numeric' : 'hidden',
                         mask: '#,##.00%', decimal: '.'
                         // readOnly: true
@@ -916,7 +916,7 @@ export default class CommitTreeComponent extends React.Component {
         let jxlTable = this.state.treeScenarioList.map((item1, count) => {
             var nodeWithPercentageChildren = this.state.nodeWithPercentageChildren.filter(c => c.treeId == item1.treeId && c.scenarioId == item1.scenarioId);
             if (nodeWithPercentageChildren.length > 0) {
-                return (<><span>{item1.treeLabel.label_en + " / " + item1.scenarioLabel.label_en}</span><div className="table-responsive">
+                return (<><span>{getLabelText(item1.treeLabel, this.state.lang) + " / " + getLabelText(item1.scenarioLabel, this.state.lang)}</span><div className="table-responsive">
                     <div id={"tableDiv" + count} className="jexcelremoveReadonlybackground consumptionDataEntryTable" name='jxlTableData' />
                 </div><br /></>)
             }
@@ -952,8 +952,8 @@ export default class CommitTreeComponent extends React.Component {
                     <td>{getLabelText(item.tree, this.state.lang)}</td>
                     <td>{getLabelText(item.node, this.state.lang)}</td>
                     <td>{getLabelText(item.scenario, this.state.lang)}</td>
-                    <td>{(item.notes != "" && item.notes != null) ? "Main : " + item.notes : ""}<br />
-                        {(item.madelingNotes != "" && item.madelingNotes != null) ? "Modeling : " + item.madelingNotes : ""}</td>
+                    <td>{(item.notes != "" && item.notes != null) ? i18n.t('static.commitTree.main') + " : " + item.notes : ""}<br />
+                        {(item.madelingNotes != "" && item.madelingNotes != null) ? i18n.t('static.commitTree.modeling') + " : " + item.madelingNotes : ""}</td>
                 </tr>
             )
         }, this);
@@ -1026,18 +1026,18 @@ export default class CommitTreeComponent extends React.Component {
                             </ProgressBar>
                             <div className="d-sm-down-none  progressbar">
                                 <ul>
-                                    <li className="quantimedProgressbartext1">Compare Data</li>
-                                    <li className="quantimedProgressbartext2">Resolve Conflicts</li>
-                                    <li className="quantimedProgressbartext3">Sending data to server</li>
-                                    <li className="quantimedProgressbartext4">Server processing</li>
-                                    <li className="quantimedProgressbartext5">Upgrade local to latest version</li>
+                                    <li className="quantimedProgressbartext1">{i18n.t('static.commitVersion.compareData')}</li>
+                                    <li className="quantimedProgressbartext2">{i18n.t('static.commitVersion.resolveConflicts')}</li>
+                                    <li className="quantimedProgressbartext3">{i18n.t('static.commitVersion.sendingDataToServer')}</li>
+                                    <li className="quantimedProgressbartext4">{i18n.t('static.commitTree.serverProcessing')}</li>
+                                    <li className="quantimedProgressbartext5">{i18n.t('static.commitVersion.upgradeLocalToLatest')}</li>
                                 </ul>
                             </div>
                             <Form name='simpleForm'>
                                 <div className=" pl-0">
                                     <div className="row">
                                         <FormGroup className="col-md-3 ">
-                                            <Label htmlFor="appendedInputButton">Program</Label>
+                                            <Label htmlFor="appendedInputButton">{i18n.t('static.dashboard.programheader')}</Label>
                                             <div className="controls ">
                                                 <Input
                                                     type="select"
@@ -1078,7 +1078,7 @@ export default class CommitTreeComponent extends React.Component {
                             <div>
                                 <div className="row">
                                     <FormGroup className="col-md-4">
-                                        <Label htmlFor="appendedInputButton">Version Type</Label>
+                                        <Label htmlFor="appendedInputButton">{i18n.t('static.report.versiontype')}</Label>
                                         <div className="controls ">
                                             <Input
                                                 type="select"
@@ -1089,13 +1089,13 @@ export default class CommitTreeComponent extends React.Component {
                                                 onChange={(e) => { this.setVersionTypeId(e); }}
                                             >
                                                 <option value="">{i18n.t('static.common.select')}</option>
-                                                <option value="1">Draft Version</option>
-                                                <option value="2">Final Version</option>
+                                                <option value="1">{i18n.t('static.commitTree.draftVersion')}</option>
+                                                <option value="2">{i18n.t('static.commitTree.finalVersion')}</option>
                                             </Input>
                                         </div>
                                     </FormGroup>
                                     <FormGroup className="col-md-6">
-                                        <Label htmlFor="appendedInputButton">Notes</Label>
+                                        <Label htmlFor="appendedInputButton">{i18n.t('static.program.notes')}</Label>
                                         <Input
                                             className="controls"
                                             type="textarea"
@@ -1105,9 +1105,9 @@ export default class CommitTreeComponent extends React.Component {
                                     </FormGroup>
 
                                     <div className="col-md-12">
-                                        <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-refresh"></i> Cancel</Button>
+                                        <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.cancel')}</Button>
                                         {/* <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={this.synchronize}><i className="fa fa-check"></i>Commit</Button> */}
-                                        <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => { this.toggleShowValidation() }}><i className="fa fa-check"></i>Commit</Button>
+                                        <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => { this.toggleShowValidation() }}><i className="fa fa-check"></i>{i18n.t('static.button.commit')}</Button>
                                     </div>
                                 </div>
                             </div>
@@ -1118,76 +1118,76 @@ export default class CommitTreeComponent extends React.Component {
                 <Modal isOpen={this.state.showValidation}
                     className={'modal-lg ' + this.props.className} id='divcontents'>
                     <ModalHeader toggle={() => this.toggleShowValidation()} className="modalHeaderSupplyPlan">
-                        <h3><strong>Forecast Validation</strong><i className="fa fa-print pull-right iconClass cursor" onClick={() => this.print()}></i></h3>
+                        <h3><strong>{i18n.t('static.commitTree.forecastValidation')}</strong><i className="fa fa-print pull-right iconClass cursor" onClick={() => this.print()}></i></h3>
 
                     </ModalHeader>
                     <div>
                         <ModalBody>
                             <span><b>{this.state.programName}</b></span><br />
-                            <span><b>Forecast Period: </b> {moment(this.state.forecastStartDate).format('MMM-YYYY')} to {moment(this.state.forecastStopDate).format('MMM-YYYY')} </span><br /><br />
+                            <span><b>{i18n.t('static.common.forecastPeriod')}: </b> {moment(this.state.forecastStartDate).format('MMM-YYYY')} to {moment(this.state.forecastStopDate).format('MMM-YYYY')} </span><br /><br />
 
-                            <span><b>1. No forecast selected: </b>(<a href="/#/report/compareAndSelectScenario" target="_blank">Compare & Select</a>, <a href="/#/forecastReport/forecastSummary" target="_blank">Forecast Summary</a>)</span><br />
+                            <span><b>1. {i18n.t('static.commitTree.noForecastSelected')} : </b>(<a href="/#/report/compareAndSelectScenario" target="_blank">{i18n.t('static.commitTree.compare&Select')}</a>, <a href="/#/forecastReport/forecastSummary" target="_blank">{i18n.t('static.commitTree.forecastSummary')}</a>)</span><br />
                             <ul>{noForecastSelected}</ul>
 
-                            <span><b>2. Consumption Forecast: </b>(<a href="/#/dataentry/consumptionDataEntryAndAdjustment" target="_blank">Data Entry & Adjustment</a>, <a href="/#/extrapolation/extrapolateData" target="_blank">Extrapolation</a>)</span><br />
-                            <span>a. Months missing actual consumption values (gap) :</span><br />
+                            <span><b>2. {i18n.t('static.commitTree.consumptionForecast')} : </b>(<a href="/#/dataentry/consumptionDataEntryAndAdjustment" target="_blank">{i18n.t('static.commitTree.dataEntry&Adjustment')}</a>, <a href="/#/extrapolation/extrapolateData" target="_blank">{i18n.t('static.commitTree.extrapolation')}</a>)</span><br />
+                            <span>a. {i18n.t('static.commitTree.monthsMissingActualConsumptionValues')} :</span><br />
                             <ul>{missingMonths}</ul>
-                            <span>b. Planning units that don’t have at least 24 months of actual consumption values:</span><br />
+                            <span>b. {i18n.t('static.commitTree.puThatDoNotHaveAtleast24MonthsOfActualConsumptionValues')} :</span><br />
                             <ul>{consumption}</ul>
 
-                            <span><b>3. Tree Forecast(s) </b></span><br />
-                            <span>a. Planning unit that doesn’t appear on any Tree </span><br />
+                            <span><b>3. {i18n.t('static.commitTree.treeForecast')} </b></span><br />
+                            <span>a. {i18n.t('static.commitTree.puThatDoesNotAppearOnAnyTree')} </span><br />
                             <ul>{pu}</ul>
 
-                            <span>b. Branches Missing Planning Unit (<a href="/#/dataset/listTree" target="_blank">Manage Tree</a>)</span><br />
+                            <span>b. {i18n.t('static.commitTree.branchesMissingPlanningUnit')} (<a href="/#/dataset/listTree" target="_blank">{i18n.t('static.common.managetree')}</a>)</span><br />
                             {missingBranches}
 
-                            <span>c. Nodes with children that don’t add up to 100%</span><br />
+                            <span>c. {i18n.t('static.commitTree.NodesWithChildrenThatDoNotAddUpTo100Prcnt')}</span><br />
                             {jxlTable}
 
 
-                            <span><b>4. Notes:</b></span><br />
+                            <span><b>4. {i18n.t('static.program.notes')}:</b></span><br />
 
-                            <span><b>a. Consumption:</b></span>
+                            <span><b>a. {i18n.t('static.forecastMethod.historicalData')} :</b></span>
                             <div className="table-scroll">
                                 <div className="table-wrap table-responsive">
                                     <Table className="table-bordered text-center mt-2 overflowhide main-table " bordered size="sm" >
                                         <thead>
                                             <tr>
-                                                <th><b>Planning Unit</b></th>
-                                                <th><b>Notes</b></th>
+                                                <th><b>{i18n.t('static.dashboard.planningunitheader')}</b></th>
+                                                <th><b>{i18n.t('static.program.notes')}</b></th>
                                             </tr>
                                         </thead>
                                         <tbody>{consumtionNotes}</tbody>
                                     </Table>
                                 </div>
                             </div><br />
-                            <span><b>b. Tree Scenarios</b></span>
+                            <span><b>b. {i18n.t('static.commitTree.treeScenarios')}</b></span>
                             <div className="table-scroll">
                                 <div className="table-wrap table-responsive">
                                     <Table className="table-bordered text-center mt-2 overflowhide main-table " bordered size="sm" >
                                         <thead>
                                             <tr>
-                                                <th><b>Tree</b></th>
-                                                <th><b>Scenario</b></th>
-                                                <th><b>Notes</b></th>
+                                                <th><b>{i18n.t('static.forecastMethod.tree')}</b></th>
+                                                <th><b>{i18n.t('static.whatIf.scenario')}</b></th>
+                                                <th><b>{i18n.t('static.program.notes')}</b></th>
                                             </tr>
                                         </thead>
                                         <tbody>{scenarioNotes}</tbody>
                                     </Table>
                                 </div>
                             </div><br />
-                            <span><b>c. Tree Nodes</b></span>
+                            <span><b>c. {i18n.t('static.commitTree.treeNodes')}</b></span>
                             {/* <div className="table-scroll"> */}
                             <div>
                                 <div className="table-wrap table-responsive">
                                     <Table className="table-bordered text-center mt-2 overflowhide main-table " bordered size="sm" >
                                         <thead>
                                             <tr>
-                                                <th><b>Tree</b></th>
-                                                <th><b>Node</b></th>
-                                                <th><b>Scenario</b></th>
-                                                <th><b>Notes</b></th>
+                                                <th><b>{i18n.t('static.forecastMethod.treeTree')}</b></th>
+                                                <th><b>{i18n.t('static.common.node')}</b></th>
+                                                <th><b>{i18n.t('static.whatIf.scenario')}</b></th>
+                                                <th><b>{i18n.t('static.program.notes')}</b></th>
                                             </tr>
                                         </thead>
                                         <tbody>{treeNodes}</tbody>
@@ -1195,8 +1195,8 @@ export default class CommitTreeComponent extends React.Component {
                                 </div>
                             </div>
                             <div className="col-md-12 pb-lg-5 pt-lg-3">
-                                <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={() => { this.toggleShowValidation() }}><i className="fa fa-times"></i> Cancel</Button>
-                                <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={this.synchronize}><i className="fa fa-check"></i>OK</Button>
+                                <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={() => { this.toggleShowValidation() }}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={this.synchronize}><i className="fa fa-check"></i>{i18n.t('static.report.ok')}</Button>
                             </div>
                         </ModalBody>
                     </div>
