@@ -1207,36 +1207,44 @@ export default class ExtrapolateDataComponent extends React.Component {
             monthsForMovingAverage: monthsForMovingAverage
         })
     }
-
-
     setMovingAvgId(e) {
         var movingAvgId = e.target.checked;
         this.setState({
             movingAvgId: movingAvgId
+        },()=>{
+            this.buildJxl()
         })
     }
     setSemiAvgId(e) {
         var semiAvgId = e.target.checked;
         this.setState({
             semiAvgId: semiAvgId
+        },()=>{
+            this.buildJxl()
         })
     }
     setLinearRegressionId(e) {
         var linearRegressionId = e.target.checked;
         this.setState({
             linearRegressionId: linearRegressionId
+        },()=>{
+            this.buildJxl()
         })
     }
     setSmoothingId(e) {
         var smoothingId = e.target.checked;
         this.setState({
             smoothingId: smoothingId
+        },()=>{
+            this.buildJxl()
         })
     }
     setArimaId(e) {
         var arimaId = e.target.checked;
         this.setState({
             arimaId: arimaId
+        },()=>{
+            this.buildJxl()
         })
     }
     // setShowAdvanceId(e) {
@@ -1722,8 +1730,8 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                     <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
                                                 </Label>
                                             </div>
-                                            {this.state.movingAvgId &&
-                                                <div className="col-md-3">
+                                            
+                                                <div className="col-md-3" style={{display:this.state.movingAvgId?'block':'none'}}>
                                                     <Label htmlFor="appendedInputButton"># of Months</Label>
                                                     <Input
                                                         className="controls"
@@ -1734,7 +1742,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                         onChange={(e) => { this.setMonthsForMovingAverage(e); this.getDatasetData(e); }}
                                                     />
                                                 </div>
-                                            }
+                                            
                                             <div>
                                                 <Popover placement="top" isOpen={this.state.popoverOpenSa} target="Popover1" trigger="hover" toggle={() => this.toggle('popoverOpenMa', !this.state.popoverOpenSa)}>
                                                     <PopoverBody>Need to add Info.</PopoverBody>
@@ -1798,8 +1806,8 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                     <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenTes', !this.state.popoverOpenTes)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
                                                 </Label>
                                             </div>
-                                            {this.state.smoothingId &&
-                                                <div className="row col-md-12">
+                                            
+                                                <div className="row col-md-12" style={{display:this.state.smoothingId?'block':'none'}}>
                                                     <div className="col-md-2">
                                                         <Label htmlFor="appendedInputButton">Confidence level</Label>
                                                         <Input
@@ -1888,7 +1896,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                         />
                                                     </div> */}
                                                 </div>
-                                            }
+                                            
                                             <div>
                                                 <Popover placement="top" isOpen={this.state.popoverOpenArima} target="Popover1" trigger="hover" toggle={() => this.toggle('popoverOpenArima', !this.state.popoverOpenArima)}>
                                                     <PopoverBody>Need to add Info.</PopoverBody>
@@ -1910,8 +1918,8 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                     <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenArima', !this.state.popoverOpenArima)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
                                                 </Label>
                                             </div>
-                                            {this.state.arimaId &&
-                                                <div className="row">
+                                           
+                                                <div className="row" style={{display:this.state.arimaId?'block':'none'}}>
                                                     <div className="col-md-3">
                                                         <Label htmlFor="appendedInputButton">p</Label>
                                                         <Input
@@ -1940,14 +1948,10 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                         />
                                                     </div>
                                                 </div>
-                                            }
+                                            
                                         </div>
                                     </FormGroup>
                                 </div>
-                            </div>
-                            <div className="col-md-12">
-                                <Button type="button" size="md" color="warning" className="float-right mr-1" onClick={this.reset}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
-                                <Button type="submit" color="success" className="mr-1 float-right" size="md" ><i className="fa fa-check"> </i>Submit</Button>
                             </div>
                         </Form>
 
