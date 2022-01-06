@@ -51,6 +51,7 @@ import docicon from '../../assets/img/doc.png'
 import { saveAs } from "file-saver";
 import { Document, ImageRun, Packer, Paragraph, ShadingType, TextRun } from "docx";
 import { calculateModelingData } from '../../views/DataSet/ModelingDataCalculation2';
+import TreeExtrapolationComponent from '../../views/DataSet/TreeExtrapolationComponent';
 import AuthenticationService from '../Common/AuthenticationService';
 import SupplyPlanFormulas from "../SupplyPlan/SupplyPlanFormulas";
 import classNames from 'classnames';
@@ -529,7 +530,7 @@ export default class BuildTree extends Component {
                 }
             },
             momList: [],
-            activeTab1: new Array(2).fill('1'),
+            activeTab1: new Array(3).fill('1'),
             tracerCategoryList: [],
             tracerCategoryList: [],
             forecastMethodList: [],
@@ -732,7 +733,7 @@ export default class BuildTree extends Component {
         var scenarioId = scenarioId;
         var arr = [];
         var currentScenario;
-        console.log("items***&---",items);
+        console.log("items***&---", items);
         for (let i = 0; i < items.length; i++) {
             console.log("&&&&item---", items[i]);
             console.log("current item --->", items[i].payload.nodeDataMap[scenarioId][0]);
@@ -1972,7 +1973,7 @@ export default class BuildTree extends Component {
         console.log("scalingTotal---", scalingTotal);
         this.setState({
             scalingTotal
-        },()=>{
+        }, () => {
             // this.filterScalingDataByMonth(this.state.scalingMonth);
         });
     }
@@ -3154,7 +3155,7 @@ export default class BuildTree extends Component {
                     }
                 }
                 treeData.push(tempTree);
-                console.log("tempTree template---",tempTree);
+                console.log("tempTree template---", tempTree);
                 this.setState({
                     treeData,
                     treeId,
@@ -4977,7 +4978,7 @@ export default class BuildTree extends Component {
         this.setState({
             activeTab1: newArray,
         });
-        if (tab == 2) {
+        if (tab == 3) {
             console.log("***>>>", this.state.currentItemConfig);
             if (this.state.currentItemConfig.context.payload.nodeType.id != 1) {
                 var curDate = (moment(Date.now()).utcOffset('-0500').format('YYYY-MM-DD'));
@@ -6749,6 +6750,11 @@ export default class BuildTree extends Component {
                             )} />
                 </TabPane>
                 <TabPane tabId="2">
+                    Tree Extrapolation
+                    {/* <ConsumptionInSupplyPlanComponent ref="consumptionChild" items={this.state} toggleLarge={this.toggleLarge} updateState={this.updateState} formSubmit={this.formSubmit} hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} consumptionPage="consumptionDataEntry" useLocalData={1} /> */}
+                    <TreeExtrapolationComponent ref="consumptionChild" items={this.state}/>
+                </TabPane>
+                <TabPane tabId="3">
 
                     <div className="row pl-lg-5 pb-lg-3 pt-lg-0">
                         <div className="offset-md-10 col-md-6 pl-lg-4">
@@ -8420,7 +8426,7 @@ export default class BuildTree extends Component {
             <Modal isOpen={this.state.openAddNodeModal}
                 className={'modal-xl '} >
                 <ModalHeader className="modalHeaderSupplyPlan hideCross">
-                    <strong>{i18n.t('static.tree.Add/EditNode')}</strong>  {this.state.activeTab1[0] === '2' && <div className="HeaderNodeText"> {
+                    <strong>{i18n.t('static.tree.Add/EditNode')}</strong>  {this.state.activeTab1[0] === '3' && <div className="HeaderNodeText"> {
                         this.state.currentItemConfig.context.payload.nodeType.id == 2 ? <i class="fa fa-hashtag" style={{ fontSize: '11px', color: '#20a8d8' }}></i> :
                             (this.state.currentItemConfig.context.payload.nodeType.id == 3 ? <i class="fa fa-percent " style={{ fontSize: '11px', color: '#20a8d8' }} ></i> :
                                 (this.state.currentItemConfig.context.payload.nodeType.id == 4 ? <i class="fa fa-cube" style={{ fontSize: '11px', color: '#20a8d8' }} ></i> :
@@ -8428,7 +8434,7 @@ export default class BuildTree extends Component {
                                         (this.state.currentItemConfig.context.payload.nodeType.id == 1 ? <i class="fa fa-plus" style={{ fontSize: '11px', color: '#20a8d8' }} ></i> : "")
                                     )))}
                         <b className="supplyplanformulas ScalingheadTitle">{this.state.currentItemConfig.context.payload.label.label_en}</b></div>}
-                    <Button size="md" onClick={() => this.setState({ openAddNodeModal: false, cursorItem: 0, highlightItem: 0, activeTab1: new Array(2).fill('1') })} color="danger" style={{ paddingTop: '0px', paddingBottom: '0px', paddingLeft: '3px', paddingRight: '3px' }} className="submitBtn float-right mr-1"> <i className="fa fa-times"></i></Button>
+                    <Button size="md" onClick={() => this.setState({ openAddNodeModal: false, cursorItem: 0, highlightItem: 0, activeTab1: new Array(3).fill('1') })} color="danger" style={{ paddingTop: '0px', paddingBottom: '0px', paddingLeft: '3px', paddingRight: '3px' }} className="submitBtn float-right mr-1"> <i className="fa fa-times"></i></Button>
                 </ModalHeader>
                 <ModalBody>
                     <Row>
@@ -8447,6 +8453,14 @@ export default class BuildTree extends Component {
                                     <NavLink
                                         active={this.state.activeTab1[0] === '2'}
                                         onClick={() => { this.toggleModal(0, '2'); }}
+                                    >
+                                        {i18n.t('static.tree.extrapolation')}
+                                    </NavLink>
+                                </NavItem>
+                                <NavItem>
+                                    <NavLink
+                                        active={this.state.activeTab1[0] === '3'}
+                                        onClick={() => { this.toggleModal(0, '3'); }}
                                     >
                                         {i18n.t('static.tree.Modeling/Transfer')}
                                     </NavLink>
