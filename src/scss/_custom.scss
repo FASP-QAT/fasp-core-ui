@@ -5632,4 +5632,20 @@ font-style: italic!important;
 // .commitversionTable .jexcel>tbody>tr>td:nth-child(18) {
 //   text-align: left!important;
 // }
-  
+
+.printme {
+	display: none;
+}
+@media print {
+	.no-printme  {
+		display: none;
+	}
+	.printme  {
+		display: block;
+	}
+}
+
+.iconClass{
+  font-size: 15px;
+  cursor: pointer;
+}
