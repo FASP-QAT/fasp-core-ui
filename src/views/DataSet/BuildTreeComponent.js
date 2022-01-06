@@ -4978,6 +4978,9 @@ export default class BuildTree extends Component {
         this.setState({
             activeTab1: newArray,
         });
+        if (tab == 2) {
+            this.refs.extrapolationChild.buildJexcel();
+        }
         if (tab == 3) {
             console.log("***>>>", this.state.currentItemConfig);
             if (this.state.currentItemConfig.context.payload.nodeType.id != 1) {
@@ -6750,9 +6753,8 @@ export default class BuildTree extends Component {
                             )} />
                 </TabPane>
                 <TabPane tabId="2">
-                    Tree Extrapolation
                     {/* <ConsumptionInSupplyPlanComponent ref="consumptionChild" items={this.state} toggleLarge={this.toggleLarge} updateState={this.updateState} formSubmit={this.formSubmit} hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} consumptionPage="consumptionDataEntry" useLocalData={1} /> */}
-                    <TreeExtrapolationComponent ref="consumptionChild" items={this.state}/>
+                    <TreeExtrapolationComponent ref="extrapolationChild" items={this.state} />
                 </TabPane>
                 <TabPane tabId="3">
 
