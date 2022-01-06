@@ -97,7 +97,14 @@ class DefaultHeader extends Component {
           
            <NavItem className="">
             <span className="nav-link">
-              <a href={"../../../../src/ShowGuidanceHtmlFile/ShowGuidance.html"} target="_blank">
+              <a href={localStorage.getItem('lang')=='en'?
+              "../../../../src/ShowGuidanceHtmlFile/ShowGuidanceEn.html":
+              localStorage.getItem('lang')=='fr'?
+              "../../../../src/ShowGuidanceHtmlFile/ShowGuidanceFr.html":
+              localStorage.getItem('lang')=='sp'?
+              "../../../../src/ShowGuidanceHtmlFile/ShowGuidanceSp.html":
+              "../../../../src/ShowGuidanceHtmlFile/ShowGuidancePr.html"
+            } target="_blank">
               <i class="nav-icon fa fa-compass ShowGuidanceIcon" title={'Show Guidance'}></i>
               </a>
             </span>
