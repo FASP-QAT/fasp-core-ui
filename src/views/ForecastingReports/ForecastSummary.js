@@ -1566,7 +1566,7 @@ class ForecastSummary extends Component {
                                                     <div id="consumptionTable" />
                                                 </div>
                                             </div> */}
-                                            <div className="table-responsive">
+                                            <div className="table-responsive" style={{ display: this.state.loading ? "none" : "block" }}>
                                                 {this.state.summeryData.length > 0 && this.state.displayId == 1 &&
                                                     <Table className="table-bordered text-center mt-2">
                                                         {/* <Table className="table-bordered text-center mt-2 overflowhide main-table "> */}
@@ -1764,6 +1764,17 @@ class ForecastSummary extends Component {
                                                     </div>
 
                                                 }
+                                            </div>
+                                            <div style={{ display: this.state.loading ? "block" : "none" }}>
+                                                <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                                    <div class="align-items-center">
+                                                        <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+
+                                                        <div class="spinner-border blue ml-4" role="status">
+
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
