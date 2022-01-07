@@ -303,6 +303,8 @@ const EditDataSet = React.lazy(() => import('../../views/DataSet/EditDataSet'));
 const ImportFromQATSupplyPlan = React.lazy(() => import('../../views/Consumption/ImportFromQATSupplyPlan'));
 const PlanningUnitSetting = React.lazy(() => import('../../views/PlanningUnitSetting/PlanningUnitSetting'));
 
+const ImportIntoQATSupplyPlan = React.lazy(() => import('../../views/Consumption/ImportIntoQATSupplyPlan'));
+
 const ConsumptionForecastError = React.lazy(() => import('../../views/ForecastingReports/ConsumptionForecastError'));
 const ForecastOutput = React.lazy(() => import('../../views/ForecastingReports/ForecastOutput'));
 const ForecastSummary = React.lazy(() => import('../../views/ForecastingReports/ForecastSummary'));
@@ -321,7 +323,7 @@ const routes = [
   { path: '/dataentry/consumptionDataEntryAndAdjustment', exact: true, name: 'Data Entry & Adjustment ', component: ConsumptionDataEntryAndAdjustment },
   { path: '/dataset/createTreeTemplate/:templateId', name: 'Create Tree Template', component: CreateTreeTemplate },
   { path: '/dataSet/buildTree/', exact: true, name: 'static.common.managetree', component: BuildTree },
-  { path: '/dataSet/buildTree/tree/:treeId/:programId',exact: true, name: 'static.common.managetree', component: BuildTree },
+  { path: '/dataSet/buildTree/tree/:treeId/:programId', exact: true, name: 'static.common.managetree', component: BuildTree },
   { path: '/dataSet/buildTree/tree/:treeId/:programId/:scenarioId', name: 'static.common.managetree', component: BuildTree },
   { path: '/dataSet/buildTree/template/:templateId', exact: true, name: 'static.common.managetree', component: BuildTree },
   { path: '/consumptionDetails/:programId/:versionId/:planningUnitId', name: 'static.consumptionDetailHead.consumptionDetail', component: ConsumptionDetails },
@@ -714,6 +716,9 @@ const routes = [
 
   { path: '/importFromQATSupplyPlan/listImportFromQATSupplyPlan/:color/:message', name: i18n.t('static.importFromQATSupplyPlan.importFromQATSupplyPlan'), component: ImportFromQATSupplyPlan },
   { path: '/importFromQATSupplyPlan/listImportFromQATSupplyPlan', exact: true, name: i18n.t('static.importFromQATSupplyPlan.importFromQATSupplyPlan'), component: ImportFromQATSupplyPlan },
+
+  { path: '/importIntoQATSupplyPlan/listImportIntoQATSupplyPlan/:color/:message', name: 'Import Into Supply Plan', component: ImportIntoQATSupplyPlan },
+  { path: '/importIntoQATSupplyPlan/listImportIntoQATSupplyPlan', exact: true, name: 'Import Into Supply Plan', component: ImportIntoQATSupplyPlan },
 
   { path: '/planningUnitSetting/listPlanningUnitSetting/:color/:message', name: 'Planning Unit Settings', component: PlanningUnitSetting },
   { path: '/planningUnitSetting/listPlanningUnitSetting', exact: true, name: 'Planning Unit Settings', component: PlanningUnitSetting },
@@ -1559,7 +1564,7 @@ class DefaultLayout extends Component {
                         // hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true)
                         // },
                         attributes: {
-                          hidden: ((((this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY')) || (this.state.businessFunctions.includes('ROLE_BF_PRODUCT_VALIDATION')) || (this.state.businessFunctions.includes('ROLE_BF_MODELING_VALIDATION')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_DATASET')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_EQUIVALENCY_UNIT_MAPPING')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_USAGE_TEMPLATE'))) && this.state.activeTab == 1) ? false : true)
+                          hidden: ((((this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY')) || (this.state.businessFunctions.includes('ROLE_BF_PRODUCT_VALIDATION')) || (this.state.businessFunctions.includes('ROLE_BF_MODELING_VALIDATION')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_DATASET')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_EQUIVALENCY_UNIT_MAPPING')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_USAGE_TEMPLATE')) || (this.state.businessFunctions.includes('ROLE_BF_COMMIT_DATASET'))) && this.state.activeTab == 1) ? false : true)
                         },
                         children: [
 
@@ -1587,7 +1592,7 @@ class DefaultLayout extends Component {
                             name: "Commit",
                             url: '/dataset/commitTree',
                             icon: 'fa fa-th',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true) }
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_COMMIT_DATASET') && this.state.activeTab == 1 ? false : true) }
                           }
 
                         ]
@@ -1599,7 +1604,7 @@ class DefaultLayout extends Component {
                         // hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true)
                         // },
                         attributes: {
-                          hidden: ((((this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY')) || (this.state.businessFunctions.includes('ROLE_BF_COMPARE_VERSION')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_DATASET')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_EQUIVALENCY_UNIT_MAPPING')) || (this.state.businessFunctions.includes('ROLE_BF_COMPARE_AND_SELECT'))|| (this.state.businessFunctions.includes('ROLE_BF_LIST_USAGE_TEMPLATE'))) && this.state.activeTab == 1) ? false : true)
+                          hidden: ((((this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY')) || (this.state.businessFunctions.includes('ROLE_BF_COMPARE_VERSION')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_DATASET')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_EQUIVALENCY_UNIT_MAPPING')) || (this.state.businessFunctions.includes('ROLE_BF_COMPARE_AND_SELECT')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_USAGE_TEMPLATE'))) && this.state.activeTab == 1) ? false : true)
                         },
                         children: [
                           {
@@ -1623,7 +1628,7 @@ class DefaultLayout extends Component {
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true) }
                           },
                           {
-                            name: "Forecast Output",
+                            name: "Monthly Forecast",
                             url: '/forecastReport/forecastOutput',
                             icon: 'fa fa-exchange',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true) }

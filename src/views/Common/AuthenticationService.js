@@ -1308,27 +1308,34 @@ class AuthenticationService {
                     case "/extrapolation/extrapolateData":
                     case "/importFromQATSupplyPlan/listImportFromQATSupplyPlan":
                     case "/importFromQATSupplyPlan/listImportFromQATSupplyPlan/:color/:message":
+                    case "/importIntoQATSupplyPlan/listImportIntoQATSupplyPlan":
+                    case "/importIntoQATSupplyPlan/listImportIntoQATSupplyPlan/:color/:message":
                         if (bfunction.includes("ROLE_BF_LIST_IMPORT_FROM_QAT_SUPPLY_PLAN")) {
                             return true;
                         }
                         break;
-                    case "/report/compareAndSelectScenario":    
+                    case "/report/compareAndSelectScenario":
                         if (bfunction.includes("ROLE_BF_COMPARE_AND_SELECT")) {
                             return true;
                         }
-                    break;
+                        break;
                     case "/validation/productValidation":
                         if (bfunction.includes("ROLE_BF_PRODUCT_VALIDATION")) {
-                                    return true;
-                                }
-                            break;
+                            return true;
+                        }
+                        break;
                     case "/validation/modelingValidation":
                         if (bfunction.includes("ROLE_BF_MODELING_VALIDATION")) {
-                                    return true;
-                                }
-                            break;
-                    case "/report/compareVersion":        
+                            return true;
+                        }
+                        break;
+                    case "/report/compareVersion":
                         if (bfunction.includes("ROLE_BF_COMPARE_VERSION")) {
+                            return true;
+                        }
+                        break;
+                    case "/dataset/commitTree":
+                        if (bfunction.includes("ROLE_BF_COMMIT_DATASET")) {
                             return true;
                         }
                         break;
@@ -1338,7 +1345,6 @@ class AuthenticationService {
                     // case "/report/compareVersion":
                     case "/dataentry/consumptionDataEntryAndAdjustment":
                     case "/dataset/listTree":
-                    case "/dataset/commitTree":
                     case "/dataset/loadDeleteDataSet":
                     case "/dataset/loadDeleteDataSet/:message":
                     case "/dataSet/buildTree/tree/:treeId/:programId":
@@ -1478,9 +1484,9 @@ class AuthenticationService {
         console.log("timeout going to clear cache");
         let keysToRemove;
         if (localStorage.getItem('curUser') != null && localStorage.getItem('curUser') != "") {
-            keysToRemove = ["token-" + this.getLoggedInUserId(), "curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken", "sesRecordCount", "sesRangeValue", "sesProgramId", "sesPlanningUnitId", "sesLocalVersionChange", "sesLatestProgram", "sesProblemStatus", "sesProblemType", "sesProblemCategory", "sesReviewed", "sesStartDate", "sesProgramIdReport", "sesVersionIdReport", "sessionType", "sesBudPro", "sesBudFs", "sesBudStatus", "sesForecastProgramIds", "sesDatasetId", "sesDatasetPlanningUnitId", "sesDatasetRegionId", "sesLiveDatasetId", "sesDatasetVersionId", "sesTreeId", "sesScenarioId", "sesLevelId","sesDatasetCompareVersionId"];
+            keysToRemove = ["token-" + this.getLoggedInUserId(), "curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken", "sesRecordCount", "sesRangeValue", "sesProgramId", "sesPlanningUnitId", "sesLocalVersionChange", "sesLatestProgram", "sesProblemStatus", "sesProblemType", "sesProblemCategory", "sesReviewed", "sesStartDate", "sesProgramIdReport", "sesVersionIdReport", "sessionType", "sesBudPro", "sesBudFs", "sesBudStatus", "sesForecastProgramIds", "sesDatasetId", "sesDatasetPlanningUnitId", "sesDatasetRegionId", "sesLiveDatasetId", "sesDatasetVersionId", "sesTreeId", "sesScenarioId", "sesLevelId", "sesDatasetCompareVersionId"];
         } else {
-            keysToRemove = ["curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken", "sesRecordCount", "sesRangeValue", "sesProgramId", "sesPlanningUnitId", "sesLocalVersionChange", "sesLatestProgram", "sesProblemStatus", "sesProblemType", "sesProblemCategory", "sesReviewed", "sesStartDate", "sesProgramIdReport", "sesVersionIdReport", "sessionType", "sesBudPro", "sesBudFs", "sesBudStatus", "sesForecastProgramIds", "sesDatasetId", "sesDatasetPlanningUnitId", "sesDatasetRegionId", "sesLiveDatasetId", "sesDatasetVersionId", "sesTreeId", "sesScenarioId", "sesLevelId","sesDatasetCompareVersionId"];
+            keysToRemove = ["curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken", "sesRecordCount", "sesRangeValue", "sesProgramId", "sesPlanningUnitId", "sesLocalVersionChange", "sesLatestProgram", "sesProblemStatus", "sesProblemType", "sesProblemCategory", "sesReviewed", "sesStartDate", "sesProgramIdReport", "sesVersionIdReport", "sessionType", "sesBudPro", "sesBudFs", "sesBudStatus", "sesForecastProgramIds", "sesDatasetId", "sesDatasetPlanningUnitId", "sesDatasetRegionId", "sesLiveDatasetId", "sesDatasetVersionId", "sesTreeId", "sesScenarioId", "sesLevelId", "sesDatasetCompareVersionId"];
         }
         keysToRemove.forEach(k => localStorage.removeItem(k));
     }

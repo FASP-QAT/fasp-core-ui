@@ -56,7 +56,7 @@ class ForecastSummary extends Component {
             rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
             minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
             maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
-            loading: false,
+            loading: true,
             programId: '',
             versionId: '',
             planningUnitLabel: '',
@@ -100,7 +100,9 @@ class ForecastSummary extends Component {
             endDateDisplay: '',
             beforeEndDateDisplay: '',
             totalProductCost: 0,
-            regPlanningUnitList: []
+            regPlanningUnitList: [],
+            hideColumn: false,
+            currencyId: '',
 
         };
         this.getPrograms = this.getPrograms.bind(this);
@@ -123,14 +125,20 @@ class ForecastSummary extends Component {
         this.hideCalculation = this.hideCalculation.bind(this);
         this.filterTsList = this.filterTsList.bind(this);
         this.saveSelectedForecast = this.saveSelectedForecast.bind(this);
-        this.forecastChanged = this.forecastChanged.bind(this)
+        this.forecastChanged = this.forecastChanged.bind(this);
+        this.backToMonthlyForecast = this.backToMonthlyForecast.bind(this);
 
+    }
+
+    backToMonthlyForecast() {
+        this.props.history.push(`/forecastReport/forecastOutput`)
     }
 
     hideCalculation(e) {
         console.log("E++++++++", e.target.value);
         this.setState({
-            hideCalculation: e.target.value
+            hideCalculation: e.target.value,
+            hideColumn: !this.state.hideColumn
         })
 
     }
@@ -233,6 +241,8 @@ class ForecastSummary extends Component {
         let programId = document.getElementById("programId").value;
         let versionId = document.getElementById("versionId").value;
         let displayId = document.getElementById("displayId").value;
+        (displayId == 1 ? document.getElementById("hideCalculationDiv").style.display = "block" : document.getElementById("hideCalculationDiv").style.display = "none");
+        (displayId == 1 ? document.getElementById("hideCurrencyDiv").style.display = "block" : document.getElementById("hideCurrencyDiv").style.display = "none");
         this.setState({
             displayId: displayId
         })
@@ -256,8 +266,14 @@ class ForecastSummary extends Component {
                     var getRequest = program.getAll();
                     var datasetList = [];
                     var datasetList1 = [];
+                    this.setState({
+                        loading: true
+                    })
 
                     getRequest.onerror = function (event) {
+                        this.setState({
+                            loading: false
+                        })
                         // Handle errors!
                     };
                     getRequest.onsuccess = function (event) {
@@ -454,7 +470,7 @@ class ForecastSummary extends Component {
                                 let tempProcurementGap = ((planningUnitList[j].stock + planningUnitList[j].existingShipments) - totalForecastedQuantity0ri) - (planningUnitList[j].monthsOfStock * totalForecastedQuantity0ri / total_months);
                                 let procurementGap = (tempProcurementGap < 0 ? '(' + tempProcurementGap + ')' : tempProcurementGap);
                                 let isProcurementGapRed = (procurementGap < 0 ? true : false)
-                                let priceType = (planningUnitList[j].procurementAgent == null && planningUnitList[j].price == null ? 'No price type available' : (planningUnitList[j].procurementAgent != null ? planningUnitList[j].procurementAgent.label.label_en : 'Custom'));
+                                let priceType = (planningUnitList[j].procurementAgent == null && planningUnitList[j].price == null ? 'No price type available' : (planningUnitList[j].procurementAgent != null ? planningUnitList[j].procurementAgent.code : 'Custom'));
                                 let isPriceTypeRed = (planningUnitList[j].procurementAgent == null && planningUnitList[j].price == null ? true : false);
                                 let unitPrice = planningUnitList[j].price;
                                 let procurementNeeded = (isProcurementGapRed == true ? '$ ' + tempProcurementGap * unitPrice : '');
@@ -481,6 +497,7 @@ class ForecastSummary extends Component {
                             }
                             console.log("Test------------>3", summeryData);
                             this.setState({
+                                loading: (displayId == 2 ? true : false),
                                 summeryData: summeryData,
                                 totalProductCost: totalProductCost,
                                 regDatasetJson: filteredProgram,
@@ -557,7 +574,7 @@ class ForecastSummary extends Component {
                                         }
                                     }
                                     var columns = [];
-                                    columns.push({ title: "Forecasting Unit", type: 'text', width: 100, readOnly: true });
+                                    columns.push({ title: "Forecasting Unit", type: 'hidden', width: 100, readOnly: true });
                                     columns.push({ title: "Planning Unit", type: 'hidden', width: 100, readOnly: true });
                                     columns.push({ title: "Planning Unit", type: 'text', width: 100, readOnly: true });
                                     for (var k = 0; k < regRegionList.length; k++) {
@@ -568,13 +585,13 @@ class ForecastSummary extends Component {
                                     columns.push({ title: "type", type: 'hidden', width: 100, readOnly: true });
                                     columns.push({ title: "Total Forecasted Qunatity", type: 'numeric', textEditor: true, mask: '#,##.00', decimal: '.', width: 100, readOnly: true });
                                     let nestedHeaders = [];
-                                    nestedHeaders.push(
-                                        {
-                                            title: '',
-                                            colspan: '1'
-                                        },
+                                    // nestedHeaders.push(
+                                    //     {
+                                    //         title: '',
+                                    //         colspan: '1'
+                                    //     },
 
-                                    );
+                                    // );
                                     nestedHeaders.push(
                                         {
                                             title: '',
@@ -610,6 +627,13 @@ class ForecastSummary extends Component {
                                         columnDrag: true,
                                         columns: columns,
                                         nestedHeaders: [nestedHeaders],
+                                        updateTable: function (el, cell, x, y, source, value, id) {
+                                            if (y != null) {
+                                                var elInstance = el.jexcel;
+                                                var rowData = elInstance.getRowData(y);
+                                                elInstance.setStyle(`C${parseInt(y) + 1}`, 'text-align', 'left');
+                                            }
+                                        }.bind(this),
                                         text: {
                                             // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
                                             showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
@@ -655,7 +679,8 @@ class ForecastSummary extends Component {
                                     var dataEl = jexcel(document.getElementById("tableDiv"), options);
                                     this.el = dataEl;
                                     this.setState({
-                                        dataEl: dataEl
+                                        dataEl: dataEl,
+                                        loading: false
                                     })
                                 }
                             });
@@ -838,15 +863,32 @@ class ForecastSummary extends Component {
                 }
                 var lang = this.state.lang;
 
-                this.setState({
-                    programs: proList.sort(function (a, b) {
-                        a = getLabelText(a.label, lang).toLowerCase();
-                        b = getLabelText(b.label, lang).toLowerCase();
-                        return a < b ? -1 : a > b ? 1 : 0;
+                if (proList.length == 1) {
+                    this.setState({
+                        programs: proList.sort(function (a, b) {
+                            a = getLabelText(a.label, lang).toLowerCase();
+                            b = getLabelText(b.label, lang).toLowerCase();
+                            return a < b ? -1 : a > b ? 1 : 0;
+                        }),
+                        programId: proList[0].programId,
+                        loading: false
+                    }, () => {
+                        this.getVersionIds();
+                        console.log("programs------------------>", this.state.programs);
                     })
-                }, () => {
-                    console.log("programs------------------>", this.state.programs);
-                })
+                } else {
+                    this.setState({
+                        programs: proList.sort(function (a, b) {
+                            a = getLabelText(a.label, lang).toLowerCase();
+                            b = getLabelText(b.label, lang).toLowerCase();
+                            return a < b ? -1 : a > b ? 1 : 0;
+                        }),
+                        loading: false
+                    }, () => {
+                        console.log("programs------------------>", this.state.programs);
+                    })
+                }
+
 
 
             }.bind(this);
@@ -857,6 +899,8 @@ class ForecastSummary extends Component {
     }
 
     componentDidMount() {
+        document.getElementById("hideCalculationDiv").style.display = "none";
+        document.getElementById("hideCurrencyDiv").style.display = "none";
         this.getPrograms();
         this.setState({
             regionVal: [{ label: "East", value: 1 }, { label: "West", value: 2 }, { label: "North", value: 3 }, { label: "South", value: 4 }],
@@ -877,8 +921,10 @@ class ForecastSummary extends Component {
 
     setVersionId(event) {
 
-        var versionId = (event.target.value.split('(')[0]).trim();
+        var versionId = ((event == null || event == '' || event == undefined) ? (this.state.versionId.split('(')[0]) : (event.target.value.split('(')[0]).trim());
         var programId = this.state.programId;
+        console.log("Test-----------------110", event);
+        console.log("Test-----------------111", versionId);
 
 
         if (programId != -1 && versionId != -1) {
@@ -955,7 +1001,7 @@ class ForecastSummary extends Component {
 
 
         this.setState({
-            versionId: event.target.value,
+            versionId: ((event == null || event == '' || event == undefined) ? (this.state.versionId) : (event.target.value).trim()),
         }, () => {
             // localStorage.setItem("sesVersionIdReport", '');
             this.filterData();
@@ -1002,8 +1048,8 @@ class ForecastSummary extends Component {
                 { title: "Desired End of Period Stock (in PU)", type: 'numeric', mask: '#,##', decimal: '.', readOnly: true, width: 100 },
                 { title: "Shipment gap", type: 'numeric', mask: '#,##', decimal: '.', readOnly: true, width: 100 },
                 { title: "Price type", type: 'dropdown', width: 100, source: [{ id: 1, name: "Dataset" }, { id: 2, name: "GHSC-PSM*" }, { id: 3, name: "Global Fund*" }] },
-                { title: "PU (unit $)", type: 'numeric', mask: '#,##.00', decimal: '.', readOnly: true, width: 100 },
-                { title: "Procurements Needed PU (total $)", type: 'numeric', mask: '#,##.00', decimal: '.', readOnly: true, width: 100 }
+                { title: "PU (unit USD)", type: 'numeric', mask: '#,##.00', decimal: '.', readOnly: true, width: 100 },
+                { title: "Procurements Needed PU (total USD)", type: 'numeric', mask: '#,##.00', decimal: '.', readOnly: true, width: 100 }
 
 
             ],
@@ -1141,9 +1187,9 @@ class ForecastSummary extends Component {
                 versionList.reverse();
                 this.setState({
                     versions: versionList,
-                    // versionId: versionList[0].versionId
+                    versionId: (versionList.length > 0 ? versionList[0].versionId : ''),
                 }, () => {
-                    // this.getPlanningUnit();
+                    this.setVersionId();
                 })
 
 
@@ -1368,7 +1414,17 @@ class ForecastSummary extends Component {
                             </div>
                         }
                     </div>
-                    <CardBody className="pb-lg-2 pt-lg-0 ">
+                    <div className="Card-header-reporticon ">
+                        <div className="card-header-actions BacktoLink">
+                            <a className="pr-lg-0 pt-lg-1">
+                                <span style={{ cursor: 'pointer' }} onClick={() => { this.backToMonthlyForecast() }}><i className="fa fa-long-arrow-left" style={{ color: '#20a8d8', fontSize: '13px' }}></i> <small className="supplyplanformulas">{'Return To Monthly Forecast'}</small></span>
+                            </a>
+                            {/* <a className="card-header-action">
+                                Back to <span style={{ cursor: 'pointer' }} onClick={() => { this.backToMonthlyForecast() }}><small className="supplyplanformulas">Monthly Forecast</small></span>
+                            </a> */}
+                        </div>
+                    </div>
+                    <CardBody className="pb-lg-2 pt-lg-1 ">
                         <div>
                             <div ref={ref}>
                                 <Form >
@@ -1397,7 +1453,7 @@ class ForecastSummary extends Component {
                                                 </div>
                                             </FormGroup>
                                             <FormGroup className="col-md-3">
-                                                <Label htmlFor="appendedInputButton">{i18n.t('static.report.version')}</Label>
+                                                <Label htmlFor="appendedInputButton">{i18n.t('static.report.version*')}</Label>
                                                 <div className="controls ">
                                                     <InputGroup>
                                                         <Input
@@ -1465,14 +1521,14 @@ class ForecastSummary extends Component {
                                                             onChange={this.filterData}
                                                         // onChange={(e) => { this.dataChange(e); this.formSubmit() }}
                                                         >
-                                                            <option value="1">National View</option>
                                                             <option value="2">Regional View</option>
+                                                            <option value="1">National View</option>
                                                         </Input>
 
                                                     </InputGroup>
                                                 </div>
                                             </FormGroup>
-                                            <FormGroup className="col-md-3">
+                                            <FormGroup className="col-md-3" id="hideCalculationDiv">
                                                 <Label htmlFor="appendedInputButton">Hide Calculations</Label>
                                                 <div className="controls ">
                                                     <InputGroup>
@@ -1491,14 +1547,36 @@ class ForecastSummary extends Component {
                                                     </InputGroup>
                                                 </div>
                                             </FormGroup>
+                                            <FormGroup className="col-md-3" id="hideCurrencyDiv">
+                                                <Label htmlFor="appendedInputButton">Currency</Label>
+                                                <div className="controls ">
+                                                    <InputGroup>
+                                                        <Input
+                                                            type="select"
+                                                            name="currencyId"
+                                                            id="currencyId"
+                                                            bsSize="sm"
+                                                            value={this.state.currencyId}
+                                                        // onChange={(e) => { this.hideCalculation(e); }}
+                                                        >
+                                                            <option value="-1">{i18n.t('static.common.select')}</option>
+                                                        </Input>
+
+                                                    </InputGroup>
+                                                </div>
+                                            </FormGroup>
 
 
 
                                         </div>
                                     </div>
                                 </Form>
-
-                                <Col md="12 pl-0" style={{ display: this.state.loading ? "none" : "block" }}>
+                                <Col md="12" className="pl-lg-0" style={{ display: this.state.loading ? "none" : "block" }}>
+                                    <div>
+                                        <p>Some text here to explain users this is not a detailed supply plan, Just high level estimate.</p>
+                                    </div>
+                                </Col>
+                                <Col md="12" className='pl-lg-0' style={{ display: this.state.loading ? "none" : "block" }}>
                                     <div className="row">
                                         <div className="col-md-12 pl-0 pr-0">
                                             {/* <div className="shipmentconsumptionSearchMarginTop" style={{ display: this.state.loading ? "none" : "block" }}>
@@ -1506,26 +1584,34 @@ class ForecastSummary extends Component {
                                                     <div id="consumptionTable" />
                                                 </div>
                                             </div> */}
-                                            <div className="table-responsive">
+                                            <div className="table-responsive" style={{ display: this.state.loading ? "none" : "block" }}>
                                                 {this.state.summeryData.length > 0 && this.state.displayId == 1 &&
-                                                    <Table className="table-striped table-bordered text-center mt-2">
+                                                    <Table className="table-bordered text-center mt-2">
                                                         {/* <Table className="table-bordered text-center mt-2 overflowhide main-table "> */}
 
                                                         <thead>
                                                             <tr>
                                                                 <th className="BorderNoneSupplyPlan sticky-col first-col clone1"></th>
-                                                                <th className="text-center" style={{}}> Forecasting Unit </th>
+                                                                {/* <th className="text-center" style={{}}> Forecasting Unit </th> */}
                                                                 <th className="text-center" style={{}}>Planning Unit</th>
                                                                 <th className="text-center" style={{}}>Total Forecasted Quantity</th>
-                                                                <th className="text-center" style={{}}>Stock (end of {this.state.beforeEndDateDisplay})</th>
-                                                                <th className="text-center" style={{}}>Existing Shipments ({this.state.startDateDisplay + ' - ' + this.state.endDateDisplay})</th>
-                                                                <th className="text-center" style={{}}>Stock (end of {this.state.endDateDisplay})</th>
-                                                                <th className="text-center" style={{}}>Desired Months of Stock (end of {this.state.endDateDisplay})</th>
-                                                                <th className="text-center" style={{}}>Desired Stock (end of {this.state.endDateDisplay})</th>
+                                                                {!this.state.hideColumn &&
+                                                                    <>
+                                                                        <th className="text-center" style={{}}>Stock (end of {this.state.beforeEndDateDisplay})</th>
+                                                                        <th className="text-center" style={{}}>Existing Shipments ({this.state.startDateDisplay + ' - ' + this.state.endDateDisplay})</th>
+                                                                        <th className="text-center" style={{}}>Stock (end of {this.state.endDateDisplay})</th>
+                                                                        <th className="text-center" style={{}}>Desired Months of Stock (end of {this.state.endDateDisplay})</th>
+                                                                        <th className="text-center" style={{}}>Desired Stock (end of {this.state.endDateDisplay})</th>
+                                                                    </>
+                                                                }
                                                                 <th className="text-center" style={{}}>Procurement Surplus/Gap</th>
-                                                                <th className="text-center" style={{}}>Price Type</th>
-                                                                <th className="text-center" style={{}}>Unit Price ($)</th>
-                                                                <th className="text-center" style={{}}>Procurements Needed ($)</th>
+                                                                {!this.state.hideColumn &&
+                                                                    <>
+                                                                        <th className="text-center" style={{}}>Price Type</th>
+                                                                        <th className="text-center" style={{}}>Unit Price (USD)</th>
+                                                                    </>
+                                                                }
+                                                                <th className="text-center" style={{}}>Procurements Needed (USD)</th>
                                                                 <th className="text-center" style={{ width: '20%' }}>Notes</th>
 
                                                             </tr>
@@ -1540,23 +1626,33 @@ class ForecastSummary extends Component {
                                                                                 <td className="BorderNoneSupplyPlan sticky-col first-col clone1">
                                                                                     {
                                                                                         item1.display == false ?
-                                                                                            <><i className="fa fa-plus-square-o supplyPlanIcon" onClick={() => this.checkedChanged(item1.tempTracerCategoryId)} ></i> <>{item1.tracerCategory.label.label_en}</></>
+                                                                                            // <><i className="fa fa-plus-square-o supplyPlanIcon" onClick={() => this.checkedChanged(item1.tempTracerCategoryId)} ></i> <>{item1.tracerCategory.label.label_en}</></>
+                                                                                            <><i className="fa fa-plus-square-o supplyPlanIcon" onClick={() => this.checkedChanged(item1.tempTracerCategoryId)} ></i> </>
                                                                                             :
-                                                                                            <><i className="fa fa-minus-square-o supplyPlanIcon" onClick={() => this.checkedChanged(item1.tempTracerCategoryId)} ></i> <>{item1.tracerCategory.label.label_en}</></>
+                                                                                            // <><i className="fa fa-minus-square-o supplyPlanIcon" onClick={() => this.checkedChanged(item1.tempTracerCategoryId)} ></i> <>{item1.tracerCategory.label.label_en}</></>
+                                                                                            <><i className="fa fa-minus-square-o supplyPlanIcon" onClick={() => this.checkedChanged(item1.tempTracerCategoryId)} ></i> </>
                                                                                     }
 
                                                                                 </td>
+                                                                                {/* <td></td> */}
+                                                                                <td><b>{item1.tracerCategory.label.label_en}</b></td>
                                                                                 <td></td>
+                                                                                {!this.state.hideColumn &&
+                                                                                    <>
+                                                                                        <td></td>
+                                                                                        <td></td>
+                                                                                        <td></td>
+                                                                                        <td></td>
+                                                                                        <td></td>
+                                                                                    </>
+                                                                                }
                                                                                 <td></td>
-                                                                                <td></td>
-                                                                                <td></td>
-                                                                                <td></td>
-                                                                                <td></td>
-                                                                                <td></td>
-                                                                                <td></td>
-                                                                                <td></td>
-                                                                                <td></td>
-                                                                                <td></td>
+                                                                                {!this.state.hideColumn &&
+                                                                                    <>
+                                                                                        <td></td>
+                                                                                        <td></td>
+                                                                                    </>
+                                                                                }
                                                                                 <td></td>
                                                                                 <td></td>
                                                                             </>
@@ -1565,17 +1661,25 @@ class ForecastSummary extends Component {
                                                                                 {item1.display == true &&
                                                                                     <>
                                                                                         <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
-                                                                                        <td>{item1.forecastingUnit.label.label_en}</td>
+                                                                                        {/* <td>{item1.forecastingUnit.label.label_en}</td> */}
                                                                                         <td>{item1.planningUnit.label.label_en}</td>
                                                                                         <td>{item1.totalForecastedQuantity}</td>
-                                                                                        <td>{item1.stock1}</td>
-                                                                                        <td>{item1.existingShipments}</td>
-                                                                                        <td>{item1.stock2}</td>
-                                                                                        <td>{item1.desiredMonthOfStock1}</td>
-                                                                                        <td>{item1.desiredMonthOfStock2}</td>
+                                                                                        {!this.state.hideColumn &&
+                                                                                            <>
+                                                                                                <td>{item1.stock1}</td>
+                                                                                                <td>{item1.existingShipments}</td>
+                                                                                                <td>{item1.stock2}</td>
+                                                                                                <td>{item1.desiredMonthOfStock1}</td>
+                                                                                                <td>{item1.desiredMonthOfStock2}</td>
+                                                                                            </>
+                                                                                        }
                                                                                         {item1.isProcurementGapRed == true ? <td className="red">{item1.procurementGap}</td> : <td>{item1.procurementGap}</td>}
-                                                                                        {item1.isPriceTypeRed == true ? <td className="red">{item1.priceType}</td> : <td>{item1.priceType}</td>}
-                                                                                        <td>{item1.unitPrice}</td>
+                                                                                        {!this.state.hideColumn &&
+                                                                                            <>
+                                                                                                {item1.isPriceTypeRed == true ? <td className="red">{item1.priceType}</td> : <td>{item1.priceType}</td>}
+                                                                                                <td>{item1.unitPrice}</td>
+                                                                                            </>
+                                                                                        }
                                                                                         <td>{item1.procurementNeeded}</td>
                                                                                         <td>{item1.notes}</td>
                                                                                     </>
@@ -1588,63 +1692,107 @@ class ForecastSummary extends Component {
                                                                 </>
                                                             ))}
                                                         </tbody>
-                                                        <tfoot>
-                                                            <tr>
-                                                                <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
-                                                                <td></td>
-                                                                <td></td>
-                                                                <td></td>
-                                                                <td></td>
-                                                                <td></td>
-                                                                <td></td>
-                                                                <td></td>
-                                                                <td></td>
-                                                                <td></td>
-                                                                <td></td>
-                                                                <td><b>Product Cost</b></td>
-                                                                <td><b>{this.state.totalProductCost}</b></td>
-                                                                <td></td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
-                                                                <td></td>
-                                                                <td></td>
-                                                                <td></td>
-                                                                <td></td>
-                                                                <td></td>
-                                                                <td></td>
-                                                                <td></td>
-                                                                <td></td>
-                                                                <td></td>
-                                                                <td></td>
-                                                                <td><b>Freight (7%)</b></td>
-                                                                <td><b>{0.07 * this.state.totalProductCost}</b></td>
-                                                                <td></td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
-                                                                <td></td>
-                                                                <td></td>
-                                                                <td></td>
-                                                                <td></td>
-                                                                <td></td>
-                                                                <td></td>
-                                                                <td></td>
-                                                                <td></td>
-                                                                <td></td>
-                                                                <td></td>
-                                                                <td><b>Total Cost</b></td>
-                                                                <td><b>{this.state.totalProductCost + 0.07 * this.state.totalProductCost}</b></td>
-                                                                <td></td>
-                                                            </tr>
-                                                        </tfoot>
+                                                        {!this.state.hideColumn &&
+                                                            <tfoot>
+                                                                <tr>
+                                                                    <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
+                                                                    {/* <td></td> */}
+                                                                    <td></td>
+                                                                    <td></td>
+                                                                    <td></td>
+                                                                    <td></td>
+                                                                    <td></td>
+                                                                    <td></td>
+                                                                    <td></td>
+                                                                    <td></td>
+                                                                    <td></td>
+                                                                    <td><b>Product Cost</b></td>
+                                                                    <td><b>{this.state.totalProductCost}</b></td>
+                                                                    <td></td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
+                                                                    {/* <td></td> */}
+                                                                    <td></td>
+                                                                    <td></td>
+                                                                    <td></td>
+                                                                    <td></td>
+                                                                    <td></td>
+                                                                    <td></td>
+                                                                    <td></td>
+                                                                    <td></td>
+                                                                    <td></td>
+                                                                    <td><b>Freight (7%)</b></td>
+                                                                    <td><b>{0.07 * this.state.totalProductCost}</b></td>
+                                                                    <td></td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
+                                                                    {/* <td></td> */}
+                                                                    <td></td>
+                                                                    <td></td>
+                                                                    <td></td>
+                                                                    <td></td>
+                                                                    <td></td>
+                                                                    <td></td>
+                                                                    <td></td>
+                                                                    <td></td>
+                                                                    <td></td>
+                                                                    <td><b>Total Cost</b></td>
+                                                                    <td><b>{this.state.totalProductCost + 0.07 * this.state.totalProductCost}</b></td>
+                                                                    <td></td>
+                                                                </tr>
+                                                            </tfoot>
+                                                        }
+                                                        {this.state.hideColumn &&
+                                                            <tfoot>
+                                                                <tr>
+                                                                    <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
+                                                                    {/* <td></td> */}
+                                                                    <td></td>
+                                                                    <td></td>
+                                                                    <td><b>Product Cost</b></td>
+                                                                    <td><b>{this.state.totalProductCost}</b></td>
+                                                                    <td></td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
+                                                                    {/* <td></td> */}
+                                                                    <td></td>
+                                                                    <td></td>
+                                                                    <td><b>Freight (7%)</b></td>
+                                                                    <td><b>{0.07 * this.state.totalProductCost}</b></td>
+                                                                    <td></td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
+                                                                    {/* <td></td> */}
+                                                                    <td></td>
+                                                                    <td></td>
+                                                                    <td><b>Total Cost</b></td>
+                                                                    <td><b>{this.state.totalProductCost + 0.07 * this.state.totalProductCost}</b></td>
+                                                                    <td></td>
+                                                                </tr>
+                                                            </tfoot>
+                                                        }
                                                     </Table>
                                                 }
                                                 {this.state.regPlanningUnitList.length > 0 && this.state.displayId == 2 &&
-                                                    <div id="tableDiv">
+                                                    <div id="tableDiv" className="table-responsive consumptionDataEntryTable">
                                                     </div>
 
                                                 }
+                                            </div>
+                                            <div style={{ display: this.state.loading ? "block" : "none" }}>
+                                                <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                                    <div class="align-items-center">
+                                                        <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+
+                                                        <div class="spinner-border blue ml-4" role="status">
+
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -1669,6 +1817,7 @@ class ForecastSummary extends Component {
                         <FormGroup>
                             <FormGroup>
                                 <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                <Button type="reset" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.filterData}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                 <Button type="submit" size="md" color="success" className="submitBtn float-right mr-1" onClick={this.saveSelectedForecast}> <i className="fa fa-check"></i> {i18n.t('static.common.submit')}</Button>
                             </FormGroup>
                         </FormGroup>
