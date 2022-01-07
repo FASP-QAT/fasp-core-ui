@@ -895,6 +895,21 @@ export default class TreeExtrapolationComponent extends React.Component {
 
                             </FormGroup>
                             <FormGroup className="col-md-3 pl-lg-0">
+                                <Label htmlFor="currencyId">Notes<span class="red Reqasterisk">*</span></Label>
+                                <InputGroup>
+                                    <Input
+                                        type="textarea"
+                                        name="notesExtrapolation"
+                                        id="notesExtrapolation"
+                                        bsSize="sm"
+                                    // value={this.state.programId}
+                                    // onChange={(e) => { this.setStartAndStopDateOfProgram(e.target.value) }}
+                                    ></Input>
+
+                                </InputGroup>
+
+                            </FormGroup>
+                            <FormGroup className="col-md-3 pl-lg-0">
                                 <Button type="submit" color="success" className="mr-1 float-right" size="md"><i className="fa fa-check"></i>{i18n.t('static.pipeline.save')}</Button>
                             </FormGroup>
                         </Row>
