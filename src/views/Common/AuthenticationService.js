@@ -1237,7 +1237,7 @@ class AuthenticationService {
                         }
                         break;
                     case "/changePassword":
-                    case "/ShowGuidance":
+                    // case "/ShowGuidance":
                         // if (bfunction.includes("ROLE_BF_CHANGE_PASSWORD")) {
                         return true;
                         // }
@@ -1245,7 +1245,7 @@ class AuthenticationService {
                     case "/logout/:message":
                     case "/logout":
                     case "/accessDenied":
-                    // case "/ShowGuidance":
+                
                         return true;
                         break;
                     case "/problem/editProblem":

@@ -87,7 +87,6 @@ const ListUser = React.lazy(() => import('../../views/User/ListUserComponent'));
 const EditUser = React.lazy(() => import('../../views/User/EditUserComponent'));
 const AccessControl = React.lazy(() => import('../../views/User/AccessControlComponent'));
 const AccessDenied = React.lazy(() => import('../../views/Common/AccessDeniedComponent'));
-const ShowGuidance = React.lazy(() => import('../../views/ApplicationDashboard/ShowGuidance'));
 
 
 const CodeEditors = React.lazy(() => import('../../views/Editors/CodeEditors'));
@@ -483,7 +482,7 @@ const routes = [
   { path: '/user/editUser/:userId', exact: true, name: 'static.breadcrum.edit', entityname: 'static.userHead.user', component: EditUser },
   { path: '/user/accessControl/:userId', exact: true, name: 'static.dashboard.useraccessctrl', component: AccessControl },
   { path: '/accessDenied', exact: true, component: AccessDenied },
-  { path: '/ShowGuidance', exact: true, component: ShowGuidance },
+  
 
   // { path: '/dashboard/:message', component: Dashboard },
   { path: '/dashboard/:color/:message', component: Dashboard },
