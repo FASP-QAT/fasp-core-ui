@@ -57,7 +57,8 @@ export default class CommitTreeComponent extends React.Component {
             noForecastSelectedList: [],
             datasetPlanningUnit: [],
             progressPer: 0,
-            cardStatus: true
+            cardStatus: true,
+            loading: true
         }
         this.synchronize = this.synchronize.bind(this);
         this.updateState = this.updateState.bind(this);
@@ -101,18 +102,42 @@ export default class CommitTreeComponent extends React.Component {
                         datasetJson: datasetJson
                     }
                     programList.push(programJson)
+                    var programId = "";
+                    var event = {
+                        target: {
+                            value: ""
+                        }
+                    };
+                    if (programList.length == 1) {
+                        console.log("in if%%%", programList.length)
+                        programId = programList[0].id;
+                        event.target.value = programList[0].id;
+                    } else if (localStorage.getItem("sesDatasetId") != "" && programList.filter(c => c.id == localStorage.getItem("sesDatasetId")).length > 0) {
+                        programId = localStorage.getItem("sesDatasetId");
+                        event.target.value = localStorage.getItem("sesDatasetId");
+                    }
+                    this.setState({
+                        programList: programList,
+                        loading: false,
+                        programId: programId
+                    }, () => {
+                        if (programId != "") {
+                            this.setProgramId(event);
+                        }
+                    })
                 }
-                this.setState({
-                    programList: programList
-                })
             }.bind(this)
         }.bind(this)
     }
 
     setProgramId(e) {
+        this.setState({
+            loading: true
+        })
         var programId = e.target.value;
         var myResult = [];
         myResult = this.state.programList;
+        localStorage.setItem("sesDatasetId", programId);
         this.setState({
             programId: programId
         })
@@ -403,7 +428,8 @@ export default class CommitTreeComponent extends React.Component {
                     consumptionListlessTwelve: consumptionListlessTwelve,
                     missingMonthList: missingMonthList,
                     noForecastSelectedList: noForecastSelectedList,
-                    progressPer: 25
+                    progressPer: 25,
+                    loading: false
                 })
 
             }.bind(this)
@@ -420,6 +446,7 @@ export default class CommitTreeComponent extends React.Component {
 
 
     buildJxl() {
+        this.setState({ loading: true })
         var treeScenarioList = this.state.treeScenarioList;
         var treeScenarioListFilter = treeScenarioList;
         for (var tsl = 0; tsl < treeScenarioListFilter.length; tsl++) {
@@ -509,6 +536,7 @@ export default class CommitTreeComponent extends React.Component {
                 this.el = languageEl;
             }
         }
+        this.setState({ loading: false })
     }
 
     toggleShowValidation() {
@@ -517,7 +545,6 @@ export default class CommitTreeComponent extends React.Component {
         }, () => {
             if (this.state.showValidation) {
                 this.setState({
-                    loading: true
                 }, () => {
                     this.buildJxl();
                 })
@@ -555,11 +582,12 @@ export default class CommitTreeComponent extends React.Component {
             }
         };
         sendGetRequest();
+        this.setState({ loading: false });
     }
 
     getLatestProgram(notificationDetails) {
-        var updatedJson = [];
         this.setState({ loading: true });
+        var updatedJson = [];
         var checkboxesChecked = [];
         var programIdsToSyncArray = [];
         var notificationArray = [];
@@ -667,7 +695,8 @@ export default class CommitTreeComponent extends React.Component {
                                         //     }
                                         //     programQPLDetailsTransaction.oncomplete = function (event) {
                                         this.setState({
-                                            progressPer: 100
+                                            progressPer: 100,
+                                            loading: false
                                         })
                                         this.goToMasterDataSync(programIdsToSyncArray);
                                         //     }.bind(this)
@@ -688,6 +717,7 @@ export default class CommitTreeComponent extends React.Component {
 
     synchronize() {
         this.toggleShowValidation();
+        this.setState({ loading: true })
         var db1;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
@@ -749,7 +779,7 @@ export default class CommitTreeComponent extends React.Component {
                                     color: "red",
                                     loading: false
                                 }, () => {
-                                    // this.hideFirstComponent();
+                                    this.hideFirstComponent();
                                 });
                             } else {
                                 switch (error.response ? error.response.status : "") {
@@ -769,7 +799,7 @@ export default class CommitTreeComponent extends React.Component {
                                             color: "red",
                                             loading: false
                                         }, () => {
-                                            // this.hideFirstComponent()
+                                            this.hideFirstComponent()
                                             if (error.response.data.messageCode == 'static.commitVersion.versionIsOutDated') {
                                                 this.checkLastModifiedDateForProgram(this.state.programId);
                                             }
@@ -783,7 +813,7 @@ export default class CommitTreeComponent extends React.Component {
                                             loading: false,
                                             color: "red"
                                         }, () => {
-                                            // this.hideFirstComponent()
+                                            this.hideFirstComponent()
                                         });
                                         break;
                                     default:
@@ -793,7 +823,7 @@ export default class CommitTreeComponent extends React.Component {
                                             loading: false,
                                             color: "red"
                                         }, () => {
-                                            // this.hideFirstComponent()
+                                            this.hideFirstComponent()
                                         });
                                         break;
                                 }
@@ -810,6 +840,7 @@ export default class CommitTreeComponent extends React.Component {
     }
 
     print() {
+        this.setState({ loading: true })
         var tableName = document.getElementsByName("jxlTableData")
         for (var t = 0; t < tableName.length; t++) {
             tableName[t].classList.remove('consumptionDataEntryTable');
@@ -839,6 +870,14 @@ export default class CommitTreeComponent extends React.Component {
         //         // pdf.output('dataurlnewwindow');
         //         pdf.save("download.pdf");
         //     });
+        this.setState({ loading: false })
+    }
+
+    hideFirstComponent() {
+        document.getElementById('div1').style.display = 'block';
+        this.state.timeout = setTimeout(function () {
+            document.getElementById('div1').style.display = 'none';
+        }, 8000);
     }
 
     render() {
@@ -962,6 +1001,7 @@ export default class CommitTreeComponent extends React.Component {
 
         return (
             <div className="animated fadeIn" >
+                <h5 id="div1" className={this.state.color}>{i18n.t(this.state.message, { entityname })}</h5>
                 {(this.state.cardStatus) &&
                     <Card id="noniframe">
                         <CardBody>
@@ -1108,6 +1148,17 @@ export default class CommitTreeComponent extends React.Component {
                                         <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.cancel')}</Button>
                                         {/* <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={this.synchronize}><i className="fa fa-check"></i>Commit</Button> */}
                                         <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => { this.toggleShowValidation() }}><i className="fa fa-check"></i>{i18n.t('static.button.commit')}</Button>
+                                    </div>
+                                </div>
+                                <div style={{ display: this.state.loading ? "block" : "none" }}>
+                                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                        <div class="align-items-center">
+                                            <div ><h4> <strong>{i18n.t('static.loading.loading')}</strong></h4></div>
+
+                                            <div class="spinner-border blue ml-4" role="status">
+
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
