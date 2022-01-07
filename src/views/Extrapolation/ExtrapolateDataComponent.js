@@ -69,7 +69,7 @@ export default class ExtrapolateDataComponent extends React.Component {
             mseMovingAvg: "",
             rSqdMovingAvg: "",
             wapeMovingAvg: "",
-
+            monthsDiff:0,
             rmseLinearReg: "",
             mapeLinearReg: "",
             mseLinearReg: "",
@@ -1546,6 +1546,16 @@ export default class ExtrapolateDataComponent extends React.Component {
         })
     }
 
+    getDateDifference(){
+        var startDate = moment([this.state.rangeValue1.from.year, this.state.rangeValue1.from.month]);
+        var endDate = moment([this.state.rangeValue1.to.year, this.state.rangeValue1.to.month]);
+        var monthsDiff = endDate.diff(startDate, 'months');
+        console.log("monthsDiff-->",monthsDiff)
+      //  document.getElementById('dateDiv').val(monthsDiff);
+        //  this.setState({
+        //      monthsDiff: monthsDiff
+        //  });
+    }
     render() {
         const pickerLang = {
             months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
@@ -1956,6 +1966,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                             >
                                                 <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} />
                                             </Picker>
+                                           
                                         </div>
                                     </FormGroup>
                                     <FormGroup className="col-md-12">
@@ -1976,7 +1987,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                 value={rangeValue1}
                                                 lang={pickerLang}
                                                 // theme="light"
-                                                onChange={this.handleRangeChange1}
+                                                onChange={this.handleRangeChange1 , this.getDateDifference()}
                                                 onDismiss={this.handleRangeDissmis1}
                                                 readOnly
                                             >
@@ -1985,6 +1996,8 @@ export default class ExtrapolateDataComponent extends React.Component {
                                         </div>
                                     </FormGroup>
                                 </div>
+                                <div id="dateDiv" className="leftAlignTable">
+                        </div>
                                 <div className="row">
                                     <Label htmlFor="appendedInputButton">Select the Extrapolation methods to be used</Label>
                                 </div>
