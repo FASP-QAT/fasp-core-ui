@@ -469,12 +469,21 @@ export default class TreeExtrapolationComponent extends React.Component {
         }
         return (
             <div className="animated fadeIn">
-                <CardBody className="pb-lg-5 pt-lg-0">
+                <CardBody className="pb-lg-2 pt-lg-0">
+                <div className="row pt-lg-0" style={{float:'right'}}>
+                        <div className="col-md-12">
+                            {/* <SupplyPlanFormulas ref="formulaeChild" /> */}
+                            <a className="">
+                                <span style={{ cursor: 'pointer',color:'20a8d8' }} ><small className="supplyplanformulas">{i18n.t('Show Guidance')}</small></span>
+
+                            </a>
+                        </div>
+                    </div>
                     <Form name='simpleForm'>
                         <div className=" pl-0">
                             <div className="row">
-                                <FormGroup className="col-md-3">
-                                    <Label htmlFor="appendedInputButton">Start Month for Historical Data<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
+                                <FormGroup className="col-md-3 pl-lg-0">
+                                    <Label htmlFor="appendedInputButton">Start Month for Historical Data1<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
                                     <div className="controls edit">
 
                                         <Picker
@@ -512,16 +521,16 @@ export default class TreeExtrapolationComponent extends React.Component {
                                         </Picker>
                                     </div>
                                 </FormGroup>
-                                <FormGroup className="col-md-3">
-                                    <Label htmlFor="appendedInputButton"><span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
+                                {/* <FormGroup className="col-md-3">
+                                    
                                     <div>
                                         Show Guidance
                                     </div>
-                                </FormGroup>
+                                </FormGroup> */}
                             </div>
                             <div className="row">
                                 <FormGroup className="col-md-12 ">
-                                    <div className="check inline  pl-lg-3 pt-lg-3">
+                                    <div className="check inline  pl-lg-3 pt-lg-2">
                                         <div>
                                             <Popover placement="top" isOpen={this.state.popoverOpenMa} target="Popover1" trigger="hover" toggle={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)}>
                                                 <PopoverBody>Need to add Info.</PopoverBody>
@@ -544,11 +553,12 @@ export default class TreeExtrapolationComponent extends React.Component {
                                             </Label>
                                         </div>
                                         {this.state.movingAvgId &&
-                                            <div className="col-md-3">
+                                            <div className="col-md-3 pt-lg-2">
                                                 <Label htmlFor="appendedInputButton"># of Months</Label>
                                                 <Input
                                                     className="controls"
                                                     type="text"
+                                                    bsSize="sm"
                                                     id="noOfMonthsId"
                                                     name="noOfMonthsId"
                                                     onChange={(e) => { this.getDatasetData(e); }}
@@ -560,7 +570,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                 <PopoverBody>Need to add Info.</PopoverBody>
                                             </Popover>
                                         </div>
-                                        <div>
+                                        <div className="pt-lg-2">
                                             <Input
                                                 className="form-check-input"
                                                 type="checkbox"
@@ -581,7 +591,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                 <PopoverBody>Need to add Info.</PopoverBody>
                                             </Popover>
                                         </div>
-                                        <div>
+                                        <div className="pt-lg-2">
                                             <Input
                                                 className="form-check-input"
                                                 type="checkbox"
@@ -602,7 +612,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                 <PopoverBody>Need to add Info.</PopoverBody>
                                             </Popover>
                                         </div>
-                                        <div>
+                                        <div className="pt-lg-2">
                                             <Input
                                                 className="form-check-input"
                                                 type="checkbox"
@@ -619,12 +629,13 @@ export default class TreeExtrapolationComponent extends React.Component {
                                             </Label>
                                         </div>
                                         {this.state.smoothingId &&
-                                            <div className="row col-md-12">
+                                            <div className="row col-md-12 pt-lg-3">
                                                 <div className="col-md-2">
                                                     <Label htmlFor="appendedInputButton">Confidence level</Label>
                                                     <Input
                                                         className="controls"
                                                         type="text"
+                                                        bsSize="sm"
                                                         id="confidenceLevelId"
                                                         name="confidenceLevelId"
                                                     />
@@ -634,6 +645,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                     <Input
                                                         className="controls"
                                                         type="text"
+                                                        bsSize="sm"
                                                         id="seasonalityId"
                                                         name="seasonalityId"
                                                     />
@@ -660,6 +672,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                         className="controls"
                                                         type="text"
                                                         id="alphaId"
+                                                        bsSize="sm"
                                                         name="alphaId"
                                                     />
                                                 </div>
@@ -669,6 +682,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                         className="controls"
                                                         type="text"
                                                         id="betaId"
+                                                        bsSize="sm"
                                                         name="betaId"
                                                     />
                                                 </div>
@@ -677,6 +691,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                     <Input
                                                         className="controls"
                                                         type="text"
+                                                        bsSize="sm"
                                                         id="gammaId"
                                                         name="gammaId"
                                                     />
@@ -687,6 +702,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                         className="controls"
                                                         type="text"
                                                         id="phiId"
+                                                        bsSize="sm"
                                                         name="phiId"
                                                     />
                                                 </div>
@@ -697,7 +713,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                 <PopoverBody>Need to add Info.</PopoverBody>
                                             </Popover>
                                         </div>
-                                        <div>
+                                        <div className="pt-lg-2">
                                             <Input
                                                 className="form-check-input"
                                                 type="checkbox"
@@ -714,13 +730,14 @@ export default class TreeExtrapolationComponent extends React.Component {
                                             </Label>
                                         </div>
                                         {this.state.arimaId &&
-                                            <div className="row">
+                                            <div className="row col-md-12 pt-lg-3">
                                                 <div className="col-md-3">
                                                     <Label htmlFor="appendedInputButton">p</Label>
                                                     <Input
                                                         className="controls"
                                                         type="text"
                                                         id="pId"
+                                                        bsSize="sm"
                                                         name="pId"
                                                     />
                                                 </div>
@@ -730,6 +747,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                         className="controls"
                                                         type="text"
                                                         id="dId"
+                                                        bsSize="sm"
                                                         name="dId"
                                                     />
                                                 </div>
@@ -739,6 +757,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                         className="controls"
                                                         type="text"
                                                         id="qId"
+                                                        bsSize="sm"
                                                         name="qId"
                                                     />
                                                 </div>
@@ -747,8 +766,8 @@ export default class TreeExtrapolationComponent extends React.Component {
                                     </div>
                                 </FormGroup>
                             </div>
-                            <div className="row">
-                                <Button type="submit" color="success" className="mr-1 float-right" size="md"><i className="fa fa-check"></i>{i18n.t('static.common.interpolate')}</Button>
+                            <div className="col-md-12 text-center pt-lg-2">
+                                <Button type="submit" color="success" className="mr-1" size="md"><i className="fa fa-check"></i>{i18n.t('static.common.interpolate')}</Button>
                             </div>
                         </div>
                     </Form>
@@ -873,7 +892,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                     </div><br/>
                     <div className="col-md-12 pl-lg-0">
                         <Row>
-                            <FormGroup className="col-md-3 pl-lg-0">
+                            <FormGroup className="col-md-3">
                                 <Label htmlFor="currencyId">Choose Method<span class="red Reqasterisk">*</span></Label>
                                 <InputGroup>
                                     <Input
@@ -894,7 +913,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                 </InputGroup>
 
                             </FormGroup>
-                            <FormGroup className="col-md-3 pl-lg-0">
+                            <FormGroup className="col-md-5">
                                 <Label htmlFor="currencyId">Notes<span class="red Reqasterisk">*</span></Label>
                                 <InputGroup>
                                     <Input
@@ -909,12 +928,13 @@ export default class TreeExtrapolationComponent extends React.Component {
                                 </InputGroup>
 
                             </FormGroup>
-                            <FormGroup className="col-md-3 pl-lg-0">
+                            <FormGroup className="pl-lg-3 ExtrapolateSaveBtn">
                                 <Button type="submit" color="success" className="mr-1 float-right" size="md"><i className="fa fa-check"></i>{i18n.t('static.pipeline.save')}</Button>
                             </FormGroup>
                         </Row>
                     </div>
                 </CardBody>
+              
                 
             </div>
         )
