@@ -605,7 +605,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                 show: '',
                 entries: '',
             },
-            onload: this.loaded,
+            onload: this.loadedExtrapolation,
             pagination: false,
             search: true,
             columnSorting: true,
@@ -636,7 +636,7 @@ export default class TreeExtrapolationComponent extends React.Component {
             // startMonthForExtrapolation: startMonth
         })
     }
-    loaded = function (instance, cell, x, y, value) {
+    loadedExtrapolation = function (instance, cell, x, y, value) {
         jExcelLoadedFunctionWithoutPagination(instance);
         var asterisk = document.getElementsByClassName("resizable")[0];
         var tr = asterisk.firstChild;
@@ -1249,10 +1249,10 @@ export default class TreeExtrapolationComponent extends React.Component {
                             </FormGroup>
                         </div>
                     </div>
-                    <div id="tableDiv" className="extrapolateTable"></div>
+                    <div id="tableDiv" className="extrapolateTable consumptionDataEntryTable"></div>
                     {/* Graph */}
-                    <div className="col-md-12">
-                        <div className="chart-wrapper chart-graph-report pl-5 ml-3" style={{ marginLeft: '50px' }}>
+                    <div className="col-md-12 pt-lg-4">
+                        <div className="chart-wrapper chart-graph-report pl-0 ml-0" style={{ marginLeft: '50px' }}>
                             <Line id="cool-canvas" data={line} options={options} />
                             <div>
 
