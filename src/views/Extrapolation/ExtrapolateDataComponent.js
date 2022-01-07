@@ -1,7 +1,5 @@
 import React from "react";
 import ReactDOM from 'react-dom';
-import regression from 'regression';
-import { std, sqrt, mean, abs } from 'mathjs';
 import {
     Card, CardBody,
     Label, Input, FormGroup,
@@ -22,7 +20,9 @@ import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
 import AuthenticationService from "../Common/AuthenticationService";
 import { calculateMovingAvg } from '../Extrapolation/MovingAverages';
-
+import { calculateSemiAverages } from '../Extrapolation/SemiAverages';
+import { calculateLinearRegression } from '../Extrapolation/LinearRegression';
+import { calculateTES } from '../Extrapolation/TES';
 
 export default class ExtrapolateDataComponent extends React.Component {
     constructor(props) {
@@ -80,7 +80,7 @@ export default class ExtrapolateDataComponent extends React.Component {
             alpha: 0.2,
             beta: 0.2,
             gamma: 0.2,
-            noOfMonthsForASeason: 12,
+            noOfMonthsForASeason: 4,
             confidence: 0.95,
             monthsForMovingAverage: 6,
             CI: "",
@@ -97,12 +97,20 @@ export default class ExtrapolateDataComponent extends React.Component {
             popoverOpenTes: false,
             popoverOpenArima: false,
             extrapolationMethodId: -1,
-            confidenceLevelId: 80,
+            confidenceLevelId: 0.85,
             showGuidance: false,
             showData: false,
             consumptionListlessTwelve: [],
             missingMonthList: [],
-            toggleDataCheck: false
+            toggleDataCheck: false,
+            movingAvgData: [],
+            semiAvgData: [],
+            linearRegressionData: [],
+            tesData: [],
+            movingAvgError: { "rmse": "", "mape": "", "mse": "", "wape": "", "rSqd": "" },
+            semiAvgError: { "rmse": "", "mape": "", "mse": "", "wape": "", "rSqd": "" },
+            linearRegressionError: { "rmse": "", "mape": "", "mse": "", "wape": "", "rSqd": "" },
+            tesError: { "rmse": "", "mape": "", "mse": "", "wape": "", "rSqd": "" }
         }
         this.toggle = this.toggle.bind(this)
         this.reset = this.reset.bind(this)
@@ -181,70 +189,6 @@ export default class ExtrapolateDataComponent extends React.Component {
 
     }
 
-    getDatasetData(e) {
-        this.setState({ loading: true })
-        var db1;
-        getDatabase();
-        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-        openRequest.onerror = function (event) {
-        }.bind(this);
-        openRequest.onsuccess = function (e) {
-            db1 = e.target.result;
-
-            var datasetTransaction = db1.transaction(['datasetData'], 'readwrite');
-            var datasetOs = datasetTransaction.objectStore('datasetData');
-            var dsRequest = datasetOs.get(this.state.forecastProgramId);
-            dsRequest.onerror = function (event) {
-            }.bind(this);
-            dsRequest.onsuccess = function (event) {
-                var datasetData = dsRequest.result;
-                console.log("datasetData-----" + datasetData);
-                var datasetDataBytes = CryptoJS.AES.decrypt(datasetData.programData, SECRET_KEY);
-                var datasetData = datasetDataBytes.toString(CryptoJS.enc.Utf8);
-
-                var datasetJson = JSON.parse(datasetData);
-                console.log("datasetJson&&&&&&&&&&&&&&&&&", datasetJson)
-                var actualConsumptionList = datasetJson.actualConsumptionList;
-                console.log(actualConsumptionList[0])
-                //            var pu = this.state.planningUnitList.filter(c => c.planningUnitId == this.state.selectedPlanningUnitId)[0];
-                var regionList = datasetJson.regionList;
-                var startDate = moment(datasetJson.currentVersion.forecastStartDate).format("YYYY-MM-DD");
-                var stopDate = moment(datasetJson.currentVersion.forecastStopDate).format("YYYY-MM-DD");
-                var consumptionExtrapolationList = datasetJson.consumptionExtrapolation;
-                var monthsForMovingAverage = 6;
-                var consumptionExtrapolationData = consumptionExtrapolationList.filter(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId && c.extrapolationMethod.id == 6)//Semi Averages
-                var consumptionExtrapolationMovingData = consumptionExtrapolationList.filter(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId && c.extrapolationMethod.id == 7)//Moving averages
-                console.log("consumptionExtrapolationMovingData+++", consumptionExtrapolationMovingData)
-                var consumptionExtrapolationRegression = consumptionExtrapolationList.filter(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId && c.extrapolationMethod.id == 5)//Linear Regression
-                if (consumptionExtrapolationMovingData.length > 0) {
-                    monthsForMovingAverage = consumptionExtrapolationMovingData[0].jsonProperties.months;
-                }
-                var monthArray = [];
-                var curDate = startDate;
-                for (var m = 0; curDate < moment(stopDate).add(-1, 'months').format("YYYY-MM-DD"); m++) {
-                    curDate = moment(startDate).add(m, 'months').format("YYYY-MM-DD");
-                    monthArray.push(curDate)
-                }
-                console.log("actualConsumptionList" + actualConsumptionList);
-                this.setState({
-                    //consumptionList: consumptionList,
-                    actualConsumptionList: actualConsumptionList,
-                    regionList: regionList,
-                    startDate: startDate,
-                    stopDate: stopDate,
-                    // consumptionUnitList: consumptionUnitList,
-                    monthArray: monthArray,
-                    datasetJson: datasetJson,
-                    monthsForMovingAverage: monthsForMovingAverage,
-                    loading: false
-
-                    // planningUnitList: planningUnitList,
-                    // forecastingUnitList: forecastingUnitList
-                }, () => { this.buildJxl(); })
-            }.bind(this)
-        }.bind(this)
-    }
-
     reset() {
         console.log('Inside reset')
         this.componentDidMount();
@@ -256,780 +200,275 @@ export default class ExtrapolateDataComponent extends React.Component {
     handleRangeDissmis1(value) {
         console.log("Value+++", value)
         this.setState({ rangeValue1: value }, () => {
-            this.setExtrapolatedParameters()
+            this.setExtrapolatedParameters(0)
         })
     }
 
     updateState(parameterName, value) {
-        console.log("$$$", value)
         this.setState({
             [parameterName]: value
+        }, () => {
+            this.buildActualJxl();
         })
     }
 
-    buildActualJxl(){
-        
+    buildActualJxl() {
+        //Jexcel table
+        var actualConsumptionList = this.state.actualConsumptionList;
+        var monthArray = this.state.monthArray;
+        let rangeValue = this.state.rangeValue1;
+        var startMonth = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
+        var dataArray = [];
+        var data = [];
+        for (var j = 0; j < monthArray.length; j++) {
+            data = [];
+            data[0] = monthArray[j];
+            var consumptionData = actualConsumptionList.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArray[j]).format("YYYY-MM") && c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId)
+            // if (consumptionData.length > 0) {
+            //     inputData.push({ "month": inputData.length + 1, "actual": consumptionData[0].amount, "forecast": null })
+            // }
+            var movingAvgDataFilter = this.state.movingAvgData.filter(c => moment(startMonth).add(c.month - 1, 'months').format("YYYY-MM") == moment(monthArray[j]).format("YYYY-MM"))
+            var semiAvgDataFilter = this.state.semiAvgData.filter(c => moment(startMonth).add(c.month - 1, 'months').format("YYYY-MM") == moment(monthArray[j]).format("YYYY-MM"))
+            var linearRegressionDataFilter = this.state.linearRegressionData.filter(c => moment(startMonth).add(c.month - 1, 'months').format("YYYY-MM") == moment(monthArray[j]).format("YYYY-MM"))
+            var tesDataFilter = this.state.tesData.filter(c => moment(startMonth).add(c.month - 1, 'months').format("YYYY-MM") == moment(monthArray[j]).format("YYYY-MM"))
+            var CI = this.state.CI;
+            //var consumptionData = actualConsumptionList.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArray[j]).format("YYYY-MM") && c.planningUnit.id == this.state.planningUnitId);
+            data[1] = consumptionData.length > 0 ? consumptionData[0].amount : "";
+            data[2] = movingAvgDataFilter.length > 0 && movingAvgDataFilter[0].forecast != null ? movingAvgDataFilter[0].forecast.toFixed(2) : '';
+            data[3] = semiAvgDataFilter.length > 0 && semiAvgDataFilter[0].forecast != null ? semiAvgDataFilter[0].forecast.toFixed(2) : '';
+            data[4] = linearRegressionDataFilter.length > 0 && linearRegressionDataFilter[0].forecast != null ? linearRegressionDataFilter[0].forecast.toFixed(2) : '';
+            data[5] = tesDataFilter.length > 0 && tesDataFilter[0].forecast != null ? (tesDataFilter[0].forecast - CI).toFixed(2) : '';
+            data[6] = tesDataFilter.length > 0 && tesDataFilter[0].forecast != null ? tesDataFilter[0].forecast.toFixed(2) : '';
+            data[7] = tesDataFilter.length > 0 && tesDataFilter[0].forecast != null ? (tesDataFilter[0].forecast + CI).toFixed(2) : '';
+            // data[8] = '';
+            dataArray.push(data)
+        }
+        this.el = jexcel(document.getElementById("tableDiv"), '');
+        this.el.destroy();
+        var options = {
+            data: dataArray,
+            columnDrag: true,
+            columns: [
+                {
+                    title: i18n.t('static.inventoryDate.inventoryReport'),
+                    type: 'calendar', options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker' }, width: 100
+                },
+                {
+                    title: i18n.t('static.extrapolation.adjustedActuals'),
+                    type: 'numeric', mask: '#,##.00', decimal: '.'
+                },
+                {
+                    title: i18n.t('static.extrapolation.movingAverages'),
+                    type: this.state.movingAvgId ? 'numeric' : 'hidden',
+                    mask: '#,##.00', decimal: '.'
+                },
+                {
+                    title: i18n.t('static.extrapolation.semiAverages'),
+                    type: this.state.semiAvgId ? 'numeric' : 'hidden',
+                    mask: '#,##.00', decimal: '.'
+                },
+                {
+                    title: i18n.t('static.extrapolation.linearRegression'),
+                    type: this.state.linearRegressionId ? 'numeric' : 'hidden',
+                    mask: '#,##.00', decimal: '.'
+                },
+                {
+                    title: i18n.t('static.extrapolation.tesLower'),
+                    type: this.state.smoothingId ? 'numeric' : 'hidden',
+                    mask: '#,##.00', decimal: '.'
+                },
+                {
+                    title: i18n.t('static.extrapolation.tes'),
+                    type: this.state.smoothingId ? 'numeric' : 'hidden',
+                    mask: '#,##.00', decimal: '.'
+                },
+                {
+                    title: i18n.t('static.extrapolation.tesUpper'),
+                    type: this.state.smoothingId ? 'numeric' : 'hidden',
+                    mask: '#,##.00', decimal: '.'
+                },
+                // {
+                //     title: i18n.t('static.extrapolation.arima'),
+                //     type: this.state.arimaId ? 'numeric' : 'hidden',
+                //     mask: '#,##.00', decimal: '.'
+                // }
+            ],
+            text: {
+                // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                show: '',
+                entries: '',
+            },
+            updateTable: function (el, cell, x, y, source, value, id) {
+                if (y != null) {
+                    var elInstance = el.jexcel;
+                    var rowData = elInstance.getRowData(y);
+                    if (moment(rowData[0]).format("YYYY-MM") >= moment(this.state.datasetJson.currentVersion.startDate).format("YYYY-MM") && moment(rowData[0]).format("YYYY-MM") <= moment(this.state.datasetJson.currentVersion.stopDate).format("YYYY-MM")) {
+                        var cell = elInstance.getCell(("A").concat(parseInt(y) + 1))
+                        cell.classList.add('jexcelBoldPurpleCell');
+                    } else {
+                        var cell = elInstance.getCell(("A").concat(parseInt(y) + 1))
+                        cell.classList.remove('jexcelBoldPurpleCell');
+                    }
+                }
+            }.bind(this),
+            onload: this.loaded,
+            pagination: false,
+            search: true,
+            columnSorting: true,
+            tableOverflow: true,
+            wordWrap: true,
+            allowInsertColumn: false,
+            allowManualInsertColumn: false,
+            allowDeleteRow: false,
+            onselection: this.selected,
+            oneditionend: this.onedit,
+            copyCompatibility: true,
+            allowExport: false,
+            paginationOptions: JEXCEL_PAGINATION_OPTION,
+            position: 'top',
+            filters: true,
+            license: JEXCEL_PRO_KEY,
+            contextMenu: function (obj, x, y, e) {
+                return [];
+            }.bind(this),
+        };
+        var dataEl = jexcel(document.getElementById("tableDiv"), options);
+        this.el = dataEl;
+        var rmseArr = [];
+        var mapeArr = [];
+        var mseArr = [];
+        var rSqdArr = [];
+        var wapeArr = [];
+
+        if (this.state.movingAvgId) {
+            rmseArr.push(this.state.movingAvgError.rmse)
+        }
+        if (this.state.semiAvgId) {
+            rmseArr.push(this.state.semiAvgError.rmse)
+        }
+        if (this.state.linearRegressionId) {
+            rmseArr.push(this.state.linearRegressionError.rmse)
+        }
+        if (this.state.smoothingId) {
+            rmseArr.push(this.state.tesError.rmse)
+        }
+
+        if (this.state.movingAvgId) {
+            mapeArr.push(this.state.movingAvgError.mape)
+        }
+        if (this.state.semiAvgId) {
+            mapeArr.push(this.state.semiAvgError.mape)
+        }
+        if (this.state.linearRegressionId) {
+            mapeArr.push(this.state.linearRegressionError.mape)
+        }
+        if (this.state.smoothingId) {
+            mapeArr.push(this.state.tesError.mape)
+        }
+
+        if (this.state.movingAvgId) {
+            mseArr.push(this.state.movingAvgError.mse)
+        }
+        if (this.state.semiAvgId) {
+            mseArr.push(this.state.semiAvgError.mse)
+        }
+        if (this.state.linearRegressionId) {
+            mseArr.push(this.state.linearRegressionError.mse)
+        }
+        if (this.state.smoothingId) {
+            mseArr.push(this.state.tesError.mse)
+        }
+
+        if (this.state.movingAvgId) {
+            rSqdArr.push(this.state.movingAvgError.rSqd)
+        }
+        if (this.state.semiAvgId) {
+            rSqdArr.push(this.state.semiAvgError.rSqd)
+        }
+        if (this.state.linearRegressionId) {
+            rSqdArr.push(this.state.linearRegressionError.rSqd)
+        }
+        if (this.state.smoothingId) {
+            rSqdArr.push(this.state.tesError.rSqd)
+        }
+
+        if (this.state.movingAvgId) {
+            wapeArr.push(this.state.movingAvgError.wape)
+        }
+        if (this.state.semiAvgId) {
+            wapeArr.push(this.state.semiAvgError.wape)
+        }
+        if (this.state.linearRegressionId) {
+            wapeArr.push(this.state.linearRegressionError.wape)
+        }
+        if (this.state.smoothingId) {
+            wapeArr.push(this.state.tesError.wape)
+        }
+
+        var minRmse = Math.min(...rmseArr);
+        var minMape = Math.min(...mapeArr);
+        var minMse = Math.min(...mseArr);
+        var minRsqd = Math.min(...rSqdArr);
+        var minWape = Math.min(...wapeArr);
+        this.setState({
+            dataEl: dataEl,
+            minRmse: minRmse,
+            minMape: minMape,
+            minMse: minMse,
+            minRsqd: minRsqd,
+            minWape: minWape,
+            loading: false
+        })
     }
 
     buildJxl() {
         this.setState({ loading: true })
         var actualConsumptionList = this.state.actualConsumptionList;
-        var monthArray = this.state.monthArray;
-        let dataArray = [];
-        var rangeValue=this.state.rangeValue1;
-        let startDate = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
-        let stopDate = rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
-        let curDate=startDate;
-        let data = [];
-        let columns = [];
-        var inputData = [];
-        var inputDataAverage = [];
-        var inputDataRegression = [];
-        var tesdata = [];
-        var startMonth = '';
+        var rangeValue1 = this.state.rangeValue1;
+        let startDate = rangeValue1.from.year + '-' + rangeValue1.from.month + '-01';
+        let stopDate = rangeValue1.to.year + '-' + rangeValue1.to.month + '-' + new Date(rangeValue1.to.year, rangeValue1.to.month, 0).getDate();
+        var rangeValue = this.state.rangeValue;
+        let startDate1 = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
+        let stopDate1 = rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
+        var minStartDate = startDate1;
+        var maxStopDate = stopDate1;
+        if (moment(startDate1).format("YYYY-MM") > moment(startDate).format("YYYY-MM")) {
+            minStartDate = startDate;
+        }
+        if (moment(stopDate1).format("YYYY-MM") < moment(stopDate).format("YYYY-MM")) {
+            maxStopDate = stopDate;
+        }
+        var monthArray = [];
+        var curDate1 = minStartDate;
+        for (var m = 0; curDate1 < moment(maxStopDate).add(-1, 'months').format("YYYY-MM-DD"); m++) {
+            curDate1 = moment(minStartDate).add(m, 'months').format("YYYY-MM-DD");
+            monthArray.push(curDate1)
+        }
+
+        let curDate = startDate;
+        var inputDataMovingAvg = [];
+        var inputDataSemiAverage = [];
+        var inputDataLinearRegression = [];
+        var inputDataTes = [];
         console.log("this.state.regionId", this.state.regionId)
         console.log("this.state.planningUnitId", this.state.planningUnitId)
-        console.log("monthArray", monthArray)
-        for (var j = 0; moment(curDate).format("YYYY-MM")<moment(stopDate).format("YYYY-MM"); j++) {
+        for (var j = 0; moment(curDate).format("YYYY-MM") < moment(stopDate).format("YYYY-MM"); j++) {
             curDate = moment(startDate).startOf('month').add(j, 'months').format("YYYY-MM-DD");
-            console.log("monthArray[j]", monthArray[j])
-
-            var consumptionData = actualConsumptionList.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArray[j]).format("YYYY-MM") && c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId)
-
-            console.log("consumptionData", consumptionData)
-            //if (consumptionData.length > 0) {
-            if (inputData.length == 0) {
-                startMonth = monthArray[j];
-            }
-            if (inputDataAverage.length == 0) {
-                startMonth = monthArray[j];
-            }
-            if (inputDataRegression.length == 0) {
-                startMonth = monthArray[j];
-            }
-            if (tesdata.length == 0) {
-                startMonth = monthArray[j];
-            }
-            inputData.push({ "month": inputData.length + 1, "actual": consumptionData.length > 0 ? consumptionData[0].amount : null, "forecast": null })
-            inputDataAverage.push({ "month": inputDataAverage.length + 1, "actual": consumptionData.length > 0 ? consumptionData[0].amount : null, "forecast": null })
-            inputDataRegression.push({ "month": inputDataRegression.length + 1, "actual": consumptionData.length > 0 ? consumptionData[0].amount : null, "forecast": null })
-            tesdata.push({ "month": tesdata.length + 1, "actual": consumptionData.length > 0 ? consumptionData[0].amount : null, "forecast": null })
-
+            var consumptionData = actualConsumptionList.filter(c => moment(c.month).format("YYYY-MM") == moment(curDate).format("YYYY-MM") && c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId)
+            inputDataMovingAvg.push({ "month": inputDataMovingAvg.length + 1, "actual": consumptionData.length > 0 ? consumptionData[0].amount : null, "forecast": null })
+            inputDataSemiAverage.push({ "month": inputDataSemiAverage.length + 1, "actual": consumptionData.length > 0 ? consumptionData[0].amount : null, "forecast": null })
+            inputDataLinearRegression.push({ "month": inputDataLinearRegression.length + 1, "actual": consumptionData.length > 0 ? consumptionData[0].amount : null, "forecast": null })
+            inputDataTes.push({ "month": inputDataTes.length + 1, "actual": consumptionData.length > 0 ? consumptionData[0].amount : null, "forecast": null })
         }
-        //}
-        console.log("inputDataRegression---", inputDataRegression)
-        console.log("tesdata---", tesdata)
-        const noOfMonthsForProjection = monthArray.length - inputDataAverage.length + 1;
-        calculateMovingAvg(inputDataAverage, this.state.monthsForMovingAverage, noOfMonthsForProjection, this);
-        // if (inputData.length % 2 != 0) {
-        //     inputData.pop();
-        // }
-        // if (inputDataAverage.length % 2 != 0) {
-        //     inputDataAverage.pop();
-        // }
-        // if (inputDataRegression.length % 2 != 0) {
-        //     inputDataRegression.pop();
-        // }
-        // if (tesdata.length % 2 != 0) {
-        //     tesdata.pop();
-        // }
-        // console.log("inputData[inputData.length - 1]", inputData[inputData.length - 1])
-        // let actualMonths = inputData[inputData.length - 1].month;
-
-        // //Semi Average
-        // if (inputData.length > 0) {
-        //     console.log(inputData);
-        //     let x1 = 0, x2 = 0, y1 = 0, y2 = 0;
-        //     let cnt = 0;
-        //     let m = 0;
-        //     let c = 0;
-        //     for (let x = 1; x <= actualMonths / 2; x++) {
-        //         x1 += inputData[x - 1].month;
-        //         y1 += inputData[x - 1].actual;
-        //         cnt++;
-        //     }
-        //     x1 = x1 / cnt;
-        //     y1 = y1 / cnt;
-        //     for (let x = actualMonths / 2 + 1; x <= actualMonths; x++) {
-        //         x2 += inputData[x - 1].month;
-        //         y2 += inputData[x - 1].actual;
-        //     }
-        //     x2 = x2 / cnt;
-        //     y2 = y2 / cnt;
-        //     m = (y2 - y1) / (x2 - x1);
-        //     c = m * (0 - x2) + y2;
-
-        //     for (let x = 1; x <= actualMonths + noOfMonthsForProjection; x++) {
-        //         if (x <= actualMonths) {
-        //             inputData[x - 1].forecast = m * x + c;
-        //         } else {
-        //             inputData[x - 1] = { "month": x, "actual": null, "forecast": m * x + c };
-        //         }
-        //     }
-        // }
-        // // Moving Average
-
-        // if (inputDataAverage.length > 0) {
-        //     // var actualMonths = inputDataAverage[inputDataAverage.length - 1].month;
-        //     var monthsForMovingAverage = this.state.monthsForMovingAverage;
-
-        //     for (let x = 1; x <= actualMonths + noOfMonthsForProjection; x++) {
-        //         console.log("x--->", x)
-        //         var forecast = '';
-        //         let startMonth = x - monthsForMovingAverage;
-        //         if (startMonth < 1) {
-        //             startMonth = 1;
-        //         }
-        //         let endMonth = x - 1;
-        //         if (endMonth < 1) {
-        //             forecast = null;
-        //         }
-        //         console.log("startMonth=" + startMonth + ", endMonth=" + endMonth);
-        //         let sum = 0;
-        //         let count = 0;
-        //         for (let x = startMonth; x <= endMonth; x++) {
-        //             console.log("x%%%%%", x)
-        //             if (x <= actualMonths) {
-        //                 sum += inputDataAverage[x - 1].actual;
-        //                 count++;
-        //             } else {
-        //                 sum += inputDataAverage[x - 1].forecast;
-        //                 count++;
-        //             }
-        //         }
-        //         console.log("sum=" + sum + ", count=" + count);
-        //         if (count == 0) {
-        //             forecast = null;
-        //         } else {
-        //             forecast = sum / count;
-        //         }
-
-        //         if (x <= actualMonths) {
-        //             inputDataAverage[x - 1].forecast = forecast;
-        //         } else {
-        //             inputDataAverage[x - 1] = { "month": x, "actual": null, "forecast": forecast };
-        //         }
-        //     }
-        // }
-        // //Regression        
-        // let actualMonthsRegression = inputDataRegression[inputDataRegression.length - 1].month;
-        // let tmpArray = new Array();
-        // for (let x = 0; x < inputDataRegression.length; x++) {
-        //     tmpArray.push(new Array(inputDataRegression[x].month, inputDataRegression[x].actual));
-        // }
-
-        // const result = regression.linear(tmpArray);
-        // const gradient = result.equation[0];
-        // const yIntercept = result.equation[1];
-        // for (let x = 1; x <= actualMonthsRegression + noOfMonthsForProjection; x++) {
-        //     console.log("x--", x)
-        //     if (x <= actualMonthsRegression) {
-        //         console.log("x-1", x - 1)
-        //         console.log("inputDataRegression%%%%%%%", inputDataRegression)
-        //         inputDataRegression[x - 1].forecast = gradient * x + yIntercept;
-        //     } else {
-        //         inputDataRegression[x - 1] = { "month": x, "actual": null, "forecast": gradient * x + yIntercept };
-        //     }
-        // }
-        // console.log("inputDataRegression", inputDataRegression);
-        // //Holts-Winters
-        // const alpha = this.state.alpha
-        // const beta = this.state.beta
-        // const gamma = this.state.gamma
-        // const noOfMonthsForASeason = this.state.noOfMonthsForASeason
-        // const confidence = this.state.confidenceLevelId
-
-        // // var alpha =  document.getElementById("alphaId").value;
-        // // var beta =  document.getElementById("betaId").value;
-        // // var gamma =  document.getElementById("gammaId").value;
-        // // var noOfMonthsForASeason =  document.getElementById("seasonalityId").value;
-        // // var confidence =  document.getElementById("confidenceLevelId").value;
-        // console.log("noOfMonthsForASeason", noOfMonthsForASeason);
-        // console.log("confidence", confidence);
-        // console.log("gamma", gamma);
-        // const tTable = [
-        //     { "df": 1, "zValue": [1.963, 3.078, 6.314, 31.82, 63.66, 318.31] },
-        //     { "df": 2, "zValue": [1.386, 1.886, 2.92, 6.965, 9.925, 22.327] },
-        //     { "df": 3, "zValue": [1.25, 1.638, 2.353, 4.541, 5.841, 10.215] },
-        //     { "df": 4, "zValue": [1.19, 1.533, 2.132, 3.747, 4.604, 7.173] },
-        //     { "df": 5, "zValue": [1.156, 1.476, 2.015, 3.365, 4.032, 5.893] },
-        //     { "df": 6, "zValue": [1.134, 1.44, 1.943, 3.143, 3.707, 5.208] },
-        //     { "df": 7, "zValue": [1.119, 1.415, 1.895, 2.998, 3.499, 4.785] },
-        //     { "df": 8, "zValue": [1.108, 1.397, 1.86, 2.896, 3.355, 4.501] },
-        //     { "df": 9, "zValue": [1.1, 1.383, 1.833, 2.821, 3.25, 4.297] },
-        //     { "df": 10, "zValue": [1.093, 1.372, 1.812, 2.764, 3.169, 4.144] },
-        //     { "df": 11, "zValue": [1.088, 1.363, 1.796, 2.718, 3.106, 4.025] },
-        //     { "df": 12, "zValue": [1.083, 1.356, 1.782, 2.681, 3.055, 3.93] },
-        //     { "df": 13, "zValue": [1.079, 1.35, 1.771, 2.65, 3.012, 3.852] },
-        //     { "df": 14, "zValue": [1.076, 1.345, 1.761, 2.624, 2.977, 3.787] },
-        //     { "df": 15, "zValue": [1.074, 1.341, 1.753, 2.602, 2.947, 3.733] },
-        //     { "df": 16, "zValue": [1.071, 1.337, 1.746, 2.583, 2.921, 3.686] },
-        //     { "df": 17, "zValue": [1.069, 1.333, 1.74, 2.567, 2.898, 3.646] },
-        //     { "df": 18, "zValue": [1.067, 1.33, 1.734, 2.552, 2.878, 3.61] },
-        //     { "df": 19, "zValue": [1.066, 1.328, 1.729, 2.539, 2.861, 3.579] },
-        //     { "df": 20, "zValue": [1.064, 1.325, 1.725, 2.528, 2.845, 3.552] },
-        //     { "df": 21, "zValue": [1.063, 1.323, 1.721, 2.518, 2.831, 3.527] },
-        //     { "df": 22, "zValue": [1.061, 1.321, 1.717, 2.508, 2.819, 3.505] },
-        //     { "df": 23, "zValue": [1.06, 1.319, 1.714, 2.5, 2.807, 3.485] },
-        //     { "df": 24, "zValue": [1.059, 1.318, 1.711, 2.492, 2.797, 3.467] },
-        //     { "df": 25, "zValue": [1.058, 1.316, 1.708, 2.485, 2.787, 3.45] },
-        //     { "df": 26, "zValue": [1.058, 1.315, 1.706, 2.479, 2.779, 3.435] },
-        //     { "df": 27, "zValue": [1.057, 1.314, 1.703, 2.473, 2.771, 3.421] },
-        //     { "df": 28, "zValue": [1.056, 1.313, 1.701, 2.467, 2.763, 3.408] },
-        //     { "df": 29, "zValue": [1.055, 1.311, 1.699, 2.462, 2.756, 3.396] },
-        //     { "df": 30, "zValue": [1.055, 1.31, 1.697, 2.457, 2.75, 3.385] },
-        //     { "df": 40, "zValue": [1.05, 1.303, 1.684, 2.423, 2.704, 3.307] },
-        //     { "df": 60, "zValue": [1.045, 1.296, 1.671, 2.39, 2.66, 3.232] },
-        //     { "df": 80, "zValue": [1.043, 1.292, 1.664, 2.374, 2.639, 3.195] },
-        //     { "df": 100, "zValue": [1.042, 1.29, 1.66, 2.364, 2.626, 3.174] },
-        //     { "df": 1000, "zValue": [1.037, 1.282, 1.646, 2.33, 2.581, 3.098] }
-        // ]
-
-
-        // //initial_seasonal_components
-        // let seasonals = new Array();
-        // let season_averages = new Array();
-        // let n_seasons = parseInt(tesdata.length / noOfMonthsForASeason);
-        // for (let x = 0; x < n_seasons; x++) {
-        //     let sum = 0;
-        //     for (let y = 0; y < noOfMonthsForASeason; y++) {
-        //         sum += tesdata[x * Number(noOfMonthsForASeason) + y].actual
-        //     }
-        //     season_averages.push(sum / noOfMonthsForASeason)
-        // }
-        // for (let x = 0; x < noOfMonthsForASeason; x++) {
-        //     let sum = 0;
-        //     for (let y = 0; y < n_seasons; y++) {
-        //         sum += tesdata[y * noOfMonthsForASeason + x].actual - season_averages[y]
-        //     }
-        //     seasonals.push(sum / n_seasons)
-        // }
-
-        // //tes
-        // let resultarr = new Array();
-        // let smooth = 0, trend = 0, m = 0, val = 0, last_smooth = 0, last_trend = 0;
-        // for (var x = 0; x < tesdata.length + 12; x++) {
-        //     if (x == 0) { // initial values
-        //         last_smooth = tesdata[0].actual
-        //         smooth = last_smooth
-
-        //         //initial_trend
-        //         let sum = 0
-        //         for (var x1 = 0; x1 < noOfMonthsForASeason; x1++) {
-        //             sum += (tesdata[noOfMonthsForASeason + x1].actual - tesdata[x1].actual) / noOfMonthsForASeason
-        //         }
-        //         last_trend = sum / noOfMonthsForASeason
-
-        //         trend = last_trend
-        //         resultarr.push(tesdata[0].actual == null ? 0 : tesdata[0].actual)
-        //     } else if (x >= tesdata.length) {
-        //         m = x - tesdata.length + 1
-        //         resultarr.push((smooth + m * trend) + seasonals[x % noOfMonthsForASeason])
-        //     } else {
-        //         val = tesdata[x].actual
-        //         smooth = alpha * (val - seasonals[x % noOfMonthsForASeason]) + (1 - alpha) * (last_smooth + last_trend)
-        //         trend = beta * (smooth - last_smooth) + (1 - beta) * last_trend
-        //         seasonals[x % noOfMonthsForASeason] = gamma * (val - smooth) + (1 - gamma) * seasonals[x % noOfMonthsForASeason]
-        //         resultarr.push(smooth + trend + seasonals[x % noOfMonthsForASeason])
-        //     }
-        //     last_smooth = smooth;
-        //     last_trend = trend;
-        // }
-
-        // const actualLength = tesdata.length;
-
-        // for (let x = 0; x < resultarr.length; x++) {
-        //     if (x >= actualLength) {
-        //         tesdata.push = { "month": (x + 1), "actual": null, "forecast": resultarr[x] }
-        //     } else {
-        //         tesdata[x].forecast = resultarr[x]
-        //     }
-        // }
-        // console.log("tesdata", tesdata);
-
-
-        // // get Zvalue:
-
-        // let final_t_table = null;
-        // var zValue = null;
-        // for (let x = 0; x < tTable.length; x++) {
-        //     if (resultarr.length < tTable[x].df) {
-        //         break;
-        //     }
-        //     final_t_table = tTable[x]
-        // }
-        // switch (confidence) {
-        //     case 0.85:
-        //         zValue = final_t_table.zValue[0];
-        //         break;
-        //     case 0.90:
-        //         zValue = final_t_table.zValue[1];
-        //         break;
-        //     case 0.95:
-        //         zValue = final_t_table.zValue[2];
-        //         break;
-        //     case 0.99:
-        //         zValue = final_t_table.zValue[3];
-        //         break;
-        //     case 0.995:
-        //         zValue = final_t_table.zValue[4];
-        //         break;
-        //     case 0.999:
-        //         zValue = final_t_table.zValue[5];
-        //         break;
-        //     default:
-        //         zValue = null;
-        // }
-        // console.log("resultarr---", resultarr)
-        // console.log("Z value = " + zValue)
-        // const stdDev = std(resultarr)
-        // console.log("Std dev = " + stdDev)
-        // const CI = zValue * stdDev / sqrt(resultarr.length)
-        // console.log("CI = " + CI)
-
-        // // error Table for TES
-        // let cnt = 0
-        // let xBar = 0
-        // let yBar = 0
-        // let xyBar = 0
-        // let xxBar = 0
-        // let eBar = 0
-        // let absEBar = 0
-        // let absEPerABar = 0
-        // let e2Bar = 0
-        // let ePerABar = 0
-
-        // for (let x = 0; x < tesdata.length; x++) {
-        //     if (tesdata[x].actual) {
-        //         xBar += tesdata[x].actual
-        //         yBar += tesdata[x].forecast
-        //         xyBar += tesdata[x].actual * tesdata[x].forecast
-        //         xxBar += tesdata[x].actual * tesdata[x].actual
-        //         eBar += tesdata[x].forecast - tesdata[x].actual
-        //         absEBar += abs(tesdata[x].forecast - tesdata[x].actual)
-        //         absEPerABar += abs(tesdata[x].forecast - tesdata[x].actual) / tesdata[x].actual
-        //         e2Bar += (tesdata[x].forecast - tesdata[x].actual) * (tesdata[x].forecast - tesdata[x].actual)
-        //         ePerABar += (tesdata[x].forecast - tesdata[x].actual) / tesdata[x].actual
-        //         cnt++
-        //     }
-        // }
-        // let wape = (eBar / xBar).toFixed(2)
-        // xBar = xBar / cnt
-        // yBar = yBar / cnt
-        // xxBar = xxBar / cnt
-        // xyBar = xyBar / cnt
-        // eBar = eBar / cnt
-        // absEBar = absEBar / cnt
-        // absEPerABar = absEPerABar / cnt
-        // e2Bar = e2Bar / cnt
-        // ePerABar = ePerABar / cnt
-
-        // var mt = (xyBar - xBar * yBar) / (xxBar - (xBar * xBar))
-        // let c = yBar - mt * xBar
-
-        // let regressionSquaredError = 0
-        // let totalSquaredError = 0
-        // for (let x = 0; x < tesdata.length; x++) {
-        //     if (tesdata[x].actual) {
-        //         regressionSquaredError += Math.pow(tesdata[x].forecast - (c + mt * x), 2)
-        //         totalSquaredError += Math.pow(tesdata[x].forecast - yBar, 2)
-        //     }
-        // }
-
-        // var rmse = (sqrt(e2Bar)).toFixed(2)
-        // var mape = absEPerABar.toFixed(2)
-        // var mse = e2Bar.toFixed(2)
-        // var rSqd = (1 - (regressionSquaredError / totalSquaredError)).toFixed(2)
-
-        // // console.log("wape",wape)
-        // // console.log("rmse",rmse)
-        // // console.log("mape",mape)
-        // // console.log("mse",mse)
-        // // console.log("rSqd",rSqd)
-
-        // // error Table for Semi
-        // let cntSemi = 0
-        // let xBarSemi = 0
-        // let yBarSemi = 0
-        // let xyBarSemi = 0
-        // let xxBarSemi = 0
-        // let eBarSemi = 0
-        // let absEBarSemi = 0
-        // let absEPerABarSemi = 0
-        // let e2BarSemi = 0
-        // let ePerABarSemi = 0
-
-        // for (let x = 0; x < inputData.length; x++) {
-        //     if (inputData[x].actual) {
-        //         xBarSemi += inputData[x].actual
-        //         yBarSemi += inputData[x].forecast
-        //         xyBarSemi += inputData[x].actual * inputData[x].forecast
-        //         xxBarSemi += inputData[x].actual * inputData[x].actual
-        //         eBarSemi += inputData[x].forecast - inputData[x].actual
-        //         absEBarSemi += abs(inputData[x].forecast - inputData[x].actual)
-        //         absEPerABarSemi += abs(inputData[x].forecast - inputData[x].actual) / inputData[x].actual
-        //         e2BarSemi += (inputData[x].forecast - inputData[x].actual) * (inputData[x].forecast - inputData[x].actual)
-        //         ePerABarSemi += (inputData[x].forecast - inputData[x].actual) / inputData[x].actual
-        //         cntSemi++
-        //     }
-        // }
-        // let wapeSemi = (eBarSemi / xBarSemi).toFixed(2)
-        // xBarSemi = xBarSemi / cntSemi
-        // yBarSemi = yBarSemi / cntSemi
-        // xxBarSemi = xxBarSemi / cntSemi
-        // xyBarSemi = xyBarSemi / cntSemi
-        // eBarSemi = eBarSemi / cntSemi
-        // absEBarSemi = absEBarSemi / cntSemi
-        // absEPerABarSemi = absEPerABarSemi / cntSemi
-        // e2BarSemi = e2BarSemi / cntSemi
-        // ePerABarSemi = ePerABarSemi / cntSemi
-
-        // var mtSemi = (xyBarSemi - xBarSemi * yBarSemi) / (xxBarSemi - (xBarSemi * xBarSemi))
-        // let cSemi = yBarSemi - mtSemi * xBarSemi
-
-        // let regressionSquaredErrorSemi = 0
-        // let totalSquaredErrorSemi = 0
-        // for (let x = 0; x < inputData.length; x++) {
-        //     if (inputData[x].actual) {
-        //         regressionSquaredErrorSemi += Math.pow(inputData[x].forecast - (cSemi + mtSemi * x), 2)
-        //         totalSquaredErrorSemi += Math.pow(inputData[x].forecast - yBarSemi, 2)
-        //     }
-        // }
-
-        // var rmseSemi = (sqrt(e2BarSemi)).toFixed(2)
-        // var mapeSemi = absEPerABarSemi.toFixed(2)
-        // var mseSemi = e2BarSemi.toFixed(2)
-        // var rSqdSemi = (1 - (regressionSquaredErrorSemi / totalSquaredErrorSemi)).toFixed(2)
-
-        // // error Table for Moving Avegrage
-        // let cntMovingAvg = 0
-        // let xBarMovingAvg = 0
-        // let yBarMovingAvg = 0
-        // let xyBarMovingAvg = 0
-        // let xxBarMovingAvg = 0
-        // let eBarMovingAvg = 0
-        // let absEBarMovingAvg = 0
-        // let absEPerABarMovingAvg = 0
-        // let e2BarMovingAvg = 0
-        // let ePerABarMovingAvg = 0
-
-        // for (let x = 0; x < inputDataAverage.length; x++) {
-        //     if (inputDataAverage[x].actual) {
-        //         xBarMovingAvg += inputDataAverage[x].actual
-        //         yBarMovingAvg += inputDataAverage[x].forecast
-        //         xyBarMovingAvg += inputDataAverage[x].actual * inputDataAverage[x].forecast
-        //         xxBarMovingAvg += inputDataAverage[x].actual * inputDataAverage[x].actual
-        //         eBarMovingAvg += inputDataAverage[x].forecast - inputDataAverage[x].actual
-        //         absEBarMovingAvg += abs(inputDataAverage[x].forecast - inputDataAverage[x].actual)
-        //         absEPerABarMovingAvg += abs(inputDataAverage[x].forecast - inputDataAverage[x].actual) / inputDataAverage[x].actual
-        //         e2BarMovingAvg += (inputDataAverage[x].forecast - inputDataAverage[x].actual) * (inputDataAverage[x].forecast - inputDataAverage[x].actual)
-        //         ePerABarMovingAvg += (inputDataAverage[x].forecast - inputDataAverage[x].actual) / inputDataAverage[x].actual
-        //         cntMovingAvg++
-        //     }
-        // }
-        // let wapeMovingAvg = (eBarMovingAvg / xBarMovingAvg).toFixed(2);
-        // xBarMovingAvg = xBarMovingAvg / cntMovingAvg
-        // yBarMovingAvg = yBarMovingAvg / cntMovingAvg
-        // xxBarMovingAvg = xxBarMovingAvg / cntMovingAvg
-        // xyBarMovingAvg = xyBarMovingAvg / cntMovingAvg
-        // eBarMovingAvg = eBarMovingAvg / cntMovingAvg
-        // absEBarMovingAvg = absEBarMovingAvg / cntMovingAvg
-        // absEPerABarMovingAvg = absEPerABarMovingAvg / cntMovingAvg
-        // e2BarMovingAvg = e2BarMovingAvg / cntMovingAvg
-        // ePerABarMovingAvg = ePerABarMovingAvg / cntMovingAvg
-
-        // var mtMovingAvg = (xyBarMovingAvg - xBarMovingAvg * yBarMovingAvg) / (xxBarMovingAvg - (xBarMovingAvg * xBarMovingAvg))
-        // let cMovingAvg = yBarMovingAvg - mtMovingAvg * xBarMovingAvg
-
-        // let regressionSquaredErrorMovingAvg = 0
-        // let totalSquaredErrorMovingAvg = 0
-        // for (let x = 0; x < inputDataAverage.length; x++) {
-        //     if (inputDataAverage[x].actual) {
-        //         regressionSquaredErrorMovingAvg += Math.pow(inputDataAverage[x].forecast - (cMovingAvg + mtMovingAvg * x), 2)
-        //         totalSquaredErrorMovingAvg += Math.pow(inputDataAverage[x].forecast - yBarMovingAvg, 2)
-        //     }
-        // }
-
-        // var rmseMovingAvg = (sqrt(e2BarMovingAvg)).toFixed(2)
-        // var mapeMovingAvg = absEPerABarMovingAvg.toFixed(2)
-        // var mseMovingAvg = e2BarMovingAvg.toFixed(2)
-        // var rSqdMovingAvg = (1 - (regressionSquaredErrorMovingAvg / totalSquaredErrorMovingAvg)).toFixed(2)
-
-        // // error Table for Linear Reggreassion
-        // let cntLinearReg = 0
-        // let xBarLinearReg = 0
-        // let yBarLinearReg = 0
-        // let xyBarLinearReg = 0
-        // let xxBarLinearReg = 0
-        // let eBarLinearReg = 0
-        // let absEBarLinearReg = 0
-        // let absEPerABarLinearReg = 0
-        // let e2BarLinearReg = 0
-        // let ePerABarLinearReg = 0
-
-        // for (let x = 0; x < inputDataRegression.length; x++) {
-        //     if (inputDataRegression[x].actual) {
-        //         xBarLinearReg += inputDataRegression[x].actual
-        //         yBarLinearReg += inputDataRegression[x].forecast
-        //         xyBarLinearReg += inputDataRegression[x].actual * inputDataRegression[x].forecast
-        //         xxBarLinearReg += inputDataRegression[x].actual * inputDataRegression[x].actual
-        //         eBarLinearReg += inputDataRegression[x].forecast - inputDataRegression[x].actual
-        //         absEBarLinearReg += abs(inputDataRegression[x].forecast - inputDataRegression[x].actual)
-        //         absEPerABarLinearReg += abs(inputDataRegression[x].forecast - inputDataRegression[x].actual) / inputDataRegression[x].actual
-        //         e2BarLinearReg += (inputDataRegression[x].forecast - inputDataRegression[x].actual) * (inputDataRegression[x].forecast - inputDataRegression[x].actual)
-        //         ePerABarLinearReg += (inputDataRegression[x].forecast - inputDataRegression[x].actual) / inputDataRegression[x].actual
-        //         cntLinearReg++
-        //     }
-        // }
-        // let wapeLinearReg = (eBarLinearReg / xBarLinearReg).toFixed(2)
-        // xBarLinearReg = xBarLinearReg / cntLinearReg
-        // yBarLinearReg = yBarLinearReg / cntLinearReg
-        // xxBarLinearReg = xxBarLinearReg / cntLinearReg
-        // xyBarLinearReg = xyBarLinearReg / cntLinearReg
-        // eBarLinearReg = eBarLinearReg / cntLinearReg
-        // absEBarLinearReg = absEBarLinearReg / cntLinearReg
-        // absEPerABarLinearReg = absEPerABarLinearReg / cntLinearReg
-        // e2BarLinearReg = e2BarLinearReg / cntLinearReg
-        // ePerABarLinearReg = ePerABarLinearReg / cntLinearReg
-
-        // var mtLinearReg = (xyBarLinearReg - xBarLinearReg * yBarLinearReg) / (xxBarLinearReg - (xBarLinearReg * xBarLinearReg))
-        // let cLinearReg = yBarLinearReg - mtLinearReg * xBarLinearReg
-
-        // let regressionSquaredErrorLinearReg = 0
-        // let totalSquaredErrorLinearReg = 0
-        // for (let x = 0; x < inputDataRegression.length; x++) {
-        //     if (inputDataRegression[x].actual) {
-        //         regressionSquaredErrorLinearReg += Math.pow(inputDataRegression[x].forecast - (cLinearReg + mtLinearReg * x), 2)
-        //         totalSquaredErrorLinearReg += Math.pow(inputDataRegression[x].forecast - yBarLinearReg, 2)
-        //     }
-        // }
-
-        // var rmseLinearReg = (sqrt(e2BarLinearReg)).toFixed(2)
-        // var mapeLinearReg = absEPerABarLinearReg.toFixed(2)
-        // var mseLinearReg = e2BarLinearReg.toFixed(2)
-        // var rSqdLinearReg = (1 - (regressionSquaredErrorLinearReg / totalSquaredErrorLinearReg)).toFixed(2)
-
-
-        // //Jexcel table
-        // for (var j = 0; j < monthArray.length; j++) {
-        //     data = [];
-        //     data[0] = monthArray[j];
-        //     var consumptionData = actualConsumptionList.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArray[j]).format("YYYY-MM") && c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId)
-        //     if (consumptionData.length > 0) {
-        //         inputData.push({ "month": inputData.length + 1, "actual": consumptionData[0].amount, "forecast": null })
-        //     }
-        //     var inputDataFilter = inputData.filter(c => moment(startMonth).add(c.month - 1, 'months').format("YYYY-MM") == moment(monthArray[j]).format("YYYY-MM"))
-        //     var inputDataAverageFilter = inputDataAverage.filter(c => moment(startMonth).add(c.month - 1, 'months').format("YYYY-MM") == moment(monthArray[j]).format("YYYY-MM"))
-        //     var inputDataRegressionFilter = inputDataRegression.filter(c => moment(startMonth).add(c.month - 1, 'months').format("YYYY-MM") == moment(monthArray[j]).format("YYYY-MM"))
-        //     var tesdataFilter = tesdata.filter(c => moment(startMonth).add(c.month - 1, 'months').format("YYYY-MM") == moment(monthArray[j]).format("YYYY-MM"))
-
-        //     //var consumptionData = actualConsumptionList.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArray[j]).format("YYYY-MM") && c.planningUnit.id == this.state.planningUnitId);
-        //     data[1] = consumptionData.length > 0 ? consumptionData[0].amount : "";
-        //     data[2] = inputDataAverageFilter.length > 0 && inputDataAverageFilter[0].forecast != null ? inputDataAverageFilter[0].forecast.toFixed(2) : '';
-        //     data[3] = inputDataFilter.length > 0 && inputDataFilter[0].forecast != null ? inputDataFilter[0].forecast.toFixed(2) : '';
-        //     data[4] = inputDataRegressionFilter.length > 0 && inputDataRegressionFilter[0].forecast != null ? inputDataRegressionFilter[0].forecast.toFixed(2) : '';
-        //     data[5] = tesdataFilter.length > 0 && tesdataFilter[0].forecast != null ? (tesdataFilter[0].forecast - CI).toFixed(2) : '';
-        //     data[6] = tesdataFilter.length > 0 && tesdataFilter[0].forecast != null ? tesdataFilter[0].forecast.toFixed(2) : '';
-        //     data[7] = tesdataFilter.length > 0 && tesdataFilter[0].forecast != null ? (tesdataFilter[0].forecast + CI).toFixed(2) : '';
-        //     data[8] = '';
-        //     dataArray.push(data)
-        // }
-        // this.el = jexcel(document.getElementById("tableDiv"), '');
-        // this.el.destroy();
-        // console.log("tesdataFilter88888888888888", tesdataFilter)
-        // console.log("inputDataFilter88888888888888", inputDataFilter)
-        // var options = {
-        //     data: dataArray,
-        //     columnDrag: true,
-        //     columns: [
-        //         {
-        //             title: i18n.t('static.inventoryDate.inventoryReport'),
-        //             type: 'calendar', options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker' }, width: 100
-        //         },
-        //         {
-        //             title: i18n.t('static.extrapolation.adjustedActuals'),
-        //             type: 'numeric', mask: '#,##.00', decimal: '.'
-        //         },
-        //         {
-        //             title: i18n.t('static.extrapolation.movingAverages'),
-        //             type: this.state.movingAvgId ? 'numeric' : 'hidden',
-        //             mask: '#,##.00', decimal: '.'
-        //         },
-        //         {
-        //             title: i18n.t('static.extrapolation.semiAverages'),
-        //             type: this.state.semiAvgId ? 'numeric' : 'hidden',
-        //             mask: '#,##.00', decimal: '.'
-        //         },
-        //         {
-        //             title: i18n.t('static.extrapolation.linearRegression'),
-        //             type: this.state.linearRegressionId ? 'numeric' : 'hidden',
-        //             mask: '#,##.00', decimal: '.'
-        //         },
-        //         {
-        //             title: i18n.t('static.extrapolation.tesLower'),
-        //             type: this.state.smoothingId ? 'numeric' : 'hidden',
-        //             mask: '#,##.00', decimal: '.'
-        //         },
-        //         {
-        //             title: i18n.t('static.extrapolation.tes'),
-        //             type: this.state.smoothingId ? 'numeric' : 'hidden',
-        //             mask: '#,##.00', decimal: '.'
-        //         },
-        //         {
-        //             title: i18n.t('static.extrapolation.tesUpper'),
-        //             type: this.state.smoothingId ? 'numeric' : 'hidden',
-        //             mask: '#,##.00', decimal: '.'
-        //         },
-        //         {
-        //             title: i18n.t('static.extrapolation.arima'),
-        //             type: this.state.arimaId ? 'numeric' : 'hidden',
-        //             mask: '#,##.00', decimal: '.'
-        //         }
-        //     ],
-        //     text: {
-        //         // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-        //         showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-        //         show: '',
-        //         entries: '',
-        //     },
-        //     onload: this.loaded,
-        //     pagination: false,
-        //     search: true,
-        //     columnSorting: true,
-        //     tableOverflow: true,
-        //     wordWrap: true,
-        //     allowInsertColumn: false,
-        //     allowManualInsertColumn: false,
-        //     allowDeleteRow: false,
-        //     onselection: this.selected,
-        //     oneditionend: this.onedit,
-        //     copyCompatibility: true,
-        //     allowExport: false,
-        //     paginationOptions: JEXCEL_PAGINATION_OPTION,
-        //     position: 'top',
-        //     filters: true,
-        //     license: JEXCEL_PRO_KEY,
-        //     contextMenu: function (obj, x, y, e) {
-        //         return [];
-        //     }.bind(this),
-        // };
-        // var dataEl = jexcel(document.getElementById("tableDiv"), options);
-        // this.el = dataEl;
-
-        // var rmseArr = [];
-        // var mapeArr = [];
-        // var mseArr = [];
-        // var rsqdArr = [];
-        // var wapeArr = [];
-
-        // if (this.state.movingAvgId) {
-        //     rmseArr.push(rmseMovingAvg)
-        // }
-        // if (this.state.semiAvgId) {
-        //     rmseArr.push(rmseSemi)
-        // }
-        // if (this.state.linearRegressionId) {
-        //     rmseArr.push(rmseLinearReg)
-        // }
-        // if (this.state.smoothingId) {
-        //     rmseArr.push(rmse)
-        // }
-
-        // if (this.state.movingAvgId) {
-        //     mapeArr.push(mapeMovingAvg)
-        // }
-        // if (this.state.semiAvgId) {
-        //     mapeArr.push(mapeSemi)
-        // }
-        // if (this.state.linearRegressionId) {
-        //     mapeArr.push(mapeLinearReg)
-        // }
-        // if (this.state.smoothingId) {
-        //     mapeArr.push(mape)
-        // }
-
-        // if (this.state.movingAvgId) {
-        //     mseArr.push(mseMovingAvg)
-        // }
-        // if (this.state.semiAvgId) {
-        //     mseArr.push(mseSemi)
-        // }
-        // if (this.state.linearRegressionId) {
-        //     mseArr.push(mseLinearReg)
-        // }
-        // if (this.state.smoothingId) {
-        //     mseArr.push(mse)
-        // }
-
-        // if (this.state.movingAvgId) {
-        //     rsqdArr.push(rSqdMovingAvg)
-        // }
-        // if (this.state.semiAvgId) {
-        //     rsqdArr.push(rSqdSemi)
-        // }
-        // if (this.state.linearRegressionId) {
-        //     rsqdArr.push(rSqdLinearReg)
-        // }
-        // if (this.state.smoothingId) {
-        //     rsqdArr.push(rSqd)
-        // }
-
-        // if (this.state.movingAvgId) {
-        //     wapeArr.push(wapeMovingAvg)
-        // }
-        // if (this.state.semiAvgId) {
-        //     wapeArr.push(wapeSemi)
-        // }
-        // if (this.state.linearRegressionId) {
-        //     wapeArr.push(wapeLinearReg)
-        // }
-        // if (this.state.smoothingId) {
-        //     wapeArr.push(wape)
-        // }
-
-        // var minRmse = Math.min(...rmseArr);
-        // var minMape = Math.min(...mapeArr);
-        // var minMse = Math.min(...mseArr);
-        // var minRsqd = Math.min(...rsqdArr);
-        // var minWape = Math.min(...wapeArr);
-
-        // this.setState({
-        //     dataEl: dataEl, loading: false,
-        //     minRmse: minRmse,
-        //     minMape: minMape,
-        //     minMse: minMse,
-        //     minRsqd: minRsqd,
-        //     minWape: minWape,
-        //     inputDataFilter: inputData,
-        //     inputDataAverageFilter: inputDataAverage,
-        //     inputDataRegressionFilter: inputDataRegression,
-        //     startMonthForExtrapolation: startMonth,
-        //     tesdataFilter: tesdata,
-        //     rmse: rmse,
-        //     mape: mape,
-        //     mse: mse,
-        //     rSqd: rSqd,
-        //     wape: wape,
-        //     rmseSemi: rmseSemi,
-        //     mapeSemi: mapeSemi,
-        //     mseSemi: mseSemi,
-        //     rSqdSemi: rSqdSemi,
-        //     wapeSemi: wapeSemi,
-        //     rmseMovingAvg: rmseMovingAvg,
-        //     mapeMovingAvg: mapeMovingAvg,
-        //     mseMovingAvg: mseMovingAvg,
-        //     rSqdMovingAvg: rSqdMovingAvg,
-        //     wapeMovingAvg: wapeMovingAvg,
-        //     rmseLinearReg: rmseLinearReg,
-        //     mapeLinearReg: mapeLinearReg,
-        //     mseLinearReg: mseLinearReg,
-        //     rSqdLinearReg: rSqdLinearReg,
-        //     wapeLinearReg: wapeLinearReg,
-        //     consumptionData: consumptionData,
-        //     CI: CI,
-        //     loading: false
-        // })
-        // console.log("tesdataFilter&&&&&&", this.state.tesdataFilter);
+        const noOfMonthsForProjection = monthArray.length - inputDataMovingAvg.length;
+        this.setState({
+            monthArray: monthArray
+        })
+        calculateMovingAvg(inputDataMovingAvg, this.state.monthsForMovingAverage, noOfMonthsForProjection, this);
+        calculateSemiAverages(inputDataSemiAverage, noOfMonthsForProjection, this);
+        calculateLinearRegression(inputDataLinearRegression, noOfMonthsForProjection, this);
+        calculateTES(inputDataTes, this.state.alpha, this.state.beta, this.state.gamma, this.state.confidenceLevelId, this.state.noOfMonthsForASeason, noOfMonthsForProjection, this);
     }
 
     loaded = function (instance, cell, x, y, value) {
@@ -1044,7 +483,7 @@ export default class ExtrapolateDataComponent extends React.Component {
         tr.children[6].classList.add('InfoTr');
         tr.children[7].classList.add('InfoTr');
         tr.children[8].classList.add('InfoTr');
-        tr.children[9].classList.add('InfoTr');
+        // tr.children[9].classList.add('InfoTr');
 
 
     }
@@ -1116,7 +555,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                 noOfMonthsForASeason: 12,
                 confidence: 0.95,
                 monthsForMovingAverage: 6,
-                confidenceLevelId: 80,
+                confidenceLevelId: 0.85,
                 loading: false,
                 showData: false
             })
@@ -1160,12 +599,12 @@ export default class ExtrapolateDataComponent extends React.Component {
                 var consumptionExtrapolationTESM = -1//TES M
                 var consumptionExtrapolationTESH = -1//TES H
 
-                var tesData = this.state.tesdataFilter;
+                var tesData = this.state.tesData;
                 var CI = this.state.CI;
 
-                var inputDataFilter = this.state.inputDataFilter;
-                var inputDataAverageFilter = this.state.inputDataAverageFilter;
-                var inputDataRegressionFilter = this.state.inputDataRegressionFilter;
+                var inputDataFilter = this.state.semiAvgData;
+                var inputDataAverageFilter = this.state.movingAvgData;
+                var inputDataRegressionFilter = this.state.linearRegressionData;
                 console.log("consumptionExtrapolationData", consumptionExtrapolationData);
                 console.log("inputDataFilter", inputDataFilter);
                 //Semi - averages
@@ -1562,12 +1001,24 @@ export default class ExtrapolateDataComponent extends React.Component {
         })
     }
 
-    setExtrapolatedParameters() {
+    setExtrapolatedParameters(updateRangeValue) {
         if (this.state.planningUnitId > 0 && this.state.regionId > 0) {
             this.setState({ loading: true })
             var datasetJson = this.state.datasetJson;
             // Need to filter
-            var rangeValue = this.state.rangeValue1;
+            var actualConsumptionListForPlanningUnitAndRegion = datasetJson.actualConsumptionList.filter(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId);
+            let actualMin = moment.min(actualConsumptionListForPlanningUnitAndRegion.map(d => moment(d.month)));
+            let actualMax = moment.max(actualConsumptionListForPlanningUnitAndRegion.map(d => moment(d.month)));
+
+
+            var rangeValue1 = "";
+            if (updateRangeValue == 0) {
+                rangeValue1 = this.state.rangeValue1;
+            } else {
+                rangeValue1 = { from: { year: new Date(actualMin).getFullYear(), month: new Date(actualMin).getMonth() + 1 }, to: { year: new Date(actualMax).getFullYear(), month: new Date(actualMax).getMonth() + 1 } }
+            }
+
+            var rangeValue = rangeValue1;
             let startDate1 = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
             let stopDate1 = rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
             var actualConsumptionList = datasetJson.actualConsumptionList.filter(c => moment(c.month).format("YYYY-MM") >= moment(startDate1).format("YYYY-MM") && moment(c.month).format("YYYY-MM") <= moment(stopDate1).format("YYYY-MM"));
@@ -1613,17 +1064,13 @@ export default class ExtrapolateDataComponent extends React.Component {
                 gamma = consumptionExtrapolationTESL[0].jsonProperties.gamma;
                 smoothingId = true;
             }
-            var monthArray = [];
-            var curDate = startDate;
-            for (var m = 0; curDate < moment(stopDate).add(-1, 'months').format("YYYY-MM-DD"); m++) {
-                curDate = moment(startDate).add(m, 'months').format("YYYY-MM-DD");
-                monthArray.push(curDate)
-            }
             this.setState({
                 actualConsumptionList: actualConsumptionList,
                 startDate: startDate,
                 stopDate: stopDate,
-                monthArray: monthArray,
+                rangeValue1: rangeValue1,
+                minDate: actualMin,
+                maxDate: actualMax,
                 monthsForMovingAverage: monthsForMovingAverage,
                 confidenceLevelId: confidenceLevel,
                 noOfMonthsForASeason: seasonality,
@@ -1694,6 +1141,9 @@ export default class ExtrapolateDataComponent extends React.Component {
     }
 
     setMonthsForMovingAverage(e) {
+        this.setState({
+            loading: true
+        })
         var monthsForMovingAverage = e.target.value;
         this.setState({
             monthsForMovingAverage: monthsForMovingAverage
@@ -1706,7 +1156,7 @@ export default class ExtrapolateDataComponent extends React.Component {
         this.setState({
             movingAvgId: movingAvgId
         }, () => {
-            this.buildJxl()
+            this.buildActualJxl()
         })
     }
     setSemiAvgId(e) {
@@ -1714,7 +1164,7 @@ export default class ExtrapolateDataComponent extends React.Component {
         this.setState({
             semiAvgId: semiAvgId
         }, () => {
-            this.buildJxl()
+            this.buildActualJxl()
         })
     }
     setLinearRegressionId(e) {
@@ -1722,7 +1172,7 @@ export default class ExtrapolateDataComponent extends React.Component {
         this.setState({
             linearRegressionId: linearRegressionId
         }, () => {
-            this.buildJxl()
+            this.buildActualJxl()
         })
     }
     setSmoothingId(e) {
@@ -1730,7 +1180,7 @@ export default class ExtrapolateDataComponent extends React.Component {
         this.setState({
             smoothingId: smoothingId
         }, () => {
-            this.buildJxl()
+            this.buildActualJxl()
         })
     }
     setArimaId(e) {
@@ -1738,7 +1188,7 @@ export default class ExtrapolateDataComponent extends React.Component {
         this.setState({
             arimaId: arimaId
         }, () => {
-            this.buildJxl()
+            this.buildActualJxl()
         })
     }
     // setShowAdvanceId(e) {
@@ -1964,7 +1414,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                     pointStyle: 'line',
                     pointBorderWidth: 5,
                     yValueFormatString: "###,###,###,###",
-                    data: this.state.inputDataAverageFilter.map((item, index) => (item.forecast > 0 ? item.forecast : null))
+                    data: this.state.movingAvgData.map((item, index) => (item.forecast > 0 ? item.forecast : null))
                 })
         }
         if (this.state.semiAvgId) {
@@ -1983,7 +1433,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                 pointStyle: 'line',
                 pointBorderWidth: 5,
                 yValueFormatString: "###,###,###,###",
-                data: this.state.inputDataFilter.map((item, index) => (item.forecast > 0 ? item.forecast : null))
+                data: this.state.semiAvgData.map((item, index) => (item.forecast > 0 ? item.forecast : null))
             })
         }
         if (this.state.linearRegressionId) {
@@ -2003,7 +1453,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                     pointStyle: 'line',
                     pointBorderWidth: 5,
                     yValueFormatString: "###,###,###,###",
-                    data: this.state.inputDataRegressionFilter.map((item, index) => (item.forecast > 0 ? item.forecast : null))
+                    data: this.state.linearRegressionData.map((item, index) => (item.forecast > 0 ? item.forecast : null))
                 })
         }
         if (this.state.smoothingId) {
@@ -2014,6 +1464,8 @@ export default class ExtrapolateDataComponent extends React.Component {
                 label: i18n.t('static.extrapolation.tesLower'),
                 backgroundColor: 'transparent',
                 borderColor: '#002FC6',
+                borderStyle: 'dotted',
+                borderDash: [10, 10],
                 ticks: {
                     fontSize: 2,
                     fontColor: 'transparent',
@@ -2022,7 +1474,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                 pointStyle: 'line',
                 pointBorderWidth: 5,
                 yValueFormatString: "###,###,###,###",
-                data: this.state.tesdataFilter.map((item, index) => (item.forecast > 0 ? (item.forecast - this.state.CI) : null))
+                data: this.state.tesData.map((item, index) => (item.forecast > 0 ? (item.forecast - this.state.CI) : null))
             })
         }
         if (this.state.smoothingId) {
@@ -2041,7 +1493,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                 pointStyle: 'line',
                 pointBorderWidth: 5,
                 yValueFormatString: "###,###,###,###",
-                data: this.state.tesdataFilter.map((item, index) => (item.forecast > 0 ? item.forecast : null))
+                data: this.state.tesData.map((item, index) => (item.forecast > 0 ? item.forecast : null))
             })
         }
         if (this.state.smoothingId) {
@@ -2052,6 +1504,8 @@ export default class ExtrapolateDataComponent extends React.Component {
                 label: i18n.t('static.extrapolation.tesUpper'),
                 backgroundColor: 'transparent',
                 borderColor: '#6c6463',
+                borderStyle: 'dotted',
+                borderDash: [10, 10],
                 ticks: {
                     fontSize: 2,
                     fontColor: 'transparent',
@@ -2060,7 +1514,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                 pointStyle: 'line',
                 pointBorderWidth: 5,
                 yValueFormatString: "###,###,###,###",
-                data: this.state.tesdataFilter.map((item, index) => (item.forecast > 0 ? (item.forecast + this.state.CI) : null))
+                data: this.state.tesData.map((item, index) => (item.forecast > 0 ? (item.forecast + this.state.CI) : null))
             })
         }
         if (this.state.arimaId) {
@@ -2133,6 +1587,25 @@ export default class ExtrapolateDataComponent extends React.Component {
                                             </Input>
                                         </div>
                                     </FormGroup>
+                                    <FormGroup className="col-md-3">
+                                        <Label htmlFor="appendedInputButton">{i18n.t('static.common.forecastPeriod')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
+                                        <div className="controls edit">
+
+                                            <Picker
+                                                years={{ min: this.state.minDate, max: this.state.maxDate }}
+                                                ref={this.pickRange}
+                                                value={rangeValue}
+                                                lang={pickerLang}
+                                                // theme="light"
+                                                // onChange={this.handleRangeChange}
+                                                // onDismiss={this.handleRangeDissmis}
+                                                className="greyColor"
+                                            >
+                                                <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} />
+                                            </Picker>
+
+                                        </div>
+                                    </FormGroup>
                                     <FormGroup className="col-md-3 ">
                                         <Label htmlFor="appendedInputButton">{i18n.t('static.dashboard.planningunitheader')}</Label>
                                         <div className="controls ">
@@ -2143,6 +1616,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                 bsSize="sm"
                                                 value={this.state.planningUnitId}
                                                 onChange={(e) => { this.setPlanningUnitId(e); }}
+                                                className="selectWrapText"
                                             >
                                                 <option value="">{i18n.t('static.common.select')}</option>
                                                 {planningUnits}
@@ -2183,31 +1657,12 @@ export default class ExtrapolateDataComponent extends React.Component {
                                             </Input>
                                         </div>
                                     </FormGroup> */}
-                                    <FormGroup className="col-md-3">
-                                        <Label htmlFor="appendedInputButton">{i18n.t('static.common.forecastPeriod')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
-                                        <div className="controls edit">
-
-                                            <Picker
-                                                years={{ min: this.state.minDate, max: this.state.maxDate }}
-                                                ref={this.pickRange}
-                                                value={rangeValue}
-                                                lang={pickerLang}
-                                                // theme="light"
-                                                // onChange={this.handleRangeChange}
-                                                // onDismiss={this.handleRangeDissmis}
-                                                className="greyColor"
-                                            >
-                                                <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} />
-                                            </Picker>
-
-                                        </div>
-                                    </FormGroup>
                                     <FormGroup className="col-md-12">
                                         <h5>
-                                            {this.state.planningUnitId > 0 &&
+                                            {i18n.t('static.common.for')}{" "}{this.state.planningUnitId > 0 &&
                                                 document.getElementById("planningUnitId").selectedOptions[0].text}
                                             {this.state.regionId > 0 &&
-                                                " and " + document.getElementById("regionId").selectedOptions[0].text + " Region, Select your extrapolation parameters:"}
+                                                " " + i18n.t('static.common.and') + " " + document.getElementById("regionId").selectedOptions[0].text+(" ") + i18n.t('static.extrpolate.selectYourExtrapolationParameters')}
                                         </h5>
                                     </FormGroup>
                                     <FormGroup className="col-md-3">
@@ -2258,7 +1713,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                     <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
                                                 </Label>
                                             </div>
-                                            <div className="col-md-3" style={{ display: this.state.movingAvgId ? 'block' : 'none' }}>
+                                            <div className="col-md-3" style={{ display: this.state.movingAvgId ? '' : 'none' }}>
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.noOfMonths')}</Label>
                                                 <Input
                                                     className="controls"
@@ -2334,7 +1789,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                 </Label>
                                             </div>
 
-                                            <div className="row col-md-12" style={{ display: this.state.smoothingId ? 'block' : 'none' }}>
+                                            <div className="row col-md-12" style={{ display: this.state.smoothingId ? '' : 'none' }}>
                                                 <div className="col-md-2">
                                                     <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.confidenceLevel')}</Label>
                                                     <Input
@@ -2345,12 +1800,12 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                         value={this.state.confidenceLevelId}
                                                         onChange={(e) => { this.setConfidenceLevelId(e); }}
                                                     >
-                                                        <option value="80">80%</option>
-                                                        <option value="85">85%</option>
-                                                        <option value="90">90%</option>
-                                                        <option value="95">95%</option>
-                                                        <option value="99">99%</option>
-                                                        <option value="99.9">99.9%</option>
+                                                        <option value="0.85">85%</option>
+                                                        <option value="0.90">90%</option>
+                                                        <option value="0.95">95%</option>
+                                                        <option value="0.99">99%</option>
+                                                        <option value="0.995">99.5%</option>
+                                                        <option value="0.999">99.9%</option>
                                                     </Input>
                                                 </div>
                                                 <div className="col-md-2">
@@ -2446,7 +1901,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                 </Label>
                                             </div>
 
-                                            <div className="row" style={{ display: this.state.arimaId ? 'block' : 'none' }}>
+                                            <div className="row" style={{ display: this.state.arimaId ? '' : 'none' }}>
                                                 <div className="col-md-3">
                                                     <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.p')}</Label>
                                                     <Input
@@ -2489,13 +1944,20 @@ export default class ExtrapolateDataComponent extends React.Component {
                         {/* Graph */}
                         <div style={{ display: !this.state.loading ? "block" : "none" }}>
                             {this.state.showData && <div className="col-md-12">
-                                <div className="chart-wrapper chart-graph-report pl-5 ml-3" style={{ marginLeft: '50px' }}>
+                                <div className="chart-wrapper chart-graph-report">
                                     <Line id="cool-canvas" data={line} options={options} />
                                     <div>
 
                                     </div>
                                 </div>
                             </div>}<br /><br />
+                            {this.state.showData &&
+                                <div className="col-md-10 pt-4 pb-3">
+                                    <ul className="legendcommitversion">
+                                        <li><span className=" greenlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.extrapolation.lowestError')} </span></li>
+                                        {/* <li><span className=" redlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.label.noFundsAvailable')} </span></li> */}
+                                    </ul>
+                                </div>}
                             {this.state.showData &&
                                 <div className="table-scroll">
                                     <div className="table-wrap table-responsive">
@@ -2524,16 +1986,16 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                 <tr>
                                                     <td>{i18n.t('static.common.rmse')}</td>
                                                     {this.state.movingAvgId &&
-                                                        <td bgcolor={this.state.minRmse == this.state.rmseMovingAvg ? "#118B70" : "#FFFFFF"}>{this.state.rmseMovingAvg}</td>
+                                                        <td style={{ textAlign: "right", "fontWeight": this.state.minRmse == this.state.movingAvgError.rmse ? "bold" : "normal" }} bgcolor={this.state.minRmse == this.state.movingAvgError.rmse ? "#86cd99" : "#FFFFFF"}>{this.state.movingAvgError.rmse != "" ? this.state.movingAvgError.rmse.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
                                                     }
                                                     {this.state.semiAvgId &&
-                                                        <td bgcolor={this.state.minRmse == this.state.rmseSemi ? "#118B70" : "#FFFFFF"}>{this.state.rmseSemi}</td>
+                                                        <td style={{ textAlign: "right", "fontWeight": this.state.minRmse == this.state.semiAvgError.rmse ? "bold" : "normal" }} bgcolor={this.state.minRmse == this.state.semiAvgError.rmse ? "#86cd99" : "#FFFFFF"}>{this.state.semiAvgError.rmse != "" ? this.state.semiAvgError.rmse.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
                                                     }
                                                     {this.state.linearRegressionId &&
-                                                        <td bgcolor={this.state.minRmse == this.state.rmseLinearReg ? "#118B70" : "#FFFFFF"}>{this.state.rmseLinearReg}</td>
+                                                        <td style={{ textAlign: "right", "fontWeight": this.state.minRmse == this.state.linearRegressionError.rmse ? "bold" : "normal" }} bgcolor={this.state.minRmse == this.state.linearRegressionError.rmse ? "#86cd99" : "#FFFFFF"}>{this.state.linearRegressionError.rmse != "" ? this.state.linearRegressionError.rmse.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
                                                     }
                                                     {this.state.smoothingId &&
-                                                        <td bgcolor={this.state.minRmse == this.state.rmse ? "#118B70" : "#FFFFFF"}>{this.state.rmse}</td>
+                                                        <td style={{ textAlign: "right", "fontWeight": this.state.minRmse == this.state.tesError.rmse ? "bold" : "normal" }} bgcolor={this.state.minRmse == this.state.tesError.rmse ? "#86cd99" : "#FFFFFF"}>{this.state.tesError.rmse != "" ? this.state.tesError.rmse.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
                                                     }
                                                     {this.state.arimaId &&
                                                         <td></td>
@@ -2542,16 +2004,16 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                 <tr>
                                                     <td>{i18n.t('static.extrapolation.mape')}</td>
                                                     {this.state.movingAvgId &&
-                                                        <td bgcolor={this.state.minMape == this.state.mapeMovingAvg ? "#118B70" : "#FFFFFF"}>{this.state.mapeMovingAvg}</td>
+                                                        <td style={{ textAlign: "right", "fontWeight": this.state.minMape == this.state.movingAvgError.mape ? "bold" : "normal" }} bgcolor={this.state.minMape == this.state.movingAvgError.mape ? "#86cd99" : "#FFFFFF"}>{this.state.movingAvgError.mape != "" ? this.state.movingAvgError.mape.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
                                                     }
                                                     {this.state.semiAvgId &&
-                                                        <td bgcolor={this.state.minMape == this.state.mapeSemi ? "#118B70" : "#FFFFFF"}>{this.state.mapeSemi}</td>
+                                                        <td style={{ textAlign: "right", "fontWeight": this.state.minMape == this.state.semiAvgError.mape ? "bold" : "normal" }} bgcolor={this.state.minMape == this.state.semiAvgError.mape ? "#86cd99" : "#FFFFFF"}>{this.state.semiAvgError.mape != "" ? this.state.semiAvgError.mape.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
                                                     }
                                                     {this.state.linearRegressionId &&
-                                                        <td bgcolor={this.state.minMape == this.state.mapeLinearReg ? "#118B70" : "#FFFFFF"}>{this.state.mapeLinearReg}</td>
+                                                        <td style={{ textAlign: "right", "fontWeight": this.state.minMape == this.state.linearRegressionError.mape ? "bold" : "normal" }} bgcolor={this.state.minMape == this.state.linearRegressionError.mape ? "#86cd99" : "#FFFFFF"}>{this.state.linearRegressionError.mape != "" ? this.state.linearRegressionError.mape.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
                                                     }
                                                     {this.state.smoothingId &&
-                                                        <td bgcolor={this.state.minMape == this.state.mape ? "#118B70" : "#FFFFFF"}>{this.state.mape}</td>
+                                                        <td style={{ textAlign: "right", "fontWeight": this.state.minMape == this.state.tesError.mape ? "bold" : "normal" }} bgcolor={this.state.minMape == this.state.tesError.mape ? "#86cd99" : "#FFFFFF"}>{this.state.tesError.mape != "" ? this.state.tesError.mape.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
                                                     }
                                                     {this.state.arimaId &&
                                                         <td></td>
@@ -2560,16 +2022,16 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                 <tr>
                                                     <td>{i18n.t('static.extrapolation.mse')}</td>
                                                     {this.state.movingAvgId &&
-                                                        <td bgcolor={this.state.minMse == this.state.mseMovingAvg ? "#118B70" : "#FFFFFF"}>{this.state.mseMovingAvg}</td>
+                                                        <td style={{ textAlign: "right", "fontWeight": this.state.minMse == this.state.movingAvgError.mse ? "bold" : "normal" }} bgcolor={this.state.minMse == this.state.movingAvgError.mse ? "#86cd99" : "#FFFFFF"}>{this.state.movingAvgError.mse != "" ? this.state.movingAvgError.mse.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
                                                     }
                                                     {this.state.semiAvgId &&
-                                                        <td bgcolor={this.state.minMse == this.state.mseSemi ? "#118B70" : "#FFFFFF"}>{this.state.mseSemi}</td>
+                                                        <td style={{ textAlign: "right", "fontWeight": this.state.minMse == this.state.semiAvgError.mse ? "bold" : "normal" }} bgcolor={this.state.minMse == this.state.semiAvgError.mse ? "#86cd99" : "#FFFFFF"}>{this.state.semiAvgError.mse != "" ? this.state.semiAvgError.mse.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
                                                     }
                                                     {this.state.linearRegressionId &&
-                                                        <td bgcolor={this.state.minMse == this.state.mseLinearReg ? "#118B70" : "#FFFFFF"}>{this.state.mseLinearReg}</td>
+                                                        <td style={{ textAlign: "right", "fontWeight": this.state.minMse == this.state.linearRegressionError.mse ? "bold" : "normal" }} bgcolor={this.state.minMse == this.state.linearRegressionError.mse ? "#86cd99" : "#FFFFFF"}>{this.state.linearRegressionError.mse != "" ? this.state.linearRegressionError.mse.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
                                                     }
                                                     {this.state.smoothingId &&
-                                                        <td bgcolor={this.state.minMse == this.state.mse ? "#118B70" : "#FFFFFF"}>{this.state.mse}</td>
+                                                        <td style={{ textAlign: "right", "fontWeight": this.state.minMse == this.state.tesError.mse ? "bold" : "normal" }} bgcolor={this.state.minMse == this.state.tesError.mse ? "#86cd99" : "#FFFFFF"}>{this.state.tesError.mse != "" ? this.state.tesError.mse.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
                                                     }
                                                     {this.state.arimaId &&
                                                         <td></td>
@@ -2578,16 +2040,16 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                 <tr>
                                                     <td>{i18n.t('static.extrapolation.wape')}</td>
                                                     {this.state.movingAvgId &&
-                                                        <td bgcolor={this.state.minWape == this.state.wapeMovingAvg ? "#118B70" : "#FFFFFF"}>{this.state.wapeMovingAvg}</td>
+                                                        <td style={{ textAlign: "right", "fontWeight": this.state.minWape == this.state.movingAvgError.wape ? "bold" : "normal" }} bgcolor={this.state.minWape == this.state.movingAvgError.wape ? "#86cd99" : "#FFFFFF"}>{this.state.movingAvgError.wape != "" ? this.state.movingAvgError.wape.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
                                                     }
                                                     {this.state.semiAvgId &&
-                                                        <td bgcolor={this.state.minWape == this.state.wapeSemi ? "#118B70" : "#FFFFFF"}>{this.state.wapeSemi}</td>
+                                                        <td style={{ textAlign: "right", "fontWeight": this.state.minWape == this.state.semiAvgError.wape ? "bold" : "normal" }} bgcolor={this.state.minWape == this.state.semiAvgError.wape ? "#86cd99" : "#FFFFFF"}>{this.state.semiAvgError.wape != "" ? this.state.semiAvgError.wape.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
                                                     }
                                                     {this.state.linearRegressionId &&
-                                                        <td bgcolor={this.state.minWape == this.state.wapeLinearReg ? "#118B70" : "#FFFFFF"}>{this.state.wapeLinearReg}</td>
+                                                        <td style={{ textAlign: "right", "fontWeight": this.state.minWape == this.state.linearRegressionError.wape ? "bold" : "normal" }} bgcolor={this.state.minWape == this.state.linearRegressionError.wape ? "#86cd99" : "#FFFFFF"}>{this.state.linearRegressionError.wape != "" ? this.state.linearRegressionError.wape.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
                                                     }
                                                     {this.state.smoothingId &&
-                                                        <td bgcolor={this.state.minWape == this.state.wape ? "#118B70" : "#FFFFFF"}>{this.state.wape}</td>
+                                                        <td style={{ textAlign: "right", "fontWeight": this.state.minWape == this.state.tesError.wape ? "bold" : "normal" }} bgcolor={this.state.minWape == this.state.tesError.wape ? "#86cd99" : "#FFFFFF"}>{this.state.tesError.wape != "" ? this.state.tesError.wape.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
                                                     }
                                                     {this.state.arimaId &&
                                                         <td></td>
@@ -2596,16 +2058,16 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                 <tr>
                                                     <td>{i18n.t('static.extrapolation.rSquare')}</td>
                                                     {this.state.movingAvgId &&
-                                                        <td bgcolor={this.state.minRsqd == this.state.rSqdMovingAvg ? "#118B70" : "#FFFFFF"}>{this.state.rSqdMovingAvg}</td>
+                                                        <td style={{ textAlign: "right", "fontWeight": this.state.minRsqd == this.state.movingAvgError.rSqd ? "bold" : "normal" }} bgcolor={this.state.minRsqd == this.state.movingAvgError.rSqd ? "#86cd99" : "#FFFFFF"}>{this.state.movingAvgError.rSqd != "" ? this.state.movingAvgError.rSqd.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
                                                     }
                                                     {this.state.semiAvgId &&
-                                                        <td bgcolor={this.state.minRsqd == this.state.rSqdSemi ? "#118B70" : "#FFFFFF"}>{this.state.rSqdSemi}</td>
+                                                        <td style={{ textAlign: "right", "fontWeight": this.state.minRsqd == this.state.semiAvgError.rSqd ? "bold" : "normal" }} bgcolor={this.state.minRsqd == this.state.semiAvgError.rSqd ? "#86cd99" : "#FFFFFF"}>{this.state.semiAvgError.rSqd != "" ? this.state.semiAvgError.rSqd.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
                                                     }
                                                     {this.state.linearRegressionId &&
-                                                        <td bgcolor={this.state.minRsqd == this.state.rSqdLinearReg ? "#118B70" : "#FFFFFF"}>{this.state.rSqdLinearReg}</td>
+                                                        <td style={{ textAlign: "right", "fontWeight": this.state.minRsqd == this.state.linearRegressionError.rSqd ? "bold" : "normal" }} bgcolor={this.state.minRsqd == this.state.linearRegressionError.rSqd ? "#86cd99" : "#FFFFFF"}>{this.state.linearRegressionError.rSqd != "" ? this.state.linearRegressionError.rSqd.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
                                                     }
                                                     {this.state.smoothingId &&
-                                                        <td bgcolor={this.state.minRsqd == this.state.rSqd ? "#118B70" : "#FFFFFF"}>{this.state.rSqd}</td>
+                                                        <td style={{ textAlign: "right", "fontWeight": this.state.minRsqd == this.state.tesError.rSqd ? "bold" : "normal" }} bgcolor={this.state.minRsqd == this.state.tesError.rSqd ? "#86cd99" : "#FFFFFF"}>{this.state.tesError.rSqd != "" ? this.state.tesError.rSqd.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
                                                     }
                                                     {this.state.arimaId &&
                                                         <td></td>
