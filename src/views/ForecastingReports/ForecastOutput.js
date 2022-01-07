@@ -94,7 +94,16 @@ class ForecastOutput extends Component {
         this.xAxisChange = this.xAxisChange.bind(this);
         this.getEquivalencyUnitData = this.getEquivalencyUnitData.bind(this);
         this.calculateEquivalencyUnitTotal = this.calculateEquivalencyUnitTotal.bind(this);
+        this.backToCompareAndSelect = this.backToCompareAndSelect.bind(this);
+        this.continueToForecastSummary = this.continueToForecastSummary.bind(this);
+    }
 
+    backToCompareAndSelect() {
+        this.props.history.push(`/report/compareAndSelectScenario`)
+    }
+
+    continueToForecastSummary() {
+        this.props.history.push(`/forecastReport/forecastSummary`)
     }
 
     calculateEquivalencyUnitTotal() {
@@ -1069,6 +1078,13 @@ class ForecastOutput extends Component {
                             this.setState({
                                 planningUnits: newPlanningUnitList,
                                 forecastingUnits: newForecastingUnitList,
+                                planningUnitValues: newPlanningUnitList.map((item, i) => {
+                                    return ({ label: getLabelText(item.label, this.state.lang), value: item.id })
+
+                                }, this),
+                                planningUnitLabels: newPlanningUnitList.map((item, i) => {
+                                    return (getLabelText(item.label, this.state.lang))
+                                }, this),
                                 equivalencyUnitLabel: selectedText
                             }, () => {
                                 this.filterData();
@@ -1077,6 +1093,13 @@ class ForecastOutput extends Component {
                             this.setState({
                                 planningUnits: planningUnitList,
                                 forecastingUnits: forecastingUnitList,
+                                planningUnitValues: planningUnitList.map((item, i) => {
+                                    return ({ label: getLabelText(item.label, this.state.lang), value: item.id })
+
+                                }, this),
+                                planningUnitLabels: planningUnitList.map((item, i) => {
+                                    return (getLabelText(item.label, this.state.lang))
+                                }, this),
                                 equivalencyUnitLabel: ''
                                 // planningUnits: filteredPU,
                                 // forecastingUnits: filtered
@@ -1591,7 +1614,7 @@ class ForecastOutput extends Component {
                     })
                     datasetsArr.push(
                         {
-                            label: item.objUnit.label.label_en,
+                            label: item.objUnit.label.label_en + ' - ' + item.scenario.label,
                             id: item.objUnit.id,
                             type: 'line',
                             stack: 3,
@@ -1763,6 +1786,20 @@ class ForecastOutput extends Component {
                             </div>
                         }
                     </div>
+                    <div className="Card-header-reporticon ">
+                        <div className="card-header-actions BacktoLink">
+                            <a className="pr-lg-0 pt-lg-1">
+                                <span style={{ cursor: 'pointer' }} onClick={() => { this.backToCompareAndSelect() }}><i className="fa fa-long-arrow-left" style={{ color: '#20a8d8', fontSize: '13px' }}></i> <small className="supplyplanformulas">{'Return To Monthly Forecast'}</small></span>
+                            </a>
+                        </div>
+                    </div>
+                    <div className="Card-header-reporticon ">
+                        <div className="card-header-actions">
+                            <a className="pr-lg-0 pt-lg-1">
+                                <span style={{ cursor: 'pointer' }} onClick={() => { this.continueToForecastSummary() }}><i className="fa fa-long-arrow-right" style={{ color: '#20a8d8', fontSize: '13px' }}></i> <small className="supplyplanformulas">{'Continue To Forecast Summary'}</small></span>
+                            </a>
+                        </div>
+                    </div>
                     <CardBody className="pb-lg-2 pt-lg-0 ">
                         <div>
                             <div ref={ref}>
@@ -1792,7 +1829,7 @@ class ForecastOutput extends Component {
                                             </FormGroup>
 
                                             <FormGroup className="col-md-3">
-                                                <Label htmlFor="appendedInputButton">{i18n.t('static.report.version')}</Label>
+                                                <Label htmlFor="appendedInputButton">{i18n.t('static.report.version*')}</Label>
                                                 <div className="controls ">
                                                     <InputGroup>
                                                         <Input

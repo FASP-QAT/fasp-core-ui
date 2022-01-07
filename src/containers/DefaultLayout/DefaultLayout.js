@@ -303,6 +303,8 @@ const EditDataSet = React.lazy(() => import('../../views/DataSet/EditDataSet'));
 const ImportFromQATSupplyPlan = React.lazy(() => import('../../views/Consumption/ImportFromQATSupplyPlan'));
 const PlanningUnitSetting = React.lazy(() => import('../../views/PlanningUnitSetting/PlanningUnitSetting'));
 
+const ImportIntoQATSupplyPlan = React.lazy(() => import('../../views/Consumption/ImportIntoQATSupplyPlan'));
+
 const ConsumptionForecastError = React.lazy(() => import('../../views/ForecastingReports/ConsumptionForecastError'));
 const ForecastOutput = React.lazy(() => import('../../views/ForecastingReports/ForecastOutput'));
 const ForecastSummary = React.lazy(() => import('../../views/ForecastingReports/ForecastSummary'));
@@ -714,6 +716,9 @@ const routes = [
 
   { path: '/importFromQATSupplyPlan/listImportFromQATSupplyPlan/:color/:message', name: i18n.t('static.importFromQATSupplyPlan.importFromQATSupplyPlan'), component: ImportFromQATSupplyPlan },
   { path: '/importFromQATSupplyPlan/listImportFromQATSupplyPlan', exact: true, name: i18n.t('static.importFromQATSupplyPlan.importFromQATSupplyPlan'), component: ImportFromQATSupplyPlan },
+
+  { path: '/importIntoQATSupplyPlan/listImportIntoQATSupplyPlan/:color/:message', name: 'Import Into Supply Plan', component: ImportIntoQATSupplyPlan },
+  { path: '/importIntoQATSupplyPlan/listImportIntoQATSupplyPlan', exact: true, name: 'Import Into Supply Plan', component: ImportIntoQATSupplyPlan },
 
   { path: '/planningUnitSetting/listPlanningUnitSetting/:color/:message', name: 'Planning Unit Settings', component: PlanningUnitSetting },
   { path: '/planningUnitSetting/listPlanningUnitSetting', exact: true, name: 'Planning Unit Settings', component: PlanningUnitSetting },
@@ -1623,7 +1628,7 @@ class DefaultLayout extends Component {
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true) }
                           },
                           {
-                            name: "Forecast Output",
+                            name: "Monthly Forecast",
                             url: '/forecastReport/forecastOutput',
                             icon: 'fa fa-exchange',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true) }

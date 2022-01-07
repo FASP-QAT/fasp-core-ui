@@ -1308,6 +1308,8 @@ class AuthenticationService {
                     case "/extrapolation/extrapolateData":
                     case "/importFromQATSupplyPlan/listImportFromQATSupplyPlan":
                     case "/importFromQATSupplyPlan/listImportFromQATSupplyPlan/:color/:message":
+                    case "/importIntoQATSupplyPlan/listImportIntoQATSupplyPlan":
+                    case "/importIntoQATSupplyPlan/listImportIntoQATSupplyPlan/:color/:message":
                         if (bfunction.includes("ROLE_BF_LIST_IMPORT_FROM_QAT_SUPPLY_PLAN")) {
                             return true;
                         }
