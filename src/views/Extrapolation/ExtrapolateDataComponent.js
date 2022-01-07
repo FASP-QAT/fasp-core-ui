@@ -2102,17 +2102,21 @@ export default class ExtrapolateDataComponent extends React.Component {
                             <span className="compareAndSelect-rarrowText"> {i18n.t('static.common.continueTo')} <a href="/#/report/compareAndSelectScenario">{i18n.t('static.dashboard.compareAndSelect')}</a></span><br />
                             {/* <strong>{i18n.t('static.dashboard.supplyPlan')}</strong> */}
 
-                            <a className="card-header-action">
+                            {/* <a className="card-header-action">
+                                <span style={{ cursor: 'pointer' }} onClick={() => { this.toggleShowGuidance() }}><small className="supplyplanformulas">{i18n.t('static.common.showGuidance')}</small></span>
+                            </a>
+                            <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} /> */}
+                        </div>
+                    </div>
+                     <div className="Card-header-reporticon pb-2">
+                        <div className="card-header-actions">
+                        <a className="card-header-action">
                                 <span style={{ cursor: 'pointer' }} onClick={() => { this.toggleShowGuidance() }}><small className="supplyplanformulas">{i18n.t('static.common.showGuidance')}</small></span>
                             </a>
                             <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
+                            {/* <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} /> */}
                         </div>
-                    </div>
-                    {/* <div className="Card-header-reporticon pb-2">
-                        <div className="card-header-actions">
-                            <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
-                        </div>
-                    </div> */}
+                    </div> 
                     <CardBody className="pb-lg-5 pt-lg-0">
                         <Form name='simpleForm'>
                             <div className=" pl-0">
