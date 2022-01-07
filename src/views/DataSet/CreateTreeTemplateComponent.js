@@ -281,6 +281,7 @@ export default class CreateTreeTemplate extends Component {
                                 {
                                     dataValue: '',
                                     notes: '',
+                                    month: new Date(),
                                     fuNode: {
                                         forecastingUnit: {
                                             id: '',
@@ -3855,8 +3856,9 @@ export default class CreateTreeTemplate extends Component {
                                                 <FormFeedback className="red">{errors.nodeUnitId}</FormFeedback>
                                             </FormGroup>}
                                         {this.state.currentItemConfig.context.payload.nodeType.id != 1 &&
+                                        
                                             <FormGroup className="col-md-6">
-                                                <Label htmlFor="currencyId">{i18n.t('static.common.month')}<span class="red Reqasterisk">*</span></Label>
+                                                <Label htmlFor="currencyId">{(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].month}{i18n.t('static.common.month')}<span class="red Reqasterisk">*</span></Label>
                                                 <div className="controls edit">
                                                     <Picker
                                                         id="month"
