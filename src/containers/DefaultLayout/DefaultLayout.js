@@ -1546,8 +1546,8 @@ class DefaultLayout extends Component {
                             name: i18n.t('static.dashboard.extrapolation'),
                             url: '/Extrapolation/extrapolateData',
                             icon: 'fa fa-th',
-                            // attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true) }
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_EXTRAPOLATION') && this.state.activeTab == 1 ? false : true) }
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true) }
+                            // attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_EXTRAPOLATION') && this.state.activeTab == 1 ? false : true) }
                           },
                         ]
                       },

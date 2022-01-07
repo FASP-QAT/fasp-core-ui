@@ -21,6 +21,7 @@ import moment from "moment"
 import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
 import AuthenticationService from "../Common/AuthenticationService";
+import { calculateMovingAvg } from '../Extrapolation/MovingAverages';
 
 
 export default class ExtrapolateDataComponent extends React.Component {
@@ -259,12 +260,26 @@ export default class ExtrapolateDataComponent extends React.Component {
         })
     }
 
+    updateState(parameterName, value) {
+        console.log("$$$", value)
+        this.setState({
+            [parameterName]: value
+        })
+    }
+
+    buildActualJxl(){
+        
+    }
+
     buildJxl() {
         this.setState({ loading: true })
         var actualConsumptionList = this.state.actualConsumptionList;
         var monthArray = this.state.monthArray;
         let dataArray = [];
-
+        var rangeValue=this.state.rangeValue1;
+        let startDate = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
+        let stopDate = rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
+        let curDate=startDate;
         let data = [];
         let columns = [];
         var inputData = [];
@@ -275,7 +290,8 @@ export default class ExtrapolateDataComponent extends React.Component {
         console.log("this.state.regionId", this.state.regionId)
         console.log("this.state.planningUnitId", this.state.planningUnitId)
         console.log("monthArray", monthArray)
-        for (var j = 0; j < monthArray.length; j++) {
+        for (var j = 0; moment(curDate).format("YYYY-MM")<moment(stopDate).format("YYYY-MM"); j++) {
+            curDate = moment(startDate).startOf('month').add(j, 'months').format("YYYY-MM-DD");
             console.log("monthArray[j]", monthArray[j])
 
             var consumptionData = actualConsumptionList.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArray[j]).format("YYYY-MM") && c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId)
@@ -303,716 +319,717 @@ export default class ExtrapolateDataComponent extends React.Component {
         //}
         console.log("inputDataRegression---", inputDataRegression)
         console.log("tesdata---", tesdata)
-        const noOfMonthsForProjection = monthArray.length - inputData.length + 1;
-        if (inputData.length % 2 != 0) {
-            inputData.pop();
-        }
-        if (inputDataAverage.length % 2 != 0) {
-            inputDataAverage.pop();
-        }
-        if (inputDataRegression.length % 2 != 0) {
-            inputDataRegression.pop();
-        }
-        if (tesdata.length % 2 != 0) {
-            tesdata.pop();
-        }
-        console.log("inputData[inputData.length - 1]", inputData[inputData.length - 1])
-        let actualMonths = inputData[inputData.length - 1].month;
+        const noOfMonthsForProjection = monthArray.length - inputDataAverage.length + 1;
+        calculateMovingAvg(inputDataAverage, this.state.monthsForMovingAverage, noOfMonthsForProjection, this);
+        // if (inputData.length % 2 != 0) {
+        //     inputData.pop();
+        // }
+        // if (inputDataAverage.length % 2 != 0) {
+        //     inputDataAverage.pop();
+        // }
+        // if (inputDataRegression.length % 2 != 0) {
+        //     inputDataRegression.pop();
+        // }
+        // if (tesdata.length % 2 != 0) {
+        //     tesdata.pop();
+        // }
+        // console.log("inputData[inputData.length - 1]", inputData[inputData.length - 1])
+        // let actualMonths = inputData[inputData.length - 1].month;
 
-        //Semi Average
-        if (inputData.length > 0) {
-            console.log(inputData);
-            let x1 = 0, x2 = 0, y1 = 0, y2 = 0;
-            let cnt = 0;
-            let m = 0;
-            let c = 0;
-            for (let x = 1; x <= actualMonths / 2; x++) {
-                x1 += inputData[x - 1].month;
-                y1 += inputData[x - 1].actual;
-                cnt++;
-            }
-            x1 = x1 / cnt;
-            y1 = y1 / cnt;
-            for (let x = actualMonths / 2 + 1; x <= actualMonths; x++) {
-                x2 += inputData[x - 1].month;
-                y2 += inputData[x - 1].actual;
-            }
-            x2 = x2 / cnt;
-            y2 = y2 / cnt;
-            m = (y2 - y1) / (x2 - x1);
-            c = m * (0 - x2) + y2;
+        // //Semi Average
+        // if (inputData.length > 0) {
+        //     console.log(inputData);
+        //     let x1 = 0, x2 = 0, y1 = 0, y2 = 0;
+        //     let cnt = 0;
+        //     let m = 0;
+        //     let c = 0;
+        //     for (let x = 1; x <= actualMonths / 2; x++) {
+        //         x1 += inputData[x - 1].month;
+        //         y1 += inputData[x - 1].actual;
+        //         cnt++;
+        //     }
+        //     x1 = x1 / cnt;
+        //     y1 = y1 / cnt;
+        //     for (let x = actualMonths / 2 + 1; x <= actualMonths; x++) {
+        //         x2 += inputData[x - 1].month;
+        //         y2 += inputData[x - 1].actual;
+        //     }
+        //     x2 = x2 / cnt;
+        //     y2 = y2 / cnt;
+        //     m = (y2 - y1) / (x2 - x1);
+        //     c = m * (0 - x2) + y2;
 
-            for (let x = 1; x <= actualMonths + noOfMonthsForProjection; x++) {
-                if (x <= actualMonths) {
-                    inputData[x - 1].forecast = m * x + c;
-                } else {
-                    inputData[x - 1] = { "month": x, "actual": null, "forecast": m * x + c };
-                }
-            }
-        }
-        // Moving Average
+        //     for (let x = 1; x <= actualMonths + noOfMonthsForProjection; x++) {
+        //         if (x <= actualMonths) {
+        //             inputData[x - 1].forecast = m * x + c;
+        //         } else {
+        //             inputData[x - 1] = { "month": x, "actual": null, "forecast": m * x + c };
+        //         }
+        //     }
+        // }
+        // // Moving Average
 
-        if (inputDataAverage.length > 0) {
-            // var actualMonths = inputDataAverage[inputDataAverage.length - 1].month;
-            var monthsForMovingAverage = this.state.monthsForMovingAverage;
+        // if (inputDataAverage.length > 0) {
+        //     // var actualMonths = inputDataAverage[inputDataAverage.length - 1].month;
+        //     var monthsForMovingAverage = this.state.monthsForMovingAverage;
 
-            for (let x = 1; x <= actualMonths + noOfMonthsForProjection; x++) {
-                console.log("x--->", x)
-                var forecast = '';
-                let startMonth = x - monthsForMovingAverage;
-                if (startMonth < 1) {
-                    startMonth = 1;
-                }
-                let endMonth = x - 1;
-                if (endMonth < 1) {
-                    forecast = null;
-                }
-                console.log("startMonth=" + startMonth + ", endMonth=" + endMonth);
-                let sum = 0;
-                let count = 0;
-                for (let x = startMonth; x <= endMonth; x++) {
-                    console.log("x%%%%%", x)
-                    if (x <= actualMonths) {
-                        sum += inputDataAverage[x - 1].actual;
-                        count++;
-                    } else {
-                        sum += inputDataAverage[x - 1].forecast;
-                        count++;
-                    }
-                }
-                console.log("sum=" + sum + ", count=" + count);
-                if (count == 0) {
-                    forecast = null;
-                } else {
-                    forecast = sum / count;
-                }
+        //     for (let x = 1; x <= actualMonths + noOfMonthsForProjection; x++) {
+        //         console.log("x--->", x)
+        //         var forecast = '';
+        //         let startMonth = x - monthsForMovingAverage;
+        //         if (startMonth < 1) {
+        //             startMonth = 1;
+        //         }
+        //         let endMonth = x - 1;
+        //         if (endMonth < 1) {
+        //             forecast = null;
+        //         }
+        //         console.log("startMonth=" + startMonth + ", endMonth=" + endMonth);
+        //         let sum = 0;
+        //         let count = 0;
+        //         for (let x = startMonth; x <= endMonth; x++) {
+        //             console.log("x%%%%%", x)
+        //             if (x <= actualMonths) {
+        //                 sum += inputDataAverage[x - 1].actual;
+        //                 count++;
+        //             } else {
+        //                 sum += inputDataAverage[x - 1].forecast;
+        //                 count++;
+        //             }
+        //         }
+        //         console.log("sum=" + sum + ", count=" + count);
+        //         if (count == 0) {
+        //             forecast = null;
+        //         } else {
+        //             forecast = sum / count;
+        //         }
 
-                if (x <= actualMonths) {
-                    inputDataAverage[x - 1].forecast = forecast;
-                } else {
-                    inputDataAverage[x - 1] = { "month": x, "actual": null, "forecast": forecast };
-                }
-            }
-        }
-        //Regression        
-        let actualMonthsRegression = inputDataRegression[inputDataRegression.length - 1].month;
-        let tmpArray = new Array();
-        for (let x = 0; x < inputDataRegression.length; x++) {
-            tmpArray.push(new Array(inputDataRegression[x].month, inputDataRegression[x].actual));
-        }
+        //         if (x <= actualMonths) {
+        //             inputDataAverage[x - 1].forecast = forecast;
+        //         } else {
+        //             inputDataAverage[x - 1] = { "month": x, "actual": null, "forecast": forecast };
+        //         }
+        //     }
+        // }
+        // //Regression        
+        // let actualMonthsRegression = inputDataRegression[inputDataRegression.length - 1].month;
+        // let tmpArray = new Array();
+        // for (let x = 0; x < inputDataRegression.length; x++) {
+        //     tmpArray.push(new Array(inputDataRegression[x].month, inputDataRegression[x].actual));
+        // }
 
-        const result = regression.linear(tmpArray);
-        const gradient = result.equation[0];
-        const yIntercept = result.equation[1];
-        for (let x = 1; x <= actualMonthsRegression + noOfMonthsForProjection; x++) {
-            console.log("x--", x)
-            if (x <= actualMonthsRegression) {
-                console.log("x-1", x - 1)
-                console.log("inputDataRegression%%%%%%%", inputDataRegression)
-                inputDataRegression[x - 1].forecast = gradient * x + yIntercept;
-            } else {
-                inputDataRegression[x - 1] = { "month": x, "actual": null, "forecast": gradient * x + yIntercept };
-            }
-        }
-        console.log("inputDataRegression", inputDataRegression);
-        //Holts-Winters
-        const alpha = this.state.alpha
-        const beta = this.state.beta
-        const gamma = this.state.gamma
-        const noOfMonthsForASeason = this.state.noOfMonthsForASeason
-        const confidence = this.state.confidenceLevelId
+        // const result = regression.linear(tmpArray);
+        // const gradient = result.equation[0];
+        // const yIntercept = result.equation[1];
+        // for (let x = 1; x <= actualMonthsRegression + noOfMonthsForProjection; x++) {
+        //     console.log("x--", x)
+        //     if (x <= actualMonthsRegression) {
+        //         console.log("x-1", x - 1)
+        //         console.log("inputDataRegression%%%%%%%", inputDataRegression)
+        //         inputDataRegression[x - 1].forecast = gradient * x + yIntercept;
+        //     } else {
+        //         inputDataRegression[x - 1] = { "month": x, "actual": null, "forecast": gradient * x + yIntercept };
+        //     }
+        // }
+        // console.log("inputDataRegression", inputDataRegression);
+        // //Holts-Winters
+        // const alpha = this.state.alpha
+        // const beta = this.state.beta
+        // const gamma = this.state.gamma
+        // const noOfMonthsForASeason = this.state.noOfMonthsForASeason
+        // const confidence = this.state.confidenceLevelId
 
-        // var alpha =  document.getElementById("alphaId").value;
-        // var beta =  document.getElementById("betaId").value;
-        // var gamma =  document.getElementById("gammaId").value;
-        // var noOfMonthsForASeason =  document.getElementById("seasonalityId").value;
-        // var confidence =  document.getElementById("confidenceLevelId").value;
-        console.log("noOfMonthsForASeason", noOfMonthsForASeason);
-        console.log("confidence", confidence);
-        console.log("gamma", gamma);
-        const tTable = [
-            { "df": 1, "zValue": [1.963, 3.078, 6.314, 31.82, 63.66, 318.31] },
-            { "df": 2, "zValue": [1.386, 1.886, 2.92, 6.965, 9.925, 22.327] },
-            { "df": 3, "zValue": [1.25, 1.638, 2.353, 4.541, 5.841, 10.215] },
-            { "df": 4, "zValue": [1.19, 1.533, 2.132, 3.747, 4.604, 7.173] },
-            { "df": 5, "zValue": [1.156, 1.476, 2.015, 3.365, 4.032, 5.893] },
-            { "df": 6, "zValue": [1.134, 1.44, 1.943, 3.143, 3.707, 5.208] },
-            { "df": 7, "zValue": [1.119, 1.415, 1.895, 2.998, 3.499, 4.785] },
-            { "df": 8, "zValue": [1.108, 1.397, 1.86, 2.896, 3.355, 4.501] },
-            { "df": 9, "zValue": [1.1, 1.383, 1.833, 2.821, 3.25, 4.297] },
-            { "df": 10, "zValue": [1.093, 1.372, 1.812, 2.764, 3.169, 4.144] },
-            { "df": 11, "zValue": [1.088, 1.363, 1.796, 2.718, 3.106, 4.025] },
-            { "df": 12, "zValue": [1.083, 1.356, 1.782, 2.681, 3.055, 3.93] },
-            { "df": 13, "zValue": [1.079, 1.35, 1.771, 2.65, 3.012, 3.852] },
-            { "df": 14, "zValue": [1.076, 1.345, 1.761, 2.624, 2.977, 3.787] },
-            { "df": 15, "zValue": [1.074, 1.341, 1.753, 2.602, 2.947, 3.733] },
-            { "df": 16, "zValue": [1.071, 1.337, 1.746, 2.583, 2.921, 3.686] },
-            { "df": 17, "zValue": [1.069, 1.333, 1.74, 2.567, 2.898, 3.646] },
-            { "df": 18, "zValue": [1.067, 1.33, 1.734, 2.552, 2.878, 3.61] },
-            { "df": 19, "zValue": [1.066, 1.328, 1.729, 2.539, 2.861, 3.579] },
-            { "df": 20, "zValue": [1.064, 1.325, 1.725, 2.528, 2.845, 3.552] },
-            { "df": 21, "zValue": [1.063, 1.323, 1.721, 2.518, 2.831, 3.527] },
-            { "df": 22, "zValue": [1.061, 1.321, 1.717, 2.508, 2.819, 3.505] },
-            { "df": 23, "zValue": [1.06, 1.319, 1.714, 2.5, 2.807, 3.485] },
-            { "df": 24, "zValue": [1.059, 1.318, 1.711, 2.492, 2.797, 3.467] },
-            { "df": 25, "zValue": [1.058, 1.316, 1.708, 2.485, 2.787, 3.45] },
-            { "df": 26, "zValue": [1.058, 1.315, 1.706, 2.479, 2.779, 3.435] },
-            { "df": 27, "zValue": [1.057, 1.314, 1.703, 2.473, 2.771, 3.421] },
-            { "df": 28, "zValue": [1.056, 1.313, 1.701, 2.467, 2.763, 3.408] },
-            { "df": 29, "zValue": [1.055, 1.311, 1.699, 2.462, 2.756, 3.396] },
-            { "df": 30, "zValue": [1.055, 1.31, 1.697, 2.457, 2.75, 3.385] },
-            { "df": 40, "zValue": [1.05, 1.303, 1.684, 2.423, 2.704, 3.307] },
-            { "df": 60, "zValue": [1.045, 1.296, 1.671, 2.39, 2.66, 3.232] },
-            { "df": 80, "zValue": [1.043, 1.292, 1.664, 2.374, 2.639, 3.195] },
-            { "df": 100, "zValue": [1.042, 1.29, 1.66, 2.364, 2.626, 3.174] },
-            { "df": 1000, "zValue": [1.037, 1.282, 1.646, 2.33, 2.581, 3.098] }
-        ]
-
-
-        //initial_seasonal_components
-        let seasonals = new Array();
-        let season_averages = new Array();
-        let n_seasons = parseInt(tesdata.length / noOfMonthsForASeason);
-        for (let x = 0; x < n_seasons; x++) {
-            let sum = 0;
-            for (let y = 0; y < noOfMonthsForASeason; y++) {
-                sum += tesdata[x * Number(noOfMonthsForASeason) + y].actual
-            }
-            season_averages.push(sum / noOfMonthsForASeason)
-        }
-        for (let x = 0; x < noOfMonthsForASeason; x++) {
-            let sum = 0;
-            for (let y = 0; y < n_seasons; y++) {
-                sum += tesdata[y * noOfMonthsForASeason + x].actual - season_averages[y]
-            }
-            seasonals.push(sum / n_seasons)
-        }
-
-        //tes
-        let resultarr = new Array();
-        let smooth = 0, trend = 0, m = 0, val = 0, last_smooth = 0, last_trend = 0;
-        for (var x = 0; x < tesdata.length + 12; x++) {
-            if (x == 0) { // initial values
-                last_smooth = tesdata[0].actual
-                smooth = last_smooth
-
-                //initial_trend
-                let sum = 0
-                for (var x1 = 0; x1 < noOfMonthsForASeason; x1++) {
-                    sum += (tesdata[noOfMonthsForASeason + x1].actual - tesdata[x1].actual) / noOfMonthsForASeason
-                }
-                last_trend = sum / noOfMonthsForASeason
-
-                trend = last_trend
-                resultarr.push(tesdata[0].actual == null ? 0 : tesdata[0].actual)
-            } else if (x >= tesdata.length) {
-                m = x - tesdata.length + 1
-                resultarr.push((smooth + m * trend) + seasonals[x % noOfMonthsForASeason])
-            } else {
-                val = tesdata[x].actual
-                smooth = alpha * (val - seasonals[x % noOfMonthsForASeason]) + (1 - alpha) * (last_smooth + last_trend)
-                trend = beta * (smooth - last_smooth) + (1 - beta) * last_trend
-                seasonals[x % noOfMonthsForASeason] = gamma * (val - smooth) + (1 - gamma) * seasonals[x % noOfMonthsForASeason]
-                resultarr.push(smooth + trend + seasonals[x % noOfMonthsForASeason])
-            }
-            last_smooth = smooth;
-            last_trend = trend;
-        }
-
-        const actualLength = tesdata.length;
-
-        for (let x = 0; x < resultarr.length; x++) {
-            if (x >= actualLength) {
-                tesdata.push = { "month": (x + 1), "actual": null, "forecast": resultarr[x] }
-            } else {
-                tesdata[x].forecast = resultarr[x]
-            }
-        }
-        console.log("tesdata", tesdata);
+        // // var alpha =  document.getElementById("alphaId").value;
+        // // var beta =  document.getElementById("betaId").value;
+        // // var gamma =  document.getElementById("gammaId").value;
+        // // var noOfMonthsForASeason =  document.getElementById("seasonalityId").value;
+        // // var confidence =  document.getElementById("confidenceLevelId").value;
+        // console.log("noOfMonthsForASeason", noOfMonthsForASeason);
+        // console.log("confidence", confidence);
+        // console.log("gamma", gamma);
+        // const tTable = [
+        //     { "df": 1, "zValue": [1.963, 3.078, 6.314, 31.82, 63.66, 318.31] },
+        //     { "df": 2, "zValue": [1.386, 1.886, 2.92, 6.965, 9.925, 22.327] },
+        //     { "df": 3, "zValue": [1.25, 1.638, 2.353, 4.541, 5.841, 10.215] },
+        //     { "df": 4, "zValue": [1.19, 1.533, 2.132, 3.747, 4.604, 7.173] },
+        //     { "df": 5, "zValue": [1.156, 1.476, 2.015, 3.365, 4.032, 5.893] },
+        //     { "df": 6, "zValue": [1.134, 1.44, 1.943, 3.143, 3.707, 5.208] },
+        //     { "df": 7, "zValue": [1.119, 1.415, 1.895, 2.998, 3.499, 4.785] },
+        //     { "df": 8, "zValue": [1.108, 1.397, 1.86, 2.896, 3.355, 4.501] },
+        //     { "df": 9, "zValue": [1.1, 1.383, 1.833, 2.821, 3.25, 4.297] },
+        //     { "df": 10, "zValue": [1.093, 1.372, 1.812, 2.764, 3.169, 4.144] },
+        //     { "df": 11, "zValue": [1.088, 1.363, 1.796, 2.718, 3.106, 4.025] },
+        //     { "df": 12, "zValue": [1.083, 1.356, 1.782, 2.681, 3.055, 3.93] },
+        //     { "df": 13, "zValue": [1.079, 1.35, 1.771, 2.65, 3.012, 3.852] },
+        //     { "df": 14, "zValue": [1.076, 1.345, 1.761, 2.624, 2.977, 3.787] },
+        //     { "df": 15, "zValue": [1.074, 1.341, 1.753, 2.602, 2.947, 3.733] },
+        //     { "df": 16, "zValue": [1.071, 1.337, 1.746, 2.583, 2.921, 3.686] },
+        //     { "df": 17, "zValue": [1.069, 1.333, 1.74, 2.567, 2.898, 3.646] },
+        //     { "df": 18, "zValue": [1.067, 1.33, 1.734, 2.552, 2.878, 3.61] },
+        //     { "df": 19, "zValue": [1.066, 1.328, 1.729, 2.539, 2.861, 3.579] },
+        //     { "df": 20, "zValue": [1.064, 1.325, 1.725, 2.528, 2.845, 3.552] },
+        //     { "df": 21, "zValue": [1.063, 1.323, 1.721, 2.518, 2.831, 3.527] },
+        //     { "df": 22, "zValue": [1.061, 1.321, 1.717, 2.508, 2.819, 3.505] },
+        //     { "df": 23, "zValue": [1.06, 1.319, 1.714, 2.5, 2.807, 3.485] },
+        //     { "df": 24, "zValue": [1.059, 1.318, 1.711, 2.492, 2.797, 3.467] },
+        //     { "df": 25, "zValue": [1.058, 1.316, 1.708, 2.485, 2.787, 3.45] },
+        //     { "df": 26, "zValue": [1.058, 1.315, 1.706, 2.479, 2.779, 3.435] },
+        //     { "df": 27, "zValue": [1.057, 1.314, 1.703, 2.473, 2.771, 3.421] },
+        //     { "df": 28, "zValue": [1.056, 1.313, 1.701, 2.467, 2.763, 3.408] },
+        //     { "df": 29, "zValue": [1.055, 1.311, 1.699, 2.462, 2.756, 3.396] },
+        //     { "df": 30, "zValue": [1.055, 1.31, 1.697, 2.457, 2.75, 3.385] },
+        //     { "df": 40, "zValue": [1.05, 1.303, 1.684, 2.423, 2.704, 3.307] },
+        //     { "df": 60, "zValue": [1.045, 1.296, 1.671, 2.39, 2.66, 3.232] },
+        //     { "df": 80, "zValue": [1.043, 1.292, 1.664, 2.374, 2.639, 3.195] },
+        //     { "df": 100, "zValue": [1.042, 1.29, 1.66, 2.364, 2.626, 3.174] },
+        //     { "df": 1000, "zValue": [1.037, 1.282, 1.646, 2.33, 2.581, 3.098] }
+        // ]
 
 
-        // get Zvalue:
+        // //initial_seasonal_components
+        // let seasonals = new Array();
+        // let season_averages = new Array();
+        // let n_seasons = parseInt(tesdata.length / noOfMonthsForASeason);
+        // for (let x = 0; x < n_seasons; x++) {
+        //     let sum = 0;
+        //     for (let y = 0; y < noOfMonthsForASeason; y++) {
+        //         sum += tesdata[x * Number(noOfMonthsForASeason) + y].actual
+        //     }
+        //     season_averages.push(sum / noOfMonthsForASeason)
+        // }
+        // for (let x = 0; x < noOfMonthsForASeason; x++) {
+        //     let sum = 0;
+        //     for (let y = 0; y < n_seasons; y++) {
+        //         sum += tesdata[y * noOfMonthsForASeason + x].actual - season_averages[y]
+        //     }
+        //     seasonals.push(sum / n_seasons)
+        // }
 
-        let final_t_table = null;
-        var zValue = null;
-        for (let x = 0; x < tTable.length; x++) {
-            if (resultarr.length < tTable[x].df) {
-                break;
-            }
-            final_t_table = tTable[x]
-        }
-        switch (confidence) {
-            case 0.85:
-                zValue = final_t_table.zValue[0];
-                break;
-            case 0.90:
-                zValue = final_t_table.zValue[1];
-                break;
-            case 0.95:
-                zValue = final_t_table.zValue[2];
-                break;
-            case 0.99:
-                zValue = final_t_table.zValue[3];
-                break;
-            case 0.995:
-                zValue = final_t_table.zValue[4];
-                break;
-            case 0.999:
-                zValue = final_t_table.zValue[5];
-                break;
-            default:
-                zValue = null;
-        }
-        console.log("resultarr---", resultarr)
-        console.log("Z value = " + zValue)
-        const stdDev = std(resultarr)
-        console.log("Std dev = " + stdDev)
-        const CI = zValue * stdDev / sqrt(resultarr.length)
-        console.log("CI = " + CI)
+        // //tes
+        // let resultarr = new Array();
+        // let smooth = 0, trend = 0, m = 0, val = 0, last_smooth = 0, last_trend = 0;
+        // for (var x = 0; x < tesdata.length + 12; x++) {
+        //     if (x == 0) { // initial values
+        //         last_smooth = tesdata[0].actual
+        //         smooth = last_smooth
 
-        // error Table for TES
-        let cnt = 0
-        let xBar = 0
-        let yBar = 0
-        let xyBar = 0
-        let xxBar = 0
-        let eBar = 0
-        let absEBar = 0
-        let absEPerABar = 0
-        let e2Bar = 0
-        let ePerABar = 0
+        //         //initial_trend
+        //         let sum = 0
+        //         for (var x1 = 0; x1 < noOfMonthsForASeason; x1++) {
+        //             sum += (tesdata[noOfMonthsForASeason + x1].actual - tesdata[x1].actual) / noOfMonthsForASeason
+        //         }
+        //         last_trend = sum / noOfMonthsForASeason
 
-        for (let x = 0; x < tesdata.length; x++) {
-            if (tesdata[x].actual) {
-                xBar += tesdata[x].actual
-                yBar += tesdata[x].forecast
-                xyBar += tesdata[x].actual * tesdata[x].forecast
-                xxBar += tesdata[x].actual * tesdata[x].actual
-                eBar += tesdata[x].forecast - tesdata[x].actual
-                absEBar += abs(tesdata[x].forecast - tesdata[x].actual)
-                absEPerABar += abs(tesdata[x].forecast - tesdata[x].actual) / tesdata[x].actual
-                e2Bar += (tesdata[x].forecast - tesdata[x].actual) * (tesdata[x].forecast - tesdata[x].actual)
-                ePerABar += (tesdata[x].forecast - tesdata[x].actual) / tesdata[x].actual
-                cnt++
-            }
-        }
-        let wape = (eBar / xBar).toFixed(2)
-        xBar = xBar / cnt
-        yBar = yBar / cnt
-        xxBar = xxBar / cnt
-        xyBar = xyBar / cnt
-        eBar = eBar / cnt
-        absEBar = absEBar / cnt
-        absEPerABar = absEPerABar / cnt
-        e2Bar = e2Bar / cnt
-        ePerABar = ePerABar / cnt
+        //         trend = last_trend
+        //         resultarr.push(tesdata[0].actual == null ? 0 : tesdata[0].actual)
+        //     } else if (x >= tesdata.length) {
+        //         m = x - tesdata.length + 1
+        //         resultarr.push((smooth + m * trend) + seasonals[x % noOfMonthsForASeason])
+        //     } else {
+        //         val = tesdata[x].actual
+        //         smooth = alpha * (val - seasonals[x % noOfMonthsForASeason]) + (1 - alpha) * (last_smooth + last_trend)
+        //         trend = beta * (smooth - last_smooth) + (1 - beta) * last_trend
+        //         seasonals[x % noOfMonthsForASeason] = gamma * (val - smooth) + (1 - gamma) * seasonals[x % noOfMonthsForASeason]
+        //         resultarr.push(smooth + trend + seasonals[x % noOfMonthsForASeason])
+        //     }
+        //     last_smooth = smooth;
+        //     last_trend = trend;
+        // }
 
-        var mt = (xyBar - xBar * yBar) / (xxBar - (xBar * xBar))
-        let c = yBar - mt * xBar
+        // const actualLength = tesdata.length;
 
-        let regressionSquaredError = 0
-        let totalSquaredError = 0
-        for (let x = 0; x < tesdata.length; x++) {
-            if (tesdata[x].actual) {
-                regressionSquaredError += Math.pow(tesdata[x].forecast - (c + mt * x), 2)
-                totalSquaredError += Math.pow(tesdata[x].forecast - yBar, 2)
-            }
-        }
-
-        var rmse = (sqrt(e2Bar)).toFixed(2)
-        var mape = absEPerABar.toFixed(2)
-        var mse = e2Bar.toFixed(2)
-        var rSqd = (1 - (regressionSquaredError / totalSquaredError)).toFixed(2)
-
-        // console.log("wape",wape)
-        // console.log("rmse",rmse)
-        // console.log("mape",mape)
-        // console.log("mse",mse)
-        // console.log("rSqd",rSqd)
-
-        // error Table for Semi
-        let cntSemi = 0
-        let xBarSemi = 0
-        let yBarSemi = 0
-        let xyBarSemi = 0
-        let xxBarSemi = 0
-        let eBarSemi = 0
-        let absEBarSemi = 0
-        let absEPerABarSemi = 0
-        let e2BarSemi = 0
-        let ePerABarSemi = 0
-
-        for (let x = 0; x < inputData.length; x++) {
-            if (inputData[x].actual) {
-                xBarSemi += inputData[x].actual
-                yBarSemi += inputData[x].forecast
-                xyBarSemi += inputData[x].actual * inputData[x].forecast
-                xxBarSemi += inputData[x].actual * inputData[x].actual
-                eBarSemi += inputData[x].forecast - inputData[x].actual
-                absEBarSemi += abs(inputData[x].forecast - inputData[x].actual)
-                absEPerABarSemi += abs(inputData[x].forecast - inputData[x].actual) / inputData[x].actual
-                e2BarSemi += (inputData[x].forecast - inputData[x].actual) * (inputData[x].forecast - inputData[x].actual)
-                ePerABarSemi += (inputData[x].forecast - inputData[x].actual) / inputData[x].actual
-                cntSemi++
-            }
-        }
-        let wapeSemi = (eBarSemi / xBarSemi).toFixed(2)
-        xBarSemi = xBarSemi / cntSemi
-        yBarSemi = yBarSemi / cntSemi
-        xxBarSemi = xxBarSemi / cntSemi
-        xyBarSemi = xyBarSemi / cntSemi
-        eBarSemi = eBarSemi / cntSemi
-        absEBarSemi = absEBarSemi / cntSemi
-        absEPerABarSemi = absEPerABarSemi / cntSemi
-        e2BarSemi = e2BarSemi / cntSemi
-        ePerABarSemi = ePerABarSemi / cntSemi
-
-        var mtSemi = (xyBarSemi - xBarSemi * yBarSemi) / (xxBarSemi - (xBarSemi * xBarSemi))
-        let cSemi = yBarSemi - mtSemi * xBarSemi
-
-        let regressionSquaredErrorSemi = 0
-        let totalSquaredErrorSemi = 0
-        for (let x = 0; x < inputData.length; x++) {
-            if (inputData[x].actual) {
-                regressionSquaredErrorSemi += Math.pow(inputData[x].forecast - (cSemi + mtSemi * x), 2)
-                totalSquaredErrorSemi += Math.pow(inputData[x].forecast - yBarSemi, 2)
-            }
-        }
-
-        var rmseSemi = (sqrt(e2BarSemi)).toFixed(2)
-        var mapeSemi = absEPerABarSemi.toFixed(2)
-        var mseSemi = e2BarSemi.toFixed(2)
-        var rSqdSemi = (1 - (regressionSquaredErrorSemi / totalSquaredErrorSemi)).toFixed(2)
-
-        // error Table for Moving Avegrage
-        let cntMovingAvg = 0
-        let xBarMovingAvg = 0
-        let yBarMovingAvg = 0
-        let xyBarMovingAvg = 0
-        let xxBarMovingAvg = 0
-        let eBarMovingAvg = 0
-        let absEBarMovingAvg = 0
-        let absEPerABarMovingAvg = 0
-        let e2BarMovingAvg = 0
-        let ePerABarMovingAvg = 0
-
-        for (let x = 0; x < inputDataAverage.length; x++) {
-            if (inputDataAverage[x].actual) {
-                xBarMovingAvg += inputDataAverage[x].actual
-                yBarMovingAvg += inputDataAverage[x].forecast
-                xyBarMovingAvg += inputDataAverage[x].actual * inputDataAverage[x].forecast
-                xxBarMovingAvg += inputDataAverage[x].actual * inputDataAverage[x].actual
-                eBarMovingAvg += inputDataAverage[x].forecast - inputDataAverage[x].actual
-                absEBarMovingAvg += abs(inputDataAverage[x].forecast - inputDataAverage[x].actual)
-                absEPerABarMovingAvg += abs(inputDataAverage[x].forecast - inputDataAverage[x].actual) / inputDataAverage[x].actual
-                e2BarMovingAvg += (inputDataAverage[x].forecast - inputDataAverage[x].actual) * (inputDataAverage[x].forecast - inputDataAverage[x].actual)
-                ePerABarMovingAvg += (inputDataAverage[x].forecast - inputDataAverage[x].actual) / inputDataAverage[x].actual
-                cntMovingAvg++
-            }
-        }
-        let wapeMovingAvg = (eBarMovingAvg / xBarMovingAvg).toFixed(2);
-        xBarMovingAvg = xBarMovingAvg / cntMovingAvg
-        yBarMovingAvg = yBarMovingAvg / cntMovingAvg
-        xxBarMovingAvg = xxBarMovingAvg / cntMovingAvg
-        xyBarMovingAvg = xyBarMovingAvg / cntMovingAvg
-        eBarMovingAvg = eBarMovingAvg / cntMovingAvg
-        absEBarMovingAvg = absEBarMovingAvg / cntMovingAvg
-        absEPerABarMovingAvg = absEPerABarMovingAvg / cntMovingAvg
-        e2BarMovingAvg = e2BarMovingAvg / cntMovingAvg
-        ePerABarMovingAvg = ePerABarMovingAvg / cntMovingAvg
-
-        var mtMovingAvg = (xyBarMovingAvg - xBarMovingAvg * yBarMovingAvg) / (xxBarMovingAvg - (xBarMovingAvg * xBarMovingAvg))
-        let cMovingAvg = yBarMovingAvg - mtMovingAvg * xBarMovingAvg
-
-        let regressionSquaredErrorMovingAvg = 0
-        let totalSquaredErrorMovingAvg = 0
-        for (let x = 0; x < inputDataAverage.length; x++) {
-            if (inputDataAverage[x].actual) {
-                regressionSquaredErrorMovingAvg += Math.pow(inputDataAverage[x].forecast - (cMovingAvg + mtMovingAvg * x), 2)
-                totalSquaredErrorMovingAvg += Math.pow(inputDataAverage[x].forecast - yBarMovingAvg, 2)
-            }
-        }
-
-        var rmseMovingAvg = (sqrt(e2BarMovingAvg)).toFixed(2)
-        var mapeMovingAvg = absEPerABarMovingAvg.toFixed(2)
-        var mseMovingAvg = e2BarMovingAvg.toFixed(2)
-        var rSqdMovingAvg = (1 - (regressionSquaredErrorMovingAvg / totalSquaredErrorMovingAvg)).toFixed(2)
-
-        // error Table for Linear Reggreassion
-        let cntLinearReg = 0
-        let xBarLinearReg = 0
-        let yBarLinearReg = 0
-        let xyBarLinearReg = 0
-        let xxBarLinearReg = 0
-        let eBarLinearReg = 0
-        let absEBarLinearReg = 0
-        let absEPerABarLinearReg = 0
-        let e2BarLinearReg = 0
-        let ePerABarLinearReg = 0
-
-        for (let x = 0; x < inputDataRegression.length; x++) {
-            if (inputDataRegression[x].actual) {
-                xBarLinearReg += inputDataRegression[x].actual
-                yBarLinearReg += inputDataRegression[x].forecast
-                xyBarLinearReg += inputDataRegression[x].actual * inputDataRegression[x].forecast
-                xxBarLinearReg += inputDataRegression[x].actual * inputDataRegression[x].actual
-                eBarLinearReg += inputDataRegression[x].forecast - inputDataRegression[x].actual
-                absEBarLinearReg += abs(inputDataRegression[x].forecast - inputDataRegression[x].actual)
-                absEPerABarLinearReg += abs(inputDataRegression[x].forecast - inputDataRegression[x].actual) / inputDataRegression[x].actual
-                e2BarLinearReg += (inputDataRegression[x].forecast - inputDataRegression[x].actual) * (inputDataRegression[x].forecast - inputDataRegression[x].actual)
-                ePerABarLinearReg += (inputDataRegression[x].forecast - inputDataRegression[x].actual) / inputDataRegression[x].actual
-                cntLinearReg++
-            }
-        }
-        let wapeLinearReg = (eBarLinearReg / xBarLinearReg).toFixed(2)
-        xBarLinearReg = xBarLinearReg / cntLinearReg
-        yBarLinearReg = yBarLinearReg / cntLinearReg
-        xxBarLinearReg = xxBarLinearReg / cntLinearReg
-        xyBarLinearReg = xyBarLinearReg / cntLinearReg
-        eBarLinearReg = eBarLinearReg / cntLinearReg
-        absEBarLinearReg = absEBarLinearReg / cntLinearReg
-        absEPerABarLinearReg = absEPerABarLinearReg / cntLinearReg
-        e2BarLinearReg = e2BarLinearReg / cntLinearReg
-        ePerABarLinearReg = ePerABarLinearReg / cntLinearReg
-
-        var mtLinearReg = (xyBarLinearReg - xBarLinearReg * yBarLinearReg) / (xxBarLinearReg - (xBarLinearReg * xBarLinearReg))
-        let cLinearReg = yBarLinearReg - mtLinearReg * xBarLinearReg
-
-        let regressionSquaredErrorLinearReg = 0
-        let totalSquaredErrorLinearReg = 0
-        for (let x = 0; x < inputDataRegression.length; x++) {
-            if (inputDataRegression[x].actual) {
-                regressionSquaredErrorLinearReg += Math.pow(inputDataRegression[x].forecast - (cLinearReg + mtLinearReg * x), 2)
-                totalSquaredErrorLinearReg += Math.pow(inputDataRegression[x].forecast - yBarLinearReg, 2)
-            }
-        }
-
-        var rmseLinearReg = (sqrt(e2BarLinearReg)).toFixed(2)
-        var mapeLinearReg = absEPerABarLinearReg.toFixed(2)
-        var mseLinearReg = e2BarLinearReg.toFixed(2)
-        var rSqdLinearReg = (1 - (regressionSquaredErrorLinearReg / totalSquaredErrorLinearReg)).toFixed(2)
+        // for (let x = 0; x < resultarr.length; x++) {
+        //     if (x >= actualLength) {
+        //         tesdata.push = { "month": (x + 1), "actual": null, "forecast": resultarr[x] }
+        //     } else {
+        //         tesdata[x].forecast = resultarr[x]
+        //     }
+        // }
+        // console.log("tesdata", tesdata);
 
 
-        //Jexcel table
-        for (var j = 0; j < monthArray.length; j++) {
-            data = [];
-            data[0] = monthArray[j];
-            var consumptionData = actualConsumptionList.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArray[j]).format("YYYY-MM") && c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId)
-            if (consumptionData.length > 0) {
-                inputData.push({ "month": inputData.length + 1, "actual": consumptionData[0].amount, "forecast": null })
-            }
-            var inputDataFilter = inputData.filter(c => moment(startMonth).add(c.month - 1, 'months').format("YYYY-MM") == moment(monthArray[j]).format("YYYY-MM"))
-            var inputDataAverageFilter = inputDataAverage.filter(c => moment(startMonth).add(c.month - 1, 'months').format("YYYY-MM") == moment(monthArray[j]).format("YYYY-MM"))
-            var inputDataRegressionFilter = inputDataRegression.filter(c => moment(startMonth).add(c.month - 1, 'months').format("YYYY-MM") == moment(monthArray[j]).format("YYYY-MM"))
-            var tesdataFilter = tesdata.filter(c => moment(startMonth).add(c.month - 1, 'months').format("YYYY-MM") == moment(monthArray[j]).format("YYYY-MM"))
+        // // get Zvalue:
 
-            //var consumptionData = actualConsumptionList.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArray[j]).format("YYYY-MM") && c.planningUnit.id == this.state.planningUnitId);
-            data[1] = consumptionData.length > 0 ? consumptionData[0].amount : "";
-            data[2] = inputDataAverageFilter.length > 0 && inputDataAverageFilter[0].forecast != null ? inputDataAverageFilter[0].forecast.toFixed(2) : '';
-            data[3] = inputDataFilter.length > 0 && inputDataFilter[0].forecast != null ? inputDataFilter[0].forecast.toFixed(2) : '';
-            data[4] = inputDataRegressionFilter.length > 0 && inputDataRegressionFilter[0].forecast != null ? inputDataRegressionFilter[0].forecast.toFixed(2) : '';
-            data[5] = tesdataFilter.length > 0 && tesdataFilter[0].forecast != null ? (tesdataFilter[0].forecast - CI).toFixed(2) : '';
-            data[6] = tesdataFilter.length > 0 && tesdataFilter[0].forecast != null ? tesdataFilter[0].forecast.toFixed(2) : '';
-            data[7] = tesdataFilter.length > 0 && tesdataFilter[0].forecast != null ? (tesdataFilter[0].forecast + CI).toFixed(2) : '';
-            data[8] = '';
-            dataArray.push(data)
-        }
-        this.el = jexcel(document.getElementById("tableDiv"), '');
-        this.el.destroy();
-        console.log("tesdataFilter88888888888888", tesdataFilter)
-        console.log("inputDataFilter88888888888888", inputDataFilter)
-        var options = {
-            data: dataArray,
-            columnDrag: true,
-            columns: [
-                {
-                    title: i18n.t('static.inventoryDate.inventoryReport'),
-                    type: 'calendar', options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker' }, width: 100
-                },
-                {
-                    title: i18n.t('static.extrapolation.adjustedActuals'),
-                    type: 'numeric', mask: '#,##.00', decimal: '.'
-                },
-                {
-                    title: i18n.t('static.extrapolation.movingAverages'),
-                    type: this.state.movingAvgId ? 'numeric' : 'hidden',
-                    mask: '#,##.00', decimal: '.'
-                },
-                {
-                    title: i18n.t('static.extrapolation.semiAverages'),
-                    type: this.state.semiAvgId ? 'numeric' : 'hidden',
-                    mask: '#,##.00', decimal: '.'
-                },
-                {
-                    title: i18n.t('static.extrapolation.linearRegression'),
-                    type: this.state.linearRegressionId ? 'numeric' : 'hidden',
-                    mask: '#,##.00', decimal: '.'
-                },
-                {
-                    title: i18n.t('static.extrapolation.tesLower'),
-                    type: this.state.smoothingId ? 'numeric' : 'hidden',
-                    mask: '#,##.00', decimal: '.'
-                },
-                {
-                    title: i18n.t('static.extrapolation.tes'),
-                    type: this.state.smoothingId ? 'numeric' : 'hidden',
-                    mask: '#,##.00', decimal: '.'
-                },
-                {
-                    title: i18n.t('static.extrapolation.tesUpper'),
-                    type: this.state.smoothingId ? 'numeric' : 'hidden',
-                    mask: '#,##.00', decimal: '.'
-                },
-                {
-                    title: i18n.t('static.extrapolation.arima'),
-                    type: this.state.arimaId ? 'numeric' : 'hidden',
-                    mask: '#,##.00', decimal: '.'
-                }
-            ],
-            text: {
-                // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                show: '',
-                entries: '',
-            },
-            onload: this.loaded,
-            pagination: false,
-            search: true,
-            columnSorting: true,
-            tableOverflow: true,
-            wordWrap: true,
-            allowInsertColumn: false,
-            allowManualInsertColumn: false,
-            allowDeleteRow: false,
-            onselection: this.selected,
-            oneditionend: this.onedit,
-            copyCompatibility: true,
-            allowExport: false,
-            paginationOptions: JEXCEL_PAGINATION_OPTION,
-            position: 'top',
-            filters: true,
-            license: JEXCEL_PRO_KEY,
-            contextMenu: function (obj, x, y, e) {
-                return [];
-            }.bind(this),
-        };
-        var dataEl = jexcel(document.getElementById("tableDiv"), options);
-        this.el = dataEl;
+        // let final_t_table = null;
+        // var zValue = null;
+        // for (let x = 0; x < tTable.length; x++) {
+        //     if (resultarr.length < tTable[x].df) {
+        //         break;
+        //     }
+        //     final_t_table = tTable[x]
+        // }
+        // switch (confidence) {
+        //     case 0.85:
+        //         zValue = final_t_table.zValue[0];
+        //         break;
+        //     case 0.90:
+        //         zValue = final_t_table.zValue[1];
+        //         break;
+        //     case 0.95:
+        //         zValue = final_t_table.zValue[2];
+        //         break;
+        //     case 0.99:
+        //         zValue = final_t_table.zValue[3];
+        //         break;
+        //     case 0.995:
+        //         zValue = final_t_table.zValue[4];
+        //         break;
+        //     case 0.999:
+        //         zValue = final_t_table.zValue[5];
+        //         break;
+        //     default:
+        //         zValue = null;
+        // }
+        // console.log("resultarr---", resultarr)
+        // console.log("Z value = " + zValue)
+        // const stdDev = std(resultarr)
+        // console.log("Std dev = " + stdDev)
+        // const CI = zValue * stdDev / sqrt(resultarr.length)
+        // console.log("CI = " + CI)
 
-        var rmseArr = [];
-        var mapeArr = [];
-        var mseArr = [];
-        var rsqdArr = [];
-        var wapeArr = [];
+        // // error Table for TES
+        // let cnt = 0
+        // let xBar = 0
+        // let yBar = 0
+        // let xyBar = 0
+        // let xxBar = 0
+        // let eBar = 0
+        // let absEBar = 0
+        // let absEPerABar = 0
+        // let e2Bar = 0
+        // let ePerABar = 0
 
-        if (this.state.movingAvgId) {
-            rmseArr.push(rmseMovingAvg)
-        }
-        if (this.state.semiAvgId) {
-            rmseArr.push(rmseSemi)
-        }
-        if (this.state.linearRegressionId) {
-            rmseArr.push(rmseLinearReg)
-        }
-        if (this.state.smoothingId) {
-            rmseArr.push(rmse)
-        }
+        // for (let x = 0; x < tesdata.length; x++) {
+        //     if (tesdata[x].actual) {
+        //         xBar += tesdata[x].actual
+        //         yBar += tesdata[x].forecast
+        //         xyBar += tesdata[x].actual * tesdata[x].forecast
+        //         xxBar += tesdata[x].actual * tesdata[x].actual
+        //         eBar += tesdata[x].forecast - tesdata[x].actual
+        //         absEBar += abs(tesdata[x].forecast - tesdata[x].actual)
+        //         absEPerABar += abs(tesdata[x].forecast - tesdata[x].actual) / tesdata[x].actual
+        //         e2Bar += (tesdata[x].forecast - tesdata[x].actual) * (tesdata[x].forecast - tesdata[x].actual)
+        //         ePerABar += (tesdata[x].forecast - tesdata[x].actual) / tesdata[x].actual
+        //         cnt++
+        //     }
+        // }
+        // let wape = (eBar / xBar).toFixed(2)
+        // xBar = xBar / cnt
+        // yBar = yBar / cnt
+        // xxBar = xxBar / cnt
+        // xyBar = xyBar / cnt
+        // eBar = eBar / cnt
+        // absEBar = absEBar / cnt
+        // absEPerABar = absEPerABar / cnt
+        // e2Bar = e2Bar / cnt
+        // ePerABar = ePerABar / cnt
 
-        if (this.state.movingAvgId) {
-            mapeArr.push(mapeMovingAvg)
-        }
-        if (this.state.semiAvgId) {
-            mapeArr.push(mapeSemi)
-        }
-        if (this.state.linearRegressionId) {
-            mapeArr.push(mapeLinearReg)
-        }
-        if (this.state.smoothingId) {
-            mapeArr.push(mape)
-        }
+        // var mt = (xyBar - xBar * yBar) / (xxBar - (xBar * xBar))
+        // let c = yBar - mt * xBar
 
-        if (this.state.movingAvgId) {
-            mseArr.push(mseMovingAvg)
-        }
-        if (this.state.semiAvgId) {
-            mseArr.push(mseSemi)
-        }
-        if (this.state.linearRegressionId) {
-            mseArr.push(mseLinearReg)
-        }
-        if (this.state.smoothingId) {
-            mseArr.push(mse)
-        }
+        // let regressionSquaredError = 0
+        // let totalSquaredError = 0
+        // for (let x = 0; x < tesdata.length; x++) {
+        //     if (tesdata[x].actual) {
+        //         regressionSquaredError += Math.pow(tesdata[x].forecast - (c + mt * x), 2)
+        //         totalSquaredError += Math.pow(tesdata[x].forecast - yBar, 2)
+        //     }
+        // }
 
-        if (this.state.movingAvgId) {
-            rsqdArr.push(rSqdMovingAvg)
-        }
-        if (this.state.semiAvgId) {
-            rsqdArr.push(rSqdSemi)
-        }
-        if (this.state.linearRegressionId) {
-            rsqdArr.push(rSqdLinearReg)
-        }
-        if (this.state.smoothingId) {
-            rsqdArr.push(rSqd)
-        }
+        // var rmse = (sqrt(e2Bar)).toFixed(2)
+        // var mape = absEPerABar.toFixed(2)
+        // var mse = e2Bar.toFixed(2)
+        // var rSqd = (1 - (regressionSquaredError / totalSquaredError)).toFixed(2)
 
-        if (this.state.movingAvgId) {
-            wapeArr.push(wapeMovingAvg)
-        }
-        if (this.state.semiAvgId) {
-            wapeArr.push(wapeSemi)
-        }
-        if (this.state.linearRegressionId) {
-            wapeArr.push(wapeLinearReg)
-        }
-        if (this.state.smoothingId) {
-            wapeArr.push(wape)
-        }
+        // // console.log("wape",wape)
+        // // console.log("rmse",rmse)
+        // // console.log("mape",mape)
+        // // console.log("mse",mse)
+        // // console.log("rSqd",rSqd)
 
-        var minRmse = Math.min(...rmseArr);
-        var minMape = Math.min(...mapeArr);
-        var minMse = Math.min(...mseArr);
-        var minRsqd = Math.min(...rsqdArr);
-        var minWape = Math.min(...wapeArr);
+        // // error Table for Semi
+        // let cntSemi = 0
+        // let xBarSemi = 0
+        // let yBarSemi = 0
+        // let xyBarSemi = 0
+        // let xxBarSemi = 0
+        // let eBarSemi = 0
+        // let absEBarSemi = 0
+        // let absEPerABarSemi = 0
+        // let e2BarSemi = 0
+        // let ePerABarSemi = 0
 
-        this.setState({
-            dataEl: dataEl, loading: false,
-            minRmse: minRmse,
-            minMape: minMape,
-            minMse: minMse,
-            minRsqd: minRsqd,
-            minWape: minWape,
-            inputDataFilter: inputData,
-            inputDataAverageFilter: inputDataAverage,
-            inputDataRegressionFilter: inputDataRegression,
-            startMonthForExtrapolation: startMonth,
-            tesdataFilter: tesdata,
-            rmse: rmse,
-            mape: mape,
-            mse: mse,
-            rSqd: rSqd,
-            wape: wape,
-            rmseSemi: rmseSemi,
-            mapeSemi: mapeSemi,
-            mseSemi: mseSemi,
-            rSqdSemi: rSqdSemi,
-            wapeSemi: wapeSemi,
-            rmseMovingAvg: rmseMovingAvg,
-            mapeMovingAvg: mapeMovingAvg,
-            mseMovingAvg: mseMovingAvg,
-            rSqdMovingAvg: rSqdMovingAvg,
-            wapeMovingAvg: wapeMovingAvg,
-            rmseLinearReg: rmseLinearReg,
-            mapeLinearReg: mapeLinearReg,
-            mseLinearReg: mseLinearReg,
-            rSqdLinearReg: rSqdLinearReg,
-            wapeLinearReg: wapeLinearReg,
-            consumptionData: consumptionData,
-            CI: CI,
-            loading: false
-        })
-        console.log("tesdataFilter&&&&&&", this.state.tesdataFilter);
+        // for (let x = 0; x < inputData.length; x++) {
+        //     if (inputData[x].actual) {
+        //         xBarSemi += inputData[x].actual
+        //         yBarSemi += inputData[x].forecast
+        //         xyBarSemi += inputData[x].actual * inputData[x].forecast
+        //         xxBarSemi += inputData[x].actual * inputData[x].actual
+        //         eBarSemi += inputData[x].forecast - inputData[x].actual
+        //         absEBarSemi += abs(inputData[x].forecast - inputData[x].actual)
+        //         absEPerABarSemi += abs(inputData[x].forecast - inputData[x].actual) / inputData[x].actual
+        //         e2BarSemi += (inputData[x].forecast - inputData[x].actual) * (inputData[x].forecast - inputData[x].actual)
+        //         ePerABarSemi += (inputData[x].forecast - inputData[x].actual) / inputData[x].actual
+        //         cntSemi++
+        //     }
+        // }
+        // let wapeSemi = (eBarSemi / xBarSemi).toFixed(2)
+        // xBarSemi = xBarSemi / cntSemi
+        // yBarSemi = yBarSemi / cntSemi
+        // xxBarSemi = xxBarSemi / cntSemi
+        // xyBarSemi = xyBarSemi / cntSemi
+        // eBarSemi = eBarSemi / cntSemi
+        // absEBarSemi = absEBarSemi / cntSemi
+        // absEPerABarSemi = absEPerABarSemi / cntSemi
+        // e2BarSemi = e2BarSemi / cntSemi
+        // ePerABarSemi = ePerABarSemi / cntSemi
+
+        // var mtSemi = (xyBarSemi - xBarSemi * yBarSemi) / (xxBarSemi - (xBarSemi * xBarSemi))
+        // let cSemi = yBarSemi - mtSemi * xBarSemi
+
+        // let regressionSquaredErrorSemi = 0
+        // let totalSquaredErrorSemi = 0
+        // for (let x = 0; x < inputData.length; x++) {
+        //     if (inputData[x].actual) {
+        //         regressionSquaredErrorSemi += Math.pow(inputData[x].forecast - (cSemi + mtSemi * x), 2)
+        //         totalSquaredErrorSemi += Math.pow(inputData[x].forecast - yBarSemi, 2)
+        //     }
+        // }
+
+        // var rmseSemi = (sqrt(e2BarSemi)).toFixed(2)
+        // var mapeSemi = absEPerABarSemi.toFixed(2)
+        // var mseSemi = e2BarSemi.toFixed(2)
+        // var rSqdSemi = (1 - (regressionSquaredErrorSemi / totalSquaredErrorSemi)).toFixed(2)
+
+        // // error Table for Moving Avegrage
+        // let cntMovingAvg = 0
+        // let xBarMovingAvg = 0
+        // let yBarMovingAvg = 0
+        // let xyBarMovingAvg = 0
+        // let xxBarMovingAvg = 0
+        // let eBarMovingAvg = 0
+        // let absEBarMovingAvg = 0
+        // let absEPerABarMovingAvg = 0
+        // let e2BarMovingAvg = 0
+        // let ePerABarMovingAvg = 0
+
+        // for (let x = 0; x < inputDataAverage.length; x++) {
+        //     if (inputDataAverage[x].actual) {
+        //         xBarMovingAvg += inputDataAverage[x].actual
+        //         yBarMovingAvg += inputDataAverage[x].forecast
+        //         xyBarMovingAvg += inputDataAverage[x].actual * inputDataAverage[x].forecast
+        //         xxBarMovingAvg += inputDataAverage[x].actual * inputDataAverage[x].actual
+        //         eBarMovingAvg += inputDataAverage[x].forecast - inputDataAverage[x].actual
+        //         absEBarMovingAvg += abs(inputDataAverage[x].forecast - inputDataAverage[x].actual)
+        //         absEPerABarMovingAvg += abs(inputDataAverage[x].forecast - inputDataAverage[x].actual) / inputDataAverage[x].actual
+        //         e2BarMovingAvg += (inputDataAverage[x].forecast - inputDataAverage[x].actual) * (inputDataAverage[x].forecast - inputDataAverage[x].actual)
+        //         ePerABarMovingAvg += (inputDataAverage[x].forecast - inputDataAverage[x].actual) / inputDataAverage[x].actual
+        //         cntMovingAvg++
+        //     }
+        // }
+        // let wapeMovingAvg = (eBarMovingAvg / xBarMovingAvg).toFixed(2);
+        // xBarMovingAvg = xBarMovingAvg / cntMovingAvg
+        // yBarMovingAvg = yBarMovingAvg / cntMovingAvg
+        // xxBarMovingAvg = xxBarMovingAvg / cntMovingAvg
+        // xyBarMovingAvg = xyBarMovingAvg / cntMovingAvg
+        // eBarMovingAvg = eBarMovingAvg / cntMovingAvg
+        // absEBarMovingAvg = absEBarMovingAvg / cntMovingAvg
+        // absEPerABarMovingAvg = absEPerABarMovingAvg / cntMovingAvg
+        // e2BarMovingAvg = e2BarMovingAvg / cntMovingAvg
+        // ePerABarMovingAvg = ePerABarMovingAvg / cntMovingAvg
+
+        // var mtMovingAvg = (xyBarMovingAvg - xBarMovingAvg * yBarMovingAvg) / (xxBarMovingAvg - (xBarMovingAvg * xBarMovingAvg))
+        // let cMovingAvg = yBarMovingAvg - mtMovingAvg * xBarMovingAvg
+
+        // let regressionSquaredErrorMovingAvg = 0
+        // let totalSquaredErrorMovingAvg = 0
+        // for (let x = 0; x < inputDataAverage.length; x++) {
+        //     if (inputDataAverage[x].actual) {
+        //         regressionSquaredErrorMovingAvg += Math.pow(inputDataAverage[x].forecast - (cMovingAvg + mtMovingAvg * x), 2)
+        //         totalSquaredErrorMovingAvg += Math.pow(inputDataAverage[x].forecast - yBarMovingAvg, 2)
+        //     }
+        // }
+
+        // var rmseMovingAvg = (sqrt(e2BarMovingAvg)).toFixed(2)
+        // var mapeMovingAvg = absEPerABarMovingAvg.toFixed(2)
+        // var mseMovingAvg = e2BarMovingAvg.toFixed(2)
+        // var rSqdMovingAvg = (1 - (regressionSquaredErrorMovingAvg / totalSquaredErrorMovingAvg)).toFixed(2)
+
+        // // error Table for Linear Reggreassion
+        // let cntLinearReg = 0
+        // let xBarLinearReg = 0
+        // let yBarLinearReg = 0
+        // let xyBarLinearReg = 0
+        // let xxBarLinearReg = 0
+        // let eBarLinearReg = 0
+        // let absEBarLinearReg = 0
+        // let absEPerABarLinearReg = 0
+        // let e2BarLinearReg = 0
+        // let ePerABarLinearReg = 0
+
+        // for (let x = 0; x < inputDataRegression.length; x++) {
+        //     if (inputDataRegression[x].actual) {
+        //         xBarLinearReg += inputDataRegression[x].actual
+        //         yBarLinearReg += inputDataRegression[x].forecast
+        //         xyBarLinearReg += inputDataRegression[x].actual * inputDataRegression[x].forecast
+        //         xxBarLinearReg += inputDataRegression[x].actual * inputDataRegression[x].actual
+        //         eBarLinearReg += inputDataRegression[x].forecast - inputDataRegression[x].actual
+        //         absEBarLinearReg += abs(inputDataRegression[x].forecast - inputDataRegression[x].actual)
+        //         absEPerABarLinearReg += abs(inputDataRegression[x].forecast - inputDataRegression[x].actual) / inputDataRegression[x].actual
+        //         e2BarLinearReg += (inputDataRegression[x].forecast - inputDataRegression[x].actual) * (inputDataRegression[x].forecast - inputDataRegression[x].actual)
+        //         ePerABarLinearReg += (inputDataRegression[x].forecast - inputDataRegression[x].actual) / inputDataRegression[x].actual
+        //         cntLinearReg++
+        //     }
+        // }
+        // let wapeLinearReg = (eBarLinearReg / xBarLinearReg).toFixed(2)
+        // xBarLinearReg = xBarLinearReg / cntLinearReg
+        // yBarLinearReg = yBarLinearReg / cntLinearReg
+        // xxBarLinearReg = xxBarLinearReg / cntLinearReg
+        // xyBarLinearReg = xyBarLinearReg / cntLinearReg
+        // eBarLinearReg = eBarLinearReg / cntLinearReg
+        // absEBarLinearReg = absEBarLinearReg / cntLinearReg
+        // absEPerABarLinearReg = absEPerABarLinearReg / cntLinearReg
+        // e2BarLinearReg = e2BarLinearReg / cntLinearReg
+        // ePerABarLinearReg = ePerABarLinearReg / cntLinearReg
+
+        // var mtLinearReg = (xyBarLinearReg - xBarLinearReg * yBarLinearReg) / (xxBarLinearReg - (xBarLinearReg * xBarLinearReg))
+        // let cLinearReg = yBarLinearReg - mtLinearReg * xBarLinearReg
+
+        // let regressionSquaredErrorLinearReg = 0
+        // let totalSquaredErrorLinearReg = 0
+        // for (let x = 0; x < inputDataRegression.length; x++) {
+        //     if (inputDataRegression[x].actual) {
+        //         regressionSquaredErrorLinearReg += Math.pow(inputDataRegression[x].forecast - (cLinearReg + mtLinearReg * x), 2)
+        //         totalSquaredErrorLinearReg += Math.pow(inputDataRegression[x].forecast - yBarLinearReg, 2)
+        //     }
+        // }
+
+        // var rmseLinearReg = (sqrt(e2BarLinearReg)).toFixed(2)
+        // var mapeLinearReg = absEPerABarLinearReg.toFixed(2)
+        // var mseLinearReg = e2BarLinearReg.toFixed(2)
+        // var rSqdLinearReg = (1 - (regressionSquaredErrorLinearReg / totalSquaredErrorLinearReg)).toFixed(2)
+
+
+        // //Jexcel table
+        // for (var j = 0; j < monthArray.length; j++) {
+        //     data = [];
+        //     data[0] = monthArray[j];
+        //     var consumptionData = actualConsumptionList.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArray[j]).format("YYYY-MM") && c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId)
+        //     if (consumptionData.length > 0) {
+        //         inputData.push({ "month": inputData.length + 1, "actual": consumptionData[0].amount, "forecast": null })
+        //     }
+        //     var inputDataFilter = inputData.filter(c => moment(startMonth).add(c.month - 1, 'months').format("YYYY-MM") == moment(monthArray[j]).format("YYYY-MM"))
+        //     var inputDataAverageFilter = inputDataAverage.filter(c => moment(startMonth).add(c.month - 1, 'months').format("YYYY-MM") == moment(monthArray[j]).format("YYYY-MM"))
+        //     var inputDataRegressionFilter = inputDataRegression.filter(c => moment(startMonth).add(c.month - 1, 'months').format("YYYY-MM") == moment(monthArray[j]).format("YYYY-MM"))
+        //     var tesdataFilter = tesdata.filter(c => moment(startMonth).add(c.month - 1, 'months').format("YYYY-MM") == moment(monthArray[j]).format("YYYY-MM"))
+
+        //     //var consumptionData = actualConsumptionList.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArray[j]).format("YYYY-MM") && c.planningUnit.id == this.state.planningUnitId);
+        //     data[1] = consumptionData.length > 0 ? consumptionData[0].amount : "";
+        //     data[2] = inputDataAverageFilter.length > 0 && inputDataAverageFilter[0].forecast != null ? inputDataAverageFilter[0].forecast.toFixed(2) : '';
+        //     data[3] = inputDataFilter.length > 0 && inputDataFilter[0].forecast != null ? inputDataFilter[0].forecast.toFixed(2) : '';
+        //     data[4] = inputDataRegressionFilter.length > 0 && inputDataRegressionFilter[0].forecast != null ? inputDataRegressionFilter[0].forecast.toFixed(2) : '';
+        //     data[5] = tesdataFilter.length > 0 && tesdataFilter[0].forecast != null ? (tesdataFilter[0].forecast - CI).toFixed(2) : '';
+        //     data[6] = tesdataFilter.length > 0 && tesdataFilter[0].forecast != null ? tesdataFilter[0].forecast.toFixed(2) : '';
+        //     data[7] = tesdataFilter.length > 0 && tesdataFilter[0].forecast != null ? (tesdataFilter[0].forecast + CI).toFixed(2) : '';
+        //     data[8] = '';
+        //     dataArray.push(data)
+        // }
+        // this.el = jexcel(document.getElementById("tableDiv"), '');
+        // this.el.destroy();
+        // console.log("tesdataFilter88888888888888", tesdataFilter)
+        // console.log("inputDataFilter88888888888888", inputDataFilter)
+        // var options = {
+        //     data: dataArray,
+        //     columnDrag: true,
+        //     columns: [
+        //         {
+        //             title: i18n.t('static.inventoryDate.inventoryReport'),
+        //             type: 'calendar', options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker' }, width: 100
+        //         },
+        //         {
+        //             title: i18n.t('static.extrapolation.adjustedActuals'),
+        //             type: 'numeric', mask: '#,##.00', decimal: '.'
+        //         },
+        //         {
+        //             title: i18n.t('static.extrapolation.movingAverages'),
+        //             type: this.state.movingAvgId ? 'numeric' : 'hidden',
+        //             mask: '#,##.00', decimal: '.'
+        //         },
+        //         {
+        //             title: i18n.t('static.extrapolation.semiAverages'),
+        //             type: this.state.semiAvgId ? 'numeric' : 'hidden',
+        //             mask: '#,##.00', decimal: '.'
+        //         },
+        //         {
+        //             title: i18n.t('static.extrapolation.linearRegression'),
+        //             type: this.state.linearRegressionId ? 'numeric' : 'hidden',
+        //             mask: '#,##.00', decimal: '.'
+        //         },
+        //         {
+        //             title: i18n.t('static.extrapolation.tesLower'),
+        //             type: this.state.smoothingId ? 'numeric' : 'hidden',
+        //             mask: '#,##.00', decimal: '.'
+        //         },
+        //         {
+        //             title: i18n.t('static.extrapolation.tes'),
+        //             type: this.state.smoothingId ? 'numeric' : 'hidden',
+        //             mask: '#,##.00', decimal: '.'
+        //         },
+        //         {
+        //             title: i18n.t('static.extrapolation.tesUpper'),
+        //             type: this.state.smoothingId ? 'numeric' : 'hidden',
+        //             mask: '#,##.00', decimal: '.'
+        //         },
+        //         {
+        //             title: i18n.t('static.extrapolation.arima'),
+        //             type: this.state.arimaId ? 'numeric' : 'hidden',
+        //             mask: '#,##.00', decimal: '.'
+        //         }
+        //     ],
+        //     text: {
+        //         // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+        //         showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+        //         show: '',
+        //         entries: '',
+        //     },
+        //     onload: this.loaded,
+        //     pagination: false,
+        //     search: true,
+        //     columnSorting: true,
+        //     tableOverflow: true,
+        //     wordWrap: true,
+        //     allowInsertColumn: false,
+        //     allowManualInsertColumn: false,
+        //     allowDeleteRow: false,
+        //     onselection: this.selected,
+        //     oneditionend: this.onedit,
+        //     copyCompatibility: true,
+        //     allowExport: false,
+        //     paginationOptions: JEXCEL_PAGINATION_OPTION,
+        //     position: 'top',
+        //     filters: true,
+        //     license: JEXCEL_PRO_KEY,
+        //     contextMenu: function (obj, x, y, e) {
+        //         return [];
+        //     }.bind(this),
+        // };
+        // var dataEl = jexcel(document.getElementById("tableDiv"), options);
+        // this.el = dataEl;
+
+        // var rmseArr = [];
+        // var mapeArr = [];
+        // var mseArr = [];
+        // var rsqdArr = [];
+        // var wapeArr = [];
+
+        // if (this.state.movingAvgId) {
+        //     rmseArr.push(rmseMovingAvg)
+        // }
+        // if (this.state.semiAvgId) {
+        //     rmseArr.push(rmseSemi)
+        // }
+        // if (this.state.linearRegressionId) {
+        //     rmseArr.push(rmseLinearReg)
+        // }
+        // if (this.state.smoothingId) {
+        //     rmseArr.push(rmse)
+        // }
+
+        // if (this.state.movingAvgId) {
+        //     mapeArr.push(mapeMovingAvg)
+        // }
+        // if (this.state.semiAvgId) {
+        //     mapeArr.push(mapeSemi)
+        // }
+        // if (this.state.linearRegressionId) {
+        //     mapeArr.push(mapeLinearReg)
+        // }
+        // if (this.state.smoothingId) {
+        //     mapeArr.push(mape)
+        // }
+
+        // if (this.state.movingAvgId) {
+        //     mseArr.push(mseMovingAvg)
+        // }
+        // if (this.state.semiAvgId) {
+        //     mseArr.push(mseSemi)
+        // }
+        // if (this.state.linearRegressionId) {
+        //     mseArr.push(mseLinearReg)
+        // }
+        // if (this.state.smoothingId) {
+        //     mseArr.push(mse)
+        // }
+
+        // if (this.state.movingAvgId) {
+        //     rsqdArr.push(rSqdMovingAvg)
+        // }
+        // if (this.state.semiAvgId) {
+        //     rsqdArr.push(rSqdSemi)
+        // }
+        // if (this.state.linearRegressionId) {
+        //     rsqdArr.push(rSqdLinearReg)
+        // }
+        // if (this.state.smoothingId) {
+        //     rsqdArr.push(rSqd)
+        // }
+
+        // if (this.state.movingAvgId) {
+        //     wapeArr.push(wapeMovingAvg)
+        // }
+        // if (this.state.semiAvgId) {
+        //     wapeArr.push(wapeSemi)
+        // }
+        // if (this.state.linearRegressionId) {
+        //     wapeArr.push(wapeLinearReg)
+        // }
+        // if (this.state.smoothingId) {
+        //     wapeArr.push(wape)
+        // }
+
+        // var minRmse = Math.min(...rmseArr);
+        // var minMape = Math.min(...mapeArr);
+        // var minMse = Math.min(...mseArr);
+        // var minRsqd = Math.min(...rsqdArr);
+        // var minWape = Math.min(...wapeArr);
+
+        // this.setState({
+        //     dataEl: dataEl, loading: false,
+        //     minRmse: minRmse,
+        //     minMape: minMape,
+        //     minMse: minMse,
+        //     minRsqd: minRsqd,
+        //     minWape: minWape,
+        //     inputDataFilter: inputData,
+        //     inputDataAverageFilter: inputDataAverage,
+        //     inputDataRegressionFilter: inputDataRegression,
+        //     startMonthForExtrapolation: startMonth,
+        //     tesdataFilter: tesdata,
+        //     rmse: rmse,
+        //     mape: mape,
+        //     mse: mse,
+        //     rSqd: rSqd,
+        //     wape: wape,
+        //     rmseSemi: rmseSemi,
+        //     mapeSemi: mapeSemi,
+        //     mseSemi: mseSemi,
+        //     rSqdSemi: rSqdSemi,
+        //     wapeSemi: wapeSemi,
+        //     rmseMovingAvg: rmseMovingAvg,
+        //     mapeMovingAvg: mapeMovingAvg,
+        //     mseMovingAvg: mseMovingAvg,
+        //     rSqdMovingAvg: rSqdMovingAvg,
+        //     wapeMovingAvg: wapeMovingAvg,
+        //     rmseLinearReg: rmseLinearReg,
+        //     mapeLinearReg: mapeLinearReg,
+        //     mseLinearReg: mseLinearReg,
+        //     rSqdLinearReg: rSqdLinearReg,
+        //     wapeLinearReg: wapeLinearReg,
+        //     consumptionData: consumptionData,
+        //     CI: CI,
+        //     loading: false
+        // })
+        // console.log("tesdataFilter&&&&&&", this.state.tesdataFilter);
     }
 
     loaded = function (instance, cell, x, y, value) {
@@ -1133,14 +1150,15 @@ export default class ExtrapolateDataComponent extends React.Component {
                 var datasetDataBytes = CryptoJS.AES.decrypt(myResult.programData, SECRET_KEY);
                 var datasetData = datasetDataBytes.toString(CryptoJS.enc.Utf8);
                 var datasetJson = JSON.parse(datasetData);
-                var consumptionExtrapolationList = datasetJson.consumptionExtrapolation;
-                var consumptionExtrapolationData = consumptionExtrapolationList.findIndex(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId && c.extrapolationMethod.id == 6)//Semi Averages
-                var consumptionExtrapolationMovingData = consumptionExtrapolationList.findIndex(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId && c.extrapolationMethod.id == 7)//Moving averages
-                var consumptionExtrapolationRegression = consumptionExtrapolationList.findIndex(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId && c.extrapolationMethod.id == 5)//Linear Regression
-                var consumptionExtrapolationTESL = consumptionExtrapolationList.findIndex(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId && c.extrapolationMethod.id == 1)//TES L
+                var consumptionExtrapolationDataUnFiltered = (datasetJson.consumptionExtrapolation);
+                var consumptionExtrapolationList = (datasetJson.consumptionExtrapolation).filter(c => c.planningUnit.id != this.state.planningUnitId && c.region.id != this.state.regionId);
+                var consumptionExtrapolationData = -1//Semi Averages
+                var consumptionExtrapolationMovingData = -1//Moving averages
+                var consumptionExtrapolationRegression = -1//Linear Regression
+                var consumptionExtrapolationTESL = -1//TES L
                 console.log("consumptionExtrapolationTESL+++", consumptionExtrapolationTESL)
-                var consumptionExtrapolationTESM = consumptionExtrapolationList.findIndex(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId && c.extrapolationMethod.id == 2)//TES M
-                var consumptionExtrapolationTESH = consumptionExtrapolationList.findIndex(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId && c.extrapolationMethod.id == 3)//TES H
+                var consumptionExtrapolationTESM = -1//TES M
+                var consumptionExtrapolationTESH = -1//TES H
 
                 var tesData = this.state.tesdataFilter;
                 var CI = this.state.CI;
@@ -1151,353 +1169,361 @@ export default class ExtrapolateDataComponent extends React.Component {
                 console.log("consumptionExtrapolationData", consumptionExtrapolationData);
                 console.log("inputDataFilter", inputDataFilter);
                 //Semi - averages
-                if (consumptionExtrapolationData == -1) {
-                    var data = [];
-                    for (var i = 0; i < inputDataFilter.length; i++) {
-                        data.push({ month: moment(this.state.startMonthForExtrapolation).add(inputDataFilter[i].month - 1, 'months').format("YYYY-MM-DD"), amount: inputDataFilter[i].forecast })
+                if (this.state.semiAvgId) {
+                    if (consumptionExtrapolationData == -1) {
+                        var data = [];
+                        for (var i = 0; i < inputDataFilter.length; i++) {
+                            data.push({ month: moment(this.state.startMonthForExtrapolation).add(inputDataFilter[i].month - 1, 'months').format("YYYY-MM-DD"), amount: inputDataFilter[i].forecast })
+                        }
+                        consumptionExtrapolationList.push(
+                            {
+                                "consumptionExtrapolationId": consumptionExtrapolationDataUnFiltered.length + 1,
+                                "planningUnit": {
+                                    "id": this.state.planningUnitId,
+                                    "label": {
+                                    }
+                                },
+                                "region": {
+                                    "id": this.state.regionId,
+                                    "label": {
+                                    }
+                                },
+                                "extrapolationMethod": {
+                                    "id": 6,
+                                    "label": {
+                                        "createdBy": null,
+                                        "createdDate": null,
+                                        "lastModifiedBy": null,
+                                        "lastModifiedDate": null,
+                                        "active": true,
+                                        "labelId": 34704,
+                                        "label_en": "Semi-Averages",
+                                        "label_sp": null,
+                                        "label_fr": null,
+                                        "label_pr": null
+                                    }
+                                },
+                                "jsonProperties": {
+                                },
+                                "createdBy": {
+                                    "userId": 1,
+                                    "username": "Anchal C"
+                                },
+                                "createdDate": "2021-12-14 12:24:20",
+                                "extrapolationDataList": data
+                            })
+                    } else {
+                        consumptionExtrapolationList[consumptionExtrapolationData].jsonProperties = {};
+                        var data = [];
+                        for (var i = 0; i < inputDataFilter.length; i++) {
+                            data.push({ month: moment(this.state.startMonthForExtrapolation).add(inputDataFilter[i].month - 1, 'months').format("YYYY-MM-DD"), amount: inputDataFilter[i].forecast })
+                        }
+                        consumptionExtrapolationList[consumptionExtrapolationData].extrapolationDataList = data;
                     }
-                    consumptionExtrapolationList.push(
-                        {
-                            "consumptionExtrapolationId": consumptionExtrapolationList.length + 1,
-                            "planningUnit": {
-                                "id": this.state.planningUnitId,
-                                "label": {
-                                }
-                            },
-                            "region": {
-                                "id": this.state.regionId,
-                                "label": {
-                                }
-                            },
-                            "extrapolationMethod": {
-                                "id": 6,
-                                "label": {
-                                    "createdBy": null,
-                                    "createdDate": null,
-                                    "lastModifiedBy": null,
-                                    "lastModifiedDate": null,
-                                    "active": true,
-                                    "labelId": 34704,
-                                    "label_en": "Semi-Averages",
-                                    "label_sp": null,
-                                    "label_fr": null,
-                                    "label_pr": null
-                                }
-                            },
-                            "jsonProperties": {
-                            },
-                            "createdBy": {
-                                "userId": 1,
-                                "username": "Anchal C"
-                            },
-                            "createdDate": "2021-12-14 12:24:20",
-                            "extrapolationDataList": data
-                        })
-                } else {
-                    consumptionExtrapolationList[consumptionExtrapolationData].jsonProperties = {};
-                    var data = [];
-                    for (var i = 0; i < inputDataFilter.length; i++) {
-                        data.push({ month: moment(this.state.startMonthForExtrapolation).add(inputDataFilter[i].month - 1, 'months').format("YYYY-MM-DD"), amount: inputDataFilter[i].forecast })
-                    }
-                    consumptionExtrapolationList[consumptionExtrapolationData].extrapolationDataList = data;
                 }
                 console.log("this.state.monthsForMovingAverage+++", this.state.monthsForMovingAverage)
                 console.log("consumptionExtrapolationMovingData+++", consumptionExtrapolationMovingData);
                 //Moving Averages
-                if (consumptionExtrapolationMovingData == -1) {
-                    var data = [];
-                    for (var i = 0; i < inputDataAverageFilter.length; i++) {
-                        data.push({ month: moment(this.state.startMonthForExtrapolation).add(inputDataAverageFilter[i].month - 1, 'months').format("YYYY-MM-DD"), amount: inputDataAverageFilter[i].forecast })
+                if (this.state.movingAvgId) {
+                    if (consumptionExtrapolationMovingData == -1) {
+                        var data = [];
+                        for (var i = 0; i < inputDataAverageFilter.length; i++) {
+                            data.push({ month: moment(this.state.startMonthForExtrapolation).add(inputDataAverageFilter[i].month - 1, 'months').format("YYYY-MM-DD"), amount: inputDataAverageFilter[i].forecast })
+                        }
+                        consumptionExtrapolationList.push(
+                            {
+                                "consumptionExtrapolationId": consumptionExtrapolationDataUnFiltered.length + 1,
+                                "planningUnit": {
+                                    "id": this.state.planningUnitId,
+                                    "label": {
+                                    }
+                                },
+                                "region": {
+                                    "id": this.state.regionId,
+                                    "label": {
+                                    }
+                                },
+                                "extrapolationMethod": {
+                                    "id": 7,
+                                    "label": {
+                                        "createdBy": null,
+                                        "createdDate": null,
+                                        "lastModifiedBy": null,
+                                        "lastModifiedDate": null,
+                                        "active": true,
+                                        "labelId": 34705,
+                                        "label_en": "Moving Averages",
+                                        "label_sp": null,
+                                        "label_fr": null,
+                                        "label_pr": null
+                                    }
+                                },
+                                "jsonProperties": {
+                                    months: this.state.monthsForMovingAverage
+                                },
+                                "createdBy": {
+                                    "userId": 1,
+                                    "username": "Anchal C"
+                                },
+                                "createdDate": "2021-12-14 12:24:20",
+                                "extrapolationDataList": data
+                            })
                     }
-                    consumptionExtrapolationList.push(
-                        {
-                            "consumptionExtrapolationId": consumptionExtrapolationList.length + 1,
-                            "planningUnit": {
-                                "id": this.state.planningUnitId,
-                                "label": {
-                                }
-                            },
-                            "region": {
-                                "id": this.state.regionId,
-                                "label": {
-                                }
-                            },
-                            "extrapolationMethod": {
-                                "id": 7,
-                                "label": {
-                                    "createdBy": null,
-                                    "createdDate": null,
-                                    "lastModifiedBy": null,
-                                    "lastModifiedDate": null,
-                                    "active": true,
-                                    "labelId": 34705,
-                                    "label_en": "Moving Averages",
-                                    "label_sp": null,
-                                    "label_fr": null,
-                                    "label_pr": null
-                                }
-                            },
-                            "jsonProperties": {
-                                months: this.state.monthsForMovingAverage
-                            },
-                            "createdBy": {
-                                "userId": 1,
-                                "username": "Anchal C"
-                            },
-                            "createdDate": "2021-12-14 12:24:20",
-                            "extrapolationDataList": data
-                        })
+                    else {
+                        consumptionExtrapolationList[consumptionExtrapolationMovingData].jsonProperties = { months: this.state.monthsForMovingAverage };
+                        var data = [];
+                        for (var i = 0; i < inputDataAverageFilter.length; i++) {
+                            data.push({ month: moment(this.state.startMonthForExtrapolation).add(inputDataAverageFilter[i].month - 1, 'months').format("YYYY-MM-DD"), amount: inputDataAverageFilter[i].forecast })
+                        }
+                        consumptionExtrapolationList[consumptionExtrapolationMovingData].extrapolationDataList = data;
+                    }
                 }
-                else {
-                    consumptionExtrapolationList[consumptionExtrapolationMovingData].jsonProperties = { months: this.state.monthsForMovingAverage };
-                    var data = [];
-                    for (var i = 0; i < inputDataAverageFilter.length; i++) {
-                        data.push({ month: moment(this.state.startMonthForExtrapolation).add(inputDataAverageFilter[i].month - 1, 'months').format("YYYY-MM-DD"), amount: inputDataAverageFilter[i].forecast })
+                if (this.state.linearRegressionId) {
+                    //Linear Regression
+                    if (consumptionExtrapolationRegression == -1) {
+                        var data = [];
+                        for (var i = 0; i < inputDataRegressionFilter.length; i++) {
+                            data.push({ month: moment(this.state.startMonthForExtrapolation).add(inputDataRegressionFilter[i].month - 1, 'months').format("YYYY-MM-DD"), amount: inputDataRegressionFilter[i].forecast })
+                        }
+                        consumptionExtrapolationList.push(
+                            {
+                                "consumptionExtrapolationId": consumptionExtrapolationDataUnFiltered.length + 1,
+                                "planningUnit": {
+                                    "id": this.state.planningUnitId,
+                                    "label": {
+                                    }
+                                },
+                                "region": {
+                                    "id": this.state.regionId,
+                                    "label": {
+                                    }
+                                },
+                                "extrapolationMethod": {
+                                    "id": 5,
+                                    "label": {
+                                        "createdBy": null,
+                                        "createdDate": null,
+                                        "lastModifiedBy": null,
+                                        "lastModifiedDate": null,
+                                        "active": true,
+                                        "labelId": 34703,
+                                        "label_en": "Linear Regression",
+                                        "label_sp": null,
+                                        "label_fr": null,
+                                        "label_pr": null
+                                    }
+                                },
+                                "jsonProperties": {
+                                },
+                                "createdBy": {
+                                    "userId": 1,
+                                    "username": "Anchal C"
+                                },
+                                "createdDate": "2021-12-14 12:24:20",
+                                "extrapolationDataList": data
+                            })
+                    } else {
+                        consumptionExtrapolationList[consumptionExtrapolationRegression].jsonProperties = {};
+                        var data = [];
+                        for (var i = 0; i < inputDataRegressionFilter.length; i++) {
+                            data.push({ month: moment(this.state.startMonthForExtrapolation).add(inputDataRegressionFilter[i].month - 1, 'months').format("YYYY-MM-DD"), amount: inputDataRegressionFilter[i].forecast })
+                        }
+                        consumptionExtrapolationList[consumptionExtrapolationRegression].extrapolationDataList = data;
                     }
-                    consumptionExtrapolationList[consumptionExtrapolationMovingData].extrapolationDataList = data;
-                }
-                //Linear Regression
-                if (consumptionExtrapolationRegression == -1) {
-                    var data = [];
-                    for (var i = 0; i < inputDataRegressionFilter.length; i++) {
-                        data.push({ month: moment(this.state.startMonthForExtrapolation).add(inputDataRegressionFilter[i].month - 1, 'months').format("YYYY-MM-DD"), amount: inputDataRegressionFilter[i].forecast })
-                    }
-                    consumptionExtrapolationList.push(
-                        {
-                            "consumptionExtrapolationId": consumptionExtrapolationList.length + 1,
-                            "planningUnit": {
-                                "id": this.state.planningUnitId,
-                                "label": {
-                                }
-                            },
-                            "region": {
-                                "id": this.state.regionId,
-                                "label": {
-                                }
-                            },
-                            "extrapolationMethod": {
-                                "id": 5,
-                                "label": {
-                                    "createdBy": null,
-                                    "createdDate": null,
-                                    "lastModifiedBy": null,
-                                    "lastModifiedDate": null,
-                                    "active": true,
-                                    "labelId": 34703,
-                                    "label_en": "Linear Regression",
-                                    "label_sp": null,
-                                    "label_fr": null,
-                                    "label_pr": null
-                                }
-                            },
-                            "jsonProperties": {
-                            },
-                            "createdBy": {
-                                "userId": 1,
-                                "username": "Anchal C"
-                            },
-                            "createdDate": "2021-12-14 12:24:20",
-                            "extrapolationDataList": data
-                        })
-                } else {
-                    consumptionExtrapolationList[consumptionExtrapolationRegression].jsonProperties = {};
-                    var data = [];
-                    for (var i = 0; i < inputDataRegressionFilter.length; i++) {
-                        data.push({ month: moment(this.state.startMonthForExtrapolation).add(inputDataRegressionFilter[i].month - 1, 'months').format("YYYY-MM-DD"), amount: inputDataRegressionFilter[i].forecast })
-                    }
-                    consumptionExtrapolationList[consumptionExtrapolationRegression].extrapolationDataList = data;
                 }
                 //TES L
-                console.log("consumptionExtrapolationTESL@@@", consumptionExtrapolationTESL)
-                if (consumptionExtrapolationTESL == -1) {
-                    console.log("in if1")
-                    var data = [];
-                    for (var i = 0; i < tesData.length; i++) {
-                        data.push({ month: moment(this.state.startMonthForExtrapolation).add(tesData[i].month - 1, 'months').format("YYYY-MM-DD"), amount: (Number(tesData[i].forecast) - Number(CI)) })
+                if (this.state.smoothingId) {
+                    console.log("consumptionExtrapolationTESL@@@", consumptionExtrapolationTESL)
+                    if (consumptionExtrapolationTESL == -1) {
+                        console.log("in if1")
+                        var data = [];
+                        for (var i = 0; i < tesData.length; i++) {
+                            data.push({ month: moment(this.state.startMonthForExtrapolation).add(tesData[i].month - 1, 'months').format("YYYY-MM-DD"), amount: (Number(tesData[i].forecast) - Number(CI)) })
+                        }
+                        consumptionExtrapolationList.push(
+                            {
+                                "consumptionExtrapolationId": consumptionExtrapolationDataUnFiltered.length + 1,
+                                "planningUnit": {
+                                    "id": this.state.planningUnitId,
+                                    "label": {
+                                    }
+                                },
+                                "region": {
+                                    "id": this.state.regionId,
+                                    "label": {
+                                    }
+                                },
+                                "extrapolationMethod": {
+                                    "id": 1,
+                                    "label": {
+                                        "createdBy": null,
+                                        "createdDate": null,
+                                        "lastModifiedBy": null,
+                                        "lastModifiedDate": null,
+                                        "active": true,
+                                        "labelId": 34703,
+                                        "label_en": "TES Low Confidence",
+                                        "label_sp": null,
+                                        "label_fr": null,
+                                        "label_pr": null
+                                    }
+                                },
+                                "jsonProperties": {
+                                    confidenceLevel: this.state.confidenceLevelId,
+                                    seasonality: this.state.noOfMonthsForASeason,
+                                    alpha: this.state.alpha,
+                                    beta: this.state.beta,
+                                    gamma: this.state.gamma
+                                },
+                                "createdBy": {
+                                    "userId": 1,
+                                    "username": "Anchal C"
+                                },
+                                "createdDate": "2021-12-14 12:24:20",
+                                "extrapolationDataList": data
+                            })
+                    } else {
+                        console.log("in else 1")
+                        consumptionExtrapolationList[consumptionExtrapolationTESL].jsonProperties = {
+                            confidenceLevel: this.state.confidenceLevelId,
+                            seasonality: this.state.noOfMonthsForASeason,
+                            alpha: this.state.alpha,
+                            beta: this.state.beta,
+                            gamma: this.state.gamma
+                        };
+                        var data = [];
+                        for (var i = 0; i < tesData.length; i++) {
+                            data.push({ month: moment(this.state.startMonthForExtrapolation).add(tesData[i].month - 1, 'months').format("YYYY-MM-DD"), amount: (Number(tesData[i].forecast) - Number(CI)) })
+                        }
+                        consumptionExtrapolationList[consumptionExtrapolationTESL].extrapolationDataList = data;
                     }
-                    consumptionExtrapolationList.push(
-                        {
-                            "consumptionExtrapolationId": consumptionExtrapolationList.length + 1,
-                            "planningUnit": {
-                                "id": this.state.planningUnitId,
-                                "label": {
-                                }
-                            },
-                            "region": {
-                                "id": this.state.regionId,
-                                "label": {
-                                }
-                            },
-                            "extrapolationMethod": {
-                                "id": 1,
-                                "label": {
-                                    "createdBy": null,
-                                    "createdDate": null,
-                                    "lastModifiedBy": null,
-                                    "lastModifiedDate": null,
-                                    "active": true,
-                                    "labelId": 34703,
-                                    "label_en": "TES Low Confidence",
-                                    "label_sp": null,
-                                    "label_fr": null,
-                                    "label_pr": null
-                                }
-                            },
-                            "jsonProperties": {
-                                confidenceLevel: this.state.confidenceLevelId,
-                                seasonality: this.state.noOfMonthsForASeason,
-                                alpha: this.state.alpha,
-                                beta: this.state.beta,
-                                gamma: this.state.gamma
-                            },
-                            "createdBy": {
-                                "userId": 1,
-                                "username": "Anchal C"
-                            },
-                            "createdDate": "2021-12-14 12:24:20",
-                            "extrapolationDataList": data
-                        })
-                } else {
-                    console.log("in else 1")
-                    consumptionExtrapolationList[consumptionExtrapolationTESL].jsonProperties = {
-                        confidenceLevel: this.state.confidenceLevelId,
-                        seasonality: this.state.noOfMonthsForASeason,
-                        alpha: this.state.alpha,
-                        beta: this.state.beta,
-                        gamma: this.state.gamma
-                    };
-                    var data = [];
-                    for (var i = 0; i < tesData.length; i++) {
-                        data.push({ month: moment(this.state.startMonthForExtrapolation).add(tesData[i].month - 1, 'months').format("YYYY-MM-DD"), amount: (Number(tesData[i].forecast) - Number(CI)) })
+                    //TES M
+                    if (consumptionExtrapolationTESM == -1) {
+                        console.log("in if2")
+                        var data = [];
+                        for (var i = 0; i < tesData.length; i++) {
+                            data.push({ month: moment(this.state.startMonthForExtrapolation).add(tesData[i].month - 1, 'months').format("YYYY-MM-DD"), amount: (Number(tesData[i].forecast)) })
+                        }
+                        consumptionExtrapolationList.push(
+                            {
+                                "consumptionExtrapolationId": consumptionExtrapolationDataUnFiltered.length + 1,
+                                "planningUnit": {
+                                    "id": this.state.planningUnitId,
+                                    "label": {
+                                    }
+                                },
+                                "region": {
+                                    "id": this.state.regionId,
+                                    "label": {
+                                    }
+                                },
+                                "extrapolationMethod": {
+                                    "id": 2,
+                                    "label": {
+                                        "createdBy": null,
+                                        "createdDate": null,
+                                        "lastModifiedBy": null,
+                                        "lastModifiedDate": null,
+                                        "active": true,
+                                        "labelId": 34703,
+                                        "label_en": "TES Med Confidence",
+                                        "label_sp": null,
+                                        "label_fr": null,
+                                        "label_pr": null
+                                    }
+                                },
+                                "jsonProperties": {
+                                    confidenceLevel: this.state.confidenceLevelId,
+                                    seasonality: this.state.noOfMonthsForASeason,
+                                    alpha: this.state.alpha,
+                                    beta: this.state.beta,
+                                    gamma: this.state.gamma
+                                },
+                                "createdBy": {
+                                    "userId": 1,
+                                    "username": "Anchal C"
+                                },
+                                "createdDate": "2021-12-14 12:24:20",
+                                "extrapolationDataList": data
+                            })
+                    } else {
+                        console.log("in else 2")
+                        consumptionExtrapolationList[consumptionExtrapolationTESM].jsonProperties = {
+                            confidenceLevel: this.state.confidenceLevelId,
+                            seasonality: this.state.noOfMonthsForASeason,
+                            alpha: this.state.alpha,
+                            beta: this.state.beta,
+                            gamma: this.state.gamma
+                        };
+                        var data = [];
+                        for (var i = 0; i < tesData.length; i++) {
+                            data.push({ month: moment(this.state.startMonthForExtrapolation).add(tesData[i].month - 1, 'months').format("YYYY-MM-DD"), amount: (Number(tesData[i].forecast)) })
+                        }
+                        consumptionExtrapolationList[consumptionExtrapolationTESM].extrapolationDataList = data;
                     }
-                    consumptionExtrapolationList[consumptionExtrapolationTESL].extrapolationDataList = data;
-                }
-                //TES M
-                if (consumptionExtrapolationTESM == -1) {
-                    console.log("in if2")
-                    var data = [];
-                    for (var i = 0; i < tesData.length; i++) {
-                        data.push({ month: moment(this.state.startMonthForExtrapolation).add(tesData[i].month - 1, 'months').format("YYYY-MM-DD"), amount: (Number(tesData[i].forecast)) })
+                    //TES H
+                    if (consumptionExtrapolationTESH == -1) {
+                        console.log("in if3")
+                        var data = [];
+                        for (var i = 0; i < tesData.length; i++) {
+                            data.push({ month: moment(this.state.startMonthForExtrapolation).add(tesData[i].month - 1, 'months').format("YYYY-MM-DD"), amount: (Number(tesData[i].forecast) + Number(CI)) })
+                        }
+                        consumptionExtrapolationList.push(
+                            {
+                                "consumptionExtrapolationId": consumptionExtrapolationDataUnFiltered.length + 1,
+                                "planningUnit": {
+                                    "id": this.state.planningUnitId,
+                                    "label": {
+                                    }
+                                },
+                                "region": {
+                                    "id": this.state.regionId,
+                                    "label": {
+                                    }
+                                },
+                                "extrapolationMethod": {
+                                    "id": 1,
+                                    "label": {
+                                        "createdBy": null,
+                                        "createdDate": null,
+                                        "lastModifiedBy": null,
+                                        "lastModifiedDate": null,
+                                        "active": true,
+                                        "labelId": 34703,
+                                        "label_en": "TES High Confidence",
+                                        "label_sp": null,
+                                        "label_fr": null,
+                                        "label_pr": null
+                                    }
+                                },
+                                "jsonProperties": {
+                                    confidenceLevel: this.state.confidenceLevelId,
+                                    seasonality: this.state.noOfMonthsForASeason,
+                                    alpha: this.state.alpha,
+                                    beta: this.state.beta,
+                                    gamma: this.state.gamma
+                                },
+                                "createdBy": {
+                                    "userId": 1,
+                                    "username": "Anchal C"
+                                },
+                                "createdDate": "2021-12-14 12:24:20",
+                                "extrapolationDataList": data
+                            })
+                    } else {
+                        consumptionExtrapolationList[consumptionExtrapolationTESH].jsonProperties = {
+                            confidenceLevel: this.state.confidenceLevelId,
+                            seasonality: this.state.noOfMonthsForASeason,
+                            alpha: this.state.alpha,
+                            beta: this.state.beta,
+                            gamma: this.state.gamma
+                        };
+                        var data = [];
+                        for (var i = 0; i < tesData.length; i++) {
+                            data.push({ month: moment(this.state.startMonthForExtrapolation).add(tesData[i].month - 1, 'months').format("YYYY-MM-DD"), amount: (Number(tesData[i].forecast) + Number(CI)) })
+                        }
+                        consumptionExtrapolationList[consumptionExtrapolationTESH].extrapolationDataList = data;
                     }
-                    consumptionExtrapolationList.push(
-                        {
-                            "consumptionExtrapolationId": consumptionExtrapolationList.length + 1,
-                            "planningUnit": {
-                                "id": this.state.planningUnitId,
-                                "label": {
-                                }
-                            },
-                            "region": {
-                                "id": this.state.regionId,
-                                "label": {
-                                }
-                            },
-                            "extrapolationMethod": {
-                                "id": 2,
-                                "label": {
-                                    "createdBy": null,
-                                    "createdDate": null,
-                                    "lastModifiedBy": null,
-                                    "lastModifiedDate": null,
-                                    "active": true,
-                                    "labelId": 34703,
-                                    "label_en": "TES Med Confidence",
-                                    "label_sp": null,
-                                    "label_fr": null,
-                                    "label_pr": null
-                                }
-                            },
-                            "jsonProperties": {
-                                confidenceLevel: this.state.confidenceLevelId,
-                                seasonality: this.state.noOfMonthsForASeason,
-                                alpha: this.state.alpha,
-                                beta: this.state.beta,
-                                gamma: this.state.gamma
-                            },
-                            "createdBy": {
-                                "userId": 1,
-                                "username": "Anchal C"
-                            },
-                            "createdDate": "2021-12-14 12:24:20",
-                            "extrapolationDataList": data
-                        })
-                } else {
-                    console.log("in else 2")
-                    consumptionExtrapolationList[consumptionExtrapolationTESM].jsonProperties = {
-                        confidenceLevel: this.state.confidenceLevelId,
-                        seasonality: this.state.noOfMonthsForASeason,
-                        alpha: this.state.alpha,
-                        beta: this.state.beta,
-                        gamma: this.state.gamma
-                    };
-                    var data = [];
-                    for (var i = 0; i < tesData.length; i++) {
-                        data.push({ month: moment(this.state.startMonthForExtrapolation).add(tesData[i].month - 1, 'months').format("YYYY-MM-DD"), amount: (Number(tesData[i].forecast)) })
-                    }
-                    consumptionExtrapolationList[consumptionExtrapolationTESM].extrapolationDataList = data;
-                }
-                //TES H
-                if (consumptionExtrapolationTESH == -1) {
-                    console.log("in if3")
-                    var data = [];
-                    for (var i = 0; i < tesData.length; i++) {
-                        data.push({ month: moment(this.state.startMonthForExtrapolation).add(tesData[i].month - 1, 'months').format("YYYY-MM-DD"), amount: (Number(tesData[i].forecast) + Number(CI)) })
-                    }
-                    consumptionExtrapolationList.push(
-                        {
-                            "consumptionExtrapolationId": consumptionExtrapolationList.length + 1,
-                            "planningUnit": {
-                                "id": this.state.planningUnitId,
-                                "label": {
-                                }
-                            },
-                            "region": {
-                                "id": this.state.regionId,
-                                "label": {
-                                }
-                            },
-                            "extrapolationMethod": {
-                                "id": 1,
-                                "label": {
-                                    "createdBy": null,
-                                    "createdDate": null,
-                                    "lastModifiedBy": null,
-                                    "lastModifiedDate": null,
-                                    "active": true,
-                                    "labelId": 34703,
-                                    "label_en": "TES High Confidence",
-                                    "label_sp": null,
-                                    "label_fr": null,
-                                    "label_pr": null
-                                }
-                            },
-                            "jsonProperties": {
-                                confidenceLevel: this.state.confidenceLevelId,
-                                seasonality: this.state.noOfMonthsForASeason,
-                                alpha: this.state.alpha,
-                                beta: this.state.beta,
-                                gamma: this.state.gamma
-                            },
-                            "createdBy": {
-                                "userId": 1,
-                                "username": "Anchal C"
-                            },
-                            "createdDate": "2021-12-14 12:24:20",
-                            "extrapolationDataList": data
-                        })
-                } else {
-                    consumptionExtrapolationList[consumptionExtrapolationTESH].jsonProperties = {
-                        confidenceLevel: this.state.confidenceLevelId,
-                        seasonality: this.state.noOfMonthsForASeason,
-                        alpha: this.state.alpha,
-                        beta: this.state.beta,
-                        gamma: this.state.gamma
-                    };
-                    var data = [];
-                    for (var i = 0; i < tesData.length; i++) {
-                        data.push({ month: moment(this.state.startMonthForExtrapolation).add(tesData[i].month - 1, 'months').format("YYYY-MM-DD"), amount: (Number(tesData[i].forecast) + Number(CI)) })
-                    }
-                    consumptionExtrapolationList[consumptionExtrapolationTESH].extrapolationDataList = data;
                 }
                 console.log('consumptionExtrapolationRegression', consumptionExtrapolationRegression);
                 datasetJson.consumptionExtrapolation = consumptionExtrapolationList;
@@ -1549,13 +1575,29 @@ export default class ExtrapolateDataComponent extends React.Component {
             var stopDate = moment(datasetJson.currentVersion.forecastStopDate).format("YYYY-MM-DD");
             var consumptionExtrapolationList = datasetJson.consumptionExtrapolation;
             var monthsForMovingAverage = this.state.monthsForMovingAverage;
+            var consumptionExtrapolationFiltered = consumptionExtrapolationList.filter(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId);
             var consumptionExtrapolationData = consumptionExtrapolationList.filter(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId && c.extrapolationMethod.id == 6)//Semi Averages
             var consumptionExtrapolationMovingData = consumptionExtrapolationList.filter(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId && c.extrapolationMethod.id == 7)//Moving averages
             console.log("consumptionExtrapolationMovingData+++", consumptionExtrapolationMovingData)
             var consumptionExtrapolationRegression = consumptionExtrapolationList.filter(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId && c.extrapolationMethod.id == 5)//Linear Regression
-            var consumptionExtrapolationTESL = consumptionExtrapolationList.filter(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId && c.extrapolationMethod.id == 1)//TES L
+            var consumptionExtrapolationTESL = consumptionExtrapolationList.filter(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId && c.extrapolationMethod.id == 1)//TES L            
+            var movingAvgId = consumptionExtrapolationFiltered.length > 0 ? false : true;
+            var semiAvgId = consumptionExtrapolationFiltered.length > 0 ? false : true;
+            var linearRegressionId = consumptionExtrapolationFiltered.length > 0 ? false : true;
+            var smoothingId = consumptionExtrapolationFiltered.length > 0 ? false : true;
+            var arimaId = consumptionExtrapolationFiltered.length > 0 ? false : true;
+
             if (consumptionExtrapolationMovingData.length > 0) {
                 monthsForMovingAverage = consumptionExtrapolationMovingData[0].jsonProperties.months;
+                movingAvgId = true;
+            }
+
+            if (consumptionExtrapolationData.length > 0) {
+                semiAvgId = true;
+            }
+
+            if (consumptionExtrapolationRegression.length > 0) {
+                linearRegressionId = true;
             }
             var confidenceLevel = this.state.confidenceLevelId;
             var seasonality = this.state.noOfMonthsForASeason;
@@ -1569,6 +1611,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                 alpha = consumptionExtrapolationTESL[0].jsonProperties.alpha;
                 beta = consumptionExtrapolationTESL[0].jsonProperties.beta;
                 gamma = consumptionExtrapolationTESL[0].jsonProperties.gamma;
+                smoothingId = true;
             }
             var monthArray = [];
             var curDate = startDate;
@@ -1588,6 +1631,11 @@ export default class ExtrapolateDataComponent extends React.Component {
                 beta: beta,
                 gamma: gamma,
                 showData: true,
+                movingAvgId: movingAvgId,
+                semiAvgId: semiAvgId,
+                linearRegressionId: linearRegressionId,
+                smoothingId: smoothingId,
+                arimaId: arimaId,
                 loading: false
             }, () => {
                 this.buildJxl();
@@ -2621,7 +2669,7 @@ export default class ExtrapolateDataComponent extends React.Component {
         var stopDate = moment(datasetJson.currentVersion.forecastStopDate).format("YYYY-MM-DD");
 
         var consumptionList = datasetJson.actualConsumptionList;
-        var datasetPlanningUnit = datasetJson.planningUnitList;
+        var datasetPlanningUnit = datasetJson.planningUnitList.filter(c => c.consuptionForecast);
         var datasetRegionList = datasetJson.regionList;
         var missingMonthList = [];
 
