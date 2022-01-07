@@ -1306,6 +1306,10 @@ class AuthenticationService {
                         }
                         break;
                     case "/extrapolation/extrapolateData":
+                        if (bfunction.includes("ROLE_BF_EXTRAPOLATION")) {
+                            return true;
+                        }
+                        break;
                     case "/importFromQATSupplyPlan/listImportFromQATSupplyPlan":
                     case "/importFromQATSupplyPlan/listImportFromQATSupplyPlan/:color/:message":
                     case "/importIntoQATSupplyPlan/listImportIntoQATSupplyPlan":

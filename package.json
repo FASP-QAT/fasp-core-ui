@@ -63,6 +63,7 @@
     "jsuites": "^4.1.0",
     "jszip": "^3.2.2",
     "jwt-decode": "^2.2.0",
+    "mathjs": "^10.0.2",
     "moment": "^2.24.0",
     "multiselect-react-dropdown": "^1.5.7",
     "node-sass": "^4.12.0",
