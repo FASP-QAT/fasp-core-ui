@@ -8505,17 +8505,18 @@ export default class BuildTree extends Component {
                                         active={this.state.activeTab1[0] === '2'}
                                         onClick={() => { this.toggleModal(0, '2'); }}
                                     >
-                                        {i18n.t('static.tree.extrapolation')}
+                                        {/* {i18n.t('static.tree.extrapolation')} */}
+                                        Extrapolation
                                     </NavLink>
                                 </NavItem>
-                                <NavItem>
+                                {/* <NavItem>
                                     <NavLink
                                         active={this.state.activeTab1[0] === '3'}
                                         onClick={() => { this.toggleModal(0, '3'); }}
                                     >
                                         {i18n.t('static.tree.Modeling/Transfer')}
                                     </NavLink>
-                                </NavItem>
+                                </NavItem> */}
 
                             </Nav>
                             <TabContent activeTab={this.state.activeTab1[0]}>

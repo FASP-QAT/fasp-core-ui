@@ -7,7 +7,7 @@ import { Row, Col, Card, CardFooter, Button, Table, CardBody, Form, Modal, Modal
 import getLabelText from '../../CommonComponent/getLabelText';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow, jExcelLoadedFunctionWithoutPagination } from '../../CommonComponent/JExcelCommonFunctions.js';
-import { SECRET_KEY, JEXCEL_INTEGER_REGEX_FOR_DATA_ENTRY, INDEXED_DB_VERSION, INDEXED_DB_NAME, DATE_FORMAT_CAP, ACTUAL_CONSUMPTION_DATA_SOURCE_TYPE, FORECASTED_CONSUMPTION_DATA_SOURCE_TYPE, JEXCEL_DATE_FORMAT_WITHOUT_DATE, ACTUAL_CONSUMPTION_TYPE, FORCASTED_CONSUMPTION_TYPE, JEXCEL_PAGINATION_OPTION, ACTUAL_CONSUMPTION_MONTHS_IN_PAST, FORECASTED_CONSUMPTION_MONTHS_IN_PAST, JEXCEL_PRO_KEY, JEXCEL_MONTH_PICKER_FORMAT, ACTUAL_CONSUMPTION_MODIFIED, FORECASTED_CONSUMPTION_MODIFIED } from "../../Constants";
+import { DATE_FORMAT_CAP_WITHOUT_DATE,SECRET_KEY, JEXCEL_INTEGER_REGEX_FOR_DATA_ENTRY, INDEXED_DB_VERSION, INDEXED_DB_NAME, DATE_FORMAT_CAP, ACTUAL_CONSUMPTION_DATA_SOURCE_TYPE, FORECASTED_CONSUMPTION_DATA_SOURCE_TYPE, JEXCEL_DATE_FORMAT_WITHOUT_DATE, ACTUAL_CONSUMPTION_TYPE, FORCASTED_CONSUMPTION_TYPE, JEXCEL_PAGINATION_OPTION, ACTUAL_CONSUMPTION_MONTHS_IN_PAST, FORECASTED_CONSUMPTION_MONTHS_IN_PAST, JEXCEL_PRO_KEY, JEXCEL_MONTH_PICKER_FORMAT, ACTUAL_CONSUMPTION_MODIFIED, FORECASTED_CONSUMPTION_MODIFIED } from "../../Constants";
 import moment from "moment";
 import CryptoJS from 'crypto-js'
 import Picker from 'react-month-picker'
@@ -574,15 +574,16 @@ export default class TreeExtrapolationComponent extends React.Component {
                     readOnly: true
                 },
                 {
-                    title: 'ARIMA',
+                    title: 'TES',
                     type: 'number',
                     readOnly: true
                 },
                 {
-                    title: 'TES (Medium)',
+                    title: 'ARIMA',
                     type: 'number',
                     readOnly: true
                 },
+
                 {
                     title: 'Selected Forecast',
                     type: 'number',
@@ -702,7 +703,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                 yAxes: [{
                     scaleLabel: {
                         display: true,
-                        labelString: 'Y axis label',
+                        labelString: 'People',
                         fontColor: 'black'
                     },
                     ticks: {
@@ -728,12 +729,19 @@ export default class TreeExtrapolationComponent extends React.Component {
                         gridLines: {
                             color: "rgba(0, 0, 0, 0)",
                         },
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Month',
+                            fontColor: 'black'
+                        },
                         ticks: {
                             fontColor: 'black',
                             callback: function (label) {
+                                console.log("month label---",label);
                                 var xAxis1 = label
                                 xAxis1 += '';
-                                var month = xAxis1.split('-')[0];
+                                console.log("month graph---",xAxis1.split('-')[0])
+                                var month = moment(label).format(DATE_FORMAT_CAP_WITHOUT_DATE);
                                 return month;
                             }
                         }
@@ -940,11 +948,11 @@ export default class TreeExtrapolationComponent extends React.Component {
         return (
             <div className="animated fadeIn">
                 <CardBody className="pb-lg-2 pt-lg-0">
-                <div className="row pt-lg-0" style={{float:'right'}}>
+                    <div className="row pt-lg-0" style={{ float: 'right' }}>
                         <div className="col-md-12">
                             {/* <SupplyPlanFormulas ref="formulaeChild" /> */}
                             <a className="">
-                                <span style={{ cursor: 'pointer',color:'20a8d8' }} ><small className="supplyplanformulas">{i18n.t('Show Guidance')}</small></span>
+                                <span style={{ cursor: 'pointer', color: '20a8d8' }} ><small className="supplyplanformulas">{i18n.t('Show Guidance')}</small></span>
 
                             </a>
                         </div>
@@ -953,7 +961,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                         <div className=" pl-0">
                             <div className="row">
                                 <FormGroup className="col-md-3 pl-lg-0">
-                                    <Label htmlFor="appendedInputButton">Start Month for Historical Data1<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
+                                    <Label htmlFor="appendedInputButton">Start Month for Historical Data<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
                                     <div className="controls edit">
 
                                         <Picker
@@ -1237,7 +1245,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                 </FormGroup>
                             </div>
                             <div className="col-md-12 text-center pt-lg-2">
-                                <Button type="submit" color="success" className="mr-1" size="md"><i className="fa fa-check"></i>{i18n.t('static.common.interpolate')}</Button>
+                                <Button type="submit" color="success" className="mr-1" size="md">Interpolate</Button>
                             </div>
                         </div>
                     </Form>
@@ -1288,10 +1296,8 @@ export default class TreeExtrapolationComponent extends React.Component {
                                             <td width="110px"><b>Moving Averages</b></td>
                                         }
                                         <td width="110px"><b>Semi Averages</b></td>
-                                        <td width="110px"><b>linear Regression</b></td>
-                                        <td width="110px"><b>TES(Lower Confidence Bound)</b></td>
-                                        <td width="110px"><b>TES(Medium)</b></td>
-                                        <td width="110px"><b>TES(Upper Confidence Bound)</b></td>
+                                        <td width="110px"><b>Linear Regression</b></td>
+                                        <td width="110px"><b>TES</b></td>
                                         <td width="110px"><b>ARIMA</b></td>
                                     </tr>
                                 </thead>
@@ -1305,8 +1311,6 @@ export default class TreeExtrapolationComponent extends React.Component {
                                         <td bgcolor="#118B70">176.258641</td>
                                         <td></td>
                                         <td></td>
-                                        <td></td>
-                                        <td></td>
                                     </tr>
                                     <tr>
                                         <td>MAPE</td>
@@ -1315,8 +1319,6 @@ export default class TreeExtrapolationComponent extends React.Component {
                                         }
                                         <td>0.531222</td>
                                         <td bgcolor="#118B70">0.506034</td>
-                                        <td></td>
-                                        <td></td>
                                         <td></td>
                                         <td></td>
                                     </tr>
@@ -1329,8 +1331,6 @@ export default class TreeExtrapolationComponent extends React.Component {
                                         <td bgcolor="#118B70">31067.108640</td>
                                         <td></td>
                                         <td></td>
-                                        <td></td>
-                                        <td></td>
                                     </tr>
                                     <tr>
                                         <td>WAPE</td>
@@ -1341,16 +1341,12 @@ export default class TreeExtrapolationComponent extends React.Component {
                                         <td></td>
                                         <td></td>
                                         <td></td>
-                                        <td></td>
-                                        <td></td>
                                     </tr>
                                     <tr>
                                         <td>R^2</td>
                                         {this.state.movingAvgId &&
                                             <td></td>
                                         }
-                                        <td></td>
-                                        <td></td>
                                         <td></td>
                                         <td></td>
                                         <td></td>
@@ -1384,7 +1380,7 @@ export default class TreeExtrapolationComponent extends React.Component {
 
                             </FormGroup>
                             <FormGroup className="col-md-5">
-                                <Label htmlFor="currencyId">Notes<span class="red Reqasterisk">*</span></Label>
+                                <Label htmlFor="currencyId">Notes</Label>
                                 <InputGroup>
                                     <Input
                                         type="textarea"
