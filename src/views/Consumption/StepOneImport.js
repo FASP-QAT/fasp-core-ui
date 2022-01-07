@@ -83,6 +83,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
             planningUnitListJexcel: [],
             stepOneData: [],
             forecastPlanignUnitListForNotDuplicate: [],
+            selectedForecastProgram: '',
 
         }
         this.changed = this.changed.bind(this);
@@ -1025,23 +1026,41 @@ export default class StepOneImportMapPlanningUnits extends Component {
         var value = (instance.jexcel.getJson(null, false)[r])[4];
 
         var mylist = this.state.planningUnitListJexcel;
+        console.log("mylist--------->100", mylist);
+        let filteredPlanningUnit = this.state.selectedForecastProgram.filteredPlanningUnit;
+
+        let mylistTemp = [];
+        mylistTemp.push(mylist[0]);
+        for (var i = 0; i < filteredPlanningUnit.length; i++) {
+            mylistTemp.push(mylist.filter(c => c.id == filteredPlanningUnit[i].id)[0]);
+        }
+        console.log("mylist--------->101", filteredPlanningUnit);
+        console.log("mylist--------->102", mylistTemp);
+
+        mylist = mylistTemp;
+
+        console.log("mylist--------->1021", mylist);
 
         if (value > 0) {
             mylist = mylist.filter(c => (c.id == -1 ? c : c.forecastingUnit.tracerCategory.id == value && c.active.toString() == "true"));
         }
 
-        console.log("mylist--------->31", mylist);
+        console.log("mylist--------->103", mylist);
 
         let forecastPlanignUnitListForNotDuplicate = this.state.forecastPlanignUnitListForNotDuplicate;
+        console.log("mylist--------->104", forecastPlanignUnitListForNotDuplicate);
         for (var i = 0; i < forecastPlanignUnitListForNotDuplicate.length; i++) {
 
             const index = mylist.findIndex(c => c.id == forecastPlanignUnitListForNotDuplicate[i].forecastPlanningUnitId);
-            const result = mylist.splice(index, 1);
+            console.log("mylist--------->1041", index);
+            if (index > 0) {
+                const result = mylist.splice(index, 1);
+            }
 
         }
 
 
-        console.log("mylist--------->32", mylist);
+        console.log("mylist--------->105", mylist);
 
         return mylist;
 
@@ -1112,7 +1131,8 @@ export default class StepOneImportMapPlanningUnits extends Component {
         this.setState({
             forecastProgramId: event.target.value,
             rangeValue: { from: { year: startDateSplit[1] - 3, month: new Date(selectedForecastProgram.forecastStartDate).getMonth() + 1 }, to: { year: forecastStopDate.getFullYear(), month: forecastStopDate.getMonth() + 1 } },
-            forecastProgramVersionId: forecastProgramVersionId
+            forecastProgramVersionId: forecastProgramVersionId,
+            selectedForecastProgram: selectedForecastProgram
         }, () => {
             this.props.updateStepOneData("forecastProgramVersionId", forecastProgramVersionId);
             this.filterData();

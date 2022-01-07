@@ -863,16 +863,32 @@ class ForecastSummary extends Component {
                 }
                 var lang = this.state.lang;
 
-                this.setState({
-                    programs: proList.sort(function (a, b) {
-                        a = getLabelText(a.label, lang).toLowerCase();
-                        b = getLabelText(b.label, lang).toLowerCase();
-                        return a < b ? -1 : a > b ? 1 : 0;
-                    }),
-                    loading: false
-                }, () => {
-                    console.log("programs------------------>", this.state.programs);
-                })
+                if (proList.length == 1) {
+                    this.setState({
+                        programs: proList.sort(function (a, b) {
+                            a = getLabelText(a.label, lang).toLowerCase();
+                            b = getLabelText(b.label, lang).toLowerCase();
+                            return a < b ? -1 : a > b ? 1 : 0;
+                        }),
+                        programId: proList[0].programId,
+                        loading: false
+                    }, () => {
+                        this.getVersionIds();
+                        console.log("programs------------------>", this.state.programs);
+                    })
+                } else {
+                    this.setState({
+                        programs: proList.sort(function (a, b) {
+                            a = getLabelText(a.label, lang).toLowerCase();
+                            b = getLabelText(b.label, lang).toLowerCase();
+                            return a < b ? -1 : a > b ? 1 : 0;
+                        }),
+                        loading: false
+                    }, () => {
+                        console.log("programs------------------>", this.state.programs);
+                    })
+                }
+
 
 
             }.bind(this);
@@ -905,8 +921,10 @@ class ForecastSummary extends Component {
 
     setVersionId(event) {
 
-        var versionId = (event.target.value.split('(')[0]).trim();
+        var versionId = ((event == null || event == '' || event == undefined) ? (this.state.versionId.split('(')[0]) : (event.target.value.split('(')[0]).trim());
         var programId = this.state.programId;
+        console.log("Test-----------------110", event);
+        console.log("Test-----------------111", versionId);
 
 
         if (programId != -1 && versionId != -1) {
@@ -983,7 +1001,7 @@ class ForecastSummary extends Component {
 
 
         this.setState({
-            versionId: event.target.value,
+            versionId: ((event == null || event == '' || event == undefined) ? (this.state.versionId) : (event.target.value).trim()),
         }, () => {
             // localStorage.setItem("sesVersionIdReport", '');
             this.filterData();
@@ -1169,9 +1187,9 @@ class ForecastSummary extends Component {
                 versionList.reverse();
                 this.setState({
                     versions: versionList,
-                    // versionId: versionList[0].versionId
+                    versionId: (versionList.length > 0 ? versionList[0].versionId : ''),
                 }, () => {
-                    // this.getPlanningUnit();
+                    this.setVersionId();
                 })
 
 
@@ -1760,7 +1778,7 @@ class ForecastSummary extends Component {
                                                     </Table>
                                                 }
                                                 {this.state.regPlanningUnitList.length > 0 && this.state.displayId == 2 &&
-                                                    <div id="tableDiv">
+                                                    <div id="tableDiv" className="table-responsive consumptionDataEntryTable">
                                                     </div>
 
                                                 }
