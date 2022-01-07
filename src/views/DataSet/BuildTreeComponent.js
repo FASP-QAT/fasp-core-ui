@@ -938,7 +938,7 @@ export default class BuildTree extends Component {
 
             const { treeData } = this.state;
             const { curTreeObj } = this.state;
-            var maxTreeId = Math.max(...treeData.map(o => o.treeId));
+            var maxTreeId = treeData.length > 0 ? Math.max(...treeData.map(o => o.treeId)) : 0;
             console.log("tree data----", curTreeObj)
             // curTreeObj.treeId = parseInt(maxTreeId) + 1;
             var nodeDataMap = {};
@@ -989,7 +989,7 @@ export default class BuildTree extends Component {
             nodeDataMap[1] = tempArray;
             var treeId = parseInt(maxTreeId) + 1;
             console.log("region values---", this.state.regionValues);
-
+            console.log("curTreeObj.regionList---", curTreeObj.regionList);
             var tempTree = {
                 treeId: treeId,
                 active: curTreeObj.active,
@@ -3107,6 +3107,7 @@ export default class BuildTree extends Component {
             // if ((this.state.regionValues).length > 0) {
             var regionList = [];
             var regions = this.state.regionValues;
+            console.log("regions---", regions)
             for (let i = 0; i < regions.length; i++) {
                 var json = {
                     id: regions[i].value,
@@ -3116,6 +3117,7 @@ export default class BuildTree extends Component {
                 }
                 regionList.push(json);
             }
+            console.log("final regionList---", regionList);
             curTreeObj.regionList = regionList;
             this.setState({ curTreeObj });
             // }
