@@ -834,41 +834,66 @@ export default class CreateTreeTemplate extends Component {
         console.log("data---", data);
         console.log("Type+++", type)
         if (data != null && data[0] != null && (data[0])[0] != null) {
-            if (itemConfig.payload.nodeType.id == 1 || itemConfig.payload.nodeType.id == 2) {
-                if (type == 1) {
-                    return addCommas((itemConfig.payload.nodeDataMap[0])[0].dataValue);
-                } else if (type == 3) {
-                    var childList = this.state.items.filter(c => c.parent == itemConfig.id && (c.payload.nodeType.id == 3 || c.payload.nodeType.id == 4 || c.payload.nodeType.id == 5));
-                    console.log("Child List+++", childList);
-                    if (childList.length > 0) {
-                        var sum = 0;
-                        childList.map(c => {
-                            sum += Number((c.payload.nodeDataMap[0])[0].dataValue)
-                        })
-                        return sum;
-                    } else {
-                        return "";
-                    }
+            if (type == 4) {
+                var result = false;
+                if (itemConfig.payload.nodeDataMap[0][0].nodeDataModelingList.length > 0) {
+                    result = true;
                 } else {
-                    return "";
+                    var arr = this.state.items.filter(x => x.level == itemConfig.level && x.id != itemConfig.id && x.id < itemConfig.id);
+                    if (arr.length > 0) {
+                        for (var i = 0; i <= arr.length; i++) {
+                            if (arr[i] != null) {
+                                console.log("arr[i]---", arr[i])
+                                var nodeDataModelingList = arr[i].payload.nodeDataMap[0][0].nodeDataModelingList;
+                                if (nodeDataModelingList.length > 0) {
+                                    var nodedata = nodeDataModelingList.filter(x => x.transferNodeDataId == itemConfig.id)[0];
+                                    if (nodedata != null && nodedata != "") {
+                                        result = true;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
+                return result;
             } else {
-                if (type == 1) {
-                    return (itemConfig.payload.nodeDataMap[0])[0].dataValue + "% of parent";
-                } else if (type == 3) {
-                    var childList = this.state.items.filter(c => c.parent == itemConfig.id && (c.payload.nodeType.id == 3 || c.payload.nodeType.id == 4 || c.payload.nodeType.id == 5));
-                    console.log("Child List+++", childList);
-                    if (childList.length > 0) {
-                        var sum = 0;
-                        childList.map(c => {
-                            sum += Number((c.payload.nodeDataMap[0])[0].dataValue)
-                        })
-                        return sum;
+                if (itemConfig.payload.nodeType.id == 1 || itemConfig.payload.nodeType.id == 2) {
+                    if (type == 1) {
+                        return addCommas((itemConfig.payload.nodeDataMap[0])[0].dataValue);
+                    } else if (type == 3) {
+                        var childList = this.state.items.filter(c => c.parent == itemConfig.id && (c.payload.nodeType.id == 3 || c.payload.nodeType.id == 4 || c.payload.nodeType.id == 5));
+                        console.log("Child List+++", childList);
+                        if (childList.length > 0) {
+                            var sum = 0;
+                            childList.map(c => {
+                                sum += Number((c.payload.nodeDataMap[0])[0].dataValue)
+                            })
+                            return sum;
+                        } else {
+                            return "";
+                        }
                     } else {
                         return "";
                     }
                 } else {
-                    return "= " + ((itemConfig.payload.nodeDataMap[0])[0].calculatedDataValue != null ? addCommas((itemConfig.payload.nodeDataMap[0])[0].calculatedDataValue) : "");
+                    if (type == 1) {
+                        return (itemConfig.payload.nodeDataMap[0])[0].dataValue + "% of parent";
+                    } else if (type == 3) {
+                        var childList = this.state.items.filter(c => c.parent == itemConfig.id && (c.payload.nodeType.id == 3 || c.payload.nodeType.id == 4 || c.payload.nodeType.id == 5));
+                        console.log("Child List+++", childList);
+                        if (childList.length > 0) {
+                            var sum = 0;
+                            childList.map(c => {
+                                sum += Number((c.payload.nodeDataMap[0])[0].dataValue)
+                            })
+                            return sum;
+                        } else {
+                            return "";
+                        }
+                    } else {
+                        return "= " + ((itemConfig.payload.nodeDataMap[0])[0].calculatedDataValue != null ? addCommas((itemConfig.payload.nodeDataMap[0])[0].calculatedDataValue) : "");
+                    }
                 }
             }
         } else {
@@ -5080,7 +5105,10 @@ export default class CreateTreeTemplate extends Component {
                 <div className="ContactTemplate boxContactTemplate">
                     <div className={itemConfig.payload.nodeType.id == 5 || itemConfig.payload.nodeType.id == 4 ? "ContactTitleBackground TemplateTitleBgblue" : "ContactTitleBackground TemplateTitleBg"}
                     >
-                        <div className={itemConfig.payload.nodeType.id == 5 || itemConfig.payload.nodeType.id == 4 ? "ContactTitle TitleColorWhite" : "ContactTitle TitleColor"}><div title={itemConfig.payload.label.label_en} style={{ fontSize: '13px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', width: '158px', float: 'left', fontWeight: 'bold' }}>{itemConfig.payload.label.label_en}</div><b style={{ color: '#212721', float: 'right' }}>{itemConfig.payload.nodeType.id == 2 ? <i class="fa fa-hashtag" style={{ fontSize: '11px', color: '#002f6c' }}></i> : (itemConfig.payload.nodeType.id == 3 ? <i class="fa fa-percent " style={{ fontSize: '11px', color: '#002f6c' }} ></i> : (itemConfig.payload.nodeType.id == 4 ? <i class="fa fa-cube" style={{ fontSize: '11px', color: '#fff' }} ></i> : (itemConfig.payload.nodeType.id == 5 ? <i class="fa fa-cubes" style={{ fontSize: '11px', color: '#fff' }} ></i> : (itemConfig.payload.nodeType.id == 1 ? <i class="fa fa-plus" style={{ fontSize: '11px', color: '#002f6c' }} ></i> : ""))))}</b></div>
+                        <div className={itemConfig.payload.nodeType.id == 5 || itemConfig.payload.nodeType.id == 4 ? "ContactTitle TitleColorWhite" : "ContactTitle TitleColor"}>
+                            <div title={itemConfig.payload.label.label_en} style={{ fontSize: '13px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', width: '157px', float: 'left', fontWeight: 'bold' }}>{itemConfig.payload.label.label_en}</div>
+                            {this.getPayloadData(itemConfig, 4) == true && <i class="fa fa-arrow-up" style={{ fontSize: '11px', color: (itemConfig.payload.nodeType.id == 4 || itemConfig.payload.nodeType.id == 5 ? '#fff' : '#002f6c') }}></i>}
+                            <b style={{ color: '#212721', float: 'right' }}>{itemConfig.payload.nodeType.id == 2 ? <i class="fa fa-hashtag" style={{ fontSize: '11px', color: '#002f6c' }}></i> : (itemConfig.payload.nodeType.id == 3 ? <i class="fa fa-percent " style={{ fontSize: '11px', color: '#002f6c' }} ></i> : (itemConfig.payload.nodeType.id == 4 ? <i class="fa fa-cube" style={{ fontSize: '11px', color: '#fff' }} ></i> : (itemConfig.payload.nodeType.id == 5 ? <i class="fa fa-cubes" style={{ fontSize: '11px', color: '#fff' }} ></i> : (itemConfig.payload.nodeType.id == 1 ? <i class="fa fa-plus" style={{ fontSize: '11px', color: '#002f6c' }} ></i> : ""))))}</b></div>
                     </div>
                     <div className="ContactPhone ContactPhoneValue">
                         <span style={{ textAlign: 'center', fontWeight: '500' }}>{this.getPayloadData(itemConfig, 1)}</span>
@@ -5491,7 +5519,7 @@ export default class CreateTreeTemplate extends Component {
                                                                 fuNode: (item.payload.nodeDataMap[0])[0].fuNode,
                                                                 puNode: (item.payload.nodeDataMap[0])[0].puNode,
                                                                 notes: (item.payload.nodeDataMap[0])[0].notes,
-                                                                manualChangesEffectFuture : true,
+                                                                manualChangesEffectFuture: true,
                                                                 nodeDataModelingList: (item.payload.nodeDataMap[0])[0].nodeDataModelingList
                                                             }
                                                         ]
@@ -5607,7 +5635,7 @@ export default class CreateTreeTemplate extends Component {
                                                 .then(response => {
                                                     console.log("after updating tree---", response);
                                                     if (response.status == 200) {
-                                                        console.log("message---",i18n.t(response.data.messageCode, { entityname }));
+                                                        console.log("message---", i18n.t(response.data.messageCode, { entityname }));
                                                         var items = response.data.flatList;
                                                         var arr = [];
                                                         for (let i = 0; i < items.length; i++) {
@@ -5625,7 +5653,7 @@ export default class CreateTreeTemplate extends Component {
                                                             console.log("load---", items[i])
                                                             // arr.push(items[i]);
                                                         }
-                                                        console.log("message---",i18n.t(response.data.messageCode, { entityname }));
+                                                        console.log("message---", i18n.t(response.data.messageCode, { entityname }));
                                                         this.setState({
                                                             treeTemplate: response.data,
                                                             items,

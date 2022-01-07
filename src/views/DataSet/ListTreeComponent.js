@@ -274,7 +274,7 @@ export default class ListTreeComponent extends Component {
                                 var rowData = obj.getRowData(y);
                                 console.log("rowData===>", rowData);
                                 rowData[0] = "";
-                                rowData[1] = "";
+                                // rowData[1] = "";
                                 var data = rowData;
                                 this.el.insertRow(
                                     data, 0, 1
