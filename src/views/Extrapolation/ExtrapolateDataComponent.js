@@ -71,7 +71,7 @@ export default class ExtrapolateDataComponent extends React.Component {
             mseMovingAvg: "",
             rSqdMovingAvg: "",
             wapeMovingAvg: "",
-
+            monthsDiff: 0,
             rmseLinearReg: "",
             mapeLinearReg: "",
             mseLinearReg: "",
@@ -1701,36 +1701,44 @@ export default class ExtrapolateDataComponent extends React.Component {
             this.buildJxl()
         })
     }
-
-
     setMovingAvgId(e) {
         var movingAvgId = e.target.checked;
         this.setState({
             movingAvgId: movingAvgId
+        }, () => {
+            this.buildJxl()
         })
     }
     setSemiAvgId(e) {
         var semiAvgId = e.target.checked;
         this.setState({
             semiAvgId: semiAvgId
+        }, () => {
+            this.buildJxl()
         })
     }
     setLinearRegressionId(e) {
         var linearRegressionId = e.target.checked;
         this.setState({
             linearRegressionId: linearRegressionId
+        }, () => {
+            this.buildJxl()
         })
     }
     setSmoothingId(e) {
         var smoothingId = e.target.checked;
         this.setState({
             smoothingId: smoothingId
+        }, () => {
+            this.buildJxl()
         })
     }
     setArimaId(e) {
         var arimaId = e.target.checked;
         this.setState({
             arimaId: arimaId
+        }, () => {
+            this.buildJxl()
         })
     }
     // setShowAdvanceId(e) {
@@ -1752,6 +1760,16 @@ export default class ExtrapolateDataComponent extends React.Component {
         })
     }
 
+    getDateDifference() {
+        var startDate = moment([this.state.rangeValue1.from.year, this.state.rangeValue1.from.month]);
+        var endDate = moment([this.state.rangeValue1.to.year, this.state.rangeValue1.to.month]);
+        var monthsDiff = endDate.diff(startDate, 'months');
+        console.log("monthsDiff-->", monthsDiff)
+        //  document.getElementById('dateDiv').val(monthsDiff);
+        //  this.setState({
+        //      monthsDiff: monthsDiff
+        //  });
+    }
     render() {
         const pickerLang = {
             months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
@@ -2181,6 +2199,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                             >
                                                 <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} />
                                             </Picker>
+
                                         </div>
                                     </FormGroup>
                                     <FormGroup className="col-md-12">
@@ -2201,7 +2220,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                 value={rangeValue1}
                                                 lang={pickerLang}
                                                 // theme="light"
-                                                onChange={this.handleRangeChange1}
+                                                onChange={this.handleRangeChange1, this.getDateDifference()}
                                                 onDismiss={this.handleRangeDissmis1}
                                                 readOnly
                                             >
@@ -2209,6 +2228,8 @@ export default class ExtrapolateDataComponent extends React.Component {
                                             </Picker>
                                         </div>
                                     </FormGroup>
+                                </div>
+                                <div id="dateDiv" className="leftAlignTable">
                                 </div>
                                 <div className="row">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.selectExtrapolationMethod')}</Label>
@@ -2237,19 +2258,18 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                     <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
                                                 </Label>
                                             </div>
-                                            {this.state.movingAvgId &&
-                                                <div className="col-md-3">
-                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.noOfMonths')}</Label>
-                                                    <Input
-                                                        className="controls"
-                                                        type="text"
-                                                        id="noOfMonthsId"
-                                                        name="noOfMonthsId"
-                                                        value={this.state.monthsForMovingAverage}
-                                                        onChange={(e) => { this.setMonthsForMovingAverage(e); }}
-                                                    />
-                                                </div>
-                                            }
+                                            <div className="col-md-3" style={{ display: this.state.movingAvgId ? 'block' : 'none' }}>
+                                                <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.noOfMonths')}</Label>
+                                                <Input
+                                                    className="controls"
+                                                    type="text"
+                                                    id="noOfMonthsId"
+                                                    name="noOfMonthsId"
+                                                    value={this.state.monthsForMovingAverage}
+                                                    onChange={(e) => { this.setMonthsForMovingAverage(e); }}
+                                                />
+                                            </div>
+
                                             <div>
                                                 <Popover placement="top" isOpen={this.state.popoverOpenSa} target="Popover1" trigger="hover" toggle={() => this.toggle('popoverOpenMa', !this.state.popoverOpenSa)}>
                                                     <PopoverBody>Need to add Info.</PopoverBody>
@@ -2313,38 +2333,38 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                     <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenTes', !this.state.popoverOpenTes)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
                                                 </Label>
                                             </div>
-                                            {this.state.smoothingId &&
-                                                <div className="row col-md-12">
-                                                    <div className="col-md-2">
-                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.confidenceLevel')}</Label>
-                                                        <Input
-                                                            type="select"
-                                                            id="confidenceLevelId"
-                                                            name="confidenceLevelId"
-                                                            bsSize="sm"
-                                                            value={this.state.confidenceLevelId}
-                                                            onChange={(e) => { this.setConfidenceLevelId(e); }}
-                                                        >
-                                                            <option value="80">80%</option>
-                                                            <option value="85">85%</option>
-                                                            <option value="90">90%</option>
-                                                            <option value="95">95%</option>
-                                                            <option value="99">99%</option>
-                                                            <option value="99.9">99.9%</option>
-                                                        </Input>
-                                                    </div>
-                                                    <div className="col-md-2">
-                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.seasonality')}</Label>
-                                                        <Input
-                                                            className="controls"
-                                                            type="text"
-                                                            id="seasonalityId"
-                                                            name="seasonalityId"
-                                                            value={this.state.noOfMonthsForASeason}
-                                                            onChange={(e) => { this.setSeasonals(e); }}
-                                                        />
-                                                    </div>
-                                                    {/* <div className="col-md-3">
+
+                                            <div className="row col-md-12" style={{ display: this.state.smoothingId ? 'block' : 'none' }}>
+                                                <div className="col-md-2">
+                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.confidenceLevel')}</Label>
+                                                    <Input
+                                                        type="select"
+                                                        id="confidenceLevelId"
+                                                        name="confidenceLevelId"
+                                                        bsSize="sm"
+                                                        value={this.state.confidenceLevelId}
+                                                        onChange={(e) => { this.setConfidenceLevelId(e); }}
+                                                    >
+                                                        <option value="80">80%</option>
+                                                        <option value="85">85%</option>
+                                                        <option value="90">90%</option>
+                                                        <option value="95">95%</option>
+                                                        <option value="99">99%</option>
+                                                        <option value="99.9">99.9%</option>
+                                                    </Input>
+                                                </div>
+                                                <div className="col-md-2">
+                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.seasonality')}</Label>
+                                                    <Input
+                                                        className="controls"
+                                                        type="text"
+                                                        id="seasonalityId"
+                                                        name="seasonalityId"
+                                                        value={this.state.noOfMonthsForASeason}
+                                                        onChange={(e) => { this.setSeasonals(e); }}
+                                                    />
+                                                </div>
+                                                {/* <div className="col-md-3">
                                                         <Input
                                                             className="form-check-input"
                                                             type="checkbox"
@@ -2360,40 +2380,40 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                         </Label>
                                                     </div> */}
 
-                                                    <div className="col-md-2">
-                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.alpha')}</Label>
-                                                        <Input
-                                                            className="controls"
-                                                            type="text"
-                                                            id="alphaId"
-                                                            name="alphaId"
-                                                            value={this.state.alpha}
-                                                            onChange={(e) => { this.setAlpha(e); }}
-                                                        />
-                                                    </div>
-                                                    <div className="col-md-2">
-                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.beta')}</Label>
-                                                        <Input
-                                                            className="controls"
-                                                            type="text"
-                                                            id="betaId"
-                                                            name="betaId"
-                                                            value={this.state.beta}
-                                                            onChange={(e) => { this.setBeta(e); }}
-                                                        />
-                                                    </div>
-                                                    <div className="col-md-2">
-                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.gamma')}</Label>
-                                                        <Input
-                                                            className="controls"
-                                                            type="text"
-                                                            id="gammaId"
-                                                            name="gammaId"
-                                                            value={this.state.gamma}
-                                                            onChange={(e) => { this.setGamma(e); }}
-                                                        />
-                                                    </div>
-                                                    {/* <div className="col-md-2">
+                                                <div className="col-md-2">
+                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.alpha')}</Label>
+                                                    <Input
+                                                        className="controls"
+                                                        type="text"
+                                                        id="alphaId"
+                                                        name="alphaId"
+                                                        value={this.state.alpha}
+                                                        onChange={(e) => { this.setAlpha(e); }}
+                                                    />
+                                                </div>
+                                                <div className="col-md-2">
+                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.beta')}</Label>
+                                                    <Input
+                                                        className="controls"
+                                                        type="text"
+                                                        id="betaId"
+                                                        name="betaId"
+                                                        value={this.state.beta}
+                                                        onChange={(e) => { this.setBeta(e); }}
+                                                    />
+                                                </div>
+                                                <div className="col-md-2">
+                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.gamma')}</Label>
+                                                    <Input
+                                                        className="controls"
+                                                        type="text"
+                                                        id="gammaId"
+                                                        name="gammaId"
+                                                        value={this.state.gamma}
+                                                        onChange={(e) => { this.setGamma(e); }}
+                                                    />
+                                                </div>
+                                                {/* <div className="col-md-2">
                                                         <Label htmlFor="appendedInputButton">Phi</Label>
                                                         <Input
                                                             className="controls"
@@ -2402,8 +2422,8 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                             name="phiId"
                                                         />
                                                     </div> */}
-                                                </div>
-                                            }
+                                            </div>
+
                                             <div>
                                                 <Popover placement="top" isOpen={this.state.popoverOpenArima} target="Popover1" trigger="hover" toggle={() => this.toggle('popoverOpenArima', !this.state.popoverOpenArima)}>
                                                     <PopoverBody>Need to add Info.</PopoverBody>
@@ -2425,37 +2445,37 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                     <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenArima', !this.state.popoverOpenArima)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
                                                 </Label>
                                             </div>
-                                            {this.state.arimaId &&
-                                                <div className="row">
-                                                    <div className="col-md-3">
-                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.p')}</Label>
-                                                        <Input
-                                                            className="controls"
-                                                            type="text"
-                                                            id="pId"
-                                                            name="pId"
-                                                        />
-                                                    </div>
-                                                    <div className="col-md-3">
-                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.d')}</Label>
-                                                        <Input
-                                                            className="controls"
-                                                            type="text"
-                                                            id="dId"
-                                                            name="dId"
-                                                        />
-                                                    </div>
-                                                    <div className="col-md-3">
-                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.q')}</Label>
-                                                        <Input
-                                                            className="controls"
-                                                            type="text"
-                                                            id="qId"
-                                                            name="qId"
-                                                        />
-                                                    </div>
+
+                                            <div className="row" style={{ display: this.state.arimaId ? 'block' : 'none' }}>
+                                                <div className="col-md-3">
+                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.p')}</Label>
+                                                    <Input
+                                                        className="controls"
+                                                        type="text"
+                                                        id="pId"
+                                                        name="pId"
+                                                    />
                                                 </div>
-                                            }
+                                                <div className="col-md-3">
+                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.d')}</Label>
+                                                    <Input
+                                                        className="controls"
+                                                        type="text"
+                                                        id="dId"
+                                                        name="dId"
+                                                    />
+                                                </div>
+                                                <div className="col-md-3">
+                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.q')}</Label>
+                                                    <Input
+                                                        className="controls"
+                                                        type="text"
+                                                        id="qId"
+                                                        name="qId"
+                                                    />
+                                                </div>
+                                            </div>
+
                                         </div>
                                     </FormGroup>
                                 </div>
