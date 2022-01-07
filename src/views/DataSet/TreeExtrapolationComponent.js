@@ -21,6 +21,456 @@ export default class TreeExtrapolationComponent extends React.Component {
         var startDate = moment("2021-05-01").format("YYYY-MM-DD");
         var endDate = moment("2022-02-01").format("YYYY-MM-DD")
         this.state = {
+            jexcelData: [
+                {
+                    month: '2020-05-01',
+                    node: '155',
+                    reportingRate: '98%',
+                    adjustedActuals: '158',
+                    ma: '233',
+                    sa: '233',
+                    lr: '233',
+                    arima: '233',
+                    tesM: '233',
+                    selectedForecast: '233',
+                    manualChange: '0',
+                    monthEndFinal: '233'
+                },
+                {
+                    month: '2020-06-01',
+                    node: '180',
+                    reportingRate: '98%',
+                    adjustedActuals: '184',
+                    ma: '246',
+                    sa: '246',
+                    lr: '246',
+                    arima: '246',
+                    tesM: '246',
+                    selectedForecast: '246',
+                    manualChange: '0',
+                    monthEndFinal: '246'
+                },
+                {
+                    month: '2020-07-01',
+                    node: '',
+                    reportingRate: '98%',
+                    adjustedActuals: '0',
+                    ma: '260',
+                    sa: '260',
+                    lr: '260',
+                    arima: '260',
+                    tesM: '260',
+                    selectedForecast: '260',
+                    manualChange: '0',
+                    monthEndFinal: '260'
+                },
+                {
+                    month: '2020-08-01',
+                    node: '',
+                    reportingRate: '98%',
+                    adjustedActuals: '0',
+                    ma: '273',
+                    sa: '273',
+                    lr: '273',
+                    arima: '273',
+                    tesM: '273',
+                    selectedForecast: '273',
+                    manualChange: '0',
+                    monthEndFinal: '273'
+                },
+                {
+                    month: '2020-09-01',
+                    node: '',
+                    reportingRate: '98%',
+                    adjustedActuals: '0',
+                    ma: '287',
+                    sa: '287',
+                    lr: '287',
+                    arima: '287',
+                    tesM: '287',
+                    selectedForecast: '287',
+                    manualChange: '0',
+                    monthEndFinal: '287'
+                },
+                {
+                    month: '2020-10-01',
+                    node: '',
+                    reportingRate: '98%',
+                    adjustedActuals: '0',
+                    ma: '300',
+                    sa: '300',
+                    lr: '300',
+                    arima: '300',
+                    tesM: '300',
+                    selectedForecast: '300',
+                    manualChange: '0',
+                    monthEndFinal: '300'
+                },
+                {
+                    month: '2020-11-01',
+                    node: '',
+                    reportingRate: '70%',
+                    adjustedActuals: '0',
+                    ma: '314',
+                    sa: '314',
+                    lr: '314',
+                    arima: '314',
+                    tesM: '314',
+                    selectedForecast: '314',
+                    manualChange: '0',
+                    monthEndFinal: '314'
+                },
+                {
+                    month: '2020-12-01',
+                    node: '600',
+                    reportingRate: '98%',
+                    adjustedActuals: '612',
+                    ma: '327',
+                    sa: '327',
+                    lr: '327',
+                    arima: '327',
+                    tesM: '327',
+                    selectedForecast: '327',
+                    manualChange: '0',
+                    monthEndFinal: '327'
+                },
+                {
+                    month: '2021-01-01',
+                    node: '165',
+                    reportingRate: '98%',
+                    adjustedActuals: '168',
+                    ma: '340',
+                    sa: '340',
+                    lr: '340',
+                    arima: '340',
+                    tesM: '340',
+                    selectedForecast: '340',
+                    manualChange: '0',
+                    monthEndFinal: '340'
+                },
+                {
+                    month: '2021-02-01',
+                    node: '190',
+                    reportingRate: '98%',
+                    adjustedActuals: '194',
+                    ma: '354',
+                    sa: '354',
+                    lr: '354',
+                    arima: '354',
+                    tesM: '354',
+                    selectedForecast: '354',
+                    manualChange: '0',
+                    monthEndFinal: '354'
+                },
+                {
+                    month: '2021-03-01',
+                    node: '280',
+                    reportingRate: '98%',
+                    adjustedActuals: '286',
+                    ma: '367',
+                    sa: '367',
+                    lr: '367',
+                    arima: '367',
+                    tesM: '367',
+                    selectedForecast: '367',
+                    manualChange: '0',
+                    monthEndFinal: '367'
+                },
+                {
+                    month: '2021-04-01',
+                    node: '370',
+                    reportingRate: '',
+                    adjustedActuals: '',
+                    ma: '635',
+                    sa: '635',
+                    lr: '635',
+                    arima: '635',
+                    tesM: '635',
+                    selectedForecast: '635',
+                    manualChange: '0',
+                    monthEndFinal: '635'
+                },
+                {
+                    month: '2021-05-01',
+                    node: '460',
+                    reportingRate: '',
+                    adjustedActuals: '',
+                    ma: '172',
+                    sa: '172',
+                    lr: '172',
+                    arima: '172',
+                    tesM: '172',
+                    selectedForecast: '172',
+                    manualChange: '0',
+                    monthEndFinal: '172'
+                },
+                {
+                    month: '2021-06-01',
+                    node: '550',
+                    reportingRate: '',
+                    adjustedActuals: '',
+                    ma: '226',
+                    sa: '226',
+                    lr: '226',
+                    arima: '226',
+                    tesM: '226',
+                    selectedForecast: '226',
+                    manualChange: '0',
+                    monthEndFinal: '226'
+                },
+                {
+                    month: '2021-07-01',
+                    node: '640',
+                    reportingRate: '',
+                    adjustedActuals: '',
+                    ma: '329',
+                    sa: '329',
+                    lr: '329',
+                    arima: '329',
+                    tesM: '329',
+                    selectedForecast: '329',
+                    manualChange: '0',
+                    monthEndFinal: '329'
+                },
+                {
+                    month: '2021-08-01',
+                    node: '730',
+                    reportingRate: '',
+                    adjustedActuals: '',
+                    ma: '721',
+                    sa: '721',
+                    lr: '721',
+                    arima: '721',
+                    tesM: '721',
+                    selectedForecast: '721',
+                    manualChange: '0',
+                    monthEndFinal: '721'
+                },
+                {
+                    month: '2021-09-01',
+                    node: '820',
+                    reportingRate: '',
+                    adjustedActuals: '',
+                    ma: '439',
+                    sa: '439',
+                    lr: '439',
+                    arima: '439',
+                    tesM: '439',
+                    selectedForecast: '439',
+                    manualChange: '0',
+                    monthEndFinal: '439'
+                },
+                {
+                    month: '2021-10-01',
+                    node: '910',
+                    reportingRate: '',
+                    adjustedActuals: '',
+                    ma: '453',
+                    sa: '453',
+                    lr: '453',
+                    arima: '453',
+                    tesM: '453',
+                    selectedForecast: '453',
+                    manualChange: '0',
+                    monthEndFinal: '453'
+                },
+                {
+                    month: '2021-11-01',
+                    node: '',
+                    reportingRate: '',
+                    adjustedActuals: '',
+                    ma: '468',
+                    sa: '468',
+                    lr: '468',
+                    arima: '468',
+                    tesM: '468',
+                    selectedForecast: '468',
+                    manualChange: '0',
+                    monthEndFinal: '468'
+                },
+                {
+                    month: '2021-12-01',
+                    node: '',
+                    reportingRate: '',
+                    adjustedActuals: '',
+                    ma: '482',
+                    sa: '482',
+                    lr: '482',
+                    arima: '482',
+                    tesM: '482',
+                    selectedForecast: '482',
+                    manualChange: '0',
+                    monthEndFinal: '482'
+                },
+                {
+                    month: '2022-01-01',
+                    node: '',
+                    reportingRate: '',
+                    adjustedActuals: '',
+                    ma: '496',
+                    sa: '496',
+                    lr: '496',
+                    arima: '496',
+                    tesM: '496',
+                    selectedForecast: '496',
+                    manualChange: '0',
+                    monthEndFinal: '496'
+                },
+                {
+                    month: '2022-02-01',
+                    node: '',
+                    reportingRate: '',
+                    adjustedActuals: '',
+                    ma: '510',
+                    sa: '510',
+                    lr: '510',
+                    arima: '510',
+                    tesM: '510',
+                    selectedForecast: '510',
+                    manualChange: '0',
+                    monthEndFinal: '510'
+                },
+                {
+                    month: '2022-03-01',
+                    node: '',
+                    reportingRate: '',
+                    adjustedActuals: '',
+                    ma: '525',
+                    sa: '525',
+                    lr: '525',
+                    arima: '525',
+                    tesM: '525',
+                    selectedForecast: '525',
+                    manualChange: '0',
+                    monthEndFinal: '525'
+                },
+                {
+                    month: '2022-04-01',
+                    node: '',
+                    reportingRate: '',
+                    adjustedActuals: '',
+                    ma: '539',
+                    sa: '539',
+                    lr: '539',
+                    arima: '539',
+                    tesM: '539',
+                    selectedForecast: '539',
+                    manualChange: '0',
+                    monthEndFinal: '539'
+                },
+                {
+                    month: '2022-05-01',
+                    node: '',
+                    reportingRate: '',
+                    adjustedActuals: '',
+                    ma: '553',
+                    sa: '553',
+                    lr: '553',
+                    arima: '553',
+                    tesM: '553',
+                    selectedForecast: '553',
+                    manualChange: '0',
+                    monthEndFinal: '553'
+                },
+                {
+                    month: '2022-06-01',
+                    node: '',
+                    reportingRate: '',
+                    adjustedActuals: '',
+                    ma: '567',
+                    sa: '567',
+                    lr: '567',
+                    arima: '567',
+                    tesM: '567',
+                    selectedForecast: '567',
+                    manualChange: '0',
+                    monthEndFinal: '567'
+                },
+                {
+                    month: '2022-07-01',
+                    node: '',
+                    reportingRate: '',
+                    adjustedActuals: '',
+                    ma: '582',
+                    sa: '582',
+                    lr: '582',
+                    arima: '582',
+                    tesM: '582',
+                    selectedForecast: '582',
+                    manualChange: '0',
+                    monthEndFinal: '582'
+                },
+                {
+                    month: '2022-08-01',
+                    node: '',
+                    reportingRate: '',
+                    adjustedActuals: '',
+                    ma: '596',
+                    sa: '596',
+                    lr: '596',
+                    arima: '596',
+                    tesM: '596',
+                    selectedForecast: '596',
+                    manualChange: '0',
+                    monthEndFinal: '596'
+                },
+                {
+                    month: '2022-09-01',
+                    node: '',
+                    reportingRate: '',
+                    adjustedActuals: '',
+                    ma: '610',
+                    sa: '610',
+                    lr: '610',
+                    arima: '610',
+                    tesM: '610',
+                    selectedForecast: '610',
+                    manualChange: '0',
+                    monthEndFinal: '610'
+                },
+                {
+                    month: '2022-10-01',
+                    node: '',
+                    reportingRate: '',
+                    adjustedActuals: '',
+                    ma: '624',
+                    sa: '624',
+                    lr: '624',
+                    arima: '624',
+                    tesM: '624',
+                    selectedForecast: '624',
+                    manualChange: '0',
+                    monthEndFinal: '624'
+                },
+                {
+                    month: '2022-11-01',
+                    node: '',
+                    reportingRate: '',
+                    adjustedActuals: '',
+                    ma: '638',
+                    sa: '638',
+                    lr: '638',
+                    arima: '638',
+                    tesM: '638',
+                    selectedForecast: '638',
+                    manualChange: '0',
+                    monthEndFinal: '638'
+                },
+                {
+                    month: '2022-12-01',
+                    node: '',
+                    reportingRate: '',
+                    adjustedActuals: '',
+                    ma: '653',
+                    sa: '653',
+                    lr: '653',
+                    arima: '653',
+                    tesM: '653',
+                    selectedForecast: '653',
+                    manualChange: '0',
+                    monthEndFinal: '653'
+                }
+            ],
             dataList: [
                 {
                     months: '2022-01-01',
@@ -64,6 +514,26 @@ export default class TreeExtrapolationComponent extends React.Component {
     buildJexcel() {
         let dataArray = [];
         let data = [];
+        var list = this.state.jexcelData;
+        let count = 0;
+        for (var j = 0; j < list.length; j++) {
+            data = [];
+            data[0] = list[j].month
+            data[1] = list[j].node
+            data[2] = list[j].reportingRate
+            data[3] = list[j].adjustedActuals
+            data[4] = list[j].ma
+            data[5] = list[j].sa
+            data[6] = list[j].lr
+            data[7] = list[j].arima
+            data[8] = list[j].tesM
+            data[9] = list[j].selectedForecast
+            data[10] = list[j].manualChange
+            data[11] = list[j].monthEndFinal
+            dataArray[count] = data;
+            count++;
+        }
+
         this.el = jexcel(document.getElementById("tableDiv"), '');
         this.el.destroy();
 
@@ -327,7 +797,7 @@ export default class TreeExtrapolationComponent extends React.Component {
 
         let line = "";
         line = {
-            labels: this.state.dataList.map((item, index) => (item.months)),
+            labels: this.state.jexcelData.map((item, index) => (item.month)),
             datasets: [
                 {
                     type: "line",
@@ -344,7 +814,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                     pointStyle: 'line',
                     pointBorderWidth: 5,
                     yValueFormatString: "###,###,###,###",
-                    data: this.state.dataList.map((item, index) => (item.actuals > 0 ? item.actuals : null))
+                    data: this.state.jexcelData.map((item, index) => (item.adjustedActuals > 0 ? item.adjustedActuals : null))
                 },
                 {
                     type: "line",
@@ -361,7 +831,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                     pointStyle: 'line',
                     pointBorderWidth: 5,
                     yValueFormatString: "###,###,###,###",
-                    data: this.state.dataList.map((item, index) => (item.movingAverages > 0 ? item.movingAverages : null))
+                    data: this.state.jexcelData.map((item, index) => (item.ma > 0 ? item.ma : null))
                 },
                 {
                     type: "line",
@@ -378,7 +848,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                     pointStyle: 'line',
                     pointBorderWidth: 5,
                     yValueFormatString: "###,###,###,###",
-                    data: this.state.dataList.map((item, index) => (item.semiAveragesForecast > 0 ? item.semiAveragesForecast : null))
+                    data: this.state.jexcelData.map((item, index) => (item.sa > 0 ? item.sa : null))
                 },
                 {
                     type: "line",
@@ -395,7 +865,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                     pointStyle: 'line',
                     pointBorderWidth: 5,
                     yValueFormatString: "###,###,###,###",
-                    data: this.state.dataList.map((item, index) => (item.linearRegression > 0 ? item.linearRegression : null))
+                    data: this.state.jexcelData.map((item, index) => (item.lr > 0 ? item.lr : null))
                 },
                 {
                     type: "line",
@@ -412,7 +882,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                     pointStyle: 'line',
                     pointBorderWidth: 5,
                     yValueFormatString: "###,###,###,###",
-                    data: this.state.dataList.map((item, index) => (item.tesLcb > 0 ? item.tesLcb : null))
+                    data: this.state.jexcelData.map((item, index) => (item.tesM > 0 ? item.tesM : null))
                 },
                 {
                     type: "line",
@@ -420,7 +890,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                     lineTension: 0,
                     label: 'TES (Medium)',
                     backgroundColor: 'transparent',
-                    borderColor: '#FFFF00',
+                    borderColor: '#651D32',
                     ticks: {
                         fontSize: 2,
                         fontColor: 'transparent',
@@ -429,7 +899,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                     pointStyle: 'line',
                     pointBorderWidth: 5,
                     yValueFormatString: "###,###,###,###",
-                    data: this.state.dataList.map((item, index) => (item.tesMedium > 0 ? item.tesMedium : null))
+                    data: this.state.jexcelData.map((item, index) => (item.tesM > 0 ? item.tesM : null))
                 },
                 {
                     type: "line",
@@ -437,7 +907,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                     lineTension: 0,
                     label: 'TES (Upper Confidence Bound)',
                     backgroundColor: 'transparent',
-                    borderColor: '#FFA500',
+                    borderColor: '#6c6463',
                     ticks: {
                         fontSize: 2,
                         fontColor: 'transparent',
@@ -446,7 +916,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                     pointStyle: 'line',
                     pointBorderWidth: 5,
                     yValueFormatString: "###,###,###,###",
-                    data: this.state.dataList.map((item, index) => (item.tesUcb > 0 ? item.tesUcb : null))
+                    data: this.state.jexcelData.map((item, index) => (item.tesM > 0 ? item.tesM : null))
                 },
                 {
                     type: "line",
@@ -463,7 +933,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                     pointStyle: 'line',
                     pointBorderWidth: 5,
                     yValueFormatString: "###,###,###,###",
-                    data: this.state.dataList.map((item, index) => (item.arimaForecast > 0 ? item.arimaForecast : null))
+                    data: this.state.jexcelData.map((item, index) => (item.arima > 0 ? item.arima : null))
                 }
             ]
         }
@@ -889,7 +1359,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                 </tbody>
                             </Table>
                         </div>
-                    </div><br/>
+                    </div><br />
                     <div className="col-md-12 pl-lg-0">
                         <Row>
                             <FormGroup className="col-md-3">
@@ -934,8 +1404,6 @@ export default class TreeExtrapolationComponent extends React.Component {
                         </Row>
                     </div>
                 </CardBody>
-              
-                
             </div>
         )
     }
