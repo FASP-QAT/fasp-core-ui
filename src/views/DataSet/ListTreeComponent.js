@@ -97,8 +97,10 @@ export default class ListTreeComponent extends Component {
                 var myResult = [];
                 myResult = getRequest.result;
                 for (var i = 0; i < myResult.length; i++) {
+                    console.log("myResult[i].programData---",myResult[i].programData);
                     var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
                     var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
+                    console.log("myResult[i].programData after---",programData);
                     myResult[i].programData = programData;
                 }
                 this.setState({
@@ -272,7 +274,7 @@ export default class ListTreeComponent extends Component {
                                 var rowData = obj.getRowData(y);
                                 console.log("rowData===>", rowData);
                                 rowData[0] = "";
-                                rowData[1] = "";
+                                // rowData[1] = "";
                                 var data = rowData;
                                 this.el.insertRow(
                                     data, 0, 1

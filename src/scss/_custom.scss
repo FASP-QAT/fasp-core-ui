@@ -5639,3 +5639,20 @@ font-style: italic!important;
   margin-left: -4px;
   margin-top: -19px;
 }
+
+.printme {
+	display: none;
+}
+@media print {
+	.no-printme  {
+		display: none;
+	}
+	.printme  {
+		display: block;
+	}
+}
+
+.iconClass{
+  font-size: 15px;
+  cursor: pointer;
+}
