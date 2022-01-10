@@ -661,7 +661,13 @@ export default class BuildTree extends Component {
         programData.treeList = treeData;
         dataSetObj.programData = programData;
         console.log("dataSetDecrypt>>>", dataSetObj);
-        calculateModelingData(dataSetObj, this, '', (nodeId != 0 ? nodeId : this.state.currentItemConfig.context.id), this.state.selectedScenario, type, this.state.treeId);
+        if (this.state.currentItemConfig.context.payload.nodeType.id == 2 && this.state.currentItemConfig.context.level != 0) {
+            var level0Data = items.filter(x => x.id == this.state.currentItemConfig.context.parent)[0];
+            if (level0Data.payload.nodeType.id == 1) {
+                nodeId = -1;
+            }
+        }
+        calculateModelingData(dataSetObj, this, '', (nodeId != 0 ? nodeId : this.state.currentItemConfig.context.id), this.state.selectedScenario, type, this.state.treeId, false);
     }
     fetchTracerCategoryList(programData) {
         console.log("programData---%%%%%%%", programData);
@@ -783,14 +789,16 @@ export default class BuildTree extends Component {
         }, () => {
             if (parameterName == 'nodeId' && (value != null && value != 0)) {
                 var items = this.state.items;
-                var nodeDataMomList = this.state.nodeDataMomList ;
+                var nodeDataMomList = this.state.nodeDataMomList;
+                console.log("nodeDataMomList---", nodeDataMomList);
                 if (nodeDataMomList.length > 0) {
-                    for (let i = 0; i <= nodeDataMomList.length; i++) {
+                    for (let i = 0; i < nodeDataMomList.length; i++) {
+                        console.log("nodeDataMomList[i]---", nodeDataMomList[i])
                         var nodeId = nodeDataMomList[i].nodeId;
                         var nodeDataMomListForNode = nodeDataMomList[i].nodeDataMomList;
                         console.log("this.state.nodeDataMomList---", this.state.nodeDataMomList);
                         var node = items.filter(n => n.id == nodeId)[0];
-                        console.log("node---",node);
+                        console.log("node---", node);
                         (node.payload.nodeDataMap[this.state.selectedScenario])[0].nodeDataMomList = nodeDataMomListForNode;
                         var findNodeIndex = items.findIndex(n => n.id == nodeId);
                         console.log("findNodeIndex---", findNodeIndex);
@@ -832,7 +840,7 @@ export default class BuildTree extends Component {
         // var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
         // console.log("dataSetObj.programData***>>>", programData);
         // this.setState({ dataSetObj: dataSetObj, forecastStartDate: programData.currentVersion.forecastStartDate, forecastStopDate: programData.currentVersion.forecastStopDate }, () => {
-        //     calculateModelingData(dataEnc, this, "BuildTree");
+
         // });
         var items = this.state.curTreeObj.tree.flatList;
         console.log("items>>>", items);
@@ -902,7 +910,6 @@ export default class BuildTree extends Component {
                     var datasetDetailsRequestJson = datasetDetailsRequest.result;
                     datasetDetailsRequestJson.changed = 1;
                     var programQPLDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
-                    // calculateModelingData(dataSetObj, this, '',,this.state.selectedScenario);
                 }.bind(this);
                 datasetDetailsRequest.onerror = function (event) {
                     this.setState({
@@ -1158,7 +1165,6 @@ export default class BuildTree extends Component {
     //             console.log("---hurrey---");
     //             // })
     //             transaction.oncomplete = function (event) {
-    //                 // calculateModelingData(dataSetObj,'');
     //                 console.log("all good >>>>");
 
     //                 // this.setState({
@@ -1219,7 +1225,6 @@ export default class BuildTree extends Component {
             console.log("---hurrey---");
             // })
             transaction.oncomplete = function (event) {
-                // calculateModelingData(dataSetObj,'');
                 console.log("all good >>>>");
 
                 this.setState({
@@ -2584,7 +2589,7 @@ export default class BuildTree extends Component {
             programData.treeList = treeData;
             // dataSetObj.programData = programData;
             console.log("dataSetDecrypt>>>", programData);
-            calculateModelingData(dataSetObj, this, '', currentItemConfig.context.id, this.state.selectedScenario, 1, this.state.treeId);
+            calculateModelingData(dataSetObj, this, '', currentItemConfig.context.id, this.state.selectedScenario, 1, this.state.treeId, false);
         });
 
     }.bind(this);
@@ -2634,7 +2639,7 @@ export default class BuildTree extends Component {
             //  dataSetObj.programData = programData;
 
             console.log("encpyDataSet>>>", dataSetObj)
-            calculateModelingData(dataSetObj, this, '', currentItemConfig.context.id, this.state.selectedScenario, 1, this.state.treeId);
+            calculateModelingData(dataSetObj, this, '', currentItemConfig.context.id, this.state.selectedScenario, 1, this.state.treeId, false);
         });
     }.bind(this);
     changed = function (instance, cell, x, y, value) {
@@ -2998,7 +3003,6 @@ export default class BuildTree extends Component {
                         this.setState({ dataSetObj: dataEnc, forecastStartDate: programData.currentVersion.forecastStartDate, forecastStopDate: programData.currentVersion.forecastStopDate }, () => {
                             this.fetchTracerCategoryList(programData);
                             this.setState({ loading: false })
-                            // calculateModelingData(decryptedDataset, this,'',"BuildTree");
                         });
                     } else {
                         this.setState({ loading: false })
@@ -5392,7 +5396,6 @@ export default class BuildTree extends Component {
             console.log("on add items-------", this.state.items);
             // var getAllAggregationNode = this.state.items.filter(c => c.payload.nodeType.id == 1);
             // console.log(">>>", getAllAggregationNode);
-            // calculateModelingData(this.state.dataSetObj, this, '', newItem.id, this.state.selectedScenario);
             this.calculateMOMData(newItem.id, 0);
             this.calculateValuesForAggregateNode(this.state.items);
         });
@@ -5633,7 +5636,6 @@ export default class BuildTree extends Component {
             console.log("updated tree data+++", this.state);
             this.calculateValuesForAggregateNode(this.state.items);
             this.calculateMOMData(0, 0);
-            // calculateModelingData(this.state.dataSetObj, this, '', currentItemConfig.context.id, this.state.selectedScenario);
             // console.log("returmed list---", this.state.nodeDataMomList);
             // this.updateTreeData();
         });
@@ -6859,12 +6861,13 @@ export default class BuildTree extends Component {
                                     </div>
                                 </div>
                                     <div style={{ 'float': 'right', 'fontSize': '18px' }}><b>{i18n.t('static.supplyPlan.total')} : {this.state.scalingTotal != "" && addCommas(parseFloat(this.state.scalingTotal).toFixed(2))}</b></div><br /><br />
-                                    <div><Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.showMomData()}> <i className="fa fa-eye" style={{ color: '#fff' }}></i> {i18n.t('static.tree.viewMonthlyData')}</Button>
-                                        <Button color="success" size="md" className="float-right mr-1" type="button" onClick={() => this.formSubmit()}> <i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
-                                        <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>
-                                    </div>
+
                                 </>
                             }
+                            <div><Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.showMomData()}> <i className="fa fa-eye" style={{ color: '#fff' }}></i> {i18n.t('static.tree.viewMonthlyData')}</Button>
+                                {this.state.showModelingJexcelNumber && <><Button color="success" size="md" className="float-right mr-1" type="button" onClick={() => this.formSubmit()}> <i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
+                                    <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button></>}
+                            </div>
                             {/* {this.state.showModelingJexcelPercent &&
                                 <><div className="calculatorimg">
                                     <div id="modelingJexcelPercent" className={"RowClickable ScalingTable"}>
@@ -7334,46 +7337,11 @@ export default class BuildTree extends Component {
 
     handleAMonthDissmis3 = (value) => {
         console.log("dismiss>>", value);
+        console.log("forecastStartDate>>", this.state.forecastStartDate);
+        console.log("forecastStopDate>>", this.state.forecastStopDate);
         var date = value.year + "-" + value.month + "-" + "01"
         this.setState({ singleValue2: value, }, () => {
             this.updateTreeData(date);
-            // this.fetchData();
-            // console.log("$$$", this.state.treeData);
-            // console.log("$$$", this.state.curTreeObj);
-            // var db1;
-            // getDatabase();
-            // var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-            // openRequest.onsuccess = function (e) {
-            //     var programId = this.state.programId;
-            //     db1 = e.target.result;
-            //     var transaction = db1.transaction(['datasetData'], 'readwrite');
-            //     var program = transaction.objectStore('datasetData');
-            //     var getRequest = program.get(programId.toString());
-            //     getRequest.onerror = function (event) {
-            //         this.setState({
-            //             supplyPlanError: i18n.t('static.program.errortext')
-            //         });
-            //     };
-            //     getRequest.onsuccess = function (event) {
-            //         // console.log("hi",getRequest.result);
-            //         var programDataBytes = CryptoJS.AES.decrypt(getRequest.result.programData, SECRET_KEY);
-            //         var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-            //         var programJson = JSON.parse(programData);
-            //         // console.log("hi bro", programJson.nodeDataModelingList)
-            //         // var getMomDataForNodes = programJson.nodeDataModelingList.filter(c => c.treeId == this.state.treeId && c.scenarioId == this.state.selectedScenario && moment(c.month).format('YYYY-MM') == moment(date).format('YYYY-MM'));
-            //         // console.log("$$$>>>", getMomDataForNodes);
-            //         console.log()
-            //         this.setState({
-            //             // modelinDataForScenario: getMomDataForNodes
-            //         }, () => {
-            //             // if (getMomDataForNodes.length > 0) { 
-            //             this.updateTreeData(date);
-            //             // } else { };
-            //         });
-            //         // getMomDataForCurrentNode.filter(c=>c.month <= '2022-12-01')
-
-            //     }.bind(this)
-            // }.bind(this)
 
         })
     }
