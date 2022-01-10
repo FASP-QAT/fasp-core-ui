@@ -53,9 +53,8 @@ class ForecastOutput extends Component {
             programId: '',
             versionId: '',
             viewById: 1,
-            equivalencyUnitId: "",
             monthArrayList: [],
-            yaxisEquUnit: 2,
+            yaxisEquUnit: -1,
             xaxis: 2,
             consumptionData: [],
             forecastPeriod: '',
@@ -139,13 +138,13 @@ class ForecastOutput extends Component {
 
 
 
-        if (this.state.xaxis == 2) {
+        if (this.state.xaxis == 2) {//no
             this.setState({
                 calculateEquivalencyUnitTotal: result1
             }, () => {
 
             })
-        } else {
+        } else {//yes
             // let consumptionData = resultTrue;
 
             // let tempConsumptionListData = consumptionData[i].consumptionList.map(m => {
@@ -198,7 +197,7 @@ class ForecastOutput extends Component {
         })
     }
 
-    getEquivalencyUnitData() {
+    getEquivalencyUnitData() {        
         let programId = document.getElementById("programId").value;
         let versionId = document.getElementById("versionId").value;
         this.setState({
@@ -278,7 +277,6 @@ class ForecastOutput extends Component {
         console.log("e.target.value+++", e.target.value)
         this.setState({
             yaxisEquUnit: yaxisEquUnit,
-            equivalencyUnitId: (e.target.value == 2 ? '' : document.getElementById("equivalencyUnitId").value),
             planningUnits: [],
             planningUnitValues: [],
             planningUnitLabels: [],
@@ -289,12 +287,13 @@ class ForecastOutput extends Component {
             monthArrayList: [],
             calculateEquivalencyUnitTotal: [],
         }, () => {
-            if (yaxisEquUnit == 1) {
-                document.getElementById("equivalencyUnitDiv").style.display = "block";
-                this.getEquivalencyUnitData();
+            if (yaxisEquUnit > 0) {//Yes
+                // document.getElementById("equivalencyUnitDiv").style.display = "block";
+                // this.getEquivalencyUnitData();
+                this.getPlanningUnitForecastingUnit();
 
-            } else {
-                document.getElementById("equivalencyUnitDiv").style.display = "none";
+            } else {//NO
+                // document.getElementById("equivalencyUnitDiv").style.display = "none";
                 this.getPlanningUnitForecastingUnit();
                 this.filterData();
             }
@@ -351,10 +350,9 @@ class ForecastOutput extends Component {
         let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate();
         let viewById = document.getElementById("viewById").value;
         let yaxisEquUnitId = document.getElementById("yaxisEquUnit").value;
-        let equivalencyUnitId = document.getElementById("equivalencyUnitId").value;
         let xaxisId = document.getElementById("xaxis").value;
 
-        if (versionId != 0 && programId > 0 && (viewById == 1 ? planningUnitIds.length > 0 : forecastingUnitIds.length > 0) && (yaxisEquUnitId == 1 ? equivalencyUnitId > 0 : true)) {
+        if (versionId != 0 && programId > 0 && (viewById == 1 ? planningUnitIds.length > 0 : forecastingUnitIds.length > 0)) {
             if (versionId.includes('Local')) {
 
                 var db1;
@@ -653,7 +651,7 @@ class ForecastOutput extends Component {
                             //     monthArrayList: monthArrayList
                             // })
 
-                            if (this.state.xaxis == 2) {
+                            if (this.state.xaxis == 2) {//No
                                 this.setState({
                                     consumptionData: consumptionData,
                                     monthArrayList: monthArrayList
@@ -661,7 +659,7 @@ class ForecastOutput extends Component {
                                     this.calculateEquivalencyUnitTotal();
                                 })
 
-                            } else {
+                            } else {//yes
                                 let min = moment(startDate).format("YYYY");
                                 let max = moment(endDate).format("YYYY");
                                 let years = [];
@@ -993,7 +991,7 @@ class ForecastOutput extends Component {
             programId: event.target.value,
             versionId: '',
             forecastPeriod: '',
-            equivalencyUnitId: '',
+            yaxisEquUnit: -1,
             consumptionData: [],
             monthArrayList: [],
             calculateEquivalencyUnitTotal: [],
@@ -1025,7 +1023,6 @@ class ForecastOutput extends Component {
     }
 
     getPlanningUnitForecastingUnit = () => {
-        let equivalencyUnitIdd = document.getElementById("equivalencyUnitId").value;
 
         let programId = document.getElementById("programId").value;
         let versionId = document.getElementById("versionId").value;
@@ -1036,7 +1033,6 @@ class ForecastOutput extends Component {
         if (programId != -1 && versionId != -1) {
 
             this.setState({
-                equivalencyUnitId: equivalencyUnitIdd,
                 planningUnits: [],
                 planningUnitValues: [],
                 planningUnitLabels: [],
@@ -1078,9 +1074,9 @@ class ForecastOutput extends Component {
                         // const idsPU = dupPlanningUnitObj.map(o => o.id)
                         // const filteredPU = dupPlanningUnitObj.filter(({ id }, index) => !idsPU.includes(id, index + 1))
 
-                        let equivalencyUnitId = document.getElementById("equivalencyUnitId").value;
-                        if (equivalencyUnitId != -1) {
-                            let filteredProgramEQList = this.state.programEquivalencyUnitList.filter(c => c.equivalencyUnit.equivalencyUnitId == equivalencyUnitId);
+                        let yaxisEquUnitId = document.getElementById("yaxisEquUnit").value;
+                        if (yaxisEquUnitId != -1) {
+                            let filteredProgramEQList = this.state.programEquivalencyUnitList.filter(c => c.equivalencyUnit.equivalencyUnitId == yaxisEquUnitId);
                             let newPlanningUnitList = [];
                             let newForecastingUnitList = [];
                             for (var i = 0; i < forecastingUnitList.length; i++) {
@@ -1097,8 +1093,8 @@ class ForecastOutput extends Component {
                                 }
                             }
 
-                            var equivalencyUnitt = document.getElementById("equivalencyUnitId");
-                            var selectedText = equivalencyUnitt.options[equivalencyUnitt.selectedIndex].text;
+                            var yaxisEquUnitt = document.getElementById("yaxisEquUnit");
+                            var selectedText = yaxisEquUnitt.options[yaxisEquUnitt.selectedIndex].text;
 
                             this.setState({
                                 planningUnits: newPlanningUnitList,
@@ -1254,7 +1250,7 @@ class ForecastOutput extends Component {
         if (versionId != '' || versionId != undefined) {
             this.setState({
                 versionId: ((event == null || event == '' || event == undefined) ? (this.state.versionId) : (event.target.value).trim()),
-                equivalencyUnitId: '',
+                yaxisEquUnit: -1,
                 planningUnits: [],
                 planningUnitValues: [],
                 planningUnitLabels: [],
@@ -1268,7 +1264,8 @@ class ForecastOutput extends Component {
             }, () => {
                 // localStorage.setItem("sesVersionIdReport", this.state.versionId);
                 // (viewById == 1 ? this.getPlanningUnitForecastingUnit() : this.getForecastingUnit());
-                this.getPlanningUnitForecastingUnit()
+                this.getEquivalencyUnitData();
+                this.getPlanningUnitForecastingUnit();
 
             })
         } else {
@@ -1276,6 +1273,7 @@ class ForecastOutput extends Component {
                 versionId: event.target.value
             }, () => {
                 // (viewById == 1 ? this.getPlanningUnitForecastingUnit() : this.getForecastingUnit());
+                this.getEquivalencyUnitData();
                 this.getPlanningUnitForecastingUnit()
             })
         }
@@ -1527,7 +1525,7 @@ class ForecastOutput extends Component {
         var chartOptions = {
             title: {
                 display: true,
-                text: (this.state.yaxisEquUnit == 1 ? this.state.equivalencyUnitLabel : 'Monthly Forecast ' + (this.state.viewById == 1 ? '(Planning Unit)' : '(Forecasting Unit)'))
+                text: (this.state.yaxisEquUnit > 0 ? this.state.equivalencyUnitLabel : 'Monthly Forecast ' + (this.state.viewById == 1 ? '(Planning Unit)' : '(Forecasting Unit)'))
             },
             scales: {
                 yAxes: [
@@ -1535,10 +1533,10 @@ class ForecastOutput extends Component {
                         id: 'A',
                         scaleLabel: {
                             display: true,
-                            labelString: (this.state.yaxisEquUnit == 1 ? this.state.equivalencyUnitLabel : (this.state.viewById == 1 ? 'Planning Unit' : 'Forecasting Unit')),
+                            labelString: (this.state.yaxisEquUnit > 0 ? this.state.equivalencyUnitLabel : (this.state.viewById == 1 ? 'Planning Unit' : 'Forecasting Unit')),
                             fontColor: 'black'
                         },
-                        stacked: (this.state.yaxisEquUnit == 1 ? true : false),
+                        stacked: (this.state.yaxisEquUnit > 0 ? true : false),
                         // stacked: true,//stacked
                         ticks: {
                             beginAtZero: true,
@@ -1645,7 +1643,7 @@ class ForecastOutput extends Component {
                             stack: 3,
                             yAxisID: 'A',
                             // backgroundColor: 'transparent',
-                            backgroundColor: (this.state.yaxisEquUnit == 1 ? backgroundColor[index] : 'transparent'),
+                            backgroundColor: (this.state.yaxisEquUnit > 0 ? backgroundColor[index] : 'transparent'),
                             // backgroundColor: item.color,//stacked
                             borderColor: backgroundColor[index],
                             borderStyle: 'dotted',
@@ -1693,7 +1691,7 @@ class ForecastOutput extends Component {
                             stack: 3,
                             yAxisID: 'A',
                             // backgroundColor: 'transparent',
-                            backgroundColor: (this.state.yaxisEquUnit == 1 ? backgroundColor[index] : 'transparent'),
+                            backgroundColor: (this.state.yaxisEquUnit > 0 ? backgroundColor[index] : 'transparent'),
                             // backgroundColor: item.color,//stacked
                             borderColor: backgroundColor[index],
                             borderStyle: 'dotted',
@@ -1913,8 +1911,29 @@ class ForecastOutput extends Component {
                                                 </div>
                                             </FormGroup>
 
-
                                             <FormGroup className="col-md-3">
+                                                <Label htmlFor="appendedInputButton">Y axis in equivalency unit</Label>
+                                                <div className="controls ">
+                                                    <InputGroup>
+                                                        <Input
+                                                            type="select"
+                                                            name="yaxisEquUnit"
+                                                            id="yaxisEquUnit"
+                                                            bsSize="sm"
+                                                            value={this.state.yaxisEquUnit}
+                                                            // onChange={this.filterData}
+                                                            onChange={(e) => { this.yAxisChange(e); }}
+                                                        >
+                                                            <option value="-1">{i18n.t('static.program.no')}</option>
+                                                            {equivalencyUnitList1}
+                                                        </Input>
+
+                                                    </InputGroup>
+                                                </div>
+                                            </FormGroup>
+
+
+                                            {/* <FormGroup className="col-md-3">
                                                 <Label htmlFor="appendedInputButton">Y axis in equivalency unit</Label>
                                                 <div className="controls ">
                                                     <InputGroup>
@@ -1953,7 +1972,7 @@ class ForecastOutput extends Component {
 
                                                     </InputGroup>
                                                 </div>
-                                            </FormGroup>
+                                            </FormGroup> */}
 
                                             <FormGroup className="col-md-3">
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.common.display')}</Label>
@@ -2097,7 +2116,7 @@ class ForecastOutput extends Component {
                                                                             ))}
                                                                         </tr>
                                                                     ))}
-                                                                    {this.state.yaxisEquUnit == 1 && this.state.xaxis == 2 &&
+                                                                    {this.state.yaxisEquUnit > 0 && this.state.xaxis == 2 &&
                                                                         <tr>
                                                                             <td></td>
                                                                             <td style={{ textAlign: 'left' }}><b>Total {" " + this.state.equivalencyUnitLabel}</b></td>
@@ -2119,7 +2138,7 @@ class ForecastOutput extends Component {
                                                                             ))}
                                                                         </tr>
                                                                     ))}
-                                                                    {this.state.yaxisEquUnit == 1 && this.state.xaxis == 1 &&
+                                                                    {this.state.yaxisEquUnit > 0 && this.state.xaxis == 1 &&
                                                                         <tr>
                                                                             <td></td>
                                                                             <td style={{ textAlign: 'left' }}><b>Total {" " + this.state.equivalencyUnitLabel}</b></td>

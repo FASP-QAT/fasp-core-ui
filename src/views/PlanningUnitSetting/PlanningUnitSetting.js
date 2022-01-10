@@ -786,7 +786,10 @@ export default class PlanningUnitSetting extends Component {
                         loading: false
                     },
                         () => {
-                            console.log("List------->pa", this.state.allProcurementAgentList)
+                            console.log("List------->pa", this.state.allProcurementAgentList);
+                            if (this.state.datasetList.length == 1) {
+                                this.setProgramId();
+                            }
                             // this.buildJExcel();
                         })
                 } else {
@@ -900,7 +903,8 @@ export default class PlanningUnitSetting extends Component {
                 console.log("DATASET-------->", datasetList);
                 this.setState({
                     datasetList: datasetList,
-                    datasetList1: datasetList1
+                    datasetList1: datasetList1,
+                    datasetId: (datasetList.length == 1 ? datasetList[0].programId : '')
                 }, () => {
                     this.planningUnitList();
                 })
