@@ -5,6 +5,7 @@ import { SECRET_KEY, CANCELLED_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, SUBMITT
 
 export function calculateModelingData(dataset, props, page, nodeId, scenarioId, type, treeId, isTemplate) {
     console.log("modelling dataset---", dataset);
+    console.log("modeling nodeId---",nodeId);
     console.log("modelling scenarioId---", scenarioId);
 
     // var db1;

@@ -647,6 +647,7 @@ export default class BuildTree extends Component {
         let { curTreeObj } = this.state;
         let { treeData } = this.state;
         let { dataSetObj } = this.state;
+        var result = false;
         var items = this.state.items;
         var programData = dataSetObj.programData;
         console.log("program data>>> 1", programData);
@@ -661,13 +662,14 @@ export default class BuildTree extends Component {
         programData.treeList = treeData;
         dataSetObj.programData = programData;
         console.log("dataSetDecrypt>>>", dataSetObj);
-        if (this.state.currentItemConfig.context.payload.nodeType.id == 2 && this.state.currentItemConfig.context.level != 0) {
-            var level0Data = items.filter(x => x.id == this.state.currentItemConfig.context.parent)[0];
-            if (level0Data.payload.nodeType.id == 1) {
-                nodeId = -1;
-            }
-        }
+        // if (this.state.currentItemConfig.context.payload.nodeType.id == 2 && this.state.currentItemConfig.context.level != 0) {
+        //     var level0Data = items.filter(x => x.id == this.state.currentItemConfig.context.parent)[0];
+        //     if (level0Data.payload.nodeType.id == 1) {
+        //         calculateModelingData(dataSetObj, this, '',-1, this.state.selectedScenario, type, this.state.treeId, false);
+        //     }
+        // }else{
         calculateModelingData(dataSetObj, this, '', (nodeId != 0 ? nodeId : this.state.currentItemConfig.context.id), this.state.selectedScenario, type, this.state.treeId, false);
+        // }
     }
     fetchTracerCategoryList(programData) {
         console.log("programData---%%%%%%%", programData);
@@ -814,7 +816,7 @@ export default class BuildTree extends Component {
                 this.setState({ items })
             }
             if (parameterName == 'type' && value == 1) {
-                if (this.state.currentItemConfig.context.payload.nodeType.id == 2) {
+                if (this.state.currentItemConfig.context.payload.nodeType.id == 1 || this.state.currentItemConfig.context.payload.nodeType.id == 2) {
                     this.setState({ momList: this.state.nodeDataMomList.filter(x => x.nodeId == this.state.currentItemConfig.context.id) }, () => {
                         console.log("going to build mom jexcel");
                         this.buildMomJexcel();
@@ -827,6 +829,9 @@ export default class BuildTree extends Component {
                 }
 
 
+            }
+            if (parameterName == 'type' && value == 0) {
+                this.calculateValuesForAggregateNode(this.state.items);
             }
             console.log("returmed list---", this.state.nodeDataMomList);
             this.updateTreeData();
@@ -1537,7 +1542,7 @@ export default class BuildTree extends Component {
             updateTable: function (el, cell, x, y, source, value, id) {
                 var elInstance = el.jexcel;
                 if (y != null) {
-                    var rowData = elInstance.getRowData(y);
+                    // var rowData = elInstance.getRowData(y);
                     // console.log("this.state.seasonality---", this.state.seasonality);
                     // if (this.state.seasonality) {
                     //     if (x == 5) {
@@ -2549,6 +2554,7 @@ export default class BuildTree extends Component {
 
     changed1 = function (instance, cell, x, y, value) {
         // 4 & 5
+        console.log("hi anchal")
         var json = this.state.momEl.getJson(null, false);
         console.log("momData>>>", json);
         var overrideListArray = [];
@@ -5052,6 +5058,13 @@ export default class BuildTree extends Component {
                 })
 
             }
+            else {
+                this.setState({
+                    showModelingJexcelNumber: true
+                }, () => {
+                    this.buildModelingJexcel();
+                })
+            }
             //  else if (this.state.currentItemConfig.context.payload.nodeType.id == 3) {
             //     this.setState({ showModelingJexcelPercent: true }, () => {
             //         this.buildModelingJexcelPercent()
@@ -5394,10 +5407,8 @@ export default class BuildTree extends Component {
             cursorItem: parseInt(items.length + 1)
         }, () => {
             console.log("on add items-------", this.state.items);
-            // var getAllAggregationNode = this.state.items.filter(c => c.payload.nodeType.id == 1);
-            // console.log(">>>", getAllAggregationNode);
             this.calculateMOMData(newItem.id, 0);
-            this.calculateValuesForAggregateNode(this.state.items);
+            // this.calculateValuesForAggregateNode(this.state.items);
         });
     }
 
@@ -5417,8 +5428,10 @@ export default class BuildTree extends Component {
             if (getChildAggregationNode.length > 0) {
                 var value = 0;
                 for (var m = 0; m < getChildAggregationNode.length; m++) {
-                    var value2 = getChildAggregationNode[m].payload.nodeDataMap[this.state.selectedScenario][0].dataValue != "" ? parseInt(getChildAggregationNode[m].payload.nodeDataMap[this.state.selectedScenario][0].dataValue) : 0;
+                    var value2 = getChildAggregationNode[m].payload.nodeDataMap[this.state.selectedScenario][0].dataValue != "" ? parseInt((getChildAggregationNode[m].payload.nodeDataMap[this.state.selectedScenario][0].dataValue).replaceAll(",", "")) : 0;
+                    console.log("value2---",value2);
                     value = value + parseInt(value2);
+                    console.log("value---",value);
                 }
 
                 var findNodeIndex = items.findIndex(n => n.id == getAllAggregationNode[i].id);
@@ -5634,7 +5647,7 @@ export default class BuildTree extends Component {
             openAddNodeModal: false,
         }, () => {
             console.log("updated tree data+++", this.state);
-            this.calculateValuesForAggregateNode(this.state.items);
+            // this.calculateValuesForAggregateNode(this.state.items);
             this.calculateMOMData(0, 0);
             // console.log("returmed list---", this.state.nodeDataMomList);
             // this.updateTreeData();
@@ -5899,7 +5912,7 @@ export default class BuildTree extends Component {
                         }}
                         validate={validateNodeData(validationSchemaNodeData)}
                         onSubmit={(values, { setSubmitting, setErrors }) => {
-                            console.log("all ok>>>");
+                            console.log("all ok>>>", this.state.currentItemConfig);
                             if (this.state.addNodeFlag) {
                                 this.onAddButtonClick(this.state.currentItemConfig)
                             } else {
