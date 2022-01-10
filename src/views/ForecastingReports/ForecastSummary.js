@@ -724,7 +724,8 @@ class ForecastSummary extends Component {
                         totalForecast += Number(ele.calculatedValue);
                     });
                 }
-                elInstance.setValueFromCoords((Number(x) + 1), y, totalForecast.toFixed(2), true);
+                // elInstance.setValueFromCoords((Number(x) + 1), y, totalForecast.toFixed(2), true);
+                elInstance.setValueFromCoords((Number(x) + 1), y, parseInt(totalForecast), true);
             }
         }
     }
