@@ -783,23 +783,36 @@ export default class BuildTree extends Component {
         }, () => {
             if (parameterName == 'nodeId' && (value != null && value != 0)) {
                 var items = this.state.items;
-                var node = items.filter(n => n.id == value)[0];
-                (node.payload.nodeDataMap[this.state.selectedScenario])[0].nodeDataMomList = this.state.nodeDataMomList;
-                var findNodeIndex = items.findIndex(n => n.id == value);
-                console.log("findNodeIndex---", findNodeIndex);
-                items[findNodeIndex] = node;
-                // nodes[findNodeIndex].valueType = currentItemConfig.valueType;
+                var nodeDataMomList = this.state.nodeDataMomList ;
+                if (nodeDataMomList.length > 0) {
+                    for (let i = 0; i <= nodeDataMomList.length; i++) {
+                        var nodeId = nodeDataMomList[i].nodeId;
+                        var nodeDataMomListForNode = nodeDataMomList[i].nodeDataMomList;
+                        console.log("this.state.nodeDataMomList---", this.state.nodeDataMomList);
+                        var node = items.filter(n => n.id == nodeId)[0];
+                        console.log("node---",node);
+                        (node.payload.nodeDataMap[this.state.selectedScenario])[0].nodeDataMomList = nodeDataMomListForNode;
+                        var findNodeIndex = items.findIndex(n => n.id == nodeId);
+                        console.log("findNodeIndex---", findNodeIndex);
+                        items[findNodeIndex] = node;
+                    }
+                }
+                // var node = items.filter(n => n.id == value)[0];
+                // (node.payload.nodeDataMap[this.state.selectedScenario])[0].nodeDataMomList = this.state.nodeDataMomList.length == 1 ? this.state.nodeDataMomList : [];
+                // var findNodeIndex = items.findIndex(n => n.id == value);
+                // console.log("findNodeIndex---", findNodeIndex);
+                // items[findNodeIndex] = node;
                 console.log("items---***", items);
                 this.setState({ items })
             }
             if (parameterName == 'type' && value == 1) {
                 if (this.state.currentItemConfig.context.payload.nodeType.id == 2) {
-                    this.setState({ momList: this.state.nodeDataMomList }, () => {
+                    this.setState({ momList: this.state.nodeDataMomList.filter(x => x.nodeId == this.state.currentItemConfig.context.id) }, () => {
                         console.log("going to build mom jexcel");
                         this.buildMomJexcel();
                     });
                 } else {
-                    this.setState({ momListPer: this.state.nodeDataMomList }, () => {
+                    this.setState({ momListPer: this.state.nodeDataMomList.filter(x => x.nodeId == this.state.currentItemConfig.context.id) }, () => {
                         console.log("going to build mom jexcel percent");
                         this.buildMomJexcelPercent();
                     });

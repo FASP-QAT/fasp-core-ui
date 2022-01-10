@@ -316,7 +316,7 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                     }
                     if (nodeId != -1) {
                         allNodeDataList.push({
-                            nodeId: aggregateNodeList[fl - 1],
+                            nodeId: aggregateNodeList[fl - 1].id,
                             nodeDataMomList: nodeDataList
                         })
                     } else {
@@ -333,7 +333,13 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
 
         // treeList[tl].tree.flatList = flatList;
     }
+    console.log("allNodeDataList---",allNodeDataList);
     props.updateState("nodeDataMomList", allNodeDataList);
+    props.updateState("nodeId", nodeId);
+    props.updateState("type", type);
+    props.updateState("loading", false);
+    props.updateState("modelingJexcelLoader", false);
+    props.updateState("momJexcelLoader", false);
     // treeList = treeList;
     // datasetJson.treeList = treeList;
     // var encryptedDatasetJson = (CryptoJS.AES.encrypt(JSON.stringify(datasetJson), SECRET_KEY)).toString();
