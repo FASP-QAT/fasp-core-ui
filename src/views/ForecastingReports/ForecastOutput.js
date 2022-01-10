@@ -115,14 +115,15 @@ class ForecastOutput extends Component {
             // console.log("consumptionList---------->2.1", consumptionList[i]);
             monthDataList = monthDataList.concat(consumptionList[i]);
         }
-        // console.log("consumptionList---------->3", monthDataList);
+        console.log("consumptionData------------------->500", monthDataList);
         // logic for add same date data
         let resultTrue = Object.values(monthDataList.reduce((a, { consumptionDate, consumptionQty }) => {
             if (!a[consumptionDate])
                 a[consumptionDate] = Object.assign({}, { consumptionDate, consumptionQty });
             else
                 // a[consumptionDate].consumptionQty += consumptionQty;
-                a[consumptionDate].consumptionQty = parseFloat(a[consumptionDate].consumptionQty) + parseFloat(consumptionQty);
+                // a[consumptionDate].consumptionQty = parseFloat(a[consumptionDate].consumptionQty) + parseFloat(consumptionQty);
+                a[consumptionDate].consumptionQty = parseInt(a[consumptionDate].consumptionQty) + parseInt(consumptionQty);
             return a;
         }, {}));
 
@@ -154,17 +155,18 @@ class ForecastOutput extends Component {
             //     }
             // });
             let tempConsumptionListData = resultTrue;
-            console.log("consumptionData------------------->33", tempConsumptionListData);
+            console.log("consumptionData------------------->501", tempConsumptionListData);
             //logic for add same date data                            
             let resultTrue1 = Object.values(tempConsumptionListData.reduce((a, { consumptionDate, consumptionQty }) => {
                 if (!a[consumptionDate])
                     a[consumptionDate] = Object.assign({}, { consumptionDate, consumptionQty });
                 else
                     // a[consumptionDate].consumptionQty += consumptionQty;
-                    a[consumptionDate].consumptionQty = parseFloat(a[consumptionDate].consumptionQty) + parseFloat(consumptionQty);
+                    // a[consumptionDate].consumptionQty = parseFloat(a[consumptionDate].consumptionQty) + parseFloat(consumptionQty);
+                    a[consumptionDate].consumptionQty = parseInt(a[consumptionDate].consumptionQty) + parseInt(consumptionQty);
                 return a;
             }, {}));
-            console.log("consumptionData------------------->3", resultTrue1);
+            console.log("consumptionData------------------->502", resultTrue1);
             let result = resultTrue1.map(m => {
                 return {
                     consumptionDate: m.consumptionDate,
@@ -172,7 +174,7 @@ class ForecastOutput extends Component {
                     consumptionQty: parseInt(m.consumptionQty)
                 }
             });
-            console.log("consumptionData------------------->4", result);
+            console.log("consumptionData------------------->503", result);
             this.setState({
                 calculateEquivalencyUnitTotal: result
             }, () => {
@@ -197,7 +199,7 @@ class ForecastOutput extends Component {
         })
     }
 
-    getEquivalencyUnitData() {        
+    getEquivalencyUnitData() {
         let programId = document.getElementById("programId").value;
         let versionId = document.getElementById("versionId").value;
         this.setState({
@@ -490,6 +492,7 @@ class ForecastOutput extends Component {
                                                             }
                                                         });
                                                         let jsonTemp = { objUnit: planningUniObj.planningUnit, scenario: { id: 1, label: treeList[j].label.label_en + filteredScenario[0].label.label_en }, display: true, color: "#ba0c2f", consumptionList: consumptionList }
+                                                        console.log("Test------------>8.1", jsonTemp);
                                                         consumptionData.push(jsonTemp);
                                                         match = 0;
                                                         break;
@@ -637,7 +640,7 @@ class ForecastOutput extends Component {
                                 }
                             }
 
-                            console.log("TestFU------------>9", consumptionData);
+                            console.log("TestFU------------>91", consumptionData);
                             // logic for add same date data
                             // let resultTrue = Object.values(tempConsumptionListData.reduce((a, { consumptionDate, consumptionQty }) => {
                             //     if (!a[consumptionDate])
@@ -656,7 +659,9 @@ class ForecastOutput extends Component {
                                     consumptionData: consumptionData,
                                     monthArrayList: monthArrayList
                                 }, () => {
-                                    this.calculateEquivalencyUnitTotal();
+                                    if (yaxisEquUnitId > 0) {
+                                        this.calculateEquivalencyUnitTotal();
+                                    }
                                 })
 
                             } else {//yes
@@ -667,9 +672,18 @@ class ForecastOutput extends Component {
                                     years.push("" + i)
                                 }
 
+                                let nextStartDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
+                                let nextEndDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-28';
+
+                                console.log("TestFU------------>92", consumptionData);
+
                                 for (let i = 0; i < consumptionData.length; i++) {
 
-                                    let tempConsumptionListData = consumptionData[i].consumptionList.map(m => {
+                                    console.log("consumptionData------------------->3002", consumptionData[i].consumptionList);
+                                    let nextConsumptionListData = consumptionData[i].consumptionList.filter(c => moment(c.consumptionDate).isBetween(nextStartDate, nextEndDate, null, '[)'))
+                                    console.log("consumptionData------------------->3003", nextConsumptionListData);
+
+                                    let tempConsumptionListData = nextConsumptionListData.map(m => {
                                         return {
                                             consumptionDate: moment(m.consumptionDate).format("YYYY"),
                                             // consumptionQty: m.consumptionQty
@@ -677,30 +691,21 @@ class ForecastOutput extends Component {
                                         }
                                     });
                                     console.log("consumptionData------------------->33", tempConsumptionListData);
+
                                     //logic for add same date data                            
                                     let resultTrue = Object.values(tempConsumptionListData.reduce((a, { consumptionDate, consumptionQty }) => {
                                         if (!a[consumptionDate])
                                             a[consumptionDate] = Object.assign({}, { consumptionDate, consumptionQty });
                                         else
                                             // a[consumptionDate].consumptionQty += consumptionQty;
-                                            a[consumptionDate].consumptionQty = parseFloat(a[consumptionDate].consumptionQty) + parseFloat(consumptionQty);
+                                            // a[consumptionDate].consumptionQty = parseFloat(a[consumptionDate].consumptionQty) + parseFloat(consumptionQty);
+                                            a[consumptionDate].consumptionQty = parseInt(a[consumptionDate].consumptionQty) + parseInt(consumptionQty);
                                         return a;
                                     }, {}));
 
                                     console.log("consumptionData------------------->3", resultTrue);
 
-                                    let result = resultTrue.map(m => {
-                                        return {
-                                            consumptionDate: m.consumptionDate,
-                                            // consumptionQty: parseFloat(m.consumptionQty).toFixed(2)
-                                            consumptionQty: parseInt(m.consumptionQty)
-                                        }
-                                    });
-
-                                    console.log("consumptionData------------------->4", result);
-
-                                    consumptionData[i].consumptionList = result;
-
+                                    consumptionData[i].consumptionList = resultTrue;
                                 }
                                 console.log("consumptionData------------------->3", years);
                                 console.log("consumptionData------------------->4", consumptionData);
@@ -708,7 +713,9 @@ class ForecastOutput extends Component {
                                     consumptionData: consumptionData,
                                     monthArrayList: years
                                 }, () => {
-                                    this.calculateEquivalencyUnitTotal();
+                                    if (yaxisEquUnitId > 0) {
+                                        this.calculateEquivalencyUnitTotal();
+                                    }
                                 })
 
 
@@ -1680,7 +1687,7 @@ class ForecastOutput extends Component {
                             if (value.length > 0) {
                                 consumptionValue.push(value[0].consumptionQty)
                             } else {
-                                consumptionValue.push("");
+                                // consumptionValue.push("");
                             }
                         }
                     })
