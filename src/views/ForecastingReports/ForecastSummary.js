@@ -1594,26 +1594,26 @@ class ForecastSummary extends Component {
                                                             <tr>
                                                                 <th className="BorderNoneSupplyPlan sticky-col first-col clone1"></th>
                                                                 {/* <th className="text-center" style={{}}> Forecasting Unit </th> */}
-                                                                <th className="text-center" style={{}}>Planning Unit</th>
-                                                                <th className="text-center" style={{}}>Total Forecasted Quantity</th>
+                                                                <th className="text-center" style={{width: '19%'}}>Planning Unit</th>
+                                                                <th className="text-center" style={{width: ''}}>Total Forecasted Quantity <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
                                                                 {!this.state.hideColumn &&
                                                                     <>
-                                                                        <th className="text-center" style={{}}>Stock (end of {this.state.beforeEndDateDisplay})</th>
-                                                                        <th className="text-center" style={{}}>Existing Shipments ({this.state.startDateDisplay + ' - ' + this.state.endDateDisplay})</th>
-                                                                        <th className="text-center" style={{}}>Stock (end of {this.state.endDateDisplay})</th>
-                                                                        <th className="text-center" style={{}}>Desired Months of Stock (end of {this.state.endDateDisplay})</th>
-                                                                        <th className="text-center" style={{}}>Desired Stock (end of {this.state.endDateDisplay})</th>
+                                                                        <th className="text-center" title="Stock (end of {this.state.beforeEndDateDisplay})" style={{width: '7%'}}>Stock <span className="FontWeightNormal">(end of {this.state.beforeEndDateDisplay})</span> <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
+                                                                        <th className="text-center" style={{width: ''}}>Existing Shipments <span className="FontWeightNormal">({this.state.startDateDisplay + ' - ' + this.state.endDateDisplay})</span> <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
+                                                                        <th className="text-center" style={{width: '8%'}}>Stock <span className="FontWeightNormal">(end of {this.state.endDateDisplay})</span> <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
+                                                                        <th className="text-center" style={{width: '7%'}}>Desired Months of Stock <span className="FontWeightNormal">(end of {this.state.endDateDisplay})</span> <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
+                                                                        <th className="text-center" style={{width: '8%'}}>Desired Stock <span className="FontWeightNormal">(end of {this.state.endDateDisplay})</span> <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
                                                                     </>
                                                                 }
-                                                                <th className="text-center" style={{}}>Procurement Surplus/Gap</th>
+                                                                <th className="text-center" style={{width: ''}}>Procurement Surplus/Gap <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
                                                                 {!this.state.hideColumn &&
                                                                     <>
-                                                                        <th className="text-center" style={{}}>Price Type</th>
-                                                                        <th className="text-center" style={{}}>Unit Price (USD)</th>
+                                                                        <th className="text-center" style={{width: '7%'}}>Price Type <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
+                                                                        <th className="text-center" style={{width: '7%'}}>Unit Price <span className="FontWeightNormal">(USD)</span> <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
                                                                     </>
                                                                 }
-                                                                <th className="text-center" style={{}}>Procurements Needed (USD)</th>
-                                                                <th className="text-center" style={{ width: '20%' }}>Notes</th>
+                                                                <th className="text-center" style={{width: ''}}>Procurements Needed <span className="FontWeightNormal">(USD)</span> <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
+                                                                <th className="text-center" style={{ width: '20%' }}>Notes <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
 
                                                             </tr>
                                                         </thead>
@@ -1663,7 +1663,7 @@ class ForecastSummary extends Component {
                                                                                     <>
                                                                                         <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                                                         {/* <td>{item1.forecastingUnit.label.label_en}</td> */}
-                                                                                        <td>{item1.planningUnit.label.label_en}</td>
+                                                                                        <td className='text-left'>{item1.planningUnit.label.label_en}</td>
                                                                                         <td>{item1.totalForecastedQuantity}</td>
                                                                                         {!this.state.hideColumn &&
                                                                                             <>
