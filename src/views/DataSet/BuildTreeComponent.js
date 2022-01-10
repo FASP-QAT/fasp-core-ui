@@ -647,7 +647,6 @@ export default class BuildTree extends Component {
         let { curTreeObj } = this.state;
         let { treeData } = this.state;
         let { dataSetObj } = this.state;
-        var result = false;
         var items = this.state.items;
         var programData = dataSetObj.programData;
         console.log("program data>>> 1", programData);
@@ -817,12 +816,13 @@ export default class BuildTree extends Component {
             }
             if (parameterName == 'type' && value == 1) {
                 if (this.state.currentItemConfig.context.payload.nodeType.id == 1 || this.state.currentItemConfig.context.payload.nodeType.id == 2) {
-                    this.setState({ momList: this.state.nodeDataMomList.filter(x => x.nodeId == this.state.currentItemConfig.context.id) }, () => {
+                    console.log("mom list ret---",this.state.nodeDataMomList.filter(x => x.nodeId == this.state.currentItemConfig.context.id));
+                    this.setState({ momList: this.state.nodeDataMomList.filter(x => x.nodeId == this.state.currentItemConfig.context.id)[0].nodeDataMomList }, () => {
                         console.log("going to build mom jexcel");
                         this.buildMomJexcel();
                     });
                 } else {
-                    this.setState({ momListPer: this.state.nodeDataMomList.filter(x => x.nodeId == this.state.currentItemConfig.context.id) }, () => {
+                    this.setState({ momListPer: this.state.nodeDataMomList.filter(x => x.nodeId == this.state.currentItemConfig.context.id)[0].nodeDataMomList }, () => {
                         console.log("going to build mom jexcel percent");
                         this.buildMomJexcelPercent();
                     });
@@ -5429,9 +5429,9 @@ export default class BuildTree extends Component {
                 var value = 0;
                 for (var m = 0; m < getChildAggregationNode.length; m++) {
                     var value2 = getChildAggregationNode[m].payload.nodeDataMap[this.state.selectedScenario][0].dataValue != "" ? parseInt((getChildAggregationNode[m].payload.nodeDataMap[this.state.selectedScenario][0].dataValue).replaceAll(",", "")) : 0;
-                    console.log("value2---",value2);
+                    console.log("value2---", value2);
                     value = value + parseInt(value2);
-                    console.log("value---",value);
+                    console.log("value---", value);
                 }
 
                 var findNodeIndex = items.findIndex(n => n.id == getAllAggregationNode[i].id);
