@@ -608,6 +608,12 @@ export default class ExtrapolateDataComponent extends React.Component {
                 console.log("consumptionExtrapolationData", consumptionExtrapolationData);
                 console.log("inputDataFilter", inputDataFilter);
                 //Semi - averages
+                var planningUnitObj = this.state.planningUnitList.filter(c => c.planningUnit.id == this.state.planningUnitId)[0].planningUnit;
+                var regionObj = this.state.regionList.filter(c => c.regionId == this.state.regionId)[0];
+                console.log("Planning Unit Obj****", planningUnitObj);
+                console.log("Region Obj****", regionObj);
+                var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
+                var curUser = AuthenticationService.getLoggedInUserId();
                 if (this.state.semiAvgId) {
                     if (consumptionExtrapolationData == -1) {
                         var data = [];
@@ -617,15 +623,10 @@ export default class ExtrapolateDataComponent extends React.Component {
                         consumptionExtrapolationList.push(
                             {
                                 "consumptionExtrapolationId": consumptionExtrapolationDataUnFiltered.length + 1,
-                                "planningUnit": {
-                                    "id": this.state.planningUnitId,
-                                    "label": {
-                                    }
-                                },
+                                "planningUnit": planningUnitObj,
                                 "region": {
-                                    "id": this.state.regionId,
-                                    "label": {
-                                    }
+                                    id:regionObj.regionId,
+                                    label:regionObj.label
                                 },
                                 "extrapolationMethod": {
                                     "id": 6,
@@ -645,19 +646,18 @@ export default class ExtrapolateDataComponent extends React.Component {
                                 "jsonProperties": {
                                 },
                                 "createdBy": {
-                                    "userId": 1,
-                                    "username": "Anchal C"
+                                    "userId": curUser
                                 },
-                                "createdDate": "2021-12-14 12:24:20",
+                                "createdDate": curDate,
                                 "extrapolationDataList": data
                             })
                     } else {
-                        consumptionExtrapolationList[consumptionExtrapolationData].jsonProperties = {};
-                        var data = [];
-                        for (var i = 0; i < inputDataFilter.length; i++) {
-                            data.push({ month: moment(this.state.startMonthForExtrapolation).add(inputDataFilter[i].month - 1, 'months').format("YYYY-MM-DD"), amount: inputDataFilter[i].forecast })
-                        }
-                        consumptionExtrapolationList[consumptionExtrapolationData].extrapolationDataList = data;
+                        // consumptionExtrapolationList[consumptionExtrapolationData].jsonProperties = {};
+                        // var data = [];
+                        // for (var i = 0; i < inputDataFilter.length; i++) {
+                        //     data.push({ month: moment(this.state.startMonthForExtrapolation).add(inputDataFilter[i].month - 1, 'months').format("YYYY-MM-DD"), amount: inputDataFilter[i].forecast })
+                        // }
+                        // consumptionExtrapolationList[consumptionExtrapolationData].extrapolationDataList = data;
                     }
                 }
                 console.log("this.state.monthsForMovingAverage+++", this.state.monthsForMovingAverage)
@@ -672,15 +672,10 @@ export default class ExtrapolateDataComponent extends React.Component {
                         consumptionExtrapolationList.push(
                             {
                                 "consumptionExtrapolationId": consumptionExtrapolationDataUnFiltered.length + 1,
-                                "planningUnit": {
-                                    "id": this.state.planningUnitId,
-                                    "label": {
-                                    }
-                                },
+                                "planningUnit": planningUnitObj,
                                 "region": {
-                                    "id": this.state.regionId,
-                                    "label": {
-                                    }
+                                    id:regionObj.regionId,
+                                    label:regionObj.label
                                 },
                                 "extrapolationMethod": {
                                     "id": 7,
@@ -701,10 +696,9 @@ export default class ExtrapolateDataComponent extends React.Component {
                                     months: this.state.monthsForMovingAverage
                                 },
                                 "createdBy": {
-                                    "userId": 1,
-                                    "username": "Anchal C"
+                                    "userId": curUser
                                 },
-                                "createdDate": "2021-12-14 12:24:20",
+                                "createdDate": curDate,
                                 "extrapolationDataList": data
                             })
                     }
@@ -727,15 +721,10 @@ export default class ExtrapolateDataComponent extends React.Component {
                         consumptionExtrapolationList.push(
                             {
                                 "consumptionExtrapolationId": consumptionExtrapolationDataUnFiltered.length + 1,
-                                "planningUnit": {
-                                    "id": this.state.planningUnitId,
-                                    "label": {
-                                    }
-                                },
+                                "planningUnit": planningUnitObj,
                                 "region": {
-                                    "id": this.state.regionId,
-                                    "label": {
-                                    }
+                                    id:regionObj.regionId,
+                                    label:regionObj.label
                                 },
                                 "extrapolationMethod": {
                                     "id": 5,
@@ -755,10 +744,9 @@ export default class ExtrapolateDataComponent extends React.Component {
                                 "jsonProperties": {
                                 },
                                 "createdBy": {
-                                    "userId": 1,
-                                    "username": "Anchal C"
+                                    "userId": curUser
                                 },
-                                "createdDate": "2021-12-14 12:24:20",
+                                "createdDate": curDate,
                                 "extrapolationDataList": data
                             })
                     } else {
@@ -782,15 +770,10 @@ export default class ExtrapolateDataComponent extends React.Component {
                         consumptionExtrapolationList.push(
                             {
                                 "consumptionExtrapolationId": consumptionExtrapolationDataUnFiltered.length + 1,
-                                "planningUnit": {
-                                    "id": this.state.planningUnitId,
-                                    "label": {
-                                    }
-                                },
+                                "planningUnit": planningUnitObj,
                                 "region": {
-                                    "id": this.state.regionId,
-                                    "label": {
-                                    }
+                                    id:regionObj.regionId,
+                                    label:regionObj.label
                                 },
                                 "extrapolationMethod": {
                                     "id": 1,
@@ -815,10 +798,9 @@ export default class ExtrapolateDataComponent extends React.Component {
                                     gamma: this.state.gamma
                                 },
                                 "createdBy": {
-                                    "userId": 1,
-                                    "username": "Anchal C"
+                                    "userId": curUser
                                 },
-                                "createdDate": "2021-12-14 12:24:20",
+                                "createdDate": curDate,
                                 "extrapolationDataList": data
                             })
                     } else {
@@ -846,15 +828,10 @@ export default class ExtrapolateDataComponent extends React.Component {
                         consumptionExtrapolationList.push(
                             {
                                 "consumptionExtrapolationId": consumptionExtrapolationDataUnFiltered.length + 1,
-                                "planningUnit": {
-                                    "id": this.state.planningUnitId,
-                                    "label": {
-                                    }
-                                },
+                                "planningUnit": planningUnitObj,
                                 "region": {
-                                    "id": this.state.regionId,
-                                    "label": {
-                                    }
+                                    id:regionObj.regionId,
+                                    label:regionObj.label
                                 },
                                 "extrapolationMethod": {
                                     "id": 2,
@@ -879,10 +856,9 @@ export default class ExtrapolateDataComponent extends React.Component {
                                     gamma: this.state.gamma
                                 },
                                 "createdBy": {
-                                    "userId": 1,
-                                    "username": "Anchal C"
+                                    "userId": curUser
                                 },
-                                "createdDate": "2021-12-14 12:24:20",
+                                "createdDate": curDate,
                                 "extrapolationDataList": data
                             })
                     } else {
@@ -910,15 +886,10 @@ export default class ExtrapolateDataComponent extends React.Component {
                         consumptionExtrapolationList.push(
                             {
                                 "consumptionExtrapolationId": consumptionExtrapolationDataUnFiltered.length + 1,
-                                "planningUnit": {
-                                    "id": this.state.planningUnitId,
-                                    "label": {
-                                    }
-                                },
+                                "planningUnit": planningUnitObj,
                                 "region": {
-                                    "id": this.state.regionId,
-                                    "label": {
-                                    }
+                                    id:regionObj.regionId,
+                                    label:regionObj.label
                                 },
                                 "extrapolationMethod": {
                                     "id": 1,
@@ -943,10 +914,9 @@ export default class ExtrapolateDataComponent extends React.Component {
                                     gamma: this.state.gamma
                                 },
                                 "createdBy": {
-                                    "userId": 1,
-                                    "username": "Anchal C"
+                                    "userId": curUser
                                 },
-                                "createdDate": "2021-12-14 12:24:20",
+                                "createdDate": curDate,
                                 "extrapolationDataList": data
                             })
                     } else {
@@ -1562,15 +1532,15 @@ export default class ExtrapolateDataComponent extends React.Component {
                             <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} /> */}
                         </div>
                     </div>
-                     <div className="Card-header-reporticon pb-2">
+                    <div className="Card-header-reporticon pb-2">
                         <div className="card-header-actions">
-                        <a className="card-header-action">
+                            <a className="card-header-action">
                                 <span style={{ cursor: 'pointer' }} onClick={() => { this.toggleShowGuidance() }}><small className="supplyplanformulas">{i18n.t('static.common.showGuidance')}</small></span>
                             </a>
                             <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
                             {/* <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} /> */}
                         </div>
-                    </div> 
+                    </div>
                     <CardBody className="pb-lg-5 pt-lg-0">
                         <Form name='simpleForm'>
                             <div className=" pl-0">
@@ -1663,10 +1633,10 @@ export default class ExtrapolateDataComponent extends React.Component {
                                     </FormGroup> */}
                                     <FormGroup className="col-md-12">
                                         <h5>
-                                            {i18n.t('static.common.for')}{" "}{this.state.planningUnitId > 0 &&
-                                                document.getElementById("planningUnitId").selectedOptions[0].text}
+                                            {this.state.planningUnitId > 0 && i18n.t('static.common.for')}{" "}<b>{this.state.planningUnitId > 0 &&
+                                                document.getElementById("planningUnitId").selectedOptions[0].text}</b>
                                             {this.state.regionId > 0 &&
-                                                " " + i18n.t('static.common.and') + " " + document.getElementById("regionId").selectedOptions[0].text+(" ") + i18n.t('static.extrpolate.selectYourExtrapolationParameters')}
+                                                " " + i18n.t('static.common.and') + " "}<b>{this.state.regionId > 0 && document.getElementById("regionId").selectedOptions[0].text + (" ")}</b> {this.state.regionId > 0 && i18n.t('static.extrpolate.selectYourExtrapolationParameters')}
                                         </h5>
                                     </FormGroup>
                                     <FormGroup className="col-md-3">
