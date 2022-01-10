@@ -298,7 +298,8 @@ export default class CreateTreeTemplate extends Component {
 
                                         },
                                         refillMonths: ''
-                                    }
+                                    },
+                                    nodeDataModelingList:[]
                                 }
                             ]
                         ]
@@ -837,7 +838,7 @@ export default class CreateTreeTemplate extends Component {
         if (data != null && data[0] != null && (data[0])[0] != null) {
             if (type == 4) {
                 var result = false;
-                if (itemConfig.payload.nodeDataMap[0][0].nodeDataModelingList.length > 0) {
+                if (itemConfig.payload.nodeDataMap[0][0].nodeDataModelingList != null && itemConfig.payload.nodeDataMap[0][0].nodeDataModelingList.length > 0) {
                     result = true;
                 } else {
                     var arr = this.state.items.filter(x => x.level == itemConfig.level && x.id != itemConfig.id && x.id < itemConfig.id);
@@ -2888,7 +2889,8 @@ export default class CreateTreeTemplate extends Component {
                                         usagePeriod: {
 
                                         }
-                                    }
+                                    },
+                                    nodeDataModelingList:[]
                                 }]
                             ]
                         },
