@@ -72,7 +72,7 @@ export default class CommitTreeComponent extends React.Component {
         openRequest.onerror = function (event) {
             this.setState({
                 message: i18n.t('static.program.errortext'),
-                color: 'red'
+                color: '#BA0C2F'
             })
             // this.hideFirstComponent()
         }.bind(this);
@@ -84,7 +84,7 @@ export default class CommitTreeComponent extends React.Component {
             programRequest.onerror = function (event) {
                 this.setState({
                     message: i18n.t('static.program.errortext'),
-                    color: 'red'
+                    color: '#BA0C2F'
                 })
                 // this.hideFirstComponent()
             }.bind(this);
@@ -148,7 +148,7 @@ export default class CommitTreeComponent extends React.Component {
         openRequest.onerror = function (event) {
             this.setState({
                 message: i18n.t('static.program.errortext'),
-                color: 'red'
+                color: '#BA0C2F'
             })
             // this.hideFirstComponent()
         }.bind(this);
@@ -609,7 +609,7 @@ export default class CommitTreeComponent extends React.Component {
                 openRequest.onerror = function (event) {
                     this.setState({
                         message: i18n.t('static.program.errortext'),
-                        color: 'red'
+                        color: '#BA0C2F'
                     })
                     // this.hideFirstComponent()
                 }.bind(this);
@@ -761,7 +761,7 @@ export default class CommitTreeComponent extends React.Component {
                     } else {
                         this.setState({
                             message: response.data.messageCode,
-                            color: "red",
+                            color: "#BA0C2F",
                             loading: false
                         })
                         // this.hideFirstComponent();
@@ -776,7 +776,7 @@ export default class CommitTreeComponent extends React.Component {
                                 console.log("+++in catch 7")
                                 this.setState({
                                     message: 'static.common.networkError',
-                                    color: "red",
+                                    color: "#BA0C2F",
                                     loading: false
                                 }, () => {
                                     this.hideFirstComponent();
@@ -796,7 +796,7 @@ export default class CommitTreeComponent extends React.Component {
                                         }
                                         this.setState({
                                             message: error.response.data.messageCode,
-                                            color: "red",
+                                            color: "#BA0C2F",
                                             loading: false
                                         }, () => {
                                             this.hideFirstComponent()
@@ -811,7 +811,7 @@ export default class CommitTreeComponent extends React.Component {
                                         this.setState({
                                             message: error.response.data.messageCode,
                                             loading: false,
-                                            color: "red"
+                                            color: "#BA0C2F"
                                         }, () => {
                                             this.hideFirstComponent()
                                         });
@@ -821,7 +821,7 @@ export default class CommitTreeComponent extends React.Component {
                                         this.setState({
                                             message: 'static.unkownError',
                                             loading: false,
-                                            color: "red"
+                                            color: "#BA0C2F"
                                         }, () => {
                                             this.hideFirstComponent()
                                         });
@@ -1168,10 +1168,13 @@ export default class CommitTreeComponent extends React.Component {
                 <iframe id="ifmcontentstoprint" style={{ height: '0px', width: '0px', position: 'absolute' }}></iframe>
                 <Modal isOpen={this.state.showValidation}
                     className={'modal-lg ' + this.props.className} id='divcontents'>
+                    {/* <ModalHeader toggle={() => this.toggleShowValidation()} className="modalHeaderSupplyPlan">
+                        <h3 style={{textAlign:'left'}}><strong>{i18n.t('static.commitTree.forecastValidation')}</strong><i className="fa fa-print pull-right iconClass cursor" onClick={() => this.print()}></i></h3>
+                    </ModalHeader> */}
                     <ModalHeader toggle={() => this.toggleShowValidation()} className="modalHeaderSupplyPlan">
-                        <h3><strong>{i18n.t('static.commitTree.forecastValidation')}</strong><i className="fa fa-print pull-right iconClass cursor" onClick={() => this.print()}></i></h3>
-
-                    </ModalHeader>
+                    <div><i className="fa fa-print pull-right iconClass cursor" onClick={() => this.print()}></i>
+                         <h3><strong>{i18n.t('static.commitTree.forecastValidation')}</strong></h3></div>
+                      </ModalHeader>
                     <div>
                         <ModalBody>
                             <span><b>{this.state.programName}</b></span><br />
