@@ -94,7 +94,16 @@ class ForecastOutput extends Component {
         this.xAxisChange = this.xAxisChange.bind(this);
         this.getEquivalencyUnitData = this.getEquivalencyUnitData.bind(this);
         this.calculateEquivalencyUnitTotal = this.calculateEquivalencyUnitTotal.bind(this);
+        this.backToCompareAndSelect = this.backToCompareAndSelect.bind(this);
+        this.continueToForecastSummary = this.continueToForecastSummary.bind(this);
+    }
 
+    backToCompareAndSelect() {
+        this.props.history.push(`/report/compareAndSelectScenario`)
+    }
+
+    continueToForecastSummary() {
+        this.props.history.push(`/forecastReport/forecastSummary`)
     }
 
     calculateEquivalencyUnitTotal() {
@@ -121,7 +130,8 @@ class ForecastOutput extends Component {
         let result1 = resultTrue.map(m => {
             return {
                 consumptionDate: m.consumptionDate,
-                consumptionQty: parseFloat(m.consumptionQty).toFixed(2)
+                // consumptionQty: parseFloat(m.consumptionQty).toFixed(2)
+                consumptionQty: parseInt(m.consumptionQty)
             }
         });
 
@@ -159,7 +169,8 @@ class ForecastOutput extends Component {
             let result = resultTrue1.map(m => {
                 return {
                     consumptionDate: m.consumptionDate,
-                    consumptionQty: parseFloat(m.consumptionQty).toFixed(2)
+                    // consumptionQty: parseFloat(m.consumptionQty).toFixed(2)
+                    consumptionQty: parseInt(m.consumptionQty)
                 }
             });
             console.log("consumptionData------------------->4", result);
@@ -476,7 +487,8 @@ class ForecastOutput extends Component {
                                                         let consumptionList = nodeDataMomList.map(m => {
                                                             return {
                                                                 consumptionDate: m.month,
-                                                                consumptionQty: (m.calculatedValue).toFixed(2)
+                                                                // consumptionQty: (m.calculatedValue).toFixed(2)
+                                                                consumptionQty: parseInt(m.calculatedValue)
                                                             }
                                                         });
                                                         let jsonTemp = { objUnit: planningUniObj.planningUnit, scenario: { id: 1, label: treeList[j].label.label_en + filteredScenario[0].label.label_en }, display: true, color: "#ba0c2f", consumptionList: consumptionList }
@@ -508,7 +520,8 @@ class ForecastOutput extends Component {
                                             let consumptionList = consumptionExtrapolationObj[0].extrapolationDataList.map(m => {
                                                 return {
                                                     consumptionDate: m.month,
-                                                    consumptionQty: m.amount
+                                                    // consumptionQty: m.amount
+                                                    consumptionQty: parseInt(m.amount)
                                                 }
                                             });
                                             let jsonTemp = { objUnit: planningUniObj.planningUnit, scenario: { id: 1, label: "" }, display: true, color: "#ba0c2f", consumptionList: consumptionList }
@@ -570,7 +583,8 @@ class ForecastOutput extends Component {
                                                             let consumptionList = nodeDataMomList.map(m => {
                                                                 return {
                                                                     consumptionDate: m.month,
-                                                                    consumptionQty: (m.calculatedValue * forecastingUniObj[l].planningUnit.multiplier).toFixed(2)
+                                                                    // consumptionQty: (m.calculatedValue * forecastingUniObj[l].planningUnit.multiplier).toFixed(2)
+                                                                    consumptionQty: parseInt(m.calculatedValue * forecastingUniObj[l].planningUnit.multiplier)
                                                                 }
                                                             });
                                                             // let jsonTemp = { objUnit: forecastingUniObj[l].planningUnit.forecastingUnit, scenario: { id: 1, label: treeList[j].label.label_en + filteredScenario[0].label.label_en }, display: true, color: "#ba0c2f", consumptionList: consumptionList }
@@ -604,7 +618,8 @@ class ForecastOutput extends Component {
                                                 let consumptionList = consumptionExtrapolationObj[0].extrapolationDataList.map(m => {
                                                     return {
                                                         consumptionDate: m.month,
-                                                        consumptionQty: m.amount
+                                                        // consumptionQty: m.amount
+                                                        consumptionQty: parseInt(m.amount)
                                                     }
                                                 });
                                                 // let jsonTemp = { objUnit: forecastingUniObj[l].planningUnit.forecastingUnit, scenario: { id: 1, label: "" }, display: true, color: "#ba0c2f", consumptionList: consumptionList }
@@ -659,7 +674,8 @@ class ForecastOutput extends Component {
                                     let tempConsumptionListData = consumptionData[i].consumptionList.map(m => {
                                         return {
                                             consumptionDate: moment(m.consumptionDate).format("YYYY"),
-                                            consumptionQty: m.consumptionQty
+                                            // consumptionQty: m.consumptionQty
+                                            consumptionQty: parseInt(m.consumptionQty)
                                         }
                                     });
                                     console.log("consumptionData------------------->33", tempConsumptionListData);
@@ -678,7 +694,8 @@ class ForecastOutput extends Component {
                                     let result = resultTrue.map(m => {
                                         return {
                                             consumptionDate: m.consumptionDate,
-                                            consumptionQty: parseFloat(m.consumptionQty).toFixed(2)
+                                            // consumptionQty: parseFloat(m.consumptionQty).toFixed(2)
+                                            consumptionQty: parseInt(m.consumptionQty)
                                         }
                                     });
 
@@ -930,16 +947,33 @@ class ForecastOutput extends Component {
                 }
                 var lang = this.state.lang;
 
-                this.setState({
-                    programs: proList.sort(function (a, b) {
-                        a = getLabelText(a.label, lang).toLowerCase();
-                        b = getLabelText(b.label, lang).toLowerCase();
-                        return a < b ? -1 : a > b ? 1 : 0;
-                    }),
-                    downloadedProgramData: downloadedProgramData
-                }, () => {
-                    console.log("programs------------------>", this.state.programs);
-                })
+                if (proList.length == 1) {
+                    this.setState({
+                        programs: proList.sort(function (a, b) {
+                            a = getLabelText(a.label, lang).toLowerCase();
+                            b = getLabelText(b.label, lang).toLowerCase();
+                            return a < b ? -1 : a > b ? 1 : 0;
+                        }),
+                        downloadedProgramData: downloadedProgramData,
+                        programId: proList[0].programId,
+                    }, () => {
+                        this.getVersionIds();
+                        console.log("programs------------------>", this.state.programs);
+                    })
+                } else {
+                    this.setState({
+                        programs: proList.sort(function (a, b) {
+                            a = getLabelText(a.label, lang).toLowerCase();
+                            b = getLabelText(b.label, lang).toLowerCase();
+                            return a < b ? -1 : a > b ? 1 : 0;
+                        }),
+                        downloadedProgramData: downloadedProgramData
+                    }, () => {
+                        console.log("programs------------------>", this.state.programs);
+                    })
+                }
+
+
 
 
             }.bind(this);
@@ -1069,6 +1103,13 @@ class ForecastOutput extends Component {
                             this.setState({
                                 planningUnits: newPlanningUnitList,
                                 forecastingUnits: newForecastingUnitList,
+                                planningUnitValues: newPlanningUnitList.map((item, i) => {
+                                    return ({ label: getLabelText(item.label, this.state.lang), value: item.id })
+
+                                }, this),
+                                planningUnitLabels: newPlanningUnitList.map((item, i) => {
+                                    return (getLabelText(item.label, this.state.lang))
+                                }, this),
                                 equivalencyUnitLabel: selectedText
                             }, () => {
                                 this.filterData();
@@ -1077,6 +1118,13 @@ class ForecastOutput extends Component {
                             this.setState({
                                 planningUnits: planningUnitList,
                                 forecastingUnits: forecastingUnitList,
+                                planningUnitValues: planningUnitList.map((item, i) => {
+                                    return ({ label: getLabelText(item.label, this.state.lang), value: item.id })
+
+                                }, this),
+                                planningUnitLabels: planningUnitList.map((item, i) => {
+                                    return (getLabelText(item.label, this.state.lang))
+                                }, this),
                                 equivalencyUnitLabel: ''
                                 // planningUnits: filteredPU,
                                 // forecastingUnits: filtered
@@ -1159,7 +1207,7 @@ class ForecastOutput extends Component {
 
 
 
-        var versionId = (event.target.value.split('(')[0]).trim();
+        var versionId = ((event == null || event == '' || event == undefined) ? (this.state.versionId.split('(')[0]) : (event.target.value.split('(')[0]).trim());
         // var version = (versionId.split('(')[0]).trim()
         var programId = this.state.programId;
 
@@ -1205,7 +1253,7 @@ class ForecastOutput extends Component {
         var viewById = document.getElementById("viewById").value;
         if (versionId != '' || versionId != undefined) {
             this.setState({
-                versionId: event.target.value,
+                versionId: ((event == null || event == '' || event == undefined) ? (this.state.versionId) : (event.target.value).trim()),
                 equivalencyUnitId: '',
                 planningUnits: [],
                 planningUnitValues: [],
@@ -1350,10 +1398,10 @@ class ForecastOutput extends Component {
                 versionList.reverse();
                 this.setState({
                     versions: versionList,
-                    // versionId: versionList[0].versionId
+                    versionId: (versionList.length > 0 ? versionList[0].versionId : ''),
                 }, () => {
                     this.filterData();
-                    // this.getPlanningUnit();
+                    this.setVersionId();
                 })
 
 
@@ -1591,7 +1639,7 @@ class ForecastOutput extends Component {
                     })
                     datasetsArr.push(
                         {
-                            label: item.objUnit.label.label_en,
+                            label: item.objUnit.label.label_en + ' - ' + item.scenario.label,
                             id: item.objUnit.id,
                             type: 'line',
                             stack: 3,
@@ -1763,6 +1811,21 @@ class ForecastOutput extends Component {
                             </div>
                         }
                     </div>
+                    <div className="Card-header-reporticon ">
+                        <div className="card-header-actions BacktoLink">
+                            <a className="pr-lg-0 pt-lg-1">
+                                <span style={{ cursor: 'pointer' }} onClick={() => { this.backToCompareAndSelect() }}><i className="fa fa-long-arrow-left" style={{ color: '#20a8d8', fontSize: '13px' }}></i> <small className="supplyplanformulas">{'Return To Monthly Forecast'}</small></span>
+                            </a><br />
+                            <span className="pr-lg-0 pt-lg-1">This report aggregates regional forecasts. For disaggregated regional forecasts, export CSV.</span>
+                        </div>
+                    </div>
+                    <div className="Card-header-reporticon ">
+                        <div className="card-header-actions">
+                            <a className="pr-lg-0 pt-lg-1">
+                                <span style={{ cursor: 'pointer' }} onClick={() => { this.continueToForecastSummary() }}><i className="fa fa-long-arrow-right" style={{ color: '#20a8d8', fontSize: '13px' }}></i> <small className="supplyplanformulas">{'Continue To Forecast Summary'}</small></span>
+                            </a>
+                        </div>
+                    </div>
                     <CardBody className="pb-lg-2 pt-lg-0 ">
                         <div>
                             <div ref={ref}>
@@ -1792,7 +1855,7 @@ class ForecastOutput extends Component {
                                             </FormGroup>
 
                                             <FormGroup className="col-md-3">
-                                                <Label htmlFor="appendedInputButton">{i18n.t('static.report.version')}</Label>
+                                                <Label htmlFor="appendedInputButton">{i18n.t('static.report.version*')}</Label>
                                                 <div className="controls ">
                                                     <InputGroup>
                                                         <Input
