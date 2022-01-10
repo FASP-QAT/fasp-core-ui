@@ -242,11 +242,11 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                     }
 
                     console.log("Node MOM List$$$", nodeDataList);
-                    
-                        allNodeDataList.push({
-                            nodeId: flatList[fl].id,
-                            nodeDataMomList: nodeDataList
-                        })
+
+                    allNodeDataList.push({
+                        nodeId: flatList[fl].id,
+                        nodeDataMomList: nodeDataList
+                    })
 
 
                     // nodeDataMapForScenario.nodeDataMomList = nodeDataList;
@@ -306,17 +306,17 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                             }
                         );
                     }
-                        allNodeDataList.push({
-                            nodeId: aggregateNodeList[fl - 1].id,
-                            nodeDataMomList: nodeDataList
-                        })
+                    allNodeDataList.push({
+                        nodeId: aggregateNodeList[fl - 1].id,
+                        nodeDataMomList: nodeDataList
+                    })
                 }
             }
         }
 
         // treeList[tl].tree.flatList = flatList;
     }
-    console.log("allNodeDataList---",allNodeDataList);
+    console.log("allNodeDataList---", allNodeDataList);
     props.updateState("nodeDataMomList", allNodeDataList);
     props.updateState("nodeId", nodeId);
     props.updateState("type", type);
