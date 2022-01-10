@@ -945,7 +945,7 @@ export default class BuildTree extends Component {
             var tempArray = [];
             var tempJson = {
                 notes: '',
-                month: new Date(),
+                month: moment(new Date()).startOf('month').format("YYYY-MM-DD"),
                 dataValue: "",
                 calculatedDataValue: '',
                 displayDataValue: '',
