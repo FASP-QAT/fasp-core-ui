@@ -816,7 +816,7 @@ export default class BuildTree extends Component {
             }
             if (parameterName == 'type' && value == 1) {
                 if (this.state.currentItemConfig.context.payload.nodeType.id == 1 || this.state.currentItemConfig.context.payload.nodeType.id == 2) {
-                    console.log("mom list ret---",this.state.nodeDataMomList.filter(x => x.nodeId == this.state.currentItemConfig.context.id));
+                    console.log("mom list ret---", this.state.nodeDataMomList.filter(x => x.nodeId == this.state.currentItemConfig.context.id));
                     this.setState({ momList: this.state.nodeDataMomList.filter(x => x.nodeId == this.state.currentItemConfig.context.id)[0].nodeDataMomList }, () => {
                         console.log("going to build mom jexcel");
                         this.buildMomJexcel();
@@ -7349,14 +7349,18 @@ export default class BuildTree extends Component {
     }
 
     handleAMonthDissmis3 = (value) => {
+        var date = value.year + "-" + value.month + "-" + "01"
         console.log("dismiss>>", value);
         console.log("forecastStartDate>>", this.state.forecastStartDate);
-        console.log("forecastStopDate>>", this.state.forecastStopDate);
-        var date = value.year + "-" + value.month + "-" + "01"
-        this.setState({ singleValue2: value, }, () => {
-            this.updateTreeData(date);
+        console.log("forecastStopDate>>", moment(date).isBetween(this.state.forecastStartDate, this.state.forecastStopDate));
+        if (moment(date).isBetween(this.state.forecastStartDate, this.state.forecastStopDate, undefined, '[)')) {
+            this.setState({ singleValue2: value, }, () => {
+                this.updateTreeData(date);
 
-        })
+            })
+        } else {
+            alert("Please select date withing forecast range");
+        }
     }
 
     handleClickMonthBox3 = (e) => {
