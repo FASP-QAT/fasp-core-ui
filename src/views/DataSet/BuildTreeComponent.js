@@ -349,7 +349,7 @@ export default class BuildTree extends Component {
             scenarioActionType: '',
             defYear1: { year: 2018, month: 4 },
             defYear2: { year: 2020, month: 9 },
-            showDiv: false,
+            showDiv: true,
             showDiv1: false,
             orgCurrentItemConfig: {},
             treeTemplateObj: [],
@@ -8092,7 +8092,7 @@ export default class BuildTree extends Component {
 
                                         </CardBody>
                                         {/* <div className="col-md-12 collapse-bg pl-lg-2 pr-lg-2 pt-lg-2 MarginBottomTree" style={{ display: this.state.showDiv ? 'block' : 'none' }} > */}
-                                        <div className="col-md-12 collapse-bg pl-lg-2 pr-lg-2 pt-lg-2 MarginBottomTree" style={{ display: this.state.showDiv ? 'block' : 'block' }}>
+                                        <div className="col-md-12 collapse-bg pl-lg-2 pr-lg-2 pt-lg-2 MarginBottomTree" style={{ display: this.state.showDiv ? 'block' : 'none' }}>
                                             <Formik
                                                 enableReinitialize={true}
                                                 initialValues={{
@@ -8121,11 +8121,11 @@ export default class BuildTree extends Component {
                                                         setFieldTouched
                                                     }) => (
                                                         <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='userForm' autocomplete="off">
-                                                            <div className='col-md-12 pt-lg-2 pb-lg-0 pr-lg-0'>
+                                                            {/* <div className='col-md-12 pt-lg-2 pb-lg-0 pr-lg-0'>
                                                                 <button className="mr-1 mb-0 float-right btn btn-info btn-md showdatabtn" onClick={this.toggleCollapse}>
                                                                 {this.state.showDiv ? i18n.t('static.common.hideData') : i18n.t('static.common.showData')}
                                                                 </button>
-                                                            </div>
+                                                            </div> */}
                                                             <Row style={{display:'inline-flex'}}>
                                                              <FormGroup className="col-md-4">
                                                                     <Label htmlFor="currencyId">{i18n.t('static.forecastMethod.forecastMethod')}<span class="red Reqasterisk">*</span></Label>
