@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import DatasetService from '../../api/DatasetService.js';
 import AuthenticationService from '../Common/AuthenticationService.js';
-import { Card, CardHeader, CardBody, Button, Col, FormGroup, Label, InputGroup, Input } from 'reactstrap';
+import { Card, CardHeader, CardBody, Button, Col, FormGroup, Label, InputGroup, Input, Modal, ModalBody, ModalFooter, ModalHeader, CardFooter, FormFeedback, Form } from 'reactstrap';
 import getLabelText from '../../CommonComponent/getLabelText'
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 import jexcel from 'jexcel-pro';
@@ -11,10 +11,47 @@ import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../Com
 import i18n from '../../i18n';
 import { JEXCEL_PAGINATION_OPTION, JEXCEL_DATE_FORMAT_SM, JEXCEL_PRO_KEY } from '../../Constants.js';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
+import { Formik } from 'formik';
+import * as Yup from 'yup'
+import '../Forms/ValidationForms/ValidationForms.css';
 import { INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY } from '../../Constants.js'
 import CryptoJS from 'crypto-js'
 import { ItemMeta } from 'semantic-ui-react';
 const entityname = i18n.t('static.common.listtree');
+
+const validationSchema = function (values) {
+    return Yup.object().shape({
+        treeName: Yup.string()
+            .required(i18n.t('static.label.fieldRequired')),
+    })
+}
+
+const initialValues = {
+    treeName: "",
+}
+
+const validate = (getValidationSchema) => {
+    return (values) => {
+        const validationSchema = getValidationSchema(values)
+        try {
+            validationSchema.validateSync(values, { abortEarly: false })
+            return {}
+        } catch (error) {
+            return getErrorsFromValidationError(error)
+        }
+    }
+}
+
+const getErrorsFromValidationError = (validationError) => {
+    const FIRST_ERROR = 0
+    return validationError.inner.reduce((errors, error) => {
+        return {
+            ...errors,
+            [error.path]: error.errors[FIRST_ERROR],
+        }
+    }, {})
+}
+
 export default class ListTreeComponent extends Component {
 
     constructor(props) {
@@ -24,7 +61,13 @@ export default class ListTreeComponent extends Component {
             treeData: [],
             datasetList: [],
             message: '',
-            loading: true
+            loading: true,
+            treeName: '',
+            isModalOpen: false,
+            programId: '',
+            versionId: '',
+            treeId: '',
+            datasetId:''
         }
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.buildJexcel = this.buildJexcel.bind(this);
@@ -33,7 +76,157 @@ export default class ListTreeComponent extends Component {
         this.getDatasetList = this.getDatasetList.bind(this);
         this.getTreeList = this.getTreeList.bind(this);
         this.getTreeTemplateList = this.getTreeTemplateList.bind(this);
+        this.copyDeleteTree = this.copyDeleteTree.bind(this);
+        this.modelOpenClose = this.modelOpenClose.bind(this);
     }
+
+
+    touchAll(setTouched, errors) {
+        setTouched({
+            'picker1': true,
+            'picker2': true,
+            'number1': true
+        }
+        )
+        this.validateForm(errors)
+    }
+    validateForm(errors) {
+        this.findFirstError('modalForm', (fieldName) => {
+            return Boolean(errors[fieldName])
+        })
+    }
+    findFirstError(formName, hasError) {
+        const form = document.forms[formName]
+        for (let i = 0; i < form.length; i++) {
+            if (hasError(form[i].name)) {
+                form[i].focus()
+                break
+            }
+        }
+    }
+
+    copyDeleteTree(treeId, programId, versionId, operationId) {
+
+        console.log("TreeId--------------->", treeId, programId, versionId, operationId);
+        var program = (this.state.datasetList.filter(x => x.programId == programId && x.version == versionId)[0]);
+        // console.log("TreeId--------------->", program.programData.treeList);
+        let tempProgram = JSON.parse(JSON.stringify(program))
+
+        if (operationId == 1) {//delete
+            // alert("If");
+            let treeList = program.programData.treeList;
+            for (var j = 0; j < treeList.length; j++) {
+                if (treeList[j].treeId == treeId) {
+                    treeList[j].active = false;
+                }
+            }
+            tempProgram.programData.treeList = treeList;
+        } else {//copy
+            // alert("Else");
+            // let treeList = JSON.parse(JSON.stringify(program.programData.treeList));
+            let treeList = program.programData.treeList;
+            let treeName = this.state.treeName;
+
+            for (let i = 0; i < treeList.length; i++) {
+                if (treeList[i].treeId == treeId) {
+                    let treeObj = JSON.parse(JSON.stringify(treeList[i]));
+                    let maxTreeId = treeList.length > 0 ? Math.max(...treeList.map(o => o.treeId)) : 0;
+                    treeObj.treeId = maxTreeId+1;
+                    treeObj.label = {
+                        "createdBy": null,
+                        "createdDate": null,
+                        "lastModifiedBy": null,
+                        "lastModifiedDate": null,
+                        "active": true,
+                        "labelId": '',
+                        "label_en": treeName,
+                        "label_sp": null,
+                        "label_fr": null,
+                        "label_pr": null
+                    }
+
+                    treeList.push(treeObj);
+                    break;
+                }
+            }
+
+
+
+            // let treeObj = treeList.filter(c => c.treeId == treeId)[0];
+            // console.log("TreeId--------------->11", treeObj + '-----------' + treeName);
+            // //operationOnTreeObj
+            // treeObj.label = {
+            //     "createdBy": null,
+            //     "createdDate": null,
+            //     "lastModifiedBy": null,
+            //     "lastModifiedDate": null,
+            //     "active": true,
+            //     "labelId": '',
+            //     "label_en": treeName,
+            //     "label_sp": null,
+            //     "label_fr": null,
+            //     "label_pr": null
+            // }
+
+            console.log("TreeId--------------->12", treeList);
+            tempProgram.programData.treeList = treeList;
+        }
+
+        console.log("TreeId--------------->13", tempProgram.programData.treeList);
+
+
+        var programData = (CryptoJS.AES.encrypt(JSON.stringify(tempProgram.programData), SECRET_KEY)).toString();
+        tempProgram.programData = programData;
+        // programs.push(program);
+        console.log("programs to update---1", tempProgram);
+
+        var db1;
+        getDatabase();
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+        openRequest.onerror = function (event) {
+            this.setState({
+                message: i18n.t('static.program.errortext'),
+                color: 'red'
+            })
+            this.hideFirstComponent()
+        }.bind(this);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var transaction = db1.transaction(['datasetData'], 'readwrite');
+            var programTransaction = transaction.objectStore('datasetData');
+
+            var programRequest = programTransaction.put(tempProgram);
+            console.log("---hurrey---");
+
+            transaction.oncomplete = function (event) {
+
+                this.setState({
+                    // loading: false,
+                    message: i18n.t('static.mt.dataUpdateSuccess'),
+                    color: "green",
+                }, () => {
+                   this.getDatasetList();
+                });
+                console.log("Data update success1");
+                // alert("success");
+
+
+            }.bind(this);
+            transaction.onerror = function (event) {
+                this.setState({
+                    loading: false,
+                    color: "red",
+                }, () => {
+                    this.hideSecondComponent();
+                });
+                console.log("Data update errr");
+            }.bind(this);
+        }.bind(this);
+
+
+    }
+
+
     getTreeTemplateList() {
         var db1;
         getDatabase();
@@ -75,6 +268,7 @@ export default class ListTreeComponent extends Component {
 
         // console.log("pro list---", proList);
         this.setState({
+            datasetId,
             treeData: datasetList
         }, () => {
             this.buildJexcel();
@@ -97,22 +291,18 @@ export default class ListTreeComponent extends Component {
                 var myResult = [];
                 myResult = getRequest.result;
                 for (var i = 0; i < myResult.length; i++) {
-                    console.log("myResult[i].programData---",myResult[i].programData);
+                    console.log("myResult[i].programData---", myResult[i].programData);
                     var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
                     var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
-                    console.log("myResult[i].programData after---",programData);
+                    console.log("myResult[i].programData after---", programData);
                     myResult[i].programData = programData;
                 }
                 this.setState({
                     datasetList: myResult
                 }, () => {
-                    console.log("datasetList---", this.state.datasetList);
-                    this.getTreeList(0);
+                    var datasetId = this.state.datasetId != "" && this.state.datasetId != 0 ? this.state.datasetId : 0;
+                    this.getTreeList(datasetId);
                 });
-                // for (var i = 0; i < myResult.length; i++) {
-                //     console.log("datasetList--->", myResult[i])
-
-                // }
 
             }.bind(this);
         }.bind(this);
@@ -161,6 +351,8 @@ export default class ListTreeComponent extends Component {
                     data[6] = treeList[k].notes
                     data[7] = programList[j].programId
                     data[8] = programList[j].id
+                    data[9] = programList[j].version
+                    data[10] = treeList[k].active
                     treeArray[count] = data;
                     count++;
                 }
@@ -225,11 +417,24 @@ export default class ListTreeComponent extends Component {
                     readOnly: true
                 },
                 {
+                    title: 'id',
+                    type: 'hidden',
+                    readOnly: true
+                },
+                {
                     title: 'versionId',
                     type: 'hidden',
                     readOnly: true
+                },
+                {
+                    type: 'dropdown',
+                    title: i18n.t('static.common.status'),
+                    readOnly: true,
+                    source: [
+                        { id: true, name: i18n.t('static.common.active') },
+                        { id: false, name: i18n.t('static.common.disabled') }
+                    ]
                 }
-
 
             ],
             text: {
@@ -264,21 +469,28 @@ export default class ListTreeComponent extends Component {
                         items.push({
                             title: i18n.t('static.common.delete'),
                             onclick: function () {
-
+                                this.copyDeleteTree(this.el.getValueFromCoords(0, y), this.el.getValueFromCoords(7, y), this.el.getValueFromCoords(9, y), 1);
                             }.bind(this)
                         });
 
                         items.push({
                             title: i18n.t('static.common.copyRow'),
                             onclick: function () {
-                                var rowData = obj.getRowData(y);
-                                console.log("rowData===>", rowData);
-                                rowData[0] = "";
-                                // rowData[1] = "";
-                                var data = rowData;
-                                this.el.insertRow(
-                                    data, 0, 1
-                                );
+                                this.setState({
+                                    programId: this.el.getValueFromCoords(7, y),
+                                    versionId: this.el.getValueFromCoords(9, y),
+                                    treeId: this.el.getValueFromCoords(0, y),
+                                    isModalOpen: !this.state.isModalOpen,
+                                })
+                                // this.copyDeleteTree(this.el.getValueFromCoords(0, y), this.el.getValueFromCoords(7, y), this.el.getValueFromCoords(9, y), 2);
+                                // var rowData = obj.getRowData(y);
+                                // console.log("rowData===>", rowData);
+                                // rowData[0] = "";
+                                // // rowData[1] = "";
+                                // var data = rowData;
+                                // this.el.insertRow(
+                                //     data, 0, 1
+                                // );
                             }.bind(this)
                         });
                     }
@@ -311,7 +523,18 @@ export default class ListTreeComponent extends Component {
         this.getDatasetList();
         this.getTreeTemplateList();
     }
-
+    modelOpenClose() {
+        this.setState({
+            isModalOpen: !this.state.isModalOpen,
+        })
+    }
+    dataChange(event) {
+        if (event.target.name == "treeName") {
+            this.setState({
+                treeName: event.target.value,
+            });
+        }
+    };
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
     }
@@ -453,6 +676,85 @@ export default class ListTreeComponent extends Component {
                             </div>
                         </div>
                     </CardBody>
+
+                    <Modal isOpen={this.state.isModalOpen}
+                        className={'modal-xl ' + this.props.className}>
+                        <ModalHeader>
+                            <strong>Tree Name</strong>
+                        </ModalHeader>
+                        <ModalBody>
+                            <h6 className="red" id="div3"></h6>
+                            <Col sm={12} style={{ flexBasis: 'auto' }}>
+                                <Card>
+                                    <Formik
+                                        initialValues={initialValues}
+                                        validate={validate(validationSchema)}
+                                        onSubmit={(values, { setSubmitting, setErrors }) => {
+
+                                            this.copyDeleteTree(this.state.treeId, this.state.programId, this.state.versionId, 2);
+                                            this.setState({
+                                                isModalOpen: !this.state.isModalOpen,
+                                            })
+
+                                        }}
+
+
+                                        render={
+                                            ({
+                                                values,
+                                                errors,
+                                                touched,
+                                                handleChange,
+                                                handleBlur,
+                                                handleSubmit,
+                                                isSubmitting,
+                                                isValid,
+                                                setTouched,
+                                                handleReset
+                                            }) => (
+                                                <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='modalForm' autocomplete="off">
+                                                    <CardBody>
+                                                        <div className="d-md-flex">
+
+                                                            <FormGroup className="mt-md-2 mb-md-0 pl-lg-2">
+                                                                <Label for="number1">Tree Name<span className="red Reqasterisk">*</span></Label>
+                                                                <div className="controls UsagePopUpInputField">
+                                                                    <Input type="text"
+                                                                        bsSize="sm"
+                                                                        name="treeName"
+                                                                        id="treeName"
+                                                                        valid={!errors.treeName && this.state.treeName != ''}
+                                                                        invalid={touched.treeName && !!errors.treeName}
+                                                                        onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                                        onBlur={handleBlur}
+                                                                        required
+                                                                        value={this.state.treeName}
+                                                                    />
+                                                                </div>
+                                                                <FormFeedback className="red">{errors.treeName}</FormFeedback>
+                                                            </FormGroup>
+
+                                                        </div>
+                                                    </CardBody>
+
+                                                    <CardFooter>
+                                                        <FormGroup>
+                                                            <Button type="button" color="danger" className="mr-1 float-right" size="md" onClick={this.modelOpenClose}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                                            <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                                            &nbsp;
+
+                                                        </FormGroup>
+                                                    </CardFooter>
+                                                </Form>
+
+                                            )} />
+
+                                </Card>
+                            </Col>
+                            <br />
+                        </ModalBody>
+                    </Modal>
+
                 </Card>
 
             </div>
