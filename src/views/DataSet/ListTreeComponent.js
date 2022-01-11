@@ -358,13 +358,13 @@ export default class ListTreeComponent extends Component {
                 }
             }
         }
+        const sortArray = (sourceArray) => {
+            const sortByName = (a, b) => a[2].localeCompare(b[2], 'en', { numeric: true });
+            return sourceArray.sort(sortByName);
+        };
+
         if (treeArray.length > 0) {
-            treeArray.sort((a, b) => {
-                console.log("a[2]---",a[2]);
-                var itemLabelA = a[2].toUpperCase(); // ignore upper and lowercase
-                var itemLabelB = b[2].toUpperCase(); // ignore upper and lowercase                   
-                return itemLabelA > itemLabelB ? -1 : 1;
-            });
+            sortArray(treeArray);
         }
         this.el = jexcel(document.getElementById("tableDiv"), '');
         this.el.destroy();
