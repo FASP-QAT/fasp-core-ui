@@ -5639,6 +5639,13 @@ font-style: italic!important;
 }
 @media print {
   thead {display: table-row-group;}
+  table tbody tr td:before,
+    table tbody tr td:after {
+        content : "" ;
+        height : 4px ;
+        display : block ;
+    }
+
 }
 // .commitTree .jexcel_content {
 //   max-height: calc(100vh - 200px) !important;
