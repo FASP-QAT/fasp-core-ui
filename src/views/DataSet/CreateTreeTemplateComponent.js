@@ -5519,7 +5519,7 @@ export default class CreateTreeTemplate extends Component {
                                                                 // month: (item.payload.nodeDataMap[0])[0].month,
                                                                 month: '2021-09-01',
                                                                 nodeDataId: (item.payload.nodeDataMap[0])[0].nodeDataId,
-                                                                dataValue: (item.payload.nodeDataMap[0])[0].dataValue,
+                                                                dataValue: (item.payload.nodeDataMap[0])[0].dataValue.toString().replaceAll(",", ""),
                                                                 fuNode: (item.payload.nodeDataMap[0])[0].fuNode,
                                                                 puNode: (item.payload.nodeDataMap[0])[0].puNode,
                                                                 notes: (item.payload.nodeDataMap[0])[0].notes,
