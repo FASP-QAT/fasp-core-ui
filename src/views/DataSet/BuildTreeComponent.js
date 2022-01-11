@@ -765,7 +765,7 @@ export default class BuildTree extends Component {
             // currentScenario: (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0]
 
         }, () => {
-            this.handleAMonthDissmis3(this.state.singleValue2);
+            this.handleAMonthDissmis3(this.state.singleValue2, 0);
             this.calculateValuesForAggregateNode(items);
             // console.log("currentScenario---", this.state.currentScenario);
         });
@@ -926,16 +926,6 @@ export default class BuildTree extends Component {
                     });
                     console.log("Data update errr");
                 }.bind(this)
-
-                // this.setState({
-                //     loading: false,
-                //     message: i18n.t('static.mt.dataUpdateSuccess'),
-                //     color: "green",
-                //     isChanged: false
-                // }, () => {
-                //     this.hideSecondComponent();
-                //     this.buildJExcel();
-                // });
 
             }.bind(this);
             transaction.onerror = function (event) {
@@ -7348,18 +7338,23 @@ export default class BuildTree extends Component {
         // alert("hi");
     }
 
-    handleAMonthDissmis3 = (value) => {
+    handleAMonthDissmis3 = (value, type) => {
+        console.log("value--->", value);
+        console.log("type--->>>", type);
         var date = value.year + "-" + value.month + "-" + "01"
         console.log("dismiss>>", value);
         console.log("forecastStartDate>>", this.state.forecastStartDate);
         console.log("forecastStopDate>>", moment(date).isBetween(this.state.forecastStartDate, this.state.forecastStopDate));
+        this.updateTreeData(date);
         if (moment(date).isBetween(this.state.forecastStartDate, this.state.forecastStopDate, undefined, '[)')) {
             this.setState({ singleValue2: value, }, () => {
-                this.updateTreeData(date);
+                
 
             })
         } else {
-            alert("Please select date withing forecast range");
+            if (type == 1) {
+                alert("Please select date withing forecast range");
+            }
         }
     }
 
@@ -8007,7 +8002,7 @@ export default class BuildTree extends Component {
                                                                 lang={pickerLang.months}
                                                                 // theme="dark"
                                                                 onChange={this.handleAMonthChange3}
-                                                                onDismiss={this.handleAMonthDissmis3}
+                                                                onDismiss={(e) => this.handleAMonthDissmis3(e, 1)}
                                                             >
                                                                 <MonthBox value={this.makeText(singleValue2)} onClick={(e) => { this.handleClickMonthBox3(e) }} />
                                                             </Picker>
@@ -8297,7 +8292,7 @@ export default class BuildTree extends Component {
                                                 <div className="col-md-6 pl-lg-0"> <h5 style={{ color: '#BA0C2F' }}>{i18n.t('static.tree.pleaseSaveAndDoARecalculateAfterDragAndDrop.')}</h5></div>
                                                 <div className="col-md-6 pr-lg-0"> <Button type="button" size="md" color="info" className="float-right mr-1" onClick={() => this.callAfterScenarioChange(this.state.selectedScenario)}><i className="fa fa-calculator"></i> {i18n.t('static.tree.calculated')}</Button>
                                                     {/* <Button type="button" size="md" color="warning" className="float-right mr-1" onClick={this.resetTree}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button> */}
-                                                    <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.saveTreeData()}><i className="fa fa-check"> </i>{i18n.t('static.pipeline.save')}</Button>
+                                                    <Button type="button" color="success" className="mr-1 float-right" size="md" onClick={() => this.saveTreeData()}><i className="fa fa-check"> </i>{i18n.t('static.pipeline.save')}</Button>
                                                 </div>
                                             </div>
                                         </CardFooter>
