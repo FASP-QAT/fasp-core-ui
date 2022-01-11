@@ -349,7 +349,7 @@ export default class BuildTree extends Component {
             scenarioActionType: '',
             defYear1: { year: 2018, month: 4 },
             defYear2: { year: 2020, month: 9 },
-            showDiv: false,
+            showDiv: true,
             showDiv1: false,
             orgCurrentItemConfig: {},
             treeTemplateObj: [],
@@ -661,7 +661,14 @@ export default class BuildTree extends Component {
         programData.treeList = treeData;
         dataSetObj.programData = programData;
         console.log("dataSetDecrypt>>>", dataSetObj);
-        calculateModelingData(dataSetObj, this, '', (nodeId != 0 ? nodeId : this.state.currentItemConfig.context.id), this.state.selectedScenario, type, this.state.treeId);
+        // if (this.state.currentItemConfig.context.payload.nodeType.id == 2 && this.state.currentItemConfig.context.level != 0) {
+        //     var level0Data = items.filter(x => x.id == this.state.currentItemConfig.context.parent)[0];
+        //     if (level0Data.payload.nodeType.id == 1) {
+        //         calculateModelingData(dataSetObj, this, '',-1, this.state.selectedScenario, type, this.state.treeId, false);
+        //     }
+        // }else{
+        calculateModelingData(dataSetObj, this, '', (nodeId != 0 ? nodeId : this.state.currentItemConfig.context.id), this.state.selectedScenario, type, this.state.treeId, false);
+        // }
     }
     fetchTracerCategoryList(programData) {
         console.log("programData---%%%%%%%", programData);
@@ -758,7 +765,7 @@ export default class BuildTree extends Component {
             // currentScenario: (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0]
 
         }, () => {
-            this.handleAMonthDissmis3(this.state.singleValue2);
+            this.handleAMonthDissmis3(this.state.singleValue2, 0);
             this.calculateValuesForAggregateNode(items);
             // console.log("currentScenario---", this.state.currentScenario);
         });
@@ -783,29 +790,48 @@ export default class BuildTree extends Component {
         }, () => {
             if (parameterName == 'nodeId' && (value != null && value != 0)) {
                 var items = this.state.items;
-                var node = items.filter(n => n.id == value)[0];
-                (node.payload.nodeDataMap[this.state.selectedScenario])[0].nodeDataMomList = this.state.nodeDataMomList;
-                var findNodeIndex = items.findIndex(n => n.id == value);
-                console.log("findNodeIndex---", findNodeIndex);
-                items[findNodeIndex] = node;
-                // nodes[findNodeIndex].valueType = currentItemConfig.valueType;
+                var nodeDataMomList = this.state.nodeDataMomList;
+                console.log("nodeDataMomList---", nodeDataMomList);
+                if (nodeDataMomList.length > 0) {
+                    for (let i = 0; i < nodeDataMomList.length; i++) {
+                        console.log("nodeDataMomList[i]---", nodeDataMomList[i])
+                        var nodeId = nodeDataMomList[i].nodeId;
+                        var nodeDataMomListForNode = nodeDataMomList[i].nodeDataMomList;
+                        console.log("this.state.nodeDataMomList---", this.state.nodeDataMomList);
+                        var node = items.filter(n => n.id == nodeId)[0];
+                        console.log("node---", node);
+                        (node.payload.nodeDataMap[this.state.selectedScenario])[0].nodeDataMomList = nodeDataMomListForNode;
+                        var findNodeIndex = items.findIndex(n => n.id == nodeId);
+                        console.log("findNodeIndex---", findNodeIndex);
+                        items[findNodeIndex] = node;
+                    }
+                }
+                // var node = items.filter(n => n.id == value)[0];
+                // (node.payload.nodeDataMap[this.state.selectedScenario])[0].nodeDataMomList = this.state.nodeDataMomList.length == 1 ? this.state.nodeDataMomList : [];
+                // var findNodeIndex = items.findIndex(n => n.id == value);
+                // console.log("findNodeIndex---", findNodeIndex);
+                // items[findNodeIndex] = node;
                 console.log("items---***", items);
                 this.setState({ items })
             }
             if (parameterName == 'type' && value == 1) {
-                if (this.state.currentItemConfig.context.payload.nodeType.id == 2) {
-                    this.setState({ momList: this.state.nodeDataMomList }, () => {
+                if (this.state.currentItemConfig.context.payload.nodeType.id == 1 || this.state.currentItemConfig.context.payload.nodeType.id == 2) {
+                    console.log("mom list ret---", this.state.nodeDataMomList.filter(x => x.nodeId == this.state.currentItemConfig.context.id));
+                    this.setState({ momList: this.state.nodeDataMomList.filter(x => x.nodeId == this.state.currentItemConfig.context.id)[0].nodeDataMomList }, () => {
                         console.log("going to build mom jexcel");
                         this.buildMomJexcel();
                     });
                 } else {
-                    this.setState({ momListPer: this.state.nodeDataMomList }, () => {
+                    this.setState({ momListPer: this.state.nodeDataMomList.filter(x => x.nodeId == this.state.currentItemConfig.context.id)[0].nodeDataMomList }, () => {
                         console.log("going to build mom jexcel percent");
                         this.buildMomJexcelPercent();
                     });
                 }
 
 
+            }
+            if (parameterName == 'type' && value == 0) {
+                this.calculateValuesForAggregateNode(this.state.items);
             }
             console.log("returmed list---", this.state.nodeDataMomList);
             this.updateTreeData();
@@ -819,7 +845,7 @@ export default class BuildTree extends Component {
         // var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
         // console.log("dataSetObj.programData***>>>", programData);
         // this.setState({ dataSetObj: dataSetObj, forecastStartDate: programData.currentVersion.forecastStartDate, forecastStopDate: programData.currentVersion.forecastStopDate }, () => {
-        //     calculateModelingData(dataEnc, this, "BuildTree");
+
         // });
         var items = this.state.curTreeObj.tree.flatList;
         console.log("items>>>", items);
@@ -889,7 +915,6 @@ export default class BuildTree extends Component {
                     var datasetDetailsRequestJson = datasetDetailsRequest.result;
                     datasetDetailsRequestJson.changed = 1;
                     var programQPLDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
-                    // calculateModelingData(dataSetObj, this, '',,this.state.selectedScenario);
                 }.bind(this);
                 datasetDetailsRequest.onerror = function (event) {
                     this.setState({
@@ -901,16 +926,6 @@ export default class BuildTree extends Component {
                     });
                     console.log("Data update errr");
                 }.bind(this)
-
-                // this.setState({
-                //     loading: false,
-                //     message: i18n.t('static.mt.dataUpdateSuccess'),
-                //     color: "green",
-                //     isChanged: false
-                // }, () => {
-                //     this.hideSecondComponent();
-                //     this.buildJExcel();
-                // });
 
             }.bind(this);
             transaction.onerror = function (event) {
@@ -945,7 +960,7 @@ export default class BuildTree extends Component {
             var tempArray = [];
             var tempJson = {
                 notes: '',
-                month: new Date(),
+                month: moment(new Date()).startOf('month').format("YYYY-MM-DD"),
                 dataValue: "",
                 calculatedDataValue: '',
                 displayDataValue: '',
@@ -1145,7 +1160,6 @@ export default class BuildTree extends Component {
     //             console.log("---hurrey---");
     //             // })
     //             transaction.oncomplete = function (event) {
-    //                 // calculateModelingData(dataSetObj,'');
     //                 console.log("all good >>>>");
 
     //                 // this.setState({
@@ -1206,7 +1220,6 @@ export default class BuildTree extends Component {
             console.log("---hurrey---");
             // })
             transaction.oncomplete = function (event) {
-                // calculateModelingData(dataSetObj,'');
                 console.log("all good >>>>");
 
                 this.setState({
@@ -1519,7 +1532,7 @@ export default class BuildTree extends Component {
             updateTable: function (el, cell, x, y, source, value, id) {
                 var elInstance = el.jexcel;
                 if (y != null) {
-                    var rowData = elInstance.getRowData(y);
+                    // var rowData = elInstance.getRowData(y);
                     // console.log("this.state.seasonality---", this.state.seasonality);
                     // if (this.state.seasonality) {
                     //     if (x == 5) {
@@ -2531,6 +2544,7 @@ export default class BuildTree extends Component {
 
     changed1 = function (instance, cell, x, y, value) {
         // 4 & 5
+        console.log("hi anchal")
         var json = this.state.momEl.getJson(null, false);
         console.log("momData>>>", json);
         var overrideListArray = [];
@@ -2571,7 +2585,7 @@ export default class BuildTree extends Component {
             programData.treeList = treeData;
             // dataSetObj.programData = programData;
             console.log("dataSetDecrypt>>>", programData);
-            calculateModelingData(dataSetObj, this, '', currentItemConfig.context.id, this.state.selectedScenario, 1, this.state.treeId);
+            calculateModelingData(dataSetObj, this, '', currentItemConfig.context.id, this.state.selectedScenario, 1, this.state.treeId, false);
         });
 
     }.bind(this);
@@ -2621,7 +2635,7 @@ export default class BuildTree extends Component {
             //  dataSetObj.programData = programData;
 
             console.log("encpyDataSet>>>", dataSetObj)
-            calculateModelingData(dataSetObj, this, '', currentItemConfig.context.id, this.state.selectedScenario, 1, this.state.treeId);
+            calculateModelingData(dataSetObj, this, '', currentItemConfig.context.id, this.state.selectedScenario, 1, this.state.treeId, false);
         });
     }.bind(this);
     changed = function (instance, cell, x, y, value) {
@@ -2985,7 +2999,6 @@ export default class BuildTree extends Component {
                         this.setState({ dataSetObj: dataEnc, forecastStartDate: programData.currentVersion.forecastStartDate, forecastStopDate: programData.currentVersion.forecastStopDate }, () => {
                             this.fetchTracerCategoryList(programData);
                             this.setState({ loading: false })
-                            // calculateModelingData(decryptedDataset, this,'',"BuildTree");
                         });
                     } else {
                         this.setState({ loading: false })
@@ -5035,6 +5048,13 @@ export default class BuildTree extends Component {
                 })
 
             }
+            else {
+                this.setState({
+                    showModelingJexcelNumber: true
+                }, () => {
+                    this.buildModelingJexcel();
+                })
+            }
             //  else if (this.state.currentItemConfig.context.payload.nodeType.id == 3) {
             //     this.setState({ showModelingJexcelPercent: true }, () => {
             //         this.buildModelingJexcelPercent()
@@ -5377,11 +5397,8 @@ export default class BuildTree extends Component {
             cursorItem: parseInt(items.length + 1)
         }, () => {
             console.log("on add items-------", this.state.items);
-            // var getAllAggregationNode = this.state.items.filter(c => c.payload.nodeType.id == 1);
-            // console.log(">>>", getAllAggregationNode);
-            // calculateModelingData(this.state.dataSetObj, this, '', newItem.id, this.state.selectedScenario);
             this.calculateMOMData(newItem.id, 0);
-            this.calculateValuesForAggregateNode(this.state.items);
+            // this.calculateValuesForAggregateNode(this.state.items);
         });
     }
 
@@ -5401,8 +5418,10 @@ export default class BuildTree extends Component {
             if (getChildAggregationNode.length > 0) {
                 var value = 0;
                 for (var m = 0; m < getChildAggregationNode.length; m++) {
-                    var value2 = getChildAggregationNode[m].payload.nodeDataMap[this.state.selectedScenario][0].dataValue != "" ? parseInt(getChildAggregationNode[m].payload.nodeDataMap[this.state.selectedScenario][0].dataValue) : 0;
+                    var value2 = getChildAggregationNode[m].payload.nodeDataMap[this.state.selectedScenario][0].dataValue != "" ? parseInt((getChildAggregationNode[m].payload.nodeDataMap[this.state.selectedScenario][0].dataValue).replaceAll(",", "")) : 0;
+                    console.log("value2---", value2);
                     value = value + parseInt(value2);
+                    console.log("value---", value);
                 }
 
                 var findNodeIndex = items.findIndex(n => n.id == getAllAggregationNode[i].id);
@@ -5618,9 +5637,8 @@ export default class BuildTree extends Component {
             openAddNodeModal: false,
         }, () => {
             console.log("updated tree data+++", this.state);
-            this.calculateValuesForAggregateNode(this.state.items);
+            // this.calculateValuesForAggregateNode(this.state.items);
             this.calculateMOMData(0, 0);
-            // calculateModelingData(this.state.dataSetObj, this, '', currentItemConfig.context.id, this.state.selectedScenario);
             // console.log("returmed list---", this.state.nodeDataMomList);
             // this.updateTreeData();
         });
@@ -5884,7 +5902,7 @@ export default class BuildTree extends Component {
                         }}
                         validate={validateNodeData(validationSchemaNodeData)}
                         onSubmit={(values, { setSubmitting, setErrors }) => {
-                            console.log("all ok>>>");
+                            console.log("all ok>>>", this.state.currentItemConfig);
                             if (this.state.addNodeFlag) {
                                 this.onAddButtonClick(this.state.currentItemConfig)
                             } else {
@@ -6846,12 +6864,13 @@ export default class BuildTree extends Component {
                                     </div>
                                 </div>
                                     <div style={{ 'float': 'right', 'fontSize': '18px' }}><b>{i18n.t('static.supplyPlan.total')} : {this.state.scalingTotal != "" && addCommas(parseFloat(this.state.scalingTotal).toFixed(2))}</b></div><br /><br />
-                                    <div><Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.showMomData()}> <i className="fa fa-eye" style={{ color: '#fff' }}></i> {i18n.t('static.tree.viewMonthlyData')}</Button>
-                                        <Button color="success" size="md" className="float-right mr-1" type="button" onClick={() => this.formSubmit()}> <i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
-                                        <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>
-                                    </div>
+
                                 </>
                             }
+                            <div><Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.showMomData()}> <i className="fa fa-eye" style={{ color: '#fff' }}></i> {i18n.t('static.tree.viewMonthlyData')}</Button>
+                                {this.state.showModelingJexcelNumber && <><Button color="success" size="md" className="float-right mr-1" type="button" onClick={() => this.formSubmit()}> <i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
+                                    <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button></>}
+                            </div>
                             {/* {this.state.showModelingJexcelPercent &&
                                 <><div className="calculatorimg">
                                     <div id="modelingJexcelPercent" className={"RowClickable ScalingTable"}>
@@ -7319,50 +7338,24 @@ export default class BuildTree extends Component {
         // alert("hi");
     }
 
-    handleAMonthDissmis3 = (value) => {
-        console.log("dismiss>>", value);
+    handleAMonthDissmis3 = (value, type) => {
+        console.log("value--->", value);
+        console.log("type--->>>", type);
         var date = value.year + "-" + value.month + "-" + "01"
-        this.setState({ singleValue2: value, }, () => {
-            this.updateTreeData(date);
-            // this.fetchData();
-            // console.log("$$$", this.state.treeData);
-            // console.log("$$$", this.state.curTreeObj);
-            // var db1;
-            // getDatabase();
-            // var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-            // openRequest.onsuccess = function (e) {
-            //     var programId = this.state.programId;
-            //     db1 = e.target.result;
-            //     var transaction = db1.transaction(['datasetData'], 'readwrite');
-            //     var program = transaction.objectStore('datasetData');
-            //     var getRequest = program.get(programId.toString());
-            //     getRequest.onerror = function (event) {
-            //         this.setState({
-            //             supplyPlanError: i18n.t('static.program.errortext')
-            //         });
-            //     };
-            //     getRequest.onsuccess = function (event) {
-            //         // console.log("hi",getRequest.result);
-            //         var programDataBytes = CryptoJS.AES.decrypt(getRequest.result.programData, SECRET_KEY);
-            //         var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-            //         var programJson = JSON.parse(programData);
-            //         // console.log("hi bro", programJson.nodeDataModelingList)
-            //         // var getMomDataForNodes = programJson.nodeDataModelingList.filter(c => c.treeId == this.state.treeId && c.scenarioId == this.state.selectedScenario && moment(c.month).format('YYYY-MM') == moment(date).format('YYYY-MM'));
-            //         // console.log("$$$>>>", getMomDataForNodes);
-            //         console.log()
-            //         this.setState({
-            //             // modelinDataForScenario: getMomDataForNodes
-            //         }, () => {
-            //             // if (getMomDataForNodes.length > 0) { 
-            //             this.updateTreeData(date);
-            //             // } else { };
-            //         });
-            //         // getMomDataForCurrentNode.filter(c=>c.month <= '2022-12-01')
+        console.log("dismiss>>", value);
+        console.log("forecastStartDate>>", this.state.forecastStartDate);
+        console.log("forecastStopDate>>", moment(date).isBetween(this.state.forecastStartDate, this.state.forecastStopDate));
+        this.updateTreeData(date);
+        if (moment(date).isBetween(this.state.forecastStartDate, this.state.forecastStopDate, undefined, '[)')) {
+            this.setState({ singleValue2: value, }, () => {
+                
 
-            //     }.bind(this)
-            // }.bind(this)
-
-        })
+            })
+        } else {
+            if (type == 1) {
+                alert("Please select date withing forecast range");
+            }
+        }
     }
 
     handleClickMonthBox3 = (e) => {
@@ -7958,6 +7951,7 @@ export default class BuildTree extends Component {
                                                             </Input>
                                                             <InputGroupAddon addonType="append">
                                                                 <InputGroupText><i class="fa fa-cog icons" data-toggle="collapse" aria-expanded="false" onClick={this.toggleCollapse}></i></InputGroupText>
+                                                            
                                                             </InputGroupAddon>
                                                         </InputGroup>
                                                         {/* <FormFeedback>{errors.languageId}</FormFeedback> */}
@@ -8009,7 +8003,7 @@ export default class BuildTree extends Component {
                                                                 lang={pickerLang.months}
                                                                 // theme="dark"
                                                                 onChange={this.handleAMonthChange3}
-                                                                onDismiss={this.handleAMonthDissmis3}
+                                                                onDismiss={(e) => this.handleAMonthDissmis3(e, 1)}
                                                             >
                                                                 <MonthBox value={this.makeText(singleValue2)} onClick={(e) => { this.handleClickMonthBox3(e) }} />
                                                             </Picker>
@@ -8097,7 +8091,8 @@ export default class BuildTree extends Component {
                                             </div>
 
                                         </CardBody>
-                                        <div className="col-md-12 collapse-bg pl-lg-2 pr-lg-2 pt-lg-2 MarginBottomTree" style={{ display: this.state.showDiv ? 'block' : 'none' }} >
+                                        {/* <div className="col-md-12 collapse-bg pl-lg-2 pr-lg-2 pt-lg-2 MarginBottomTree" style={{ display: this.state.showDiv ? 'block' : 'none' }} > */}
+                                        <div className="col-md-12 collapse-bg pl-lg-2 pr-lg-2 pt-lg-2 MarginBottomTree" style={{ display: this.state.showDiv ? 'block' : 'none' }}>
                                             <Formik
                                                 enableReinitialize={true}
                                                 initialValues={{
@@ -8126,8 +8121,13 @@ export default class BuildTree extends Component {
                                                         setFieldTouched
                                                     }) => (
                                                         <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='userForm' autocomplete="off">
-                                                            <Row>
-                                                                <FormGroup className="col-md-4">
+                                                            {/* <div className='col-md-12 pt-lg-2 pb-lg-0 pr-lg-0'>
+                                                                <button className="mr-1 mb-0 float-right btn btn-info btn-md showdatabtn" onClick={this.toggleCollapse}>
+                                                                {this.state.showDiv ? i18n.t('static.common.hideData') : i18n.t('static.common.showData')}
+                                                                </button>
+                                                            </div> */}
+                                                            <Row style={{display:'inline-flex'}}>
+                                                             <FormGroup className="col-md-4">
                                                                     <Label htmlFor="currencyId">{i18n.t('static.forecastMethod.forecastMethod')}<span class="red Reqasterisk">*</span></Label>
                                                                     <Input
                                                                         type="select"
@@ -8238,6 +8238,7 @@ export default class BuildTree extends Component {
                                                                     </FormGroup>
                                                                 </FormGroup>
                                                                 <FormGroup className="col-md-3 pt-lg-4">
+                                                               
                                                                     <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setState({ showDiv: false })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                                                     <Button type="submit" size="md" onClick={() => this.touchAll(setTouched, errors)} color="success" className="submitBtn float-right mr-1"> <i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
                                                                 </FormGroup>
@@ -8299,7 +8300,7 @@ export default class BuildTree extends Component {
                                                 <div className="col-md-6 pl-lg-0"> <h5 style={{ color: '#BA0C2F' }}>{i18n.t('static.tree.pleaseSaveAndDoARecalculateAfterDragAndDrop.')}</h5></div>
                                                 <div className="col-md-6 pr-lg-0"> <Button type="button" size="md" color="info" className="float-right mr-1" onClick={() => this.callAfterScenarioChange(this.state.selectedScenario)}><i className="fa fa-calculator"></i> {i18n.t('static.tree.calculated')}</Button>
                                                     {/* <Button type="button" size="md" color="warning" className="float-right mr-1" onClick={this.resetTree}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button> */}
-                                                    <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.saveTreeData()}><i className="fa fa-check"> </i>{i18n.t('static.pipeline.save')}</Button>
+                                                    <Button type="button" color="success" className="mr-1 float-right" size="md" onClick={() => this.saveTreeData()}><i className="fa fa-check"> </i>{i18n.t('static.pipeline.save')}</Button>
                                                 </div>
                                             </div>
                                         </CardFooter>

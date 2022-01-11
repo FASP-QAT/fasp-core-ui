@@ -220,6 +220,7 @@ export default class ExtrapolateDataComponent extends React.Component {
         var startMonth = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
         var dataArray = [];
         var data = [];
+        var consumptionDataArr = [];
         for (var j = 0; j < monthArray.length; j++) {
             data = [];
             data[0] = monthArray[j];
@@ -234,6 +235,7 @@ export default class ExtrapolateDataComponent extends React.Component {
             var CI = this.state.CI;
             //var consumptionData = actualConsumptionList.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArray[j]).format("YYYY-MM") && c.planningUnit.id == this.state.planningUnitId);
             data[1] = consumptionData.length > 0 ? consumptionData[0].amount : "";
+            consumptionDataArr.push(consumptionData.length > 0 ? consumptionData[0].amount : null);
             data[2] = movingAvgDataFilter.length > 0 && movingAvgDataFilter[0].forecast != null ? movingAvgDataFilter[0].forecast.toFixed(2) : '';
             data[3] = semiAvgDataFilter.length > 0 && semiAvgDataFilter[0].forecast != null ? semiAvgDataFilter[0].forecast.toFixed(2) : '';
             data[4] = linearRegressionDataFilter.length > 0 && linearRegressionDataFilter[0].forecast != null ? linearRegressionDataFilter[0].forecast.toFixed(2) : '';
@@ -418,7 +420,8 @@ export default class ExtrapolateDataComponent extends React.Component {
             minMse: minMse,
             minRsqd: minRsqd,
             minWape: minWape,
-            loading: false
+            loading: false,
+            consumptionData: consumptionDataArr
         })
     }
 
@@ -608,6 +611,12 @@ export default class ExtrapolateDataComponent extends React.Component {
                 console.log("consumptionExtrapolationData", consumptionExtrapolationData);
                 console.log("inputDataFilter", inputDataFilter);
                 //Semi - averages
+                var planningUnitObj = this.state.planningUnitList.filter(c => c.planningUnit.id == this.state.planningUnitId)[0].planningUnit;
+                var regionObj = this.state.regionList.filter(c => c.regionId == this.state.regionId)[0];
+                console.log("Planning Unit Obj****", planningUnitObj);
+                console.log("Region Obj****", regionObj);
+                var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
+                var curUser = AuthenticationService.getLoggedInUserId();
                 if (this.state.semiAvgId) {
                     if (consumptionExtrapolationData == -1) {
                         var data = [];
@@ -617,15 +626,10 @@ export default class ExtrapolateDataComponent extends React.Component {
                         consumptionExtrapolationList.push(
                             {
                                 "consumptionExtrapolationId": consumptionExtrapolationDataUnFiltered.length + 1,
-                                "planningUnit": {
-                                    "id": this.state.planningUnitId,
-                                    "label": {
-                                    }
-                                },
+                                "planningUnit": planningUnitObj,
                                 "region": {
-                                    "id": this.state.regionId,
-                                    "label": {
-                                    }
+                                    id: regionObj.regionId,
+                                    label: regionObj.label
                                 },
                                 "extrapolationMethod": {
                                     "id": 6,
@@ -645,19 +649,18 @@ export default class ExtrapolateDataComponent extends React.Component {
                                 "jsonProperties": {
                                 },
                                 "createdBy": {
-                                    "userId": 1,
-                                    "username": "Anchal C"
+                                    "userId": curUser
                                 },
-                                "createdDate": "2021-12-14 12:24:20",
+                                "createdDate": curDate,
                                 "extrapolationDataList": data
                             })
                     } else {
-                        consumptionExtrapolationList[consumptionExtrapolationData].jsonProperties = {};
-                        var data = [];
-                        for (var i = 0; i < inputDataFilter.length; i++) {
-                            data.push({ month: moment(this.state.startMonthForExtrapolation).add(inputDataFilter[i].month - 1, 'months').format("YYYY-MM-DD"), amount: inputDataFilter[i].forecast })
-                        }
-                        consumptionExtrapolationList[consumptionExtrapolationData].extrapolationDataList = data;
+                        // consumptionExtrapolationList[consumptionExtrapolationData].jsonProperties = {};
+                        // var data = [];
+                        // for (var i = 0; i < inputDataFilter.length; i++) {
+                        //     data.push({ month: moment(this.state.startMonthForExtrapolation).add(inputDataFilter[i].month - 1, 'months').format("YYYY-MM-DD"), amount: inputDataFilter[i].forecast })
+                        // }
+                        // consumptionExtrapolationList[consumptionExtrapolationData].extrapolationDataList = data;
                     }
                 }
                 console.log("this.state.monthsForMovingAverage+++", this.state.monthsForMovingAverage)
@@ -672,15 +675,10 @@ export default class ExtrapolateDataComponent extends React.Component {
                         consumptionExtrapolationList.push(
                             {
                                 "consumptionExtrapolationId": consumptionExtrapolationDataUnFiltered.length + 1,
-                                "planningUnit": {
-                                    "id": this.state.planningUnitId,
-                                    "label": {
-                                    }
-                                },
+                                "planningUnit": planningUnitObj,
                                 "region": {
-                                    "id": this.state.regionId,
-                                    "label": {
-                                    }
+                                    id: regionObj.regionId,
+                                    label: regionObj.label
                                 },
                                 "extrapolationMethod": {
                                     "id": 7,
@@ -701,10 +699,9 @@ export default class ExtrapolateDataComponent extends React.Component {
                                     months: this.state.monthsForMovingAverage
                                 },
                                 "createdBy": {
-                                    "userId": 1,
-                                    "username": "Anchal C"
+                                    "userId": curUser
                                 },
-                                "createdDate": "2021-12-14 12:24:20",
+                                "createdDate": curDate,
                                 "extrapolationDataList": data
                             })
                     }
@@ -727,15 +724,10 @@ export default class ExtrapolateDataComponent extends React.Component {
                         consumptionExtrapolationList.push(
                             {
                                 "consumptionExtrapolationId": consumptionExtrapolationDataUnFiltered.length + 1,
-                                "planningUnit": {
-                                    "id": this.state.planningUnitId,
-                                    "label": {
-                                    }
-                                },
+                                "planningUnit": planningUnitObj,
                                 "region": {
-                                    "id": this.state.regionId,
-                                    "label": {
-                                    }
+                                    id: regionObj.regionId,
+                                    label: regionObj.label
                                 },
                                 "extrapolationMethod": {
                                     "id": 5,
@@ -755,10 +747,9 @@ export default class ExtrapolateDataComponent extends React.Component {
                                 "jsonProperties": {
                                 },
                                 "createdBy": {
-                                    "userId": 1,
-                                    "username": "Anchal C"
+                                    "userId": curUser
                                 },
-                                "createdDate": "2021-12-14 12:24:20",
+                                "createdDate": curDate,
                                 "extrapolationDataList": data
                             })
                     } else {
@@ -782,15 +773,10 @@ export default class ExtrapolateDataComponent extends React.Component {
                         consumptionExtrapolationList.push(
                             {
                                 "consumptionExtrapolationId": consumptionExtrapolationDataUnFiltered.length + 1,
-                                "planningUnit": {
-                                    "id": this.state.planningUnitId,
-                                    "label": {
-                                    }
-                                },
+                                "planningUnit": planningUnitObj,
                                 "region": {
-                                    "id": this.state.regionId,
-                                    "label": {
-                                    }
+                                    id: regionObj.regionId,
+                                    label: regionObj.label
                                 },
                                 "extrapolationMethod": {
                                     "id": 1,
@@ -815,10 +801,9 @@ export default class ExtrapolateDataComponent extends React.Component {
                                     gamma: this.state.gamma
                                 },
                                 "createdBy": {
-                                    "userId": 1,
-                                    "username": "Anchal C"
+                                    "userId": curUser
                                 },
-                                "createdDate": "2021-12-14 12:24:20",
+                                "createdDate": curDate,
                                 "extrapolationDataList": data
                             })
                     } else {
@@ -846,15 +831,10 @@ export default class ExtrapolateDataComponent extends React.Component {
                         consumptionExtrapolationList.push(
                             {
                                 "consumptionExtrapolationId": consumptionExtrapolationDataUnFiltered.length + 1,
-                                "planningUnit": {
-                                    "id": this.state.planningUnitId,
-                                    "label": {
-                                    }
-                                },
+                                "planningUnit": planningUnitObj,
                                 "region": {
-                                    "id": this.state.regionId,
-                                    "label": {
-                                    }
+                                    id: regionObj.regionId,
+                                    label: regionObj.label
                                 },
                                 "extrapolationMethod": {
                                     "id": 2,
@@ -879,10 +859,9 @@ export default class ExtrapolateDataComponent extends React.Component {
                                     gamma: this.state.gamma
                                 },
                                 "createdBy": {
-                                    "userId": 1,
-                                    "username": "Anchal C"
+                                    "userId": curUser
                                 },
-                                "createdDate": "2021-12-14 12:24:20",
+                                "createdDate": curDate,
                                 "extrapolationDataList": data
                             })
                     } else {
@@ -910,15 +889,10 @@ export default class ExtrapolateDataComponent extends React.Component {
                         consumptionExtrapolationList.push(
                             {
                                 "consumptionExtrapolationId": consumptionExtrapolationDataUnFiltered.length + 1,
-                                "planningUnit": {
-                                    "id": this.state.planningUnitId,
-                                    "label": {
-                                    }
-                                },
+                                "planningUnit": planningUnitObj,
                                 "region": {
-                                    "id": this.state.regionId,
-                                    "label": {
-                                    }
+                                    id: regionObj.regionId,
+                                    label: regionObj.label
                                 },
                                 "extrapolationMethod": {
                                     "id": 1,
@@ -943,10 +917,9 @@ export default class ExtrapolateDataComponent extends React.Component {
                                     gamma: this.state.gamma
                                 },
                                 "createdBy": {
-                                    "userId": 1,
-                                    "username": "Anchal C"
+                                    "userId": curUser
                                 },
-                                "createdDate": "2021-12-14 12:24:20",
+                                "createdDate": curDate,
                                 "extrapolationDataList": data
                             })
                     } else {
@@ -1315,6 +1288,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                         },
                         ticks: {
                             fontColor: 'black',
+                            autoSkip: false,
                             callback: function (label) {
                                 var xAxis1 = label
                                 xAxis1 += '';
@@ -1334,12 +1308,15 @@ export default class ExtrapolateDataComponent extends React.Component {
                                 xAxis2 += '';
                                 var month = xAxis2.split('-')[0];
                                 var year = xAxis2.split('-')[1];
-                                if (month === "Feb") {
+                                if (month === "Jul") {
                                     return year;
                                 } else {
                                     return "";
                                 }
-                            }
+                            },
+                            maxRotation: 0,
+                            minRotation: 0,
+                            autoSkip: false
                         }
                     }]
             },
@@ -1395,8 +1372,17 @@ export default class ExtrapolateDataComponent extends React.Component {
             pointStyle: 'line',
             pointBorderWidth: 5,
             yValueFormatString: "###,###,###,###",
-            data: this.state.consumptionData.map((item, index) => (item.amount > 0 ? item.amount : null))
+            data: this.state.consumptionData
         })
+
+        let stopDate = this.state.rangeValue1.to.year + '-' + (this.state.rangeValue1.to.month) + '-' + new Date(this.state.rangeValue1.to.year, this.state.rangeValue1.to.month, 0).getDate()
+        stopDate=moment(stopDate).format("YYYY-MM-DD");
+        let startDate = this.state.rangeValue1.from.year + '-' + (this.state.rangeValue1.from.month) + '-01'
+        startDate=moment(startDate).format("YYYY-MM-DD");
+        
+        console.log("Stop Date&&&",stopDate);
+        console.log("Stop Date&&&",this.state.movingAvgData);
+
         if (this.state.movingAvgId) {
             datasets.push(
                 {
@@ -1414,7 +1400,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                     pointStyle: 'line',
                     pointBorderWidth: 5,
                     yValueFormatString: "###,###,###,###",
-                    data: this.state.movingAvgData.map((item, index) => (item.forecast > 0 ? item.forecast : null))
+                    data: this.state.movingAvgData.map((item, index) => (item.forecast > 0 && moment(startDate).add(item.month - 1, 'months').format("YYYY-MM") > moment(stopDate).format("YYYY-MM") ? item.forecast : null))
                 })
         }
         if (this.state.semiAvgId) {
@@ -1433,7 +1419,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                 pointStyle: 'line',
                 pointBorderWidth: 5,
                 yValueFormatString: "###,###,###,###",
-                data: this.state.semiAvgData.map((item, index) => (item.forecast > 0 ? item.forecast : null))
+                data: this.state.semiAvgData.map((item, index) => (item.forecast > 0  && moment(startDate).add(item.month - 1, 'months').format("YYYY-MM") > moment(stopDate).format("YYYY-MM") ? item.forecast : null))
             })
         }
         if (this.state.linearRegressionId) {
@@ -1453,7 +1439,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                     pointStyle: 'line',
                     pointBorderWidth: 5,
                     yValueFormatString: "###,###,###,###",
-                    data: this.state.linearRegressionData.map((item, index) => (item.forecast > 0 ? item.forecast : null))
+                    data: this.state.linearRegressionData.map((item, index) => (item.forecast > 0  && moment(startDate).add(item.month - 1, 'months').format("YYYY-MM") > moment(stopDate).format("YYYY-MM") ? item.forecast : null))
                 })
         }
         if (this.state.smoothingId) {
@@ -1474,7 +1460,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                 pointStyle: 'line',
                 pointBorderWidth: 5,
                 yValueFormatString: "###,###,###,###",
-                data: this.state.tesData.map((item, index) => (item.forecast > 0 ? (item.forecast - this.state.CI) : null))
+                data: this.state.tesData.map((item, index) => (item.forecast > 0 && moment(startDate).add(item.month - 1, 'months').format("YYYY-MM") > moment(stopDate).format("YYYY-MM") ? (item.forecast - this.state.CI) : null))
             })
         }
         if (this.state.smoothingId) {
@@ -1493,7 +1479,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                 pointStyle: 'line',
                 pointBorderWidth: 5,
                 yValueFormatString: "###,###,###,###",
-                data: this.state.tesData.map((item, index) => (item.forecast > 0 ? item.forecast : null))
+                data: this.state.tesData.map((item, index) => (item.forecast > 0  && moment(startDate).add(item.month - 1, 'months').format("YYYY-MM") > moment(stopDate).format("YYYY-MM") ? item.forecast : null))
             })
         }
         if (this.state.smoothingId) {
@@ -1514,7 +1500,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                 pointStyle: 'line',
                 pointBorderWidth: 5,
                 yValueFormatString: "###,###,###,###",
-                data: this.state.tesData.map((item, index) => (item.forecast > 0 ? (item.forecast + this.state.CI) : null))
+                data: this.state.tesData.map((item, index) => (item.forecast > 0  && moment(startDate).add(item.month - 1, 'months').format("YYYY-MM") > moment(stopDate).format("YYYY-MM") ? (item.forecast + this.state.CI) : null))
             })
         }
         if (this.state.arimaId) {
@@ -1539,7 +1525,7 @@ export default class ExtrapolateDataComponent extends React.Component {
         let line = {};
         if (this.state.showData) {
             line = {
-                labels: this.state.dataList.map((item, index) => (item.months)),
+                labels: this.state.monthArray.map(c => moment(c).format("MMM-YYYY")),
                 datasets: datasets
             }
         }
@@ -1562,15 +1548,15 @@ export default class ExtrapolateDataComponent extends React.Component {
                             <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} /> */}
                         </div>
                     </div>
-                     <div className="Card-header-reporticon pb-2">
+                    <div className="Card-header-reporticon pb-2">
                         <div className="card-header-actions">
-                        <a className="card-header-action">
+                            <a className="card-header-action">
                                 <span style={{ cursor: 'pointer' }} onClick={() => { this.toggleShowGuidance() }}><small className="supplyplanformulas">{i18n.t('static.common.showGuidance')}</small></span>
                             </a>
                             <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
                             {/* <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} /> */}
                         </div>
-                    </div> 
+                    </div>
                     <CardBody className="pb-lg-5 pt-lg-0">
                         <Form name='simpleForm'>
                             <div className=" pl-0">
@@ -1663,10 +1649,10 @@ export default class ExtrapolateDataComponent extends React.Component {
                                     </FormGroup> */}
                                     <FormGroup className="col-md-12">
                                         <h5>
-                                            {i18n.t('static.common.for')}{" "}{this.state.planningUnitId > 0 &&
-                                                document.getElementById("planningUnitId").selectedOptions[0].text}
+                                            {this.state.planningUnitId > 0 && i18n.t('static.common.for')}{" "}<b>{this.state.planningUnitId > 0 &&
+                                                document.getElementById("planningUnitId").selectedOptions[0].text}</b>
                                             {this.state.regionId > 0 &&
-                                                " " + i18n.t('static.common.and') + " " + document.getElementById("regionId").selectedOptions[0].text+(" ") + i18n.t('static.extrpolate.selectYourExtrapolationParameters')}
+                                                " " + i18n.t('static.common.and') + " "}<b>{this.state.regionId > 0 && document.getElementById("regionId").selectedOptions[0].text + (" ")}</b> {this.state.regionId > 0 && i18n.t('static.extrpolate.selectYourExtrapolationParameters')}
                                         </h5>
                                     </FormGroup>
                                     <FormGroup className="col-md-3">

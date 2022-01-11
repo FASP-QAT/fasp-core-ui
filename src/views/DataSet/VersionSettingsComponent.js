@@ -415,8 +415,8 @@ class VersionSettingsComponent extends Component {
                     var program = (this.state.datasetList.filter(x => x.id == id)[0]);
                     var databytes = CryptoJS.AES.decrypt(program.programData, SECRET_KEY);
                     var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
-                    programData.currentVersion.forecastStartDate = startDate;
-                    programData.currentVersion.forecastStopDate = stopDate;
+                    programData.currentVersion.forecastStartDate = moment(startDate).startOf('month').format("YYYY-MM-DD");
+                    programData.currentVersion.forecastStopDate = moment(stopDate).startOf('month').format("YYYY-MM-DD");
                     programData.currentVersion.daysInMonth = noOfDaysInMonth;
                     programData.currentVersion.notes = notes;
 
