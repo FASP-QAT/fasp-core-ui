@@ -117,7 +117,7 @@ export default class ExtrapolateDataComponent extends React.Component {
         this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
         this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
         this.pickRange = React.createRef();
-
+        this.getDateDifference=this.getDateDifference.bind(this);
         this._handleClickRangeBox1 = this._handleClickRangeBox1.bind(this)
 
         this.handleRangeDissmis1 = this.handleRangeDissmis1.bind(this);
@@ -186,7 +186,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                 })
             }.bind(this)
         }.bind(this)
-
+        this.getDateDifference();
     }
 
     reset() {
@@ -1065,6 +1065,19 @@ export default class ExtrapolateDataComponent extends React.Component {
         }
     }
 
+    exportCSV() {
+        var csvRow = [];
+        csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + document.getElementById("datasetId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+        csvRow.push('')
+        csvRow.push('"' + (i18n.t('static.common.forecastPeriod') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ', '%20') + '"')
+        csvRow.push('')
+        csvRow.push('"' + (i18n.t('static.program.region') + ' : ' + document.getElementById("regionId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+        csvRow.push('')
+        csvRow.push('"' + (i18n.t('static.report.planningUnit') + ' : ' + document.getElementById("planningUnitId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+        csvRow.push('')
+        csvRow.push('')
+    }
+
     setAlpha(e) {
         var alpha = e.target.value;
         this.setState({
@@ -1181,15 +1194,18 @@ export default class ExtrapolateDataComponent extends React.Component {
     }
 
     getDateDifference() {
-        var startDate = moment([this.state.rangeValue1.from.year, this.state.rangeValue1.from.month]);
-        var endDate = moment([this.state.rangeValue1.to.year, this.state.rangeValue1.to.month]);
-        var monthsDiff = endDate.diff(startDate, 'months');
-        console.log("monthsDiff-->", monthsDiff)
-        //  document.getElementById('dateDiv').val(monthsDiff);
-        //  this.setState({
-        //      monthsDiff: monthsDiff
-        //  });
+        var rangeValue = this.state.rangeValue1;
+        let startDate = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
+        let endDate =rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
+        console.log("startDate-->", startDate);
+        console.log("endDate-->", endDate);
+        var monthsDiff = moment(endDate).diff(startDate, 'months', false);
+        console.log("monthsDiff-->", monthsDiff);
+         this.setState({
+             monthsDiff: monthsDiff
+         });
     }
+
     render() {
         const pickerLang = {
             months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
@@ -1649,7 +1665,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                 value={rangeValue1}
                                                 lang={pickerLang}
                                                 // theme="light"
-                                                onChange={this.handleRangeChange1, this.getDateDifference()}
+                                                onChange={this.handleRangeChange1, this.getDateDifference}
                                                 onDismiss={this.handleRangeDissmis1}
                                                 readOnly
                                             >
@@ -1657,9 +1673,10 @@ export default class ExtrapolateDataComponent extends React.Component {
                                             </Picker>
                                         </div>
                                     </FormGroup>
+                                    <Label>{this.state.monthsDiff} Months</Label>
+                                  
                                 </div>
-                                <div id="dateDiv" className="leftAlignTable">
-                                </div>
+                               
                                 <div className="row">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.selectExtrapolationMethod')}</Label>
                                 </div>
