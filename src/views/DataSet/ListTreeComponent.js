@@ -66,7 +66,8 @@ export default class ListTreeComponent extends Component {
             isModalOpen: false,
             programId: '',
             versionId: '',
-            treeId: '',            
+            treeId: '',
+            datasetId: ''
         }
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.buildJexcel = this.buildJexcel.bind(this);
@@ -128,7 +129,9 @@ export default class ListTreeComponent extends Component {
 
             for (let i = 0; i < treeList.length; i++) {
                 if (treeList[i].treeId == treeId) {
-                    let treeObj = treeList[i];
+                    let treeObj = JSON.parse(JSON.stringify(treeList[i]));
+                    let maxTreeId = treeList.length > 0 ? Math.max(...treeList.map(o => o.treeId)) : 0;
+                    treeObj.treeId = maxTreeId + 1;
                     treeObj.label = {
                         "createdBy": null,
                         "createdDate": null,
@@ -202,7 +205,7 @@ export default class ListTreeComponent extends Component {
                     message: i18n.t('static.mt.dataUpdateSuccess'),
                     color: "green",
                 }, () => {
-
+                    this.getDatasetList();
                 });
                 console.log("Data update success1");
                 // alert("success");
@@ -265,6 +268,7 @@ export default class ListTreeComponent extends Component {
 
         // console.log("pro list---", proList);
         this.setState({
+            datasetId,
             treeData: datasetList
         }, () => {
             this.buildJexcel();
@@ -296,13 +300,9 @@ export default class ListTreeComponent extends Component {
                 this.setState({
                     datasetList: myResult
                 }, () => {
-                    console.log("datasetList---", this.state.datasetList);
-                    this.getTreeList(0);
+                    var datasetId = this.state.datasetId != "" && this.state.datasetId != 0 ? this.state.datasetId : 0;
+                    this.getTreeList(datasetId);
                 });
-                // for (var i = 0; i < myResult.length; i++) {
-                //     console.log("datasetList--->", myResult[i])
-
-                // }
 
             }.bind(this);
         }.bind(this);
@@ -352,6 +352,7 @@ export default class ListTreeComponent extends Component {
                     data[7] = programList[j].programId
                     data[8] = programList[j].id
                     data[9] = programList[j].version
+                    data[10] = treeList[k].active
                     treeArray[count] = data;
                     count++;
                 }
@@ -359,9 +360,10 @@ export default class ListTreeComponent extends Component {
         }
         if (treeArray.length > 0) {
             treeArray.sort((a, b) => {
+                console.log("a[2]---",a[2]);
                 var itemLabelA = a[2].toUpperCase(); // ignore upper and lowercase
                 var itemLabelB = b[2].toUpperCase(); // ignore upper and lowercase                   
-                return itemLabelA > itemLabelB ? 1 : -1;
+                return itemLabelA > itemLabelB ? -1 : 1;
             });
         }
         this.el = jexcel(document.getElementById("tableDiv"), '');
@@ -424,8 +426,16 @@ export default class ListTreeComponent extends Component {
                     title: 'versionId',
                     type: 'hidden',
                     readOnly: true
+                },
+                {
+                    type: 'dropdown',
+                    title: i18n.t('static.common.status'),
+                    readOnly: true,
+                    source: [
+                        { id: true, name: i18n.t('static.common.active') },
+                        { id: false, name: i18n.t('static.common.disabled') }
+                    ]
                 }
-
 
             ],
             text: {
@@ -669,14 +679,14 @@ export default class ListTreeComponent extends Component {
                     </CardBody>
 
                     <Modal isOpen={this.state.isModalOpen}
-                        className={'modal-xl ' + this.props.className}>
+                        className={'modal-md ' + this.props.className}>
                         <ModalHeader>
-                            <strong>Tree Name</strong>
+                            <strong>Tree Details</strong>
                         </ModalHeader>
-                        <ModalBody>
+                        <ModalBody className='pb-lg-0'>
                             <h6 className="red" id="div3"></h6>
                             <Col sm={12} style={{ flexBasis: 'auto' }}>
-                                <Card>
+                                {/* <Card> */}
                                     <Formik
                                         initialValues={initialValues}
                                         validate={validate(validationSchema)}
@@ -704,43 +714,46 @@ export default class ListTreeComponent extends Component {
                                                 handleReset
                                             }) => (
                                                 <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='modalForm' autocomplete="off">
-                                                    <CardBody>
-                                                        <div className="d-md-flex">
+                                                    {/* <CardBody> */}
+                                                    <div className="row">
 
-                                                            <FormGroup className="mt-md-2 mb-md-0 pl-lg-2">
-                                                                <Label for="number1">Tree Name<span className="red Reqasterisk">*</span></Label>
-                                                                <div className="controls UsagePopUpInputField">
-                                                                    <Input type="text"
-                                                                        bsSize="sm"
-                                                                        name="treeName"
-                                                                        id="treeName"
-                                                                        valid={!errors.treeName && this.state.treeName != ''}
-                                                                        invalid={touched.treeName && !!errors.treeName}
-                                                                        onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                                        onBlur={handleBlur}
-                                                                        required
-                                                                        value={this.state.treeName}
-                                                                    />
-                                                                </div>
-                                                                <FormFeedback className="red">{errors.treeName}</FormFeedback>
-                                                            </FormGroup>
+                                                        <FormGroup className="col-md-12">
+                                                            <Label for="number1">Tree Name<span className="red Reqasterisk">*</span></Label>
+                                                            <div className="controls">
+                                                                <Input type="text"
+                                                                    bsSize="sm"
+                                                                    name="treeName"
+                                                                    id="treeName"
+                                                                    valid={!errors.treeName && this.state.treeName != ''}
+                                                                    invalid={touched.treeName && !!errors.treeName}
+                                                                    onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                                    onBlur={handleBlur}
+                                                                    required
+                                                                    value={this.state.treeName}
+                                                                />
+                                                            </div>
+                                                            <FormFeedback className="red">{errors.treeName}</FormFeedback>
+                                                        </FormGroup>
+                                                        <FormGroup className="col-md-12 float-right pt-lg-4">
+                                                            <Button type="button" color="danger" className="mr-1 float-right" size="md" onClick={this.modelOpenClose}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                                            <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                                            &nbsp;
 
-                                                        </div>
-                                                    </CardBody>
-
-                                                    <CardFooter>
+                                                        </FormGroup>
+                                                    </div>
+                                                    {/* <CardFooter>
                                                         <FormGroup>
                                                             <Button type="button" color="danger" className="mr-1 float-right" size="md" onClick={this.modelOpenClose}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                                             <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                                             &nbsp;
 
                                                         </FormGroup>
-                                                    </CardFooter>
+                                                    </CardFooter> */}
                                                 </Form>
 
                                             )} />
 
-                                </Card>
+                                {/* </Card> */}
                             </Col>
                             <br />
                         </ModalBody>
