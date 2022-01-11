@@ -7971,6 +7971,7 @@ export default class BuildTree extends Component {
                                                             </Input>
                                                             <InputGroupAddon addonType="append">
                                                                 <InputGroupText><i class="fa fa-cog icons" data-toggle="collapse" aria-expanded="false" onClick={this.toggleCollapse}></i></InputGroupText>
+                                                            
                                                             </InputGroupAddon>
                                                         </InputGroup>
                                                         {/* <FormFeedback>{errors.languageId}</FormFeedback> */}
@@ -8110,7 +8111,8 @@ export default class BuildTree extends Component {
                                             </div>
 
                                         </CardBody>
-                                        <div className="col-md-12 collapse-bg pl-lg-2 pr-lg-2 pt-lg-2 MarginBottomTree" style={{ display: this.state.showDiv ? 'block' : 'none' }} >
+                                        {/* <div className="col-md-12 collapse-bg pl-lg-2 pr-lg-2 pt-lg-2 MarginBottomTree" style={{ display: this.state.showDiv ? 'block' : 'none' }} > */}
+                                        <div className="col-md-12 collapse-bg pl-lg-2 pr-lg-2 pt-lg-2 MarginBottomTree" style={{ display: this.state.showDiv ? 'block' : 'block' }}>
                                             <Formik
                                                 enableReinitialize={true}
                                                 initialValues={{
@@ -8139,8 +8141,13 @@ export default class BuildTree extends Component {
                                                         setFieldTouched
                                                     }) => (
                                                         <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='userForm' autocomplete="off">
-                                                            <Row>
-                                                                <FormGroup className="col-md-4">
+                                                            <div className='col-md-12 pt-lg-2 pb-lg-0 pr-lg-0'>
+                                                                <button className="mr-1 mb-0 float-right btn btn-info btn-md showdatabtn" onClick={this.toggleCollapse}>
+                                                                {this.state.showDiv ? i18n.t('static.common.hideData') : i18n.t('static.common.showData')}
+                                                                </button>
+                                                            </div>
+                                                            <Row style={{display:'inline-flex'}}>
+                                                             <FormGroup className="col-md-4">
                                                                     <Label htmlFor="currencyId">{i18n.t('static.forecastMethod.forecastMethod')}<span class="red Reqasterisk">*</span></Label>
                                                                     <Input
                                                                         type="select"
@@ -8251,6 +8258,7 @@ export default class BuildTree extends Component {
                                                                     </FormGroup>
                                                                 </FormGroup>
                                                                 <FormGroup className="col-md-3 pt-lg-4">
+                                                               
                                                                     <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setState({ showDiv: false })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                                                     <Button type="submit" size="md" onClick={() => this.touchAll(setTouched, errors)} color="success" className="submitBtn float-right mr-1"> <i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
                                                                 </FormGroup>
