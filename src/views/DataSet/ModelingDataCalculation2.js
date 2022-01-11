@@ -5,6 +5,7 @@ import { SECRET_KEY, CANCELLED_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, SUBMITT
 
 export function calculateModelingData(dataset, props, page, nodeId, scenarioId, type, treeId, isTemplate) {
     console.log("modelling dataset---", dataset);
+    console.log("modeling nodeId---",nodeId);
     console.log("modelling scenarioId---", scenarioId);
 
     // var db1;
@@ -248,9 +249,15 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                         nodeDataMomList: nodeDataList
                     })
 
-
+                    nodeDataMapForScenario.nodeDataMomList = nodeDataList;
+                    nodeDataMap[scenarioList[ndm].id] = [nodeDataMapForScenario];
                     // nodeDataMapForScenario.nodeDataMomList = nodeDataList;
                     // nodeDataMap[scenarioList[ndm].id] = [nodeDataMapForScenario];
+                }
+                if (nodeId == -1) {
+                    var findIndex = flatListUnsorted.findIndex(c => c.id == flatList[fl].id);
+                    payload.nodeDataMap = nodeDataMap;
+                    flatList[findIndex].payload = payload;
                 }
                 // payload.nodeDataMap = nodeDataMap;
                 // flatList[fl].payload = payload;
@@ -310,6 +317,14 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                         nodeId: aggregateNodeList[fl - 1].id,
                         nodeDataMomList: nodeDataList
                     })
+
+                    nodeDataMapForScenario.nodeDataMomList = nodeDataList;
+                    nodeDataMap[scenarioList[ndm].id] = [nodeDataMapForScenario];
+                }
+                if (nodeId == -1) {
+                    var findIndex = flatListUnsorted.findIndex(c => c.id == aggregateNodeList[fl - 1].id);
+                    payload.nodeDataMap = nodeDataMap;
+                    flatList[fl].payload = payload;
                 }
             }
         }
