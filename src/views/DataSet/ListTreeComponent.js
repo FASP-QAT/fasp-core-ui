@@ -358,13 +358,13 @@ export default class ListTreeComponent extends Component {
                 }
             }
         }
+        const sortArray = (sourceArray) => {
+            const sortByName = (a, b) => a[2].localeCompare(b[2], 'en', { numeric: true });
+            return sourceArray.sort(sortByName);
+        };
+
         if (treeArray.length > 0) {
-            treeArray.sort((a, b) => {
-                console.log("a[2]---",a[2]);
-                var itemLabelA = a[2].toUpperCase(); // ignore upper and lowercase
-                var itemLabelB = b[2].toUpperCase(); // ignore upper and lowercase                   
-                return itemLabelA > itemLabelB ? -1 : 1;
-            });
+            sortArray(treeArray);
         }
         this.el = jexcel(document.getElementById("tableDiv"), '');
         this.el.destroy();
@@ -687,61 +687,61 @@ export default class ListTreeComponent extends Component {
                             <h6 className="red" id="div3"></h6>
                             <Col sm={12} style={{ flexBasis: 'auto' }}>
                                 {/* <Card> */}
-                                    <Formik
-                                        initialValues={initialValues}
-                                        validate={validate(validationSchema)}
-                                        onSubmit={(values, { setSubmitting, setErrors }) => {
+                                <Formik
+                                    initialValues={initialValues}
+                                    validate={validate(validationSchema)}
+                                    onSubmit={(values, { setSubmitting, setErrors }) => {
 
-                                            this.copyDeleteTree(this.state.treeId, this.state.programId, this.state.versionId, 2);
-                                            this.setState({
-                                                isModalOpen: !this.state.isModalOpen,
-                                            })
+                                        this.copyDeleteTree(this.state.treeId, this.state.programId, this.state.versionId, 2);
+                                        this.setState({
+                                            isModalOpen: !this.state.isModalOpen,
+                                        })
 
-                                        }}
+                                    }}
 
 
-                                        render={
-                                            ({
-                                                values,
-                                                errors,
-                                                touched,
-                                                handleChange,
-                                                handleBlur,
-                                                handleSubmit,
-                                                isSubmitting,
-                                                isValid,
-                                                setTouched,
-                                                handleReset
-                                            }) => (
-                                                <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='modalForm' autocomplete="off">
-                                                    {/* <CardBody> */}
-                                                    <div className="row">
+                                    render={
+                                        ({
+                                            values,
+                                            errors,
+                                            touched,
+                                            handleChange,
+                                            handleBlur,
+                                            handleSubmit,
+                                            isSubmitting,
+                                            isValid,
+                                            setTouched,
+                                            handleReset
+                                        }) => (
+                                            <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='modalForm' autocomplete="off">
+                                                {/* <CardBody> */}
+                                                <div className="row">
 
-                                                        <FormGroup className="col-md-12">
-                                                            <Label for="number1">Tree Name<span className="red Reqasterisk">*</span></Label>
-                                                            <div className="controls">
-                                                                <Input type="text"
-                                                                    bsSize="sm"
-                                                                    name="treeName"
-                                                                    id="treeName"
-                                                                    valid={!errors.treeName && this.state.treeName != ''}
-                                                                    invalid={touched.treeName && !!errors.treeName}
-                                                                    onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                                    onBlur={handleBlur}
-                                                                    required
-                                                                    value={this.state.treeName}
-                                                                />
-                                                            </div>
-                                                            <FormFeedback className="red">{errors.treeName}</FormFeedback>
-                                                        </FormGroup>
-                                                        <FormGroup className="col-md-12 float-right pt-lg-4">
-                                                            <Button type="button" color="danger" className="mr-1 float-right" size="md" onClick={this.modelOpenClose}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                                            <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
-                                                            &nbsp;
+                                                    <FormGroup className="col-md-12">
+                                                        <Label for="number1">Tree Name<span className="red Reqasterisk">*</span></Label>
+                                                        <div className="controls">
+                                                            <Input type="text"
+                                                                bsSize="sm"
+                                                                name="treeName"
+                                                                id="treeName"
+                                                                valid={!errors.treeName && this.state.treeName != ''}
+                                                                invalid={touched.treeName && !!errors.treeName}
+                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                                onBlur={handleBlur}
+                                                                required
+                                                                value={this.state.treeName}
+                                                            />
+                                                        </div>
+                                                        <FormFeedback className="red">{errors.treeName}</FormFeedback>
+                                                    </FormGroup>
+                                                    <FormGroup className="col-md-12 float-right pt-lg-4">
+                                                        <Button type="button" color="danger" className="mr-1 float-right" size="md" onClick={this.modelOpenClose}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                                        <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                                        &nbsp;
 
-                                                        </FormGroup>
-                                                    </div>
-                                                    {/* <CardFooter>
+                                                    </FormGroup>
+                                                </div>
+                                                {/* <CardFooter>
                                                         <FormGroup>
                                                             <Button type="button" color="danger" className="mr-1 float-right" size="md" onClick={this.modelOpenClose}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                                             <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
@@ -749,9 +749,9 @@ export default class ListTreeComponent extends Component {
 
                                                         </FormGroup>
                                                     </CardFooter> */}
-                                                </Form>
+                                            </Form>
 
-                                            )} />
+                                        )} />
 
                                 {/* </Card> */}
                             </Col>
