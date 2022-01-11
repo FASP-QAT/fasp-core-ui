@@ -5149,10 +5149,16 @@ height: 0px;
     // }
     
     .listtreetable .jexcel > thead > tr >td:nth-child(4) {
-      text-align: left!important;
+      text-align: center!important;
   }
   .listtreetable .jexcelremoveReadonlybackground .jexcel>tbody>tr>td:nth-child(4).readonly {
     text-align: left!important;
+}
+.listtreetable .jexcelremoveReadonlybackground .jexcel>tbody>tr>td.readonly {
+  cursor: pointer;
+}
+.TreeTemplateTable .jexcelremoveReadonlybackground .jexcel>tbody>tr>td.readonly {
+  cursor: pointer;
 }
 .boxContactTemplate{
     opacity: 1!important;
