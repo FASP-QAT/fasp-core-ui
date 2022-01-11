@@ -220,6 +220,7 @@ export default class ExtrapolateDataComponent extends React.Component {
         var startMonth = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
         var dataArray = [];
         var data = [];
+        var consumptionDataArr = [];
         for (var j = 0; j < monthArray.length; j++) {
             data = [];
             data[0] = monthArray[j];
@@ -234,6 +235,7 @@ export default class ExtrapolateDataComponent extends React.Component {
             var CI = this.state.CI;
             //var consumptionData = actualConsumptionList.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArray[j]).format("YYYY-MM") && c.planningUnit.id == this.state.planningUnitId);
             data[1] = consumptionData.length > 0 ? consumptionData[0].amount : "";
+            consumptionDataArr.push(consumptionData.length > 0 ? consumptionData[0].amount : null);
             data[2] = movingAvgDataFilter.length > 0 && movingAvgDataFilter[0].forecast != null ? movingAvgDataFilter[0].forecast.toFixed(2) : '';
             data[3] = semiAvgDataFilter.length > 0 && semiAvgDataFilter[0].forecast != null ? semiAvgDataFilter[0].forecast.toFixed(2) : '';
             data[4] = linearRegressionDataFilter.length > 0 && linearRegressionDataFilter[0].forecast != null ? linearRegressionDataFilter[0].forecast.toFixed(2) : '';
@@ -418,7 +420,8 @@ export default class ExtrapolateDataComponent extends React.Component {
             minMse: minMse,
             minRsqd: minRsqd,
             minWape: minWape,
-            loading: false
+            loading: false,
+            consumptionData: consumptionDataArr
         })
     }
 
@@ -625,8 +628,8 @@ export default class ExtrapolateDataComponent extends React.Component {
                                 "consumptionExtrapolationId": consumptionExtrapolationDataUnFiltered.length + 1,
                                 "planningUnit": planningUnitObj,
                                 "region": {
-                                    id:regionObj.regionId,
-                                    label:regionObj.label
+                                    id: regionObj.regionId,
+                                    label: regionObj.label
                                 },
                                 "extrapolationMethod": {
                                     "id": 6,
@@ -674,8 +677,8 @@ export default class ExtrapolateDataComponent extends React.Component {
                                 "consumptionExtrapolationId": consumptionExtrapolationDataUnFiltered.length + 1,
                                 "planningUnit": planningUnitObj,
                                 "region": {
-                                    id:regionObj.regionId,
-                                    label:regionObj.label
+                                    id: regionObj.regionId,
+                                    label: regionObj.label
                                 },
                                 "extrapolationMethod": {
                                     "id": 7,
@@ -723,8 +726,8 @@ export default class ExtrapolateDataComponent extends React.Component {
                                 "consumptionExtrapolationId": consumptionExtrapolationDataUnFiltered.length + 1,
                                 "planningUnit": planningUnitObj,
                                 "region": {
-                                    id:regionObj.regionId,
-                                    label:regionObj.label
+                                    id: regionObj.regionId,
+                                    label: regionObj.label
                                 },
                                 "extrapolationMethod": {
                                     "id": 5,
@@ -772,8 +775,8 @@ export default class ExtrapolateDataComponent extends React.Component {
                                 "consumptionExtrapolationId": consumptionExtrapolationDataUnFiltered.length + 1,
                                 "planningUnit": planningUnitObj,
                                 "region": {
-                                    id:regionObj.regionId,
-                                    label:regionObj.label
+                                    id: regionObj.regionId,
+                                    label: regionObj.label
                                 },
                                 "extrapolationMethod": {
                                     "id": 1,
@@ -830,8 +833,8 @@ export default class ExtrapolateDataComponent extends React.Component {
                                 "consumptionExtrapolationId": consumptionExtrapolationDataUnFiltered.length + 1,
                                 "planningUnit": planningUnitObj,
                                 "region": {
-                                    id:regionObj.regionId,
-                                    label:regionObj.label
+                                    id: regionObj.regionId,
+                                    label: regionObj.label
                                 },
                                 "extrapolationMethod": {
                                     "id": 2,
@@ -888,8 +891,8 @@ export default class ExtrapolateDataComponent extends React.Component {
                                 "consumptionExtrapolationId": consumptionExtrapolationDataUnFiltered.length + 1,
                                 "planningUnit": planningUnitObj,
                                 "region": {
-                                    id:regionObj.regionId,
-                                    label:regionObj.label
+                                    id: regionObj.regionId,
+                                    label: regionObj.label
                                 },
                                 "extrapolationMethod": {
                                     "id": 1,
@@ -1285,6 +1288,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                         },
                         ticks: {
                             fontColor: 'black',
+                            autoSkip: false,
                             callback: function (label) {
                                 var xAxis1 = label
                                 xAxis1 += '';
@@ -1304,12 +1308,15 @@ export default class ExtrapolateDataComponent extends React.Component {
                                 xAxis2 += '';
                                 var month = xAxis2.split('-')[0];
                                 var year = xAxis2.split('-')[1];
-                                if (month === "Feb") {
+                                if (month === "Jul") {
                                     return year;
                                 } else {
                                     return "";
                                 }
-                            }
+                            },
+                            maxRotation: 0,
+                            minRotation: 0,
+                            autoSkip: false
                         }
                     }]
             },
@@ -1365,8 +1372,17 @@ export default class ExtrapolateDataComponent extends React.Component {
             pointStyle: 'line',
             pointBorderWidth: 5,
             yValueFormatString: "###,###,###,###",
-            data: this.state.consumptionData.map((item, index) => (item.amount > 0 ? item.amount : null))
+            data: this.state.consumptionData
         })
+
+        let stopDate = this.state.rangeValue1.to.year + '-' + (this.state.rangeValue1.to.month) + '-' + new Date(this.state.rangeValue1.to.year, this.state.rangeValue1.to.month, 0).getDate()
+        stopDate=moment(stopDate).format("YYYY-MM-DD");
+        let startDate = this.state.rangeValue1.from.year + '-' + (this.state.rangeValue1.from.month) + '-01'
+        startDate=moment(startDate).format("YYYY-MM-DD");
+        
+        console.log("Stop Date&&&",stopDate);
+        console.log("Stop Date&&&",this.state.movingAvgData);
+
         if (this.state.movingAvgId) {
             datasets.push(
                 {
@@ -1384,7 +1400,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                     pointStyle: 'line',
                     pointBorderWidth: 5,
                     yValueFormatString: "###,###,###,###",
-                    data: this.state.movingAvgData.map((item, index) => (item.forecast > 0 ? item.forecast : null))
+                    data: this.state.movingAvgData.map((item, index) => (item.forecast > 0 && moment(startDate).add(item.month - 1, 'months').format("YYYY-MM") > moment(stopDate).format("YYYY-MM") ? item.forecast : null))
                 })
         }
         if (this.state.semiAvgId) {
@@ -1403,7 +1419,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                 pointStyle: 'line',
                 pointBorderWidth: 5,
                 yValueFormatString: "###,###,###,###",
-                data: this.state.semiAvgData.map((item, index) => (item.forecast > 0 ? item.forecast : null))
+                data: this.state.semiAvgData.map((item, index) => (item.forecast > 0  && moment(startDate).add(item.month - 1, 'months').format("YYYY-MM") > moment(stopDate).format("YYYY-MM") ? item.forecast : null))
             })
         }
         if (this.state.linearRegressionId) {
@@ -1423,7 +1439,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                     pointStyle: 'line',
                     pointBorderWidth: 5,
                     yValueFormatString: "###,###,###,###",
-                    data: this.state.linearRegressionData.map((item, index) => (item.forecast > 0 ? item.forecast : null))
+                    data: this.state.linearRegressionData.map((item, index) => (item.forecast > 0  && moment(startDate).add(item.month - 1, 'months').format("YYYY-MM") > moment(stopDate).format("YYYY-MM") ? item.forecast : null))
                 })
         }
         if (this.state.smoothingId) {
@@ -1444,7 +1460,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                 pointStyle: 'line',
                 pointBorderWidth: 5,
                 yValueFormatString: "###,###,###,###",
-                data: this.state.tesData.map((item, index) => (item.forecast > 0 ? (item.forecast - this.state.CI) : null))
+                data: this.state.tesData.map((item, index) => (item.forecast > 0 && moment(startDate).add(item.month - 1, 'months').format("YYYY-MM") > moment(stopDate).format("YYYY-MM") ? (item.forecast - this.state.CI) : null))
             })
         }
         if (this.state.smoothingId) {
@@ -1463,7 +1479,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                 pointStyle: 'line',
                 pointBorderWidth: 5,
                 yValueFormatString: "###,###,###,###",
-                data: this.state.tesData.map((item, index) => (item.forecast > 0 ? item.forecast : null))
+                data: this.state.tesData.map((item, index) => (item.forecast > 0  && moment(startDate).add(item.month - 1, 'months').format("YYYY-MM") > moment(stopDate).format("YYYY-MM") ? item.forecast : null))
             })
         }
         if (this.state.smoothingId) {
@@ -1484,7 +1500,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                 pointStyle: 'line',
                 pointBorderWidth: 5,
                 yValueFormatString: "###,###,###,###",
-                data: this.state.tesData.map((item, index) => (item.forecast > 0 ? (item.forecast + this.state.CI) : null))
+                data: this.state.tesData.map((item, index) => (item.forecast > 0  && moment(startDate).add(item.month - 1, 'months').format("YYYY-MM") > moment(stopDate).format("YYYY-MM") ? (item.forecast + this.state.CI) : null))
             })
         }
         if (this.state.arimaId) {
@@ -1509,7 +1525,7 @@ export default class ExtrapolateDataComponent extends React.Component {
         let line = {};
         if (this.state.showData) {
             line = {
-                labels: this.state.dataList.map((item, index) => (item.months)),
+                labels: this.state.monthArray.map(c => moment(c).format("MMM-YYYY")),
                 datasets: datasets
             }
         }
