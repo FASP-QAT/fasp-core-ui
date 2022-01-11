@@ -66,7 +66,7 @@ export default class ListTreeComponent extends Component {
             isModalOpen: false,
             programId: '',
             versionId: '',
-            treeId: '',
+            treeId: '',            
         }
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.buildJexcel = this.buildJexcel.bind(this);
@@ -112,7 +112,7 @@ export default class ListTreeComponent extends Component {
         let tempProgram = JSON.parse(JSON.stringify(program))
 
         if (operationId == 1) {//delete
-            alert("If");
+            // alert("If");
             let treeList = program.programData.treeList;
             for (var j = 0; j < treeList.length; j++) {
                 if (treeList[j].treeId == treeId) {
@@ -121,42 +121,32 @@ export default class ListTreeComponent extends Component {
             }
             tempProgram.programData.treeList = treeList;
         } else {//copy
-            alert("Else");
+            // alert("Else");
+            // let treeList = JSON.parse(JSON.stringify(program.programData.treeList));
             let treeList = program.programData.treeList;
             let treeName = this.state.treeName;
 
             for (let i = 0; i < treeList.length; i++) {
                 if (treeList[i].treeId == treeId) {
-                    // treeObj = treeList[i];
-                    treeList[treeList.length] = treeList[i];
+                    let treeObj = treeList[i];
+                    treeObj.label = {
+                        "createdBy": null,
+                        "createdDate": null,
+                        "lastModifiedBy": null,
+                        "lastModifiedDate": null,
+                        "active": true,
+                        "labelId": '',
+                        "label_en": treeName,
+                        "label_sp": null,
+                        "label_fr": null,
+                        "label_pr": null
+                    }
+
+                    treeList.push(treeObj);
                     break;
                 }
             }
 
-            treeList[treeList.length - 1].label = {
-                "createdBy": null,
-                "createdDate": null,
-                "lastModifiedBy": null,
-                "lastModifiedDate": null,
-                "active": true,
-                "labelId": '',
-                "label_en": treeName,
-                "label_sp": null,
-                "label_fr": null,
-                "label_pr": null
-            }
-            // treeObj.label = {
-            //     "createdBy": null,
-            //     "createdDate": null,
-            //     "lastModifiedBy": null,
-            //     "lastModifiedDate": null,
-            //     "active": true,
-            //     "labelId": '',
-            //     "label_en": treeName,
-            //     "label_sp": null,
-            //     "label_fr": null,
-            //     "label_pr": null
-            // }
 
 
             // let treeObj = treeList.filter(c => c.treeId == treeId)[0];
@@ -179,7 +169,7 @@ export default class ListTreeComponent extends Component {
             tempProgram.programData.treeList = treeList;
         }
 
-
+        console.log("TreeId--------------->13", tempProgram.programData.treeList);
 
 
         var programData = (CryptoJS.AES.encrypt(JSON.stringify(tempProgram.programData), SECRET_KEY)).toString();
