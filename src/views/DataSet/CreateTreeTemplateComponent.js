@@ -467,12 +467,12 @@ export default class CreateTreeTemplate extends Component {
 
     calculateMOMData(nodeId, type) {
         let { treeTemplate } = this.state;
-        console.log("before---*",treeTemplate)
+        console.log("before---*", treeTemplate)
         var items = this.state.items;
 
         treeTemplate.flatList = items;
-        console.log("after---*",treeTemplate)
-        calculateModelingData(treeTemplate, this, '', (nodeId != 0 ? nodeId : this.state.currentItemConfig.context.id), 0, type, 0, false);
+        console.log("after---*", treeTemplate)
+        calculateModelingData(treeTemplate, this, '', (nodeId != 0 ? nodeId : this.state.currentItemConfig.context.id), 0, type, -1, true);
     }
 
     updateState(parameterName, value) {
@@ -534,54 +534,11 @@ export default class CreateTreeTemplate extends Component {
         this.setState({
             momJexcelLoader: true
         });
-        let { dataSetObj } = this.state;
-        var dataSetObjCopy = JSON.parse(JSON.stringify(dataSetObj));
-        var programData = dataSetObjCopy.programData;
-        console.log("dataSetDecrypt>>>", programData);
-
-        programData = (CryptoJS.AES.encrypt(JSON.stringify(programData), SECRET_KEY)).toString();
-        dataSetObjCopy.programData = programData;
-
-        console.log("encpyDataSet>>>", dataSetObjCopy)
-        // store update object in indexdb
-        var db1;
-        getDatabase();
-        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-        openRequest.onerror = function (event) {
-            this.setState({
-                message: i18n.t('static.program.errortext'),
-                color: '#BA0C2F'
-            })
-            this.hideFirstComponent()
-        }.bind(this);
-        openRequest.onsuccess = function (e) {
-            db1 = e.target.result;
-            var transaction = db1.transaction(['datasetData'], 'readwrite');
-            var programTransaction = transaction.objectStore('datasetData');
-            // programs.forEach(program => {
-            var programRequest = programTransaction.put(dataSetObjCopy);
-            console.log("---hurrey---");
-            // })
-            transaction.oncomplete = function (event) {
-                console.log("all good >>>>");
-
-                this.setState({
-                    momJexcelLoader: false
-                });
-                console.log("Data update success");
-            }.bind(this);
-            transaction.onerror = function (event) {
-                this.setState({
-                    loading: false,
-                    // message: 'Error occured.',
-                    color: "#BA0C2F",
-                }, () => {
-                    this.hideSecondComponent();
-                });
-                console.log("Data update errr");
-            }.bind(this);
-        }.bind(this);
-        // nodeDataId,month,manualChangeValue,seconalityPer
+        let { treeTemplate } = this.state;
+        this.setState({
+            treeTemplate,
+            momJexcelLoader: false
+        });
     }
 
     filterScalingDataByMonth(date) {
@@ -1143,7 +1100,7 @@ export default class CreateTreeTemplate extends Component {
             data[5] = parseFloat(momListParent[j].calculatedValue).toFixed(2)
             data[6] = parseFloat(momList[j].calculatedValue).toFixed(2)
             // data[6] = this.state.manualChange ? momList[j].calculatedValue : ((momListParent[j].manualChange > 0) ? momListParent[j].endValueWithManualChangeWMC : momListParent[j].calculatedValueWMC *  momList[j].endValueWithManualChangeWMC) / 100
-            data[7] = this.state.currentScenario.nodeDataId
+            data[7] = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].nodeDataId
             // `=ROUND(((E${parseInt(j) + 1}*F${parseInt(j) + 1})/100),0)`
             dataArray[count] = data;
             count++;
@@ -1713,6 +1670,80 @@ export default class CreateTreeTemplate extends Component {
 
         }
     }.bind(this)
+    changed1 = function (instance, cell, x, y, value) {
+        // 4 & 5
+        console.log("hi anchal")
+        var json = this.state.momEl.getJson(null, false);
+        console.log("momData>>>", json);
+        var overrideListArray = [];
+        for (var i = 0; i < json.length; i++) {
+            var map1 = new Map(Object.entries(json[i]));
+            if (map1.get("4") != '' || map1.get("5") != '') {
+                var overrideData = {
+                    month: map1.get("0"),
+                    seasonalityPerc: map1.get("4"),
+                    manualChange: map1.get("5"),
+                    nodeDataId: map1.get("7"),
+                    active: true
+                }
+                console.log("overrideData>>>", overrideData);
+                overrideListArray.push(overrideData);
+            }
+        }
+        console.log("overRide data list>>>", overrideListArray);
+        let { currentItemConfig } = this.state;
+        let { treeTemplate } = this.state;
+        var items = this.state.items;
+        (currentItemConfig.context.payload.nodeDataMap[0])[0].nodeDataOverrideList = overrideListArray;
+        this.setState({ currentItemConfig }, () => {
+            var findNodeIndex = items.findIndex(n => n.id == currentItemConfig.context.id);
+            items[findNodeIndex] = currentItemConfig.context;
+            treeTemplate.flatList = items;
+            this.setState({
+                treeTemplate
+            }, () => {
+                console.log("treeTemplate>>>", treeTemplate);
+                calculateModelingData(treeTemplate, this, '', currentItemConfig.context.id, 0, 1, -1, true);
+            });
+
+        });
+
+    }.bind(this);
+    changed2 = function (instance, cell, x, y, value) {
+        var json = this.state.momElPer.getJson(null, false);
+        console.log("momData>>>", json);
+        var overrideListArray = [];
+        for (var i = 0; i < json.length; i++) {
+            var map1 = new Map(Object.entries(json[i]));
+            if (map1.get("3") != '') {
+                var overrideData = {
+                    month: map1.get("0"),
+                    seasonalityPerc: 0,
+                    manualChange: map1.get("3"),
+                    nodeDataId: map1.get("7"),
+                    active: true
+                }
+                console.log("overrideData>>>", overrideData);
+                overrideListArray.push(overrideData);
+            }
+        }
+        console.log("overRide data list>>>", overrideListArray);
+        let { currentItemConfig } = this.state;
+        let { treeTemplate } = this.state;
+        var items = this.state.items;
+        (currentItemConfig.context.payload.nodeDataMap[0])[0].nodeDataOverrideList = overrideListArray;
+        this.setState({ currentItemConfig }, () => {
+            // console.log("currentIemConfigInUpdetMom>>>", currentItemConfig);
+            var findNodeIndex = items.findIndex(n => n.id == currentItemConfig.context.id);
+            items[findNodeIndex] = currentItemConfig.context;
+            treeTemplate.flatList = items; this.setState({
+                treeTemplate
+            }, () => {
+                console.log("treeTemplate>>>", treeTemplate);
+                calculateModelingData(treeTemplate, this, '', currentItemConfig.context.id, 0, 1, -1, true);
+            });
+        });
+    }.bind(this);
     changed = function (instance, cell, x, y, value) {
         //Modeling type
         if (x == 2) {
@@ -4193,7 +4224,7 @@ export default class CreateTreeTemplate extends Component {
                                         {this.state.currentItemConfig.context.payload.nodeType.id != 1 &&
 
                                             <FormGroup className="col-md-6">
-                                                <Label htmlFor="currencyId">{(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].month}{i18n.t('static.common.month')}<span class="red Reqasterisk">*</span></Label>
+                                                <Label htmlFor="currencyId">{i18n.t('static.common.month')}<span class="red Reqasterisk">*</span></Label>
                                                 <div className="controls edit">
                                                     <Picker
                                                         id="month"

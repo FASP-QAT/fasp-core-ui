@@ -7,6 +7,7 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
     console.log("modelling dataset---", dataset);
     console.log("modeling nodeId---", nodeId);
     console.log("modelling scenarioId---", scenarioId);
+    nodeId = -1;
 
     // var db1;
     // getDatabase();
@@ -24,7 +25,7 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
         datasetJson = dataset;
     }
     var allNodeDataList = [];
-    console.log("datasetJson modeling--->", datasetJson.treeList);
+    // console.log("datasetJson modeling--->", datasetJson.treeList);
     var startDate = "";
     var stopDate = "";
     if (!isTemplate) {
@@ -43,9 +44,9 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                 tree: {
                     flatList: datasetJson.flatList
                 },
-                scenarioList: {
+                scenarioList: [{
                     id: 0
-                }
+                }]
             }
         ]
     }
@@ -230,6 +231,7 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                             var parentFiltered = (flatListUnsorted.filter(c => c.id == parent))[0];
                             console.log("parentFiltered---", parentFiltered);
                             var singleNodeData = (parentFiltered.payload.nodeDataMap[scenarioList[ndm].id])[0];
+                            console.log("singleNodeData---",singleNodeData);
                             var parentValue = singleNodeData.nodeDataMomList.filter(c => moment(c.month).format("YYYY-MM-DD") == moment(curDate).format("YYYY-MM-DD"))[0].calculatedValue;
                             calculatedValue = (Number(Number(parentValue) * Number(endValue)) / 100);
                         }
