@@ -543,7 +543,6 @@ export default class BuildTree extends Component {
             datasetList: [],
             forecastStartDate: '',
             forecastStopDate: '',
-            momListPer: [],
             momListPerParent: [],
             parentNodeDataMap: [],
             modelinDataForScenario: [],
@@ -1299,9 +1298,8 @@ export default class BuildTree extends Component {
         }
     }
     buildMomJexcelPercent() {
-        this.getStartValueForMonth('');
         var parentStartValue = this.state.parentScenario.calculatedDataValue;
-        console.log("parentStartValue---", parentStartValue)
+        // console.log("parentStartValue---", parentStartValue)
         var momList = this.state.momListPer;
         var momListParent = this.state.momListPerParent;
         var dataArray = [];
@@ -1591,46 +1589,7 @@ export default class BuildTree extends Component {
                 this.buildMomJexcel();
             });
         }
-        // var db1;
-        // getDatabase();
-        // var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-        // openRequest.onsuccess = function (e) {
-        //     var programId = this.state.programId;
-        //     db1 = e.target.result;
-        //     var transaction = db1.transaction(['datasetData'], 'readwrite');
-        //     var program = transaction.objectStore('datasetData');
-        //     var getRequest = program.get(programId.toString());
-        //     getRequest.onerror = function (event) {
-        //         this.setState({
-        //             supplyPlanError: i18n.t('static.program.errortext')
-        //         });
-        //     };
-        //     getRequest.onsuccess = function (event) {
-        //         // console.log("hi",getRequest.result);
-        //         var programDataBytes = CryptoJS.AES.decrypt(getRequest.result.programData, SECRET_KEY);
-        //         var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-        //         var programJson = JSON.parse(programData);
-        //         // console.log("hi bro", programJson.nodeDataModelingList)
-        //         var getMomDataForCurrentNode = programJson.nodeDataModelingList.filter(c => c.id == this.state.currentItemConfig.context.id && c.nodeDataId == this.state.currentScenario.nodeDataId);
-        //         console.log("getMomDataForCurrentNode>>>", getMomDataForCurrentNode);
-
-        //         if (this.state.currentItemConfig.context.payload.nodeType.id > 2) {
-        //             var getMomDataForCurrentNodeParent = programJson.nodeDataModelingList.filter(c => c.id == this.state.currentItemConfig.parentItem.id && c.nodeDataId == this.state.parentScenario.nodeDataId);
-        //             console.log("in if>>>>", getMomDataForCurrentNodeParent);
-
-        //             this.setState({ showMomDataPercent: true, showMomData: false, momListPer: getMomDataForCurrentNode, momListPerParent: getMomDataForCurrentNodeParent }, () => {
-        //                 this.buildMomJexcelPercent();
-        //             });
-        //         } else {
-        //             console.log("in else>>>>");
-        //             this.setState({ showMomDataPercent: false, showMomData: true, momList: getMomDataForCurrentNode }, () => {
-        //                 this.buildMomJexcel();
-        //             });
-        //         }
-        //     }.bind(this)
-        // }.bind(this)
-
-
+      
     }
     setStartAndStopDateOfProgram(programId) {
         console.log("programId>>>", programId);
@@ -1813,50 +1772,7 @@ export default class BuildTree extends Component {
                 console.log("going to call MOM data");
                 this.calculateMOMData(0, 0);
             });
-            // store update object in indexdb
-            // var db1;
-            // getDatabase();
-            // var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-            // openRequest.onerror = function (event) {
-            //     this.setState({
-            //         message: i18n.t('static.program.errortext'),
-            //         color: '#BA0C2F'
-            //     })
-            //     this.hideFirstComponent()
-            // }.bind(this);
-            // openRequest.onsuccess = function (e) {
-            //     db1 = e.target.result;
-            //     var transaction = db1.transaction(['datasetData'], 'readwrite');
-            //     var programTransaction = transaction.objectStore('datasetData');
-            //     // programs.forEach(program => {
-            //     var programRequest = programTransaction.put(dataSetObj);
-            //     console.log("---hurrey---");
-            //     // })
-            //     transaction.oncomplete = function (event) {
-
-            //         this.calculateMOMData(0,1);
-            //         console.log("all good >>>>");
-            //         this.setState({
-            //             dataSetObj,
-            //             items,
-            //             scalingList: data,
-            //             openAddNodeModal: false,
-            //             activeTab1: new Array(2).fill('1')
-            //         });
-            //         console.log("Data update success");
-            //     }.bind(this);
-            //     transaction.onerror = function (event) {
-            //         this.setState({
-            //             loading: false,
-            //             // message: 'Error occured.',
-            //             color: "#BA0C2F",
-            //         }, () => {
-            //             this.hideSecondComponent();
-            //         });
-            //         console.log("Data update errr");
-            //     }.bind(this);
-            // }.bind(this);
-
+          
 
         }
     }
@@ -2014,14 +1930,14 @@ export default class BuildTree extends Component {
                 elInstance.setValueFromCoords(2, this.state.currentRowIndex, this.state.currentModelingType, true);
                 elInstance.setValueFromCoords(3, this.state.currentRowIndex, this.state.currentCalculatorStartDate, true);
                 elInstance.setValueFromCoords(4, this.state.currentRowIndex, this.state.currentCalculatorStopDate, true);
-                elInstance.setValueFromCoords(5, this.state.currentRowIndex, parseFloat(this.state.currentTargetChangePercentage).toFixed(4), true);
+                elInstance.setValueFromCoords(5, this.state.currentRowIndex, parseFloat(this.state.currentTargetChangePercentage).toFixed(2), true);
                 elInstance.setValueFromCoords(6, this.state.currentRowIndex, '', true);
                 elInstance.setValueFromCoords(8, this.state.currentRowIndex, parseFloat(this.state.currentCalculatedMomChange).toFixed(2), true);
             } else if (this.state.currentModelingType == 4) {
                 elInstance.setValueFromCoords(2, this.state.currentRowIndex, this.state.currentModelingType, true);
                 elInstance.setValueFromCoords(3, this.state.currentRowIndex, this.state.currentCalculatorStartDate, true);
                 elInstance.setValueFromCoords(4, this.state.currentRowIndex, this.state.currentCalculatorStopDate, true);
-                elInstance.setValueFromCoords(5, this.state.currentRowIndex, parseFloat(this.state.currentTargetChangePercentage).toFixed(4), true);
+                elInstance.setValueFromCoords(5, this.state.currentRowIndex, parseFloat(this.state.currentTargetChangePercentage).toFixed(2), true);
                 elInstance.setValueFromCoords(6, this.state.currentRowIndex, '', true);
                 elInstance.setValueFromCoords(8, this.state.currentRowIndex, parseFloat(this.state.currentCalculatedMomChange).toFixed(2), true);
             }
@@ -2095,7 +2011,8 @@ export default class BuildTree extends Component {
         var startDate = this.state.currentCalculatorStartDate;
         var endDate = this.state.currentCalculatorStopDate;
         var monthDifference = moment(endDate).diff(startDate, 'months', true);
-        var getEndValueFromPercentage = (this.state.currentCalculatorStartValue * e.target.value) / 100;
+        var getValue = e.target.value.toString().replaceAll(",", "");
+        var getEndValueFromPercentage = (this.state.currentCalculatorStartValue * getValue) / 100;
 
 
         // if (this.state.currentItemConfig.context.payload.nodeType.id == 3) {
@@ -2107,30 +2024,30 @@ export default class BuildTree extends Component {
         var momValue = ''
         if (this.state.currentModelingType == 2) {
             // var momValue = ((parseFloat(targetEndValue - this.state.currentCalculatorStartValue)) / monthDifference).toFixed(2);
-            var momValue = ((parseFloat((this.state.currentCalculatorStartValue * e.target.value) / 100))).toFixed(2);
+            var momValue = ((parseFloat((this.state.currentCalculatorStartValue * getValue) / 100))).toFixed(2);
         }
         if (this.state.currentModelingType == 3) {
             if (this.state.currentItemConfig.context.payload.nodeType.id > 2) {
-                var getChangeInPercent = e.target.value;
+                var getChangeInPercent = getValue;
                 var momValue = (this.state.currentScenario.calculatedDataValue * getChangeInPercent / 100).toFixed(2);
             } else {
                 // var momValue = ((parseFloat(targetEndValue - this.state.currentCalculatorStartValue)) / monthDifference / this.state.currentCalculatorStartValue * 100).toFixed(2);
-                var momValue = ((parseFloat((this.state.currentCalculatorStartValue * e.target.value) / 100))).toFixed(2);
+                var momValue = ((parseFloat((this.state.currentCalculatorStartValue * getValue) / 100))).toFixed(2);
             }
 
         }
         if (this.state.currentModelingType == 4) {
             // var momValue = ((Math.pow(parseFloat(targetEndValue / this.state.currentCalculatorStartValue), parseFloat(1 / monthDifference)) - 1) * 100).toFixed(2);
-            var momValue = ((parseFloat((this.state.currentCalculatorStartValue * e.target.value) / 100))).toFixed(2);
+            var momValue = ((parseFloat((this.state.currentCalculatorStartValue * getValue) / 100))).toFixed(2);
 
         }
         if (this.state.currentModelingType == 5) {
-            var momValue = (parseFloat(e.target.value)).toFixed(2);
+            var momValue = (parseFloat(getValue)).toFixed(2);
         }
 
         this.setState({
-            currentEndValue: (e.target.value != '' && this.state.currentModelingType != 3 && this.state.currentModelingType != 5) ? targetEndValue : '',
-            currentCalculatedMomChange: e.target.value != '' ? momValue : ''
+            currentEndValue: (getValue != '' && this.state.currentModelingType != 3 && this.state.currentModelingType != 5) ? targetEndValue : '',
+            currentCalculatedMomChange: getValue != '' ? momValue : ''
         });
     }
     calculateMomByChangeInNumber(e) {
@@ -2142,25 +2059,26 @@ export default class BuildTree extends Component {
         var startDate = this.state.currentCalculatorStartDate;
         var endDate = this.state.currentCalculatorStopDate;
         var monthDifference = moment(endDate).diff(startDate, 'months', true);
+        var getValue = e.target.value.toString().replaceAll(",", "");
         // var getEndValueFromNumber = parseFloat(this.state.currentCalculatorStartValue) + parseFloat(e.target.value);
-        var targetEndValue = parseFloat(this.state.currentCalculatorStartValue) + parseFloat(e.target.value);
+        var targetEndValue = parseFloat(this.state.currentCalculatorStartValue) + parseFloat(getValue);
 
         var momValue = ''
         if (this.state.currentModelingType == 2) {
             // momValue = ((parseFloat(targetEndValue - this.state.currentCalculatorStartValue)) / monthDifference).toFixed(2);
-            momValue = e.target.value;
+            momValue = getValue;
         }
         if (this.state.currentModelingType == 3) {
             // momValue = ((parseFloat(targetEndValue - this.state.currentCalculatorStartValue)) / monthDifference / this.state.currentCalculatorStartValue * 100).toFixed(2);
-            momValue = e.target.value;
+            momValue = getValue;
         }
         if (this.state.currentModelingType == 4) {
             // momValue = ((Math.pow(parseFloat(targetEndValue / this.state.currentCalculatorStartValue), parseFloat(1 / monthDifference)) - 1) * 100).toFixed(2);
-            momValue = e.target.value;
+            momValue = getValue;
         }
         this.setState({
-            currentEndValue: e.target.value != '' ? targetEndValue.toFixed(2) : '',
-            currentCalculatedMomChange: e.target.value != '' ? momValue : ''
+            currentEndValue: getValue != '' ? targetEndValue.toFixed(2) : '',
+            currentCalculatedMomChange: getValue != '' ? momValue : ''
         });
     }
 
@@ -6871,17 +6789,6 @@ export default class BuildTree extends Component {
                                 {this.state.showModelingJexcelNumber && <><Button color="success" size="md" className="float-right mr-1" type="button" onClick={() => this.formSubmit()}> <i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
                                     <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button></>}
                             </div>
-                            {/* {this.state.showModelingJexcelPercent &&
-                                <><div className="calculatorimg">
-                                    <div id="modelingJexcelPercent" className={"RowClickable ScalingTable"}>
-                                    </div>
-                                </div>
-                                    <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.showMomDataPercent()}> <i className="fa fa-eye" style={{ color: '#fff' }}></i> {i18n.t('static.tree.viewMonthlyData')}</Button>
-                                    <Button color="success" size="md" className="float-right mr-1" type="button"> <i className="fa fa-check"></i> {i18n.t('static.common.update')}</Button>
-                                    <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRowJexcelPer()}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>
-                                </>
-                            } */}
-
                         </div>
 
 
@@ -6981,7 +6888,7 @@ export default class BuildTree extends Component {
                                                 name="currentTargetChangePercentage"
                                                 bsSize="sm"
                                                 onChange={(e) => { this.dataChange(e); this.calculateMomByChangeInPercent(e) }}
-                                                value={this.state.currentTargetChangePercentage}
+                                                value={addCommas(this.state.currentTargetChangePercentage)}
                                                 readOnly={this.state.currentTargetChangePercentageEdit}
 
                                             >
@@ -7000,7 +6907,7 @@ export default class BuildTree extends Component {
                                                 name="currentTargetChangeNumber"
                                                 bsSize="sm"
                                                 onChange={(e) => { this.dataChange(e); this.calculateMomByChangeInNumber(e) }}
-                                                value={this.state.currentTargetChangeNumber}
+                                                value={addCommas(this.state.currentTargetChangeNumber)}
                                                 readOnly={this.state.currentTargetChangeNumberEdit}
                                             >
                                             </Input>
@@ -7016,7 +6923,7 @@ export default class BuildTree extends Component {
                                                 name="calculatedMomChange"
                                                 bsSize="sm"
                                                 readOnly={true}
-                                                value={this.state.currentCalculatedMomChange}>
+                                                value={addCommas(this.state.currentCalculatedMomChange)}>
                                             </Input>
                                             {/* <FormFeedback className="red">{errors.nodeTitle}</FormFeedback> */}
                                         </FormGroup>
