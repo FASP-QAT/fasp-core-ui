@@ -1958,7 +1958,7 @@
     "static.report.localprocurement": "Local Procurement",
     "static.quantimed.quantimedImportScreenThird": "Select Date Range",
     "static.supplyPlan.adjustedContainers": "Adjusted Containers",
-    "static.tree.modelingCalculaterTool:": "Modeling Calculater Tool:",
+    "static.tree.modelingCalculaterTool": "Modeling Calculater Tool:",
     "static.shipment.dateIsLesserThanPrevDate": "Selected date is earlier than the date selected in previous columns.",
     "static.supplyPlan.consumptionMsg": "Consumption (* indicates actual)",
     "static.organisation.organisationcodemax4digittext": "Display name length should be 4 characters long",

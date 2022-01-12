@@ -5,8 +5,9 @@ import { SECRET_KEY, CANCELLED_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, SUBMITT
 
 export function calculateModelingData(dataset, props, page, nodeId, scenarioId, type, treeId, isTemplate) {
     console.log("modelling dataset---", dataset);
-    console.log("modeling nodeId---",nodeId);
+    console.log("modeling nodeId---", nodeId);
     console.log("modelling scenarioId---", scenarioId);
+    nodeId = -1;
 
     // var db1;
     // getDatabase();
@@ -24,7 +25,7 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
         datasetJson = dataset;
     }
     var allNodeDataList = [];
-    console.log("datasetJson modeling--->", datasetJson.treeList);
+    // console.log("datasetJson modeling--->", datasetJson.treeList);
     var startDate = "";
     var stopDate = "";
     if (!isTemplate) {
@@ -43,9 +44,9 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                 tree: {
                     flatList: datasetJson.flatList
                 },
-                scenarioList: {
+                scenarioList: [{
                     id: 0
-                }
+                }]
             }
         ]
     }
@@ -63,7 +64,14 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
         }
         var transferToNodeList = [];
         if (nodeId != -1) {
-            flatList = flatList.filter(c => c.id == nodeId);
+            var curNode = flatList.filter(c => c.id == nodeId)[0];
+            var currentNodeType = curNode.payload.nodeType.id;
+            var parentNodeType = curNode.parent != null ? flatList.filter(c => c.id == curNode.parent)[0].payload.nodeType.id : 0;
+            if (currentNodeType == 2 && parentNodeType == 1) {
+
+            } else {
+                flatList = flatList.filter(c => c.id == nodeId);
+            }
         }
         for (var fl = 0; fl < flatList.length; fl++) {
             var payload = flatList[fl].payload;
@@ -223,6 +231,7 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                             var parentFiltered = (flatListUnsorted.filter(c => c.id == parent))[0];
                             console.log("parentFiltered---", parentFiltered);
                             var singleNodeData = (parentFiltered.payload.nodeDataMap[scenarioList[ndm].id])[0];
+                            console.log("singleNodeData---",singleNodeData);
                             var parentValue = singleNodeData.nodeDataMomList.filter(c => moment(c.month).format("YYYY-MM-DD") == moment(curDate).format("YYYY-MM-DD"))[0].calculatedValue;
                             calculatedValue = (Number(Number(parentValue) * Number(endValue)) / 100);
                         }
