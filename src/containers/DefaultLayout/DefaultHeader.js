@@ -95,21 +95,6 @@ class DefaultHeader extends Component {
             </DropdownMenu>
           </UncontrolledDropdown> */}
           
-           <NavItem className="">
-            <span className="nav-link">
-              <a href={localStorage.getItem('lang')=='en'?
-              "../../../../src/ShowGuidanceHtmlFile/ShowGuidanceEn.html":
-              localStorage.getItem('lang')=='fr'?
-              "../../../../src/ShowGuidanceHtmlFile/ShowGuidanceFr.html":
-              localStorage.getItem('lang')=='sp'?
-              "../../../../src/ShowGuidanceHtmlFile/ShowGuidanceSp.html":
-              "../../../../src/ShowGuidanceHtmlFile/ShowGuidancePr.html"
-            } target="_blank">
-              <i class="nav-icon fa fa-compass ShowGuidanceIcon" title={'Show Guidance'}></i>
-              </a>
-            </span>
-          </NavItem>
-
           {checkOnline === 'Online' && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANUAL_TAGGING') && this.props.activeModule == 2 &&
             <NavItem className="">
               <NavLink to="#" className="nav-link">
@@ -165,6 +150,21 @@ class DefaultHeader extends Component {
               </a>
             </span>
           </NavItem> */}
+
+        <NavItem className="">
+            <span className="nav-link">
+              <a href={localStorage.getItem('lang')=='en'?
+              "../../../../src/ShowGuidanceHtmlFile/ShowGuidanceEn.html":
+              localStorage.getItem('lang')=='fr'?
+              "../../../../src/ShowGuidanceHtmlFile/ShowGuidanceFr.html":
+              localStorage.getItem('lang')=='sp'?
+              "../../../../src/ShowGuidanceHtmlFile/ShowGuidanceSp.html":
+              "../../../../src/ShowGuidanceHtmlFile/ShowGuidancePr.html"
+            } target="_blank">
+              <i class="nav-icon fa fa-compass ShowGuidanceIcon" title={'Show Guidance'}></i>
+              </a>
+            </span>
+          </NavItem>
 
           <NavItem className="">
             <span className="nav-link">
