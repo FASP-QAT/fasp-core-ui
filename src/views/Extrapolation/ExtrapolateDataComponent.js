@@ -1444,7 +1444,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                             <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} /> */}
                         </div>
                     </div>
-                    <div className="Card-header-reporticon pb-2">
+                    <div className="Card-header-reporticon pb-0">
                         <div className="card-header-actions">
                             <a className="card-header-action">
                                 <span style={{ cursor: 'pointer' }} onClick={() => { this.toggleShowGuidance() }}><small className="supplyplanformulas">{i18n.t('static.common.showGuidance')}</small></span>
@@ -1453,7 +1453,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                             {/* <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} /> */}
                         </div>
                     </div>
-                    <CardBody className="pb-lg-5 pt-lg-0">
+                    <CardBody className="pb-lg-0 pt-lg-0">
                         <Form name='simpleForm'>
                             <div className=" pl-0">
                                 <div className="row">
@@ -1502,7 +1502,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                 bsSize="sm"
                                                 value={this.state.planningUnitId}
                                                 onChange={(e) => { this.setPlanningUnitId(e); }}
-                                                className="selectWrapText"
+                                                className=""
                                             >
                                                 <option value="">{i18n.t('static.common.select')}</option>
                                                 {planningUnits}
@@ -1569,15 +1569,17 @@ export default class ExtrapolateDataComponent extends React.Component {
                                             </Picker>
                                         </div>
                                     </FormGroup>
+                                    <div className="MorginTopMonth">
                                     <Label>{this.state.monthsDiff} {i18n.t('static.report.month')}</Label>
+                                    </div>
 
                                 </div>
 
-                                <div className="row">
+                                <div className="col-md-12 pl-lg-0">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.selectExtrapolationMethod')}</Label>
                                 </div>
-                                <div className="row">
-                                    <FormGroup className="col-md-12 ">
+                                <div className="col-md-12 pl-lg-1">
+                                    <FormGroup className="">
                                         <div className="check inline  pl-lg-3 pt-lg-3">
                                             <div>
                                                 <Popover placement="top" isOpen={this.state.popoverOpenMa} target="Popover1" trigger="hover" toggle={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)}>
@@ -1600,12 +1602,13 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                     <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
                                                 </Label>
                                             </div>
-                                            <div className="col-md-2" style={{ display: this.state.movingAvgId ? '' : 'none' }}>
+                                            <div className="col-md-2 pt-lg-2" style={{ display: this.state.movingAvgId ? '' : 'none' }}>
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.noOfMonths')}</Label>
                                                 <Input
                                                     className="controls"
                                                     type="text"
                                                     id="noOfMonthsId"
+                                                    bsSize="sm"
                                                     name="noOfMonthsId"
                                                     value={this.state.monthsForMovingAverage}
                                                     onChange={(e) => { this.setMonthsForMovingAverage(e); }}
@@ -1617,7 +1620,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                     <PopoverBody>Need to add Info.</PopoverBody>
                                                 </Popover>
                                             </div>
-                                            <div>
+                                            <div className="pt-lg-2">
                                                 <Input
                                                     className="form-check-input"
                                                     type="checkbox"
@@ -1638,7 +1641,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                     <PopoverBody>Need to add Info.</PopoverBody>
                                                 </Popover>
                                             </div>
-                                            <div>
+                                            <div className="pt-lg-2">
                                                 <Input
                                                     className="form-check-input"
                                                     type="checkbox"
@@ -1659,7 +1662,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                     <PopoverBody>Need to add Info.</PopoverBody>
                                                 </Popover>
                                             </div>
-                                            <div>
+                                            <div className="pt-lg-2">
                                                 <Input
                                                     className="form-check-input"
                                                     type="checkbox"
@@ -1676,7 +1679,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                 </Label>
                                             </div>
 
-                                            <div className="row col-md-12" style={{ display: this.state.smoothingId ? '' : 'none' }}>
+                                            <div className="row col-md-12 pt-lg-2" style={{ display: this.state.smoothingId ? '' : 'none' }}>
                                                 <div className="col-md-2">
                                                     <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.confidenceLevel')}</Label>
                                                     <Input
@@ -1700,6 +1703,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                     <Input
                                                         className="controls"
                                                         type="text"
+                                                        bsSize="sm"
                                                         id="seasonalityId"
                                                         name="seasonalityId"
                                                         value={this.state.noOfMonthsForASeason}
@@ -1729,6 +1733,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                         type="text"
                                                         id="alphaId"
                                                         name="alphaId"
+                                                        bsSize="sm"
                                                         value={this.state.alpha}
                                                         onChange={(e) => { this.setAlpha(e); }}
                                                     />
@@ -1739,6 +1744,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                         className="controls"
                                                         type="text"
                                                         id="betaId"
+                                                        bsSize="sm"
                                                         name="betaId"
                                                         value={this.state.beta}
                                                         onChange={(e) => { this.setBeta(e); }}
@@ -1750,6 +1756,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                         className="controls"
                                                         type="text"
                                                         id="gammaId"
+                                                        bsSize="sm"
                                                         name="gammaId"
                                                         value={this.state.gamma}
                                                         onChange={(e) => { this.setGamma(e); }}
@@ -1771,7 +1778,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                     <PopoverBody>Need to add Info.</PopoverBody>
                                                 </Popover>
                                             </div>
-                                            <div>
+                                            <div className="pt-lg-2">
                                                 <Input
                                                     className="form-check-input"
                                                     type="checkbox"
@@ -1788,7 +1795,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                 </Label>
                                             </div>
 
-                                            <div className="row col-md-12" style={{ display: this.state.arimaId ? '' : 'none' }}>
+                                            <div className="row col-md-12 pt-lg-2" style={{ display: this.state.arimaId ? '' : 'none' }}>
                                                 <div className="col-md-2">
                                                     <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.p')}</Label>
                                                     <Input
@@ -1796,6 +1803,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                         type="text"
                                                         id="pId"
                                                         name="pId"
+                                                        bsSize="sm"
                                                     />
                                                 </div>
                                                 <div className="col-md-2">
@@ -1805,6 +1813,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                         type="text"
                                                         id="dId"
                                                         name="dId"
+                                                        bsSize="sm"
                                                     />
                                                 </div>
                                                 <div className="col-md-2">
@@ -1814,6 +1823,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                         type="text"
                                                         id="qId"
                                                         name="qId"
+                                                        bsSize="sm"
                                                     />
                                                 </div>
                                             </div>
