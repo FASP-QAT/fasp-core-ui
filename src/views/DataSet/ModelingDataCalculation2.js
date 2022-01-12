@@ -5,7 +5,7 @@ import { SECRET_KEY, CANCELLED_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, SUBMITT
 
 export function calculateModelingData(dataset, props, page, nodeId, scenarioId, type, treeId, isTemplate) {
     console.log("modelling dataset---", dataset);
-    console.log("modeling nodeId---",nodeId);
+    console.log("modeling nodeId---", nodeId);
     console.log("modelling scenarioId---", scenarioId);
 
     // var db1;
@@ -63,7 +63,14 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
         }
         var transferToNodeList = [];
         if (nodeId != -1) {
-            flatList = flatList.filter(c => c.id == nodeId);
+            var curNode = flatList.filter(c => c.id == nodeId)[0];
+            var currentNodeType = curNode.payload.nodeType.id;
+            var parentNodeType = curNode.parent != null ? flatList.filter(c => c.id == curNode.parent)[0].payload.nodeType.id : 0;
+            if (currentNodeType == 2 && parentNodeType == 1) {
+
+            } else {
+                flatList = flatList.filter(c => c.id == nodeId);
+            }
         }
         for (var fl = 0; fl < flatList.length; fl++) {
             var payload = flatList[fl].payload;
