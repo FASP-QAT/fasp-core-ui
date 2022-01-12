@@ -118,7 +118,7 @@ function getZValue(df, confidence,tTable) {
 function initial_trend(data, slen) {
     let sum = 0
     for (let x = 0; x < slen; x++) {
-        sum += (data[slen + x].actual - data[x].actual) / slen
+        sum += (Number(data[Number(slen) + Number(x)].actual) - Number(data[x].actual)) / slen
     }
     return sum / slen
 }
