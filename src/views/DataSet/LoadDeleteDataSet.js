@@ -1296,6 +1296,7 @@ class LoadDeleteDataSet extends Component {
                                                                 changed: 0
                                                             };
                                                             programIds.push(json[r].programId + "_v" + json[r].currentVersion.versionId + "_uId_" + userId);
+                                                            console.log("hey program download changed flag check");
                                                             var programQPLDetailsRequest = programQPLDetailsOs.put(programQPLDetailsJson);
                                                         }
                                                         programQPLDetailsTransaction.oncomplete = function (event) {

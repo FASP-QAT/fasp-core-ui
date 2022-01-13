@@ -864,10 +864,10 @@ export default class BuildTree extends Component {
         let { treeData } = this.state;
         let { dataSetObj } = this.state;
         var items = this.state.items;
-
+        let tempProgram = JSON.parse(JSON.stringify(dataSetObj))
         // var databytes = CryptoJS.AES.decrypt(dataSetObj.programData, SECRET_KEY);
         // var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
-        var programData = dataSetObj.programData;
+        var programData = tempProgram.programData;
         programData.treeList = treeData;
         console.log("program data>>>", programData);
 
@@ -883,9 +883,9 @@ export default class BuildTree extends Component {
 
 
         programData = (CryptoJS.AES.encrypt(JSON.stringify(programData), SECRET_KEY)).toString();
-        dataSetObj.programData = programData;
+        tempProgram.programData = programData;
 
-        console.log("encpyDataSet>>>", dataSetObj)
+        console.log("encpyDataSet>>>", tempProgram)
         // store update object in indexdb
         var db1;
         getDatabase();
@@ -902,18 +902,36 @@ export default class BuildTree extends Component {
             var transaction = db1.transaction(['datasetData'], 'readwrite');
             var programTransaction = transaction.objectStore('datasetData');
             // programs.forEach(program => {
-            var programRequest = programTransaction.put(dataSetObj);
+            var programRequest = programTransaction.put(tempProgram);
             transaction.oncomplete = function (event) {
                 db1 = e.target.result;
                 var detailTransaction = db1.transaction(['datasetDetails'], 'readwrite');
                 var datasetDetailsTransaction = detailTransaction.objectStore('datasetDetails');
-                var datasetDetailsRequest = datasetDetailsTransaction.get(this.props.match.params.programId);
+                console.log("this.props.match.params.programId---", this.state.programId);
+                var datasetDetailsRequest = datasetDetailsTransaction.get(this.state.programId);
                 datasetDetailsRequest.onsuccess = function (e) {
                     console.log("all good >>>>");
                     console.log("Data update success");
                     var datasetDetailsRequestJson = datasetDetailsRequest.result;
                     datasetDetailsRequestJson.changed = 1;
                     var programQPLDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
+                    programQPLDetailsRequest1.onsuccess = function (event) {
+                        this.setState({
+                            loading: false,
+                            // message: 'Error occured.',
+                            color: "#BA0C2F",
+                        });
+                        console.log("Data update success");
+                    }.bind(this)
+                    programQPLDetailsRequest1.onerror = function (event) {
+                        this.setState({
+                            loading: false,
+                            // message: 'Error occured.',
+                            color: "#BA0C2F",
+                        });
+                        console.log("Data update success");
+                    }.bind(this)
+                    
                 }.bind(this);
                 datasetDetailsRequest.onerror = function (event) {
                     this.setState({
@@ -925,6 +943,7 @@ export default class BuildTree extends Component {
                     });
                     console.log("Data update errr");
                 }.bind(this)
+
 
             }.bind(this);
             transaction.onerror = function (event) {
@@ -1589,7 +1608,7 @@ export default class BuildTree extends Component {
                 this.buildMomJexcel();
             });
         }
-      
+
     }
     setStartAndStopDateOfProgram(programId) {
         console.log("programId>>>", programId);
@@ -1772,7 +1791,7 @@ export default class BuildTree extends Component {
                 console.log("going to call MOM data");
                 this.calculateMOMData(0, 0);
             });
-          
+
 
         }
     }
@@ -7255,7 +7274,7 @@ export default class BuildTree extends Component {
         this.updateTreeData(date);
         if (moment(date).isBetween(this.state.forecastStartDate, this.state.forecastStopDate, undefined, '[)')) {
             this.setState({ singleValue2: value, }, () => {
-                
+
 
             })
         } else {
@@ -7858,7 +7877,7 @@ export default class BuildTree extends Component {
                                                             </Input>
                                                             <InputGroupAddon addonType="append">
                                                                 <InputGroupText><i class="fa fa-cog icons" data-toggle="collapse" aria-expanded="false" onClick={this.toggleCollapse}></i></InputGroupText>
-                                                            
+
                                                             </InputGroupAddon>
                                                         </InputGroup>
                                                         {/* <FormFeedback>{errors.languageId}</FormFeedback> */}
@@ -8033,8 +8052,8 @@ export default class BuildTree extends Component {
                                                                 {this.state.showDiv ? i18n.t('static.common.hideData') : i18n.t('static.common.showData')}
                                                                 </button>
                                                             </div> */}
-                                                            <Row style={{display:'inline-flex'}}>
-                                                             <FormGroup className="col-md-4">
+                                                            <Row style={{ display: 'inline-flex' }}>
+                                                                <FormGroup className="col-md-4">
                                                                     <Label htmlFor="currencyId">{i18n.t('static.forecastMethod.forecastMethod')}<span class="red Reqasterisk">*</span></Label>
                                                                     <Input
                                                                         type="select"
@@ -8145,7 +8164,7 @@ export default class BuildTree extends Component {
                                                                     </FormGroup>
                                                                 </FormGroup>
                                                                 <FormGroup className="col-md-3 pt-lg-4">
-                                                               
+
                                                                     <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setState({ showDiv: false })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                                                     <Button type="submit" size="md" onClick={() => this.touchAll(setTouched, errors)} color="success" className="submitBtn float-right mr-1"> <i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
                                                                 </FormGroup>
