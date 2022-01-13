@@ -114,7 +114,8 @@ export default class ExtrapolateDataComponent extends React.Component {
             semiAvgError: { "rmse": "", "mape": "", "mse": "", "wape": "", "rSqd": "" },
             linearRegressionError: { "rmse": "", "mape": "", "mse": "", "wape": "", "rSqd": "" },
             tesError: { "rmse": "", "mape": "", "mse": "", "wape": "", "rSqd": "" },
-            dataChanged: false
+            dataChanged: false,
+            noDataMessage: ""
         }
         this.toggle = this.toggle.bind(this)
         this.reset = this.reset.bind(this)
@@ -413,11 +414,11 @@ export default class ExtrapolateDataComponent extends React.Component {
             wapeArr.push(this.state.tesError.wape)
         }
 
-        var minRmse = Math.min(...rmseArr);
-        var minMape = Math.min(...mapeArr);
-        var minMse = Math.min(...mseArr);
-        var minRsqd = Math.min(...rSqdArr);
-        var minWape = Math.min(...wapeArr);
+        var minRmse = Math.min(...rmseArr.filter(c=>c!=""));
+        var minMape = Math.min(...mapeArr.filter(c=>c!=""));
+        var minMse = Math.min(...mseArr.filter(c=>c!=""));
+        var minRsqd = Math.min(...rSqdArr.filter(c=>c!=""));
+        var minWape = Math.min(...wapeArr.filter(c=>c!=""));
         this.setState({
             dataEl: dataEl,
             minRmse: minRmse,
@@ -476,7 +477,16 @@ export default class ExtrapolateDataComponent extends React.Component {
         calculateMovingAvg(inputDataMovingAvg, this.state.monthsForMovingAverage, noOfMonthsForProjection, this);
         calculateSemiAverages(inputDataSemiAverage, noOfMonthsForProjection, this);
         calculateLinearRegression(inputDataLinearRegression, noOfMonthsForProjection, this);
-        calculateTES(inputDataTes, this.state.alpha, this.state.beta, this.state.gamma, this.state.confidenceLevelId, this.state.noOfMonthsForASeason, noOfMonthsForProjection, this);
+        console.log("inputDataTes.length+++",inputDataTes.length);
+        if (inputDataTes.length >= (this.state.noOfMonthsForASeason * 2)) {
+            calculateTES(inputDataTes, this.state.alpha, this.state.beta, this.state.gamma, this.state.confidenceLevelId, this.state.noOfMonthsForASeason, noOfMonthsForProjection, this);
+        } else {
+            this.setState({
+                tesData: [],
+                CI: 0,
+                tesError: { "rmse": "", "mape": "", "mse": "", "wape": "", "rSqd": "" }
+            })
+        }
     }
 
     loaded = function (instance, cell, x, y, value) {
@@ -560,7 +570,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                 alpha: 0.2,
                 beta: 0.2,
                 gamma: 0.2,
-                noOfMonthsForASeason: 12,
+                noOfMonthsForASeason: 4,
                 confidence: 0.95,
                 monthsForMovingAverage: 6,
                 confidenceLevelId: 0.85,
@@ -845,90 +855,101 @@ export default class ExtrapolateDataComponent extends React.Component {
             var datasetJson = this.state.datasetJson;
             // Need to filter
             var actualConsumptionListForPlanningUnitAndRegion = datasetJson.actualConsumptionList.filter(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId);
-            let actualMin = moment.min(actualConsumptionListForPlanningUnitAndRegion.map(d => moment(d.month)));
-            let actualMax = moment.max(actualConsumptionListForPlanningUnitAndRegion.map(d => moment(d.month)));
+
+            if (actualConsumptionListForPlanningUnitAndRegion.length > 0) {
+                let actualMin = moment.min(actualConsumptionListForPlanningUnitAndRegion.map(d => moment(d.month)));
+                let actualMax = moment.max(actualConsumptionListForPlanningUnitAndRegion.map(d => moment(d.month)));
 
 
-            var rangeValue1 = "";
-            if (updateRangeValue == 0) {
-                rangeValue1 = this.state.rangeValue1;
+                var rangeValue1 = "";
+                if (updateRangeValue == 0) {
+                    rangeValue1 = this.state.rangeValue1;
+                } else {
+                    rangeValue1 = { from: { year: new Date(actualMin).getFullYear(), month: new Date(actualMin).getMonth() + 1 }, to: { year: new Date(actualMax).getFullYear(), month: new Date(actualMax).getMonth() + 1 } }
+                }
+
+                var rangeValue = rangeValue1;
+                let startDate1 = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
+                let stopDate1 = rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
+                var actualConsumptionList = datasetJson.actualConsumptionList.filter(c => moment(c.month).format("YYYY-MM") >= moment(startDate1).format("YYYY-MM") && moment(c.month).format("YYYY-MM") <= moment(stopDate1).format("YYYY-MM"));
+                var startDate = moment(datasetJson.currentVersion.forecastStartDate).format("YYYY-MM-DD");
+                var stopDate = moment(datasetJson.currentVersion.forecastStopDate).format("YYYY-MM-DD");
+                var consumptionExtrapolationList = datasetJson.consumptionExtrapolation;
+                var monthsForMovingAverage = this.state.monthsForMovingAverage;
+                var consumptionExtrapolationFiltered = consumptionExtrapolationList.filter(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId);
+                var consumptionExtrapolationData = consumptionExtrapolationList.filter(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId && c.extrapolationMethod.id == 6)//Semi Averages
+                var consumptionExtrapolationMovingData = consumptionExtrapolationList.filter(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId && c.extrapolationMethod.id == 7)//Moving averages
+                console.log("consumptionExtrapolationMovingData+++", consumptionExtrapolationMovingData)
+                var consumptionExtrapolationRegression = consumptionExtrapolationList.filter(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId && c.extrapolationMethod.id == 5)//Linear Regression
+                var consumptionExtrapolationTESL = consumptionExtrapolationList.filter(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId && c.extrapolationMethod.id == 1)//TES L            
+                var movingAvgId = consumptionExtrapolationFiltered.length > 0 ? false : true;
+                var semiAvgId = consumptionExtrapolationFiltered.length > 0 ? false : true;
+                var linearRegressionId = consumptionExtrapolationFiltered.length > 0 ? false : true;
+                var smoothingId = consumptionExtrapolationFiltered.length > 0 ? false : true;
+                var arimaId = consumptionExtrapolationFiltered.length > 0 ? false : true;
+
+                if (consumptionExtrapolationMovingData.length > 0) {
+                    monthsForMovingAverage = consumptionExtrapolationMovingData[0].jsonProperties.months;
+                    movingAvgId = true;
+                }
+
+                if (consumptionExtrapolationData.length > 0) {
+                    semiAvgId = true;
+                }
+
+                if (consumptionExtrapolationRegression.length > 0) {
+                    linearRegressionId = true;
+                }
+                var confidenceLevel = this.state.confidenceLevelId;
+                var seasonality = this.state.noOfMonthsForASeason;
+                var alpha = this.state.alpha;
+                var beta = this.state.beta;
+                var gamma = this.state.gamma;
+                console.log("consumptionExtrapolationTESL+++", consumptionExtrapolationTESL)
+                if (consumptionExtrapolationTESL.length > 0) {
+                    confidenceLevel = consumptionExtrapolationTESL[0].jsonProperties.confidenceLevel;
+                    seasonality = consumptionExtrapolationTESL[0].jsonProperties.seasonality;
+                    alpha = consumptionExtrapolationTESL[0].jsonProperties.alpha;
+                    beta = consumptionExtrapolationTESL[0].jsonProperties.beta;
+                    gamma = consumptionExtrapolationTESL[0].jsonProperties.gamma;
+                    smoothingId = true;
+                }
+                this.setState({
+                    actualConsumptionList: actualConsumptionList,
+                    startDate: startDate,
+                    stopDate: stopDate,
+                    rangeValue1: rangeValue1,
+                    minDate: actualMin,
+                    maxDate: actualMax,
+                    monthsForMovingAverage: monthsForMovingAverage,
+                    confidenceLevelId: confidenceLevel,
+                    noOfMonthsForASeason: seasonality,
+                    alpha: alpha,
+                    beta: beta,
+                    gamma: gamma,
+                    showData: true,
+                    movingAvgId: movingAvgId,
+                    semiAvgId: semiAvgId,
+                    linearRegressionId: linearRegressionId,
+                    smoothingId: smoothingId,
+                    arimaId: arimaId,
+                    noDataMessage: "",
+                    loading: false
+                }, () => {
+                    this.buildJxl();
+                })
             } else {
-                rangeValue1 = { from: { year: new Date(actualMin).getFullYear(), month: new Date(actualMin).getMonth() + 1 }, to: { year: new Date(actualMax).getFullYear(), month: new Date(actualMax).getMonth() + 1 } }
+                this.setState({
+                    showData: false,
+                    loading: false,
+                    noDataMessage: i18n.t('static.extrapolate.noDataFound')
+                })
             }
-
-            var rangeValue = rangeValue1;
-            let startDate1 = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
-            let stopDate1 = rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
-            var actualConsumptionList = datasetJson.actualConsumptionList.filter(c => moment(c.month).format("YYYY-MM") >= moment(startDate1).format("YYYY-MM") && moment(c.month).format("YYYY-MM") <= moment(stopDate1).format("YYYY-MM"));
-            var startDate = moment(datasetJson.currentVersion.forecastStartDate).format("YYYY-MM-DD");
-            var stopDate = moment(datasetJson.currentVersion.forecastStopDate).format("YYYY-MM-DD");
-            var consumptionExtrapolationList = datasetJson.consumptionExtrapolation;
-            var monthsForMovingAverage = this.state.monthsForMovingAverage;
-            var consumptionExtrapolationFiltered = consumptionExtrapolationList.filter(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId);
-            var consumptionExtrapolationData = consumptionExtrapolationList.filter(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId && c.extrapolationMethod.id == 6)//Semi Averages
-            var consumptionExtrapolationMovingData = consumptionExtrapolationList.filter(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId && c.extrapolationMethod.id == 7)//Moving averages
-            console.log("consumptionExtrapolationMovingData+++", consumptionExtrapolationMovingData)
-            var consumptionExtrapolationRegression = consumptionExtrapolationList.filter(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId && c.extrapolationMethod.id == 5)//Linear Regression
-            var consumptionExtrapolationTESL = consumptionExtrapolationList.filter(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId && c.extrapolationMethod.id == 1)//TES L            
-            var movingAvgId = consumptionExtrapolationFiltered.length > 0 ? false : true;
-            var semiAvgId = consumptionExtrapolationFiltered.length > 0 ? false : true;
-            var linearRegressionId = consumptionExtrapolationFiltered.length > 0 ? false : true;
-            var smoothingId = consumptionExtrapolationFiltered.length > 0 ? false : true;
-            var arimaId = consumptionExtrapolationFiltered.length > 0 ? false : true;
-
-            if (consumptionExtrapolationMovingData.length > 0) {
-                monthsForMovingAverage = consumptionExtrapolationMovingData[0].jsonProperties.months;
-                movingAvgId = true;
-            }
-
-            if (consumptionExtrapolationData.length > 0) {
-                semiAvgId = true;
-            }
-
-            if (consumptionExtrapolationRegression.length > 0) {
-                linearRegressionId = true;
-            }
-            var confidenceLevel = this.state.confidenceLevelId;
-            var seasonality = this.state.noOfMonthsForASeason;
-            var alpha = this.state.alpha;
-            var beta = this.state.beta;
-            var gamma = this.state.gamma;
-            console.log("consumptionExtrapolationTESL+++", consumptionExtrapolationTESL)
-            if (consumptionExtrapolationTESL.length > 0) {
-                confidenceLevel = consumptionExtrapolationTESL[0].jsonProperties.confidenceLevel;
-                seasonality = consumptionExtrapolationTESL[0].jsonProperties.seasonality;
-                alpha = consumptionExtrapolationTESL[0].jsonProperties.alpha;
-                beta = consumptionExtrapolationTESL[0].jsonProperties.beta;
-                gamma = consumptionExtrapolationTESL[0].jsonProperties.gamma;
-                smoothingId = true;
-            }
-            this.setState({
-                actualConsumptionList: actualConsumptionList,
-                startDate: startDate,
-                stopDate: stopDate,
-                rangeValue1: rangeValue1,
-                minDate: actualMin,
-                maxDate: actualMax,
-                monthsForMovingAverage: monthsForMovingAverage,
-                confidenceLevelId: confidenceLevel,
-                noOfMonthsForASeason: seasonality,
-                alpha: alpha,
-                beta: beta,
-                gamma: gamma,
-                showData: true,
-                movingAvgId: movingAvgId,
-                semiAvgId: semiAvgId,
-                linearRegressionId: linearRegressionId,
-                smoothingId: smoothingId,
-                arimaId: arimaId,
-                loading: false
-            }, () => {
-                this.buildJxl();
-            })
         } else {
             this.setState({
                 showData: false,
-                loading: false
+                loading: false,
+                noDataMessage: ""
             })
         }
     }
@@ -1444,7 +1465,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                             <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} /> */}
                         </div>
                     </div>
-                    <div className="Card-header-reporticon pb-2">
+                    <div className="Card-header-reporticon pb-0">
                         <div className="card-header-actions">
                             <a className="card-header-action">
                                 <span style={{ cursor: 'pointer' }} onClick={() => { this.toggleShowGuidance() }}><small className="supplyplanformulas">{i18n.t('static.common.showGuidance')}</small></span>
@@ -1453,7 +1474,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                             {/* <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} /> */}
                         </div>
                     </div>
-                    <CardBody className="pb-lg-5 pt-lg-0">
+                    <CardBody className="pb-lg-0 pt-lg-0">
                         <Form name='simpleForm'>
                             <div className=" pl-0">
                                 <div className="row">
@@ -1502,7 +1523,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                 bsSize="sm"
                                                 value={this.state.planningUnitId}
                                                 onChange={(e) => { this.setPlanningUnitId(e); }}
-                                                className="selectWrapText"
+                                                className=""
                                             >
                                                 <option value="">{i18n.t('static.common.select')}</option>
                                                 {planningUnits}
@@ -1569,15 +1590,17 @@ export default class ExtrapolateDataComponent extends React.Component {
                                             </Picker>
                                         </div>
                                     </FormGroup>
-                                    <Label>{this.state.monthsDiff} {i18n.t('static.report.month')}</Label>
+                                    <div className="MorginTopMonth">
+                                        <Label>{this.state.monthsDiff} {i18n.t('static.report.month')}</Label>
+                                    </div>
 
                                 </div>
 
-                                <div className="row">
+                                <div className="col-md-12 pl-lg-0">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.selectExtrapolationMethod')}</Label>
                                 </div>
-                                <div className="row">
-                                    <FormGroup className="col-md-12 ">
+                                <div className="col-md-12 pl-lg-1">
+                                    <FormGroup className="">
                                         <div className="check inline  pl-lg-3 pt-lg-3">
                                             <div>
                                                 <Popover placement="top" isOpen={this.state.popoverOpenMa} target="Popover1" trigger="hover" toggle={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)}>
@@ -1600,12 +1623,13 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                     <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
                                                 </Label>
                                             </div>
-                                            <div className="col-md-2" style={{ display: this.state.movingAvgId ? '' : 'none' }}>
+                                            <div className="col-md-2 pt-lg-2" style={{ display: this.state.movingAvgId ? '' : 'none' }}>
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.noOfMonths')}</Label>
                                                 <Input
                                                     className="controls"
                                                     type="text"
                                                     id="noOfMonthsId"
+                                                    bsSize="sm"
                                                     name="noOfMonthsId"
                                                     value={this.state.monthsForMovingAverage}
                                                     onChange={(e) => { this.setMonthsForMovingAverage(e); }}
@@ -1617,7 +1641,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                     <PopoverBody>Need to add Info.</PopoverBody>
                                                 </Popover>
                                             </div>
-                                            <div>
+                                            <div className="pt-lg-2">
                                                 <Input
                                                     className="form-check-input"
                                                     type="checkbox"
@@ -1638,7 +1662,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                     <PopoverBody>Need to add Info.</PopoverBody>
                                                 </Popover>
                                             </div>
-                                            <div>
+                                            <div className="pt-lg-2">
                                                 <Input
                                                     className="form-check-input"
                                                     type="checkbox"
@@ -1659,7 +1683,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                     <PopoverBody>Need to add Info.</PopoverBody>
                                                 </Popover>
                                             </div>
-                                            <div>
+                                            <div className="pt-lg-2">
                                                 <Input
                                                     className="form-check-input"
                                                     type="checkbox"
@@ -1676,7 +1700,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                 </Label>
                                             </div>
 
-                                            <div className="row col-md-12" style={{ display: this.state.smoothingId ? '' : 'none' }}>
+                                            <div className="row col-md-12 pt-lg-2" style={{ display: this.state.smoothingId ? '' : 'none' }}>
                                                 <div className="col-md-2">
                                                     <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.confidenceLevel')}</Label>
                                                     <Input
@@ -1699,7 +1723,8 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                     <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.seasonality')}</Label>
                                                     <Input
                                                         className="controls"
-                                                        type="text"
+                                                        type="number"
+                                                        bsSize="sm"
                                                         id="seasonalityId"
                                                         name="seasonalityId"
                                                         value={this.state.noOfMonthsForASeason}
@@ -1729,6 +1754,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                         type="text"
                                                         id="alphaId"
                                                         name="alphaId"
+                                                        bsSize="sm"
                                                         value={this.state.alpha}
                                                         onChange={(e) => { this.setAlpha(e); }}
                                                     />
@@ -1739,6 +1765,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                         className="controls"
                                                         type="text"
                                                         id="betaId"
+                                                        bsSize="sm"
                                                         name="betaId"
                                                         value={this.state.beta}
                                                         onChange={(e) => { this.setBeta(e); }}
@@ -1750,6 +1777,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                         className="controls"
                                                         type="text"
                                                         id="gammaId"
+                                                        bsSize="sm"
                                                         name="gammaId"
                                                         value={this.state.gamma}
                                                         onChange={(e) => { this.setGamma(e); }}
@@ -1771,7 +1799,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                     <PopoverBody>Need to add Info.</PopoverBody>
                                                 </Popover>
                                             </div>
-                                            <div>
+                                            <div className="pt-lg-2">
                                                 <Input
                                                     className="form-check-input"
                                                     type="checkbox"
@@ -1788,7 +1816,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                 </Label>
                                             </div>
 
-                                            <div className="row col-md-12" style={{ display: this.state.arimaId ? '' : 'none' }}>
+                                            <div className="row col-md-12 pt-lg-2" style={{ display: this.state.arimaId ? '' : 'none' }}>
                                                 <div className="col-md-2">
                                                     <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.p')}</Label>
                                                     <Input
@@ -1796,6 +1824,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                         type="text"
                                                         id="pId"
                                                         name="pId"
+                                                        bsSize="sm"
                                                     />
                                                 </div>
                                                 <div className="col-md-2">
@@ -1805,6 +1834,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                         type="text"
                                                         id="dId"
                                                         name="dId"
+                                                        bsSize="sm"
                                                     />
                                                 </div>
                                                 <div className="col-md-2">
@@ -1814,6 +1844,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                         type="text"
                                                         id="qId"
                                                         name="qId"
+                                                        bsSize="sm"
                                                     />
                                                 </div>
                                             </div>
@@ -1827,7 +1858,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                 <Button type="submit" color="success" className="mr-1 float-right" size="md" ><i className="fa fa-check"> </i>Submit</Button>
                             </div> */}
                         </Form>
-
+                        <h5 className={"red"} id="div1">{this.state.noDataMessage}</h5>
                         {/* Graph */}
                         <div style={{ display: !this.state.loading ? "block" : "none" }}>
                             {this.state.showData && <div className="col-md-12">
@@ -1981,8 +2012,8 @@ export default class ExtrapolateDataComponent extends React.Component {
                     <CardFooter>
                         <FormGroup>
                             <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                            {this.state.dataChanged && <>    <Button type="button" id="formSubmitButton" size="md" color="success" className="float-right mr-1" onClick={() => this.saveForecastConsumptionExtrapolation()}><i className="fa fa-check"></i>{i18n.t('static.pipeline.save')}</Button>&nbsp;
-                                <Button type="button" id="dataCheck" size="md" color="info" className="float-right mr-1" onClick={() => this.openDataCheckModel()}><i className="fa fa-check"></i>{i18n.t('static.common.dataCheck')}</Button></>}
+                            {this.state.dataChanged && <>    <Button type="button" id="formSubmitButton" size="md" color="success" className="float-right mr-1" onClick={() => this.saveForecastConsumptionExtrapolation()}><i className="fa fa-check"></i>{i18n.t('static.pipeline.save')}</Button>&nbsp;</>}
+                            {this.state.showData && <>                                    <Button type="button" id="dataCheck" size="md" color="info" className="float-right mr-1" onClick={() => this.openDataCheckModel()}><i className="fa fa-check"></i>{i18n.t('static.common.dataCheck')}</Button></>}
                             &nbsp;
                         </FormGroup>
                     </CardFooter>
