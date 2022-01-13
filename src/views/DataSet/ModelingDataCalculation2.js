@@ -266,7 +266,7 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                 if (nodeId == -1) {
                     var findIndex = flatListUnsorted.findIndex(c => c.id == flatList[fl].id);
                     payload.nodeDataMap = nodeDataMap;
-                    flatList[findIndex].payload = payload;
+                    flatListUnsorted[findIndex].payload = payload;
                 }
                 // payload.nodeDataMap = nodeDataMap;
                 // flatList[fl].payload = payload;
@@ -332,8 +332,10 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                 }
                 if (nodeId == -1) {
                     var findIndex = flatListUnsorted.findIndex(c => c.id == aggregateNodeList[fl - 1].id);
+                    console.log("flatListUnsorted++++",flatListUnsorted)
+                    console.log("flatListUnsorted++++",aggregateNodeList[fl - 1].id)
                     payload.nodeDataMap = nodeDataMap;
-                    flatList[fl].payload = payload;
+                    flatListUnsorted[findIndex].payload = payload;
                 }
             }
         }
