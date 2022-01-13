@@ -164,7 +164,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                         name: datasetJson.programCode,
                         id: myResult[i].id,
                         regionList: datasetJson.regionList,
-                        planningUnitList: datasetJson.planningUnitList,
+                        planningUnitList: datasetJson.planningUnitList.filter(c=>c.consuptionForecast),
                         datasetData: datasetJson
                     }
                     forecastProgramList.push(forecastProgramJson)

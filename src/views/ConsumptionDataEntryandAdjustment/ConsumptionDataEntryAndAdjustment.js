@@ -75,49 +75,49 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     this.setState({
       loading: true
     }, () => {
-      var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF', 'AG', 'AH', 'AI', 'AJ', 'AK']
+      var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF', 'AG', 'AH', 'AI', 'AJ', 'AK','AL','AM']
       var consumptionList = this.state.consumptionList;
       var consumptionUnit = {};
       if (consumptionUnitId > 0) {
-        consumptionUnit = this.state.consumptionUnitList.filter(c => c.planningUnit.id == consumptionUnitId)[0];
+        consumptionUnit = this.state.planningUnitList.filter(c => c.planningUnit.id == consumptionUnitId)[0];
       } else {
-        consumptionUnit = {
-          forecastConsumptionUnitId: 0,
-          dataType: 0,
-          forecastingUnit: {
-            id: 0,
-            label: {
-              label_en: ""
-            },
-            multiplier: 1
-          }, planningUnit: {
-            id: 0,
-            label: {
-              label_en: ""
-            },
-            multiplier: 1
-          }, otherUnit: {
-            id: 0,
-            label: {
-              label_en: ""
-            },
-            multiplier: 1
-          }
+        // consumptionUnit = {
+        //   forecastConsumptionUnitId: 0,
+        //   dataType: 0,
+        //   forecastingUnit: {
+        //     id: 0,
+        //     label: {
+        //       label_en: ""
+        //     },
+        //     multiplier: 1
+        //   }, planningUnit: {
+        //     id: 0,
+        //     label: {
+        //       label_en: ""
+        //     },
+        //     multiplier: 1
+        //   }, otherUnit: {
+        //     id: 0,
+        //     label: {
+        //       label_en: ""
+        //     },
+        //     multiplier: 1
+        //   }
 
-        }
+        // }
       }
 
       var multiplier = 1;
       if (consumptionUnitId != 0) {
-        if (consumptionUnit.dataType == 1) {
-          multiplier = consumptionUnit.forecastingUnit.multiplier;
-        } else if (consumptionUnit.dataType == 2) {
+        if (consumptionUnit.consumptionDataType == 1) {
+          multiplier = 1;
+        } else if (consumptionUnit.consumptionDataType == 2) {
           multiplier = consumptionUnit.planningUnit.multiplier;
         } else {
           multiplier = consumptionUnit.otherUnit.multiplier;
         }
       }
-      consumptionList = consumptionList.filter(c => c.consumptionUnit.planningUnit.id == consumptionUnitId);
+      consumptionList = consumptionList.filter(c => c.planningUnit.id == consumptionUnitId);
       var monthArray = this.state.monthArray;
       var regionList = this.state.regionList;
       let dataArray = [];
@@ -143,7 +143,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         data[0] = "Actual Consumption"
         for (var j = 0; j < monthArray.length; j++) {
           var consumptionData = consumptionList.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArray[j].date).format("YYYY-MM") && c.region.id == regionList[r].regionId);
-          data[j + 1] = consumptionData.length > 0 ? consumptionData[0].actualConsumption : "";
+          data[j + 1] = consumptionData.length > 0 ? consumptionData[0].amount : "";
         }
         dataArray.push(data);
 
@@ -279,25 +279,25 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         // }
         console.log("consumptionUnit++++", consumptionUnit);
         data = [];
-        data[0] = consumptionUnit.dataType == 1 ? true : false;
+        data[0] = consumptionUnit.consumptionDataType == 1 ? true : false;
         data[1] = 1;
-        data[2] = getLabelText(consumptionUnit.forecastingUnit.label, this.state.lang);
-        data[3] = consumptionUnit.forecastingUnit.multiplier;
-        data[4] = consumptionUnit.forecastingUnit.id;
+        data[2] = getLabelText(consumptionUnit.planningUnit.forecastingUnit.label, this.state.lang);
+        data[3] = 1;
+        data[4] = consumptionUnit.planningUnit.forecastingUnit.id;
         dataArray1.push(data);
         data = [];
-        data[0] = consumptionUnit.dataType == 2 ? true : false;
+        data[0] = consumptionUnit.consumptionDataType == 2 ? true : false;
         data[1] = 2;
         data[2] = getLabelText(consumptionUnit.planningUnit.label, this.state.lang);
         data[3] = parseInt(consumptionUnit.planningUnit.multiplier);
         data[4] = consumptionUnit.planningUnit.id;
         dataArray1.push(data);
         data = [];
-        data[0] = consumptionUnit.dataType == 3 ? true : false;
+        data[0] = consumptionUnit.consumptionDataType == 3 ? true : false;
         data[1] = 3;
-        data[2] = consumptionUnit.dataType == 3 ? getLabelText(consumptionUnit.otherUnit.label, this.state.lang) : "";
-        data[3] = consumptionUnit.dataType == 3 ? parseInt(consumptionUnit.otherUnit.multiplier) : "";
-        data[4] = consumptionUnit.dataType == 3 ? consumptionUnit.otherUnit.id : "";
+        data[2] = consumptionUnit.consumptionDataType == 3 ? getLabelText(consumptionUnit.otherUnit.label, this.state.lang) : "";
+        data[3] = consumptionUnit.consumptionDataType == 3 ? parseInt(consumptionUnit.otherUnit.multiplier) : "";
+        data[4] = consumptionUnit.consumptionDataType == 3 ? consumptionUnit.otherUnit.id : "";
         dataArray1.push(data);
       } else {
         data = [];
@@ -544,7 +544,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
             daysOfStockOutCount += 8
           }
         }
-        datasetJson.consumptionList = fullConsumptionList;
+        datasetJson.actualConsumptionList = fullConsumptionList;
         datasetData = (CryptoJS.AES.encrypt(JSON.stringify(datasetJson), SECRET_KEY)).toString()
         myResult.programData = datasetData;
         var putRequest = datasetTransaction.put(myResult);
@@ -569,7 +569,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
 
   loaded = function (instance, cell, x, y, value) {
     jExcelLoadedFunctionOnlyHideRow(instance);
-    var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF', 'AG', 'AH', 'AI', 'AJ', 'AK'];
+    var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF', 'AG', 'AH', 'AI', 'AJ', 'AK','AL','AM'];
     var elInstance = instance.jexcel;
     var json = elInstance.getJson(null, false);
     for (var j = 0; j < json.length; j++) {
@@ -577,7 +577,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       cell.classList.add('readonly');
     }
 
-    for (var j = 0; j < this.state.monthArray.length - 2; j++) {
+    for (var j = 0; j < this.state.monthArray.length; j++) {
       var count = 2;
       var count1 = 1;
       var count2 = 6;
@@ -699,53 +699,44 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       }.bind(this);
       dsRequest.onsuccess = function (event) {
 
-        var tcTransaction = db1.transaction(['tracerCategory'], 'readwrite');
-        var tcOs = tcTransaction.objectStore('tracerCategory');
-        var tcRequest = tcOs.getAll();
-        tcRequest.onerror = function (event) {
-        }.bind(this);
-        tcRequest.onsuccess = function (event) {
-          var myResult = [];
-          myResult = tcRequest.result;
+        // var tcTransaction = db1.transaction(['tracerCategory'], 'readwrite');
+        // var tcOs = tcTransaction.objectStore('tracerCategory');
+        // var tcRequest = tcOs.getAll();
+        // tcRequest.onerror = function (event) {
+        // }.bind(this);
+        // tcRequest.onsuccess = function (event) {
+        //   var myResult = [];
+        //   myResult = tcRequest.result;
 
-          var fuTransaction = db1.transaction(['forecastingUnit'], 'readwrite');
-          var fuOs = fuTransaction.objectStore('forecastingUnit');
-          var fuRequest = fuOs.getAll();
-          fuRequest.onerror = function (event) {
-          }.bind(this);
-          fuRequest.onsuccess = function (event) {
-            var fuResult = [];
-            fuResult = fuRequest.result;
+        //   var fuTransaction = db1.transaction(['forecastingUnit'], 'readwrite');
+        //   var fuOs = fuTransaction.objectStore('forecastingUnit');
+        //   var fuRequest = fuOs.getAll();
+        //   fuRequest.onerror = function (event) {
+        //   }.bind(this);
+        //   fuRequest.onsuccess = function (event) {
+        //     var fuResult = [];
+        //     fuResult = fuRequest.result;
 
-            var puTransaction = db1.transaction(['planningUnit'], 'readwrite');
-            var puOs = puTransaction.objectStore('planningUnit');
-            var puRequest = puOs.getAll();
-            puRequest.onerror = function (event) {
-            }.bind(this);
-            puRequest.onsuccess = function (event) {
-              var puResult = [];
-              puResult = puRequest.result;
+        //     var puTransaction = db1.transaction(['planningUnit'], 'readwrite');
+        //     var puOs = puTransaction.objectStore('planningUnit');
+        //     var puRequest = puOs.getAll();
+        //     puRequest.onerror = function (event) {
+        //     }.bind(this);
+        //     puRequest.onsuccess = function (event) {
+        //       var puResult = [];
+        //       puResult = puRequest.result;
               // var datasetData = this.state.datasetList.filter(c => c.id == )[0].dataset;
               var datasetData = dsRequest.result;
               var datasetDataBytes = CryptoJS.AES.decrypt(datasetData.programData, SECRET_KEY);
               var datasetData = datasetDataBytes.toString(CryptoJS.enc.Utf8);
               var datasetJson = JSON.parse(datasetData);
-              var healthAreaList = [...new Set(datasetJson.healthAreaList.map(ele => (ele.id)))];
-              console.log("MyResult+++", myResult);
-              var tracerCategoryListFilter = myResult.filter(c => healthAreaList.includes(c.healthArea.id));
-              var tracerCategoryIds = [...new Set(tracerCategoryListFilter.map(ele => (ele.tracerCategoryId)))];
-              var forecastingUnitList = fuResult.filter(c => tracerCategoryIds.includes(c.tracerCategory.id));
-              var forecastingUnitIds = [...new Set(forecastingUnitList.map(ele => (ele.forecastingUnitId)))];
-              var planningUnitList = puResult.filter(c => forecastingUnitIds.includes(c.forecastingUnit.forecastingUnitId));
-              var consumptionList = datasetJson.consumptionList;
-              var consumptionUnitId = [...new Set(consumptionList.map(ele => (ele.consumptionUnit.planningUnit.id)))];
-              var consumptionUnitList = [];
-              consumptionUnitId.map(item => {
-                consumptionUnitList.push(consumptionList.filter(c => c.consumptionUnit.planningUnit.id == item)[0].consumptionUnit)
-              })
+              console.log("DatasetJson&&&",datasetJson);
+              var consumptionList = datasetJson.actualConsumptionList;
+              var planningUnitList=datasetJson.planningUnitList.filter(c=>c.consuptionForecast);
+              console.log("PlanningUnitList&&&&",planningUnitList)
               var regionList = datasetJson.regionList;
-              var startDate = moment(datasetJson.currentVersion.forecastStartDate).add(-36, 'months').format("YYYY-MM-DD");
-              var stopDate = moment(datasetJson.currentVersion.forecastStartDate).add(-1, 'months').format("YYYY-MM-DD");
+              var startDate = moment(Date.now()).add(-36, 'months').format("YYYY-MM-DD");
+              var stopDate = moment(Date.now()).format("YYYY-MM-DD");
               console.log("STart date+++", startDate);
               console.log("Stop Date+++", stopDate);
               var daysInMonth = datasetJson.currentVersion.daysInMonth;
@@ -761,11 +752,11 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                 monthArray.push({ date: curDate, noOfDays: noOfDays })
                 var totalPlanningUnit = 0;
                 var totalPlanningUnitPU = 0;
-                for (var cul = 0; cul < consumptionUnitList.length; cul++) {
+                for (var cul = 0; cul < planningUnitList.length; cul++) {
                   var totalQty = "";
                   var totalQtyPU = "";
                   for (var r = 0; r < regionList.length; r++) {
-                    var consumptionDataForMonth = consumptionList.filter(c => c.region.id == regionList[r].regionId && moment(c.month).format("YYYY-MM") == moment(curDate).format("YYYY-MM") && c.consumptionUnit.planningUnit.id == consumptionUnitList[cul].planningUnit.id)
+                    var consumptionDataForMonth = consumptionList.filter(c => c.region.id == regionList[r].regionId && moment(c.month).format("YYYY-MM") == moment(curDate).format("YYYY-MM") && c.planningUnit.id == planningUnitList[cul].planningUnit.id)
                     var qty = 0;
                     var qtyInPU = 0;
                     var reportingRate = "";
@@ -774,17 +765,17 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                     if (consumptionDataForMonth.length > 0) {
                       var c = consumptionDataForMonth[0];
                       reportingRate = c.reportingRate > 0 ? c.reportingRate : 100;
-                      actualConsumption = c.actualConsumption;
+                      actualConsumption = c.amount;
                       daysOfStockOut = c.daysOfStockOut;
                       qty = (Number(actualConsumption) / Number(reportingRate) / Number(1 - (Number(daysOfStockOut) / Number(noOfDays)))) * 100;
                       qty = qty.toFixed(2)
                       var multiplier = 0;
-                      if (c.consumptionUnit.dataType == 1) {
-                        multiplier = c.consumptionUnit.forecastingUnit.multiplier
-                      } else if (c.consumptionUnit.dataType == 2) {
-                        multiplier = c.consumptionUnit.planningUnit.multiplier
+                      if (planningUnitList[cul].consumptionDataType == 1) {
+                        multiplier = 1
+                      } else if (planningUnitList[cul].consumptionDataType == 2) {
+                        multiplier = planningUnitList[cul].planningUnit.multiplier
                       } else {
-                        multiplier = c.consumptionUnit.otherUnit.multiplier
+                        multiplier = planningUnitList[cul].otherUnit.multiplier
                       }
                       qtyInPU = (Number(qty) / Number(multiplier)).toFixed(2)
                     } else {
@@ -793,13 +784,13 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                       daysOfStockOut = 0;
                       qtyInPU = ""
                     }
-                    planningUnitTotalListRegion.push({ planningUnitId: consumptionUnitList[cul].planningUnit.id, month: curDate, qty: qty, qtyInPU: qtyInPU, reportingRate: reportingRate, region: regionList[r], multiplier: multiplier, actualConsumption: actualConsumption, daysOfStockOut: daysOfStockOut, noOfDays: noOfDays })
+                    planningUnitTotalListRegion.push({ planningUnitId: planningUnitList[cul].planningUnit.id, month: curDate, qty: qty, qtyInPU: qtyInPU, reportingRate: reportingRate, region: regionList[r], multiplier: multiplier, actualConsumption: actualConsumption, daysOfStockOut: daysOfStockOut, noOfDays: noOfDays })
                     if (qty != "") {
                       totalQty = Number(totalQty) + Number(qty);
                       totalQtyPU = Number(totalQtyPU) + Number(qtyInPU);
                     }
                   }
-                  planningUnitTotalList.push({ planningUnitId: consumptionUnitList[cul].planningUnit.id, month: curDate, qty: totalQty, qtyInPU: totalQtyPU })
+                  planningUnitTotalList.push({ planningUnitId: planningUnitList[cul].planningUnit.id, month: curDate, qty: totalQty, qtyInPU: totalQtyPU })
                   totalPlanningUnit += totalQty;
                   totalPlanningUnitPU += totalQtyPU;
                 }
@@ -811,11 +802,11 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                 regionList: regionList,
                 startDate: startDate,
                 stopDate: stopDate,
-                consumptionUnitList: consumptionUnitList,
+                // consumptionUnitList: consumptionUnitList,
                 monthArray: monthArray,
                 datasetJson: datasetJson,
                 planningUnitList: planningUnitList,
-                forecastingUnitList: forecastingUnitList,
+                // forecastingUnitList: forecastingUnitList,
                 showTable: true,
                 loading: false,
                 planningUnitTotalList: planningUnitTotalList,
@@ -823,9 +814,9 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
               })
             }.bind(this)
           }.bind(this)
-        }.bind(this)
-      }.bind(this)
-    }.bind(this)
+        // }.bind(this)
+      // }.bind(this)
+    // }.bind(this)
   }
 
   getARUList(e) {
@@ -867,8 +858,8 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     let planningUnits = planningUnitList.length > 0
       && planningUnitList.map((item, i) => {
         return (
-          <option key={i} value={item.planningUnitId}>
-            {getLabelText(item.label, this.state.lang)}
+          <option key={i} value={item.planningUnit.id}>
+            {getLabelText(item.planningUnit.label, this.state.lang)}
           </option>
         )
       }, this);
@@ -926,7 +917,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       if (elInstance != undefined) {
         var colourCount = 0;
         datasetListForGraph.push({
-          label: getLabelText(this.state.selectedConsumptionUnitObject.dataType == 1 ? this.state.selectedConsumptionUnitObject.forecastingUnit.label : this.state.selectedConsumptionUnitObject.dataType == 2 ? this.state.selectedConsumptionUnitObject.planningUnit.label : this.state.selectedConsumptionUnitObject.otherUnit.label, this.state.lang),
+          label: getLabelText(this.state.selectedConsumptionUnitObject.consumptionDataType == 1 ? this.state.selectedConsumptionUnitObject.planningUnit.forecastingUnit.label : this.state.selectedConsumptionUnitObject.consumptionDataType == 2 ? this.state.selectedConsumptionUnitObject.planningUnit.label : this.state.selectedConsumptionUnitObject.otherUnit.label, this.state.lang),
           data: this.state.planningUnitTotalList.filter(c => c.planningUnitId == this.state.selectedConsumptionUnitObject.planningUnit.id).map(item => (item.qty > 0 ? item.qty : null)),
           type: 'line',
           backgroundColor: 'transparent',
@@ -1058,7 +1049,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                             </tr>
                           </thead>
                           <tbody>
-                            {this.state.consumptionUnitList.map(item => {
+                            {this.state.planningUnitList.map(item => {
                               var total = 0;
                               var totalPU = 0;
                               return (<>
@@ -1066,11 +1057,11 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                                   <td className="BorderNoneSupplyPlan sticky-col first-col clone1" onClick={() => this.toggleAccordion(item.planningUnit.id)}>
                                     {this.state.consumptionUnitShowArr.includes(item.planningUnit.id) ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i>}
                                   </td>
-                                  <td className="sticky-col first-col clone hoverTd" align="left" onClick={() => { this.buildDataJexcel(item.planningUnit.id) }}>{item.dataType == 1 ? getLabelText(item.forecastingUnit.label, this.state.lang) : item.dataType == 2 ? getLabelText(item.planningUnit.label, this.state.lang) : getLabelText(item.otherUnit.label, this.state.lang)}</td>
+                                  <td className="sticky-col first-col clone hoverTd" align="left" onClick={() => { this.buildDataJexcel(item.planningUnit.id) }}>{item.consumptionDataType == 1 ? getLabelText(item.planningUnit.forecastingUnit.label, this.state.lang) : item.consumptionDataType == 2 ? getLabelText(item.planningUnit.label, this.state.lang) : getLabelText(item.otherUnit.label, this.state.lang)}</td>
                                   {this.state.monthArray.map((item1, count) => {
                                     var data = this.state.planningUnitTotalList.filter(c => c.planningUnitId == item.planningUnit.id && moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM"))
-                                    total += data[0].qty;
-                                    totalPU += data[0].qtyInPU;
+                                    total += Number(data[0].qty);
+                                    totalPU += Number(data[0].qtyInPU);
                                     return (<td onClick={() => { this.buildDataJexcel(item.planningUnit.id) }}><NumberFormat displayType={'text'} thousandSeparator={true} value={this.state.showInPlanningUnit ? data[0].qtyInPU : data[0].qty} /></td>)
                                   })}
                                   <td>{this.state.showInPlanningUnit ? totalPU : total}</td>
@@ -1088,8 +1079,8 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                                       totalRegionPU += Number(data[0].qtyInPU);
                                       return (<td onClick={() => { this.buildDataJexcel(item.planningUnit.id) }}><NumberFormat displayType={'text'} thousandSeparator={true} value={this.state.showInPlanningUnit ? data[0].qtyInPU : data[0].qty} /></td>)
                                     })}
-                                    <td>{this.state.showInPlanningUnit ? totalRegionPU : totalRegion}</td>
-                                    <td>{this.state.showInPlanningUnit ? (totalRegionPU / totalPU) * 100 : (totalRegion / total) * 100}</td>
+                                    <td>{this.state.showInPlanningUnit ? totalRegionPU.toFixed(2) : totalRegion.toFixed(2)}</td>
+                                    <td>{this.state.showInPlanningUnit ? ((totalRegionPU / totalPU) * 100).toFixed(2) : ((totalRegion / total) * 100).toFixed(2)}{"%"}</td>
                                   </tr>)
                                 })}
                               </>)
