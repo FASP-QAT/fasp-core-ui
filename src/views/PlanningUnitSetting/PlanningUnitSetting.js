@@ -1809,7 +1809,7 @@ export default class PlanningUnitSetting extends Component {
         data[9] = 0;
         data[10] = 1;
         data[11] = 1;
-        data[12] = null;
+        data[12] = {};
         data[13] = -1;
         data[14] = true;
 
