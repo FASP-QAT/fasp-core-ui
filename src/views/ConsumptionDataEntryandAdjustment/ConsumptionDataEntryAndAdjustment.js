@@ -506,23 +506,25 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         var regionList = this.state.regionList;
         var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
         var curUser = AuthenticationService.getLoggedInUserId();
-        for (var i = 0; i < monthArray.length - 2; i++) {
+        for (var i = 0; i < monthArray.length; i++) {
           var columnData = elInstance.getColumnData([i + 1]);
           var actualConsumptionCount = 2;
           var reportingRateCount = 3;
           var daysOfStockOutCount = 4;
           for (var r = 0; r < regionList.length; r++) {
             var index = 0;
-            index = fullConsumptionList.findIndex(c => c.consumptionUnit.planningUnit.id == consumptionUnit.planningUnit.id && c.region.id == regionList[r].regionId && moment(c.month).format("YYYY-MM") == moment(monthArray[i].date).format("YYYY-MM"));
+            index = fullConsumptionList.findIndex(c => c.planningUnit.id == consumptionUnit.planningUnit.id && c.region.id == regionList[r].regionId && moment(c.month).format("YYYY-MM") == moment(monthArray[i].date).format("YYYY-MM"));            
             if (columnData[actualConsumptionCount] > 0) {
               if (index != -1) {
-                fullConsumptionList[index].actualConsumption = columnData[actualConsumptionCount];
+                fullConsumptionList[index].amount = columnData[actualConsumptionCount];
                 fullConsumptionList[index].reportingRate = columnData[reportingRateCount];
                 fullConsumptionList[index].daysOfStockOut = columnData[daysOfStockOutCount];
               } else {
                 var json = {
-                  actualConsumption: columnData[actualConsumptionCount],
-                  consumptionUnit: consumptionUnit,
+                  amount: columnData[actualConsumptionCount],
+                  planningUnit:{
+                    id:consumptionUnit.planningUnit.id
+                  },
                   createdBy: {
                     userId: curUser
                   },
