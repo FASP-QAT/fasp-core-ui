@@ -284,7 +284,7 @@ class VersionSettingsComponent extends Component {
             console.log("startDate--------->", startDate);
             if (startDate != null && month != null) {
                 let newStartDate = new Date(startDate);
-                newStartDate.setMonth(newStartDate.getMonth() + month);
+                newStartDate.setMonth(newStartDate.getMonth() + (month - 1));
                 // console.log("startDate--------->1", new Date(newStartDate));
                 this.el.setValueFromCoords(17, y, 1, true);
                 this.el.setValueFromCoords(9, y, newStartDate.getFullYear() + '-' + (newStartDate.getMonth() + 1) + "-01 00:00:00", true);
@@ -305,6 +305,7 @@ class VersionSettingsComponent extends Component {
                 var months;
                 months = (d2.getFullYear() - d1.getFullYear()) * 12;
                 months += d2.getMonth() - d1.getMonth();
+                months = months - 1;
                 this.el.setValueFromCoords(17, y, 1, true);
                 this.el.setValueFromCoords(8, y, months, true);
             }

@@ -68,7 +68,8 @@ class ForecastOutput extends Component {
             equivalencyUnitList: [],
             programEquivalencyUnitList: [],
             equivalencyUnitLabel: '',
-            calculateEquivalencyUnitTotal: []
+            calculateEquivalencyUnitTotal: [],
+            lang: localStorage.getItem('lang'),
             // consumptionDataAll: [
             //     { planningUnit: { id: 1, label: "abacavir-lamivudine 600+300mg/Tablet Tablet (PO), bottle of 30" }, scenario: { id: 3, label: "C. Consumption Low" }, display: true, color: "#ba0c2f", consumptionList: [{ consumptionDate: "2021-01-01", consumptionQty: 36577 }, { consumptionDate: "2021-02-01", consumptionQty: 36805 }, { consumptionDate: "2021-03-01", consumptionQty: 37039 }, { consumptionDate: "2021-04-01", consumptionQty: 37273 }, { consumptionDate: "2021-05-01", consumptionQty: 37507 }, { consumptionDate: "2021-06-01", consumptionQty: 37741 }, { consumptionDate: "2021-07-01", consumptionQty: 37982 }, { consumptionDate: "2021-08-01", consumptionQty: 38223 }, { consumptionDate: "2021-09-01", consumptionQty: 38464 }, { consumptionDate: "2021-10-01", consumptionQty: 38705 }, { consumptionDate: "2021-11-01", consumptionQty: 38953 }, { consumptionDate: "2021-12-01", consumptionQty: 39200 }] },
             //     { planningUnit: { id: 2, label: "dolutegravir-lamivudine-tenofovir 50+300+300mg/Tablet Tablet (PO) - bottle of 30" }, scenario: { id: 1, label: "A. Consumption High" }, color: "#0067b9", display: true, consumptionList: [{ consumptionDate: "2021-01-01", consumptionQty: 29927 }, { consumptionDate: "2021-02-01", consumptionQty: 30113 }, { consumptionDate: "2021-03-01", consumptionQty: 30305 }, { consumptionDate: "2021-04-01", consumptionQty: 30496 }, { consumptionDate: "2021-05-01", consumptionQty: 30688 }, { consumptionDate: "2021-06-01", consumptionQty: 30879 }, { consumptionDate: "2021-07-01", consumptionQty: 31077 }, { consumptionDate: "2021-08-01", consumptionQty: 31274 }, { consumptionDate: "2021-09-01", consumptionQty: 31471 }, { consumptionDate: "2021-10-01", consumptionQty: 31668 }, { consumptionDate: "2021-11-01", consumptionQty: 31870 }, { consumptionDate: "2021-12-01", consumptionQty: 32073 }] },
@@ -337,6 +338,134 @@ class ForecastOutput extends Component {
     toggledata = () => this.setState((currentState) => ({ show: !currentState.show }));
 
     exportCSV() {
+        var csvRow = [];
+        csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+        csvRow.push('')
+        csvRow.push('"' + (i18n.t('static.report.version*') + ' : ' + document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+        csvRow.push('')
+        csvRow.push('"' + ('Forecast Period' + ' : ' + document.getElementById("forecastPeriod").value).replaceAll(' ', '%20') + '"')
+        csvRow.push('')
+        csvRow.push('"' + (i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ', '%20') + '"')
+        csvRow.push('')
+        csvRow.push('"' + ('Y axis in equivalency unit' + ' : ' + document.getElementById("yaxisEquUnit").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+        csvRow.push('')
+        csvRow.push('"' + (i18n.t('static.common.display') + ' : ' + document.getElementById("viewById").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+        csvRow.push('')
+        if (document.getElementById("viewById").value == 1) {//planning unit
+            this.state.planningUnitLabels.map(ele =>
+                csvRow.push('"' + (i18n.t('static.report.planningUnit') + ' : ' + ele.toString()).replaceAll(' ', '%20') + '"'))
+        } else {//forecasting unit
+            this.state.forecastingUnitLabels.map(ele =>
+                csvRow.push('"' + (i18n.t('static.product.unit1') + ' : ' + ele.toString()).replaceAll(' ', '%20') + '"'))
+        }
+        csvRow.push('')
+        csvRow.push('"' + ('X-axis Aggregate By Year' + ' : ' + document.getElementById("xaxis").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+
+        csvRow.push('')
+        csvRow.push('')
+
+        const headers = [];
+        // columns.map((item, idx) => { headers[idx] = ((item.text).replaceAll(' ', '%20')) });
+        // headers.push(i18n.t('static.importFromQATSupplyPlan.supplyPlanPlanningUnit'));
+
+        // headers.push('Display');
+        (this.state.viewById == 1 ? headers.push('Planning Unit') : headers.push('Forecasting Unit'));
+        headers.push('Forecast');
+        {
+            this.state.xaxis == 2 && this.state.monthArrayList.map(item => (
+                headers.push(moment(item).format(DATE_FORMAT_CAP_WITHOUT_DATE))
+            ))
+        }
+        {
+            this.state.xaxis == 1 && this.state.monthArrayList.map(item => (
+                headers.push(moment(item).format("YYYY"))
+            ))
+        }
+
+        var A = [this.addDoubleQuoteToRowContent(headers)]
+
+        // this.state.buildCSVTable.map(ele => 
+        //     A.push(this.addDoubleQuoteToRowContent([ ((ele.supplyPlanPlanningUnit).replaceAll(',', ' ')).replaceAll(' ', '%20'), 
+        //     ((ele.forecastPlanningUnit).replaceAll(',', ' ')).replaceAll(' ', '%20'), 
+        //     ele.region, this.dateFormatter(ele.month).replaceAll(' ', '%20'), 
+        //     ele.supplyPlanConsumption, 
+        //     ele.multiplier, 
+        //     ele.convertedConsumption, 
+        //     ele.currentQATConsumption, 
+        //     ele.import == true ? 'Yes' : 'No' ])));
+
+
+        this.state.xaxis == 2 && this.state.consumptionData.map(ele => {
+            let propertyName = this.state.monthArrayList.map(item1 => (
+                ele.consumptionList.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(item1).format("YYYY-MM")).length > 0 ? (ele.consumptionList.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(item1).format("YYYY-MM"))[0].consumptionQty) : ''
+            ));
+
+            return (A.push(this.addDoubleQuoteToRowContent([
+                ((getLabelText(ele.objUnit.label, this.state.lang)).replaceAll(',', ' ')).replaceAll(' ', '%20'),
+                ((ele.scenario.label).replaceAll(',', ' ')).replaceAll(' ', '%20'),
+            ].concat(propertyName))))
+        }
+        );
+
+
+        if (this.state.yaxisEquUnit > 0 && this.state.xaxis == 2) {
+            let propertyName = this.state.monthArrayList.map(item1 => (
+                this.state.calculateEquivalencyUnitTotal.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(item1).format("YYYY-MM")).length > 0 ? this.state.calculateEquivalencyUnitTotal.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(item1).format("YYYY-MM"))[0].consumptionQty : ''
+            ));
+            A.push(this.addDoubleQuoteToRowContent([
+                (("Total " + this.state.equivalencyUnitLabel).replaceAll(',', ' ')).replaceAll(' ', '%20'),
+                '',
+            ].concat(propertyName)));
+        }
+
+
+
+
+        this.state.xaxis == 1 && this.state.consumptionData.map(ele => {
+            let propertyName = this.state.monthArrayList.map(item1 => (
+                ele.consumptionList.filter(c => moment(c.consumptionDate).format("YYYY") == moment(item1).format("YYYY")).length > 0 ? ele.consumptionList.filter(c => moment(c.consumptionDate).format("YYYY") == moment(item1).format("YYYY"))[0].consumptionQty : ''
+            ));
+
+            return (
+                A.push(this.addDoubleQuoteToRowContent([
+                    ((getLabelText(ele.objUnit.label, this.state.lang)).replaceAll(',', ' ')).replaceAll(' ', '%20'),
+                    ((ele.scenario.label).replaceAll(',', ' ')).replaceAll(' ', '%20'),
+                ].concat(propertyName)))
+            )
+        }
+        );
+
+        if (this.state.yaxisEquUnit > 0 && this.state.xaxis == 1) {
+            let propertyName = this.state.monthArrayList.map(item1 => (
+                this.state.calculateEquivalencyUnitTotal.filter(c => moment(c.consumptionDate).format("YYYY") == moment(item1).format("YYYY")).length > 0 ? this.state.calculateEquivalencyUnitTotal.filter(c => moment(c.consumptionDate).format("YYYY") == moment(item1).format("YYYY"))[0].consumptionQty : ''
+            ));
+            A.push(this.addDoubleQuoteToRowContent([
+                (("Total " + this.state.equivalencyUnitLabel).replaceAll(',', ' ')).replaceAll(' ', '%20'),
+                '',
+            ].concat(propertyName)));
+
+        }
+
+
+
+        for (var i = 0; i < A.length; i++) {
+            // console.log(A[i])
+            csvRow.push(A[i].join(","))
+        }
+
+        var csvString = csvRow.join("%0A")
+        // console.log('csvString' + csvString)
+        var a = document.createElement("a")
+        a.href = 'data:attachment/csv,' + csvString
+        a.target = "_Blank"
+        a.download = 'Monthly Forecast' + ".csv"
+        document.body.appendChild(a)
+        a.click();
+
+    }
+
+    addDoubleQuoteToRowContent = (arr) => {
+        return arr.map(ele => '"' + ele + '"')
     }
 
 
