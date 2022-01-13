@@ -3214,7 +3214,8 @@ export default class CreateTreeTemplate extends Component {
 
                                         }
                                     },
-                                    nodeDataModelingList: []
+                                    nodeDataModelingList: [],
+                                    nodeDataOverrideList: [],
                                 }]
                             ]
                         },
@@ -3244,7 +3245,9 @@ export default class CreateTreeTemplate extends Component {
                         },
                         nodeDataMap: [
                             [{
-                                month:new Date(),
+                                nodeDataModelingList: [],
+                                nodeDataOverrideList: [],
+                                month: new Date(),
                                 dataValue: '',
                                 fuNode: {
                                     forecastingUnit: {
@@ -5720,6 +5723,8 @@ export default class CreateTreeTemplate extends Component {
                                                 nodeDataMap: [
                                                     [
                                                         {
+                                                            nodeDataModelingList: [],
+                                                            nodeDataOverrideList: [],
                                                             month: new Date(),
                                                             dataValue: '',
                                                             calculatedDataValue: '',
