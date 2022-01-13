@@ -1762,15 +1762,16 @@ class ForecastSummary extends Component {
                                             </div> */}
                                             <div className="table-responsive" style={{ display: this.state.loading ? "none" : "block" }}>
                                                 {this.state.summeryData.length > 0 && this.state.displayId == 1 &&
-                                                    <Table className="table-bordered text-center mt-2">
+                                                <div className='table-scroll1'>
+                                                    <Table className="table-bordered table-bordered1 text-center mt-2">
                                                         {/* <Table className="table-bordered text-center mt-2 overflowhide main-table "> */}
 
                                                         <thead>
                                                             <tr>
                                                                 <th className="BorderNoneSupplyPlan sticky-col first-col clone1"></th>
                                                                 {/* <th className="text-center" style={{}}> Forecasting Unit </th> */}
-                                                                <th className="text-center" style={{ width: '19%' }}>Planning Unit</th>
-                                                                <th className="text-center" style={{ width: '' }}>Total Forecasted Quantity <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
+                                                                <th className="text-center ForecastSumarydWidth sticky-col first-col clone" style={{width: '19%'}}>Planning Unit</th>
+                                                                <th className="text-center" style={{width: ''}}>Total Forecasted Quantity <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
                                                                 {!this.state.hideColumn &&
                                                                     <>
                                                                         <th className="text-center" title="Stock (end of {this.state.beforeEndDateDisplay})" style={{ width: '7%' }}>Stock <span className="FontWeightNormal">(end of {this.state.beforeEndDateDisplay})</span> <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
@@ -1811,7 +1812,7 @@ class ForecastSummary extends Component {
 
                                                                                 </td>
                                                                                 {/* <td></td> */}
-                                                                                <td><b>{item1.tracerCategory.label.label_en}</b></td>
+                                                                                <td className='text-left sticky-col first-col clone'><b>{item1.tracerCategory.label.label_en}</b></td>
                                                                                 <td></td>
                                                                                 {!this.state.hideColumn &&
                                                                                     <>
@@ -1838,7 +1839,7 @@ class ForecastSummary extends Component {
                                                                                     <>
                                                                                         <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                                                         {/* <td>{item1.forecastingUnit.label.label_en}</td> */}
-                                                                                        <td className='text-left'>{item1.planningUnit.label.label_en}</td>
+                                                                                        <td className='text-left  sticky-col first-col clone'>{item1.planningUnit.label.label_en}</td>
                                                                                         <td>{item1.totalForecastedQuantity}</td>
                                                                                         {!this.state.hideColumn &&
                                                                                             <>
@@ -1873,7 +1874,7 @@ class ForecastSummary extends Component {
                                                                 <tr>
                                                                     <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                                     {/* <td></td> */}
-                                                                    <td></td>
+                                                                    <td className='text-left sticky-col first-col clone'></td>
                                                                     <td></td>
                                                                     <td></td>
                                                                     <td></td>
@@ -1889,7 +1890,7 @@ class ForecastSummary extends Component {
                                                                 <tr>
                                                                     <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                                     {/* <td></td> */}
-                                                                    <td></td>
+                                                                    <td className='text-left sticky-col first-col clone'></td>
                                                                     <td></td>
                                                                     <td></td>
                                                                     <td></td>
@@ -1905,7 +1906,7 @@ class ForecastSummary extends Component {
                                                                 <tr>
                                                                     <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                                     {/* <td></td> */}
-                                                                    <td></td>
+                                                                    <td className='text-left sticky-col first-col clone'></td>
                                                                     <td></td>
                                                                     <td></td>
                                                                     <td></td>
@@ -1925,7 +1926,7 @@ class ForecastSummary extends Component {
                                                                 <tr>
                                                                     <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                                     {/* <td></td> */}
-                                                                    <td></td>
+                                                                    <td className='text-left sticky-col first-col clone'></td>
                                                                     <td></td>
                                                                     <td><b>Product Cost</b></td>
                                                                     <td><b>{this.state.totalProductCost}</b></td>
@@ -1934,7 +1935,7 @@ class ForecastSummary extends Component {
                                                                 <tr>
                                                                     <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                                     {/* <td></td> */}
-                                                                    <td></td>
+                                                                    <td className='text-left sticky-col first-col clone'></td>
                                                                     <td></td>
                                                                     <td><b>Freight (7%)</b></td>
                                                                     <td><b>{0.07 * this.state.totalProductCost}</b></td>
@@ -1943,7 +1944,7 @@ class ForecastSummary extends Component {
                                                                 <tr>
                                                                     <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                                     {/* <td></td> */}
-                                                                    <td></td>
+                                                                    <td className='text-left sticky-col first-col clone'></td>
                                                                     <td></td>
                                                                     <td><b>Total Cost</b></td>
                                                                     <td><b>{this.state.totalProductCost + 0.07 * this.state.totalProductCost}</b></td>
@@ -1952,13 +1953,17 @@ class ForecastSummary extends Component {
                                                             </tfoot>
                                                         }
                                                     </Table>
+                                                    </div>
                                                 }
                                                 {this.state.regPlanningUnitList.length > 0 && this.state.displayId == 2 &&
+                                                <div className='ForecastSummaryTable'>
                                                     <div id="tableDiv" className="table-responsive consumptionDataEntryTable">
                                                     </div>
+                                                </div>
 
                                                 }
                                             </div>
+                                            
                                             <div style={{ display: this.state.loading ? "block" : "none" }}>
                                                 <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                                                     <div class="align-items-center">

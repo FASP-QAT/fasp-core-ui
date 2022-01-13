@@ -5,7 +5,7 @@ import {
     Card,
     CardBody,
     Col,
-    Table, FormGroup, Input, InputGroup, Label, Form
+    Table, FormGroup, Input, InputGroup, PopoverBody, Popover, Label, Form
 } from 'reactstrap';
 import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
 import i18n from '../../i18n'
@@ -42,6 +42,8 @@ class ForecastOutput extends Component {
         var dt = new Date();
         dt.setMonth(dt.getMonth() - 10);
         this.state = {
+            popoverOpen: false,
+            popoverOpen1: false,
             programs: [],
             versions: [],
             show: false,
@@ -96,6 +98,8 @@ class ForecastOutput extends Component {
         this.calculateEquivalencyUnitTotal = this.calculateEquivalencyUnitTotal.bind(this);
         this.backToCompareAndSelect = this.backToCompareAndSelect.bind(this);
         this.continueToForecastSummary = this.continueToForecastSummary.bind(this);
+        this.toggleEu = this.toggleEu.bind(this);
+        this.toggleRv = this.toggleRv.bind(this);
     }
 
     backToCompareAndSelect() {
@@ -1646,6 +1650,20 @@ class ForecastOutput extends Component {
 
     getIndexAsKey = (d) => { return d.key };
 
+    
+    toggleEu() {
+        this.setState({
+            popoverOpen: !this.state.popoverOpen,
+        });
+    }
+
+    toggleRv() {
+        this.setState({
+            popoverOpen1: !this.state.popoverOpen1,
+        });
+    }
+
+
     render() {
 
         const backgroundColor = [
@@ -1946,20 +1964,26 @@ class ForecastOutput extends Component {
                         }
                     </div>
                     <div className="Card-header-reporticon ">
-                        <div className="card-header-actions BacktoLink">
-                            <a className="pr-lg-0 pt-lg-1">
+                        <div className="card-header-actions BacktoLink col-md-12 pl-lg-0 pr-lg-0 pt-lg-2">
+                            <a className="pr-lg-0 pt-lg-1 float-left">
                                 <span style={{ cursor: 'pointer' }} onClick={() => { this.backToCompareAndSelect() }}><i className="fa fa-long-arrow-left" style={{ color: '#20a8d8', fontSize: '13px' }}></i> <small className="supplyplanformulas">{'Return To Monthly Forecast'}</small></span>
-                            </a><br />
-                            <span className="pr-lg-0 pt-lg-1">This report aggregates regional forecasts. For disaggregated regional forecasts, export CSV.</span>
+                            </a>
+                            <a className="pr-lg-0 pt-lg-1 float-right">
+                                <span style={{ cursor: 'pointer' }} onClick={() => { this.continueToForecastSummary() }}><i className="fa fa-long-arrow-right" style={{ color: '#20a8d8', fontSize: '13px' }}></i> <small className="supplyplanformulas">{'Continue To Forecast Summary'}</small></span>
+                            </a>
+                            
                         </div>
                     </div>
-                    <div className="Card-header-reporticon ">
+                    <div className='col-md-12 pt-lg-2 pb-lg-3'>
+                    <span className="pr-lg-0 pt-lg-1">This report aggregates regional forecasts. For disaggregated regional forecasts, export CSV.</span>
+                    </div>
+                    {/* <div className="Card-header-reporticon ">
                         <div className="card-header-actions">
                             <a className="pr-lg-0 pt-lg-1">
                                 <span style={{ cursor: 'pointer' }} onClick={() => { this.continueToForecastSummary() }}><i className="fa fa-long-arrow-right" style={{ color: '#20a8d8', fontSize: '13px' }}></i> <small className="supplyplanformulas">{'Continue To Forecast Summary'}</small></span>
                             </a>
                         </div>
-                    </div>
+                    </div> */}
                     <CardBody className="pb-lg-2 pt-lg-0 ">
                         <div>
                             <div ref={ref}>
@@ -2048,7 +2072,7 @@ class ForecastOutput extends Component {
                                             </FormGroup>
 
                                             <FormGroup className="col-md-3">
-                                                <Label htmlFor="appendedInputButton">Y axis in equivalency unit</Label>
+                                                <Label htmlFor="appendedInputButton">Y axis in equivalency unit  <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={this.toggleEu} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                                 <div className="controls ">
                                                     <InputGroup>
                                                         <Input
@@ -2067,7 +2091,11 @@ class ForecastOutput extends Component {
                                                     </InputGroup>
                                                 </div>
                                             </FormGroup>
-
+                                            <div>
+                                            <Popover placement="top" isOpen={this.state.popoverOpen} target="Popover1" trigger="hover" toggle={this.toggleEu}>
+                                                <PopoverBody>Need to add Info.</PopoverBody>
+                                            </Popover>
+                                        </div>
 
                                             {/* <FormGroup className="col-md-3">
                                                 <Label htmlFor="appendedInputButton">Y axis in equivalency unit</Label>
@@ -2111,7 +2139,7 @@ class ForecastOutput extends Component {
                                             </FormGroup> */}
 
                                             <FormGroup className="col-md-3">
-                                                <Label htmlFor="appendedInputButton">{i18n.t('static.common.display')}</Label>
+                                                <Label htmlFor="appendedInputButton">{i18n.t('static.common.display')}  <i class="fa fa-info-circle icons pl-lg-2" id="Popover2" onClick={this.toggleRv} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                                 <div className="controls">
                                                     <InputGroup>
                                                         <Input
@@ -2128,6 +2156,11 @@ class ForecastOutput extends Component {
                                                     </InputGroup>
                                                 </div>
                                             </FormGroup>
+                                            <div>
+                                            <Popover placement="top" isOpen={this.state.popoverOpen1} target="Popover2" trigger="hover" toggle={this.toggleRv}>
+                                                <PopoverBody>Need to add Info.</PopoverBody>
+                                            </Popover>
+                                            </div>
                                             <FormGroup className="col-md-3" id="forecastingUnitDiv">
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.product.unit1')}</Label>
                                                 <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
@@ -2195,8 +2228,8 @@ class ForecastOutput extends Component {
                                         {this.state.consumptionData.length > 0
                                             &&
                                             <div className="col-md-12 p-0">
-                                                <div className="col-md-12">
-                                                    <div className="chart-wrapper chart-graph-report pl-5 ml-3" style={{ marginLeft: '50px' }}>
+                                                <div className="col-md-12 pl-lg-0">
+                                                    <div className="chart-wrapper chart-graph-report pl-lg-4">
                                                         <Bar id="cool-canvas" data={bar} options={chartOptions}
                                                         // datasetKeyProvider={this.getIndexAsKey}
                                                         />
@@ -2222,17 +2255,17 @@ class ForecastOutput extends Component {
 
 
                                     <div className="row">
-                                        <div className="col-md-12 pl-0 pr-0">
+                                        <div className="col-md-12 pl-3 pr-3">
                                             {this.state.show &&
-                                                <div className="table-scroll">
+                                                <div className="table-scroll1">
                                                     <div className="table-wrap table-responsive">
                                                         {this.state.consumptionData.length > 0 &&
-                                                            <Table className="table-bordered text-center mt-2 overflowhide main-table " bordered size="sm" options={this.options}>
+                                                            <Table className="table-bordered table-bordered1 text-center mt-2 overflowhide main-table " bordered size="sm" options={this.options}>
                                                                 <thead>
                                                                     <tr>
-                                                                        <th>Display?</th>
-                                                                        <th>{this.state.viewById == 1 ? 'Planning Unit' : 'Forecasting Unit'}</th>
-                                                                        <th>Forecast</th>
+                                                                        <th className='Firstcolum'>Display?</th>
+                                                                        <th className='Secondcolum'>{this.state.viewById == 1 ? 'Planning Unit' : 'Forecasting Unit'}</th>
+                                                                        <th className='MonthlyForecastdWidth Thirdcolum'>Forecast</th>
                                                                         {this.state.xaxis == 2 && this.state.monthArrayList.map(item => (
                                                                             <th>{moment(item).format(DATE_FORMAT_CAP_WITHOUT_DATE)}</th>
                                                                         ))}
@@ -2244,9 +2277,9 @@ class ForecastOutput extends Component {
                                                                 <tbody>
                                                                     {this.state.xaxis == 2 && this.state.consumptionData.map(item => (
                                                                         <tr>
-                                                                            <td align="center"><input type="checkbox" id={"planningUnitCheckbox" + item.objUnit.id} checked={item.display} onChange={() => this.planningUnitCheckedChanged(item.objUnit.id)} /></td>
-                                                                            <td style={{ textAlign: 'left' }}>{item.objUnit.label.label_en}</td>
-                                                                            <td>{item.scenario.label}</td>
+                                                                            <td className="sticky-col first-col clone Firstcolum" align="center"><input type="checkbox" id={"planningUnitCheckbox" + item.objUnit.id} checked={item.display} onChange={() => this.planningUnitCheckedChanged(item.objUnit.id)} /></td>
+                                                                            <td className="sticky-col first-col clone Secondcolum" style={{ textAlign: 'left' }}>{item.objUnit.label.label_en}</td>
+                                                                            <td className='text-left sticky-col first-col clone Thirdcolum'>{item.scenario.label}</td>
                                                                             {this.state.monthArrayList.map(item1 => (
                                                                                 <td>{item.consumptionList.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(item1).format("YYYY-MM")).length > 0 ? <NumberFormat displayType={'text'} thousandSeparator={true} value={item.consumptionList.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(item1).format("YYYY-MM"))[0].consumptionQty} /> : ""}</td>
                                                                             ))}
@@ -2266,9 +2299,9 @@ class ForecastOutput extends Component {
 
                                                                     {this.state.xaxis == 1 && this.state.consumptionData.map(item => (
                                                                         <tr>
-                                                                            <td align="center"><input type="checkbox" id={"planningUnitCheckbox" + item.objUnit.id} checked={item.display} onChange={() => this.planningUnitCheckedChanged(item.objUnit.id)} /></td>
-                                                                            <td style={{ textAlign: 'left' }}>{item.objUnit.label.label_en}</td>
-                                                                            <td>{item.scenario.label}</td>
+                                                                            <td className="sticky-col first-col clone Firstcolum" align="center"><input type="checkbox" id={"planningUnitCheckbox" + item.objUnit.id} checked={item.display} onChange={() => this.planningUnitCheckedChanged(item.objUnit.id)} /></td>
+                                                                            <td className="sticky-col first-col clone Secondcolum" style={{ textAlign: 'left' }}>{item.objUnit.label.label_en}</td>
+                                                                            <td className='text-left sticky-col first-col clone Thirdcolum'>{item.scenario.label}</td>
                                                                             {this.state.monthArrayList.map(item1 => (
                                                                                 <td>{item.consumptionList.filter(c => moment(c.consumptionDate).format("YYYY") == moment(item1).format("YYYY")).length > 0 ? <NumberFormat displayType={'text'} thousandSeparator={true} value={item.consumptionList.filter(c => moment(c.consumptionDate).format("YYYY") == moment(item1).format("YYYY"))[0].consumptionQty} /> : ""}</td>
                                                                             ))}
