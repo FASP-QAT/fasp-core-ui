@@ -190,6 +190,9 @@ export function getDatabase() {
         if(!db1.objectStoreNames.contains('equivalencyUnit')){
             storeOS = db1.createObjectStore('equivalencyUnit', { keyPath: 'equivalencyUnitMappingId', autoIncrement: true});
         }
+        if(!db1.objectStoreNames.contains('extrapolationMethod')){
+            storeOS = db1.createObjectStore('extrapolationMethod', { keyPath: 'id', autoIncrement: true});
+        }
         console.log("indexed db completed----------------------")
         
     };
