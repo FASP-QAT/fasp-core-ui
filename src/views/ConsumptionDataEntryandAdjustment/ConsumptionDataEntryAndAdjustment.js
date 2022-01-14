@@ -19,6 +19,7 @@ import { JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants.js';
 import { jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
 import NumberFormat from 'react-number-format';
 import { CustomTooltips } from "@coreui/coreui-plugin-chartjs-custom-tooltips";
+import { Prompt } from "react-router-dom";
 
 const entityname = i18n.t('static.consumption.consumptionDataEntryandAdjustment');
 
