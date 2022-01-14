@@ -314,14 +314,14 @@ class ProductValidation extends Component {
             }
             var maxLevel = Math.max.apply(Math, flatList.map(function (o) { return o.level; }))
             console.log("MaxLevel+++", maxLevel);
-            var planningUnitList = nodeDataList.filter(c => c.nodeDataMap.puNode != null);
-            var fuListThatDoesNotHaveChildren = nodeDataList.filter(c => c.nodeDataMap.fuNode != null && nodeDataList.filter(f => f.parent == c.id).length == 0);
+            var planningUnitList = nodeDataList.filter(c => c.flatItem.payload.nodeType.id == 5);
+            var fuListThatDoesNotHaveChildren = nodeDataList.filter(c => c.flatItem.payload.nodeType.id == 4 && nodeDataList.filter(f => f.flatItem.parent == c.flatItem.id).length == 0);
             planningUnitList = planningUnitList.concat(fuListThatDoesNotHaveChildren);
             console.log("PlanningUnitList+++", planningUnitList);
             console.log("fuListThatDoesNotHaveChildren+++", fuListThatDoesNotHaveChildren);
             var finalData = [];
             for (var i = 0; i < planningUnitList.length; i++) {
-                if (planningUnitList[i].nodeDataMap.puNode != null) {
+                if (planningUnitList[i].flatItem.payload.nodeType.id == 5) {
                     var fuNode = nodeDataList.filter(c => c.flatItem.id == planningUnitList[i].flatItem.parent)[0];
                     var node = nodeDataList.filter(c => c.flatItem.id == planningUnitList[i].flatItem.parent)[0];
                     var parentLabelList = [];
@@ -347,6 +347,7 @@ class ProductValidation extends Component {
                     finalData.push({ name: name, nodeDataMap: planningUnitList[i].nodeDataMap, flatItem: planningUnitList[i].flatItem, parentNodeNodeDataMap: fuNode.nodeDataMap, parentNodeFlatItem: fuNode.flatItem })
                 } else {
                     for (var j = 0; j < maxLevel - 2; j++) {
+                        var node = nodeDataList.filter(c => c.flatItem.id == planningUnitList[i].flatItem.parent)[0];
                         var parentNode = nodeDataList.filter(c => c.flatItem.id == node.flatItem.parent)[0];
                         parentLabelList.push(getLabelText(parentNode.flatItem.payload.label, this.state.lang));
                         node = parentNode;
@@ -767,10 +768,10 @@ class ProductValidation extends Component {
         var x2 = x.length > 1 ? '.' + x[1] : '';
         var rgx = /(\d+)(\d{3})/;
         while (rgx.test(x1)) {
-          x1 = x1.replace(rgx, '$1' + ',' + '$2');
+            x1 = x1.replace(rgx, '$1' + ',' + '$2');
         }
         return x1 + x2;
-      }
+    }
 
     exportPDF() {
         const addFooters = doc => {

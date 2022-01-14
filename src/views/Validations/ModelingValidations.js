@@ -577,21 +577,22 @@ class ModelingValidation extends Component {
             var treeListFiltered = this.state.treeListFiltered;
             var flatDataForLevel = treeListFiltered.tree.flatList.filter(c => c.level == levelId);
             var flatData = flatDataForLevel[0];
-            levelUnit = getLabelText(flatData.payload.nodeUnit.label, this.state.lang)
+            var nodeUnit = this.state.unitList.filter(c => c.unitId == flatData.payload.nodeUnit.id);
+            levelUnit = nodeUnit.length > 0 ? getLabelText(nodeUnit[0].label, this.state.lang) : ""
             var nodeList = [];
             var nodeVal = [];
             var nodeIdArr = [];
             var nodeLabelArr = [];
             for (var fdfl = 0; fdfl < flatDataForLevel.length; fdfl++) {
                 nodeList.push({
-                    value: flatDataForLevel[fdfl].payload.nodeId,
+                    value: flatDataForLevel[fdfl].id,
                     label: getLabelText(flatDataForLevel[fdfl].payload.label, this.state.lang)
                 })
                 nodeVal.push({
-                    value: flatDataForLevel[fdfl].payload.nodeId,
+                    value: flatDataForLevel[fdfl].id,
                     label: getLabelText(flatDataForLevel[fdfl].payload.label, this.state.lang)
                 })
-                nodeIdArr.push(flatDataForLevel[fdfl].payload.nodeId)
+                nodeIdArr.push(flatDataForLevel[fdfl].id)
                 nodeLabelArr.push(getLabelText(flatDataForLevel[fdfl].payload.label, this.state.lang))
             }
             this.setState({
@@ -729,48 +730,59 @@ class ModelingValidation extends Component {
             getRequest.onerror = function (event) {
             }.bind(this);
             getRequest.onsuccess = function (event) {
-                var myResult = [];
-                myResult = getRequest.result;
-                var datasetList = this.state.datasetList;
-                for (var mr = 0; mr < myResult.length; mr++) {
-                    var index = datasetList.findIndex(c => c.id == myResult[mr].programId);
-                    if (index == -1) {
-                        var programNameBytes = CryptoJS.AES.decrypt(myResult[mr].programName, SECRET_KEY);
-                        var programNameLabel = programNameBytes.toString(CryptoJS.enc.Utf8);
-                        var programNameJson = JSON.parse(programNameLabel)
-                        var json = {
-                            id: myResult[mr].programId,
-                            name: getLabelText(programNameJson, this.state.lang),
-                            versionList: [{ versionId: myResult[mr].version + "  (Local)" }]
+
+
+                var unitTransaction = db1.transaction(['unit'], 'readwrite');
+                var unitOs = unitTransaction.objectStore('unit');
+                var unitRequest = unitOs.getAll();
+                unitRequest.onerror = function (event) {
+                }.bind(this);
+                unitRequest.onsuccess = function (event) {
+                    var unitList = unitRequest.result;
+                    var myResult = [];
+                    myResult = getRequest.result;
+                    var datasetList = this.state.datasetList;
+                    for (var mr = 0; mr < myResult.length; mr++) {
+                        var index = datasetList.findIndex(c => c.id == myResult[mr].programId);
+                        if (index == -1) {
+                            var programNameBytes = CryptoJS.AES.decrypt(myResult[mr].programName, SECRET_KEY);
+                            var programNameLabel = programNameBytes.toString(CryptoJS.enc.Utf8);
+                            var programNameJson = JSON.parse(programNameLabel)
+                            var json = {
+                                id: myResult[mr].programId,
+                                name: getLabelText(programNameJson, this.state.lang),
+                                versionList: [{ versionId: myResult[mr].version + "  (Local)" }]
+                            }
+                            datasetList.push(json)
+                        } else {
+                            var existingVersionList = datasetList[index].versionList;
+                            existingVersionList.push({ versionId: myResult[mr].version + "  (Local)" })
+                            datasetList[index].versionList = existingVersionList
                         }
-                        datasetList.push(json)
-                    } else {
-                        var existingVersionList = datasetList[index].versionList;
-                        existingVersionList.push({ versionId: myResult[mr].version + "  (Local)" })
-                        datasetList[index].versionList = existingVersionList
                     }
-                }
-                var datasetId = "";
-                var event = {
-                    target: {
-                        value: ""
+                    var datasetId = "";
+                    var event = {
+                        target: {
+                            value: ""
+                        }
+                    };
+                    if (datasetList.length == 1) {
+                        datasetId = datasetList[0].id;
+                        event.target.value = datasetList[0].id;
+                    } else if (localStorage.getItem("sesLiveDatasetId") != "" && datasetList.filter(c => c.id == localStorage.getItem("sesLiveDatasetId")).length > 0) {
+                        datasetId = localStorage.getItem("sesLiveDatasetId");
+                        event.target.value = localStorage.getItem("sesLiveDatasetId");
                     }
-                };
-                if (datasetList.length == 1) {
-                    datasetId = datasetList[0].id;
-                    event.target.value = datasetList[0].id;
-                } else if (localStorage.getItem("sesLiveDatasetId") != "" && datasetList.filter(c => c.id == localStorage.getItem("sesLiveDatasetId")).length > 0) {
-                    datasetId = localStorage.getItem("sesLiveDatasetId");
-                    event.target.value = localStorage.getItem("sesLiveDatasetId");
-                }
-                this.setState({
-                    datasetList: datasetList,
-                    loading: false
-                }, () => {
-                    if (datasetId != "") {
-                        this.setDatasetId(event);
-                    }
-                })
+                    this.setState({
+                        datasetList: datasetList,
+                        unitList: unitList,
+                        loading: false
+                    }, () => {
+                        if (datasetId != "") {
+                            this.setDatasetId(event);
+                        }
+                    })
+                }.bind(this)
             }.bind(this)
         }.bind(this)
     }
