@@ -53,7 +53,7 @@ class ForecastOutput extends Component {
             maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
             loading: false,
             programId: '',
-            versionId: '',
+            versionId: -1,
             viewById: 1,
             monthArrayList: [],
             yaxisEquUnit: -1,
@@ -474,6 +474,195 @@ class ForecastOutput extends Component {
 
 
     exportPDF = () => {
+        const addFooters = doc => {
+
+            const pageCount = doc.internal.getNumberOfPages()
+
+            doc.setFont('helvetica', 'bold')
+            doc.setFontSize(6)
+            for (var i = 1; i <= pageCount; i++) {
+                doc.setPage(i)
+
+                doc.setPage(i)
+                doc.text('Page ' + String(i) + ' of ' + String(pageCount), doc.internal.pageSize.width / 9, doc.internal.pageSize.height - 30, {
+                    align: 'center'
+                })
+                doc.text('Copyright © 2020 ' + i18n.t('static.footer'), doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
+                    align: 'center'
+                })
+
+            }
+        }
+
+        const addHeaders = doc => {
+
+            const pageCount = doc.internal.getNumberOfPages()
+            for (var i = 1; i <= pageCount; i++) {
+                doc.setFontSize(12)
+                doc.setFont('helvetica', 'bold')
+                doc.setPage(i)
+                doc.addImage(LOGO, 'png', 0, 10, 180, 50, 'FAST');
+                doc.setTextColor("#002f6c");
+                doc.text('Monthly Forecast', doc.internal.pageSize.width / 2, 60, {
+                    align: 'center'
+                })
+                if (i == 1) {
+                    doc.setFont('helvetica', 'normal')
+                    doc.setFontSize(8)
+                    doc.text(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
+                        align: 'left'
+                    })
+                    doc.text(i18n.t('static.report.version*') + ' : ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130, {
+                        align: 'left'
+                    })
+                    doc.text('Forecast Period' + ' : ' + document.getElementById("forecastPeriod").value, doc.internal.pageSize.width / 8, 150, {
+                        align: 'left'
+                    })
+                    doc.text(i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to), doc.internal.pageSize.width / 8, 170, {
+                        align: 'left'
+                    })
+                    doc.text('Y axis in equivalency unit' + ' : ' + document.getElementById("yaxisEquUnit").selectedOptions[0].text, doc.internal.pageSize.width / 8, 190, {
+                        align: 'left'
+                    })
+                    doc.text(i18n.t('static.common.display') + ' : ' + document.getElementById("viewById").selectedOptions[0].text, doc.internal.pageSize.width / 8, 210, {
+                        align: 'left'
+                    })
+                    if (document.getElementById("viewById").value == 1) {
+                        var planningText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
+                        doc.text(doc.internal.pageSize.width / 8, 230, planningText)
+                    } else {
+                        var planningText = doc.splitTextToSize((i18n.t('static.product.unit1') + ' : ' + this.state.forecastingUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
+                        doc.text(doc.internal.pageSize.width / 8, 230, planningText)
+                    }
+                    doc.text('X-axis Aggregate By Year' + ' : ' + document.getElementById("xaxis").selectedOptions[0].text, doc.internal.pageSize.width / 8, 250, {
+                        align: 'left'
+                    })
+
+                }
+
+            }
+        }
+
+        const unit = "pt";
+        const size = "A4"; // Use A1, A2, A3 or A4
+        const orientation = "landscape"; // portrait or landscape
+
+        const marginLeft = 10;
+        const doc = new jsPDF(orientation, unit, size);
+
+        doc.setFontSize(8);
+        var canvas = document.getElementById("cool-canvas");
+
+        //creates image
+
+        var canvasImg = canvas.toDataURL("image/png", 1.0);
+        var width = doc.internal.pageSize.width;
+        var height = doc.internal.pageSize.height;
+        var h1 = 100;
+        var aspectwidth1 = (width - h1);
+
+        doc.addImage(canvasImg, 'png', 50, 280, 750, 260, 'CANVAS');
+
+        const headers = [];
+
+        (this.state.viewById == 1 ? headers.push('Planning Unit') : headers.push('Forecasting Unit'));
+        headers.push('Forecast');
+        {
+            this.state.xaxis == 2 && this.state.monthArrayList.map(item => (
+                headers.push(moment(item).format(DATE_FORMAT_CAP_WITHOUT_DATE))
+            ))
+        }
+        {
+            this.state.xaxis == 1 && this.state.monthArrayList.map(item => (
+                headers.push(moment(item).format("YYYY"))
+            ))
+        }
+
+        var header = [headers]
+        var A = [];
+        let data = []
+        this.state.xaxis == 2 && this.state.consumptionData.map(ele => {
+            let propertyName = this.state.monthArrayList.map(item1 => (
+                ele.consumptionList.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(item1).format("YYYY-MM")).length > 0 ? (ele.consumptionList.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(item1).format("YYYY-MM"))[0].consumptionQty) : ''
+            ));
+            A = [];
+            A.push(
+                ((getLabelText(ele.objUnit.label, this.state.lang))),
+                ((ele.scenario.label))
+            )
+
+            A = A.concat(propertyName)
+            data.push(A);
+            return A
+        }
+        );
+        console.log("Test---------->", A);
+        // data = [A];
+
+
+        if (this.state.yaxisEquUnit > 0 && this.state.xaxis == 2) {
+            A = [];
+            let propertyName = this.state.monthArrayList.map(item1 => (
+                this.state.calculateEquivalencyUnitTotal.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(item1).format("YYYY-MM")).length > 0 ? this.state.calculateEquivalencyUnitTotal.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(item1).format("YYYY-MM"))[0].consumptionQty : ''
+            ));
+            A.push(
+                (("Total " + this.state.equivalencyUnitLabel)),
+                ''
+            );
+            A = A.concat(propertyName);
+            data.push(A);
+        }
+
+
+
+
+        this.state.xaxis == 1 && this.state.consumptionData.map(ele => {
+            let propertyName = this.state.monthArrayList.map(item1 => (
+                ele.consumptionList.filter(c => moment(c.consumptionDate).format("YYYY") == moment(item1).format("YYYY")).length > 0 ? ele.consumptionList.filter(c => moment(c.consumptionDate).format("YYYY") == moment(item1).format("YYYY"))[0].consumptionQty : ''
+            ));
+            A = [];
+            A.push(
+                ((getLabelText(ele.objUnit.label, this.state.lang))),
+                ((ele.scenario.label))
+            )
+
+            A = A.concat(propertyName)
+            data.push(A);
+            return A
+        }
+        );
+
+
+        if (this.state.yaxisEquUnit > 0 && this.state.xaxis == 1) {
+            A = [];
+            let propertyName = this.state.monthArrayList.map(item1 => (
+                this.state.calculateEquivalencyUnitTotal.filter(c => moment(c.consumptionDate).format("YYYY") == moment(item1).format("YYYY")).length > 0 ? this.state.calculateEquivalencyUnitTotal.filter(c => moment(c.consumptionDate).format("YYYY") == moment(item1).format("YYYY"))[0].consumptionQty : ''
+            ));
+            A.push(
+                (("Total " + this.state.equivalencyUnitLabel)),
+                ''
+            );
+            A = A.concat(propertyName);
+            data.push(A);
+
+        }
+
+        // let data = [A];
+
+        let content = {
+            margin: { top: 80, bottom: 50 },
+            startY: height,
+            head: header,
+            body: data,
+            styles: { lineWidth: 1, fontSize: 8, halign: 'center' }
+
+        };
+
+        doc.autoTable(content);
+        addHeaders(doc)
+        addFooters(doc)
+        doc.save('Monthly Forecast'.concat('.pdf'));
+
     }
 
     filterData() {
@@ -1343,7 +1532,8 @@ class ForecastOutput extends Component {
 
 
 
-        var versionId = ((event == null || event == '' || event == undefined) ? (this.state.versionId.split('(')[0]) : (event.target.value.split('(')[0]).trim());
+        var versionId = ((event == null || event == '' || event == undefined) ? ((this.state.versionId).toString().split('(')[0]) : (event.target.value.split('(')[0]).trim());
+        versionId = parseInt(versionId);
         // var version = (versionId.split('(')[0]).trim()
         var programId = this.state.programId;
 
