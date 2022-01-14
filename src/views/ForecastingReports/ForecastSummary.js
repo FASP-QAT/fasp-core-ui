@@ -242,9 +242,16 @@ class ForecastSummary extends Component {
         csvRow.push('')
         csvRow.push('"' + ('Display' + ' : ' + document.getElementById("displayId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
         csvRow.push('')
-        csvRow.push('')
 
         let viewById = document.getElementById("displayId").value;
+
+        if (viewById == 1) {//National
+            csvRow.push('"' + ('Hide Calculations' + ' : ' + document.getElementById("calculationId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+            csvRow.push('')
+        }
+
+
+
         if (viewById == 1) {//National----1
             const headers = [];
             headers.push('');
@@ -479,7 +486,169 @@ class ForecastSummary extends Component {
     }
 
 
-    exportPDF = () => {
+    exportPDF = (columns) => {
+        const addFooters = doc => {
+
+            const pageCount = doc.internal.getNumberOfPages()
+
+            doc.setFont('helvetica', 'bold')
+            doc.setFontSize(6)
+            for (var i = 1; i <= pageCount; i++) {
+                doc.setPage(i)
+
+                doc.setPage(i)
+                doc.text('Page ' + String(i) + ' of ' + String(pageCount), doc.internal.pageSize.width / 9, doc.internal.pageSize.height - 30, {
+                    align: 'center'
+                })
+                doc.text('Copyright © 2020 ' + i18n.t('static.footer'), doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
+                    align: 'center'
+                })
+
+
+            }
+        }
+        const addHeaders = doc => {
+
+            const pageCount = doc.internal.getNumberOfPages()
+            for (var i = 1; i <= pageCount; i++) {
+                doc.setFontSize(12)
+                doc.setFont('helvetica', 'bold')
+                doc.setPage(i)
+                doc.addImage(LOGO, 'png', 0, 10, 180, 50, 'FAST');
+
+                doc.setTextColor("#002f6c");
+                doc.text('Forecast Summary', doc.internal.pageSize.width / 2, 60, {
+                    align: 'center'
+                })
+                if (i == 1) {
+                    doc.setFontSize(8)
+                    doc.setFont('helvetica', 'normal')
+                    doc.text(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 90, {
+                        align: 'left'
+                    })
+                    doc.text(i18n.t('static.report.version*') + ' : ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
+                        align: 'left'
+                    })
+                    doc.text(i18n.t('static.report.dateRange') + ' : ' + this.state.startYear + ' ~ ' + this.state.endYear, doc.internal.pageSize.width / 8, 130, {
+                        align: 'left'
+                    })
+                    doc.text('Display' + ' : ' + document.getElementById("displayId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 150, {
+                        align: 'left'
+                    })
+
+                    let viewById = document.getElementById("displayId").value;
+                    if (viewById == 1) {//National
+                        doc.text('Hide Calculations' + ' : ' + document.getElementById("calculationId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 170, {
+                            align: 'left'
+                        })
+                    }
+
+                }
+
+            }
+        }
+
+        const unit = "pt";
+        const size = "A4"; // Use A1, A2, A3 or A4
+        const orientation = "landscape"; // portrait or landscape
+
+        const marginLeft = 10;
+        const doc = new jsPDF(orientation, unit, size);
+
+        doc.setFontSize(8);
+
+
+        // const title = i18n.t('static.dashboard.stockstatusmatrix');
+        let viewById = document.getElementById("displayId").value;
+        var tcList = this.state.tracerCategoryList;
+        var puList = this.state.regPlanningUnitList;
+        let regRegionList = this.state.regRegionList;
+        let tsList = this.state.tsList;
+
+        let header = [{ content: i18n.t('static.planningunit.planningunit'), rowSpan: 2, styles: { halign: 'center' } }];
+        let header1 = [];
+        
+        for (var k = 0; k < regRegionList.length; k++) {
+            header1.push({ content: regRegionList[k].label.label_en, colSpan: 3, styles: { halign: 'center' } })
+
+            header.push([
+                { content: 'Selected Forecast', styles: { halign: 'center' } },
+                { content: 'Forecast Quantity', styles: { halign: 'center' } },
+                { content: 'Notes', styles: { halign: 'center' } }]
+            )
+        }
+        header.push([
+            { content: 'Total Forecasted Qunatity', rowSpan: 2, styles: { halign: 'center' } },
+        ]);
+
+        // let data;
+        // data = this.state.data.map(ele => [ele.planningUnit.id, getLabelText(ele.planningUnit.label, this.state.lang), getLabelText(ele.unit.label, this.state.lang), ele.minMonthsOfStock, ele.reorderFrequency, ele.year, ele.jan != null ? isNaN(ele.jan) ? '' : this.formatter(ele.jan) : i18n.t("static.supplyPlanFormula.na"), ele.feb != null ? isNaN(ele.feb) ? '' : this.formatter(ele.feb) : i18n.t("static.supplyPlanFormula.na"), ele.mar != null ? isNaN(ele.mar) ? '' : this.formatter(ele.mar) : i18n.t("static.supplyPlanFormula.na"), ele.apr != null ? isNaN(ele.apr) ? '' : this.formatter(ele.apr) : i18n.t("static.supplyPlanFormula.na"), ele.may != null ? isNaN(ele.may) ? '' : this.formatter(ele.may) : i18n.t("static.supplyPlanFormula.na"), ele.jun != null ? isNaN(ele.jun) ? '' : this.formatter(ele.jun) : i18n.t("static.supplyPlanFormula.na"), ele.jul != null ? isNaN(ele.jul) ? '' : this.formatter(ele.jul) : i18n.t("static.supplyPlanFormula.na"), ele.aug != null ? isNaN(ele.aug) ? '' : this.formatter(ele.aug) : i18n.t("static.supplyPlanFormula.na"), ele.sep != null ? isNaN(ele.sep) ? '' : this.formatter(ele.sep) : i18n.t("static.supplyPlanFormula.na"), ele.oct != null ? isNaN(ele.oct) ? '' : this.formatter(ele.oct) : i18n.t("static.supplyPlanFormula.na"), ele.nov != null ? isNaN(ele.nov) ? '' : this.formatter(ele.nov) : i18n.t("static.supplyPlanFormula.na"), ele.dec != null ? isNaN(ele.dec) ? '' : this.formatter(ele.dec) : i18n.t("static.supplyPlanFormula.na")]);
+
+        let data = [];
+
+        for (var tc = 0; tc < tcList.length; tc++) {
+            let tempData1 = [];
+            tempData1.push(puList.filter(c => c.planningUnit.forecastingUnit.tracerCategory.id == tcList[tc])[0].planningUnit.forecastingUnit.tracerCategory.label.label_en);
+            data.push(tempData1);
+            tempData1 = [];
+
+            var puListFiltered = puList.filter(c => c.planningUnit.forecastingUnit.tracerCategory.id == tcList[tc]);
+            for (var j = 0; j < puListFiltered.length; j++) {
+                let regionArray = [];
+                var total = 0;
+
+
+                for (var k = 0; k < regRegionList.length; k++) {
+                    var filterForecastSelected = puListFiltered[j].selectedForecastMap[regRegionList[k].regionId]
+                    // console.log("Array--------->2", filterForecastSelected);
+                    total += Number(filterForecastSelected != undefined ? filterForecastSelected.totalForecast : 0);
+
+                    // (tsList.filter(c => c.id == )[0].label)
+                    let nameTC = '';
+                    try {
+                        let idTC = (((filterForecastSelected != undefined) ? (filterForecastSelected.scenarioId > 0) ? "T" + filterForecastSelected.scenarioId : (filterForecastSelected.consumptionExtrapolationId > 0) ? "C" + filterForecastSelected.consumptionExtrapolationId : "" : ""));
+                        nameTC = (tsList.filter(c => c.id == idTC)[0].name);
+
+                    }
+                    catch (err) {
+                        // document.getElementById("demo").innerHTML = err.message;
+                    }
+
+                    // regionArray.push((((filterForecastSelected != undefined) ? (filterForecastSelected.scenarioId > 0) ? treeVar : (filterForecastSelected.consumptionExtrapolationId > 0) ? consumptionVar : "" : "")));
+                    regionArray.push(((nameTC)));
+                    regionArray.push((filterForecastSelected != undefined ? (filterForecastSelected.totalForecast == null ? "" : filterForecastSelected.totalForecast) : ""));
+                    regionArray.push((filterForecastSelected != undefined ? (filterForecastSelected.notes == null ? "" : ((filterForecastSelected.notes))) : ""));
+                }
+                // console.log("Array--------->", regionArray);
+                tempData1.push(puListFiltered[j].planningUnit.label.label_en);
+                tempData1 = tempData1.concat(regionArray);
+                tempData1.push(total);
+                data.push(tempData1);
+                // A.push(this.addDoubleQuoteToRowContent([((puListFiltered[j].planningUnit.label.label_en).replaceAll(',', ' ')).replaceAll(' ', '%20')].concat(regionArray).concat([total])));
+                // console.log("Array--------->2", [((puListFiltered[j].planningUnit.label.label_en).replaceAll(',', ' ')).replaceAll(' ', '%20')].concat(regionArray).concat([total]));
+            }
+        }
+
+
+
+
+        var startY = 230 + (this.state.planningUnitValues.length * 3)
+        let content = {
+            margin: { top: 80, bottom: 90 },
+            startY: startY,
+            head: header,
+            body: data,
+            styles: { lineWidth: 1, fontSize: 8, cellWidth: 38, halign: 'center' },
+            columnStyles: {
+                1: { cellWidth: 99.89 },
+                2: { cellWidth: 54 },
+            }
+        };
+
+        doc.autoTable(content);
+        addHeaders(doc)
+        addFooters(doc)
+        doc.save('Forecast Summary' + ".pdf")
     }
 
     filterData() {
@@ -1735,7 +1904,7 @@ class ForecastSummary extends Component {
                                                     </InputGroup>
                                                 </div>
                                             </FormGroup>
-                                            <FormGroup className="col-md-3" id="hideCurrencyDiv">
+                                            <FormGroup className="col-md-3" id="hideCurrencyDiv" style={{ display: 'none' }}>
                                                 <Label htmlFor="appendedInputButton">Currency</Label>
                                                 <div className="controls ">
                                                     <InputGroup>
