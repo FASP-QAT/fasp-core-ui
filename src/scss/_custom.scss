@@ -5515,6 +5515,7 @@ border: 1px solid #eee;
      cursor: col-resize;
      font-size: 14px;
    }
+  
 .DropdownScenario{
   position: absolute;
   z-index: 10;
@@ -5655,7 +5656,15 @@ font-style: italic!important;
 @media print {
   thead {display: table-row-group;}
 }
-
+.FontWeightNormal{
+  font-weight: normal;
+}
+.ToltipInfoicon{
+  color: #002f6c;
+}
+.SelectFeildWidth{
+  width:200px;
+}
 .ShowGuidanceIcon{
   -webkit-text-stroke: 1px #fff;
   font-size:31px;
@@ -5693,4 +5702,61 @@ font-style: italic!important;
 }
 .MorginTopMonth{
   margin-top: 31px;
+}
+.ForecastSummaryTable .jexcel > thead{
+  position: sticky;
+  top: 0;
+ }
+ .ForecastSumarydWidth {
+  overflow: hidden !important;
+  min-width: 200px !important;
+  word-wrap: break-word !important;
+  z-index: 100;
+  position: sticky;
+  /* border: none !important; */
+  // z-index: 1;
+}
+.table-scroll1{
+  border-spacing: 0;
+  border-collapse: inherit;
+}
+.table-scroll1 table {
+  width: 100%;
+  margin: auto;
+  white-space: inherit;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+.table-bordered1 {
+  border: none!important;
+}
+.table-scroll1 .table-bordered thead th, .table-bordered thead td {
+   border-bottom-width: 0px!important;
+}
+
+.table-scroll1 .table thead th {
+   border-bottom: 0px solid #c8ced3!important;
+}
+.Firstcolum{
+  position: sticky;
+    left: 0;
+    z-index: 999;
+}
+.Secondcolum{
+  position: sticky;
+  left: 61px;
+  z-index: 999;
+}
+.Thirdcolum{
+  position: sticky;
+  left: 261px;
+  z-index: 999;
+}
+.MonthlyForecastdWidth {
+  overflow: hidden !important;
+  min-width: 167px !important;
+  word-wrap: break-word !important;
+  z-index: 100;
+  position: sticky;
+  /* border: none !important; */
 }
