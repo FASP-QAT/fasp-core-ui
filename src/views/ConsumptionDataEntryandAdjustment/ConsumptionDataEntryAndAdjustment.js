@@ -21,7 +21,7 @@ import NumberFormat from 'react-number-format';
 import { CustomTooltips } from "@coreui/coreui-plugin-chartjs-custom-tooltips";
 import { Prompt } from "react-router-dom";
 
-const entityname = i18n.t('static.consumption.consumptionDataEntryandAdjustment');
+const entityname = i18n.t('static.dashboard.dataEntryAndAdjustment');
 
 export default class ConsumptionDataEntryandAdjustment extends React.Component {
 
@@ -132,8 +132,8 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         let dataArray = [];
         let data = [];
         let columns = [];
-        columns.push({ title: 'Month', type: 'text', width: 200 })
-        data[0] = "Days in Month";
+        columns.push({ title: i18n.t('static.inventoryDate.inventoryReport'), type: 'text', width: 200 })
+        data[0] = i18n.t('static.program.noOfDaysInMonth');
         for (var j = 0; j < monthArray.length; j++) {
           data[j + 1] = monthArray[j].noOfDays;
           columns.push({ title: moment(monthArray[j].date).format(DATE_FORMAT_CAP_WITHOUT_DATE), type: 'numeric', textEditor: false, mask: '#,##.00', decimal: '.', disabledMaskOnEdition: true, width: 100 })
@@ -152,7 +152,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
 
           dataArray.push(data);
           data = [];
-          data[0] = "Actual Consumption"
+          data[0] = i18n.t('static.supplyPlan.actualConsumption')
           for (var j = 0; j < monthArray.length; j++) {
             var consumptionData = consumptionList.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArray[j].date).format("YYYY-MM") && c.region.id == regionList[r].regionId);
             data[j + 1] = consumptionData.length > 0 ? consumptionData[0].amount : "";
@@ -161,7 +161,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           dataArray.push(data);
 
           data = [];
-          data[0] = "Reporting Rate"
+          data[0] = i18n.t('static.dataentry.reportingRate')
           for (var j = 0; j < monthArray.length; j++) {
             var consumptionData = consumptionList.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArray[j].date).format("YYYY-MM") && c.region.id == regionList[r].regionId);
             data[j + 1] = consumptionData.length > 0 && consumptionData[0].reportingRate > 0 ? consumptionData[0].reportingRate : 100;
@@ -170,7 +170,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           dataArray.push(data);
 
           data = [];
-          data[0] = "Stockout Rate (days)"
+          data[0] = i18n.t('static.dataentry.stockedOut')
           for (var j = 0; j < monthArray.length; j++) {
             var consumptionData = consumptionList.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArray[j].date).format("YYYY-MM") && c.region.id == regionList[r].regionId);
             data[j + 1] = consumptionData.length > 0 && consumptionData[0].daysOfStockOut > 0 ? consumptionData[0].daysOfStockOut : 0;
@@ -179,7 +179,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           dataArray.push(data);
 
           data = [];
-          data[0] = "Stockout Rate (%)"
+          data[0] = i18n.t('static.dataentry.stockedOutPer')
           for (var j = 0; j < monthArray.length; j++) {
             data[j + 1] = `=ROUND(${colArr[j + 1]}${parseInt(dataArray.length)}/${colArr[j + 1] + "1"}*100,0)`;
           }
@@ -187,7 +187,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           dataArray.push(data);
 
           data = [];
-          data[0] = "Adjusted Consumption"
+          data[0] = i18n.t('static.dataentry.adjustedConsumption')
           for (var j = 0; j < monthArray.length; j++) {
             data[j + 1] = `=ROUND((${colArr[j + 1]}${parseInt(dataArray.length - 3)}/${colArr[j + 1]}${parseInt(dataArray.length - 2)}/(1-(${colArr[j + 1]}${parseInt(dataArray.length - 1)}/${colArr[j + 1] + "1"})))*100,0)`;
           }
@@ -195,7 +195,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           dataArray.push(data);
 
           data = [];
-          data[0] = "Converted to Planning Unit"
+          data[0] = i18n.t('static.dataentry.convertedToPlanningUnit')
           for (var j = 0; j < monthArray.length; j++) {
             // data[j + 1] = `=ROUND(${colArr[j + 1]}${parseInt(dataArray.length)}/${colArr[monthArray.length + 1] + "0"},0)`;
             data[j + 1] = `=ROUND(${colArr[j + 1]}${parseInt(dataArray.length)}/${multiplier},0)`;
@@ -380,26 +380,26 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           colHeaderClasses: ["Reqasterisk"],
           columns: [
             {
-              title: 'Default',
+              title: i18n.t('static.realm.default'),
               type: 'radio'
             },
             {
-              title: "Data Type",
+              title: i18n.t('static.dataentry.dataType'),
               type: 'dropdown',
-              source: [{ id: 1, name: "Forecasting Unit" }, { id: 2, name: "Planning Unit" }, { id: 3, name: "Other" }],
+              source: [{ id: 1, name: i18n.t('static.product.unit1') }, { id: 2, name: i18n.t('static.product.product') }, { id: 3, name: i18n.t('static.dataentry.other') }],
             },
             {
-              title: "Product",
+              title: i18n.t('static.dashboard.Productmenu'),
               type: 'text',
               // source: mixedList,
               // filter: this.filterList
             },
             {
-              title: "Multiplier",
+              title: i18n.t('static.importFromQATSupplyPlan.multiplier'),
               type: 'numeric'
             },
             {
-              title: "Multiplier",
+              title: i18n.t('static.importFromQATSupplyPlan.multiplier'),
               type: 'hidden'
             }
           ],
@@ -627,7 +627,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
             dataEl: "",
             showDetailTable: false,
             loading: false,
-            message: "Data saved successfully",
+            message: i18n.t('static.compareAndSelect.dataSaved'),
             consumptionChanged: false
           }, () => {
             this.getDatasetData();
@@ -1214,7 +1214,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                     <FormGroup className="tab-ml-0 mb-md-3 ml-3">
                       <Col md="12" >
                         <Input className="form-check-input" type="checkbox" id="checkbox1" name="checkbox1" value={this.state.showInPlanningUnit} onChange={(e) => this.setShowInPlanningUnits(e)} />
-                        <Label check className="form-check-label" htmlFor="checkbox1">Show everything in planning units</Label>
+                        <Label check className="form-check-label" htmlFor="checkbox1">{i18n.t('static.dataentry.showInPlanningUnits')}</Label>
                       </Col>
                     </FormGroup>
                   </div>
@@ -1229,12 +1229,12 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                           <thead>
                             <tr>
                               <th className="BorderNoneSupplyPlan sticky-col first-col clone1"></th>
-                              <th className="dataentryTdWidth sticky-col first-col clone">Product</th>
+                              <th className="dataentryTdWidth sticky-col first-col clone">{i18n.t('static.dashboard.Productmenu')}</th>
                               {this.state.monthArray.map((item, count) => {
                                 return (<th>{moment(item.date).format(DATE_FORMAT_CAP_WITHOUT_DATE)}</th>)
                               })}
-                              <th>Total</th>
-                              <th>Regional%</th>
+                              <th>{i18n.t('static.supplyPlan.total')}</th>
+                              <th>{i18n.t('static.dataentry.regionalPer')}</th>
                             </tr>
                           </thead>
                           <tbody>
@@ -1308,7 +1308,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                             </div>
                           </FormGroup></>}
                       <FormGroup className="col-md-6" style={{ display: this.state.showDetailTable ? 'block' : 'none' }}>
-                        <Label htmlFor="appendedInputButton">Consumption Notes</Label>
+                        <Label htmlFor="appendedInputButton">{i18n.t('static.dataentry.consumptionNotes')}</Label>
                         <div className="controls ">
                           <InputGroup>
                             <Input
@@ -1390,7 +1390,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           <CardFooter>
             <FormGroup>
               <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-              {this.state.consumptionChanged && <><Button type="button" id="formSubmitButton" size="md" color="success" className="float-right mr-1" onClick={() => this.saveConsumptionList()}><i className="fa fa-check"></i>Save</Button>&nbsp;</>}
+              {this.state.consumptionChanged && <><Button type="button" id="formSubmitButton" size="md" color="success" className="float-right mr-1" onClick={() => this.saveConsumptionList()}><i className="fa fa-check"></i>{i18n.t('static.pipeline.save')}</Button>&nbsp;</>}
               {this.state.showSmallTable && <> <Button type="button" id="dataCheck" size="md" color="info" className="float-right mr-1" onClick={() => this.openDataCheckModel()}><i className="fa fa-check"></i>{i18n.t('static.common.dataCheck')}</Button></>}
               &nbsp;
             </FormGroup>
