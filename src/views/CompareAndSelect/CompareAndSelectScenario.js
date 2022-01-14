@@ -182,7 +182,7 @@ class CompareAndSelectScenario extends Component {
             var count = 0;
             var consumptionExtrapolation = datasetJson.consumptionExtrapolation.filter(c => c.planningUnit.id == this.state.planningUnitId);
             for (var ce = 0; ce < consumptionExtrapolation.length; ce++) {
-                if (colourArrayCount > 9) {
+                if (colourArrayCount > 8) {
                     colourArrayCount = 0;
                 }
                 treeScenarioList.push({ id: consumptionExtrapolation[ce].consumptionExtrapolationId, tree: consumptionExtrapolation[ce], scenario: consumptionExtrapolation[ce], checked: true, color: colourArray[colourArrayCount], type: "C", data: consumptionExtrapolation[ce].extrapolationDataList, readonly: false });

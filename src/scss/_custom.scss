@@ -5694,3 +5694,15 @@ font-style: italic!important;
 .MorginTopMonth{
   margin-top: 31px;
 }
+
+.regionBold{
+  font-weight: bold;
+}
+
+.dataentryTable .jexcel>tbody>tr>td:nth-child(3) {
+  text-align: left!important;
+}
+
+.dataentryTable .jexcel>tbody>tr>td:nth-child(4) {
+  text-align: left!important;
+}
