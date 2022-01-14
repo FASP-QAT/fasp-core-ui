@@ -1372,8 +1372,16 @@ class ForecastOutput extends Component {
 
             let forecastStopDate = new Date((month[d1.getMonth()] + '-' + d1.getFullYear()));
             forecastStopDate.setMonth(forecastStopDate.getMonth() - 1);
+
+            let forecastStartDateNew = selectedForecastProgram.currentVersion.forecastStartDate;
+            let forecastStopDateNew = selectedForecastProgram.currentVersion.forecastStopDate;
+
+            let beforeEndDateDisplay = new Date(selectedForecastProgram.forecastStartDate);
+            beforeEndDateDisplay.setMonth(beforeEndDateDisplay.getMonth() - 1);
+
             this.setState({
-                forecastPeriod: (month[new Date((month[d1.getMonth()] + '-' + d1.getFullYear())).getMonth()]) + ' ' + (startDateSplit[1] - 3) + ' ~ ' + month[forecastStopDate.getMonth()] + ' ' + forecastStopDate.getFullYear(),
+                // forecastPeriod: (month[new Date((month[d1.getMonth()] + '-' + d1.getFullYear())).getMonth()]) + ' ' + (startDateSplit[1] - 3) + ' ~ ' + month[forecastStopDate.getMonth()] + ' ' + forecastStopDate.getFullYear(),
+                forecastPeriod: month[new Date(forecastStartDateNew).getMonth()] + ' ' + new Date(forecastStartDateNew).getFullYear() + ' ~ ' + month[new Date(forecastStartDateNew).getMonth()] + ' ' + new Date(forecastStopDateNew).getFullYear(),
             }, () => {
 
             })
@@ -1650,7 +1658,7 @@ class ForecastOutput extends Component {
 
     getIndexAsKey = (d) => { return d.key };
 
-    
+
     toggleEu() {
         this.setState({
             popoverOpen: !this.state.popoverOpen,
@@ -1971,11 +1979,11 @@ class ForecastOutput extends Component {
                             <a className="pr-lg-0 pt-lg-1 float-right">
                                 <span style={{ cursor: 'pointer' }} onClick={() => { this.continueToForecastSummary() }}><i className="fa fa-long-arrow-right" style={{ color: '#20a8d8', fontSize: '13px' }}></i> <small className="supplyplanformulas">{'Continue To Forecast Summary'}</small></span>
                             </a>
-                            
+
                         </div>
                     </div>
                     <div className='col-md-12 pt-lg-2 pb-lg-3'>
-                    <span className="pr-lg-0 pt-lg-1">This report aggregates regional forecasts. For disaggregated regional forecasts, export CSV.</span>
+                        <span className="pr-lg-0 pt-lg-1">This report aggregates regional forecasts. For disaggregated regional forecasts, export CSV.</span>
                     </div>
                     {/* <div className="Card-header-reporticon ">
                         <div className="card-header-actions">
@@ -2092,10 +2100,10 @@ class ForecastOutput extends Component {
                                                 </div>
                                             </FormGroup>
                                             <div>
-                                            <Popover placement="top" isOpen={this.state.popoverOpen} target="Popover1" trigger="hover" toggle={this.toggleEu}>
-                                                <PopoverBody>Need to add Info.</PopoverBody>
-                                            </Popover>
-                                        </div>
+                                                <Popover placement="top" isOpen={this.state.popoverOpen} target="Popover1" trigger="hover" toggle={this.toggleEu}>
+                                                    <PopoverBody>Need to add Info.</PopoverBody>
+                                                </Popover>
+                                            </div>
 
                                             {/* <FormGroup className="col-md-3">
                                                 <Label htmlFor="appendedInputButton">Y axis in equivalency unit</Label>
@@ -2157,9 +2165,9 @@ class ForecastOutput extends Component {
                                                 </div>
                                             </FormGroup>
                                             <div>
-                                            <Popover placement="top" isOpen={this.state.popoverOpen1} target="Popover2" trigger="hover" toggle={this.toggleRv}>
-                                                <PopoverBody>Need to add Info.</PopoverBody>
-                                            </Popover>
+                                                <Popover placement="top" isOpen={this.state.popoverOpen1} target="Popover2" trigger="hover" toggle={this.toggleRv}>
+                                                    <PopoverBody>Need to add Info.</PopoverBody>
+                                                </Popover>
                                             </div>
                                             <FormGroup className="col-md-3" id="forecastingUnitDiv">
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.product.unit1')}</Label>

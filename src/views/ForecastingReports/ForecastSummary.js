@@ -1228,12 +1228,24 @@ class ForecastSummary extends Component {
             let forecastStopDate1 = new Date((month[d1.getMonth()] + '-' + d1.getFullYear()));
             forecastStopDate1.setMonth(forecastStopDate1.getMonth() - 1);
             console.log("Test-----------------111", startDateSplit);
+
+            let forecastStartDateNew = selectedForecastProgram.forecastStartDate;
+            let forecastStopDateNew = selectedForecastProgram.forecastStopDate;
+
+            let beforeEndDateDisplay = new Date(selectedForecastProgram.forecastStartDate);
+            beforeEndDateDisplay.setMonth(beforeEndDateDisplay.getMonth() - 1);
+
             this.setState({
-                forecastPeriod: (month[new Date((month[d1.getMonth()] + '-' + d1.getFullYear())).getMonth()]) + ' ' + (startDateSplit1[1] - 3) + ' ~ ' + month[forecastStopDate1.getMonth()] + ' ' + forecastStopDate1.getFullYear(),
-                rangeValue: { from: { year: startDateSplit[1] - 3, month: new Date(selectedForecastProgram.forecastStartDate).getMonth() + 1 }, to: { year: forecastStopDate.getFullYear(), month: forecastStopDate.getMonth() + 1 } },
-                startDateDisplay: months[new Date(selectedForecastProgram.currentVersion.forecastStartDate).getMonth()] + ' ' + (startDateSplit[1] - 3),
-                endDateDisplay: months[(forecastStopDate.getMonth())] + ' ' + forecastStopDate.getFullYear(),
-                beforeEndDateDisplay: months[(d11.getMonth())] + ' ' + d11.getFullYear(),
+                // forecastPeriod: (month[new Date((month[d1.getMonth()] + '-' + d1.getFullYear())).getMonth()]) + ' ' + (startDateSplit1[1] - 3) + ' ~ ' + month[forecastStopDate1.getMonth()] + ' ' + forecastStopDate1.getFullYear(),
+                // rangeValue: { from: { year: startDateSplit[1] - 3, month: new Date(selectedForecastProgram.forecastStartDate).getMonth() + 1 }, to: { year: forecastStopDate.getFullYear(), month: forecastStopDate.getMonth() + 1 } },
+                // startDateDisplay: months[new Date(selectedForecastProgram.currentVersion.forecastStartDate).getMonth()] + ' ' + (startDateSplit[1] - 3),
+                // endDateDisplay: months[(forecastStopDate.getMonth())] + ' ' + forecastStopDate.getFullYear(),
+                // beforeEndDateDisplay: months[(d11.getMonth())] + ' ' + d11.getFullYear(),
+                forecastPeriod: months[new Date(forecastStartDateNew).getMonth()] + ' ' + new Date(forecastStartDateNew).getFullYear() + ' ~ ' + months[new Date(forecastStartDateNew).getMonth()] + ' ' + new Date(forecastStopDateNew).getFullYear(),
+                rangeValue: { from: { year: new Date(forecastStartDateNew).getFullYear(), month: new Date(forecastStartDateNew).getMonth() + 1 }, to: { year: new Date(forecastStopDateNew).getFullYear(), month: new Date(forecastStopDateNew).getMonth() + 1 } },
+                startDateDisplay: months[new Date(forecastStartDateNew).getMonth()] + ' ' + new Date(forecastStartDateNew).getFullYear(),
+                endDateDisplay: months[new Date(forecastStopDateNew).getMonth()] + ' ' + new Date(forecastStopDateNew).getFullYear(),
+                beforeEndDateDisplay: months[new Date(beforeEndDateDisplay).getMonth()] + ' ' + new Date(beforeEndDateDisplay).getFullYear(),
             }, () => {
 
             })
@@ -1762,208 +1774,208 @@ class ForecastSummary extends Component {
                                             </div> */}
                                             <div className="table-responsive" style={{ display: this.state.loading ? "none" : "block" }}>
                                                 {this.state.summeryData.length > 0 && this.state.displayId == 1 &&
-                                                <div className='table-scroll1'>
-                                                    <Table className="table-bordered table-bordered1 text-center mt-2">
-                                                        {/* <Table className="table-bordered text-center mt-2 overflowhide main-table "> */}
+                                                    <div className='table-scroll1'>
+                                                        <Table className="table-bordered table-bordered1 text-center mt-2">
+                                                            {/* <Table className="table-bordered text-center mt-2 overflowhide main-table "> */}
 
-                                                        <thead>
-                                                            <tr>
-                                                                <th className="BorderNoneSupplyPlan sticky-col first-col clone1"></th>
-                                                                {/* <th className="text-center" style={{}}> Forecasting Unit </th> */}
-                                                                <th className="text-center ForecastSumarydWidth sticky-col first-col clone" style={{width: '19%'}}>Planning Unit</th>
-                                                                <th className="text-center" style={{width: ''}}>Total Forecasted Quantity <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
-                                                                {!this.state.hideColumn &&
+                                                            <thead>
+                                                                <tr>
+                                                                    <th className="BorderNoneSupplyPlan sticky-col first-col clone1"></th>
+                                                                    {/* <th className="text-center" style={{}}> Forecasting Unit </th> */}
+                                                                    <th className="text-center ForecastSumarydWidth sticky-col first-col clone" style={{ width: '19%' }}>Planning Unit</th>
+                                                                    <th className="text-center" style={{ width: '' }}>Total Forecasted Quantity <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
+                                                                    {!this.state.hideColumn &&
+                                                                        <>
+                                                                            <th className="text-center" title="Stock (end of {this.state.beforeEndDateDisplay})" style={{ width: '7%' }}>Stock <span className="FontWeightNormal">(end of {this.state.beforeEndDateDisplay})</span> <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
+                                                                            <th className="text-center" style={{ width: '' }}>Existing Shipments <span className="FontWeightNormal">({this.state.startDateDisplay + ' - ' + this.state.endDateDisplay})</span> <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
+                                                                            <th className="text-center" style={{ width: '8%' }}>Stock <span className="FontWeightNormal">(end of {this.state.endDateDisplay})</span> <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
+                                                                            <th className="text-center" style={{ width: '7%' }}>Desired Months of Stock <span className="FontWeightNormal">(end of {this.state.endDateDisplay})</span> <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
+                                                                            <th className="text-center" style={{ width: '8%' }}>Desired Stock <span className="FontWeightNormal">(end of {this.state.endDateDisplay})</span> <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
+                                                                        </>
+                                                                    }
+                                                                    <th className="text-center" style={{ width: '' }}>Procurement Surplus/Gap <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
+                                                                    {!this.state.hideColumn &&
+                                                                        <>
+                                                                            <th className="text-center" style={{ width: '7%' }}>Price Type <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
+                                                                            <th className="text-center" style={{ width: '7%' }}>Unit Price <span className="FontWeightNormal">(USD)</span> <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
+                                                                        </>
+                                                                    }
+                                                                    <th className="text-center" style={{ width: '' }}>Procurements Needed <span className="FontWeightNormal">(USD)</span> <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
+                                                                    <th className="text-center" style={{ width: '20%' }}>Notes <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
+
+                                                                </tr>
+                                                            </thead>
+
+                                                            <tbody>
+                                                                {this.state.summeryData.map(item1 => (
                                                                     <>
-                                                                        <th className="text-center" title="Stock (end of {this.state.beforeEndDateDisplay})" style={{ width: '7%' }}>Stock <span className="FontWeightNormal">(end of {this.state.beforeEndDateDisplay})</span> <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
-                                                                        <th className="text-center" style={{ width: '' }}>Existing Shipments <span className="FontWeightNormal">({this.state.startDateDisplay + ' - ' + this.state.endDateDisplay})</span> <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
-                                                                        <th className="text-center" style={{ width: '8%' }}>Stock <span className="FontWeightNormal">(end of {this.state.endDateDisplay})</span> <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
-                                                                        <th className="text-center" style={{ width: '7%' }}>Desired Months of Stock <span className="FontWeightNormal">(end of {this.state.endDateDisplay})</span> <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
-                                                                        <th className="text-center" style={{ width: '8%' }}>Desired Stock <span className="FontWeightNormal">(end of {this.state.endDateDisplay})</span> <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
-                                                                    </>
-                                                                }
-                                                                <th className="text-center" style={{ width: '' }}>Procurement Surplus/Gap <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
-                                                                {!this.state.hideColumn &&
-                                                                    <>
-                                                                        <th className="text-center" style={{ width: '7%' }}>Price Type <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
-                                                                        <th className="text-center" style={{ width: '7%' }}>Unit Price <span className="FontWeightNormal">(USD)</span> <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
-                                                                    </>
-                                                                }
-                                                                <th className="text-center" style={{ width: '' }}>Procurements Needed <span className="FontWeightNormal">(USD)</span> <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
-                                                                <th className="text-center" style={{ width: '20%' }}>Notes <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
+                                                                        <tr>
+                                                                            {item1.id == 0 ?
+                                                                                <>
+                                                                                    <td className="BorderNoneSupplyPlan sticky-col first-col clone1">
+                                                                                        {
+                                                                                            item1.display == false ?
+                                                                                                // <><i className="fa fa-plus-square-o supplyPlanIcon" onClick={() => this.checkedChanged(item1.tempTracerCategoryId)} ></i> <>{item1.tracerCategory.label.label_en}</></>
+                                                                                                <><i className="fa fa-plus-square-o supplyPlanIcon" onClick={() => this.checkedChanged(item1.tempTracerCategoryId)} ></i> </>
+                                                                                                :
+                                                                                                // <><i className="fa fa-minus-square-o supplyPlanIcon" onClick={() => this.checkedChanged(item1.tempTracerCategoryId)} ></i> <>{item1.tracerCategory.label.label_en}</></>
+                                                                                                <><i className="fa fa-minus-square-o supplyPlanIcon" onClick={() => this.checkedChanged(item1.tempTracerCategoryId)} ></i> </>
+                                                                                        }
 
-                                                            </tr>
-                                                        </thead>
-
-                                                        <tbody>
-                                                            {this.state.summeryData.map(item1 => (
-                                                                <>
-                                                                    <tr>
-                                                                        {item1.id == 0 ?
-                                                                            <>
-                                                                                <td className="BorderNoneSupplyPlan sticky-col first-col clone1">
-                                                                                    {
-                                                                                        item1.display == false ?
-                                                                                            // <><i className="fa fa-plus-square-o supplyPlanIcon" onClick={() => this.checkedChanged(item1.tempTracerCategoryId)} ></i> <>{item1.tracerCategory.label.label_en}</></>
-                                                                                            <><i className="fa fa-plus-square-o supplyPlanIcon" onClick={() => this.checkedChanged(item1.tempTracerCategoryId)} ></i> </>
-                                                                                            :
-                                                                                            // <><i className="fa fa-minus-square-o supplyPlanIcon" onClick={() => this.checkedChanged(item1.tempTracerCategoryId)} ></i> <>{item1.tracerCategory.label.label_en}</></>
-                                                                                            <><i className="fa fa-minus-square-o supplyPlanIcon" onClick={() => this.checkedChanged(item1.tempTracerCategoryId)} ></i> </>
+                                                                                    </td>
+                                                                                    {/* <td></td> */}
+                                                                                    <td className='text-left sticky-col first-col clone'><b>{item1.tracerCategory.label.label_en}</b></td>
+                                                                                    <td></td>
+                                                                                    {!this.state.hideColumn &&
+                                                                                        <>
+                                                                                            <td></td>
+                                                                                            <td></td>
+                                                                                            <td></td>
+                                                                                            <td></td>
+                                                                                            <td></td>
+                                                                                        </>
                                                                                     }
+                                                                                    <td></td>
+                                                                                    {!this.state.hideColumn &&
+                                                                                        <>
+                                                                                            <td></td>
+                                                                                            <td></td>
+                                                                                        </>
+                                                                                    }
+                                                                                    <td></td>
+                                                                                    <td></td>
+                                                                                </>
+                                                                                :
+                                                                                <>
+                                                                                    {item1.display == true &&
+                                                                                        <>
+                                                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
+                                                                                            {/* <td>{item1.forecastingUnit.label.label_en}</td> */}
+                                                                                            <td className='text-left  sticky-col first-col clone'>{item1.planningUnit.label.label_en}</td>
+                                                                                            <td>{item1.totalForecastedQuantity}</td>
+                                                                                            {!this.state.hideColumn &&
+                                                                                                <>
+                                                                                                    <td>{item1.stock1}</td>
+                                                                                                    <td>{item1.existingShipments}</td>
+                                                                                                    <td>{item1.stock2}</td>
+                                                                                                    <td>{item1.desiredMonthOfStock1}</td>
+                                                                                                    <td>{item1.desiredMonthOfStock2}</td>
+                                                                                                </>
+                                                                                            }
+                                                                                            {item1.isProcurementGapRed == true ? <td className="red">{item1.procurementGap}</td> : <td>{item1.procurementGap}</td>}
+                                                                                            {!this.state.hideColumn &&
+                                                                                                <>
+                                                                                                    {item1.isPriceTypeRed == true ? <td className="red">{item1.priceType}</td> : <td>{item1.priceType}</td>}
+                                                                                                    <td>{item1.unitPrice}</td>
+                                                                                                </>
+                                                                                            }
+                                                                                            <td>{item1.procurementNeeded}</td>
+                                                                                            <td>{item1.notes}</td>
+                                                                                        </>
+                                                                                    }
+                                                                                </>
+                                                                            }
 
-                                                                                </td>
-                                                                                {/* <td></td> */}
-                                                                                <td className='text-left sticky-col first-col clone'><b>{item1.tracerCategory.label.label_en}</b></td>
-                                                                                <td></td>
-                                                                                {!this.state.hideColumn &&
-                                                                                    <>
-                                                                                        <td></td>
-                                                                                        <td></td>
-                                                                                        <td></td>
-                                                                                        <td></td>
-                                                                                        <td></td>
-                                                                                    </>
-                                                                                }
-                                                                                <td></td>
-                                                                                {!this.state.hideColumn &&
-                                                                                    <>
-                                                                                        <td></td>
-                                                                                        <td></td>
-                                                                                    </>
-                                                                                }
-                                                                                <td></td>
-                                                                                <td></td>
-                                                                            </>
-                                                                            :
-                                                                            <>
-                                                                                {item1.display == true &&
-                                                                                    <>
-                                                                                        <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
-                                                                                        {/* <td>{item1.forecastingUnit.label.label_en}</td> */}
-                                                                                        <td className='text-left  sticky-col first-col clone'>{item1.planningUnit.label.label_en}</td>
-                                                                                        <td>{item1.totalForecastedQuantity}</td>
-                                                                                        {!this.state.hideColumn &&
-                                                                                            <>
-                                                                                                <td>{item1.stock1}</td>
-                                                                                                <td>{item1.existingShipments}</td>
-                                                                                                <td>{item1.stock2}</td>
-                                                                                                <td>{item1.desiredMonthOfStock1}</td>
-                                                                                                <td>{item1.desiredMonthOfStock2}</td>
-                                                                                            </>
-                                                                                        }
-                                                                                        {item1.isProcurementGapRed == true ? <td className="red">{item1.procurementGap}</td> : <td>{item1.procurementGap}</td>}
-                                                                                        {!this.state.hideColumn &&
-                                                                                            <>
-                                                                                                {item1.isPriceTypeRed == true ? <td className="red">{item1.priceType}</td> : <td>{item1.priceType}</td>}
-                                                                                                <td>{item1.unitPrice}</td>
-                                                                                            </>
-                                                                                        }
-                                                                                        <td>{item1.procurementNeeded}</td>
-                                                                                        <td>{item1.notes}</td>
-                                                                                    </>
-                                                                                }
-                                                                            </>
-                                                                        }
+                                                                        </tr>
 
+                                                                    </>
+                                                                ))}
+                                                            </tbody>
+                                                            {!this.state.hideColumn &&
+                                                                <tfoot>
+                                                                    <tr>
+                                                                        <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
+                                                                        {/* <td></td> */}
+                                                                        <td className='text-left sticky-col first-col clone'></td>
+                                                                        <td></td>
+                                                                        <td></td>
+                                                                        <td></td>
+                                                                        <td></td>
+                                                                        <td></td>
+                                                                        <td></td>
+                                                                        <td></td>
+                                                                        <td></td>
+                                                                        <td><b>Product Cost</b></td>
+                                                                        <td><b>{this.state.totalProductCost}</b></td>
+                                                                        <td></td>
                                                                     </tr>
-
-                                                                </>
-                                                            ))}
-                                                        </tbody>
-                                                        {!this.state.hideColumn &&
-                                                            <tfoot>
-                                                                <tr>
-                                                                    <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
-                                                                    {/* <td></td> */}
-                                                                    <td className='text-left sticky-col first-col clone'></td>
-                                                                    <td></td>
-                                                                    <td></td>
-                                                                    <td></td>
-                                                                    <td></td>
-                                                                    <td></td>
-                                                                    <td></td>
-                                                                    <td></td>
-                                                                    <td></td>
-                                                                    <td><b>Product Cost</b></td>
-                                                                    <td><b>{this.state.totalProductCost}</b></td>
-                                                                    <td></td>
-                                                                </tr>
-                                                                <tr>
-                                                                    <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
-                                                                    {/* <td></td> */}
-                                                                    <td className='text-left sticky-col first-col clone'></td>
-                                                                    <td></td>
-                                                                    <td></td>
-                                                                    <td></td>
-                                                                    <td></td>
-                                                                    <td></td>
-                                                                    <td></td>
-                                                                    <td></td>
-                                                                    <td></td>
-                                                                    <td><b>Freight (7%)</b></td>
-                                                                    <td><b>{0.07 * this.state.totalProductCost}</b></td>
-                                                                    <td></td>
-                                                                </tr>
-                                                                <tr>
-                                                                    <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
-                                                                    {/* <td></td> */}
-                                                                    <td className='text-left sticky-col first-col clone'></td>
-                                                                    <td></td>
-                                                                    <td></td>
-                                                                    <td></td>
-                                                                    <td></td>
-                                                                    <td></td>
-                                                                    <td></td>
-                                                                    <td></td>
-                                                                    <td></td>
-                                                                    <td><b>Total Cost</b></td>
-                                                                    <td><b>{this.state.totalProductCost + 0.07 * this.state.totalProductCost}</b></td>
-                                                                    <td></td>
-                                                                </tr>
-                                                            </tfoot>
-                                                        }
-                                                        {this.state.hideColumn &&
-                                                            <tfoot>
-                                                                <tr>
-                                                                    <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
-                                                                    {/* <td></td> */}
-                                                                    <td className='text-left sticky-col first-col clone'></td>
-                                                                    <td></td>
-                                                                    <td><b>Product Cost</b></td>
-                                                                    <td><b>{this.state.totalProductCost}</b></td>
-                                                                    <td></td>
-                                                                </tr>
-                                                                <tr>
-                                                                    <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
-                                                                    {/* <td></td> */}
-                                                                    <td className='text-left sticky-col first-col clone'></td>
-                                                                    <td></td>
-                                                                    <td><b>Freight (7%)</b></td>
-                                                                    <td><b>{0.07 * this.state.totalProductCost}</b></td>
-                                                                    <td></td>
-                                                                </tr>
-                                                                <tr>
-                                                                    <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
-                                                                    {/* <td></td> */}
-                                                                    <td className='text-left sticky-col first-col clone'></td>
-                                                                    <td></td>
-                                                                    <td><b>Total Cost</b></td>
-                                                                    <td><b>{this.state.totalProductCost + 0.07 * this.state.totalProductCost}</b></td>
-                                                                    <td></td>
-                                                                </tr>
-                                                            </tfoot>
-                                                        }
-                                                    </Table>
+                                                                    <tr>
+                                                                        <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
+                                                                        {/* <td></td> */}
+                                                                        <td className='text-left sticky-col first-col clone'></td>
+                                                                        <td></td>
+                                                                        <td></td>
+                                                                        <td></td>
+                                                                        <td></td>
+                                                                        <td></td>
+                                                                        <td></td>
+                                                                        <td></td>
+                                                                        <td></td>
+                                                                        <td><b>Freight (7%)</b></td>
+                                                                        <td><b>{0.07 * this.state.totalProductCost}</b></td>
+                                                                        <td></td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
+                                                                        {/* <td></td> */}
+                                                                        <td className='text-left sticky-col first-col clone'></td>
+                                                                        <td></td>
+                                                                        <td></td>
+                                                                        <td></td>
+                                                                        <td></td>
+                                                                        <td></td>
+                                                                        <td></td>
+                                                                        <td></td>
+                                                                        <td></td>
+                                                                        <td><b>Total Cost</b></td>
+                                                                        <td><b>{this.state.totalProductCost + 0.07 * this.state.totalProductCost}</b></td>
+                                                                        <td></td>
+                                                                    </tr>
+                                                                </tfoot>
+                                                            }
+                                                            {this.state.hideColumn &&
+                                                                <tfoot>
+                                                                    <tr>
+                                                                        <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
+                                                                        {/* <td></td> */}
+                                                                        <td className='text-left sticky-col first-col clone'></td>
+                                                                        <td></td>
+                                                                        <td><b>Product Cost</b></td>
+                                                                        <td><b>{this.state.totalProductCost}</b></td>
+                                                                        <td></td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
+                                                                        {/* <td></td> */}
+                                                                        <td className='text-left sticky-col first-col clone'></td>
+                                                                        <td></td>
+                                                                        <td><b>Freight (7%)</b></td>
+                                                                        <td><b>{0.07 * this.state.totalProductCost}</b></td>
+                                                                        <td></td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
+                                                                        {/* <td></td> */}
+                                                                        <td className='text-left sticky-col first-col clone'></td>
+                                                                        <td></td>
+                                                                        <td><b>Total Cost</b></td>
+                                                                        <td><b>{this.state.totalProductCost + 0.07 * this.state.totalProductCost}</b></td>
+                                                                        <td></td>
+                                                                    </tr>
+                                                                </tfoot>
+                                                            }
+                                                        </Table>
                                                     </div>
                                                 }
                                                 {this.state.regPlanningUnitList.length > 0 && this.state.displayId == 2 &&
-                                                <div className='ForecastSummaryTable'>
-                                                    <div id="tableDiv" className="table-responsive consumptionDataEntryTable">
+                                                    <div className='ForecastSummaryTable'>
+                                                        <div id="tableDiv" className="table-responsive consumptionDataEntryTable">
+                                                        </div>
                                                     </div>
-                                                </div>
 
                                                 }
                                             </div>
-                                            
+
                                             <div style={{ display: this.state.loading ? "block" : "none" }}>
                                                 <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                                                     <div class="align-items-center">
