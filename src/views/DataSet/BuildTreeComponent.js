@@ -344,7 +344,7 @@ export default class BuildTree extends Component {
         this.pickAMonth4 = React.createRef()
         this.pickAMonth5 = React.createRef()
         this.state = {
-            updatedPlanningUnitList : [],
+            updatedPlanningUnitList: [],
             nodeId: '',
             nodeDataMomList: [],
             scenarioActionType: '',
@@ -3402,15 +3402,17 @@ export default class BuildTree extends Component {
 
     getPlanningUnitListByFUId(forecastingUnitId) {
         console.log("forecastingUnitId---", forecastingUnitId);
-        console.log("pl unit---", this.state.planningUnitList);
+        console.log("pl unit---", this.state.updatedPlanningUnitList);
         var planningUnitList = this.state.updatedPlanningUnitList.filter(x => x.forecastingUnit.id == forecastingUnitId);
         this.setState({
             planningUnitList
         }, () => {
             console.log("filtered planning unit list---", this.state.planningUnitList);
             if (this.state.currentItemConfig.context.payload.nodeType.id == 5 && this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario].puNode != null) {
-                console.log("test---", this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.planningUnit.id);
+                console.log("test---", (this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].puNode.planningUnit.id);
+                // (this.state.currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].puNode.planningUnit.id
                 var conversionFactor = this.state.updatedPlanningUnitList.filter(x => x.id == this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.planningUnit.id)[0].multiplier;
+                console.log("conversionFactor---", conversionFactor);
                 this.setState({
                     conversionFactor
                 }, () => {
@@ -3792,7 +3794,7 @@ export default class BuildTree extends Component {
                     console.log("cur item config--- ", this.state.currentItemConfig);
                     this.getForecastingUnitUnitByFUId(forecastingUnitList[0].id);
                 })
-            } 
+            }
             // else {
             //     console.log("fu list 2---");
             //     const currentItemConfig = this.state.currentItemConfig;
@@ -5306,6 +5308,7 @@ export default class BuildTree extends Component {
             var pu = (this.state.planningUnitList.filter(c => c.id == event.target.value))[0];
             (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].puNode.planningUnit.unit.id = pu.unit.id;
             (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].puNode.planningUnit.id = event.target.value;
+            (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].puNode.planningUnit.multiplier = pu.multiplier;
             this.setState({
                 conversionFactor: pu.multiplier
             }, () => {
@@ -5558,9 +5561,18 @@ export default class BuildTree extends Component {
                     this.getUsageText();
                     this.state.currentItemConfig.context.payload.nodeUnit.id = this.state.currentItemConfig.parentItem.payload.nodeUnit.id;
                 } else if (data.context.payload.nodeType.id == 5) {
+                    console.log("pu 1---", (data.context.payload.nodeDataMap[scenarioId])[0].puNode.planningUnit.id);
+                    console.log("pu 2---", (this.state.currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].puNode.planningUnit.id);
                     this.getPlanningUnitListByFUId((data.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode.forecastingUnit.id);
                     this.getNoOfMonthsInUsagePeriod();
                     this.state.currentItemConfig.context.payload.nodeUnit.id = this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id;
+                    var conversionFactor = this.state.updatedPlanningUnitList.filter(x => x.id == this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.planningUnit.id)[0].multiplier;
+                    console.log("conversionFactor---", conversionFactor);
+                    this.setState({
+                        conversionFactor
+                    }, () => {
+                        this.getUsageText();
+                    });
                 } else if (data.context.payload.nodeType.id != 1) {
                     this.getSameLevelNodeList(data.context.level, data.context.id);
                 }
@@ -7391,6 +7403,14 @@ export default class BuildTree extends Component {
             } else {
                 (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].displayCalculatedDataValue = (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].calculatedDataValue;
                 (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].displayDataValue = (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].dataValue;
+            }
+            //
+            if (items[i].payload.nodeType.id == 4) {
+                if ((items[i].payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.usageType.id == 2) {
+
+                } else {
+
+                }
             }
         }
         this.setState({
