@@ -5772,3 +5772,16 @@ font-style: italic!important;
 .dataentryTable .jexcel>tbody>tr>td:nth-child(4) {
   text-align: left!important;
 }
+
+.compareVersion .jexcel>tbody>tr>td:nth-child(2) {
+  text-align: left!important;
+}
+
+.compareVersion .jexcel>thead>tr:nth-child(1)>td:nth-child(2) {
+  border-top:0px!important;
+  border-left:0px!important;
+}
+.compareVersion .jexcel>thead>tr:nth-child(1)>td:nth-child(3) {
+  border-top:0px!important;
+  border-left:0px!important;
+}
