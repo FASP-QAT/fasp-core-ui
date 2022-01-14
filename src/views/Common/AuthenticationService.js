@@ -1237,7 +1237,7 @@ class AuthenticationService {
                         }
                         break;
                     case "/changePassword":
-                    // case "/ShowGuidance":
+                        // case "/ShowGuidance":
                         // if (bfunction.includes("ROLE_BF_CHANGE_PASSWORD")) {
                         return true;
                         // }
@@ -1245,7 +1245,7 @@ class AuthenticationService {
                     case "/logout/:message":
                     case "/logout":
                     case "/accessDenied":
-                
+
                         return true;
                         break;
                     case "/problem/editProblem":
@@ -1345,11 +1345,11 @@ class AuthenticationService {
                             return true;
                         }
                         break;
-                    // case "/report/compareAndSelectScenario":
-                    // case "/validation/productValidation":
-                    // case "/validation/modelingValidation":
-                    // case "/report/compareVersion":
                     case "/dataentry/consumptionDataEntryAndAdjustment":
+                        if (bfunction.includes("ROLE_BF_CONSUMPTION_DATA_ENTRY_ADJUSTMENT")) {
+                            return true;
+                        }
+                        break;
                     case "/dataset/listTree":
                     case "/dataset/loadDeleteDataSet":
                     case "/dataset/loadDeleteDataSet/:message":
