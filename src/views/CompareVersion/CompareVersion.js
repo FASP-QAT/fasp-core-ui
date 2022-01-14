@@ -452,7 +452,7 @@ class CompareVersion extends Component {
                         <div className="card-header-actions">
                             <a className="card-header-action">
 
-                            {(this.state.firstDataSet == 1 && this.state.secondDataSet == 1) && <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.refs.compareVersionTable.exportPDF()} />}
+                                {(this.state.firstDataSet == 1 && this.state.secondDataSet == 1) && <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.refs.compareVersionTable.exportPDF()} />}
 
 
                             </a>
@@ -486,7 +486,7 @@ class CompareVersion extends Component {
                                                 </InputGroup>
                                             </div>
                                         </FormGroup>
-                                        <FormGroup className="col-md-3">
+                                        <FormGroup className="col-md-2">
                                             <Label htmlFor="appendedInputButton">{i18n.t('static.report.version')}</Label>
                                             <div className="controls ">
                                                 <InputGroup>
@@ -507,7 +507,44 @@ class CompareVersion extends Component {
                                                 </InputGroup>
                                             </div>
                                         </FormGroup>
-                                        <FormGroup className="col-md-3">
+                                        {this.state.firstDataSet == 1 && <FormGroup className="col-md-3">
+                                            <Label htmlFor="appendedInputButton">{i18n.t('static.common.forecastPeriod')}</Label>
+                                            <div className="controls ">
+                                                <InputGroup>
+                                                    <Input
+                                                        type="text"
+                                                        name="forecastPeriod"
+                                                        id="forecastPeriod"
+                                                        bsSize="sm"
+                                                        readonly={true}
+                                                        value={moment(this.state.datasetData.currentVersion.forecastStartDate).format(DATE_FORMAT_CAP_WITHOUT_DATE) + " - " + moment(this.state.datasetData.currentVersion.forecastStopDate).format(DATE_FORMAT_CAP_WITHOUT_DATE)}
+
+                                                    >
+                                                    </Input>
+
+                                                </InputGroup>
+                                            </div>
+                                        </FormGroup>}
+                                        {this.state.firstDataSet == 1 && <FormGroup className="col-md-3">
+                                            <Label htmlFor="appendedInputButton">{i18n.t('static.common.note')}</Label>
+                                            <div className="controls ">
+                                                <InputGroup>
+                                                    <Input
+                                                        type="textarea"
+                                                        name="forecastPeriod"
+                                                        id="forecastPeriod"
+                                                        bsSize="sm"
+                                                        readonly={true}
+                                                        value={this.state.datasetData.currentVersion.notes}
+
+                                                    >
+                                                    </Input>
+
+                                                </InputGroup>
+                                            </div>
+                                        </FormGroup>}
+
+                                        <FormGroup className="col-md-2">
                                             <Label htmlFor="appendedInputButton">{i18n.t('static.compareVersion.compareWithVersion')}</Label>
                                             <div className="controls ">
                                                 <InputGroup>
@@ -528,6 +565,42 @@ class CompareVersion extends Component {
                                                 </InputGroup>
                                             </div>
                                         </FormGroup>
+                                        {this.state.secondDataSet == 1 && <FormGroup className="col-md-3">
+                                            <Label htmlFor="appendedInputButton">{i18n.t('static.common.forecastPeriod')}</Label>
+                                            <div className="controls ">
+                                                <InputGroup>
+                                                    <Input
+                                                        type="text"
+                                                        name="forecastPeriod"
+                                                        id="forecastPeriod"
+                                                        bsSize="sm"
+                                                        readonly={true}
+                                                        value={moment(this.state.datasetData1.currentVersion.forecastStartDate).format(DATE_FORMAT_CAP_WITHOUT_DATE) + " - " + moment(this.state.datasetData1.currentVersion.forecastStopDate).format(DATE_FORMAT_CAP_WITHOUT_DATE)}
+
+                                                    >
+                                                    </Input>
+
+                                                </InputGroup>
+                                            </div>
+                                        </FormGroup>}
+                                        {this.state.secondDataSet == 1 && <FormGroup className="col-md-3">
+                                            <Label htmlFor="appendedInputButton">{i18n.t('static.common.note')}</Label>
+                                            <div className="controls ">
+                                                <InputGroup>
+                                                    <Input
+                                                        type="textarea"
+                                                        name="forecastPeriod"
+                                                        id="forecastPeriod"
+                                                        bsSize="sm"
+                                                        readonly={true}
+                                                        value={this.state.datasetData1.currentVersion.notes}
+
+                                                    >
+                                                    </Input>
+
+                                                </InputGroup>
+                                            </div>
+                                        </FormGroup>}
                                     </div>
                                 </div>
                             </Form>
@@ -536,7 +609,7 @@ class CompareVersion extends Component {
                                     <>
                                         <CompareVersionTable ref="compareVersionTable" datasetData={this.state.datasetData} datasetData1={this.state.datasetData1} datasetData2={this.state.datasetData} page="compareVersion" versionLabel={"V" + this.state.versionId} versionLabel1={"V" + this.state.versionId1} updateState={this.updateState} />
                                         <div className="table-responsive">
-                                            <div id="tableDiv" />
+                                            <div id="tableDiv" className="compareVersion" />
                                         </div>
                                     </>
                                 }
