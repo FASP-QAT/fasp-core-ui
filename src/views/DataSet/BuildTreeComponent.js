@@ -344,7 +344,7 @@ export default class BuildTree extends Component {
         this.pickAMonth4 = React.createRef()
         this.pickAMonth5 = React.createRef()
         this.state = {
-            updatedPlanningUnitList : [],
+            updatedPlanningUnitList: [],
             nodeId: '',
             nodeDataMomList: [],
             scenarioActionType: '',
@@ -1719,91 +1719,99 @@ export default class BuildTree extends Component {
     //     })
     // }
     formSubmit() {
-        var validation = this.checkValidation();
-        if (validation == true) {
-            this.setState({
-                modelingJexcelLoader: true
-            })
-            var tableJson = this.el.getJson(null, false);
-            var data = this.state.currentScenario.nodeDataModelingList;
-            var maxModelingId = data.length > 0 ? Math.max(...data.map(o => o.nodeDataModelingId)) : 0;
-            var obj;
-            var items = this.state.items;
-            var item = items.filter(x => x.id == this.state.currentItemConfig.context.id)[0];
-            const itemIndex1 = items.findIndex(o => o.id === this.state.currentItemConfig.context.id);
-            for (var i = 0; i < tableJson.length; i++) {
-                var map1 = new Map(Object.entries(tableJson[i]));
-                console.log("9 map---" + map1.get("9"))
-                if (parseInt(map1.get("10")) === 1) {
-                    if (map1.get("9") != "" && map1.get("9") != 0) {
-                        const itemIndex = data.findIndex(o => o.nodeDataModelingId === map1.get("9"));
-                        console.log("data[itemIndex]---", data[itemIndex]);
-                        obj = data.filter(x => x.nodeDataModelingId == map1.get("9"))[0];
-                        console.log("obj--->>>>>", obj);
-                        var transfer = map1[0] != "" ? map1.get("0") : '';
-                        console.log("transfer---", transfer);
-                        obj.transferNodeDataId = transfer;
-                        obj.notes = map1.get("1");
-                        obj.modelingType.id = map1.get("2");
-                        obj.startDate = map1.get("3");
-                        obj.stopDate = map1.get("4");
-                        obj.dataValue = map1.get("2") == 2 ? map1.get("6") : map1.get("5");
-                        obj.nodeDataModelingId = map1.get("9")
+        this.setState({
+            modelingJexcelLoader: true
+        }, () => {
+            var validation = this.checkValidation();
+            console.log("validation---", validation);
+            if (validation == true) {
 
-                        data[itemIndex] = obj;
-                    } else {
-                        console.log("maxModelingId---", maxModelingId);
-                        obj = {
-                            transferNodeDataId: map1[0] != "" ? map1.get("0") : '',
-                            notes: map1.get("1"),
-                            modelingType: {
-                                id: map1.get("2")
-                            },
-                            startDate: map1.get("3"),
-                            stopDate: map1.get("4"),
-                            dataValue: map1.get("2") == 2 ? map1.get("6") : map1.get("5"),
-                            nodeDataModelingId: parseInt(maxModelingId) + 1
+                console.log("form submit 1---");
+                var tableJson = this.el.getJson(null, false);
+                console.log("form submit 1---");
+                var data = this.state.currentScenario.nodeDataModelingList;
+                console.log("form submit 1---");
+                var maxModelingId = data.length > 0 ? Math.max(...data.map(o => o.nodeDataModelingId)) : 0;
+                console.log("form submit 1---");
+                var obj;
+                var items = this.state.items;
+                var item = items.filter(x => x.id == this.state.currentItemConfig.context.id)[0];
+                console.log("form submit 1---");
+                const itemIndex1 = items.findIndex(o => o.id === this.state.currentItemConfig.context.id);
+                console.log("form submit 1---");
+                for (var i = 0; i < tableJson.length; i++) {
+                    var map1 = new Map(Object.entries(tableJson[i]));
+                    console.log("9 map---" + map1.get("9"))
+                    if (parseInt(map1.get("10")) === 1) {
+                        if (map1.get("9") != "" && map1.get("9") != 0) {
+                            const itemIndex = data.findIndex(o => o.nodeDataModelingId === map1.get("9"));
+                            console.log("data[itemIndex]---", data[itemIndex]);
+                            obj = data.filter(x => x.nodeDataModelingId == map1.get("9"))[0];
+                            console.log("obj--->>>>>", obj);
+                            var transfer = map1[0] != "" ? map1.get("0") : '';
+                            console.log("transfer---", transfer);
+                            obj.transferNodeDataId = transfer;
+                            obj.notes = map1.get("1");
+                            obj.modelingType.id = map1.get("2");
+                            obj.startDate = map1.get("3");
+                            obj.stopDate = map1.get("4");
+                            obj.dataValue = map1.get("2") == 2 ? map1.get("6") : map1.get("5");
+                            obj.nodeDataModelingId = map1.get("9")
+
+                            data[itemIndex] = obj;
+                        } else {
+                            console.log("maxModelingId---", maxModelingId);
+                            obj = {
+                                transferNodeDataId: map1[0] != "" ? map1.get("0") : '',
+                                notes: map1.get("1"),
+                                modelingType: {
+                                    id: map1.get("2")
+                                },
+                                startDate: map1.get("3"),
+                                stopDate: map1.get("4"),
+                                dataValue: map1.get("2") == 2 ? map1.get("6") : map1.get("5"),
+                                nodeDataModelingId: parseInt(maxModelingId) + 1
+                            }
+                            maxModelingId++;
+                            console.log("obj to push---", obj);
+                            data.push(obj);
                         }
-                        maxModelingId++;
-                        console.log("obj to push---", obj);
-                        data.push(obj);
+                        console.log("obj---", obj);
+                        console.log("data--->>>", data);
+                        (item.payload.nodeDataMap[this.state.selectedScenario])[0].nodeDataModelingList = data;
+                        console.log("item---", item);
+                        items[itemIndex1] = item;
+                        console.log("items---", items);
+                        // Call function by dolly
+
                     }
-                    console.log("obj---", obj);
-                    console.log("data--->>>", data);
-                    (item.payload.nodeDataMap[this.state.selectedScenario])[0].nodeDataModelingList = data;
-                    console.log("item---", item);
-                    items[itemIndex1] = item;
-                    console.log("items---", items);
-                    // Call function by dolly
-
                 }
+
+                let { curTreeObj } = this.state;
+                let { treeData } = this.state;
+                let { dataSetObj } = this.state;
+                curTreeObj.tree.flatList = items;
+                var findTreeIndex = treeData.findIndex(n => n.treeId == curTreeObj.treeId);
+                treeData[findTreeIndex] = curTreeObj;
+                var programData = dataSetObj.programData;
+                programData.treeList = treeData;
+                console.log("dataSetDecrypt>>>", programData);
+                dataSetObj.programData = programData;
+
+                console.log("encpyDataSet>>>", dataSetObj)
+                this.setState({
+                    dataSetObj,
+                    items,
+                    scalingList: data,
+                    openAddNodeModal: false,
+                    activeTab1: new Array(2).fill('1')
+                }, () => {
+                    console.log("going to call MOM data");
+                    this.calculateMOMData(0, 0);
+                });
             }
+        })
 
-            let { curTreeObj } = this.state;
-            let { treeData } = this.state;
-            let { dataSetObj } = this.state;
-            curTreeObj.tree.flatList = items;
-            var findTreeIndex = treeData.findIndex(n => n.treeId == curTreeObj.treeId);
-            treeData[findTreeIndex] = curTreeObj;
-            var programData = dataSetObj.programData;
-            programData.treeList = treeData;
-            console.log("dataSetDecrypt>>>", programData);
-            dataSetObj.programData = programData;
-
-            console.log("encpyDataSet>>>", dataSetObj)
-            this.setState({
-                dataSetObj,
-                items,
-                scalingList: data,
-                // openAddNodeModal: false,
-                activeTab1: new Array(2).fill('1')
-            }, () => {
-                console.log("going to call MOM data");
-                this.calculateMOMData(0, 0);
-            });
-
-
-        }
     }
     checkValidation() {
         var valid = true;
@@ -2465,7 +2473,7 @@ export default class BuildTree extends Component {
                 currentCalculatorStopDate: '',
                 currentCalculatorStartValue: '',
             }, () => {
-                console.log("x row data===>", this.el.getRowData(x));
+                // console.log("x row data===>", this.el.getRowData(x));
                 var elInstance = this.state.modelingEl;
                 var rowData = elInstance.getRowData(x);
                 this.setState({
@@ -2774,13 +2782,13 @@ export default class BuildTree extends Component {
                     if (type == 1) {
                         console.log("get payload 5", (itemConfig.payload.nodeDataMap[scenarioId])[0].fuNode);
                         if (itemConfig.payload.nodeType.id == 4) {
-                            if ((itemConfig.payload.nodeDataMap[scenarioId])[0].fuNode.usageType.id == 2) {
-                                console.log("test---", (itemConfig.payload.nodeDataMap[scenarioId])[0].fuNode.usagePeriod.usagePeriodId);
-                                console.log("this.state.usagePeriodList---", this.state.usagePeriodList);
-                                return addCommas((itemConfig.payload.nodeDataMap[scenarioId])[0].displayDataValue) + "% of parent, " + (itemConfig.payload.nodeDataMap[scenarioId])[0].fuNode.noOfForecastingUnitsPerPerson + "/" + this.state.usagePeriodList.filter(x => x.usagePeriodId == (itemConfig.payload.nodeDataMap[scenarioId])[0].fuNode.usagePeriod.usagePeriodId)[0].label.label_en;
-                            } else {
-                                return addCommas((itemConfig.payload.nodeDataMap[scenarioId])[0].displayDataValue) + "% of parent";
-                            }
+                            // if ((itemConfig.payload.nodeDataMap[scenarioId])[0].fuNode.usageType.id == 2) {
+                            console.log("test---", (itemConfig.payload.nodeDataMap[scenarioId])[0].fuNode.usagePeriod.usagePeriodId);
+                            console.log("this.state.usagePeriodList---", this.state.usagePeriodList);
+                            return addCommas((itemConfig.payload.nodeDataMap[scenarioId])[0].displayDataValue) + "% of parent, " + addCommas((itemConfig.payload.nodeDataMap[scenarioId])[0].fuPerMonth) + "/" + 'Month';
+                            // } else {
+                            //     return addCommas((itemConfig.payload.nodeDataMap[scenarioId])[0].displayDataValue) + "% of parent";
+                            // }
 
                         } else if (itemConfig.payload.nodeType.id == 5) {
                             console.log("payload get puNode---", (itemConfig.payload.nodeDataMap[scenarioId])[0]);
@@ -3402,15 +3410,17 @@ export default class BuildTree extends Component {
 
     getPlanningUnitListByFUId(forecastingUnitId) {
         console.log("forecastingUnitId---", forecastingUnitId);
-        console.log("pl unit---", this.state.planningUnitList);
+        console.log("pl unit---", this.state.updatedPlanningUnitList);
         var planningUnitList = this.state.updatedPlanningUnitList.filter(x => x.forecastingUnit.id == forecastingUnitId);
         this.setState({
             planningUnitList
         }, () => {
             console.log("filtered planning unit list---", this.state.planningUnitList);
             if (this.state.currentItemConfig.context.payload.nodeType.id == 5 && this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario].puNode != null) {
-                console.log("test---", this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.planningUnit.id);
+                console.log("test---", (this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].puNode.planningUnit.id);
+                // (this.state.currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].puNode.planningUnit.id
                 var conversionFactor = this.state.updatedPlanningUnitList.filter(x => x.id == this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.planningUnit.id)[0].multiplier;
+                console.log("conversionFactor---", conversionFactor);
                 this.setState({
                     conversionFactor
                 }, () => {
@@ -3792,7 +3802,7 @@ export default class BuildTree extends Component {
                     console.log("cur item config--- ", this.state.currentItemConfig);
                     this.getForecastingUnitUnitByFUId(forecastingUnitList[0].id);
                 })
-            } 
+            }
             // else {
             //     console.log("fu list 2---");
             //     const currentItemConfig = this.state.currentItemConfig;
@@ -4294,13 +4304,14 @@ export default class BuildTree extends Component {
             templateId: this.props.match.params.templateId
         }, () => {
             // if (this.state.programId != "") {
+
+            this.getUsagePeriodList();
             this.getTreeList();
             // }
             // this.getTracerCategoryList();
             this.getForecastMethodList();
             this.getUnitListForDimensionIdFour();
             this.getUnitList();
-            this.getUsagePeriodList();
             this.getUsageTypeList();
             this.getUsageTemplateList();
             // this.getForecastingUnitListByTracerCategory("");
@@ -5306,6 +5317,7 @@ export default class BuildTree extends Component {
             var pu = (this.state.planningUnitList.filter(c => c.id == event.target.value))[0];
             (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].puNode.planningUnit.unit.id = pu.unit.id;
             (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].puNode.planningUnit.id = event.target.value;
+            (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].puNode.planningUnit.multiplier = pu.multiplier;
             this.setState({
                 conversionFactor: pu.multiplier
             }, () => {
@@ -5558,9 +5570,18 @@ export default class BuildTree extends Component {
                     this.getUsageText();
                     this.state.currentItemConfig.context.payload.nodeUnit.id = this.state.currentItemConfig.parentItem.payload.nodeUnit.id;
                 } else if (data.context.payload.nodeType.id == 5) {
+                    console.log("pu 1---", (data.context.payload.nodeDataMap[scenarioId])[0].puNode.planningUnit.id);
+                    console.log("pu 2---", (this.state.currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].puNode.planningUnit.id);
                     this.getPlanningUnitListByFUId((data.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode.forecastingUnit.id);
                     this.getNoOfMonthsInUsagePeriod();
                     this.state.currentItemConfig.context.payload.nodeUnit.id = this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id;
+                    var conversionFactor = this.state.updatedPlanningUnitList.filter(x => x.id == this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.planningUnit.id)[0].multiplier;
+                    console.log("conversionFactor---", conversionFactor);
+                    this.setState({
+                        conversionFactor
+                    }, () => {
+                        this.getUsageText();
+                    });
                 } else if (data.context.payload.nodeType.id != 1) {
                     this.getSameLevelNodeList(data.context.level, data.context.id);
                 }
@@ -6728,7 +6749,7 @@ export default class BuildTree extends Component {
                                                         </tr>
                                                         <tr>
                                                             <td>{i18n.t('static.tree.#OfFU/month/')} {this.state.nodeUnitList.filter(c => c.unitId == this.state.usageTypeParent)[0].label.label_en}</td>
-                                                            <td>{addCommas(this.state.currentScenario.fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod)}</td>
+                                                            <td>{addCommas((this.state.currentScenario.fuNode.noOfForecastingUnitsPerPerson / this.state.currentScenario.fuNode.usageFrequency) * (this.state.usagePeriodList.filter(c => c.usagePeriodId == this.state.currentScenario.fuNode.usagePeriod.usagePeriodId))[0].convertToMonth)}</td>
                                                         </tr>
                                                     </table>}
                                                 {(this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentScenario.fuNode.usageType.id == 1) &&
@@ -6817,7 +6838,7 @@ export default class BuildTree extends Component {
                             </Picker>
                         </FormGroup>
 
-                        <div className="col-md-12">
+                        <div className="col-md-12">{this.state.modelingJexcelLoader}
                             {this.state.showModelingJexcelNumber &&
                                 <> <div className="calculatorimg">
                                     <div id="modelingJexcel" className={"RowClickable ScalingTable"} style={{ display: this.state.modelingJexcelLoader ? "none" : "block" }}>
@@ -7391,6 +7412,32 @@ export default class BuildTree extends Component {
             } else {
                 (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].displayCalculatedDataValue = (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].calculatedDataValue;
                 (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].displayDataValue = (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].dataValue;
+            }
+            //
+            if (items[i].payload.nodeType.id == 4) {
+                var fuPerMonth, totalValue;
+                var noOfForecastingUnitsPerPerson = (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.noOfForecastingUnitsPerPerson;
+                var usageFrequency = (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.usageFrequency;
+                var convertToMonth = (this.state.usagePeriodList.filter(c => c.usagePeriodId == (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.usagePeriod.usagePeriodId))[0].convertToMonth;
+                if ((items[i].payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.usageType.id == 2) {
+                    fuPerMonth = ((noOfForecastingUnitsPerPerson / usageFrequency) * convertToMonth);
+                    totalValue = fuPerMonth * (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].displayCalculatedDataValue;
+
+                } else {
+                    var noOfPersons = (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.noOfPersons;
+                    if ((items[i].payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.oneTimeUsage == "true") {
+                        fuPerMonth = noOfForecastingUnitsPerPerson / noOfPersons;
+                        totalValue = fuPerMonth * (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].displayCalculatedDataValue;
+                    } else {
+                        fuPerMonth = ((noOfForecastingUnitsPerPerson / noOfPersons) * usageFrequency * convertToMonth);
+                        totalValue = fuPerMonth * (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].displayCalculatedDataValue;
+                    }
+                }
+                (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].displayCalculatedDataValue = Math.round(totalValue);
+                (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].fuPerMonth = fuPerMonth;
+            } else if (items[i].payload.nodeType.id == 5) {
+                var item = items.filter(x => x.id == items[i].parent)[0];
+                (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].displayCalculatedDataValue = Math.round(((item.payload.nodeDataMap[this.state.selectedScenario])[0].displayCalculatedDataValue * (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].dataValue) / 100);
             }
         }
         this.setState({
