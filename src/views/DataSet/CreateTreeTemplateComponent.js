@@ -1647,7 +1647,7 @@ export default class CreateTreeTemplate extends Component {
                 currentCalculatorStopDate: '',
                 currentCalculatorStartValue: '',
             }, () => {
-                console.log("x row data===>", this.el.getRowData(x));
+                // console.log("x row data===>", this.el.getRowData(x));
                 var elInstance = this.state.modelingEl;
                 var rowData = elInstance.getRowData(x);
                 this.setState({
