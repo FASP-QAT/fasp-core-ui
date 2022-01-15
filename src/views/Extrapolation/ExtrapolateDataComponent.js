@@ -164,7 +164,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                         name: datasetJson.programCode,
                         id: myResult[i].id,
                         regionList: datasetJson.regionList,
-                        planningUnitList: datasetJson.planningUnitList,
+                        planningUnitList: datasetJson.planningUnitList.filter(c => c.consuptionForecast),
                         datasetData: datasetJson
                     }
                     forecastProgramList.push(forecastProgramJson)
@@ -245,9 +245,9 @@ export default class ExtrapolateDataComponent extends React.Component {
             data[2] = movingAvgDataFilter.length > 0 && movingAvgDataFilter[0].forecast != null ? movingAvgDataFilter[0].forecast.toFixed(2) : '';
             data[3] = semiAvgDataFilter.length > 0 && semiAvgDataFilter[0].forecast != null ? semiAvgDataFilter[0].forecast.toFixed(2) : '';
             data[4] = linearRegressionDataFilter.length > 0 && linearRegressionDataFilter[0].forecast != null ? linearRegressionDataFilter[0].forecast.toFixed(2) : '';
-            data[5] = tesDataFilter.length > 0 && tesDataFilter[0].forecast != null ? (tesDataFilter[0].forecast - CI).toFixed(2) : '';
-            data[6] = tesDataFilter.length > 0 && tesDataFilter[0].forecast != null ? tesDataFilter[0].forecast.toFixed(2) : '';
-            data[7] = tesDataFilter.length > 0 && tesDataFilter[0].forecast != null ? (tesDataFilter[0].forecast + CI).toFixed(2) : '';
+            data[5] = tesDataFilter.length > 0 && tesDataFilter[0].forecast != null ? (Number(tesDataFilter[0].forecast) - CI).toFixed(2) : '';
+            data[6] = tesDataFilter.length > 0 && tesDataFilter[0].forecast != null ? Number(tesDataFilter[0].forecast).toFixed(2) : '';
+            data[7] = tesDataFilter.length > 0 && tesDataFilter[0].forecast != null ? (Number(tesDataFilter[0].forecast) + CI).toFixed(2) : '';
             // data[8] = '';
             dataArray.push(data)
         }
@@ -414,11 +414,11 @@ export default class ExtrapolateDataComponent extends React.Component {
             wapeArr.push(this.state.tesError.wape)
         }
 
-        var minRmse = Math.min(...rmseArr.filter(c=>c!=""));
-        var minMape = Math.min(...mapeArr.filter(c=>c!=""));
-        var minMse = Math.min(...mseArr.filter(c=>c!=""));
-        var minRsqd = Math.min(...rSqdArr.filter(c=>c!=""));
-        var minWape = Math.min(...wapeArr.filter(c=>c!=""));
+        var minRmse = Math.min(...rmseArr.filter(c => c != ""));
+        var minMape = Math.min(...mapeArr.filter(c => c != ""));
+        var minMse = Math.min(...mseArr.filter(c => c != ""));
+        var minRsqd = Math.min(...rSqdArr.filter(c => c != ""));
+        var minWape = Math.min(...wapeArr.filter(c => c != ""));
         this.setState({
             dataEl: dataEl,
             minRmse: minRmse,
@@ -477,7 +477,7 @@ export default class ExtrapolateDataComponent extends React.Component {
         calculateMovingAvg(inputDataMovingAvg, this.state.monthsForMovingAverage, noOfMonthsForProjection, this);
         calculateSemiAverages(inputDataSemiAverage, noOfMonthsForProjection, this);
         calculateLinearRegression(inputDataLinearRegression, noOfMonthsForProjection, this);
-        console.log("inputDataTes.length+++",inputDataTes.length);
+        console.log("inputDataTes.length+++", inputDataTes.length);
         if (inputDataTes.length >= (this.state.noOfMonthsForASeason * 2)) {
             calculateTES(inputDataTes, this.state.alpha, this.state.beta, this.state.gamma, this.state.confidenceLevelId, this.state.noOfMonthsForASeason, noOfMonthsForProjection, this);
         } else {
@@ -506,77 +506,90 @@ export default class ExtrapolateDataComponent extends React.Component {
 
     }
     getPlanningUnitList(e) {
-        this.setState({ loading: true })
-        localStorage.setItem("sesDatasetId", e.target.value);
-        var forecastProgramId = e.target.value;
-        if (forecastProgramId != "") {
-            var forecastProgramListFilter = this.state.forecastProgramList.filter(c => c.id == forecastProgramId)[0]
-            var regionList = forecastProgramListFilter.regionList;
-            var startDate = forecastProgramListFilter.datasetData.currentVersion.forecastStartDate;
-            var stopDate = forecastProgramListFilter.datasetData.currentVersion.forecastStopDate;
-            var rangeValue = { from: { year: new Date(startDate).getFullYear(), month: new Date(startDate).getMonth() + 1 }, to: { year: new Date(stopDate).getFullYear(), month: new Date(stopDate).getMonth() + 1 } }
+        var cont = false;
+        if (this.state.dataChanged) {
+            var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
+            if (cf == true) {
+                cont = true;
+            } else {
 
-            var planningUnitList = forecastProgramListFilter.planningUnitList;
-            var planningUnitId = "";
-            var event = {
-                target: {
-                    value: ""
-                }
-            };
-            if (planningUnitList.length == 1) {
-                planningUnitId = planningUnitList[0].planningUnit.id;
-                event.target.value = planningUnitList[0].planningUnit.id;
-            } else if (localStorage.getItem("sesDatasetPlanningUnitId") != "" && planningUnitList.filter(c => c.planningUnit.id == localStorage.getItem("sesDatasetPlanningUnitId")).length > 0) {
-                planningUnitId = localStorage.getItem("sesDatasetPlanningUnitId");
-                event.target.value = localStorage.getItem("sesDatasetPlanningUnitId");
             }
-
-            var regionId = "";
-            var regionEvent = {
-                target: {
-                    value: ""
-                }
-            };
-            if (regionList.length == 1) {
-                regionId = regionList[0].regionId;
-                regionEvent.target.value = regionList[0].regionId;
-            } else if (localStorage.getItem("sesDatasetRegionId") != "" && regionList.filter(c => c.regionId == localStorage.getItem("sesDatasetRegionId")).length > 0) {
-                regionId = localStorage.getItem("sesDatasetRegionId");
-                regionEvent.target.value = localStorage.getItem("sesDatasetRegionId");
-            }
-            this.setState({
-                planningUnitList: planningUnitList,
-                forecastProgramId: forecastProgramId,
-                regionList: regionList,
-                datasetJson: forecastProgramListFilter.datasetData,
-                rangeValue: rangeValue,
-                rangeValue1: rangeValue,
-                loading: false
-            }, () => {
-                if (planningUnitId != "") {
-                    this.setPlanningUnitId(event);
-                }
-                if (regionId != "") {
-                    this.setRegionId(regionEvent);
-                }
-            })
         } else {
-            this.setState({
-                forecastProgramId: forecastProgramId,
-                planningUnitList: [],
-                planningUnitId: "",
-                regionId: "",
-                regionList: [],
-                alpha: 0.2,
-                beta: 0.2,
-                gamma: 0.2,
-                noOfMonthsForASeason: 4,
-                confidence: 0.95,
-                monthsForMovingAverage: 6,
-                confidenceLevelId: 0.85,
-                loading: false,
-                showData: false
-            })
+            cont = true;
+        }
+        if (cont == true) {
+            this.setState({ loading: true })
+            localStorage.setItem("sesDatasetId", e.target.value);
+            var forecastProgramId = e.target.value;
+            if (forecastProgramId != "") {
+                var forecastProgramListFilter = this.state.forecastProgramList.filter(c => c.id == forecastProgramId)[0]
+                var regionList = forecastProgramListFilter.regionList;
+                var startDate = forecastProgramListFilter.datasetData.currentVersion.forecastStartDate;
+                var stopDate = forecastProgramListFilter.datasetData.currentVersion.forecastStopDate;
+                var rangeValue = { from: { year: new Date(startDate).getFullYear(), month: new Date(startDate).getMonth() + 1 }, to: { year: new Date(stopDate).getFullYear(), month: new Date(stopDate).getMonth() + 1 } }
+
+                var planningUnitList = forecastProgramListFilter.planningUnitList;
+                var planningUnitId = "";
+                var event = {
+                    target: {
+                        value: ""
+                    }
+                };
+                if (planningUnitList.length == 1) {
+                    planningUnitId = planningUnitList[0].planningUnit.id;
+                    event.target.value = planningUnitList[0].planningUnit.id;
+                } else if (localStorage.getItem("sesDatasetPlanningUnitId") != "" && planningUnitList.filter(c => c.planningUnit.id == localStorage.getItem("sesDatasetPlanningUnitId")).length > 0) {
+                    planningUnitId = localStorage.getItem("sesDatasetPlanningUnitId");
+                    event.target.value = localStorage.getItem("sesDatasetPlanningUnitId");
+                }
+
+                var regionId = "";
+                var regionEvent = {
+                    target: {
+                        value: ""
+                    }
+                };
+                if (regionList.length == 1) {
+                    regionId = regionList[0].regionId;
+                    regionEvent.target.value = regionList[0].regionId;
+                } else if (localStorage.getItem("sesDatasetRegionId") != "" && regionList.filter(c => c.regionId == localStorage.getItem("sesDatasetRegionId")).length > 0) {
+                    regionId = localStorage.getItem("sesDatasetRegionId");
+                    regionEvent.target.value = localStorage.getItem("sesDatasetRegionId");
+                }
+                this.setState({
+                    planningUnitList: planningUnitList,
+                    forecastProgramId: forecastProgramId,
+                    regionList: regionList,
+                    datasetJson: forecastProgramListFilter.datasetData,
+                    rangeValue: rangeValue,
+                    rangeValue1: rangeValue,
+                    loading: false
+                }, () => {
+                    if (planningUnitId != "") {
+                        this.setPlanningUnitId(event);
+                    }
+                    if (regionId != "") {
+                        this.setRegionId(regionEvent);
+                    }
+                })
+            } else {
+                this.setState({
+                    forecastProgramId: forecastProgramId,
+                    planningUnitList: [],
+                    planningUnitId: "",
+                    regionId: "",
+                    regionList: [],
+                    alpha: 0.2,
+                    beta: 0.2,
+                    gamma: 0.2,
+                    noOfMonthsForASeason: 4,
+                    confidence: 0.95,
+                    monthsForMovingAverage: 6,
+                    confidenceLevelId: 0.85,
+                    loading: false,
+                    showData: false
+                })
+            }
         }
     }
 
@@ -830,23 +843,49 @@ export default class ExtrapolateDataComponent extends React.Component {
     }
 
     setPlanningUnitId(e) {
-        var planningUnitId = e.target.value;
-        localStorage.setItem("sesDatasetPlanningUnitId", e.target.value);
-        this.setState({
-            planningUnitId: planningUnitId
-        }, () => {
-            this.setExtrapolatedParameters();
-        })
+        var cont = false;
+        if (this.state.dataChanged) {
+            var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
+            if (cf == true) {
+                cont = true;
+            } else {
+
+            }
+        } else {
+            cont = true;
+        }
+        if (cont == true) {
+            var planningUnitId = e.target.value;
+            localStorage.setItem("sesDatasetPlanningUnitId", e.target.value);
+            this.setState({
+                planningUnitId: planningUnitId
+            }, () => {
+                this.setExtrapolatedParameters();
+            })
+        }
     }
 
     setRegionId(e) {
-        var regionId = e.target.value;
-        localStorage.setItem("sesDatasetRegionId", e.target.value);
-        this.setState({
-            regionId: regionId
-        }, () => {
-            this.setExtrapolatedParameters();
-        })
+        var cont = false;
+        if (this.state.dataChanged) {
+            var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
+            if (cf == true) {
+                cont = true;
+            } else {
+
+            }
+        } else {
+            cont = true;
+        }
+        if (cont == true) {
+            var regionId = e.target.value;
+            localStorage.setItem("sesDatasetRegionId", e.target.value);
+            this.setState({
+                regionId: regionId
+            }, () => {
+                this.setExtrapolatedParameters();
+            })
+        }
     }
 
     setExtrapolatedParameters(updateRangeValue) {
@@ -855,8 +894,7 @@ export default class ExtrapolateDataComponent extends React.Component {
             var datasetJson = this.state.datasetJson;
             // Need to filter
             var actualConsumptionListForPlanningUnitAndRegion = datasetJson.actualConsumptionList.filter(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId);
-
-            if (actualConsumptionListForPlanningUnitAndRegion.length > 0) {
+            if (actualConsumptionListForPlanningUnitAndRegion.length > 1) {
                 let actualMin = moment.min(actualConsumptionListForPlanningUnitAndRegion.map(d => moment(d.month)));
                 let actualMax = moment.max(actualConsumptionListForPlanningUnitAndRegion.map(d => moment(d.month)));
 
