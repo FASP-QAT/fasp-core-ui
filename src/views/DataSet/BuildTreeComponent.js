@@ -1803,8 +1803,8 @@ export default class BuildTree extends Component {
                     dataSetObj,
                     items,
                     scalingList: data,
-                    openAddNodeModal: false,
-                    activeTab1: new Array(2).fill('1')
+                    // openAddNodeModal: false,
+                    activeTab1: new Array(2).fill('2')
                 }, () => {
                     console.log("going to call MOM data");
                     this.calculateMOMData(0, 0);
@@ -6022,7 +6022,7 @@ export default class BuildTree extends Component {
 
 
                                         {/* {this.state.numberNode && */}
-                                        <>
+                                        {/* <> */}
                                             <FormGroup className="col-md-6" style={{ display: this.state.numberNode ? 'block' : 'none' }}>
                                                 <Label htmlFor="currencyId">{i18n.t('static.tree.percentageOfParent')}<span class="red Reqasterisk">*</span></Label>
                                                 <Input type="text"
@@ -6040,7 +6040,7 @@ export default class BuildTree extends Component {
                                                     value={this.state.currentScenario.dataValue}></Input>
                                                 <FormFeedback className="red">{errors.percentageOfParent}</FormFeedback>
                                             </FormGroup>
-                                            <FormGroup className="col-md-6">
+                                            <FormGroup className="col-md-6" style={{ display: this.state.numberNode ? 'block' : 'none' }}>
                                                 <Label htmlFor="currencyId">{i18n.t('static.tree.parentValue')}<span class="red Reqasterisk">*</span></Label>
                                                 <Input type="text"
                                                     id="parentValue"
@@ -6051,7 +6051,8 @@ export default class BuildTree extends Component {
                                                     // value={this.state.addNodeFlag != "true" ? addCommas(this.state.parentScenario.calculatedDataValue) : addCommas(this.state.parentValue)}
                                                     value={addCommas(this.state.parentValue)}
                                                 ></Input>
-                                            </FormGroup></>
+                                            </FormGroup>
+                                            {/* </> */}
 
                                         {/* } */}
                                         {/* {this.state.aggregationNode && */}

@@ -347,6 +347,7 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
     props.updateState("nodeId", nodeId);
     props.updateState("type", type);
     props.updateState("loading", false);
+    console.log("here------------------------")
     props.updateState("modelingJexcelLoader", false);
     props.updateState("momJexcelLoader", false);
     // treeList = treeList;
