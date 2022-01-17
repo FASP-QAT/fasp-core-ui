@@ -643,11 +643,12 @@ class ForecastSummary extends Component {
                 startY: startY,
                 head: header,
                 body: data,
-                styles: { lineWidth: 1, fontSize: 8, cellWidth: 38, halign: 'center' },
-                columnStyles: {
-                    1: { cellWidth: 99.89 },
-                    2: { cellWidth: 54 },
-                }
+                styles: { lineWidth: 1, fontSize: 8, halign: 'center' }
+                // styles: { lineWidth: 1, fontSize: 8, cellWidth: 38, halign: 'center' },
+                // columnStyles: {
+                //     1: { cellWidth: 99.89 },
+                //     2: { cellWidth: 54 },
+                // }
             };
 
             doc.autoTable(content);
@@ -780,11 +781,12 @@ class ForecastSummary extends Component {
                 startY: startY,
                 head: headers,
                 body: data,
-                styles: { lineWidth: 1, fontSize: 8, cellWidth: 38, halign: 'center' },
-                columnStyles: {
-                    1: { cellWidth: 99.89 },
-                    2: { cellWidth: 54 },
-                }
+                styles: { lineWidth: 1, fontSize: 8, halign: 'center' }
+                // styles: { lineWidth: 1, fontSize: 8, cellWidth: 38, halign: 'center' },
+                // columnStyles: {
+                //     1: { cellWidth: 99.89 },
+                //     2: { cellWidth: 54 },
+                // }
             };
 
             doc.autoTable(content);

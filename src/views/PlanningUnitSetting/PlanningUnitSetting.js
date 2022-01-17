@@ -1341,11 +1341,37 @@ export default class PlanningUnitSetting extends Component {
             wordWrap: true,
             allowInsertColumn: false,
             allowManualInsertColumn: false,
-            allowDeleteRow: false,
+            allowDeleteRow: true,
             // onselection: this.selected,
             onchange: this.changed,
+            contextMenu: function (obj, x, y, e) {
+                var items = [];
+                //Add consumption batch info
 
 
+                if (y == null) {
+                    // alert("Hi");
+                } else {
+                    // alert("Hi1");
+                    // Delete a row
+                    if (obj.options.allowDeleteRow == true) {
+                        // alert("Hi2");
+                        // region id
+                        if (obj.getRowData(y)[11] == 1) {
+                            items.push({
+                                title: i18n.t("static.common.deleterow"),
+                                onclick: function () {
+                                    obj.deleteRow(parseInt(y));
+                                }
+                            });
+                            // Line
+                            // items.push({ type: 'line' });
+                        }
+                    }
+                }
+
+                return items;
+            }.bind(this),
             oneditionend: this.oneditionend,
             copyCompatibility: true,
             allowExport: false,
@@ -1353,9 +1379,9 @@ export default class PlanningUnitSetting extends Component {
             position: 'top',
             filters: true,
             license: JEXCEL_PRO_KEY,
-            contextMenu: function (obj, x, y, e) {
-                return [];
-            }.bind(this),
+            // contextMenu: function (obj, x, y, e) {
+            //     return [];
+            // }.bind(this),
         };
         var languageEl = jexcel(document.getElementById("tableDiv"), options);
         this.el = languageEl;
