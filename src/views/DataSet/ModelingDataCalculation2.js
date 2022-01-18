@@ -351,8 +351,10 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
     props.updateState("nodeId", nodeId);
     props.updateState("type", type);
     props.updateState("loading", false);
+    console.log("here------------------------")
     props.updateState("modelingJexcelLoader", false);
     props.updateState("momJexcelLoader", false);
+    props.updateState("message1", "Data updated successfully");
     // treeList = treeList;
     // datasetJson.treeList = treeList;
     // var encryptedDatasetJson = (CryptoJS.AES.encrypt(JSON.stringify(datasetJson), SECRET_KEY)).toString();

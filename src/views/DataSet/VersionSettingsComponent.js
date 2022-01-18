@@ -623,14 +623,14 @@ class VersionSettingsComponent extends Component {
         let versionSettingsList = this.state.versionSettingsList;
         let versionSettingsArray = [];
         let count = 0;
-        var downloadedDataset = this.state.datasetList;
-        for (var j = 0; j < downloadedDataset.length; j++) {
-            var bytes = CryptoJS.AES.decrypt(downloadedDataset[j].programData, SECRET_KEY);
+        var versionTypeId = document.getElementById('versionTypeId').value;
+        for (var j = 0; j < versionSettingsList.length; j++) {
+            var bytes = CryptoJS.AES.decrypt(versionSettingsList[j].programData, SECRET_KEY);
             var pd = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
             data = [];
-            data[0] = downloadedDataset[j].programId
-            data[1] = downloadedDataset[j].programCode
-            data[2] = downloadedDataset[j].version + "(Local)"
+            data[0] = versionSettingsList[j].programId
+            data[1] = versionSettingsList[j].programCode
+            data[2] = versionSettingsList[j].version + "(Local)"
             data[3] = ''
             data[4] = pd.currentVersion.notes
             data[5] = ''
@@ -664,7 +664,7 @@ class VersionSettingsComponent extends Component {
             }
             // 1-Local 0-Live
             data[10] = 1
-            data[11] = downloadedDataset[j].id
+            data[11] = versionSettingsList[j].id
             data[12] = 0
             data[13] = pd.currentVersion.daysInMonth != null ? pd.currentVersion.daysInMonth : '0'
 
@@ -673,12 +673,14 @@ class VersionSettingsComponent extends Component {
             data[15] = (pd.currentVersion.forecastThresholdHighPerc == null ? '' : pd.currentVersion.forecastThresholdHighPerc)
             data[16] = (pd.currentVersion.forecastThresholdLowPerc == null ? '' : pd.currentVersion.forecastThresholdLowPerc)
             data[17] = 0;
-            versionSettingsArray[count] = data;
-            count++;
+            if (versionTypeId == "") {
+                versionSettingsArray[count] = data;
+                count++;
+            }
 
         }
         // console.log("versionSettingsArray------->", versionSettingsArray);
-        var versionTypeId = document.getElementById('versionTypeId').value;
+
         for (var j = 0; j < versionSettingsList.length; j++) {
             var databytes = CryptoJS.AES.decrypt(versionSettingsList[j].programData, SECRET_KEY);
             var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
