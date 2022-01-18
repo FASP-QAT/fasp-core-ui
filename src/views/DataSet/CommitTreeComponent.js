@@ -481,7 +481,7 @@ export default class CommitTreeComponent extends React.Component {
                     var regionArray = [];
                     for (var drl = 0; drl < datasetRegionList.length; drl++) {
                         if (selectedForecast[datasetRegionList[drl].regionId] == undefined || (selectedForecast[datasetRegionList[drl].regionId].scenarioId == null && selectedForecast[datasetRegionList[drl].regionId].consumptionExtrapolationId == null)) {
-                            regionArray.push(getLabelText(datasetRegionList[drl].label, this.state.lang));
+                            regionArray.push({ id: datasetRegionList[drl].regionId, label: getLabelText(datasetRegionList[drl].label, this.state.lang) });
                         }
                     }
                     noForecastSelectedList.push({
@@ -1004,6 +1004,14 @@ export default class CommitTreeComponent extends React.Component {
         }, 8000);
     }
 
+    noForecastSelectedClicked(planningUnitId, regionId) {
+        localStorage.setItem("sesDatasetPlanningUnitId", planningUnitId);
+        localStorage.setItem("sesDatasetRegionId", regionId);
+        const win = window.open("/#/report/compareAndSelectScenario", "_blank");
+        win.focus();
+        // this.props.history.push(``);
+    }
+
     render() {
         const { programList } = this.state;
         let programs = programList.length > 0 && programList.map((item, i) => {
@@ -1016,13 +1024,19 @@ export default class CommitTreeComponent extends React.Component {
 
         //No forecast selected
         const { noForecastSelectedList } = this.state;
-        let noForecastSelected = noForecastSelectedList.length > 0 && noForecastSelectedList.map((item, i) => {
-            return (
-                <li key={i}>
-                    <div>{getLabelText(item.planningUnit.planningUnit.label, this.state.lang) + " - " + item.regionList}</div>
-                </li>
-            )
-        }, this);
+        let noForecastSelected = noForecastSelectedList.length > 0 &&
+            noForecastSelectedList.map((item, i) => {
+                return (
+                    item.regionList.map(item1 => {
+                        console.log("item1", item1);
+                        return (
+                            <li key={i}>
+                                <div className="hoverDiv" onClick={() => this.noForecastSelectedClicked(item.planningUnit.planningUnit.id, item1.id)}>{getLabelText(item.planningUnit.planningUnit.label, this.state.lang) + " - " + item1.label}</div>
+                            </li>
+                        )
+                    }, this)
+                )
+            }, this);
 
         //Consumption : missing months
         const { missingMonthList } = this.state;
