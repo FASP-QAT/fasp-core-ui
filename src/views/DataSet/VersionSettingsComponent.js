@@ -284,7 +284,7 @@ class VersionSettingsComponent extends Component {
             console.log("startDate--------->", startDate);
             if (startDate != null && month != null) {
                 let newStartDate = new Date(startDate);
-                newStartDate.setMonth(newStartDate.getMonth() + month);
+                newStartDate.setMonth(newStartDate.getMonth() + (month - 1));
                 // console.log("startDate--------->1", new Date(newStartDate));
                 this.el.setValueFromCoords(17, y, 1, true);
                 this.el.setValueFromCoords(9, y, newStartDate.getFullYear() + '-' + (newStartDate.getMonth() + 1) + "-01 00:00:00", true);
@@ -305,6 +305,7 @@ class VersionSettingsComponent extends Component {
                 var months;
                 months = (d2.getFullYear() - d1.getFullYear()) * 12;
                 months += d2.getMonth() - d1.getMonth();
+                months = months - 1;
                 this.el.setValueFromCoords(17, y, 1, true);
                 this.el.setValueFromCoords(8, y, months, true);
             }
@@ -415,8 +416,8 @@ class VersionSettingsComponent extends Component {
                     var program = (this.state.datasetList.filter(x => x.id == id)[0]);
                     var databytes = CryptoJS.AES.decrypt(program.programData, SECRET_KEY);
                     var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
-                    programData.currentVersion.forecastStartDate = startDate;
-                    programData.currentVersion.forecastStopDate = stopDate;
+                    programData.currentVersion.forecastStartDate = moment(startDate).startOf('month').format("YYYY-MM-DD");
+                    programData.currentVersion.forecastStopDate = moment(stopDate).startOf('month').format("YYYY-MM-DD");
                     programData.currentVersion.daysInMonth = noOfDaysInMonth;
                     programData.currentVersion.notes = notes;
 

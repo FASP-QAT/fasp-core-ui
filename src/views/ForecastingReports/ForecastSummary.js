@@ -56,9 +56,9 @@ class ForecastSummary extends Component {
             rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
             minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
             maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
-            loading: false,
+            loading: true,
             programId: '',
-            versionId: '',
+            versionId: -1,
             planningUnitLabel: '',
             viewById: 1,
             regionList: [],
@@ -100,7 +100,11 @@ class ForecastSummary extends Component {
             endDateDisplay: '',
             beforeEndDateDisplay: '',
             totalProductCost: 0,
-            regPlanningUnitList: []
+            regPlanningUnitList: [],
+            hideColumn: false,
+            currencyId: '',
+            dataArray: [],
+            lang: localStorage.getItem('lang'),
 
         };
         this.getPrograms = this.getPrograms.bind(this);
@@ -123,14 +127,20 @@ class ForecastSummary extends Component {
         this.hideCalculation = this.hideCalculation.bind(this);
         this.filterTsList = this.filterTsList.bind(this);
         this.saveSelectedForecast = this.saveSelectedForecast.bind(this);
-        this.forecastChanged = this.forecastChanged.bind(this)
+        this.forecastChanged = this.forecastChanged.bind(this);
+        this.backToMonthlyForecast = this.backToMonthlyForecast.bind(this);
 
+    }
+
+    backToMonthlyForecast() {
+        this.props.history.push(`/forecastReport/forecastOutput`)
     }
 
     hideCalculation(e) {
         console.log("E++++++++", e.target.value);
         this.setState({
-            hideCalculation: e.target.value
+            hideCalculation: e.target.value,
+            hideColumn: !this.state.hideColumn
         })
 
     }
@@ -223,16 +233,576 @@ class ForecastSummary extends Component {
     toggledata = () => this.setState((currentState) => ({ show: !currentState.show }));
 
     exportCSV() {
+        var csvRow = [];
+        csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+        csvRow.push('')
+        csvRow.push('"' + (i18n.t('static.report.version*') + ' : ' + document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+        csvRow.push('')
+        csvRow.push('"' + ('Forecast Period' + ' : ' + document.getElementById("forecastPeriod").value).replaceAll(' ', '%20') + '"')
+        csvRow.push('')
+        csvRow.push('"' + ('Display' + ' : ' + document.getElementById("displayId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+        csvRow.push('')
+
+        let viewById = document.getElementById("displayId").value;
+
+        if (viewById == 1) {//National
+            csvRow.push('"' + ('Hide Calculations' + ' : ' + document.getElementById("calculationId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+            csvRow.push('')
+        }
+
+
+
+        if (viewById == 1) {//National----1
+            const headers = [];
+            headers.push('');
+            headers.push('Planning Unit');
+            headers.push('Total Forecasted Quantity');
+            if (!this.state.hideColumn) {
+                headers.push('Stock (end of ' + this.state.beforeEndDateDisplay + ')');
+                headers.push('Existing Shipments (' + this.state.startDateDisplay + ' - ' + this.state.endDateDisplay + ')');
+                headers.push('Stock (end of ' + this.state.endDateDisplay + ')');
+                headers.push('Desired Months of Stock (end of' + this.state.endDateDisplay + ')');
+                headers.push('Desired Stock (end of ' + this.state.endDateDisplay + ')');
+            }
+            headers.push('Procurement Surplus/Gap');
+            if (!this.state.hideColumn) {
+                headers.push('Price Type');
+                headers.push('Unit Price (USD)');
+            }
+            headers.push('Procurements Needed (USD)');
+            headers.push('Notes');
+
+            var A = [this.addDoubleQuoteToRowContent(headers)]
+
+            // this.state.buildCSVTable.map(ele => 
+            //     A.push(this.addDoubleQuoteToRowContent([ ((ele.supplyPlanPlanningUnit).replaceAll(',', ' ')).replaceAll(' ', '%20'), 
+            //     ((ele.forecastPlanningUnit).replaceAll(',', ' ')).replaceAll(' ', '%20'), 
+            //     ele.region, this.dateFormatter(ele.month).replaceAll(' ', '%20'), 
+            //     ele.supplyPlanConsumption, 
+            //     ele.multiplier, 
+            //     ele.convertedConsumption, 
+            //     ele.currentQATConsumption, 
+            //     ele.import == true ? 'Yes' : 'No' ])));
+
+            this.state.summeryData.map(ele => {
+                let propertyName = [];
+                if (!this.state.hideColumn) {
+                    propertyName.push((ele.stock1 == null ? '' : ele.stock1));
+                    propertyName.push((ele.existingShipments == null ? '' : ele.existingShipments));
+                    propertyName.push((ele.stock2 == null ? '' : ele.stock2));
+                    propertyName.push((ele.desiredMonthOfStock1 == null ? '' : ele.desiredMonthOfStock1));
+                    propertyName.push((ele.desiredMonthOfStock2 == null ? '' : ele.desiredMonthOfStock2));
+                }
+                let propertyName1 = [];
+                if (!this.state.hideColumn) {
+                    propertyName1.push((ele.priceType == null ? '' : ele.priceType));
+                    propertyName1.push((ele.unitPrice == null ? '' : ele.unitPrice));
+                }
+                return (ele.id != 0 &&
+                    A.push(this.addDoubleQuoteToRowContent([
+                        // ((getLabelText(ele.tracerCategory.label, this.state.lang)).replaceAll(',', ' ')).replaceAll(' ', '%20'),
+                        // ((getLabelText(ele.planningUnit.label, this.state.lang)).replaceAll(',', ' ')).replaceAll(' ', '%20'),
+                        ((ele.tracerCategory.label.label_en).replaceAll(',', ' ')).replaceAll(' ', '%20'),
+                        ((ele.planningUnit.label.label_en).replaceAll(',', ' ')).replaceAll(' ', '%20'),
+                        (ele.totalForecastedQuantity == null ? '' : ele.totalForecastedQuantity)
+                    ].concat(propertyName).concat([(ele.procurementGap == null ? '' : ele.procurementGap)].concat(propertyName1).concat([(ele.procurementNeeded == null ? '' : ele.procurementNeeded), (ele.notes == null ? '' : ele.notes)]))))
+                )
+            }
+            );
+
+            if (!this.state.hideColumn) {
+                A.push(this.addDoubleQuoteToRowContent([
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    'Product Cost',
+                    this.state.totalProductCost,
+                    ''
+                ]))
+                A.push(this.addDoubleQuoteToRowContent([
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    'Freight (7%)',
+                    (0.07 * this.state.totalProductCost),
+                    ''
+                ]))
+                A.push(this.addDoubleQuoteToRowContent([
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    'Total Cost',
+                    (this.state.totalProductCost + 0.07 * this.state.totalProductCost),
+                    ''
+                ]))
+            } else {
+                A.push(this.addDoubleQuoteToRowContent([
+                    '',
+                    '',
+                    '',
+                    'Product Cost',
+                    this.state.totalProductCost,
+                    ''
+                ]))
+                A.push(this.addDoubleQuoteToRowContent([
+                    '',
+                    '',
+                    '',
+                    'Freight (7%)',
+                    (0.07 * this.state.totalProductCost),
+                    ''
+                ]))
+                A.push(this.addDoubleQuoteToRowContent([
+                    '',
+                    '',
+                    '',
+                    'Total Cost',
+                    (this.state.totalProductCost + 0.07 * this.state.totalProductCost),
+                    ''
+                ]))
+            }
+
+
+            for (var i = 0; i < A.length; i++) {
+                // console.log(A[i])
+                csvRow.push(A[i].join(","))
+            }
+
+            var csvString = csvRow.join("%0A")
+            // console.log('csvString' + csvString)
+            var a = document.createElement("a")
+            a.href = 'data:attachment/csv,' + csvString
+            a.target = "_Blank"
+            a.download = 'Forecast Summary' + ".csv"
+            document.body.appendChild(a)
+            a.click();
+
+        } else {//Regional-------2
+            const nestedHeaders = [];
+            var tcList = this.state.tracerCategoryList;
+            var puList = this.state.regPlanningUnitList;
+            let regRegionList = this.state.regRegionList;
+            let tsList = this.state.tsList;
+            console.log("Array--------->31", tsList);
+            nestedHeaders.push('');
+            for (var k = 0; k < regRegionList.length; k++) {
+                nestedHeaders.push('');
+                nestedHeaders.push(regRegionList[k].label.label_en);
+                nestedHeaders.push('');
+            }
+            nestedHeaders.push('All Regions');
+            var A = [this.addDoubleQuoteToRowContent(nestedHeaders)]
+
+            const headers = [];
+            headers.push('Planning Unit');
+            for (var k = 0; k < regRegionList.length; k++) {
+                headers.push('Selected Forecast');
+                headers.push('Forecast Quantity');
+                headers.push('Notes');
+            }
+
+            headers.push('Total Forecasted Qunatity');
+            A.push([this.addDoubleQuoteToRowContent(headers)]);
+
+            for (var tc = 0; tc < tcList.length; tc++) {
+                A.push([this.addDoubleQuoteToRowContent([((puList.filter(c => c.planningUnit.forecastingUnit.tracerCategory.id == tcList[tc])[0].planningUnit.forecastingUnit.tracerCategory.label.label_en).replaceAll(',', ' ')).replaceAll(' ', '%20')])]);
+
+                var puListFiltered = puList.filter(c => c.planningUnit.forecastingUnit.tracerCategory.id == tcList[tc]);
+                for (var j = 0; j < puListFiltered.length; j++) {
+                    let regionArray = [];
+                    var total = 0;
+
+
+                    for (var k = 0; k < regRegionList.length; k++) {
+                        var filterForecastSelected = puListFiltered[j].selectedForecastMap[regRegionList[k].regionId]
+                        // console.log("Array--------->2", filterForecastSelected);
+                        total += Number(filterForecastSelected != undefined ? filterForecastSelected.totalForecast : 0);
+
+                        // (tsList.filter(c => c.id == )[0].label)
+                        let nameTC = '';
+                        try {
+                            let idTC = (((filterForecastSelected != undefined) ? (filterForecastSelected.scenarioId > 0) ? "T" + filterForecastSelected.scenarioId : (filterForecastSelected.consumptionExtrapolationId > 0) ? "C" + filterForecastSelected.consumptionExtrapolationId : "" : ""));
+                            nameTC = (tsList.filter(c => c.id == idTC)[0].name);
+
+                        }
+                        catch (err) {
+                            // document.getElementById("demo").innerHTML = err.message;
+                        }
+
+                        // regionArray.push((((filterForecastSelected != undefined) ? (filterForecastSelected.scenarioId > 0) ? treeVar : (filterForecastSelected.consumptionExtrapolationId > 0) ? consumptionVar : "" : "")));
+                        regionArray.push(((nameTC).replaceAll(',', ' ')).replaceAll(' ', '%20'));
+                        regionArray.push((filterForecastSelected != undefined ? (filterForecastSelected.totalForecast == null ? "" : filterForecastSelected.totalForecast) : ""));
+                        regionArray.push((filterForecastSelected != undefined ? (filterForecastSelected.notes == null ? "" : ((filterForecastSelected.notes).replaceAll(',', ' ')).replaceAll(' ', '%20')) : ""));
+                    }
+                    // console.log("Array--------->", regionArray);
+
+                    A.push(this.addDoubleQuoteToRowContent([((puListFiltered[j].planningUnit.label.label_en).replaceAll(',', ' ')).replaceAll(' ', '%20')].concat(regionArray).concat([total])));
+                    // console.log("Array--------->2", [((puListFiltered[j].planningUnit.label.label_en).replaceAll(',', ' ')).replaceAll(' ', '%20')].concat(regionArray).concat([total]));
+                }
+            }
+
+            for (var i = 0; i < A.length; i++) {
+                // console.log(A[i])
+                csvRow.push(A[i].join(","))
+            }
+
+            var csvString = csvRow.join("%0A")
+            // console.log('csvString' + csvString)
+            var a = document.createElement("a")
+            a.href = 'data:attachment/csv,' + csvString
+            a.target = "_Blank"
+            a.download = 'Forecast Summary' + ".csv"
+            document.body.appendChild(a)
+            a.click();
+
+        }
+
+
+    }
+
+    addDoubleQuoteToRowContent = (arr) => {
+        return arr.map(ele => '"' + ele + '"')
     }
 
 
-    exportPDF = () => {
+    exportPDF = (columns) => {
+        const addFooters = doc => {
+
+            const pageCount = doc.internal.getNumberOfPages()
+
+            doc.setFont('helvetica', 'bold')
+            doc.setFontSize(6)
+            for (var i = 1; i <= pageCount; i++) {
+                doc.setPage(i)
+
+                doc.setPage(i)
+                doc.text('Page ' + String(i) + ' of ' + String(pageCount), doc.internal.pageSize.width / 9, doc.internal.pageSize.height - 30, {
+                    align: 'center'
+                })
+                doc.text('Copyright © 2020 ' + i18n.t('static.footer'), doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
+                    align: 'center'
+                })
+
+
+            }
+        }
+        const addHeaders = doc => {
+
+            const pageCount = doc.internal.getNumberOfPages()
+            for (var i = 1; i <= pageCount; i++) {
+                doc.setFontSize(12)
+                doc.setFont('helvetica', 'bold')
+                doc.setPage(i)
+                doc.addImage(LOGO, 'png', 0, 10, 180, 50, 'FAST');
+
+                doc.setTextColor("#002f6c");
+                doc.text('Forecast Summary', doc.internal.pageSize.width / 2, 60, {
+                    align: 'center'
+                })
+                if (i == 1) {
+                    doc.setFontSize(8)
+                    doc.setFont('helvetica', 'normal')
+                    doc.text(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 90, {
+                        align: 'left'
+                    })
+                    doc.text(i18n.t('static.report.version*') + ' : ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
+                        align: 'left'
+                    })
+                    doc.text(i18n.t('static.report.dateRange') + ' : ' + document.getElementById("forecastPeriod").value, doc.internal.pageSize.width / 8, 130, {
+                        align: 'left'
+                    })
+                    doc.text('Display' + ' : ' + document.getElementById("displayId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 150, {
+                        align: 'left'
+                    })
+
+                    let viewById = document.getElementById("displayId").value;
+                    if (viewById == 1) {//National
+                        doc.text('Hide Calculations' + ' : ' + document.getElementById("calculationId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 170, {
+                            align: 'left'
+                        })
+                    }
+
+                }
+
+            }
+        }
+
+        const unit = "pt";
+        const size = "A4"; // Use A1, A2, A3 or A4
+        const orientation = "landscape"; // portrait or landscape
+
+        const marginLeft = 10;
+        const doc = new jsPDF(orientation, unit, size);
+
+        doc.setFontSize(8);
+
+
+        // const title = i18n.t('static.dashboard.stockstatusmatrix');
+        let viewById = document.getElementById("displayId").value;
+        if (viewById == 2) {//Regional
+
+            var tcList = this.state.tracerCategoryList;
+            var puList = this.state.regPlanningUnitList;
+            let regRegionList = this.state.regRegionList;
+            let tsList = this.state.tsList;
+
+            // let header1 = [{ content: i18n.t('static.planningunit.planningunit'), rowSpan: 2, styles: { halign: 'center' } }];
+            // let header2 = [];
+
+            // header1.push({ content: 'National', colSpan: 3, styles: { halign: 'center' } });
+            // header1.push({ content: 'South', colSpan: 3, styles: { halign: 'center' } });
+            // header1.push({ content: 'Total Forecasted Qunatity', rowSpan: 2, styles: { halign: 'center' } });
+            // header2.push(
+            //     { content: 'Selected Forecast', styles: { halign: 'center' } },
+            //     { content: 'Forecast Quantity', styles: { halign: 'center' } },
+            //     { content: 'Notes', styles: { halign: 'center' } },
+
+            //     { content: 'Selected Forecast', styles: { halign: 'center' } },
+            //     { content: 'Forecast Quantity', styles: { halign: 'center' } },
+            //     { content: 'Notes', styles: { halign: 'center' } }
+            // )
+            // let header = [header1, header2];
+
+            let header1 = [{ content: i18n.t('static.planningunit.planningunit'), rowSpan: 2, styles: { halign: 'center' } }];
+            let header2 = [];
+
+            for (var k = 0; k < regRegionList.length; k++) {
+                header1.push({ content: regRegionList[k].label.label_en, colSpan: 3, styles: { halign: 'center' } })
+
+                header2.push(
+                    { content: 'Selected Forecast', styles: { halign: 'center' } },
+                    { content: 'Forecast Quantity', styles: { halign: 'center' } },
+                    { content: 'Notes', styles: { halign: 'center' } }
+                )
+            }
+            header1.push({ content: 'Total Forecasted Qunatity', rowSpan: 2, styles: { halign: 'center' } });
+            let header = [header1, header2];
+            let data = [];
+            for (var tc = 0; tc < tcList.length; tc++) {
+                let tempData1 = [];
+                tempData1.push(puList.filter(c => c.planningUnit.forecastingUnit.tracerCategory.id == tcList[tc])[0].planningUnit.forecastingUnit.tracerCategory.label.label_en);
+                data.push(tempData1);
+                tempData1 = [];
+
+                var puListFiltered = puList.filter(c => c.planningUnit.forecastingUnit.tracerCategory.id == tcList[tc]);
+                for (var j = 0; j < puListFiltered.length; j++) {
+                    let regionArray = [];
+                    var total = 0;
+
+                    for (var k = 0; k < regRegionList.length; k++) {
+                        var filterForecastSelected = puListFiltered[j].selectedForecastMap[regRegionList[k].regionId]
+                        // console.log("Array--------->2", filterForecastSelected);
+                        total += Number(filterForecastSelected != undefined ? filterForecastSelected.totalForecast : 0);
+
+                        let nameTC = '';
+                        try {
+                            let idTC = (((filterForecastSelected != undefined) ? (filterForecastSelected.scenarioId > 0) ? "T" + filterForecastSelected.scenarioId : (filterForecastSelected.consumptionExtrapolationId > 0) ? "C" + filterForecastSelected.consumptionExtrapolationId : "" : ""));
+                            nameTC = (tsList.filter(c => c.id == idTC)[0].name);
+
+                        }
+                        catch (err) {
+                            // document.getElementById("demo").innerHTML = err.message;
+                        }
+
+                        regionArray.push(((nameTC)));
+                        regionArray.push((filterForecastSelected != undefined ? (filterForecastSelected.totalForecast == null ? "" : filterForecastSelected.totalForecast) : ""));
+                        regionArray.push((filterForecastSelected != undefined ? (filterForecastSelected.notes == null ? "" : ((filterForecastSelected.notes))) : ""));
+                    }
+                    tempData1.push(puListFiltered[j].planningUnit.label.label_en);
+                    tempData1 = tempData1.concat(regionArray);
+                    tempData1.push(total);
+                    data.push(tempData1);
+
+                }
+            }
+
+            var startY = 230;
+            let content = {
+                margin: { top: 80, bottom: 90 },
+                startY: startY,
+                head: header,
+                body: data,
+                styles: { lineWidth: 1, fontSize: 8, halign: 'center' }
+                // styles: { lineWidth: 1, fontSize: 8, cellWidth: 38, halign: 'center' },
+                // columnStyles: {
+                //     1: { cellWidth: 99.89 },
+                //     2: { cellWidth: 54 },
+                // }
+            };
+
+            doc.autoTable(content);
+            addHeaders(doc)
+            addFooters(doc)
+            doc.save('Forecast Summary' + ".pdf")
+        } else {//National
+
+            let headers = [];
+            let headers1 = ['', 'Planning Unit', 'Total Forecasted Quantity'];
+            if (!this.state.hideColumn) {
+                headers1 = headers1.concat(['Stock (end of ' + this.state.beforeEndDateDisplay + ')', 'Existing Shipments (' + this.state.startDateDisplay + ' - ' + this.state.endDateDisplay + ')', 'Stock (end of ' + this.state.endDateDisplay + ')', 'Desired Months of Stock (end of' + this.state.endDateDisplay + ')', 'Desired Stock (end of ' + this.state.endDateDisplay + ')']);
+            }
+            headers1 = headers1.concat(['Procurement Surplus/Gap']);
+            if (!this.state.hideColumn) {
+                headers1 = headers1.concat(['Price Type', 'Unit Price (USD)']);
+            }
+            headers1 = headers1.concat(['Procurements Needed (USD)', 'Notes']);
+            headers.push(headers1);
+            // const data = this.state.matricsList.map(elt => [this.dateFormatter(elt.month), this.formatter(elt.forecastedConsumption), this.formatter(elt.actualConsumption), elt.message == null ? this.PercentageFormatter(elt.forecastError) : i18n.t(elt.message)]);
+            let data = [];
+
+            this.state.summeryData.map(ele => {
+                let A = [];
+                let propertyName = [];
+                if (!this.state.hideColumn) {
+                    propertyName.push((ele.stock1 == null ? '' : ele.stock1));
+                    propertyName.push((ele.existingShipments == null ? '' : ele.existingShipments));
+                    propertyName.push((ele.stock2 == null ? '' : ele.stock2));
+                    propertyName.push((ele.desiredMonthOfStock1 == null ? '' : ele.desiredMonthOfStock1));
+                    propertyName.push((ele.desiredMonthOfStock2 == null ? '' : ele.desiredMonthOfStock2));
+                }
+                let propertyName1 = [];
+                if (!this.state.hideColumn) {
+                    propertyName1.push((ele.priceType == null ? '' : ele.priceType));
+                    propertyName1.push((ele.unitPrice == null ? '' : ele.unitPrice));
+                }
+
+                if (ele.id != 0) {
+                    A.push((
+                        (ele.tracerCategory.label.label_en)),
+                        ((ele.planningUnit.label.label_en)),
+                        (ele.totalForecastedQuantity == null ? '' : ele.totalForecastedQuantity)
+                    )
+                    A = A.concat(propertyName).concat([(ele.procurementGap == null ? '' : ele.procurementGap)].concat(propertyName1).concat([(ele.procurementNeeded == null ? '' : ele.procurementNeeded), (ele.notes == null ? '' : ele.notes)]));
+                }
+
+                return (ele.id != 0 &&
+                    data.push(A)
+                )
+            }
+            );
+
+            if (!this.state.hideColumn) {
+                data.push([
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    'Product Cost',
+                    this.state.totalProductCost,
+                    ''
+                ])
+                data.push([
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    'Freight (7%)',
+                    (0.07 * this.state.totalProductCost),
+                    ''
+                ])
+                data.push([
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    'Total Cost',
+                    (this.state.totalProductCost + 0.07 * this.state.totalProductCost),
+                    ''
+                ])
+            } else {
+                data.push([
+                    '',
+                    '',
+                    '',
+                    'Product Cost',
+                    this.state.totalProductCost,
+                    ''
+                ])
+                data.push([
+                    '',
+                    '',
+                    '',
+                    'Freight (7%)',
+                    (0.07 * this.state.totalProductCost),
+                    ''
+                ])
+                data.push([
+                    '',
+                    '',
+                    '',
+                    'Total Cost',
+                    (this.state.totalProductCost + 0.07 * this.state.totalProductCost),
+                    ''
+                ])
+            }
+
+            var startY = 230;
+            let content = {
+                margin: { top: 80, bottom: 90 },
+                startY: startY,
+                head: headers,
+                body: data,
+                styles: { lineWidth: 1, fontSize: 8, halign: 'center' }
+                // styles: { lineWidth: 1, fontSize: 8, cellWidth: 38, halign: 'center' },
+                // columnStyles: {
+                //     1: { cellWidth: 99.89 },
+                //     2: { cellWidth: 54 },
+                // }
+            };
+
+            doc.autoTable(content);
+            addHeaders(doc)
+            addFooters(doc)
+            doc.save('Forecast Summary' + ".pdf")
+
+        }
     }
 
     filterData() {
         let programId = document.getElementById("programId").value;
         let versionId = document.getElementById("versionId").value;
         let displayId = document.getElementById("displayId").value;
+        (displayId == 1 ? document.getElementById("hideCalculationDiv").style.display = "block" : document.getElementById("hideCalculationDiv").style.display = "none");
+        (displayId == 1 ? document.getElementById("hideCurrencyDiv").style.display = "block" : document.getElementById("hideCurrencyDiv").style.display = "none");
         this.setState({
             displayId: displayId
         })
@@ -256,8 +826,14 @@ class ForecastSummary extends Component {
                     var getRequest = program.getAll();
                     var datasetList = [];
                     var datasetList1 = [];
+                    this.setState({
+                        loading: true
+                    })
 
                     getRequest.onerror = function (event) {
+                        this.setState({
+                            loading: false
+                        })
                         // Handle errors!
                     };
                     getRequest.onsuccess = function (event) {
@@ -267,7 +843,6 @@ class ForecastSummary extends Component {
                         // this.setState({
                         //     datasetList: myResult
                         // });
-
 
                         var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
                         var userId = userBytes.toString(CryptoJS.enc.Utf8);
@@ -454,7 +1029,7 @@ class ForecastSummary extends Component {
                                 let tempProcurementGap = ((planningUnitList[j].stock + planningUnitList[j].existingShipments) - totalForecastedQuantity0ri) - (planningUnitList[j].monthsOfStock * totalForecastedQuantity0ri / total_months);
                                 let procurementGap = (tempProcurementGap < 0 ? '(' + tempProcurementGap + ')' : tempProcurementGap);
                                 let isProcurementGapRed = (procurementGap < 0 ? true : false)
-                                let priceType = (planningUnitList[j].procurementAgent == null && planningUnitList[j].price == null ? 'No price type available' : (planningUnitList[j].procurementAgent != null ? planningUnitList[j].procurementAgent.label.label_en : 'Custom'));
+                                let priceType = (planningUnitList[j].procurementAgent == null && planningUnitList[j].price == null ? 'No price type available' : (planningUnitList[j].procurementAgent != null ? planningUnitList[j].procurementAgent.code : 'Custom'));
                                 let isPriceTypeRed = (planningUnitList[j].procurementAgent == null && planningUnitList[j].price == null ? true : false);
                                 let unitPrice = planningUnitList[j].price;
                                 let procurementNeeded = (isProcurementGapRed == true ? '$ ' + tempProcurementGap * unitPrice : '');
@@ -481,6 +1056,7 @@ class ForecastSummary extends Component {
                             }
                             console.log("Test------------>3", summeryData);
                             this.setState({
+                                loading: (displayId == 2 ? true : false),
                                 summeryData: summeryData,
                                 totalProductCost: totalProductCost,
                                 regDatasetJson: filteredProgram,
@@ -525,7 +1101,8 @@ class ForecastSummary extends Component {
                                         data = [];
                                         data[0] = puList.filter(c => c.planningUnit.forecastingUnit.tracerCategory.id == tcList[tc])[0].planningUnit.forecastingUnit.tracerCategory.label.label_en;
                                         data[1] = "";
-                                        data[2] = "";
+                                        // data[2] = "";
+                                        data[2] = puList.filter(c => c.planningUnit.forecastingUnit.tracerCategory.id == tcList[tc])[0].planningUnit.forecastingUnit.tracerCategory.label.label_en;
                                         for (var k = 0; k < this.state.regRegionList.length; k++) {
                                             data[k + 3] = "";
                                             data[k + 4] = "";
@@ -557,7 +1134,7 @@ class ForecastSummary extends Component {
                                         }
                                     }
                                     var columns = [];
-                                    columns.push({ title: "Forecasting Unit", type: 'text', width: 100, readOnly: true });
+                                    columns.push({ title: "Forecasting Unit", type: 'hidden', width: 100, readOnly: true });
                                     columns.push({ title: "Planning Unit", type: 'hidden', width: 100, readOnly: true });
                                     columns.push({ title: "Planning Unit", type: 'text', width: 100, readOnly: true });
                                     for (var k = 0; k < regRegionList.length; k++) {
@@ -568,13 +1145,13 @@ class ForecastSummary extends Component {
                                     columns.push({ title: "type", type: 'hidden', width: 100, readOnly: true });
                                     columns.push({ title: "Total Forecasted Qunatity", type: 'numeric', textEditor: true, mask: '#,##.00', decimal: '.', width: 100, readOnly: true });
                                     let nestedHeaders = [];
-                                    nestedHeaders.push(
-                                        {
-                                            title: '',
-                                            colspan: '1'
-                                        },
+                                    // nestedHeaders.push(
+                                    //     {
+                                    //         title: '',
+                                    //         colspan: '1'
+                                    //     },
 
-                                    );
+                                    // );
                                     nestedHeaders.push(
                                         {
                                             title: '',
@@ -604,12 +1181,23 @@ class ForecastSummary extends Component {
                                     // console.log("languageArray---->", languageArray);
                                     this.el = jexcel(document.getElementById("tableDiv"), '');
                                     this.el.destroy();
-                                    console.log("DataArray+++", dataArray)
+                                    console.log("DataArray+++", dataArray);
+                                    this.setState({
+                                        dataArray: dataArray
+                                    }, () => {
+                                    })
                                     var options = {
                                         data: dataArray,
                                         columnDrag: true,
                                         columns: columns,
                                         nestedHeaders: [nestedHeaders],
+                                        updateTable: function (el, cell, x, y, source, value, id) {
+                                            if (y != null) {
+                                                var elInstance = el.jexcel;
+                                                var rowData = elInstance.getRowData(y);
+                                                elInstance.setStyle(`C${parseInt(y) + 1}`, 'text-align', 'left');
+                                            }
+                                        }.bind(this),
                                         text: {
                                             // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
                                             showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
@@ -655,7 +1243,8 @@ class ForecastSummary extends Component {
                                     var dataEl = jexcel(document.getElementById("tableDiv"), options);
                                     this.el = dataEl;
                                     this.setState({
-                                        dataEl: dataEl
+                                        dataEl: dataEl,
+                                        loading: false
                                     })
                                 }
                             });
@@ -672,7 +1261,10 @@ class ForecastSummary extends Component {
 
             }
         } else {//validation message
-
+            this.setState({
+                dataArray: [],
+                summeryData: []
+            })
         }
     }
 
@@ -699,7 +1291,8 @@ class ForecastSummary extends Component {
                         totalForecast += Number(ele.calculatedValue);
                     });
                 }
-                elInstance.setValueFromCoords((Number(x) + 1), y, totalForecast.toFixed(2), true);
+                // elInstance.setValueFromCoords((Number(x) + 1), y, totalForecast.toFixed(2), true);
+                elInstance.setValueFromCoords((Number(x) + 1), y, parseInt(totalForecast), true);
             }
         }
     }
@@ -838,15 +1431,32 @@ class ForecastSummary extends Component {
                 }
                 var lang = this.state.lang;
 
-                this.setState({
-                    programs: proList.sort(function (a, b) {
-                        a = getLabelText(a.label, lang).toLowerCase();
-                        b = getLabelText(b.label, lang).toLowerCase();
-                        return a < b ? -1 : a > b ? 1 : 0;
+                if (proList.length == 1) {
+                    this.setState({
+                        programs: proList.sort(function (a, b) {
+                            a = getLabelText(a.label, lang).toLowerCase();
+                            b = getLabelText(b.label, lang).toLowerCase();
+                            return a < b ? -1 : a > b ? 1 : 0;
+                        }),
+                        programId: proList[0].programId,
+                        loading: false
+                    }, () => {
+                        this.getVersionIds();
+                        console.log("programs------------------>", this.state.programs);
                     })
-                }, () => {
-                    console.log("programs------------------>", this.state.programs);
-                })
+                } else {
+                    this.setState({
+                        programs: proList.sort(function (a, b) {
+                            a = getLabelText(a.label, lang).toLowerCase();
+                            b = getLabelText(b.label, lang).toLowerCase();
+                            return a < b ? -1 : a > b ? 1 : 0;
+                        }),
+                        loading: false
+                    }, () => {
+                        console.log("programs------------------>", this.state.programs);
+                    })
+                }
+
 
 
             }.bind(this);
@@ -857,6 +1467,8 @@ class ForecastSummary extends Component {
     }
 
     componentDidMount() {
+        document.getElementById("hideCalculationDiv").style.display = "none";
+        document.getElementById("hideCurrencyDiv").style.display = "none";
         this.getPrograms();
         this.setState({
             regionVal: [{ label: "East", value: 1 }, { label: "West", value: 2 }, { label: "North", value: 3 }, { label: "South", value: 4 }],
@@ -877,8 +1489,11 @@ class ForecastSummary extends Component {
 
     setVersionId(event) {
 
-        var versionId = (event.target.value.split('(')[0]).trim();
+        var versionId = ((event == null || event == '' || event == undefined) ? ((this.state.versionId).toString().split('(')[0]) : (event.target.value.split('(')[0]).trim());
+        versionId = parseInt(versionId);
         var programId = this.state.programId;
+        console.log("Test-----------------110", event);
+        console.log("Test-----------------111", versionId);
 
 
         if (programId != -1 && versionId != -1) {
@@ -928,12 +1543,24 @@ class ForecastSummary extends Component {
             let forecastStopDate1 = new Date((month[d1.getMonth()] + '-' + d1.getFullYear()));
             forecastStopDate1.setMonth(forecastStopDate1.getMonth() - 1);
             console.log("Test-----------------111", startDateSplit);
+
+            let forecastStartDateNew = selectedForecastProgram.forecastStartDate;
+            let forecastStopDateNew = selectedForecastProgram.forecastStopDate;
+
+            let beforeEndDateDisplay = new Date(selectedForecastProgram.forecastStartDate);
+            beforeEndDateDisplay.setMonth(beforeEndDateDisplay.getMonth() - 1);
+
             this.setState({
-                forecastPeriod: (month[new Date((month[d1.getMonth()] + '-' + d1.getFullYear())).getMonth()]) + ' ' + (startDateSplit1[1] - 3) + ' ~ ' + month[forecastStopDate1.getMonth()] + ' ' + forecastStopDate1.getFullYear(),
-                rangeValue: { from: { year: startDateSplit[1] - 3, month: new Date(selectedForecastProgram.forecastStartDate).getMonth() + 1 }, to: { year: forecastStopDate.getFullYear(), month: forecastStopDate.getMonth() + 1 } },
-                startDateDisplay: months[new Date(selectedForecastProgram.currentVersion.forecastStartDate).getMonth()] + ' ' + (startDateSplit[1] - 3),
-                endDateDisplay: months[(forecastStopDate.getMonth())] + ' ' + forecastStopDate.getFullYear(),
-                beforeEndDateDisplay: months[(d11.getMonth())] + ' ' + d11.getFullYear(),
+                // forecastPeriod: (month[new Date((month[d1.getMonth()] + '-' + d1.getFullYear())).getMonth()]) + ' ' + (startDateSplit1[1] - 3) + ' ~ ' + month[forecastStopDate1.getMonth()] + ' ' + forecastStopDate1.getFullYear(),
+                // rangeValue: { from: { year: startDateSplit[1] - 3, month: new Date(selectedForecastProgram.forecastStartDate).getMonth() + 1 }, to: { year: forecastStopDate.getFullYear(), month: forecastStopDate.getMonth() + 1 } },
+                // startDateDisplay: months[new Date(selectedForecastProgram.currentVersion.forecastStartDate).getMonth()] + ' ' + (startDateSplit[1] - 3),
+                // endDateDisplay: months[(forecastStopDate.getMonth())] + ' ' + forecastStopDate.getFullYear(),
+                // beforeEndDateDisplay: months[(d11.getMonth())] + ' ' + d11.getFullYear(),
+                forecastPeriod: months[new Date(forecastStartDateNew).getMonth()] + ' ' + new Date(forecastStartDateNew).getFullYear() + ' ~ ' + months[new Date(forecastStartDateNew).getMonth()] + ' ' + new Date(forecastStopDateNew).getFullYear(),
+                rangeValue: { from: { year: new Date(forecastStartDateNew).getFullYear(), month: new Date(forecastStartDateNew).getMonth() + 1 }, to: { year: new Date(forecastStopDateNew).getFullYear(), month: new Date(forecastStopDateNew).getMonth() + 1 } },
+                startDateDisplay: months[new Date(forecastStartDateNew).getMonth()] + ' ' + new Date(forecastStartDateNew).getFullYear(),
+                endDateDisplay: months[new Date(forecastStopDateNew).getMonth()] + ' ' + new Date(forecastStopDateNew).getFullYear(),
+                beforeEndDateDisplay: months[new Date(beforeEndDateDisplay).getMonth()] + ' ' + new Date(beforeEndDateDisplay).getFullYear(),
             }, () => {
 
             })
@@ -955,91 +1582,13 @@ class ForecastSummary extends Component {
 
 
         this.setState({
-            versionId: event.target.value,
+            versionId: ((event == null || event == '' || event == undefined) ? (this.state.versionId) : (event.target.value).trim()),
         }, () => {
             // localStorage.setItem("sesVersionIdReport", '');
             this.filterData();
         })
 
 
-    }
-
-    buildJexcel() {
-        var dataArr = [];
-        var data = [];
-        var consumptionData = this.state.consumptionData;
-        console.log("ConsumptionData+++", consumptionData[0].forecastingUnit);
-        for (var j = 0; j < consumptionData.length; j++) {
-            console.log("ConsumptionData+++", consumptionData[j].forecastingUnit);
-            data = [];
-            data[0] = consumptionData[j].forecastingUnit.label; //A
-            data[1] = consumptionData[j].planningUnit.label; //B
-            data[2] = consumptionData[j].scenario.id; //C
-            data[3] = consumptionData[j].consumptionQty;//D
-            data[4] = consumptionData[j].startingStock;//E
-            data[5] = consumptionData[j].existingShipmentQty;//F
-            data[6] = `=E${parseInt(j) + 1}+F${parseInt(j) + 1}-D${parseInt(j) + 1}`;//G
-            data[7] = consumptionData[j].desiredMonthsOfStock;//H
-            data[8] = `=ROUND(H${parseInt(j) + 1}*D${parseInt(j) + 1}/36,0)`;//I
-            data[9] = `=ROUND(G${parseInt(j) + 1}-I${parseInt(j) + 1},0)`; //J
-            data[10] = consumptionData[j].priceType;//K
-            data[11] = consumptionData[j].price;//L
-            data[12] = `=IF(IFERROR(-J${parseInt(j) + 1}*L${parseInt(j) + 1},"")>0,IFERROR(-J${parseInt(j) + 1}*L${parseInt(j) + 1},""),"")`;
-            dataArr[j] = data;
-        }
-        var options = {
-            data: dataArr,
-            columnDrag: true,
-            columns: [
-                { title: i18n.t('static.product.unit1'), type: 'text', width: 200, readOnly: true },
-                { title: i18n.t('static.product.product'), type: 'text', width: 200, readOnly: true },
-                { type: 'dropdown', title: "Scenario", source: this.state.scenarioList, width: 200 },
-                { title: "Forecast (PU)", type: 'numeric', width: 100, type: 'numeric', mask: '#,##', decimal: '.', readOnly: true },
-                { title: "Starting Stock (PU) - end of Dec 2020", type: 'numeric', mask: '#,##', readOnly: true, width: 100 },
-                { title: 'Existing Shipments in period (PU)', type: 'numeric', mask: '#,##', decimal: '.', readOnly: true, width: 100, },
-                { title: "Ending Stock - end of Dec 2023", type: 'numeric', mask: '#,##', decimal: '.', width: 100, readOnly: true },
-                { title: "Desired End of Period Stock (in months)", type: 'numeric', mask: '#,##', decimal: '.', width: 100, readOnly: true },
-                { title: "Desired End of Period Stock (in PU)", type: 'numeric', mask: '#,##', decimal: '.', readOnly: true, width: 100 },
-                { title: "Shipment gap", type: 'numeric', mask: '#,##', decimal: '.', readOnly: true, width: 100 },
-                { title: "Price type", type: 'dropdown', width: 100, source: [{ id: 1, name: "Dataset" }, { id: 2, name: "GHSC-PSM*" }, { id: 3, name: "Global Fund*" }] },
-                { title: "PU (unit $)", type: 'numeric', mask: '#,##.00', decimal: '.', readOnly: true, width: 100 },
-                { title: "Procurements Needed PU (total $)", type: 'numeric', mask: '#,##.00', decimal: '.', readOnly: true, width: 100 }
-
-
-            ],
-            text: {
-                // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                show: '',
-                entries: '',
-            },
-            onload: this.loaded,
-            pagination: localStorage.getItem("sesRecordCount"),
-            search: true,
-            columnSorting: true,
-            tableOverflow: true,
-            wordWrap: true,
-            allowInsertColumn: false,
-            allowManualInsertColumn: false,
-            allowDeleteRow: false,
-            onselection: this.selected,
-            oneditionend: this.onedit,
-            copyCompatibility: true,
-            allowExport: false,
-            paginationOptions: JEXCEL_PAGINATION_OPTION,
-            position: 'top',
-            filters: true,
-            license: JEXCEL_PRO_KEY,
-            contextMenu: function (obj, x, y, e) {
-                return [];
-            }.bind(this),
-        }
-        var myVar = jexcel(document.getElementById("consumptionTable"), options);
-        this.el = myVar;
-        this.setState({
-            consumptionEl: myVar,
-            loading: false
-        })
     }
 
     loaded(instance) {
@@ -1141,9 +1690,9 @@ class ForecastSummary extends Component {
                 versionList.reverse();
                 this.setState({
                     versions: versionList,
-                    // versionId: versionList[0].versionId
+                    versionId: (versionList.length > 0 ? versionList[0].versionId : ''),
                 }, () => {
-                    // this.getPlanningUnit();
+                    this.setVersionId();
                 })
 
 
@@ -1345,7 +1894,7 @@ class ForecastSummary extends Component {
                 <Card>
                     <div className="Card-header-reporticon pb-2">
                         {checkOnline === 'Online' &&
-                            this.state.consumptionData.length > 0 &&
+                            (this.state.dataArray.length > 0 || this.state.summeryData.length > 0) &&
                             <div className="card-header-actions">
                                 <a className="card-header-action">
 
@@ -1357,7 +1906,7 @@ class ForecastSummary extends Component {
                             </div>
                         }
                         {checkOnline === 'Offline' &&
-                            this.state.offlineConsumptionList.length > 0 &&
+                            (this.state.dataArray.length > 0 || this.state.summeryData.length > 0) &&
                             <div className="card-header-actions">
                                 <a className="card-header-action">
 
@@ -1368,7 +1917,17 @@ class ForecastSummary extends Component {
                             </div>
                         }
                     </div>
-                    <CardBody className="pb-lg-2 pt-lg-0 ">
+                    <div className="Card-header-reporticon ">
+                        <div className="card-header-actions BacktoLink">
+                            <a className="pr-lg-0 pt-lg-1">
+                                <span style={{ cursor: 'pointer' }} onClick={() => { this.backToMonthlyForecast() }}><i className="fa fa-long-arrow-left" style={{ color: '#20a8d8', fontSize: '13px' }}></i> <small className="supplyplanformulas">{'Return To Monthly Forecast'}</small></span>
+                            </a>
+                            {/* <a className="card-header-action">
+                                Back to <span style={{ cursor: 'pointer' }} onClick={() => { this.backToMonthlyForecast() }}><small className="supplyplanformulas">Monthly Forecast</small></span>
+                            </a> */}
+                        </div>
+                    </div>
+                    <CardBody className="pb-lg-2 pt-lg-1 ">
                         <div>
                             <div ref={ref}>
                                 <Form >
@@ -1397,7 +1956,7 @@ class ForecastSummary extends Component {
                                                 </div>
                                             </FormGroup>
                                             <FormGroup className="col-md-3">
-                                                <Label htmlFor="appendedInputButton">{i18n.t('static.report.version')}</Label>
+                                                <Label htmlFor="appendedInputButton">{i18n.t('static.report.version*')}</Label>
                                                 <div className="controls ">
                                                     <InputGroup>
                                                         <Input
@@ -1465,14 +2024,14 @@ class ForecastSummary extends Component {
                                                             onChange={this.filterData}
                                                         // onChange={(e) => { this.dataChange(e); this.formSubmit() }}
                                                         >
-                                                            <option value="1">National View</option>
                                                             <option value="2">Regional View</option>
+                                                            <option value="1">National View</option>
                                                         </Input>
 
                                                     </InputGroup>
                                                 </div>
                                             </FormGroup>
-                                            <FormGroup className="col-md-3">
+                                            <FormGroup className="col-md-3" id="hideCalculationDiv">
                                                 <Label htmlFor="appendedInputButton">Hide Calculations</Label>
                                                 <div className="controls ">
                                                     <InputGroup>
@@ -1491,14 +2050,36 @@ class ForecastSummary extends Component {
                                                     </InputGroup>
                                                 </div>
                                             </FormGroup>
+                                            <FormGroup className="col-md-3" id="hideCurrencyDiv" style={{ display: 'none' }}>
+                                                <Label htmlFor="appendedInputButton">Currency</Label>
+                                                <div className="controls ">
+                                                    <InputGroup>
+                                                        <Input
+                                                            type="select"
+                                                            name="currencyId"
+                                                            id="currencyId"
+                                                            bsSize="sm"
+                                                            value={this.state.currencyId}
+                                                        // onChange={(e) => { this.hideCalculation(e); }}
+                                                        >
+                                                            <option value="-1">{i18n.t('static.common.select')}</option>
+                                                        </Input>
+
+                                                    </InputGroup>
+                                                </div>
+                                            </FormGroup>
 
 
 
                                         </div>
                                     </div>
                                 </Form>
-
-                                <Col md="12 pl-0" style={{ display: this.state.loading ? "none" : "block" }}>
+                                <Col md="12" className="pl-lg-0" style={{ display: this.state.loading ? "none" : "block" }}>
+                                    <div>
+                                        <p>Some text here to explain users this is not a detailed supply plan, Just high level estimate.</p>
+                                    </div>
+                                </Col>
+                                <Col md="12" className='pl-lg-0' style={{ display: this.state.loading ? "none" : "block" }}>
                                     <div className="row">
                                         <div className="col-md-12 pl-0 pr-0">
                                             {/* <div className="shipmentconsumptionSearchMarginTop" style={{ display: this.state.loading ? "none" : "block" }}>
@@ -1506,145 +2087,220 @@ class ForecastSummary extends Component {
                                                     <div id="consumptionTable" />
                                                 </div>
                                             </div> */}
-                                            <div className="table-responsive">
+                                            <div className="table-responsive" style={{ display: this.state.loading ? "none" : "block" }}>
                                                 {this.state.summeryData.length > 0 && this.state.displayId == 1 &&
-                                                    <Table className="table-striped table-bordered text-center mt-2">
-                                                        {/* <Table className="table-bordered text-center mt-2 overflowhide main-table "> */}
+                                                    <div className='table-scroll1'>
+                                                        <Table className="table-bordered table-bordered1 text-center mt-2">
+                                                            {/* <Table className="table-bordered text-center mt-2 overflowhide main-table "> */}
 
-                                                        <thead>
-                                                            <tr>
-                                                                <th className="BorderNoneSupplyPlan sticky-col first-col clone1"></th>
-                                                                <th className="text-center" style={{}}> Forecasting Unit </th>
-                                                                <th className="text-center" style={{}}>Planning Unit</th>
-                                                                <th className="text-center" style={{}}>Total Forecasted Quantity</th>
-                                                                <th className="text-center" style={{}}>Stock (end of {this.state.beforeEndDateDisplay})</th>
-                                                                <th className="text-center" style={{}}>Existing Shipments ({this.state.startDateDisplay + ' - ' + this.state.endDateDisplay})</th>
-                                                                <th className="text-center" style={{}}>Stock (end of {this.state.endDateDisplay})</th>
-                                                                <th className="text-center" style={{}}>Desired Months of Stock (end of {this.state.endDateDisplay})</th>
-                                                                <th className="text-center" style={{}}>Desired Stock (end of {this.state.endDateDisplay})</th>
-                                                                <th className="text-center" style={{}}>Procurement Surplus/Gap</th>
-                                                                <th className="text-center" style={{}}>Price Type</th>
-                                                                <th className="text-center" style={{}}>Unit Price ($)</th>
-                                                                <th className="text-center" style={{}}>Procurements Needed ($)</th>
-                                                                <th className="text-center" style={{ width: '20%' }}>Notes</th>
+                                                            <thead>
+                                                                <tr>
+                                                                    <th className="BorderNoneSupplyPlan sticky-col first-col clone1"></th>
+                                                                    {/* <th className="text-center" style={{}}> Forecasting Unit </th> */}
+                                                                    <th className="text-center ForecastSumarydWidth sticky-col first-col clone" style={{ width: '19%' }}>Planning Unit</th>
+                                                                    <th className="text-center" style={{ width: '' }}>Total Forecasted Quantity <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
+                                                                    {!this.state.hideColumn &&
+                                                                        <>
+                                                                            <th className="text-center" title="Stock (end of {this.state.beforeEndDateDisplay})" style={{ width: '7%' }}>Stock <span className="FontWeightNormal">(end of {this.state.beforeEndDateDisplay})</span> <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
+                                                                            <th className="text-center" style={{ width: '' }}>Existing Shipments <span className="FontWeightNormal">({this.state.startDateDisplay + ' - ' + this.state.endDateDisplay})</span> <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
+                                                                            <th className="text-center" style={{ width: '8%' }}>Stock <span className="FontWeightNormal">(end of {this.state.endDateDisplay})</span> <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
+                                                                            <th className="text-center" style={{ width: '7%' }}>Desired Months of Stock <span className="FontWeightNormal">(end of {this.state.endDateDisplay})</span> <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
+                                                                            <th className="text-center" style={{ width: '8%' }}>Desired Stock <span className="FontWeightNormal">(end of {this.state.endDateDisplay})</span> <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
+                                                                        </>
+                                                                    }
+                                                                    <th className="text-center" style={{ width: '' }}>Procurement Surplus/Gap <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
+                                                                    {!this.state.hideColumn &&
+                                                                        <>
+                                                                            <th className="text-center" style={{ width: '7%' }}>Price Type <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
+                                                                            <th className="text-center" style={{ width: '7%' }}>Unit Price <span className="FontWeightNormal">(USD)</span> <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
+                                                                        </>
+                                                                    }
+                                                                    <th className="text-center" style={{ width: '' }}>Procurements Needed <span className="FontWeightNormal">(USD)</span> <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
+                                                                    <th className="text-center" style={{ width: '20%' }}>Notes <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
 
-                                                            </tr>
-                                                        </thead>
+                                                                </tr>
+                                                            </thead>
 
-                                                        <tbody>
-                                                            {this.state.summeryData.map(item1 => (
-                                                                <>
-                                                                    <tr>
-                                                                        {item1.id == 0 ?
-                                                                            <>
-                                                                                <td className="BorderNoneSupplyPlan sticky-col first-col clone1">
-                                                                                    {
-                                                                                        item1.display == false ?
-                                                                                            <><i className="fa fa-plus-square-o supplyPlanIcon" onClick={() => this.checkedChanged(item1.tempTracerCategoryId)} ></i> <>{item1.tracerCategory.label.label_en}</></>
-                                                                                            :
-                                                                                            <><i className="fa fa-minus-square-o supplyPlanIcon" onClick={() => this.checkedChanged(item1.tempTracerCategoryId)} ></i> <>{item1.tracerCategory.label.label_en}</></>
+                                                            <tbody>
+                                                                {this.state.summeryData.map(item1 => (
+                                                                    <>
+                                                                        <tr>
+                                                                            {item1.id == 0 ?
+                                                                                <>
+                                                                                    <td className="BorderNoneSupplyPlan sticky-col first-col clone1">
+                                                                                        {
+                                                                                            item1.display == false ?
+                                                                                                // <><i className="fa fa-plus-square-o supplyPlanIcon" onClick={() => this.checkedChanged(item1.tempTracerCategoryId)} ></i> <>{item1.tracerCategory.label.label_en}</></>
+                                                                                                <><i className="fa fa-plus-square-o supplyPlanIcon" onClick={() => this.checkedChanged(item1.tempTracerCategoryId)} ></i> </>
+                                                                                                :
+                                                                                                // <><i className="fa fa-minus-square-o supplyPlanIcon" onClick={() => this.checkedChanged(item1.tempTracerCategoryId)} ></i> <>{item1.tracerCategory.label.label_en}</></>
+                                                                                                <><i className="fa fa-minus-square-o supplyPlanIcon" onClick={() => this.checkedChanged(item1.tempTracerCategoryId)} ></i> </>
+                                                                                        }
+
+                                                                                    </td>
+                                                                                    {/* <td></td> */}
+                                                                                    <td className='text-left sticky-col first-col clone'><b>{item1.tracerCategory.label.label_en}</b></td>
+                                                                                    <td></td>
+                                                                                    {!this.state.hideColumn &&
+                                                                                        <>
+                                                                                            <td></td>
+                                                                                            <td></td>
+                                                                                            <td></td>
+                                                                                            <td></td>
+                                                                                            <td></td>
+                                                                                        </>
                                                                                     }
+                                                                                    <td></td>
+                                                                                    {!this.state.hideColumn &&
+                                                                                        <>
+                                                                                            <td></td>
+                                                                                            <td></td>
+                                                                                        </>
+                                                                                    }
+                                                                                    <td></td>
+                                                                                    <td></td>
+                                                                                </>
+                                                                                :
+                                                                                <>
+                                                                                    {item1.display == true &&
+                                                                                        <>
+                                                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
+                                                                                            {/* <td>{item1.forecastingUnit.label.label_en}</td> */}
+                                                                                            <td className='text-left  sticky-col first-col clone'>{item1.planningUnit.label.label_en}</td>
+                                                                                            <td>{item1.totalForecastedQuantity}</td>
+                                                                                            {!this.state.hideColumn &&
+                                                                                                <>
+                                                                                                    <td>{item1.stock1}</td>
+                                                                                                    <td>{item1.existingShipments}</td>
+                                                                                                    <td>{item1.stock2}</td>
+                                                                                                    <td>{item1.desiredMonthOfStock1}</td>
+                                                                                                    <td>{item1.desiredMonthOfStock2}</td>
+                                                                                                </>
+                                                                                            }
+                                                                                            {item1.isProcurementGapRed == true ? <td className="red">{item1.procurementGap}</td> : <td>{item1.procurementGap}</td>}
+                                                                                            {!this.state.hideColumn &&
+                                                                                                <>
+                                                                                                    {item1.isPriceTypeRed == true ? <td className="red">{item1.priceType}</td> : <td>{item1.priceType}</td>}
+                                                                                                    <td>{item1.unitPrice}</td>
+                                                                                                </>
+                                                                                            }
+                                                                                            <td>{item1.procurementNeeded}</td>
+                                                                                            <td>{item1.notes}</td>
+                                                                                        </>
+                                                                                    }
+                                                                                </>
+                                                                            }
 
-                                                                                </td>
-                                                                                <td></td>
-                                                                                <td></td>
-                                                                                <td></td>
-                                                                                <td></td>
-                                                                                <td></td>
-                                                                                <td></td>
-                                                                                <td></td>
-                                                                                <td></td>
-                                                                                <td></td>
-                                                                                <td></td>
-                                                                                <td></td>
-                                                                                <td></td>
-                                                                                <td></td>
-                                                                            </>
-                                                                            :
-                                                                            <>
-                                                                                {item1.display == true &&
-                                                                                    <>
-                                                                                        <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
-                                                                                        <td>{item1.forecastingUnit.label.label_en}</td>
-                                                                                        <td>{item1.planningUnit.label.label_en}</td>
-                                                                                        <td>{item1.totalForecastedQuantity}</td>
-                                                                                        <td>{item1.stock1}</td>
-                                                                                        <td>{item1.existingShipments}</td>
-                                                                                        <td>{item1.stock2}</td>
-                                                                                        <td>{item1.desiredMonthOfStock1}</td>
-                                                                                        <td>{item1.desiredMonthOfStock2}</td>
-                                                                                        {item1.isProcurementGapRed == true ? <td className="red">{item1.procurementGap}</td> : <td>{item1.procurementGap}</td>}
-                                                                                        {item1.isPriceTypeRed == true ? <td className="red">{item1.priceType}</td> : <td>{item1.priceType}</td>}
-                                                                                        <td>{item1.unitPrice}</td>
-                                                                                        <td>{item1.procurementNeeded}</td>
-                                                                                        <td>{item1.notes}</td>
-                                                                                    </>
-                                                                                }
-                                                                            </>
-                                                                        }
+                                                                        </tr>
 
+                                                                    </>
+                                                                ))}
+                                                            </tbody>
+                                                            {!this.state.hideColumn &&
+                                                                <tfoot>
+                                                                    <tr>
+                                                                        <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
+                                                                        {/* <td></td> */}
+                                                                        <td className='text-left sticky-col first-col clone'></td>
+                                                                        <td></td>
+                                                                        <td></td>
+                                                                        <td></td>
+                                                                        <td></td>
+                                                                        <td></td>
+                                                                        <td></td>
+                                                                        <td></td>
+                                                                        <td></td>
+                                                                        <td><b>Product Cost</b></td>
+                                                                        <td><b>{this.state.totalProductCost}</b></td>
+                                                                        <td></td>
                                                                     </tr>
-
-                                                                </>
-                                                            ))}
-                                                        </tbody>
-                                                        <tfoot>
-                                                            <tr>
-                                                                <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
-                                                                <td></td>
-                                                                <td></td>
-                                                                <td></td>
-                                                                <td></td>
-                                                                <td></td>
-                                                                <td></td>
-                                                                <td></td>
-                                                                <td></td>
-                                                                <td></td>
-                                                                <td></td>
-                                                                <td><b>Product Cost</b></td>
-                                                                <td><b>{this.state.totalProductCost}</b></td>
-                                                                <td></td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
-                                                                <td></td>
-                                                                <td></td>
-                                                                <td></td>
-                                                                <td></td>
-                                                                <td></td>
-                                                                <td></td>
-                                                                <td></td>
-                                                                <td></td>
-                                                                <td></td>
-                                                                <td></td>
-                                                                <td><b>Freight (7%)</b></td>
-                                                                <td><b>{0.07 * this.state.totalProductCost}</b></td>
-                                                                <td></td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
-                                                                <td></td>
-                                                                <td></td>
-                                                                <td></td>
-                                                                <td></td>
-                                                                <td></td>
-                                                                <td></td>
-                                                                <td></td>
-                                                                <td></td>
-                                                                <td></td>
-                                                                <td></td>
-                                                                <td><b>Total Cost</b></td>
-                                                                <td><b>{this.state.totalProductCost + 0.07 * this.state.totalProductCost}</b></td>
-                                                                <td></td>
-                                                            </tr>
-                                                        </tfoot>
-                                                    </Table>
+                                                                    <tr>
+                                                                        <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
+                                                                        {/* <td></td> */}
+                                                                        <td className='text-left sticky-col first-col clone'></td>
+                                                                        <td></td>
+                                                                        <td></td>
+                                                                        <td></td>
+                                                                        <td></td>
+                                                                        <td></td>
+                                                                        <td></td>
+                                                                        <td></td>
+                                                                        <td></td>
+                                                                        <td><b>Freight (7%)</b></td>
+                                                                        <td><b>{0.07 * this.state.totalProductCost}</b></td>
+                                                                        <td></td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
+                                                                        {/* <td></td> */}
+                                                                        <td className='text-left sticky-col first-col clone'></td>
+                                                                        <td></td>
+                                                                        <td></td>
+                                                                        <td></td>
+                                                                        <td></td>
+                                                                        <td></td>
+                                                                        <td></td>
+                                                                        <td></td>
+                                                                        <td></td>
+                                                                        <td><b>Total Cost</b></td>
+                                                                        <td><b>{this.state.totalProductCost + 0.07 * this.state.totalProductCost}</b></td>
+                                                                        <td></td>
+                                                                    </tr>
+                                                                </tfoot>
+                                                            }
+                                                            {this.state.hideColumn &&
+                                                                <tfoot>
+                                                                    <tr>
+                                                                        <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
+                                                                        {/* <td></td> */}
+                                                                        <td className='text-left sticky-col first-col clone'></td>
+                                                                        <td></td>
+                                                                        <td><b>Product Cost</b></td>
+                                                                        <td><b>{this.state.totalProductCost}</b></td>
+                                                                        <td></td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
+                                                                        {/* <td></td> */}
+                                                                        <td className='text-left sticky-col first-col clone'></td>
+                                                                        <td></td>
+                                                                        <td><b>Freight (7%)</b></td>
+                                                                        <td><b>{0.07 * this.state.totalProductCost}</b></td>
+                                                                        <td></td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
+                                                                        {/* <td></td> */}
+                                                                        <td className='text-left sticky-col first-col clone'></td>
+                                                                        <td></td>
+                                                                        <td><b>Total Cost</b></td>
+                                                                        <td><b>{this.state.totalProductCost + 0.07 * this.state.totalProductCost}</b></td>
+                                                                        <td></td>
+                                                                    </tr>
+                                                                </tfoot>
+                                                            }
+                                                        </Table>
+                                                    </div>
                                                 }
                                                 {this.state.regPlanningUnitList.length > 0 && this.state.displayId == 2 &&
-                                                    <div id="tableDiv">
+                                                    <div className='ForecastSummaryTable'>
+                                                        <div id="tableDiv" className="table-responsive consumptionDataEntryTable">
+                                                        </div>
                                                     </div>
 
                                                 }
+                                            </div>
+
+                                            <div style={{ display: this.state.loading ? "block" : "none" }}>
+                                                <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                                    <div class="align-items-center">
+                                                        <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+
+                                                        <div class="spinner-border blue ml-4" role="status">
+
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -1669,6 +2325,7 @@ class ForecastSummary extends Component {
                         <FormGroup>
                             <FormGroup>
                                 <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                <Button type="reset" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.filterData}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                 <Button type="submit" size="md" color="success" className="submitBtn float-right mr-1" onClick={this.saveSelectedForecast}> <i className="fa fa-check"></i> {i18n.t('static.common.submit')}</Button>
                             </FormGroup>
                         </FormGroup>

@@ -165,66 +165,66 @@ export default class PlanningUnitSetting extends Component {
                     this.el.setComments(col, "");
                 }
 
-                var col = ("E").concat(parseInt(y) + 1);
-                var value = this.el.getValue(`E${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-                var reg = JEXCEL_INTEGER_REGEX;
-                console.log("value------------->E", value);
-                if (value == "") {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                    valid = false;
-                } else {
-                    if (isNaN(parseInt(value)) || !(reg.test(value))) {
-                        this.el.setStyle(col, "background-color", "transparent");
-                        this.el.setStyle(col, "background-color", "yellow");
-                        this.el.setComments(col, i18n.t('static.message.invalidnumber'));
-                        valid = false;
-                    } else {
-                        this.el.setStyle(col, "background-color", "transparent");
-                        this.el.setComments(col, "");
-                    }
-                }
+                // var col = ("E").concat(parseInt(y) + 1);
+                // var value = this.el.getValue(`E${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+                // var reg = JEXCEL_INTEGER_REGEX;
+                // console.log("value------------->E", value);
+                // if (value == "") {
+                //     this.el.setStyle(col, "background-color", "transparent");
+                //     this.el.setStyle(col, "background-color", "yellow");
+                //     this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                //     valid = false;
+                // } else {
+                //     if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                //         this.el.setStyle(col, "background-color", "transparent");
+                //         this.el.setStyle(col, "background-color", "yellow");
+                //         this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                //         valid = false;
+                //     } else {
+                //         this.el.setStyle(col, "background-color", "transparent");
+                //         this.el.setComments(col, "");
+                //     }
+                // }
 
-                var col = ("F").concat(parseInt(y) + 1);
-                var value = this.el.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-                var reg = JEXCEL_INTEGER_REGEX;
-                if (value == "") {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                    valid = false;
-                } else {
-                    if (isNaN(parseInt(value)) || !(reg.test(value))) {
-                        this.el.setStyle(col, "background-color", "transparent");
-                        this.el.setStyle(col, "background-color", "yellow");
-                        this.el.setComments(col, i18n.t('static.message.invalidnumber'));
-                        valid = false;
-                    } else {
-                        this.el.setStyle(col, "background-color", "transparent");
-                        this.el.setComments(col, "");
-                    }
-                }
+                // var col = ("F").concat(parseInt(y) + 1);
+                // var value = this.el.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+                // var reg = JEXCEL_INTEGER_REGEX;
+                // if (value == "") {
+                //     this.el.setStyle(col, "background-color", "transparent");
+                //     this.el.setStyle(col, "background-color", "yellow");
+                //     this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                //     valid = false;
+                // } else {
+                //     if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                //         this.el.setStyle(col, "background-color", "transparent");
+                //         this.el.setStyle(col, "background-color", "yellow");
+                //         this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                //         valid = false;
+                //     } else {
+                //         this.el.setStyle(col, "background-color", "transparent");
+                //         this.el.setComments(col, "");
+                //     }
+                // }
 
-                var col = ("G").concat(parseInt(y) + 1);
-                var value = this.el.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-                var reg = JEXCEL_INTEGER_REGEX;
-                if (value == "") {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                    valid = false;
-                } else {
-                    if (isNaN(parseInt(value)) || !(reg.test(value))) {
-                        this.el.setStyle(col, "background-color", "transparent");
-                        this.el.setStyle(col, "background-color", "yellow");
-                        this.el.setComments(col, i18n.t('static.message.invalidnumber'));
-                        valid = false;
-                    } else {
-                        this.el.setStyle(col, "background-color", "transparent");
-                        this.el.setComments(col, "");
-                    }
-                }
+                // var col = ("G").concat(parseInt(y) + 1);
+                // var value = this.el.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+                // var reg = JEXCEL_INTEGER_REGEX;
+                // if (value == "") {
+                //     this.el.setStyle(col, "background-color", "transparent");
+                //     this.el.setStyle(col, "background-color", "yellow");
+                //     this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                //     valid = false;
+                // } else {
+                //     if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                //         this.el.setStyle(col, "background-color", "transparent");
+                //         this.el.setStyle(col, "background-color", "yellow");
+                //         this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                //         valid = false;
+                //     } else {
+                //         this.el.setStyle(col, "background-color", "transparent");
+                //         this.el.setComments(col, "");
+                //     }
+                // }
 
                 //procurement agent
                 var col = ("H").concat(parseInt(y) + 1);
@@ -337,71 +337,71 @@ export default class PlanningUnitSetting extends Component {
             }
         }
 
-        //stock
-        if (x == 4) {
-            var col = ("E").concat(parseInt(y) + 1);
-            value = this.el.getValue(`E${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-            // var reg = /^[0-9\b]+$/;
-            var reg = JEXCEL_INTEGER_REGEX;
-            if (value != "") {
-                if (isNaN(parseInt(value)) || !(reg.test(value))) {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.message.invalidnumber'))
-                } else {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setComments(col, "");
-                }
-            } else {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-            }
-        }
+        // //stock
+        // if (x == 4) {
+        //     var col = ("E").concat(parseInt(y) + 1);
+        //     value = this.el.getValue(`E${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+        //     // var reg = /^[0-9\b]+$/;
+        //     var reg = JEXCEL_INTEGER_REGEX;
+        //     if (value != "") {
+        //         if (isNaN(parseInt(value)) || !(reg.test(value))) {
+        //             this.el.setStyle(col, "background-color", "transparent");
+        //             this.el.setStyle(col, "background-color", "yellow");
+        //             this.el.setComments(col, i18n.t('static.message.invalidnumber'))
+        //         } else {
+        //             this.el.setStyle(col, "background-color", "transparent");
+        //             this.el.setComments(col, "");
+        //         }
+        //     } else {
+        //         this.el.setStyle(col, "background-color", "transparent");
+        //         this.el.setStyle(col, "background-color", "yellow");
+        //         this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+        //     }
+        // }
 
-        //existing shipments
-        if (x == 5) {
-            var col = ("F").concat(parseInt(y) + 1);
-            value = this.el.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-            // var reg = /^[0-9\b]+$/;
-            var reg = JEXCEL_INTEGER_REGEX;
-            if (value != "") {
-                if (isNaN(parseInt(value)) || !(reg.test(value))) {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
-                } else {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setComments(col, "");
-                }
-            } else {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-            }
-        }
+        // //existing shipments
+        // if (x == 5) {
+        //     var col = ("F").concat(parseInt(y) + 1);
+        //     value = this.el.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+        //     // var reg = /^[0-9\b]+$/;
+        //     var reg = JEXCEL_INTEGER_REGEX;
+        //     if (value != "") {
+        //         if (isNaN(parseInt(value)) || !(reg.test(value))) {
+        //             this.el.setStyle(col, "background-color", "transparent");
+        //             this.el.setStyle(col, "background-color", "yellow");
+        //             this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+        //         } else {
+        //             this.el.setStyle(col, "background-color", "transparent");
+        //             this.el.setComments(col, "");
+        //         }
+        //     } else {
+        //         this.el.setStyle(col, "background-color", "transparent");
+        //         this.el.setStyle(col, "background-color", "yellow");
+        //         this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+        //     }
+        // }
 
-        //desired months of stock
-        if (x == 6) {
-            var col = ("G").concat(parseInt(y) + 1);
-            value = this.el.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-            // var reg = /^[0-9\b]+$/;
-            var reg = JEXCEL_INTEGER_REGEX;
-            if (value != "") {
-                if (isNaN(parseInt(value)) || !(reg.test(value))) {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
-                } else {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setComments(col, "");
-                }
-            } else {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-            }
-        }
+        // //desired months of stock
+        // if (x == 6) {
+        //     var col = ("G").concat(parseInt(y) + 1);
+        //     value = this.el.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+        //     // var reg = /^[0-9\b]+$/;
+        //     var reg = JEXCEL_INTEGER_REGEX;
+        //     if (value != "") {
+        //         if (isNaN(parseInt(value)) || !(reg.test(value))) {
+        //             this.el.setStyle(col, "background-color", "transparent");
+        //             this.el.setStyle(col, "background-color", "yellow");
+        //             this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+        //         } else {
+        //             this.el.setStyle(col, "background-color", "transparent");
+        //             this.el.setComments(col, "");
+        //         }
+        //     } else {
+        //         this.el.setStyle(col, "background-color", "transparent");
+        //         this.el.setStyle(col, "background-color", "yellow");
+        //         this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+        //     }
+        // }
 
 
         //procurement Agent
@@ -786,7 +786,10 @@ export default class PlanningUnitSetting extends Component {
                         loading: false
                     },
                         () => {
-                            console.log("List------->pa", this.state.allProcurementAgentList)
+                            console.log("List------->pa", this.state.allProcurementAgentList);
+                            if (this.state.datasetList.length == 1) {
+                                this.setProgramId();
+                            }
                             // this.buildJExcel();
                         })
                 } else {
@@ -900,7 +903,8 @@ export default class PlanningUnitSetting extends Component {
                 console.log("DATASET-------->", datasetList);
                 this.setState({
                     datasetList: datasetList,
-                    datasetList1: datasetList1
+                    datasetList1: datasetList1,
+                    datasetId: (datasetList.length == 1 ? datasetList[0].programId : '')
                 }, () => {
                     this.planningUnitList();
                 })
@@ -918,22 +922,21 @@ export default class PlanningUnitSetting extends Component {
             var tempId = sel.options[sel.selectedIndex].text;
             let forecastProgramVersionId = tempId.split('~')[1];
             let selectedForecastProgram = this.state.datasetList.filter(c => c.programId == pID && c.versionId == forecastProgramVersionId)[0]
-            let startDateSplit = selectedForecastProgram.forecastStartDate.split('-');
-            let stopDateSplit = selectedForecastProgram.forecastStopDate.split('-');
 
-            let forecastStopDate = new Date(selectedForecastProgram.forecastStartDate);
-            forecastStopDate.setMonth(forecastStopDate.getMonth() - 1);
+            let forecastStartDate = selectedForecastProgram.forecastStartDate;
+            let forecastStopDate = selectedForecastProgram.forecastStopDate;
 
-            let d1 = new Date(startDateSplit[1] - 3 + '-' + (new Date(selectedForecastProgram.forecastStartDate).getMonth() + 1) + '-01 00:00:00');
-            d1.setMonth(d1.getMonth() - 1);
+            let beforeEndDateDisplay = new Date(selectedForecastProgram.forecastStartDate);
+            beforeEndDateDisplay.setMonth(beforeEndDateDisplay.getMonth() - 1);
 
             this.setState(
                 {
                     datasetId: pID,
-                    rangeValue: { from: { year: startDateSplit[1] - 3, month: new Date(selectedForecastProgram.forecastStartDate).getMonth() + 1 }, to: { year: forecastStopDate.getFullYear(), month: forecastStopDate.getMonth() + 1 } },
-                    startDateDisplay: months[new Date(selectedForecastProgram.forecastStartDate).getMonth()] + ' ' + (startDateSplit[1] - 3),
-                    endDateDisplay: months[(forecastStopDate.getMonth())] + ' ' + forecastStopDate.getFullYear(),
-                    beforeEndDateDisplay: months[(d1.getMonth())] + ' ' + d1.getFullYear(),
+                    // rangeValue: { from: { year: startDateSplit[1] - 3, month: new Date(selectedForecastProgram.forecastStartDate).getMonth() + 1 }, to: { year: forecastStopDate.getFullYear(), month: forecastStopDate.getMonth() + 1 } },
+                    rangeValue: { from: { year: new Date(forecastStartDate).getFullYear(), month: new Date(forecastStartDate).getMonth() + 1 }, to: { year: new Date(forecastStopDate).getFullYear(), month: new Date(forecastStopDate).getMonth() + 1 } },
+                    startDateDisplay: months[new Date(forecastStartDate).getMonth()] + ' ' + new Date(forecastStartDate).getFullYear(),
+                    endDateDisplay: months[new Date(forecastStopDate).getMonth()] + ' ' + new Date(forecastStopDate).getFullYear(),
+                    beforeEndDateDisplay: months[new Date(beforeEndDateDisplay).getMonth()] + ' ' + new Date(beforeEndDateDisplay).getFullYear(),
                 }, () => {
                     // console.log("d----------->0", d1);
                     // console.log("d----------->00", (d1.getMonth()));
@@ -961,6 +964,57 @@ export default class PlanningUnitSetting extends Component {
 
     }
 
+    // setProgramId(event) {
+    //     // console.log("PID----------------->", document.getElementById("forecastProgramId").value);
+    //     var pID = document.getElementById("forecastProgramId").value;
+    //     if (pID != 0) {
+    //         var sel = document.getElementById("forecastProgramId");
+    //         var tempId = sel.options[sel.selectedIndex].text;
+    //         let forecastProgramVersionId = tempId.split('~')[1];
+    //         let selectedForecastProgram = this.state.datasetList.filter(c => c.programId == pID && c.versionId == forecastProgramVersionId)[0]
+    //         let startDateSplit = selectedForecastProgram.forecastStartDate.split('-');
+    //         let stopDateSplit = selectedForecastProgram.forecastStopDate.split('-');
+
+    //         let forecastStopDate = new Date(selectedForecastProgram.forecastStartDate);
+    //         forecastStopDate.setMonth(forecastStopDate.getMonth() - 1);
+
+    //         let d1 = new Date(startDateSplit[1] - 3 + '-' + (new Date(selectedForecastProgram.forecastStartDate).getMonth() + 1) + '-01 00:00:00');
+    //         d1.setMonth(d1.getMonth() - 1);
+
+    //         this.setState(
+    //             {
+    //                 datasetId: pID,
+    //                 rangeValue: { from: { year: startDateSplit[1] - 3, month: new Date(selectedForecastProgram.forecastStartDate).getMonth() + 1 }, to: { year: forecastStopDate.getFullYear(), month: forecastStopDate.getMonth() + 1 } },
+    //                 startDateDisplay: months[new Date(selectedForecastProgram.forecastStartDate).getMonth()] + ' ' + (startDateSplit[1] - 3),
+    //                 endDateDisplay: months[(forecastStopDate.getMonth())] + ' ' + forecastStopDate.getFullYear(),
+    //                 beforeEndDateDisplay: months[(d1.getMonth())] + ' ' + d1.getFullYear(),
+    //             }, () => {
+    //                 // console.log("d----------->0", d1);
+    //                 // console.log("d----------->00", (d1.getMonth()));
+    //                 // console.log("d----------->1", this.state.startDateDisplay);
+    //                 // console.log("d----------->2", this.state.endDateDisplay);
+    //                 // console.log("d----------->3", this.state.beforeEndDateDisplay);
+
+    //                 this.filterData();
+    //             })
+    //     } else {
+    //         var dt = new Date();
+    //         dt.setMonth(dt.getMonth() - REPORT_DATEPICKER_START_MONTH);
+    //         var dt1 = new Date();
+    //         dt1.setMonth(dt1.getMonth() + REPORT_DATEPICKER_END_MONTH);
+    //         this.setState(
+    //             {
+    //                 datasetId: 0,
+    //                 rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: dt1.getFullYear(), month: dt1.getMonth() + 1 } },
+    //             }, () => {
+    //                 this.el = jexcel(document.getElementById("tableDiv"), '');
+    //                 this.el.destroy();
+    //                 this.filterData();
+    //             })
+    //     }
+
+    // }
+
     filterData() {
 
         let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
@@ -980,52 +1034,6 @@ export default class PlanningUnitSetting extends Component {
                     forecastProgramVersionId: forecastProgramVersionId,
                     selsource: selectedForecastProgram.planningUnitList,
                     loading: true,
-                    // selsource: [
-                    //     {
-                    //         "a1a": "ARVs",
-                    //         "a2a": "Abacavir 300 mg Tablet, 60 Tablets",
-                    //         "a3a": true,
-                    //         "a4a": true,
-                    //         "a5a": "11,199",
-                    //         "a6a": "54,714",
-                    //         "a7a": "5",
-                    //         "a8a": "Custom",
-                    //         "a9a": "1.06"
-                    //     },
-                    //     {
-                    //         "a1a": "ARVs",
-                    //         "a2a": "Lamivudine 10 mg/mL Solution, 100 mL",
-                    //         "a3a": true,
-                    //         "a4a": true,
-                    //         "a5a": "10,938",
-                    //         "a6a": "51,751",
-                    //         "a7a": "5",
-                    //         "a8a": "GHSC-PSM",
-                    //         "a9a": "3.06"
-                    //     },
-                    //     {
-                    //         "a1a": "Condoms",
-                    //         "a2a": "Male Condom (Latex) Lubricated, No Logo, 49 mm, 1 Each",
-                    //         "a3a": true,
-                    //         "a4a": false,
-                    //         "a5a": "19,352",
-                    //         "a6a": "84,472",
-                    //         "a7a": "5",
-                    //         "a8a": "GHSC-PSM",
-                    //         "a9a": "4.10"
-                    //     },
-                    //     {
-                    //         "a1a": "Condoms",
-                    //         "a2a": "Male Condom (Latex) Lubricated, Ultimate Blue, 53 mm, 4320 Pieces",
-                    //         "a3a": true,
-                    //         "a4a": true,
-                    //         "a5a": "12,633",
-                    //         "a6a": "83,678",
-                    //         "a7a": "5",
-                    //         "a8a": "UNFPA",
-                    //         "a9a": "5.10"
-                    //     }
-                    // ],
                     selectedForecastProgram: selectedForecastProgram,
                 }, () => {
                     // this.buildJExcel();
@@ -1333,11 +1341,37 @@ export default class PlanningUnitSetting extends Component {
             wordWrap: true,
             allowInsertColumn: false,
             allowManualInsertColumn: false,
-            allowDeleteRow: false,
+            allowDeleteRow: true,
             // onselection: this.selected,
             onchange: this.changed,
+            contextMenu: function (obj, x, y, e) {
+                var items = [];
+                //Add consumption batch info
 
 
+                if (y == null) {
+                    // alert("Hi");
+                } else {
+                    // alert("Hi1");
+                    // Delete a row
+                    if (obj.options.allowDeleteRow == true) {
+                        // alert("Hi2");
+                        // region id
+                        if (obj.getRowData(y)[11] == 1) {
+                            items.push({
+                                title: i18n.t("static.common.deleterow"),
+                                onclick: function () {
+                                    obj.deleteRow(parseInt(y));
+                                }
+                            });
+                            // Line
+                            // items.push({ type: 'line' });
+                        }
+                    }
+                }
+
+                return items;
+            }.bind(this),
             oneditionend: this.oneditionend,
             copyCompatibility: true,
             allowExport: false,
@@ -1345,9 +1379,9 @@ export default class PlanningUnitSetting extends Component {
             position: 'top',
             filters: true,
             license: JEXCEL_PRO_KEY,
-            contextMenu: function (obj, x, y, e) {
-                return [];
-            }.bind(this),
+            // contextMenu: function (obj, x, y, e) {
+            //     return [];
+            // }.bind(this),
         };
         var languageEl = jexcel(document.getElementById("tableDiv"), options);
         this.el = languageEl;
@@ -1428,6 +1462,14 @@ export default class PlanningUnitSetting extends Component {
 
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
+        var asterisk = document.getElementsByClassName("resizable")[0];
+        var tr = asterisk.firstChild;
+        tr.children[1].classList.add('AsteriskTheadtrTd');
+        tr.children[2].classList.add('AsteriskTheadtrTd');
+        tr.children[3].classList.add('AsteriskTheadtrTd');
+        tr.children[4].classList.add('AsteriskTheadtrTd');
+        tr.children[8].classList.add('AsteriskTheadtrTd');
+        tr.children[9].classList.add('AsteriskTheadtrTd');
     }
 
     formSubmit = function () {
@@ -1801,7 +1843,7 @@ export default class PlanningUnitSetting extends Component {
         data[9] = 0;
         data[10] = 1;
         data[11] = 1;
-        data[12] = null;
+        data[12] = {};
         data[13] = -1;
         data[14] = true;
 

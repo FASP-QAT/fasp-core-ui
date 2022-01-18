@@ -1237,6 +1237,7 @@ class AuthenticationService {
                         }
                         break;
                     case "/changePassword":
+                        // case "/ShowGuidance":
                         // if (bfunction.includes("ROLE_BF_CHANGE_PASSWORD")) {
                         return true;
                         // }
@@ -1244,6 +1245,7 @@ class AuthenticationService {
                     case "/logout/:message":
                     case "/logout":
                     case "/accessDenied":
+
                         return true;
                         break;
                     case "/problem/editProblem":
@@ -1306,8 +1308,14 @@ class AuthenticationService {
                         }
                         break;
                     case "/extrapolation/extrapolateData":
+                        if (bfunction.includes("ROLE_BF_EXTRAPOLATION")) {
+                            return true;
+                        }
+                        break;
                     case "/importFromQATSupplyPlan/listImportFromQATSupplyPlan":
                     case "/importFromQATSupplyPlan/listImportFromQATSupplyPlan/:color/:message":
+                    case "/importIntoQATSupplyPlan/listImportIntoQATSupplyPlan":
+                    case "/importIntoQATSupplyPlan/listImportIntoQATSupplyPlan/:color/:message":
                         if (bfunction.includes("ROLE_BF_LIST_IMPORT_FROM_QAT_SUPPLY_PLAN")) {
                             return true;
                         }
@@ -1337,11 +1345,11 @@ class AuthenticationService {
                             return true;
                         }
                         break;
-                    // case "/report/compareAndSelectScenario":
-                    // case "/validation/productValidation":
-                    // case "/validation/modelingValidation":
-                    // case "/report/compareVersion":
                     case "/dataentry/consumptionDataEntryAndAdjustment":
+                        if (bfunction.includes("ROLE_BF_CONSUMPTION_DATA_ENTRY_ADJUSTMENT")) {
+                            return true;
+                        }
+                        break;
                     case "/dataset/listTree":
                     case "/dataset/loadDeleteDataSet":
                     case "/dataset/loadDeleteDataSet/:message":
