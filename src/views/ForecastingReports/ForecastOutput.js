@@ -2164,7 +2164,7 @@ class ForecastOutput extends Component {
                     <div className="Card-header-reporticon ">
                         <div className="card-header-actions BacktoLink col-md-12 pl-lg-0 pr-lg-0 pt-lg-2">
                             <a className="pr-lg-0 pt-lg-1 float-left">
-                                <span style={{ cursor: 'pointer' }} onClick={() => { this.backToCompareAndSelect() }}><i className="fa fa-long-arrow-left" style={{ color: '#20a8d8', fontSize: '13px' }}></i> <small className="supplyplanformulas">{'Return To Monthly Forecast'}</small></span>
+                                <span style={{ cursor: 'pointer' }} onClick={() => { this.backToCompareAndSelect() }}><i className="fa fa-long-arrow-left" style={{ color: '#20a8d8', fontSize: '13px' }}></i> <small className="supplyplanformulas">{'Return To Compare And Select Forecast'}</small></span>
                             </a>
                             <a className="pr-lg-0 pt-lg-1 float-right">
                                 <span style={{ cursor: 'pointer' }} onClick={() => { this.continueToForecastSummary() }}><i className="fa fa-long-arrow-right" style={{ color: '#20a8d8', fontSize: '13px' }}></i> <small className="supplyplanformulas">{'Continue To Forecast Summary'}</small></span>
@@ -2337,7 +2337,8 @@ class ForecastOutput extends Component {
                                             </FormGroup> */}
 
                                             <FormGroup className="col-md-3">
-                                                <Label htmlFor="appendedInputButton">{i18n.t('static.common.display')}  <i class="fa fa-info-circle icons pl-lg-2" id="Popover2" onClick={this.toggleRv} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
+                                                {/* <Label htmlFor="appendedInputButton">{i18n.t('static.common.display')}  <i class="fa fa-info-circle icons pl-lg-2" id="Popover2" onClick={this.toggleRv} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label> */}
+                                                <Label htmlFor="appendedInputButton">{i18n.t('static.common.display')}</Label>
                                                 <div className="controls">
                                                     <InputGroup>
                                                         <Input
@@ -2354,11 +2355,11 @@ class ForecastOutput extends Component {
                                                     </InputGroup>
                                                 </div>
                                             </FormGroup>
-                                            <div>
+                                            {/* <div>
                                                 <Popover placement="top" isOpen={this.state.popoverOpen1} target="Popover2" trigger="hover" toggle={this.toggleRv}>
                                                     <PopoverBody>Need to add Info.</PopoverBody>
                                                 </Popover>
-                                            </div>
+                                            </div> */}
                                             <FormGroup className="col-md-3" id="forecastingUnitDiv">
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.product.unit1')}</Label>
                                                 <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
