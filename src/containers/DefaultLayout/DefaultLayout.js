@@ -1245,12 +1245,12 @@ class DefaultLayout extends Component {
                             icon: 'fa fa-language',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_LANGUAGE') ? false : true) }
                           },
-                          {
-                            name: i18n.t('static.modelingType.modelingType'),
-                            url: '/modelingType/listModelingType',
-                            icon: 'fa fa-globe',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_MODELING_TYPE') && this.state.activeTab == 1 ? false : true) }
-                          },
+                          // {
+                          //   name: i18n.t('static.modelingType.modelingType'),
+                          //   url: '/modelingType/listModelingType',
+                          //   icon: 'fa fa-globe',
+                          //   attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_MODELING_TYPE') && this.state.activeTab == 1 ? false : true) }
+                          // },
                           {
                             name: i18n.t('static.roleHead.role'),
                             url: '/role/listRole',
@@ -1270,6 +1270,19 @@ class DefaultLayout extends Component {
                             url: '/user/listUser',
                             icon: 'fa fa-users',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_USER') ? false : true) }
+                          },
+
+                          {
+                            name: i18n.t('static.usagePeriod.usagePeriod'),
+                            url: '/usagePeriod/listUsagePeriod',
+                            icon: 'fa fa-cube',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_USAGE_PERIOD') && this.state.activeTab == 1 ? false : true) }
+                          },
+                          {
+                            name: i18n.t('static.modelingType.modelingType'),
+                            url: '/modelingType/listModelingType',
+                            icon: 'fa fa-file-o',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_MODELING_TYPE') && this.state.activeTab == 1 ? false : true) }
                           },
                           , {
                             name: i18n.t('static.dashboard.unit'),
@@ -1340,12 +1353,12 @@ class DefaultLayout extends Component {
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_DATA_SOURCE_TYPE') && this.state.activeTab == 2 ? false : true) }
                           },
 
-                          {
-                            name: i18n.t('static.forecastMethod.forecastMethod'),
-                            url: '/forecastMethod/listForecastMethod',
-                            icon: 'fa fa-money',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_FORECAST_METHOD') && this.state.activeTab == 1 ? false : true) }
-                          },
+                          // {
+                          //   name: i18n.t('static.forecastMethod.forecastMethod'),
+                          //   url: '/forecastMethod/listForecastMethod',
+                          //   icon: 'fa fa-bar-chart',
+                          //   attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_FORECAST_METHOD') && this.state.activeTab == 1 ? false : true) }
+                          // },
 
                           {
                             name: i18n.t('static.fundingSourceHead.fundingSource'),
@@ -1431,6 +1444,7 @@ class DefaultLayout extends Component {
                                 icon: 'fa fa-th-large',
                                 attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_TRACER_CATEGORY') ? false : true) }
                               },
+                              
                             ]
                           },
 
@@ -1441,13 +1455,20 @@ class DefaultLayout extends Component {
                             icon: 'fa fa-medkit',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_HEALTH_AREA') ? false : true) }
                           },
-
                           {
-                            name: i18n.t('static.usagePeriod.usagePeriod'),
-                            url: '/usagePeriod/listUsagePeriod',
-                            icon: 'fa fa-globe',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_USAGE_PERIOD') && this.state.activeTab == 1 ? false : true) }
+                            name: i18n.t('static.forecastMethod.forecastMethod'),
+                            url: '/forecastMethod/listForecastMethod',
+                            icon: 'fa fa-bar-chart',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_FORECAST_METHOD') && this.state.activeTab == 1 ? false : true) }
                           },
+
+
+                          // {
+                          //   name: i18n.t('static.usagePeriod.usagePeriod'),
+                          //   url: '/usagePeriod/listUsagePeriod',
+                          //   icon: 'fa fa-globe',
+                          //   attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_USAGE_PERIOD') && this.state.activeTab == 1 ? false : true) }
+                          // },
 
                           {
                             name: i18n.t('static.integration.integration'),
