@@ -3327,10 +3327,12 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     }
                 }
 
-                var validation = checkValidtion("number", "K", y, elInstance.getValue(`K${parseInt(y) + 1}`, true).toString().replaceAll("\,", ""), elInstance, JEXCEL_INTEGER_REGEX_FOR_DATA_ENTRY, 1, 0);
-                if (validation == false) {
-                    valid = false;
-                    elInstance.setValueFromCoords(31, y, 1, true);
+                if (rowData[22] == false) {
+                    var validation = checkValidtion("number", "K", y, elInstance.getValue(`K${parseInt(y) + 1}`, true).toString().replaceAll("\,", ""), elInstance, JEXCEL_INTEGER_REGEX_FOR_DATA_ENTRY, 1, 0);
+                    if (validation == false) {
+                        valid = false;
+                        elInstance.setValueFromCoords(31, y, 1, true);
+                    }
                 }
 
                 var validation = checkValidtion("text", "O", y, rowData[14], elInstance);
