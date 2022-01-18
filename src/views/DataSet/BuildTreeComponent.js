@@ -6867,9 +6867,9 @@ export default class BuildTree extends Component {
 
 
                         {this.state.showCalculatorFields &&
-                            <div className="col-md-12 pl-lg-0 pr-lg-0">
+                            <div className="col-md-12 pl-lg-0 pr-lg-0 pt-lg-3">
                                 <fieldset className="scheduler-border">
-                                    <legend className="scheduler-border">{i18n.t('static.tree.modelingCalculaterTool:')}</legend>
+                                    <legend className="scheduler-border">{i18n.t('static.tree.modelingCalculaterTool')}</legend>
                                     <div className="row">
                                         {/* <div className="row"> */}
                                         {/* <FormGroup className="col-md-12 pt-lg-1">
