@@ -5799,3 +5799,16 @@ font-style: italic!important;
 .hoverDiv:hover {
   cursor: pointer;
 }
+
+.hoverDiv {
+  color: #205493;
+    text-decoration: none;
+    background-color: transparent
+}
+
+.hoverDiv :hover{
+  color: #167495;
+    text-decoration: none !important;
+    cursor: pointer;
+}
+

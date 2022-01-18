@@ -1372,7 +1372,8 @@ class EquivalancyUnit extends Component {
                             name: getLabelText(listArray[i].label, this.state.lang),
                             id: parseInt(listArray[i].equivalencyUnitId),
                             active: listArray[i].active,
-                            healthAreaList: listArray[i].healthAreaList
+                            healthAreaList: listArray[i].healthAreaList,
+                            realm: listArray[i].realm
                         }
                         tempList[i] = paJson
                     }
@@ -1639,7 +1640,7 @@ class EquivalancyUnit extends Component {
                 if (parseInt(map1.get("8")) === 1) {
                     let healthAreaSplit = elInstance.getValueFromCoords(1, i).split(';');
                     let healthAreaTempList = []
-                    for (let k = 0; k < healthAreaSplit.length; k++) {
+                    for (let k = 0; k < healthAreaSplit.length - 1; k++) {
                         healthAreaTempList.push({ id: healthAreaSplit[k] });
                     }
                     let json = {
@@ -1755,12 +1756,13 @@ class EquivalancyUnit extends Component {
             for (var i = 0; i < tableJson.length; i++) {
                 var map1 = new Map(Object.entries(tableJson[i]));
                 console.log("12 map---" + map1.get("12"))
+                let equivalencyUnitObj = this.state.equivalancyUnitList.filter(c => c.id == parseInt(map1.get("1")))[0];
                 if (parseInt(map1.get("12")) === 1) {
                     let json = {
                         equivalencyUnitMappingId: parseInt(map1.get("0")),
                         tracerCategory: { id: parseInt(map1.get("3")) },
                         forecastingUnit: { id: parseInt(map1.get("4")) },
-                        equivalencyUnit: { equivalencyUnitId: parseInt(map1.get("1")) },
+                        equivalencyUnit: { equivalencyUnitId: parseInt(map1.get("1")), realm: equivalencyUnitObj.realm },
                         convertToEu: map1.get("6").toString().replace(/,/g, ""),
                         notes: map1.get("7"),
                         program: (parseInt(map1.get("8")) == -1 ? null : { id: parseInt(map1.get("8")) }),

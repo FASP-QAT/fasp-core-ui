@@ -89,6 +89,7 @@ export default class CommitTreeComponent extends React.Component {
             consumptionListlessTwelve: [],
             missingMonthList: [],
             treeNodeList: [],
+            treeScenarioNotes: [],
             missingBranchesList: [],
             noForecastSelectedList: [],
             datasetPlanningUnit: [],
@@ -239,6 +240,21 @@ export default class CommitTreeComponent extends React.Component {
                 var PgmTreeList = programData[0].datasetJson.treeList;
                 console.log("Program --", programData[0].datasetJson);
 
+                var treeScenarioNotes = [];
+                var missingBranchesList = [];
+                for (var tl = 0; tl < PgmTreeList.length; tl++) {
+                    var treeList = PgmTreeList[tl];
+                    var scenarioList = treeList.scenarioList;
+                    for (var ndm = 0; ndm < scenarioList.length; ndm++) {
+                        treeScenarioNotes.push({
+                            tree: PgmTreeList[tl].label,
+                            scenario: scenarioList[ndm].label,
+                            treeId: PgmTreeList[tl].treeId,
+                            scenarioId: scenarioList[ndm].id,
+                            scenarioNotes: scenarioList[ndm].notes
+                        });
+                    }
+                }
                 var treePlanningUnitList = [];
                 var treeNodeList = [];
                 var treeScenarioList = [];
@@ -261,11 +277,13 @@ export default class CommitTreeComponent extends React.Component {
                             var modelingList = ((nodeDataMap[scenarioList[ndm].id])[0].nodeDataModelingList);
                             var madelingNotes = "";
                             for (var ml = 0; ml < modelingList.length; ml++) {
-                                madelingNotes = madelingNotes.concat(modelingList[ml].notes)
+                                madelingNotes = madelingNotes.concat(modelingList[ml].notes).concat(" ")
                             }
                             treeNodeList.push({
                                 tree: PgmTreeList[tl].label,
                                 scenario: scenarioList[ndm].label,
+                                treeId: PgmTreeList[tl].treeId,
+                                scenarioId: scenarioList[ndm].id,
                                 node: payload.label,
                                 notes: nodeNotes,
                                 madelingNotes: madelingNotes,
@@ -304,7 +322,8 @@ export default class CommitTreeComponent extends React.Component {
                 this.setState({
                     treeNodeList: treeNodeList,
                     treeScenarioList: treeScenarioList,
-                    missingBranchesList: missingBranchesList
+                    missingBranchesList: missingBranchesList,
+                    treeScenarioNotes: treeScenarioNotes
                 })
 
                 // Tree Forecast : planing unit missing on tree
@@ -1012,6 +1031,21 @@ export default class CommitTreeComponent extends React.Component {
         // this.props.history.push(``);
     }
 
+    missingMonthsClicked(planningUnitId) {
+        const win = window.open("/#/dataentry/consumptionDataEntryAndAdjustment/" + planningUnitId, "_blank");
+        win.focus();
+    }
+
+    missingBranchesClicked(treeId) {
+        const win = window.open(`/#/dataSet/buildTree/tree/${treeId}/${this.state.programId}`, "_blank");
+        win.focus();
+    }
+
+    nodeWithPercentageChildrenClicked(treeId, scenarioId) {
+        const win = window.open(`/#/dataSet/buildTree/tree/${treeId}/${this.state.programId}/${scenarioId}`, "_blank");
+        win.focus();
+    }
+
     render() {
         const { programList } = this.state;
         let programs = programList.length > 0 && programList.map((item, i) => {
@@ -1043,7 +1077,7 @@ export default class CommitTreeComponent extends React.Component {
         let missingMonths = missingMonthList.length > 0 && missingMonthList.map((item, i) => {
             return (
                 <li key={i}>
-                    <div><span><b>{getLabelText(item.planningUnitLabel, this.state.lang) + " - " + getLabelText(item.regionLabel, this.state.lang) + " : "}</b>{"" + item.monthsArray}</span></div>
+                    <div><span><div className="hoverDiv" onClick={() => this.missingMonthsClicked(item.planningUnitId)}><b>{getLabelText(item.planningUnitLabel, this.state.lang) + " - " + getLabelText(item.regionLabel, this.state.lang) + " : "}</b></div>{"" + item.monthsArray}</span></div>
                 </li>
             )
         }, this);
@@ -1053,7 +1087,7 @@ export default class CommitTreeComponent extends React.Component {
         let consumption = consumptionListlessTwelve.length > 0 && consumptionListlessTwelve.map((item, i) => {
             return (
                 <li key={i}>
-                    <div><span><b>{getLabelText(item.planningUnitLabel, this.state.lang) + " - " + getLabelText(item.regionLabel, this.state.lang) + " : "}</b></span><span>{item.noOfMonths + " month(s)"}</span></div>
+                    <div><span><div className="hoverDiv" onClick={() => this.missingMonthsClicked(item.planningUnitId)}><b>{getLabelText(item.planningUnitLabel, this.state.lang) + " - " + getLabelText(item.regionLabel, this.state.lang) + " : "}</b></div></span><span>{item.noOfMonths + " month(s)"}</span></div>
                 </li>
             )
         }, this);
@@ -1074,7 +1108,7 @@ export default class CommitTreeComponent extends React.Component {
             return (
                 <ul>
                     <li key={i}>
-                        <div><span>{getLabelText(item.treeLabel, this.state.lang)}</span></div>
+                        <div className="hoverDiv" onClick={() => this.missingBranchesClicked(item.treeId)}><span>{getLabelText(item.treeLabel, this.state.lang)}</span></div>
                         {item.flatList.length > 0 && item.flatList.map((item1, j) => {
                             return (
                                 <ul>
@@ -1093,7 +1127,7 @@ export default class CommitTreeComponent extends React.Component {
         let jxlTable = this.state.treeScenarioList.map((item1, count) => {
             var nodeWithPercentageChildren = this.state.nodeWithPercentageChildren.filter(c => c.treeId == item1.treeId && c.scenarioId == item1.scenarioId);
             if (nodeWithPercentageChildren.length > 0) {
-                return (<><span>{getLabelText(item1.treeLabel, this.state.lang) + " / " + getLabelText(item1.scenarioLabel, this.state.lang)}</span><div className="table-responsive">
+                return (<><span className="hoverDiv" onClick={() => this.nodeWithPercentageChildrenClicked(item1.treeId, item1.scenarioId)}>{getLabelText(item1.treeLabel, this.state.lang) + " / " + getLabelText(item1.scenarioLabel, this.state.lang)}</span><div className="table-responsive">
                     <div id={"tableDiv" + count} className="jexcelremoveReadonlybackground consumptionDataEntryTable" name='jxlTableData' />
                 </div><br /></>)
             }
@@ -1103,7 +1137,7 @@ export default class CommitTreeComponent extends React.Component {
         const { datasetPlanningUnit } = this.state;
         let consumtionNotes = datasetPlanningUnit.length > 0 && datasetPlanningUnit.map((item, i) => {
             return (
-                <tr key={i}>
+                <tr key={i} className="hoverTd" onClick={() => this.missingMonthsClicked(item.planningUnit.id)}>
                     <td>{getLabelText(item.planningUnit.label, this.state.lang)}</td>
                     <td>{item.consumtionNotes}</td>
                 </tr>
@@ -1111,10 +1145,10 @@ export default class CommitTreeComponent extends React.Component {
         }, this);
 
         //Tree scenario Notes
-        const { treeNodeList } = this.state;
-        let scenarioNotes = treeNodeList.length > 0 && treeNodeList.map((item, i) => {
+        const { treeScenarioNotes } = this.state;
+        let scenarioNotes = treeScenarioNotes.length > 0 && treeScenarioNotes.map((item, i) => {
             return (
-                <tr key={i}>
+                <tr key={i} className="hoverTd" onClick={() => this.nodeWithPercentageChildrenClicked(item.treeId, item.scenarioId)}>
                     <td>{getLabelText(item.tree, this.state.lang)}</td>
                     <td>{getLabelText(item.scenario, this.state.lang)}</td>
                     <td>{item.scenarioNotes}</td>
@@ -1123,9 +1157,10 @@ export default class CommitTreeComponent extends React.Component {
         }, this);
 
         //Tree Nodes Notes
+        const { treeNodeList } = this.state;
         let treeNodes = treeNodeList.length > 0 && treeNodeList.map((item, i) => {
             return (
-                <tr key={i}>
+                <tr key={i} className="hoverTd" onClick={() => this.nodeWithPercentageChildrenClicked(item.treeId, item.scenarioId)}>
                     <td>{getLabelText(item.tree, this.state.lang)}</td>
                     <td>{getLabelText(item.node, this.state.lang)}</td>
                     <td>{getLabelText(item.scenario, this.state.lang)}</td>
@@ -1364,11 +1399,11 @@ export default class CommitTreeComponent extends React.Component {
                             <span>b. {i18n.t('static.commitTree.puThatDoNotHaveAtleast24MonthsOfActualConsumptionValues')} :</span><br />
                             <ul>{consumption}</ul>
 
-                            <span><b>3. {i18n.t('static.commitTree.treeForecast')} </b></span><br />
+                            <span><b>3. {i18n.t('static.commitTree.treeForecast')} </b>(<a href="/#/dataset/listTree" target="_blank">{i18n.t('static.common.managetree')}</a>)</span><br />
                             <span>a. {i18n.t('static.commitTree.puThatDoesNotAppearOnAnyTree')} </span><br />
                             <ul>{pu}</ul>
 
-                            <span>b. {i18n.t('static.commitTree.branchesMissingPlanningUnit')} (<a href="/#/dataset/listTree" target="_blank">{i18n.t('static.common.managetree')}</a>)</span><br />
+                            <span>b. {i18n.t('static.commitTree.branchesMissingPlanningUnit')}</span><br />
                             {missingBranches}
 
                             <span>c. {i18n.t('static.commitTree.NodesWithChildrenThatDoNotAddUpTo100Prcnt')}</span><br />
@@ -1413,7 +1448,7 @@ export default class CommitTreeComponent extends React.Component {
                                     <Table className="table-bordered text-center mt-2 overflowhide main-table " bordered size="sm" >
                                         <thead>
                                             <tr>
-                                                <th><b>{i18n.t('static.forecastMethod.treeTree')}</b></th>
+                                                <th><b>{i18n.t('static.forecastMethod.tree')}</b></th>
                                                 <th><b>{i18n.t('static.common.node')}</b></th>
                                                 <th><b>{i18n.t('static.whatIf.scenario')}</b></th>
                                                 <th><b>{i18n.t('static.program.notes')}</b></th>

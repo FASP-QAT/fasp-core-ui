@@ -1346,6 +1346,7 @@ class AuthenticationService {
                         }
                         break;
                     case "/dataentry/consumptionDataEntryAndAdjustment":
+                    case "/dataentry/consumptionDataEntryAndAdjustment/:planningUnitId":    
                         if (bfunction.includes("ROLE_BF_CONSUMPTION_DATA_ENTRY_ADJUSTMENT")) {
                             return true;
                         }
