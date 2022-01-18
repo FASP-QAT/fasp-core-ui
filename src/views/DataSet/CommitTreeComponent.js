@@ -2,9 +2,12 @@ import React from "react";
 import ReactDOM from 'react-dom';
 import {
     Card, CardBody,
+    FormFeedback,
     Label, Input, FormGroup,
     CardFooter, Button, Col, Form, InputGroup, Modal, ModalHeader, ModalFooter, ModalBody, Row, Table, PopoverBody, Popover
 } from 'reactstrap';
+import { Formik } from 'formik';
+import * as Yup from 'yup';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { DATE_FORMAT_CAP_WITHOUT_DATE, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_MONTH_PICKER_FORMAT, JEXCEL_PAGINATION_OPTION, SECRET_KEY, PENDING_APPROVAL_VERSION_STATUS } from "../../Constants";
 import i18n from '../../i18n';
@@ -26,8 +29,41 @@ import ProgramService from "../../api/ProgramService";
 import AuthenticationService from '../Common/AuthenticationService.js';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
-const entityname = i18n.t('static.button.commit');
+import pdfIcon from '../../assets/img/pdf.png';
 
+const entityname = i18n.t('static.button.commit');
+const initialValues = {
+    notes: ''
+}
+
+const validationSchema = function (values, t) {
+    return Yup.object().shape({
+        notes: Yup.string()
+            .matches(/^([a-zA-Z0-9\s,\./<>\?;':""[\]\\{}\|`~!@#\$%\^&\*()-_=\+]*)$/, i18n.t("static.label.validData"))
+    })
+}
+const validate = (getValidationSchema) => {
+    return (values) => {
+
+        const validationSchema = getValidationSchema(values, i18n.t)
+        try {
+            validationSchema.validateSync(values, { abortEarly: false })
+            return {}
+        } catch (error) {
+            return getErrorsFromValidationError(error)
+        }
+    }
+}
+
+const getErrorsFromValidationError = (validationError) => {
+    const FIRST_ERROR = 0
+    return validationError.inner.reduce((errors, error) => {
+        return {
+            ...errors,
+            [error.path]: error.errors[FIRST_ERROR],
+        }
+    }, {})
+}
 
 export default class CommitTreeComponent extends React.Component {
     constructor(props) {
@@ -63,6 +99,34 @@ export default class CommitTreeComponent extends React.Component {
         this.synchronize = this.synchronize.bind(this);
         this.updateState = this.updateState.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
+    }
+
+    notesChange(event) {
+        this.setState({
+            notes: event.target.value
+        })
+    }
+
+    touchAll(setTouched, errors) {
+        setTouched({
+            notes: true
+        }
+        );
+        this.validateForm(errors);
+    }
+    validateForm(errors) {
+        this.findFirstError('budgetForm', (fieldName) => {
+            return Boolean(errors[fieldName])
+        })
+    }
+    findFirstError(formName, hasError) {
+        const form = document.forms[formName]
+        for (let i = 0; i < form.length; i++) {
+            if (hasError(form[i].name)) {
+                form[i].focus()
+                break
+            }
+        }
     }
 
     componentDidMount = function () {
@@ -382,6 +446,7 @@ export default class CommitTreeComponent extends React.Component {
                         var puId = datasetPlanningUnit[dpu].planningUnit.id;
                         var regionId = datasetRegionList[drl].regionId;
                         var consumptionListFiltered = consumptionList.filter(c => c.planningUnit.id == puId && c.region.id == regionId);
+                        console.log("consumptionListFiltered+++", consumptionListFiltered);
                         if (consumptionListFiltered.length < 24) {
                             consumptionListlessTwelve.push({
                                 planningUnitId: datasetPlanningUnit[dpu].planningUnit.id,
@@ -393,7 +458,7 @@ export default class CommitTreeComponent extends React.Component {
                         }
 
                         //Consumption : missing months
-                        for (var i = 0; curDate < stopDate; i++) {
+                        for (var i = 0; moment(curDate).format("YYYY-MM") < moment(Date.now()).format("YYYY-MM"); i++) {
                             curDate = moment(startDate).add(i, 'months').format("YYYY-MM-DD");
                             var consumptionListFilteredForMonth = consumptionList.filter(c => c.planningUnit.id == puId && c.region.id == regionId && c.month == curDate);
                             if (consumptionListFilteredForMonth.length == 0) {
@@ -415,8 +480,8 @@ export default class CommitTreeComponent extends React.Component {
                     var selectedForecast = datasetPlanningUnit[dpu].selectedForecastMap;
                     var regionArray = [];
                     for (var drl = 0; drl < datasetRegionList.length; drl++) {
-                        if (selectedForecast[datasetRegionList[drl].regionId] == undefined) {
-                            regionArray.push(getLabelText(datasetRegionList[drl].label, this.state.lang));
+                        if (selectedForecast[datasetRegionList[drl].regionId] == undefined || (selectedForecast[datasetRegionList[drl].regionId].scenarioId == null && selectedForecast[datasetRegionList[drl].regionId].consumptionExtrapolationId == null)) {
+                            regionArray.push({ id: datasetRegionList[drl].regionId, label: getLabelText(datasetRegionList[drl].label, this.state.lang) });
                         }
                     }
                     noForecastSelectedList.push({
@@ -500,7 +565,7 @@ export default class CommitTreeComponent extends React.Component {
                         entries: '',
                     },
                     onload: function (instance, cell, x, y, value) {
-                        jExcelLoadedFunction(instance);
+                        jExcelLoadedFunctionOnlyHideRow(instance);
                     },
                     updateTable: function (el, cell, x, y, source, value, id) {
                         if (y != null && x != 0) {
@@ -564,6 +629,7 @@ export default class CommitTreeComponent extends React.Component {
 
         const sendGetRequest = async () => {
             try {
+                console.log("In get request****")
                 AuthenticationService.setupAxiosInterceptors();
                 const resp = await ProgramService.sendNotificationAsync(commitRequestId);
                 var curUser = AuthenticationService.getLoggedInUserId();
@@ -572,17 +638,58 @@ export default class CommitTreeComponent extends React.Component {
                         progressPer: 75
                         , message: i18n.t('static.commitVersion.serverProcessingCompleted'), color: 'green'
                     }, () => {
-                        // this.hideFirstComponent();
+                        this.hideFirstComponent();
                         this.getLatestProgram({ openModal: true, notificationDetails: resp.data });
                     })
+                } else if (resp.data.createdBy.userId == curUser && resp.data.status == 3) {
+                    var db1;
+                    getDatabase();
+                    var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+                    openRequest.onerror = function (event) {
+                        this.setState({
+                            message: i18n.t('static.program.errortext'),
+                            color: 'red'
+                        })
+                        this.hideFirstComponent()
+                    }.bind(this);
+                    openRequest.onsuccess = function (e) {
+                        db1 = e.target.result;
+                        var transaction = db1.transaction(['datasetDetails'], 'readwrite');
+                        var program = transaction.objectStore('datasetDetails');
+                        var getRequest = program.get((this.state.programId));
+                        getRequest.onerror = function (event) {
+                            this.setState({
+                                message: i18n.t('static.program.errortext'),
+                                color: 'red'
+                            })
+                            this.hideFirstComponent()
+                        }.bind(this);
+                        getRequest.onsuccess = function (event) {
+                            var myResult = [];
+                            myResult = getRequest.result;
+                            console.log("In readonly 0****")
+                            myResult.readonly = 0;
+                            var transaction1 = db1.transaction(['datasetDetails'], 'readwrite');
+                            var program1 = transaction1.objectStore('datasetDetails');
+                            var getRequest1 = program1.put(myResult);
+                            getRequest1.onsuccess = function (e) {
+                                this.setState({
+                                    message: i18n.t('static.commitTree.commitFailed'),
+                                    color: 'red',
+                                    loading: false
+                                })
+                                this.hideFirstComponent()
+                            }.bind(this)
+                        }.bind(this)
+                    }.bind(this)
                 }
             } catch (err) {
                 // Handle Error Here
                 console.error("Error+++", err);
+                this.setState({ loading: false });
             }
         };
         sendGetRequest();
-        this.setState({ loading: false });
     }
 
     getLatestProgram(notificationDetails) {
@@ -626,13 +733,18 @@ export default class CommitTreeComponent extends React.Component {
                         var datasetRequest1 = datasetDataOs1.delete(this.state.programId);
 
                         datasetDataTransaction1.oncomplete = function (event) {
-                            var programDataTransaction2 = db1.transaction(['downloadedDatasetData'], 'readwrite');
-                            programDataTransaction2.oncomplete = function (event) {
+
+                            var datasetDataTransaction2 = db1.transaction(['datasetDetails'], 'readwrite');
+                            var datasetDataOs2 = datasetDataTransaction2.objectStore('datasetDetails');
+                            var datasetRequest2 = datasetDataOs2.delete(this.state.programId);
+
+                            datasetDataTransaction2.oncomplete = function (event) {
+                                // var programDataTransaction2 = db1.transaction(['downloadedDatasetData'], 'readwrite');
+                                // programDataTransaction2.oncomplete = function (event) {
 
                                 var transactionForSavingData = db1.transaction(['datasetData'], 'readwrite');
                                 var programSaveData = transactionForSavingData.objectStore('datasetData');
                                 for (var r = 0; r < json.length; r++) {
-                                    json[r].actionList = [];
                                     var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
                                     var userId = userBytes.toString(CryptoJS.enc.Utf8);
                                     // var version = json[r].requestedProgramVersion;
@@ -675,37 +787,34 @@ export default class CommitTreeComponent extends React.Component {
 
                                     }
                                     transactionForSavingDownloadedProgramData.oncomplete = function (event) {
-                                        //     var programQPLDetailsTransaction = db1.transaction(['programQPLDetails'], 'readwrite');
-                                        //     var programQPLDetailsOs = programQPLDetailsTransaction.objectStore('programQPLDetails');
-                                        //     var programIds = []
-                                        //     for (var r = 0; r < json.length; r++) {
-                                        //         var programQPLDetailsJson = {
-                                        //             id: json[r].programId + "_v" + json[r].currentVersion.versionId + "_uId_" + userId,
-                                        //             programId: json[r].programId,
-                                        //             version: json[r].currentVersion.versionId,
-                                        //             userId: userId,
-                                        //             programCode: json[r].programCode,
-                                        //             openCount: 0,
-                                        //             addressedCount: 0,
-                                        //             programModified: 0,
-                                        //             readonly: 0
-                                        //         };
-                                        //         programIds.push(json[r].programId + "_v" + json[r].currentVersion.versionId + "_uId_" + userId);
-                                        //         var programQPLDetailsRequest = programQPLDetailsOs.put(programQPLDetailsJson);
-                                        //     }
-                                        //     programQPLDetailsTransaction.oncomplete = function (event) {
-                                        this.setState({
-                                            progressPer: 100,
-                                            loading: false
-                                        })
-                                        this.goToMasterDataSync(programIdsToSyncArray);
-                                        //     }.bind(this)
+                                        var programQPLDetailsTransaction = db1.transaction(['datasetDetails'], 'readwrite');
+                                        var programQPLDetailsOs = programQPLDetailsTransaction.objectStore('datasetDetails');
+                                        var programIds = []
+                                        for (var r = 0; r < json.length; r++) {
+                                            var programQPLDetailsJson = {
+                                                id: json[r].programId + "_v" + json[r].currentVersion.versionId + "_uId_" + userId,
+                                                programId: json[r].programId,
+                                                version: json[r].currentVersion.versionId,
+                                                userId: userId,
+                                                programCode: json[r].programCode,
+                                                changed: 0
+                                            };
+                                            var programQPLDetailsRequest = programQPLDetailsOs.put(programQPLDetailsJson);
+                                        }
+                                        programQPLDetailsTransaction.oncomplete = function (event) {
+                                            this.setState({
+                                                progressPer: 100,
+                                                loading: false
+                                            })
+                                            this.goToMasterDataSync(programIdsToSyncArray);
+                                        }.bind(this)
                                     }.bind(this)
                                 }.bind(this);
                             }.bind(this);
                         }.bind(this);
                     }.bind(this);
                 }.bind(this);
+                // }.bind(this);
             })
 
     }
@@ -716,122 +825,137 @@ export default class CommitTreeComponent extends React.Component {
 
 
     synchronize() {
-        this.toggleShowValidation();
-        this.setState({ loading: true })
-        var db1;
-        getDatabase();
-        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-        openRequest.onerror = function (event) {
+        this.setState({ showValidation: !this.state.showValidation }, () => {
             this.setState({
-                supplyPlanError: i18n.t('static.program.errortext')
-            })
-        }.bind(this);
-        openRequest.onsuccess = function (e) {
-            db1 = e.target.result;
-            var programDataTransaction = db1.transaction(['datasetData'], 'readwrite');
-            var programDataOs = programDataTransaction.objectStore('datasetData');
-            var programRequest = programDataOs.get((this.state.programId));
-            programRequest.onerror = function (event) {
-                this.setState({
-                    supplyPlanError: i18n.t('static.program.errortext')
-                })
-            }.bind(this);
-            programRequest.onsuccess = function (e) {
-
-                var datasetDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
-                var datasetData = datasetDataBytes.toString(CryptoJS.enc.Utf8);
-                var datasetJson = JSON.parse(datasetData);
-                var programJson = datasetJson;
-                programJson.versionType = { id: document.getElementById("versionTypeId").value };
-                programJson.versionStatus = { id: 2 };
-                programJson.notes = document.getElementById("notesId").value;
-
-                //create saveDatasetData in ProgramService
-                DatasetService.saveDatasetData(programJson, this.state.comparedLatestVersion).then(response => {
-                    if (response.status == 200) {
-
+                loading: true,
+            }, () => {
+                var db1;
+                getDatabase();
+                var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+                openRequest.onerror = function (event) {
+                    this.setState({
+                        supplyPlanError: i18n.t('static.program.errortext')
+                    })
+                }.bind(this);
+                openRequest.onsuccess = function (e) {
+                    db1 = e.target.result;
+                    var programDataTransaction = db1.transaction(['datasetData'], 'readwrite');
+                    var programDataOs = programDataTransaction.objectStore('datasetData');
+                    var programRequest = programDataOs.get((this.state.programId));
+                    programRequest.onerror = function (event) {
                         this.setState({
-                            progressPer: 50
-                            , message: i18n.t('static.commitVersion.sendLocalToServerCompleted'), color: 'green'
-                        }, () => {
-                            // this.hideFirstComponent();
-                            // getLatestProgram also copy , use getAllDatasetData instead getAllProgramData
-                            this.redirectToDashbaord(response.data);
+                            supplyPlanError: i18n.t('static.program.errortext')
                         })
-                    } else {
-                        this.setState({
-                            message: response.data.messageCode,
-                            color: "red",
-                            loading: false
-                        })
-                        // this.hideFirstComponent();
-                    }
-                })
-                    .catch(
-                        error => {
-                            console.log("@@@Error4", error);
-                            console.log("@@@Error4", error.message);
-                            console.log("@@@Error4", error.response ? error.response.status : "")
-                            if (error.message === "Network Error") {
-                                console.log("+++in catch 7")
-                                this.setState({
-                                    message: 'static.common.networkError',
-                                    color: "red",
-                                    loading: false
-                                }, () => {
+                    }.bind(this);
+                    programRequest.onsuccess = function (e) {
+                        var programQPLDetailsTransaction1 = db1.transaction(['datasetDetails'], 'readwrite');
+                        var programQPLDetailsOs1 = programQPLDetailsTransaction1.objectStore('datasetDetails');
+                        var programQPLDetailsGetRequest = programQPLDetailsOs1.get((this.state.programId));
+                        programQPLDetailsGetRequest.onsuccess = function (event) {
+                            var programQPLDetails = programQPLDetailsGetRequest.result;
+                            var datasetDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+                            var datasetData = datasetDataBytes.toString(CryptoJS.enc.Utf8);
+                            var datasetJson = JSON.parse(datasetData);
+                            var programJson = datasetJson;
+                            programJson.versionType = { id: document.getElementById("versionTypeId").value };
+                            programJson.versionStatus = { id: 2 };
+                            programJson.notes = document.getElementById("notes").value;
+
+                            //create saveDatasetData in ProgramService
+                            DatasetService.saveDatasetData(programJson, this.state.comparedLatestVersion).then(response => {
+                                if (response.status == 200) {
+                                    var transactionForProgramQPLDetails = db1.transaction(['datasetDetails'], 'readwrite');
+                                    var programQPLDetailSaveData = transactionForProgramQPLDetails.objectStore('datasetDetails');
+                                    programQPLDetails.readonly = 1;
+                                    var putRequest2 = programQPLDetailSaveData.put(programQPLDetails);
+                                    localStorage.setItem("sesProgramId", "");
+                                    console.log(")))) Made program readonly");
+                                    this.setState({
+                                        progressPer: 50
+                                        , message: i18n.t('static.commitVersion.sendLocalToServerCompleted'), color: 'green'
+                                    }, () => {
+                                        this.hideFirstComponent();
+                                        // getLatestProgram also copy , use getAllDatasetData instead getAllProgramData
+                                        this.redirectToDashbaord(response.data);
+                                    })
+                                } else {
+                                    this.setState({
+                                        message: response.data.messageCode,
+                                        color: "red",
+                                        loading: false
+                                    })
                                     this.hideFirstComponent();
-                                });
-                            } else {
-                                switch (error.response ? error.response.status : "") {
-
-                                    case 401:
-                                        this.props.history.push(`/login/static.message.sessionExpired`)
-                                        break;
-                                    case 403:
-                                        this.props.history.push(`/accessDenied`)
-                                        break;
-                                    case 406:
-                                        if (error.response.data.messageCode == 'static.commitVersion.versionIsOutDated') {
-                                            alert(i18n.t("static.commitVersion.versionIsOutDated"));
-                                        }
-                                        this.setState({
-                                            message: error.response.data.messageCode,
-                                            color: "red",
-                                            loading: false
-                                        }, () => {
-                                            this.hideFirstComponent()
-                                            if (error.response.data.messageCode == 'static.commitVersion.versionIsOutDated') {
-                                                this.checkLastModifiedDateForProgram(this.state.programId);
-                                            }
-                                        });
-                                        break;
-                                    case 500:
-                                    case 404:
-                                    case 412:
-                                        this.setState({
-                                            message: error.response.data.messageCode,
-                                            loading: false,
-                                            color: "red"
-                                        }, () => {
-                                            this.hideFirstComponent()
-                                        });
-                                        break;
-                                    default:
-                                        console.log("+++in catch 8")
-                                        this.setState({
-                                            message: 'static.unkownError',
-                                            loading: false,
-                                            color: "red"
-                                        }, () => {
-                                            this.hideFirstComponent()
-                                        });
-                                        break;
                                 }
-                            }
-                        }
-                    );
-            }.bind(this)
-        }.bind(this)
+                            })
+                                .catch(
+                                    error => {
+                                        console.log("@@@Error4", error);
+                                        console.log("@@@Error4", error.message);
+                                        console.log("@@@Error4", error.response ? error.response.status : "")
+                                        if (error.message === "Network Error") {
+                                            console.log("+++in catch 7")
+                                            this.setState({
+                                                message: 'static.common.networkError',
+                                                color: "red",
+                                                loading: false
+                                            }, () => {
+                                                this.hideFirstComponent();
+                                            });
+                                        } else {
+                                            switch (error.response ? error.response.status : "") {
+
+                                                case 401:
+                                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                                    break;
+                                                case 403:
+                                                    this.props.history.push(`/accessDenied`)
+                                                    break;
+                                                case 406:
+                                                    if (error.response.data.messageCode == 'static.commitVersion.versionIsOutDated') {
+                                                        alert(i18n.t("static.commitVersion.versionIsOutDated"));
+                                                    }
+                                                    this.setState({
+                                                        message: error.response.data.messageCode,
+                                                        color: "red",
+                                                        loading: false
+                                                    }, () => {
+                                                        this.hideFirstComponent()
+                                                        if (error.response.data.messageCode == 'static.commitVersion.versionIsOutDated') {
+                                                            this.checkLastModifiedDateForProgram(this.state.programId);
+                                                        }
+                                                    });
+                                                    break;
+                                                case 500:
+                                                case 404:
+                                                case 412:
+                                                    this.setState({
+                                                        message: error.response.data.messageCode,
+                                                        loading: false,
+                                                        color: "red"
+                                                    }, () => {
+                                                        this.hideFirstComponent()
+                                                    });
+                                                    break;
+                                                default:
+                                                    console.log("+++in catch 8")
+                                                    this.setState({
+                                                        message: 'static.unkownError',
+                                                        loading: false,
+                                                        color: "red"
+                                                    }, () => {
+                                                        this.hideFirstComponent()
+                                                    });
+                                                    break;
+                                            }
+                                        }
+                                    }
+                                );
+                        }.bind(this)
+                    }.bind(this)
+                }.bind(this)
+            })
+        })
+
     }
 
     cancelClicked() {
@@ -880,6 +1004,14 @@ export default class CommitTreeComponent extends React.Component {
         }, 8000);
     }
 
+    noForecastSelectedClicked(planningUnitId, regionId) {
+        localStorage.setItem("sesDatasetPlanningUnitId", planningUnitId);
+        localStorage.setItem("sesDatasetRegionId", regionId);
+        const win = window.open("/#/report/compareAndSelectScenario", "_blank");
+        win.focus();
+        // this.props.history.push(``);
+    }
+
     render() {
         const { programList } = this.state;
         let programs = programList.length > 0 && programList.map((item, i) => {
@@ -892,13 +1024,19 @@ export default class CommitTreeComponent extends React.Component {
 
         //No forecast selected
         const { noForecastSelectedList } = this.state;
-        let noForecastSelected = noForecastSelectedList.length > 0 && noForecastSelectedList.map((item, i) => {
-            return (
-                <li key={i}>
-                    <div>{getLabelText(item.planningUnit.planningUnit.label, this.state.lang) + " - " + item.regionList}</div>
-                </li>
-            )
-        }, this);
+        let noForecastSelected = noForecastSelectedList.length > 0 &&
+            noForecastSelectedList.map((item, i) => {
+                return (
+                    item.regionList.map(item1 => {
+                        console.log("item1", item1);
+                        return (
+                            <li key={i}>
+                                <div className="hoverDiv" onClick={() => this.noForecastSelectedClicked(item.planningUnit.planningUnit.id, item1.id)}>{getLabelText(item.planningUnit.planningUnit.label, this.state.lang) + " - " + item1.label}</div>
+                            </li>
+                        )
+                    }, this)
+                )
+            }, this);
 
         //Consumption : missing months
         const { missingMonthList } = this.state;
@@ -1094,6 +1232,8 @@ export default class CommitTreeComponent extends React.Component {
                                         </FormGroup>
                                     </div>
                                 </div>
+                            </Form>
+                            <div style={{ display: this.state.loading ? "none" : "block" }}>
                                 {(this.state.showCompare) &&
                                     <>
                                         <div className="col-md-10 pt-lg-1 pb-lg-0 pl-lg-0">
@@ -1114,50 +1254,82 @@ export default class CommitTreeComponent extends React.Component {
                                 <Button type="button" size="md" color="warning" className="float-right mr-1" onClick={this.reset}><i className="fa fa-refresh"></i> Cancel</Button>
                                 <Button type="button" color="success" className="mr-1 float-right" size="md" onClick={() => { this.toggleShowValidation() }}><i className="fa fa-check"></i>Next</Button>
                             </div> */}
-                            </Form>
-                            <div>
-                                <div className="row">
-                                    <FormGroup className="col-md-4">
-                                        <Label htmlFor="appendedInputButton">{i18n.t('static.report.versiontype')}</Label>
-                                        <div className="controls ">
-                                            <Input
-                                                type="select"
-                                                name="versionTypeId"
-                                                id="versionTypeId"
-                                                bsSize="sm"
-                                                value={this.state.versionTypeId}
-                                                onChange={(e) => { this.setVersionTypeId(e); }}
-                                            >
-                                                <option value="">{i18n.t('static.common.select')}</option>
-                                                <option value="1">{i18n.t('static.commitTree.draftVersion')}</option>
-                                                <option value="2">{i18n.t('static.commitTree.finalVersion')}</option>
-                                            </Input>
-                                        </div>
-                                    </FormGroup>
-                                    <FormGroup className="col-md-6">
-                                        <Label htmlFor="appendedInputButton">{i18n.t('static.program.notes')}</Label>
-                                        <Input
-                                            className="controls"
-                                            type="textarea"
-                                            id="notesId"
-                                            name="notesId"
-                                        />
-                                    </FormGroup>
 
-                                    <div className="col-md-12">
-                                        <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.cancel')}</Button>
-                                        {/* <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={this.synchronize}><i className="fa fa-check"></i>Commit</Button> */}
-                                        <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => { this.toggleShowValidation() }}><i className="fa fa-check"></i>{i18n.t('static.button.commit')}</Button>
-                                    </div>
+                                <div>
+                                    <Formik
+                                        initialValues={initialValues}
+                                        validate={validate(validationSchema)}
+                                        onSubmit={(values, { setSubmitting, setErrors }) => {
+                                            this.toggleShowValidation()
+                                        }}
+                                        render={
+                                            ({
+                                                values,
+                                                errors,
+                                                touched,
+                                                handleChange,
+                                                handleBlur,
+                                                handleSubmit,
+                                                isSubmitting,
+                                                isValid,
+                                                setTouched,
+                                                handleReset,
+                                                setFieldValue,
+                                                setFieldTouched,
+                                                setFieldError
+                                            }) => (
+                                                <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='budgetForm' autocomplete="off">
+                                                    <div className="row">
+                                                        <FormGroup className="col-md-4">
+                                                            <Label htmlFor="appendedInputButton">{i18n.t('static.report.versiontype')}</Label>
+                                                            <div className="controls ">
+                                                                <Input
+                                                                    type="select"
+                                                                    name="versionTypeId"
+                                                                    id="versionTypeId"
+                                                                    bsSize="sm"
+                                                                    value={this.state.versionTypeId}
+                                                                    onChange={(e) => { this.setVersionTypeId(e); }}
+                                                                >
+                                                                    <option value="1">{i18n.t('static.commitTree.draftVersion')}</option>
+                                                                    <option value="2">{i18n.t('static.commitTree.finalVersion')}</option>
+                                                                </Input>
+                                                            </div>
+                                                        </FormGroup>
+                                                        <FormGroup className="col-md-6">
+                                                            <Label htmlFor="appendedInputButton">{i18n.t('static.program.notes')}</Label>
+                                                            <Input
+                                                                className="controls"
+                                                                type="textarea"
+                                                                id="notes"
+                                                                name="notes"
+                                                                valid={!errors.notes && this.state.notes != ''}
+                                                                invalid={touched.notes && !!errors.notes}
+                                                                onChange={(e) => { handleChange(e); this.notesChange(e); }}
+                                                                onBlur={handleBlur}
+                                                                value={this.state.notes}
+
+                                                            />
+                                                            <FormFeedback className="red">{errors.notes}</FormFeedback>
+                                                        </FormGroup>
+
+                                                        <div className="col-md-12">
+                                                            <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.cancel')}</Button>
+                                                            {/* <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={this.synchronize}><i className="fa fa-check"></i>Commit</Button> */}
+                                                            <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)} ><i className="fa fa-check"></i>{i18n.t('static.button.commit')}</Button>
+                                                        </div>
+                                                    </div>
+                                                </Form>
+                                            )} />
                                 </div>
-                                <div style={{ display: this.state.loading ? "block" : "none" }}>
-                                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                                        <div class="align-items-center">
-                                            <div ><h4> <strong>{i18n.t('static.loading.loading')}</strong></h4></div>
+                            </div>
+                            <div style={{ display: this.state.loading ? "block" : "none" }}>
+                                <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                    <div class="align-items-center">
+                                        <div ><h4> <strong>{i18n.t('static.loading.loading')}</strong></h4></div>
 
-                                            <div class="spinner-border blue ml-4" role="status">
+                                        <div class="spinner-border blue ml-4" role="status">
 
-                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -1169,8 +1341,11 @@ export default class CommitTreeComponent extends React.Component {
                 <Modal isOpen={this.state.showValidation}
                     className={'modal-lg ' + this.props.className} id='divcontents'>
                     <ModalHeader toggle={() => this.toggleShowValidation()} className="modalHeaderSupplyPlan">
-                        <h3><strong>{i18n.t('static.commitTree.forecastValidation')}</strong><i className="fa fa-print pull-right iconClass cursor" onClick={() => this.print()}></i></h3>
-
+                        <h3><strong>{i18n.t('static.commitTree.forecastValidation')}</strong></h3>
+                        <div className="row">
+                            <img className=" pull-right iconClass cursor" style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.exportPDF()} />
+                            <i className="fa fa-print pull-right iconClass cursor" onClick={() => this.print()}></i>
+                        </div>
                     </ModalHeader>
                     <div>
                         <ModalBody>
