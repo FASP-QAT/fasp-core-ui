@@ -5798,3 +5798,12 @@ font-style: italic!important;
     cursor: pointer;
 }
 
+@media print {
+  thead {display: table-row-group;}
+  table tbody tr td:before,
+    table tbody tr td:after {
+        content : "" ;
+        height : 4px ;
+        display : block ;
+    }
+}
