@@ -1718,13 +1718,13 @@ export default class CreateTreeTemplate extends Component {
                         cell = elInstance.getCell(("F").concat(parseInt(y) + 1))
                         cell.classList.add('readonly');
                     }
-                    if (rowData[3] != "" && moment(this.state.minMonth).diff(moment(rowData[3]), 'months') == 0) {
-                        var cell = elInstance.getCell(("D").concat(parseInt(y) + 1))
-                        cell.classList.add('readonly');
-                    } else {
-                        var cell = elInstance.getCell(("D").concat(parseInt(y) + 1))
-                        cell.classList.remove('readonly');
-                    }
+                    // if (rowData[3] != "" && moment(this.state.minMonth).diff(moment(rowData[3]), 'months') == 0) {
+                    //     var cell = elInstance.getCell(("D").concat(parseInt(y) + 1))
+                    //     cell.classList.add('readonly');
+                    // } else {
+                    //     var cell = elInstance.getCell(("D").concat(parseInt(y) + 1))
+                    //     cell.classList.remove('readonly');
+                    // }
 
                 }
             }.bind(this),
@@ -1783,12 +1783,12 @@ export default class CreateTreeTemplate extends Component {
                     if (obj.options.allowDeleteRow == true) {
                         // region id
                         // if (obj.getRowData(y)[9] == "" || obj.getRowData(y)[9] == 0) {
-                            items.push({
-                                title: i18n.t("static.common.deleterow"),
-                                onclick: function () {
-                                    obj.deleteRow(parseInt(y));
-                                }
-                            });
+                        items.push({
+                            title: i18n.t("static.common.deleterow"),
+                            onclick: function () {
+                                obj.deleteRow(parseInt(y));
+                            }
+                        });
                         // }
                     }
                 }
@@ -3421,6 +3421,7 @@ export default class CreateTreeTemplate extends Component {
                                     },
                                     nodeDataModelingList: [],
                                     nodeDataOverrideList: [],
+                                    nodeDataMomList: []
                                 }]
                             ]
                         },
@@ -3452,6 +3453,7 @@ export default class CreateTreeTemplate extends Component {
                             [{
                                 nodeDataModelingList: [],
                                 nodeDataOverrideList: [],
+                                nodeDataMomList: [],
                                 month: new Date(),
                                 dataValue: '',
                                 fuNode: {
@@ -3661,7 +3663,8 @@ export default class CreateTreeTemplate extends Component {
             currentItemConfig.context.payload.nodeUnit.id = event.target.value;
         }
         if (event.target.name === "percentageOfParent") {
-            (currentItemConfig.context.payload.nodeDataMap[0])[0].dataValue = event.target.value;
+            var value = (event.target.value).replaceAll(",", "");
+            (currentItemConfig.context.payload.nodeDataMap[0])[0].dataValue = value;
             var calculatedDataValue;
             var parentValue;
             var parentValue1;
@@ -3672,8 +3675,8 @@ export default class CreateTreeTemplate extends Component {
             }
 
             console.log("parentValue---", parentValue);
-            parentValue = (parentValue1).toString().replaceAll(",", "");
-            (currentItemConfig.context.payload.nodeDataMap[0])[0].calculatedDataValue = parseInt(parentValue * event.target.value) / 100
+            parentValue = parentValue1;
+            (currentItemConfig.context.payload.nodeDataMap[0])[0].calculatedDataValue = parseInt(parentValue * value) / 100
             console.log("calculatedDataValue---", currentItemConfig);
             this.setState({
                 parentValue
@@ -3681,8 +3684,9 @@ export default class CreateTreeTemplate extends Component {
         }
         if (event.target.name === "nodeValue") {
             console.log("inside node value-------");
-            (currentItemConfig.context.payload.nodeDataMap[0])[0].dataValue = event.target.value;
-            (currentItemConfig.context.payload.nodeDataMap[0])[0].calculatedDataValue = event.target.value;
+            var value = (event.target.value).replaceAll(",", "");
+            (currentItemConfig.context.payload.nodeDataMap[0])[0].dataValue = value;
+            (currentItemConfig.context.payload.nodeDataMap[0])[0].calculatedDataValue = value;
         }
         if (event.target.name === "notes") {
             (currentItemConfig.context.payload.nodeDataMap[0])[0].notes = event.target.value;
@@ -4070,7 +4074,7 @@ export default class CreateTreeTemplate extends Component {
                         id: 'A',
                         scaleLabel: {
                             display: true,
-                            labelString: "",
+                            labelString: this.state.currentItemConfig.context.payload.nodeUnit.label != null && this.state.currentItemConfig.context.payload.nodeType.id != 1 ? getLabelText(this.state.currentItemConfig.context.payload.nodeUnit.label, this.state.lang) : '',
                             fontColor: 'black'
                         },
                         stacked: false,
@@ -4078,6 +4082,19 @@ export default class CreateTreeTemplate extends Component {
                             beginAtZero: true,
                             fontColor: 'black',
                             // stepSize: 1000000
+                            callback: function (value) {
+                                var cell1 = value
+                                cell1 += '';
+                                var x = cell1.split('.');
+                                var x1 = x[0];
+                                var x2 = x.length > 1 ? '.' + x[1] : '';
+                                var rgx = /(\d+)(\d{3})/;
+                                while (rgx.test(x1)) {
+                                    x1 = x1.replace(rgx, '$1' + ',' + '$2');
+                                }
+                                return x1 + x2;
+
+                            }
                         },
                         gridLines: {
                             drawBorder: true, lineWidth: 1
@@ -4094,6 +4111,35 @@ export default class CreateTreeTemplate extends Component {
                         drawBorder: true, lineWidth: 0
                     }
                 }]
+            },
+            tooltips: {
+                enabled: true,
+                custom: CustomTooltips,
+                callbacks: {
+                    label: function (tooltipItem, data) {
+                        // console.log("tooltipItem---", tooltipItem);
+                        // console.log("tooltipItem data---", data);
+                        // if (tooltipItem.datasetIndex == 1) {
+                        let label = data.labels[tooltipItem.index];
+                        let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
+
+                        var cell1 = value
+                        cell1 += '';
+                        var x = cell1.split('.');
+                        var x1 = x[0];
+                        var x2 = x.length > 1 ? '.' + x[1] : '';
+                        var rgx = /(\d+)(\d{3})/;
+                        while (rgx.test(x1)) {
+                            x1 = x1.replace(rgx, '$1' + ',' + '$2');
+                        }
+                        return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
+                        // } else {
+                        // let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
+                        // return data.datasets[tooltipItem.datasetIndex].label + ' : ' + value + " %";
+                        // }
+                    }
+                }
+
             },
             maintainAspectRatio: false
             ,
@@ -6015,6 +6061,7 @@ export default class CreateTreeTemplate extends Component {
                                                         {
                                                             nodeDataModelingList: [],
                                                             nodeDataOverrideList: [],
+                                                            nodeDataMomList: [],
                                                             month: new Date(),
                                                             dataValue: '',
                                                             calculatedDataValue: '',
@@ -6268,7 +6315,7 @@ export default class CreateTreeTemplate extends Component {
                                                                 // month: (item.payload.nodeDataMap[0])[0].month,
                                                                 month: '2021-09-01',
                                                                 nodeDataId: (item.payload.nodeDataMap[0])[0].nodeDataId,
-                                                                dataValue: (item.payload.nodeDataMap[0])[0].dataValue.toString().replaceAll(",", ""),
+                                                                dataValue: (item.payload.nodeDataMap[0])[0].dataValue,
                                                                 fuNode: (item.payload.nodeDataMap[0])[0].fuNode,
                                                                 puNode: (item.payload.nodeDataMap[0])[0].puNode,
                                                                 notes: (item.payload.nodeDataMap[0])[0].notes,

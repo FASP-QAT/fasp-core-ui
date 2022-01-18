@@ -983,7 +983,6 @@ export default class BuildTree extends Component {
                 showDiv: false
             })
         } else {
-
             const { treeData } = this.state;
             const { curTreeObj } = this.state;
             var maxTreeId = treeData.length > 0 ? Math.max(...treeData.map(o => o.treeId)) : 0;
@@ -999,6 +998,7 @@ export default class BuildTree extends Component {
                 displayDataValue: '',
                 nodeDataModelingList: [],
                 nodeDataOverrideList: [],
+                nodeDataMomList: [],
                 fuNode: {
                     noOfForecastingUnitsPerPerson: '',
                     usageFrequency: '',
@@ -2366,13 +2366,13 @@ export default class BuildTree extends Component {
                         cell = elInstance.getCell(("F").concat(parseInt(y) + 1))
                         cell.classList.add('readonly');
                     }
-                    if (rowData[3] != "" && moment(this.state.minMonth).diff(moment(rowData[3]), 'months') == 0) {
-                        var cell = elInstance.getCell(("D").concat(parseInt(y) + 1))
-                        cell.classList.add('readonly');
-                    } else {
-                        var cell = elInstance.getCell(("D").concat(parseInt(y) + 1))
-                        cell.classList.remove('readonly');
-                    }
+                    // if (rowData[3] != "" && moment(this.state.minMonth).diff(moment(rowData[3]), 'months') == 0) {
+                    //     var cell = elInstance.getCell(("D").concat(parseInt(y) + 1))
+                    //     cell.classList.add('readonly');
+                    // } else {
+                    //     var cell = elInstance.getCell(("D").concat(parseInt(y) + 1))
+                    //     cell.classList.remove('readonly');
+                    // }
 
                 }
             }.bind(this),
@@ -4584,31 +4584,27 @@ export default class BuildTree extends Component {
         }
         if (event.target.name === "percentageOfParent") {
 
-            console.log("event.target.value---", event.target.value);
-            (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].dataValue = event.target.value;
-            this.state.currentScenario.dataValue = event.target.value;
+            console.log("event.target.value---", (event.target.value).replaceAll(",", ""));
+            var value = (event.target.value).replaceAll(",", "");
+            (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].dataValue = value;
+            this.state.currentScenario.dataValue = value;
             console.log("currentItemConfig.context.payload after$$$", currentItemConfig.context.payload);
             console.log("current scenario$$$", this.state.currentScenario);
             var calculatedDataValue;
-            var parentValue;
-            if (this.state.addNodeFlag !== "true") {
-                parentValue = (this.state.currentItemConfig.parentItem.payload.nodeDataMap[this.state.selectedScenario])[0].calculatedDataValue
-            } else {
-                // parentValue = this.state.currentScenario.calculatedDataValue
-                parentValue = (this.state.currentItemConfig.parentItem.payload.nodeDataMap[this.state.selectedScenario])[0].calculatedDataValue
-            }
-            console.log("parentValue wihout comma---", (event.target.value * parentValue.toString().replaceAll(",", "")) / 100);
+            var parentValue = (this.state.currentItemConfig.parentItem.payload.nodeDataMap[this.state.selectedScenario])[0].calculatedDataValue
+                // console.log("parentValue wihout comma---", (event.target.value * parentValue.toString().replaceAll(",", "")) / 100);
 
-            (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].calculatedDataValue = (event.target.value * parentValue.toString().replaceAll(",", "")) / 100
+                // (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].calculatedDataValue = (value * parentValue.toString().replaceAll(",", "")) / 100
+                (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].calculatedDataValue = (value * parentValue) / 100
             console.log("calculatedDataValue---", currentItemConfig);
             this.setState({
                 parentValue: parentValue
             })
         }
         if (event.target.name === "nodeValue") {
-            console.log("$$$$", (currentItemConfig.context.payload.nodeDataMap));
-            (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].dataValue = event.target.value;
-            (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].calculatedDataValue = event.target.value;
+            console.log("$$$$-----", (event.target.value).replaceAll(",", ""));
+            (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].dataValue = (event.target.value).replaceAll(",", "");
+            (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].calculatedDataValue = (event.target.value).replaceAll(",", "");
         }
         if (event.target.name === "notes") {
             (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].notes = event.target.value;
@@ -4774,14 +4770,16 @@ export default class BuildTree extends Component {
             return a > b ? -1 : a < b ? 1 : 0;
         }.bind(this));
 
-        console.log(">>>", getAllAggregationNode);
+        console.log("getAllAggregationNode--->", getAllAggregationNode);
         for (var i = 0; i < getAllAggregationNode.length; i++) {
+            console.log("getAllAggregationNode[i].id---", getAllAggregationNode[i].id);
             var getChildAggregationNode = items.filter(c => c.parent == getAllAggregationNode[i].id && (c.payload.nodeType.id == 1 || c.payload.nodeType.id == 2))
             console.log(">>>", getChildAggregationNode);
             if (getChildAggregationNode.length > 0) {
                 var value = 0;
                 for (var m = 0; m < getChildAggregationNode.length; m++) {
-                    var value2 = getChildAggregationNode[m].payload.nodeDataMap[this.state.selectedScenario][0].dataValue != "" ? parseInt((getChildAggregationNode[m].payload.nodeDataMap[this.state.selectedScenario][0].dataValue).replaceAll(",", "")) : 0;
+                    console.log("getChildAggregationNode[m]---", getChildAggregationNode[m].payload.nodeDataMap[this.state.selectedScenario][0]);
+                    var value2 = getChildAggregationNode[m].payload.nodeDataMap[this.state.selectedScenario][0].dataValue != "" ? parseInt(getChildAggregationNode[m].payload.nodeDataMap[this.state.selectedScenario][0].dataValue) : 0;
                     console.log("value2---", value2);
                     value = value + parseInt(value2);
                     console.log("value---", value);
@@ -5027,14 +5025,27 @@ export default class BuildTree extends Component {
                         id: 'A',
                         scaleLabel: {
                             display: true,
-                            labelString: "",
+                            labelString: this.state.currentItemConfig.context.payload.nodeUnit.label != null && this.state.currentItemConfig.context.payload.nodeType.id != 1 ? getLabelText(this.state.currentItemConfig.context.payload.nodeUnit.label, this.state.lang) : '',
                             fontColor: 'black'
                         },
                         stacked: false,
                         ticks: {
                             beginAtZero: true,
                             fontColor: 'black',
-                            // stepSize: 1000000
+                            // stepSize: 100000,
+                            callback: function (value) {
+                                var cell1 = value
+                                cell1 += '';
+                                var x = cell1.split('.');
+                                var x1 = x[0];
+                                var x2 = x.length > 1 ? '.' + x[1] : '';
+                                var rgx = /(\d+)(\d{3})/;
+                                while (rgx.test(x1)) {
+                                    x1 = x1.replace(rgx, '$1' + ',' + '$2');
+                                }
+                                return x1 + x2;
+
+                            }
                         },
                         gridLines: {
                             drawBorder: true, lineWidth: 1
@@ -5051,6 +5062,35 @@ export default class BuildTree extends Component {
                         drawBorder: true, lineWidth: 0
                     }
                 }]
+            },
+            tooltips: {
+                enabled: true,
+                custom: CustomTooltips,
+                callbacks: {
+                    label: function (tooltipItem, data) {
+                        // console.log("tooltipItem---", tooltipItem);
+                        // console.log("tooltipItem data---", data);
+                        // if (tooltipItem.datasetIndex == 1) {
+                        let label = data.labels[tooltipItem.index];
+                        let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
+
+                        var cell1 = value
+                        cell1 += '';
+                        var x = cell1.split('.');
+                        var x1 = x[0];
+                        var x2 = x.length > 1 ? '.' + x[1] : '';
+                        var rgx = /(\d+)(\d{3})/;
+                        while (rgx.test(x1)) {
+                            x1 = x1.replace(rgx, '$1' + ',' + '$2');
+                        }
+                        return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
+                        // } else {
+                        // let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
+                        // return data.datasets[tooltipItem.datasetIndex].label + ' : ' + value + " %";
+                        // }
+                    }
+                }
+
             },
             maintainAspectRatio: false
             ,
@@ -6153,7 +6193,11 @@ export default class BuildTree extends Component {
                                                         </tr>
                                                         <tr>
                                                             <td>{i18n.t('static.tree.#OfFU/month/')} {this.state.nodeUnitList.filter(c => c.unitId == this.state.usageTypeParent)[0].label.label_en}</td>
-                                                            <td>{addCommas((this.state.currentScenario.fuNode.noOfForecastingUnitsPerPerson / this.state.currentScenario.fuNode.usageFrequency) * (this.state.usagePeriodList.filter(c => c.usagePeriodId == this.state.currentScenario.fuNode.usagePeriod.usagePeriodId))[0].convertToMonth)}</td>
+                                                            {this.state.currentScenario.fuNode.usagePeriod.usagePeriodId != "" &&
+                                                                <td>{addCommas((this.state.currentScenario.fuNode.noOfForecastingUnitsPerPerson / this.state.currentScenario.fuNode.usageFrequency) * (this.state.usagePeriodList.filter(c => c.usagePeriodId == this.state.currentScenario.fuNode.usagePeriod.usagePeriodId))[0].convertToMonth)}</td>}
+                                                            {this.state.currentScenario.fuNode.usagePeriod.usagePeriodId == "" &&
+                                                                <td></td>
+                                                            }
                                                         </tr>
                                                     </table>}
                                                 {(this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentScenario.fuNode.usageType.id == 1) &&
@@ -7110,6 +7154,8 @@ export default class BuildTree extends Component {
                                             noOfForecastingUnitsPerPerson: '',
                                             usageFrequency: '',
                                             nodeDataModelingList: [],
+                                            nodeDataOverrideList: [],
+                                            nodeDataMomList: [],
                                             forecastingUnit: {
                                                 label: {
                                                     label_en: ''
