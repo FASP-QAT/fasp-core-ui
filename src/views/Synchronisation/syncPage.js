@@ -1849,7 +1849,7 @@ export default class syncPage extends Component {
                                       data[7] = mergedConsumptionData[cd].multiplier; //F
                                       data[8] = Math.round(Math.round(mergedConsumptionData[cd].consumptionRcpuQty) * mergedConsumptionData[cd].multiplier); //I
                                       data[9] = mergedConsumptionData[cd].dayOfStockOut;
-                                      if (mergedConsumptionData[cd].notes === null || ((mergedConsumptionData[cd].notes).trim() == "NULL")) {
+                                      if (mergedConsumptionData[cd].notes === null || ((mergedConsumptionData[cd].notes) == "NULL")) {
                                         data[10] = "";
                                       } else {
                                         data[10] = mergedConsumptionData[cd].notes;
