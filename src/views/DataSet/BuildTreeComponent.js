@@ -4946,7 +4946,7 @@ export default class BuildTree extends Component {
                 orgCurrentItemConfig: JSON.parse(JSON.stringify(data.context)),
                 currentItemConfig: JSON.parse(JSON.stringify(data)),
                 level0: (data.context.level == 0 ? false : true),
-                numberNode: (data.context.payload.nodeType.id == 2 ? false : true),
+                numberNode: (data.context.payload.nodeType.id == 1 || data.context.payload.nodeType.id == 2 ? false : true),
                 aggregationNode: (data.context.payload.nodeType.id == 1 ? false : true),
                 currentScenario: (data.context.payload.nodeDataMap[this.state.selectedScenario])[0],
                 highlightItem: item.id,
@@ -5444,6 +5444,7 @@ export default class BuildTree extends Component {
                                         </FormGroup>
 
                                         {/* } */}
+                                        {this.state.currentItemConfig.context.payload.nodeType.id != 1 &&
                                         <FormGroup className="col-md-6">
                                             <Label htmlFor="currencyId">{i18n.t('static.common.month')}<span class="red Reqasterisk">*</span></Label>
                                             <div className="controls edit">
@@ -5465,7 +5466,7 @@ export default class BuildTree extends Component {
                                                         onClick={this.handleClickMonthBox1} />
                                                 </Picker>
                                             </div>
-                                        </FormGroup>
+                                        </FormGroup>}
 
 
                                         {/* {this.state.numberNode && */}
@@ -7192,7 +7193,7 @@ export default class BuildTree extends Component {
                                         }
                                     },
                                     level0: true,
-                                    numberNode: (itemConfig.payload.nodeType.id == 2 ? false : true),
+                                    numberNode: (itemConfig.payload.nodeType.id == 1 || itemConfig.payload.nodeType.id == 2 ? false : true),
                                     aggregationNode: (itemConfig.payload.nodeType.id == 1 ? false : true),
                                     addNodeFlag: true,
                                     openAddNodeModal: true,
