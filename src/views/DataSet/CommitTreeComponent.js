@@ -28,8 +28,10 @@ import { ProgressBar, Step } from "react-step-progress-bar";
 import ProgramService from "../../api/ProgramService";
 import AuthenticationService from '../Common/AuthenticationService.js';
 import jsPDF from 'jspdf';
+import "jspdf-autotable";
 import html2canvas from 'html2canvas';
 import pdfIcon from '../../assets/img/pdf.png';
+import { LOGO } from "../../CommonComponent/Logo";
 
 const entityname = i18n.t('static.button.commit');
 const initialValues = {
@@ -174,7 +176,6 @@ export default class CommitTreeComponent extends React.Component {
                         }
                     };
                     if (programList.length == 1) {
-                        console.log("in if%%%", programList.length)
                         programId = programList[0].id;
                         event.target.value = programList[0].id;
                     } else if (localStorage.getItem("sesDatasetId") != "" && programList.filter(c => c.id == localStorage.getItem("sesDatasetId")).length > 0) {
@@ -238,7 +239,6 @@ export default class CommitTreeComponent extends React.Component {
                 })
 
                 var PgmTreeList = programData[0].datasetJson.treeList;
-                console.log("Program --", programData[0].datasetJson);
 
                 var treeScenarioNotes = [];
                 var missingBranchesList = [];
@@ -465,7 +465,6 @@ export default class CommitTreeComponent extends React.Component {
                         var puId = datasetPlanningUnit[dpu].planningUnit.id;
                         var regionId = datasetRegionList[drl].regionId;
                         var consumptionListFiltered = consumptionList.filter(c => c.planningUnit.id == puId && c.region.id == regionId);
-                        console.log("consumptionListFiltered+++", consumptionListFiltered);
                         if (consumptionListFiltered.length < 24) {
                             consumptionListlessTwelve.push({
                                 planningUnitId: datasetPlanningUnit[dpu].planningUnit.id,
@@ -572,6 +571,8 @@ export default class CommitTreeComponent extends React.Component {
                         // readOnly: true
                     });
                 }
+                treeScenarioListFilter[tsl].columnArray = columnsArray;
+                treeScenarioListFilter[tsl].dataArray = childrenArray;
                 var options = {
                     data: childrenArray,
                     columnDrag: true,
@@ -620,7 +621,7 @@ export default class CommitTreeComponent extends React.Component {
                 this.el = languageEl;
             }
         }
-        this.setState({ loading: false })
+        this.setState({ loading: false, treeScenarioListFilter: treeScenarioListFilter })
     }
 
     toggleShowValidation() {
@@ -648,7 +649,6 @@ export default class CommitTreeComponent extends React.Component {
 
         const sendGetRequest = async () => {
             try {
-                console.log("In get request****")
                 AuthenticationService.setupAxiosInterceptors();
                 const resp = await ProgramService.sendNotificationAsync(commitRequestId);
                 var curUser = AuthenticationService.getLoggedInUserId();
@@ -686,7 +686,6 @@ export default class CommitTreeComponent extends React.Component {
                         getRequest.onsuccess = function (event) {
                             var myResult = [];
                             myResult = getRequest.result;
-                            console.log("In readonly 0****")
                             myResult.readonly = 0;
                             var transaction1 = db1.transaction(['datasetDetails'], 'readwrite');
                             var program1 = transaction1.objectStore('datasetDetails');
@@ -728,7 +727,6 @@ export default class CommitTreeComponent extends React.Component {
         DatasetService.getAllDatasetData(checkboxesChecked)
             .then(response => {
                 var json = response.data;
-                console.log('json', json);
                 var db1;
                 getDatabase();
                 var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
@@ -888,7 +886,6 @@ export default class CommitTreeComponent extends React.Component {
                                     programQPLDetails.readonly = 1;
                                     var putRequest2 = programQPLDetailSaveData.put(programQPLDetails);
                                     localStorage.setItem("sesProgramId", "");
-                                    console.log(")))) Made program readonly");
                                     this.setState({
                                         progressPer: 50
                                         , message: i18n.t('static.commitVersion.sendLocalToServerCompleted'), color: 'green'
@@ -908,11 +905,7 @@ export default class CommitTreeComponent extends React.Component {
                             })
                                 .catch(
                                     error => {
-                                        console.log("@@@Error4", error);
-                                        console.log("@@@Error4", error.message);
-                                        console.log("@@@Error4", error.response ? error.response.status : "")
                                         if (error.message === "Network Error") {
-                                            console.log("+++in catch 7")
                                             this.setState({
                                                 message: 'static.common.networkError',
                                                 color: "red",
@@ -956,7 +949,6 @@ export default class CommitTreeComponent extends React.Component {
                                                     });
                                                     break;
                                                 default:
-                                                    console.log("+++in catch 8")
                                                     this.setState({
                                                         message: 'static.unkownError',
                                                         loading: false,
@@ -1016,6 +1008,540 @@ export default class CommitTreeComponent extends React.Component {
         this.setState({ loading: false })
     }
 
+    exportPDF() {
+        const addFooters = doc => {
+
+            const pageCount = doc.internal.getNumberOfPages()
+
+            doc.setFont('helvetica', 'bold')
+            doc.setFontSize(6)
+            for (var i = 1; i <= pageCount; i++) {
+                doc.setPage(i)
+
+                doc.setPage(i)
+                doc.text('Page ' + String(i) + ' of ' + String(pageCount), doc.internal.pageSize.width / 9, doc.internal.pageSize.height - 30, {
+                    align: 'center'
+                })
+                doc.text('Copyright © 2020 ' + i18n.t('static.footer'), doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
+                    align: 'center'
+                })
+
+
+            }
+        }
+        const addHeaders = doc => {
+
+            const pageCount = doc.internal.getNumberOfPages()
+
+
+            //  var file = new File('QAT-logo.png','../../../assets/img/QAT-logo.png');
+            // var reader = new FileReader();
+
+            //var data='';
+            // Use fs.readFile() method to read the file 
+            //fs.readFile('../../assets/img/logo.svg', 'utf8', function(err, data){ 
+            //}); 
+            for (var i = 1; i <= pageCount; i++) {
+                doc.setFontSize(12)
+                doc.setFont('helvetica', 'bold')
+                doc.setPage(i)
+                doc.addImage(LOGO, 'png', 0, 10, 180, 50, 'FAST');
+                /*doc.addImage(data, 10, 30, {
+                  align: 'justify'
+                });*/
+                doc.setTextColor("#002f6c");
+                doc.text(i18n.t('static.commitTree.forecastValidation'), doc.internal.pageSize.width / 2, 60, {
+                    align: 'center'
+                })
+                if (i == 1) {
+                    doc.setFont('helvetica', 'normal')
+                    doc.setFontSize(8)
+                    doc.text(i18n.t('static.dashboard.programheader') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 20, 90, {
+                        align: 'left'
+                    })
+
+                }
+
+            }
+        }
+
+
+        const unit = "pt";
+        const size = "A4"; // Use A1, A2, A3 or A4
+        const orientation = "landscape"; // portrait or landscape
+
+        const marginLeft = 10;
+        const doc = new jsPDF(orientation, unit, size, true);
+
+        doc.setFontSize(8);
+        doc.setFont('helvetica', 'normal')
+
+
+        var y = 110;
+        var planningText = doc.splitTextToSize(i18n.t('static.common.forecastPeriod') + ' : ' + moment(this.state.forecastStartDate).format('MMM-YYYY') + ' to ' + moment(this.state.forecastStopDate).format('MMM-YYYY'), doc.internal.pageSize.width * 3 / 4);
+        // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+        for (var i = 0; i < planningText.length; i++) {
+            if (y > doc.internal.pageSize.height - 100) {
+                doc.addPage();
+                y = 80;
+
+            }
+            doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
+            y = y + 10;
+        }
+
+
+        doc.setFont('helvetica', 'bold')
+        planningText = doc.splitTextToSize("1. " + i18n.t('static.commitTree.noForecastSelected'), doc.internal.pageSize.width * 3 / 4);
+        // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+        y = y + 20;
+        for (var i = 0; i < planningText.length; i++) {
+            if (y > doc.internal.pageSize.height - 100) {
+                doc.addPage();
+                y = 80;
+
+            }
+            doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
+            y = y + 10;
+        }
+
+        doc.setFont('helvetica', 'normal')
+        this.state.noForecastSelectedList.map((item, i) => {
+            item.regionList.map(item1 => {
+                planningText = doc.splitTextToSize(getLabelText(item.planningUnit.planningUnit.label, this.state.lang) + " - " + item1.label, doc.internal.pageSize.width * 3 / 4);
+                // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+                y = y + 3;
+                for (var i = 0; i < planningText.length; i++) {
+                    if (y > doc.internal.pageSize.height - 100) {
+                        doc.addPage();
+                        y = 80;
+
+                    }
+                    doc.text(doc.internal.pageSize.width / 15, y, planningText[i]);
+                    y = y + 10;
+                }
+            })
+        })
+
+        doc.setFont('helvetica', 'bold')
+        planningText = doc.splitTextToSize("2. " + i18n.t('static.commitTree.consumptionForecast'), doc.internal.pageSize.width * 3 / 4);
+        // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+        y = y + 20;
+        for (var i = 0; i < planningText.length; i++) {
+            if (y > doc.internal.pageSize.height - 100) {
+                doc.addPage();
+                y = 80;
+
+            }
+            doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
+            y = y + 10;
+        }
+
+        doc.setFont('helvetica', 'normal')
+        planningText = doc.splitTextToSize("a. " + i18n.t('static.commitTree.monthsMissingActualConsumptionValues'), doc.internal.pageSize.width * 3 / 4);
+        // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+        y = y + 10;
+        for (var i = 0; i < planningText.length; i++) {
+            if (y > doc.internal.pageSize.height - 100) {
+                doc.addPage();
+                y = 80;
+
+            }
+            doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
+            y = y + 10;
+        }
+        this.state.missingMonthList.map((item, i) => {
+            doc.setFont('helvetica', 'bold')
+            planningText = doc.splitTextToSize(getLabelText(item.planningUnitLabel, this.state.lang) + " - " + getLabelText(item.regionLabel, this.state.lang) + " : ", doc.internal.pageSize.width * 3 / 4);
+            // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+            y = y + 10;
+            for (var i = 0; i < planningText.length; i++) {
+                if (y > doc.internal.pageSize.height - 100) {
+                    doc.addPage();
+                    y = 80;
+
+                }
+                doc.text(doc.internal.pageSize.width / 15, y, planningText[i]);
+                y = y + 10;
+            }
+            doc.setFont('helvetica', 'normal')
+            planningText = doc.splitTextToSize("" + item.monthsArray, doc.internal.pageSize.width * 3 / 4);
+            // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+            y = y + 3;
+            for (var i = 0; i < planningText.length; i++) {
+                if (y > doc.internal.pageSize.height - 100) {
+                    doc.addPage();
+                    y = 80;
+
+                }
+                doc.text(doc.internal.pageSize.width / 15, y, planningText[i]);
+                y = y + 10;
+            }
+        })
+
+        doc.setFont('helvetica', 'normal')
+        planningText = doc.splitTextToSize("b. " + i18n.t('static.commitTree.puThatDoNotHaveAtleast24MonthsOfActualConsumptionValues'), doc.internal.pageSize.width * 3 / 4);
+        // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+        y = y + 20;
+        for (var i = 0; i < planningText.length; i++) {
+            if (y > doc.internal.pageSize.height - 100) {
+                doc.addPage();
+                y = 80;
+
+            }
+            doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
+            y = y + 10;
+        }
+        this.state.consumptionListlessTwelve.map((item, i) => {
+            doc.setFont('helvetica', 'bold')
+            planningText = doc.splitTextToSize(getLabelText(item.planningUnitLabel, this.state.lang) + " - " + getLabelText(item.regionLabel, this.state.lang) + " : ", doc.internal.pageSize.width * 3 / 4);
+            // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+            y = y + 10;
+            for (var i = 0; i < planningText.length; i++) {
+                if (y > doc.internal.pageSize.height - 100) {
+                    doc.addPage();
+                    y = 80;
+
+                }
+                doc.text(doc.internal.pageSize.width / 15, y, planningText[i]);
+                y = y + 10;
+            }
+            doc.setFont('helvetica', 'normal')
+            planningText = doc.splitTextToSize("" + item.noOfMonths + " month(s)", doc.internal.pageSize.width * 3 / 4);
+            // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+            y = y + 3;
+            for (var i = 0; i < planningText.length; i++) {
+                if (y > doc.internal.pageSize.height - 100) {
+                    doc.addPage();
+                    y = 80;
+
+                }
+                doc.text(doc.internal.pageSize.width / 15, y, planningText[i]);
+                y = y + 10;
+            }
+        })
+
+        doc.setFont('helvetica', 'bold')
+        planningText = doc.splitTextToSize("3. " + i18n.t('static.commitTree.treeForecast'), doc.internal.pageSize.width * 3 / 4);
+        // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+        y = y + 20;
+        for (var i = 0; i < planningText.length; i++) {
+            if (y > doc.internal.pageSize.height - 100) {
+                doc.addPage();
+                y = 80;
+
+            }
+            doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
+            y = y + 10;
+        }
+
+        doc.setFont('helvetica', 'normal')
+        planningText = doc.splitTextToSize("a. " + i18n.t('static.commitTree.puThatDoesNotAppearOnAnyTree'), doc.internal.pageSize.width * 3 / 4);
+        // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+        y = y + 10;
+        for (var i = 0; i < planningText.length; i++) {
+            if (y > doc.internal.pageSize.height - 100) {
+                doc.addPage();
+                y = 80;
+
+            }
+            doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
+            y = y + 10;
+        }
+        doc.setFont('helvetica', 'normal')
+        this.state.notSelectedPlanningUnitList.map((item, i) => {
+            planningText = doc.splitTextToSize(getLabelText(item.planningUnit.label, this.state.lang) + " - " + item.regionsArray, doc.internal.pageSize.width * 3 / 4);
+            // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+            y = y + 3;
+            for (var i = 0; i < planningText.length; i++) {
+                if (y > doc.internal.pageSize.height - 100) {
+                    doc.addPage();
+                    y = 80;
+
+                }
+                doc.text(doc.internal.pageSize.width / 15, y, planningText[i]);
+                y = y + 10;
+            }
+        })
+
+        doc.setFont('helvetica', 'normal')
+        planningText = doc.splitTextToSize("b. " + i18n.t('static.commitTree.branchesMissingPlanningUnit'), doc.internal.pageSize.width * 3 / 4);
+        // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+        y = y + 10;
+        for (var i = 0; i < planningText.length; i++) {
+            if (y > doc.internal.pageSize.height - 100) {
+                doc.addPage();
+                y = 80;
+
+            }
+            doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
+            y = y + 10;
+        }
+
+        this.state.missingBranchesList.map((item, i) => {
+            doc.setFont('helvetica', 'normal')
+            planningText = doc.splitTextToSize(getLabelText(item.treeLabel, this.state.lang), doc.internal.pageSize.width * 3 / 4);
+            // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+            y = y + 10;
+            for (var i = 0; i < planningText.length; i++) {
+                if (y > doc.internal.pageSize.height - 100) {
+                    doc.addPage();
+                    y = 80;
+
+                }
+                doc.text(doc.internal.pageSize.width / 15, y, planningText[i]);
+                y = y + 10;
+            }
+            item.flatList.length > 0 && item.flatList.map((item1, j) => {
+                doc.setFont('helvetica', 'normal')
+                if (item1.payload.nodeType.id == 4) {
+                    doc.setTextColor("red")
+                } else {
+                    doc.setTextColor("black")
+                }
+
+                planningText = doc.splitTextToSize(getLabelText(item1.payload.label, this.state.lang), doc.internal.pageSize.width * 3 / 4);
+                // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+                y = y + 10;
+                for (var i = 0; i < planningText.length; i++) {
+                    if (y > doc.internal.pageSize.height - 100) {
+                        doc.addPage();
+                        y = 80;
+
+                    }
+                    doc.text(doc.internal.pageSize.width / 10, y, planningText[i]);
+                    y = y + 10;
+                }
+            })
+
+        })
+
+        doc.setFont('helvetica', 'normal')
+        planningText = doc.splitTextToSize("c. " + i18n.t('static.commitTree.NodesWithChildrenThatDoNotAddUpTo100Prcnt'), doc.internal.pageSize.width * 3 / 4);
+        // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+        y = y + 10;
+        for (var i = 0; i < planningText.length; i++) {
+            if (y > doc.internal.pageSize.height - 100) {
+                doc.addPage();
+                y = 80;
+
+            }
+            doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
+            y = y + 10;
+        }
+        var height = doc.internal.pageSize.height - 50;
+        var h1 = 50;
+        //   var aspectwidth1 = (width - h1);
+        var startY = y + 10
+        var pages = Math.ceil(startY / height)
+        for (var j = 1; j < pages; j++) {
+            doc.addPage()
+        }
+        y = startY - ((height - h1) * (pages - 1))
+        this.state.treeScenarioList.map((item1, count) => {
+            var nodeWithPercentageChildren = this.state.nodeWithPercentageChildren.filter(c => c.treeId == item1.treeId && c.scenarioId == item1.scenarioId);
+            if (nodeWithPercentageChildren.length > 0) {
+                doc.setFont('helvetica', 'normal')
+                planningText = doc.splitTextToSize(getLabelText(item1.treeLabel, this.state.lang) + " / " + getLabelText(item1.scenarioLabel, this.state.lang), doc.internal.pageSize.width * 3 / 4);
+                // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+                y = y + 10;
+                for (var i = 0; i < planningText.length; i++) {
+                    if (y > doc.internal.pageSize.height - 100) {
+                        doc.addPage();
+                        y = 80;
+
+                    }
+                    doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
+                    y = y + 10;
+                }
+
+
+                var columnsArray = [];
+                item1.columnArray.filter(c => c.type != 'hidden').map(item4 => {
+                    columnsArray.push(item4.title)
+                })
+                var dataArr = [];
+                item1.dataArray.map(item3 => {
+                    var dataArr1 = []
+                    item1.columnArray.map((item2, count) => {
+                        if (item2.type != 'hidden') {
+                            dataArr1.push(item3[count])
+                        }
+                    })
+                    dataArr.push(dataArr1);
+                })
+
+                var data = dataArr;
+                var content = {
+                    margin: { top: 80, bottom: 50 },
+                    startY: y,
+                    head: [columnsArray],
+                    body: data,
+                    styles: { lineWidth: 1, fontSize: 8, halign: 'center' }
+
+                };
+                doc.autoTable(content);
+                doc.addPage();
+                y = 80;
+            }
+        })
+
+        doc.setFont('helvetica', 'bold')
+        planningText = doc.splitTextToSize("4. " + i18n.t('static.program.notes'), doc.internal.pageSize.width * 3 / 4);
+        // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+        y = y + 20;
+        for (var i = 0; i < planningText.length; i++) {
+            if (y > doc.internal.pageSize.height - 100) {
+                doc.addPage();
+                y = 80;
+
+            }
+            doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
+            y = y + 10;
+        }
+
+        doc.setFont('helvetica', 'normal')
+        planningText = doc.splitTextToSize("a. " + i18n.t('static.forecastMethod.historicalData'), doc.internal.pageSize.width * 3 / 4);
+        // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+        y = y + 10;
+        for (var i = 0; i < planningText.length; i++) {
+            if (y > doc.internal.pageSize.height - 100) {
+                doc.addPage();
+                y = 80;
+
+            }
+            doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
+            y = y + 10;
+        }
+        var height = doc.internal.pageSize.height;
+        var h1 = 50;
+        var startY = y + 10
+        var pages = Math.ceil(startY / height)
+        for (var j = 1; j < pages; j++) {
+            doc.addPage()
+        }
+        var startYtable = startY - ((height - h1) * (pages - 1))
+        var columns = [];
+        columns.push(i18n.t('static.dashboard.planningunitheader'));
+        columns.push(i18n.t('static.program.notes'));
+        var headers = [columns]
+        var dataArr2 = [];
+        this.state.datasetPlanningUnit.map((item5, i) => {
+            dataArr2.push([
+                getLabelText(item5.planningUnit.label, this.state.lang),
+                item5.consumtionNotes])
+        });
+        var content1 = {
+            margin: { top: 80, bottom: 50 },
+            startY: startYtable,
+            head: headers,
+            body: dataArr2,
+            styles: { lineWidth: 1, fontSize: 8, halign: 'center' }
+
+        };
+        doc.autoTable(content1);
+        doc.addPage()
+
+        doc.setFont('helvetica', 'normal')
+        y = 80;
+        planningText = doc.splitTextToSize("b. " + i18n.t('static.commitTree.treeScenarios'), doc.internal.pageSize.width * 3 / 4);
+        // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+        y = y + 10;
+        for (var i = 0; i < planningText.length; i++) {
+            if (y > doc.internal.pageSize.height - 100) {
+                doc.addPage();
+                y = 80;
+
+            }
+            doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
+            y = y + 10;
+        }
+
+        var height = doc.internal.pageSize.height;
+        var h1 = 50;
+        var startY = y + 10
+        var pages = Math.ceil(startY / height)
+        for (var j = 1; j < pages; j++) {
+            doc.addPage()
+        }
+        var startYtable = startY - ((height - h1) * (pages - 1))
+        var columns = [];
+        columns.push(i18n.t('static.forecastMethod.tree'));
+        columns.push(i18n.t('static.whatIf.scenario'));
+        columns.push(i18n.t('static.program.notes'));
+        var headers = [columns]
+        var dataArr2 = [];
+        this.state.treeScenarioNotes.map((item5, i) => {
+            dataArr2.push([
+                getLabelText(item5.tree, this.state.lang),
+                getLabelText(item5.scenario, this.state.lang),
+                item5.scenarioNotes
+            ])
+        });
+        var content2 = {
+            margin: { top: 80, bottom: 50 },
+            startY: startYtable,
+            head: headers,
+            body: dataArr2,
+            styles: { lineWidth: 1, fontSize: 8, halign: 'center' }
+
+        };
+        doc.autoTable(content2);
+        y = 80;
+        doc.addPage()
+        doc.setFont('helvetica', 'normal')
+        planningText = doc.splitTextToSize("c. " + i18n.t('static.commitTree.treeNodes'), doc.internal.pageSize.width * 3 / 4);
+        // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+        y = y + 10;
+        for (var i = 0; i < planningText.length; i++) {
+            if (y > doc.internal.pageSize.height - 100) {
+                doc.addPage();
+                y = 80;
+
+            }
+            doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
+            y = y + 10;
+        }
+        var height = doc.internal.pageSize.height;
+        var h1 = 50;
+        var startY = y + 10
+        var pages = Math.ceil(startY / height)
+        for (var j = 1; j < pages; j++) {
+            doc.addPage()
+        }
+        var startYtable = startY - ((height - h1) * (pages - 1))
+        var columns = [];
+        columns.push(i18n.t('static.forecastMethod.tree'));
+        columns.push(i18n.t('static.common.node'));
+        columns.push(i18n.t('static.whatIf.scenario'));
+        columns.push(i18n.t('static.program.notes'));
+        var headers = [columns]
+        var dataArr2 = [];
+        this.state.treeNodeList.map((item6, i) => {
+            dataArr2.push([
+                getLabelText(item6.tree, this.state.lang),
+                getLabelText(item6.node, this.state.lang),
+                getLabelText(item6.scenario, this.state.lang),
+                ((item6.notes != "" && item6.notes != null) ? i18n.t('static.commitTree.main') + " : " + item6.notes : "" + "" +
+                    ((item6.madelingNotes != "" && item6.madelingNotes != null) ? i18n.t('static.commitTree.modeling') + " : " + item6.madelingNotes : ""))
+            ])
+        });
+        var content3 = {
+            margin: { top: 80, bottom: 50 },
+            startY: startYtable,
+            head: headers,
+            body: dataArr2,
+            styles: { lineWidth: 1, fontSize: 8, halign: 'center' }
+
+        };
+        doc.autoTable(content3);
+
+
+        addHeaders(doc)
+        addFooters(doc)
+        doc.save(i18n.t('static.commitTree.forecastValidation').concat('.pdf'));
+    }
+
     hideFirstComponent() {
         document.getElementById('div1').style.display = 'block';
         this.state.timeout = setTimeout(function () {
@@ -1062,7 +1588,6 @@ export default class CommitTreeComponent extends React.Component {
             noForecastSelectedList.map((item, i) => {
                 return (
                     item.regionList.map(item1 => {
-                        console.log("item1", item1);
                         return (
                             <li key={i}>
                                 <div className="hoverDiv" onClick={() => this.noForecastSelectedClicked(item.planningUnit.planningUnit.id, item1.id)}>{getLabelText(item.planningUnit.planningUnit.label, this.state.lang) + " - " + item1.label}</div>
