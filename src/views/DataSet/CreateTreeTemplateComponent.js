@@ -77,37 +77,174 @@ let initialValuesNodeData = {
 const validationSchemaNodeData = function (values) {
     return Yup.object().shape({
         nodeTypeId: Yup.string()
-            .required('This is required'),
+            .required(i18n.t('static.validation.fieldRequired')),
         nodeTitle: Yup.string()
-            .required('This is required'),
+            .required(i18n.t('static.validation.fieldRequired')),
         nodeUnitId: Yup.string()
-            .test('nodeUnitId', 'This is required',
+            .test('nodeUnitId', i18n.t('static.validation.fieldRequired'),
                 function (value) {
-                    if (parseInt(document.getElementById("nodeTypeId").value) == 3 && document.getElementById("nodeUnitId").value == "") {
+                    // console.log("@@@",(parseInt(document.getElementById("nodeTypeId").value) == 3 || parseInt(document.getElementById("nodeTypeId").value) == 2) && document.getElementById("nodeUnitId").value == "");
+                    if ((parseInt(document.getElementById("nodeTypeId").value) == 3 || parseInt(document.getElementById("nodeTypeId").value) == 2) && document.getElementById("nodeUnitId").value == "") {
                         return false;
                     } else {
                         return true;
                     }
                 }),
         percentageOfParent: Yup.string()
-            .test('percentageOfParent', 'This is required',
+            .test('percentageOfParent', i18n.t('static.validation.fieldRequired'),
                 function (value) {
-                    if (parseInt(document.getElementById("nodeTypeId").value) == 3 && document.getElementById("percentageOfParent").value == "") {
+                    var testNumber = document.getElementById("percentageOfParent").value != "" ? (/^\d{0,3}(\.\d{1,2})?$/).test(document.getElementById("percentageOfParent").value) : false;
+                    // console.log(">>>>*", parseInt(document.getElementById("nodeTypeId").value) == 3 || parseInt(document.getElementById("nodeTypeId").value) == 4) && (document.getElementById("percentageOfParent").value == "" || testNumber == false);
+                    if ((parseInt(document.getElementById("nodeTypeId").value) == 3 || parseInt(document.getElementById("nodeTypeId").value) == 4 || parseInt(document.getElementById("nodeTypeId").value) == 5) && (document.getElementById("percentageOfParent").value == "" || testNumber == false)) {
                         return false;
                     } else {
                         return true;
                     }
                 }),
-        // nodeValue: Yup.string()
-        //     .test('nodeValue', 'This is required',
+        nodeValue: Yup.string()
+            .test('nodeValue', 'Please enter a valid number having less then 10 digits.',
+                function (value) {
+                    // console.log("*****", document.getElementById("nodeValue").value);
+                    var testNumber = (/^(?!$)\d{0,10}(?:\.\d{1,2})?$/).test((document.getElementById("nodeValue").value).replaceAll(",", ""));
+                    // console.log("*****", testNumber);
+                    if ((parseInt(document.getElementById("nodeTypeId").value) == 3 || parseInt(document.getElementById("nodeTypeId").value) == 2) && (document.getElementById("nodeValue").value == "" || testNumber == false)) {
+                        return false;
+                    } else {
+                        return true;
+                    }
+                }),
+        tracerCategoryId: Yup.string()
+            .test('tracerCategoryId', i18n.t('static.validation.fieldRequired'),
+                function (value) {
+                    if (parseInt(document.getElementById("nodeTypeId").value) == 4 && document.getElementById("tracerCategoryId").value == "") {
+                        return false;
+                    } else {
+                        return true;
+                    }
+                }),
+        usageTypeIdFU: Yup.string()
+            .test('usageTypeIdFU', i18n.t('static.validation.fieldRequired'),
+                function (value) {
+                    if (parseInt(document.getElementById("nodeTypeId").value) == 4 && document.getElementById("usageTypeIdFU").value == "") {
+                        return false;
+                    } else {
+                        return true;
+                    }
+                }),
+        lagInMonths:
+            Yup.string().test('lagInMonths', 'Please enter a valid number having less then 3 digit befor decimal and 2 digits after decimal.',
+                function (value) {
+                    // console.log("*****", document.getElementById("nodeValue").value);
+                    var testNumber = (/^\d{0,3}(\.\d{1,2})?$/).test(document.getElementById("lagInMonths").value);
+                    // console.log("*****", testNumber);
+                    if ((parseInt(document.getElementById("nodeTypeId").value) == 4) && (document.getElementById("lagInMonths").value == "" || testNumber == false)) {
+                        return false;
+                    } else {
+                        return true;
+                    }
+                }),
+
+        noOfPersons:
+            Yup.string().test('noOfPersons', 'Please enter a valid 10 digit number.',
+                function (value) {
+                    // console.log("*****", document.getElementById("nodeValue").value);
+                    var testNumber = (/^\d{0,10}?$/).test((document.getElementById("noOfPersons").value).replaceAll(",", ""));
+                    // console.log("*****", testNumber);
+                    if ((parseInt(document.getElementById("nodeTypeId").value) == 4) && (document.getElementById("noOfPersons").value == "" || testNumber == false)) {
+                        return false;
+                    } else {
+                        return true;
+                    }
+                }),
+
+        forecastingUnitPerPersonsFC:
+            Yup.string().test('forecastingUnitPerPersonsFC', 'Please enter a valid number having max 12 digits before decimal and max 2 digit after decimal.',
+                function (value) {
+                    // console.log("*****", document.getElementById("nodeValue").value);
+                    var testNumber = (/^\d{0,12}(\.\d{1,4})?$/).test((document.getElementById("forecastingUnitPerPersonsFC").value).replaceAll(",", ""));
+                    // console.log("*****", testNumber);
+                    if ((parseInt(document.getElementById("nodeTypeId").value) == 4) && (document.getElementById("forecastingUnitPerPersonsFC").value == "" || testNumber == false)) {
+                        return false;
+                    } else {
+                        return true;
+                    }
+                }),
+        // usageFrequency: Yup.string()
+        //     .test('usageFrequency', 'Please enter a valid number having max 12 digits before decimal and max 2 digit after decimal.',
         //         function (value) {
-        //             if (parseInt(document.getElementById("nodeTypeId").value) == 3 && document.getElementById("nodeValue").value == "") {
+        //             // console.log("@@@>1", (parseInt(document.getElementById("nodeTypeId").value) == 4));
+        //             // console.log("@@@>1", document.getElementById("usageTypeIdFU").value == 2);
+        //             // console.log("@@@>2", document.getElementById("usageFrequency").value == "");
+        //             var testNumber = (/^\d{0,12}(\.\d{1,2})?$/).test((document.getElementById("usageFrequency").value).replaceAll(",", ""))
+        //             if (document.getElementById("usageTypeIdFU").value == 2 && (document.getElementById("usageFrequency").value == "" || testNumber == false)) {
         //                 return false;
         //             } else {
         //                 return true;
         //             }
         //         }),
+        // usagePeriodId: Yup.string()
+        //     .test('usagePeriodId', 'This field is required.',
+        //         function (value) {
+        //             // console.log("@@@>1", (parseInt(document.getElementById("nodeTypeId").value) == 4));
+        //             // console.log("@@@>1", document.getElementById("usageTypeIdFU").value == 2);
+        //             // console.log("@@@>2", document.getElementById("usageFrequency").value == "");
+        //             if (document.getElementById("usageTypeIdFU").value == 2 && document.getElementById("usagePeriodId").value == "") {
+        //                 return false;
+        //             } else {
+        //                 return true;
+        //             }
 
+        //         }),
+
+        oneTimeUsage: Yup.string()
+            .test('oneTimeUsage', i18n.t('static.validation.fieldRequired'),
+                function (value) {
+                    if (document.getElementById("usageTypeIdFU").value == 1 && document.getElementById("oneTimeUsage").value == "") {
+                        return false;
+                    } else {
+                        return true;
+                    }
+                }),
+        repeatCount: Yup.string().test('forecastingUnitPerPersonsFC', 'Please enter a valid number having max 12 digits before decimal and max 2 digit after decimal.',
+            function (value) {
+                var testNumber = (/^\d{0,12}(\.\d{1,4})?$/).test((document.getElementById("repeatCount").value).replaceAll(",", ""));
+                if (document.getElementById("oneTimeUsage").value == 2 && (document.getElementById("repeatCount").value == "" || testNumber == false)) {
+                    return false;
+                } else {
+                    return true;
+                }
+            }),
+        planningUnitId: Yup.string()
+            .test('planningUnitId', i18n.t('static.validation.fieldRequired'),
+                function (value) {
+                    if (parseInt(document.getElementById("nodeTypeId").value) == 5 && document.getElementById("planningUnitId").value == "") {
+                        return false;
+                    } else {
+                        return true;
+                    }
+                }),
+
+        refillMonths: Yup.string()
+            .test('refillMonths', 'Please enter a valid number having less then 10 digits.',
+                function (value) {
+                    // console.log("*****", document.getElementById("nodeValue").value);
+                    // var testNumber = (/^(?!$)\d{0,10}?$/).test((document.getElementById("refillMonths").value).replaceAll(",", ""));
+                    // console.log("*****", testNumber);
+                    if ((document.getElementById("nodeTypeId").value == 5 && document.getElementById("usageTypeIdPU").value == 2) && (document.getElementById("refillMonths").value == "")) {
+                        return false;
+                    } else {
+                        return true;
+                    }
+                }),
+        sharePlanningUnit: Yup.string()
+            .test('sharePlanningUnit', i18n.t('static.validation.fieldRequired'),
+                function (value) {
+                    if (document.getElementById("nodeTypeId").value == 5 && document.getElementById("sharePlanningUnit").value == "") {
+                        return false;
+                    } else {
+                        return true;
+                    }
+                }),
 
     })
 }
@@ -425,11 +562,30 @@ export default class CreateTreeTemplate extends Component {
         this.acceptValue = this.acceptValue.bind(this);
         this.calculateScalingTotal = this.calculateScalingTotal.bind(this);
         this.formSubmit = this.formSubmit.bind(this);
+        this.formSubmitLoader = this.formSubmitLoader.bind(this);
         this.checkValidation = this.checkValidation.bind(this);
         this.momCheckbox = this.momCheckbox.bind(this);
         this.resetNodeData = this.resetNodeData.bind(this);
         this.filterScalingDataByMonth = this.filterScalingDataByMonth.bind(this);
         this.calculateMOMData = this.calculateMOMData.bind(this);
+        this.hideSecondComponent = this.hideSecondComponent.bind(this);
+    }
+    hideSecondComponent() {
+        setTimeout(function () {
+            document.getElementById('div2').style.display = 'none';
+        }, 8000);
+    }
+    formSubmitLoader() {
+        // alert("load 1")
+        this.setState({
+            modelingJexcelLoader: true
+        }, () => {
+            // alert("load 2")
+            setTimeout(() => {
+                console.log("inside set timeout")
+                this.formSubmit();
+            }, 0);
+        })
     }
 
     momCheckbox(e) {
@@ -533,12 +689,14 @@ export default class CreateTreeTemplate extends Component {
     updateMomDataInDataSet() {
         this.setState({
             momJexcelLoader: true
+        }, () => {
+            let { treeTemplate } = this.state;
+            this.setState({
+                treeTemplate,
+                momJexcelLoader: false
+            });
         });
-        let { treeTemplate } = this.state;
-        this.setState({
-            treeTemplate,
-            momJexcelLoader: false
-        });
+
     }
 
     filterScalingDataByMonth(date) {
@@ -592,6 +750,7 @@ export default class CreateTreeTemplate extends Component {
             var data = this.state.scalingList;
             var maxModelingId = data.length > 0 ? Math.max(...data.map(o => o.nodeDataModelingId)) : 0;
             var obj;
+            var dataArr = [];
             var items = this.state.items;
             var item = items.filter(x => x.id == this.state.currentItemConfig.context.id)[0];
             const itemIndex1 = items.findIndex(o => o.id === this.state.currentItemConfig.context.id);
@@ -599,6 +758,10 @@ export default class CreateTreeTemplate extends Component {
                 var map1 = new Map(Object.entries(tableJson[i]));
                 console.log("10 map---" + map1.get("10"))
                 if (parseInt(map1.get("10")) === 1) {
+                    var parts1 = map1.get("3").split('-');
+                    var startDate = parts1[0] + "-" + parts1[1] + "-01"
+                    var parts2 = map1.get("4").split('-');
+                    var stopDate = parts2[0] + "-" + parts2[1] + "-01"
                     if (map1.get("9") != "" && map1.get("9") != 0) {
                         const itemIndex = data.findIndex(o => o.nodeDataModelingId === map1.get("9"));
                         console.log("data[itemIndex]---", data[itemIndex]);
@@ -609,12 +772,12 @@ export default class CreateTreeTemplate extends Component {
                         obj.transferNodeDataId = transfer;
                         obj.notes = map1.get("1");
                         obj.modelingType.id = map1.get("2");
-                        obj.startDate = map1.get("3");
-                        obj.stopDate = map1.get("4");
+                        obj.startDate = startDate;
+                        obj.stopDate = stopDate;
                         obj.dataValue = map1.get("2") == 2 ? map1.get("6") : map1.get("5");
                         obj.nodeDataModelingId = map1.get("9")
 
-                        data[itemIndex] = obj;
+                        // data[itemIndex] = obj;
                     } else {
                         console.log("maxModelingId---", maxModelingId);
                         obj = {
@@ -623,27 +786,28 @@ export default class CreateTreeTemplate extends Component {
                             modelingType: {
                                 id: map1.get("2")
                             },
-                            startDate: map1.get("3"),
-                            stopDate: map1.get("4"),
+                            startDate: startDate,
+                            stopDate: stopDate,
                             dataValue: map1.get("2") == 2 ? map1.get("6") : map1.get("5"),
                             nodeDataModelingId: parseInt(maxModelingId) + 1
                         }
                         maxModelingId++;
                         console.log("obj to push---", obj);
-                        data.push(obj);
+                        // data.push(obj);
                     }
+                    dataArr.push(obj);
                     console.log("obj---", obj);
-                    console.log("data--->>>", data);
-                    (item.payload.nodeDataMap[0])[0].nodeDataModelingList = data;
+                    console.log("dataArr--->>>", dataArr);
+                    (item.payload.nodeDataMap[0])[0].nodeDataModelingList = dataArr;
                     console.log("item---", item);
                     items[itemIndex1] = item;
                     console.log("items---", items);
                     // Call function by dolly
                     this.setState({
                         items,
-                        scalingList: data,
-                        openAddNodeModal: false,
-                        activeTab1: new Array(2).fill('1')
+                        scalingList: dataArr,
+                        // openAddNodeModal: false,
+                        activeTab1: new Array(2).fill('2')
                     }, () => {
                         console.log("going to call MOM data");
                         this.calculateMOMData(0, 0);
@@ -905,7 +1069,7 @@ export default class CreateTreeTemplate extends Component {
         if (this.state.currentModelingType == 3) {
             if (this.state.currentItemConfig.context.payload.nodeType.id > 2) {
                 var getChangeInPercent = getValue;
-                var momValue = (this.state.currentScenario.calculatedDataValue * getChangeInPercent / 100).toFixed(2);
+                var momValue = (this.state.currentItemConfig.context.payload.nodeDataMap[0][0].calculatedDataValue * getChangeInPercent / 100).toFixed(2);
             } else {
                 // var momValue = ((parseFloat(targetEndValue - this.state.currentCalculatorStartValue)) / monthDifference / this.state.currentCalculatorStartValue * 100).toFixed(2);
                 var momValue = ((parseFloat((this.state.currentCalculatorStartValue * getValue) / 100))).toFixed(2);
@@ -962,19 +1126,9 @@ export default class CreateTreeTemplate extends Component {
 
 
     getPayloadData(itemConfig, type) {
-        console.log("inside get payload");
-        console.log("This.state in getpayload data+++", this.state.items);
         var data = [];
+        var totalValue = "";
         data = itemConfig.payload.nodeDataMap;
-        console.log("itemConfig---", data);
-        var curMonth = moment().format("YYYY-MM");
-        // console.log("cur date ---", itemConfig.payload.nodeDataMap[0]);
-        // for (var i = 0; i < data.length; i++) {
-        // var month = moment(data[i].month).format("YYYY-MM");
-        // console.log("month---");
-        // }
-        console.log("data---", data);
-        console.log("Type+++", type)
         if (data != null && data[0] != null && (data[0])[0] != null) {
             if (type == 4) {
                 var result = false;
@@ -985,7 +1139,6 @@ export default class CreateTreeTemplate extends Component {
                     if (arr.length > 0) {
                         for (var i = 0; i <= arr.length; i++) {
                             if (arr[i] != null) {
-                                console.log("arr[i]---", arr[i])
                                 var nodeDataModelingList = arr[i].payload.nodeDataMap[0][0].nodeDataModelingList;
                                 if (nodeDataModelingList.length > 0) {
                                     var nodedata = nodeDataModelingList.filter(x => x.transferNodeDataId == itemConfig.id)[0];
@@ -1005,7 +1158,6 @@ export default class CreateTreeTemplate extends Component {
                         return addCommas((itemConfig.payload.nodeDataMap[0])[0].dataValue);
                     } else if (type == 3) {
                         var childList = this.state.items.filter(c => c.parent == itemConfig.id && (c.payload.nodeType.id == 3 || c.payload.nodeType.id == 4 || c.payload.nodeType.id == 5));
-                        console.log("Child List+++", childList);
                         if (childList.length > 0) {
                             var sum = 0;
                             childList.map(c => {
@@ -1020,10 +1172,33 @@ export default class CreateTreeTemplate extends Component {
                     }
                 } else {
                     if (type == 1) {
-                        return (itemConfig.payload.nodeDataMap[0])[0].dataValue + "% of parent";
+                        if (itemConfig.payload.nodeType.id == 4) {
+                            var fuPerMonth;
+                            var noOfForecastingUnitsPerPerson = (itemConfig.payload.nodeDataMap[0])[0].fuNode.noOfForecastingUnitsPerPerson;
+                            var usageFrequency = (itemConfig.payload.nodeDataMap[0])[0].fuNode.usageFrequency;
+                            var convertToMonth = (this.state.usagePeriodList.filter(c => c.usagePeriodId == (itemConfig.payload.nodeDataMap[0])[0].fuNode.usagePeriod.usagePeriodId))[0].convertToMonth;
+                            if ((itemConfig.payload.nodeDataMap[0])[0].fuNode.usageType.id == 2) {
+                                fuPerMonth = ((noOfForecastingUnitsPerPerson / usageFrequency) * convertToMonth);
+                                totalValue = fuPerMonth * (itemConfig.payload.nodeDataMap[0])[0].calculatedDataValue;
+                            } else {
+                                var noOfPersons = (itemConfig.payload.nodeDataMap[0])[0].fuNode.noOfPersons;
+                                if ((itemConfig.payload.nodeDataMap[0])[0].fuNode.oneTimeUsage == "true") {
+                                    fuPerMonth = noOfForecastingUnitsPerPerson / noOfPersons;
+                                    totalValue = fuPerMonth * (itemConfig.payload.nodeDataMap[0])[0].calculatedDataValue;
+                                } else {
+                                    fuPerMonth = ((noOfForecastingUnitsPerPerson / noOfPersons) * usageFrequency * convertToMonth);
+                                    totalValue = fuPerMonth * (itemConfig.payload.nodeDataMap[0])[0].calculatedDataValue;
+                                }
+                            }
+                            (itemConfig.payload.nodeDataMap[0])[0].totalValue = totalValue;
+                            return addCommas((itemConfig.payload.nodeDataMap[0])[0].dataValue) + "% of parent, " + addCommas(fuPerMonth) + "/" + 'Month';
+                        } else if (itemConfig.payload.nodeType.id == 5) {
+                            return addCommas((itemConfig.payload.nodeDataMap[0])[0].dataValue) + "% of parent, conversion = " + (itemConfig.payload.nodeDataMap[0])[0].puNode.planningUnit.multiplier;
+                        } else {
+                            return addCommas((itemConfig.payload.nodeDataMap[0])[0].dataValue) + "% of parent";
+                        }
                     } else if (type == 3) {
                         var childList = this.state.items.filter(c => c.parent == itemConfig.id && (c.payload.nodeType.id == 3 || c.payload.nodeType.id == 4 || c.payload.nodeType.id == 5));
-                        console.log("Child List+++", childList);
                         if (childList.length > 0) {
                             var sum = 0;
                             childList.map(c => {
@@ -1034,7 +1209,15 @@ export default class CreateTreeTemplate extends Component {
                             return "";
                         }
                     } else {
-                        return "= " + ((itemConfig.payload.nodeDataMap[0])[0].calculatedDataValue != null ? addCommas((itemConfig.payload.nodeDataMap[0])[0].calculatedDataValue) : "");
+                        if (itemConfig.payload.nodeType.id == 4) {
+                            return "= " + ((itemConfig.payload.nodeDataMap[0])[0].totalValue != null ? addCommas(Math.round((itemConfig.payload.nodeDataMap[0])[0].totalValue)) : "");
+                        } else if (itemConfig.payload.nodeType.id == 5) {
+                            totalValue = (this.state.items.filter(x => x.id == itemConfig.parent)[0].payload.nodeDataMap[0][0].totalValue * (itemConfig.payload.nodeDataMap[0])[0].dataValue) / 100;
+                            return "= " + (totalValue != null ? addCommas(Math.round(totalValue)) : "");
+                        }
+                        else {
+                            return "= " + ((itemConfig.payload.nodeDataMap[0])[0].calculatedDataValue != null ? addCommas((itemConfig.payload.nodeDataMap[0])[0].calculatedDataValue) : "");
+                        }
                     }
                 }
             }
@@ -1044,11 +1227,8 @@ export default class CreateTreeTemplate extends Component {
     }
 
     getSameLevelNodeList(level, id) {
-        console.log("level---", level);
-        console.log("id---", id);
         var sameLevelNodeList = [];
         var arr = this.state.items.filter(x => x.level == level && x.id != id && x.id > id);
-        console.log("arr---", arr);
         for (var i = 0; i < arr.length; i++) {
             sameLevelNodeList[i] = { id: arr[i].id, name: getLabelText(arr[i].payload.label, this.state.lang) }
         }
@@ -1512,7 +1692,7 @@ export default class CreateTreeTemplate extends Component {
             wordWrap: true,
             allowInsertColumn: false,
             allowManualInsertColumn: false,
-            allowDeleteRow: false,
+            allowDeleteRow: true,
             onchange: this.changed,
             updateTable: function (el, cell, x, y, source, value, id) {
                 var elInstance = el.jexcel;
@@ -1538,13 +1718,13 @@ export default class CreateTreeTemplate extends Component {
                         cell = elInstance.getCell(("F").concat(parseInt(y) + 1))
                         cell.classList.add('readonly');
                     }
-                    if (rowData[3] != "" && moment(this.state.minMonth).diff(moment(rowData[3]), 'months') == 0) {
-                        var cell = elInstance.getCell(("D").concat(parseInt(y) + 1))
-                        cell.classList.add('readonly');
-                    } else {
-                        var cell = elInstance.getCell(("D").concat(parseInt(y) + 1))
-                        cell.classList.remove('readonly');
-                    }
+                    // if (rowData[3] != "" && moment(this.state.minMonth).diff(moment(rowData[3]), 'months') == 0) {
+                    //     var cell = elInstance.getCell(("D").concat(parseInt(y) + 1))
+                    //     cell.classList.add('readonly');
+                    // } else {
+                    //     var cell = elInstance.getCell(("D").concat(parseInt(y) + 1))
+                    //     cell.classList.remove('readonly');
+                    // }
 
                 }
             }.bind(this),
@@ -1602,14 +1782,14 @@ export default class CreateTreeTemplate extends Component {
                     // Delete a row
                     if (obj.options.allowDeleteRow == true) {
                         // region id
-                        if (obj.getRowData(y)[9] == "" || obj.getRowData(y)[9] == 0) {
-                            items.push({
-                                title: i18n.t("static.common.deleterow"),
-                                onclick: function () {
-                                    obj.deleteRow(parseInt(y));
-                                }
-                            });
-                        }
+                        // if (obj.getRowData(y)[9] == "" || obj.getRowData(y)[9] == 0) {
+                        items.push({
+                            title: i18n.t("static.common.deleterow"),
+                            onclick: function () {
+                                obj.deleteRow(parseInt(y));
+                            }
+                        });
+                        // }
                     }
                 }
 
@@ -1626,9 +1806,8 @@ export default class CreateTreeTemplate extends Component {
         this.setState({
             modelingEl: modelingEl
         }, () => {
-
+            var curDate = moment(Date.now()).utcOffset('-0500').startOf('month').format('YYYY-MM-DD');
             console.log("curDate---", curDate)
-            var curDate = new Date();
             this.filterScalingDataByMonth(curDate);
         }
         );
@@ -1672,76 +1851,88 @@ export default class CreateTreeTemplate extends Component {
     }.bind(this)
     changed1 = function (instance, cell, x, y, value) {
         // 4 & 5
-        console.log("hi anchal")
-        var json = this.state.momEl.getJson(null, false);
-        console.log("momData>>>", json);
-        var overrideListArray = [];
-        for (var i = 0; i < json.length; i++) {
-            var map1 = new Map(Object.entries(json[i]));
-            if (map1.get("4") != '' || map1.get("5") != '') {
-                var overrideData = {
-                    month: map1.get("0"),
-                    seasonalityPerc: map1.get("4"),
-                    manualChange: map1.get("5"),
-                    nodeDataId: map1.get("7"),
-                    active: true
+        this.setState({
+            momJexcelLoader: true
+        }, () => {
+            setTimeout(() => {
+                console.log("hi anchal")
+                var json = this.state.momEl.getJson(null, false);
+                console.log("momData>>>", json);
+                var overrideListArray = [];
+                for (var i = 0; i < json.length; i++) {
+                    var map1 = new Map(Object.entries(json[i]));
+                    if (map1.get("4") != '' || map1.get("5") != '') {
+                        var overrideData = {
+                            month: map1.get("0"),
+                            seasonalityPerc: map1.get("4"),
+                            manualChange: map1.get("5"),
+                            nodeDataId: map1.get("7"),
+                            active: true
+                        }
+                        console.log("overrideData>>>", overrideData);
+                        overrideListArray.push(overrideData);
+                    }
                 }
-                console.log("overrideData>>>", overrideData);
-                overrideListArray.push(overrideData);
-            }
-        }
-        console.log("overRide data list>>>", overrideListArray);
-        let { currentItemConfig } = this.state;
-        let { treeTemplate } = this.state;
-        var items = this.state.items;
-        (currentItemConfig.context.payload.nodeDataMap[0])[0].nodeDataOverrideList = overrideListArray;
-        this.setState({ currentItemConfig }, () => {
-            var findNodeIndex = items.findIndex(n => n.id == currentItemConfig.context.id);
-            items[findNodeIndex] = currentItemConfig.context;
-            treeTemplate.flatList = items;
-            this.setState({
-                treeTemplate
-            }, () => {
-                console.log("treeTemplate>>>", treeTemplate);
-                calculateModelingData(treeTemplate, this, '', currentItemConfig.context.id, 0, 1, -1, true);
-            });
+                console.log("overRide data list>>>", overrideListArray);
+                let { currentItemConfig } = this.state;
+                let { treeTemplate } = this.state;
+                var items = this.state.items;
+                (currentItemConfig.context.payload.nodeDataMap[0])[0].nodeDataOverrideList = overrideListArray;
+                this.setState({ currentItemConfig }, () => {
+                    var findNodeIndex = items.findIndex(n => n.id == currentItemConfig.context.id);
+                    items[findNodeIndex] = currentItemConfig.context;
+                    treeTemplate.flatList = items;
+                    this.setState({
+                        treeTemplate
+                    }, () => {
+                        console.log("treeTemplate>>>", treeTemplate);
+                        calculateModelingData(treeTemplate, this, '', currentItemConfig.context.id, 0, 1, -1, true);
+                    });
 
+                });
+            }, 0);
         });
 
     }.bind(this);
     changed2 = function (instance, cell, x, y, value) {
-        var json = this.state.momElPer.getJson(null, false);
-        console.log("momData>>>", json);
-        var overrideListArray = [];
-        for (var i = 0; i < json.length; i++) {
-            var map1 = new Map(Object.entries(json[i]));
-            if (map1.get("3") != '') {
-                var overrideData = {
-                    month: map1.get("0"),
-                    seasonalityPerc: 0,
-                    manualChange: map1.get("3"),
-                    nodeDataId: map1.get("7"),
-                    active: true
+        this.setState({
+            momJexcelLoader: true
+        }, () => {
+            setTimeout(() => {
+                var json = this.state.momElPer.getJson(null, false);
+                console.log("momData>>>", json);
+                var overrideListArray = [];
+                for (var i = 0; i < json.length; i++) {
+                    var map1 = new Map(Object.entries(json[i]));
+                    if (map1.get("3") != '') {
+                        var overrideData = {
+                            month: map1.get("0"),
+                            seasonalityPerc: 0,
+                            manualChange: map1.get("3"),
+                            nodeDataId: map1.get("7"),
+                            active: true
+                        }
+                        console.log("overrideData>>>", overrideData);
+                        overrideListArray.push(overrideData);
+                    }
                 }
-                console.log("overrideData>>>", overrideData);
-                overrideListArray.push(overrideData);
-            }
-        }
-        console.log("overRide data list>>>", overrideListArray);
-        let { currentItemConfig } = this.state;
-        let { treeTemplate } = this.state;
-        var items = this.state.items;
-        (currentItemConfig.context.payload.nodeDataMap[0])[0].nodeDataOverrideList = overrideListArray;
-        this.setState({ currentItemConfig }, () => {
-            // console.log("currentIemConfigInUpdetMom>>>", currentItemConfig);
-            var findNodeIndex = items.findIndex(n => n.id == currentItemConfig.context.id);
-            items[findNodeIndex] = currentItemConfig.context;
-            treeTemplate.flatList = items; this.setState({
-                treeTemplate
-            }, () => {
-                console.log("treeTemplate>>>", treeTemplate);
-                calculateModelingData(treeTemplate, this, '', currentItemConfig.context.id, 0, 1, -1, true);
-            });
+                console.log("overRide data list>>>", overrideListArray);
+                let { currentItemConfig } = this.state;
+                let { treeTemplate } = this.state;
+                var items = this.state.items;
+                (currentItemConfig.context.payload.nodeDataMap[0])[0].nodeDataOverrideList = overrideListArray;
+                this.setState({ currentItemConfig }, () => {
+                    // console.log("currentIemConfigInUpdetMom>>>", currentItemConfig);
+                    var findNodeIndex = items.findIndex(n => n.id == currentItemConfig.context.id);
+                    items[findNodeIndex] = currentItemConfig.context;
+                    treeTemplate.flatList = items; this.setState({
+                        treeTemplate
+                    }, () => {
+                        console.log("treeTemplate>>>", treeTemplate);
+                        calculateModelingData(treeTemplate, this, '', currentItemConfig.context.id, 0, 1, -1, true);
+                    });
+                });
+            }, 0);
         });
     }.bind(this);
     changed = function (instance, cell, x, y, value) {
@@ -2260,17 +2451,29 @@ export default class CreateTreeTemplate extends Component {
         console.log("usageTemplate---", usageTemplate);
         const { currentItemConfig } = this.state;
         (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.lagInMonths = usageTemplate.lagInMonths;
-        (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.noOfPersons = usageTemplate.noOfPatients;
-        (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.noOfForecastingUnitsPerPerson = usageTemplate.noOfForecastingUnits;
-        (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageFrequency = usageTemplate.usageFrequencyCount;
-        (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usagePeriod.usagePeriodId = usageTemplate.usageFrequencyUsagePeriod != null ? usageTemplate.usageFrequencyUsagePeriod.usagePeriodId : '';
-        (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.unit.id = usageTemplate.unit.id;
-        if ((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageType.id == 1) {
-            (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.oneTimeUsage = usageTemplate.oneTimeUsage;
-            (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.repeatCount = usageTemplate.repeatCount;
-            (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.repeatUsagePeriod.usagePeriodId = usageTemplate.repeatUsagePeriod.usagePeriodId;
+        (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.noOfPersons = usageTemplate.noOfPatients;
+        (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.noOfForecastingUnitsPerPerson = usageTemplate.noOfForecastingUnits;
+        (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageFrequency = usageTemplate.usageFrequencyCount;
+        (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usagePeriod.usagePeriodId = usageTemplate.usageFrequencyUsagePeriod != null ? usageTemplate.usageFrequencyUsagePeriod.usagePeriodId : '';
+        (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.unit.id = usageTemplate.unit.id;
+        (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.id = usageTemplate.forecastingUnit.id;
+        (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.label.label_en = usageTemplate.forecastingUnit.label.label_en;
+        (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageType.id = usageTemplate.usageType.id;
+        // for (var i = 0; i < newResult.length; i++) {
+        var autocompleteData = [{ value: usageTemplate.forecastingUnit.id, label: getLabelText(usageTemplate.forecastingUnit.label, this.state.lang) + " [" + usageTemplate.forecastingUnit.id + "]" }]
+        // }
+
+
+        if ((currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageType.id == 1) {
+            (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.oneTimeUsage = usageTemplate.oneTimeUsage;
+            (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.repeatCount = usageTemplate.repeatCount;
+            (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.repeatUsagePeriod.usagePeriodId = usageTemplate.repeatUsagePeriod != null ? usageTemplate.repeatUsagePeriod.usagePeriodId : '';
         }
-        this.setState({ currentItemConfig }, () => {
+        this.setState({
+            currentItemConfig,
+            autocompleteData
+        }, () => {
+            console.log("copy from template---", this.state.currentItemConfig);
             this.getNoOfMonthsInUsagePeriod();
             this.getNoFURequired();
             this.getNoOfFUPatient();
@@ -2494,7 +2697,8 @@ export default class CreateTreeTemplate extends Component {
 
             var autocompleteData = [];
             for (var i = 0; i < response.data.length; i++) {
-                autocompleteData[i] = { value: response.data[i].forecastingUnitId, label: response.data[i].label.label_en + " [" + response.data[i].forecastingUnitId + "]" }
+                // autocompleteData[i] = { value: response.data[i].forecastingUnitId, label: response.data[i].label.label_en + " [" + response.data[i].forecastingUnitId + "]" }
+                autocompleteData[i] = { value: response.data[i].forecastingUnitId, label: response.data[i].forecastingUnitId + "|" + getLabelText(response.data[i].label, this.state.lang) }
             }
             this.setState({
                 autocompleteData,
@@ -2503,23 +2707,24 @@ export default class CreateTreeTemplate extends Component {
                 if (response.data.length == 1) {
                     const currentItemConfig = this.state.currentItemConfig;
                     (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.id = response.data[0].forecastingUnitId;
-                    (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.label.label_en = response.data[0].forecastingUnitId + " | " + response.data[0].label.label_en;
+                    (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.label.label_en = response.data[i].forecastingUnitId + "|" + getLabelText(response.data[i].label, this.state.lang);
                     this.setState({
                         currentItemConfig: currentItemConfig
                     }, () => {
                         this.getForecastingUnitUnitByFUId(response.data[0].forecastingUnitId);
                     })
-                } else {
-                    const currentItemConfig = this.state.currentItemConfig;
-                    (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.id = "";
-                    (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.label.label_en = "";
-                    this.setState({
-                        currentItemConfig: currentItemConfig
-
-                    }, () => {
-
-                    })
                 }
+                // else {
+                //     const currentItemConfig = this.state.currentItemConfig;
+                //     (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.id = "";
+                //     (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.label.label_en = "";
+                //     this.setState({
+                //         currentItemConfig: currentItemConfig
+
+                //     }, () => {
+
+                //     })
+                // }
             })
 
 
@@ -2680,7 +2885,7 @@ export default class CreateTreeTemplate extends Component {
         this.getNodeTyeList();
         this.getUsageTemplateList(0);
         ForecastMethodService.getActiveForecastMethodList().then(response => {
-            var listArray = response.data;
+            var listArray = response.data.filter(x => x.forecastMethodTypeId == 1);
             listArray.sort((a, b) => {
                 var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
                 var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
@@ -3216,6 +3421,7 @@ export default class CreateTreeTemplate extends Component {
                                     },
                                     nodeDataModelingList: [],
                                     nodeDataOverrideList: [],
+                                    nodeDataMomList: []
                                 }]
                             ]
                         },
@@ -3247,6 +3453,7 @@ export default class CreateTreeTemplate extends Component {
                             [{
                                 nodeDataModelingList: [],
                                 nodeDataOverrideList: [],
+                                nodeDataMomList: [],
                                 month: new Date(),
                                 dataValue: '',
                                 fuNode: {
@@ -3456,7 +3663,8 @@ export default class CreateTreeTemplate extends Component {
             currentItemConfig.context.payload.nodeUnit.id = event.target.value;
         }
         if (event.target.name === "percentageOfParent") {
-            (currentItemConfig.context.payload.nodeDataMap[0])[0].dataValue = event.target.value;
+            var value = (event.target.value).replaceAll(",", "");
+            (currentItemConfig.context.payload.nodeDataMap[0])[0].dataValue = value;
             var calculatedDataValue;
             var parentValue;
             var parentValue1;
@@ -3467,16 +3675,18 @@ export default class CreateTreeTemplate extends Component {
             }
 
             console.log("parentValue---", parentValue);
-            parentValue = (parentValue1).toString().replaceAll(",", "");
-            (currentItemConfig.context.payload.nodeDataMap[0])[0].calculatedDataValue = parseInt(parentValue * event.target.value) / 100
+            parentValue = parentValue1;
+            (currentItemConfig.context.payload.nodeDataMap[0])[0].calculatedDataValue = parseInt(parentValue * value) / 100
             console.log("calculatedDataValue---", currentItemConfig);
             this.setState({
                 parentValue
             })
         }
         if (event.target.name === "nodeValue") {
-            (currentItemConfig.context.payload.nodeDataMap[0])[0].dataValue = event.target.value;
-            (currentItemConfig.context.payload.nodeDataMap[0])[0].calculatedDataValue = event.target.value;
+            console.log("inside node value-------");
+            var value = (event.target.value).replaceAll(",", "");
+            (currentItemConfig.context.payload.nodeDataMap[0])[0].dataValue = value;
+            (currentItemConfig.context.payload.nodeDataMap[0])[0].calculatedDataValue = value;
         }
         if (event.target.name === "notes") {
             (currentItemConfig.context.payload.nodeDataMap[0])[0].notes = event.target.value;
@@ -3782,7 +3992,7 @@ export default class CreateTreeTemplate extends Component {
                 showMomData: false,
                 // preItem: preItem,
                 orgCurrentItemConfig: JSON.parse(JSON.stringify(data.context)),
-                currentItemConfig: data,
+                currentItemConfig: JSON.parse(JSON.stringify(data)),
                 level0: (data.context.level == 0 ? false : true),
                 numberNode: (data.context.payload.nodeType.id == 2 ? false : true),
                 aggregationNode: (data.context.payload.nodeType.id == 1 ? false : true),
@@ -3838,10 +4048,11 @@ export default class CreateTreeTemplate extends Component {
     };
 
     updateNodeInfoInJson(currentItemConfig) {
+        this.setState({ loading: true })
         console.log("update tree node called------------", currentItemConfig);
         var nodes = this.state.items;
-        var findNodeIndex = nodes.findIndex(n => n.id == currentItemConfig.id);
-        nodes[findNodeIndex] = currentItemConfig;
+        var findNodeIndex = nodes.findIndex(n => n.id == currentItemConfig.context.id);
+        nodes[findNodeIndex] = currentItemConfig.context;
         // nodes[findNodeIndex].valueType = currentItemConfig.valueType;
         this.setState({
             items: nodes,
@@ -3863,7 +4074,7 @@ export default class CreateTreeTemplate extends Component {
                         id: 'A',
                         scaleLabel: {
                             display: true,
-                            labelString: "",
+                            labelString: this.state.currentItemConfig.context.payload.nodeUnit.label != null && this.state.currentItemConfig.context.payload.nodeType.id != 1 ? getLabelText(this.state.currentItemConfig.context.payload.nodeUnit.label, this.state.lang) : '',
                             fontColor: 'black'
                         },
                         stacked: false,
@@ -3871,6 +4082,19 @@ export default class CreateTreeTemplate extends Component {
                             beginAtZero: true,
                             fontColor: 'black',
                             // stepSize: 1000000
+                            callback: function (value) {
+                                var cell1 = value
+                                cell1 += '';
+                                var x = cell1.split('.');
+                                var x1 = x[0];
+                                var x2 = x.length > 1 ? '.' + x[1] : '';
+                                var rgx = /(\d+)(\d{3})/;
+                                while (rgx.test(x1)) {
+                                    x1 = x1.replace(rgx, '$1' + ',' + '$2');
+                                }
+                                return x1 + x2;
+
+                            }
                         },
                         gridLines: {
                             drawBorder: true, lineWidth: 1
@@ -3887,6 +4111,35 @@ export default class CreateTreeTemplate extends Component {
                         drawBorder: true, lineWidth: 0
                     }
                 }]
+            },
+            tooltips: {
+                enabled: true,
+                custom: CustomTooltips,
+                callbacks: {
+                    label: function (tooltipItem, data) {
+                        // console.log("tooltipItem---", tooltipItem);
+                        // console.log("tooltipItem data---", data);
+                        // if (tooltipItem.datasetIndex == 1) {
+                        let label = data.labels[tooltipItem.index];
+                        let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
+
+                        var cell1 = value
+                        cell1 += '';
+                        var x = cell1.split('.');
+                        var x1 = x[0];
+                        var x2 = x.length > 1 ? '.' + x[1] : '';
+                        var rgx = /(\d+)(\d{3})/;
+                        while (rgx.test(x1)) {
+                            x1 = x1.replace(rgx, '$1' + ',' + '$2');
+                        }
+                        return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
+                        // } else {
+                        // let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
+                        // return data.datasets[tooltipItem.datasetIndex].label + ' : ' + value + " %";
+                        // }
+                    }
+                }
+
             },
             maintainAspectRatio: false
             ,
@@ -4101,13 +4354,13 @@ export default class CreateTreeTemplate extends Component {
             <>
                 <TabPane tabId="1">
                     <Formik
-                        // enableReinitialize={true}
+                        enableReinitialize={true}
                         // initialValues={initialValuesNodeData}
                         initialValues={{
                             nodeTitle: this.state.currentItemConfig.context.payload.label.label_en,
                             nodeTypeId: this.state.currentItemConfig.context.payload.nodeType.id,
-                            nodeUnitId: this.state.currentItemConfig.context.payload.nodeUnit.id,
-                            percentageOfParent: (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].dataValue
+                            nodeUnitId: this.state.currentItemConfig.context.payload.nodeUnit.id
+                            // percentageOfParent: (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].dataValue
                         }}
                         validate={validateNodeData(validationSchemaNodeData)}
                         onSubmit={(values, { setSubmitting, setErrors }) => {
@@ -4197,35 +4450,36 @@ export default class CreateTreeTemplate extends Component {
                                             <FormFeedback className="red">{errors.nodeTypeId}</FormFeedback>
                                         </FormGroup>
 
-                                        {this.state.aggregationNode &&
+                                        {/* {this.state.aggregationNode && */}
 
-                                            <FormGroup className="col-md-6">
-                                                <Label htmlFor="currencyId">Node Unit<span class="red Reqasterisk">*</span></Label>
-                                                <Input
-                                                    type="select"
-                                                    id="nodeUnitId"
-                                                    name="nodeUnitId"
-                                                    bsSize="sm"
-                                                    valid={!errors.nodeUnitId && this.state.currentItemConfig.context.payload.nodeUnit.id != ''}
-                                                    invalid={touched.nodeUnitId && !!errors.nodeUnitId}
-                                                    onBlur={handleBlur}
-                                                    onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                    required
-                                                    disabled={this.state.currentItemConfig.context.payload.nodeType.id > 3 ? true : false}
-                                                    value={this.state.currentItemConfig.context.payload.nodeType.id == 4 ? this.state.currentItemConfig.parentItem.payload.nodeUnit.id : this.state.currentItemConfig.context.payload.nodeUnit.id}
-                                                >
-                                                    <option value="">{i18n.t('static.common.select')}</option>
-                                                    {this.state.nodeUnitList.length > 0
-                                                        && this.state.nodeUnitList.map((item, i) => {
-                                                            return (
-                                                                <option key={i} value={item.unitId}>
-                                                                    {getLabelText(item.label, this.state.lang)}
-                                                                </option>
-                                                            )
-                                                        }, this)}
-                                                </Input>
-                                                <FormFeedback className="red">{errors.nodeUnitId}</FormFeedback>
-                                            </FormGroup>}
+                                        <FormGroup className="col-md-6" style={{ display: this.state.aggregationNode ? 'block' : 'none' }}>
+                                            <Label htmlFor="currencyId">Node Unit<span class="red Reqasterisk">*</span></Label>
+                                            <Input
+                                                type="select"
+                                                id="nodeUnitId"
+                                                name="nodeUnitId"
+                                                bsSize="sm"
+                                                valid={!errors.nodeUnitId && this.state.currentItemConfig.context.payload.nodeUnit.id != ''}
+                                                invalid={touched.nodeUnitId && !!errors.nodeUnitId}
+                                                onBlur={handleBlur}
+                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                required
+                                                disabled={this.state.currentItemConfig.context.payload.nodeType.id > 3 ? true : false}
+                                                value={this.state.currentItemConfig.context.payload.nodeType.id == 4 ? this.state.currentItemConfig.parentItem.payload.nodeUnit.id : this.state.currentItemConfig.context.payload.nodeUnit.id}
+                                            >
+                                                <option value="">{i18n.t('static.common.select')}</option>
+                                                {this.state.nodeUnitList.length > 0
+                                                    && this.state.nodeUnitList.map((item, i) => {
+                                                        return (
+                                                            <option key={i} value={item.unitId}>
+                                                                {getLabelText(item.label, this.state.lang)}
+                                                            </option>
+                                                        )
+                                                    }, this)}
+                                            </Input>
+                                            <FormFeedback className="red">{errors.nodeUnitId}</FormFeedback>
+                                        </FormGroup>
+                                        {/* } */}
                                         {this.state.currentItemConfig.context.payload.nodeType.id != 1 &&
 
                                             <FormGroup className="col-md-6">
@@ -4249,54 +4503,57 @@ export default class CreateTreeTemplate extends Component {
                                             </FormGroup>
                                         }
 
-                                        {(this.state.numberNode && this.state.currentItemConfig.context.payload.nodeType.id != 1) &&
-                                            <>
-                                                <FormGroup className="col-md-6">
-                                                    <Label htmlFor="currencyId">Percentage of Parent<span class="red Reqasterisk">*</span></Label>
-                                                    <Input type="text"
-                                                        id="percentageOfParent"
-                                                        name="percentageOfParent"
-                                                        bsSize="sm"
-                                                        valid={!errors.percentageOfParent && (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].dataValue != ''}
-                                                        invalid={touched.percentageOfParent && !!errors.percentageOfParent}
-                                                        onBlur={handleBlur}
-                                                        onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                        step={.01}
-                                                        value={(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].dataValue}></Input>
-                                                    <FormFeedback className="red">{errors.percentageOfParent}</FormFeedback>
-                                                </FormGroup>
-                                                <FormGroup className="col-md-6">
-                                                    <Label htmlFor="currencyId">Parent Value<span class="red Reqasterisk">*</span></Label>
-                                                    <Input type="text"
-                                                        id="parentValue"
-                                                        name="parentValue"
-                                                        bsSize="sm"
-                                                        readOnly={true}
-                                                        onChange={(e) => { this.dataChange(e) }}
-                                                        value={this.state.addNodeFlag != "true" ? addCommas(this.state.currentItemConfig.parentItem != null ? (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].calculatedDataValue : '') : addCommas(this.state.parentValue)}
-                                                    ></Input>
-                                                </FormGroup></>}
-                                        {(this.state.aggregationNode && this.state.currentItemConfig.context.payload.nodeType.id != 1) &&
-                                            <FormGroup className="col-md-6">
-                                                <Label htmlFor="currencyId">Node Value<span class="red Reqasterisk">*</span></Label>
-                                                <Input type="text"
-                                                    id="nodeValue"
-                                                    name="nodeValue"
-                                                    bsSize="sm"
-                                                    // valid={!errors.nodeValue && (this.state.currentItemConfig.context.payload.nodeType.id != 1 && this.state.currentItemConfig.context.payload.nodeType.id != 2) ? addCommas((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].calculatedDataValue) : addCommas((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].dataValue) != ''}
-                                                    // invalid={touched.nodeValue && !!errors.nodeValue}
-                                                    onBlur={handleBlur}
-                                                    readOnly={this.state.numberNode ? true : false}
-                                                    onChange={(e) => { this.dataChange(e) }}
-                                                    // step={.01}
-                                                    // value={this.getNodeValue(this.state.currentItemConfig.context.payload.nodeType.id)}
-                                                    value={(this.state.currentItemConfig.context.payload.nodeType.id != 1 && this.state.currentItemConfig.context.payload.nodeType.id != 2) ? addCommas((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].calculatedDataValue) : addCommas((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].dataValue)}
-                                                ></Input>
-                                                {/* <FormFeedback className="red">{errors.nodeValue}</FormFeedback> */}
-                                            </FormGroup>}
+                                        {/* {(this.state.numberNode && this.state.currentItemConfig.context.payload.nodeType.id != 1) && */}
+                                        {/* <> */}
+                                        <FormGroup className="col-md-6" style={{ display: this.state.numberNode ? 'block' : 'none' }}>
+                                            <Label htmlFor="currencyId">Percentage of Parent<span class="red Reqasterisk">*</span></Label>
+                                            <Input type="text"
+                                                id="percentageOfParent"
+                                                name="percentageOfParent"
+                                                bsSize="sm"
+                                                valid={!errors.percentageOfParent && (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].dataValue != ''}
+                                                invalid={touched.percentageOfParent && !!errors.percentageOfParent}
+                                                onBlur={handleBlur}
+                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                step={.01}
+                                                value={(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].dataValue}></Input>
+                                            <FormFeedback className="red">{errors.percentageOfParent}</FormFeedback>
+                                        </FormGroup>
+                                        <FormGroup className="col-md-6" style={{ display: this.state.numberNode ? 'block' : 'none' }}>
+                                            <Label htmlFor="currencyId">Parent Value<span class="red Reqasterisk">*</span></Label>
+                                            <Input type="text"
+                                                id="parentValue"
+                                                name="parentValue"
+                                                bsSize="sm"
+                                                readOnly={true}
+                                                onChange={(e) => { this.dataChange(e) }}
+                                                value={this.state.addNodeFlag != "true" ? addCommas(this.state.currentItemConfig.parentItem != null ? (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].calculatedDataValue : '') : addCommas(this.state.parentValue)}
+                                            ></Input>
+                                        </FormGroup>
+                                        {/* </> */}
+                                        {/* } */}
+                                        {/* {(this.state.aggregationNode && this.state.currentItemConfig.context.payload.nodeType.id != 1) && */}
+                                        <FormGroup className="col-md-6" style={{ display: this.state.aggregationNode ? 'block' : 'none' }}>
+                                            <Label htmlFor="currencyId">Node Value<span class="red Reqasterisk">*</span></Label>
+                                            <Input type="text"
+                                                id="nodeValue"
+                                                name="nodeValue"
+                                                bsSize="sm"
+                                                valid={!errors.nodeValue && (this.state.currentItemConfig.context.payload.nodeType.id != 1 && this.state.currentItemConfig.context.payload.nodeType.id != 2) ? addCommas(this.state.currentItemConfig.context.payload.nodeDataMap[0][0].calculatedDataValue) : addCommas(this.state.currentItemConfig.context.payload.nodeDataMap[0][0].dataValue) != ''}
+                                                invalid={touched.nodeValue && !!errors.nodeValue}
+                                                onBlur={handleBlur}
+                                                readOnly={this.state.numberNode ? true : false}
+                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                // step={.01}
+                                                // value={this.getNodeValue(this.state.currentItemConfig.context.payload.nodeType.id)}
+                                                value={(this.state.currentItemConfig.context.payload.nodeType.id != 1 && this.state.currentItemConfig.context.payload.nodeType.id != 2) ? addCommas((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].calculatedDataValue) : addCommas((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].dataValue)}
+                                            ></Input>
+                                            <FormFeedback className="red">{errors.nodeValue}</FormFeedback>
+                                        </FormGroup>
+                                        {/* // } */}
 
                                         <FormGroup className="col-md-6">
-                                            <Label htmlFor="currencyId">Notes</Label>
+                                            <Label htmlFor="currencyId">{i18n.t('static.common.note')}</Label>
                                             <Input type="textarea"
                                                 id="notes"
                                                 name="notes"
@@ -4307,229 +4564,258 @@ export default class CreateTreeTemplate extends Component {
                                         </FormGroup>
                                     </div>
                                     {/* Planning unit start */}
-                                    {(this.state.currentItemConfig.context.payload.nodeType.id == 5) &&
-                                        <div>
-                                            <div className="row">
-                                                <FormGroup className="col-md-2">
-                                                    <Label htmlFor="currencyId">{i18n.t('static.common.typeofuse')}<span class="red Reqasterisk">*</span></Label>
-
-                                                </FormGroup>
-                                                <FormGroup className="col-md-10">
-                                                    <Input
-                                                        type="select"
-                                                        id="usageTypeIdPU"
-                                                        name="usageTypeIdPU"
-                                                        bsSize="sm"
-                                                        onChange={(e) => { this.dataChange(e) }}
-                                                        required
-                                                        disabled={true}
-                                                        value={(this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.usageType.id}
-                                                    >
-                                                        <option value="">{i18n.t('static.common.select')}</option>
-                                                        {this.state.usageTypeList.length > 0
-                                                            && this.state.usageTypeList.map((item, i) => {
-                                                                return (
-                                                                    <option key={i} value={item.id}>
-                                                                        {getLabelText(item.label, this.state.lang)}
-                                                                    </option>
-                                                                )
-                                                            }, this)}
-                                                    </Input>
-                                                </FormGroup>
-                                                <FormGroup className="col-md-2">
-                                                    <Label htmlFor="currencyId">Forecasting unit<span class="red Reqasterisk">*</span></Label>
-
-                                                </FormGroup>
-                                                <FormGroup className="col-md-10">
-                                                    <Input type="text"
-                                                        id="forecastingUnitPU"
-                                                        name="forecastingUnitPU"
-                                                        bsSize="sm"
-                                                        readOnly={true}
-                                                        value={(this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.label.label_en}>
-
-                                                    </Input>
-                                                </FormGroup>
-                                                <FormGroup className="col-md-2">
-                                                    <Label htmlFor="currencyId">{(this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.usageType.id == 2 ? "# of FU / month / Clients" : "# of FU / usage / Patient"}<span class="red Reqasterisk">*</span></Label>
-
-                                                </FormGroup>
-                                                <FormGroup className="col-md-5">
-                                                    <Input type="text"
-                                                        id="forecastingUnitPU"
-                                                        name="forecastingUnitPU"
-                                                        bsSize="sm"
-                                                        readOnly={true}
-
-                                                        value={addCommas((this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.usageType.id == 2 ? ((this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod) : this.state.noOfMonthsInUsagePeriod)}>
-
-                                                    </Input>
-                                                </FormGroup>
-                                                <FormGroup className="col-md-5">
-                                                    <Input type="select"
-                                                        id="forecastingUnitUnitPU"
-                                                        name="forecastingUnitUnitPU"
-                                                        bsSize="sm"
-                                                        disabled="true"
-                                                        onChange={(e) => { this.dataChange(e) }}
-                                                        value={(this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.unit.id}>
-
-                                                        <option value=""></option>
-                                                        {this.state.nodeUnitList.length > 0
-                                                            && this.state.unitList.map((item, i) => {
-                                                                return (
-                                                                    <option key={i} value={item.unitId}>
-                                                                        {getLabelText(item.label, this.state.lang)}
-                                                                    </option>
-                                                                )
-                                                            }, this)}
-                                                    </Input>
-                                                </FormGroup>
-                                                <FormGroup className="col-md-2">
-                                                    <Label htmlFor="currencyId">Planning unit<span class="red Reqasterisk">*</span></Label>
-
-                                                </FormGroup>
-                                                <FormGroup className="col-md-10">
-                                                    <Input type="select"
-                                                        id="planningUnitId"
-                                                        name="planningUnitId"
-                                                        bsSize="sm"
-                                                        onChange={(e) => { this.dataChange(e) }}
-                                                        value={(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.planningUnit.id}>
-
-                                                        <option value="">{i18n.t('static.common.select')}</option>
-                                                        {this.state.planningUnitList.length > 0
-                                                            && this.state.planningUnitList.map((item, i) => {
-                                                                return (
-                                                                    <option key={i} value={item.planningUnitId}>
-                                                                        {getLabelText(item.label, this.state.lang)}
-                                                                    </option>
-                                                                )
-                                                            }, this)}
-                                                    </Input>
-                                                </FormGroup>
-                                                <FormGroup className="col-md-2">
-                                                    <Label htmlFor="currencyId">Conversion Factor (FU:PU)<span class="red Reqasterisk">*</span></Label>
-                                                </FormGroup>
-                                                <FormGroup className="col-md-10">
-                                                    <Input type="text"
-                                                        id="conversionFactor"
-                                                        name="conversionFactor"
-                                                        bsSize="sm"
-                                                        readOnly={true}
-                                                        value={addCommas(this.state.conversionFactor)}>
-
-                                                    </Input>
-                                                </FormGroup>
-                                                <FormGroup className="col-md-2">
-                                                    <Label htmlFor="currencyId">{(this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.usageType.id == 2 ? "# of PU / month /" : "# of PU / usage / "}<span class="red Reqasterisk">*</span></Label>
-                                                </FormGroup>
-                                                <FormGroup className="col-md-5">
-                                                    <Input type="text"
-                                                        id="noOfPUUsage"
-                                                        name="noOfPUUsage"
-                                                        bsSize="sm"
-                                                        readOnly={true}
-                                                        value={addCommas((this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.usageType.id == 2 ? (((this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod) / this.state.conversionFactor) : (this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor))}>
-
-                                                    </Input>
-                                                </FormGroup>
-                                                <FormGroup className="col-md-5">
-                                                    <Input type="select"
-                                                        id="planningUnitUnitPU"
-                                                        name="planningUnitUnitPU"
-                                                        bsSize="sm"
-                                                        disabled="true"
-                                                        onChange={(e) => { this.dataChange(e) }}
-                                                        value={(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.planningUnit.unit.id}>
-
-                                                        <option value=""></option>
-                                                        {this.state.unitList.length > 0
-                                                            && this.state.unitList.map((item, i) => {
-                                                                return (
-                                                                    <option key={i} value={item.unitId}>
-                                                                        {getLabelText(item.label, this.state.lang)}
-                                                                    </option>
-                                                                )
-                                                            }, this)}
-                                                    </Input>
-                                                </FormGroup>
-                                                {(this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.usageType.id == 2 &&
-                                                    <>
-                                                        <FormGroup className="col-md-2">
-                                                            <Label htmlFor="currencyId">QAT estimate for interval (Every _ months)<span class="red Reqasterisk">*</span></Label>
-                                                        </FormGroup>
-                                                        <FormGroup className="col-md-10">
-                                                            <Input type="text"
-                                                                id="interval"
-                                                                name="interval"
-                                                                bsSize="sm"
-                                                                readOnly={true}
-                                                                value={addCommas(this.state.conversionFactor / ((this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod))}>
-
-                                                            </Input>
-                                                        </FormGroup>
-                                                        <FormGroup className="col-md-2">
-                                                            <Label htmlFor="currencyId">Consumption interval (Every X months)<span class="red Reqasterisk">*</span></Label>
-                                                        </FormGroup>
-                                                        <FormGroup className="col-md-10">
-                                                            <Input type="text"
-                                                                id="refillMonths"
-                                                                name="refillMonths"
-                                                                onChange={(e) => { this.dataChange(e) }}
-                                                                bsSize="sm"
-                                                                value={addCommas((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.refillMonths)}>
-
-                                                            </Input>
-                                                        </FormGroup></>}
-                                                <FormGroup className="col-md-2">
-                                                    <Label htmlFor="currencyId">Will Clients share one PU?<span class="red Reqasterisk">*</span></Label>
-                                                </FormGroup>
-                                                <FormGroup className="col-md-10">
-                                                    <Input type="select"
-                                                        id="sharePlanningUnit"
-                                                        name="sharePlanningUnit"
-                                                        bsSize="sm"
-                                                        onChange={(e) => { this.dataChange(e) }}
-                                                        value={(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.sharePlanningUnit}>
-
-                                                        <option value="">{i18n.t('static.common.select')}</option>
-                                                        <option value="true">Yes</option>
-                                                        <option value="false">No</option>
-
-                                                    </Input>
-                                                </FormGroup>
-                                                <FormGroup className="col-md-2">
-                                                    <Label htmlFor="currencyId">{(this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.usageType.id == 2 ? "How many PU per interval per " : "How many PU per usage per "}{this.state.unitList.filter(c => c.unitId == this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id)[0].label.label_en}?<span class="red Reqasterisk">*</span></Label>
-                                                </FormGroup>
-                                                <FormGroup className="col-md-10">
-                                                    <Input type="text"
-                                                        id="puInterval"
-                                                        name="puInterval"
-                                                        readOnly={true}
-                                                        bsSize="sm"
-                                                        value={addCommas((this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.usageType.id == 2 ? ((((this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod) / this.state.conversionFactor) / (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.refillMonths) : ((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.sharePlanningUnit == "true" ? (this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor) : Math.round((this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor))))}>
-
-                                                    </Input>
-                                                </FormGroup>
-
-                                            </div>
-                                            <div className="col-md-12 pt-2 pl-2"><b>{this.state.usageText}</b></div>
-                                        </div>}
-                                    {/* Plannign unit end */}
-                                    {(this.state.currentItemConfig.context.payload.nodeType.id == 4) && <div>
+                                    <div>
                                         <div className="row">
+                                            {(this.state.currentItemConfig.context.payload.nodeType.id == 5) &&
+                                                <>
+                                                    <FormGroup className="col-md-2">
+                                                        <Label htmlFor="currencyId">{i18n.t('static.common.typeofuse')}<span class="red Reqasterisk">*</span></Label>
 
-                                            <FormGroup className="col-md-6">
-                                                <Label htmlFor="currencyId">Tracer Category<span class="red Reqasterisk">*</span></Label>
+                                                    </FormGroup>
+                                                    <FormGroup className="col-md-10">
+                                                        <Input
+                                                            type="select"
+                                                            id="usageTypeIdPU"
+                                                            name="usageTypeIdPU"
+                                                            bsSize="sm"
+                                                            onChange={(e) => { this.dataChange(e) }}
+                                                            required
+                                                            disabled={true}
+                                                            value={(this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.usageType.id}
+                                                        >
+                                                            <option value="">{i18n.t('static.common.select')}</option>
+                                                            {this.state.usageTypeList.length > 0
+                                                                && this.state.usageTypeList.map((item, i) => {
+                                                                    return (
+                                                                        <option key={i} value={item.id}>
+                                                                            {getLabelText(item.label, this.state.lang)}
+                                                                        </option>
+                                                                    )
+                                                                }, this)}
+                                                        </Input>
+                                                    </FormGroup>
+                                                    <FormGroup className="col-md-2">
+                                                        <Label htmlFor="currencyId">Forecasting unit<span class="red Reqasterisk">*</span></Label>
+
+                                                    </FormGroup>
+                                                    <FormGroup className="col-md-10">
+                                                        <Input type="text"
+                                                            id="forecastingUnitPU"
+                                                            name="forecastingUnitPU"
+                                                            bsSize="sm"
+                                                            readOnly={true}
+                                                            value={(this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.label.label_en}>
+
+                                                        </Input>
+                                                    </FormGroup>
+                                                    <FormGroup className="col-md-2">
+                                                        <Label htmlFor="currencyId">{(this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.usageType.id == 2 ? "# of FU / month / Clients" : "# of FU / usage / Patient"}<span class="red Reqasterisk">*</span></Label>
+
+                                                    </FormGroup>
+                                                    <FormGroup className="col-md-5">
+                                                        <Input type="text"
+                                                            id="forecastingUnitPU"
+                                                            name="forecastingUnitPU"
+                                                            bsSize="sm"
+                                                            readOnly={true}
+
+                                                            value={addCommas((this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.usageType.id == 2 ? ((this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod) : this.state.noOfMonthsInUsagePeriod)}>
+
+                                                        </Input>
+                                                    </FormGroup>
+                                                    <FormGroup className="col-md-5">
+                                                        <Input type="select"
+                                                            id="forecastingUnitUnitPU"
+                                                            name="forecastingUnitUnitPU"
+                                                            bsSize="sm"
+                                                            disabled="true"
+                                                            onChange={(e) => { this.dataChange(e) }}
+                                                            value={(this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.unit.id}>
+
+                                                            <option value=""></option>
+                                                            {this.state.nodeUnitList.length > 0
+                                                                && this.state.unitList.map((item, i) => {
+                                                                    return (
+                                                                        <option key={i} value={item.unitId}>
+                                                                            {getLabelText(item.label, this.state.lang)}
+                                                                        </option>
+                                                                    )
+                                                                }, this)}
+                                                        </Input>
+                                                    </FormGroup></>}
+                                            <FormGroup className="col-md-2" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 5 ? 'block' : 'none' }}>
+                                                <Label htmlFor="currencyId">{i18n.t('static.product.product')}<span class="red Reqasterisk">*</span></Label>
+
+                                            </FormGroup>
+                                            <FormGroup className="col-md-10" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 5 ? 'block' : 'none' }}>
+                                                <Input type="select"
+                                                    id="planningUnitId"
+                                                    name="planningUnitId"
+                                                    bsSize="sm"
+                                                    valid={!errors.planningUnitId && this.state.currentItemConfig.context.payload.nodeType.id == 5 ? this.state.currentItemConfig.context.payload.nodeDataMap[0][0].puNode.planningUnit.id != '' : !errors.planningUnitId}
+                                                    invalid={touched.planningUnitId && !!errors.planningUnitId}
+                                                    onBlur={handleBlur}
+                                                    onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                    value={this.state.currentItemConfig.context.payload.nodeType.id == 5 ? (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.planningUnit.id : ""}>
+
+                                                    <option value="">{i18n.t('static.common.select')}</option>
+                                                    {this.state.planningUnitList.length > 0
+                                                        && this.state.planningUnitList.map((item, i) => {
+                                                            return (
+                                                                <option key={i} value={item.planningUnitId}>
+                                                                    {getLabelText(item.label, this.state.lang)}
+                                                                </option>
+                                                            )
+                                                        }, this)}
+                                                </Input>
+                                                <FormFeedback className="red">{errors.planningUnitId}</FormFeedback>
+                                            </FormGroup>
+                                            {(this.state.currentItemConfig.context.payload.nodeType.id == 5) &&
+                                                <>
+                                                    <FormGroup className="col-md-2">
+                                                        <Label htmlFor="currencyId">Conversion Factor (FU:PU)<span class="red Reqasterisk">*</span></Label>
+                                                    </FormGroup>
+                                                    <FormGroup className="col-md-10">
+                                                        <Input type="text"
+                                                            id="conversionFactor"
+                                                            name="conversionFactor"
+                                                            bsSize="sm"
+                                                            readOnly={true}
+                                                            value={addCommas(this.state.conversionFactor)}>
+
+                                                        </Input>
+                                                    </FormGroup>
+                                                    <FormGroup className="col-md-2">
+                                                        <Label htmlFor="currencyId">{(this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.usageType.id == 2 ? "# of PU / month /" : "# of PU / usage / "}<span class="red Reqasterisk">*</span></Label>
+                                                    </FormGroup>
+                                                    <FormGroup className="col-md-5">
+                                                        <Input type="text"
+                                                            id="noOfPUUsage"
+                                                            name="noOfPUUsage"
+                                                            bsSize="sm"
+                                                            readOnly={true}
+                                                            value={addCommas((this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.usageType.id == 2 ? (((this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod) / this.state.conversionFactor) : (this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor))}>
+
+                                                        </Input>
+                                                    </FormGroup>
+                                                    <FormGroup className="col-md-5">
+                                                        <Input type="select"
+                                                            id="planningUnitUnitPU"
+                                                            name="planningUnitUnitPU"
+                                                            bsSize="sm"
+                                                            disabled="true"
+                                                            onChange={(e) => { this.dataChange(e) }}
+                                                            value={(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.planningUnit.unit.id}>
+
+                                                            <option value=""></option>
+                                                            {this.state.unitList.length > 0
+                                                                && this.state.unitList.map((item, i) => {
+                                                                    return (
+                                                                        <option key={i} value={item.unitId}>
+                                                                            {getLabelText(item.label, this.state.lang)}
+                                                                        </option>
+                                                                    )
+                                                                }, this)}
+                                                        </Input>
+                                                    </FormGroup>
+                                                    {(this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.usageType.id == 2 &&
+                                                        <>
+                                                            <FormGroup className="col-md-2">
+                                                                <Label htmlFor="currencyId">{i18n.t('static.tree.QATEstimateForIntervalEvery_months')}<span class="red Reqasterisk">*</span></Label>
+                                                            </FormGroup>
+                                                            <FormGroup className="col-md-10">
+                                                                <Input type="text"
+                                                                    id="interval"
+                                                                    name="interval"
+                                                                    bsSize="sm"
+                                                                    readOnly={true}
+                                                                    value={addCommas(this.state.conversionFactor / ((this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod))}>
+
+                                                                </Input>
+                                                            </FormGroup></>}
+                                                </>}
+                                            <FormGroup className="col-md-2" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 5 && this.state.currentItemConfig.parentItem.payload.nodeDataMap[0][0].fuNode.usageType.id == 2 ? 'block' : 'none' }}>
+                                                <Label htmlFor="currencyId">{i18n.t('static.tree.consumptionIntervalEveryXMonths')}<span class="red Reqasterisk">*</span></Label>
+                                            </FormGroup>
+                                            <FormGroup className="col-md-10" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 5 && this.state.currentItemConfig.parentItem.payload.nodeDataMap[0][0].fuNode.usageType.id == 2 ? 'block' : 'none' }}>
+                                                <Input type="text"
+                                                    id="refillMonths"
+                                                    name="refillMonths"
+                                                    valid={!errors.refillMonths && this.state.currentItemConfig.context.payload.nodeType.id == 5 && this.state.currentItemConfig.parentItem.payload.nodeDataMap[0][0].fuNode.usageType.id == 2 ? this.state.currentItemConfig.context.payload.nodeDataMap[0][0].puNode.refillMonths != '' : !errors.refillMonths}
+                                                    invalid={touched.refillMonths && !!errors.refillMonths}
+                                                    onBlur={handleBlur}
+                                                    onChange={(e) => {
+                                                        handleChange(e);
+                                                        this.dataChange(e)
+                                                    }}
+                                                    bsSize="sm"
+                                                    value={addCommas(this.state.currentItemConfig.context.payload.nodeType.id == 5 && (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.usageType.id == 2 ? (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.refillMonths : "")}>
+
+                                                </Input>
+                                                <FormFeedback className="red">{errors.refillMonths}</FormFeedback>
+                                            </FormGroup>
+                                            <FormGroup className="col-md-2" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 5 ? 'block' : 'none' }}>
+                                                <Label htmlFor="currencyId">{i18n.t('static.tree.willClientsShareOnePU?')}<span class="red Reqasterisk">*</span></Label>
+                                            </FormGroup>
+                                            <FormGroup className="col-md-10" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 5 ? 'block' : 'none' }}>
+                                                <Input type="select"
+                                                    id="sharePlanningUnit"
+                                                    name="sharePlanningUnit"
+                                                    bsSize="sm"
+                                                    valid={!errors.sharePlanningUnit && this.state.currentItemConfig.context.payload.nodeType.id == 5 ? this.state.currentItemConfig.context.payload.nodeDataMap[0][0].puNode.sharePlanningUnit != '' : !errors.sharePlanningUnit}
+                                                    invalid={touched.sharePlanningUnit && !!errors.sharePlanningUnit}
+                                                    onBlur={handleBlur}
+                                                    onChange={(e) => {
+                                                        handleChange(e);
+                                                        this.dataChange(e)
+                                                    }}
+                                                    value={this.state.currentItemConfig.context.payload.nodeType.id == 5 ? (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.sharePlanningUnit : ""}>
+
+                                                    <option value="">{i18n.t('static.common.select')}</option>
+                                                    <option value="true">Yes</option>
+                                                    <option value="false">No</option>
+
+                                                </Input>
+                                                <FormFeedback className="red">{errors.sharePlanningUnit}</FormFeedback>
+                                            </FormGroup>
+                                            {(this.state.currentItemConfig.context.payload.nodeType.id == 5) &&
+                                                <>
+                                                    <FormGroup className="col-md-2">
+                                                        <Label htmlFor="currencyId">{(this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.usageType.id == 2 ? "How many PU per interval per " : "How many PU per usage per "}{this.state.unitList.filter(c => c.unitId == this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id)[0].label.label_en}?<span class="red Reqasterisk">*</span></Label>
+                                                    </FormGroup>
+                                                    <FormGroup className="col-md-10">
+                                                        <Input type="text"
+                                                            id="puInterval"
+                                                            name="puInterval"
+                                                            readOnly={true}
+                                                            bsSize="sm"
+                                                            value={addCommas((this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.usageType.id == 2 ? ((((this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod) / this.state.conversionFactor) / (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.refillMonths) : ((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.sharePlanningUnit == "true" ? (this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor) : Math.round((this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor))))}>
+
+                                                        </Input>
+                                                    </FormGroup>
+                                                </>}
+                                        </div>
+                                        {/* <div className="col-md-12 pt-2 pl-2"><b>{this.state.usageText}</b></div> */}
+                                    </div>
+                                    {/* Plannign unit end */}
+                                    <div>
+                                        <div className="row">
+                                            <FormGroup className="col-md-6" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 4 ? 'block' : 'none' }}>
+                                                <Label htmlFor="currencyId">{i18n.t('static.tracercategory.tracercategory')}<span class="red Reqasterisk">*</span></Label>
                                                 <Input
                                                     type="select"
                                                     id="tracerCategoryId"
                                                     name="tracerCategoryId"
                                                     bsSize="sm"
-                                                    onChange={(e) => { this.dataChange(e); this.getForecastingUnitListByTracerCategoryId(e) }}
+                                                    valid={!errors.tracerCategoryId && this.state.currentItemConfig.context.payload.nodeType.id == 4 ? this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.forecastingUnit.tracerCategory.id != '' : !errors.tracerCategoryId}
+                                                    invalid={touched.tracerCategoryId && !!errors.tracerCategoryId}
+                                                    onBlur={handleBlur}
+                                                    onChange={(e) => {
+                                                        handleChange(e);
+                                                        this.dataChange(e); this.getForecastingUnitListByTracerCategoryId(e)
+                                                    }}
                                                     required
-                                                    value={(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.tracerCategory.id}
+                                                    value={this.state.currentItemConfig.context.payload.nodeType.id == 4 ? this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.forecastingUnit.tracerCategory.id : ""}
                                                 >
                                                     <option value="">{i18n.t('static.common.selecttracercategory')}</option>
                                                     {this.state.tracerCategoryList.length > 0
@@ -4541,16 +4827,20 @@ export default class CreateTreeTemplate extends Component {
                                                             )
                                                         }, this)}
                                                 </Input>
+                                                <FormFeedback className="red">{errors.tracerCategoryId}</FormFeedback>
                                             </FormGroup>
 
-                                            <FormGroup className="col-md-6">
-                                                <Label htmlFor="currencyId">Copy from Template</Label>
+                                            <FormGroup className="col-md-6" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 4 ? 'block' : 'none' }}>
+                                                <Label htmlFor="currencyId">{i18n.t('static.tree.copyFromTemplate')}</Label>
                                                 <Input
                                                     type="select"
                                                     name="usageTemplateId"
                                                     id="usageTemplateId"
                                                     bsSize="sm"
-                                                    onChange={(e) => { this.copyDataFromUsageTemplate(e); this.dataChange(e) }}
+                                                    valid={!errors.usageTemplateId && this.state.usageTemplateId != ''}
+                                                    invalid={touched.usageTemplateId && !!errors.usageTemplateId}
+                                                    onBlur={handleBlur}
+                                                    onChange={(e) => { handleChange(e); this.copyDataFromUsageTemplate(e); this.dataChange(e) }}
                                                     required
                                                     value={this.state.usageTemplateId}
                                                 >
@@ -4564,26 +4854,29 @@ export default class CreateTreeTemplate extends Component {
                                                             )
                                                         }, this)}
                                                 </Input>
+                                                {/* <FormFeedback className="red">{errors.usageTemplateId}</FormFeedback> */}
                                             </FormGroup>
-                                            <FormGroup className="col-md-12">
-                                                <Label htmlFor="currencyId">Forecasting Unit<span class="red Reqasterisk">*</span></Label>
+                                            <FormGroup className="col-md-12" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 4 ? 'block' : 'none' }}>
+                                                <Label htmlFor="currencyId">{i18n.t('static.product.unit1')}<span class="red Reqasterisk">*</span></Label>
                                                 <div className="controls fuNodeAutocomplete"
                                                 >
                                                     <Autocomplete
                                                         id="forecastingUnitId"
                                                         name="forecastingUnitId"
-                                                        // value={{ value: (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.id, label: (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.label.label_en }}
-                                                        defaultValue={{ value: (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.id, label: (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.label.label_en }}
+                                                        // value={{ value: this.state.currentScenario.fuNode.forecastingUnit.id, label: this.state.currentScenario.fuNode.forecastingUnit.label.label_en }}
+                                                        defaultValue={{ value: this.state.currentItemConfig.context.payload.nodeType.id == 4 ? this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.forecastingUnit.id : "", label: this.state.currentItemConfig.context.payload.nodeType.id == 4 ? this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.forecastingUnit.label.label_en : "" }}
                                                         options={this.state.autocompleteData}
                                                         getOptionLabel={(option) => option.label}
-                                                        // style={{ width: 730 }}
+                                                        // style={{ width: 1000 }}
                                                         onChange={(event, value) => {
                                                             console.log("combo 2 ro combo box---", value);
+                                                            // console.log("combo 2 ro combo box---", event.target.value);
                                                             // if(){
-                                                            (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.id = value.value;
+                                                            this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.forecastingUnit.id = value.value;
                                                             if (value != null) {
-                                                                (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.label.label_en = value.label;
+                                                                this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.forecastingUnit.label.label_en = value.label;
                                                             }
+                                                            console.log("autocomplete data---", this.state.currentItemConfig)
                                                             this.getForecastingUnitUnitByFUId(value.value);
 
                                                         }} // prints the selected value
@@ -4595,16 +4888,23 @@ export default class CreateTreeTemplate extends Component {
 
                                                 </div>
                                             </FormGroup>
-                                            <FormGroup className="col-md-6">
+
+                                            <FormGroup className="col-md-6" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 4 ? 'block' : 'none' }}>
                                                 <Label htmlFor="currencyId">{i18n.t('static.common.typeofuse')}<span class="red Reqasterisk">*</span></Label>
                                                 <Input
                                                     type="select"
                                                     id="usageTypeIdFU"
                                                     name="usageTypeIdFU"
                                                     bsSize="sm"
-                                                    onChange={(e) => { this.dataChange(e) }}
+                                                    valid={!errors.usageTypeIdFU && this.state.currentItemConfig.context.payload.nodeType.id == 4 ? this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usageType.id != '' : !errors.usageTypeIdFU}
+                                                    invalid={touched.usageTypeIdFU && !!errors.usageTypeIdFU}
+                                                    onBlur={handleBlur}
+                                                    onChange={(e) => {
+                                                        handleChange(e);
+                                                        this.dataChange(e)
+                                                    }}
                                                     required
-                                                    value={(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageType.id}
+                                                    value={this.state.currentItemConfig.context.payload.nodeType.id == 4 ? this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usageType.id : ""}
                                                 >
                                                     <option value="">{i18n.t('static.common.select')}</option>
                                                     {this.state.usageTypeList.length > 0
@@ -4616,36 +4916,52 @@ export default class CreateTreeTemplate extends Component {
                                                             )
                                                         }, this)}
                                                 </Input>
+                                                <FormFeedback className="red">{errors.usageTypeIdFU}</FormFeedback>
                                             </FormGroup>
-                                            <FormGroup className="col-md-6">
-                                                <Label htmlFor="currencyId">Lag in months (0=immediate)<span class="red Reqasterisk">*</span></Label>
+
+                                            <FormGroup className="col-md-6" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 4 ? 'block' : 'none' }}>
+                                                <Label htmlFor="currencyId">{i18n.t('static.tree.lagInMonth0Immediate')}<span class="red Reqasterisk">*</span></Label>
                                                 <Input type="text"
                                                     id="lagInMonths"
                                                     name="lagInMonths"
                                                     bsSize="sm"
-                                                    onChange={(e) => { this.dataChange(e) }}
-                                                    value={addCommas((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.lagInMonths)}
+                                                    valid={!errors.lagInMonths && this.state.currentItemConfig.context.payload.nodeType.id == 4 ? this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.lagInMonths != '' : !errors.lagInMonths}
+                                                    invalid={touched.lagInMonths && !!errors.lagInMonths}
+                                                    onBlur={handleBlur}
+                                                    onChange={(e) => {
+                                                        handleChange(e);
+                                                        this.dataChange(e)
+                                                    }}
+                                                    value={this.state.currentItemConfig.context.payload.nodeType.id == 4 ? this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.lagInMonths : ""}
                                                 ></Input>
+                                                <FormFeedback className="red">{errors.lagInMonths}</FormFeedback>
                                             </FormGroup>
                                         </div>
                                         <div className="row">
 
-                                            <FormGroup className="col-md-2">
-                                                <Label htmlFor="currencyId">Every<span class="red Reqasterisk">*</span></Label>
+                                            <FormGroup className="col-md-2" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 4 ? 'block' : 'none' }}>
+                                                <Label htmlFor="currencyId">{i18n.t('static.usageTemplate.every')}<span class="red Reqasterisk">*</span></Label>
 
                                             </FormGroup>
-                                            <FormGroup className="col-md-5">
+                                            <FormGroup className="col-md-5" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 4 ? 'block' : 'none' }} >
                                                 <Input type="text"
                                                     id="noOfPersons"
                                                     name="noOfPersons"
                                                     bsSize="sm"
-                                                    readOnly={(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageType.id == 2 ? true : false}
-                                                    onChange={(e) => { this.dataChange(e) }}
-                                                    value={addCommas((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.noOfPersons)}>
+                                                    valid={!errors.noOfPersons && this.state.currentItemConfig.context.payload.nodeType.id == 4 ? this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.noOfPersons != '' : !errors.noOfPersons}
+                                                    invalid={touched.noOfPersons && !!errors.noOfPersons}
+                                                    onBlur={handleBlur}
+                                                    readOnly={this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usageType.id == 2 ? true : false}
+                                                    onChange={(e) => {
+                                                        handleChange(e);
+                                                        this.dataChange(e)
+                                                    }}
+                                                    value={addCommas(this.state.currentItemConfig.context.payload.nodeType.id == 4 ? this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.noOfPersons : "")}>
 
                                                 </Input>
+                                                <FormFeedback className="red">{errors.noOfPersons}</FormFeedback>
                                             </FormGroup>
-                                            <FormGroup className="col-md-5">
+                                            <FormGroup className="col-md-5" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 4 ? 'block' : 'none' }}>
                                                 <Input type="select"
                                                     id="usageTypeParent"
                                                     name="usageTypeParent"
@@ -4664,25 +4980,34 @@ export default class CreateTreeTemplate extends Component {
                                                         }, this)}
                                                 </Input>
                                             </FormGroup>
-                                            <FormGroup className="col-md-2">
-                                                <Label htmlFor="currencyId">requires<span class="red Reqasterisk">*</span></Label>
+                                            <FormGroup className="col-md-2" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 4 ? 'block' : 'none' }}>
+                                                <Label htmlFor="currencyId">{i18n.t('static.tree.requires')}<span class="red Reqasterisk">*</span></Label>
                                             </FormGroup>
-                                            <FormGroup className="col-md-5">
+                                            <FormGroup className="col-md-5" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 4 ? 'block' : 'none' }}>
                                                 <Input type="text"
                                                     id="forecastingUnitPerPersonsFC"
                                                     name="forecastingUnitPerPersonsFC"
                                                     bsSize="sm"
-                                                    onChange={(e) => { this.dataChange(e) }}
-                                                    value={addCommas((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.noOfForecastingUnitsPerPerson)}></Input>
+                                                    valid={!errors.forecastingUnitPerPersonsFC && this.state.currentItemConfig.context.payload.nodeType.id == 4 ? this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.noOfForecastingUnitsPerPerson != '' : !errors.forecastingUnitPerPersonsFC}
+                                                    invalid={touched.forecastingUnitPerPersonsFC && !!errors.forecastingUnitPerPersonsFC}
+                                                    onBlur={handleBlur}
+                                                    onChange={(e) => {
+                                                        handleChange(e);
+                                                        this.dataChange(e)
+                                                    }}
+                                                    value={addCommas(this.state.currentItemConfig.context.payload.nodeType.id == 4 ? this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.noOfForecastingUnitsPerPerson : "")}>
+
+                                                </Input>
+                                                <FormFeedback className="red">{errors.forecastingUnitPerPersonsFC}</FormFeedback>
                                             </FormGroup>
-                                            <FormGroup className="col-md-5">
+                                            <FormGroup className="col-md-5" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 4 ? 'block' : 'none' }}>
                                                 <Input type="select"
                                                     id="forecastingUnitUnit"
                                                     name="forecastingUnitUnit"
                                                     bsSize="sm"
                                                     disabled="true"
                                                     onChange={(e) => { this.dataChange(e) }}
-                                                    value={(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.unit.id}>
+                                                    value={this.state.currentItemConfig.context.payload.nodeType.id == 4 ? this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.forecastingUnit.unit.id : ""}>
 
                                                     <option value=""></option>
                                                     {this.state.nodeUnitList.length > 0
@@ -4695,146 +5020,51 @@ export default class CreateTreeTemplate extends Component {
                                                         }, this)}
                                                 </Input>
                                             </FormGroup>
-                                            {(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageType.id == 1 &&
+                                            {/* {(this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usageType.id == 1) && */}
+                                            <>
+                                                <FormGroup className="col-md-2" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usageType.id == 1 ? 'block' : 'none' }}>
+                                                    <Label htmlFor="currencyId">{i18n.t('static.tree.singleUse')}<span class="red Reqasterisk">*</span></Label>
+                                                </FormGroup>
+                                                <FormGroup className="col-md-10" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usageType.id == 1 ? 'block' : 'none' }}>
+                                                    <Input type="select"
+                                                        id="oneTimeUsage"
+                                                        name="oneTimeUsage"
+                                                        bsSize="sm"
+                                                        valid={!errors.oneTimeUsage && this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usageType.id == 1 ? this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.oneTimeUsage != '' : !errors.oneTimeUsage}
+                                                        invalid={touched.oneTimeUsage && !!errors.oneTimeUsage}
+                                                        onBlur={handleBlur}
+                                                        onChange={(e) => {
+                                                            handleChange(e);
+                                                            this.dataChange(e)
+                                                        }}
+                                                        value={this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usageType.id == 1 ? this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.oneTimeUsage : ""}>
+
+                                                        <option value="">{i18n.t('static.common.select')}</option>
+                                                        <option value="true">{i18n.t('static.realm.yes')}</option>
+                                                        <option value="false">{i18n.t('static.program.no')}</option>
+
+                                                    </Input>
+                                                    <FormFeedback className="red">{errors.oneTimeUsage}</FormFeedback>
+                                                </FormGroup>
+                                                {/* <FormGroup className="col-md-5"></FormGroup> */}
+                                                {/* {this.state.currentScenario.fuNode.oneTimeUsage != "true" && */}
                                                 <>
-                                                    <FormGroup className="col-md-1">
-                                                        <Label for="isSync">Single Use </Label>
-                                                    </FormGroup>
-                                                    <div className="col-md-10" style={{ marginLeft: '4%' }}>
-                                                        <FormGroup className="ml-lg-3" check inline >
-                                                            <Input
-                                                                className="form-check-input"
-                                                                type="radio"
-                                                                id="oneTimeUsage1"
-                                                                name="oneTimeUsage"
-                                                                value={(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.oneTimeUsage}
-                                                                checked={(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.oneTimeUsage === "true"}
-                                                                onChange={(e) => { this.dataChange(e) }}
-                                                            />
-                                                            <Label
-                                                                className="form-check-label"
-                                                                check htmlFor="inline-radio1">
-                                                                {i18n.t('static.program.yes')}
-                                                            </Label>
-                                                        </FormGroup>
-                                                        <FormGroup check inline>
-                                                            <Input
-                                                                className="form-check-input"
-                                                                type="radio"
-                                                                id="oneTimeUsage2"
-                                                                name="oneTimeUsage"
-                                                                value={(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.oneTimeUsage}
-                                                                checked={this.state.addNodeFlag ? true : (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.oneTimeUsage === "false"}
-                                                                onChange={(e) => { this.dataChange(e) }}
-                                                            />
-                                                            <Label
-                                                                className="form-check-label"
-                                                                check htmlFor="inline-radio2">
-                                                                {i18n.t('static.program.no')}
-                                                            </Label>
-                                                        </FormGroup>
-                                                    </div>
-                                                    {/* <FormGroup className="col-md-2">
-                                                        <Label htmlFor="currencyId">Single Use<span class="red Reqasterisk">*</span></Label>
-                                                    </FormGroup>
-                                                    <FormGroup className="col-md-10">
-                                                        <Input type="select"
-                                                            id="oneTimeUsage"
-                                                            name="oneTimeUsage"
-                                                            bsSize="sm"
-                                                            onChange={(e) => { this.dataChange(e) }}
-                                                            value={(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.oneTimeUsage}>
-
-                                                            <option value="">{i18n.t('static.common.select')}</option>
-                                                            <option value="true">Yes</option>
-                                                            <option value="false">No</option>
-
-                                                        </Input>
-                                                    </FormGroup> */}
-                                                    {/* <FormGroup className="col-md-5"></FormGroup> */}
-                                                    {(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.oneTimeUsage != "true" &&
-                                                        <>
-                                                            <FormGroup className="col-md-2"></FormGroup>
-                                                            <FormGroup className="col-md-4">
-                                                                <Input type="text"
-                                                                    name="usageFrequency"
-                                                                    bsSize="sm"
-                                                                    onChange={(e) => { this.dataChange(e) }}
-                                                                    value={(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageFrequency}></Input>
-                                                            </FormGroup>
-                                                            <FormGroup className="col-md-2">
-                                                                <Input type="text"
-                                                                    name="timesPer"
-                                                                    bsSize="sm"
-                                                                    readOnly={true}
-                                                                    value={'times per'}></Input>
-                                                            </FormGroup>
-                                                            <FormGroup className="col-md-4">
-                                                                <Input
-                                                                    type="select"
-                                                                    id="usagePeriodId"
-                                                                    name="usagePeriodId"
-                                                                    bsSize="sm"
-                                                                    onChange={(e) => { this.dataChange(e) }}
-                                                                    required
-                                                                    value={(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usagePeriod.usagePeriodId}
-                                                                >
-                                                                    <option value="">{i18n.t('static.common.select')}</option>
-                                                                    {this.state.usagePeriodList.length > 0
-                                                                        && this.state.usagePeriodList.map((item, i) => {
-                                                                            return (
-                                                                                <option key={i} value={item.usagePeriodId}>
-                                                                                    {getLabelText(item.label, this.state.lang)}
-                                                                                </option>
-                                                                            )
-                                                                        }, this)}
-                                                                </Input>
-                                                            </FormGroup>
-                                                            <FormGroup className="col-md-2">
-                                                                <Label htmlFor="currencyId">for<span class="red Reqasterisk">*</span></Label>
-                                                            </FormGroup>
-                                                            <FormGroup className="col-md-5">
-                                                                <Input type="text"
-                                                                    id="repeatCount"
-                                                                    name="repeatCount"
-                                                                    bsSize="sm"
-                                                                    onChange={(e) => { this.dataChange(e) }}
-                                                                    value={addCommas((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.repeatCount)}></Input>
-                                                            </FormGroup>
-                                                            <FormGroup className="col-md-5">
-                                                                <Input type="select"
-                                                                    id="repeatUsagePeriodId"
-                                                                    name="repeatUsagePeriodId"
-                                                                    bsSize="sm"
-                                                                    onChange={(e) => { this.dataChange(e) }}
-                                                                    value={(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.repeatUsagePeriod != null ? (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.repeatUsagePeriod.usagePeriodId : ''}>
-
-                                                                    <option value="">{i18n.t('static.common.select')}</option>
-                                                                    {this.state.usagePeriodList.length > 0
-                                                                        && this.state.usagePeriodList.map((item, i) => {
-                                                                            return (
-                                                                                <option key={i} value={item.usagePeriodId}>
-                                                                                    {getLabelText(item.label, this.state.lang)}
-                                                                                </option>
-                                                                            )
-                                                                        }, this)}
-                                                                </Input>
-                                                            </FormGroup></>}
-                                                </>
-                                            }
-                                            {(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageType.id == 2 &&
-                                                <>
-                                                    <FormGroup className="col-md-2">
-                                                        <Label htmlFor="currencyId">every<span class="red Reqasterisk">*</span></Label>
-                                                    </FormGroup>
-                                                    <FormGroup className="col-md-5">
+                                                    <FormGroup className="col-md-2" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usageType.id == 1 && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.oneTimeUsage != "true" ? 'block' : 'none' }}></FormGroup>
+                                                    <FormGroup className="col-md-4" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usageType.id == 1 && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.oneTimeUsage != "true" ? 'block' : 'none' }}>
                                                         <Input type="text"
                                                             name="usageFrequency"
                                                             bsSize="sm"
                                                             onChange={(e) => { this.dataChange(e) }}
-                                                            value={(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageFrequency}></Input>
+                                                            value={this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usageType.id == 1 && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.oneTimeUsage != "true" ? this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usageFrequency : ""}></Input>
                                                     </FormGroup>
-                                                    <FormGroup className="col-md-5">
+                                                    <FormGroup className="col-md-2" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usageType.id == 1 && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.oneTimeUsage != "true" ? 'block' : 'none' }}>
+                                                        <Input type="text"
+                                                            name="timesPer"
+                                                            bsSize="sm"
+                                                            readOnly={true}
+                                                            value={i18n.t('static.tree.timesPer')}></Input>
+                                                    </FormGroup>
+                                                    <FormGroup className="col-md-4" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usageType.id == 1 && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.oneTimeUsage != "true" ? 'block' : 'none' }}>
                                                         <Input
                                                             type="select"
                                                             id="usagePeriodId"
@@ -4842,7 +5072,7 @@ export default class CreateTreeTemplate extends Component {
                                                             bsSize="sm"
                                                             onChange={(e) => { this.dataChange(e) }}
                                                             required
-                                                            value={(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usagePeriod.usagePeriodId}
+                                                            value={this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usageType.id == 1 && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.oneTimeUsage != "true" ? this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usagePeriod.usagePeriodId : ""}
                                                         >
                                                             <option value="">{i18n.t('static.common.select')}</option>
                                                             {this.state.usagePeriodList.length > 0
@@ -4855,42 +5085,148 @@ export default class CreateTreeTemplate extends Component {
                                                                 }, this)}
                                                         </Input>
                                                     </FormGroup>
-                                                </>}
-                                            <div style={{ clear: 'both', width: '100%' }} className="pl-lg-3 pr-lg-3">
-                                                {(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageType.id == 2 &&
+                                                    <FormGroup className="col-md-2" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usageType.id == 1 && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.oneTimeUsage != "true" ? 'block' : 'none' }}>
+                                                        <Label htmlFor="currencyId">for<span class="red Reqasterisk">*</span></Label>
+                                                    </FormGroup>
+                                                    <FormGroup className="col-md-5" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usageType.id == 1 && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.oneTimeUsage != "true" ? 'block' : 'none' }}>
+                                                        <Input type="text"
+                                                            id="repeatCount"
+                                                            name="repeatCount"
+                                                            bsSize="sm"
+                                                            valid={!errors.repeatCount && this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usageType.id == 1 && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.oneTimeUsage != "true" ? this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.repeatCount != '' : !errors.repeatCount}
+                                                            invalid={touched.repeatCount && !!errors.repeatCount}
+                                                            onBlur={handleBlur}
+                                                            onChange={(e) => {
+                                                                handleChange(e);
+                                                                this.dataChange(e)
+                                                            }}
+                                                            value={addCommas(this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usageType.id == 1 && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.oneTimeUsage != "true" ? this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.repeatCount : "")}>
+                                                        </Input>
+                                                        <FormFeedback className="red">{errors.repeatCount}</FormFeedback>
+                                                    </FormGroup>
+                                                    <FormGroup className="col-md-5" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usageType.id == 1 && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.oneTimeUsage != "true" ? 'block' : 'none' }}>
+                                                        <Input type="select"
+                                                            id="repeatUsagePeriodId"
+                                                            name="repeatUsagePeriodId"
+                                                            bsSize="sm"
+                                                            onChange={(e) => { this.dataChange(e) }}
+                                                            value={this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usageType.id == 1 && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.oneTimeUsage != "true" && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.repeatUsagePeriod != null ? this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.repeatUsagePeriod.usagePeriodId : ''}>
+
+                                                            <option value="">{i18n.t('static.common.select')}</option>
+                                                            {this.state.usagePeriodList.length > 0
+                                                                && this.state.usagePeriodList.map((item, i) => {
+                                                                    return (
+                                                                        <option key={i} value={item.usagePeriodId}>
+                                                                            {getLabelText(item.label, this.state.lang)}
+                                                                        </option>
+                                                                    )
+                                                                }, this)}
+                                                        </Input>
+                                                    </FormGroup></>
+
+                                                {/* // } */}
+                                            </>
+                                            {/* // } */}
+
+
+
+                                            {/* {(this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentScenario.fuNode.usageType.id == 2) && */}
+                                            <>
+
+                                                <FormGroup className="col-md-2" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usageType.id == 2 ? 'block' : 'none' }}>
+                                                    <Label htmlFor="currencyId">{i18n.t('static.usageTemplate.every')}<span class="red Reqasterisk">*</span></Label>
+                                                </FormGroup>
+                                                <FormGroup className="col-md-5" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usageType.id == 2 ? 'block' : 'none' }}>
+                                                    <Input type="text"
+                                                        id="usageFrequency"
+                                                        name="usageFrequency"
+                                                        bsSize="sm"
+                                                        // valid={!errors.usageFrequency && (this.state.currentItemConfig.context.payload.nodeType.id == 4 ? this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usageFrequency != "" : false)}
+                                                        // invalid={touched.usageFrequency && !!errors.usageFrequency}
+                                                        // onBlur={handleBlur}
+                                                        onChange={(e) => {
+                                                            // handleChange(e); 
+                                                            this.dataChange(e)
+                                                        }}
+                                                        value={this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usageType.id == 2 ? this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usageFrequency : ""}></Input>
+                                                    {/* <FormFeedback className="red">{errors.usageFrequency}</FormFeedback> */}
+                                                </FormGroup>
+                                                <FormGroup className="col-md-5" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageType.id == 2 ? 'block' : 'none' }}>
+                                                    <Input
+                                                        type="select"
+                                                        id="usagePeriodId"
+                                                        name="usagePeriodId"
+                                                        bsSize="sm"
+                                                        // valid={!errors.usagePeriodId && (this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usageType.id == 2 ? this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usageFrequency != "" : false)}
+                                                        // invalid={touched.usagePeriodId && !!errors.usagePeriodId}
+                                                        onBlur={handleBlur}
+                                                        onChange={(e) => {
+                                                            // handleChange(e); 
+                                                            this.dataChange(e)
+                                                        }}
+                                                        required
+                                                        value={this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageType.id == 2 ? (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usagePeriod.usagePeriodId : ""}
+                                                    >
+                                                        <option value="">{i18n.t('static.common.select')}</option>
+                                                        {this.state.usagePeriodList.length > 0
+                                                            && this.state.usagePeriodList.map((item, i) => {
+                                                                return (
+                                                                    <option key={i} value={item.usagePeriodId}>
+                                                                        {getLabelText(item.label, this.state.lang)}
+                                                                    </option>
+                                                                )
+                                                            }, this)}
+                                                    </Input>
+                                                    {/* <FormFeedback className="red">{errors.usagePeriodId}</FormFeedback> */}
+                                                </FormGroup>
+                                            </>
+
+                                            {/* } */}
+
+                                            <div className="pl-lg-3 pr-lg-3" style={{ clear: 'both', width: '100%' }}>
+                                                {(this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageType.id == 2) &&
                                                     <table className="table table-bordered">
                                                         <tr>
-                                                            <td># of FU required for period</td>
-                                                            <td>{addCommas((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.noOfForecastingUnitsPerPerson)}</td>
+                                                            <td>{i18n.t('static.tree.#OfFURequiredForPeriod')}</td>
+                                                            <td>{addCommas(this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.noOfForecastingUnitsPerPerson)}</td>
                                                         </tr>
                                                         <tr>
-                                                            <td># of months in period</td>
+                                                            <td>{i18n.t('static.tree.#OfMonthsInPeriod')}</td>
                                                             <td>{addCommas(this.state.noOfMonthsInUsagePeriod)}</td>
                                                         </tr>
                                                         <tr>
-                                                            <td># of FU / month / {this.state.currentItemConfig.context.payload.nodeType.id == 4 ? this.state.nodeUnitList.filter(c => c.unitId == this.state.usageTypeParent)[0].label.label_en : ""}</td>
-                                                            <td>{addCommas((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod)}</td>
+                                                            <td>{i18n.t('static.tree.#OfFU/month/')} {this.state.nodeUnitList.filter(c => c.unitId == this.state.usageTypeParent)[0].label.label_en}</td>
+                                                            {this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usagePeriod.usagePeriodId != "" &&
+                                                                <td>{addCommas((this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.noOfForecastingUnitsPerPerson / this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usageFrequency) * (this.state.usagePeriodList.filter(c => c.usagePeriodId == this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usagePeriod.usagePeriodId))[0].convertToMonth)}</td>}
+                                                            {this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usagePeriod.usagePeriodId == "" &&
+                                                                <td></td>}
+                                                            {/* <td>{addCommas((this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.noOfForecastingUnitsPerPerson / this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usageFrequency) * (this.state.usagePeriodList.filter(c => c.usagePeriodId == this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usagePeriod.usagePeriodId))[0].convertToMonth)}</td> */}
                                                         </tr>
                                                     </table>}
-                                                {(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageType.id == 1 &&
+                                                {(this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usageType.id == 1) &&
                                                     <table className="table table-bordered">
                                                         <tr>
-                                                            <td># of FU / {this.state.currentItemConfig.context.payload.nodeType.id == 4 ? this.state.nodeUnitList.filter(c => c.unitId == this.state.usageTypeParent)[0].label.label_en : ""}</td>
+                                                            <td>{i18n.t('static.tree.#OfFU/')} {this.state.nodeUnitList.filter(c => c.unitId == this.state.usageTypeParent)[0].label.label_en}</td>
                                                             <td>{addCommas(this.state.noOfFUPatient)}</td>
                                                         </tr>
                                                         <tr>
-                                                            <td># of FU / month / {this.state.currentItemConfig.context.payload.nodeType.id == 4 ? this.state.nodeUnitList.filter(c => c.unitId == this.state.usageTypeParent)[0].label.label_en : ""}</td>
+                                                            <td>{i18n.t('static.tree.#OfFU/month/')} {this.state.nodeUnitList.filter(c => c.unitId == this.state.usageTypeParent)[0].label.label_en}</td>
                                                             <td>{addCommas(this.state.noOfMonthsInUsagePeriod)}</td>
                                                         </tr>
                                                         <tr>
-                                                            <td># of FU required</td>
+                                                            <td>{i18n.t('static.tree.#OfFURequiredForPeriod')}</td>
                                                             <td>{addCommas(this.state.noFURequired)}</td>
                                                         </tr>
                                                     </table>}
                                             </div>
-                                            <div className="col-md-12 pt-2 pl-2 pb-lg-3"><b>{this.state.usageText}</b></div>
+
                                         </div>
-                                    </div>}
+                                    </div>
+
+                                    {/* } */}
+                                    {(this.state.currentItemConfig.context.payload.nodeType.id == 4 || this.state.currentItemConfig.context.payload.nodeType.id == 5) &&
+                                        <div className="col-md-12 pt-2 pl-2 pb-lg-3"><b>{this.state.usageText}</b></div>
+                                    }
                                     {/* disabled={!isValid} */}
                                     <FormGroup className="pb-lg-3">
                                         <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setState({ openAddNodeModal: false, cursorItem: 0, highlightItem: 0, activeTab1: new Array(2).fill('1') })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
@@ -4972,7 +5308,7 @@ export default class CreateTreeTemplate extends Component {
                                 </>
                             }
                             <div><Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.showMomData()}> <i className="fa fa-eye" style={{ color: '#fff' }}></i> {i18n.t('static.tree.viewMonthlyData')}</Button>
-                                {this.state.showModelingJexcelNumber && <><Button color="success" size="md" className="float-right mr-1" type="button" onClick={() => this.formSubmit()}> <i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
+                                {this.state.showModelingJexcelNumber && <><Button color="success" size="md" className="float-right mr-1" type="button" onClick={(e) => this.formSubmitLoader(e)}> <i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
                                     <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button></>}
                             </div>
                         </div>
@@ -5725,6 +6061,7 @@ export default class CreateTreeTemplate extends Component {
                                                         {
                                                             nodeDataModelingList: [],
                                                             nodeDataOverrideList: [],
+                                                            nodeDataMomList: [],
                                                             month: new Date(),
                                                             dataValue: '',
                                                             calculatedDataValue: '',
@@ -5745,7 +6082,7 @@ export default class CreateTreeTemplate extends Component {
 
                                                                 },
                                                                 usagePeriod: {
-
+                                                                    usagePeriodId: ''
                                                                 },
                                                                 repeatUsagePeriod: {
 
@@ -5917,7 +6254,7 @@ export default class CreateTreeTemplate extends Component {
         }
         return <div className="animated fadeIn">
             <AuthenticationServiceComponent history={this.props.history} />
-            <h5 className="red" id="div2">
+            <h5 className={this.state.color} id="div2">
                 {i18n.t(this.state.message, { entityname })}</h5>
             <Row>
                 <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
@@ -5978,7 +6315,7 @@ export default class CreateTreeTemplate extends Component {
                                                                 // month: (item.payload.nodeDataMap[0])[0].month,
                                                                 month: '2021-09-01',
                                                                 nodeDataId: (item.payload.nodeDataMap[0])[0].nodeDataId,
-                                                                dataValue: (item.payload.nodeDataMap[0])[0].dataValue.toString().replaceAll(",", ""),
+                                                                dataValue: (item.payload.nodeDataMap[0])[0].dataValue,
                                                                 fuNode: (item.payload.nodeDataMap[0])[0].fuNode,
                                                                 puNode: (item.payload.nodeDataMap[0])[0].puNode,
                                                                 notes: (item.payload.nodeDataMap[0])[0].notes,
@@ -6037,11 +6374,11 @@ export default class CreateTreeTemplate extends Component {
                                                             treeTemplate: response.data,
                                                             items,
                                                             message: i18n.t('static.message.addTreeTemplate'),
+                                                            color: 'green',
                                                             loading: false
                                                         }, () => {
-                                                            console.log(">>>", new Date('2021-01-01').getFullYear(), "+", ("0" + (new Date('2021-12-01').getMonth() + 1)).slice(-2));
-                                                            console.log("Tree Template---", this.state.items);
-                                                        })
+                                                            this.hideSecondComponent();
+                                                        });
                                                         // this.props.history.push(`/dataset/listTreeTemplate/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                                                     } else {
                                                         this.setState({
@@ -6121,11 +6458,11 @@ export default class CreateTreeTemplate extends Component {
                                                             treeTemplate: response.data,
                                                             items,
                                                             message: i18n.t('static.message.editTreeTemplate'),
-                                                            loading: false
+                                                            loading: false,
+                                                            color: 'green'
                                                         }, () => {
-                                                            console.log(">>>", new Date('2021-01-01').getFullYear(), "+", ("0" + (new Date('2021-12-01').getMonth() + 1)).slice(-2));
-                                                            console.log("Tree Template---", this.state.items);
-                                                        })
+                                                            this.hideSecondComponent();
+                                                        });
                                                         // this.props.history.push(`/dataset/listTreeTemplate/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                                                     } else {
                                                         this.setState({

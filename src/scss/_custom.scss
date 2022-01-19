@@ -5785,3 +5785,25 @@ font-style: italic!important;
   border-top:0px!important;
   border-left:0px!important;
 }
+
+.hoverDiv {
+  color: #205493;
+    text-decoration: none;
+    background-color: transparent
+}
+
+.hoverDiv :hover{
+  color: #167495;
+    text-decoration: none !important;
+    cursor: pointer;
+}
+
+@media print {
+  thead {display: table-row-group;}
+  table tbody tr td:before,
+    table tbody tr td:after {
+        content : "" ;
+        height : 4px ;
+        display : block ;
+    }
+}
