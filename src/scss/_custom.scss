@@ -5826,3 +5826,12 @@ font-style: italic!important;
   max-height: calc(100vh - 300px)!important;
   overflow: scroll;
 }
+@media print {
+  thead {display: table-row-group;}
+  table tbody tr td:before,
+    table tbody tr td:after {
+        content : "" ;
+        height : 4px ;
+        display : block ;
+    }
+}

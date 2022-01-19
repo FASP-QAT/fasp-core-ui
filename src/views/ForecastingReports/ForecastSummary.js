@@ -238,15 +238,15 @@ class ForecastSummary extends Component {
         csvRow.push('')
         csvRow.push('"' + (i18n.t('static.report.version*') + ' : ' + document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
         csvRow.push('')
-        csvRow.push('"' + ('Forecast Period' + ' : ' + document.getElementById("forecastPeriod").value).replaceAll(' ', '%20') + '"')
+        csvRow.push('"' + (i18n.t('static.common.forecastPeriod') + ' : ' + document.getElementById("forecastPeriod").value).replaceAll(' ', '%20') + '"')
         csvRow.push('')
-        csvRow.push('"' + ('Display' + ' : ' + document.getElementById("displayId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+        csvRow.push('"' + (i18n.t('static.forecastReport.display') + ' : ' + document.getElementById("displayId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
         csvRow.push('')
 
         let viewById = document.getElementById("displayId").value;
 
         if (viewById == 1) {//National
-            csvRow.push('"' + ('Hide Calculations' + ' : ' + document.getElementById("calculationId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+            csvRow.push('"' + (i18n.t('static.forecastReport.hideCalculations') + ' : ' + document.getElementById("calculationId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
             csvRow.push('')
         }
 
@@ -255,22 +255,22 @@ class ForecastSummary extends Component {
         if (viewById == 1) {//National----1
             const headers = [];
             headers.push('');
-            headers.push('Planning Unit');
-            headers.push('Total Forecasted Quantity');
+            headers.push(i18n.t('static.product.product'));
+            headers.push(i18n.t('static.forecastReport.totalForecastQuantity'));
             if (!this.state.hideColumn) {
-                headers.push('Stock (end of ' + this.state.beforeEndDateDisplay + ')');
-                headers.push('Existing Shipments (' + this.state.startDateDisplay + ' - ' + this.state.endDateDisplay + ')');
-                headers.push('Stock (end of ' + this.state.endDateDisplay + ')');
-                headers.push('Desired Months of Stock (end of' + this.state.endDateDisplay + ')');
-                headers.push('Desired Stock (end of ' + this.state.endDateDisplay + ')');
+                headers.push(i18n.t('static.report.stock') + i18n.t('static.forecastReport.endOf') + this.state.beforeEndDateDisplay + ')');
+                headers.push(i18n.t('static.forecastReport.existingShipments') + '(' + this.state.startDateDisplay + ' - ' + this.state.endDateDisplay + ')');
+                headers.push(i18n.t('static.report.stock') + i18n.t('static.forecastReport.endOf') + this.state.endDateDisplay + ')');
+                headers.push(i18n.t('static.forecastReport.desiredMonthsOfStock') + i18n.t('static.forecastReport.endOf') + this.state.endDateDisplay + ')');
+                headers.push(i18n.t('static.forecastReport.desiredStock') + i18n.t('static.forecastReport.endOf') + this.state.endDateDisplay + ')');
             }
-            headers.push('Procurement Surplus/Gap');
+            headers.push(i18n.t('static.forecastReport.procurementSurplus'));
             if (!this.state.hideColumn) {
-                headers.push('Price Type');
-                headers.push('Unit Price (USD)');
+                headers.push(i18n.t('static.forecastReport.priceType'));
+                headers.push(i18n.t('static.forecastReport.unitPrice') + ' (USD)');
             }
-            headers.push('Procurements Needed (USD)');
-            headers.push('Notes');
+            headers.push(i18n.t('static.forecastReport.ProcurementsNeeded') + '(USD)');
+            headers.push(i18n.t('static.program.notes'));
 
             var A = [this.addDoubleQuoteToRowContent(headers)]
 
@@ -322,7 +322,7 @@ class ForecastSummary extends Component {
                     '',
                     '',
                     '',
-                    'Product Cost',
+                    i18n.t('static.forecastReport.productCost'),
                     this.state.totalProductCost,
                     ''
                 ]))
@@ -337,7 +337,7 @@ class ForecastSummary extends Component {
                     '',
                     '',
                     '',
-                    'Freight (7%)',
+                    i18n.t('static.forecastReport.freight') + '(7%)',
                     (0.07 * this.state.totalProductCost),
                     ''
                 ]))
@@ -352,7 +352,7 @@ class ForecastSummary extends Component {
                     '',
                     '',
                     '',
-                    'Total Cost',
+                    i18n.t('static.shipment.totalCost'),
                     (this.state.totalProductCost + 0.07 * this.state.totalProductCost),
                     ''
                 ]))
@@ -361,7 +361,7 @@ class ForecastSummary extends Component {
                     '',
                     '',
                     '',
-                    'Product Cost',
+                    i18n.t('static.forecastReport.productCost'),
                     this.state.totalProductCost,
                     ''
                 ]))
@@ -369,7 +369,7 @@ class ForecastSummary extends Component {
                     '',
                     '',
                     '',
-                    'Freight (7%)',
+                    i18n.t('static.forecastReport.freight') + '(7%)',
                     (0.07 * this.state.totalProductCost),
                     ''
                 ]))
@@ -377,7 +377,7 @@ class ForecastSummary extends Component {
                     '',
                     '',
                     '',
-                    'Total Cost',
+                    i18n.t('static.shipment.totalCost'),
                     (this.state.totalProductCost + 0.07 * this.state.totalProductCost),
                     ''
                 ]))
@@ -394,7 +394,7 @@ class ForecastSummary extends Component {
             var a = document.createElement("a")
             a.href = 'data:attachment/csv,' + csvString
             a.target = "_Blank"
-            a.download = 'Forecast Summary' + ".csv"
+            a.download = i18n.t('static.forecastReport.forecastSummary') + ".csv"
             document.body.appendChild(a)
             a.click();
 
@@ -411,18 +411,18 @@ class ForecastSummary extends Component {
                 nestedHeaders.push(regRegionList[k].label.label_en);
                 nestedHeaders.push('');
             }
-            nestedHeaders.push('All Regions');
+            nestedHeaders.push(i18n.t('static.forecastReport.allRegions'));
             var A = [this.addDoubleQuoteToRowContent(nestedHeaders)]
 
             const headers = [];
-            headers.push('Planning Unit');
+            headers.push(i18n.t('static.product.product'));
             for (var k = 0; k < regRegionList.length; k++) {
-                headers.push('Selected Forecast');
-                headers.push('Forecast Quantity');
-                headers.push('Notes');
+                headers.push(i18n.t('static.compareVersion.selectedForecast'));
+                headers.push(i18n.t('static.forecastReport.forecastQuantity'));
+                headers.push(i18n.t('static.program.notes'));
             }
 
-            headers.push('Total Forecasted Qunatity');
+            headers.push(i18n.t('static.forecastReport.totalForecastQuantity'));
             A.push([this.addDoubleQuoteToRowContent(headers)]);
 
             for (var tc = 0; tc < tcList.length; tc++) {
@@ -472,7 +472,7 @@ class ForecastSummary extends Component {
             var a = document.createElement("a")
             a.href = 'data:attachment/csv,' + csvString
             a.target = "_Blank"
-            a.download = 'Forecast Summary' + ".csv"
+            a.download = i18n.t('static.forecastReport.forecastSummary') + ".csv"
             document.body.appendChild(a)
             a.click();
 
@@ -517,7 +517,7 @@ class ForecastSummary extends Component {
                 doc.addImage(LOGO, 'png', 0, 10, 180, 50, 'FAST');
 
                 doc.setTextColor("#002f6c");
-                doc.text('Forecast Summary', doc.internal.pageSize.width / 2, 60, {
+                doc.text(i18n.t('static.forecastReport.forecastSummary'), doc.internal.pageSize.width / 2, 60, {
                     align: 'center'
                 })
                 if (i == 1) {
@@ -532,13 +532,13 @@ class ForecastSummary extends Component {
                     doc.text(i18n.t('static.report.dateRange') + ' : ' + document.getElementById("forecastPeriod").value, doc.internal.pageSize.width / 8, 130, {
                         align: 'left'
                     })
-                    doc.text('Display' + ' : ' + document.getElementById("displayId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 150, {
+                    doc.text(i18n.t('static.forecastReport.display') + ' : ' + document.getElementById("displayId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 150, {
                         align: 'left'
                     })
 
                     let viewById = document.getElementById("displayId").value;
                     if (viewById == 1) {//National
-                        doc.text('Hide Calculations' + ' : ' + document.getElementById("calculationId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 170, {
+                        doc.text(i18n.t('static.forecastReport.hideCalculations') + ' : ' + document.getElementById("calculationId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 170, {
                             align: 'left'
                         })
                     }
@@ -591,12 +591,12 @@ class ForecastSummary extends Component {
                 header1.push({ content: regRegionList[k].label.label_en, colSpan: 3, styles: { halign: 'center' } })
 
                 header2.push(
-                    { content: 'Selected Forecast', styles: { halign: 'center' } },
-                    { content: 'Forecast Quantity', styles: { halign: 'center' } },
-                    { content: 'Notes', styles: { halign: 'center' } }
+                    { content: i18n.t('static.compareVersion.selectedForecast'), styles: { halign: 'center' } },
+                    { content: i18n.t('static.forecastReport.forecastQuantity'), styles: { halign: 'center' } },
+                    { content: i18n.t('static.program.notes'), styles: { halign: 'center' } }
                 )
             }
-            header1.push({ content: 'Total Forecasted Qunatity', rowSpan: 2, styles: { halign: 'center' } });
+            header1.push({ content: i18n.t('static.forecastReport.totalForecastQuantity'), rowSpan: 2, styles: { halign: 'center' } });
             let header = [header1, header2];
             let data = [];
             for (var tc = 0; tc < tcList.length; tc++) {
@@ -654,19 +654,19 @@ class ForecastSummary extends Component {
             doc.autoTable(content);
             addHeaders(doc)
             addFooters(doc)
-            doc.save('Forecast Summary' + ".pdf")
+            doc.save(i18n.t('static.forecastReport.forecastSummary') + ".pdf")
         } else {//National
 
             let headers = [];
-            let headers1 = ['', 'Planning Unit', 'Total Forecasted Quantity'];
+            let headers1 = ['', i18n.t('static.product.product'), i18n.t('static.forecastReport.totalForecastQuantity')];
             if (!this.state.hideColumn) {
-                headers1 = headers1.concat(['Stock (end of ' + this.state.beforeEndDateDisplay + ')', 'Existing Shipments (' + this.state.startDateDisplay + ' - ' + this.state.endDateDisplay + ')', 'Stock (end of ' + this.state.endDateDisplay + ')', 'Desired Months of Stock (end of' + this.state.endDateDisplay + ')', 'Desired Stock (end of ' + this.state.endDateDisplay + ')']);
+                headers1 = headers1.concat([i18n.t('static.report.stock') + i18n.t('static.forecastReport.endOf') + this.state.beforeEndDateDisplay + ')', i18n.t('static.forecastReport.existingShipments') + '(' + this.state.startDateDisplay + ' - ' + this.state.endDateDisplay + ')', i18n.t('static.report.stock') + i18n.t('static.forecastReport.endOf') + this.state.endDateDisplay + ')', i18n.t('static.forecastReport.desiredMonthsOfStock') + i18n.t('static.forecastReport.endOf') + this.state.endDateDisplay + ')', i18n.t('static.forecastReport.desiredStock') + i18n.t('static.forecastReport.endOf') + this.state.endDateDisplay + ')']);
             }
-            headers1 = headers1.concat(['Procurement Surplus/Gap']);
+            headers1 = headers1.concat([i18n.t('static.forecastReport.procurementSurplus')]);
             if (!this.state.hideColumn) {
-                headers1 = headers1.concat(['Price Type', 'Unit Price (USD)']);
+                headers1 = headers1.concat([i18n.t('static.forecastReport.priceType'), i18n.t('static.forecastReport.unitPrice') + '(USD)']);
             }
-            headers1 = headers1.concat(['Procurements Needed (USD)', 'Notes']);
+            headers1 = headers1.concat([i18n.t('static.forecastReport.ProcurementsNeeded') + '(USD)', i18n.t('static.program.notes')]);
             headers.push(headers1);
             // const data = this.state.matricsList.map(elt => [this.dateFormatter(elt.month), this.formatter(elt.forecastedConsumption), this.formatter(elt.actualConsumption), elt.message == null ? this.PercentageFormatter(elt.forecastError) : i18n.t(elt.message)]);
             let data = [];
@@ -714,7 +714,7 @@ class ForecastSummary extends Component {
                     '',
                     '',
                     '',
-                    'Product Cost',
+                    i18n.t('static.forecastReport.productCost'),
                     this.state.totalProductCost,
                     ''
                 ])
@@ -729,7 +729,7 @@ class ForecastSummary extends Component {
                     '',
                     '',
                     '',
-                    'Freight (7%)',
+                    i18n.t('static.forecastReport.freight') + '(7%)',
                     (0.07 * this.state.totalProductCost),
                     ''
                 ])
@@ -744,7 +744,7 @@ class ForecastSummary extends Component {
                     '',
                     '',
                     '',
-                    'Total Cost',
+                    i18n.t('static.shipment.totalCost'),
                     (this.state.totalProductCost + 0.07 * this.state.totalProductCost),
                     ''
                 ])
@@ -753,7 +753,7 @@ class ForecastSummary extends Component {
                     '',
                     '',
                     '',
-                    'Product Cost',
+                    i18n.t('static.forecastReport.productCost'),
                     this.state.totalProductCost,
                     ''
                 ])
@@ -761,7 +761,7 @@ class ForecastSummary extends Component {
                     '',
                     '',
                     '',
-                    'Freight (7%)',
+                    i18n.t('static.forecastReport.freight') + '(7%)',
                     (0.07 * this.state.totalProductCost),
                     ''
                 ])
@@ -769,7 +769,7 @@ class ForecastSummary extends Component {
                     '',
                     '',
                     '',
-                    'Total Cost',
+                    i18n.t('static.shipment.totalCost'),
                     (this.state.totalProductCost + 0.07 * this.state.totalProductCost),
                     ''
                 ])
@@ -792,7 +792,7 @@ class ForecastSummary extends Component {
             doc.autoTable(content);
             addHeaders(doc)
             addFooters(doc)
-            doc.save('Forecast Summary' + ".pdf")
+            doc.save(i18n.t('static.forecastReport.forecastSummary') + ".pdf")
 
         }
     }
@@ -1029,7 +1029,7 @@ class ForecastSummary extends Component {
                                 let tempProcurementGap = ((planningUnitList[j].stock + planningUnitList[j].existingShipments) - totalForecastedQuantity0ri) - (planningUnitList[j].monthsOfStock * totalForecastedQuantity0ri / total_months);
                                 let procurementGap = (tempProcurementGap < 0 ? '(' + tempProcurementGap + ')' : tempProcurementGap);
                                 let isProcurementGapRed = (procurementGap < 0 ? true : false)
-                                let priceType = (planningUnitList[j].procurementAgent == null && planningUnitList[j].price == null ? 'No price type available' : (planningUnitList[j].procurementAgent != null ? planningUnitList[j].procurementAgent.code : 'Custom'));
+                                let priceType = (planningUnitList[j].procurementAgent == null && planningUnitList[j].price == null ? i18n.t('static.forecastReport.NoPriceTypeAvailable') : (planningUnitList[j].procurementAgent != null ? planningUnitList[j].procurementAgent.code : i18n.t('static.forecastReport.custom')));
                                 let isPriceTypeRed = (planningUnitList[j].procurementAgent == null && planningUnitList[j].price == null ? true : false);
                                 let unitPrice = planningUnitList[j].price;
                                 let procurementNeeded = (isProcurementGapRed == true ? '$ ' + tempProcurementGap * unitPrice : '');
@@ -1134,16 +1134,16 @@ class ForecastSummary extends Component {
                                         }
                                     }
                                     var columns = [];
-                                    columns.push({ title: "Forecasting Unit", type: 'hidden', width: 100, readOnly: true });
-                                    columns.push({ title: "Planning Unit", type: 'hidden', width: 100, readOnly: true });
-                                    columns.push({ title: "Planning Unit", type: 'text', width: 100, readOnly: true });
+                                    columns.push({ title: i18n.t('static.product.unit1'), type: 'hidden', width: 100, readOnly: true });
+                                    columns.push({ title: i18n.t('static.product.product'), type: 'hidden', width: 100, readOnly: true });
+                                    columns.push({ title: i18n.t('static.product.product'), type: 'text', width: 100, readOnly: true });
                                     for (var k = 0; k < regRegionList.length; k++) {
-                                        columns.push({ title: "Selected Forecast", type: 'dropdown', width: 100, source: tsList, filter: this.filterTsList });
-                                        columns.push({ title: "Forecast Quantity", type: 'numeric', textEditor: true, mask: '#,##.00', decimal: '.', width: 100, readOnly: true });
-                                        columns.push({ title: "Notes", type: 'text', width: 100 });
+                                        columns.push({ title: i18n.t('static.compareVersion.selectedForecast'), type: 'dropdown', width: 100, source: tsList, filter: this.filterTsList });
+                                        columns.push({ title: i18n.t('static.forecastReport.forecastQuantity'), type: 'numeric', textEditor: true, mask: '#,##.00', decimal: '.', width: 100, readOnly: true });
+                                        columns.push({ title: i18n.t('static.program.notes'), type: 'text', width: 100 });
                                     }
-                                    columns.push({ title: "type", type: 'hidden', width: 100, readOnly: true });
-                                    columns.push({ title: "Total Forecasted Qunatity", type: 'numeric', textEditor: true, mask: '#,##.00', decimal: '.', width: 100, readOnly: true });
+                                    columns.push({ title: i18n.t('static.supplyPlan.type'), type: 'hidden', width: 100, readOnly: true });
+                                    columns.push({ title: i18n.t('static.forecastReport.totalForecastQuantity'), type: 'numeric', textEditor: true, mask: '#,##.00', decimal: '.', width: 100, readOnly: true });
                                     let nestedHeaders = [];
                                     // nestedHeaders.push(
                                     //     {
@@ -1170,7 +1170,7 @@ class ForecastSummary extends Component {
                                     }
                                     nestedHeaders.push(
                                         {
-                                            title: 'All Regions',
+                                            title: i18n.t('static.forecastReport.allRegions'),
                                             colspan: '1'
                                         },
                                     );
@@ -1845,7 +1845,7 @@ class ForecastSummary extends Component {
                 }.bind(this);
                 putRequest.onsuccess = function (event) {
                     let id = AuthenticationService.displayDashboardBasedOnRole();
-                    this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/green/' + "Data saved successfully");
+                    this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/green/' + i18n.t('static.compareAndSelect.dataSaved'));
                 }.bind(this)
             }.bind(this)
         }.bind(this)
@@ -1898,7 +1898,7 @@ class ForecastSummary extends Component {
                             <div className="card-header-actions">
                                 <a className="card-header-action">
 
-                                    <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => this.exportPDF()} />
+                                    <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.exportPDF()} />
 
 
                                 </a>
@@ -1920,7 +1920,7 @@ class ForecastSummary extends Component {
                     <div className="Card-header-reporticon ">
                         <div className="card-header-actions BacktoLink">
                             <a className="pr-lg-0 pt-lg-1">
-                                <span style={{ cursor: 'pointer' }} onClick={() => { this.backToMonthlyForecast() }}><i className="fa fa-long-arrow-left" style={{ color: '#20a8d8', fontSize: '13px' }}></i> <small className="supplyplanformulas">{'Return To Monthly Forecast'}</small></span>
+                                <span style={{ cursor: 'pointer' }} onClick={() => { this.backToMonthlyForecast() }}><i className="fa fa-long-arrow-left" style={{ color: '#20a8d8', fontSize: '13px' }}></i> <small className="supplyplanformulas">{i18n.t('static.forecastReport.returnToMonthlyForecast')}</small></span>
                             </a>
                             {/* <a className="card-header-action">
                                 Back to <span style={{ cursor: 'pointer' }} onClick={() => { this.backToMonthlyForecast() }}><small className="supplyplanformulas">Monthly Forecast</small></span>
@@ -1977,7 +1977,7 @@ class ForecastSummary extends Component {
                                                 </div>
                                             </FormGroup>
                                             <FormGroup className="col-md-3">
-                                                <Label htmlFor="appendedInputButton">Forecast Period</Label>
+                                                <Label htmlFor="appendedInputButton">{i18n.t('static.common.forecastPeriod')}</Label>
                                                 <div className="controls ">
                                                     <InputGroup>
                                                         <Input
@@ -1996,7 +1996,7 @@ class ForecastSummary extends Component {
                                                 </div>
                                             </FormGroup>
                                             <FormGroup className="col-md-3" style={{ display: 'none' }}>
-                                                <Label htmlFor="appendedInputButton">Forecast Period<span className="stock-box-icon fa fa-sort-desc ml-1"></span></Label>
+                                                <Label htmlFor="appendedInputButton">{i18n.t('static.common.forecastPeriod')}<span className="stock-box-icon fa fa-sort-desc ml-1"></span></Label>
                                                 <div className="controls edit">
 
                                                     <Picker
@@ -2013,7 +2013,7 @@ class ForecastSummary extends Component {
                                                 </div>
                                             </FormGroup>
                                             <FormGroup className="col-md-3">
-                                                <Label htmlFor="appendedInputButton">Display</Label>
+                                                <Label htmlFor="appendedInputButton">{i18n.t('static.forecastReport.display')}</Label>
                                                 <div className="controls ">
                                                     <InputGroup>
                                                         <Input
@@ -2024,15 +2024,15 @@ class ForecastSummary extends Component {
                                                             onChange={this.filterData}
                                                         // onChange={(e) => { this.dataChange(e); this.formSubmit() }}
                                                         >
-                                                            <option value="2">Regional View</option>
-                                                            <option value="1">National View</option>
+                                                            <option value="2">{i18n.t('static.forecastReport.regionalView')}</option>
+                                                            <option value="1">{i18n.t('static.forecastReport.nationalView')}</option>
                                                         </Input>
 
                                                     </InputGroup>
                                                 </div>
                                             </FormGroup>
                                             <FormGroup className="col-md-3" id="hideCalculationDiv">
-                                                <Label htmlFor="appendedInputButton">Hide Calculations</Label>
+                                                <Label htmlFor="appendedInputButton">{i18n.t('static.forecastReport.hideCalculations')}</Label>
                                                 <div className="controls ">
                                                     <InputGroup>
                                                         <Input
@@ -2043,15 +2043,15 @@ class ForecastSummary extends Component {
                                                             value={this.state.hideCalculation}
                                                             onChange={(e) => { this.hideCalculation(e); }}
                                                         >
-                                                            <option value="1">Yes</option>
-                                                            <option value="2">No</option>
+                                                            <option value="1">{i18n.t('static.realm.yes')}</option>
+                                                            <option value="2">{i18n.t('static.program.no')}</option>
                                                         </Input>
 
                                                     </InputGroup>
                                                 </div>
                                             </FormGroup>
                                             <FormGroup className="col-md-3" id="hideCurrencyDiv" style={{ display: 'none' }}>
-                                                <Label htmlFor="appendedInputButton">Currency</Label>
+                                                <Label htmlFor="appendedInputButton">{i18n.t('static.country.currency')}</Label>
                                                 <div className="controls ">
                                                     <InputGroup>
                                                         <Input
@@ -2097,26 +2097,26 @@ class ForecastSummary extends Component {
                                                                 <tr>
                                                                     <th className="BorderNoneSupplyPlan sticky-col first-col clone1"></th>
                                                                     {/* <th className="text-center" style={{}}> Forecasting Unit </th> */}
-                                                                    <th className="text-center ForecastSumarydWidth sticky-col first-col clone" style={{ width: '19%' }}>Planning Unit</th>
-                                                                    <th className="text-center" style={{ width: '' }}>Total Forecasted Quantity </th>
+                                                                    <th className="text-center ForecastSumarydWidth sticky-col first-col clone" style={{ width: '19%' }}>{i18n.t('static.product.product')}</th>
+                                                                    <th className="text-center" style={{ width: '' }}>{i18n.t('static.forecastReport.totalForecastQuantity')} </th>
                                                                     {!this.state.hideColumn &&
                                                                         <>
-                                                                            <th className="text-center" style={{ width: '7%' }}>Stock <span className="FontWeightNormal">(end of {this.state.beforeEndDateDisplay})</span> </th>
-                                                                            <th className="text-center" style={{ width: '' }}>Existing Shipments <span className="FontWeightNormal">({this.state.startDateDisplay + ' - ' + this.state.endDateDisplay})</span> </th>
-                                                                            <th className="text-center" title="Stock (end of {this.state.beforeEndDateDisplay})" style={{ width: '8%' }}>Stock <span className="FontWeightNormal">(end of {this.state.endDateDisplay})</span> <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
-                                                                            <th className="text-center" style={{ width: '7%' }}>Desired Months of Stock <span className="FontWeightNormal">(end of {this.state.endDateDisplay})</span> </th>
-                                                                            <th className="text-center" title="Stock (end of {this.state.beforeEndDateDisplay})" style={{ width: '8%' }}>Desired Stock <span className="FontWeightNormal">(end of {this.state.endDateDisplay})</span> <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
+                                                                            <th className="text-center" style={{ width: '7%' }}>{i18n.t('static.report.stock')} <span className="FontWeightNormal">{i18n.t('static.forecastReport.endOf')} {this.state.beforeEndDateDisplay})</span> </th>
+                                                                            <th className="text-center" style={{ width: '' }}>{i18n.t('static.forecastReport.existingShipments')} <span className="FontWeightNormal">({this.state.startDateDisplay + ' - ' + this.state.endDateDisplay})</span> </th>
+                                                                            <th className="text-center" title="Stock (end of {this.state.beforeEndDateDisplay})" style={{ width: '8%' }}>{i18n.t('static.report.stock')} <span className="FontWeightNormal">{i18n.t('static.forecastReport.endOf')} {this.state.endDateDisplay})</span> <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
+                                                                            <th className="text-center" style={{ width: '7%' }}>{i18n.t('static.forecastReport.desiredMonthsOfStock')} <span className="FontWeightNormal">{i18n.t('static.forecastReport.endOf')} {this.state.endDateDisplay})</span> </th>
+                                                                            <th className="text-center" title="Stock (end of {this.state.beforeEndDateDisplay})" style={{ width: '8%' }}>{i18n.t('static.forecastReport.desiredStock')} <span className="FontWeightNormal">{i18n.t('static.forecastReport.endOf')} {this.state.endDateDisplay})</span> <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
                                                                         </>
                                                                     }
-                                                                    <th className="text-center" title="Stock (end of {this.state.beforeEndDateDisplay})" style={{ width: '' }}>Procurement Surplus/Gap <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
+                                                                    <th className="text-center" title="Stock (end of {this.state.beforeEndDateDisplay})" style={{ width: '' }}>{i18n.t('static.forecastReport.procurementSurplus')} <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
                                                                     {!this.state.hideColumn &&
                                                                         <>
-                                                                            <th className="text-center" style={{ width: '7%' }}>Price Type </th>
-                                                                            <th className="text-center" style={{ width: '7%' }}>Unit Price <span className="FontWeightNormal">(USD)</span> </th>
+                                                                            <th className="text-center" style={{ width: '7%' }}>{i18n.t('static.forecastReport.priceType')} </th>
+                                                                            <th className="text-center" style={{ width: '7%' }}>{i18n.t('static.forecastReport.unitPrice')} <span className="FontWeightNormal">(USD)</span> </th>
                                                                         </>
                                                                     }
-                                                                    <th className="text-center" style={{ width: '' }}>Procurements Needed <span className="FontWeightNormal">(USD)</span> </th>
-                                                                    <th className="text-center" style={{ width: '20%' }}>Notes </th>
+                                                                    <th className="text-center" style={{ width: '' }}>{i18n.t('static.forecastReport.ProcurementsNeeded')} <span className="FontWeightNormal">(USD)</span> </th>
+                                                                    <th className="text-center" style={{ width: '20%' }}>{i18n.t('static.program.notes')} </th>
 
                                                                 </tr>
                                                             </thead>
@@ -2210,7 +2210,7 @@ class ForecastSummary extends Component {
                                                                         <td></td>
                                                                         <td></td>
                                                                         <td></td>
-                                                                        <td><b>Product Cost</b></td>
+                                                                        <td><b>{i18n.t('static.forecastReport.productCost')}</b></td>
                                                                         <td><b>{this.state.totalProductCost}</b></td>
                                                                         <td></td>
                                                                     </tr>
@@ -2226,7 +2226,7 @@ class ForecastSummary extends Component {
                                                                         <td></td>
                                                                         <td></td>
                                                                         <td></td>
-                                                                        <td><b>Freight (7%)</b></td>
+                                                                        <td><b>{i18n.t('static.forecastReport.freight')} (7%)</b></td>
                                                                         <td><b>{0.07 * this.state.totalProductCost}</b></td>
                                                                         <td></td>
                                                                     </tr>
@@ -2242,7 +2242,7 @@ class ForecastSummary extends Component {
                                                                         <td></td>
                                                                         <td></td>
                                                                         <td></td>
-                                                                        <td><b>Total Cost</b></td>
+                                                                        <td><b>{i18n.t('static.shipment.totalCost')}</b></td>
                                                                         <td><b>{this.state.totalProductCost + 0.07 * this.state.totalProductCost}</b></td>
                                                                         <td></td>
                                                                     </tr>
@@ -2255,7 +2255,7 @@ class ForecastSummary extends Component {
                                                                         {/* <td></td> */}
                                                                         <td className='text-left sticky-col first-col clone'></td>
                                                                         <td></td>
-                                                                        <td><b>Product Cost</b></td>
+                                                                        <td><b>{i18n.t('static.forecastReport.productCost')}</b></td>
                                                                         <td><b>{this.state.totalProductCost}</b></td>
                                                                         <td></td>
                                                                     </tr>
@@ -2264,7 +2264,7 @@ class ForecastSummary extends Component {
                                                                         {/* <td></td> */}
                                                                         <td className='text-left sticky-col first-col clone'></td>
                                                                         <td></td>
-                                                                        <td><b>Freight (7%)</b></td>
+                                                                        <td><b>{i18n.t('static.forecastReport.freight')} (7%)</b></td>
                                                                         <td><b>{0.07 * this.state.totalProductCost}</b></td>
                                                                         <td></td>
                                                                     </tr>
@@ -2273,7 +2273,7 @@ class ForecastSummary extends Component {
                                                                         {/* <td></td> */}
                                                                         <td className='text-left sticky-col first-col clone'></td>
                                                                         <td></td>
-                                                                        <td><b>Total Cost</b></td>
+                                                                        <td><b>{i18n.t('static.shipment.totalCost')}</b></td>
                                                                         <td><b>{this.state.totalProductCost + 0.07 * this.state.totalProductCost}</b></td>
                                                                         <td></td>
                                                                     </tr>
