@@ -901,13 +901,25 @@ export default class PlanningUnitSetting extends Component {
                     // }
                 }
                 console.log("DATASET-------->", datasetList);
-                this.setState({
-                    datasetList: datasetList,
-                    datasetList1: datasetList1,
-                    datasetId: (datasetList.length == 1 ? datasetList[0].programId : '')
-                }, () => {
-                    this.planningUnitList();
-                })
+                if (localStorage.getItem("sesForecastProgramIdReport") != '' && localStorage.getItem("sesForecastProgramIdReport") != undefined && localStorage.getItem("sesForecastVersionIdReport") != '' && localStorage.getItem("sesForecastVersionIdReport") != undefined) {
+                    
+                    this.setState({
+                        datasetList: datasetList,
+                        datasetList1: datasetList1,
+                        datasetId: (datasetList.length == 1 ? datasetList[0].programId : '')
+                    }, () => {
+                        this.planningUnitList();
+                    })
+                } else {
+                    this.setState({
+                        datasetList: datasetList,
+                        datasetList1: datasetList1,
+                        datasetId: (datasetList.length == 1 ? datasetList[0].programId : '')
+                    }, () => {
+                        this.planningUnitList();
+                    })
+                }
+
 
 
             }.bind(this);
@@ -934,9 +946,9 @@ export default class PlanningUnitSetting extends Component {
                     datasetId: pID,
                     // rangeValue: { from: { year: startDateSplit[1] - 3, month: new Date(selectedForecastProgram.forecastStartDate).getMonth() + 1 }, to: { year: forecastStopDate.getFullYear(), month: forecastStopDate.getMonth() + 1 } },
                     rangeValue: { from: { year: new Date(forecastStartDate).getFullYear(), month: new Date(forecastStartDate).getMonth() + 1 }, to: { year: new Date(forecastStopDate).getFullYear(), month: new Date(forecastStopDate).getMonth() + 1 } },
-                    startDateDisplay: months[new Date(forecastStartDate).getMonth()] + ' ' + new Date(forecastStartDate).getFullYear(),
-                    endDateDisplay: months[new Date(forecastStopDate).getMonth()] + ' ' + new Date(forecastStopDate).getFullYear(),
-                    beforeEndDateDisplay: months[new Date(beforeEndDateDisplay).getMonth()] + ' ' + new Date(beforeEndDateDisplay).getFullYear(),
+                    startDateDisplay: (forecastStartDate == '' ? '' : months[new Date(forecastStartDate).getMonth()] + ' ' + new Date(forecastStartDate).getFullYear()),
+                    endDateDisplay: (forecastStopDate == '' ? '' : months[new Date(forecastStopDate).getMonth()] + ' ' + new Date(forecastStopDate).getFullYear()),
+                    beforeEndDateDisplay: (!isNaN(beforeEndDateDisplay.getTime()) == false ? '' : months[new Date(beforeEndDateDisplay).getMonth()] + ' ' + new Date(beforeEndDateDisplay).getFullYear()),
                 }, () => {
                     // console.log("d----------->0", d1);
                     // console.log("d----------->00", (d1.getMonth()));
@@ -955,6 +967,10 @@ export default class PlanningUnitSetting extends Component {
                 {
                     datasetId: 0,
                     rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: dt1.getFullYear(), month: dt1.getMonth() + 1 } },
+                    // startDateDisplay: months[new Date(dt).getMonth() + 1] + ' ' + new Date(dt).getFullYear(),
+                    // endDateDisplay: months[new Date(dt1).getMonth() + 1] + ' ' + new Date(dt1).getFullYear(),
+                    startDateDisplay: '',
+                    endDateDisplay: '',
                 }, () => {
                     this.el = jexcel(document.getElementById("tableDiv"), '');
                     this.el.destroy();
@@ -963,57 +979,6 @@ export default class PlanningUnitSetting extends Component {
         }
 
     }
-
-    // setProgramId(event) {
-    //     // console.log("PID----------------->", document.getElementById("forecastProgramId").value);
-    //     var pID = document.getElementById("forecastProgramId").value;
-    //     if (pID != 0) {
-    //         var sel = document.getElementById("forecastProgramId");
-    //         var tempId = sel.options[sel.selectedIndex].text;
-    //         let forecastProgramVersionId = tempId.split('~')[1];
-    //         let selectedForecastProgram = this.state.datasetList.filter(c => c.programId == pID && c.versionId == forecastProgramVersionId)[0]
-    //         let startDateSplit = selectedForecastProgram.forecastStartDate.split('-');
-    //         let stopDateSplit = selectedForecastProgram.forecastStopDate.split('-');
-
-    //         let forecastStopDate = new Date(selectedForecastProgram.forecastStartDate);
-    //         forecastStopDate.setMonth(forecastStopDate.getMonth() - 1);
-
-    //         let d1 = new Date(startDateSplit[1] - 3 + '-' + (new Date(selectedForecastProgram.forecastStartDate).getMonth() + 1) + '-01 00:00:00');
-    //         d1.setMonth(d1.getMonth() - 1);
-
-    //         this.setState(
-    //             {
-    //                 datasetId: pID,
-    //                 rangeValue: { from: { year: startDateSplit[1] - 3, month: new Date(selectedForecastProgram.forecastStartDate).getMonth() + 1 }, to: { year: forecastStopDate.getFullYear(), month: forecastStopDate.getMonth() + 1 } },
-    //                 startDateDisplay: months[new Date(selectedForecastProgram.forecastStartDate).getMonth()] + ' ' + (startDateSplit[1] - 3),
-    //                 endDateDisplay: months[(forecastStopDate.getMonth())] + ' ' + forecastStopDate.getFullYear(),
-    //                 beforeEndDateDisplay: months[(d1.getMonth())] + ' ' + d1.getFullYear(),
-    //             }, () => {
-    //                 // console.log("d----------->0", d1);
-    //                 // console.log("d----------->00", (d1.getMonth()));
-    //                 // console.log("d----------->1", this.state.startDateDisplay);
-    //                 // console.log("d----------->2", this.state.endDateDisplay);
-    //                 // console.log("d----------->3", this.state.beforeEndDateDisplay);
-
-    //                 this.filterData();
-    //             })
-    //     } else {
-    //         var dt = new Date();
-    //         dt.setMonth(dt.getMonth() - REPORT_DATEPICKER_START_MONTH);
-    //         var dt1 = new Date();
-    //         dt1.setMonth(dt1.getMonth() + REPORT_DATEPICKER_END_MONTH);
-    //         this.setState(
-    //             {
-    //                 datasetId: 0,
-    //                 rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: dt1.getFullYear(), month: dt1.getMonth() + 1 } },
-    //             }, () => {
-    //                 this.el = jexcel(document.getElementById("tableDiv"), '');
-    //                 this.el.destroy();
-    //                 this.filterData();
-    //             })
-    //     }
-
-    // }
 
     filterData() {
 
@@ -1917,6 +1882,23 @@ export default class PlanningUnitSetting extends Component {
                                             </div>
                                         </FormGroup>
                                         <FormGroup className="col-md-3">
+                                            <Label htmlFor="appendedInputButton">{i18n.t('static.common.forecastPeriod')}</Label>
+                                            <div className="controls ">
+                                                <InputGroup>
+                                                    <Input
+                                                        type="text"
+                                                        name="forecastPeriod"
+                                                        id="forecastPeriod"
+                                                        bsSize="sm"
+                                                        disabled={true}
+                                                        value={this.state.startDateDisplay + ' ~ ' + this.state.endDateDisplay}
+                                                    >
+                                                    </Input>
+
+                                                </InputGroup>
+                                            </div>
+                                        </FormGroup>
+                                        <FormGroup className="col-md-3" style={{ display: 'none' }}>
                                             <Label htmlFor="appendedInputButton">Forecast Period</Label>
                                             <div className="controls edit">
 
