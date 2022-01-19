@@ -311,13 +311,13 @@ const ForecastSummary = React.lazy(() => import('../../views/ForecastingReports/
 
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
-  { path: '/dataset/versionSettings', name: 'static.versionSettings.versionSettings', component: VersionSettingsComponent },
+  { path: '/dataset/versionSettings', name: 'static.UpdateversionSettings.UpdateversionSettings', component: VersionSettingsComponent },
   { path: '/dataset/loadDeleteDataSet', name: 'Load/Delete Local Version', component: LoadDeleteDataSet },
   { path: '/dataset/loadDeleteDataSet/:message', name: 'Load/Delete Local Version', component: LoadDeleteDataSet },
-  { path: '/dataset/listTreeTemplate/:color/:message', name: 'List Tree Template', component: ListTreeTemplate },
-  { path: '/dataset/listTreeTemplate/', exact: true, name: 'List Tree Template', component: ListTreeTemplate },
+  { path: '/dataset/listTreeTemplate/:color/:message', name: 'static.dataset.TreeTemplate', component: ListTreeTemplate },
+  { path: '/dataset/listTreeTemplate/', exact: true, name: 'static.dataset.TreeTemplate', component: ListTreeTemplate },
   { path: '/validation/modelingValidation', exact: true, name: 'static.dashboard.modelingValidation', component: ModelingValidation },
-  { path: '/report/compareVersion', exact: true, name: 'static.dashboard.compareVersion', component: CompareVersion },
+  { path: '/report/compareVersion', exact: true, name: 'static.dashboard.Versioncomarition', component: CompareVersion },
   { path: '/validation/productValidation', exact: true, name: 'static.dashboard.productValidation', component: ProductValidation },
   { path: '/report/compareAndSelectScenario', exact: true, name: 'static.dashboard.compareAndSelect', component: CompareAndSelectScenario },
   { path: '/dataentry/consumptionDataEntryAndAdjustment', exact: true, name: 'static.dashboard.dataEntryAndAdjustment ', component: ConsumptionDataEntryAndAdjustment },
@@ -707,14 +707,14 @@ const routes = [
   { path: '/extrapolation/extrapolateData', exact: true, name: 'static.dashboard.extrapolation', component: ExtrapolateData },
 
   { path: '/dataset/listTree/:color/:message', name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.common.managetree') }), component: ListTree },
-  { path: '/dataset/commitTree', exact: true, name: i18n.t('static.breadcrum.list', { entityname: 'Commit' }), component: CommitTree },
+  { path: '/dataset/commitTree', exact: true, name: i18n.t('static.breadcrum.list', { entityname: 'static.commitProgram.commitProgram' }), component: CommitTree },
   { path: '/dataset/listTree', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.common.managetree') }), component: ListTree },
 
-  { path: '/dataset/addDataSet', name: 'static.breadcrum.add', entityname: 'static.dataset.manageProgram', component: AddDataSet },
-  { path: '/dataset/listDataSet', exact: true, name: 'static.breadcrum.list', entityname: 'static.dataset.manageProgram', component: DataSetList },
+  { path: '/dataset/addDataSet', name: 'static.breadcrum.add', entityname: 'static.dataset.manageProgramInfo', component: AddDataSet },
+  { path: '/dataset/listDataSet', exact: true, name: 'static.breadcrum.list', entityname: 'static.dataset.manageProgramInfo', component: DataSetList },
   // { path: '/dataset/listDataSet/:message', component: ListDataSource },
-  { path: '/dataset/listDataSet/:color/:message', name: 'static.breadcrum.list', entityname: 'static.dataset.manageProgram', component: DataSetList },
-  { path: '/dataset/editDataSet/:dataSetId', name: 'static.breadcrum.edit', entityname: 'static.dataset.manageProgram', component: EditDataSet },
+  { path: '/dataset/listDataSet/:color/:message', name: 'static.breadcrum.list', entityname: 'static.dataset.manageProgramInfo', component: DataSetList },
+  { path: '/dataset/editDataSet/:dataSetId', name: 'static.breadcrum.edit', entityname: 'static.dataset.manageProgramInfo', component: EditDataSet },
 
   { path: '/importFromQATSupplyPlan/listImportFromQATSupplyPlan/:color/:message', name: i18n.t('static.importFromQATSupplyPlan.importFromQATSupplyPlan'), component: ImportFromQATSupplyPlan },
   { path: '/importFromQATSupplyPlan/listImportFromQATSupplyPlan', exact: true, name: i18n.t('static.importFromQATSupplyPlan.importFromQATSupplyPlan'), component: ImportFromQATSupplyPlan },
@@ -722,12 +722,12 @@ const routes = [
   { path: '/importIntoQATSupplyPlan/listImportIntoQATSupplyPlan/:color/:message', name: 'Import Into Supply Plan', component: ImportIntoQATSupplyPlan },
   { path: '/importIntoQATSupplyPlan/listImportIntoQATSupplyPlan', exact: true, name: 'Import Into Supply Plan', component: ImportIntoQATSupplyPlan },
 
-  { path: '/planningUnitSetting/listPlanningUnitSetting/:color/:message', name: 'Planning Unit Settings', component: PlanningUnitSetting },
-  { path: '/planningUnitSetting/listPlanningUnitSetting', exact: true, name: 'Planning Unit Settings', component: PlanningUnitSetting },
+  { path: '/planningUnitSetting/listPlanningUnitSetting/:color/:message', name: 'static.UpdateplanningUnitSetting.UpdateplanningUnitSetting', component: PlanningUnitSetting },
+  { path: '/planningUnitSetting/listPlanningUnitSetting', exact: true, name: 'static.UpdateplanningUnitSetting.UpdateplanningUnitSetting', component: PlanningUnitSetting },
 
   { path: '/forecastReport/consumptionForecastError', name: 'Consumption Forecast Error', component: ConsumptionForecastError },
-  { path: '/forecastReport/forecastOutput', name: 'Monthly Forecast', component: ForecastOutput },
-  { path: '/forecastReport/forecastSummary', name: 'Forecast Summary', component: ForecastSummary },
+  { path: '/forecastReport/forecastOutput', name: 'static.MonthlyForecast.MonthlyForecast', component: ForecastOutput },
+  { path: '/forecastReport/forecastSummary', name: 'static.ForecastSummary.ForecastSummary', component: ForecastSummary },
 
 ];
 
@@ -1448,7 +1448,12 @@ class DefaultLayout extends Component {
                               
                             ]
                           },
-
+                          {
+                            name: i18n.t('static.equivalancyUnit.equivalancyUnits'),
+                            url: '/equivalancyUnit/listEquivalancyUnit',
+                            icon: 'fa fa-link',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_EQUIVALENCY_UNIT_MAPPING') && this.state.activeTab == 1 ? false : true) }
+                          },
 
                           {
                             name: i18n.t('static.healtharea.healtharea'),
@@ -1499,11 +1504,29 @@ class DefaultLayout extends Component {
                           hidden: ((((this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_DATASET')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_EQUIVALENCY_UNIT_MAPPING')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_USAGE_TEMPLATE'))) && this.state.activeTab == 1) ? false : true)
                         },
                         children: [
+                          // {
+                          //   name: i18n.t('static.dataset.manageProgram'),
+                          //   url: '/dataSet/listDataSet',
+                          //   icon: 'fa fa-file-text-o',
+                          //   attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_DATASET') && this.state.activeTab == 1 ? false : true) }
+                          // },
                           {
-                            name: i18n.t('static.dataset.manageProgram'),
+                            name: i18n.t('static.dataset.manageProgramInfo'),
                             url: '/dataSet/listDataSet',
-                            icon: 'fa fa-globe',
+                            icon: 'fa fa-file-text-o',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_DATASET') && this.state.activeTab == 1 ? false : true) }
+                          },
+                          {
+                            name: i18n.t('static.UpdateversionSettings.UpdateversionSettings'),
+                            url: '/dataset/versionSettings',
+                            icon: 'fa fa-code-fork',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true) }
+                          },
+                          {
+                            name: i18n.t('static.UpdateplanningUnitSetting.UpdateplanningUnitSetting'),
+                            url: '/planningUnitSetting/listPlanningUnitSetting',
+                            icon: 'fa fa-cog',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true) }
                           },
                           {
                             name: i18n.t('static.common.loadDeleteDataSet'),
@@ -1512,17 +1535,13 @@ class DefaultLayout extends Component {
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true) }
                           },
                           {
-                            name: i18n.t('static.equivalancyUnit.equivalancyUnits'),
-                            url: '/equivalancyUnit/listEquivalancyUnit',
-                            icon: 'fa fa-link',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_EQUIVALENCY_UNIT_MAPPING') && this.state.activeTab == 1 ? false : true) }
+                            name: i18n.t('static.commitProgram.commitProgram'),
+                            url: '/dataset/commitTree',
+                            icon: 'fa fa-th',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_COMMIT_DATASET') && this.state.activeTab == 1 ? false : true) }
                           },
-                          {
-                            name: i18n.t('static.usageTemplate.usageTemplate'),
-                            url: '/usageTemplate/listUsageTemplate',
-                            icon: 'fa fa-bank',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_USAGE_TEMPLATE') && this.state.activeTab == 1 ? false : true) }
-                          },
+                         
+                          
                           // {
                           //   name: i18n.t('static.common.listtree'),
                           //   url: '/dataset/listTree',
@@ -1530,27 +1549,33 @@ class DefaultLayout extends Component {
                           //   attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true) }
                           // },
                           {
-                            name: 'List Tree Template',
+                            name: i18n.t('static.dataset.TreeTemplate'),
                             url: '/dataset/listTreeTemplate',
                             icon: 'fa fa-sitemap',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true) }
                           },
                           {
-                            name: i18n.t('static.versionSettings.versionSettings'),
-                            url: '/dataset/versionSettings',
-                            icon: 'fa fa-code-fork',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true) }
+                            name: i18n.t('static.usageTemplate.usageTemplate'),
+                            url: '/usageTemplate/listUsageTemplate',
+                            icon: 'fa fa-list-alt',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_USAGE_TEMPLATE') && this.state.activeTab == 1 ? false : true) }
                           },
-                          {
-                            name: 'Planning Unit Settings',
-                            url: '/planningUnitSetting/listPlanningUnitSetting',
-                            icon: 'fa fa-code-fork',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true) }
-                          },
+                          // {
+                          //   name: i18n.t('static.versionSettings.versionSettings'),
+                          //   url: '/dataset/versionSettings',
+                          //   icon: 'fa fa-code-fork',
+                          //   attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true) }
+                          // },
+                          // {
+                          //   name: 'Planning Unit Settings',
+                          //   url: '/planningUnitSetting/listPlanningUnitSetting',
+                          //   icon: 'fa fa-cog',
+                          //   attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true) }
+                          // },
                         ]
                       },
                       {
-                        name: "Consumption-Based Forecast",
+                        name: i18n.t('static.ConsumptionBasedForecast.ConsumptionBasedForecastConsumption-Based Forecast'),
                         icon: 'fa fa-list',
                         // attributes: {
                         // hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true)
@@ -1566,22 +1591,22 @@ class DefaultLayout extends Component {
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_IMPORT_FROM_QAT_SUPPLY_PLAN') && this.state.activeTab == 1 ? false : true) }
                           },
                           {
-                            name: i18n.t('static.dashboard.dataEntryAndAdjustment'),
+                            name: i18n.t('static.dashboard.dataEntryAndAdjustments'),
                             url: '/dataentry/consumptionDataEntryAndAdjustment',
-                            icon: 'fa fa-th',
+                            icon: 'fa fa-file-text-o',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_DATA_ENTRY_ADJUSTMENT') && this.state.activeTab == 1 ? false : true) }
                           },
                           {
                             name: i18n.t('static.dashboard.extrapolation'),
                             url: '/Extrapolation/extrapolateData',
-                            icon: 'fa fa-th',
+                            icon: 'fa fa-line-chart',
                             // attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true) }
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_EXTRAPOLATION') && this.state.activeTab == 1 ? false : true) }
                           },
                         ]
                       },
                       {
-                        name: "Tree Forecast",
+                        name: i18n.t('static.TreeForecast.TreeForecast'),
                         icon: 'fa fa-list',
                         // attributes: {
                         // hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true)
@@ -1594,34 +1619,34 @@ class DefaultLayout extends Component {
                           {
                             name: i18n.t('static.common.managetree'),
                             url: '/dataset/listTree',
-                            icon: 'fa fa-th',
+                            icon: 'fa fa-sitemap',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true) }
                           },
                           {
                             name: i18n.t('static.dashboard.modelingValidation'),
                             url: '/validation/modelingValidation',
-                            icon: 'fa fa-th',
+                            icon: 'fa fa-check-square-o',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_MODELING_VALIDATION') && this.state.activeTab == 1 ? false : true) }
                             // attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true) }
                           },
                           {
                             name: i18n.t('static.dashboard.productValidation'),
                             url: '/validation/productValidation',
-                            icon: 'fa fa-th',
+                            icon: 'fa fa-cube',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_PRODUCT_VALIDATION') && this.state.activeTab == 1 ? false : true) }
                             // attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true) }
                           },
-                          {
-                            name: "Commit",
-                            url: '/dataset/commitTree',
-                            icon: 'fa fa-th',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_COMMIT_DATASET') && this.state.activeTab == 1 ? false : true) }
-                          }
+                          // {
+                          //   name: "Commit",
+                          //   url: '/dataset/commitTree',
+                          //   icon: 'fa fa-th',
+                          //   attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_COMMIT_DATASET') && this.state.activeTab == 1 ? false : true) }
+                          // }
 
                         ]
                       },
                       {
-                        name: "Reports",
+                        name: i18n.t('static.ForecastAnalysisOutput.ForecastAnalysisOutput'),
                         icon: 'fa fa-list',
                         // attributes: {
                         // hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true)
@@ -1630,38 +1655,46 @@ class DefaultLayout extends Component {
                           hidden: ((((this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY')) || (this.state.businessFunctions.includes('ROLE_BF_COMPARE_VERSION')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_DATASET')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_EQUIVALENCY_UNIT_MAPPING')) || (this.state.businessFunctions.includes('ROLE_BF_COMPARE_AND_SELECT')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_USAGE_TEMPLATE'))) && this.state.activeTab == 1) ? false : true)
                         },
                         children: [
-                          {
-                            name: i18n.t('static.dashboard.compareVersion'),
-                            url: '/report/compareVersion',
-                            icon: 'fa fa-th',
-                            // attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true) }
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_COMPARE_VERSION') && this.state.activeTab == 1 ? false : true) }
-                          },
+                          // {
+                          //   name: i18n.t('static.dashboard.compareVersion'),
+                          //   url: '/report/compareVersion',
+                          //   icon: 'fa fa-th',
+                          //   // attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true) }
+                          //   attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_COMPARE_VERSION') && this.state.activeTab == 1 ? false : true) }
+                          // },
                           {
                             name: i18n.t('static.dashboard.compareAndSelect'),
                             url: '/report/compareAndSelectScenario',
-                            icon: 'fa fa-th',
+                            icon: 'fa fa-line-chart',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_COMPARE_AND_SELECT') && this.state.activeTab == 1 ? false : true) }
                             // attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true) }
                           },
+                          
                           {
-                            name: "Forecast Summary",
-                            url: '/forecastReport/forecastSummary',
-                            icon: 'fa fa-exchange',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true) }
-                          },
-                          {
-                            name: "Monthly Forecast",
+                            name: i18n.t('static.MonthlyForecast.MonthlyForecast'),
                             url: '/forecastReport/forecastOutput',
-                            icon: 'fa fa-exchange',
+                            icon: 'fa fa-bar-chart',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true) }
                           },
                           {
-                            name: 'Consumption Forecast Error',
-                            url: '/forecastReport/consumptionForecastError',
-                            icon: 'fa fa-exchange',
+                            name: i18n.t('static.ForecastSummary.ForecastSummary'),
+                            url: '/forecastReport/forecastSummary',
+                            icon: 'fa fa-pie-chart',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true) }
                           },
+                          {
+                            name: i18n.t('static.dashboard.Versioncomarition'),
+                            url: '/report/compareVersion',
+                            icon: 'fa fa-files-o',
+                            // attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true) }
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_COMPARE_VERSION') && this.state.activeTab == 1 ? false : true) }
+                          },
+                          // {
+                          //   name: 'Consumption Forecast Error',
+                          //   url: '/forecastReport/consumptionForecastError',
+                          //   icon: 'fa fa-signal',
+                          //   attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true) }
+                          // },
                         ]
                       },
                       // !this.state.businessFunctions.includes('ROLE_BF_VIEW_GUEST_SCREENS') &&
@@ -3175,7 +3208,7 @@ class DefaultLayout extends Component {
                       className="bgColourRemoveLink tab2"
                       active={this.state.activeTab === '2'}
                       onClick={() => { this.toggle(0, '2'); }}
-                      style={{ border: "none" }}
+                      style={{ border: "none",padding:"0.75rem 0.2rem" }}
                       title={i18n.t('static.module.supplyPlanningMod')}
                     >
                       {/* <i class="nav-icon fa fa-database"  style={{ fontSize: '18px', paddingTop: '5px' }} ></i> */}

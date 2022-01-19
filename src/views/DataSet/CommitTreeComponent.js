@@ -1379,10 +1379,10 @@ export default class CommitTreeComponent extends React.Component {
                         <h3 style={{textAlign:'left'}}><strong>{i18n.t('static.commitTree.forecastValidation')}</strong><i className="fa fa-print pull-right iconClass cursor" onClick={() => this.print()}></i></h3>
                     </ModalHeader> */}
                     <ModalHeader toggle={() => this.toggleShowValidation()} className="modalHeaderSupplyPlan">
-                        <h3><strong>{i18n.t('static.commitTree.forecastValidation')}</strong></h3>
-                        <div className="row">
-                            <img className=" pull-right iconClass cursor" style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.exportPDF()} />
-                            <i className="fa fa-print pull-right iconClass cursor" onClick={() => this.print()}></i>
+                    <div>
+                        <img className=" pull-right iconClass cursor ml-lg-2" style={{ height: '22px', width: '22px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.exportPDF()} />
+                            <i className="fa fa-print pull-right iconClassCommit cursor" onClick={() => this.print()}></i>
+                            <h3><strong>{i18n.t('static.commitTree.forecastValidation')}</strong></h3>
                         </div>
                     </ModalHeader>
                     <div>
@@ -1414,7 +1414,7 @@ export default class CommitTreeComponent extends React.Component {
 
                             <span><b>a. {i18n.t('static.forecastMethod.historicalData')} :</b></span>
                             <div className="table-scroll">
-                                <div className="table-wrap table-responsive">
+                                <div className="table-wrap table-responsive fixTableHead">
                                     <Table className="table-bordered text-center mt-2 overflowhide main-table " bordered size="sm" >
                                         <thead>
                                             <tr>
@@ -1428,7 +1428,7 @@ export default class CommitTreeComponent extends React.Component {
                             </div><br />
                             <span><b>b. {i18n.t('static.commitTree.treeScenarios')}</b></span>
                             <div className="table-scroll">
-                                <div className="table-wrap table-responsive">
+                                <div className="table-wrap table-responsive fixTableHead">
                                     <Table className="table-bordered text-center mt-2 overflowhide main-table " bordered size="sm" >
                                         <thead>
                                             <tr>
@@ -1443,8 +1443,8 @@ export default class CommitTreeComponent extends React.Component {
                             </div><br />
                             <span><b>c. {i18n.t('static.commitTree.treeNodes')}</b></span>
                             {/* <div className="table-scroll"> */}
-                            <div>
-                                <div className="table-wrap table-responsive">
+                            <div className="">
+                                <div className="table-wrap table-responsive fixTableHead">
                                     <Table className="table-bordered text-center mt-2 overflowhide main-table " bordered size="sm" >
                                         <thead>
                                             <tr>
