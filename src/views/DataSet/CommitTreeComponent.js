@@ -235,7 +235,8 @@ export default class CommitTreeComponent extends React.Component {
                     programDataDownloaded: datasetJson,
                     programName: programData[0].name + 'v' + programData[0].version + ' (local)',
                     forecastStartDate: programData[0].datasetJson.currentVersion.forecastStartDate,
-                    forecastStopDate: programData[0].datasetJson.currentVersion.forecastStopDate
+                    forecastStopDate: programData[0].datasetJson.currentVersion.forecastStopDate,
+                    notes: programData[0].datasetJson.currentVersion.notes
                 })
 
                 var PgmTreeList = programData[0].datasetJson.treeList;
@@ -874,10 +875,9 @@ export default class CommitTreeComponent extends React.Component {
                             var datasetData = datasetDataBytes.toString(CryptoJS.enc.Utf8);
                             var datasetJson = JSON.parse(datasetData);
                             var programJson = datasetJson;
-                            programJson.versionType = { id: document.getElementById("versionTypeId").value };
-                            programJson.versionStatus = { id: 2 };
-                            programJson.notes = document.getElementById("notes").value;
-
+                            programJson.currentVersion.versionType = { id: document.getElementById("versionTypeId").value };
+                            programJson.currentVersion.notes = document.getElementById("notes").value;;
+                            console.log("ProgramJson+++",programJson);
                             //create saveDatasetData in ProgramService
                             DatasetService.saveDatasetData(programJson, this.state.comparedLatestVersion).then(response => {
                                 if (response.status == 200) {
@@ -1904,8 +1904,8 @@ export default class CommitTreeComponent extends React.Component {
                         <h3 style={{textAlign:'left'}}><strong>{i18n.t('static.commitTree.forecastValidation')}</strong><i className="fa fa-print pull-right iconClass cursor" onClick={() => this.print()}></i></h3>
                     </ModalHeader> */}
                     <ModalHeader toggle={() => this.toggleShowValidation()} className="modalHeaderSupplyPlan">
-                    <div>
-                        <img className=" pull-right iconClass cursor ml-lg-2" style={{ height: '22px', width: '22px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.exportPDF()} />
+                        <div>
+                            <img className=" pull-right iconClass cursor ml-lg-2" style={{ height: '22px', width: '22px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.exportPDF()} />
                             <i className="fa fa-print pull-right iconClassCommit cursor" onClick={() => this.print()}></i>
                             <h3><strong>{i18n.t('static.commitTree.forecastValidation')}</strong></h3>
                         </div>

@@ -20,6 +20,9 @@ import { jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCom
 import NumberFormat from 'react-number-format';
 import { CustomTooltips } from "@coreui/coreui-plugin-chartjs-custom-tooltips";
 import { Prompt } from "react-router-dom";
+import pdfIcon from '../../assets/img/pdf.png';
+import jsPDF from 'jspdf';
+import { LOGO } from "../../CommonComponent/Logo";
 
 const entityname = i18n.t('static.dashboard.dataEntryAndAdjustment');
 
@@ -1092,6 +1095,180 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     }
   }
 
+
+  exportPDFDataCheck(){
+    const addFooters = doc => {
+
+      const pageCount = doc.internal.getNumberOfPages()
+
+      doc.setFont('helvetica', 'bold')
+      doc.setFontSize(6)
+      for (var i = 1; i <= pageCount; i++) {
+          doc.setPage(i)
+
+          doc.setPage(i)
+          doc.text('Page ' + String(i) + ' of ' + String(pageCount), doc.internal.pageSize.width / 9, doc.internal.pageSize.height - 30, {
+              align: 'center'
+          })
+          doc.text('Copyright © 2020 ' + i18n.t('static.footer'), doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
+              align: 'center'
+          })
+
+
+      }
+  }
+  const addHeaders = doc => {
+
+      const pageCount = doc.internal.getNumberOfPages()
+
+
+      //  var file = new File('QAT-logo.png','../../../assets/img/QAT-logo.png');
+      // var reader = new FileReader();
+
+      //var data='';
+      // Use fs.readFile() method to read the file 
+      //fs.readFile('../../assets/img/logo.svg', 'utf8', function(err, data){ 
+      //}); 
+      for (var i = 1; i <= pageCount; i++) {
+          doc.setFontSize(12)
+          doc.setFont('helvetica', 'bold')
+          doc.setPage(i)
+          doc.addImage(LOGO, 'png', 0, 10, 180, 50, 'FAST');
+          /*doc.addImage(data, 10, 30, {
+            align: 'justify'
+          });*/
+          doc.setTextColor("#002f6c");
+          doc.text(i18n.t('static.common.dataCheck'), doc.internal.pageSize.width / 2, 60, {
+              align: 'center'
+          })
+          if (i == 1) {
+              doc.setFont('helvetica', 'normal')
+              doc.setFontSize(8)
+              doc.text(i18n.t('static.dashboard.programheader') + ' : ' + document.getElementById("datasetId").selectedOptions[0].text, doc.internal.pageSize.width / 20, 90, {
+                  align: 'left'
+              })
+
+          }
+
+      }
+  }
+
+
+  const unit = "pt";
+  const size = "A4"; // Use A1, A2, A3 or A4
+  const orientation = "landscape"; // portrait or landscape
+
+  const marginLeft = 10;
+  const doc = new jsPDF(orientation, unit, size, true);
+
+  doc.setFontSize(8);
+  doc.setFont('helvetica', 'normal')
+
+
+  var y = 110;
+
+  doc.setFont('helvetica', 'bold')
+  var planningText = doc.splitTextToSize(i18n.t('static.commitTree.consumptionForecast'), doc.internal.pageSize.width * 3 / 4);
+  // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+  y = y + 20;
+  for (var i = 0; i < planningText.length; i++) {
+      if (y > doc.internal.pageSize.height - 100) {
+          doc.addPage();
+          y = 80;
+
+      }
+      doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
+      y = y + 10;
+  }
+
+  doc.setFont('helvetica', 'normal')
+  planningText = doc.splitTextToSize("a. " + i18n.t('static.commitTree.monthsMissingActualConsumptionValues'), doc.internal.pageSize.width * 3 / 4);
+  // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+  y = y + 10;
+  for (var i = 0; i < planningText.length; i++) {
+      if (y > doc.internal.pageSize.height - 100) {
+          doc.addPage();
+          y = 80;
+
+      }
+      doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
+      y = y + 10;
+  }
+  this.state.missingMonthList.map((item, i) => {
+      doc.setFont('helvetica', 'bold')
+      planningText = doc.splitTextToSize(getLabelText(item.planningUnitLabel, this.state.lang) + " - " + getLabelText(item.regionLabel, this.state.lang) + " : ", doc.internal.pageSize.width * 3 / 4);
+      // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+      y = y + 10;
+      for (var i = 0; i < planningText.length; i++) {
+          if (y > doc.internal.pageSize.height - 100) {
+              doc.addPage();
+              y = 80;
+
+          }
+          doc.text(doc.internal.pageSize.width / 15, y, planningText[i]);
+          y = y + 10;
+      }
+      doc.setFont('helvetica', 'normal')
+      planningText = doc.splitTextToSize("" + item.monthsArray, doc.internal.pageSize.width * 3 / 4);
+      // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+      y = y + 3;
+      for (var i = 0; i < planningText.length; i++) {
+          if (y > doc.internal.pageSize.height - 100) {
+              doc.addPage();
+              y = 80;
+
+          }
+          doc.text(doc.internal.pageSize.width / 15, y, planningText[i]);
+          y = y + 10;
+      }
+  })
+
+  doc.setFont('helvetica', 'normal')
+  planningText = doc.splitTextToSize("b. " + i18n.t('static.commitTree.puThatDoNotHaveAtleast24MonthsOfActualConsumptionValues'), doc.internal.pageSize.width * 3 / 4);
+  // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+  y = y + 20;
+  for (var i = 0; i < planningText.length; i++) {
+      if (y > doc.internal.pageSize.height - 100) {
+          doc.addPage();
+          y = 80;
+
+      }
+      doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
+      y = y + 10;
+  }
+  this.state.consumptionListlessTwelve.map((item, i) => {
+      doc.setFont('helvetica', 'bold')
+      planningText = doc.splitTextToSize(getLabelText(item.planningUnitLabel, this.state.lang) + " - " + getLabelText(item.regionLabel, this.state.lang) + " : ", doc.internal.pageSize.width * 3 / 4);
+      // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+      y = y + 10;
+      for (var i = 0; i < planningText.length; i++) {
+          if (y > doc.internal.pageSize.height - 100) {
+              doc.addPage();
+              y = 80;
+
+          }
+          doc.text(doc.internal.pageSize.width / 15, y, planningText[i]);
+          y = y + 10;
+      }
+      doc.setFont('helvetica', 'normal')
+      planningText = doc.splitTextToSize("" + item.noOfMonths + " month(s)", doc.internal.pageSize.width * 3 / 4);
+      // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+      y = y + 3;
+      for (var i = 0; i < planningText.length; i++) {
+          if (y > doc.internal.pageSize.height - 100) {
+              doc.addPage();
+              y = 80;
+
+          }
+          doc.text(doc.internal.pageSize.width / 15, y, planningText[i]);
+          y = y + 10;
+      }
+  })
+  addHeaders(doc)
+  addFooters(doc)
+  doc.save(i18n.t('static.common.dataCheck').concat('.pdf'));
+  }
+
   render() {
     const { datasetList } = this.state;
     let datasets = datasetList.length > 0
@@ -1512,7 +1689,10 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         <Modal isOpen={this.state.toggleDataCheck}
           className={'modal-lg ' + this.props.className} >
           <ModalHeader toggle={() => this.openDataCheckModel()} className="modalHeaderSupplyPlan">
-            <strong>{i18n.t('static.common.dataCheck')}</strong>
+            <div>
+              <img className=" pull-right iconClass cursor ml-lg-2" style={{ height: '22px', width: '22px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.exportPDFDataCheck()} />
+              <strong>{i18n.t('static.common.dataCheck')}</strong>
+            </div>
           </ModalHeader>
           <div>
             <ModalBody>
