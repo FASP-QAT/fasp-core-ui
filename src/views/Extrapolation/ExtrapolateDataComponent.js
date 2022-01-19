@@ -27,6 +27,10 @@ import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
 import { Prompt } from "react-router";
 
 const entityname = i18n.t('static.dashboard.extrapolation');
+const pickerLang = {
+    months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
+    from: 'From', to: 'To',
+}
 export default class ExtrapolateDataComponent extends React.Component {
     constructor(props) {
         super(props);
@@ -51,6 +55,7 @@ export default class ExtrapolateDataComponent extends React.Component {
             inputDataRegressionFilter: [],
             tesdataFilter: [],
             consumptionData: [],
+            columns: [],
             tesdataFilterLowerBond: [],
             tesdataFilterUpperBond: [],
             lang: localStorage.getItem("lang"),
@@ -992,17 +997,165 @@ export default class ExtrapolateDataComponent extends React.Component {
         }
     }
 
+    makeText = m => {
+        if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
+        return '?'
+    }
+    addDoubleQuoteToRowContent = (arr) => {
+        return arr.map(ele => '"' + ele + '"')
+    }
+
     exportCSV() {
         var csvRow = [];
-        csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + document.getElementById("datasetId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+        csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + document.getElementById("forecastProgramId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
         csvRow.push('')
         csvRow.push('"' + (i18n.t('static.common.forecastPeriod') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ', '%20') + '"')
         csvRow.push('')
+        csvRow.push('"' + (i18n.t('static.dashboard.planningunitheader') + ' : ' + document.getElementById("planningUnitId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+        csvRow.push('')
         csvRow.push('"' + (i18n.t('static.program.region') + ' : ' + document.getElementById("regionId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
         csvRow.push('')
-        csvRow.push('"' + (i18n.t('static.report.planningUnit') + ' : ' + document.getElementById("planningUnitId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+        csvRow.push('"' + (i18n.t('static.extrapolation.dateRangeForHistoricData') + ' : ' + this.makeText(this.state.rangeValue1.from) + ' ~ ' + this.makeText(this.state.rangeValue1.to)).replaceAll(' ', '%20') + '"')
+        csvRow.push('')
+        csvRow.push('"' + (i18n.t('static.program.region') + ' : ' + document.getElementById("regionId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+        csvRow.push('')
+        csvRow.push('"'+(i18n.t('static.extrapolation.selectedExtraploationMethods'))+'"')
+        if (this.state.movingAvgId) {
+            csvRow.push('"' + (i18n.t('static.extrapolation.movingAverages')) + '"')
+        }
+        if (this.state.semiAvgId) {
+            csvRow.push('"' + (i18n.t('static.extrapolation.semiAverages')) + '"')
+        }
+        if (this.state.linearRegressionId) {
+            csvRow.push('"' + (i18n.t('static.extrapolation.linearRegression')) + '"')
+        }
+        if (this.state.smoothingId) {
+            csvRow.push('"' + (i18n.t('static.extrapolation.tes')) + '"')
+        }
+        if (this.state.arimaId) {
+            csvRow.push('"' + (i18n.t('static.extrapolation.arima')) + '"')
+        }
+        csvRow.push('')
+
+        var columns = [];
+        columns.push(i18n.t('static.common.errors'));
+        if (this.state.movingAvgId) {
+            columns.push(i18n.t('static.extrapolation.movingAverages'))
+        }
+        if (this.state.semiAvgId) {
+            columns.push(i18n.t('static.extrapolation.semiAverages'))
+        }
+        if (this.state.linearRegressionId) {
+            columns.push(i18n.t('static.extrapolation.linearRegression'))
+        }
+        if (this.state.smoothingId) {
+            columns.push(i18n.t('static.extrapolation.tes'))
+        }
+        if (this.state.arimaId) {
+            columns.push(i18n.t('static.extrapolation.arima'))
+        }
+        let headers = [];
+        columns.map((item, idx) => { headers[idx] = (item).replaceAll(' ', '%20') });
+        var A = [this.addDoubleQuoteToRowContent(headers)];
+        A.push(this.addDoubleQuoteToRowContent([
+            i18n.t('static.common.rmse'),
+            this.state.movingAvgId ? this.state.movingAvgError.rmse : "",
+            this.state.semiAvgId ? this.state.semiAvgError.rmse : "",
+            this.state.linearRegressionId ? this.state.linearRegressionError.rmse : "",
+            this.state.smoothingId ? this.state.tesError.rmse : "",
+            this.state.arimaId ? "" : ""]))
+        A.push(this.addDoubleQuoteToRowContent([
+            i18n.t('static.extrapolation.mape'),
+            this.state.movingAvgId ? this.state.movingAvgError.mape : "",
+            this.state.semiAvgId ? this.state.semiAvgError.mape : "",
+            this.state.linearRegressionId ? this.state.linearRegressionError.mape : "",
+            this.state.smoothingId ? this.state.tesError.mape : "",
+            this.state.arimaId ? "" : ""]))
+        A.push(this.addDoubleQuoteToRowContent([
+            i18n.t('static.extrapolation.mse'),
+            this.state.movingAvgId ? this.state.movingAvgError.mse : "",
+            this.state.semiAvgId ? this.state.semiAvgError.mse : "",
+            this.state.linearRegressionId ? this.state.linearRegressionError.mse : "",
+            this.state.smoothingId ? this.state.tesError.mse : "",
+            this.state.arimaId ? "" : ""]))
+        A.push(this.addDoubleQuoteToRowContent([
+            i18n.t('static.extrapolation.wape'),
+            this.state.movingAvgId ? this.state.movingAvgError.wape : "",
+            this.state.semiAvgId ? this.state.semiAvgError.wape : "",
+            this.state.linearRegressionId ? this.state.linearRegressionError.wape : "",
+            this.state.smoothingId ? this.state.tesError.wape : "",
+            this.state.arimaId ? "" : ""]))
+        A.push(this.addDoubleQuoteToRowContent([
+            i18n.t('static.extrapolation.rSquare'),
+            this.state.movingAvgId ? this.state.movingAvgError.rSqd : "",
+            this.state.semiAvgId ? this.state.semiAvgError.rSqd : "",
+            this.state.linearRegressionId ? this.state.linearRegressionError.rSqd : "",
+            this.state.smoothingId ? this.state.tesError.rSqd : "",
+            this.state.arimaId ? "" : ""]))
+
+        for (var i = 0; i < A.length; i++) {
+            csvRow.push(A[i].join(","))
+        }
         csvRow.push('')
         csvRow.push('')
+        headers = [];
+        var columns = [];
+        columns.push(i18n.t('static.inventoryDate.inventoryReport'))
+        columns.push(i18n.t('static.extrapolation.adjustedActuals'))
+        if (this.state.movingAvgId) {
+            columns.push(i18n.t('static.extrapolation.movingAverages'))
+        } if (this.state.semiAvgId) {
+            columns.push(i18n.t('static.extrapolation.semiAverages'))
+        } if (this.state.linearRegressionId) {
+            columns.push(i18n.t('static.extrapolation.linearRegression'))
+        }
+        if (this.state.smoothingId) {
+            columns.push(i18n.t('static.extrapolation.tesLower'))
+            columns.push(i18n.t('static.extrapolation.tes'))
+            columns.push(i18n.t('static.extrapolation.tesUpper'))
+        } if (this.state.arimaId) {
+            columns.push(i18n.t('static.extrapolation.arima'))
+        }
+        headers = [];
+        columns.map((item, idx) => { headers[idx] = (item).replaceAll(' ', '%20') });
+        var C = []
+        C.push([this.addDoubleQuoteToRowContent(headers)]);
+        var B = [];
+        var monthArray = this.state.monthArray;
+        let rangeValue = this.state.rangeValue1;
+        var startMonth = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
+        var actualConsumptionList = this.state.actualConsumptionList;
+        var CI = this.state.CI;
+        for (var j = 0; j < monthArray.length; j++) {
+            B = [];
+            var consumptionData = actualConsumptionList.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArray[j]).format("YYYY-MM") && c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId)
+            var movingAvgDataFilter = this.state.movingAvgData.filter(c => moment(startMonth).add(c.month - 1, 'months').format("YYYY-MM") == moment(monthArray[j]).format("YYYY-MM"))
+            var semiAvgDataFilter = this.state.semiAvgData.filter(c => moment(startMonth).add(c.month - 1, 'months').format("YYYY-MM") == moment(monthArray[j]).format("YYYY-MM"))
+            var linearRegressionDataFilter = this.state.linearRegressionData.filter(c => moment(startMonth).add(c.month - 1, 'months').format("YYYY-MM") == moment(monthArray[j]).format("YYYY-MM"))
+            var tesDataFilter = this.state.tesData.filter(c => moment(startMonth).add(c.month - 1, 'months').format("YYYY-MM") == moment(monthArray[j]).format("YYYY-MM"))
+            B.push(
+                moment(monthArray[j]).format(DATE_FORMAT_CAP_WITHOUT_DATE).toString().replaceAll(',', ' ').replaceAll(' ', '%20'),
+                consumptionData.length > 0 ? consumptionData[0].amount : "",
+                this.state.movingAvgId && movingAvgDataFilter.length > 0 && movingAvgDataFilter[0].forecast != null ? movingAvgDataFilter[0].forecast.toFixed(2) : '',
+                this.state.semiAvgId && semiAvgDataFilter.length > 0 && semiAvgDataFilter[0].forecast != null ? semiAvgDataFilter[0].forecast.toFixed(2) : '',
+                this.state.linearRegressionId && linearRegressionDataFilter.length > 0 && linearRegressionDataFilter[0].forecast != null ? linearRegressionDataFilter[0].forecast.toFixed(2) : '',
+                this.state.smoothingId && tesDataFilter.length > 0 && tesDataFilter[0].forecast != null ? (Number(tesDataFilter[0].forecast) - CI).toFixed(2) : '',
+                this.state.smoothingId && tesDataFilter.length > 0 && tesDataFilter[0].forecast != null ? Number(tesDataFilter[0].forecast).toFixed(2) : '',
+                this.state.smoothingId && tesDataFilter.length > 0 && tesDataFilter[0].forecast != null ? (Number(tesDataFilter[0].forecast) + CI).toFixed(2) : '',
+                this.state.arimaId?"":"")
+            C.push(this.addDoubleQuoteToRowContent(B));
+        }
+        for (var i = 0; i < C.length; i++) {
+            csvRow.push(C[i].join(","))
+        }
+
+        var csvString = csvRow.join("%0A")
+        var a = document.createElement("a")
+        a.href = 'data:attachment/csv,' + csvString
+        a.target = "_Blank"
+        a.download = i18n.t('static.dashboard.extrapolation') + ".csv"
+        document.body.appendChild(a)
+        a.click()
     }
 
     setAlpha(e) {
