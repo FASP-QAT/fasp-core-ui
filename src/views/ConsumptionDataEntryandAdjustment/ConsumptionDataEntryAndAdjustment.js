@@ -477,6 +477,111 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     }
   }
 
+
+  interpolationMissingActualConsumption() {
+    console.log("Interploate");
+    var monthArray = this.state.monthArray;
+    var regionList = this.state.regionList;
+    var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
+    var curUser = AuthenticationService.getLoggedInUserId();
+   
+    var consumptionUnit = this.state.selectedConsumptionUnitObject;
+    var fullConsumptionList = this.state.consumptionList.filter(c => c.planningUnit.id != consumptionUnit.planningUnit.id);
+    console.log("fullConsumptionList----?",fullConsumptionList)
+    console.log("consumptionUnit----->",consumptionUnit)
+    var elInstance = this.state.dataEl;
+    for (var i = 0; i < monthArray.length - 2; i++) {
+      var columnData = elInstance.getColumnData([i + 1]);
+      var actualConsumptionCount = 2;
+      var reportingRateCount = 3;
+      var daysOfStockOutCount = 4;
+      for (var r = 0; r < regionList.length; r++) {
+        console.log("fullConsumptionList----in if",fullConsumptionList)
+        var index = 0;
+     //   index = fullConsumptionList.findIndex(c => c.planningUnit.id == consumptionUnit.planningUnit.id && c.region.id == regionList[r].regionId && moment(c.month).format("YYYY-MM") == moment(monthArray[i].date).format("YYYY-MM"));
+        index = fullConsumptionList.findIndex(con =>  con.region.id == regionList[r].regionId && moment(con.month).format("YYYY-MM") == moment(monthArray[i].date).format("YYYY-MM"));
+                  
+        if (columnData[actualConsumptionCount] > 0) {
+          if (index != -1) {
+            fullConsumptionList[index].actualConsumption = columnData[actualConsumptionCount];
+            fullConsumptionList[index].reportingRate = columnData[reportingRateCount];
+            fullConsumptionList[index].daysOfStockOut = columnData[daysOfStockOutCount];
+          } else {
+            var json = {
+              actualConsumption: columnData[actualConsumptionCount],
+              consumptionUnit: consumptionUnit,
+              createdBy: {
+                userId: curUser
+              },
+              createdDate: curDate,
+              daysOfStockOut: 0,
+              exculde: false,
+              forecastConsumptionId: 0,
+              month: moment(monthArray[i].date).format("YYYY-MM-DD"),
+              region: {
+                id: regionList[r].regionId
+              },
+              reportingRate: 100
+            }
+            fullConsumptionList.push(json);
+          }
+        }
+        actualConsumptionCount += 8;
+        reportingRateCount += 8;
+        daysOfStockOutCount += 8
+      }
+    }
+
+    for (var r = 0; r < regionList.length; r++) {
+      for (var j = 0; j < monthArray.length; j++) {
+        var consumptionData = fullConsumptionList.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArray[j].date).format("YYYY-MM") && c.region.id == regionList[r].regionId && c.amount >= 0);
+        console.log("consumptionData---",consumptionData)
+        if (consumptionData.length == 0) {
+          console.log("fullConsumptionList&&&&",fullConsumptionList)
+          var startValList = fullConsumptionList.filter(c => moment(c.month).format("YYYY-MM") < moment(monthArray[j].date).format("YYYY-MM") && c.region.id == regionList[r].regionId && c.amount >= 0)
+            .sort(function (a, b) {
+              return new Date(a.month) - new Date(b.month);
+            });
+            console.log("startValList",startValList)
+          var startVal = startValList[startValList.length - 1].amount;
+          var startMonthVal = startValList[startValList.length - 1].month;
+          var endValList = fullConsumptionList.filter(c => moment(c.month).format("YYYY-MM") > moment(monthArray[j].date).format("YYYY-MM") && c.region.id == regionList[r].regionId && c.amount >= 0)
+            .sort(function (a, b) {
+              return new Date(a.month) - new Date(b.month);
+            });
+            console.log('endValList',endValList)
+          var endVal = endValList[0].amount;
+          var endMonthVal = endValList[0].month;
+
+          //y=y1+(x-x1)*y2-y1/x2-x1;
+          var missingActualConsumption = startVal + (moment(monthArray[j].date).format("YYYY-MM") - startMonthVal) * endVal - startVal / endMonthVal - startMonthVal;
+          var json = {
+            amount: missingActualConsumption,
+            consumptionUnit: consumptionUnit,
+            createdBy: {
+              userId: curUser
+            },
+            createdDate: curDate,
+            daysOfStockOut: columnData[daysOfStockOutCount],
+            exculde: false,
+            forecastConsumptionId: 0,
+            month: moment(monthArray[i].date).format("YYYY-MM-DD"),
+            region: {
+              id: regionList[r].regionId
+            },
+            reportingRate: columnData[reportingRateCount]
+          }
+          fullConsumptionList.push(json);
+        }
+      }
+    }
+
+    this.setState({
+      consumptionList:fullConsumptionList
+    })
+    this.buildDataJexcel(this.state.selectedConsumptionUnitId);    
+  }
+
   saveConsumptionList() {
     this.setState({
       loading: true
@@ -1327,6 +1432,8 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                             </Input>
                           </InputGroup>
                         </div>
+                        <Button type="button" id="formSubmitButton" size="md" color="success" className="float-right mr-1" onClick={() => this.interpolationMissingActualConsumption()}>
+                        <i className="fa fa-check"></i>{i18n.t('static.pipeline.interpolateMissingValues')}</Button>
                       </FormGroup>
                     </div>
                     {/* <div className="table-scroll">
