@@ -747,9 +747,9 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         if (datasetList.length == 1) {
           datasetId = datasetList[0].id;
           event.target.value = datasetList[0].id;
-        } else if (localStorage.getItem("sesLiveDatasetId") != "" && datasetList.filter(c => c.id == localStorage.getItem("sesLiveDatasetId")).length > 0) {
-          datasetId = localStorage.getItem("sesLiveDatasetId");
-          event.target.value = localStorage.getItem("sesLiveDatasetId");
+        } else if (localStorage.getItem("sesDatasetId") != "" && datasetList.filter(c => c.id == localStorage.getItem("sesDatasetId")).length > 0) {
+          datasetId = localStorage.getItem("sesDatasetId");
+          event.target.value = localStorage.getItem("sesDatasetId");
         }
         this.setState({
           datasetList: datasetList,
@@ -780,7 +780,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         loading: true
       })
       var datasetId = e.target.value;
-      localStorage.setItem("sesLiveDatasetId", datasetId);
+      localStorage.setItem("sesDatasetId", datasetId);
       this.setState({
         datasetId: datasetId,
       }, () => {
@@ -920,6 +920,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
               var allPlanningUnitList = puResult.filter(c => forecastingUnitIds.includes(c.forecastingUnit.forecastingUnitId));
               console.log("PlanningUnitTotalKList+++", planningUnitTotalList);
               console.log("PlanningUnitListForRegion+++", planningUnitTotalListRegion);
+
               this.setState({
                 consumptionList: consumptionList,
                 regionList: regionList,
@@ -935,6 +936,11 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                 planningUnitTotalList: planningUnitTotalList,
                 planningUnitTotalListRegion: planningUnitTotalListRegion,
                 allPlanningUnitList: allPlanningUnitList
+              }, () => {
+                console.log("this.props.match.params.planningUnitId+++",this.props.match.params.planningUnitId)
+                if (this.props.match.params.planningUnitId > 0) {
+                  this.buildDataJexcel(this.props.match.params.planningUnitId)
+                }
               })
             }.bind(this)
           }.bind(this)

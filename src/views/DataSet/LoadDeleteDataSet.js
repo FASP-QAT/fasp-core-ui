@@ -1293,7 +1293,8 @@ class LoadDeleteDataSet extends Component {
                                                                 version: json[r].currentVersion.versionId,
                                                                 userId: userId,
                                                                 programCode: json[r].programCode,
-                                                                changed: 0
+                                                                changed: 0,
+                                                                readonly: 0
                                                             };
                                                             programIds.push(json[r].programId + "_v" + json[r].currentVersion.versionId + "_uId_" + userId);
                                                             console.log("hey program download changed flag check");
@@ -1313,7 +1314,8 @@ class LoadDeleteDataSet extends Component {
                                                             // this.refs.programListChild.checkNewerVersions();
                                                             this.getPrograms();
                                                             this.getLocalPrograms();
-                                                            this.props.history.push({ pathname: `/masterDataSync/green/` + 'Dataset loaded successfully', state: { "programIds": programIds } })
+                                                            // this.props.history.push({ pathname: `/masterDataSync/green/` + 'Dataset loaded successfully', state: { "programIds": programIds } })
+                                                            this.props.history.push({ pathname: `/syncProgram/green/` + 'Dataset loaded successfully', state: { "programIds": programIds } })
                                                         }.bind(this)
                                                     }.bind(this)
                                                 }.bind(this)

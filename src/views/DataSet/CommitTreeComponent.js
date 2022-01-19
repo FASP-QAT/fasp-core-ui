@@ -2,9 +2,12 @@ import React from "react";
 import ReactDOM from 'react-dom';
 import {
     Card, CardBody,
+    FormFeedback,
     Label, Input, FormGroup,
     CardFooter, Button, Col, Form, InputGroup, Modal, ModalHeader, ModalFooter, ModalBody, Row, Table, PopoverBody, Popover
 } from 'reactstrap';
+import { Formik } from 'formik';
+import * as Yup from 'yup';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { DATE_FORMAT_CAP_WITHOUT_DATE, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_MONTH_PICKER_FORMAT, JEXCEL_PAGINATION_OPTION, SECRET_KEY, PENDING_APPROVAL_VERSION_STATUS } from "../../Constants";
 import i18n from '../../i18n';
@@ -25,9 +28,44 @@ import { ProgressBar, Step } from "react-step-progress-bar";
 import ProgramService from "../../api/ProgramService";
 import AuthenticationService from '../Common/AuthenticationService.js';
 import jsPDF from 'jspdf';
+import "jspdf-autotable";
 import html2canvas from 'html2canvas';
-const entityname = i18n.t('static.button.commit');
+import pdfIcon from '../../assets/img/pdf.png';
+import { LOGO } from "../../CommonComponent/Logo";
 
+const entityname = i18n.t('static.button.commit');
+const initialValues = {
+    notes: ''
+}
+
+const validationSchema = function (values, t) {
+    return Yup.object().shape({
+        notes: Yup.string()
+            .matches(/^([a-zA-Z0-9\s,\./<>\?;':""[\]\\{}\|`~!@#\$%\^&\*()-_=\+]*)$/, i18n.t("static.label.validData"))
+    })
+}
+const validate = (getValidationSchema) => {
+    return (values) => {
+
+        const validationSchema = getValidationSchema(values, i18n.t)
+        try {
+            validationSchema.validateSync(values, { abortEarly: false })
+            return {}
+        } catch (error) {
+            return getErrorsFromValidationError(error)
+        }
+    }
+}
+
+const getErrorsFromValidationError = (validationError) => {
+    const FIRST_ERROR = 0
+    return validationError.inner.reduce((errors, error) => {
+        return {
+            ...errors,
+            [error.path]: error.errors[FIRST_ERROR],
+        }
+    }, {})
+}
 
 export default class CommitTreeComponent extends React.Component {
     constructor(props) {
@@ -53,6 +91,7 @@ export default class CommitTreeComponent extends React.Component {
             consumptionListlessTwelve: [],
             missingMonthList: [],
             treeNodeList: [],
+            treeScenarioNotes: [],
             missingBranchesList: [],
             noForecastSelectedList: [],
             datasetPlanningUnit: [],
@@ -63,6 +102,34 @@ export default class CommitTreeComponent extends React.Component {
         this.synchronize = this.synchronize.bind(this);
         this.updateState = this.updateState.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
+    }
+
+    notesChange(event) {
+        this.setState({
+            notes: event.target.value
+        })
+    }
+
+    touchAll(setTouched, errors) {
+        setTouched({
+            notes: true
+        }
+        );
+        this.validateForm(errors);
+    }
+    validateForm(errors) {
+        this.findFirstError('budgetForm', (fieldName) => {
+            return Boolean(errors[fieldName])
+        })
+    }
+    findFirstError(formName, hasError) {
+        const form = document.forms[formName]
+        for (let i = 0; i < form.length; i++) {
+            if (hasError(form[i].name)) {
+                form[i].focus()
+                break
+            }
+        }
     }
 
     componentDidMount = function () {
@@ -109,7 +176,6 @@ export default class CommitTreeComponent extends React.Component {
                         }
                     };
                     if (programList.length == 1) {
-                        console.log("in if%%%", programList.length)
                         programId = programList[0].id;
                         event.target.value = programList[0].id;
                     } else if (localStorage.getItem("sesDatasetId") != "" && programList.filter(c => c.id == localStorage.getItem("sesDatasetId")).length > 0) {
@@ -173,8 +239,22 @@ export default class CommitTreeComponent extends React.Component {
                 })
 
                 var PgmTreeList = programData[0].datasetJson.treeList;
-                console.log("Program --", programData[0].datasetJson);
 
+                var treeScenarioNotes = [];
+                var missingBranchesList = [];
+                for (var tl = 0; tl < PgmTreeList.length; tl++) {
+                    var treeList = PgmTreeList[tl];
+                    var scenarioList = treeList.scenarioList;
+                    for (var ndm = 0; ndm < scenarioList.length; ndm++) {
+                        treeScenarioNotes.push({
+                            tree: PgmTreeList[tl].label,
+                            scenario: scenarioList[ndm].label,
+                            treeId: PgmTreeList[tl].treeId,
+                            scenarioId: scenarioList[ndm].id,
+                            scenarioNotes: scenarioList[ndm].notes
+                        });
+                    }
+                }
                 var treePlanningUnitList = [];
                 var treeNodeList = [];
                 var treeScenarioList = [];
@@ -197,11 +277,13 @@ export default class CommitTreeComponent extends React.Component {
                             var modelingList = ((nodeDataMap[scenarioList[ndm].id])[0].nodeDataModelingList);
                             var madelingNotes = "";
                             for (var ml = 0; ml < modelingList.length; ml++) {
-                                madelingNotes = madelingNotes.concat(modelingList[ml].notes)
+                                madelingNotes = madelingNotes.concat(modelingList[ml].notes).concat(" ")
                             }
                             treeNodeList.push({
                                 tree: PgmTreeList[tl].label,
                                 scenario: scenarioList[ndm].label,
+                                treeId: PgmTreeList[tl].treeId,
+                                scenarioId: scenarioList[ndm].id,
                                 node: payload.label,
                                 notes: nodeNotes,
                                 madelingNotes: madelingNotes,
@@ -240,7 +322,8 @@ export default class CommitTreeComponent extends React.Component {
                 this.setState({
                     treeNodeList: treeNodeList,
                     treeScenarioList: treeScenarioList,
-                    missingBranchesList: missingBranchesList
+                    missingBranchesList: missingBranchesList,
+                    treeScenarioNotes: treeScenarioNotes
                 })
 
                 // Tree Forecast : planing unit missing on tree
@@ -393,7 +476,7 @@ export default class CommitTreeComponent extends React.Component {
                         }
 
                         //Consumption : missing months
-                        for (var i = 0; curDate < stopDate; i++) {
+                        for (var i = 0; moment(curDate).format("YYYY-MM") < moment(Date.now()).format("YYYY-MM"); i++) {
                             curDate = moment(startDate).add(i, 'months').format("YYYY-MM-DD");
                             var consumptionListFilteredForMonth = consumptionList.filter(c => c.planningUnit.id == puId && c.region.id == regionId && c.month == curDate);
                             if (consumptionListFilteredForMonth.length == 0) {
@@ -415,8 +498,8 @@ export default class CommitTreeComponent extends React.Component {
                     var selectedForecast = datasetPlanningUnit[dpu].selectedForecastMap;
                     var regionArray = [];
                     for (var drl = 0; drl < datasetRegionList.length; drl++) {
-                        if (selectedForecast[datasetRegionList[drl].regionId] == undefined) {
-                            regionArray.push(getLabelText(datasetRegionList[drl].label, this.state.lang));
+                        if (selectedForecast[datasetRegionList[drl].regionId] == undefined || (selectedForecast[datasetRegionList[drl].regionId].scenarioId == null && selectedForecast[datasetRegionList[drl].regionId].consumptionExtrapolationId == null)) {
+                            regionArray.push({ id: datasetRegionList[drl].regionId, label: getLabelText(datasetRegionList[drl].label, this.state.lang) });
                         }
                     }
                     noForecastSelectedList.push({
@@ -488,6 +571,8 @@ export default class CommitTreeComponent extends React.Component {
                         // readOnly: true
                     });
                 }
+                treeScenarioListFilter[tsl].columnArray = columnsArray;
+                treeScenarioListFilter[tsl].dataArray = childrenArray;
                 var options = {
                     data: childrenArray,
                     columnDrag: true,
@@ -500,7 +585,7 @@ export default class CommitTreeComponent extends React.Component {
                         entries: '',
                     },
                     onload: function (instance, cell, x, y, value) {
-                        jExcelLoadedFunction(instance);
+                        jExcelLoadedFunctionOnlyHideRow(instance);
                     },
                     updateTable: function (el, cell, x, y, source, value, id) {
                         if (y != null && x != 0) {
@@ -536,7 +621,7 @@ export default class CommitTreeComponent extends React.Component {
                 this.el = languageEl;
             }
         }
-        this.setState({ loading: false })
+        this.setState({ loading: false, treeScenarioListFilter: treeScenarioListFilter })
     }
 
     toggleShowValidation() {
@@ -572,17 +657,57 @@ export default class CommitTreeComponent extends React.Component {
                         progressPer: 75
                         , message: i18n.t('static.commitVersion.serverProcessingCompleted'), color: 'green'
                     }, () => {
-                        // this.hideFirstComponent();
+                        this.hideFirstComponent();
                         this.getLatestProgram({ openModal: true, notificationDetails: resp.data });
                     })
+                } else if (resp.data.createdBy.userId == curUser && resp.data.status == 3) {
+                    var db1;
+                    getDatabase();
+                    var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+                    openRequest.onerror = function (event) {
+                        this.setState({
+                            message: i18n.t('static.program.errortext'),
+                            color: 'red'
+                        })
+                        this.hideFirstComponent()
+                    }.bind(this);
+                    openRequest.onsuccess = function (e) {
+                        db1 = e.target.result;
+                        var transaction = db1.transaction(['datasetDetails'], 'readwrite');
+                        var program = transaction.objectStore('datasetDetails');
+                        var getRequest = program.get((this.state.programId));
+                        getRequest.onerror = function (event) {
+                            this.setState({
+                                message: i18n.t('static.program.errortext'),
+                                color: 'red'
+                            })
+                            this.hideFirstComponent()
+                        }.bind(this);
+                        getRequest.onsuccess = function (event) {
+                            var myResult = [];
+                            myResult = getRequest.result;
+                            myResult.readonly = 0;
+                            var transaction1 = db1.transaction(['datasetDetails'], 'readwrite');
+                            var program1 = transaction1.objectStore('datasetDetails');
+                            var getRequest1 = program1.put(myResult);
+                            getRequest1.onsuccess = function (e) {
+                                this.setState({
+                                    message: i18n.t('static.commitTree.commitFailed'),
+                                    color: 'red',
+                                    loading: false
+                                })
+                                this.hideFirstComponent()
+                            }.bind(this)
+                        }.bind(this)
+                    }.bind(this)
                 }
             } catch (err) {
                 // Handle Error Here
                 console.error("Error+++", err);
+                this.setState({ loading: false });
             }
         };
         sendGetRequest();
-        this.setState({ loading: false });
     }
 
     getLatestProgram(notificationDetails) {
@@ -602,7 +727,6 @@ export default class CommitTreeComponent extends React.Component {
         DatasetService.getAllDatasetData(checkboxesChecked)
             .then(response => {
                 var json = response.data;
-                console.log('json', json);
                 var db1;
                 getDatabase();
                 var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
@@ -626,13 +750,18 @@ export default class CommitTreeComponent extends React.Component {
                         var datasetRequest1 = datasetDataOs1.delete(this.state.programId);
 
                         datasetDataTransaction1.oncomplete = function (event) {
-                            var programDataTransaction2 = db1.transaction(['downloadedDatasetData'], 'readwrite');
-                            programDataTransaction2.oncomplete = function (event) {
+
+                            var datasetDataTransaction2 = db1.transaction(['datasetDetails'], 'readwrite');
+                            var datasetDataOs2 = datasetDataTransaction2.objectStore('datasetDetails');
+                            var datasetRequest2 = datasetDataOs2.delete(this.state.programId);
+
+                            datasetDataTransaction2.oncomplete = function (event) {
+                                // var programDataTransaction2 = db1.transaction(['downloadedDatasetData'], 'readwrite');
+                                // programDataTransaction2.oncomplete = function (event) {
 
                                 var transactionForSavingData = db1.transaction(['datasetData'], 'readwrite');
                                 var programSaveData = transactionForSavingData.objectStore('datasetData');
                                 for (var r = 0; r < json.length; r++) {
-                                    json[r].actionList = [];
                                     var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
                                     var userId = userBytes.toString(CryptoJS.enc.Utf8);
                                     // var version = json[r].requestedProgramVersion;
@@ -675,37 +804,34 @@ export default class CommitTreeComponent extends React.Component {
 
                                     }
                                     transactionForSavingDownloadedProgramData.oncomplete = function (event) {
-                                        //     var programQPLDetailsTransaction = db1.transaction(['programQPLDetails'], 'readwrite');
-                                        //     var programQPLDetailsOs = programQPLDetailsTransaction.objectStore('programQPLDetails');
-                                        //     var programIds = []
-                                        //     for (var r = 0; r < json.length; r++) {
-                                        //         var programQPLDetailsJson = {
-                                        //             id: json[r].programId + "_v" + json[r].currentVersion.versionId + "_uId_" + userId,
-                                        //             programId: json[r].programId,
-                                        //             version: json[r].currentVersion.versionId,
-                                        //             userId: userId,
-                                        //             programCode: json[r].programCode,
-                                        //             openCount: 0,
-                                        //             addressedCount: 0,
-                                        //             programModified: 0,
-                                        //             readonly: 0
-                                        //         };
-                                        //         programIds.push(json[r].programId + "_v" + json[r].currentVersion.versionId + "_uId_" + userId);
-                                        //         var programQPLDetailsRequest = programQPLDetailsOs.put(programQPLDetailsJson);
-                                        //     }
-                                        //     programQPLDetailsTransaction.oncomplete = function (event) {
-                                        this.setState({
-                                            progressPer: 100,
-                                            loading: false
-                                        })
-                                        this.goToMasterDataSync(programIdsToSyncArray);
-                                        //     }.bind(this)
+                                        var programQPLDetailsTransaction = db1.transaction(['datasetDetails'], 'readwrite');
+                                        var programQPLDetailsOs = programQPLDetailsTransaction.objectStore('datasetDetails');
+                                        var programIds = []
+                                        for (var r = 0; r < json.length; r++) {
+                                            var programQPLDetailsJson = {
+                                                id: json[r].programId + "_v" + json[r].currentVersion.versionId + "_uId_" + userId,
+                                                programId: json[r].programId,
+                                                version: json[r].currentVersion.versionId,
+                                                userId: userId,
+                                                programCode: json[r].programCode,
+                                                changed: 0
+                                            };
+                                            var programQPLDetailsRequest = programQPLDetailsOs.put(programQPLDetailsJson);
+                                        }
+                                        programQPLDetailsTransaction.oncomplete = function (event) {
+                                            this.setState({
+                                                progressPer: 100,
+                                                loading: false
+                                            })
+                                            this.goToMasterDataSync(programIdsToSyncArray);
+                                        }.bind(this)
                                     }.bind(this)
                                 }.bind(this);
                             }.bind(this);
                         }.bind(this);
                     }.bind(this);
                 }.bind(this);
+                // }.bind(this);
             })
 
     }
@@ -716,122 +842,131 @@ export default class CommitTreeComponent extends React.Component {
 
 
     synchronize() {
-        this.toggleShowValidation();
-        this.setState({ loading: true })
-        var db1;
-        getDatabase();
-        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-        openRequest.onerror = function (event) {
+        this.setState({ showValidation: !this.state.showValidation }, () => {
             this.setState({
-                supplyPlanError: i18n.t('static.program.errortext')
-            })
-        }.bind(this);
-        openRequest.onsuccess = function (e) {
-            db1 = e.target.result;
-            var programDataTransaction = db1.transaction(['datasetData'], 'readwrite');
-            var programDataOs = programDataTransaction.objectStore('datasetData');
-            var programRequest = programDataOs.get((this.state.programId));
-            programRequest.onerror = function (event) {
-                this.setState({
-                    supplyPlanError: i18n.t('static.program.errortext')
-                })
-            }.bind(this);
-            programRequest.onsuccess = function (e) {
-
-                var datasetDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
-                var datasetData = datasetDataBytes.toString(CryptoJS.enc.Utf8);
-                var datasetJson = JSON.parse(datasetData);
-                var programJson = datasetJson;
-                programJson.versionType = { id: document.getElementById("versionTypeId").value };
-                programJson.versionStatus = { id: 2 };
-                programJson.notes = document.getElementById("notesId").value;
-
-                //create saveDatasetData in ProgramService
-                DatasetService.saveDatasetData(programJson, this.state.comparedLatestVersion).then(response => {
-                    if (response.status == 200) {
-
+                loading: true,
+            }, () => {
+                var db1;
+                getDatabase();
+                var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+                openRequest.onerror = function (event) {
+                    this.setState({
+                        supplyPlanError: i18n.t('static.program.errortext')
+                    })
+                }.bind(this);
+                openRequest.onsuccess = function (e) {
+                    db1 = e.target.result;
+                    var programDataTransaction = db1.transaction(['datasetData'], 'readwrite');
+                    var programDataOs = programDataTransaction.objectStore('datasetData');
+                    var programRequest = programDataOs.get((this.state.programId));
+                    programRequest.onerror = function (event) {
                         this.setState({
-                            progressPer: 50
-                            , message: i18n.t('static.commitVersion.sendLocalToServerCompleted'), color: 'green'
-                        }, () => {
-                            // this.hideFirstComponent();
-                            // getLatestProgram also copy , use getAllDatasetData instead getAllProgramData
-                            this.redirectToDashbaord(response.data);
+                            supplyPlanError: i18n.t('static.program.errortext')
                         })
-                    } else {
-                        this.setState({
-                            message: response.data.messageCode,
-                            color: "red",
-                            loading: false
-                        })
-                        // this.hideFirstComponent();
-                    }
-                })
-                    .catch(
-                        error => {
-                            console.log("@@@Error4", error);
-                            console.log("@@@Error4", error.message);
-                            console.log("@@@Error4", error.response ? error.response.status : "")
-                            if (error.message === "Network Error") {
-                                console.log("+++in catch 7")
-                                this.setState({
-                                    message: 'static.common.networkError',
-                                    color: "red",
-                                    loading: false
-                                }, () => {
+                    }.bind(this);
+                    programRequest.onsuccess = function (e) {
+                        var programQPLDetailsTransaction1 = db1.transaction(['datasetDetails'], 'readwrite');
+                        var programQPLDetailsOs1 = programQPLDetailsTransaction1.objectStore('datasetDetails');
+                        var programQPLDetailsGetRequest = programQPLDetailsOs1.get((this.state.programId));
+                        programQPLDetailsGetRequest.onsuccess = function (event) {
+                            var programQPLDetails = programQPLDetailsGetRequest.result;
+                            var datasetDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+                            var datasetData = datasetDataBytes.toString(CryptoJS.enc.Utf8);
+                            var datasetJson = JSON.parse(datasetData);
+                            var programJson = datasetJson;
+                            programJson.versionType = { id: document.getElementById("versionTypeId").value };
+                            programJson.versionStatus = { id: 2 };
+                            programJson.notes = document.getElementById("notes").value;
+
+                            //create saveDatasetData in ProgramService
+                            DatasetService.saveDatasetData(programJson, this.state.comparedLatestVersion).then(response => {
+                                if (response.status == 200) {
+                                    var transactionForProgramQPLDetails = db1.transaction(['datasetDetails'], 'readwrite');
+                                    var programQPLDetailSaveData = transactionForProgramQPLDetails.objectStore('datasetDetails');
+                                    programQPLDetails.readonly = 1;
+                                    var putRequest2 = programQPLDetailSaveData.put(programQPLDetails);
+                                    localStorage.setItem("sesProgramId", "");
+                                    this.setState({
+                                        progressPer: 50
+                                        , message: i18n.t('static.commitVersion.sendLocalToServerCompleted'), color: 'green'
+                                    }, () => {
+                                        this.hideFirstComponent();
+                                        // getLatestProgram also copy , use getAllDatasetData instead getAllProgramData
+                                        this.redirectToDashbaord(response.data);
+                                    })
+                                } else {
+                                    this.setState({
+                                        message: response.data.messageCode,
+                                        color: "red",
+                                        loading: false
+                                    })
                                     this.hideFirstComponent();
-                                });
-                            } else {
-                                switch (error.response ? error.response.status : "") {
-
-                                    case 401:
-                                        this.props.history.push(`/login/static.message.sessionExpired`)
-                                        break;
-                                    case 403:
-                                        this.props.history.push(`/accessDenied`)
-                                        break;
-                                    case 406:
-                                        if (error.response.data.messageCode == 'static.commitVersion.versionIsOutDated') {
-                                            alert(i18n.t("static.commitVersion.versionIsOutDated"));
-                                        }
-                                        this.setState({
-                                            message: error.response.data.messageCode,
-                                            color: "red",
-                                            loading: false
-                                        }, () => {
-                                            this.hideFirstComponent()
-                                            if (error.response.data.messageCode == 'static.commitVersion.versionIsOutDated') {
-                                                this.checkLastModifiedDateForProgram(this.state.programId);
-                                            }
-                                        });
-                                        break;
-                                    case 500:
-                                    case 404:
-                                    case 412:
-                                        this.setState({
-                                            message: error.response.data.messageCode,
-                                            loading: false,
-                                            color: "red"
-                                        }, () => {
-                                            this.hideFirstComponent()
-                                        });
-                                        break;
-                                    default:
-                                        console.log("+++in catch 8")
-                                        this.setState({
-                                            message: 'static.unkownError',
-                                            loading: false,
-                                            color: "red"
-                                        }, () => {
-                                            this.hideFirstComponent()
-                                        });
-                                        break;
                                 }
-                            }
-                        }
-                    );
-            }.bind(this)
-        }.bind(this)
+                            })
+                                .catch(
+                                    error => {
+                                        if (error.message === "Network Error") {
+                                            this.setState({
+                                                message: 'static.common.networkError',
+                                                color: "red",
+                                                loading: false
+                                            }, () => {
+                                                this.hideFirstComponent();
+                                            });
+                                        } else {
+                                            switch (error.response ? error.response.status : "") {
+
+                                                case 401:
+                                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                                    break;
+                                                case 403:
+                                                    this.props.history.push(`/accessDenied`)
+                                                    break;
+                                                case 406:
+                                                    if (error.response.data.messageCode == 'static.commitVersion.versionIsOutDated') {
+                                                        alert(i18n.t("static.commitVersion.versionIsOutDated"));
+                                                    }
+                                                    this.setState({
+                                                        message: error.response.data.messageCode,
+                                                        color: "red",
+                                                        loading: false
+                                                    }, () => {
+                                                        this.hideFirstComponent()
+                                                        if (error.response.data.messageCode == 'static.commitVersion.versionIsOutDated') {
+                                                            this.checkLastModifiedDateForProgram(this.state.programId);
+                                                        }
+                                                    });
+                                                    break;
+                                                case 500:
+                                                case 404:
+                                                case 412:
+                                                    this.setState({
+                                                        message: error.response.data.messageCode,
+                                                        loading: false,
+                                                        color: "red"
+                                                    }, () => {
+                                                        this.hideFirstComponent()
+                                                    });
+                                                    break;
+                                                default:
+                                                    this.setState({
+                                                        message: 'static.unkownError',
+                                                        loading: false,
+                                                        color: "red"
+                                                    }, () => {
+                                                        this.hideFirstComponent()
+                                                    });
+                                                    break;
+                                            }
+                                        }
+                                    }
+                                );
+                        }.bind(this)
+                    }.bind(this)
+                }.bind(this)
+            })
+        })
+
     }
 
     cancelClicked() {
@@ -873,11 +1008,568 @@ export default class CommitTreeComponent extends React.Component {
         this.setState({ loading: false })
     }
 
+    exportPDF() {
+        const addFooters = doc => {
+
+            const pageCount = doc.internal.getNumberOfPages()
+
+            doc.setFont('helvetica', 'bold')
+            doc.setFontSize(6)
+            for (var i = 1; i <= pageCount; i++) {
+                doc.setPage(i)
+
+                doc.setPage(i)
+                doc.text('Page ' + String(i) + ' of ' + String(pageCount), doc.internal.pageSize.width / 9, doc.internal.pageSize.height - 30, {
+                    align: 'center'
+                })
+                doc.text('Copyright © 2020 ' + i18n.t('static.footer'), doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
+                    align: 'center'
+                })
+
+
+            }
+        }
+        const addHeaders = doc => {
+
+            const pageCount = doc.internal.getNumberOfPages()
+
+
+            //  var file = new File('QAT-logo.png','../../../assets/img/QAT-logo.png');
+            // var reader = new FileReader();
+
+            //var data='';
+            // Use fs.readFile() method to read the file 
+            //fs.readFile('../../assets/img/logo.svg', 'utf8', function(err, data){ 
+            //}); 
+            for (var i = 1; i <= pageCount; i++) {
+                doc.setFontSize(12)
+                doc.setFont('helvetica', 'bold')
+                doc.setPage(i)
+                doc.addImage(LOGO, 'png', 0, 10, 180, 50, 'FAST');
+                /*doc.addImage(data, 10, 30, {
+                  align: 'justify'
+                });*/
+                doc.setTextColor("#002f6c");
+                doc.text(i18n.t('static.commitTree.forecastValidation'), doc.internal.pageSize.width / 2, 60, {
+                    align: 'center'
+                })
+                if (i == 1) {
+                    doc.setFont('helvetica', 'normal')
+                    doc.setFontSize(8)
+                    doc.text(i18n.t('static.dashboard.programheader') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 20, 90, {
+                        align: 'left'
+                    })
+
+                }
+
+            }
+        }
+
+
+        const unit = "pt";
+        const size = "A4"; // Use A1, A2, A3 or A4
+        const orientation = "landscape"; // portrait or landscape
+
+        const marginLeft = 10;
+        const doc = new jsPDF(orientation, unit, size, true);
+
+        doc.setFontSize(8);
+        doc.setFont('helvetica', 'normal')
+
+
+        var y = 110;
+        var planningText = doc.splitTextToSize(i18n.t('static.common.forecastPeriod') + ' : ' + moment(this.state.forecastStartDate).format('MMM-YYYY') + ' to ' + moment(this.state.forecastStopDate).format('MMM-YYYY'), doc.internal.pageSize.width * 3 / 4);
+        // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+        for (var i = 0; i < planningText.length; i++) {
+            if (y > doc.internal.pageSize.height - 100) {
+                doc.addPage();
+                y = 80;
+
+            }
+            doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
+            y = y + 10;
+        }
+
+
+        doc.setFont('helvetica', 'bold')
+        planningText = doc.splitTextToSize("1. " + i18n.t('static.commitTree.noForecastSelected'), doc.internal.pageSize.width * 3 / 4);
+        // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+        y = y + 20;
+        for (var i = 0; i < planningText.length; i++) {
+            if (y > doc.internal.pageSize.height - 100) {
+                doc.addPage();
+                y = 80;
+
+            }
+            doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
+            y = y + 10;
+        }
+
+        doc.setFont('helvetica', 'normal')
+        this.state.noForecastSelectedList.map((item, i) => {
+            item.regionList.map(item1 => {
+                planningText = doc.splitTextToSize(getLabelText(item.planningUnit.planningUnit.label, this.state.lang) + " - " + item1.label, doc.internal.pageSize.width * 3 / 4);
+                // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+                y = y + 3;
+                for (var i = 0; i < planningText.length; i++) {
+                    if (y > doc.internal.pageSize.height - 100) {
+                        doc.addPage();
+                        y = 80;
+
+                    }
+                    doc.text(doc.internal.pageSize.width / 15, y, planningText[i]);
+                    y = y + 10;
+                }
+            })
+        })
+
+        doc.setFont('helvetica', 'bold')
+        planningText = doc.splitTextToSize("2. " + i18n.t('static.commitTree.consumptionForecast'), doc.internal.pageSize.width * 3 / 4);
+        // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+        y = y + 20;
+        for (var i = 0; i < planningText.length; i++) {
+            if (y > doc.internal.pageSize.height - 100) {
+                doc.addPage();
+                y = 80;
+
+            }
+            doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
+            y = y + 10;
+        }
+
+        doc.setFont('helvetica', 'normal')
+        planningText = doc.splitTextToSize("a. " + i18n.t('static.commitTree.monthsMissingActualConsumptionValues'), doc.internal.pageSize.width * 3 / 4);
+        // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+        y = y + 10;
+        for (var i = 0; i < planningText.length; i++) {
+            if (y > doc.internal.pageSize.height - 100) {
+                doc.addPage();
+                y = 80;
+
+            }
+            doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
+            y = y + 10;
+        }
+        this.state.missingMonthList.map((item, i) => {
+            doc.setFont('helvetica', 'bold')
+            planningText = doc.splitTextToSize(getLabelText(item.planningUnitLabel, this.state.lang) + " - " + getLabelText(item.regionLabel, this.state.lang) + " : ", doc.internal.pageSize.width * 3 / 4);
+            // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+            y = y + 10;
+            for (var i = 0; i < planningText.length; i++) {
+                if (y > doc.internal.pageSize.height - 100) {
+                    doc.addPage();
+                    y = 80;
+
+                }
+                doc.text(doc.internal.pageSize.width / 15, y, planningText[i]);
+                y = y + 10;
+            }
+            doc.setFont('helvetica', 'normal')
+            planningText = doc.splitTextToSize("" + item.monthsArray, doc.internal.pageSize.width * 3 / 4);
+            // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+            y = y + 3;
+            for (var i = 0; i < planningText.length; i++) {
+                if (y > doc.internal.pageSize.height - 100) {
+                    doc.addPage();
+                    y = 80;
+
+                }
+                doc.text(doc.internal.pageSize.width / 15, y, planningText[i]);
+                y = y + 10;
+            }
+        })
+
+        doc.setFont('helvetica', 'normal')
+        planningText = doc.splitTextToSize("b. " + i18n.t('static.commitTree.puThatDoNotHaveAtleast24MonthsOfActualConsumptionValues'), doc.internal.pageSize.width * 3 / 4);
+        // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+        y = y + 20;
+        for (var i = 0; i < planningText.length; i++) {
+            if (y > doc.internal.pageSize.height - 100) {
+                doc.addPage();
+                y = 80;
+
+            }
+            doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
+            y = y + 10;
+        }
+        this.state.consumptionListlessTwelve.map((item, i) => {
+            doc.setFont('helvetica', 'bold')
+            planningText = doc.splitTextToSize(getLabelText(item.planningUnitLabel, this.state.lang) + " - " + getLabelText(item.regionLabel, this.state.lang) + " : ", doc.internal.pageSize.width * 3 / 4);
+            // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+            y = y + 10;
+            for (var i = 0; i < planningText.length; i++) {
+                if (y > doc.internal.pageSize.height - 100) {
+                    doc.addPage();
+                    y = 80;
+
+                }
+                doc.text(doc.internal.pageSize.width / 15, y, planningText[i]);
+                y = y + 10;
+            }
+            doc.setFont('helvetica', 'normal')
+            planningText = doc.splitTextToSize("" + item.noOfMonths + " month(s)", doc.internal.pageSize.width * 3 / 4);
+            // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+            y = y + 3;
+            for (var i = 0; i < planningText.length; i++) {
+                if (y > doc.internal.pageSize.height - 100) {
+                    doc.addPage();
+                    y = 80;
+
+                }
+                doc.text(doc.internal.pageSize.width / 15, y, planningText[i]);
+                y = y + 10;
+            }
+        })
+
+        doc.setFont('helvetica', 'bold')
+        planningText = doc.splitTextToSize("3. " + i18n.t('static.commitTree.treeForecast'), doc.internal.pageSize.width * 3 / 4);
+        // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+        y = y + 20;
+        for (var i = 0; i < planningText.length; i++) {
+            if (y > doc.internal.pageSize.height - 100) {
+                doc.addPage();
+                y = 80;
+
+            }
+            doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
+            y = y + 10;
+        }
+
+        doc.setFont('helvetica', 'normal')
+        planningText = doc.splitTextToSize("a. " + i18n.t('static.commitTree.puThatDoesNotAppearOnAnyTree'), doc.internal.pageSize.width * 3 / 4);
+        // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+        y = y + 10;
+        for (var i = 0; i < planningText.length; i++) {
+            if (y > doc.internal.pageSize.height - 100) {
+                doc.addPage();
+                y = 80;
+
+            }
+            doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
+            y = y + 10;
+        }
+        doc.setFont('helvetica', 'normal')
+        this.state.notSelectedPlanningUnitList.map((item, i) => {
+            planningText = doc.splitTextToSize(getLabelText(item.planningUnit.label, this.state.lang) + " - " + item.regionsArray, doc.internal.pageSize.width * 3 / 4);
+            // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+            y = y + 3;
+            for (var i = 0; i < planningText.length; i++) {
+                if (y > doc.internal.pageSize.height - 100) {
+                    doc.addPage();
+                    y = 80;
+
+                }
+                doc.text(doc.internal.pageSize.width / 15, y, planningText[i]);
+                y = y + 10;
+            }
+        })
+
+        doc.setFont('helvetica', 'normal')
+        planningText = doc.splitTextToSize("b. " + i18n.t('static.commitTree.branchesMissingPlanningUnit'), doc.internal.pageSize.width * 3 / 4);
+        // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+        y = y + 10;
+        for (var i = 0; i < planningText.length; i++) {
+            if (y > doc.internal.pageSize.height - 100) {
+                doc.addPage();
+                y = 80;
+
+            }
+            doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
+            y = y + 10;
+        }
+
+        this.state.missingBranchesList.map((item, i) => {
+            doc.setFont('helvetica', 'normal')
+            planningText = doc.splitTextToSize(getLabelText(item.treeLabel, this.state.lang), doc.internal.pageSize.width * 3 / 4);
+            // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+            y = y + 10;
+            for (var i = 0; i < planningText.length; i++) {
+                if (y > doc.internal.pageSize.height - 100) {
+                    doc.addPage();
+                    y = 80;
+
+                }
+                doc.text(doc.internal.pageSize.width / 15, y, planningText[i]);
+                y = y + 10;
+            }
+            item.flatList.length > 0 && item.flatList.map((item1, j) => {
+                doc.setFont('helvetica', 'normal')
+                if (item1.payload.nodeType.id == 4) {
+                    doc.setTextColor("red")
+                } else {
+                    doc.setTextColor("black")
+                }
+
+                planningText = doc.splitTextToSize(getLabelText(item1.payload.label, this.state.lang), doc.internal.pageSize.width * 3 / 4);
+                // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+                y = y + 10;
+                for (var i = 0; i < planningText.length; i++) {
+                    if (y > doc.internal.pageSize.height - 100) {
+                        doc.addPage();
+                        y = 80;
+
+                    }
+                    doc.text(doc.internal.pageSize.width / 10, y, planningText[i]);
+                    y = y + 10;
+                }
+            })
+
+        })
+
+        doc.setFont('helvetica', 'normal')
+        planningText = doc.splitTextToSize("c. " + i18n.t('static.commitTree.NodesWithChildrenThatDoNotAddUpTo100Prcnt'), doc.internal.pageSize.width * 3 / 4);
+        // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+        y = y + 10;
+        for (var i = 0; i < planningText.length; i++) {
+            if (y > doc.internal.pageSize.height - 100) {
+                doc.addPage();
+                y = 80;
+
+            }
+            doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
+            y = y + 10;
+        }
+        var height = doc.internal.pageSize.height - 50;
+        var h1 = 50;
+        //   var aspectwidth1 = (width - h1);
+        var startY = y + 10
+        var pages = Math.ceil(startY / height)
+        for (var j = 1; j < pages; j++) {
+            doc.addPage()
+        }
+        y = startY - ((height - h1) * (pages - 1))
+        this.state.treeScenarioList.map((item1, count) => {
+            var nodeWithPercentageChildren = this.state.nodeWithPercentageChildren.filter(c => c.treeId == item1.treeId && c.scenarioId == item1.scenarioId);
+            if (nodeWithPercentageChildren.length > 0) {
+                doc.setFont('helvetica', 'normal')
+                planningText = doc.splitTextToSize(getLabelText(item1.treeLabel, this.state.lang) + " / " + getLabelText(item1.scenarioLabel, this.state.lang), doc.internal.pageSize.width * 3 / 4);
+                // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+                y = y + 10;
+                for (var i = 0; i < planningText.length; i++) {
+                    if (y > doc.internal.pageSize.height - 100) {
+                        doc.addPage();
+                        y = 80;
+
+                    }
+                    doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
+                    y = y + 10;
+                }
+
+
+                var columnsArray = [];
+                item1.columnArray.filter(c => c.type != 'hidden').map(item4 => {
+                    columnsArray.push(item4.title)
+                })
+                var dataArr = [];
+                item1.dataArray.map(item3 => {
+                    var dataArr1 = []
+                    item1.columnArray.map((item2, count) => {
+                        if (item2.type != 'hidden') {
+                            dataArr1.push(item3[count])
+                        }
+                    })
+                    dataArr.push(dataArr1);
+                })
+
+                var data = dataArr;
+                var content = {
+                    margin: { top: 80, bottom: 50 },
+                    startY: y,
+                    head: [columnsArray],
+                    body: data,
+                    styles: { lineWidth: 1, fontSize: 8, halign: 'center' }
+
+                };
+                doc.autoTable(content);
+                doc.addPage();
+                y = 80;
+            }
+        })
+
+        doc.setFont('helvetica', 'bold')
+        planningText = doc.splitTextToSize("4. " + i18n.t('static.program.notes'), doc.internal.pageSize.width * 3 / 4);
+        // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+        y = y + 20;
+        for (var i = 0; i < planningText.length; i++) {
+            if (y > doc.internal.pageSize.height - 100) {
+                doc.addPage();
+                y = 80;
+
+            }
+            doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
+            y = y + 10;
+        }
+
+        doc.setFont('helvetica', 'normal')
+        planningText = doc.splitTextToSize("a. " + i18n.t('static.forecastMethod.historicalData'), doc.internal.pageSize.width * 3 / 4);
+        // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+        y = y + 10;
+        for (var i = 0; i < planningText.length; i++) {
+            if (y > doc.internal.pageSize.height - 100) {
+                doc.addPage();
+                y = 80;
+
+            }
+            doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
+            y = y + 10;
+        }
+        var height = doc.internal.pageSize.height;
+        var h1 = 50;
+        var startY = y + 10
+        var pages = Math.ceil(startY / height)
+        for (var j = 1; j < pages; j++) {
+            doc.addPage()
+        }
+        var startYtable = startY - ((height - h1) * (pages - 1))
+        var columns = [];
+        columns.push(i18n.t('static.dashboard.planningunitheader'));
+        columns.push(i18n.t('static.program.notes'));
+        var headers = [columns]
+        var dataArr2 = [];
+        this.state.datasetPlanningUnit.map((item5, i) => {
+            dataArr2.push([
+                getLabelText(item5.planningUnit.label, this.state.lang),
+                item5.consumtionNotes])
+        });
+        var content1 = {
+            margin: { top: 80, bottom: 50 },
+            startY: startYtable,
+            head: headers,
+            body: dataArr2,
+            styles: { lineWidth: 1, fontSize: 8, halign: 'center' }
+
+        };
+        doc.autoTable(content1);
+        doc.addPage()
+
+        doc.setFont('helvetica', 'normal')
+        y = 80;
+        planningText = doc.splitTextToSize("b. " + i18n.t('static.commitTree.treeScenarios'), doc.internal.pageSize.width * 3 / 4);
+        // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+        y = y + 10;
+        for (var i = 0; i < planningText.length; i++) {
+            if (y > doc.internal.pageSize.height - 100) {
+                doc.addPage();
+                y = 80;
+
+            }
+            doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
+            y = y + 10;
+        }
+
+        var height = doc.internal.pageSize.height;
+        var h1 = 50;
+        var startY = y + 10
+        var pages = Math.ceil(startY / height)
+        for (var j = 1; j < pages; j++) {
+            doc.addPage()
+        }
+        var startYtable = startY - ((height - h1) * (pages - 1))
+        var columns = [];
+        columns.push(i18n.t('static.forecastMethod.tree'));
+        columns.push(i18n.t('static.whatIf.scenario'));
+        columns.push(i18n.t('static.program.notes'));
+        var headers = [columns]
+        var dataArr2 = [];
+        this.state.treeScenarioNotes.map((item5, i) => {
+            dataArr2.push([
+                getLabelText(item5.tree, this.state.lang),
+                getLabelText(item5.scenario, this.state.lang),
+                item5.scenarioNotes
+            ])
+        });
+        var content2 = {
+            margin: { top: 80, bottom: 50 },
+            startY: startYtable,
+            head: headers,
+            body: dataArr2,
+            styles: { lineWidth: 1, fontSize: 8, halign: 'center' }
+
+        };
+        doc.autoTable(content2);
+        y = 80;
+        doc.addPage()
+        doc.setFont('helvetica', 'normal')
+        planningText = doc.splitTextToSize("c. " + i18n.t('static.commitTree.treeNodes'), doc.internal.pageSize.width * 3 / 4);
+        // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+        y = y + 10;
+        for (var i = 0; i < planningText.length; i++) {
+            if (y > doc.internal.pageSize.height - 100) {
+                doc.addPage();
+                y = 80;
+
+            }
+            doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
+            y = y + 10;
+        }
+        var height = doc.internal.pageSize.height;
+        var h1 = 50;
+        var startY = y + 10
+        var pages = Math.ceil(startY / height)
+        for (var j = 1; j < pages; j++) {
+            doc.addPage()
+        }
+        var startYtable = startY - ((height - h1) * (pages - 1))
+        var columns = [];
+        columns.push(i18n.t('static.forecastMethod.tree'));
+        columns.push(i18n.t('static.common.node'));
+        columns.push(i18n.t('static.whatIf.scenario'));
+        columns.push(i18n.t('static.program.notes'));
+        var headers = [columns]
+        var dataArr2 = [];
+        this.state.treeNodeList.map((item6, i) => {
+            dataArr2.push([
+                getLabelText(item6.tree, this.state.lang),
+                getLabelText(item6.node, this.state.lang),
+                getLabelText(item6.scenario, this.state.lang),
+                ((item6.notes != "" && item6.notes != null) ? i18n.t('static.commitTree.main') + " : " + item6.notes : "" + "" +
+                    ((item6.madelingNotes != "" && item6.madelingNotes != null) ? i18n.t('static.commitTree.modeling') + " : " + item6.madelingNotes : ""))
+            ])
+        });
+        var content3 = {
+            margin: { top: 80, bottom: 50 },
+            startY: startYtable,
+            head: headers,
+            body: dataArr2,
+            styles: { lineWidth: 1, fontSize: 8, halign: 'center' }
+
+        };
+        doc.autoTable(content3);
+
+
+        addHeaders(doc)
+        addFooters(doc)
+        doc.save(i18n.t('static.commitTree.forecastValidation').concat('.pdf'));
+    }
+
     hideFirstComponent() {
         document.getElementById('div1').style.display = 'block';
         this.state.timeout = setTimeout(function () {
             document.getElementById('div1').style.display = 'none';
         }, 8000);
+    }
+
+    noForecastSelectedClicked(planningUnitId, regionId) {
+        localStorage.setItem("sesDatasetPlanningUnitId", planningUnitId);
+        localStorage.setItem("sesDatasetRegionId", regionId);
+        const win = window.open("/#/report/compareAndSelectScenario", "_blank");
+        win.focus();
+        // this.props.history.push(``);
+    }
+
+    missingMonthsClicked(planningUnitId) {
+        const win = window.open("/#/dataentry/consumptionDataEntryAndAdjustment/" + planningUnitId, "_blank");
+        win.focus();
+    }
+
+    missingBranchesClicked(treeId) {
+        const win = window.open(`/#/dataSet/buildTree/tree/${treeId}/${this.state.programId}`, "_blank");
+        win.focus();
+    }
+
+    nodeWithPercentageChildrenClicked(treeId, scenarioId) {
+        const win = window.open(`/#/dataSet/buildTree/tree/${treeId}/${this.state.programId}/${scenarioId}`, "_blank");
+        win.focus();
     }
 
     render() {
@@ -892,20 +1584,25 @@ export default class CommitTreeComponent extends React.Component {
 
         //No forecast selected
         const { noForecastSelectedList } = this.state;
-        let noForecastSelected = noForecastSelectedList.length > 0 && noForecastSelectedList.map((item, i) => {
-            return (
-                <li key={i}>
-                    <div>{getLabelText(item.planningUnit.planningUnit.label, this.state.lang) + " - " + item.regionList}</div>
-                </li>
-            )
-        }, this);
+        let noForecastSelected = noForecastSelectedList.length > 0 &&
+            noForecastSelectedList.map((item, i) => {
+                return (
+                    item.regionList.map(item1 => {
+                        return (
+                            <li key={i}>
+                                <div className="hoverDiv" onClick={() => this.noForecastSelectedClicked(item.planningUnit.planningUnit.id, item1.id)}>{getLabelText(item.planningUnit.planningUnit.label, this.state.lang) + " - " + item1.label}</div>
+                            </li>
+                        )
+                    }, this)
+                )
+            }, this);
 
         //Consumption : missing months
         const { missingMonthList } = this.state;
         let missingMonths = missingMonthList.length > 0 && missingMonthList.map((item, i) => {
             return (
                 <li key={i}>
-                    <div><span><b>{getLabelText(item.planningUnitLabel, this.state.lang) + " - " + getLabelText(item.regionLabel, this.state.lang) + " : "}</b>{"" + item.monthsArray}</span></div>
+                    <div><span><div className="hoverDiv" onClick={() => this.missingMonthsClicked(item.planningUnitId)}><b>{getLabelText(item.planningUnitLabel, this.state.lang) + " - " + getLabelText(item.regionLabel, this.state.lang) + " : "}</b></div>{"" + item.monthsArray}</span></div>
                 </li>
             )
         }, this);
@@ -915,7 +1612,7 @@ export default class CommitTreeComponent extends React.Component {
         let consumption = consumptionListlessTwelve.length > 0 && consumptionListlessTwelve.map((item, i) => {
             return (
                 <li key={i}>
-                    <div><span><b>{getLabelText(item.planningUnitLabel, this.state.lang) + " - " + getLabelText(item.regionLabel, this.state.lang) + " : "}</b></span><span>{item.noOfMonths + " month(s)"}</span></div>
+                    <div><span><div className="hoverDiv" onClick={() => this.missingMonthsClicked(item.planningUnitId)}><b>{getLabelText(item.planningUnitLabel, this.state.lang) + " - " + getLabelText(item.regionLabel, this.state.lang) + " : "}</b></div></span><span>{item.noOfMonths + " month(s)"}</span></div>
                 </li>
             )
         }, this);
@@ -936,7 +1633,7 @@ export default class CommitTreeComponent extends React.Component {
             return (
                 <ul>
                     <li key={i}>
-                        <div><span>{getLabelText(item.treeLabel, this.state.lang)}</span></div>
+                        <div className="hoverDiv" onClick={() => this.missingBranchesClicked(item.treeId)}><span>{getLabelText(item.treeLabel, this.state.lang)}</span></div>
                         {item.flatList.length > 0 && item.flatList.map((item1, j) => {
                             return (
                                 <ul>
@@ -955,7 +1652,7 @@ export default class CommitTreeComponent extends React.Component {
         let jxlTable = this.state.treeScenarioList.map((item1, count) => {
             var nodeWithPercentageChildren = this.state.nodeWithPercentageChildren.filter(c => c.treeId == item1.treeId && c.scenarioId == item1.scenarioId);
             if (nodeWithPercentageChildren.length > 0) {
-                return (<><span>{getLabelText(item1.treeLabel, this.state.lang) + " / " + getLabelText(item1.scenarioLabel, this.state.lang)}</span><div className="table-responsive">
+                return (<><span className="hoverDiv" onClick={() => this.nodeWithPercentageChildrenClicked(item1.treeId, item1.scenarioId)}>{getLabelText(item1.treeLabel, this.state.lang) + " / " + getLabelText(item1.scenarioLabel, this.state.lang)}</span><div className="table-responsive">
                     <div id={"tableDiv" + count} className="jexcelremoveReadonlybackground consumptionDataEntryTable" name='jxlTableData' />
                 </div><br /></>)
             }
@@ -965,7 +1662,7 @@ export default class CommitTreeComponent extends React.Component {
         const { datasetPlanningUnit } = this.state;
         let consumtionNotes = datasetPlanningUnit.length > 0 && datasetPlanningUnit.map((item, i) => {
             return (
-                <tr key={i}>
+                <tr key={i} className="hoverTd" onClick={() => this.missingMonthsClicked(item.planningUnit.id)}>
                     <td>{getLabelText(item.planningUnit.label, this.state.lang)}</td>
                     <td>{item.consumtionNotes}</td>
                 </tr>
@@ -973,10 +1670,10 @@ export default class CommitTreeComponent extends React.Component {
         }, this);
 
         //Tree scenario Notes
-        const { treeNodeList } = this.state;
-        let scenarioNotes = treeNodeList.length > 0 && treeNodeList.map((item, i) => {
+        const { treeScenarioNotes } = this.state;
+        let scenarioNotes = treeScenarioNotes.length > 0 && treeScenarioNotes.map((item, i) => {
             return (
-                <tr key={i}>
+                <tr key={i} className="hoverTd" onClick={() => this.nodeWithPercentageChildrenClicked(item.treeId, item.scenarioId)}>
                     <td>{getLabelText(item.tree, this.state.lang)}</td>
                     <td>{getLabelText(item.scenario, this.state.lang)}</td>
                     <td>{item.scenarioNotes}</td>
@@ -985,9 +1682,10 @@ export default class CommitTreeComponent extends React.Component {
         }, this);
 
         //Tree Nodes Notes
+        const { treeNodeList } = this.state;
         let treeNodes = treeNodeList.length > 0 && treeNodeList.map((item, i) => {
             return (
-                <tr key={i}>
+                <tr key={i} className="hoverTd" onClick={() => this.nodeWithPercentageChildrenClicked(item.treeId, item.scenarioId)}>
                     <td>{getLabelText(item.tree, this.state.lang)}</td>
                     <td>{getLabelText(item.node, this.state.lang)}</td>
                     <td>{getLabelText(item.scenario, this.state.lang)}</td>
@@ -1094,6 +1792,8 @@ export default class CommitTreeComponent extends React.Component {
                                         </FormGroup>
                                     </div>
                                 </div>
+                            </Form>
+                            <div style={{ display: this.state.loading ? "none" : "block" }}>
                                 {(this.state.showCompare) &&
                                     <>
                                         <div className="col-md-10 pt-lg-1 pb-lg-0 pl-lg-0">
@@ -1114,50 +1814,82 @@ export default class CommitTreeComponent extends React.Component {
                                 <Button type="button" size="md" color="warning" className="float-right mr-1" onClick={this.reset}><i className="fa fa-refresh"></i> Cancel</Button>
                                 <Button type="button" color="success" className="mr-1 float-right" size="md" onClick={() => { this.toggleShowValidation() }}><i className="fa fa-check"></i>Next</Button>
                             </div> */}
-                            </Form>
-                            <div>
-                                <div className="row">
-                                    <FormGroup className="col-md-4">
-                                        <Label htmlFor="appendedInputButton">{i18n.t('static.report.versiontype')}</Label>
-                                        <div className="controls ">
-                                            <Input
-                                                type="select"
-                                                name="versionTypeId"
-                                                id="versionTypeId"
-                                                bsSize="sm"
-                                                value={this.state.versionTypeId}
-                                                onChange={(e) => { this.setVersionTypeId(e); }}
-                                            >
-                                                <option value="">{i18n.t('static.common.select')}</option>
-                                                <option value="1">{i18n.t('static.commitTree.draftVersion')}</option>
-                                                <option value="2">{i18n.t('static.commitTree.finalVersion')}</option>
-                                            </Input>
-                                        </div>
-                                    </FormGroup>
-                                    <FormGroup className="col-md-6">
-                                        <Label htmlFor="appendedInputButton">{i18n.t('static.program.notes')}</Label>
-                                        <Input
-                                            className="controls"
-                                            type="textarea"
-                                            id="notesId"
-                                            name="notesId"
-                                        />
-                                    </FormGroup>
 
-                                    <div className="col-md-12">
-                                        <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.cancel')}</Button>
-                                        {/* <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={this.synchronize}><i className="fa fa-check"></i>Commit</Button> */}
-                                        <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => { this.toggleShowValidation() }}><i className="fa fa-check"></i>{i18n.t('static.button.commit')}</Button>
-                                    </div>
+                                <div>
+                                    <Formik
+                                        initialValues={initialValues}
+                                        validate={validate(validationSchema)}
+                                        onSubmit={(values, { setSubmitting, setErrors }) => {
+                                            this.toggleShowValidation()
+                                        }}
+                                        render={
+                                            ({
+                                                values,
+                                                errors,
+                                                touched,
+                                                handleChange,
+                                                handleBlur,
+                                                handleSubmit,
+                                                isSubmitting,
+                                                isValid,
+                                                setTouched,
+                                                handleReset,
+                                                setFieldValue,
+                                                setFieldTouched,
+                                                setFieldError
+                                            }) => (
+                                                <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='budgetForm' autocomplete="off">
+                                                    <div className="row">
+                                                        <FormGroup className="col-md-4">
+                                                            <Label htmlFor="appendedInputButton">{i18n.t('static.report.versiontype')}</Label>
+                                                            <div className="controls ">
+                                                                <Input
+                                                                    type="select"
+                                                                    name="versionTypeId"
+                                                                    id="versionTypeId"
+                                                                    bsSize="sm"
+                                                                    value={this.state.versionTypeId}
+                                                                    onChange={(e) => { this.setVersionTypeId(e); }}
+                                                                >
+                                                                    <option value="1">{i18n.t('static.commitTree.draftVersion')}</option>
+                                                                    <option value="2">{i18n.t('static.commitTree.finalVersion')}</option>
+                                                                </Input>
+                                                            </div>
+                                                        </FormGroup>
+                                                        <FormGroup className="col-md-6">
+                                                            <Label htmlFor="appendedInputButton">{i18n.t('static.program.notes')}</Label>
+                                                            <Input
+                                                                className="controls"
+                                                                type="textarea"
+                                                                id="notes"
+                                                                name="notes"
+                                                                valid={!errors.notes && this.state.notes != ''}
+                                                                invalid={touched.notes && !!errors.notes}
+                                                                onChange={(e) => { handleChange(e); this.notesChange(e); }}
+                                                                onBlur={handleBlur}
+                                                                value={this.state.notes}
+
+                                                            />
+                                                            <FormFeedback className="red">{errors.notes}</FormFeedback>
+                                                        </FormGroup>
+
+                                                        <div className="col-md-12">
+                                                            <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.cancel')}</Button>
+                                                            {/* <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={this.synchronize}><i className="fa fa-check"></i>Commit</Button> */}
+                                                            <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)} ><i className="fa fa-check"></i>{i18n.t('static.button.commit')}</Button>
+                                                        </div>
+                                                    </div>
+                                                </Form>
+                                            )} />
                                 </div>
-                                <div style={{ display: this.state.loading ? "block" : "none" }}>
-                                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                                        <div class="align-items-center">
-                                            <div ><h4> <strong>{i18n.t('static.loading.loading')}</strong></h4></div>
+                            </div>
+                            <div style={{ display: this.state.loading ? "block" : "none" }}>
+                                <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                    <div class="align-items-center">
+                                        <div ><h4> <strong>{i18n.t('static.loading.loading')}</strong></h4></div>
 
-                                            <div class="spinner-border blue ml-4" role="status">
+                                        <div class="spinner-border blue ml-4" role="status">
 
-                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -1169,8 +1901,11 @@ export default class CommitTreeComponent extends React.Component {
                 <Modal isOpen={this.state.showValidation}
                     className={'modal-lg ' + this.props.className} id='divcontents'>
                     <ModalHeader toggle={() => this.toggleShowValidation()} className="modalHeaderSupplyPlan">
-                        <h3><strong>{i18n.t('static.commitTree.forecastValidation')}</strong><i className="fa fa-print pull-right iconClass cursor" onClick={() => this.print()}></i></h3>
-
+                        <h3><strong>{i18n.t('static.commitTree.forecastValidation')}</strong></h3>
+                        <div className="row">
+                            <img className=" pull-right iconClass cursor" style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.exportPDF()} />
+                            <i className="fa fa-print pull-right iconClass cursor" onClick={() => this.print()}></i>
+                        </div>
                     </ModalHeader>
                     <div>
                         <ModalBody>
@@ -1186,11 +1921,11 @@ export default class CommitTreeComponent extends React.Component {
                             <span>b. {i18n.t('static.commitTree.puThatDoNotHaveAtleast24MonthsOfActualConsumptionValues')} :</span><br />
                             <ul>{consumption}</ul>
 
-                            <span><b>3. {i18n.t('static.commitTree.treeForecast')} </b></span><br />
+                            <span><b>3. {i18n.t('static.commitTree.treeForecast')} </b>(<a href="/#/dataset/listTree" target="_blank">{i18n.t('static.common.managetree')}</a>)</span><br />
                             <span>a. {i18n.t('static.commitTree.puThatDoesNotAppearOnAnyTree')} </span><br />
                             <ul>{pu}</ul>
 
-                            <span>b. {i18n.t('static.commitTree.branchesMissingPlanningUnit')} (<a href="/#/dataset/listTree" target="_blank">{i18n.t('static.common.managetree')}</a>)</span><br />
+                            <span>b. {i18n.t('static.commitTree.branchesMissingPlanningUnit')}</span><br />
                             {missingBranches}
 
                             <span>c. {i18n.t('static.commitTree.NodesWithChildrenThatDoNotAddUpTo100Prcnt')}</span><br />
@@ -1235,7 +1970,7 @@ export default class CommitTreeComponent extends React.Component {
                                     <Table className="table-bordered text-center mt-2 overflowhide main-table " bordered size="sm" >
                                         <thead>
                                             <tr>
-                                                <th><b>{i18n.t('static.forecastMethod.treeTree')}</b></th>
+                                                <th><b>{i18n.t('static.forecastMethod.tree')}</b></th>
                                                 <th><b>{i18n.t('static.common.node')}</b></th>
                                                 <th><b>{i18n.t('static.whatIf.scenario')}</b></th>
                                                 <th><b>{i18n.t('static.program.notes')}</b></th>

@@ -131,7 +131,7 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                     for (var i = 0; curDate < stopDate; i++) {
                         console.log("curDate---", curDate);
                         curDate = moment(startDate).add(i, 'months').format("YYYY-MM-DD");
-                        var nodeDataModelingList = (nodeDataModelingListWithTransfer).filter(c => moment(curDate).format("YYYY-MM-DD") >= moment(c.startDate).format("YYYY-MM-DD") && moment(curDate).format("YYYY-MM-DD") <= moment(c.stopDate).format("YYYY-MM-DD"));
+                        var nodeDataModelingList = (nodeDataModelingListWithTransfer).filter(c => moment(curDate).format("YYYY-MM") >= moment(c.startDate).format("YYYY-MM") && moment(curDate).format("YYYY-MM") <= moment(c.stopDate).format("YYYY-MM"));
                         var nodeDataOverrideList = ((nodeDataMap[scenarioList[ndm].id])[0].nodeDataOverrideList);
                         var startValue = 0;
                         console.log("nodeDataMapForScenario---", nodeDataMapForScenario)
@@ -152,6 +152,7 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                         var difference = 0;
                         var differenceWMC = 0;
                         var transferNodeValue = 0;
+                        console.log("nodeDataModelingList****",nodeDataModelingList);
                         for (var ndml = 0; ndml < nodeDataModelingList.length; ndml++) {
                             var nodeDataModeling = nodeDataModelingList[ndml];
                             //Linear number
@@ -182,7 +183,10 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                             }
                             //Exponential %
                             else if (nodeDataModeling.modelingType.id == 4 && (nodeDataModeling.transferNodeDataId == null || nodeDataModeling.transferNodeDataId == "")) {
+                                console.log("datavalue ****",Number(nodeDataModeling.dataValue));
+                                console.log(" actual difference ****",Number((Number(startValue) * Number(nodeDataModeling.dataValue)) / 100));
                                 difference += Number((Number(startValue) * Number(nodeDataModeling.dataValue)) / 100);
+                                console.log("differenxce****",difference);
                                 differenceWMC += Number((Number(startValue) * Number(nodeDataModeling.dataValue)) / 100);
                             }
                             //Linear % point
@@ -347,8 +351,10 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
     props.updateState("nodeId", nodeId);
     props.updateState("type", type);
     props.updateState("loading", false);
+    console.log("here------------------------")
     props.updateState("modelingJexcelLoader", false);
     props.updateState("momJexcelLoader", false);
+    props.updateState("message1", "Data updated successfully");
     // treeList = treeList;
     // datasetJson.treeList = treeList;
     // var encryptedDatasetJson = (CryptoJS.AES.encrypt(JSON.stringify(datasetJson), SECRET_KEY)).toString();
