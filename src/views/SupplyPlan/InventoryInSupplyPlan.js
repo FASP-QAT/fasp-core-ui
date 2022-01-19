@@ -270,7 +270,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                         data[7] = inventoryList[j].multiplier; //H
                         data[8] = `=ROUND(F${parseInt(j) + 1}*H${parseInt(j) + 1},0)`; //I
                         data[9] = `=ROUND(G${parseInt(j) + 1}*H${parseInt(j) + 1},0)`; //J
-                        if (inventoryList[j].notes === null || ((inventoryList[j].notes).trim() == "NULL")) {
+                        if (inventoryList[j].notes === null || ((inventoryList[j].notes) == "NULL")) {
                             data[10] = "";
                         } else {
                             data[10] = inventoryList[j].notes;
