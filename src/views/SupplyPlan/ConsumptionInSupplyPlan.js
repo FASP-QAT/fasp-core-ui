@@ -263,7 +263,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                         data[6] = consumptionList[j].multiplier; //G
                         data[7] = `=ROUND(F${parseInt(j) + 1}*G${parseInt(j) + 1},0)`; //H
                         data[8] = consumptionList[j].dayOfStockOut;
-                        if (consumptionList[j].notes === null || ((consumptionList[j].notes).trim() == "NULL")) {
+                        if (consumptionList[j].notes === null || ((consumptionList[j].notes) == "NULL")) {
                             data[9] = "";
                         } else {
                             data[9] = consumptionList[j].notes;
