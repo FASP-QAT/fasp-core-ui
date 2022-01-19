@@ -198,13 +198,13 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                             }
                             console.log("nodeDataModeling 1---", nodeDataModeling);
 
-                            //Linear # transfer
-                            if (nodeDataModeling.modelingType.id == 2 && nodeDataModeling.transferNodeDataId != null && moment(curDate).format("YYYY-MM-DD") > moment(nodeDataMapForScenario.month).format("YYYY-MM-DD")) {
-                                transferNodeValue += Number(nodeDataModeling.dataValue);
-                            }
-                            if (nodeDataModeling.modelingType.id == 5 && nodeDataModeling.transferNodeDataId != null && moment(curDate).format("YYYY-MM-DD") > moment(nodeDataMapForScenario.month).format("YYYY-MM-DD")) {
-                                transferNodeValue += Number(nodeDataModeling.dataValue);
-                            }
+                            // //Linear # transfer
+                            // if (nodeDataModeling.modelingType.id == 2 && nodeDataModeling.transferNodeDataId != null && moment(curDate).format("YYYY-MM-DD") > moment(nodeDataMapForScenario.month).format("YYYY-MM-DD")) {
+                            //     transferNodeValue += Number(nodeDataModeling.dataValue);
+                            // }
+                            // if (nodeDataModeling.modelingType.id == 5 && nodeDataModeling.transferNodeDataId != null && moment(curDate).format("YYYY-MM-DD") > moment(nodeDataMapForScenario.month).format("YYYY-MM-DD")) {
+                            //     transferNodeValue += Number(nodeDataModeling.dataValue);
+                            // }
 
                         }
                         var endValue = 0;
@@ -313,6 +313,8 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                         var aggregatedEndValue = 0;
                         var aggregatedCalculatedValue = 0;
                         var aggregatedDifference = 0;
+                        var aggregatedSeasonality = 0;
+                        var aggregatedManualChange = 0;
                         for (var cnfl = 0; cnfl < childNodeFlatList.length; cnfl++) {
                             var childScenario = (childNodeFlatList[cnfl].payload.nodeDataMap[scenarioList[ndm].id]);
                             if (childScenario != undefined && childScenario.length > 0) {
@@ -324,6 +326,8 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                 aggregatedEndValue += Number(nodeDataListFiltered.endValue);
                                 aggregatedCalculatedValue += Number(nodeDataListFiltered.calculatedValue);
                                 aggregatedDifference += Number(nodeDataListFiltered.difference);
+                                aggregatedSeasonality += Number(nodeDataListFiltered.seasonalityPerc);
+                                aggregatedManualChange += Number(nodeDataListFiltered.manualChange);
                             }
                         }
                         console.log("agg data---", aggregatedStartValue)
@@ -334,8 +338,8 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                 endValue: aggregatedEndValue,
                                 calculatedValue: aggregatedCalculatedValue,
                                 difference: aggregatedDifference,
-                                seasonalityPerc: 0,
-                                manualChange: 0,
+                                seasonalityPerc: aggregatedSeasonality,
+                                manualChange: aggregatedManualChange,
                             }
                         );
                     }
@@ -357,6 +361,10 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                 }
             }
         }
+
+        // Have list of ids having transer to and transfer from
+        // Then based on that work with each one
+
 
         // treeList[tl].tree.flatList = flatList;
     }
