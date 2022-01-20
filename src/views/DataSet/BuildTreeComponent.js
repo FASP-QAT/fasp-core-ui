@@ -4739,10 +4739,12 @@ export default class BuildTree extends Component {
         this.setState({ openAddNodeModal: false });
         const { items } = this.state;
         var maxNodeId = items.length > 0 ? Math.max(...items.map(o => o.id)) : 0;
+        var nodeId = parseInt(maxNodeId + 1);
         var newItem = itemConfig.context;
         newItem.parent = itemConfig.context.parent;
-        newItem.id = parseInt(maxNodeId + 1);
+        newItem.id = nodeId;
         newItem.level = parseInt(itemConfig.context.level + 1);
+        newItem.payload.nodeId = nodeId;
         var parentSortOrder = items.filter(c => c.id == itemConfig.context.parent)[0].sortOrder;
         var childList = items.filter(c => c.parent == itemConfig.context.parent);
         newItem.sortOrder = parentSortOrder.concat(".").concat(("0" + (Number(childList.length) + 1)).slice(-2));
@@ -4756,7 +4758,7 @@ export default class BuildTree extends Component {
         console.log("add button clicked value after update---", newItem);
         this.setState({
             items: [...items, newItem],
-            cursorItem: parseInt(maxNodeId + 1)
+            cursorItem: nodeId
         }, () => {
             console.log("on add items-------", this.state.items);
             this.calculateMOMData(newItem.id, 0);
