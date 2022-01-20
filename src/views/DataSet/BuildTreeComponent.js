@@ -1371,7 +1371,8 @@ export default class BuildTree extends Component {
                 {
                     title: i18n.t('static.common.month'),
                     type: 'calendar',
-                    options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker' }, width: 100
+                    options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker' }, width: 100,
+                    readOnly: true
                 },
                 {
                     title: i18n.t('static.tree.%of') + getLabelText(this.state.currentItemConfig.parentItem.payload.label, this.state.lang) + i18n.t('static.tree.monthStart'),
@@ -1463,15 +1464,6 @@ export default class BuildTree extends Component {
         let count = 0;
         for (var j = 0; j < momList.length; j++) {
             data = [];
-
-
-            // data[1] = this.state.manualChange ? parseFloat(momList[j].startValue).toFixed(2) : parseFloat(momList[j].startValueWMC).toFixed(2)
-            // data[2] = parseFloat(momList[j].difference).toFixed(2)
-            // data[3] = this.state.manualChange ? parseFloat(momList[j].endValueWithoutAddingManualChange).toFixed(2) : parseFloat(momList[j].endValueWithoutAddingManualChangeWMC).toFixed(2)
-            // data[4] = parseFloat(momList[j].seasonalityPerc).toFixed(2)
-            // data[5] = parseFloat(momList[j].manualChange).toFixed(2)
-            // data[6] = this.state.manualChange ? parseFloat(momList[j].endValue).toFixed(2) : (momList[j].seasonalityPerc > 0 || momList[j].manualChange > 0) ? parseFloat(momList[j].endValueWithManualChangeWMC).toFixed(2) : parseFloat(momList[j].endValueWMC).toFixed(2)
-            // data[7] = momList[j].nodeDataId
             data[0] = momList[j].month
             data[1] = parseFloat(momList[j].startValue).toFixed(2)
             data[2] = parseFloat(momList[j].difference).toFixed(2)
@@ -1498,7 +1490,8 @@ export default class BuildTree extends Component {
                     // 0
                     title: i18n.t('static.common.month'),
                     type: 'calendar',
-                    options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker' }, width: 100
+                    options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker' }, width: 100,
+                    readOnly: true
                 },
                 {
                     // 1
@@ -1527,13 +1520,14 @@ export default class BuildTree extends Component {
                     title: i18n.t('static.tree.seasonalityIndex'),
                     type: this.state.seasonality == true ? 'numeric' : 'hidden',
                     mask: '#,##.00', decimal: '.',
+                    readOnly: !this.state.aggregationNode ? true : false
                 },
                 {
                     // 5
                     title: i18n.t('static.tree.manualChange+-'),
                     type: this.state.seasonality == true ? 'numeric' : 'hidden',
                     mask: '#,##.00', decimal: '.',
-
+                    readOnly: !this.state.aggregationNode ? true : false
                 },
                 {
                     title: i18n.t('static.tree.MonthEnd'),
@@ -1565,27 +1559,19 @@ export default class BuildTree extends Component {
             allowDeleteRow: false,
             onchange: this.changed1,
             updateTable: function (el, cell, x, y, source, value, id) {
-                var elInstance = el.jexcel;
-                if (y != null) {
-                    // var rowData = elInstance.getRowData(y);
-                    // console.log("this.state.seasonality---", this.state.seasonality);
-                    // if (this.state.seasonality) {
-                    //     if (x == 5) {
-                    //         // cell.classList.add('readonly');
-                    //         // cell.style.readOnly = 'true';
-                    //         cell.style.backgroundColor = '#fff';
-                    //         // $(cell).addClass('readonly');
-                    //     }
-                    // }
-                    // else {
-                    //     if (x == 5) {
-                    //         // cell.classList.add('readonly');
-                    //         // cell.style.readOnly = 'true';
-                    //         cell.style.backgroundColor = '#f46e42';
-                    //         // $(cell).addClass('readonly');
-                    //     }
-                    // }
-                }
+                // var elInstance = el.jexcel;
+                // if (y != null) {
+                //     // var rowData = elInstance.getRowData(y);
+                //     // console.log("this.state.seasonality---", this.state.seasonality);
+                //     if (!this.state.aggregationNode) {
+                //         cell.classList.add('readonly');
+                //         // $(cell).addClass('readonly');
+                //     }
+                //     else {
+                //         cell.classList.remove('readonly');
+                //         // $(cell).addClass('readonly');
+                //     }
+                // }
             }.bind(this),
             // oneditionend: this.onedit,
             // onselection: this.selected,
@@ -2126,11 +2112,11 @@ export default class BuildTree extends Component {
     }
 
 
-    getSameLevelNodeList(level, id) {
+    getSameLevelNodeList(level, id, parent, nodeTypeId) {
         console.log("level---", level);
         console.log("id---", id);
         var sameLevelNodeList = [];
-        var arr = this.state.items.filter(x => x.level == level && x.id != id && x.id > id);
+        var arr = this.state.items.filter(x => x.level == level && x.id != id && x.id > id && x.parent == parent && x.payload.nodeType.id == nodeTypeId);
         console.log("arr---", arr);
         for (var i = 0; i < arr.length; i++) {
             sameLevelNodeList[i] = { id: arr[i].id, name: getLabelText(arr[i].payload.label, this.state.lang) }
@@ -2781,9 +2767,9 @@ export default class BuildTree extends Component {
                         if (childList.length > 0) {
                             var sum = 0;
                             childList.map(c => {
-                                console.log("childList 1---",childList);
-                                console.log("child scenarioId 1---",scenarioId);
-                                console.log("child 1---",c.payload);
+                                console.log("childList 1---", childList);
+                                console.log("child scenarioId 1---", scenarioId);
+                                console.log("child 1---", c.payload);
                                 sum += Number((c.payload.nodeDataMap[scenarioId])[0].displayDataValue)
                             })
                             return sum.toFixed(2);
@@ -2821,9 +2807,9 @@ export default class BuildTree extends Component {
                         if (childList.length > 0) {
                             var sum = 0;
                             childList.map(c => {
-                                console.log("childList 2---",childList);
+                                console.log("childList 2---", childList);
                                 // console.log("child scenarioId 2---",(c.payload.nodeDataMap[scenarioId])[0] != null);
-                                console.log("child 2---",c.payload.label.label_en,"map---",c.payload);
+                                console.log("child 2---", c.payload.label.label_en, "map---", c.payload);
                                 sum += Number(c.payload.nodeDataMap.hasOwnProperty(scenarioId) ? (c.payload.nodeDataMap[scenarioId])[0].displayDataValue : 0)
                             })
                             return sum.toFixed(2);
@@ -3618,16 +3604,17 @@ export default class BuildTree extends Component {
                 console.log("duv---", div);
                 if (div != 0) {
                     // noOfMonthsInUsagePeriod = 1 / (convertToMonth * usageFrequency);
-                    noOfMonthsInUsagePeriod =  usageFrequency / convertToMonth;
+                    noOfMonthsInUsagePeriod = usageFrequency / convertToMonth;
                     console.log("noOfMonthsInUsagePeriod---", noOfMonthsInUsagePeriod);
                 }
             } else {
                 // var noOfFUPatient = this.state.noOfFUPatient;
                 var noOfFUPatient;
                 if (this.state.currentItemConfig.context.payload.nodeType.id == 4) {
-                    console.log("no of persons---",(this.state.currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.noOfPersons);
-                    console.log("no of noOfForecastingUnitsPerPerson---",(this.state.currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.noOfForecastingUnitsPerPerson);
+                    console.log("no of persons---", (this.state.currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.noOfPersons);
+                    console.log("no of noOfForecastingUnitsPerPerson---", (this.state.currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.noOfForecastingUnitsPerPerson);
                     noOfFUPatient = (this.state.currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.noOfForecastingUnitsPerPerson / (this.state.currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.noOfPersons;
+                    console.log("noOfFUPatient---", noOfFUPatient);
                 } else {
                     console.log("--->>>>>>>>>>>>>>>>>>>>>>>>>>", (this.state.currentItemConfig.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode);
                     noOfFUPatient = (this.state.currentItemConfig.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode.noOfForecastingUnitsPerPerson / (this.state.currentItemConfig.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode.noOfPersons;
@@ -4279,6 +4266,7 @@ export default class BuildTree extends Component {
                     tempArray.push((items[i].payload.nodeDataMap[minScenarioId])[0]);
                     nodeDataMap = items[i].payload.nodeDataMap;
                     nodeDataMap[scenarioId] = tempArray;
+                    nodeDataMap[scenarioId][0].nodeDataId = scenarioId;
                     items[i].payload.nodeDataMap = nodeDataMap;
                 }
                 console.log("items-----------", items);
@@ -4750,13 +4738,15 @@ export default class BuildTree extends Component {
         console.log("add button clicked---", itemConfig);
         this.setState({ openAddNodeModal: false });
         const { items } = this.state;
+        var maxNodeId = items.length > 0 ? Math.max(...items.map(o => o.id)) : 0;
         var newItem = itemConfig.context;
         newItem.parent = itemConfig.context.parent;
-        newItem.id = parseInt(items.length + 1);
+        newItem.id = parseInt(maxNodeId + 1);
         newItem.level = parseInt(itemConfig.context.level + 1);
         var parentSortOrder = items.filter(c => c.id == itemConfig.context.parent)[0].sortOrder;
         var childList = items.filter(c => c.parent == itemConfig.context.parent);
         newItem.sortOrder = parentSortOrder.concat(".").concat(("0" + (Number(childList.length) + 1)).slice(-2));
+        (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].nodeDataId = this.state.selectedScenario;
         (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].displayDataValue = (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].dataValue;
         (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].displayCalculatedDataValue = (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].calculatedDataValue;
         (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].month = moment((newItem.payload.nodeDataMap[this.state.selectedScenario])[0].month).startOf('month').format("YYYY-MM-DD")
@@ -4766,7 +4756,7 @@ export default class BuildTree extends Component {
         console.log("add button clicked value after update---", newItem);
         this.setState({
             items: [...items, newItem],
-            cursorItem: parseInt(items.length + 1)
+            cursorItem: parseInt(maxNodeId + 1)
         }, () => {
             console.log("on add items-------", this.state.items);
             this.calculateMOMData(newItem.id, 0);
@@ -4947,6 +4937,7 @@ export default class BuildTree extends Component {
         const { context: item } = data;
         if (item != null) {
             this.setState({
+                sameLevelNodeList:[],
                 showCalculatorFields: false,
                 showMomData: false,
                 showMomDataPercent: false,
@@ -4997,7 +4988,7 @@ export default class BuildTree extends Component {
                         this.getUsageText();
                     });
                 } else if (data.context.payload.nodeType.id != 1) {
-                    this.getSameLevelNodeList(data.context.level, data.context.id);
+                    this.getSameLevelNodeList(data.context.level, data.context.id, data.context.parent, data.context.payload.nodeType.id);
                 }
                 // this.setState({
 
@@ -6322,7 +6313,7 @@ export default class BuildTree extends Component {
                                 </>
                             }
                             <div><Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.showMomData()}> <i className="fa fa-eye" style={{ color: '#fff' }}></i> {i18n.t('static.tree.viewMonthlyData')}</Button>
-                                {this.state.showModelingJexcelNumber && <><Button color="success" size="md" className="float-right mr-1" type="button" onClick={(e) => this.formSubmitLoader(e)}> <i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
+                                {this.state.aggregationNode && <><Button color="success" size="md" className="float-right mr-1" type="button" onClick={(e) => this.formSubmitLoader(e)}> <i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
                                     <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button></>}
                             </div>
                         </div>
@@ -6570,7 +6561,7 @@ export default class BuildTree extends Component {
                                     <div className="col-md-6 float-right">
                                         <FormGroup className="float-right" >
                                             <div className="check inline  pl-lg-1 pt-lg-0">
-                                                <div>
+                                                <div style={{ display: this.state.aggregationNode ? 'block' : 'none' }}>
                                                     <Input
                                                         className="form-check-input checkboxMargin"
                                                         type="checkbox"
