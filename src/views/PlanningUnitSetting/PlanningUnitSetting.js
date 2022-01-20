@@ -787,9 +787,10 @@ export default class PlanningUnitSetting extends Component {
                     },
                         () => {
                             console.log("List------->pa", this.state.allProcurementAgentList);
-                            if (this.state.datasetList.length == 1) {
-                                this.setProgramId();
-                            }
+                            // if (this.state.datasetList.length == 1) {
+                            //     this.setProgramId();
+                            // }
+                            this.setProgramId();
                             // this.buildJExcel();
                         })
                 } else {
@@ -901,12 +902,14 @@ export default class PlanningUnitSetting extends Component {
                     // }
                 }
                 console.log("DATASET-------->", datasetList);
-                if (localStorage.getItem("sesForecastProgramIdReport") != '' && localStorage.getItem("sesForecastProgramIdReport") != undefined && localStorage.getItem("sesForecastVersionIdReport") != '' && localStorage.getItem("sesForecastVersionIdReport") != undefined) {
-                    
+                if (localStorage.getItem("sesForecastProgramIdReport") != '' && localStorage.getItem("sesForecastProgramIdReport") != undefined && localStorage.getItem("sesForecastVersionIdReport") != '' && localStorage.getItem("sesForecastVersionIdReport") != undefined && !localStorage.getItem("sesForecastVersionIdReport").includes('Local')) {
+
                     this.setState({
                         datasetList: datasetList,
                         datasetList1: datasetList1,
-                        datasetId: (datasetList.length == 1 ? datasetList[0].programId : '')
+                        forecastProgramId: localStorage.getItem("sesForecastProgramIdReport"),
+                        forecastProgramVersionId: localStorage.getItem("sesForecastVersionIdReport"),
+                        datasetId: datasetList.filter(c => c.programId == localStorage.getItem("sesForecastProgramIdReport") && c.programVersion == localStorage.getItem("sesForecastVersionIdReport"))[0].id,
                     }, () => {
                         this.planningUnitList();
                     })
@@ -914,7 +917,9 @@ export default class PlanningUnitSetting extends Component {
                     this.setState({
                         datasetList: datasetList,
                         datasetList1: datasetList1,
-                        datasetId: (datasetList.length == 1 ? datasetList[0].programId : '')
+                        forecastProgramId: (datasetList.length == 1 ? datasetList[0].programId : ''),
+                        forecastProgramVersionId: (datasetList.length == 1 ? datasetList[0].programVersion : ''),
+                        datasetId: (datasetList.length == 1 ? datasetList[0].id : ''),
                     }, () => {
                         this.planningUnitList();
                     })
@@ -927,13 +932,21 @@ export default class PlanningUnitSetting extends Component {
     }
 
     setProgramId(event) {
-        // console.log("PID----------------->", document.getElementById("forecastProgramId").value);
+
+        console.log("PID----------------->", document.getElementById("forecastProgramId").value);
         var pID = document.getElementById("forecastProgramId").value;
         if (pID != 0) {
-            var sel = document.getElementById("forecastProgramId");
-            var tempId = sel.options[sel.selectedIndex].text;
-            let forecastProgramVersionId = tempId.split('~')[1];
-            let selectedForecastProgram = this.state.datasetList.filter(c => c.programId == pID && c.versionId == forecastProgramVersionId)[0]
+            // var sel = document.getElementById("forecastProgramId");
+            // var tempId = sel.options[sel.selectedIndex].text;
+            // let forecastProgramVersionId = tempId.split('~')[1];            
+            let programSplit = pID.split('_');
+            // console.log("programSplit-------->1", programSplit);
+            // console.log("programSplit-------->2", programSplit[0]);
+            let programId = programSplit[0];
+            let versionId = programSplit[1];
+            versionId = versionId.replace(/[^\d]/g, '');
+            console.log("programSplit-------->1", versionId);
+            let selectedForecastProgram = this.state.datasetList.filter(c => c.programId == programId && c.versionId == versionId)[0]
 
             let forecastStartDate = selectedForecastProgram.forecastStartDate;
             let forecastStopDate = selectedForecastProgram.forecastStopDate;
@@ -941,14 +954,20 @@ export default class PlanningUnitSetting extends Component {
             let beforeEndDateDisplay = new Date(selectedForecastProgram.forecastStartDate);
             beforeEndDateDisplay.setMonth(beforeEndDateDisplay.getMonth() - 1);
 
+            localStorage.setItem("sesForecastProgramIdReport", parseInt(programId));
+            localStorage.setItem("sesForecastVersionIdReport", parseInt(versionId));
+
             this.setState(
                 {
-                    datasetId: pID,
                     // rangeValue: { from: { year: startDateSplit[1] - 3, month: new Date(selectedForecastProgram.forecastStartDate).getMonth() + 1 }, to: { year: forecastStopDate.getFullYear(), month: forecastStopDate.getMonth() + 1 } },
                     rangeValue: { from: { year: new Date(forecastStartDate).getFullYear(), month: new Date(forecastStartDate).getMonth() + 1 }, to: { year: new Date(forecastStopDate).getFullYear(), month: new Date(forecastStopDate).getMonth() + 1 } },
                     startDateDisplay: (forecastStartDate == '' ? '' : months[new Date(forecastStartDate).getMonth()] + ' ' + new Date(forecastStartDate).getFullYear()),
                     endDateDisplay: (forecastStopDate == '' ? '' : months[new Date(forecastStopDate).getMonth()] + ' ' + new Date(forecastStopDate).getFullYear()),
                     beforeEndDateDisplay: (!isNaN(beforeEndDateDisplay.getTime()) == false ? '' : months[new Date(beforeEndDateDisplay).getMonth()] + ' ' + new Date(beforeEndDateDisplay).getFullYear()),
+                    forecastProgramId: parseInt(programId),
+                    forecastProgramVersionId: parseInt(versionId),
+                    datasetId: selectedForecastProgram.id,
+
                 }, () => {
                     // console.log("d----------->0", d1);
                     // console.log("d----------->00", (d1.getMonth()));
@@ -965,12 +984,14 @@ export default class PlanningUnitSetting extends Component {
             dt1.setMonth(dt1.getMonth() + REPORT_DATEPICKER_END_MONTH);
             this.setState(
                 {
-                    datasetId: 0,
                     rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: dt1.getFullYear(), month: dt1.getMonth() + 1 } },
                     // startDateDisplay: months[new Date(dt).getMonth() + 1] + ' ' + new Date(dt).getFullYear(),
                     // endDateDisplay: months[new Date(dt1).getMonth() + 1] + ' ' + new Date(dt1).getFullYear(),
                     startDateDisplay: '',
                     endDateDisplay: '',
+                    forecastProgramId: 0,
+                    forecastProgramVersionId: 0,
+                    datasetId: '',
                 }, () => {
                     this.el = jexcel(document.getElementById("tableDiv"), '');
                     this.el.destroy();
@@ -984,19 +1005,15 @@ export default class PlanningUnitSetting extends Component {
 
         let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
         let stopDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate();
-        var forecastProgramId = document.getElementById("forecastProgramId").value;
+        var forecastProgramId = this.state.forecastProgramId;
         console.log("forecastProgramId--------->", forecastProgramId);
 
         if (forecastProgramId > 0) {
-            var sel = document.getElementById("forecastProgramId");
-            var tempId = sel.options[sel.selectedIndex].text;
-            let forecastProgramVersionId = tempId.split('~')[1];
-            let selectedForecastProgram = this.state.datasetList.filter(c => c.programId == forecastProgramId && c.versionId == forecastProgramVersionId)[0];
+
+            let selectedForecastProgram = this.state.datasetList.filter(c => c.programId == this.state.forecastProgramId && c.versionId == this.state.forecastProgramVersionId)[0];
             console.log("selectedForecastProgram---------->", selectedForecastProgram);
             this.setState(
                 {
-                    forecastProgramId: forecastProgramId,
-                    forecastProgramVersionId: forecastProgramVersionId,
                     selsource: selectedForecastProgram.planningUnitList,
                     loading: true,
                     selectedForecastProgram: selectedForecastProgram,
@@ -1831,7 +1848,7 @@ export default class PlanningUnitSetting extends Component {
         let datasets = datasetList.length > 0
             && datasetList.map((item, i) => {
                 return (
-                    <option key={i} value={item.programId}>
+                    <option key={i} value={item.id}>
                         {item.programCode + '~' + item.versionId}
                     </option>
                 )
