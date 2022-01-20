@@ -2781,6 +2781,9 @@ export default class BuildTree extends Component {
                         if (childList.length > 0) {
                             var sum = 0;
                             childList.map(c => {
+                                console.log("childList 1---",childList);
+                                console.log("child scenarioId 1---",scenarioId);
+                                console.log("child 1---",c.payload);
                                 sum += Number((c.payload.nodeDataMap[scenarioId])[0].displayDataValue)
                             })
                             return sum.toFixed(2);
@@ -2814,11 +2817,14 @@ export default class BuildTree extends Component {
                     } else if (type == 3) {
                         console.log("get payload 6");
                         var childList = this.state.items.filter(c => c.parent == itemConfig.id && (c.payload.nodeType.id == 3 || c.payload.nodeType.id == 4 || c.payload.nodeType.id == 5));
-                        console.log("Child List+++", childList);
+                        console.log("Child List my+++", childList);
                         if (childList.length > 0) {
                             var sum = 0;
                             childList.map(c => {
-                                sum += Number((c.payload.nodeDataMap[scenarioId])[0].displayDataValue)
+                                console.log("childList 2---",childList);
+                                // console.log("child scenarioId 2---",(c.payload.nodeDataMap[scenarioId])[0] != null);
+                                console.log("child 2---",c.payload.label.label_en,"map---",c.payload);
+                                sum += Number(c.payload.nodeDataMap.hasOwnProperty(scenarioId) ? (c.payload.nodeDataMap[scenarioId])[0].displayDataValue : 0)
                             })
                             return sum.toFixed(2);
                         } else {
@@ -3611,13 +3617,16 @@ export default class BuildTree extends Component {
                 var div = (convertToMonth * usageFrequency);
                 console.log("duv---", div);
                 if (div != 0) {
-                    noOfMonthsInUsagePeriod = 1 / (convertToMonth * usageFrequency);
+                    // noOfMonthsInUsagePeriod = 1 / (convertToMonth * usageFrequency);
+                    noOfMonthsInUsagePeriod =  usageFrequency / convertToMonth;
                     console.log("noOfMonthsInUsagePeriod---", noOfMonthsInUsagePeriod);
                 }
             } else {
                 // var noOfFUPatient = this.state.noOfFUPatient;
                 var noOfFUPatient;
                 if (this.state.currentItemConfig.context.payload.nodeType.id == 4) {
+                    console.log("no of persons---",(this.state.currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.noOfPersons);
+                    console.log("no of noOfForecastingUnitsPerPerson---",(this.state.currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.noOfForecastingUnitsPerPerson);
                     noOfFUPatient = (this.state.currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.noOfForecastingUnitsPerPerson / (this.state.currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.noOfPersons;
                 } else {
                     console.log("--->>>>>>>>>>>>>>>>>>>>>>>>>>", (this.state.currentItemConfig.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode);
@@ -5445,28 +5454,28 @@ export default class BuildTree extends Component {
 
                                         {/* } */}
                                         {this.state.currentItemConfig.context.payload.nodeType.id != 1 &&
-                                        <FormGroup className="col-md-6">
-                                            <Label htmlFor="currencyId">{i18n.t('static.common.month')}<span class="red Reqasterisk">*</span></Label>
-                                            <div className="controls edit">
-                                                <Picker
+                                            <FormGroup className="col-md-6">
+                                                <Label htmlFor="currencyId">{i18n.t('static.common.month')}<span class="red Reqasterisk">*</span></Label>
+                                                <div className="controls edit">
+                                                    <Picker
 
-                                                    id="month"
-                                                    name="month"
-                                                    ref={this.pickAMonth1}
-                                                    years={{ min: this.state.minDate, max: this.state.maxDate }}
-                                                    value={{
-                                                        year: new Date(this.state.currentScenario.month).getFullYear(), month: ("0" + (new Date(this.state.currentScenario.month).getMonth() + 1)).slice(-2)
-                                                    }}
-                                                    lang={pickerLang.months}
-                                                    // theme="dark"
-                                                    onChange={this.handleAMonthChange1}
-                                                    onDismiss={this.handleAMonthDissmis1}
-                                                >
-                                                    <MonthBox value={this.makeText({ year: new Date(this.state.currentScenario.month).getFullYear(), month: ("0" + (new Date(this.state.currentScenario.month).getMonth() + 1)).slice(-2) })}
-                                                        onClick={this.handleClickMonthBox1} />
-                                                </Picker>
-                                            </div>
-                                        </FormGroup>}
+                                                        id="month"
+                                                        name="month"
+                                                        ref={this.pickAMonth1}
+                                                        years={{ min: this.state.minDate, max: this.state.maxDate }}
+                                                        value={{
+                                                            year: new Date(this.state.currentScenario.month).getFullYear(), month: ("0" + (new Date(this.state.currentScenario.month).getMonth() + 1)).slice(-2)
+                                                        }}
+                                                        lang={pickerLang.months}
+                                                        // theme="dark"
+                                                        onChange={this.handleAMonthChange1}
+                                                        onDismiss={this.handleAMonthDissmis1}
+                                                    >
+                                                        <MonthBox value={this.makeText({ year: new Date(this.state.currentScenario.month).getFullYear(), month: ("0" + (new Date(this.state.currentScenario.month).getMonth() + 1)).slice(-2) })}
+                                                            onClick={this.handleClickMonthBox1} />
+                                                    </Picker>
+                                                </div>
+                                            </FormGroup>}
 
 
                                         {/* {this.state.numberNode && */}

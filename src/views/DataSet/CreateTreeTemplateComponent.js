@@ -3994,7 +3994,7 @@ export default class CreateTreeTemplate extends Component {
                 orgCurrentItemConfig: JSON.parse(JSON.stringify(data.context)),
                 currentItemConfig: JSON.parse(JSON.stringify(data)),
                 level0: (data.context.level == 0 ? false : true),
-                numberNode: (data.context.payload.nodeType.id == 2 ? false : true),
+                numberNode: (data.context.payload.nodeType.id == 1 || data.context.payload.nodeType.id == 2 ? false : true),
                 aggregationNode: (data.context.payload.nodeType.id == 1 ? false : true),
                 scalingList: (data.context.payload.nodeDataMap[0])[0].nodeDataModelingList != null ? (data.context.payload.nodeDataMap[0])[0].nodeDataModelingList : [],
                 //         title: item.title,
@@ -4359,8 +4359,9 @@ export default class CreateTreeTemplate extends Component {
                         initialValues={{
                             nodeTitle: this.state.currentItemConfig.context.payload.label.label_en,
                             nodeTypeId: this.state.currentItemConfig.context.payload.nodeType.id,
-                            nodeUnitId: this.state.currentItemConfig.context.payload.nodeUnit.id
-                            // percentageOfParent: (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].dataValue
+                            nodeUnitId: this.state.currentItemConfig.context.payload.nodeUnit.id,
+                            nodeValue: this.state.currentItemConfig.context.payload.nodeType.id != 1 && this.state.currentItemConfig.context.payload.nodeType.id != 2 ? this.state.currentItemConfig.context.payload.nodeDataMap[0][0].calculatedDataValue : this.state.currentItemConfig.context.payload.nodeDataMap[0][0].dataValue,
+                            percentageOfParent: (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].dataValue
                         }}
                         validate={validateNodeData(validationSchemaNodeData)}
                         onSubmit={(values, { setSubmitting, setErrors }) => {
@@ -6037,7 +6038,7 @@ export default class CreateTreeTemplate extends Component {
                                 this.setState({
                                     usageText: "",
                                     level0: true,
-                                    numberNode: (itemConfig.payload.nodeType.id == 2 ? false : true),
+                                    numberNode: (itemConfig.payload.nodeType.id == 1 || itemConfig.payload.nodeType.id == 2 ? false : true),
                                     aggregationNode: (itemConfig.payload.nodeType.id == 1 ? false : true),
                                     addNodeFlag: true,
                                     openAddNodeModal: true,
@@ -6312,8 +6313,9 @@ export default class CreateTreeTemplate extends Component {
                                                     {
                                                         0: [
                                                             {
-                                                                // month: (item.payload.nodeDataMap[0])[0].month,
-                                                                month: '2021-09-01',
+                                                                month: (item.payload.nodeDataMap[0])[0].month,
+                                                                monthNo: new Date((item.payload.nodeDataMap[0])[0].month).getMonth(),
+                                                                // month: '2021-09-01',
                                                                 nodeDataId: (item.payload.nodeDataMap[0])[0].nodeDataId,
                                                                 dataValue: (item.payload.nodeDataMap[0])[0].dataValue,
                                                                 fuNode: (item.payload.nodeDataMap[0])[0].fuNode,
