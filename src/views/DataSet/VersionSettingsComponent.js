@@ -305,7 +305,8 @@ class VersionSettingsComponent extends Component {
                 var months;
                 months = (d2.getFullYear() - d1.getFullYear()) * 12;
                 months += d2.getMonth() - d1.getMonth();
-                months = months - 1;
+                // months = months - 1;
+                months = months + 1;
                 this.el.setValueFromCoords(17, y, 1, true);
                 this.el.setValueFromCoords(8, y, months, true);
             }
