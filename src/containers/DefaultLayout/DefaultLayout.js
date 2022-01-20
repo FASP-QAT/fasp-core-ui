@@ -320,8 +320,8 @@ const routes = [
   { path: '/report/compareVersion', exact: true, name: 'static.dashboard.Versioncomarition', component: CompareVersion },
   { path: '/validation/productValidation', exact: true, name: 'static.dashboard.productValidation', component: ProductValidation },
   { path: '/report/compareAndSelectScenario', exact: true, name: 'static.dashboard.compareAndSelect', component: CompareAndSelectScenario },
-  { path: '/dataentry/consumptionDataEntryAndAdjustment', exact: true, name: 'static.dashboard.dataEntryAndAdjustment ', component: ConsumptionDataEntryAndAdjustment },
-  { path: '/dataentry/consumptionDataEntryAndAdjustment/:planningUnitId', exact: true, name: 'static.dashboard.dataEntryAndAdjustment ', component: ConsumptionDataEntryAndAdjustment },
+  { path: '/dataentry/consumptionDataEntryAndAdjustment', exact: true, name: 'static.dashboard.dataEntryAndAdjustments ', component: ConsumptionDataEntryAndAdjustment },
+  { path: '/dataentry/consumptionDataEntryAndAdjustment/:planningUnitId', exact: true, name: 'static.dashboard.dataEntryAndAdjustments ', component: ConsumptionDataEntryAndAdjustment },
   { path: '/dataset/createTreeTemplate/:templateId', name: 'Create Tree Template', component: CreateTreeTemplate },
   { path: '/dataSet/buildTree/', exact: true, name: 'static.common.managetree', component: BuildTree },
   { path: '/dataSet/buildTree/tree/:treeId/:programId', exact: true, name: 'static.common.managetree', component: BuildTree },
@@ -722,8 +722,8 @@ const routes = [
   { path: '/importIntoQATSupplyPlan/listImportIntoQATSupplyPlan/:color/:message', name: 'Import Into Supply Plan', component: ImportIntoQATSupplyPlan },
   { path: '/importIntoQATSupplyPlan/listImportIntoQATSupplyPlan', exact: true, name: 'Import Into Supply Plan', component: ImportIntoQATSupplyPlan },
 
-  { path: '/planningUnitSetting/listPlanningUnitSetting/:color/:message', name: 'static.UpdateplanningUnitSetting.UpdateplanningUnitSetting', component: PlanningUnitSetting },
-  { path: '/planningUnitSetting/listPlanningUnitSetting', exact: true, name: 'static.UpdateplanningUnitSetting.UpdateplanningUnitSetting', component: PlanningUnitSetting },
+  { path: '/planningUnitSetting/listPlanningUnitSetting/:color/:message', name: 'static.updatePlanningUnit.updatePlanningUnit', component: PlanningUnitSetting },
+  { path: '/planningUnitSetting/listPlanningUnitSetting', exact: true, name: 'static.updatePlanningUnit.updatePlanningUnit', component: PlanningUnitSetting },
 
   { path: '/forecastReport/consumptionForecastError', name: 'Consumption Forecast Error', component: ConsumptionForecastError },
   { path: '/forecastReport/forecastOutput', name: 'static.MonthlyForecast.MonthlyForecast', component: ForecastOutput },
@@ -1523,7 +1523,7 @@ class DefaultLayout extends Component {
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true) }
                           },
                           {
-                            name: i18n.t('static.UpdateplanningUnitSetting.UpdateplanningUnitSetting'),
+                            name: i18n.t('static.updatePlanningUnit.updatePlanningUnit'),
                             url: '/planningUnitSetting/listPlanningUnitSetting',
                             icon: 'fa fa-cog',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true) }
@@ -1575,7 +1575,7 @@ class DefaultLayout extends Component {
                         ]
                       },
                       {
-                        name: i18n.t('static.ConsumptionBasedForecast.ConsumptionBasedForecastConsumption-Based Forecast'),
+                        name: i18n.t('static.ConsumptionBasedForecast.ConsumptionBasedForecast'),
                         icon: 'fa fa-list',
                         // attributes: {
                         // hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true)
