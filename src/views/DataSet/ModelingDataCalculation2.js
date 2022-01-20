@@ -1,7 +1,4 @@
-import CryptoJS from 'crypto-js'
 import moment from 'moment';
-import { getDatabase } from '../../CommonComponent/IndexedDbFunctions.js';
-import { SECRET_KEY, CANCELLED_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, SUBMITTED_SHIPMENT_STATUS, APPROVED_SHIPMENT_STATUS, SHIPPED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, DELIVERED_SHIPMENT_STATUS, ON_HOLD_SHIPMENT_STATUS, FIRST_DATA_ENTRY_DATE, TBD_PROCUREMENT_AGENT_ID, ACTUAL_CONSUMPTION_TYPE, FORCASTED_CONSUMPTION_TYPE, INDEXED_DB_NAME, INDEXED_DB_VERSION, QAT_DATA_SOURCE_ID, NOTES_FOR_QAT_ADJUSTMENTS, ACTUAL_CONSUMPTION_DATA_SOURCE_TYPE, BATCH_PREFIX } from '../../Constants.js'
 
 export function calculateModelingData(dataset, props, page, nodeId, scenarioId, type, treeId, isTemplate) {
     console.log("modelling dataset---", dataset);
@@ -156,13 +153,13 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                         for (var ndml = 0; ndml < nodeDataModelingList.length; ndml++) {
                             var nodeDataModeling = nodeDataModelingList[ndml];
                             //Linear number
-                            if (nodeDataModeling.modelingType.id == 2 && (nodeDataModeling.transferNodeDataId == null || nodeDataModeling.transferNodeDataId == "")) {
+                            if (nodeDataModeling.modelingType.id == 2) {
                                 console.log("modeling datavalue 2---", nodeDataModeling.dataValue)
                                 difference += Number(nodeDataModeling.dataValue);
                                 differenceWMC += Number(nodeDataModeling.dataValue);
                             }
                             //Linear %
-                            else if (nodeDataModeling.modelingType.id == 3 && (nodeDataModeling.transferNodeDataId == null || nodeDataModeling.transferNodeDataId == "")) {
+                            else if (nodeDataModeling.modelingType.id == 3) {
                                 var dv = 0;
                                 var dvWMC = 0;
                                 if (moment(nodeDataMapForScenario.month).format("YYYY-MM-DD") == moment(nodeDataModeling.startDate).format("YYYY-MM-DD")) {
@@ -182,7 +179,7 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                 differenceWMC += Number((Number(dvWMC) * Number(nodeDataModeling.dataValue)) / 100);
                             }
                             //Exponential %
-                            else if (nodeDataModeling.modelingType.id == 4 && (nodeDataModeling.transferNodeDataId == null || nodeDataModeling.transferNodeDataId == "")) {
+                            else if (nodeDataModeling.modelingType.id == 4) {
                                 console.log("datavalue ****", Number(nodeDataModeling.dataValue));
                                 console.log(" actual difference ****", Number((Number(startValue) * Number(nodeDataModeling.dataValue)) / 100));
                                 difference += Number((Number(startValue) * Number(nodeDataModeling.dataValue)) / 100);
@@ -191,7 +188,7 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                             }
                             //Linear % point
 
-                            else if (nodeDataModeling.modelingType.id == 5 && (nodeDataModeling.transferNodeDataId == null || nodeDataModeling.transferNodeDataId == "")) {
+                            else if (nodeDataModeling.modelingType.id == 5) {
                                 console.log("nodeDataModeling---", nodeDataModeling);
                                 difference += Number(nodeDataModeling.dataValue);
                                 differenceWMC += Number(nodeDataModeling.dataValue);
@@ -223,6 +220,28 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                         }
 
                         endValue = endValue + totalManualChange;
+                        if (payload.nodeType.id == 3 || payload.nodeType.id == 4 || payload.nodeType.id == 5) {
+                            if (endValue < 0) {
+                                endValue = 0;
+                            }
+                            if (endValue > 100) {
+                                endValue = 100;
+                            }
+
+                            if (endValueWMC < 0) {
+                                endValueWMC = 0;
+                            }
+                            if (endValueWMC > 100) {
+                                endValueWMC = 100;
+                            }
+                        } else if (payload.nodeType.id == 2) {
+                            if (endValue < 0) {
+                                endValue = 0;
+                            }
+                            if (endValueWMC < 0) {
+                                endValueWMC = 0;
+                            }
+                        }
 
                         var calculatedValue = 0;
                         if (payload.nodeType.id == 2) {
