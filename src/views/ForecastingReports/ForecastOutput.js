@@ -751,6 +751,9 @@ class ForecastOutput extends Component {
                             datasetList: datasetList,
                             datasetList1: datasetList1
                         }, () => {
+                            localStorage.setItem("sesForecastProgramIdReport", parseInt(programId));
+                            localStorage.setItem("sesForecastVersionIdReport", document.getElementById("versionId").value);
+                            
                             let filteredProgram = this.state.datasetList.filter(c => c.programId == programId && c.versionId == (versionId.split('(')[0]).trim())[0];
 
                             var monthArrayList = [];
@@ -1288,16 +1291,33 @@ class ForecastOutput extends Component {
                         console.log("programs------------------>", this.state.programs);
                     })
                 } else {
-                    this.setState({
-                        programs: proList.sort(function (a, b) {
-                            a = getLabelText(a.label, lang).toLowerCase();
-                            b = getLabelText(b.label, lang).toLowerCase();
-                            return a < b ? -1 : a > b ? 1 : 0;
-                        }),
-                        downloadedProgramData: downloadedProgramData
-                    }, () => {
-                        console.log("programs------------------>", this.state.programs);
-                    })
+
+                    if (localStorage.getItem("sesForecastProgramIdReport") != '' && localStorage.getItem("sesForecastProgramIdReport") != undefined) {
+                        this.setState({
+                            programs: proList.sort(function (a, b) {
+                                a = getLabelText(a.label, lang).toLowerCase();
+                                b = getLabelText(b.label, lang).toLowerCase();
+                                return a < b ? -1 : a > b ? 1 : 0;
+                            }),
+                            downloadedProgramData: downloadedProgramData,
+                            programId: localStorage.getItem("sesForecastProgramIdReport"),
+                        }, () => {
+                            this.getVersionIds();
+                            console.log("programs------------------>", this.state.programs);
+                        })
+                    } else {
+                        this.setState({
+                            programs: proList.sort(function (a, b) {
+                                a = getLabelText(a.label, lang).toLowerCase();
+                                b = getLabelText(b.label, lang).toLowerCase();
+                                return a < b ? -1 : a > b ? 1 : 0;
+                            }),
+                            downloadedProgramData: downloadedProgramData
+                        }, () => {
+                            console.log("programs------------------>", this.state.programs);
+                        })
+                    }
+
                 }
 
 
@@ -1732,13 +1752,25 @@ class ForecastOutput extends Component {
                     return a.indexOf(x) === i;
                 })
                 versionList.reverse();
-                this.setState({
-                    versions: versionList,
-                    versionId: (versionList.length > 0 ? versionList[0].versionId : ''),
-                }, () => {
-                    this.filterData();
-                    this.setVersionId();
-                })
+
+                if (localStorage.getItem("sesForecastVersionIdReport") != '' && localStorage.getItem("sesForecastVersionIdReport") != undefined) {
+                    let versionVar = versionList.filter(c => c.versionId == localStorage.getItem("sesForecastVersionIdReport"));
+                    this.setState({
+                        versions: versionList,
+                        versionId: (versionVar != '' && versionVar != undefined ? localStorage.getItem("sesForecastVersionIdReport") : versionList[0].versionId),
+                    }, () => {
+                        this.filterData();
+                        this.setVersionId();
+                    })
+                } else {
+                    this.setState({
+                        versions: versionList,
+                        versionId: (versionList.length > 0 ? versionList[0].versionId : ''),
+                    }, () => {
+                        this.filterData();
+                        this.setVersionId();
+                    })
+                }
 
 
             }.bind(this);
@@ -1877,7 +1909,7 @@ class ForecastOutput extends Component {
         var chartOptions = {
             title: {
                 display: true,
-                text: (this.state.yaxisEquUnit > 0 ? this.state.equivalencyUnitLabel : 'Monthly Forecast ' + (this.state.viewById == 1 ? '('+i18n.t('static.product.product') +')' : '('+i18n.t('static.forecastingunit.forecastingunit')+')'))
+                text: (this.state.yaxisEquUnit > 0 ? this.state.equivalencyUnitLabel : 'Monthly Forecast ' + (this.state.viewById == 1 ? '(' + i18n.t('static.product.product') + ')' : '(' + i18n.t('static.forecastingunit.forecastingunit') + ')'))
             },
             scales: {
                 yAxes: [
