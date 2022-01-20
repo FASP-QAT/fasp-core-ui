@@ -492,18 +492,41 @@ class ModelingValidation extends Component {
                 var totalPer = 0;
                 for (var k = 0; k < nodeVal.length; k++) {
                     var flatListFiltered = flatList.filter(c => c.id == nodeVal[k].value)[0].payload.nodeDataMap[this.state.scenarioId][0].nodeDataMomList;
-                    var calculatedValue = flatListFiltered.length > 0 ? flatListFiltered.filter(c => moment(c.month).format("YYYY-MM-DD") == moment(monthList[j]).format("YYYY-MM-DD"))[0].calculatedValue : "";
-                    data[k + 1] = flatListFiltered.length > 0 ? Number(calculatedValue).toFixed(2) : "";
+                    var calculatedValue = "";
+                    if (flatListFiltered.length > 0) {
+                        var cvList = flatListFiltered.filter(c => moment(c.month).format("YYYY-MM-DD") == moment(monthList[j]).format("YYYY-MM-DD"));
+                        if (cvList.length > 0) {
+                            calculatedValue = cvList[0].calculatedValue
+                        } else {
+                            calculatedValue = "";
+                        }
+                    } else {
+                        calculatedValue = "";
+                    }
+                    data[k + 1] = calculatedValue != "" ? Number(calculatedValue).toFixed(2) : "";
                     total += Number(calculatedValue);
                 }
                 data[nodeVal.length + 1] = Number(total).toFixed(2);
 
                 for (var k = 0; k < nodeVal.length; k++) {
                     var flatListFiltered = flatList.filter(c => c.id == nodeVal[k].value)[0].payload.nodeDataMap[this.state.scenarioId][0].nodeDataMomList;
-                    var calculatedValue = flatListFiltered.length > 0 ? flatListFiltered.filter(c => moment(c.month).format("YYYY-MM-DD") == moment(monthList[j]).format("YYYY-MM-DD"))[0].calculatedValue : "";
-                    var val = (Number(calculatedValue) / Number(total)) * 100;
-                    data[nodeVal.length + 1 + k + 1] = calculatedValue != 0 ? Number(val).toFixed(2) : 0;
-                    totalPer += calculatedValue != 0 ? val : 0;
+                    var calculatedValue = "";
+                    if (flatListFiltered.length > 0) {
+                        var cvList = flatListFiltered.filter(c => moment(c.month).format("YYYY-MM-DD") == moment(monthList[j]).format("YYYY-MM-DD"));
+                        if (cvList.length > 0) {
+                            calculatedValue = cvList[0].calculatedValue
+                        } else {
+                            calculatedValue = "";
+                        }
+                    } else {
+                        calculatedValue = "";
+                    }
+                    var val = ""
+                    if (calculatedValue != "") {
+                        val = (Number(calculatedValue) / Number(total)) * 100;
+                    }
+                    data[nodeVal.length + 1 + k + 1] = val != "" ? Number(val).toFixed(2) : 0;
+                    totalPer += calculatedValue != "" ? val : 0;
                 }
                 data[nodeVal.length + 1 + nodeVal.length + 1] = totalPer != 0 ? Number(totalPer).toFixed(2) : 0;
                 dataArr.push(data);
