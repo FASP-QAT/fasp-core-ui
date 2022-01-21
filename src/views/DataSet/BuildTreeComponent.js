@@ -4754,8 +4754,31 @@ export default class BuildTree extends Component {
         (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].month = moment((newItem.payload.nodeDataMap[this.state.selectedScenario])[0].month).startOf('month').format("YYYY-MM-DD")
         if (itemConfig.context.payload.nodeType.id == 4) {
             (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.forecastingUnit.label.label_en = (itemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.forecastingUnit.label.label_en;
+            // (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].puNode = {};
         }
-        console.log("add button clicked value after update---", newItem);
+        // else if (itemConfig.context.payload.nodeType.id == 5) {
+        //     (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode = {};
+        // } else {
+        //     (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode = {};
+        //     (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].puNode = {};
+        // }
+        var scenarioList = this.state.scenarioList.filter(x => x.id != this.state.selectedScenario);
+        if (scenarioList.length > 0) {
+            for (let i = 0; i < scenarioList.length; i++) {
+                var tempArray = [];
+                var nodeDataMap = {};
+                tempArray.push(JSON.parse(JSON.stringify((newItem.payload.nodeDataMap[this.state.selectedScenario])[0])));
+                console.log("tempArray---",tempArray);
+                nodeDataMap = newItem.payload.nodeDataMap;
+                tempArray[0].nodeDataId = scenarioList[i].id;
+                nodeDataMap[scenarioList[i].id] = tempArray;
+                // nodeDataMap[scenarioList[i].id][0].nodeDataId = scenarioList[i].id;
+                newItem.payload.nodeDataMap = nodeDataMap;
+                // (newItem.payload.nodeDataMap[scenarioList[i].id])[0] = (newItem.payload.nodeDataMap[this.state.selectedScenario]);
+            }
+        }
+        console.log("add button clicked value after update---", newItem.payload.nodeDataMap.size);
+        console.log("add button clicked value after update---", newItem.payload.nodeDataMap.length);
         this.setState({
             items: [...items, newItem],
             cursorItem: nodeId
@@ -4939,7 +4962,7 @@ export default class BuildTree extends Component {
         const { context: item } = data;
         if (item != null) {
             this.setState({
-                sameLevelNodeList:[],
+                sameLevelNodeList: [],
                 showCalculatorFields: false,
                 showMomData: false,
                 showMomDataPercent: false,
