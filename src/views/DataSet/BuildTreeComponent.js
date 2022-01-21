@@ -333,6 +333,7 @@ export default class BuildTree extends Component {
         this.pickAMonth4 = React.createRef()
         this.pickAMonth5 = React.createRef()
         this.state = {
+            maxNodeDataId: '',
             message1: '',
             updatedPlanningUnitList: [],
             nodeId: '',
@@ -633,6 +634,36 @@ export default class BuildTree extends Component {
         this.calculateMOMData = this.calculateMOMData.bind(this);
         this.changed1 = this.changed1.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
+        this.getMaxNodeDataId = this.getMaxNodeDataId.bind(this);
+    }
+    getMaxNodeDataId() {
+        var maxNodeDataId = 0;
+        if (this.state.maxNodeDataId != "" && this.state.maxNodeDataId != 0) {
+            maxNodeDataId = parseInt(this.state.maxNodeDataId + 1);
+            console.log("maxNodeDataId 1---", maxNodeDataId)
+            this.setState({
+                maxNodeDataId
+            })
+        } else {
+            var items = this.state.items;
+            var nodeDataMap = [];
+            for (let i = 0; i < items.length; i++) {
+                var scenarioList = this.state.scenarioList;
+                for (let j = 0; j < scenarioList.length; j++) {
+                    console.log("array a---", i, "---", items[i]);
+                    if (items[i].payload.nodeDataMap.hasOwnProperty(scenarioList[j].id)) {
+                        nodeDataMap.push(items[i].payload.nodeDataMap[scenarioList[j].id][0]);
+                    }
+                }
+            }
+            maxNodeDataId = nodeDataMap.length > 0 ? Math.max(...nodeDataMap.map(o => o.nodeDataId)) : 0;
+            console.log("nodeDataMap array---", nodeDataMap);
+            console.log("maxNodeDataId 2---", maxNodeDataId)
+            this.setState({
+                maxNodeDataId
+            })
+        }
+        return maxNodeDataId;
     }
 
     formSubmitLoader() {
@@ -2119,7 +2150,7 @@ export default class BuildTree extends Component {
         var arr = this.state.items.filter(x => x.level == level && x.id != id && x.id > id && x.parent == parent && x.payload.nodeType.id == nodeTypeId);
         console.log("arr---", arr);
         for (var i = 0; i < arr.length; i++) {
-            sameLevelNodeList[i] = { id: arr[i].id, name: getLabelText(arr[i].payload.label, this.state.lang) }
+            sameLevelNodeList[i] = { id: arr[i].payload.nodeDataMap[this.state.selectedScenario][0].nodeDataId, name: getLabelText(arr[i].payload.label, this.state.lang) }
         }
         console.log("sameLevelNodeList---", sameLevelNodeList);
         this.setState({
@@ -2767,9 +2798,6 @@ export default class BuildTree extends Component {
                         if (childList.length > 0) {
                             var sum = 0;
                             childList.map(c => {
-                                console.log("childList 1---", childList);
-                                console.log("child scenarioId 1---", scenarioId);
-                                console.log("child 1---", c.payload);
                                 sum += Number((c.payload.nodeDataMap[scenarioId])[0].displayDataValue)
                             })
                             return sum.toFixed(2);
@@ -4268,7 +4296,7 @@ export default class BuildTree extends Component {
                     tempArray.push((items[i].payload.nodeDataMap[minScenarioId])[0]);
                     nodeDataMap = items[i].payload.nodeDataMap;
                     nodeDataMap[scenarioId] = tempArray;
-                    nodeDataMap[scenarioId][0].nodeDataId = scenarioId;
+                    nodeDataMap[scenarioId][0].nodeDataId = this.getMaxNodeDataId();
                     items[i].payload.nodeDataMap = nodeDataMap;
                 }
                 console.log("items-----------", items);
@@ -4738,6 +4766,7 @@ export default class BuildTree extends Component {
     }
     onAddButtonClick(itemConfig) {
         console.log("add button clicked---", itemConfig);
+        // console.log("max node data id---", this.getMaxNodeDataId())
         this.setState({ openAddNodeModal: false });
         const { items } = this.state;
         var maxNodeId = items.length > 0 ? Math.max(...items.map(o => o.id)) : 0;
@@ -4750,18 +4779,42 @@ export default class BuildTree extends Component {
         var parentSortOrder = items.filter(c => c.id == itemConfig.context.parent)[0].sortOrder;
         var childList = items.filter(c => c.parent == itemConfig.context.parent);
         newItem.sortOrder = parentSortOrder.concat(".").concat(("0" + (Number(childList.length) + 1)).slice(-2));
-        (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].nodeDataId = this.state.selectedScenario;
+        (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].nodeDataId = this.getMaxNodeDataId();
         (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].displayDataValue = (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].dataValue;
         (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].displayCalculatedDataValue = (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].calculatedDataValue;
         (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].month = moment((newItem.payload.nodeDataMap[this.state.selectedScenario])[0].month).startOf('month').format("YYYY-MM-DD")
         if (itemConfig.context.payload.nodeType.id == 4) {
             (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.forecastingUnit.label.label_en = (itemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.forecastingUnit.label.label_en;
+            // (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].puNode = {};
         }
-        console.log("add button clicked value after update---", newItem);
+        // else if (itemConfig.context.payload.nodeType.id == 5) {
+        //     (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode = {};
+        // } else {
+        //     (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode = {};
+        //     (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].puNode = {};
+        // }
+        var scenarioList = this.state.scenarioList.filter(x => x.id != this.state.selectedScenario);
+        if (scenarioList.length > 0) {
+            for (let i = 0; i < scenarioList.length; i++) {
+                var tempArray = [];
+                var nodeDataMap = {};
+                tempArray.push(JSON.parse(JSON.stringify((newItem.payload.nodeDataMap[this.state.selectedScenario])[0])));
+                console.log("tempArray---", tempArray);
+                nodeDataMap = newItem.payload.nodeDataMap;
+                tempArray[0].nodeDataId = this.getMaxNodeDataId();
+                nodeDataMap[scenarioList[i].id] = tempArray;
+                // nodeDataMap[scenarioList[i].id][0].nodeDataId = scenarioList[i].id;
+                newItem.payload.nodeDataMap = nodeDataMap;
+                // (newItem.payload.nodeDataMap[scenarioList[i].id])[0] = (newItem.payload.nodeDataMap[this.state.selectedScenario]);
+            }
+        }
+        console.log("add button clicked value after update---", newItem.payload.nodeDataMap.size);
+        console.log("add button clicked value after update---", newItem.payload.nodeDataMap.length);
         this.setState({
             items: [...items, newItem],
             cursorItem: nodeId
         }, () => {
+
             console.log("on add items-------", this.state.items);
             this.calculateMOMData(newItem.id, 0);
             // this.calculateValuesForAggregateNode(this.state.items);
@@ -4941,7 +4994,7 @@ export default class BuildTree extends Component {
         const { context: item } = data;
         if (item != null) {
             this.setState({
-                sameLevelNodeList:[],
+                sameLevelNodeList: [],
                 showCalculatorFields: false,
                 showMomData: false,
                 showMomDataPercent: false,
@@ -6193,35 +6246,35 @@ export default class BuildTree extends Component {
                                                 {(this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentScenario.fuNode.usageType.id == 2) &&
                                                     <table className="table table-bordered">
                                                         <tr>
-                                                            <td>{i18n.t('static.tree.#OfFURequiredForPeriod')}</td>
-                                                            <td>{addCommas(this.state.currentScenario.fuNode.noOfForecastingUnitsPerPerson)}</td>
+                                                            <td style={{ width: '50%' }}>{i18n.t('static.tree.#OfFURequiredForPeriod')}</td>
+                                                            <td style={{ width: '50%' }}>{addCommas(this.state.currentScenario.fuNode.noOfForecastingUnitsPerPerson)}</td>
                                                         </tr>
                                                         <tr>
-                                                            <td>{i18n.t('static.tree.#OfMonthsInPeriod')}</td>
-                                                            <td>{addCommas(this.state.noOfMonthsInUsagePeriod)}</td>
+                                                            <td style={{ width: '50%' }}>{i18n.t('static.tree.#OfMonthsInPeriod')}</td>
+                                                            <td style={{ width: '50%' }}>{addCommas(this.state.noOfMonthsInUsagePeriod)}</td>
                                                         </tr>
                                                         <tr>
-                                                            <td>{i18n.t('static.tree.#OfFU/month/')} {this.state.nodeUnitList.filter(c => c.unitId == this.state.usageTypeParent)[0].label.label_en}</td>
+                                                            <td style={{ width: '50%' }}>{i18n.t('static.tree.#OfFU/month/')} {this.state.nodeUnitList.filter(c => c.unitId == this.state.usageTypeParent)[0].label.label_en}</td>
                                                             {this.state.currentScenario.fuNode.usagePeriod.usagePeriodId != "" &&
-                                                                <td>{addCommas((this.state.currentScenario.fuNode.noOfForecastingUnitsPerPerson / this.state.currentScenario.fuNode.usageFrequency) * (this.state.usagePeriodList.filter(c => c.usagePeriodId == this.state.currentScenario.fuNode.usagePeriod.usagePeriodId))[0].convertToMonth)}</td>}
+                                                                <td style={{ width: '50%' }}>{addCommas((this.state.currentScenario.fuNode.noOfForecastingUnitsPerPerson / this.state.currentScenario.fuNode.usageFrequency) * (this.state.usagePeriodList.filter(c => c.usagePeriodId == this.state.currentScenario.fuNode.usagePeriod.usagePeriodId))[0].convertToMonth)}</td>}
                                                             {this.state.currentScenario.fuNode.usagePeriod.usagePeriodId == "" &&
-                                                                <td></td>
+                                                                <td style={{ width: '50%' }}></td>
                                                             }
                                                         </tr>
                                                     </table>}
                                                 {(this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentScenario.fuNode.usageType.id == 1) &&
                                                     <table className="table table-bordered">
                                                         <tr>
-                                                            <td>{i18n.t('static.tree.#OfFU/')} {this.state.nodeUnitList.filter(c => c.unitId == this.state.usageTypeParent)[0].label.label_en}</td>
-                                                            <td>{addCommas(this.state.noOfFUPatient)}</td>
+                                                            <td style={{ width: '50%' }}>{i18n.t('static.tree.#OfFU/')} {this.state.nodeUnitList.filter(c => c.unitId == this.state.usageTypeParent)[0].label.label_en}</td>
+                                                            <td style={{ width: '50%' }}>{addCommas(this.state.noOfFUPatient)}</td>
                                                         </tr>
                                                         <tr>
-                                                            <td>{i18n.t('static.tree.#OfFU/month/')} {this.state.nodeUnitList.filter(c => c.unitId == this.state.usageTypeParent)[0].label.label_en}</td>
-                                                            <td>{addCommas(this.state.noOfMonthsInUsagePeriod)}</td>
+                                                            <td style={{ width: '50%' }}>{i18n.t('static.tree.#OfFU/month/')} {this.state.nodeUnitList.filter(c => c.unitId == this.state.usageTypeParent)[0].label.label_en}</td>
+                                                            <td style={{ width: '50%' }}>{addCommas(this.state.noOfMonthsInUsagePeriod)}</td>
                                                         </tr>
                                                         <tr>
-                                                            <td>{i18n.t('static.tree.#OfFURequiredForPeriod')}</td>
-                                                            <td>{addCommas(this.state.noFURequired)}</td>
+                                                            <td style={{ width: '50%' }}>{i18n.t('static.tree.#OfFURequiredForPeriod')}</td>
+                                                            <td style={{ width: '50%' }}>{addCommas(this.state.noFURequired)}</td>
                                                         </tr>
                                                     </table>}
                                             </div>
