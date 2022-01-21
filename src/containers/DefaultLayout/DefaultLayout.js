@@ -293,6 +293,8 @@ const ListTreeTemplate = React.lazy(() => import('../../views/DataSet/ListTreeTe
 const CommitTree = React.lazy(() => import('../../views/DataSet/CommitTreeComponent.js'));
 const CreateTreeTemplate = React.lazy(() => import('../../views/DataSet/CreateTreeTemplateComponent'));
 const LoadDeleteDataSet = React.lazy(() => import('../../views/DataSet/LoadDeleteDataSet'));
+const ExportDataset = React.lazy(() => import('../../views/DataSet/ExportDataset'));
+const ImportDataset = React.lazy(() => import('../../views/DataSet/ImportDataset'));
 const VersionSettingsComponent = React.lazy(() => import('../../views/DataSet/VersionSettingsComponent'));
 
 
@@ -313,6 +315,8 @@ const ForecastSummary = React.lazy(() => import('../../views/ForecastingReports/
 const routes = [
   { path: '/dataset/versionSettings', name: 'static.UpdateversionSettings.UpdateversionSettings', component: VersionSettingsComponent },
   { path: '/dataset/loadDeleteDataSet', name: 'Load/Delete Local Version', component: LoadDeleteDataSet },
+  { path: '/dataset/exportDataset', name: 'Export Dataset', component: ExportDataset },
+  { path: '/dataset/importDataset', name: 'Import Dataset', component: ImportDataset },
   { path: '/dataset/loadDeleteDataSet/:message', name: 'Load/Delete Local Version', component: LoadDeleteDataSet },
   { path: '/dataset/listTreeTemplate/:color/:message', name: 'static.dataset.TreeTemplate', component: ListTreeTemplate },
   { path: '/dataset/listTreeTemplate/', exact: true, name: 'static.dataset.TreeTemplate', component: ListTreeTemplate },
@@ -1531,6 +1535,18 @@ class DefaultLayout extends Component {
                           {
                             name: i18n.t('static.common.loadDeleteDataSet'),
                             url: '/dataset/loadDeleteDataSet',
+                            icon: 'fa fa-download',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true) }
+                          },
+                          {
+                            name: 'Import Dataset',
+                            url: '/dataset/importDataset',
+                            icon: 'fa fa-download',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true) }
+                          },
+                          {
+                            name: 'Export Dataset',
+                            url: '/dataset/exportDataset',
                             icon: 'fa fa-download',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true) }
                           },
