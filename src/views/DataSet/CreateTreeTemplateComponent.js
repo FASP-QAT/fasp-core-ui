@@ -5843,6 +5843,8 @@ export default class CreateTreeTemplate extends Component {
                         row3 = row3.concat("\t");
                     }
                     if (items[i].payload.nodeType.id == 1 || items[i].payload.nodeType.id == 2) {
+                        row = row.concat("NA ")
+                        row1 = row1.concat(" Subtotal")
                     } else {
                         row = row.concat(total).concat("% ")
                         row1 = row1.concat(" Subtotal")
@@ -5856,7 +5858,7 @@ export default class CreateTreeTemplate extends Component {
                             type: ShadingType.CLEAR,
                             fill: "cfcdc9"
                         },
-                        style: total != 100 ? "aside" : "",
+                        style: row != "NA " ? total != 100 ? "aside" : "" : ""
                     }))
                 }
             }
