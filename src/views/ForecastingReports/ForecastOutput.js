@@ -784,80 +784,82 @@ class ForecastOutput extends Component {
                                     console.log("Test------------>3", Object.keys(selectedForecastMap)[0]);
                                     console.log("Test------------>4", (selectedForecastMap[Object.keys(selectedForecastMap)[0]]));
 
-                                    let selectedForecastMapObjIn = (selectedForecastMap[Object.keys(selectedForecastMap)[0]]);
+                                    if (selectedForecastMap[Object.keys(selectedForecastMap)[0]] != undefined && selectedForecastMap[Object.keys(selectedForecastMap)[0]] != null && selectedForecastMap[Object.keys(selectedForecastMap)[0]] != '') {
+                                        let selectedForecastMapObjIn = (selectedForecastMap[Object.keys(selectedForecastMap)[0]]);
 
-                                    let scenarioId = selectedForecastMapObjIn.scenarioId;
-                                    let consumptionExtrapolationId = selectedForecastMapObjIn.consumptionExtrapolationId;
+                                        let scenarioId = selectedForecastMapObjIn.scenarioId;
+                                        let consumptionExtrapolationId = selectedForecastMapObjIn.consumptionExtrapolationId;
 
-                                    if (scenarioId != null) {//scenarioId
-                                        // console.log("Test------------>IF");
+                                        if (scenarioId != null) {//scenarioId
+                                            // console.log("Test------------>IF");
 
-                                        for (let j = 0; j < treeList.length; j++) {
-                                            let filteredScenario = treeList[j].scenarioList.filter(c => c.id == scenarioId);
-                                            if (filteredScenario.length > 0) {
-                                                let flatlist = treeList[j].tree.flatList;
+                                            for (let j = 0; j < treeList.length; j++) {
+                                                let filteredScenario = treeList[j].scenarioList.filter(c => c.id == scenarioId);
+                                                if (filteredScenario.length > 0) {
+                                                    let flatlist = treeList[j].tree.flatList;
 
-                                                let listContainNodeType5 = flatlist.filter(c => c.payload.nodeType.id == 5);
+                                                    let listContainNodeType5 = flatlist.filter(c => c.payload.nodeType.id == 5);
 
-                                                console.log("Test------------>5", listContainNodeType5);
-                                                console.log("Test------------>6", listContainNodeType5[0].payload);
-                                                console.log("Test------------>7", (listContainNodeType5[0].payload.nodeDataMap[scenarioId]));
-                                                // console.log("Test------------>8", filteredPUNode);
-                                                let match = 0;
-                                                for (let k = 0; k < listContainNodeType5.length; k++) {
-                                                    let arrayOfNodeDataMap = (listContainNodeType5[k].payload.nodeDataMap[scenarioId]).filter(c => c.puNode.planningUnit.id == selectedPlanningUnit[i].value)
-                                                    console.log("Test------------>7.1", arrayOfNodeDataMap);
+                                                    console.log("Test------------>5", listContainNodeType5);
+                                                    console.log("Test------------>6", listContainNodeType5[0].payload);
+                                                    console.log("Test------------>7", (listContainNodeType5[0].payload.nodeDataMap[scenarioId]));
+                                                    // console.log("Test------------>8", filteredPUNode);
+                                                    let match = 0;
+                                                    for (let k = 0; k < listContainNodeType5.length; k++) {
+                                                        let arrayOfNodeDataMap = (listContainNodeType5[k].payload.nodeDataMap[scenarioId]).filter(c => c.puNode.planningUnit.id == selectedPlanningUnit[i].value)
+                                                        console.log("Test------------>7.1", arrayOfNodeDataMap);
 
-                                                    if (arrayOfNodeDataMap.length > 0) {
-                                                        console.log("Test------------>8", arrayOfNodeDataMap[0].nodeDataMomList);
-                                                        nodeDataMomList = arrayOfNodeDataMap[0].nodeDataMomList;
-                                                        let consumptionList = nodeDataMomList.map(m => {
-                                                            return {
-                                                                consumptionDate: m.month,
-                                                                // consumptionQty: (m.calculatedValue).toFixed(2)
-                                                                consumptionQty: parseInt(m.calculatedValue)
-                                                            }
-                                                        });
-                                                        let jsonTemp = { objUnit: planningUniObj.planningUnit, scenario: { id: 1, label: treeList[j].label.label_en + filteredScenario[0].label.label_en }, display: true, color: "#ba0c2f", consumptionList: consumptionList }
-                                                        console.log("Test------------>8.1", jsonTemp);
-                                                        consumptionData.push(jsonTemp);
-                                                        match = 0;
-                                                        break;
-                                                    } else {
-                                                        // let jsonTemp = { objUnit: planningUniObj.planningUnit, scenario: filteredScenario[0], display: true, color: "#ba0c2f", consumptionList: [] }
-                                                        // consumptionData.push(jsonTemp);
-                                                        match = 1;
+                                                        if (arrayOfNodeDataMap.length > 0) {
+                                                            console.log("Test------------>8", arrayOfNodeDataMap[0].nodeDataMomList);
+                                                            nodeDataMomList = arrayOfNodeDataMap[0].nodeDataMomList;
+                                                            let consumptionList = nodeDataMomList.map(m => {
+                                                                return {
+                                                                    consumptionDate: m.month,
+                                                                    // consumptionQty: (m.calculatedValue).toFixed(2)
+                                                                    consumptionQty: parseInt(m.calculatedValue)
+                                                                }
+                                                            });
+                                                            let jsonTemp = { objUnit: planningUniObj.planningUnit, scenario: { id: 1, label: treeList[j].label.label_en + filteredScenario[0].label.label_en }, display: true, color: "#ba0c2f", consumptionList: consumptionList }
+                                                            console.log("Test------------>8.1", jsonTemp);
+                                                            consumptionData.push(jsonTemp);
+                                                            match = 0;
+                                                            break;
+                                                        } else {
+                                                            // let jsonTemp = { objUnit: planningUniObj.planningUnit, scenario: filteredScenario[0], display: true, color: "#ba0c2f", consumptionList: [] }
+                                                            // consumptionData.push(jsonTemp);
+                                                            match = 1;
+                                                        }
                                                     }
+
+                                                    if (match == 1) {
+                                                        let jsonTemp = { objUnit: planningUniObj.planningUnit, scenario: { id: 1, label: treeList[j].label.label_en + filteredScenario[0].label.label_en }, display: true, color: "#ba0c2f", consumptionList: [] }
+                                                        consumptionData.push(jsonTemp);
+                                                    }
+
+                                                    // let nodeDataMomList = listContainNodeType5.payload.nodeDataMap[scenarioId].filter(c => c.puNode.planningUnit.id == selectedPlanningUnit[i].value)[0].nodeDataMomList;
+
+                                                    // break;
                                                 }
-
-                                                if (match == 1) {
-                                                    let jsonTemp = { objUnit: planningUniObj.planningUnit, scenario: { id: 1, label: treeList[j].label.label_en + filteredScenario[0].label.label_en }, display: true, color: "#ba0c2f", consumptionList: [] }
-                                                    consumptionData.push(jsonTemp);
-                                                }
-
-                                                // let nodeDataMomList = listContainNodeType5.payload.nodeDataMap[scenarioId].filter(c => c.puNode.planningUnit.id == selectedPlanningUnit[i].value)[0].nodeDataMomList;
-
-                                                // break;
                                             }
-                                        }
 
-                                    } else {//consumptionExtrapolationId
-                                        // console.log("Test------------>ELSE");
-                                        let consumptionExtrapolationObj = consumptionExtrapolation.filter(c => c.consumptionExtrapolationId == consumptionExtrapolationId);
-                                        if (consumptionExtrapolationObj.length > 0) {
-                                            let consumptionList = consumptionExtrapolationObj[0].extrapolationDataList.map(m => {
-                                                return {
-                                                    consumptionDate: m.month,
-                                                    // consumptionQty: m.amount
-                                                    consumptionQty: parseInt(m.amount)
-                                                }
-                                            });
-                                            let jsonTemp = { objUnit: planningUniObj.planningUnit, scenario: { id: 1, label: "" }, display: true, color: "#ba0c2f", consumptionList: consumptionList }
-                                            consumptionData.push(jsonTemp);
+                                        } else {//consumptionExtrapolationId
+                                            // console.log("Test------------>ELSE");
+                                            let consumptionExtrapolationObj = consumptionExtrapolation.filter(c => c.consumptionExtrapolationId == consumptionExtrapolationId);
+                                            if (consumptionExtrapolationObj.length > 0) {
+                                                let consumptionList = consumptionExtrapolationObj[0].extrapolationDataList.map(m => {
+                                                    return {
+                                                        consumptionDate: m.month,
+                                                        // consumptionQty: m.amount
+                                                        consumptionQty: parseInt(m.amount)
+                                                    }
+                                                });
+                                                let jsonTemp = { objUnit: planningUniObj.planningUnit, scenario: { id: 1, label: "" }, display: true, color: "#ba0c2f", consumptionList: consumptionList }
+                                                consumptionData.push(jsonTemp);
 
-                                        } else {
-                                            let jsonTemp = { objUnit: planningUniObj.planningUnit, scenario: { id: 1, label: "" }, display: true, color: "#ba0c2f", consumptionList: [] }
-                                            consumptionData.push(jsonTemp);
+                                            } else {
+                                                let jsonTemp = { objUnit: planningUniObj.planningUnit, scenario: { id: 1, label: "" }, display: true, color: "#ba0c2f", consumptionList: [] }
+                                                consumptionData.push(jsonTemp);
+                                            }
                                         }
                                     }
                                 }
@@ -881,87 +883,88 @@ class ForecastOutput extends Component {
                                         console.log("TestFU------------>3", Object.keys(selectedForecastMap)[0]);
                                         console.log("TestFU------------>4", (selectedForecastMap[Object.keys(selectedForecastMap)[0]]));
 
-                                        let selectedForecastMapObjIn = (selectedForecastMap[Object.keys(selectedForecastMap)[0]]);
+                                        if (selectedForecastMap[Object.keys(selectedForecastMap)[0]] != undefined && selectedForecastMap[Object.keys(selectedForecastMap)[0]] != '' && selectedForecastMap[Object.keys(selectedForecastMap)[0]] != null) {
+                                            let selectedForecastMapObjIn = (selectedForecastMap[Object.keys(selectedForecastMap)[0]]);
 
-                                        let scenarioId = selectedForecastMapObjIn.scenarioId;
-                                        let consumptionExtrapolationId = selectedForecastMapObjIn.consumptionExtrapolationId;
+                                            let scenarioId = selectedForecastMapObjIn.scenarioId;
+                                            let consumptionExtrapolationId = selectedForecastMapObjIn.consumptionExtrapolationId;
 
-                                        if (scenarioId != null) {//scenarioId
-                                            // console.log("Test------------>IF");
+                                            if (scenarioId != null) {//scenarioId
+                                                // console.log("Test------------>IF");
 
-                                            for (let j = 0; j < treeList.length; j++) {
-                                                let filteredScenario = treeList[j].scenarioList.filter(c => c.id == scenarioId);
-                                                if (filteredScenario.length > 0) {
-                                                    let flatlist = treeList[j].tree.flatList;
+                                                for (let j = 0; j < treeList.length; j++) {
+                                                    let filteredScenario = treeList[j].scenarioList.filter(c => c.id == scenarioId);
+                                                    if (filteredScenario.length > 0) {
+                                                        let flatlist = treeList[j].tree.flatList;
 
-                                                    let listContainNodeType4 = flatlist.filter(c => c.payload.nodeType.id == 4);
+                                                        let listContainNodeType4 = flatlist.filter(c => c.payload.nodeType.id == 4);
 
-                                                    console.log("TestFU------------>5", listContainNodeType4);
-                                                    console.log("TestFU------------>6", listContainNodeType4[0].payload);
-                                                    console.log("TestFU------------>7", (listContainNodeType4[0].payload.nodeDataMap[scenarioId]));
-                                                    // console.log("TestFU------------>8", filteredPUNode);
-                                                    let match = 0;
-                                                    for (let k = 0; k < listContainNodeType4.length; k++) {
-                                                        let arrayOfNodeDataMap = (listContainNodeType4[k].payload.nodeDataMap[scenarioId]).filter(c => c.fuNode.forecastingUnit.id == selectedForecastingUnit[i].value)
-                                                        console.log("TestFU------------>7.1", arrayOfNodeDataMap);
+                                                        console.log("TestFU------------>5", listContainNodeType4);
+                                                        console.log("TestFU------------>6", listContainNodeType4[0].payload);
+                                                        console.log("TestFU------------>7", (listContainNodeType4[0].payload.nodeDataMap[scenarioId]));
+                                                        // console.log("TestFU------------>8", filteredPUNode);
+                                                        let match = 0;
+                                                        for (let k = 0; k < listContainNodeType4.length; k++) {
+                                                            let arrayOfNodeDataMap = (listContainNodeType4[k].payload.nodeDataMap[scenarioId]).filter(c => c.fuNode.forecastingUnit.id == selectedForecastingUnit[i].value)
+                                                            console.log("TestFU------------>7.1", arrayOfNodeDataMap);
 
-                                                        if (arrayOfNodeDataMap.length > 0) {
-                                                            console.log("TestFU------------>8", arrayOfNodeDataMap[0].nodeDataMomList);
-                                                            nodeDataMomList = arrayOfNodeDataMap[0].nodeDataMomList;
-                                                            let consumptionList = nodeDataMomList.map(m => {
-                                                                return {
-                                                                    consumptionDate: m.month,
-                                                                    // consumptionQty: (m.calculatedValue * forecastingUniObj[l].planningUnit.multiplier).toFixed(2)
-                                                                    consumptionQty: parseInt(m.calculatedValue * forecastingUniObj[l].planningUnit.multiplier)
-                                                                }
-                                                            });
-                                                            // let jsonTemp = { objUnit: forecastingUniObj[l].planningUnit.forecastingUnit, scenario: { id: 1, label: treeList[j].label.label_en + filteredScenario[0].label.label_en }, display: true, color: "#ba0c2f", consumptionList: consumptionList }
-                                                            let jsonTemp = { objUnit: { id: forecastingUniObj[l].planningUnit.id, label: forecastingUniObj[l].planningUnit.forecastingUnit.label }, scenario: { id: 1, label: treeList[j].label.label_en + filteredScenario[0].label.label_en }, display: true, color: "#ba0c2f", consumptionList: consumptionList }
-                                                            consumptionData.push(jsonTemp);
-                                                            match = 0;
-                                                            break;
-                                                        } else {
-                                                            // let jsonTemp = { objUnit: forecastingUniObj[l].planningUnit.forecastingUnit, scenario: filteredScenario[0], display: true, color: "#ba0c2f", consumptionList: [] }
-                                                            // consumptionData.push(jsonTemp);
-                                                            match = 1;
+                                                            if (arrayOfNodeDataMap.length > 0) {
+                                                                console.log("TestFU------------>8", arrayOfNodeDataMap[0].nodeDataMomList);
+                                                                nodeDataMomList = arrayOfNodeDataMap[0].nodeDataMomList;
+                                                                let consumptionList = nodeDataMomList.map(m => {
+                                                                    return {
+                                                                        consumptionDate: m.month,
+                                                                        // consumptionQty: (m.calculatedValue * forecastingUniObj[l].planningUnit.multiplier).toFixed(2)
+                                                                        consumptionQty: parseInt(m.calculatedValue * forecastingUniObj[l].planningUnit.multiplier)
+                                                                    }
+                                                                });
+                                                                // let jsonTemp = { objUnit: forecastingUniObj[l].planningUnit.forecastingUnit, scenario: { id: 1, label: treeList[j].label.label_en + filteredScenario[0].label.label_en }, display: true, color: "#ba0c2f", consumptionList: consumptionList }
+                                                                let jsonTemp = { objUnit: { id: forecastingUniObj[l].planningUnit.id, label: forecastingUniObj[l].planningUnit.forecastingUnit.label }, scenario: { id: 1, label: treeList[j].label.label_en + filteredScenario[0].label.label_en }, display: true, color: "#ba0c2f", consumptionList: consumptionList }
+                                                                consumptionData.push(jsonTemp);
+                                                                match = 0;
+                                                                break;
+                                                            } else {
+                                                                // let jsonTemp = { objUnit: forecastingUniObj[l].planningUnit.forecastingUnit, scenario: filteredScenario[0], display: true, color: "#ba0c2f", consumptionList: [] }
+                                                                // consumptionData.push(jsonTemp);
+                                                                match = 1;
+                                                            }
                                                         }
+
+                                                        if (match == 1) {
+                                                            // let jsonTemp = { objUnit: forecastingUniObj[l].planningUnit.forecastingUnit, scenario: { id: 1, label: treeList[j].label.label_en + filteredScenario[0].label.label_en }, display: true, color: "#ba0c2f", consumptionList: [] }
+                                                            let jsonTemp = { objUnit: { id: forecastingUniObj[l].planningUnit.id, label: forecastingUniObj[l].planningUnit.forecastingUnit.label }, scenario: { id: 1, label: treeList[j].label.label_en + filteredScenario[0].label.label_en }, display: true, color: "#ba0c2f", consumptionList: [] }
+                                                            consumptionData.push(jsonTemp);
+                                                        }
+
+                                                        // let nodeDataMomList = listContainNodeType4.payload.nodeDataMap[scenarioId].filter(c => c.puNode.planningUnit.id == selectedForecastingUnit[i].value)[0].nodeDataMomList;
+
+                                                        // break;
                                                     }
+                                                }
 
-                                                    if (match == 1) {
-                                                        // let jsonTemp = { objUnit: forecastingUniObj[l].planningUnit.forecastingUnit, scenario: { id: 1, label: treeList[j].label.label_en + filteredScenario[0].label.label_en }, display: true, color: "#ba0c2f", consumptionList: [] }
-                                                        let jsonTemp = { objUnit: { id: forecastingUniObj[l].planningUnit.id, label: forecastingUniObj[l].planningUnit.forecastingUnit.label }, scenario: { id: 1, label: treeList[j].label.label_en + filteredScenario[0].label.label_en }, display: true, color: "#ba0c2f", consumptionList: [] }
-                                                        consumptionData.push(jsonTemp);
-                                                    }
+                                            } else {//consumptionExtrapolationId
+                                                // console.log("Test------------>ELSE");
+                                                let consumptionExtrapolationObj = consumptionExtrapolation.filter(c => c.consumptionExtrapolationId == consumptionExtrapolationId);
+                                                if (consumptionExtrapolationObj.length > 0) {
+                                                    let consumptionList = consumptionExtrapolationObj[0].extrapolationDataList.map(m => {
+                                                        return {
+                                                            consumptionDate: m.month,
+                                                            // consumptionQty: m.amount
+                                                            consumptionQty: parseInt(m.amount)
+                                                        }
+                                                    });
+                                                    // let jsonTemp = { objUnit: forecastingUniObj[l].planningUnit.forecastingUnit, scenario: { id: 1, label: "" }, display: true, color: "#ba0c2f", consumptionList: consumptionList }
+                                                    let jsonTemp = { objUnit: { id: forecastingUniObj[l].planningUnit.id, label: forecastingUniObj[l].planningUnit.forecastingUnit.label }, scenario: { id: 1, label: "" }, display: true, color: "#ba0c2f", consumptionList: consumptionList }
+                                                    consumptionData.push(jsonTemp);
 
-                                                    // let nodeDataMomList = listContainNodeType4.payload.nodeDataMap[scenarioId].filter(c => c.puNode.planningUnit.id == selectedForecastingUnit[i].value)[0].nodeDataMomList;
-
-                                                    // break;
+                                                } else {
+                                                    // let jsonTemp = { objUnit: forecastingUniObj[l].planningUnit.forecastingUnit, scenario: { id: 1, label: "" }, display: true, color: "#ba0c2f", consumptionList: [] }
+                                                    let jsonTemp = { objUnit: { id: forecastingUniObj[l].planningUnit.id, label: forecastingUniObj[l].planningUnit.forecastingUnit.label }, scenario: { id: 1, label: "" }, display: true, color: "#ba0c2f", consumptionList: [] }
+                                                    consumptionData.push(jsonTemp);
                                                 }
                                             }
 
-                                        } else {//consumptionExtrapolationId
-                                            // console.log("Test------------>ELSE");
-                                            let consumptionExtrapolationObj = consumptionExtrapolation.filter(c => c.consumptionExtrapolationId == consumptionExtrapolationId);
-                                            if (consumptionExtrapolationObj.length > 0) {
-                                                let consumptionList = consumptionExtrapolationObj[0].extrapolationDataList.map(m => {
-                                                    return {
-                                                        consumptionDate: m.month,
-                                                        // consumptionQty: m.amount
-                                                        consumptionQty: parseInt(m.amount)
-                                                    }
-                                                });
-                                                // let jsonTemp = { objUnit: forecastingUniObj[l].planningUnit.forecastingUnit, scenario: { id: 1, label: "" }, display: true, color: "#ba0c2f", consumptionList: consumptionList }
-                                                let jsonTemp = { objUnit: { id: forecastingUniObj[l].planningUnit.id, label: forecastingUniObj[l].planningUnit.forecastingUnit.label }, scenario: { id: 1, label: "" }, display: true, color: "#ba0c2f", consumptionList: consumptionList }
-                                                consumptionData.push(jsonTemp);
-
-                                            } else {
-                                                // let jsonTemp = { objUnit: forecastingUniObj[l].planningUnit.forecastingUnit, scenario: { id: 1, label: "" }, display: true, color: "#ba0c2f", consumptionList: [] }
-                                                let jsonTemp = { objUnit: { id: forecastingUniObj[l].planningUnit.id, label: forecastingUniObj[l].planningUnit.forecastingUnit.label }, scenario: { id: 1, label: "" }, display: true, color: "#ba0c2f", consumptionList: [] }
-                                                consumptionData.push(jsonTemp);
-                                            }
                                         }
-
-
                                     }//end of forecastingUniObj L
 
                                 }
