@@ -128,6 +128,18 @@ class ModelingValidation extends Component {
         if (versionId != "") {
             this.setState({
                 versionId: versionId,
+                treeList: [],
+                treeId: "",
+                scenarioList: [],
+                scenarioId: "",
+                levelList: [],
+                dataEl: "",
+                levelId: "",
+                levelUnit: "",
+                nodeList: [],
+                nodeVal: [],
+                nodeIdArr: [],
+                nodeLabelArr: [],
                 loading: false
             }, () => {
                 this.getDatasetData()
@@ -212,6 +224,7 @@ class ModelingValidation extends Component {
                 }
             }).catch(
                 error => {
+                    console.log("In catch error",error);
                     this.el = jexcel(document.getElementById("tableDiv"), '');
                     this.el.destroy();
                     this.setState({
