@@ -1353,6 +1353,8 @@ class AuthenticationService {
                         break;
                     case "/dataset/listTree":
                     case "/dataset/loadDeleteDataSet":
+                    case "/dataset/exportDataset":    
+                    case "/dataset/importDataset":    
                     case "/dataset/loadDeleteDataSet/:message":
                     case "/dataSet/buildTree/tree/:treeId/:programId":
                     case "/dataSet/buildTree/tree/:treeId/:programId/:scenarioId":
