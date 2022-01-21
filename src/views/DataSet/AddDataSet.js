@@ -145,9 +145,8 @@ export default class AddForecastProgram extends Component {
                 healthAreaArray: [],
                 regionArray: [],
                 currentVersion: {
-                    forecastStartDate: '2022-01-01',
-                    forecastStopDate: '2022-12-01',
-                    versionId: 1
+                    forecastStartDate: '',
+                    forecastStopDate: '',
                 }
 
             },
@@ -910,8 +909,8 @@ export default class AddForecastProgram extends Component {
 
                                     // pro.currentVersion.forecastStartDate = new Date(this.state.singleValue1.year + '-' + this.state.singleValue1.month + '-01');
                                     // pro.currentVersion.forecastStopDate = new Date(new Date(this.state.singleValue2.year + '-' + this.state.singleValue2.month + '-01'));
-                                    // pro.currentVersion.forecastStartDate = this.state.singleValue1.year + '-' + this.state.singleValue1.month + '-01';
-                                    // pro.currentVersion.forecastStopDate = this.state.singleValue2.year + '-' + this.state.singleValue2.month + '-01';
+                                    pro.currentVersion.forecastStartDate = this.state.singleValue1.year + '-' + this.state.singleValue1.month + '-01';
+                                    pro.currentVersion.forecastStopDate = this.state.singleValue2.year + '-' + this.state.singleValue2.month + '-01';
                                     console.log("Pro=---------------->+++", pro)
                                     ProgramService.addDataset(pro).then(response => {
                                         if (response.status == 200) {

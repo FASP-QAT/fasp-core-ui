@@ -798,8 +798,11 @@ class ForecastSummary extends Component {
     }
 
     filterData() {
+        console.log("INSIDE FILTERDATA---------------------------------");
         let programId = document.getElementById("programId").value;
         let versionId = document.getElementById("versionId").value;
+        console.log("programId----------->", programId);
+        console.log("versionId----------->", versionId);
         let displayId = document.getElementById("displayId").value;
         (displayId == 1 ? document.getElementById("hideCalculationDiv").style.display = "block" : document.getElementById("hideCalculationDiv").style.display = "none");
         // (displayId == 1 ? document.getElementById("hideCurrencyDiv").style.display = "block" : document.getElementById("hideCurrencyDiv").style.display = "none");
@@ -815,6 +818,17 @@ class ForecastSummary extends Component {
 
 
         if (versionId != 0 && programId > 0) {
+            if (versionId == -1) {
+                console.log("1------------------------");
+                this.setState({ message: i18n.t('static.program.validversion'), summeryData: [], dataArray: [], versionId: '', forecastPeriod: '', });
+                try {
+                    this.el = jexcel(document.getElementById("tableDiv"), '');
+                    this.el.destroy();
+                }
+                catch (err) {
+                    // document.getElementById("demo").innerHTML = err.message;
+                }
+            }
             if (versionId.includes('Local')) {
                 var db1;
                 getDatabase();
@@ -891,7 +905,8 @@ class ForecastSummary extends Component {
                         console.log("DATASET-------->", datasetList);
                         this.setState({
                             datasetList: datasetList,
-                            datasetList1: datasetList1
+                            datasetList1: datasetList1,
+                            message: ''
                         }, () => {
                             localStorage.setItem("sesForecastProgramIdReport", parseInt(programId));
                             localStorage.setItem("sesForecastVersionIdReport", document.getElementById("versionId").value);
@@ -1182,8 +1197,14 @@ class ForecastSummary extends Component {
                                     //     languageArray[0] = data;
                                     // }
                                     // console.log("languageArray---->", languageArray);
-                                    this.el = jexcel(document.getElementById("tableDiv"), '');
-                                    this.el.destroy();
+                                    try {
+                                        this.el = jexcel(document.getElementById("tableDiv"), '');
+                                        this.el.destroy();
+                                    }
+                                    catch (err) {
+                                        // document.getElementById("demo").innerHTML = err.message;
+                                    }
+
                                     console.log("DataArray+++", dataArray);
                                     this.setState({
                                         dataArray: dataArray
@@ -1258,17 +1279,42 @@ class ForecastSummary extends Component {
                 }.bind(this);
 
 
-            } else {//api call
-
-
+            } else if (versionId > 0) {//api call
+                // alert("Hi");
+                console.log("2------------------------");
+                this.setState({ message: '', summeryData: [], dataArray: [] });
+                try {
+                    this.el = jexcel(document.getElementById("tableDiv"), '');
+                    this.el.destroy();
+                }
+                catch (err) {
+                    // document.getElementById("demo").innerHTML = err.message;
+                }
 
             }
-        } else {//validation message
-            this.setState({
-                dataArray: [],
-                summeryData: []
-            })
+        } else if (programId == -1) { //validation message
+            this.setState({ message: i18n.t('static.common.selectProgram'), summeryData: [], dataArray: [], programId: '', versionId: '', forecastPeriod: '', });
+            try {
+                this.el = jexcel(document.getElementById("tableDiv"), '');
+                this.el.destroy();
+            }
+            catch (err) {
+                // document.getElementById("demo").innerHTML = err.message;
+            }
+
+        } else if (versionId == -1) {
+            console.log("3------------------------");
+            this.setState({ message: i18n.t('static.program.validversion'), summeryData: [], dataArray: [], versionId: '', forecastPeriod: '', });
+            try {
+                this.el = jexcel(document.getElementById("tableDiv"), '');
+                this.el.destroy();
+            }
+            catch (err) {
+                // document.getElementById("demo").innerHTML = err.message;
+            }
         }
+
+
     }
 
     forecastChanged = function (instance, cell, x, y, value) {
@@ -1502,6 +1548,7 @@ class ForecastSummary extends Component {
             versionId: ''
         }, () => {
             // localStorage.setItem("sesVersionIdReport", '');
+            this.filterData();
             this.getVersionIds();
         })
     }
@@ -1595,7 +1642,7 @@ class ForecastSummary extends Component {
                 endDateDisplay: '',
                 beforeEndDateDisplay: '',
             }, () => {
-
+                // this.filterData();
             })
         }
 
@@ -2353,7 +2400,7 @@ class ForecastSummary extends Component {
                             </div>
                         </div>
                     </CardBody>
-                    {this.state.regPlanningUnitList.length > 0 && this.state.displayId == 2 && <CardFooter>
+                    {this.state.regPlanningUnitList.length > 0 && this.state.displayId == 2 && this.state.dataArray.length > 0 && < CardFooter >
                         <FormGroup>
                             <FormGroup>
                                 <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>

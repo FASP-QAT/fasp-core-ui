@@ -650,7 +650,7 @@ class VersionSettingsComponent extends Component {
                 var months;
                 months = (d2.getFullYear() - d1.getFullYear()) * 12;
                 months += d2.getMonth() - d1.getMonth();
-                data[8] = months
+                data[8] = months + 1
             } else {
                 data[8] = 0
             }
