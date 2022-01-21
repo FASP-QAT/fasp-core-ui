@@ -45,6 +45,10 @@ import SupplyPlanFormulas from "../SupplyPlan/SupplyPlanFormulas";
 import classNames from 'classnames';
 import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
+import PDFDocument from 'pdfkit-nodejs-webpack';
+import blobStream from 'blob-stream';
+import OrgDiagramPdfkit from '../TreePDF/OrgDiagramPdfkit';
+import Size from '../../../node_modules/basicprimitives/src/graphics/structs/Size';
 
 // const ref = React.createRef();
 const entityname = 'Tree';
@@ -2981,91 +2985,116 @@ export default class BuildTree extends Component {
     }
 
     exportPDF = () => {
-        console.log("download pdf");
-        const addFooters = doc => {
-
-            const pageCount = doc.internal.getNumberOfPages()
-
-            doc.setFont('helvetica', 'bold')
-            doc.setFontSize(6)
-            for (var i = 1; i <= pageCount; i++) {
-                doc.setPage(i)
-
-                doc.setPage(i)
-                doc.text('Page ' + String(i) + ' of ' + String(pageCount), doc.internal.pageSize.width / 9, doc.internal.pageSize.height - 30, {
-                    align: 'center'
+        let treeLevel = this.state.items.length;
+        const treeLevelItems = []
+        for (var i = 0; i <= treeLevel; i++) {
+            if (i == 0) {
+                treeLevelItems.push({
+                    annotationType: AnnotationType.Level,
+                    levels: [0],
+                    title: "Level 0",
+                    titleColor: "#002f6c",
+                    fontWeight: "bold",
+                    transForm: 'rotate(270deg)',
+                    offset: new Thickness(0, 0, 0, -1),
+                    lineWidth: new Thickness(0, 0, 0, 0),
+                    opacity: 0,
+                    borderColor: Colors.Gray,
+                    // fillColor: "#f5f5f5",
+                    lineType: LineType.Dotted
+                });
+            }
+            else if (i % 2 == 0) {
+                treeLevelItems.push(new LevelAnnotationConfig({
+                    levels: [i],
+                    title: "Level " + i,
+                    titleColor: "#002f6c",
+                    fontWeight: "bold",
+                    transForm: 'rotate(270deg)',
+                    offset: new Thickness(0, 0, 0, -1),
+                    lineWidth: new Thickness(0, 0, 0, 0),
+                    opacity: 0,
+                    borderColor: Colors.Gray,
+                    // fillColor: "#f5f5f5",
+                    lineType: LineType.Solid
                 })
-                doc.text('Copyright © 2020 ' + i18n.t('static.footer'), doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
-                    align: 'center'
-                })
-
-
+                );
             }
+            else {
+                treeLevelItems.push(new LevelAnnotationConfig({
+                    levels: [i],
+                    title: "Level " + i,
+                    titleColor: "#002f6c",
+                    fontWeight: "bold",
+                    transForm: 'rotate(270deg)',
+                    offset: new Thickness(0, 0, 0, -1),
+                    lineWidth: new Thickness(0, 0, 0, 0),
+                    opacity: 0.08,
+                    borderColor: Colors.Gray,
+                    // fillColor: "#f5f5f5",
+                    lineType: LineType.Dotted
+                }));
+            }
+            console.log("level json***", treeLevelItems);
         }
-        const addHeaders = doc => {
 
-            const pageCount = doc.internal.getNumberOfPages()
-            for (var i = 1; i <= pageCount; i++) {
-                doc.setFontSize(12)
-                doc.setFont('helvetica', 'bold')
-
-                doc.setPage(i)
-                doc.addImage(LOGO, 'png', 0, 10, 180, 50, 'FAST');
-                doc.setTextColor("#002f6c");
-                // doc.text(i18n.t('static.dashboard.stockstatusacrossplanningunit'), doc.internal.pageSize.width / 2, 60, {
-                //     align: 'center'
-                // })
-                // if (i == 1) {
-                //     doc.setFontSize(8)
-                //     doc.setFont('helvetica', 'normal')
-                //     doc.text(i18n.t('static.common.month') + ' : ' + this.makeText(this.state.singleValue2), doc.internal.pageSize.width / 8, 90, {
-                //         align: 'left'
-                //     })
-                //     doc.text(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
-                //         align: 'left'
-                //     })
-                //     doc.text(i18n.t('static.report.version*') + ' : ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130, {
-                //         align: 'left'
-                //     })
-                //     doc.text(i18n.t('static.program.isincludeplannedshipment') + ' : ' + document.getElementById("includePlanningShipments").selectedOptions[0].text, doc.internal.pageSize.width / 8, 150, {
-                //         align: 'left'
-                //     })
-                //     var planningText = doc.splitTextToSize((i18n.t('static.tracercategory.tracercategory') + ' : ' + this.state.tracerCategoryLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
-                //     doc.text(doc.internal.pageSize.width / 8, 170, planningText)
-
-                // }
-
+        var templates = [
+            {
+                itemSize: new Size(200, 100),
+                itemTemplate :
+                '<div>'
+                + '<div name="titleBackground">'
+                + '<div name="title">'
+                + '<i className="fa fa-plus"></i>'
+                + '</div>'
+                + '</div>'
             }
+        ]
+        var items = this.state.items;
+        var newItems = [];
+        items.map(ele => {
+            ele.scenarioId = this.state.selectedScenario
+            ele.showModelingValidation = this.state.showModelingValidation
+            ele.items = this.state.items
+            newItems.push(ele)
+        })
+        var sampleChart = OrgDiagramPdfkit({
+            ...this.state,
+            pageFitMode: PageFitMode.Enabled,
+            hasSelectorCheckbox: Enabled.False,
+            hasButtons: Enabled.True,
+            buttonsPanelSize: 40,
+            orientationType: OrientationType.Top,
+            defaultTemplateName: "ContactTemplate",
+            linesColor: Colors.Black,
+            annotations: treeLevelItems,
+            items: newItems,
+            templates: (templates || [])
+        });
+        var sample3size = sampleChart.getSize();
+        var doc = new PDFDocument({ size: 'LEGAL' });
+        var stream = doc.pipe(blobStream());
+
+        var legalSize = { width: 612.00, height: 1008.00 }
+        var scale = Math.min(legalSize.width / (sample3size.width + 300), legalSize.height / (sample3size.height + 300))
+        doc.scale(scale);
+        doc.fontSize(25)
+            .text('Tree PDF', 30, 30);
+
+        sampleChart.draw(doc, 60, 100);
+
+        doc.restore();
+
+        doc.end();
+
+        if (typeof stream !== 'undefined') {
+            stream.on('finish', function () {
+                var string = stream.toBlob('application/pdf');
+                window.saveAs(string, 'tree.pdf');
+            });
+        } else {
+            alert('Error: Failed to create file stream.');
         }
-        const unit = "pt";
-        const size = "A4"; // Use A1, A2, A3 or A4
-        const orientation = "landscape"; // portrait or landscape
-
-        const marginLeft = 10;
-        const doc = new jsPDF(orientation, unit, size, true);
-
-        doc.setFontSize(8);
-
-        var width = doc.internal.pageSize.width;
-        var height = doc.internal.pageSize.height;
-        var h1 = 50;
-        const headers = '';
-        const data = this.state.items;
-
-        let content = {
-            margin: { top: 80, bottom: 50 },
-            startY: 200,
-            head: [headers],
-            body: data,
-            styles: { lineWidth: 1, fontSize: 8, halign: 'center', cellWidth: 75 },
-            columnStyles: {
-                1: { cellWidth: 161.89 },
-            }
-        };
-        doc.autoTable(content);
-        addHeaders(doc)
-        addFooters(doc)
-        doc.save(i18n.t('static.dashboard.stockstatusacrossplanningunit') + ".pdf")
 
     }
     handleRegionChange = (regionIds) => {
@@ -4939,7 +4968,7 @@ export default class BuildTree extends Component {
         const { context: item } = data;
         if (item != null) {
             this.setState({
-                sameLevelNodeList:[],
+                sameLevelNodeList: [],
                 showCalculatorFields: false,
                 showMomData: false,
                 showMomDataPercent: false,
