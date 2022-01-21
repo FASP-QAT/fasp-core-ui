@@ -337,6 +337,7 @@ export default class CreateTreeTemplate extends Component {
         this.pickAMonth2 = React.createRef()
         this.pickAMonth1 = React.createRef()
         this.state = {
+            maxNodeDataId: '',
             nodeDataMomList: [],
             modelingJexcelLoader: false,
             momJexcelLoader: false,
@@ -569,7 +570,34 @@ export default class CreateTreeTemplate extends Component {
         this.filterScalingDataByMonth = this.filterScalingDataByMonth.bind(this);
         this.calculateMOMData = this.calculateMOMData.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
+        this.getMaxNodeDataId = this.getMaxNodeDataId.bind(this);
     }
+    getMaxNodeDataId() {
+        var maxNodeDataId = 0;
+        if (this.state.maxNodeDataId != "" && this.state.maxNodeDataId != 0) {
+            maxNodeDataId = parseInt(this.state.maxNodeDataId + 1);
+            console.log("maxNodeDataId 1---", maxNodeDataId)
+            this.setState({
+                maxNodeDataId
+            })
+        } else {
+            var items = this.state.items;
+            var nodeDataMap = [];
+            for (let i = 0; i < items.length; i++) {
+                if (items[i].payload.nodeDataMap.hasOwnProperty(0)) {
+                    nodeDataMap.push(items[i].payload.nodeDataMap[0][0]);
+                }
+            }
+            maxNodeDataId = nodeDataMap.length > 0 ? Math.max(...nodeDataMap.map(o => o.nodeDataId)) : 0;
+            console.log("nodeDataMap array---", nodeDataMap);
+            console.log("maxNodeDataId 2---", maxNodeDataId)
+            this.setState({
+                maxNodeDataId
+            })
+        }
+        return maxNodeDataId;
+    }
+
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
@@ -1226,11 +1254,11 @@ export default class CreateTreeTemplate extends Component {
         }
     }
 
-    getSameLevelNodeList(level, id) {
+    getSameLevelNodeList(level, id, parent, nodeTypeId) {
         var sameLevelNodeList = [];
-        var arr = this.state.items.filter(x => x.level == level && x.id != id && x.id > id);
+        var arr = this.state.items.filter(x => x.level == level && x.id != id && x.id > id && x.parent == parent && x.payload.nodeType.id == nodeTypeId);
         for (var i = 0; i < arr.length; i++) {
-            sameLevelNodeList[i] = { id: arr[i].id, name: getLabelText(arr[i].payload.label, this.state.lang) }
+            sameLevelNodeList[i] = { id: (arr[i].payload.nodeDataMap[0])[0].nodeDataId, name: getLabelText(arr[i].payload.label, this.state.lang) }
         }
         this.setState({
             sameLevelNodeList
@@ -3800,20 +3828,24 @@ export default class CreateTreeTemplate extends Component {
         console.log("add button clicked---", itemConfig);
         this.setState({ openAddNodeModal: false });
         const { items } = this.state;
+        var maxNodeId = items.length > 0 ? Math.max(...items.map(o => o.id)) : 0;
+        var nodeId = parseInt(maxNodeId + 1);
         var newItem = itemConfig.context;
         newItem.parent = itemConfig.context.parent;
-        newItem.id = parseInt(items.length + 1);
+        newItem.id = nodeId;
         newItem.level = parseInt(itemConfig.context.level + 1);
+        newItem.payload.nodeId = nodeId;
         var parentSortOrder = items.filter(c => c.id == itemConfig.context.parent)[0].sortOrder;
         var childList = items.filter(c => c.parent == itemConfig.context.parent);
         newItem.sortOrder = parentSortOrder.concat(".").concat(("0" + (Number(childList.length) + 1)).slice(-2));
+        (newItem.payload.nodeDataMap[0])[0].nodeDataId = this.getMaxNodeDataId();
         if (itemConfig.context.payload.nodeType.id == 4) {
             (newItem.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.label.label_en = (itemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.label.label_en;
         }
         console.log("add button clicked value after update---", newItem);
         this.setState({
             items: [...items, newItem],
-            cursorItem: parseInt(items.length + 1)
+            cursorItem: nodeId
         }, () => {
             console.log("on add items-------", this.state.items);
             this.calculateMOMData(newItem.id, 0);
@@ -3985,6 +4017,7 @@ export default class CreateTreeTemplate extends Component {
         // const preItem = JSON.parse(JSON.stringify(data.context));
         if (item != null) {
             this.setState({
+                sameLevelNodeList: [],
                 showCalculatorFields: false,
                 openAddNodeModal: true,
                 addNodeFlag: false,
@@ -4039,7 +4072,7 @@ export default class CreateTreeTemplate extends Component {
                     // this.getConversionFactor((data.context.payload.nodeDataMap[0])[0].puNode.planningUnit.id);
                     this.state.currentItemConfig.context.payload.nodeUnit.id = this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id;
                 } else if (data.context.payload.nodeType.id != 1) {
-                    this.getSameLevelNodeList(data.context.level, data.context.id);
+                    this.getSameLevelNodeList(data.context.level, data.context.id, data.context.parent, data.context.payload.nodeType.id);
                 }
 
 
@@ -5188,35 +5221,35 @@ export default class CreateTreeTemplate extends Component {
                                                 {(this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageType.id == 2) &&
                                                     <table className="table table-bordered">
                                                         <tr>
-                                                            <td>{i18n.t('static.tree.#OfFURequiredForPeriod')}</td>
-                                                            <td>{addCommas(this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.noOfForecastingUnitsPerPerson)}</td>
+                                                            <td style={{ width: '50%' }}>{i18n.t('static.tree.#OfFURequiredForPeriod')}</td>
+                                                            <td style={{ width: '50%' }}>{addCommas(this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.noOfForecastingUnitsPerPerson)}</td>
                                                         </tr>
                                                         <tr>
-                                                            <td>{i18n.t('static.tree.#OfMonthsInPeriod')}</td>
-                                                            <td>{addCommas(this.state.noOfMonthsInUsagePeriod)}</td>
+                                                            <td style={{ width: '50%' }}>{i18n.t('static.tree.#OfMonthsInPeriod')}</td>
+                                                            <td style={{ width: '50%' }}>{addCommas(this.state.noOfMonthsInUsagePeriod)}</td>
                                                         </tr>
                                                         <tr>
-                                                            <td>{i18n.t('static.tree.#OfFU/month/')} {this.state.nodeUnitList.filter(c => c.unitId == this.state.usageTypeParent)[0].label.label_en}</td>
+                                                            <td style={{ width: '50%' }}>{i18n.t('static.tree.#OfFU/month/')} {this.state.nodeUnitList.filter(c => c.unitId == this.state.usageTypeParent)[0].label.label_en}</td>
                                                             {this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usagePeriod.usagePeriodId != "" &&
-                                                                <td>{addCommas((this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.noOfForecastingUnitsPerPerson / this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usageFrequency) * (this.state.usagePeriodList.filter(c => c.usagePeriodId == this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usagePeriod.usagePeriodId))[0].convertToMonth)}</td>}
+                                                                <td style={{ width: '50%' }}>{addCommas((this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.noOfForecastingUnitsPerPerson / this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usageFrequency) * (this.state.usagePeriodList.filter(c => c.usagePeriodId == this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usagePeriod.usagePeriodId))[0].convertToMonth)}</td>}
                                                             {this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usagePeriod.usagePeriodId == "" &&
-                                                                <td></td>}
+                                                                <td style={{ width: '50%' }}></td>}
                                                             {/* <td>{addCommas((this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.noOfForecastingUnitsPerPerson / this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usageFrequency) * (this.state.usagePeriodList.filter(c => c.usagePeriodId == this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usagePeriod.usagePeriodId))[0].convertToMonth)}</td> */}
                                                         </tr>
                                                     </table>}
                                                 {(this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usageType.id == 1) &&
                                                     <table className="table table-bordered">
                                                         <tr>
-                                                            <td>{i18n.t('static.tree.#OfFU/')} {this.state.nodeUnitList.filter(c => c.unitId == this.state.usageTypeParent)[0].label.label_en}</td>
-                                                            <td>{addCommas(this.state.noOfFUPatient)}</td>
+                                                            <td style={{ width: '50%' }}>{i18n.t('static.tree.#OfFU/')} {this.state.nodeUnitList.filter(c => c.unitId == this.state.usageTypeParent)[0].label.label_en}</td>
+                                                            <td style={{ width: '50%' }}>{addCommas(this.state.noOfFUPatient)}</td>
                                                         </tr>
                                                         <tr>
-                                                            <td>{i18n.t('static.tree.#OfFU/month/')} {this.state.nodeUnitList.filter(c => c.unitId == this.state.usageTypeParent)[0].label.label_en}</td>
-                                                            <td>{addCommas(this.state.noOfMonthsInUsagePeriod)}</td>
+                                                            <td style={{ width: '50%' }}>{i18n.t('static.tree.#OfFU/month/')} {this.state.nodeUnitList.filter(c => c.unitId == this.state.usageTypeParent)[0].label.label_en}</td>
+                                                            <td style={{ width: '50%' }}>{addCommas(this.state.noOfMonthsInUsagePeriod)}</td>
                                                         </tr>
                                                         <tr>
-                                                            <td>{i18n.t('static.tree.#OfFURequiredForPeriod')}</td>
-                                                            <td>{addCommas(this.state.noFURequired)}</td>
+                                                            <td style={{ width: '50%' }}>{i18n.t('static.tree.#OfFURequiredForPeriod')}</td>
+                                                            <td style={{ width: '50%' }}>{addCommas(this.state.noFURequired)}</td>
                                                         </tr>
                                                     </table>}
                                             </div>
@@ -5843,6 +5876,8 @@ export default class CreateTreeTemplate extends Component {
                         row3 = row3.concat("\t");
                     }
                     if (items[i].payload.nodeType.id == 1 || items[i].payload.nodeType.id == 2) {
+                        row = row.concat("NA ")
+                        row1 = row1.concat(" Subtotal")
                     } else {
                         row = row.concat(total).concat("% ")
                         row1 = row1.concat(" Subtotal")
@@ -5856,7 +5891,7 @@ export default class CreateTreeTemplate extends Component {
                             type: ShadingType.CLEAR,
                             fill: "cfcdc9"
                         },
-                        style: total != 100 ? "aside" : "",
+                        style: row != "NA " ? total != 100 ? "aside" : "" : ""
                     }))
                 }
             }
