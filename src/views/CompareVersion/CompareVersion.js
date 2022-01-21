@@ -303,7 +303,7 @@ class CompareVersion extends Component {
                     this.setState({
                         datasetData: datasetJson,
                         firstDataSet: 1,
-                        loading: this.state.secondDataSet == 0 ? false : true
+                        loading: false
                     }, () => {
                     })
                 }.bind(this)
@@ -317,7 +317,7 @@ class CompareVersion extends Component {
                     this.setState({
                         datasetData: responseData,
                         firstDataSet: 1,
-                        loading: this.state.secondDataSet == 0 ? false : true
+                        loading: false
                     })
                 } else {
                     this.setState({
@@ -377,7 +377,7 @@ class CompareVersion extends Component {
                     this.setState({
                         datasetData1: datasetJson,
                         secondDataSet: 1,
-                        loading: this.state.firstDataSet == 0 ? false : true
+                        loading: false
                     }, () => {
                     })
                 }.bind(this)
@@ -391,7 +391,7 @@ class CompareVersion extends Component {
                     this.setState({
                         datasetData1: responseData,
                         secondDataSet: 1,
-                        loading: this.state.firstDataSet == 0 ? false : true
+                        loading: false
                     })
                 } else {
                     this.setState({
