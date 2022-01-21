@@ -666,6 +666,7 @@ class ForecastOutput extends Component {
     }
 
     filterData() {
+        console.log("INSIDE FILTERDATA---------------------------------");
         let planningUnitIds = this.state.planningUnitValues.map(ele => (ele.value).toString())
         let forecastingUnitIds = this.state.forecastingUnitValues.map(ele => (ele.value).toString())
         let programId = document.getElementById("programId").value;
@@ -749,11 +750,12 @@ class ForecastOutput extends Component {
                         console.log("DATASET-------->", datasetList);
                         this.setState({
                             datasetList: datasetList,
-                            datasetList1: datasetList1
+                            datasetList1: datasetList1,
+                            message: ''
                         }, () => {
                             localStorage.setItem("sesForecastProgramIdReport", parseInt(programId));
                             localStorage.setItem("sesForecastVersionIdReport", document.getElementById("versionId").value);
-                            
+
                             let filteredProgram = this.state.datasetList.filter(c => c.programId == programId && c.versionId == (versionId.split('(')[0]).trim())[0];
 
                             var monthArrayList = [];
@@ -982,7 +984,8 @@ class ForecastOutput extends Component {
                             if (this.state.xaxis == 2) {//No
                                 this.setState({
                                     consumptionData: consumptionData,
-                                    monthArrayList: monthArrayList
+                                    monthArrayList: monthArrayList,
+                                    message: ''
                                 }, () => {
                                     if (yaxisEquUnitId > 0) {
                                         this.calculateEquivalencyUnitTotal();
@@ -1036,7 +1039,8 @@ class ForecastOutput extends Component {
                                 console.log("consumptionData------------------->4", consumptionData);
                                 this.setState({
                                     consumptionData: consumptionData,
-                                    monthArrayList: years
+                                    monthArrayList: years,
+                                    message: ''
                                 }, () => {
                                     if (yaxisEquUnitId > 0) {
                                         this.calculateEquivalencyUnitTotal();
@@ -1158,9 +1162,25 @@ class ForecastOutput extends Component {
             }
 
 
-        } else {//validation message
+        } else if (programId == -1) {//validation message            
+            this.setState({ message: i18n.t('static.common.selectProgram'), consumptionData: [], monthArrayList: [], datasetList: [], datasetList1: [], versions: [], planningUnits: [], planningUnitValues: [], planningUnitLabels: [], forecastingUnits: [], forecastingUnitValues: [], forecastingUnitLabels: [], equivalencyUnitList: [], programId: '', versionId: '', forecastPeriod: '', yaxisEquUnit: -1 });
+
+        } else if (versionId == -1) {
+            this.setState({ message: i18n.t('static.program.validversion'), consumptionData: [], monthArrayList: [], datasetList: [], datasetList1: [], planningUnits: [], planningUnitValues: [], planningUnitLabels: [], forecastingUnits: [], forecastingUnitValues: [], forecastingUnitLabels: [], equivalencyUnitList: [], versionId: '', forecastPeriod: '', yaxisEquUnit: -1 });
+
+        } else if (viewById == 1 && planningUnitIds.length == 0) {
+            this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), consumptionData: [], monthArrayList: [], datasetList: [], datasetList1: [], planningUnitValues: [], planningUnitLabels: [], forecastingUnitValues: [], forecastingUnitLabels: [] });
+
+        } else if (viewById == 2 && forecastingUnitIds.length == 0) {
+            this.setState({ message: i18n.t('static.planningunit.forcastingunittext'), consumptionData: [], monthArrayList: [], datasetList: [], datasetList1: [], planningUnitValues: [], planningUnitLabels: [], forecastingUnitValues: [], forecastingUnitLabels: [] });
 
         }
+
+
+
+
+
+
 
     }
 
@@ -1288,7 +1308,7 @@ class ForecastOutput extends Component {
                         programId: proList[0].programId,
                     }, () => {
                         this.getVersionIds();
-                        console.log("programs------------------>", this.state.programs);
+                        console.log("programs------------------>1", this.state.programs);
                     })
                 } else {
 
@@ -1303,7 +1323,7 @@ class ForecastOutput extends Component {
                             programId: localStorage.getItem("sesForecastProgramIdReport"),
                         }, () => {
                             this.getVersionIds();
-                            console.log("programs------------------>", this.state.programs);
+                            console.log("programs------------------>2", this.state.programs);
                         })
                     } else {
                         this.setState({
@@ -1314,7 +1334,8 @@ class ForecastOutput extends Component {
                             }),
                             downloadedProgramData: downloadedProgramData
                         }, () => {
-                            console.log("programs------------------>", this.state.programs);
+                            this.filterData();
+                            console.log("programs------------------>3", this.state.programs);
                         })
                     }
 
@@ -1622,6 +1643,7 @@ class ForecastOutput extends Component {
             }, () => {
                 // localStorage.setItem("sesVersionIdReport", this.state.versionId);
                 // (viewById == 1 ? this.getPlanningUnitForecastingUnit() : this.getForecastingUnit());
+                this.filterData();
                 this.getEquivalencyUnitData();
                 this.getPlanningUnitForecastingUnit();
 
@@ -1631,6 +1653,7 @@ class ForecastOutput extends Component {
                 versionId: event.target.value
             }, () => {
                 // (viewById == 1 ? this.getPlanningUnitForecastingUnit() : this.getForecastingUnit());
+                this.filterData();
                 this.getEquivalencyUnitData();
                 this.getPlanningUnitForecastingUnit()
             })
