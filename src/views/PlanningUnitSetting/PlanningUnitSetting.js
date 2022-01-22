@@ -791,7 +791,7 @@ export default class PlanningUnitSetting extends Component {
 
                     this.setState({
                         allProcurementAgentList: tempList,
-                        loading: false
+                        // loading: false
                     },
                         () => {
                             console.log("List------->pa", this.state.allProcurementAgentList);
@@ -946,6 +946,9 @@ export default class PlanningUnitSetting extends Component {
         console.log("PID----------------->", document.getElementById("forecastProgramId").value);
         var pID = document.getElementById("forecastProgramId").value;
         if (pID != 0) {
+            this.setState({
+                loading: true
+            })
             // var sel = document.getElementById("forecastProgramId");
             // var tempId = sel.options[sel.selectedIndex].text;
             // let forecastProgramVersionId = tempId.split('~')[1];            
@@ -966,10 +969,16 @@ export default class PlanningUnitSetting extends Component {
                 tracerCategoryArray = tracerCategoryArray.concat(tracerCategoryObj);
             }
 
-            // console.log("tracerCategoryArray----------->", tracerCategoryArray.map(ele => (ele.id).toString()));
+            // console.log("tracerCategoryArray----------->1", tracerCategoryArray.map(ele => (ele.id).toString()));
+            // console.log("tracerCategoryArray----------->2", selectedForecastProgram.planningUnitList.map(ele => (ele.planningUnit.forecastingUnit.tracerCategory.id).toString()));
+            let tracerCategoryArray1 = tracerCategoryArray.map(ele => (ele.id).toString());
+            let tracerCategoryArray2 = selectedForecastProgram.planningUnitList.map(ele => (ele.planningUnit.forecastingUnit.tracerCategory.id).toString());
+            let tracerCategoryArray3 = tracerCategoryArray1.concat(tracerCategoryArray2);
+            tracerCategoryArray3 = [... new Set(tracerCategoryArray3)];
 
+            console.log("tracerCategoryArray----------->3", tracerCategoryArray3);
 
-            PlanningUnitService.getPlanningUnitByTracerCategoryIds(tracerCategoryArray.map(ele => (ele.id).toString()))
+            PlanningUnitService.getPlanningUnitByTracerCategoryIds(tracerCategoryArray3)
                 .then(response => {
                     console.log("RESP----->pu", response.data);
 
@@ -1092,6 +1101,7 @@ export default class PlanningUnitSetting extends Component {
                     forecastProgramId: 0,
                     forecastProgramVersionId: 0,
                     datasetId: '',
+                    loading: false
                 }, () => {
                     this.el = jexcel(document.getElementById("tableDiv"), '');
                     this.el.destroy();
@@ -1128,7 +1138,8 @@ export default class PlanningUnitSetting extends Component {
         } else {
             this.setState(
                 {
-                    allowAdd: false
+                    allowAdd: false,
+                    loading: false
                 }, () => {
 
                 })
