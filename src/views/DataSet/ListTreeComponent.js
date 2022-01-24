@@ -543,16 +543,15 @@ export default class ListTreeComponent extends Component {
         if (x == 0 && value != 0) {
             // console.log("HEADER SELECTION--------------------------");
         } else {
-
-            var treeId = this.el.getValueFromCoords(0, x);
-            var programId = this.el.getValueFromCoords(8, x);
-            console.log("programId>>>", programId);
-            // if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_DIMENSION')) {
-            this.props.history.push({
-                pathname: `/dataSet/buildTree/tree/${treeId}/${programId}`,
-                // state: { role }
-            });
-            // }
+            if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE_TEMPLATE')) {
+                var treeId = this.el.getValueFromCoords(0, x);
+                var programId = this.el.getValueFromCoords(8, x);
+                console.log("programId>>>", programId);
+                this.props.history.push({
+                    pathname: `/dataSet/buildTree/tree/${treeId}/${programId}`,
+                    // state: { role }
+                });
+            }
 
         }
     }.bind(this);
@@ -604,7 +603,7 @@ export default class ListTreeComponent extends Component {
                             <div className="card-header-action">
                                 <Col md="12 pl-0 pr-lg-0">
                                     <div className="d-md-flex">
-                                        {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_LIST_REALM_COUNTRY') &&
+                                        {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_TREE') &&
                                             // <Button type="submit" size="md" color="success" onClick={this.formSubmit} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.createTreeFromTemplate')}</Button>
                                             // <Col md="3" className="pl-0">
                                             <FormGroup className="tab-ml-1 mt-md-2 mb-md-0 ">
