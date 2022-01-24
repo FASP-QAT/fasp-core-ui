@@ -396,10 +396,12 @@ class EquivalancyUnit extends Component {
     }
 
     filterHealthArea = function (instance, cell, c, r, source) {
+        console.log("myList--------->0", this.state.technicalAreaList);
 
-        var mylist = this.state.technicalAreaList.filter(c => c.active.toString() == "true");
+        var mylist = this.state.technicalAreaList.filter(c => c.id != '' && c.id != null);
+        mylist = mylist.filter(c => c.active.toString() == "true");
 
-        // console.log("myList--------->1", value);
+        console.log("myList--------->1", this.state.technicalAreaList);
         // console.log("myList--------->2", mylist);
         // console.log("myList--------->3", this.state.forecastingUnitList);
         return mylist.sort(function (a, b) {
