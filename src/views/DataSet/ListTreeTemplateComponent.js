@@ -10,7 +10,7 @@ import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
 import i18n from '../../i18n';
 import { JEXCEL_PAGINATION_OPTION, JEXCEL_DATE_FORMAT_SM, JEXCEL_PRO_KEY } from '../../Constants.js';
-const entityname = i18n.t('static.common.listtree');
+const entityname = 'Tree Template';
 export default class ListTreeTemplate extends Component {
 
     constructor(props) {
@@ -123,8 +123,6 @@ export default class ListTreeTemplate extends Component {
             allowManualInsertColumn: false,
             allowDeleteRow: false,
             onselection: this.selected,
-
-
             oneditionend: this.onedit,
             copyCompatibility: true,
             allowExport: false,
@@ -133,34 +131,37 @@ export default class ListTreeTemplate extends Component {
             filters: true,
             license: JEXCEL_PRO_KEY,
             contextMenu: function (obj, x, y, e) {
-                var items = [];
-                if (y != null) {
-                    if (obj.options.allowInsertRow == true) {
-                        items.push({
-                            title: 'Delete',
-                            onclick: function () {
-
-                            }.bind(this)
-                        });
-
-                        items.push({
-                            title: i18n.t('static.common.copyRow'),
-                            onclick: function () {
-                                var rowData = obj.getRowData(y);
-                                console.log("rowData===>", rowData);
-                                rowData[0] = "";
-                                rowData[1] = "";
-                                var data = rowData;
-                                this.el.insertRow(
-                                    data, 0, 1
-                                );
-                            }.bind(this)
-                        });
-                    }
-                }
-
-                return items;
+                return false;
             }.bind(this),
+            // contextMenu: function (obj, x, y, e) {
+            //     var items = [];
+            //     if (y != null) {
+            //         if (obj.options.allowInsertRow == true) {
+            //             items.push({
+            //                 title: 'Delete',
+            //                 onclick: function () {
+
+            //                 }.bind(this)
+            //             });
+
+            //             items.push({
+            //                 title: i18n.t('static.common.copyRow'),
+            //                 onclick: function () {
+            //                     var rowData = obj.getRowData(y);
+            //                     console.log("rowData===>", rowData);
+            //                     rowData[0] = "";
+            //                     rowData[1] = "";
+            //                     var data = rowData;
+            //                     this.el.insertRow(
+            //                         data, 0, 1
+            //                     );
+            //                 }.bind(this)
+            //             });
+            //         }
+            //     }
+
+            //     return items;
+            // }.bind(this),
         };
         var treeEl = jexcel(document.getElementById("tableDiv"), options);
         this.el = treeEl;
