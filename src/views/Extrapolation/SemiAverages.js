@@ -3,6 +3,7 @@ let m = 0;
 let c = 0;
 export function calculateSemiAverages(inputData, noOfProjectionMonths, props) {
     const data = inputData;
+    console.log("InputData@@@",inputData)
     if (inputData.length % 2 == 1) {
         inputData.pop();
         noOfProjectionMonths += 1

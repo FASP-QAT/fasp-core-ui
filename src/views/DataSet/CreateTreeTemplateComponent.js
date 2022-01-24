@@ -276,7 +276,7 @@ const validationSchema = function (values) {
         forecastMethodId: Yup.string()
             .required("Please select forecast method"),
         treeName: Yup.string()
-            .required("Please enter tree name"),
+            .required("Please enter template name"),
         monthsInPast: Yup.number()
             .typeError('Please enter months in past')
             .integer("Please enter only values")
@@ -1859,7 +1859,7 @@ export default class CreateTreeTemplate extends Component {
                 var rowData = elInstance.getRowData(x);
                 this.setState({
                     currentRowIndex: x,
-                    showCalculatorFields: true,
+                    showCalculatorFields: this.state.aggregationNode ? true : false,
                     currentModelingType: rowData[2],
                     currentCalculatorStartDate: rowData[3],
                     currentCalculatorStopDate: rowData[4],
@@ -2597,7 +2597,7 @@ export default class CreateTreeTemplate extends Component {
                 var div = (convertToMonth * usageFrequency);
                 console.log("duv---", div);
                 if (div != 0) {
-                    noOfMonthsInUsagePeriod = 1 / (convertToMonth * usageFrequency);
+                    noOfMonthsInUsagePeriod = usageFrequency / convertToMonth;
                     console.log("noOfMonthsInUsagePeriod---", noOfMonthsInUsagePeriod);
                 }
             } else {
@@ -3826,7 +3826,6 @@ export default class CreateTreeTemplate extends Component {
     }
     onAddButtonClick(itemConfig) {
         console.log("add button clicked---", itemConfig);
-        this.setState({ openAddNodeModal: false });
         const { items } = this.state;
         var maxNodeId = items.length > 0 ? Math.max(...items.map(o => o.id)) : 0;
         var nodeId = parseInt(maxNodeId + 1);
@@ -3839,6 +3838,7 @@ export default class CreateTreeTemplate extends Component {
         var childList = items.filter(c => c.parent == itemConfig.context.parent);
         newItem.sortOrder = parentSortOrder.concat(".").concat(("0" + (Number(childList.length) + 1)).slice(-2));
         (newItem.payload.nodeDataMap[0])[0].nodeDataId = this.getMaxNodeDataId();
+        (newItem.payload.nodeDataMap[0])[0].month = moment((newItem.payload.nodeDataMap[0])[0].month).startOf('month').format("YYYY-MM-DD")
         if (itemConfig.context.payload.nodeType.id == 4) {
             (newItem.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.label.label_en = (itemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.label.label_en;
         }
@@ -4081,15 +4081,13 @@ export default class CreateTreeTemplate extends Component {
     };
 
     updateNodeInfoInJson(currentItemConfig) {
-        this.setState({ loading: true })
         console.log("update tree node called------------", currentItemConfig);
         var nodes = this.state.items;
         var findNodeIndex = nodes.findIndex(n => n.id == currentItemConfig.context.id);
         nodes[findNodeIndex] = currentItemConfig.context;
         // nodes[findNodeIndex].valueType = currentItemConfig.valueType;
         this.setState({
-            items: nodes,
-            openAddNodeModal: false,
+            items: nodes
         }, () => {
             console.log("updated tree data+++", this.state);
             this.calculateMOMData(0, 0);
@@ -4398,15 +4396,20 @@ export default class CreateTreeTemplate extends Component {
                         }}
                         validate={validateNodeData(validationSchemaNodeData)}
                         onSubmit={(values, { setSubmitting, setErrors }) => {
-                            console.log("all ok>>>");
-                            if (this.state.addNodeFlag) {
-                                this.onAddButtonClick(this.state.currentItemConfig)
-                            } else {
-                                this.updateNodeInfoInJson(this.state.currentItemConfig)
-                            }
-                            this.setState({
-                                cursorItem: 0,
-                                highlightItem: 0
+                            this.setState({ loading: true, openAddNodeModal: false }, () => {
+                                console.log("all ok>>>");
+                                setTimeout(() => {
+                                    console.log("inside set timeout on submit")
+                                    if (this.state.addNodeFlag) {
+                                        this.onAddButtonClick(this.state.currentItemConfig)
+                                    } else {
+                                        this.updateNodeInfoInJson(this.state.currentItemConfig)
+                                    }
+                                    this.setState({
+                                        cursorItem: 0,
+                                        highlightItem: 0
+                                    })
+                                }, 0);
                             })
 
                         }}
@@ -5342,7 +5345,7 @@ export default class CreateTreeTemplate extends Component {
                                 </>
                             }
                             <div><Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.showMomData()}> <i className="fa fa-eye" style={{ color: '#fff' }}></i> {i18n.t('static.tree.viewMonthlyData')}</Button>
-                                {this.state.showModelingJexcelNumber && <><Button color="success" size="md" className="float-right mr-1" type="button" onClick={(e) => this.formSubmitLoader(e)}> <i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
+                                {this.state.aggregationNode && <><Button color="success" size="md" className="float-right mr-1" type="button" onClick={(e) => this.formSubmitLoader(e)}> <i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
                                     <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button></>}
                             </div>
                         </div>

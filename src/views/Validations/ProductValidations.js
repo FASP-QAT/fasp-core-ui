@@ -403,8 +403,13 @@ class ProductValidation extends Component {
                 }
                 var usageTextPU = "";
                 if (finalData[i].nodeDataMap != "") {
+                    console.log("finalData[i]@@@", finalData[i]);
+                    console.log("PlanningUnitList@@@", this.state.datasetData.planningUnitList);
                     var planningUnitObj = this.state.datasetData.planningUnitList.filter(c => c.planningUnit.id == finalData[i].nodeDataMap.puNode.planningUnit.id);
-                    var planningUnit = getLabelText(planningUnitObj[0].planningUnit.label, this.state.lang);
+                    var planningUnit = ""
+                    if (planningUnitObj.length > 0) {
+                        planningUnit = getLabelText(planningUnitObj[0].planningUnit.label, this.state.lang);
+                    }
                     var usagePeriodId;
                     var usageTypeId;
                     var usageFrequency;
@@ -481,7 +486,7 @@ class ProductValidation extends Component {
                 data[2] = getLabelText(finalData[i].parentNodeNodeDataMap.fuNode.forecastingUnit.label, this.state.lang);
                 data[3] = usageText;
                 var planningUnitObj = finalData[i].nodeDataMap != "" ? this.state.datasetData.planningUnitList.filter(c => c.planningUnit.id == finalData[i].nodeDataMap.puNode.planningUnit.id) : [];
-                data[4] = finalData[i].nodeDataMap != "" ? getLabelText(planningUnitObj[0].planningUnit.label, this.state.lang) : "";
+                data[4] = finalData[i].nodeDataMap != "" && planningUnitObj.length>0 ? getLabelText(planningUnitObj[0].planningUnit.label, this.state.lang) : "";
                 data[5] = usageTextPU;
                 data[6] = selectedPlanningUnit != undefined && selectedPlanningUnit.length > 0 && finalData[i].nodeDataMap != "" ? qty.toFixed(2) : "";
                 data[7] = selectedPlanningUnit != undefined && selectedPlanningUnit.length > 0 && finalData[i].nodeDataMap != "" ? price.toFixed(2) : "";
@@ -540,15 +545,15 @@ class ProductValidation extends Component {
                     },
                     {
                         title: i18n.t('static.report.qty'),
-                        type: 'numeric',mask: '#,##.00', decimal: '.'
+                        type: 'numeric', mask: '#,##.00', decimal: '.'
                     },
                     {
                         title: i18n.t('static.supplyPlan.pricePerPlanningUnit'),
-                        type: 'numeric',mask: '#,##.00', decimal: '.'
+                        type: 'numeric', mask: '#,##.00', decimal: '.'
                     },
                     {
                         title: i18n.t('static.productValidation.cost'),
-                        type: 'numeric',mask: '#,##.00', decimal: '.'
+                        type: 'numeric', mask: '#,##.00', decimal: '.'
                     },
                     {
                         title: "IsTotal",
@@ -602,7 +607,7 @@ class ProductValidation extends Component {
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunctionOnlyHideRow(instance);
         var json = instance.jexcel.getJson(null, false);
-        var colArr = ["A", "B", "C", "D", "E", "F", "G","H","I","J"]
+        var colArr = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"]
         for (var j = 0; j < json.length; j++) {
             if (json[j][9] == 1) {
                 for (var i = 0; i < colArr.length; i++) {
