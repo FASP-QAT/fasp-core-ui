@@ -1984,7 +1984,7 @@ class ForecastSummary extends Component {
 
                 <Card>
                     <div className="Card-header-reporticon pb-2">
-                        {checkOnline === 'Online' &&
+                        {
                             (this.state.dataArray.length > 0 || this.state.summeryData.length > 0) &&
                             <div className="card-header-actions">
                                 <a className="card-header-action">
@@ -1996,7 +1996,7 @@ class ForecastSummary extends Component {
                                 <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
                             </div>
                         }
-                        {checkOnline === 'Offline' &&
+                        {/* {checkOnline === 'Offline' &&
                             (this.state.dataArray.length > 0 || this.state.summeryData.length > 0) &&
                             <div className="card-header-actions">
                                 <a className="card-header-action">
@@ -2006,7 +2006,7 @@ class ForecastSummary extends Component {
                                 </a>
                                 <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
                             </div>
-                        }
+                        } */}
                     </div>
                     <div className="Card-header-reporticon ">
                         <div className="card-header-actions BacktoLink">
