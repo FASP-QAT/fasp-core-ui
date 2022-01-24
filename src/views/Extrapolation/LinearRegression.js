@@ -1,6 +1,7 @@
 import regression from 'regression';
 import { calculateError } from '../Extrapolation/ErrorCalculations.js';
 export function calculateLinearRegression(inputData, noOfProjectionMonths, props) {
+    console.log("InputData@@@",inputData)
     const data = inputData;
 
     const noOfMonthsForProjection = noOfProjectionMonths;

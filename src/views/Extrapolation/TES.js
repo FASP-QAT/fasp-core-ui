@@ -1,6 +1,7 @@
 import { std, sqrt, mean, abs } from 'mathjs';
 import { calculateError } from '../Extrapolation/ErrorCalculations.js';
 export function calculateTES(inputData, alphaParam, betaParam, gammaParam, confidenceLevel, seasonality, noOfProjectionMonths, props) {
+    console.log("InputData@@@",inputData)
     const alpha = alphaParam
     const beta = betaParam
     const gamma = gammaParam
