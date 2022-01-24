@@ -3074,14 +3074,7 @@ export default class BuildTree extends Component {
 
         var templates = [
             {
-                itemSize: new Size(200, 100),
-                itemTemplate :
-                '<div>'
-                + '<div name="titleBackground">'
-                + '<div name="title">'
-                + '<i className="fa fa-plus"></i>'
-                + '</div>'
-                + '</div>'
+                itemSize: new Size(200, 100)
             }
         ]
         var items = this.state.items;
