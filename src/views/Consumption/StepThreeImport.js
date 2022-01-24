@@ -228,7 +228,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                                 let regionObj = selectedForecastProgramObj.regionList.filter(c => c.regionId == parseInt(map1.get("10")))[0];
 
                                 let tempJson = {
-                                    "actualConsumptionId": '',
+                                    "actualConsumptionId": null,
                                     "planningUnit": {
                                         "id": selectedPlanningUnitObj.planningUnitId,
                                         "label": selectedPlanningUnitObj.label,

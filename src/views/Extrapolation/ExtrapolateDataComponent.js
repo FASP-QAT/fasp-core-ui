@@ -982,6 +982,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                     smoothingId: smoothingId,
                     arimaId: arimaId,
                     noDataMessage: "",
+                    dataChanged:true,
                     loading: false
                 }, () => {
                     this.buildJxl();

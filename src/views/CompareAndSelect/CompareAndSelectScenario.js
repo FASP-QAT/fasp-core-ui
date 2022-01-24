@@ -1372,7 +1372,7 @@ console.log("in if for set@@@",this.state.datasetList);
         this.setState({ loading: true })
         var scenarioId = this.state.selectedTreeScenarioId.toString().split("~")[1];
         if (scenarioId == undefined) {
-            scenarioId = "";
+            scenarioId = null;
         }
         var consumptionExtrapolationId = "";
         if (!this.state.selectedTreeScenarioId.toString().includes("~")) {
