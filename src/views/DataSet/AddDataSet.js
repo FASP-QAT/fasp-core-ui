@@ -1283,6 +1283,12 @@ export default class AddForecastProgram extends Component {
         this.state.regionList = [];
         program.regionArray = [];
 
+        this.state.forecastProgramInMonth = '';
+        this.state.singleValue1 = { year: new Date().getFullYear(), month: new Date().getMonth() + 1 };
+        this.state.singleValue2 = { year: new Date().getFullYear() + 1, month: new Date().getMonth() + 1 };
+        this.state.minDate = { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 };
+        this.state.maxDate = { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 };
+
         this.setState({
             program
         },
