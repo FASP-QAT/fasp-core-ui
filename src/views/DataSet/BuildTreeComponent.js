@@ -651,18 +651,24 @@ export default class BuildTree extends Component {
         } else {
             var items = this.state.items;
             var nodeDataMap = [];
+            var nodeDataMapIdArr = [];
+            console.log("items.length---", items)
             for (let i = 0; i < items.length; i++) {
                 var scenarioList = this.state.scenarioList;
+                console.log("scenarioList length---", scenarioList.length);
                 for (let j = 0; j < scenarioList.length; j++) {
                     console.log("array a---", i, "---", items[i]);
                     if (items[i].payload.nodeDataMap.hasOwnProperty(scenarioList[j].id)) {
                         nodeDataMap.push(items[i].payload.nodeDataMap[scenarioList[j].id][0]);
+                        nodeDataMapIdArr.push(items[i].payload.nodeDataMap[scenarioList[j].id][0].nodeDataId);
                     }
                 }
             }
             maxNodeDataId = nodeDataMap.length > 0 ? Math.max(...nodeDataMap.map(o => o.nodeDataId)) : 0;
             console.log("nodeDataMap array---", nodeDataMap);
+            console.log("nodeDataMapIdArr---", nodeDataMapIdArr);
             console.log("maxNodeDataId 2---", maxNodeDataId)
+            maxNodeDataId = parseInt(maxNodeDataId + 1);
             this.setState({
                 maxNodeDataId
             })
@@ -702,17 +708,9 @@ export default class BuildTree extends Component {
         curTreeObj.scenarioList = this.state.scenarioList;
         var findTreeIndex = treeData.findIndex(n => n.treeId == curTreeObj.treeId);
         treeData[findTreeIndex] = curTreeObj;
-        // alert("28---")
         programData.treeList = treeData;
         dataSetObj.programData = programData;
         console.log("dataSetDecrypt>>>", dataSetObj);
-        // if (this.state.currentItemConfig.context.payload.nodeType.id == 2 && this.state.currentItemConfig.context.level != 0) {
-        //     var level0Data = items.filter(x => x.id == this.state.currentItemConfig.context.parent)[0];
-        //     if (level0Data.payload.nodeType.id == 1) {
-        //         calculateModelingData(dataSetObj, this, '',-1, this.state.selectedScenario, type, this.state.treeId, false);
-        //     }
-        // }else{
-        // alert("29---")
         calculateModelingData(dataSetObj, this, '', (nodeId != 0 ? nodeId : this.state.currentItemConfig.context.id), this.state.selectedScenario, type, this.state.treeId, false);
         // }
     }
@@ -779,13 +777,9 @@ export default class BuildTree extends Component {
     callAfterScenarioChange(scenarioId) {
         console.log("&&&&scenarioId---", scenarioId);
         let { curTreeObj } = this.state;
-        let { currentItemConfig } = this.state;
-        let { treeTemplate } = this.state;
 
         var items = curTreeObj.tree.flatList;
         var scenarioId = scenarioId;
-        var arr = [];
-        var currentScenario;
         console.log("items***&---", items);
         for (let i = 0; i < items.length; i++) {
             console.log("&&&&item---", items[i]);
@@ -1478,6 +1472,9 @@ export default class BuildTree extends Component {
             position: 'top',
             filters: true,
             license: JEXCEL_PRO_KEY,
+            contextMenu: function (obj, x, y, e) {
+                return false;
+            }.bind(this),
 
         };
         var momElPer = jexcel(document.getElementById("momJexcelPer"), options);
@@ -1616,6 +1613,9 @@ export default class BuildTree extends Component {
             position: 'top',
             filters: true,
             license: JEXCEL_PRO_KEY,
+            contextMenu: function (obj, x, y, e) {
+                return false;
+            }.bind(this),
 
         };
         var momEl = jexcel(document.getElementById("momJexcel"), options);
@@ -1716,8 +1716,12 @@ export default class BuildTree extends Component {
 
         if (e.target.name === "manualChange") {
             (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].manualChangesEffectFuture = (e.target.checked == true ? true : false)
+            var nodes = this.state.items;
+            var findNodeIndex = nodes.findIndex(n => n.id == currentItemConfig.context.id);
+            nodes[findNodeIndex] = currentItemConfig.context;
             this.setState({
                 currentItemConfig,
+                items: nodes,
                 currentScenario: (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0]
             }, () => {
                 this.calculateMOMData(0, 1);
@@ -1753,88 +1757,95 @@ export default class BuildTree extends Component {
             var validation = this.checkValidation();
             console.log("validation---", validation);
             if (validation == true) {
-                console.log("entered if ---", new Date());
-                var tableJson = this.el.getJson(null, false);
-                console.log("tableJson length---", tableJson.length);
-                var data = this.state.currentScenario.nodeDataModelingList;
-                var maxModelingId = data.length > 0 ? Math.max(...data.map(o => o.nodeDataModelingId)) : 0;
-                console.log("maxModelingId---", maxModelingId);
-                var obj;
-                var dataArr = [];
-                var items = this.state.items;
-                var item = items.filter(x => x.id == this.state.currentItemConfig.context.id)[0];
-                const itemIndex1 = items.findIndex(o => o.id === this.state.currentItemConfig.context.id);
-                for (var i = 0; i < tableJson.length; i++) {
-                    var map1 = new Map(Object.entries(tableJson[i]));
-                    console.log("10 map---" + map1.get("10"));
-                    if (parseInt(map1.get("10")) === 1) {
-                        console.log("10 map true---");
+                try {
+                    console.log("entered if ---", new Date());
+                    var tableJson = this.state.modelingEl.getJson(null, false);
+                    console.log("tableJson length---", tableJson.length);
+                    var data = this.state.currentScenario.nodeDataModelingList;
+                    var maxModelingId = data.length > 0 ? Math.max(...data.map(o => o.nodeDataModelingId)) : 0;
+                    console.log("maxModelingId---", maxModelingId);
+                    var obj;
+                    var dataArr = [];
+                    var items = this.state.items;
+                    var item = items.filter(x => x.id == this.state.currentItemConfig.context.id)[0];
+                    const itemIndex1 = items.findIndex(o => o.id === this.state.currentItemConfig.context.id);
+                    for (var i = 0; i < tableJson.length; i++) {
+                        var map1 = new Map(Object.entries(tableJson[i]));
+                        console.log("10 map---" + map1.get("10"));
+                        if (parseInt(map1.get("10")) === 1) {
+                            console.log("10 map true---");
 
-                        var parts1 = map1.get("3").split('-');
-                        var startDate = parts1[0] + "-" + parts1[1] + "-01"
-                        var parts2 = map1.get("4").split('-');
-                        var stopDate = parts2[0] + "-" + parts2[1] + "-01"
-                        if (map1.get("9") != "" && map1.get("9") != 0) {
-                            console.log("inside 9 map true---");
-                            const itemIndex = data.findIndex(o => o.nodeDataModelingId === map1.get("9"));
-                            obj = data.filter(x => x.nodeDataModelingId == map1.get("9"))[0];
-                            console.log("obj--->>>>>", obj);
-                            var transfer = map1[0] != "" ? map1.get("0") : '';
-                            console.log("transfer---", transfer);
-                            obj.transferNodeDataId = transfer;
-                            obj.notes = map1.get("1");
-                            obj.modelingType.id = map1.get("2");
-                            obj.startDate = startDate;
-                            obj.stopDate = stopDate;
-                            obj.dataValue = map1.get("2") == 2 ? map1.get("6") : map1.get("5");
-                            obj.nodeDataModelingId = map1.get("9")
-                            // data[itemIndex] = obj;
-                            // dataArr.push(obj);
-                        } else {
-                            obj = {
-                                transferNodeDataId: map1[0] != "" ? map1.get("0") : '',
-                                notes: map1.get("1"),
-                                modelingType: {
-                                    id: map1.get("2")
-                                },
-                                startDate: startDate,
-                                stopDate: stopDate,
-                                dataValue: map1.get("2") == 2 ? map1.get("6") : map1.get("5"),
-                                nodeDataModelingId: parseInt(maxModelingId) + 1
+                            var parts1 = map1.get("3").split('-');
+                            var startDate = parts1[0] + "-" + parts1[1] + "-01"
+                            var parts2 = map1.get("4").split('-');
+                            var stopDate = parts2[0] + "-" + parts2[1] + "-01"
+                            if (map1.get("9") != "" && map1.get("9") != 0) {
+                                console.log("inside 9 map true---");
+                                const itemIndex = data.findIndex(o => o.nodeDataModelingId === map1.get("9"));
+                                obj = data.filter(x => x.nodeDataModelingId == map1.get("9"))[0];
+                                console.log("obj--->>>>>", obj);
+                                var transfer = map1[0] != "" ? map1.get("0") : '';
+                                console.log("transfer---", transfer);
+                                obj.transferNodeDataId = transfer;
+                                obj.notes = map1.get("1");
+                                obj.modelingType.id = map1.get("2");
+                                obj.startDate = startDate;
+                                obj.stopDate = stopDate;
+                                obj.dataValue = map1.get("2") == 2 ? map1.get("6") : map1.get("5");
+                                obj.nodeDataModelingId = map1.get("9")
+                                // data[itemIndex] = obj;
+                                // dataArr.push(obj);
+                            } else {
+                                obj = {
+                                    transferNodeDataId: map1[0] != "" ? map1.get("0") : '',
+                                    notes: map1.get("1"),
+                                    modelingType: {
+                                        id: map1.get("2")
+                                    },
+                                    startDate: startDate,
+                                    stopDate: stopDate,
+                                    dataValue: map1.get("2") == 2 ? map1.get("6") : map1.get("5"),
+                                    nodeDataModelingId: parseInt(maxModelingId) + 1
+                                }
+                                maxModelingId++;
                             }
-                            maxModelingId++;
+                            dataArr.push(obj);
+                            console.log("dataArr--->>>", dataArr);
+                            (item.payload.nodeDataMap[this.state.selectedScenario])[0].nodeDataModelingList = dataArr;
+                            console.log("item---", item);
+                            items[itemIndex1] = item;
+                            console.log("items---", items);
                         }
-                        dataArr.push(obj);
-                        console.log("dataArr--->>>", dataArr);
-                        (item.payload.nodeDataMap[this.state.selectedScenario])[0].nodeDataModelingList = dataArr;
-                        console.log("item---", item);
-                        items[itemIndex1] = item;
-                        console.log("items---", items);
                     }
+
+                    let { curTreeObj } = this.state;
+                    let { treeData } = this.state;
+                    let { dataSetObj } = this.state;
+                    curTreeObj.tree.flatList = items;
+                    var findTreeIndex = treeData.findIndex(n => n.treeId == curTreeObj.treeId);
+                    treeData[findTreeIndex] = curTreeObj;
+                    var programData = dataSetObj.programData;
+                    programData.treeList = treeData;
+                    console.log("dataSetDecrypt>>>", programData);
+                    dataSetObj.programData = programData;
+
+                    console.log("encpyDataSet>>>", dataSetObj)
+                    this.setState({
+                        dataSetObj,
+                        items,
+                        scalingList: dataArr,
+                        // openAddNodeModal: false,
+                        activeTab1: new Array(2).fill('1')
+                    }, () => {
+                        console.log("going to call MOM data");
+                        this.calculateMOMData(0, 0);
+                    });
+                } catch (err) {
+                    console.log("scaling err---", err);
+                    localStorage.setItem("scalingErrorTree", err);
                 }
-
-                let { curTreeObj } = this.state;
-                let { treeData } = this.state;
-                let { dataSetObj } = this.state;
-                curTreeObj.tree.flatList = items;
-                var findTreeIndex = treeData.findIndex(n => n.treeId == curTreeObj.treeId);
-                treeData[findTreeIndex] = curTreeObj;
-                var programData = dataSetObj.programData;
-                programData.treeList = treeData;
-                console.log("dataSetDecrypt>>>", programData);
-                dataSetObj.programData = programData;
-
-                console.log("encpyDataSet>>>", dataSetObj)
-                this.setState({
-                    dataSetObj,
-                    items,
-                    scalingList: dataArr,
-                    // openAddNodeModal: false,
-                    activeTab1: new Array(2).fill('2')
-                }, () => {
-                    console.log("going to call MOM data");
-                    this.calculateMOMData(0, 0);
-                });
+            } else {
+                this.setState({ modelingJexcelLoader: false })
             }
         }
         // })
@@ -2409,23 +2420,23 @@ export default class BuildTree extends Component {
                 var items = [];
                 if (y == null) {
                     // Sorting
-                    if (obj.options.columnSorting == true) {
-                        // Line
-                        items.push({ type: 'line' });
+                    // if (obj.options.columnSorting == true) {
+                    //     // Line
+                    //     items.push({ type: 'line' });
 
-                        items.push({
-                            title: obj.options.text.orderAscending,
-                            onclick: function () {
-                                obj.orderBy(x, 0);
-                            }
-                        });
-                        items.push({
-                            title: obj.options.text.orderDescending,
-                            onclick: function () {
-                                obj.orderBy(x, 1);
-                            }
-                        });
-                    }
+                    //     items.push({
+                    //         title: obj.options.text.orderAscending,
+                    //         onclick: function () {
+                    //             obj.orderBy(x, 0);
+                    //         }
+                    //     });
+                    //     items.push({
+                    //         title: obj.options.text.orderDescending,
+                    //         onclick: function () {
+                    //             obj.orderBy(x, 1);
+                    //         }
+                    //     });
+                    // }
                 } else {
                     // at start
                     if (obj.options.allowInsertRow == true) {
@@ -2501,7 +2512,7 @@ export default class BuildTree extends Component {
                 var rowData = elInstance.getRowData(x);
                 this.setState({
                     currentRowIndex: x,
-                    showCalculatorFields: true,
+                    showCalculatorFields: this.state.aggregationNode ? true : false,
                     currentModelingType: rowData[2],
                     currentCalculatorStartDate: rowData[3],
                     currentCalculatorStopDate: rowData[4],
@@ -2532,7 +2543,7 @@ export default class BuildTree extends Component {
                 var overrideListArray = [];
                 for (var i = 0; i < json.length; i++) {
                     var map1 = new Map(Object.entries(json[i]));
-                    if (map1.get("4") != '' || map1.get("5") != '') {
+                    if ((map1.get("4") != '' && map1.get("4") != 0.00) || (map1.get("5") != '' && map1.get("5") != 0.00)) {
                         var overrideData = {
                             month: map1.get("0"),
                             seasonalityPerc: map1.get("4"),
@@ -3075,13 +3086,13 @@ export default class BuildTree extends Component {
         var templates = [
             {
                 itemSize: new Size(200, 100),
-                itemTemplate :
-                '<div>'
-                + '<div name="titleBackground">'
-                + '<div name="title">'
-                + '<i className="fa fa-plus"></i>'
-                + '</div>'
-                + '</div>'
+                itemTemplate:
+                    '<div>'
+                    + '<div name="titleBackground">'
+                    + '<div name="title">'
+                    + '<i className="fa fa-plus"></i>'
+                    + '</div>'
+                    + '</div>'
             }
         ]
         var items = this.state.items;
@@ -3495,7 +3506,7 @@ export default class BuildTree extends Component {
                 }, () => {
                     this.getUsageText();
                 });
-            } 
+            }
             // else if (type == 1) {
             //     if (this.state.planningUnitList.length == 1) {
             //         console.log("node data pu---", this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario]);
@@ -4329,6 +4340,7 @@ export default class BuildTree extends Component {
         var type = this.state.scenarioActionType;
         var items = curTreeObj.tree.flatList;
         var scenarioId;
+        var temNodeDataMap = [];
         if (type == 1) {
             var maxScenarioId = Math.max(...scenarioList.map(o => o.id));
             var minScenarioId = Math.min(...scenarioList.map(o => o.id));
@@ -4350,20 +4362,28 @@ export default class BuildTree extends Component {
                 }
 
                 console.log("***>minScenarioId---", items);
+                var tArr = [];
                 for (var i = 0; i < items.length; i++) {
-                    console.log("***>items[i]----", items[i]);
-                    console.log("***>(items[i].payload.nodeDataMap[minScenarioId])[0]----", (items[i].payload.nodeDataMap[minScenarioId])[0]);
+                    for (let j = 0; j < scenarioList.length; j++) {
+                        if (items[i].payload.nodeDataMap.hasOwnProperty(scenarioList[j].id)) {
+                            temNodeDataMap.push(items[i].payload.nodeDataMap[scenarioList[j].id][0]);
+                            tArr.push(items[i].payload.nodeDataMap[scenarioList[j].id][0].nodeDataId);
+                        }
+                    }
                     var tempArray = [];
                     var nodeDataMap = {};
                     // tempArray = items[i].payload.nodeDataMap;
-                    tempArray.push((items[i].payload.nodeDataMap[minScenarioId])[0]);
+                    tempArray.push(JSON.parse(JSON.stringify((items[i].payload.nodeDataMap[minScenarioId])[0])));
                     nodeDataMap = items[i].payload.nodeDataMap;
                     nodeDataMap[scenarioId] = tempArray;
-                    nodeDataMap[scenarioId][0].nodeDataId = this.getMaxNodeDataId();
+                    // var nodeDataId = this.getMaxNodeDataId(items);
+                    // console.log("nodeDataId---", nodeDataId);
+                    nodeDataMap[scenarioId][0].nodeDataId = "";
                     items[i].payload.nodeDataMap = nodeDataMap;
                 }
-                console.log("items-----------", items);
-                this.updateTreeData();
+                console.log("items-----------%%%%%%", items);
+                console.log("tArr---", tArr);
+
             }
         } else if (type == 2 || type == 3) {
             scenarioId = this.state.selectedScenario;
@@ -4393,6 +4413,17 @@ export default class BuildTree extends Component {
             openAddScenarioModal: false
         }, () => {
             console.log("final tab list---", this.state.items);
+            if (type == 1) {
+                var maxNodeDataId = temNodeDataMap.length > 0 ? Math.max(...temNodeDataMap.map(o => o.nodeDataId)) : 0;
+                console.log("scenarioId---", scenarioId);
+                for (var i = 0; i < items.length; i++) {
+                    maxNodeDataId = parseInt(maxNodeDataId) + 1;
+                    (items[i].payload.nodeDataMap[scenarioId])[0].nodeDataId = maxNodeDataId;
+                    console.log("my node data id--->", (items[i].payload.nodeDataMap[scenarioId])[0].nodeDataId);
+                }
+                this.callAfterScenarioChange(scenarioId);
+                this.updateTreeData();
+            }
         });
     }
     nodeTypeChange(value) {

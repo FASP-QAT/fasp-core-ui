@@ -622,10 +622,14 @@ export default class CreateTreeTemplate extends Component {
 
         if (e.target.name === "manualChange") {
             (currentItemConfig.context.payload.nodeDataMap[0])[0].manualChangesEffectFuture = (e.target.checked == true ? true : false)
+            var nodes = this.state.items;
+            var findNodeIndex = nodes.findIndex(n => n.id == currentItemConfig.context.id);
+            nodes[findNodeIndex] = currentItemConfig.context;
             this.setState({
                 currentItemConfig,
-                currentScenario: (currentItemConfig.context.payload.nodeDataMap[0])[0]
+                items: nodes
             }, () => {
+                console.log("currentItemConfig---", currentItemConfig);
                 this.calculateMOMData(0, 1);
                 console.log('manual change---', this.state.manualChange);
             });
@@ -753,7 +757,7 @@ export default class CreateTreeTemplate extends Component {
             this.state.modelingEl.setValueFromCoords(8, i, calculatedChangeForMonth, true);
             scalingTotal = parseFloat(scalingTotal) + parseFloat(calculatedChangeForMonth);
         }
-        this.setState({ scalingTotal });
+        this.setState({ scalingTotal, scalingMonth: date });
 
     }
     resetNodeData() {
@@ -769,78 +773,85 @@ export default class CreateTreeTemplate extends Component {
     }
 
     formSubmit() {
-        var validation = this.checkValidation();
-        if (validation == true) {
-            this.setState({
-                modelingJexcelLoader: true
-            })
-            var tableJson = this.el.getJson(null, false);
-            var data = this.state.scalingList;
-            var maxModelingId = data.length > 0 ? Math.max(...data.map(o => o.nodeDataModelingId)) : 0;
-            var obj;
-            var dataArr = [];
-            var items = this.state.items;
-            var item = items.filter(x => x.id == this.state.currentItemConfig.context.id)[0];
-            const itemIndex1 = items.findIndex(o => o.id === this.state.currentItemConfig.context.id);
-            for (var i = 0; i < tableJson.length; i++) {
-                var map1 = new Map(Object.entries(tableJson[i]));
-                console.log("10 map---" + map1.get("10"))
-                if (parseInt(map1.get("10")) === 1) {
-                    var parts1 = map1.get("3").split('-');
-                    var startDate = parts1[0] + "-" + parts1[1] + "-01"
-                    var parts2 = map1.get("4").split('-');
-                    var stopDate = parts2[0] + "-" + parts2[1] + "-01"
-                    if (map1.get("9") != "" && map1.get("9") != 0) {
-                        const itemIndex = data.findIndex(o => o.nodeDataModelingId === map1.get("9"));
-                        console.log("data[itemIndex]---", data[itemIndex]);
-                        obj = data.filter(x => x.nodeDataModelingId == map1.get("9"))[0];
-                        console.log("obj--->>>>>", obj);
-                        var transfer = map1[0] != "" ? map1.get("0") : '';
-                        console.log("transfer---", transfer);
-                        obj.transferNodeDataId = transfer;
-                        obj.notes = map1.get("1");
-                        obj.modelingType.id = map1.get("2");
-                        obj.startDate = startDate;
-                        obj.stopDate = stopDate;
-                        obj.dataValue = map1.get("2") == 2 ? map1.get("6") : map1.get("5");
-                        obj.nodeDataModelingId = map1.get("9")
+        if (this.state.modelingJexcelLoader === true) {
+            var validation = this.checkValidation();
+            console.log("validation---", validation);
+            if (validation == true) {
+                try {
+                    var tableJson = this.state.modelingEl.getJson(null, false);
+                    var data = this.state.scalingList;
+                    var maxModelingId = data.length > 0 ? Math.max(...data.map(o => o.nodeDataModelingId)) : 0;
+                    var obj;
+                    var dataArr = [];
+                    var items = this.state.items;
+                    var item = items.filter(x => x.id == this.state.currentItemConfig.context.id)[0];
+                    const itemIndex1 = items.findIndex(o => o.id === this.state.currentItemConfig.context.id);
+                    for (var i = 0; i < tableJson.length; i++) {
+                        var map1 = new Map(Object.entries(tableJson[i]));
+                        console.log("10 map---" + map1.get("10"))
+                        if (parseInt(map1.get("10")) === 1) {
+                            var parts1 = map1.get("3").split('-');
+                            var startDate = parts1[0] + "-" + parts1[1] + "-01"
+                            var parts2 = map1.get("4").split('-');
+                            var stopDate = parts2[0] + "-" + parts2[1] + "-01"
+                            if (map1.get("9") != "" && map1.get("9") != 0) {
+                                const itemIndex = data.findIndex(o => o.nodeDataModelingId === map1.get("9"));
+                                console.log("data[itemIndex]---", data[itemIndex]);
+                                obj = data.filter(x => x.nodeDataModelingId == map1.get("9"))[0];
+                                console.log("obj--->>>>>", obj);
+                                var transfer = map1[0] != "" ? map1.get("0") : '';
+                                console.log("transfer---", transfer);
+                                obj.transferNodeDataId = transfer;
+                                obj.notes = map1.get("1");
+                                obj.modelingType.id = map1.get("2");
+                                obj.startDate = startDate;
+                                obj.stopDate = stopDate;
+                                obj.dataValue = map1.get("2") == 2 ? map1.get("6") : map1.get("5");
+                                obj.nodeDataModelingId = map1.get("9")
 
-                        // data[itemIndex] = obj;
-                    } else {
-                        console.log("maxModelingId---", maxModelingId);
-                        obj = {
-                            transferNodeDataId: map1[0] != "" ? map1.get("0") : '',
-                            notes: map1.get("1"),
-                            modelingType: {
-                                id: map1.get("2")
-                            },
-                            startDate: startDate,
-                            stopDate: stopDate,
-                            dataValue: map1.get("2") == 2 ? map1.get("6") : map1.get("5"),
-                            nodeDataModelingId: parseInt(maxModelingId) + 1
+                                // data[itemIndex] = obj;
+                            } else {
+                                console.log("maxModelingId---", maxModelingId);
+                                obj = {
+                                    transferNodeDataId: map1[0] != "" ? map1.get("0") : '',
+                                    notes: map1.get("1"),
+                                    modelingType: {
+                                        id: map1.get("2")
+                                    },
+                                    startDate: startDate,
+                                    stopDate: stopDate,
+                                    dataValue: map1.get("2") == 2 ? map1.get("6") : map1.get("5"),
+                                    nodeDataModelingId: parseInt(maxModelingId) + 1
+                                }
+                                maxModelingId++;
+                                console.log("obj to push---", obj);
+                                // data.push(obj);
+                            }
+                            dataArr.push(obj);
+                            console.log("obj---", obj);
+                            console.log("dataArr--->>>", dataArr);
+                            (item.payload.nodeDataMap[0])[0].nodeDataModelingList = dataArr;
+                            console.log("item---", item);
+                            items[itemIndex1] = item;
+                            console.log("items---", items);
+                            // Call function by dolly
+                            this.setState({
+                                items,
+                                scalingList: dataArr,
+                                // openAddNodeModal: false,
+                                activeTab1: new Array(2).fill('1')
+                            }, () => {
+                                console.log("going to call MOM data");
+                                this.calculateMOMData(0, 0);
+                            });
                         }
-                        maxModelingId++;
-                        console.log("obj to push---", obj);
-                        // data.push(obj);
                     }
-                    dataArr.push(obj);
-                    console.log("obj---", obj);
-                    console.log("dataArr--->>>", dataArr);
-                    (item.payload.nodeDataMap[0])[0].nodeDataModelingList = dataArr;
-                    console.log("item---", item);
-                    items[itemIndex1] = item;
-                    console.log("items---", items);
-                    // Call function by dolly
-                    this.setState({
-                        items,
-                        scalingList: dataArr,
-                        // openAddNodeModal: false,
-                        activeTab1: new Array(2).fill('2')
-                    }, () => {
-                        console.log("going to call MOM data");
-                        this.calculateMOMData(0, 0);
-                    });
+                } catch (err) {
+                    console.log("scaling err---", err);
+                    localStorage.setItem("scalingErrorTemplate", err);
                 }
+            } else {
+                this.setState({ modelingJexcelLoader: false })
             }
         }
     }
@@ -1398,6 +1409,9 @@ export default class CreateTreeTemplate extends Component {
             position: 'top',
             filters: true,
             license: JEXCEL_PRO_KEY,
+            contextMenu: function (obj, x, y, e) {
+                return false;
+            }.bind(this),
 
         };
         var momElPer = jexcel(document.getElementById("momJexcelPer"), options);
@@ -1541,6 +1555,9 @@ export default class CreateTreeTemplate extends Component {
             position: 'top',
             filters: true,
             license: JEXCEL_PRO_KEY,
+            contextMenu: function (obj, x, y, e) {
+                return false;
+            }.bind(this),
 
         };
         var momEl = jexcel(document.getElementById("momJexcel"), options);
@@ -1768,23 +1785,23 @@ export default class CreateTreeTemplate extends Component {
                 var items = [];
                 if (y == null) {
                     // Sorting
-                    if (obj.options.columnSorting == true) {
-                        // Line
-                        items.push({ type: 'line' });
+                    // if (obj.options.columnSorting == true) {
+                    //     // Line
+                    //     items.push({ type: 'line' });
 
-                        items.push({
-                            title: obj.options.text.orderAscending,
-                            onclick: function () {
-                                obj.orderBy(x, 0);
-                            }
-                        });
-                        items.push({
-                            title: obj.options.text.orderDescending,
-                            onclick: function () {
-                                obj.orderBy(x, 1);
-                            }
-                        });
-                    }
+                    //     items.push({
+                    //         title: obj.options.text.orderAscending,
+                    //         onclick: function () {
+                    //             obj.orderBy(x, 0);
+                    //         }
+                    //     });
+                    //     items.push({
+                    //         title: obj.options.text.orderDescending,
+                    //         onclick: function () {
+                    //             obj.orderBy(x, 1);
+                    //         }
+                    //     });
+                    // }
                 } else {
                     // at start
                     if (obj.options.allowInsertRow == true) {
@@ -1889,7 +1906,7 @@ export default class CreateTreeTemplate extends Component {
                 var overrideListArray = [];
                 for (var i = 0; i < json.length; i++) {
                     var map1 = new Map(Object.entries(json[i]));
-                    if (map1.get("4") != '' || map1.get("5") != '') {
+                    if ((map1.get("4") != '' && map1.get("4") != 0.00) || (map1.get("5") != '' && map1.get("5") != 0.00)) {
                         var overrideData = {
                             month: map1.get("0"),
                             seasonalityPerc: map1.get("4"),
@@ -3689,6 +3706,12 @@ export default class CreateTreeTemplate extends Component {
         }
         if (event.target.name === "nodeUnitId") {
             currentItemConfig.context.payload.nodeUnit.id = event.target.value;
+            var nodeUnit = document.getElementById("nodeUnitId");
+            var selectedText = nodeUnit.options[nodeUnit.selectedIndex].text;
+            var label = {
+                label_en: selectedText
+            }
+            currentItemConfig.context.payload.nodeUnit.label = label;
         }
         if (event.target.name === "percentageOfParent") {
             var value = (event.target.value).replaceAll(",", "");
@@ -5595,7 +5618,7 @@ export default class CreateTreeTemplate extends Component {
                                     <div className="col-md-6 float-right">
                                         <FormGroup className="float-right" >
                                             <div className="check inline  pl-lg-1 pt-lg-0">
-                                                <div>
+                                                <div style={{ display: this.state.aggregationNode ? 'block' : 'none' }}>
                                                     <Input
                                                         className="form-check-input checkboxMargin"
                                                         type="checkbox"
@@ -6323,6 +6346,9 @@ export default class CreateTreeTemplate extends Component {
                                     }}
                                     validate={validate(validationSchema)}
                                     onSubmit={(values, { setSubmitting, setErrors }) => {
+                                        this.setState({
+                                            loading: true
+                                        })
                                         console.log("on submit called-----------------");
                                         var template = this.state.treeTemplate;
                                         console.log("template---", template);
@@ -6359,8 +6385,10 @@ export default class CreateTreeTemplate extends Component {
                                                                 fuNode: (item.payload.nodeDataMap[0])[0].fuNode,
                                                                 puNode: (item.payload.nodeDataMap[0])[0].puNode,
                                                                 notes: (item.payload.nodeDataMap[0])[0].notes,
-                                                                manualChangesEffectFuture: true,
-                                                                nodeDataModelingList: (item.payload.nodeDataMap[0])[0].nodeDataModelingList
+                                                                manualChangesEffectFuture: (item.payload.nodeDataMap[0])[0].manualChangesEffectFuture,
+                                                                nodeDataModelingList: (item.payload.nodeDataMap[0])[0].nodeDataModelingList,
+                                                                nodeDataMomList: (item.payload.nodeDataMap[0])[0].nodeDataMomList,
+                                                                nodeDataOverrideList: (item.payload.nodeDataMap[0])[0].nodeDataOverrideList
                                                             }
                                                         ]
                                                     }
@@ -6385,9 +6413,7 @@ export default class CreateTreeTemplate extends Component {
                                             flatList: flatList
                                         }
                                         console.log("template obj---", templateObj);
-                                        this.setState({
-                                            loading: true
-                                        })
+
                                         if (template.treeTemplateId == 0) {
                                             DatasetService.addTreeTemplate(templateObj)
                                                 .then(response => {
@@ -6721,13 +6747,24 @@ export default class CreateTreeTemplate extends Component {
                                                         </div>
 
                                                     </CardBody>
-                                                    <div class="sample">
+                                                    <div style={{ display: !this.state.loading ? "block" : "none" }} class="sample">
                                                         <Provider>
                                                             <div className="placeholder" style={{ clear: 'both', height: '100vh', border: '1px solid #a7c6ed' }} >
                                                                 {/* <OrgDiagram centerOnCursor={true} config={config} onHighlightChanged={this.onHighlightChanged} /> */}
                                                                 <OrgDiagram centerOnCursor={true} config={config} onCursorChanged={this.onCursoChanged} />
                                                             </div>
                                                         </Provider>
+                                                    </div>
+                                                    <div style={{ display: this.state.loading ? "block" : "none" }}>
+                                                        <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                                            <div class="align-items-center">
+                                                                <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+
+                                                                <div class="spinner-border blue ml-4" role="status">
+
+                                                                </div>
+                                                            </div>
+                                                        </div>
                                                     </div>
                                                     <CardFooter style={{ backgroundColor: 'transparent', borderTop: '0px solid #c8ced3' }}>
                                                         {/* <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button> */}
