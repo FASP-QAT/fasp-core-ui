@@ -839,7 +839,29 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                     var cell = elInstance.getCell((colArr[c]).concat(parseInt(i) + 1))
                     cell.classList.add('readonly');
                 }
+                if (rowData[11] == false) {
+                    for (var c = 0; c < colArr.length; c++) {
+                        var cell = elInstance.getCell((colArr[c]).concat(parseInt(i) + 1))
+                        cell.classList.add('shipmentEntryDoNotInclude');
+                    }
+                } else {
+                    for (var c = 0; c < colArr.length; c++) {
+                        var cell = elInstance.getCell((colArr[c]).concat(parseInt(i) + 1))
+                        cell.classList.remove('shipmentEntryDoNotInclude');
+                    }
+                }
             } else {
+                if (rowData[11] == false) {
+                    for (var c = 0; c < colArr.length; c++) {
+                        var cell = elInstance.getCell((colArr[c]).concat(parseInt(i) + 1))
+                        cell.classList.add('shipmentEntryDoNotInclude');
+                    }
+                } else {
+                    for (var c = 0; c < colArr.length; c++) {
+                        var cell = elInstance.getCell((colArr[c]).concat(parseInt(i) + 1))
+                        cell.classList.remove('shipmentEntryDoNotInclude');
+                    }
+                }
 
             }
         }
