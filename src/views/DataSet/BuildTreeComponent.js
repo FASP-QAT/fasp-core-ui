@@ -2954,6 +2954,7 @@ export default class BuildTree extends Component {
     }
 
     getDatasetList() {
+        console.log("get dataset list program id---", this.state.programId);
         this.setState({ loading: true });
         var db1;
         getDatabase();
@@ -2970,10 +2971,13 @@ export default class BuildTree extends Component {
             getRequest.onsuccess = function (event) {
                 var myResult = [];
                 myResult = getRequest.result;
+                console.log("length---", this.state.programId != null ? "hi" : "hello");
                 this.setState({
-                    datasetList: myResult
+                    datasetList: myResult,
+                    programId: this.state.programId != null ? this.state.programId : (myResult.length == 1 ? myResult[0].id : "")
                 }, () => {
                     console.log("my datasetList --->", this.state.datasetList);
+                    console.log("my datasetList program--->", this.state.programId);
                     var dataSetObj = this.state.datasetList.filter(c => c.id == this.state.programId)[0];
                     console.log("dataSetObj---", dataSetObj);
                     if (dataSetObj != null) {
@@ -3460,7 +3464,26 @@ export default class BuildTree extends Component {
                 }, () => {
                     this.getUsageText();
                 });
-            }
+            } 
+            // else if (type == 1) {
+            //     if (this.state.planningUnitList.length == 1) {
+            //         console.log("node data pu---", this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario]);
+            //         var pu = (this.state.planningUnitList)[0];
+            //         console.log("node data pu list---", pu);
+            //         var puNode = {
+            //             planningUnit: {
+            //                 id: pu.id,
+            //                 unit: {
+            //                     id: pu.unit.id
+            //                 },
+            //                 multiplier: pu.multiplier,
+            //                 refillMonths : ''
+            //             }
+            //         }
+            //         this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario].puNode = puNode;
+            //         console.log("final node data---",this.state.currentItemConfig.context.payload)
+            //     }
+            // }
         });
 
     }
@@ -4777,8 +4800,6 @@ export default class BuildTree extends Component {
     }
     onAddButtonClick(itemConfig) {
         console.log("add button clicked---", itemConfig);
-        // console.log("max node data id---", this.getMaxNodeDataId())
-        // this.setState({ openAddNodeModal: false });
         const { items } = this.state;
         var maxNodeId = items.length > 0 ? Math.max(...items.map(o => o.id)) : 0;
         var nodeId = parseInt(maxNodeId + 1);
@@ -4796,14 +4817,7 @@ export default class BuildTree extends Component {
         (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].month = moment((newItem.payload.nodeDataMap[this.state.selectedScenario])[0].month).startOf('month').format("YYYY-MM-DD")
         if (itemConfig.context.payload.nodeType.id == 4) {
             (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.forecastingUnit.label.label_en = (itemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.forecastingUnit.label.label_en;
-            // (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].puNode = {};
         }
-        // else if (itemConfig.context.payload.nodeType.id == 5) {
-        //     (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode = {};
-        // } else {
-        //     (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode = {};
-        //     (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].puNode = {};
-        // }
         var scenarioList = this.state.scenarioList.filter(x => x.id != this.state.selectedScenario);
         if (scenarioList.length > 0) {
             for (let i = 0; i < scenarioList.length; i++) {
@@ -5071,7 +5085,6 @@ export default class BuildTree extends Component {
         var findNodeIndex = nodes.findIndex(n => n.id == currentItemConfig.context.id);
         console.log("findNodeIndex---", findNodeIndex);
         nodes[findNodeIndex] = currentItemConfig.context;
-        // nodes[findNodeIndex].valueType = currentItemConfig.valueType;
         console.log("nodes---", nodes);
         this.setState({
             items: nodes
@@ -6364,7 +6377,7 @@ export default class BuildTree extends Component {
                             </Picker>
                         </FormGroup>
 
-                        <div className="col-md-12">{this.state.modelingJexcelLoader}
+                        <div className="col-md-12">
                             {this.state.showModelingJexcelNumber &&
                                 <> <div className="calculatorimg">
                                     <div id="modelingJexcel" className={"RowClickable ScalingTable"} style={{ display: this.state.modelingJexcelLoader ? "none" : "block" }}>
@@ -7210,9 +7223,11 @@ export default class BuildTree extends Component {
                                     },
                                     puNode: {
                                         planningUnit: {
+                                            id: '',
                                             unit: {
 
-                                            }
+                                            },
+                                            multiplier: ''
                                         },
                                         refillMonths: ''
                                     }
@@ -7258,9 +7273,11 @@ export default class BuildTree extends Component {
                                         },
                                         puNode: {
                                             planningUnit: {
+                                                id: '',
                                                 unit: {
 
-                                                }
+                                                },
+                                                multiplier: ''
                                             },
                                             refillMonths: ''
                                         }
@@ -7492,7 +7509,7 @@ export default class BuildTree extends Component {
                                                     </FormGroup>
                                                     <FormGroup className="col-md-3 pl-lg-0">
 
-                                                        <Label htmlFor="languageId">{i18n.t('static.whatIf.scenario')}<span class="red Reqasterisk">*</span></Label>
+                                                        <Label htmlFor="languageId">{i18n.t('static.whatIf.scenario')}</Label>
                                                         <InputGroup>
                                                             {/* <InputGroupAddon addonType="append">
                                                                         <InputGroupText><i class="fa fa-plus icons" aria-hidden="true" data-toggle="tooltip" data-html="true" data-placement="bottom" onClick={this.showPopUp} title=""></i></InputGroupText>
@@ -7526,7 +7543,7 @@ export default class BuildTree extends Component {
                                                         {/* <FormFeedback>{errors.languageId}</FormFeedback> */}
                                                     </FormGroup>
                                                     <FormGroup className="col-md-3 pl-lg-0">
-                                                        <Label htmlFor="languageId">{i18n.t('static.supplyPlan.date')}<span class="red Reqasterisk">*</span></Label>
+                                                        <Label htmlFor="languageId">{i18n.t('static.supplyPlan.date')}</Label>
                                                         <div className="controls edit">
                                                             <Picker
                                                                 ref={this.pickAMonth3}

@@ -244,8 +244,7 @@ export default class ListTreeComponent extends Component {
                 var myResult = [];
                 myResult = getRequest.result;
                 this.setState({
-                    treeTemplateList: myResult
-                    // .filter(x => x.active == "true")
+                    treeTemplateList: myResult.filter(x => x.active == true)
                 });
                 // for (var i = 0; i < myResult.length; i++) {
                 //     console.log("treeTemplateList--->", myResult[i])

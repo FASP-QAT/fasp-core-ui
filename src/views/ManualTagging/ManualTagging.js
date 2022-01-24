@@ -25,7 +25,7 @@ import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import TextField from '@material-ui/core/TextField';
 import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions.js';
-import {MultiSelect} from 'react-multi-select-component';
+import MultiSelect from 'react-multi-select-component';
 import conversionFormula from '../../assets/img/conversionFormula.png';
 import conversionFormulaExample from '../../assets/img/conversionFormulaExample.png';
 
