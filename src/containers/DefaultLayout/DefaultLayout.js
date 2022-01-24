@@ -1541,13 +1541,13 @@ class DefaultLayout extends Component {
                           {
                             name: 'Import Dataset',
                             url: '/dataset/importDataset',
-                            icon: 'fa fa-download',
+                            icon: 'fa fa-cloud-download',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true) }
                           },
                           {
                             name: 'Export Dataset',
                             url: '/dataset/exportDataset',
-                            icon: 'fa fa-download',
+                            icon: 'fa fa-arrow-circle-o-right',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true) }
                           },
                           {

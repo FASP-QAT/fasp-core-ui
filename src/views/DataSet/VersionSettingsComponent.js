@@ -1024,7 +1024,7 @@ class VersionSettingsComponent extends Component {
                         </Col>
                         {/* <div id="loader" className="center"></div> */}
 
-                        <div className="VersionSettingMarginTop">
+                        <div className="VersionSettingMarginTop consumptionDataEntryTable">
                             <div id="tableDiv" className={"RemoveStriped"} style={{ display: this.state.loading ? "none" : "block" }}>
                             </div>
                         </div>
