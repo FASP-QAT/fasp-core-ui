@@ -2195,8 +2195,7 @@ class ForecastOutput extends Component {
 
                 <Card>
                     <div className="Card-header-reporticon pb-2">
-                        {checkOnline === 'Online' &&
-                            this.state.consumptionData.length > 0 &&
+                        {this.state.consumptionData.length > 0 &&
                             <div className="card-header-actions">
                                 <a className="card-header-action">
 
@@ -2207,7 +2206,7 @@ class ForecastOutput extends Component {
                                 <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
                             </div>
                         }
-                        {checkOnline === 'Offline' &&
+                        {/* {checkOnline === 'Offline' &&
                             this.state.offlineConsumptionList.length > 0 &&
                             <div className="card-header-actions">
                                 <a className="card-header-action">
@@ -2217,7 +2216,7 @@ class ForecastOutput extends Component {
                                 </a>
                                 <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
                             </div>
-                        }
+                        } */}
                     </div>
                     <div className="Card-header-reporticon ">
                         <div className="card-header-actions BacktoLink col-md-12 pl-lg-0 pr-lg-0 pt-lg-2">

@@ -1301,6 +1301,11 @@ class AuthenticationService {
 
                     case "/planningUnitSetting/listPlanningUnitSetting":
                     case "/planningUnitSetting/listPlanningUnitSetting/:color/:message":
+                        if (bfunction.includes("ROLE_BF_LIST_PLANNING_UNIT_SETTING")) {
+                            return true;
+                        }
+                        break;
+
                     case "/equivalancyUnit/listEquivalancyUnit":
                     case "/equivalancyUnit/listEquivalancyUnit/:color/:message":
                         if (bfunction.includes("ROLE_BF_LIST_EQUIVALENCY_UNIT_MAPPING")) {
@@ -1353,8 +1358,8 @@ class AuthenticationService {
                         break;
                     case "/dataset/listTree":
                     case "/dataset/loadDeleteDataSet":
-                    case "/dataset/exportDataset":    
-                    case "/dataset/importDataset":    
+                    case "/dataset/exportDataset":
+                    case "/dataset/importDataset":
                     case "/dataset/loadDeleteDataSet/:message":
                     case "/dataSet/buildTree/tree/:treeId/:programId":
                     case "/dataSet/buildTree/tree/:treeId/:programId/:scenarioId":
@@ -1395,10 +1400,20 @@ class AuthenticationService {
                         }
                         break;
 
+                    case "/forecastReport/forecastOutput":
+                        if (bfunction.includes("ROLE_BF_LIST_MONTHLY_FORECAST")) {
+                            return true;
+                        }
+                        break;
+
+                    case "/forecastReport/forecastSummary":
+                        if (bfunction.includes("ROLE_BF_LIST_FORECAST_SUMMARY")) {
+                            return true;
+                        }
+                        break;
+
                     case "/forecastReport/consumptionForecastError":
                     case "/forecastReport/compareScenario":
-                    case "/forecastReport/forecastSummary":
-                    case "/forecastReport/forecastOutput":
                         return true;
 
                     default:

@@ -1530,7 +1530,7 @@ class DefaultLayout extends Component {
                             name: i18n.t('static.updatePlanningUnit.updatePlanningUnit'),
                             url: '/planningUnitSetting/listPlanningUnitSetting',
                             icon: 'fa fa-cog',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true) }
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_PLANNING_UNIT_SETTING') && this.state.activeTab == 1 ? false : true) }
                           },
                           {
                             name: i18n.t('static.common.loadDeleteDataSet'),
@@ -1690,13 +1690,13 @@ class DefaultLayout extends Component {
                             name: i18n.t('static.MonthlyForecast.MonthlyForecast'),
                             url: '/forecastReport/forecastOutput',
                             icon: 'fa fa-bar-chart',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true) }
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_MONTHLY_FORECAST') && this.state.activeTab == 1 ? false : true) }
                           },
                           {
                             name: i18n.t('static.ForecastSummary.ForecastSummary'),
                             url: '/forecastReport/forecastSummary',
                             icon: 'fa fa-pie-chart',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true) }
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_FORECAST_SUMMARY') && this.state.activeTab == 1 ? false : true) }
                           },
                           {
                             name: i18n.t('static.dashboard.Versioncomarition'),
@@ -2785,6 +2785,59 @@ class DefaultLayout extends Component {
                           //   icon: 'fa fa-list',
                           //   attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN') ? false : true) }
                           // }
+                        ]
+                      },
+
+                      {
+                        name: i18n.t('static.ForecastAnalysisOutput.ForecastAnalysisOutput'),
+                        icon: 'fa fa-list',
+                        // attributes: {
+                        // hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true)
+                        // },
+                        attributes: {
+                          hidden: ((((this.state.businessFunctions.includes('ROLE_BF_COMPARE_AND_SELECT')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_MONTHLY_FORECAST')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_FORECAST_SUMMARY'))   ) && this.state.activeTab == 1) ? false : true)
+                        },
+                        children: [
+                          // {
+                          //   name: i18n.t('static.dashboard.compareVersion'),
+                          //   url: '/report/compareVersion',
+                          //   icon: 'fa fa-th',
+                          //   // attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true) }
+                          //   attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_COMPARE_VERSION') && this.state.activeTab == 1 ? false : true) }
+                          // },
+                          // {
+                          //   name: i18n.t('static.dashboard.compareAndSelect'),
+                          //   url: '/report/compareAndSelectScenario',
+                          //   icon: 'fa fa-line-chart',
+                          //   attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_COMPARE_AND_SELECT') && this.state.activeTab == 1 ? false : true) }
+                          //   // attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true) }
+                          // },
+                          
+                          {
+                            name: i18n.t('static.MonthlyForecast.MonthlyForecast'),
+                            url: '/forecastReport/forecastOutput',
+                            icon: 'fa fa-bar-chart',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_MONTHLY_FORECAST') && this.state.activeTab == 1 ? false : true) }
+                          },
+                          {
+                            name: i18n.t('static.ForecastSummary.ForecastSummary'),
+                            url: '/forecastReport/forecastSummary',
+                            icon: 'fa fa-pie-chart',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_FORECAST_SUMMARY') && this.state.activeTab == 1 ? false : true) }
+                          },
+                          // {
+                          //   name: i18n.t('static.dashboard.Versioncomarition'),
+                          //   url: '/report/compareVersion',
+                          //   icon: 'fa fa-files-o',
+                          //   // attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true) }
+                          //   attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_COMPARE_VERSION') && this.state.activeTab == 1 ? false : true) }
+                          // },
+                          // {
+                          //   name: 'Consumption Forecast Error',
+                          //   url: '/forecastReport/consumptionForecastError',
+                          //   icon: 'fa fa-signal',
+                          //   attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true) }
+                          // },
                         ]
                       },
 
