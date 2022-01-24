@@ -15,6 +15,7 @@ import 'react-select/dist/react-select.min.css';
 import AuthenticationService from "../Common/AuthenticationService.js";
 import moment from "moment"
 import jexcel from 'jexcel-pro';
+import csvicon from '../../assets/img/csv.png';
 import { JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants.js';
 import { jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
 import NumberFormat from 'react-number-format';
@@ -475,12 +476,12 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
 
 
   interpolationMissingActualConsumption() {
-    
+    var notes = "";
     var monthArray = this.state.monthArray;
     var regionList = this.state.regionList;
     var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
     var curUser = AuthenticationService.getLoggedInUserId();
-   
+
     var consumptionUnit = this.state.selectedConsumptionUnitObject;
     if (this.state.selectedConsumptionUnitId == 0) {
       var json = this.state.smallTableEl.getJson(null, false);
@@ -543,9 +544,9 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       var daysOfStockOutCount = 4;
       for (var r = 0; r < regionList.length; r++) {
         var index = -1;
-     //   index = fullConsumptionList.findIndex(c => c.planningUnit.id == consumptionUnit.planningUnit.id && c.region.id == regionList[r].regionId && moment(c.month).format("YYYY-MM") == moment(monthArray[i].date).format("YYYY-MM"));
-       // index = fullConsumptionList.findIndex(con =>  con.region.id == regionList[r].regionId && moment(con.month).format("YYYY-MM") == moment(monthArray[i].date).format("YYYY-MM"));
-                  
+        //   index = fullConsumptionList.findIndex(c => c.planningUnit.id == consumptionUnit.planningUnit.id && c.region.id == regionList[r].regionId && moment(c.month).format("YYYY-MM") == moment(monthArray[i].date).format("YYYY-MM"));
+        // index = fullConsumptionList.findIndex(con =>  con.region.id == regionList[r].regionId && moment(con.month).format("YYYY-MM") == moment(monthArray[i].date).format("YYYY-MM"));
+
         if (columnData[actualConsumptionCount] > 0) {
           if (index != -1) {
             fullConsumptionList[index].actualConsumption = columnData[actualConsumptionCount];
@@ -585,54 +586,56 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       for (var j = 0; j < monthArray.length; j++) {
         var consumptionData = fullConsumptionList.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArray[j].date).format("YYYY-MM") && c.planningUnit.id == consumptionUnit.planningUnit.id && c.region.id == regionList[r].regionId && c.amount > 0);
         if (consumptionData.length == 0) {
-          var startValList = fullConsumptionList.filter(c => moment(c.month).format("YYYY-MM") < moment(monthArray[j].date).format("YYYY-MM") && c.planningUnit.id == consumptionUnit.planningUnit.id  && c.region.id == regionList[r].regionId && c.amount > 0)
+          var startValList = fullConsumptionList.filter(c => moment(c.month).format("YYYY-MM") < moment(monthArray[j].date).format("YYYY-MM") && c.planningUnit.id == consumptionUnit.planningUnit.id && c.region.id == regionList[r].regionId && c.amount > 0)
             .sort(function (a, b) {
               return new Date(a.month) - new Date(b.month);
             });
-            var endValList = fullConsumptionList.filter(c => moment(c.month).format("YYYY-MM") > moment(monthArray[j].date).format("YYYY-MM") && c.planningUnit.id == consumptionUnit.planningUnit.id && c.region.id == regionList[r].regionId && c.amount > 0)
+          var endValList = fullConsumptionList.filter(c => moment(c.month).format("YYYY-MM") > moment(monthArray[j].date).format("YYYY-MM") && c.planningUnit.id == consumptionUnit.planningUnit.id && c.region.id == regionList[r].regionId && c.amount > 0)
             .sort(function (a, b) {
               return new Date(a.month) - new Date(b.month);
             });
-            if(startValList.length>0 && endValList.length >0){
-          var startVal = startValList[startValList.length - 1].amount;
-          var startMonthVal = startValList[startValList.length - 1].month;
-          var endVal = endValList[0].amount;
-          var endMonthVal = endValList[0].month;
-
-          //y=y1+(x-x1)*(y2-y1)/(x2-x1);
-        const monthDifference =  moment(new Date(monthArray[j].date)).diff(new Date(startMonthVal), 'months', true);
-        const monthDiff =  moment(new Date(endMonthVal)).diff(new Date(startMonthVal), 'months', true);
-        var missingActualConsumption = Number(startVal) + (monthDifference * ((Number(endVal) - Number(startVal)) / monthDiff));
-          var json = {
-            amount:missingActualConsumption.toFixed(2),
-            planningUnit: {
-              id: consumptionUnit.planningUnit.id,
-              label: consumptionUnit.planningUnit.label
-            },
-            createdBy: {
-              userId: curUser
-            },
-            createdDate: curDate,
-            daysOfStockOut: columnData[daysOfStockOutCount],
-            exculde: false,
-            forecastConsumptionId: 0,
-            month: moment(monthArray[j].date).format("YYYY-MM-DD"),
-            region: {
-              id: regionList[r].regionId,
-              label: regionList[r].label
-            },
-            reportingRate: columnData[reportingRateCount]
+          if (startValList.length > 0 && endValList.length > 0) {
+            var startVal = startValList[startValList.length - 1].amount;
+            var startMonthVal = startValList[startValList.length - 1].month;
+            var endVal = endValList[0].amount;
+            var endMonthVal = endValList[0].month;
+            notes += regionList[r].label + " " + moment(monthArray[j].date).format("YYYY-MM");
+            //y=y1+(x-x1)*(y2-y1)/(x2-x1);
+            const monthDifference = moment(new Date(monthArray[j].date)).diff(new Date(startMonthVal), 'months', true);
+            const monthDiff = moment(new Date(endMonthVal)).diff(new Date(startMonthVal), 'months', true);
+            var missingActualConsumption = Number(startVal) + (monthDifference * ((Number(endVal) - Number(startVal)) / monthDiff));
+            var json = {
+              amount: missingActualConsumption.toFixed(2),
+              planningUnit: {
+                id: consumptionUnit.planningUnit.id,
+                label: consumptionUnit.planningUnit.label
+              },
+              createdBy: {
+                userId: curUser
+              },
+              createdDate: curDate,
+              daysOfStockOut: columnData[daysOfStockOutCount],
+              exculde: false,
+              forecastConsumptionId: 0,
+              month: moment(monthArray[j].date).format("YYYY-MM-DD"),
+              region: {
+                id: regionList[r].regionId,
+                label: regionList[r].label
+              },
+              reportingRate: columnData[reportingRateCount]
+            }
+            fullConsumptionList.push(json);
           }
-          fullConsumptionList.push(json);
-        }}
+        }
       }
     }
-    document.getElementById("consumptionNotes").value= document.getElementById("consumptionNotes").value.concat("Interpolated value")
-    
+    // document.getElementById("consumptionNotes").value = document.getElementById("consumptionNotes").value.concat(notes).concat("filled in with interpolated");
+    document.getElementById("consumptionNotes").value = notes;
+
     this.setState({
-      consumptionList:fullConsumptionList
+      consumptionList: fullConsumptionList
     })
-    this.buildDataJexcel(this.state.selectedConsumptionUnitId);    
+    this.buildDataJexcel(this.state.selectedConsumptionUnitId);
   }
 
   saveConsumptionList() {
@@ -863,6 +866,140 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
   componentDidMount() {
     this.getDatasetList();
   }
+  addDoubleQuoteToRowContent = (arr) => {
+    return arr.map(ele => '"' + ele + '"')
+  }
+
+  exportCSV() {
+    var csvRow = [];
+    csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + document.getElementById("datasetId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+    csvRow.push('')
+    csvRow.push('"' + (i18n.t('static.dashboard.planningunitheader') + ' : ' + document.getElementById("planningUnitId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+    csvRow.push('')
+    csvRow.push('')
+    var columns = [];
+    columns.push(i18n.t('static.dashboard.Productmenu'));
+    this.state.monthArray.map(item => (
+      columns.push(moment(item.date).format(DATE_FORMAT_CAP_WITHOUT_DATE))
+    ))
+    columns.push(i18n.t('static.supplyPlan.total'));
+    columns.push(i18n.t('static.dataentry.regionalPer'));
+
+    let headers = [];
+    columns.map((item, idx) => { headers[idx] = (item).replaceAll(' ', '%20') });
+    var A = [this.addDoubleQuoteToRowContent(headers)];
+
+    this.state.planningUnitList.map(item => {
+      var total = 0;
+      var totalPU = 0;
+      var datacsv = [];
+      datacsv.push(item.consumptionDataType == 1 ? getLabelText(item.planningUnit.forecastingUnit.label, this.state.lang) : item.consumptionDataType == 2 ? getLabelText(item.planningUnit.label, this.state.lang) : getLabelText(item.otherUnit.label, this.state.lang));
+      this.state.monthArray.map((item1, count) => {
+        var data = this.state.planningUnitTotalList.filter(c => c.planningUnitId == item.planningUnit.id && moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM"));
+        total += Number(data[0].qty);
+        totalPU += Number(data[0].qtyInPU);
+        datacsv.push(this.state.showInPlanningUnit ? data[0].qtyInPU : data[0].qty)
+      })
+      datacsv.push(this.state.showInPlanningUnit ? Math.round(totalPU) : Math.round(total));
+      datacsv.push("100 %");
+
+      A.push(this.addDoubleQuoteToRowContent(datacsv))
+    });
+
+    for (var i = 0; i < A.length; i++) {
+      csvRow.push(A[i].join(","))
+    }
+
+    csvRow.push('')
+    csvRow.push('')
+    headers = [];
+    var columns = [];
+    columns.push(i18n.t('static.inventoryDate.inventoryReport'))
+    this.state.monthArray.map(item => (
+      columns.push(moment(item.date).format(DATE_FORMAT_CAP_WITHOUT_DATE))
+    ))
+    columns.push('')
+    columns.map((item, idx) => { headers[idx] = (item).replaceAll(' ', '%20') });
+    var C = []
+    C.push([this.addDoubleQuoteToRowContent(headers)]);
+    var B = [];
+    var monthArray = this.state.monthArray;
+    var regionList = this.state.regionList;
+    var consumptionList = this.state.consumptionList;
+    var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF', 'AG', 'AH', 'AI', 'AJ', 'AK', 'AL', 'AM', 'AN']
+    var dataArray = [];
+    // B.push(i18n.t('static.program.noOfDaysInMonth').replaceAll(' ', '%20') + '"')
+    for (var j = 0; j < monthArray.length; j++) {
+      B.push(monthArray[j].noOfDays)
+    }
+    C.push(this.addDoubleQuoteToRowContent(B));
+
+    for (var r = 0; r < regionList.length; r++) {
+      B = [];
+      B.push(getLabelText(regionList[r].label))
+      for (var j = 0; j < monthArray.length; j++) {
+        B.push("")
+      }
+      C.push(this.addDoubleQuoteToRowContent(B));
+      B = [];
+      B.push(i18n.t('static.supplyPlan.actualConsumption'))
+      for (var j = 0; j < monthArray.length; j++) {
+        var consumptionData = consumptionList.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArray[j].date).format("YYYY-MM") && c.region.id == regionList[r].regionId);
+        B.push(consumptionData.length > 0 ? consumptionData[0].amount : "")
+      }
+      C.push(this.addDoubleQuoteToRowContent(B));
+      B = [];
+      B.push(i18n.t('static.dataentry.reportingRate'))
+      for (var j = 0; j < monthArray.length; j++) {
+        var consumptionData = consumptionList.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArray[j].date).format("YYYY-MM") && c.region.id == regionList[r].regionId);
+        B.push(consumptionData.length > 0 && consumptionData[0].reportingRate > 0 ? consumptionData[0].reportingRate : 100)
+      }
+      C.push(this.addDoubleQuoteToRowContent(B));
+      B = [];
+      B.push(i18n.t('static.dataentry.stockedOut'))
+      for (var j = 0; j < monthArray.length; j++) {
+        var consumptionData = consumptionList.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArray[j].date).format("YYYY-MM") && c.region.id == regionList[r].regionId);
+        B.push(consumptionData.length > 0 && consumptionData[0].daysOfStockOut > 0 ? consumptionData[0].daysOfStockOut : 0)
+      }
+      C.push(this.addDoubleQuoteToRowContent(B));
+      B = [];
+      B.push(i18n.t('static.dataentry.stockedOutPer'))
+      for (var j = 0; j < monthArray.length; j++) {
+        // B.push(`=ROUND(${colArr[j + 1]}${parseInt(dataArray.length)}/${colArr[j + 1] + "1"}*100,0)`)
+      }
+      C.push(this.addDoubleQuoteToRowContent(B));
+      B = [];
+
+      B.push(i18n.t('static.dataentry.adjustedConsumption'))
+      for (var j = 0; j < monthArray.length; j++) {
+        // B.push(`=ROUND((${colArr[j + 1]}${parseInt(dataArray.length - 3)}/${colArr[j + 1]}${parseInt(dataArray.length - 2)}/(1-(${colArr[j + 1]}${parseInt(dataArray.length - 1)}/${colArr[j + 1] + "1"})))*100,0)`)
+      }
+      C.push(this.addDoubleQuoteToRowContent(B));
+      B = [];
+
+      B.push(i18n.t('static.dataentry.convertedToPlanningUnit'))
+      for (var j = 0; j < monthArray.length; j++) {
+        // B.push(`=ROUND(${colArr[j + 1]}${parseInt(dataArray.length)}/${multiplier},0)`)
+      }
+      C.push(this.addDoubleQuoteToRowContent(B));
+      B = [];
+    }
+
+    for (var i = 0; i < C.length; i++) {
+      csvRow.push(C[i].join(","))
+    }
+
+
+
+    var csvString = csvRow.join("%0A")
+    var a = document.createElement("a")
+    a.href = 'data:attachment/csv,' + csvString
+    a.target = "_Blank"
+    a.download = i18n.t('static.dashboard.dataEntryAndAdjustment') + ".csv"
+    document.body.appendChild(a)
+    a.click()
+  }
+
 
   getDatasetList() {
     this.setState({
@@ -1321,6 +1458,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                                 <span style={{ cursor: 'pointer' }} onClick={() => { this.toggleShowGuidance() }}><small className="supplyplanformulas">{i18n.t('static.common.showGuidance')}</small></span>
                             </a>
                             <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} /> */}
+              <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
             </div>
           </div>
           <div className="Card-header-reporticon pb-0">
@@ -1404,7 +1542,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                                     totalPU += Number(data[0].qtyInPU);
                                     return (<td onClick={() => { this.buildDataJexcel(item.planningUnit.id) }}><NumberFormat displayType={'text'} thousandSeparator={true} value={this.state.showInPlanningUnit ? data[0].qtyInPU : data[0].qty} /></td>)
                                   })}
-                                  <td>{this.state.showInPlanningUnit ? Math.round(totalPU) : Math.round(total)}</td>
+                                  <td><NumberFormat displayType={'text'} thousandSeparator={true} value={this.state.showInPlanningUnit ? Math.round(totalPU) : Math.round(total)} /></td>
                                   <td>100%</td>
                                 </tr>
                                 {this.state.regionList.map(r => {
@@ -1473,7 +1611,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                           </InputGroup>
                         </div>
                         <Button type="button" id="formSubmitButton" size="md" color="success" className="float-right mr-1" onClick={() => this.interpolationMissingActualConsumption()}>
-                        <i className="fa fa-check"></i>{i18n.t('static.pipeline.interpolateMissingValues')}</Button>
+                          <i className="fa fa-check"></i>{i18n.t('static.pipeline.interpolateMissingValues')}</Button>
                       </FormGroup>
                     </div>
                     {/* <div className="table-scroll">
