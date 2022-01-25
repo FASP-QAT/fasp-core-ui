@@ -1448,25 +1448,27 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         <Card>
           <div className="card-header-actions">
             <div className="Card-header-reporticon">
-              <span className="compareAndSelect-larrow"> <i className="cui-arrow-left icons " > </i></span>
-              <span className="compareAndSelect-rarrow"> <i className="cui-arrow-right icons " > </i></span>
-              <span className="compareAndSelect-larrowText"> {i18n.t('static.common.backTo')} <a href="/#/importFromQATSupplyPlan/listImportFromQATSupplyPlan">{i18n.t('static.importFromQATSupplyPlan.importFromQATSupplyPlan')}</a></span>
-              <span className="compareAndSelect-rarrowText"> {i18n.t('static.common.continueTo')} <a href="/#/extrapolation/extrapolateData">{i18n.t('static.dashboard.extrapolation')}</a></span><br />
+              <span className="compareAndSelect-larrow"> <i className="cui-arrow-left icons " > </i></span> 
+              <span className="compareAndSelect-rarrow"> <i className="cui-arrow-right icons " > </i></span> 
+              <span className="compareAndSelect-larrowText"> {i18n.t('static.common.backTo')} <a href="/#/importFromQATSupplyPlan/listImportFromQATSupplyPlan" className="supplyplanformulas">{i18n.t('static.importFromQATSupplyPlan.importFromQATSupplyPlan')}</a></span>
+              <span className="compareAndSelect-rarrowText"> {i18n.t('static.common.continueTo')} <a href="/#/extrapolation/extrapolateData" className="supplyplanformulas">{i18n.t('static.dashboard.extrapolation')}</a></span><br />
               {/* <strong>{i18n.t('static.dashboard.supplyPlan')}</strong> */}
 
               {/* <a className="card-header-action">
                                 <span style={{ cursor: 'pointer' }} onClick={() => { this.toggleShowGuidance() }}><small className="supplyplanformulas">{i18n.t('static.common.showGuidance')}</small></span>
                             </a>
                             <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} /> */}
-              <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
+              {/* <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} /> */}
             </div>
           </div>
-          <div className="Card-header-reporticon pb-0">
+          <div className="Card-header-addicon pb-0">
             <div className="card-header-actions">
+            <img style={{ height: '23px', width: '23px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
               <a className="card-header-action">
                 <span style={{ cursor: 'pointer' }} onClick={() => { this.toggleShowGuidance() }}><small className="supplyplanformulas">{i18n.t('static.common.showGuidance')}</small></span>
               </a>
-              {this.state.datasetId != "" && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} ><i className="fa fa-plus-square" onClick={() => this.buildDataJexcel(0)}></i></a>}
+              <span className="card-header-action">
+              {this.state.datasetId != "" && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} ><i className="fa fa-plus-square" style={{fontSize:'20px'}} onClick={() => this.buildDataJexcel(0)}></i></a>}</span>
               {/* <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} /> */}
             </div>
           </div>
@@ -1574,7 +1576,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                     <div className="row">
                       {this.state.showDetailTable &&
                         <>
-                          <FormGroup className="col-md-6">
+                          <FormGroup className="col-md-4">
                             <Label htmlFor="appendedInputButton">{i18n.t('static.dashboard.planningunitheader')}</Label>
                             <div className="controls ">
                               <InputGroup>
@@ -1596,7 +1598,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                               </InputGroup>
                             </div>
                           </FormGroup></>}
-                      <FormGroup className="col-md-6" style={{ display: this.state.showDetailTable ? 'block' : 'none' }}>
+                      <FormGroup className="col-md-4" style={{ display: this.state.showDetailTable ? 'block' : 'none' }}>
                         <Label htmlFor="appendedInputButton">{i18n.t('static.dataentry.consumptionNotes')}</Label>
                         <div className="controls ">
                           <InputGroup>
@@ -1610,6 +1612,8 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                             </Input>
                           </InputGroup>
                         </div>
+                        </FormGroup>
+                        <FormGroup className="col-md-4" style={{paddingTop:'30px',display: this.state.showDetailTable ? 'block' : 'none' }}>
                         <Button type="button" id="formSubmitButton" size="md" color="success" className="float-right mr-1" onClick={() => this.interpolationMissingActualConsumption()}>
                           <i className="fa fa-check"></i>{i18n.t('static.pipeline.interpolateMissingValues')}</Button>
                       </FormGroup>
@@ -1636,7 +1640,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                     {/* </> */}
 
                     <div className="row">
-                      <div className="col-md-12 pl-0 pr-0">
+                      <div className="col-md-12 pl-2 pr-2">
                         <div id="smallTableDiv" className="dataentryTable">
                         </div>
                       </div>
@@ -1644,7 +1648,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                     <br></br>
                     <br></br>
                     <div className="row">
-                      <div className="col-md-12 pl-0 pr-0">
+                      <div className="col-md-12 pl-2 pr-2">
                         <div id="tableDiv" className="leftAlignTable">
                         </div>
                       </div>
