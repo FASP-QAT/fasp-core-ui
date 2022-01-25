@@ -324,8 +324,8 @@ const routes = [
   { path: '/report/compareVersion', exact: true, name: 'static.dashboard.Versioncomarition', component: CompareVersion },
   { path: '/validation/productValidation', exact: true, name: 'static.dashboard.productValidation', component: ProductValidation },
   { path: '/report/compareAndSelectScenario', exact: true, name: 'static.dashboard.compareAndSelect', component: CompareAndSelectScenario },
-  { path: '/dataentry/consumptionDataEntryAndAdjustment', exact: true, name: 'static.dashboard.dataEntryAndAdjustments ', component: ConsumptionDataEntryAndAdjustment },
-  { path: '/dataentry/consumptionDataEntryAndAdjustment/:planningUnitId', exact: true, name: 'static.dashboard.dataEntryAndAdjustments ', component: ConsumptionDataEntryAndAdjustment },
+  { path: '/dataentry/consumptionDataEntryAndAdjustment', exact: true, name: 'static.dashboard.dataEntryAndAdjustments', component: ConsumptionDataEntryAndAdjustment },
+  { path: '/dataentry/consumptionDataEntryAndAdjustment/:planningUnitId', exact: true, name: 'static.dashboard.dataEntryAndAdjustments', component: ConsumptionDataEntryAndAdjustment },
   { path: '/dataset/createTreeTemplate/:templateId', name: 'Create Tree Template', component: CreateTreeTemplate },
   { path: '/dataSet/buildTree/', exact: true, name: 'static.common.managetree', component: BuildTree },
   { path: '/dataSet/buildTree/tree/:treeId/:programId', exact: true, name: 'static.common.managetree', component: BuildTree },
@@ -1541,13 +1541,13 @@ class DefaultLayout extends Component {
                           {
                             name: 'Import Dataset',
                             url: '/dataset/importDataset',
-                            icon: 'fa fa-download',
+                            icon: 'fa fa-cloud-download',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true) }
                           },
                           {
                             name: 'Export Dataset',
                             url: '/dataset/exportDataset',
-                            icon: 'fa fa-download',
+                            icon: 'fa fa-arrow-circle-o-right',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true) }
                           },
                           {

@@ -1641,10 +1641,15 @@ class EquivalancyUnit extends Component {
                 console.log("8 map---" + map1.get("8"))
                 if (parseInt(map1.get("8")) === 1) {
                     let healthAreaSplit = elInstance.getValueFromCoords(1, i).split(';');
+                    console.log("healthAreaSplit--------->1", healthAreaSplit);
                     let healthAreaTempList = []
-                    for (let k = 0; k < healthAreaSplit.length - 1; k++) {
-                        healthAreaTempList.push({ id: healthAreaSplit[k] });
+                    for (let k = 0; k < healthAreaSplit.length; k++) {
+                        // healthAreaTempList.push({ id: healthAreaSplit[k] });
+                        if (!isNaN(parseInt(healthAreaSplit[k]))) {
+                            healthAreaTempList.push({ id: healthAreaSplit[k] });
+                        }
                     }
+                    console.log("healthAreaSplit--------->2", healthAreaTempList);
                     let json = {
 
                         equivalencyUnitId: parseInt(map1.get("0")),

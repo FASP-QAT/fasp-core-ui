@@ -113,15 +113,15 @@ const validationSchemaNodeData = function (values) {
                         return true;
                     }
                 }),
-        tracerCategoryId: Yup.string()
-            .test('tracerCategoryId', i18n.t('static.validation.fieldRequired'),
-                function (value) {
-                    if (parseInt(document.getElementById("nodeTypeId").value) == 4 && document.getElementById("tracerCategoryId").value == "") {
-                        return false;
-                    } else {
-                        return true;
-                    }
-                }),
+        // tracerCategoryId: Yup.string()
+        //     .test('tracerCategoryId', i18n.t('static.validation.fieldRequired'),
+        //         function (value) {
+        //             if (parseInt(document.getElementById("nodeTypeId").value) == 4 && document.getElementById("tracerCategoryId").value == "") {
+        //                 return false;
+        //             } else {
+        //                 return true;
+        //             }
+        //         }),
         usageTypeIdFU: Yup.string()
             .test('usageTypeIdFU', i18n.t('static.validation.fieldRequired'),
                 function (value) {
@@ -599,6 +599,7 @@ export default class CreateTreeTemplate extends Component {
     }
 
     hideSecondComponent() {
+        document.getElementById('div2').style.display = 'block';
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 8000);
@@ -703,6 +704,9 @@ export default class CreateTreeTemplate extends Component {
                         this.buildMomJexcel();
                     });
                 } else {
+                    console.log("id to filter---", this.state.currentItemConfig.context.id)
+                    console.log("id to filter list---", this.state.nodeDataMomList)
+                    console.log("id to filter filter list---", this.state.nodeDataMomList.filter(x => x.nodeId == this.state.currentItemConfig.context.id)[0].nodeDataMomList)
                     this.setState({ momListPer: this.state.nodeDataMomList.filter(x => x.nodeId == this.state.currentItemConfig.context.id)[0].nodeDataMomList }, () => {
                         console.log("going to build mom jexcel percent");
                         this.buildMomJexcelPercent();
@@ -1213,15 +1217,19 @@ export default class CreateTreeTemplate extends Component {
                     if (type == 1) {
                         if (itemConfig.payload.nodeType.id == 4) {
                             var fuPerMonth;
+                            var usageFrequency;
+                            var convertToMonth;
                             var noOfForecastingUnitsPerPerson = (itemConfig.payload.nodeDataMap[0])[0].fuNode.noOfForecastingUnitsPerPerson;
-                            var usageFrequency = (itemConfig.payload.nodeDataMap[0])[0].fuNode.usageFrequency;
-                            var convertToMonth = (this.state.usagePeriodList.filter(c => c.usagePeriodId == (itemConfig.payload.nodeDataMap[0])[0].fuNode.usagePeriod.usagePeriodId))[0].convertToMonth;
+                            if ((itemConfig.payload.nodeDataMap[0])[0].fuNode.usageType.id == 2 || ((itemConfig.payload.nodeDataMap[0])[0].fuNode.oneTimeUsage != "true" && (itemConfig.payload.nodeDataMap[0])[0].fuNode.oneTimeUsage != true)) {
+                                usageFrequency = (itemConfig.payload.nodeDataMap[0])[0].fuNode.usageFrequency;
+                                convertToMonth = (this.state.usagePeriodList.filter(c => c.usagePeriodId == (itemConfig.payload.nodeDataMap[0])[0].fuNode.usagePeriod.usagePeriodId))[0].convertToMonth;
+                            }
                             if ((itemConfig.payload.nodeDataMap[0])[0].fuNode.usageType.id == 2) {
                                 fuPerMonth = ((noOfForecastingUnitsPerPerson / usageFrequency) * convertToMonth);
                                 totalValue = fuPerMonth * (itemConfig.payload.nodeDataMap[0])[0].calculatedDataValue;
                             } else {
                                 var noOfPersons = (itemConfig.payload.nodeDataMap[0])[0].fuNode.noOfPersons;
-                                if ((itemConfig.payload.nodeDataMap[0])[0].fuNode.oneTimeUsage == "true") {
+                                if ((itemConfig.payload.nodeDataMap[0])[0].fuNode.oneTimeUsage == "true" || (itemConfig.payload.nodeDataMap[0])[0].fuNode.oneTimeUsage == true) {
                                     fuPerMonth = noOfForecastingUnitsPerPerson / noOfPersons;
                                     totalValue = fuPerMonth * (itemConfig.payload.nodeDataMap[0])[0].calculatedDataValue;
                                 } else {
@@ -1230,7 +1238,7 @@ export default class CreateTreeTemplate extends Component {
                                 }
                             }
                             (itemConfig.payload.nodeDataMap[0])[0].totalValue = totalValue;
-                            return addCommas((itemConfig.payload.nodeDataMap[0])[0].dataValue) + "% of parent, " + addCommas(fuPerMonth) + "/" + 'Month';
+                            return addCommas((itemConfig.payload.nodeDataMap[0])[0].dataValue) + "% of parent, " + addCommas(Math.round(fuPerMonth)) + "/" + 'Month';
                         } else if (itemConfig.payload.nodeType.id == 5) {
                             return addCommas((itemConfig.payload.nodeDataMap[0])[0].dataValue) + "% of parent, conversion = " + (itemConfig.payload.nodeDataMap[0])[0].puNode.planningUnit.multiplier;
                         } else {
@@ -1306,6 +1314,7 @@ export default class CreateTreeTemplate extends Component {
     buildMomJexcelPercent() {
         var momList = this.state.momListPer;
         var momListParent = this.state.momListPerParent;
+        console.log("momListParent---", momListParent)
         var dataArray = [];
         let count = 0;
         for (var j = 0; j < momList.length; j++) {
@@ -1341,7 +1350,7 @@ export default class CreateTreeTemplate extends Component {
                     options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker' }, width: 100
                 },
                 {
-                    title: i18n.t('static.tree.%of') + getLabelText(this.state.currentItemConfig.parentItem.payload.label, this.state.lang) + i18n.t('static.tree.monthStart'),
+                    title: i18n.t('static.tree.%of') + " " + getLabelText(this.state.currentItemConfig.parentItem.payload.label, this.state.lang) + " " + i18n.t('static.tree.monthStart'),
                     type: 'numeric',
                     mask: '#,##.00', decimal: '.',
                     readOnly: true
@@ -1360,20 +1369,20 @@ export default class CreateTreeTemplate extends Component {
 
                 },
                 {
-                    title: i18n.t('static.tree.%of') + getLabelText(this.state.currentItemConfig.parentItem.payload.label, this.state.lang) + i18n.t('static.tree.MonthEnd'),
+                    title: i18n.t('static.tree.%of') + " " + getLabelText(this.state.currentItemConfig.parentItem.payload.label, this.state.lang) + " " + i18n.t('static.tree.MonthEnd'),
                     type: 'numeric',
                     mask: '#,##.00', decimal: '.',
                     readOnly: true
                 },
                 {
-                    title: getLabelText(this.state.currentItemConfig.parentItem.payload.label, this.state.lang) + i18n.t('static.tree.MonthEnd'),
+                    title: getLabelText(this.state.currentItemConfig.parentItem.payload.label, this.state.lang) + " " + i18n.t('static.tree.MonthEnd'),
                     type: 'numeric',
                     mask: '#,##.00', decimal: '.',
                     readOnly: true
 
                 },
                 {
-                    title: getLabelText(this.state.currentItemConfig.context.payload.label, this.state.lang) + i18n.t('static.tree.MonthEnd'),
+                    title: getLabelText(this.state.currentItemConfig.context.payload.label, this.state.lang) + " " + i18n.t('static.tree.MonthEnd'),
                     type: 'numeric',
                     mask: '#,##.00', decimal: '.',
                     readOnly: true
@@ -1435,7 +1444,7 @@ export default class CreateTreeTemplate extends Component {
             data[0] = momList[j].month
             data[1] = parseFloat(momList[j].startValue).toFixed(2)
             data[2] = parseFloat(momList[j].difference).toFixed(2)
-            data[3] = parseFloat(momList[j].endValueWMC).toFixed(2)
+            data[3] = parseFloat(parseFloat(momList[j].startValue) + parseFloat(momList[j].difference)).toFixed(2)
             data[4] = parseFloat(momList[j].seasonalityPerc).toFixed(2)
             data[5] = parseFloat(momList[j].manualChange).toFixed(2)
             data[6] = parseFloat(momList[j].endValue).toFixed(2)
@@ -1949,7 +1958,7 @@ export default class CreateTreeTemplate extends Component {
                 var overrideListArray = [];
                 for (var i = 0; i < json.length; i++) {
                     var map1 = new Map(Object.entries(json[i]));
-                    if (map1.get("3") != '') {
+                    if (map1.get("3") != '' && map1.get("3") != 0.00) {
                         var overrideData = {
                             month: map1.get("0"),
                             seasonalityPerc: 0,
@@ -2436,7 +2445,7 @@ export default class CreateTreeTemplate extends Component {
         // console.log("forecastingUnitId---", forecastingUnitId);
         // var usageTypeId = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageType.id;
         // console.log("usageTypeId---", usageTypeId);
-        UsageTemplateService.getUsageTemplateListForTree((tracerCategoryId != "" ? tracerCategoryId : 0)).then(response => {
+        UsageTemplateService.getUsageTemplateListForTree((tracerCategoryId != "" && tracerCategoryId != null ? tracerCategoryId : 0)).then(response => {
             var listArray = response.data;
             listArray.sort((a, b) => {
                 var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
@@ -2502,10 +2511,11 @@ export default class CreateTreeTemplate extends Component {
         (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usagePeriod.usagePeriodId = usageTemplate.usageFrequencyUsagePeriod != null ? usageTemplate.usageFrequencyUsagePeriod.usagePeriodId : '';
         (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.unit.id = usageTemplate.unit.id;
         (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.id = usageTemplate.forecastingUnit.id;
-        (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.label.label_en = usageTemplate.forecastingUnit.label.label_en;
+        (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.label.label_en = usageTemplate.forecastingUnit.id + "|" + getLabelText(usageTemplate.forecastingUnit.label, this.state.lang);
         (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageType.id = usageTemplate.usageType.id;
+        (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.tracerCategory.id = usageTemplate.tracerCategory.id;
         // for (var i = 0; i < newResult.length; i++) {
-        var autocompleteData = [{ value: usageTemplate.forecastingUnit.id, label: getLabelText(usageTemplate.forecastingUnit.label, this.state.lang) + " [" + usageTemplate.forecastingUnit.id + "]" }]
+        var autocompleteData = [{ value: usageTemplate.forecastingUnit.id, label: usageTemplate.forecastingUnit.id + "|" + getLabelText(usageTemplate.forecastingUnit.label, this.state.lang) }]
         // }
 
 
@@ -2530,6 +2540,8 @@ export default class CreateTreeTemplate extends Component {
         var usagePeriodId;
         var usageTypeId;
         var usageFrequency;
+        var repeatUsagePeriodId;
+        var oneTimeUsage;
         var nodeTypeId = this.state.currentItemConfig.context.payload.nodeType.id;
         if (nodeTypeId == 5) {
             usageTypeId = (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.usageType.id;
@@ -2538,6 +2550,9 @@ export default class CreateTreeTemplate extends Component {
             console.log("usagePeriodId---", usagePeriodId);
             usageFrequency = (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.usageFrequency;
             console.log("usageFrequency---", usageFrequency);
+            if (usageTypeId == 1) {
+                oneTimeUsage = (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.oneTimeUsage;
+            }
         } else {
             usageTypeId = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageType.id;
             console.log("usageTypeId---", usageTypeId);
@@ -2545,6 +2560,9 @@ export default class CreateTreeTemplate extends Component {
             console.log("usagePeriodId---", usagePeriodId);
             usageFrequency = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageFrequency;
             console.log("usageFrequency---", usageFrequency);
+            if (usageTypeId == 1) {
+                oneTimeUsage = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.oneTimeUsage;
+            }
         }
         console.log("usagePeriodId dis---", usagePeriodId);
         var noOfMonthsInUsagePeriod = 0;
@@ -2558,7 +2576,7 @@ export default class CreateTreeTemplate extends Component {
                 var div = (convertToMonth * usageFrequency);
                 console.log("duv---", div);
                 if (div != 0) {
-                    noOfMonthsInUsagePeriod = 1 / (convertToMonth * usageFrequency);
+                    noOfMonthsInUsagePeriod = usageFrequency / convertToMonth;
                     console.log("noOfMonthsInUsagePeriod---", noOfMonthsInUsagePeriod);
                 }
             } else {
@@ -2575,21 +2593,34 @@ export default class CreateTreeTemplate extends Component {
                 noOfMonthsInUsagePeriod = convertToMonth * usageFrequency * noOfFUPatient;
                 console.log("noOfMonthsInUsagePeriod---", noOfMonthsInUsagePeriod);
             }
-            // console.log("convertToMontRepeat>>>", convertToMontRepeat);
-            // console.log(">>>", (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.repeatCount);
-            // console.log(">>>", noOfMonthsInUsagePeriod);
-            var noFURequired = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.repeatCount / (convertToMonth * noOfMonthsInUsagePeriod);
+            if (oneTimeUsage != "true" && oneTimeUsage != true && usageTypeId == 1) {
+                console.log("(this.state.currentItemConfig.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode---", (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode);
+                repeatUsagePeriodId = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.repeatUsagePeriod.usagePeriodId;
+                convertToMonth = (this.state.usagePeriodList.filter(c => c.usagePeriodId == repeatUsagePeriodId))[0].convertToMonth;
+            }
+            // var noFURequired = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.repeatCount / (convertToMonth * noOfMonthsInUsagePeriod);
+            var noFURequired = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.oneTimeUsage != "true" && (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.oneTimeUsage != true ? ((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.repeatCount / convertToMonth) * noOfMonthsInUsagePeriod : noOfFUPatient;
             console.log("noFURequired---", noFURequired);
-            this.setState({
-                noFURequired
-            });
+
+        } else if (usageTypeId == 1 && oneTimeUsage != null && (oneTimeUsage == "true" || oneTimeUsage == true)) {
+            if (this.state.currentItemConfig.context.payload.nodeType.id == 4) {
+                noFURequired = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.noOfForecastingUnitsPerPerson / (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.noOfPersons;
+            } else {
+                console.log("--->>>>>>>>>>>>>>>>>>>>>>>>>>", (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode);
+                noFURequired = (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.noOfForecastingUnitsPerPerson / (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.noOfPersons;
+            }
+            // noOfMonthsInUsagePeriod = noOfFUPatient;
         }
+        this.setState({
+            noFURequired: (noFURequired != "" && noFURequired != 0 ? Math.round(noFURequired) : 0)
+        });
     }
 
     getNoOfMonthsInUsagePeriod() {
         var usagePeriodId;
         var usageTypeId;
         var usageFrequency;
+        var oneTimeUsage;
         var nodeTypeId = this.state.currentItemConfig.context.payload.nodeType.id;
         if (nodeTypeId == 5) {
             usageTypeId = (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.usageType.id;
@@ -2598,6 +2629,9 @@ export default class CreateTreeTemplate extends Component {
             console.log("usagePeriodId---", usagePeriodId);
             usageFrequency = (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.usageFrequency;
             console.log("usageFrequency---", usageFrequency);
+            if(usageTypeId == 1){
+            oneTimeUsage = (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.oneTimeUsage;
+            }
         } else {
             usageTypeId = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageType.id;
             console.log("usageTypeId---", usageTypeId);
@@ -2605,6 +2639,9 @@ export default class CreateTreeTemplate extends Component {
             console.log("usagePeriodId---", usagePeriodId);
             usageFrequency = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageFrequency;
             console.log("usageFrequency---", usageFrequency);
+            if(usageTypeId == 1){
+            oneTimeUsage = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.oneTimeUsage;
+            }
         }
         var noOfMonthsInUsagePeriod = 0;
         if (usagePeriodId != null && usagePeriodId != "") {
@@ -2627,9 +2664,17 @@ export default class CreateTreeTemplate extends Component {
                     noOfFUPatient = (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.noOfForecastingUnitsPerPerson / (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.noOfPersons;
                 }
                 console.log("no of fu patient---", noOfFUPatient);
-                noOfMonthsInUsagePeriod = convertToMonth * usageFrequency * noOfFUPatient;
+                noOfMonthsInUsagePeriod = oneTimeUsage != "true" && oneTimeUsage != true ? convertToMonth * usageFrequency * noOfFUPatient : noOfFUPatient;
                 console.log("noOfMonthsInUsagePeriod---", noOfMonthsInUsagePeriod);
             }
+        } else if (usageTypeId == 1 && oneTimeUsage != null && (oneTimeUsage == "true" || oneTimeUsage == true)) {
+            if (this.state.currentItemConfig.context.payload.nodeType.id == 4) {
+                noOfFUPatient = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.noOfForecastingUnitsPerPerson / (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.noOfPersons;
+            } else {
+                console.log("--->>>>>>>>>>>>>>>>>>>>>>>>>>", (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode);
+                noOfFUPatient = (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.noOfForecastingUnitsPerPerson / (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.noOfPersons;
+            }
+            noOfMonthsInUsagePeriod = noOfFUPatient;
         }
         this.setState({
             noOfMonthsInUsagePeriod
@@ -2676,7 +2721,7 @@ export default class CreateTreeTemplate extends Component {
 
 
 
-            if ((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageType.id == 2 || (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.oneTimeUsage != "true") {
+            if ((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageType.id == 2 || ((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.oneTimeUsage != "true" && (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.oneTimeUsage != true)) {
                 selectedText2 = this.state.usagePeriodList.filter(c => c.usagePeriodId == (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usagePeriod.usagePeriodId)[0].label.label_en;
             }
         }
@@ -2684,22 +2729,15 @@ export default class CreateTreeTemplate extends Component {
         if (this.state.currentItemConfig.context.payload.nodeType.id == 4) {
 
             if ((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageType.id == 1) {
-                if ((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.oneTimeUsage != "true") {
+                if ((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.oneTimeUsage != "true" && (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.oneTimeUsage != true) {
                     var selectedText3 = this.state.usagePeriodList.filter(c => c.usagePeriodId == (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.repeatUsagePeriod.usagePeriodId)[0].label.label_en;
-                    // if (this.state.addNodeFlag) {
-                    //     var repeatUsagePeriodId = document.getElementById("repeatUsagePeriodId");
-                    //     var selectedText3 = repeatUsagePeriodId.options[repeatUsagePeriodId.selectedIndex].text;
-                    // } else {
-                    //     var selectedText3 = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.repeatUsagePeriod.;
-                    // }
-
                     var repeatCount = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.repeatCount != null ? (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.repeatCount : '';
                     usageText = "Every " + noOfPersons + " " + selectedText + "(s) requires " + noOfForecastingUnitsPerPerson + " " + selectedText1 + "(s), " + usageFrequency + " times per " + selectedText2 + " for " + repeatCount + " " + selectedText3;
                 } else {
                     usageText = "Every " + noOfPersons + " " + selectedText + "(s) requires " + noOfForecastingUnitsPerPerson + " " + selectedText1 + "(s)";
                 }
             } else {
-                usageText = "Every " + noOfPersons + " " + selectedText + "(s) requires " + noOfForecastingUnitsPerPerson + " " + selectedText1 + "(s) every " + usageFrequency + " " + selectedText2;
+                usageText = "Every " + noOfPersons + " " + selectedText + "(s) requires " + noOfForecastingUnitsPerPerson + " " + selectedText1 + "(s) every " + usageFrequency + " " + selectedText2 + " indefinitely";
             }
         } else {
             //PU
@@ -2752,7 +2790,7 @@ export default class CreateTreeTemplate extends Component {
                 if (response.data.length == 1) {
                     const currentItemConfig = this.state.currentItemConfig;
                     (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.id = response.data[0].forecastingUnitId;
-                    (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.label.label_en = response.data[i].forecastingUnitId + "|" + getLabelText(response.data[i].label, this.state.lang);
+                    (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.label.label_en = response.data[0].forecastingUnitId + "|" + getLabelText(response.data[0].label, this.state.lang);
                     this.setState({
                         currentItemConfig: currentItemConfig
                     }, () => {
@@ -3366,11 +3404,18 @@ export default class CreateTreeTemplate extends Component {
                     console.log("load---", items[i])
                     // arr.push(items[i]);
                 }
+                var curDate = (moment(Date.now()).utcOffset('-0500').format('YYYY-MM-DD'));
+                var minMonth = moment(curDate).subtract(response.data.monthsInPast, 'months').startOf('month').format("YYYY-MM-DD");
+                var maxMonth = moment(curDate).add(response.data.monthsInFuture, 'months').endOf('month').format("YYYY-MM-DD");
+                var minDate = { year: new Date(minMonth).getFullYear(), month: new Date(minMonth).getMonth() + 1 };
+                var maxDate = { year: new Date(maxMonth).getFullYear(), month: new Date(maxMonth).getMonth() + 1 };
                 this.setState({
                     treeTemplate: response.data,
                     items,
                     tempItems: items,
-                    loading: false
+                    loading: false,
+                    minDate,
+                    maxDate
                 }, () => {
                     console.log(">>>", new Date('2021-01-01').getFullYear(), "+", ("0" + (new Date('2021-12-01').getMonth() + 1)).slice(-2));
                     console.log("Tree Template---", this.state.items);
@@ -3599,8 +3644,8 @@ export default class CreateTreeTemplate extends Component {
             if (this.state.currentItemConfig.context.payload.nodeType.id != 1) {
                 var curDate = (moment(Date.now()).utcOffset('-0500').format('YYYY-MM-DD'));
                 var month = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].month;
-                var minMonth = moment(month).subtract(this.state.treeTemplate.monthsInPast, 'months').startOf('month').format("YYYY-MM-DD");
-                var maxMonth = moment(month).add(this.state.treeTemplate.monthsInFuture, 'months').endOf('month').format("YYYY-MM-DD");
+                var minMonth = moment(curDate).subtract(this.state.treeTemplate.monthsInPast, 'months').startOf('month').format("YYYY-MM-DD");
+                var maxMonth = moment(curDate).add(this.state.treeTemplate.monthsInFuture, 'months').endOf('month').format("YYYY-MM-DD");
                 var modelingTypeList = this.state.modelingTypeList;
                 var arr = [];
                 if (this.state.currentItemConfig.context.payload.nodeType.id == 2) {
@@ -3683,13 +3728,30 @@ export default class CreateTreeTemplate extends Component {
 
         if (event.target.name === "monthsInPast") {
             treeTemplate.monthsInPast = event.target.value;
+            var curDate = (moment(Date.now()).utcOffset('-0500').format('YYYY-MM-DD'));
+            var minMonth = moment(curDate).subtract(event.target.value, 'months').startOf('month').format("YYYY-MM-DD");
+            var maxMonth = moment(curDate).add(treeTemplate.monthsInFuture, 'months').endOf('month').format("YYYY-MM-DD");
+            var minDate = { year: new Date(minMonth).getFullYear(), month: new Date(minMonth).getMonth() + 1 };
+            var maxDate = { year: new Date(maxMonth).getFullYear(), month: new Date(maxMonth).getMonth() + 1 };
+            this.setState({
+                minDate, maxDate
+            })
         }
 
         if (event.target.name === "monthsInFuture") {
             treeTemplate.monthsInFuture = event.target.value;
+            var curDate = (moment(Date.now()).utcOffset('-0500').format('YYYY-MM-DD'));
+            var minMonth = moment(curDate).subtract(treeTemplate.monthsInPast, 'months').startOf('month').format("YYYY-MM-DD");
+            var maxMonth = moment(curDate).add(event.target.value, 'months').endOf('month').format("YYYY-MM-DD");
+            var minDate = { year: new Date(minMonth).getFullYear(), month: new Date(minMonth).getMonth() + 1 };
+            var maxDate = { year: new Date(maxMonth).getFullYear(), month: new Date(maxMonth).getMonth() + 1 };
+            this.setState({
+                minDate, maxDate
+            })
         }
 
         if (event.target.name === "usageTemplateId") {
+            console.log("usage temp value---",event.target.value);
             this.setState({
                 usageTemplateId: event.target.value
             });
@@ -3767,7 +3829,9 @@ export default class CreateTreeTemplate extends Component {
         }
 
         if (event.target.name === "oneTimeUsage") {
-            (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.oneTimeUsage = event.target.id === "oneTimeUsage2" ? "false" : "true";
+            (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.oneTimeUsage = event.target.value;
+            this.getNoOfMonthsInUsagePeriod();
+            this.getNoFURequired();
             this.getUsageText();
         }
 
@@ -4040,6 +4104,7 @@ export default class CreateTreeTemplate extends Component {
         // const preItem = JSON.parse(JSON.stringify(data.context));
         if (item != null) {
             this.setState({
+                usageTemplateId: '',
                 sameLevelNodeList: [],
                 showCalculatorFields: false,
                 openAddNodeModal: true,
@@ -4540,28 +4605,28 @@ export default class CreateTreeTemplate extends Component {
                                             <FormFeedback className="red">{errors.nodeUnitId}</FormFeedback>
                                         </FormGroup>
                                         {/* } */}
-                                        {this.state.currentItemConfig.context.payload.nodeType.id != 1 &&
+                                        {/* {this.state.currentItemConfig.context.payload.nodeType.id != 1 && */}
 
-                                            <FormGroup className="col-md-6">
-                                                <Label htmlFor="currencyId">{i18n.t('static.common.month')}<span class="red Reqasterisk">*</span></Label>
-                                                <div className="controls edit">
-                                                    <Picker
-                                                        id="month"
-                                                        name="month"
-                                                        ref={this.pickAMonth1}
-                                                        years={{ min: this.state.minDate, max: this.state.maxDate }}
-                                                        value={{ year: new Date((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].month).getFullYear(), month: ("0" + (new Date((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].month).getMonth() + 1)).slice(-2) }}
-                                                        lang={pickerLang.months}
-                                                        // theme="dark"
-                                                        onChange={this.handleAMonthChange1}
-                                                        onDismiss={this.handleAMonthDissmis1}
-                                                    >
-                                                        <MonthBox value={this.makeText({ year: new Date((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].month).getFullYear(), month: ("0" + (new Date((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].month).getMonth() + 1)).slice(-2) })}
-                                                            onClick={this.handleClickMonthBox1} />
-                                                    </Picker>
-                                                </div>
-                                            </FormGroup>
-                                        }
+                                        <FormGroup className="col-md-6" style={{ display: this.state.aggregationNode ? 'block' : 'none' }}>
+                                            <Label htmlFor="currencyId">{i18n.t('static.common.month')}<span class="red Reqasterisk">*</span></Label>
+                                            <div className="controls edit">
+                                                <Picker
+                                                    id="month"
+                                                    name="month"
+                                                    ref={this.pickAMonth1}
+                                                    years={{ min: this.state.minDate, max: this.state.maxDate }}
+                                                    value={{ year: new Date((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].month).getFullYear(), month: ("0" + (new Date((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].month).getMonth() + 1)).slice(-2) }}
+                                                    lang={pickerLang.months}
+                                                    // theme="dark"
+                                                    onChange={this.handleAMonthChange1}
+                                                    onDismiss={this.handleAMonthDissmis1}
+                                                >
+                                                    <MonthBox value={this.makeText({ year: new Date((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].month).getFullYear(), month: ("0" + (new Date((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].month).getMonth() + 1)).slice(-2) })}
+                                                        onClick={this.handleClickMonthBox1} />
+                                                </Picker>
+                                            </div>
+                                        </FormGroup>
+                                        {/* // } */}
 
                                         {/* {(this.state.numberNode && this.state.currentItemConfig.context.payload.nodeType.id != 1) && */}
                                         {/* <> */}
@@ -4580,7 +4645,7 @@ export default class CreateTreeTemplate extends Component {
                                             <FormFeedback className="red">{errors.percentageOfParent}</FormFeedback>
                                         </FormGroup>
                                         <FormGroup className="col-md-6" style={{ display: this.state.numberNode ? 'block' : 'none' }}>
-                                            <Label htmlFor="currencyId">Parent Value<span class="red Reqasterisk">*</span></Label>
+                                            <Label htmlFor="currencyId">Parent Value</Label>
                                             <Input type="text"
                                                 id="parentValue"
                                                 name="parentValue"
@@ -4861,17 +4926,16 @@ export default class CreateTreeTemplate extends Component {
                                     <div>
                                         <div className="row">
                                             <FormGroup className="col-md-6" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 4 ? 'block' : 'none' }}>
-                                                <Label htmlFor="currencyId">{i18n.t('static.tracercategory.tracercategory')}<span class="red Reqasterisk">*</span></Label>
+                                                <Label htmlFor="currencyId">{i18n.t('static.tracercategory.tracercategory')}</Label>
                                                 <Input
                                                     type="select"
                                                     id="tracerCategoryId"
                                                     name="tracerCategoryId"
                                                     bsSize="sm"
-                                                    valid={!errors.tracerCategoryId && this.state.currentItemConfig.context.payload.nodeType.id == 4 ? this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.forecastingUnit.tracerCategory.id != '' : !errors.tracerCategoryId}
-                                                    invalid={touched.tracerCategoryId && !!errors.tracerCategoryId}
+                                                    // valid={!errors.tracerCategoryId && this.state.currentItemConfig.context.payload.nodeType.id == 4 ? this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.forecastingUnit.tracerCategory.id != '' : !errors.tracerCategoryId}
+                                                    // invalid={touched.tracerCategoryId && !!errors.tracerCategoryId}
                                                     onBlur={handleBlur}
                                                     onChange={(e) => {
-                                                        handleChange(e);
                                                         this.dataChange(e); this.getForecastingUnitListByTracerCategoryId(e)
                                                     }}
                                                     required
@@ -4897,10 +4961,10 @@ export default class CreateTreeTemplate extends Component {
                                                     name="usageTemplateId"
                                                     id="usageTemplateId"
                                                     bsSize="sm"
-                                                    valid={!errors.usageTemplateId && this.state.usageTemplateId != ''}
-                                                    invalid={touched.usageTemplateId && !!errors.usageTemplateId}
+                                                    // valid={!errors.usageTemplateId && this.state.usageTemplateId != ''}
+                                                    // invalid={touched.usageTemplateId && !!errors.usageTemplateId}
                                                     onBlur={handleBlur}
-                                                    onChange={(e) => { handleChange(e); this.copyDataFromUsageTemplate(e); this.dataChange(e) }}
+                                                    onChange={(e) => {this.dataChange(e);this.copyDataFromUsageTemplate(e)}}
                                                     required
                                                     value={this.state.usageTemplateId}
                                                 >
@@ -4923,7 +4987,7 @@ export default class CreateTreeTemplate extends Component {
                                                     <Autocomplete
                                                         id="forecastingUnitId"
                                                         name="forecastingUnitId"
-                                                        // value={{ value: this.state.currentScenario.fuNode.forecastingUnit.id, label: this.state.currentScenario.fuNode.forecastingUnit.label.label_en }}
+                                                        value={{ value: this.state.currentItemConfig.context.payload.nodeType.id == 4 ? this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.forecastingUnit.id : "", label: this.state.currentItemConfig.context.payload.nodeType.id == 4 ? this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.forecastingUnit.label.label_en : "" }}
                                                         defaultValue={{ value: this.state.currentItemConfig.context.payload.nodeType.id == 4 ? this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.forecastingUnit.id : "", label: this.state.currentItemConfig.context.payload.nodeType.id == 4 ? this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.forecastingUnit.label.label_en : "" }}
                                                         options={this.state.autocompleteData}
                                                         getOptionLabel={(option) => option.label}
@@ -5109,22 +5173,22 @@ export default class CreateTreeTemplate extends Component {
                                                 {/* <FormGroup className="col-md-5"></FormGroup> */}
                                                 {/* {this.state.currentScenario.fuNode.oneTimeUsage != "true" && */}
                                                 <>
-                                                    <FormGroup className="col-md-2" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usageType.id == 1 && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.oneTimeUsage != "true" ? 'block' : 'none' }}></FormGroup>
-                                                    <FormGroup className="col-md-4" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usageType.id == 1 && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.oneTimeUsage != "true" ? 'block' : 'none' }}>
+                                                    <FormGroup className="col-md-2" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usageType.id == 1 && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.oneTimeUsage != "true" && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.oneTimeUsage != true ? 'block' : 'none' }}></FormGroup>
+                                                    <FormGroup className="col-md-4" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usageType.id == 1 && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.oneTimeUsage != "true" && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.oneTimeUsage != true ? 'block' : 'none' }}>
                                                         <Input type="text"
                                                             name="usageFrequency"
                                                             bsSize="sm"
                                                             onChange={(e) => { this.dataChange(e) }}
                                                             value={this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usageType.id == 1 && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.oneTimeUsage != "true" ? this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usageFrequency : ""}></Input>
                                                     </FormGroup>
-                                                    <FormGroup className="col-md-2" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usageType.id == 1 && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.oneTimeUsage != "true" ? 'block' : 'none' }}>
+                                                    <FormGroup className="col-md-2" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usageType.id == 1 && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.oneTimeUsage != "true" && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.oneTimeUsage != true ? 'block' : 'none' }}>
                                                         <Input type="text"
                                                             name="timesPer"
                                                             bsSize="sm"
                                                             readOnly={true}
                                                             value={i18n.t('static.tree.timesPer')}></Input>
                                                     </FormGroup>
-                                                    <FormGroup className="col-md-4" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usageType.id == 1 && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.oneTimeUsage != "true" ? 'block' : 'none' }}>
+                                                    <FormGroup className="col-md-4" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usageType.id == 1 && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.oneTimeUsage != "true" && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.oneTimeUsage != true ? 'block' : 'none' }}>
                                                         <Input
                                                             type="select"
                                                             id="usagePeriodId"
@@ -5145,10 +5209,10 @@ export default class CreateTreeTemplate extends Component {
                                                                 }, this)}
                                                         </Input>
                                                     </FormGroup>
-                                                    <FormGroup className="col-md-2" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usageType.id == 1 && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.oneTimeUsage != "true" ? 'block' : 'none' }}>
+                                                    <FormGroup className="col-md-2" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usageType.id == 1 && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.oneTimeUsage != "true" && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.oneTimeUsage != true ? 'block' : 'none' }}>
                                                         <Label htmlFor="currencyId">for<span class="red Reqasterisk">*</span></Label>
                                                     </FormGroup>
-                                                    <FormGroup className="col-md-5" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usageType.id == 1 && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.oneTimeUsage != "true" ? 'block' : 'none' }}>
+                                                    <FormGroup className="col-md-5" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usageType.id == 1 && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.oneTimeUsage != "true" && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.oneTimeUsage != true ? 'block' : 'none' }}>
                                                         <Input type="text"
                                                             id="repeatCount"
                                                             name="repeatCount"
@@ -5164,7 +5228,7 @@ export default class CreateTreeTemplate extends Component {
                                                         </Input>
                                                         <FormFeedback className="red">{errors.repeatCount}</FormFeedback>
                                                     </FormGroup>
-                                                    <FormGroup className="col-md-5" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usageType.id == 1 && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.oneTimeUsage != "true" ? 'block' : 'none' }}>
+                                                    <FormGroup className="col-md-5" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usageType.id == 1 && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.oneTimeUsage != "true" && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.oneTimeUsage != true ? 'block' : 'none' }}>
                                                         <Input type="select"
                                                             id="repeatUsagePeriodId"
                                                             name="repeatUsagePeriodId"
@@ -5331,7 +5395,7 @@ export default class CreateTreeTemplate extends Component {
                         <FormGroup className="col-md-4 pl-lg-0">
                             <Picker
                                 ref={this.pickAMonth2}
-                                years={{ min: this.state.minMonth, max: this.state.maxMonth }}
+                                years={{ min: this.state.minDate, max: this.state.maxDate }}
                                 value={{
                                     year:
                                         new Date(this.state.scalingMonth).getFullYear(), month: ("0" + (new Date(this.state.scalingMonth).getMonth() + 1)).slice(-2)
@@ -6097,6 +6161,7 @@ export default class CreateTreeTemplate extends Component {
                                 event.stopPropagation();
                                 console.log("add node----", itemConfig);
                                 this.setState({
+                                    usageTemplateId: '',
                                     usageText: "",
                                     level0: true,
                                     numberNode: (itemConfig.payload.nodeType.id == 1 || itemConfig.payload.nodeType.id == 2 ? false : true),
@@ -6229,7 +6294,11 @@ export default class CreateTreeTemplate extends Component {
                                     });
 
                                     this.getNodeTypeFollowUpList(itemConfig.payload.nodeType.id);
-                                    if (itemConfig.payload.nodeType.id == 4) {
+
+                                    if (itemConfig.payload.nodeType.id == 2 || itemConfig.payload.nodeType.id == 3) {
+                                        this.getUsageTemplateList(0);
+                                    }
+                                    else if (itemConfig.payload.nodeType.id == 4) {
                                         console.log("fu id---", (itemConfig.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.id);
                                         this.getPlanningUnitListByFUId((itemConfig.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.idString);
                                         this.getNoOfFUPatient();

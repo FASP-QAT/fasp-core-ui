@@ -56,6 +56,7 @@ class CompareVersion extends Component {
         localStorage.setItem("sesDatasetVersionId", versionId);
         this.setState({
             versionId: versionId,
+            firstDataSet: 0
         }, () => {
             this.getData();
         })
@@ -66,6 +67,7 @@ class CompareVersion extends Component {
         localStorage.setItem("sesDatasetCompareVersionId", versionId);
         this.setState({
             versionId1: versionId,
+            secondDataSet: 0
         }, () => {
             this.getData1();
         })

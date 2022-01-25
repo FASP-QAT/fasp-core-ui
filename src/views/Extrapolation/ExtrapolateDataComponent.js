@@ -473,10 +473,10 @@ export default class ExtrapolateDataComponent extends React.Component {
         for (var j = 0; moment(curDate).format("YYYY-MM") < moment(stopDate).format("YYYY-MM"); j++) {
             curDate = moment(startDate).startOf('month').add(j, 'months').format("YYYY-MM-DD");
             var consumptionData = actualConsumptionList.filter(c => moment(c.month).format("YYYY-MM") == moment(curDate).format("YYYY-MM") && c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId)
-            inputDataMovingAvg.push({ "month": inputDataMovingAvg.length + 1, "actual": consumptionData.length > 0 ? consumptionData[0].amount : null, "forecast": null })
-            inputDataSemiAverage.push({ "month": inputDataSemiAverage.length + 1, "actual": consumptionData.length > 0 ? consumptionData[0].amount : null, "forecast": null })
-            inputDataLinearRegression.push({ "month": inputDataLinearRegression.length + 1, "actual": consumptionData.length > 0 ? consumptionData[0].amount : null, "forecast": null })
-            inputDataTes.push({ "month": inputDataTes.length + 1, "actual": consumptionData.length > 0 ? consumptionData[0].amount : null, "forecast": null })
+            inputDataMovingAvg.push({ "month": inputDataMovingAvg.length + 1, "actual": consumptionData.length > 0 ? Number(consumptionData[0].amount) : null, "forecast": null })
+            inputDataSemiAverage.push({ "month": inputDataSemiAverage.length + 1, "actual": consumptionData.length > 0 ? Number(consumptionData[0].amount) : null, "forecast": null })
+            inputDataLinearRegression.push({ "month": inputDataLinearRegression.length + 1, "actual": consumptionData.length > 0 ? Number(consumptionData[0].amount) : null, "forecast": null })
+            inputDataTes.push({ "month": inputDataTes.length + 1, "actual": consumptionData.length > 0 ? Number(consumptionData[0].amount) : null, "forecast": null })
         }
         const noOfMonthsForProjection = monthArray.length - inputDataMovingAvg.length;
         this.setState({
@@ -667,7 +667,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                     if (this.state.semiAvgId) {
                         var data = [];
                         for (var i = 0; i < inputDataFilter.length; i++) {
-                            data.push({ month: moment(this.state.startMonthForExtrapolation).add(inputDataFilter[i].month - 1, 'months').format("YYYY-MM-DD"), amount: inputDataFilter[i].forecast })
+                            data.push({ month: moment(this.state.startDate).add(inputDataFilter[i].month - 1, 'months').format("YYYY-MM-DD"), amount: inputDataFilter[i].forecast })
                         }
                         consumptionExtrapolationList.push(
                             {
@@ -694,7 +694,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                     if (this.state.movingAvgId) {
                         var data = [];
                         for (var i = 0; i < inputDataAverageFilter.length; i++) {
-                            data.push({ month: moment(this.state.startMonthForExtrapolation).add(inputDataAverageFilter[i].month - 1, 'months').format("YYYY-MM-DD"), amount: inputDataAverageFilter[i].forecast })
+                            data.push({ month: moment(this.state.startDate).add(inputDataAverageFilter[i].month - 1, 'months').format("YYYY-MM-DD"), amount: inputDataAverageFilter[i].forecast })
                         }
                         consumptionExtrapolationList.push(
                             {
@@ -721,7 +721,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                         //Linear Regression
                         var data = [];
                         for (var i = 0; i < inputDataRegressionFilter.length; i++) {
-                            data.push({ month: moment(this.state.startMonthForExtrapolation).add(inputDataRegressionFilter[i].month - 1, 'months').format("YYYY-MM-DD"), amount: inputDataRegressionFilter[i].forecast })
+                            data.push({ month: moment(this.state.startDate).add(inputDataRegressionFilter[i].month - 1, 'months').format("YYYY-MM-DD"), amount: inputDataRegressionFilter[i].forecast })
                         }
                         consumptionExtrapolationList.push(
                             {
@@ -748,7 +748,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                         console.log("in if1")
                         var data = [];
                         for (var i = 0; i < tesData.length; i++) {
-                            data.push({ month: moment(this.state.startMonthForExtrapolation).add(tesData[i].month - 1, 'months').format("YYYY-MM-DD"), amount: (Number(tesData[i].forecast) - Number(CI)) })
+                            data.push({ month: moment(this.state.startDate).add(tesData[i].month - 1, 'months').format("YYYY-MM-DD"), amount: (Number(tesData[i].forecast) - Number(CI)) })
                         }
                         consumptionExtrapolationList.push(
                             {
@@ -777,7 +777,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                         console.log("in if2")
                         var data = [];
                         for (var i = 0; i < tesData.length; i++) {
-                            data.push({ month: moment(this.state.startMonthForExtrapolation).add(tesData[i].month - 1, 'months').format("YYYY-MM-DD"), amount: (Number(tesData[i].forecast)) })
+                            data.push({ month: moment(this.state.startDate).add(tesData[i].month - 1, 'months').format("YYYY-MM-DD"), amount: (Number(tesData[i].forecast)) })
                         }
                         consumptionExtrapolationList.push(
                             {
@@ -806,7 +806,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                         console.log("in if3")
                         var data = [];
                         for (var i = 0; i < tesData.length; i++) {
-                            data.push({ month: moment(this.state.startMonthForExtrapolation).add(tesData[i].month - 1, 'months').format("YYYY-MM-DD"), amount: (Number(tesData[i].forecast) + Number(CI)) })
+                            data.push({ month: moment(this.state.startDate).add(tesData[i].month - 1, 'months').format("YYYY-MM-DD"), amount: (Number(tesData[i].forecast) + Number(CI)) })
                         }
                         consumptionExtrapolationList.push(
                             {
@@ -838,7 +838,9 @@ export default class ExtrapolateDataComponent extends React.Component {
                     datasetData = (CryptoJS.AES.encrypt(JSON.stringify(datasetJson), SECRET_KEY)).toString()
                     myResult.programData = datasetData;
                     var putRequest = datasetTransaction.put(myResult);
-
+                    this.setState({
+                        dataChanged:false
+                    })
                     putRequest.onerror = function (event) {
                     }.bind(this);
                     putRequest.onsuccess = function (event) {
@@ -980,6 +982,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                     smoothingId: smoothingId,
                     arimaId: arimaId,
                     noDataMessage: "",
+                    dataChanged:true,
                     loading: false
                 }, () => {
                     this.buildJxl();
@@ -1680,7 +1683,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                     pointStyle: 'line',
                     pointBorderWidth: 5,
                     yValueFormatString: "###,###,###,###",
-                    data: this.state.movingAvgData.map((item, index) => (item.forecast > 0 && moment(startDate).add(item.month - 1, 'months').format("YYYY-MM") > moment(stopDate).format("YYYY-MM") ? item.forecast.toFixed(2) : null))
+                    data: this.state.movingAvgData.map((item, index) => (item.forecast > 0 && moment(startDate).add(item.month, 'months').format("YYYY-MM") > moment(stopDate).format("YYYY-MM") ? item.forecast.toFixed(2) : null))
                 })
         }
         if (this.state.semiAvgId) {
@@ -1699,7 +1702,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                 pointStyle: 'line',
                 pointBorderWidth: 5,
                 yValueFormatString: "###,###,###,###",
-                data: this.state.semiAvgData.map((item, index) => (item.forecast > 0 && moment(startDate).add(item.month - 1, 'months').format("YYYY-MM") > moment(stopDate).format("YYYY-MM") ? item.forecast.toFixed(2) : null))
+                data: this.state.semiAvgData.map((item, index) => (item.forecast > 0 && moment(startDate).add(item.month, 'months').format("YYYY-MM") > moment(stopDate).format("YYYY-MM") ? item.forecast.toFixed(2) : null))
             })
         }
         if (this.state.linearRegressionId) {
@@ -1719,7 +1722,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                     pointStyle: 'line',
                     pointBorderWidth: 5,
                     yValueFormatString: "###,###,###,###",
-                    data: this.state.linearRegressionData.map((item, index) => (item.forecast > 0 && moment(startDate).add(item.month - 1, 'months').format("YYYY-MM") > moment(stopDate).format("YYYY-MM") ? item.forecast.toFixed(2) : null))
+                    data: this.state.linearRegressionData.map((item, index) => (item.forecast > 0 && moment(startDate).add(item.month, 'months').format("YYYY-MM") > moment(stopDate).format("YYYY-MM") ? item.forecast.toFixed(2) : null))
                 })
         }
         if (this.state.smoothingId) {
@@ -1740,7 +1743,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                 pointStyle: 'line',
                 pointBorderWidth: 5,
                 yValueFormatString: "###,###,###,###",
-                data: this.state.tesData.map((item, index) => (item.forecast > 0 && moment(startDate).add(item.month - 1, 'months').format("YYYY-MM") > moment(stopDate).format("YYYY-MM") ? (item.forecast - this.state.CI).toFixed(2) : null))
+                data: this.state.tesData.map((item, index) => (item.forecast > 0 && moment(startDate).add(item.month, 'months').format("YYYY-MM") > moment(stopDate).format("YYYY-MM") ? (item.forecast - this.state.CI).toFixed(2) : null))
             })
         }
         if (this.state.smoothingId) {
@@ -1759,7 +1762,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                 pointStyle: 'line',
                 pointBorderWidth: 5,
                 yValueFormatString: "###,###,###,###",
-                data: this.state.tesData.map((item, index) => (item.forecast > 0 && moment(startDate).add(item.month - 1, 'months').format("YYYY-MM") > moment(stopDate).format("YYYY-MM") ? item.forecast.toFixed(2) : null))
+                data: this.state.tesData.map((item, index) => (item.forecast > 0 && moment(startDate).add(item.month, 'months').format("YYYY-MM") > moment(stopDate).format("YYYY-MM") ? item.forecast.toFixed(2) : null))
             })
         }
         if (this.state.smoothingId) {
@@ -1780,7 +1783,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                 pointStyle: 'line',
                 pointBorderWidth: 5,
                 yValueFormatString: "###,###,###,###",
-                data: this.state.tesData.map((item, index) => (item.forecast > 0 && moment(startDate).add(item.month - 1, 'months').format("YYYY-MM") > moment(stopDate).format("YYYY-MM") ? (item.forecast + this.state.CI).toFixed(2) : null))
+                data: this.state.tesData.map((item, index) => (item.forecast > 0 && moment(startDate).add(item.month, 'months').format("YYYY-MM") > moment(stopDate).format("YYYY-MM") ? (item.forecast + this.state.CI).toFixed(2) : null))
             })
         }
         if (this.state.arimaId) {
