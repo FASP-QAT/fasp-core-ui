@@ -3020,7 +3020,7 @@ export default class BuildTree extends Component {
 
     exportPDF = () => {
         let treeLevel = this.state.items.length;
-        const treeLevelItems = []
+        var treeLevelItems = []
         for (var i = 0; i <= treeLevel; i++) {
             if (i == 0) {
                 treeLevelItems.push({
@@ -3074,7 +3074,7 @@ export default class BuildTree extends Component {
 
         var templates = [
             {
-                itemSize: new Size(200, 100)
+                itemSize: new Size(200, 85)
             }
         ]
         var items = this.state.items;
@@ -3085,7 +3085,7 @@ export default class BuildTree extends Component {
             ele.items = this.state.items
             newItems.push(ele)
         })
-        var sampleChart = OrgDiagramPdfkit({
+        var sampleChart = new OrgDiagramPdfkit({
             ...this.state,
             pageFitMode: PageFitMode.Enabled,
             hasSelectorCheckbox: Enabled.False,

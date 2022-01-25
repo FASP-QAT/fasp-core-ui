@@ -95,7 +95,8 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                             stopDate: hasTransferNodeIdList[tnl].stopDate,
                             stopDateNo: hasTransferNodeIdList[tnl].stopDateNo,
                             transferNodeDataId: -1,
-                            nodeDataId: hasTransferNodeIdList[tnl].transferNodeDataId
+                            nodeDataId: hasTransferNodeIdList[tnl].transferNodeDataId,
+                            transferFromNodeDataId: flatList[fl].id
                         })
                     }
 
@@ -160,31 +161,60 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                             }
                             //Linear %
                             else if (nodeDataModeling.modelingType.id == 3) {
-                                var dv = 0;
-                                var dvWMC = 0;
-                                if (moment(nodeDataMapForScenario.month).format("YYYY-MM-DD") == moment(nodeDataModeling.startDate).format("YYYY-MM-DD")) {
-                                    if (nodeDataMapForScenario.calculatedDataValue == null || payload.nodeType.id != 2) {
-                                        console.log("modeling datavalue 3---", nodeDataMapForScenario.dataValue)
-                                        dv = nodeDataMapForScenario.dataValue;
-                                        dvWMC = nodeDataMapForScenario.dataValue;
+                                if (nodeDataModeling.transferFromNodeDataId != undefined && nodeDataModeling.transferFromNodeDataId != null && nodeDataModeling.transferFromNodeDataId != "") {
+                                    var transferFromNodeData = flatList.filter(c => c.id == nodeDataModeling.transferFromNodeDataId);
+                                    var transferFromNodeDataMapForScenario = (transferFromNodeData[0].payload.nodeDataMap[scenarioList[ndm].id])[0];
+                                    var transferFromNodeMomList = transferFromNodeDataMapForScenario.nodeDataModelingList;
+                                    var dv = 0;
+                                    var dvWMC = 0;
+                                    if (moment(transferFromNodeDataMapForScenario.month).format("YYYY-MM-DD") == moment(nodeDataModeling.startDate).format("YYYY-MM-DD")) {
+                                        if (transferFromNodeDataMapForScenario.calculatedDataValue == null || payload.nodeType.id != 2) {
+                                            console.log("modeling datavalue 3---", transferFromNodeDataMapForScenario.dataValue)
+                                            dv = transferFromNodeDataMapForScenario.dataValue;
+                                            dvWMC = transferFromNodeDataMapForScenario.dataValue;
+                                        } else {
+                                            dv = transferFromNodeDataMapForScenario.calculatedDataValue;
+                                            dvWMC = transferFromNodeDataMapForScenario.calculatedDataValue;
+                                        }
                                     } else {
-                                        dv = nodeDataMapForScenario.calculatedDataValue;
-                                        dvWMC = nodeDataMapForScenario.calculatedDataValue;
+                                        dv = (transferFromNodeMomList.filter(c => moment(c.month).format("YYYY-MM-DD") == moment(nodeDataModeling.startDate).add(-1, 'months').format("YYYY-MM-DD"))[0]).endValue;
+                                        dvWMC = (transferFromNodeMomList.filter(c => moment(c.month).format("YYYY-MM-DD") == moment(nodeDataModeling.startDate).add(-1, 'months').format("YYYY-MM-DD"))[0]).endValueWMC;
                                     }
+                                    difference += Number((Number(dv) * Number(nodeDataModeling.dataValue)) / 100);
+                                    differenceWMC += Number((Number(dvWMC) * Number(nodeDataModeling.dataValue)) / 100);
                                 } else {
-                                    dv = (nodeDataList.filter(c => moment(c.month).format("YYYY-MM-DD") == moment(nodeDataModeling.startDate).add(-1, 'months').format("YYYY-MM-DD"))[0]).endValue;
-                                    dvWMC = (nodeDataList.filter(c => moment(c.month).format("YYYY-MM-DD") == moment(nodeDataModeling.startDate).add(-1, 'months').format("YYYY-MM-DD"))[0]).endValueWMC;
+                                    var dv = 0;
+                                    var dvWMC = 0;
+                                    if (moment(nodeDataMapForScenario.month).format("YYYY-MM-DD") == moment(nodeDataModeling.startDate).format("YYYY-MM-DD")) {
+                                        if (nodeDataMapForScenario.calculatedDataValue == null || payload.nodeType.id != 2) {
+                                            console.log("modeling datavalue 3---", nodeDataMapForScenario.dataValue)
+                                            dv = nodeDataMapForScenario.dataValue;
+                                            dvWMC = nodeDataMapForScenario.dataValue;
+                                        } else {
+                                            dv = nodeDataMapForScenario.calculatedDataValue;
+                                            dvWMC = nodeDataMapForScenario.calculatedDataValue;
+                                        }
+                                    } else {
+                                        dv = (nodeDataList.filter(c => moment(c.month).format("YYYY-MM-DD") == moment(nodeDataModeling.startDate).add(-1, 'months').format("YYYY-MM-DD"))[0]).endValue;
+                                        dvWMC = (nodeDataList.filter(c => moment(c.month).format("YYYY-MM-DD") == moment(nodeDataModeling.startDate).add(-1, 'months').format("YYYY-MM-DD"))[0]).endValueWMC;
+                                    }
+                                    difference += Number((Number(dv) * Number(nodeDataModeling.dataValue)) / 100);
+                                    differenceWMC += Number((Number(dvWMC) * Number(nodeDataModeling.dataValue)) / 100);
                                 }
-                                difference += Number((Number(dv) * Number(nodeDataModeling.dataValue)) / 100);
-                                differenceWMC += Number((Number(dvWMC) * Number(nodeDataModeling.dataValue)) / 100);
                             }
                             //Exponential %
                             else if (nodeDataModeling.modelingType.id == 4) {
-                                console.log("datavalue ****", Number(nodeDataModeling.dataValue));
-                                console.log(" actual difference ****", Number((Number(startValue) * Number(nodeDataModeling.dataValue)) / 100));
-                                difference += Number((Number(startValue) * Number(nodeDataModeling.dataValue)) / 100);
-                                console.log("differenxce****", difference);
-                                differenceWMC += Number((Number(startValue) * Number(nodeDataModeling.dataValue)) / 100);
+                                if (nodeDataModeling.transferFromNodeDataId != undefined && nodeDataModeling.transferFromNodeDataId != null && nodeDataModeling.transferFromNodeDataId != "") {
+                                    var transferFromNodeData = flatList.filter(c => c.id == nodeDataModeling.transferFromNodeDataId);
+                                    var transferFromNodeDataMapForScenario = (transferFromNodeData[0].payload.nodeDataMap[scenarioList[ndm].id])[0];
+                                    var transferFromNodeMomList = transferFromNodeDataMapForScenario.nodeDataModelingList;
+                                    var transferStartValue = (transferFromNodeMomList.filter(c => moment(c.month).format("YYYY-MM-DD") == moment(nodeDataModeling.startDate).add(0, 'months').format("YYYY-MM-DD"))[0]).startValue;
+                                    difference += Number((Number(transferStartValue) * Number(nodeDataModeling.dataValue)) / 100);
+                                    differenceWMC += Number((Number(transferStartValue) * Number(nodeDataModeling.dataValue)) / 100);
+                                } else {
+                                    difference += Number((Number(startValue) * Number(nodeDataModeling.dataValue)) / 100);
+                                    differenceWMC += Number((Number(startValue) * Number(nodeDataModeling.dataValue)) / 100);
+                                }
                             }
                             //Linear % point
 

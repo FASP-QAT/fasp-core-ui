@@ -43,7 +43,7 @@ export default function LevelTitleTemplate(options, orientation) {
 
     var fontSize = parseInt(levelTitleFontSize, 10);
     position.width=30;
-    position.height=115;
+    position.height=102;
     renderRotatedText({doc, textOrientation, label, fontSize, fontColor, position, titleColor, horizontalAlignment, verticalAlignment });
   }
 
