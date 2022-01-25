@@ -639,6 +639,7 @@ export default class BuildTree extends Component {
         this.changed1 = this.changed1.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.getMaxNodeDataId = this.getMaxNodeDataId.bind(this);
+        this.exportPDF = this.exportPDF.bind(this);
     }
     getMaxNodeDataId() {
         var maxNodeDataId = 0;
@@ -3077,14 +3078,18 @@ export default class BuildTree extends Component {
                 itemSize: new Size(200, 85)
             }
         ]
-        var items = this.state.items;
+        var items1 = this.state.items;
         var newItems = [];
-        items.map(ele => {
-            ele.scenarioId = this.state.selectedScenario
-            ele.showModelingValidation = this.state.showModelingValidation
-            ele.items = this.state.items
-            newItems.push(ele)
-        })
+        for (var i = 0; i < items1.length; i++) {
+            var e = items1[i];
+            e.scenarioId = this.state.selectedScenario
+            e.showModelingValidation = this.state.showModelingValidation
+            e.result = this.getPayloadData(items1[i], 4)
+            var text = this.getPayloadData(items1[i], 3)
+            e.text = text;
+            newItems.push(e)
+        }
+
         var sampleChart = new OrgDiagramPdfkit({
             ...this.state,
             pageFitMode: PageFitMode.Enabled,
@@ -3488,7 +3493,7 @@ export default class BuildTree extends Component {
                 }, () => {
                     this.getUsageText();
                 });
-            } 
+            }
             // else if (type == 1) {
             //     if (this.state.planningUnitList.length == 1) {
             //         console.log("node data pu---", this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario]);
@@ -5040,6 +5045,7 @@ export default class BuildTree extends Component {
         }
     };
     onCursoChanged(event, data) {
+        console.log("Data@@@", data)
         const { context: item } = data;
         if (item != null) {
             this.setState({

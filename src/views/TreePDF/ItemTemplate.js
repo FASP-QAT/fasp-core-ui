@@ -70,27 +70,27 @@ export default function ItemTemplate(options, itemTemplateConfig) {
     // /* photo */
     // if (itemConfig.image != null) {
 
-    var result = false;
-    if (itemConfig.payload.nodeDataMap[itemConfig.scenarioId][0].nodeDataModelingList.length > 0) {
-      result = true;
-    } else {
-      var arr = itemConfig.items.filter(x => x.level == itemConfig.level && x.id != itemConfig.id && x.id < itemConfig.id);
-      if (arr.length > 0) {
-        for (var i = 0; i <= arr.length; i++) {
-          if (arr[i] != null) {
-            console.log("arr[i]---", arr[i])
-            var nodeDataModelingList = arr[i].payload.nodeDataMap[itemConfig.scenarioId][0].nodeDataModelingList;
-            if (nodeDataModelingList.length > 0) {
-              var nodedata = nodeDataModelingList.filter(x => x.transferNodeDataId == itemConfig.id)[0];
-              if (nodedata != null && nodedata != "") {
-                result = true;
-                break;
-              }
-            }
-          }
-        }
-      }
-    }
+    var result = itemConfig.result;
+    // if (itemConfig.payload.nodeDataMap[itemConfig.scenarioId][0].nodeDataModelingList.length > 0) {
+    //   result = true;
+    // } else {
+    //   var arr = itemConfig.items1.filter(x => x.level == itemConfig.level && x.id != itemConfig.id && x.id < itemConfig.id);
+    //   if (arr.length > 0) {
+    //     for (var i = 0; i <= arr.length; i++) {
+    //       if (arr[i] != null) {
+    //         console.log("arr[i]---", arr[i])
+    //         var nodeDataModelingList = arr[i].payload.nodeDataMap[itemConfig.scenarioId][0].nodeDataModelingList;
+    //         if (nodeDataModelingList.length > 0) {
+    //           var nodedata = nodeDataModelingList.filter(x => x.transferNodeDataId == itemConfig.id)[0];
+    //           if (nodedata != null && nodedata != "") {
+    //             result = true;
+    //             break;
+    //           }
+    //         }
+    //       }
+    //     }
+    //   }
+    // }
     if (result) {
       if (itemConfig.payload.nodeType.id == 4 || itemConfig.payload.nodeType.id == 5) {
         // White image
@@ -178,41 +178,7 @@ export default function ItemTemplate(options, itemTemplateConfig) {
 
     }
     if (itemConfig.showModelingValidation) {
-      var text = "";
-      if (itemConfig.payload.nodeType.id == 1 || itemConfig.payload.nodeType.id == 2) {
-        var childList = itemConfig.items.filter(c => c.parent == itemConfig.id && (c.payload.nodeType.id == 3 || c.payload.nodeType.id == 4 || c.payload.nodeType.id == 5));
-        console.log("Child List+++", childList);
-        if (childList.length > 0) {
-          var sum = 0;
-          childList.map(c => {
-            console.log("childList 1---", childList);
-            console.log("child 1---", c.payload);
-            sum += Number((c.payload.nodeDataMap[itemConfig.scenarioId])[0].displayDataValue)
-          })
-          text = sum.toFixed(2);
-        } else {
-          console.log("get payload 3");
-          text = "";
-        }
-      } else {
-        console.log("get payload 6");
-        var childList = itemConfig.items.filter(c => c.parent == itemConfig.id && (c.payload.nodeType.id == 3 || c.payload.nodeType.id == 4 || c.payload.nodeType.id == 5));
-        console.log("Child List my+++", childList);
-        if (childList.length > 0) {
-          var sum = 0;
-          childList.map(c => {
-            console.log("childList 2---", childList);
-            // console.log("child scenarioId 2---",(c.payload.nodeDataMap[scenarioId])[0] != null);
-            console.log("child 2---", c.payload.label.label_en, "map---", c.payload);
-            sum += Number(c.payload.nodeDataMap.hasOwnProperty(itemConfig.scenarioId) ? (c.payload.nodeDataMap[itemConfig.scenarioId])[0].displayDataValue : 0)
-          })
-          text = sum.toFixed(2);
-        } else {
-          console.log("get payload 7");
-          text = "";
-        }
-
-      }
+      var text = itemConfig.text;
       var text1 = "";
       var text2 = "";
       if (text != "") {
