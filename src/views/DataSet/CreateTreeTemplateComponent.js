@@ -6184,6 +6184,7 @@ export default class CreateTreeTemplate extends Component {
                                 event.stopPropagation();
                                 console.log("add node----", itemConfig);
                                 this.setState({
+                                    scalingList: [],
                                     usageTemplateId: '',
                                     usageText: "",
                                     level0: true,

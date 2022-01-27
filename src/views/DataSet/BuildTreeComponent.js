@@ -1022,6 +1022,7 @@ export default class BuildTree extends Component {
             var nodeDataMap = {};
             var tempArray = [];
             var tempJson = {
+                nodeDataId:1,
                 notes: '',
                 month: moment(new Date()).startOf('month').format("YYYY-MM-DD"),
                 dataValue: "",
@@ -3210,7 +3211,7 @@ export default class BuildTree extends Component {
                     flatList[i].payload.nodeDataMap = nodeDataMap;
                 }
                 console.log("flat list--->", flatList);
-                var maxTreeId = Math.max(...treeData.map(o => o.treeId));
+                var maxTreeId = treeData.length > 0 ? Math.max(...treeData.map(o => o.treeId)) : 0;
                 var treeId = parseInt(maxTreeId) + 1;
                 var tempTree = {
                     treeId: treeId,
@@ -3258,7 +3259,7 @@ export default class BuildTree extends Component {
             console.log("tree data---", this.state.treeData);
             var curTreeObj = this.state.treeData.filter(x => x.treeId == treeId)[0];
             console.log("curTreeObj---", curTreeObj)
-            var regionValues = (curTreeObj.regionList).map((item, i) => {
+            var regionValues = (curTreeObj.regionList) != null && (curTreeObj.regionList).map((item, i) => {
                 return ({ label: getLabelText(item.label, this.state.lang), value: item.id })
 
             }, this);
