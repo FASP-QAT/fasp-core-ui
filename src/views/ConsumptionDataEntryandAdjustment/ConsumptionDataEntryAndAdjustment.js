@@ -872,6 +872,27 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
 
   exportCSV() {
     var csvRow = [];
+    var actualConsumptionCount = 15;
+    var reportingRateCount = 16;
+    var stockOutDaysCount = 17;
+    var adjustedConsumptionCount = 19;
+    var consumptionUnit = {};
+    var consumptionList = this.state.consumptionList;
+    console.log("document.getElementByIdplanningUnitId",document.getElementById("planningUnitId").selectedOptions[0])
+    var consumptionUnitId = document.getElementById("planningUnitId").selectedOptions[0].value;
+    consumptionUnit = this.state.planningUnitList.filter(c => c.planningUnit.id == consumptionUnitId)[0];
+    var multiplier = 1;
+    // if (consumptionUnitId != 0) {
+    //   if (consumptionUnit.consumptionDataType == 1) {
+    //     multiplier = consumptionUnit.planningUnit.multiplier;
+    //   } else if (consumptionUnit.consumptionDataType == 2) {
+    //     multiplier = 1;
+    //   } else {
+    //     multiplier = consumptionUnit.otherUnit.multiplier;
+    //   }
+    // }
+
+
     csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + document.getElementById("datasetId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
     csvRow.push('')
     csvRow.push('"' + (i18n.t('static.dashboard.planningunitheader') + ' : ' + document.getElementById("planningUnitId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
@@ -925,9 +946,10 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     var B = [];
     var monthArray = this.state.monthArray;
     var regionList = this.state.regionList;
-    var consumptionList = this.state.consumptionList;
+    console.log("777777777777777777",consumptionUnitId)
+    var consumptionList = consumptionList.filter(c => c.planningUnit.id == consumptionUnitId);
+    console.log("consumptionList",consumptionList)
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF', 'AG', 'AH', 'AI', 'AJ', 'AK', 'AL', 'AM', 'AN']
-    var dataArray = [];
     // B.push(i18n.t('static.program.noOfDaysInMonth').replaceAll(' ', '%20') + '"')
     for (var j = 0; j < monthArray.length; j++) {
       B.push(monthArray[j].noOfDays)
@@ -965,24 +987,29 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       B = [];
       B.push(i18n.t('static.dataentry.stockedOutPer'))
       for (var j = 0; j < monthArray.length; j++) {
-        // B.push(`=ROUND(${colArr[j + 1]}${parseInt(dataArray.length)}/${colArr[j + 1] + "1"}*100,0)`)
+        B.push(`=ROUND(${colArr[j + 1]}${parseInt(stockOutDaysCount)}/${parseInt(monthArray[j].noOfDays)}*100,0)`)
       }
       C.push(this.addDoubleQuoteToRowContent(B));
       B = [];
 
       B.push(i18n.t('static.dataentry.adjustedConsumption'))
       for (var j = 0; j < monthArray.length; j++) {
-        // B.push(`=ROUND((${colArr[j + 1]}${parseInt(dataArray.length - 3)}/${colArr[j + 1]}${parseInt(dataArray.length - 2)}/(1-(${colArr[j + 1]}${parseInt(dataArray.length - 1)}/${colArr[j + 1] + "1"})))*100,0)`)
+        B.push(`=ROUND((${colArr[j + 1]}${parseInt(actualConsumptionCount)}/${colArr[j + 1]}${parseInt(reportingRateCount)}/(1-(${colArr[j + 1]}${parseInt(stockOutDaysCount)}/${parseInt(monthArray[j].noOfDays)})))*100,0)`)
       }
       C.push(this.addDoubleQuoteToRowContent(B));
       B = [];
 
       B.push(i18n.t('static.dataentry.convertedToPlanningUnit'))
       for (var j = 0; j < monthArray.length; j++) {
-        // B.push(`=ROUND(${colArr[j + 1]}${parseInt(dataArray.length)}/${multiplier},0)`)
+        B.push(`=ROUND(${colArr[j + 1]}${parseInt(adjustedConsumptionCount)}/${multiplier},0)`)
       }
       C.push(this.addDoubleQuoteToRowContent(B));
       B = [];
+
+      actualConsumptionCount += 7;
+      reportingRateCount += 7;
+      stockOutDaysCount += 7;
+      adjustedConsumptionCount += 7;
     }
 
     for (var i = 0; i < C.length; i++) {
