@@ -337,6 +337,7 @@ export default class CreateTreeTemplate extends Component {
         this.pickAMonth2 = React.createRef()
         this.pickAMonth1 = React.createRef()
         this.state = {
+            hidePlanningUnit : false,
             maxNodeDataId: '',
             nodeDataMomList: [],
             modelingJexcelLoader: false,
@@ -2613,7 +2614,7 @@ export default class CreateTreeTemplate extends Component {
             var noFURequired = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.oneTimeUsage != "true" && (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.oneTimeUsage != true ? ((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.repeatCount / convertToMonth) * noOfMonthsInUsagePeriod : noOfFUPatient;
             console.log("noFURequired---", noFURequired);
 
-        } else if (usageTypeId == 1 && oneTimeUsage != null && (oneTimeUsage == "true" || oneTimeUsage == true)) {
+        } else if (usageTypeId == 1) {
             if (this.state.currentItemConfig.context.payload.nodeType.id == 4) {
                 noFURequired = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.noOfForecastingUnitsPerPerson / (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.noOfPersons;
             } else {
@@ -6784,6 +6785,7 @@ export default class CreateTreeTemplate extends Component {
                                                                                 type="checkbox"
                                                                                 id="active6"
                                                                                 name="active6"
+                                                                                disabled={this.state.hidePlanningUnit}
                                                                                 // checked={false}
                                                                                 onClick={(e) => { this.filterPlanningUnitNode(e); }}
                                                                             />
