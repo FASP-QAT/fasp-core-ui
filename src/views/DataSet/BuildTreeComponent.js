@@ -1143,7 +1143,7 @@ export default class BuildTree extends Component {
             var dataValue = modelingTypeId == 2 ? map1.get("6") : map1.get("5");
             console.log("startDate---", startDate);
             console.log("stopDate---", stopDate);
-            const result = moment(date).isBetween(startDate, stopDate, null, '[)');
+            const result = moment(date).isBetween(startDate, stopDate, null, '[]');
             console.log("result---", result);
             if (result) {
                 var nodeValue = this.state.currentScenario.calculatedDataValue;

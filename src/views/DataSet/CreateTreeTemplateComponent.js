@@ -736,7 +736,7 @@ export default class CreateTreeTemplate extends Component {
     }
 
     filterScalingDataByMonth(date) {
-        // console.log("date--->>>>>>>", date);
+        console.log("date--->>>>>>>", date);
         var json = this.state.modelingEl.getJson(null, false);
         // console.log("modelingElData>>>", json);
         var scalingTotal = 0;
@@ -747,7 +747,10 @@ export default class CreateTreeTemplate extends Component {
             var stopDate = map1.get("4");
             var modelingTypeId = map1.get("2");
             var dataValue = modelingTypeId == 2 ? map1.get("6") : map1.get("5");
-            const result = moment(date).isBetween(startDate, stopDate, null, '[)');
+            console.log("startDate---", startDate);
+            console.log("stopDate---", stopDate);
+            const result = moment(date).isBetween(startDate, stopDate, null, '[]');
+            console.log("result---", result);
             console.log("modelingTypeId---", modelingTypeId);
             if (result) {
                 var nodeValue = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].calculatedDataValue;
