@@ -303,6 +303,39 @@ export default class StepOneImportMapPlanningUnits extends Component {
 
 
             } else {
+                let SupplyPlanningUnitId = this.el.getValueFromCoords(0, y);
+                console.log("MYVALUE----------->1", SupplyPlanningUnitId);
+
+                let forecastPlanignUnitListForNotDuplicate = this.state.forecastPlanignUnitListForNotDuplicate;
+                console.log("MYVALUE----------->2", forecastPlanignUnitListForNotDuplicate);
+                let index = forecastPlanignUnitListForNotDuplicate.filter(c => c.supplyPlanPlanningUnitId == SupplyPlanningUnitId);
+                console.log("MYVALUE----------->3", index);
+                if (index.length > 0) {
+                    console.log("MYVALUE----------->41", forecastPlanignUnitListForNotDuplicate.filter(c => c.supplyPlanPlanningUnitId != SupplyPlanningUnitId));
+                    
+                    this.setState({
+                        forecastPlanignUnitListForNotDuplicate: forecastPlanignUnitListForNotDuplicate.filter(c => c.supplyPlanPlanningUnitId != SupplyPlanningUnitId)
+                    })
+                } else {
+                    console.log("MYVALUE----------->42", forecastPlanignUnitListForNotDuplicate);
+                }
+
+
+
+                // let forecastPlanignUnitListForNotDuplicate = this.state.forecastPlanignUnitListForNotDuplicate;
+                // let tempForecastPlanignUnitListForNotDuplicate = forecastPlanignUnitListForNotDuplicate;
+                // console.log("MYVALUE----------->2", forecastPlanignUnitListForNotDuplicate);
+                // for (var i = 0; i < forecastPlanignUnitListForNotDuplicate.length; i++) {
+
+                //     const index = tempForecastPlanignUnitListForNotDuplicate.findIndex(c => c.supplyPlanPlanningUnitId == forecastPlanignUnitListForNotDuplicate[i].forecastPlanningUnitId);
+                //     console.log("MYVALUE----------->3", index);
+                //     if (index > 0) {
+                //         const result = mylist.splice(index, 1);
+                //     }
+
+                // }
+
+
                 this.el.setValueFromCoords(5, y, '', true);
                 this.el.setValueFromCoords(7, y, '', true);
                 this.el.setValueFromCoords(8, y, '', true);
@@ -789,7 +822,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
             for (var j = 0; j < papuList.length; j++) {
 
                 let planningUnitObj = this.state.planningUnitList.filter(c => c.planningUnitId == papuList[j].planningUnit.id)[0];
-
+                console.log("TracerCategory--------->", getLabelText(papuList[j].planningUnit.label, this.state.lang) + ' | ' + papuList[j].planningUnit.id + ' ------ ' + planningUnitObj.forecastingUnit.tracerCategory.label.label_en);
                 data = [];
                 data[0] = papuList[j].planningUnit.id
                 data[1] = getLabelText(papuList[j].planningUnit.label, this.state.lang) + ' | ' + papuList[j].planningUnit.id
