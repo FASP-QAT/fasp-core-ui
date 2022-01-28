@@ -479,8 +479,11 @@ export default class CommitTreeComponent extends React.Component {
                         //Consumption : missing months
                         for (var i = 0; moment(curDate).format("YYYY-MM") < moment(Date.now()).format("YYYY-MM"); i++) {
                             curDate = moment(startDate).add(i, 'months').format("YYYY-MM-DD");
-                            var consumptionListFilteredForMonth = consumptionList.filter(c => c.planningUnit.id == puId && c.region.id == regionId && c.month == curDate);
-                            if (consumptionListFilteredForMonth.length == 0) {
+                            var consumptionListFilteredForMonth = consumptionList.filter(c => c.planningUnit.id == puId && c.region.id == regionId);
+                            var consumptionListForCurrentMonth=consumptionListFilteredForMonth.filter(c => moment(c.month).format("YYYY-MM") == moment(curDate).format("YYYY-MM"));
+                            var checkIfPrevMonthConsumptionAva = consumptionListFilteredForMonth.filter(c => moment(c.month).format("YYYY-MM") < moment(curDate).format("YYYY-MM"));
+                            var checkIfNextMonthConsumptionAva = consumptionListFilteredForMonth.filter(c => moment(c.month).format("YYYY-MM") > moment(curDate).format("YYYY-MM"));
+                            if (consumptionListForCurrentMonth.length == 0 && checkIfPrevMonthConsumptionAva.length > 0 && checkIfNextMonthConsumptionAva.length > 0) {
                                 monthsArray.push(moment(curDate).format(DATE_FORMAT_CAP_WITHOUT_DATE));
                             }
                         }
@@ -877,7 +880,7 @@ export default class CommitTreeComponent extends React.Component {
                             var programJson = datasetJson;
                             programJson.currentVersion.versionType = { id: document.getElementById("versionTypeId").value };
                             programJson.currentVersion.notes = document.getElementById("notes").value;;
-                            console.log("ProgramJson+++",programJson);
+                            console.log("ProgramJson+++", programJson);
                             //create saveDatasetData in ProgramService
                             DatasetService.saveDatasetData(programJson, this.state.comparedLatestVersion).then(response => {
                                 if (response.status == 200) {
@@ -1805,9 +1808,9 @@ export default class CommitTreeComponent extends React.Component {
                                         </div>
                                         <CompareVersionTable ref="conflictChild" page="commit" datasetData={this.state.programDataLocal} datasetData1={this.state.programDataServer} datasetData2={this.state.programDataDownloaded} versionLabel={"V" + this.state.programDataLocal.currentVersion.versionId + "(Local)"} versionLabel1={"V" + this.state.programDataServer.currentVersion.versionId + "(Server)"} updateState={this.updateState} />
                                         <div className='ForecastSummaryTable'>
-                                        <div className="table-responsive RemoveStriped commitversionTable CommitTableMarginTop consumptionDataEntryTable">
-                                            <div id="tableDiv" />
-                                        </div>
+                                            <div className="table-responsive RemoveStriped commitversionTable CommitTableMarginTop consumptionDataEntryTable">
+                                                <div id="tableDiv" />
+                                            </div>
                                         </div>
                                     </>
                                 }

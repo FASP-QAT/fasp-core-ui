@@ -337,6 +337,7 @@ export default class CreateTreeTemplate extends Component {
         this.pickAMonth2 = React.createRef()
         this.pickAMonth1 = React.createRef()
         this.state = {
+            hidePlanningUnit : false,
             maxNodeDataId: '',
             nodeDataMomList: [],
             modelingJexcelLoader: false,
@@ -574,13 +575,13 @@ export default class CreateTreeTemplate extends Component {
     }
     getMaxNodeDataId() {
         var maxNodeDataId = 0;
-        if (this.state.maxNodeDataId != "" && this.state.maxNodeDataId != 0) {
-            maxNodeDataId = parseInt(this.state.maxNodeDataId + 1);
-            console.log("maxNodeDataId 1---", maxNodeDataId)
-            this.setState({
-                maxNodeDataId
-            })
-        } else {
+        // if (this.state.maxNodeDataId != "" && this.state.maxNodeDataId != 0) {
+        //     maxNodeDataId = parseInt(this.state.maxNodeDataId + 1);
+        //     console.log("maxNodeDataId 1---", maxNodeDataId)
+        //     this.setState({
+        //         maxNodeDataId
+        //     })
+        // } else {
             var items = this.state.items;
             var nodeDataMap = [];
             for (let i = 0; i < items.length; i++) {
@@ -594,7 +595,7 @@ export default class CreateTreeTemplate extends Component {
             this.setState({
                 maxNodeDataId
             })
-        }
+        // }
         return maxNodeDataId;
     }
 
@@ -736,7 +737,7 @@ export default class CreateTreeTemplate extends Component {
     }
 
     filterScalingDataByMonth(date) {
-        // console.log("date--->>>>>>>", date);
+        console.log("date--->>>>>>>", date);
         var json = this.state.modelingEl.getJson(null, false);
         // console.log("modelingElData>>>", json);
         var scalingTotal = 0;
@@ -747,7 +748,10 @@ export default class CreateTreeTemplate extends Component {
             var stopDate = map1.get("4");
             var modelingTypeId = map1.get("2");
             var dataValue = modelingTypeId == 2 ? map1.get("6") : map1.get("5");
-            const result = moment(date).isBetween(startDate, stopDate, null, '[)');
+            console.log("startDate---", startDate);
+            console.log("stopDate---", stopDate);
+            const result = moment(date).isBetween(startDate, stopDate, null, '[]');
+            console.log("result---", result);
             console.log("modelingTypeId---", modelingTypeId);
             if (result) {
                 var nodeValue = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].calculatedDataValue;
@@ -2610,7 +2614,7 @@ export default class CreateTreeTemplate extends Component {
             var noFURequired = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.oneTimeUsage != "true" && (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.oneTimeUsage != true ? ((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.repeatCount / convertToMonth) * noOfMonthsInUsagePeriod : noOfFUPatient;
             console.log("noFURequired---", noFURequired);
 
-        } else if (usageTypeId == 1 && oneTimeUsage != null && (oneTimeUsage == "true" || oneTimeUsage == true)) {
+        } else if (usageTypeId == 1) {
             if (this.state.currentItemConfig.context.payload.nodeType.id == 4) {
                 noFURequired = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.noOfForecastingUnitsPerPerson / (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.noOfPersons;
             } else {
@@ -3511,6 +3515,7 @@ export default class CreateTreeTemplate extends Component {
                             },
                             nodeDataMap: [
                                 [{
+                                    nodeDataId : 1,
                                     notes: '',
                                     month: new Date(),
                                     dataValue: '',
@@ -3562,6 +3567,7 @@ export default class CreateTreeTemplate extends Component {
                         },
                         nodeDataMap: [
                             [{
+                                nodeDataId : 1,
                                 notes: '',
                                 nodeDataModelingList: [],
                                 nodeDataOverrideList: [],
@@ -3948,7 +3954,7 @@ export default class CreateTreeTemplate extends Component {
         var parentSortOrder = items.filter(c => c.id == itemConfig.context.parent)[0].sortOrder;
         var childList = items.filter(c => c.parent == itemConfig.context.parent);
         newItem.sortOrder = parentSortOrder.concat(".").concat(("0" + (Number(childList.length) + 1)).slice(-2));
-        (newItem.payload.nodeDataMap[0])[0].nodeDataId = this.getMaxNodeDataId();
+        (newItem.payload.nodeDataMap[0])[0].nodeDataId = this.getMaxNodeDataId() + 1;
         (newItem.payload.nodeDataMap[0])[0].month = moment((newItem.payload.nodeDataMap[0])[0].month).startOf('month').format("YYYY-MM-DD")
         if (itemConfig.context.payload.nodeType.id == 4) {
             (newItem.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.label.label_en = (itemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.label.label_en;
@@ -6184,6 +6190,7 @@ export default class CreateTreeTemplate extends Component {
                                 event.stopPropagation();
                                 console.log("add node----", itemConfig);
                                 this.setState({
+                                    scalingList: [],
                                     usageTemplateId: '',
                                     usageText: "",
                                     level0: true,
@@ -6778,6 +6785,7 @@ export default class CreateTreeTemplate extends Component {
                                                                                 type="checkbox"
                                                                                 id="active6"
                                                                                 name="active6"
+                                                                                disabled={this.state.hidePlanningUnit}
                                                                                 // checked={false}
                                                                                 onClick={(e) => { this.filterPlanningUnitNode(e); }}
                                                                             />

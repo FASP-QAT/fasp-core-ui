@@ -1022,6 +1022,7 @@ export default class BuildTree extends Component {
             var nodeDataMap = {};
             var tempArray = [];
             var tempJson = {
+                nodeDataId:1,
                 notes: '',
                 month: moment(new Date()).startOf('month').format("YYYY-MM-DD"),
                 dataValue: "",
@@ -1142,7 +1143,7 @@ export default class BuildTree extends Component {
             var dataValue = modelingTypeId == 2 ? map1.get("6") : map1.get("5");
             console.log("startDate---", startDate);
             console.log("stopDate---", stopDate);
-            const result = moment(date).isBetween(startDate, stopDate, null, '[)');
+            const result = moment(date).isBetween(startDate, stopDate, null, '[]');
             console.log("result---", result);
             if (result) {
                 var nodeValue = this.state.currentScenario.calculatedDataValue;
@@ -1502,7 +1503,7 @@ export default class BuildTree extends Component {
             data[0] = momList[j].month
             data[1] = parseFloat(momList[j].startValue).toFixed(2)
             data[2] = parseFloat(momList[j].difference).toFixed(2)
-            data[3] = parseFloat(parseFloat(momList[j].startValue) + parseFloat(momList[j].difference)).toFixed(2)
+            data[3] = parseFloat(parseFloat(momList[j].startValue) + parseFloat(momList[j].difference)) < 0 ? 0 : parseFloat(parseFloat(momList[j].startValue) + parseFloat(momList[j].difference)).toFixed(2)
             data[4] = parseFloat(momList[j].seasonalityPerc).toFixed(2)
             data[5] = parseFloat(momList[j].manualChange).toFixed(2)
             data[6] = parseFloat(momList[j].endValue).toFixed(2)
@@ -3210,7 +3211,7 @@ export default class BuildTree extends Component {
                     flatList[i].payload.nodeDataMap = nodeDataMap;
                 }
                 console.log("flat list--->", flatList);
-                var maxTreeId = Math.max(...treeData.map(o => o.treeId));
+                var maxTreeId = treeData.length > 0 ? Math.max(...treeData.map(o => o.treeId)) : 0;
                 var treeId = parseInt(maxTreeId) + 1;
                 var tempTree = {
                     treeId: treeId,
@@ -3258,7 +3259,7 @@ export default class BuildTree extends Component {
             console.log("tree data---", this.state.treeData);
             var curTreeObj = this.state.treeData.filter(x => x.treeId == treeId)[0];
             console.log("curTreeObj---", curTreeObj)
-            var regionValues = (curTreeObj.regionList).map((item, i) => {
+            var regionValues = (curTreeObj.regionList) != null && (curTreeObj.regionList).map((item, i) => {
                 return ({ label: getLabelText(item.label, this.state.lang), value: item.id })
 
             }, this);
