@@ -4134,3 +4134,7 @@ z-index:999;
   .jexcel_contextmenu>.header{
     display:none
   }
+
+  .jexcel > thead.resizable > tr > .arrow-down:not(.AsteriskTheadtrTd)::after {
+    content: ""!important;
+  }
