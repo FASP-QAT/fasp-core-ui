@@ -839,7 +839,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                     myResult.programData = datasetData;
                     var putRequest = datasetTransaction.put(myResult);
                     this.setState({
-                        dataChanged:false
+                        dataChanged: false
                     })
                     putRequest.onerror = function (event) {
                     }.bind(this);
@@ -982,7 +982,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                     smoothingId: smoothingId,
                     arimaId: arimaId,
                     noDataMessage: "",
-                    dataChanged:true,
+                    dataChanged: true,
                     loading: false
                 }, () => {
                     this.buildJxl();
@@ -1025,7 +1025,7 @@ export default class ExtrapolateDataComponent extends React.Component {
         csvRow.push('')
         csvRow.push('"' + (i18n.t('static.program.region') + ' : ' + document.getElementById("regionId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
         csvRow.push('')
-        csvRow.push('"'+(i18n.t('static.extrapolation.selectedExtraploationMethods'))+'"')
+        csvRow.push('"' + (i18n.t('static.extrapolation.selectedExtraploationMethods')) + '"')
         if (this.state.movingAvgId) {
             csvRow.push('"' + (i18n.t('static.extrapolation.movingAverages')) + '"')
         }
@@ -1148,7 +1148,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                 this.state.smoothingId && tesDataFilter.length > 0 && tesDataFilter[0].forecast != null ? (Number(tesDataFilter[0].forecast) - CI).toFixed(2) : '',
                 this.state.smoothingId && tesDataFilter.length > 0 && tesDataFilter[0].forecast != null ? Number(tesDataFilter[0].forecast).toFixed(2) : '',
                 this.state.smoothingId && tesDataFilter.length > 0 && tesDataFilter[0].forecast != null ? (Number(tesDataFilter[0].forecast) + CI).toFixed(2) : '',
-                this.state.arimaId?"":"")
+                this.state.arimaId ? "" : "")
             C.push(this.addDoubleQuoteToRowContent(B));
         }
         for (var i = 0; i < C.length; i++) {
@@ -1303,178 +1303,178 @@ export default class ExtrapolateDataComponent extends React.Component {
         });
     }
 
-    exportPDFDataCheck(){
+    exportPDFDataCheck() {
         const addFooters = doc => {
-    
-          const pageCount = doc.internal.getNumberOfPages()
-    
-          doc.setFont('helvetica', 'bold')
-          doc.setFontSize(6)
-          for (var i = 1; i <= pageCount; i++) {
-              doc.setPage(i)
-    
-              doc.setPage(i)
-              doc.text('Page ' + String(i) + ' of ' + String(pageCount), doc.internal.pageSize.width / 9, doc.internal.pageSize.height - 30, {
-                  align: 'center'
-              })
-              doc.text('Copyright © 2020 ' + i18n.t('static.footer'), doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
-                  align: 'center'
-              })
-    
-    
-          }
-      }
-      const addHeaders = doc => {
-    
-          const pageCount = doc.internal.getNumberOfPages()
-    
-    
-          //  var file = new File('QAT-logo.png','../../../assets/img/QAT-logo.png');
-          // var reader = new FileReader();
-    
-          //var data='';
-          // Use fs.readFile() method to read the file 
-          //fs.readFile('../../assets/img/logo.svg', 'utf8', function(err, data){ 
-          //}); 
-          for (var i = 1; i <= pageCount; i++) {
-              doc.setFontSize(12)
-              doc.setFont('helvetica', 'bold')
-              doc.setPage(i)
-              doc.addImage(LOGO, 'png', 0, 10, 180, 50, 'FAST');
-              /*doc.addImage(data, 10, 30, {
-                align: 'justify'
-              });*/
-              doc.setTextColor("#002f6c");
-              doc.text(i18n.t('static.common.dataCheck'), doc.internal.pageSize.width / 2, 60, {
-                  align: 'center'
-              })
-              if (i == 1) {
-                  doc.setFont('helvetica', 'normal')
-                  doc.setFontSize(8)
-                  doc.text(i18n.t('static.dashboard.programheader') + ' : ' + document.getElementById("forecastProgramId").selectedOptions[0].text, doc.internal.pageSize.width / 20, 90, {
-                      align: 'left'
-                  })
-    
-              }
-    
-          }
-      }
-    
-    
-      const unit = "pt";
-      const size = "A4"; // Use A1, A2, A3 or A4
-      const orientation = "landscape"; // portrait or landscape
-    
-      const marginLeft = 10;
-      const doc = new jsPDF(orientation, unit, size, true);
-    
-      doc.setFontSize(8);
-      doc.setFont('helvetica', 'normal')
-    
-    
-      var y = 110;
-    
-      doc.setFont('helvetica', 'bold')
-      var planningText = doc.splitTextToSize(i18n.t('static.commitTree.consumptionForecast'), doc.internal.pageSize.width * 3 / 4);
-      // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
-      y = y + 20;
-      for (var i = 0; i < planningText.length; i++) {
-          if (y > doc.internal.pageSize.height - 100) {
-              doc.addPage();
-              y = 80;
-    
-          }
-          doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
-          y = y + 10;
-      }
-    
-      doc.setFont('helvetica', 'normal')
-      planningText = doc.splitTextToSize("a. " + i18n.t('static.commitTree.monthsMissingActualConsumptionValues'), doc.internal.pageSize.width * 3 / 4);
-      // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
-      y = y + 10;
-      for (var i = 0; i < planningText.length; i++) {
-          if (y > doc.internal.pageSize.height - 100) {
-              doc.addPage();
-              y = 80;
-    
-          }
-          doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
-          y = y + 10;
-      }
-      this.state.missingMonthList.map((item, i) => {
-          doc.setFont('helvetica', 'bold')
-          planningText = doc.splitTextToSize(getLabelText(item.planningUnitLabel, this.state.lang) + " - " + getLabelText(item.regionLabel, this.state.lang) + " : ", doc.internal.pageSize.width * 3 / 4);
-          // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
-          y = y + 10;
-          for (var i = 0; i < planningText.length; i++) {
-              if (y > doc.internal.pageSize.height - 100) {
-                  doc.addPage();
-                  y = 80;
-    
-              }
-              doc.text(doc.internal.pageSize.width / 15, y, planningText[i]);
-              y = y + 10;
-          }
-          doc.setFont('helvetica', 'normal')
-          planningText = doc.splitTextToSize("" + item.monthsArray, doc.internal.pageSize.width * 3 / 4);
-          // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
-          y = y + 3;
-          for (var i = 0; i < planningText.length; i++) {
-              if (y > doc.internal.pageSize.height - 100) {
-                  doc.addPage();
-                  y = 80;
-    
-              }
-              doc.text(doc.internal.pageSize.width / 15, y, planningText[i]);
-              y = y + 10;
-          }
-      })
-    
-      doc.setFont('helvetica', 'normal')
-      planningText = doc.splitTextToSize("b. " + i18n.t('static.commitTree.puThatDoNotHaveAtleast24MonthsOfActualConsumptionValues'), doc.internal.pageSize.width * 3 / 4);
-      // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
-      y = y + 20;
-      for (var i = 0; i < planningText.length; i++) {
-          if (y > doc.internal.pageSize.height - 100) {
-              doc.addPage();
-              y = 80;
-    
-          }
-          doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
-          y = y + 10;
-      }
-      this.state.consumptionListlessTwelve.map((item, i) => {
-          doc.setFont('helvetica', 'bold')
-          planningText = doc.splitTextToSize(getLabelText(item.planningUnitLabel, this.state.lang) + " - " + getLabelText(item.regionLabel, this.state.lang) + " : ", doc.internal.pageSize.width * 3 / 4);
-          // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
-          y = y + 10;
-          for (var i = 0; i < planningText.length; i++) {
-              if (y > doc.internal.pageSize.height - 100) {
-                  doc.addPage();
-                  y = 80;
-    
-              }
-              doc.text(doc.internal.pageSize.width / 15, y, planningText[i]);
-              y = y + 10;
-          }
-          doc.setFont('helvetica', 'normal')
-          planningText = doc.splitTextToSize("" + item.noOfMonths + " month(s)", doc.internal.pageSize.width * 3 / 4);
-          // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
-          y = y + 3;
-          for (var i = 0; i < planningText.length; i++) {
-              if (y > doc.internal.pageSize.height - 100) {
-                  doc.addPage();
-                  y = 80;
-    
-              }
-              doc.text(doc.internal.pageSize.width / 15, y, planningText[i]);
-              y = y + 10;
-          }
-      })
-      addHeaders(doc)
-      addFooters(doc)
-      doc.save(i18n.t('static.common.dataCheck').concat('.pdf'));
-      }
+
+            const pageCount = doc.internal.getNumberOfPages()
+
+            doc.setFont('helvetica', 'bold')
+            doc.setFontSize(6)
+            for (var i = 1; i <= pageCount; i++) {
+                doc.setPage(i)
+
+                doc.setPage(i)
+                doc.text('Page ' + String(i) + ' of ' + String(pageCount), doc.internal.pageSize.width / 9, doc.internal.pageSize.height - 30, {
+                    align: 'center'
+                })
+                doc.text('Copyright © 2020 ' + i18n.t('static.footer'), doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
+                    align: 'center'
+                })
+
+
+            }
+        }
+        const addHeaders = doc => {
+
+            const pageCount = doc.internal.getNumberOfPages()
+
+
+            //  var file = new File('QAT-logo.png','../../../assets/img/QAT-logo.png');
+            // var reader = new FileReader();
+
+            //var data='';
+            // Use fs.readFile() method to read the file 
+            //fs.readFile('../../assets/img/logo.svg', 'utf8', function(err, data){ 
+            //}); 
+            for (var i = 1; i <= pageCount; i++) {
+                doc.setFontSize(12)
+                doc.setFont('helvetica', 'bold')
+                doc.setPage(i)
+                doc.addImage(LOGO, 'png', 0, 10, 180, 50, 'FAST');
+                /*doc.addImage(data, 10, 30, {
+                  align: 'justify'
+                });*/
+                doc.setTextColor("#002f6c");
+                doc.text(i18n.t('static.common.dataCheck'), doc.internal.pageSize.width / 2, 60, {
+                    align: 'center'
+                })
+                if (i == 1) {
+                    doc.setFont('helvetica', 'normal')
+                    doc.setFontSize(8)
+                    doc.text(i18n.t('static.dashboard.programheader') + ' : ' + document.getElementById("forecastProgramId").selectedOptions[0].text, doc.internal.pageSize.width / 20, 90, {
+                        align: 'left'
+                    })
+
+                }
+
+            }
+        }
+
+
+        const unit = "pt";
+        const size = "A4"; // Use A1, A2, A3 or A4
+        const orientation = "landscape"; // portrait or landscape
+
+        const marginLeft = 10;
+        const doc = new jsPDF(orientation, unit, size, true);
+
+        doc.setFontSize(8);
+        doc.setFont('helvetica', 'normal')
+
+
+        var y = 110;
+
+        doc.setFont('helvetica', 'bold')
+        var planningText = doc.splitTextToSize(i18n.t('static.commitTree.consumptionForecast'), doc.internal.pageSize.width * 3 / 4);
+        // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+        y = y + 20;
+        for (var i = 0; i < planningText.length; i++) {
+            if (y > doc.internal.pageSize.height - 100) {
+                doc.addPage();
+                y = 80;
+
+            }
+            doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
+            y = y + 10;
+        }
+
+        doc.setFont('helvetica', 'normal')
+        planningText = doc.splitTextToSize("a. " + i18n.t('static.commitTree.monthsMissingActualConsumptionValues'), doc.internal.pageSize.width * 3 / 4);
+        // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+        y = y + 10;
+        for (var i = 0; i < planningText.length; i++) {
+            if (y > doc.internal.pageSize.height - 100) {
+                doc.addPage();
+                y = 80;
+
+            }
+            doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
+            y = y + 10;
+        }
+        this.state.missingMonthList.map((item, i) => {
+            doc.setFont('helvetica', 'bold')
+            planningText = doc.splitTextToSize(getLabelText(item.planningUnitLabel, this.state.lang) + " - " + getLabelText(item.regionLabel, this.state.lang) + " : ", doc.internal.pageSize.width * 3 / 4);
+            // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+            y = y + 10;
+            for (var i = 0; i < planningText.length; i++) {
+                if (y > doc.internal.pageSize.height - 100) {
+                    doc.addPage();
+                    y = 80;
+
+                }
+                doc.text(doc.internal.pageSize.width / 15, y, planningText[i]);
+                y = y + 10;
+            }
+            doc.setFont('helvetica', 'normal')
+            planningText = doc.splitTextToSize("" + item.monthsArray, doc.internal.pageSize.width * 3 / 4);
+            // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+            y = y + 3;
+            for (var i = 0; i < planningText.length; i++) {
+                if (y > doc.internal.pageSize.height - 100) {
+                    doc.addPage();
+                    y = 80;
+
+                }
+                doc.text(doc.internal.pageSize.width / 15, y, planningText[i]);
+                y = y + 10;
+            }
+        })
+
+        doc.setFont('helvetica', 'normal')
+        planningText = doc.splitTextToSize("b. " + i18n.t('static.commitTree.puThatDoNotHaveAtleast24MonthsOfActualConsumptionValues'), doc.internal.pageSize.width * 3 / 4);
+        // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+        y = y + 20;
+        for (var i = 0; i < planningText.length; i++) {
+            if (y > doc.internal.pageSize.height - 100) {
+                doc.addPage();
+                y = 80;
+
+            }
+            doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
+            y = y + 10;
+        }
+        this.state.consumptionListlessTwelve.map((item, i) => {
+            doc.setFont('helvetica', 'bold')
+            planningText = doc.splitTextToSize(getLabelText(item.planningUnitLabel, this.state.lang) + " - " + getLabelText(item.regionLabel, this.state.lang) + " : ", doc.internal.pageSize.width * 3 / 4);
+            // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+            y = y + 10;
+            for (var i = 0; i < planningText.length; i++) {
+                if (y > doc.internal.pageSize.height - 100) {
+                    doc.addPage();
+                    y = 80;
+
+                }
+                doc.text(doc.internal.pageSize.width / 15, y, planningText[i]);
+                y = y + 10;
+            }
+            doc.setFont('helvetica', 'normal')
+            planningText = doc.splitTextToSize("" + item.noOfMonths + " month(s)", doc.internal.pageSize.width * 3 / 4);
+            // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+            y = y + 3;
+            for (var i = 0; i < planningText.length; i++) {
+                if (y > doc.internal.pageSize.height - 100) {
+                    doc.addPage();
+                    y = 80;
+
+                }
+                doc.text(doc.internal.pageSize.width / 15, y, planningText[i]);
+                y = y + 10;
+            }
+        })
+        addHeaders(doc)
+        addFooters(doc)
+        doc.save(i18n.t('static.common.dataCheck').concat('.pdf'));
+    }
 
     render() {
         const pickerLang = {
@@ -2408,10 +2408,10 @@ export default class ExtrapolateDataComponent extends React.Component {
                 <Modal isOpen={this.state.toggleDataCheck}
                     className={'modal-lg ' + this.props.className} >
                     <ModalHeader toggle={() => this.openDataCheckModel()} className="modalHeaderSupplyPlan">
-                    <div>
-                        <img className=" pull-right iconClass cursor ml-lg-2" style={{ height: '22px', width: '22px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.exportPDFDataCheck()} />
-                        <strong>{i18n.t('static.common.dataCheck')}</strong>
-                    </div>
+                        <div>
+                            <img className=" pull-right iconClass cursor ml-lg-2" style={{ height: '22px', width: '22px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.exportPDFDataCheck()} />
+                            <strong>{i18n.t('static.common.dataCheck')}</strong>
+                        </div>
                     </ModalHeader>
                     <div>
                         <ModalBody>
@@ -2503,8 +2503,11 @@ export default class ExtrapolateDataComponent extends React.Component {
                 //Consumption : missing months
                 for (var i = 0; moment(curDate).format("YYYY-MM") < moment(stopDate).format("YYYY-MM"); i++) {
                     curDate = moment(startDate).add(i, 'months').format("YYYY-MM-DD");
-                    var consumptionListFilteredForMonth = consumptionList.filter(c => c.planningUnit.id == puId && c.region.id == regionId && c.month == curDate);
-                    if (consumptionListFilteredForMonth.length == 0) {
+                    var consumptionListFilteredForMonth = consumptionList.filter(c => c.planningUnit.id == puId && c.region.id == regionId);
+                    var consumptionListForCurrentMonth = consumptionListFilteredForMonth.filter(c => moment(c.month).format("YYYY-MM") == moment(curDate).format("YYYY-MM"));
+                    var checkIfPrevMonthConsumptionAva = consumptionListFilteredForMonth.filter(c => moment(c.month).format("YYYY-MM") < moment(curDate).format("YYYY-MM"));
+                    var checkIfNextMonthConsumptionAva = consumptionListFilteredForMonth.filter(c => moment(c.month).format("YYYY-MM") > moment(curDate).format("YYYY-MM"));
+                    if (consumptionListForCurrentMonth.length == 0 && checkIfPrevMonthConsumptionAva.length > 0 && checkIfNextMonthConsumptionAva.length > 0) {
                         monthsArray.push(moment(curDate).format(DATE_FORMAT_CAP_WITHOUT_DATE));
                     }
                 }
