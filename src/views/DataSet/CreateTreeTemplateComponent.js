@@ -31,7 +31,7 @@ import TracerCategoryService from '../../api/TracerCategoryService';
 import ForecastingUnitService from '../../api/ForecastingUnitService';
 import PlanningUnitService from '../../api/PlanningUnitService';
 import UsageTemplateService from '../../api/UsageTemplateService';
-import { INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, TREE_DIMENSION_ID, JEXCEL_MONTH_PICKER_FORMAT, DATE_FORMAT_CAP_WITHOUT_DATE, JEXCEL_DECIMAL_NO_REGEX_LONG } from '../../Constants.js'
+import { INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY, JEXCEL_PAGINATION_OPTION,JEXCEL_DECIMAL_MONTHLY_CHANGE, JEXCEL_PRO_KEY, TREE_DIMENSION_ID, JEXCEL_MONTH_PICKER_FORMAT, DATE_FORMAT_CAP_WITHOUT_DATE, JEXCEL_DECIMAL_NO_REGEX_LONG } from '../../Constants.js'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import TextField from '@material-ui/core/TextField';
@@ -2045,7 +2045,7 @@ export default class CreateTreeTemplate extends Component {
         var rowData = elInstance.getRowData(y);
         console.log("modelingTypeId-3--", rowData[2])
         if (rowData[2] != "") {
-            // var reg = JEXCEL_DECIMAL_NO_REGEX_LONG;
+            var reg = JEXCEL_DECIMAL_MONTHLY_CHANGE;
             var monthDifference = moment(stopDate).diff(startDate, 'months', true);
             var nodeValue = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].calculatedDataValue;
             var calculatedChangeForMonth;
@@ -2058,11 +2058,11 @@ export default class CreateTreeTemplate extends Component {
                     instance.jexcel.setStyle(col, "background-color", "yellow");
                     instance.jexcel.setComments(col, i18n.t('static.label.fieldRequired'));
                 }
-                // else if (!(reg.test(value))) {
-                //     instance.jexcel.setStyle(col, "background-color", "transparent");
-                //     instance.jexcel.setStyle(col, "background-color", "yellow");
-                //     instance.jexcel.setComments(col, i18n.t('static.message.invalidnumber'));
-                // }
+                else if (!(reg.test(value))) {
+                    instance.jexcel.setStyle(col, "background-color", "transparent");
+                    instance.jexcel.setStyle(col, "background-color", "yellow");
+                    instance.jexcel.setComments(col, i18n.t('static.message.invalidnumber'));
+                }
                 else {
                     instance.jexcel.setStyle(col, "background-color", "transparent");
                     instance.jexcel.setComments(col, "");
@@ -2077,16 +2077,17 @@ export default class CreateTreeTemplate extends Component {
             // Monthly change #
             if (x == 6 && rowData[2] == 2) {
                 var col = ("G").concat(parseInt(y) + 1);
+                var reg = JEXCEL_DECIMAL_MONTHLY_CHANGE;
                 if (value == "") {
                     instance.jexcel.setStyle(col, "background-color", "transparent");
                     instance.jexcel.setStyle(col, "background-color", "yellow");
                     instance.jexcel.setComments(col, i18n.t('static.label.fieldRequired'));
                 }
-                // else if (!(reg.test(value))) {
-                //     instance.jexcel.setStyle(col, "background-color", "transparent");
-                //     instance.jexcel.setStyle(col, "background-color", "yellow");
-                //     instance.jexcel.setComments(col, i18n.t('static.message.invalidnumber'));
-                // }
+                else if (!(reg.test(value))) {
+                    instance.jexcel.setStyle(col, "background-color", "transparent");
+                    instance.jexcel.setStyle(col, "background-color", "yellow");
+                    instance.jexcel.setComments(col, i18n.t('static.message.invalidnumber'));
+                }
                 else {
                     instance.jexcel.setStyle(col, "background-color", "transparent");
                     instance.jexcel.setComments(col, "");

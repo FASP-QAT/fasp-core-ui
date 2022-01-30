@@ -21,7 +21,7 @@ import getLabelText from '../../CommonComponent/getLabelText';
 import moment from 'moment';
 import Picker from 'react-month-picker';
 import MonthBox from '../../CommonComponent/MonthBox.js';
-import { INDEXED_DB_NAME, INDEXED_DB_VERSION, TREE_DIMENSION_ID, SECRET_KEY, JEXCEL_MONTH_PICKER_FORMAT, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, JEXCEL_DECIMAL_NO_REGEX_LONG, DATE_FORMAT_CAP_WITHOUT_DATE } from '../../Constants.js'
+import { INDEXED_DB_NAME, INDEXED_DB_VERSION, TREE_DIMENSION_ID, SECRET_KEY, JEXCEL_MONTH_PICKER_FORMAT, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, JEXCEL_DECIMAL_NO_REGEX_LONG, DATE_FORMAT_CAP_WITHOUT_DATE,JEXCEL_DECIMAL_MONTHLY_CHANGE } from '../../Constants.js'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import jexcel from 'jexcel-pro';
 import "../../../node_modules/jexcel-pro/dist/jexcel.css";
@@ -737,7 +737,7 @@ export default class BuildTree extends Component {
                 multiplier: item.planningUnit.multiplier
             })
         })
-        console.log("duplicate fu list--->", forecastingUnitList);
+        console.log("updatedPlanningUnitList", updatedPlanningUnitList);
         planningUnitList.map(item => {
             tracerCategoryList.push({
                 label: item.planningUnit.forecastingUnit.tracerCategory.label, tracerCategoryId: item.planningUnit.forecastingUnit.tracerCategory.id
@@ -753,6 +753,19 @@ export default class BuildTree extends Component {
             forecastingUnitList,
             planningUnitList: updatedPlanningUnitList,
             updatedPlanningUnitList
+        }, () => {
+            if (forecastingUnitList.length > 0) {
+                var fuIds = forecastingUnitList.map(x => x.id).join(", ");
+                console.log("fuIds---", fuIds)
+                if (fuIds != "") {
+                    var fuIdArray = fuIds.split(',').map(Number);
+                    console.log("fuIdArray---", fuIdArray);
+                    this.getUsageTemplateList(fuIdArray);
+                }
+                // var result = array.filter(function(value) {
+                //     return filterNumbers.indexOf(value) === -1;
+                // });
+            }
         });
     }
 
@@ -1022,7 +1035,7 @@ export default class BuildTree extends Component {
             var nodeDataMap = {};
             var tempArray = [];
             var tempJson = {
-                nodeDataId:1,
+                nodeDataId: 1,
                 notes: '',
                 month: moment(new Date()).startOf('month').format("YYYY-MM-DD"),
                 dataValue: "",
@@ -2277,7 +2290,7 @@ export default class BuildTree extends Component {
             data[2] = scalingList[j].modelingType.id
             data[3] = scalingList[j].startDate
             data[4] = scalingList[j].stopDate
-            data[5] = scalingList[j].modelingType.id != 2 ? parseFloat(scalingList[j].dataValue).toFixed(4) : ''
+            data[5] = scalingList[j].modelingType.id != 2 ? parseFloat(scalingList[j].dataValue).toFixed(2) : ''
             data[6] = scalingList[j].modelingType.id == 2 ? scalingList[j].dataValue : ''
             data[7] = cleanUp
             var nodeValue = this.state.currentScenario.calculatedDataValue;
@@ -2696,7 +2709,7 @@ export default class BuildTree extends Component {
         var rowData = elInstance.getRowData(y);
         console.log("modelingTypeId-3--", rowData[2])
         if (rowData[2] != "") {
-            // var reg = JEXCEL_DECIMAL_NO_REGEX_LONG;
+            var reg = JEXCEL_DECIMAL_MONTHLY_CHANGE;
             var monthDifference = moment(stopDate).diff(startDate, 'months', true);
             var nodeValue = this.state.currentScenario.calculatedDataValue;
             var calculatedChangeForMonth;
@@ -2709,11 +2722,11 @@ export default class BuildTree extends Component {
                     instance.jexcel.setStyle(col, "background-color", "yellow");
                     instance.jexcel.setComments(col, i18n.t('static.label.fieldRequired'));
                 }
-                // else if (!(reg.test(value))) {
-                //     instance.jexcel.setStyle(col, "background-color", "transparent");
-                //     instance.jexcel.setStyle(col, "background-color", "yellow");
-                //     instance.jexcel.setComments(col, i18n.t('static.message.invalidnumber'));
-                // }
+                else if (!(reg.test(value))) {
+                    instance.jexcel.setStyle(col, "background-color", "transparent");
+                    instance.jexcel.setStyle(col, "background-color", "yellow");
+                    instance.jexcel.setComments(col, i18n.t('static.message.invalidnumber'));
+                }
                 else {
                     instance.jexcel.setStyle(col, "background-color", "transparent");
                     instance.jexcel.setComments(col, "");
@@ -2728,16 +2741,17 @@ export default class BuildTree extends Component {
             // Monthly change #
             if (x == 6 && rowData[2] == 2) {
                 var col = ("G").concat(parseInt(y) + 1);
+                var reg = JEXCEL_DECIMAL_MONTHLY_CHANGE;
                 if (value == "") {
                     instance.jexcel.setStyle(col, "background-color", "transparent");
                     instance.jexcel.setStyle(col, "background-color", "yellow");
                     instance.jexcel.setComments(col, i18n.t('static.label.fieldRequired'));
                 }
-                // else if (!(reg.test(value))) {
-                //     instance.jexcel.setStyle(col, "background-color", "transparent");
-                //     instance.jexcel.setStyle(col, "background-color", "yellow");
-                //     instance.jexcel.setComments(col, i18n.t('static.message.invalidnumber'));
-                // }
+                else if (!(reg.test(value))) {
+                    instance.jexcel.setStyle(col, "background-color", "transparent");
+                    instance.jexcel.setStyle(col, "background-color", "yellow");
+                    instance.jexcel.setComments(col, i18n.t('static.message.invalidnumber'));
+                }
                 else {
                     instance.jexcel.setStyle(col, "background-color", "transparent");
                     instance.jexcel.setComments(col, "");
@@ -4286,7 +4300,7 @@ export default class BuildTree extends Component {
         });
     }
 
-    getUsageTemplateList() {
+    getUsageTemplateList(fuIdArray) {
         // console.log("tracerCategoryId---", tracerCategoryId);
         const lan = 'en';
         var db1;
@@ -4304,11 +4318,10 @@ export default class BuildTree extends Component {
             planningunitRequest.onsuccess = function (e) {
                 var myResult = [];
                 myResult = planningunitRequest.result;
-                var usageTemplateListAll = []
-                console.log("usageTemplateListAll===============6", myResult)
-
+                console.log("myResult===============6", myResult)
+                var usageTemplateListAll = myResult.filter(el => fuIdArray.indexOf(el.forecastingUnit.id) != -1);
                 this.setState({
-                    usageTemplateListAll: myResult
+                    usageTemplateListAll
                 }, () => {
                     console.log("usageTemplateList All===============>", this.state.usageTemplateListAll)
                 })
@@ -4362,7 +4375,7 @@ export default class BuildTree extends Component {
             this.getUnitListForDimensionIdFour();
             this.getUnitList();
             this.getUsageTypeList();
-            this.getUsageTemplateList();
+            // this.getUsageTemplateList();
             this.getNodeTyeList();
             this.getDatasetList();
             this.getModelingTypeList();
