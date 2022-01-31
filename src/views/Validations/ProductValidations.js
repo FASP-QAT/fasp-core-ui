@@ -458,7 +458,7 @@ class ProductValidation extends Component {
                     var selectedPlanningUnit = datasetData.planningUnitList.filter(c => c.planningUnit.id == finalData[i].nodeDataMap.puNode.planningUnit.id);
                     var price = "";
                     if (selectedPlanningUnit.length > 0) {
-                        price = selectedPlanningUnit[0].price;
+                        price = Number(selectedPlanningUnit[0].price);
                     }
                     var qty = "";
 
