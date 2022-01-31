@@ -721,7 +721,7 @@ class UsagePeriod extends Component {
                         <div className="table-responsive consumptionDataEntryTable">
                             {/* <div id="paputableDiv" style={{ display: this.state.loading ? "none" : "block" }} className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_PERIOD') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"}> */}
                             
-                            <div id="paputableDiv" style={{ display: this.state.loading ? "none" : "block",marginTop:'-13px' }} className={(AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_PERIOD') || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_USAGE_PERIOD')) ? "RowClickable" : "jexcelremoveReadonlybackground"}>
+                            <div id="paputableDiv" style={{ display: this.state.loading ? "none" : "block"}} className={(AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_PERIOD') || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_USAGE_PERIOD')) ? "RowClickable" : "jexcelremoveReadonlybackground"}>
                             </div>
                             </div>
                             <div style={{ display: this.state.loading ? "block" : "none" }}>

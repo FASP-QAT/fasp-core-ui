@@ -1532,22 +1532,28 @@ class DefaultLayout extends Component {
                             icon: 'fa fa-cog',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_PLANNING_UNIT_SETTING') && this.state.activeTab == 1 ? false : true) }
                           },
+                          // {
+                          //   name: i18n.t('static.common.loadDeleteDataSet'),
+                          //   url: '/dataset/loadDeleteDataSet',
+                          //   icon: 'fa fa-download',
+                          //   attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true) }
+                          // },
                           {
-                            name: i18n.t('static.common.loadDeleteDataSet'),
-                            url: '/dataset/loadDeleteDataSet',
-                            icon: 'fa fa-download',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true) }
-                          },
-                          {
-                            name: 'Import Dataset',
+                            name: 'Import Program',
                             url: '/dataset/importDataset',
                             icon: 'fa fa-cloud-download',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true) }
                           },
                           {
-                            name: 'Export Dataset',
+                            name: 'Export Program',
                             url: '/dataset/exportDataset',
                             icon: 'fa fa-arrow-circle-o-right',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true) }
+                          },
+                          {
+                            name: i18n.t('static.common.loadDeleteDataSet'),
+                            url: '/dataset/loadDeleteDataSet',
+                            icon: 'fa fa-download',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true) }
                           },
                           {
@@ -1564,18 +1570,18 @@ class DefaultLayout extends Component {
                           //   icon: 'fa fa-list-alt ',
                           //   attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true) }
                           // },
-                          {
-                            name: i18n.t('static.dataset.TreeTemplate'),
-                            url: '/dataset/listTreeTemplate',
-                            icon: 'fa fa-sitemap',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_TREE_TEMPLATE') && this.state.activeTab == 1 ? false : true) }
-                          },
-                          {
-                            name: i18n.t('static.usageTemplate.usageTemplate'),
-                            url: '/usageTemplate/listUsageTemplate',
-                            icon: 'fa fa-list-alt',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_USAGE_TEMPLATE') && this.state.activeTab == 1 ? false : true) }
-                          },
+                          // {
+                          //   name: i18n.t('static.dataset.TreeTemplate'),
+                          //   url: '/dataset/listTreeTemplate',
+                          //   icon: 'fa fa-sitemap',
+                          //   attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_TREE_TEMPLATE') && this.state.activeTab == 1 ? false : true) }
+                          // },
+                          // {
+                          //   name: i18n.t('static.usageTemplate.usageTemplate'),
+                          //   url: '/usageTemplate/listUsageTemplate',
+                          //   icon: 'fa fa-list-alt',
+                          //   attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_USAGE_TEMPLATE') && this.state.activeTab == 1 ? false : true) }
+                          // },
                           // {
                           //   name: i18n.t('static.versionSettings.versionSettings'),
                           //   url: '/dataset/versionSettings',
@@ -1606,6 +1612,12 @@ class DefaultLayout extends Component {
                             icon: 'fa fa-dot-circle-o',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_IMPORT_FROM_QAT_SUPPLY_PLAN') && this.state.activeTab == 1 ? false : true) }
                           },
+                          // {
+                          //   name: i18n.t('static.LoadConsumptionFromSupplyPlanning.LoadConsumptionFromSupplyPlanning'),
+                          //   url: '/importFromQATSupplyPlan/listImportFromQATSupplyPlan',
+                          //   icon: 'fa fa-dot-circle-o',
+                          //   attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_IMPORT_FROM_QAT_SUPPLY_PLAN') && this.state.activeTab == 1 ? false : true) }
+                          // },
                           {
                             name: i18n.t('static.dashboard.dataEntryAndAdjustments'),
                             url: '/dataentry/consumptionDataEntryAndAdjustment',
@@ -1637,6 +1649,18 @@ class DefaultLayout extends Component {
                             url: '/dataset/listTree',
                             icon: 'fa fa-sitemap',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_TREE') && this.state.activeTab == 1 ? false : true) }
+                          },
+                          {
+                            name: i18n.t('static.dataset.TreeTemplate'),
+                            url: '/dataset/listTreeTemplate',
+                            icon: 'fa fa-th-list',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_TREE_TEMPLATE') && this.state.activeTab == 1 ? false : true) }
+                          },
+                          {
+                            name: i18n.t('static.usageTemplate.usageTemplate'),
+                            url: '/usageTemplate/listUsageTemplate',
+                            icon: 'fa fa-list-alt',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_USAGE_TEMPLATE') && this.state.activeTab == 1 ? false : true) }
                           },
                           {
                             name: i18n.t('static.dashboard.modelingValidation'),
