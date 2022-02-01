@@ -263,7 +263,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                         data[6] = consumptionList[j].multiplier; //G
                         data[7] = `=ROUND(F${parseInt(j) + 1}*G${parseInt(j) + 1},0)`; //H
                         data[8] = consumptionList[j].dayOfStockOut;
-                        if (consumptionList[j].notes === null || ((consumptionList[j].notes).trim() == "NULL")) {
+                        if (consumptionList[j].notes === null || ((consumptionList[j].notes) == "NULL")) {
                             data[9] = "";
                         } else {
                             data[9] = consumptionList[j].notes;
@@ -676,6 +676,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
         if (json.length < jsonLength) {
             jsonLength = json.length;
         }
+        var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O']
         for (var y = 0; y < jsonLength; y++) {
             var rowData = elInstance.getRowData(y);
             if (rowData[12] != -1 && rowData[12] !== "" && rowData[12] != undefined) {
@@ -685,7 +686,6 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                 } else {
                     lastEditableDate = moment(Date.now()).subtract(FORECASTED_CONSUMPTION_MONTHS_IN_PAST + 1, 'months').format("YYYY-MM-DD");
                 }
-                var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O']
                 if (rowData[12] != -1 && moment(rowData[0]).format("YYYY-MM") < moment(lastEditableDate).format("YYYY-MM-DD") && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes("ROLE_BF_READONLY_ACCESS_REALM_ADMIN")) {
                     for (var c = 0; c < colArr.length; c++) {
                         var cell = elInstance.getCell((colArr[c]).concat(parseInt(y) + 1))
@@ -707,6 +707,17 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                         var cell = elInstance.getCell(("C").concat(parseInt(y) + 1))
                         cell.classList.remove('readonly');
                     }
+                    if (rowData[10] == false) {
+                        for (var c = 0; c < colArr.length; c++) {
+                            var cell = elInstance.getCell((colArr[c]).concat(parseInt(y) + 1))
+                            cell.classList.add('shipmentEntryDoNotInclude');
+                        }
+                    } else {
+                        for (var c = 0; c < colArr.length; c++) {
+                            var cell = elInstance.getCell((colArr[c]).concat(parseInt(y) + 1))
+                            cell.classList.remove('shipmentEntryDoNotInclude');
+                        }
+                    }
                 }
             } else {
                 if (rowData[2] == 2) {
@@ -723,6 +734,17 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                 } else {
                     var cell = elInstance.getCell(("C").concat(parseInt(y) + 1))
                     cell.classList.remove('readonly');
+                }
+                if (rowData[10] == false) {
+                    for (var c = 0; c < colArr.length; c++) {
+                        var cell = elInstance.getCell((colArr[c]).concat(parseInt(y) + 1))
+                        cell.classList.add('shipmentEntryDoNotInclude');
+                    }
+                } else {
+                    for (var c = 0; c < colArr.length; c++) {
+                        var cell = elInstance.getCell((colArr[c]).concat(parseInt(y) + 1))
+                        cell.classList.remove('shipmentEntryDoNotInclude');
+                    }
                 }
             }
         }
@@ -742,6 +764,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
         }
         var start = pageNo * (document.getElementsByClassName("jexcel_pagination_dropdown")[0]).value;
         for (var y = start; y < jsonLength; y++) {
+            var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O']
             var rowData = elInstance.getRowData(y);
             if (rowData[12] != -1 && rowData[12] !== "" && rowData[12] != undefined) {
                 var lastEditableDate = "";
@@ -750,7 +773,6 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                 } else {
                     lastEditableDate = moment(Date.now()).subtract(FORECASTED_CONSUMPTION_MONTHS_IN_PAST + 1, 'months').format("YYYY-MM-DD");
                 }
-                var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O']
                 if (rowData[12] != -1 && moment(rowData[0]).format("YYYY-MM") < moment(lastEditableDate).format("YYYY-MM-DD") && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes("ROLE_BF_READONLY_ACCESS_REALM_ADMIN")) {
                     for (var c = 0; c < colArr.length; c++) {
                         var cell = elInstance.getCell((colArr[c]).concat(parseInt(y) + 1))
@@ -772,6 +794,17 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                         var cell = elInstance.getCell(("C").concat(parseInt(y) + 1))
                         cell.classList.remove('readonly');
                     }
+                    if (rowData[10] == false) {
+                        for (var c = 0; c < colArr.length; c++) {
+                            var cell = elInstance.getCell((colArr[c]).concat(parseInt(y) + 1))
+                            cell.classList.add('shipmentEntryDoNotInclude');
+                        }
+                    } else {
+                        for (var c = 0; c < colArr.length; c++) {
+                            var cell = elInstance.getCell((colArr[c]).concat(parseInt(y) + 1))
+                            cell.classList.remove('shipmentEntryDoNotInclude');
+                        }
+                    }
                 }
             } else {
                 if (rowData[2] == 2) {
@@ -788,6 +821,17 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                 } else {
                     var cell = elInstance.getCell(("C").concat(parseInt(y) + 1))
                     cell.classList.remove('readonly');
+                }
+                if (rowData[10] == false) {
+                    for (var c = 0; c < colArr.length; c++) {
+                        var cell = elInstance.getCell((colArr[c]).concat(parseInt(y) + 1))
+                        cell.classList.add('shipmentEntryDoNotInclude');
+                    }
+                } else {
+                    for (var c = 0; c < colArr.length; c++) {
+                        var cell = elInstance.getCell((colArr[c]).concat(parseInt(y) + 1))
+                        cell.classList.remove('shipmentEntryDoNotInclude');
+                    }
                 }
             }
         }
@@ -822,7 +866,8 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
         this.props.updateState("consumptionError", "");
         this.props.updateState("consumptionDuplicateError", "");
         this.props.updateState("consumptionChangedFlag", 1);
-        if (x == 12 || x == 0 || x == 2 || x == 15) {
+        if (x == 12 || x == 0 || x == 2 || x == 15 || x == 10) {
+            var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O']
             var rowData = elInstance.getRowData(y);
             if (rowData[12] != -1 && rowData[12] !== "" && rowData[12] != undefined) {
                 var lastEditableDate = "";
@@ -831,7 +876,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                 } else {
                     lastEditableDate = moment(Date.now()).subtract(FORECASTED_CONSUMPTION_MONTHS_IN_PAST + 1, 'months').format("YYYY-MM-DD");
                 }
-                var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O']
+
                 if (rowData[12] != -1 && moment(rowData[0]).format("YYYY-MM") < moment(lastEditableDate).format("YYYY-MM-DD") && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes("ROLE_BF_READONLY_ACCESS_REALM_ADMIN")) {
                     for (var c = 0; c < colArr.length; c++) {
                         var cell = elInstance.getCell((colArr[c]).concat(parseInt(y) + 1))
@@ -853,6 +898,18 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                         var cell = elInstance.getCell(("C").concat(parseInt(y) + 1))
                         cell.classList.remove('readonly');
                     }
+                    if (rowData[10] == false) {
+                        for (var c = 0; c < colArr.length; c++) {
+                            var cell = elInstance.getCell((colArr[c]).concat(parseInt(y) + 1))
+                            cell.classList.add('shipmentEntryDoNotInclude');
+                        }
+                    } else {
+                        for (var c = 0; c < colArr.length; c++) {
+                            var cell = elInstance.getCell((colArr[c]).concat(parseInt(y) + 1))
+                            cell.classList.remove('shipmentEntryDoNotInclude');
+                        }
+                    }
+
                 }
             } else {
                 if (rowData[2] == 2) {
@@ -869,6 +926,17 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                 } else {
                     var cell = elInstance.getCell(("C").concat(parseInt(y) + 1))
                     cell.classList.remove('readonly');
+                }
+                if (rowData[10] == false) {
+                    for (var c = 0; c < colArr.length; c++) {
+                        var cell = elInstance.getCell((colArr[c]).concat(parseInt(y) + 1))
+                        cell.classList.add('shipmentEntryDoNotInclude');
+                    }
+                } else {
+                    for (var c = 0; c < colArr.length; c++) {
+                        var cell = elInstance.getCell((colArr[c]).concat(parseInt(y) + 1))
+                        cell.classList.remove('shipmentEntryDoNotInclude');
+                    }
                 }
             }
         }

@@ -10,7 +10,7 @@ import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
 import i18n from '../../i18n';
 import { JEXCEL_PAGINATION_OPTION, JEXCEL_DATE_FORMAT_SM, JEXCEL_PRO_KEY } from '../../Constants.js';
-const entityname = i18n.t('static.common.listtree');
+const entityname = 'Tree Template';
 export default class ListTreeTemplate extends Component {
 
     constructor(props) {
@@ -123,8 +123,6 @@ export default class ListTreeTemplate extends Component {
             allowManualInsertColumn: false,
             allowDeleteRow: false,
             onselection: this.selected,
-
-
             oneditionend: this.onedit,
             copyCompatibility: true,
             allowExport: false,
@@ -133,34 +131,37 @@ export default class ListTreeTemplate extends Component {
             filters: true,
             license: JEXCEL_PRO_KEY,
             contextMenu: function (obj, x, y, e) {
-                var items = [];
-                if (y != null) {
-                    if (obj.options.allowInsertRow == true) {
-                        items.push({
-                            title: 'Delete',
-                            onclick: function () {
-
-                            }.bind(this)
-                        });
-
-                        items.push({
-                            title: i18n.t('static.common.copyRow'),
-                            onclick: function () {
-                                var rowData = obj.getRowData(y);
-                                console.log("rowData===>", rowData);
-                                rowData[0] = "";
-                                rowData[1] = "";
-                                var data = rowData;
-                                this.el.insertRow(
-                                    data, 0, 1
-                                );
-                            }.bind(this)
-                        });
-                    }
-                }
-
-                return items;
+                return false;
             }.bind(this),
+            // contextMenu: function (obj, x, y, e) {
+            //     var items = [];
+            //     if (y != null) {
+            //         if (obj.options.allowInsertRow == true) {
+            //             items.push({
+            //                 title: 'Delete',
+            //                 onclick: function () {
+
+            //                 }.bind(this)
+            //             });
+
+            //             items.push({
+            //                 title: i18n.t('static.common.copyRow'),
+            //                 onclick: function () {
+            //                     var rowData = obj.getRowData(y);
+            //                     console.log("rowData===>", rowData);
+            //                     rowData[0] = "";
+            //                     rowData[1] = "";
+            //                     var data = rowData;
+            //                     this.el.insertRow(
+            //                         data, 0, 1
+            //                     );
+            //                 }.bind(this)
+            //             });
+            //         }
+            //     }
+
+            //     return items;
+            // }.bind(this),
         };
         var treeEl = jexcel(document.getElementById("tableDiv"), options);
         this.el = treeEl;
@@ -184,7 +185,7 @@ export default class ListTreeTemplate extends Component {
     componentDidMount() {
         this.hideFirstComponent();
         DatasetService.getTreeTemplateList().then(response => {
-            console.log("tree template list---",response.data)
+            console.log("tree template list---", response.data)
             this.setState({
                 treeTemplateList: response.data,
                 loading: false
@@ -241,14 +242,13 @@ export default class ListTreeTemplate extends Component {
         if (x == 0 && value != 0) {
             // console.log("HEADER SELECTION--------------------------");
         } else {
-
-            var treeTemplateId = this.el.getValueFromCoords(0, x);
-            // if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_DIMENSION')) {
-            this.props.history.push({
-                pathname: `/dataset/createTreeTemplate/${treeTemplateId}`,
-                // state: { role }
-            });
-            // }
+            if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE_TEMPLATE')) {
+                var treeTemplateId = this.el.getValueFromCoords(0, x);
+                this.props.history.push({
+                    pathname: `/dataset/createTreeTemplate/${treeTemplateId}`,
+                    // state: { role }
+                });
+            }
 
         }
     }.bind(this);
@@ -278,7 +278,7 @@ export default class ListTreeTemplate extends Component {
                         {/* <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong> */}
                         <div className="card-header-actions">
                             <div className="card-header-action">
-                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_LIST_REALM_COUNTRY') &&
+                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_TREE_TEMPLATE') &&
                                     <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addTreeTemplate}><i className="fa fa-plus-square"></i></a>
                                 }
 
@@ -288,7 +288,9 @@ export default class ListTreeTemplate extends Component {
                     </div>
                     <CardBody className="pb-lg-0 pt-lg-0">
                         {/* <div id="loader" className="center"></div> */}
-                        <div id="tableDiv" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_DIMENSION') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
+                        <div className="TreeTemplateTable">
+                            <div id="tableDiv" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE_TEMPLATE') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
+                            </div>
                         </div>
                         <div style={{ display: this.state.loading ? "block" : "none" }}>
                             <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >

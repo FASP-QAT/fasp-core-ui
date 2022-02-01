@@ -1368,11 +1368,12 @@ a:hover {
 
 @media (min-width: 992px) {
   .sidebar .nav {
-    // font-size: 12px !important;
-    font-size: 13px !important;
+    font-size: 12px !important;
+    // font-size: 13px !important;
   }
   .sidebar .nav-link {
-    padding: 0.75rem 0.2rem !important;
+    // padding: 0.75rem 0.2rem !important;
+    padding: 0.75rem 9px;
   }
   .f-End {
     justify-content: flex-end !important;
@@ -1765,6 +1766,10 @@ h5,
 .legendcommitversion .greylegend {
   background-color: #D3D3D3;
   border-color: 1px solid #D3D3D3;
+}
+.legendcommitversion .readonlylegend {
+  background-color: #cfcdc9;
+  border-color: 1px solid #cfcdc9;
 }
 
 .legend .lightgreenlegend {
@@ -5154,6 +5159,12 @@ height: 0px;
   .listtreetable .jexcelremoveReadonlybackground .jexcel>tbody>tr>td:nth-child(4).readonly {
     text-align: left!important;
 }
+.listtreetable .jexcelremoveReadonlybackground .jexcel>tbody>tr>td.readonly {
+  cursor: pointer;
+}
+.TreeTemplateTable .jexcelremoveReadonlybackground .jexcel>tbody>tr>td.readonly {
+  cursor: pointer;
+}
 .boxContactTemplate{
     opacity: 1!important;
     background-color: #fefefe!important;
@@ -5350,10 +5361,12 @@ height: 0px;
 .addtreebg{
   background: #20a8d8!important;
   color: #fff!important;
+  cursor: pointer;
 }
 .addtreebg option { 
   background-color: #fff!important;
   color:#000!important; 
+  
 }
 .treeValidation{
     margin-top: -16px;
@@ -5520,6 +5533,7 @@ border: 1px solid #eee;
      cursor: col-resize;
      font-size: 14px;
    }
+  
 .DropdownScenario{
   position: absolute;
   z-index: 10;
@@ -5615,4 +5629,253 @@ font-style: italic!important;
 .extrapolateTable .jexcel > thead {
   position: sticky;
   top: 0;
+}
+ .CommitTableMarginTop{
+   margin-top: -31px;
+ }
+//   .commitversionTable .jexcel>thead>tr>td:nth-child(2).jexcel_filters_icon {
+//     text-align: left!important;
+// }
+//   .commitversionTable .jexcel>thead>tr>td:nth-child(3).jexcel_filters_icon {
+//     text-align: left!important;
+// }
+// .commitversionTable .jexcel>thead>tr>td:nth-child(6).jexcel_filters_icon {
+//   text-align: left!important;
+// }
+// .commitversionTable .jexcel>thead>tr>td:nth-child(9).jexcel_filters_icon {
+//   text-align: left!important;
+// }
+// .commitversionTable .jexcel>thead>tr>td:nth-child(12).jexcel_filters_icon {
+//   text-align: left!important;
+// }
+// .commitversionTable .jexcel>thead>tr>td:nth-child(15).jexcel_filters_icon {
+//   text-align: left!important;
+// }
+// .commitversionTable .jexcel>thead>tr>td:nth-child(18).jexcel_filters_icon {
+//   text-align: left!important;
+// }
+.commitversionTable .jexcel>tbody>tr>td:nth-child(2) {
+  text-align: left!important;
+}
+.commitversionTable .jexcel>tbody>tr>td:nth-child(3) {
+  text-align: left!important;
+}
+.commitversionTable .jexcel>tbody>tr>td:nth-child(4) {
+  text-align: left!important;
+}
+.commitversionTable .jexcel>tbody>tr>td:nth-child(5) {
+  text-align: left!important;
+}
+.commitversionTable .jexcel>tbody>tr>td:nth-child(6) {
+  text-align: left!important;
+}
+.commitversionTable .jexcel>tbody>tr>td:nth-child(7) {
+  text-align: left!important;
+}
+.commitversionTable .jexcel>tbody>tr>td:nth-child(8) {
+  text-align: left!important;
+}
+.commitversionTable .jexcel>tbody>tr>td:nth-child(9) {
+  text-align: left!important;
+}
+// .commitversionTable .jexcel>tbody>tr>td:nth-child(18) {
+//   text-align: left!important;
+// }
+  
+
+.BacktoLink{
+  float: left!important;
+  margin-left: -4px;
+  margin-top: -19px;
+}
+
+.iconClass{
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.iconClassCommit{
+  font-size: 20px;
+  cursor: pointer;
+}
+@media print {
+  thead {display: table-row-group;}
+  table tbody tr td:before,
+    table tbody tr td:after {
+        content : "" ;
+        height : 4px ;
+        display : block ;
+    }
+    .fixTableHead table {
+     height: 100%!important;
+    }
+
+}
+// .commitTree .jexcel_content {
+//   max-height: calc(100vh - 200px) !important;
+//   overflow: scroll !important;
+// }
+.FontWeightNormal{
+  font-weight: normal;
+}
+.ToltipInfoicon{
+  color: #002f6c;
+}
+.SelectFeildWidth{
+  width:200px;
+}
+.ShowGuidanceIcon{
+  -webkit-text-stroke: 1px #fff;
+  font-size:31px;
+  padding-top:2px;
+  // padding-left:5px;
+  color: #a7c6ed;
+}
+
+.ShowGuidanceTitle{
+    color: #BA0C2F!important;
+    text-align: center;
+    font-size: 28px;
+    text-transform: uppercase;
+}
+
+// .ShowGuidanceTitle::after {
+//   content: '';
+//   position: relative;
+//   display: block;
+//   height: 1px;
+//   width: 200px!important;
+//   margin-top: 15px;
+//   background: #BA0C2F;
+//   margin-left: auto;
+//   margin-right: auto;
+//   will-change: transform, opacity;
+// }
+
+.ShowGuidancePText{
+  font-size: 14px;
+  text-align: justify;
+  padding-top: 12px;
+  line-height: 22px;
+  color: #212721;
+}
+.MorginTopMonth{
+  margin-top: 31px;
+}
+.ForecastSummaryTable .jexcel > thead{
+  position: sticky;
+  top: 0;
+ }
+ .commitversionTable.jexcel > thead{
+  position: sticky;
+  top: 0;
+ }
+ .ForecastSumarydWidth {
+  overflow: hidden !important;
+  min-width: 200px !important;
+  word-wrap: break-word !important;
+  z-index: 100;
+  position: sticky;
+  /* border: none !important; */
+  // z-index: 1;
+}
+.table-scroll1{
+  border-spacing: 0;
+  border-collapse: inherit;
+}
+.table-scroll1 table {
+  width: 100%;
+  margin: auto;
+  white-space: inherit;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+.table-bordered1 {
+  border: none!important;
+}
+.table-scroll1 .table-bordered thead th, .table-bordered thead td {
+   border-bottom-width: 0px!important;
+}
+
+.table-scroll1 .table thead th {
+   border-bottom: 0px solid #c8ced3!important;
+}
+.Firstcolum{
+  position: sticky;
+    left: 0;
+    z-index: 999;
+}
+.Secondcolum{
+  position: sticky;
+  // left: 61px;
+  left:53px;
+  z-index: 999;
+}
+.Thirdcolum{
+  position: sticky;
+  left: 261px;
+  z-index: 999;
+}
+.MonthlyForecastdWidth {
+  overflow: hidden !important;
+  min-width: 167px !important;
+  word-wrap: break-word !important;
+  z-index: 100;
+  position: sticky;
+  /* border: none !important; */
+}
+
+.regionBold{
+  font-weight: bold;
+}
+
+.dataentryTable .jexcel>tbody>tr>td:nth-child(3) {
+  text-align: left!important;
+}
+
+.dataentryTable .jexcel>tbody>tr>td:nth-child(4) {
+  text-align: left!important;
+}
+
+.compareVersion .jexcel>tbody>tr>td:nth-child(2) {
+  text-align: left!important;
+}
+
+.compareVersion .jexcel>thead>tr:nth-child(1)>td:nth-child(2) {
+  border-top:0px!important;
+  border-left:0px!important;
+}
+.compareVersion .jexcel>thead>tr:nth-child(1)>td:nth-child(3) {
+  border-top:0px!important;
+  border-left:0px!important;
+}
+.hoverDiv:hover {
+  cursor: pointer;
+}
+
+.hoverDiv {
+  color: #205493;
+    text-decoration: none;
+    background-color: transparent
+}
+
+.hoverDiv :hover{
+  color: #167495;
+    text-decoration: none !important;
+    cursor: pointer;
+}
+
+.fixTableHead {
+  // overflow-y: auto;
+  max-height: calc(100vh - 300px)!important;
+  overflow: scroll;
+}
+@media print {
+  thead {display: table-row-group;}
+  table tbody tr td:before,
+    table tbody tr td:after {
+        content : "" ;
+        height : 4px ;
+        display : block ;
+    }
 }

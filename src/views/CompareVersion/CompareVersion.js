@@ -48,12 +48,15 @@ class CompareVersion extends Component {
         this.getVersionList = this.getVersionList.bind(this);
         this.setVersionId = this.setVersionId.bind(this);
         this.setVersionId1 = this.setVersionId1.bind(this);
+        this.updateState = this.updateState.bind(this);
     }
 
     setVersionId(e) {
         var versionId = e.target.value;
+        localStorage.setItem("sesDatasetVersionId", versionId);
         this.setState({
             versionId: versionId,
+            firstDataSet: 0
         }, () => {
             this.getData();
         })
@@ -61,8 +64,10 @@ class CompareVersion extends Component {
 
     setVersionId1(e) {
         var versionId = e.target.value;
+        localStorage.setItem("sesDatasetCompareVersionId", versionId);
         this.setState({
             versionId1: versionId,
+            secondDataSet: 0
         }, () => {
             this.getData1();
         })
@@ -70,11 +75,12 @@ class CompareVersion extends Component {
 
     setDatasetId(e) {
         var datasetId = e.target.value;
+        localStorage.setItem("sesLiveDatasetId", datasetId);
         this.setState({
             datasetId: datasetId,
             versionList: [],
             versionId: "",
-            versionId1:""
+            versionId1: ""
         }, () => {
             this.getVersionList();
         })
@@ -107,18 +113,62 @@ class CompareVersion extends Component {
             for (var v = 0; v < vList.length; v++) {
                 versionList.push(vList[v].versionId)
             }
+            var versionId = "";
+            var event = {
+                target: {
+                    value: ""
+                }
+            };
+            if (versionList.length == 1) {
+                versionId = versionList[0];
+                event.target.value = versionList[0];
+            } else if (localStorage.getItem("sesDatasetVersionId") != "" && versionList.filter(c => c == localStorage.getItem("sesDatasetVersionId")).length > 0) {
+                versionId = localStorage.getItem("sesDatasetVersionId");
+                event.target.value = localStorage.getItem("sesDatasetVersionId");
+            }
+
+            var versionId1 = "";
+            var event1 = {
+                target: {
+                    value: ""
+                }
+            };
+            if (versionList.length == 1) {
+                versionId1 = versionList[0];
+                event1.target.value = versionList[0];
+            } else if (localStorage.getItem("sesDatasetCompareVersionId") != "" && versionList.filter(c => c == localStorage.getItem("sesDatasetCompareVersionId")).length > 0) {
+                versionId1 = localStorage.getItem("sesDatasetCompareVersionId");
+                event1.target.value = localStorage.getItem("sesDatasetCompareVersionId");
+            }
+
+
             this.setState({
                 versionList: versionList,
                 loading: false
+            }, () => {
+                if (versionId != "") {
+                    this.setVersionId(event)
+                }
+                if (versionId1 != "") {
+                    this.setVersionId1(event1)
+                }
             })
         } else {
             this.setState({
                 versionList: [],
                 versionId: "",
-                versionId1:"",
+                versionId1: "",
+                firstDataSet: 0,
+                secondDataSet: 0,
                 loading: false
             })
         }
+    }
+
+    updateState(parameterName, value) {
+        this.setState({
+            [parameterName]: value
+        })
     }
 
     componentDidMount() {
@@ -185,19 +235,36 @@ class CompareVersion extends Component {
                         var json = {
                             id: myResult[mr].programId,
                             name: getLabelText(programNameJson, this.state.lang),
-                            versionList: [{ versionId: myResult[mr].version + "  (Local)" }]
+                            versionList: [{ versionId: myResult[mr].version + " (Local)" }]
                         }
                         datasetList.push(json)
                     } else {
                         var existingVersionList = datasetList[index].versionList;
                         console.log("existingVersionList+++", datasetList[index].versionList)
-                        existingVersionList.push({ versionId: myResult[mr].version + "  (Local)" })
+                        existingVersionList.push({ versionId: myResult[mr].version + " (Local)" })
                         datasetList[index].versionList = existingVersionList
                     }
+                }
+                var datasetId = "";
+                var event = {
+                    target: {
+                        value: ""
+                    }
+                };
+                if (datasetList.length == 1) {
+                    datasetId = datasetList[0].id;
+                    event.target.value = datasetList[0].id;
+                } else if (localStorage.getItem("sesLiveDatasetId") != "" && datasetList.filter(c => c.id == localStorage.getItem("sesLiveDatasetId")).length > 0) {
+                    datasetId = localStorage.getItem("sesLiveDatasetId");
+                    event.target.value = localStorage.getItem("sesLiveDatasetId");
                 }
                 this.setState({
                     datasetList: datasetList,
                     loading: false
+                }, () => {
+                    if (datasetId != "") {
+                        this.setDatasetId(event);
+                    }
                 })
             }.bind(this)
         }.bind(this)
@@ -373,6 +440,7 @@ class CompareVersion extends Component {
                     </option>
                 )
             }, this);
+        console.log("This.state.loading+++", this.state.loading)
 
         return (
             <div className="animated fadeIn" >
@@ -386,11 +454,11 @@ class CompareVersion extends Component {
                         <div className="card-header-actions">
                             <a className="card-header-action">
 
-                                <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => this.exportPDF()} />
+                                {(this.state.firstDataSet == 1 && this.state.secondDataSet == 1) && <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.refs.compareVersionTable.exportPDF()} />}
 
 
                             </a>
-                            <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
+                            {(this.state.firstDataSet == 1 && this.state.secondDataSet == 1) && <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.refs.compareVersionTable.exportCSV()} />}
                         </div>
                         {/* } */}
                     </div>
@@ -420,7 +488,7 @@ class CompareVersion extends Component {
                                                 </InputGroup>
                                             </div>
                                         </FormGroup>
-                                        <FormGroup className="col-md-3">
+                                        <FormGroup className="col-md-2">
                                             <Label htmlFor="appendedInputButton">{i18n.t('static.report.version')}</Label>
                                             <div className="controls ">
                                                 <InputGroup>
@@ -441,8 +509,45 @@ class CompareVersion extends Component {
                                                 </InputGroup>
                                             </div>
                                         </FormGroup>
-                                        <FormGroup className="col-md-3">
-                                            <Label htmlFor="appendedInputButton">Compare with version</Label>
+                                        {this.state.firstDataSet == 1 && <FormGroup className="col-md-3">
+                                            <Label htmlFor="appendedInputButton">{i18n.t('static.common.forecastPeriod')}</Label>
+                                            <div className="controls ">
+                                                <InputGroup>
+                                                    <Input
+                                                        type="text"
+                                                        name="forecastPeriod"
+                                                        id="forecastPeriod"
+                                                        bsSize="sm"
+                                                        readonly={true}
+                                                        value={moment(this.state.datasetData.currentVersion.forecastStartDate).format(DATE_FORMAT_CAP_WITHOUT_DATE) + " - " + moment(this.state.datasetData.currentVersion.forecastStopDate).format(DATE_FORMAT_CAP_WITHOUT_DATE)}
+
+                                                    >
+                                                    </Input>
+
+                                                </InputGroup>
+                                            </div>
+                                        </FormGroup>}
+                                        {this.state.firstDataSet == 1 && <FormGroup className="col-md-3">
+                                            <Label htmlFor="appendedInputButton">{i18n.t('static.common.note')}</Label>
+                                            <div className="controls ">
+                                                <InputGroup>
+                                                    <Input
+                                                        type="textarea"
+                                                        name="forecastPeriod"
+                                                        id="forecastPeriod"
+                                                        bsSize="sm"
+                                                        readonly={true}
+                                                        value={this.state.datasetData.currentVersion.notes}
+
+                                                    >
+                                                    </Input>
+
+                                                </InputGroup>
+                                            </div>
+                                        </FormGroup>}
+
+                                        <FormGroup className="col-md-2">
+                                            <Label htmlFor="appendedInputButton">{i18n.t('static.compareVersion.compareWithVersion')}</Label>
                                             <div className="controls ">
                                                 <InputGroup>
                                                     <Input
@@ -462,17 +567,55 @@ class CompareVersion extends Component {
                                                 </InputGroup>
                                             </div>
                                         </FormGroup>
+                                        {this.state.secondDataSet == 1 && <FormGroup className="col-md-3">
+                                            <Label htmlFor="appendedInputButton">{i18n.t('static.common.forecastPeriod')}</Label>
+                                            <div className="controls ">
+                                                <InputGroup>
+                                                    <Input
+                                                        type="text"
+                                                        name="forecastPeriod"
+                                                        id="forecastPeriod"
+                                                        bsSize="sm"
+                                                        readonly={true}
+                                                        value={moment(this.state.datasetData1.currentVersion.forecastStartDate).format(DATE_FORMAT_CAP_WITHOUT_DATE) + " - " + moment(this.state.datasetData1.currentVersion.forecastStopDate).format(DATE_FORMAT_CAP_WITHOUT_DATE)}
+
+                                                    >
+                                                    </Input>
+
+                                                </InputGroup>
+                                            </div>
+                                        </FormGroup>}
+                                        {this.state.secondDataSet == 1 && <FormGroup className="col-md-3">
+                                            <Label htmlFor="appendedInputButton">{i18n.t('static.common.note')}</Label>
+                                            <div className="controls ">
+                                                <InputGroup>
+                                                    <Input
+                                                        type="textarea"
+                                                        name="forecastPeriod"
+                                                        id="forecastPeriod"
+                                                        bsSize="sm"
+                                                        readonly={true}
+                                                        value={this.state.datasetData1.currentVersion.notes}
+
+                                                    >
+                                                    </Input>
+
+                                                </InputGroup>
+                                            </div>
+                                        </FormGroup>}
                                     </div>
                                 </div>
                             </Form>
-                            {(this.state.firstDataSet == 1 && this.state.secondDataSet == 1) &&
-                                <>
-                                    <CompareVersionTable datasetData={this.state.datasetData} datasetData1={this.state.datasetData1} datasetData2={this.state.datasetData} page="compareVersion" versionLabel={"V" + this.state.versionId} versionLabel1={"V" + this.state.versionId1}/>
-                                    <div className="table-responsive">
-                                        <div id="tableDiv" />
-                                    </div>
-                                </>
-                            }
+                            <div style={{ display: !this.state.loading ? "block" : "none" }}>
+                                {(this.state.firstDataSet == 1 && this.state.secondDataSet == 1) &&
+                                    <>
+                                        <CompareVersionTable ref="compareVersionTable" datasetData={this.state.datasetData} datasetData1={this.state.datasetData1} datasetData2={this.state.datasetData} page="compareVersion" versionLabel={"V" + this.state.versionId} versionLabel1={"V" + this.state.versionId1} updateState={this.updateState} />
+                                        <div className="table-responsive">
+                                            <div id="tableDiv" className="compareVersion" />
+                                        </div>
+                                    </>
+                                }
+                            </div>
                             <div style={{ display: this.state.loading ? "block" : "none" }}>
                                 <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                                     <div class="align-items-center">

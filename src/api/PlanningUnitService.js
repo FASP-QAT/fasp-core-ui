@@ -80,5 +80,10 @@ class PlanningUnitService {
         return axios.post(`${API_URL}/api/procurementAgent/planningUnits`, json, {}
         );
     }
+
+    getPlanningUnitByTracerCategoryIds(json) {
+        return axios.post(`${API_URL}/api/planningUnit/tracerCategorys`, json, {}
+        );
+    }
 }
 export default new PlanningUnitService();

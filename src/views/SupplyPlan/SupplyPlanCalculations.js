@@ -975,6 +975,15 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                     } else {
                                         mos = 0;
                                     }
+
+                                    var mosWps = "";
+                                    if (closingBalanceWps != 0 && amc != 0 && amc != null) {
+                                        mosWps = Number(closingBalanceWps / amc).toFixed(4);
+                                    } else if (amc == 0 || amc == null) {
+                                        mosWps = null;
+                                    } else {
+                                        mosWps = 0;
+                                    }
                                     var json = {
                                         programId: generalProgramJson.programId,
                                         versionId: generalProgramJson.currentVersion.versionId,
@@ -1016,6 +1025,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                         unmetDemand: unmetDemandQty === "" ? null : unmetDemandQty,
                                         unmetDemandWps: unmetDemandQtyWps === "" ? null : unmetDemandQtyWps,
                                         mos: mos,
+                                        mosWps:mosWps,
                                         nationalAdjustment: nationalAdjustment,
                                         nationalAdjustmentWps: nationalAdjustmentWps,
                                         expectedStock: expectedStock,

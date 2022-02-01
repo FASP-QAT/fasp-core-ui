@@ -149,6 +149,28 @@ export function calculateModelingData(dataset, props, page) {
                             }
 
                             endValue = endValue + totalManualChange;
+                            if (payload.nodeType.id == 3 || payload.nodeType.id == 4 || payload.nodeType.id == 5) {
+                                if (endValue < 0) {
+                                    endValue = 0;
+                                }
+                                if (endValue > 100) {
+                                    endValue = 100;
+                                }
+    
+                                if (endValueWMC < 0) {
+                                    endValueWMC = 0;
+                                }
+                                if (endValueWMC > 100) {
+                                    endValueWMC = 100;
+                                }
+                            } else if (payload.nodeType.id == 2) {
+                                if (endValue < 0) {
+                                    endValue = 0;
+                                }
+                                if (endValueWMC < 0) {
+                                    endValueWMC = 0;
+                                }
+                            }
 
                             var calculatedValue = 0;
                             if (payload.nodeType.id == 2) {

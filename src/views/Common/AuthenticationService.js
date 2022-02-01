@@ -1237,6 +1237,7 @@ class AuthenticationService {
                         }
                         break;
                     case "/changePassword":
+                        // case "/ShowGuidance":
                         // if (bfunction.includes("ROLE_BF_CHANGE_PASSWORD")) {
                         return true;
                         // }
@@ -1244,6 +1245,7 @@ class AuthenticationService {
                     case "/logout/:message":
                     case "/logout":
                     case "/accessDenied":
+
                         return true;
                         break;
                     case "/problem/editProblem":
@@ -1299,6 +1301,11 @@ class AuthenticationService {
 
                     case "/planningUnitSetting/listPlanningUnitSetting":
                     case "/planningUnitSetting/listPlanningUnitSetting/:color/:message":
+                        if (bfunction.includes("ROLE_BF_LIST_PLANNING_UNIT_SETTING")) {
+                            return true;
+                        }
+                        break;
+
                     case "/equivalancyUnit/listEquivalancyUnit":
                     case "/equivalancyUnit/listEquivalancyUnit/:color/:message":
                         if (bfunction.includes("ROLE_BF_LIST_EQUIVALENCY_UNIT_MAPPING")) {
@@ -1306,37 +1313,56 @@ class AuthenticationService {
                         }
                         break;
                     case "/extrapolation/extrapolateData":
+                        if (bfunction.includes("ROLE_BF_EXTRAPOLATION")) {
+                            return true;
+                        }
+                        break;
                     case "/importFromQATSupplyPlan/listImportFromQATSupplyPlan":
                     case "/importFromQATSupplyPlan/listImportFromQATSupplyPlan/:color/:message":
+                    case "/importIntoQATSupplyPlan/listImportIntoQATSupplyPlan":
+                    case "/importIntoQATSupplyPlan/listImportIntoQATSupplyPlan/:color/:message":
                         if (bfunction.includes("ROLE_BF_LIST_IMPORT_FROM_QAT_SUPPLY_PLAN")) {
                             return true;
                         }
                         break;
-                    case "/report/compareAndSelectScenario":    
+                    case "/report/compareAndSelectScenario":
                         if (bfunction.includes("ROLE_BF_COMPARE_AND_SELECT")) {
                             return true;
                         }
-                    break;
+                        break;
                     case "/validation/productValidation":
                         if (bfunction.includes("ROLE_BF_PRODUCT_VALIDATION")) {
-                                    return true;
-                                }
-                            break;
+                            return true;
+                        }
+                        break;
                     case "/validation/modelingValidation":
                         if (bfunction.includes("ROLE_BF_MODELING_VALIDATION")) {
-                                    return true;
-                                }
-                            break;
-                    // case "/report/compareAndSelectScenario":
-                    // case "/validation/productValidation":
-                    // case "/validation/modelingValidation":
+                            return true;
+                        }
+                        break;
                     case "/report/compareVersion":
-                    case "/dataentry/consumptionDataEntryAndAdjustment":
-                    case "/dataset/listTree":
+                        if (bfunction.includes("ROLE_BF_COMPARE_VERSION")) {
+                            return true;
+                        }
+                        break;
                     case "/dataset/commitTree":
+                        if (bfunction.includes("ROLE_BF_COMMIT_DATASET")) {
+                            return true;
+                        }
+                        break;
+                    case "/dataentry/consumptionDataEntryAndAdjustment":
+                    case "/dataentry/consumptionDataEntryAndAdjustment/:planningUnitId":
+                        if (bfunction.includes("ROLE_BF_CONSUMPTION_DATA_ENTRY_ADJUSTMENT")) {
+                            return true;
+                        }
+                        break;
+                    case "/dataset/listTree":
                     case "/dataset/loadDeleteDataSet":
+                    case "/dataset/exportDataset":
+                    case "/dataset/importDataset":
                     case "/dataset/loadDeleteDataSet/:message":
                     case "/dataSet/buildTree/tree/:treeId/:programId":
+                    case "/dataSet/buildTree/tree/:treeId/:programId/:scenarioId":
                     case "/dataSet/buildTree/":
                     case "/dataset/createTreeTemplate/:templateId":
                     case "/dataset/listTreeTemplate/":
@@ -1374,10 +1400,20 @@ class AuthenticationService {
                         }
                         break;
 
+                    case "/forecastReport/forecastOutput":
+                        if (bfunction.includes("ROLE_BF_LIST_MONTHLY_FORECAST")) {
+                            return true;
+                        }
+                        break;
+
+                    case "/forecastReport/forecastSummary":
+                        if (bfunction.includes("ROLE_BF_LIST_FORECAST_SUMMARY")) {
+                            return true;
+                        }
+                        break;
+
                     case "/forecastReport/consumptionForecastError":
                     case "/forecastReport/compareScenario":
-                    case "/forecastReport/forecastSummary":
-                    case "/forecastReport/forecastOutput":
                         return true;
 
                     default:
@@ -1472,9 +1508,9 @@ class AuthenticationService {
         console.log("timeout going to clear cache");
         let keysToRemove;
         if (localStorage.getItem('curUser') != null && localStorage.getItem('curUser') != "") {
-            keysToRemove = ["token-" + this.getLoggedInUserId(), "curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken", "sesRecordCount", "sesRangeValue", "sesProgramId", "sesPlanningUnitId", "sesLocalVersionChange", "sesLatestProgram", "sesProblemStatus", "sesProblemType", "sesProblemCategory", "sesReviewed", "sesStartDate", "sesProgramIdReport", "sesVersionIdReport", "sessionType", "sesBudPro", "sesBudFs", "sesBudStatus", "sesForecastProgramIds", "sesDatasetId", "sesDatasetPlanningUnitId", "sesDatasetRegionId", "sesLiveDatasetId", "sesDatasetVersionId", "sesTreeId", "sesScenarioId", "sesLevelId"];
+            keysToRemove = ["token-" + this.getLoggedInUserId(), "curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken", "sesRecordCount", "sesRangeValue", "sesProgramId", "sesPlanningUnitId", "sesLocalVersionChange", "sesLatestProgram", "sesProblemStatus", "sesProblemType", "sesProblemCategory", "sesReviewed", "sesStartDate", "sesProgramIdReport", "sesVersionIdReport", "sessionType", "sesBudPro", "sesBudFs", "sesBudStatus", "sesForecastProgramIds", "sesDatasetId", "sesDatasetPlanningUnitId", "sesDatasetRegionId", "sesLiveDatasetId", "sesDatasetVersionId", "sesTreeId", "sesScenarioId", "sesLevelId", "sesDatasetCompareVersionId", "sesForecastProgramIdReport", "sesForecastVersionIdReport"];
         } else {
-            keysToRemove = ["curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken", "sesRecordCount", "sesRangeValue", "sesProgramId", "sesPlanningUnitId", "sesLocalVersionChange", "sesLatestProgram", "sesProblemStatus", "sesProblemType", "sesProblemCategory", "sesReviewed", "sesStartDate", "sesProgramIdReport", "sesVersionIdReport", "sessionType", "sesBudPro", "sesBudFs", "sesBudStatus", "sesForecastProgramIds", "sesDatasetId", "sesDatasetPlanningUnitId", "sesDatasetRegionId", "sesLiveDatasetId", "sesDatasetVersionId", "sesTreeId", "sesScenarioId", "sesLevelId"];
+            keysToRemove = ["curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken", "sesRecordCount", "sesRangeValue", "sesProgramId", "sesPlanningUnitId", "sesLocalVersionChange", "sesLatestProgram", "sesProblemStatus", "sesProblemType", "sesProblemCategory", "sesReviewed", "sesStartDate", "sesProgramIdReport", "sesVersionIdReport", "sessionType", "sesBudPro", "sesBudFs", "sesBudStatus", "sesForecastProgramIds", "sesDatasetId", "sesDatasetPlanningUnitId", "sesDatasetRegionId", "sesLiveDatasetId", "sesDatasetVersionId", "sesTreeId", "sesScenarioId", "sesLevelId", "sesDatasetCompareVersionId", "sesForecastProgramIdReport", "sesForecastVersionIdReport"];
         }
         keysToRemove.forEach(k => localStorage.removeItem(k));
     }
@@ -1503,6 +1539,7 @@ class AuthenticationService {
         localStorage.setItem('sesTreeId', "");
         localStorage.setItem('sesScenarioId', "");
         localStorage.setItem('sesDatasetVersionId', "");
+        localStorage.setItem('sesDatasetCompareVersionId', "");
         localStorage.setItem('sesDatasetPlanningUnitId', "");
         localStorage.setItem('sesDatasetRegionId', "");
         localStorage.setItem('sesPlanningUnitId', "");
@@ -1514,6 +1551,8 @@ class AuthenticationService {
         localStorage.setItem('sesReviewed', "-1");
         localStorage.setItem('sesProgramIdReport', "");
         localStorage.setItem('sesVersionIdReport', "");
+        localStorage.setItem('sesForecastProgramIdReport', "");
+        localStorage.setItem('sesForecastVersionIdReport', "");
         localStorage.setItem('sesBudPro', "");
         localStorage.setItem('sesBudFs', "");
         localStorage.setItem('sesBudStatus', "");

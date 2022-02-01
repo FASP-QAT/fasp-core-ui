@@ -26,6 +26,8 @@ import "../../../node_modules/jexcel-pro/dist/jexcel.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import ProgramService from '../../api/ProgramService';
 import DatasetService from '../../api/DatasetService';
+import jsPDF from "jspdf";
+import { LOGO } from '../../CommonComponent/Logo';
 
 const ref = React.createRef();
 const pickerLang = {
@@ -60,6 +62,7 @@ class ModelingValidation extends Component {
             nodeVal: [],
             nodeList: [],
             nodeIdArr: [],
+            nodeLabelArr: [],
             nodeDataModelingList: [],
             loading: false,
             monthList: [],
@@ -78,26 +81,29 @@ class ModelingValidation extends Component {
     }
 
     setNodeVal(e) {
-        this.setState({loading:true})
+        this.setState({ loading: true })
         var nodeIdArr = [];
+        var nodeLabelArr = [];
         for (var i = 0; i < e.length; i++) {
             nodeIdArr.push(e[i].value);
+            nodeLabelArr.push(e[i].label);
         }
         this.setState({
             nodeVal: e,
             nodeIdArr,
-            loading:false
+            nodeLabelArr,
+            loading: false
         }, () => {
             this.getData()
         })
     }
 
     setDisplayBy(e) {
-        this.setState({loading:true})
+        this.setState({ loading: true })
         var displayBy = e.target.value;
         this.setState({
             displayBy: displayBy,
-            loading:false
+            loading: false
         }, () => {
             this.getData()
         })
@@ -116,13 +122,25 @@ class ModelingValidation extends Component {
     }
 
     setVersionId(e) {
-        this.setState({loading:true})
+        this.setState({ loading: true })
         var versionId = e.target.value;
         localStorage.setItem("sesDatasetVersionId", versionId);
         if (versionId != "") {
             this.setState({
                 versionId: versionId,
-                loading:false
+                treeList: [],
+                treeId: "",
+                scenarioList: [],
+                scenarioId: "",
+                levelList: [],
+                dataEl: "",
+                levelId: "",
+                levelUnit: "",
+                nodeList: [],
+                nodeVal: [],
+                nodeIdArr: [],
+                nodeLabelArr: [],
+                loading: false
             }, () => {
                 this.getDatasetData()
             })
@@ -143,6 +161,7 @@ class ModelingValidation extends Component {
                 nodeList: [],
                 nodeVal: [],
                 nodeIdArr: [],
+                nodeLabelArr: [],
                 loading: false
 
             })
@@ -205,6 +224,7 @@ class ModelingValidation extends Component {
                 }
             }).catch(
                 error => {
+                    console.log("In catch error",error);
                     this.el = jexcel(document.getElementById("tableDiv"), '');
                     this.el.destroy();
                     this.setState({
@@ -220,6 +240,7 @@ class ModelingValidation extends Component {
                         nodeList: [],
                         nodeVal: [],
                         nodeIdArr: [],
+                        nodeLabelArr: [],
                         loading: false
                     })
                 }
@@ -239,6 +260,7 @@ class ModelingValidation extends Component {
                 nodeList: [],
                 nodeVal: [],
                 nodeIdArr: [],
+                nodeLabelArr: [],
                 dataEl: "",
                 loading: false
             })
@@ -246,7 +268,7 @@ class ModelingValidation extends Component {
     }
 
     getTreeList() {
-        this.setState({loading:true})
+        this.setState({ loading: true })
         var datasetJson = this.state.datasetData;
         var treeList = datasetJson.treeList;
         var startDate = moment(datasetJson.currentVersion.forecastStartDate).format("YYYY-MM-DD");
@@ -261,14 +283,14 @@ class ModelingValidation extends Component {
         if (treeList.length == 1) {
             treeId = treeList[0].treeId;
             event.target.value = treeList[0].treeId;
-        } else if (localStorage.getItem("sesTreeId") != "") {
+        } else if (localStorage.getItem("sesTreeId") != "" && treeList.filter(c => c.treeId == localStorage.getItem("sesTreeId")).length > 0) {
             treeId = localStorage.getItem("sesTreeId");
             event.target.value = localStorage.getItem("sesTreeId");
         }
         this.setState({
             treeList: treeList,
             rangeValue: rangeValue,
-            loading:false
+            loading: false
         }, () => {
             if (treeId != "") {
                 this.setTreeId(event);
@@ -278,13 +300,13 @@ class ModelingValidation extends Component {
     }
 
     setTreeId(e) {
-        this.setState({loading:true})
+        this.setState({ loading: true })
         var treeId = e.target.value;
         localStorage.setItem("sesTreeId", treeId);
         if (treeId > 0) {
             this.setState({
                 treeId: treeId,
-                loading:false,
+                loading: false,
             }, () => {
                 this.getScenarioList()
             })
@@ -302,13 +324,14 @@ class ModelingValidation extends Component {
                 nodeList: [],
                 nodeVal: [],
                 nodeIdArr: [],
-                loading:false
+                nodeLabelArr: [],
+                loading: false
             })
         }
     }
 
     getScenarioList() {
-        this.setState({loading:true})
+        this.setState({ loading: true })
         var treeList = this.state.treeList;
         if (this.state.treeId > 0) {
             var treeListFiltered = treeList.filter(c => c.treeId == this.state.treeId)[0];
@@ -323,7 +346,7 @@ class ModelingValidation extends Component {
             if (scenarioList.length == 1) {
                 scenarioId = scenarioList[0].id;
                 event.target.value = scenarioList[0].id;
-            } else if (localStorage.getItem("sesScenarioId") != "") {
+            } else if (localStorage.getItem("sesScenarioId") != "" && scenarioList.filter(c => c.id == localStorage.getItem("sesScenarioId")).length > 0) {
                 scenarioId = localStorage.getItem("sesScenarioId");
                 event.target.value = localStorage.getItem("sesScenarioId");
             }
@@ -337,7 +360,7 @@ class ModelingValidation extends Component {
             if (levelList.length == 1) {
                 levelId = levelList[0];
                 levelEvent.target.value = levelList[0];
-            } else if (localStorage.getItem("sesLevelId") != "") {
+            } else if (localStorage.getItem("sesLevelId") != "" && levelList.filter(c => c == localStorage.getItem("sesLevelId")).length > 0) {
                 levelId = localStorage.getItem("sesLevelId");
                 levelEvent.target.value = localStorage.getItem("sesLevelId");
             }
@@ -346,7 +369,7 @@ class ModelingValidation extends Component {
                 scenarioList: treeListFiltered.scenarioList,
                 levelList: levelList,
                 treeListFiltered: treeListFiltered,
-                loading:false
+                loading: false
             }, () => {
                 if (scenarioId != "") {
                     this.setScenarioId(event);
@@ -369,19 +392,20 @@ class ModelingValidation extends Component {
                 nodeList: [],
                 nodeVal: [],
                 nodeIdArr: [],
-                loading:false,
+                nodeLabelArr: [],
+                loading: false,
             })
         }
     }
 
     setScenarioId(e) {
-        this.setState({loading:true})
+        this.setState({ loading: true })
         var scenarioId = e.target.value;
         localStorage.setItem("sesScenarioId", scenarioId);
         if (scenarioId != "") {
             this.setState({
                 scenarioId: scenarioId,
-                loading:false
+                loading: false
             }, () => {
                 this.getData()
             })
@@ -390,7 +414,7 @@ class ModelingValidation extends Component {
             this.el.destroy();
             this.setState({
                 scenarioId: scenarioId,
-                loading:false,
+                loading: false,
                 dataEl: ""
             })
         }
@@ -401,13 +425,13 @@ class ModelingValidation extends Component {
     }
 
     setDatasetId(e) {
-        this.setState({loading:true})
+        this.setState({ loading: true })
         var datasetId = e.target.value;
         localStorage.setItem("sesLiveDatasetId", datasetId);
         if (datasetId > 0) {
             this.setState({
                 datasetId: datasetId,
-                loading:false
+                loading: false
             }, () => {
                 this.getVersionList();
             })
@@ -425,11 +449,12 @@ class ModelingValidation extends Component {
                 nodeList: [],
                 nodeVal: [],
                 nodeIdArr: [],
+                nodeLabelArr: [],
                 treeList: [],
                 treeId: "",
                 versionList: [],
                 versionId: "",
-                loading:false
+                loading: false
             })
         }
     }
@@ -464,11 +489,11 @@ class ModelingValidation extends Component {
             for (var k = 0; k < nodeVal.length; k++) {
                 columns.push({ title: nodeVal[k].label, width: 100, readOnly: true, type: displayBy == 1 ? 'numeric' : 'hidden', mask: displayBy == 1 ? '#,##.00' : '#,##.00 %', decimal: '.' });
             }
-            columns.push({ title: i18n.t('static.supplyPlan.total'), width: 100, readOnly: true, type: displayBy == 1 ? 'numeric' : 'hidden', mask: displayBy == 1 ? '#,##.00 %' : '#,## %' });
+            columns.push({ title: i18n.t('static.supplyPlan.total'), width: 100, readOnly: true, type: displayBy == 1 ? 'numeric' : 'hidden', mask: displayBy == 1 ? '#,##.00' : '#,## %' });
             for (var k = 0; k < nodeVal.length; k++) {
                 columns.push({ title: nodeVal[k].label, width: 100, readOnly: true, type: displayBy == 2 ? 'numeric' : 'hidden', mask: displayBy == 1 ? '#,##.00' : '#,##.00 %', decimal: '.' });
             }
-            columns.push({ title: i18n.t('static.supplyPlan.total'), width: 100, readOnly: true, type: displayBy == 2 ? 'numeric' : 'hidden', mask: displayBy == 1 ? '#,##.00 %' : '#,## %' });
+            columns.push({ title: i18n.t('static.supplyPlan.total'), width: 100, readOnly: true, type: displayBy == 2 ? 'numeric' : 'hidden', mask: displayBy == 1 ? '#,##.00' : '#,## %' });
             var data = [];
             var dataArr = [];
             var nodeVal = this.state.nodeVal;
@@ -480,18 +505,41 @@ class ModelingValidation extends Component {
                 var totalPer = 0;
                 for (var k = 0; k < nodeVal.length; k++) {
                     var flatListFiltered = flatList.filter(c => c.id == nodeVal[k].value)[0].payload.nodeDataMap[this.state.scenarioId][0].nodeDataMomList;
-                    var calculatedValue = flatListFiltered.length > 0 ? flatListFiltered.filter(c => moment(c.month).format("YYYY-MM-DD") == moment(monthList[j]).format("YYYY-MM-DD"))[0].calculatedValue : "";
-                    data[k + 1] = flatListFiltered.length > 0 ? Number(calculatedValue).toFixed(2) : "";
+                    var calculatedValue = "";
+                    if (flatListFiltered.length > 0) {
+                        var cvList = flatListFiltered.filter(c => moment(c.month).format("YYYY-MM-DD") == moment(monthList[j]).format("YYYY-MM-DD"));
+                        if (cvList.length > 0) {
+                            calculatedValue = cvList[0].calculatedValue
+                        } else {
+                            calculatedValue = "";
+                        }
+                    } else {
+                        calculatedValue = "";
+                    }
+                    data[k + 1] = calculatedValue != "" ? Number(calculatedValue).toFixed(2) : "";
                     total += Number(calculatedValue);
                 }
                 data[nodeVal.length + 1] = Number(total).toFixed(2);
 
                 for (var k = 0; k < nodeVal.length; k++) {
                     var flatListFiltered = flatList.filter(c => c.id == nodeVal[k].value)[0].payload.nodeDataMap[this.state.scenarioId][0].nodeDataMomList;
-                    var calculatedValue = flatListFiltered.length > 0 ? flatListFiltered.filter(c => moment(c.month).format("YYYY-MM-DD") == moment(monthList[j]).format("YYYY-MM-DD"))[0].calculatedValue : "";
-                    var val = (Number(calculatedValue) / Number(total)) * 100;
-                    data[nodeVal.length + 1 + k + 1] = calculatedValue != 0 ? Number(val).toFixed(2) : 0;
-                    totalPer += calculatedValue != 0 ? val : 0;
+                    var calculatedValue = "";
+                    if (flatListFiltered.length > 0) {
+                        var cvList = flatListFiltered.filter(c => moment(c.month).format("YYYY-MM-DD") == moment(monthList[j]).format("YYYY-MM-DD"));
+                        if (cvList.length > 0) {
+                            calculatedValue = cvList[0].calculatedValue
+                        } else {
+                            calculatedValue = "";
+                        }
+                    } else {
+                        calculatedValue = "";
+                    }
+                    var val = ""
+                    if (calculatedValue != "") {
+                        val = (Number(calculatedValue) / Number(total)) * 100;
+                    }
+                    data[nodeVal.length + 1 + k + 1] = val != "" ? Number(val).toFixed(2) : 0;
+                    totalPer += calculatedValue != "" ? val : 0;
                 }
                 data[nodeVal.length + 1 + nodeVal.length + 1] = totalPer != 0 ? Number(totalPer).toFixed(2) : 0;
                 dataArr.push(data);
@@ -538,7 +586,8 @@ class ModelingValidation extends Component {
                 monthList: monthList,
                 dataEl: dataEl,
                 loading: false,
-                show: false
+                show: false,
+                columns: columns
             })
         } else {
             this.el = jexcel(document.getElementById("tableDiv"), '');
@@ -556,7 +605,7 @@ class ModelingValidation extends Component {
     }
 
     setLevelId(e) {
-        this.setState({loading:true})
+        this.setState({ loading: true })
         var levelId = e.target.value;
         localStorage.setItem("sesLevelId", levelId);
         var levelUnit = "";
@@ -564,28 +613,32 @@ class ModelingValidation extends Component {
             var treeListFiltered = this.state.treeListFiltered;
             var flatDataForLevel = treeListFiltered.tree.flatList.filter(c => c.level == levelId);
             var flatData = flatDataForLevel[0];
-            levelUnit = getLabelText(flatData.payload.nodeUnit.label, this.state.lang)
+            var nodeUnit = this.state.unitList.filter(c => c.unitId == flatData.payload.nodeUnit.id);
+            levelUnit = nodeUnit.length > 0 ? getLabelText(nodeUnit[0].label, this.state.lang) : ""
             var nodeList = [];
             var nodeVal = [];
             var nodeIdArr = [];
+            var nodeLabelArr = [];
             for (var fdfl = 0; fdfl < flatDataForLevel.length; fdfl++) {
                 nodeList.push({
-                    value: flatDataForLevel[fdfl].payload.nodeId,
+                    value: flatDataForLevel[fdfl].id,
                     label: getLabelText(flatDataForLevel[fdfl].payload.label, this.state.lang)
                 })
                 nodeVal.push({
-                    value: flatDataForLevel[fdfl].payload.nodeId,
+                    value: flatDataForLevel[fdfl].id,
                     label: getLabelText(flatDataForLevel[fdfl].payload.label, this.state.lang)
                 })
-                nodeIdArr.push(flatDataForLevel[fdfl].payload.nodeId)
+                nodeIdArr.push(flatDataForLevel[fdfl].id)
+                nodeLabelArr.push(getLabelText(flatDataForLevel[fdfl].payload.label, this.state.lang))
             }
             this.setState({
                 levelId: levelId,
                 levelUnit: levelUnit != null ? levelUnit : "",
                 nodeList: nodeList,
                 nodeIdArr: nodeIdArr,
+                nodeLabelArr: nodeLabelArr,
                 nodeVal: nodeVal,
-                loading:false
+                loading: false
             }, () => {
                 this.getData();
             })
@@ -596,8 +649,9 @@ class ModelingValidation extends Component {
                 levelUnit: "",
                 nodeList: [],
                 nodeIdArr: [],
+                nodeLabelArr: [],
                 nodeVal: [],
-                loading:false
+                loading: false
             }, () => {
                 this.getData()
             })
@@ -625,7 +679,7 @@ class ModelingValidation extends Component {
             if (versionList.length == 1) {
                 versionId = versionList[0];
                 event.target.value = versionList[0];
-            } else if (localStorage.getItem("sesVersionId") != "") {
+            } else if (localStorage.getItem("sesDatasetVersionId") != "" && versionList.filter(c => c == localStorage.getItem("sesDatasetVersionId")).length > 0) {
                 versionId = localStorage.getItem("sesDatasetVersionId");
                 event.target.value = localStorage.getItem("sesDatasetVersionId");
             }
@@ -654,7 +708,8 @@ class ModelingValidation extends Component {
                 levelUnit: "",
                 nodeList: [],
                 nodeVal: [],
-                nodeIdArr: []
+                nodeIdArr: [],
+                nodeLabelArr: [],
             })
         }
     }
@@ -711,48 +766,59 @@ class ModelingValidation extends Component {
             getRequest.onerror = function (event) {
             }.bind(this);
             getRequest.onsuccess = function (event) {
-                var myResult = [];
-                myResult = getRequest.result;
-                var datasetList = this.state.datasetList;
-                for (var mr = 0; mr < myResult.length; mr++) {
-                    var index = datasetList.findIndex(c => c.id == myResult[mr].programId);
-                    if (index == -1) {
-                        var programNameBytes = CryptoJS.AES.decrypt(myResult[mr].programName, SECRET_KEY);
-                        var programNameLabel = programNameBytes.toString(CryptoJS.enc.Utf8);
-                        var programNameJson = JSON.parse(programNameLabel)
-                        var json = {
-                            id: myResult[mr].programId,
-                            name: getLabelText(programNameJson, this.state.lang),
-                            versionList: [{ versionId: myResult[mr].version + "  (Local)" }]
+
+
+                var unitTransaction = db1.transaction(['unit'], 'readwrite');
+                var unitOs = unitTransaction.objectStore('unit');
+                var unitRequest = unitOs.getAll();
+                unitRequest.onerror = function (event) {
+                }.bind(this);
+                unitRequest.onsuccess = function (event) {
+                    var unitList = unitRequest.result;
+                    var myResult = [];
+                    myResult = getRequest.result;
+                    var datasetList = this.state.datasetList;
+                    for (var mr = 0; mr < myResult.length; mr++) {
+                        var index = datasetList.findIndex(c => c.id == myResult[mr].programId);
+                        if (index == -1) {
+                            var programNameBytes = CryptoJS.AES.decrypt(myResult[mr].programName, SECRET_KEY);
+                            var programNameLabel = programNameBytes.toString(CryptoJS.enc.Utf8);
+                            var programNameJson = JSON.parse(programNameLabel)
+                            var json = {
+                                id: myResult[mr].programId,
+                                name: getLabelText(programNameJson, this.state.lang),
+                                versionList: [{ versionId: myResult[mr].version + "  (Local)" }]
+                            }
+                            datasetList.push(json)
+                        } else {
+                            var existingVersionList = datasetList[index].versionList;
+                            existingVersionList.push({ versionId: myResult[mr].version + "  (Local)" })
+                            datasetList[index].versionList = existingVersionList
                         }
-                        datasetList.push(json)
-                    } else {
-                        var existingVersionList = datasetList[index].versionList;
-                        existingVersionList.push({ versionId: myResult[mr].version + "  (Local)" })
-                        datasetList[index].versionList = existingVersionList
                     }
-                }
-                var datasetId = "";
-                var event = {
-                    target: {
-                        value: ""
+                    var datasetId = "";
+                    var event = {
+                        target: {
+                            value: ""
+                        }
+                    };
+                    if (datasetList.length == 1) {
+                        datasetId = datasetList[0].id;
+                        event.target.value = datasetList[0].id;
+                    } else if (localStorage.getItem("sesLiveDatasetId") != "" && datasetList.filter(c => c.id == localStorage.getItem("sesLiveDatasetId")).length > 0) {
+                        datasetId = localStorage.getItem("sesLiveDatasetId");
+                        event.target.value = localStorage.getItem("sesLiveDatasetId");
                     }
-                };
-                if (datasetList.length == 1) {
-                    datasetId = datasetList[0].id;
-                    event.target.value = datasetList[0].id;
-                } else if (localStorage.getItem("sesLiveDatasetId") != "") {
-                    datasetId = localStorage.getItem("sesLiveDatasetId");
-                    event.target.value = localStorage.getItem("sesLiveDatasetId");
-                }
-                this.setState({
-                    datasetList: datasetList,
-                    loading: false
-                }, () => {
-                    if (datasetId != "") {
-                        this.setDatasetId(event);
-                    }
-                })
+                    this.setState({
+                        datasetList: datasetList,
+                        unitList: unitList,
+                        loading: false
+                    }, () => {
+                        if (datasetId != "") {
+                            this.setDatasetId(event);
+                        }
+                    })
+                }.bind(this)
             }.bind(this)
         }.bind(this)
     }
@@ -769,6 +835,343 @@ class ModelingValidation extends Component {
 
     _handleClickRangeBox(e) {
         this.refs.pickRange.show()
+    }
+
+    addDoubleQuoteToRowContent = (arr) => {
+        return arr.map(ele => '"' + ele + '"')
+    }
+
+    formatter = value => {
+
+        var cell1 = value
+        cell1 += '';
+        var x = cell1.split('.');
+        var x1 = x[0];
+        var x2 = x.length > 1 ? '.' + x[1] : '';
+        var rgx = /(\d+)(\d{3})/;
+        while (rgx.test(x1)) {
+            x1 = x1.replace(rgx, '$1' + ',' + '$2');
+        }
+        return x1 + x2;
+    }
+
+    exportPDF() {
+        const addFooters = doc => {
+
+            const pageCount = doc.internal.getNumberOfPages()
+
+            doc.setFont('helvetica', 'bold')
+            doc.setFontSize(6)
+            for (var i = 1; i <= pageCount; i++) {
+                doc.setPage(i)
+
+                doc.setPage(i)
+                doc.text('Page ' + String(i) + ' of ' + String(pageCount), doc.internal.pageSize.width / 9, doc.internal.pageSize.height - 30, {
+                    align: 'center'
+                })
+                doc.text('Copyright © 2020 ' + i18n.t('static.footer'), doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
+                    align: 'center'
+                })
+
+
+            }
+        }
+        const addHeaders = doc => {
+
+            const pageCount = doc.internal.getNumberOfPages()
+
+
+            //  var file = new File('QAT-logo.png','../../../assets/img/QAT-logo.png');
+            // var reader = new FileReader();
+
+            //var data='';
+            // Use fs.readFile() method to read the file 
+            //fs.readFile('../../assets/img/logo.svg', 'utf8', function(err, data){ 
+            //}); 
+            for (var i = 1; i <= pageCount; i++) {
+                doc.setFontSize(12)
+                doc.setFont('helvetica', 'bold')
+                doc.setPage(i)
+                doc.addImage(LOGO, 'png', 0, 10, 180, 50, 'FAST');
+                /*doc.addImage(data, 10, 30, {
+                  align: 'justify'
+                });*/
+                doc.setTextColor("#002f6c");
+                doc.text(i18n.t('static.dashboard.modelingValidation'), doc.internal.pageSize.width / 2, 60, {
+                    align: 'center'
+                })
+                if (i == 1) {
+                    doc.setFont('helvetica', 'normal')
+                    doc.setFontSize(8)
+                    doc.text(i18n.t('static.dashboard.programheader') + ' : ' + document.getElementById("datasetId").selectedOptions[0].text, doc.internal.pageSize.width / 20, 90, {
+                        align: 'left'
+                    })
+
+                }
+
+            }
+        }
+
+
+        const unit = "pt";
+        const size = "A4"; // Use A1, A2, A3 or A4
+        const orientation = "landscape"; // portrait or landscape
+
+        const marginLeft = 10;
+        const doc = new jsPDF(orientation, unit, size, true);
+
+        doc.setFontSize(8);
+        doc.setFont('helvetica', 'normal')
+        doc.setTextColor("#002f6c");
+
+
+        var y = 110;
+        var planningText = doc.splitTextToSize(i18n.t('static.report.version') + ' : ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width * 3 / 4);
+        // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+        for (var i = 0; i < planningText.length; i++) {
+            if (y > doc.internal.pageSize.height - 100) {
+                doc.addPage();
+                y = 80;
+
+            }
+            doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
+            y = y + 10;
+            console.log(y)
+        }
+
+        planningText = doc.splitTextToSize(i18n.t('static.common.treeName') + ' : ' + document.getElementById("treeId").selectedOptions[0].text, doc.internal.pageSize.width * 3 / 4);
+        // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+        y = y + 10;
+        for (var i = 0; i < planningText.length; i++) {
+            if (y > doc.internal.pageSize.height - 100) {
+                doc.addPage();
+                y = 80;
+
+            }
+            doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
+            y = y + 10;
+            console.log(y)
+        }
+
+        planningText = doc.splitTextToSize(i18n.t('static.whatIf.scenario') + ' : ' + document.getElementById("scenarioId").selectedOptions[0].text, doc.internal.pageSize.width * 3 / 4);
+        // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+        y = y + 10;
+        for (var i = 0; i < planningText.length; i++) {
+            if (y > doc.internal.pageSize.height - 100) {
+                doc.addPage();
+                y = 80;
+
+            }
+            doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
+            y = y + 10;
+            console.log(y)
+        }
+
+        planningText = doc.splitTextToSize(i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to), doc.internal.pageSize.width * 3 / 4);
+        // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+        y = y + 10;
+        for (var i = 0; i < planningText.length; i++) {
+            if (y > doc.internal.pageSize.height - 100) {
+                doc.addPage();
+                y = 80;
+
+            }
+            doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
+            y = y + 10;
+            console.log(y)
+        }
+
+        planningText = doc.splitTextToSize(i18n.t('static.common.level') + ' : ' + document.getElementById("levelId").selectedOptions[0].text, doc.internal.pageSize.width * 3 / 4);
+        // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+        y = y + 10;
+        for (var i = 0; i < planningText.length; i++) {
+            if (y > doc.internal.pageSize.height - 100) {
+                doc.addPage();
+                y = 80;
+
+            }
+            doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
+            y = y + 10;
+            console.log(y)
+        }
+
+        planningText = doc.splitTextToSize(i18n.t('static.modelingValidation.levelUnit') + ' : ' + document.getElementById("levelUnit").value, doc.internal.pageSize.width * 3 / 4);
+        // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+        y = y + 10;
+        for (var i = 0; i < planningText.length; i++) {
+            if (y > doc.internal.pageSize.height - 100) {
+                doc.addPage();
+                y = 80;
+
+            }
+            doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
+            y = y + 10;
+            console.log(y)
+        }
+
+        planningText = doc.splitTextToSize(i18n.t('static.common.node') + ' : ' + this.state.nodeLabelArr.join('; '), doc.internal.pageSize.width * 3 / 4);
+        // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+        y = y + 10;
+        for (var i = 0; i < planningText.length; i++) {
+            if (y > doc.internal.pageSize.height - 100) {
+                doc.addPage();
+                y = 80;
+
+            }
+            doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
+            y = y + 10;
+            console.log(y)
+        }
+
+        y = y + 10;
+        doc.text(i18n.t('static.modelingValidation.displayBy') + ' : ' + document.getElementById("displayBy").selectedOptions[0].text, doc.internal.pageSize.width / 20, y, {
+            align: 'left'
+        })
+        y = y + 10;
+
+
+
+
+
+        //   const title = i18n.t('static.dashboard.globalconsumption');
+        var canvas = document.getElementById("cool-canvas");
+        //   //creates image
+
+        var canvasImg = canvas.toDataURL("image/png", 1.0);
+        var width = doc.internal.pageSize.width;
+        var height = doc.internal.pageSize.height;
+        var h1 = 50;
+        var aspectwidth1 = (width - h1);
+        let startY = y + 10
+        //   console.log('startY', startY)
+        let pages = Math.ceil(startY / height)
+        for (var j = 1; j < pages; j++) {
+            doc.addPage()
+        }
+        let startYtable = startY - ((height - h1) * (pages - 1))
+        doc.setTextColor("#fff");
+        if (startYtable > (height - 400)) {
+            doc.addPage()
+            startYtable = 80
+        }
+        doc.addImage(canvasImg, 'png', 50, startYtable, 750, 260, 'CANVAS');
+        var columns = [];
+        this.state.columns.filter(c => c.type != 'hidden').map((item, idx) => { columns.push(item.title) });
+        var dataArr = [];
+        var dataArr1 = [];
+        console.log("this.state.dataEl.getJson(null, false)+++", this.state.dataEl.getJson(null, false))
+        this.state.dataEl.getJson(null, false).map(ele => {
+            dataArr = [];
+            this.state.columns.map((item, idx) => {
+                if (item.type != 'hidden') {
+                    console.log("ele[idx]+++", ele[idx])
+                    if (item.type == 'numeric') {
+                        if (item.mask != undefined && item.mask.toString().includes("%")) {
+                            dataArr.push(this.formatter(ele[idx]) + " %");
+                        } else {
+                            dataArr.push(this.formatter(ele[idx]));
+                        }
+                    } else if (item.type == 'calendar') {
+                        dataArr.push(moment(ele[idx]).format(DATE_FORMAT_CAP_WITHOUT_DATE));
+                    } else {
+                        dataArr.push(ele[idx]);
+                    }
+                }
+
+            })
+            dataArr1.push(dataArr);
+        })
+        const data = dataArr1;
+        doc.addPage()
+        let content = {
+            margin: { top: 80, bottom: 50 },
+            startY: startYtable,
+            head: [columns],
+            body: data,
+            styles: { lineWidth: 1, fontSize: 8, halign: 'center' }
+
+        };
+
+
+        //doc.text(title, marginLeft, 40);
+        doc.autoTable(content);
+        addHeaders(doc)
+        addFooters(doc)
+        doc.save(i18n.t('static.dashboard.modelingValidation').concat('.pdf'));
+        //creates PDF from img
+        /*  var doc = new jsPDF('landscape');
+          doc.setFontSize(20);
+          doc.text(15, 15, "Cool Chart");
+          doc.save('canvas.pdf');*/
+    }
+
+    exportCSV() {
+        var csvRow = [];
+        csvRow.push('"' + (i18n.t('static.dashboard.programheader') + ' : ' + document.getElementById("datasetId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+        csvRow.push('')
+        csvRow.push('"' + (i18n.t('static.report.version') + ' : ' + document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+        csvRow.push('')
+        csvRow.push('"' + (i18n.t('static.common.treeName') + ' : ' + document.getElementById("treeId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+        csvRow.push('')
+        csvRow.push('"' + (i18n.t('static.whatIf.scenario') + ' : ' + document.getElementById("scenarioId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+        csvRow.push('')
+        csvRow.push('"' + (i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ', '%20') + '"')
+        csvRow.push('')
+        csvRow.push('"' + (i18n.t('static.common.level') + ' : ' + document.getElementById("levelId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+        csvRow.push('')
+        csvRow.push('"' + (i18n.t('static.modelingValidation.levelUnit') + ' : ' + document.getElementById("levelUnit").value).replaceAll(' ', '%20') + '"')
+        csvRow.push('')
+        this.state.nodeLabelArr.map(ele =>
+            csvRow.push('"' + (i18n.t('static.common.node')).replaceAll(' ', '%20') + ' : ' + (ele.toString()).replaceAll(' ', '%20') + '"'))
+        csvRow.push('')
+        csvRow.push('"' + (i18n.t('static.modelingValidation.displayBy') + ' : ' + document.getElementById("displayBy").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+        csvRow.push('')
+
+
+        csvRow.push('')
+        csvRow.push('"' + (i18n.t('static.common.youdatastart')).replaceAll(' ', '%20') + '"')
+        csvRow.push('')
+        var re;
+        var columns = [];
+        // columns.push(i18n.t('static.common.level'));
+        // columns.push(i18n.t('static.supplyPlan.type'));
+        // columns.push(i18n.t('static.forecastingunit.forecastingunit'));
+        // columns.push(i18n.t('static.forecastingunit.forecastingunit') + " " + i18n.t('static.common.text'));
+        // columns.push(i18n.t('static.common.product'));
+        // columns.push(i18n.t('static.common.product') + " " + i18n.t('static.common.text'));
+        // columns.push(i18n.t('static.productValidation.cost'));
+        const headers = [];
+        this.state.columns.filter(c => c.type != 'hidden').map((item, idx) => { headers[idx] = (item.title).replaceAll(' ', '%20') });
+
+        var A = [this.addDoubleQuoteToRowContent(headers)];
+        var B = []
+        this.state.dataEl.getJson(null, false).map(ele => {
+            B = [];
+            this.state.columns.map((item, idx) => {
+                if (item.type != 'hidden') {
+                    if (item.mask != undefined && item.mask.toString().includes("%")) {
+                        B.push((ele[idx] + (" %")).toString().replaceAll(',', ' ').replaceAll(' ', '%20'));
+                    } else if (item.type == 'calendar') {
+                        B.push(moment(ele[idx]).format(DATE_FORMAT_CAP_WITHOUT_DATE).toString().replaceAll(',', ' ').replaceAll(' ', '%20'));
+                    } else {
+                        B.push(ele[idx].toString().replaceAll(',', ' ').replaceAll(' ', '%20'));
+                    }
+                }
+            })
+            A.push(this.addDoubleQuoteToRowContent(B));
+        })
+
+
+        for (var i = 0; i < A.length; i++) {
+            csvRow.push(A[i].join(","))
+        }
+        var csvString = csvRow.join("%0A")
+        var a = document.createElement("a")
+        a.href = 'data:attachment/csv,' + csvString
+        a.target = "_Blank"
+        a.download = i18n.t('static.dashboard.modelingValidation') + ".csv"
+        document.body.appendChild(a)
+        a.click()
     }
 
     render() {
@@ -974,11 +1377,11 @@ class ModelingValidation extends Component {
                         <div className="card-header-actions">
                             <a className="card-header-action">
 
-                                <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.exportPDF()} />
+                                {this.state.monthList.length > 0 && this.state.dataEl != undefined && this.state.dataEl != "" && <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.exportPDF()} />}
 
 
                             </a>
-                            <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
+                            {this.state.monthList.length > 0 && this.state.dataEl != undefined && this.state.dataEl != "" && <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />}
                         </div>
                         {/* } */}
                     </div>

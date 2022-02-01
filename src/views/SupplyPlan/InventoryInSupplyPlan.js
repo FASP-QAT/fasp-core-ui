@@ -270,7 +270,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                         data[7] = inventoryList[j].multiplier; //H
                         data[8] = `=ROUND(F${parseInt(j) + 1}*H${parseInt(j) + 1},0)`; //I
                         data[9] = `=ROUND(G${parseInt(j) + 1}*H${parseInt(j) + 1},0)`; //J
-                        if (inventoryList[j].notes === null || ((inventoryList[j].notes).trim() == "NULL")) {
+                        if (inventoryList[j].notes === null || ((inventoryList[j].notes) == "NULL")) {
                             data[10] = "";
                         } else {
                             data[10] = inventoryList[j].notes;
@@ -790,7 +790,29 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                     var cell = elInstance.getCell((colArr[c]).concat(parseInt(z) + 1))
                     cell.classList.add('readonly');
                 }
+                if (rowData[11] == false) {
+                    for (var c = 0; c < colArr.length; c++) {
+                        var cell = elInstance.getCell((colArr[c]).concat(parseInt(z) + 1))
+                        cell.classList.add('shipmentEntryDoNotInclude');
+                    }
+                } else {
+                    for (var c = 0; c < colArr.length; c++) {
+                        var cell = elInstance.getCell((colArr[c]).concat(parseInt(z) + 1))
+                        cell.classList.remove('shipmentEntryDoNotInclude');
+                    }
+                }
             } else {
+                if (rowData[11] == false) {
+                    for (var c = 0; c < colArr.length; c++) {
+                        var cell = elInstance.getCell((colArr[c]).concat(parseInt(z) + 1))
+                        cell.classList.add('shipmentEntryDoNotInclude');
+                    }
+                } else {
+                    for (var c = 0; c < colArr.length; c++) {
+                        var cell = elInstance.getCell((colArr[c]).concat(parseInt(z) + 1))
+                        cell.classList.remove('shipmentEntryDoNotInclude');
+                    }
+                }
 
             }
         }
@@ -817,7 +839,29 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                     var cell = elInstance.getCell((colArr[c]).concat(parseInt(i) + 1))
                     cell.classList.add('readonly');
                 }
+                if (rowData[11] == false) {
+                    for (var c = 0; c < colArr.length; c++) {
+                        var cell = elInstance.getCell((colArr[c]).concat(parseInt(i) + 1))
+                        cell.classList.add('shipmentEntryDoNotInclude');
+                    }
+                } else {
+                    for (var c = 0; c < colArr.length; c++) {
+                        var cell = elInstance.getCell((colArr[c]).concat(parseInt(i) + 1))
+                        cell.classList.remove('shipmentEntryDoNotInclude');
+                    }
+                }
             } else {
+                if (rowData[11] == false) {
+                    for (var c = 0; c < colArr.length; c++) {
+                        var cell = elInstance.getCell((colArr[c]).concat(parseInt(i) + 1))
+                        cell.classList.add('shipmentEntryDoNotInclude');
+                    }
+                } else {
+                    for (var c = 0; c < colArr.length; c++) {
+                        var cell = elInstance.getCell((colArr[c]).concat(parseInt(i) + 1))
+                        cell.classList.remove('shipmentEntryDoNotInclude');
+                    }
+                }
 
             }
         }
@@ -829,7 +873,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
         this.props.updateState("inventoryError", "");
         this.props.updateState("inventoryDuplicateError", "");
         this.props.updateState("inventoryChangedFlag", 1);
-        if (x == 0 || x == 14) {
+        if (x == 0 || x == 14 || x == 11) {
             var rowData = elInstance.getRowData(y);
             console.log("RowData+++", rowData)
             var lastEditableDate = moment(Date.now()).subtract(INVENTORY_MONTHS_IN_PAST + 1, 'months').format("YYYY-MM-DD");
@@ -840,6 +884,17 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                     cell.classList.add('readonly');
                 }
             } else {
+                if (rowData[11] == false) {
+                    for (var c = 0; c < colArr.length; c++) {
+                        var cell = elInstance.getCell((colArr[c]).concat(parseInt(y) + 1))
+                        cell.classList.add('shipmentEntryDoNotInclude');
+                    }
+                } else {
+                    for (var c = 0; c < colArr.length; c++) {
+                        var cell = elInstance.getCell((colArr[c]).concat(parseInt(y) + 1))
+                        cell.classList.remove('shipmentEntryDoNotInclude');
+                    }
+                }
 
             }
         }

@@ -284,7 +284,7 @@ class VersionSettingsComponent extends Component {
             console.log("startDate--------->", startDate);
             if (startDate != null && month != null) {
                 let newStartDate = new Date(startDate);
-                newStartDate.setMonth(newStartDate.getMonth() + month);
+                newStartDate.setMonth(newStartDate.getMonth() + (month - 1));
                 // console.log("startDate--------->1", new Date(newStartDate));
                 this.el.setValueFromCoords(17, y, 1, true);
                 this.el.setValueFromCoords(9, y, newStartDate.getFullYear() + '-' + (newStartDate.getMonth() + 1) + "-01 00:00:00", true);
@@ -305,6 +305,8 @@ class VersionSettingsComponent extends Component {
                 var months;
                 months = (d2.getFullYear() - d1.getFullYear()) * 12;
                 months += d2.getMonth() - d1.getMonth();
+                // months = months - 1;
+                months = months + 1;
                 this.el.setValueFromCoords(17, y, 1, true);
                 this.el.setValueFromCoords(8, y, months, true);
             }
@@ -415,8 +417,8 @@ class VersionSettingsComponent extends Component {
                     var program = (this.state.datasetList.filter(x => x.id == id)[0]);
                     var databytes = CryptoJS.AES.decrypt(program.programData, SECRET_KEY);
                     var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
-                    programData.currentVersion.forecastStartDate = startDate;
-                    programData.currentVersion.forecastStopDate = stopDate;
+                    programData.currentVersion.forecastStartDate = moment(startDate).startOf('month').format("YYYY-MM-DD");
+                    programData.currentVersion.forecastStopDate = moment(stopDate).startOf('month').format("YYYY-MM-DD");
                     programData.currentVersion.daysInMonth = noOfDaysInMonth;
                     programData.currentVersion.notes = notes;
 
@@ -622,14 +624,14 @@ class VersionSettingsComponent extends Component {
         let versionSettingsList = this.state.versionSettingsList;
         let versionSettingsArray = [];
         let count = 0;
-        var downloadedDataset = this.state.datasetList;
-        for (var j = 0; j < downloadedDataset.length; j++) {
-            var bytes = CryptoJS.AES.decrypt(downloadedDataset[j].programData, SECRET_KEY);
+        var versionTypeId = document.getElementById('versionTypeId').value;
+        for (var j = 0; j < versionSettingsList.length; j++) {
+            var bytes = CryptoJS.AES.decrypt(versionSettingsList[j].programData, SECRET_KEY);
             var pd = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
             data = [];
-            data[0] = downloadedDataset[j].programId
-            data[1] = downloadedDataset[j].programCode
-            data[2] = downloadedDataset[j].version + "(Local)"
+            data[0] = versionSettingsList[j].programId
+            data[1] = versionSettingsList[j].programCode
+            data[2] = versionSettingsList[j].version + "(Local)"
             data[3] = ''
             data[4] = pd.currentVersion.notes
             data[5] = ''
@@ -648,7 +650,7 @@ class VersionSettingsComponent extends Component {
                 var months;
                 months = (d2.getFullYear() - d1.getFullYear()) * 12;
                 months += d2.getMonth() - d1.getMonth();
-                data[8] = months
+                data[8] = months + 1
             } else {
                 data[8] = 0
             }
@@ -663,7 +665,7 @@ class VersionSettingsComponent extends Component {
             }
             // 1-Local 0-Live
             data[10] = 1
-            data[11] = downloadedDataset[j].id
+            data[11] = versionSettingsList[j].id
             data[12] = 0
             data[13] = pd.currentVersion.daysInMonth != null ? pd.currentVersion.daysInMonth : '0'
 
@@ -672,12 +674,14 @@ class VersionSettingsComponent extends Component {
             data[15] = (pd.currentVersion.forecastThresholdHighPerc == null ? '' : pd.currentVersion.forecastThresholdHighPerc)
             data[16] = (pd.currentVersion.forecastThresholdLowPerc == null ? '' : pd.currentVersion.forecastThresholdLowPerc)
             data[17] = 0;
-            versionSettingsArray[count] = data;
-            count++;
+            if (versionTypeId == "") {
+                versionSettingsArray[count] = data;
+                count++;
+            }
 
         }
         // console.log("versionSettingsArray------->", versionSettingsArray);
-        var versionTypeId = document.getElementById('versionTypeId').value;
+
         for (var j = 0; j < versionSettingsList.length; j++) {
             var databytes = CryptoJS.AES.decrypt(versionSettingsList[j].programData, SECRET_KEY);
             var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
@@ -1020,7 +1024,7 @@ class VersionSettingsComponent extends Component {
                         </Col>
                         {/* <div id="loader" className="center"></div> */}
 
-                        <div className="VersionSettingMarginTop">
+                        <div className="VersionSettingMarginTop consumptionDataEntryTable">
                             <div id="tableDiv" className={"RemoveStriped"} style={{ display: this.state.loading ? "none" : "block" }}>
                             </div>
                         </div>

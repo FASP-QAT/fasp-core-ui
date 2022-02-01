@@ -26,6 +26,8 @@ import "../../../node_modules/jexcel-pro/dist/jexcel.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import ProgramService from '../../api/ProgramService';
 import DatasetService from '../../api/DatasetService';
+import jsPDF from "jspdf";
+import { LOGO } from '../../CommonComponent/Logo';
 
 class ProductValidation extends Component {
     constructor(props) {
@@ -37,6 +39,7 @@ class ProductValidation extends Component {
             versionId: "",
             versionList: [],
             datasetData: {},
+            localProgramId: '',
             treeList: [],
             treeId: "",
             scenarioList: [],
@@ -112,6 +115,7 @@ class ProductValidation extends Component {
                     var datasetJson = JSON.parse(datasetData);
                     this.setState({
                         datasetData: datasetJson,
+                        localProgramId: datasetId,
                         loading: false
                     }, () => {
                         this.getTreeList();
@@ -126,6 +130,7 @@ class ProductValidation extends Component {
                     var responseData = response.data[0];
                     this.setState({
                         datasetData: responseData,
+                        localProgramId: "",
                         loading: false
                     }, () => {
                         this.getTreeList();
@@ -141,6 +146,7 @@ class ProductValidation extends Component {
                 error => {
                     this.setState({
                         datasetData: {},
+                        localProgramId: "",
                         treeList: [],
                         treeId: "",
                         scenarioList: [],
@@ -152,6 +158,7 @@ class ProductValidation extends Component {
         } else {
             this.setState({
                 datasetData: {},
+                localProgramId: "",
                 treeList: [],
                 treeId: "",
                 scenarioList: [],
@@ -175,7 +182,7 @@ class ProductValidation extends Component {
         if (treeList.length == 1) {
             treeId = treeList[0].treeId;
             event.target.value = treeList[0].treeId;
-        } else if (localStorage.getItem("sesTreeId") != "") {
+        } else if (localStorage.getItem("sesTreeId") != "" && treeList.filter(c => c.treeId == localStorage.getItem("sesTreeId")).length > 0) {
             treeId = localStorage.getItem("sesTreeId");
             event.target.value = localStorage.getItem("sesTreeId");
         }
@@ -226,7 +233,7 @@ class ProductValidation extends Component {
             if (scenarioList.length == 1) {
                 scenarioId = scenarioList[0].id;
                 event.target.value = scenarioList[0].id;
-            } else if (localStorage.getItem("sesScenarioId") != "") {
+            } else if (localStorage.getItem("sesScenarioId") != "" && scenarioList.filter(c => c.id == localStorage.getItem("sesScenarioId")).length > 0) {
                 scenarioId = localStorage.getItem("sesScenarioId");
                 event.target.value = localStorage.getItem("sesScenarioId");
             }
@@ -307,17 +314,17 @@ class ProductValidation extends Component {
             }
             var maxLevel = Math.max.apply(Math, flatList.map(function (o) { return o.level; }))
             console.log("MaxLevel+++", maxLevel);
-            var planningUnitList = nodeDataList.filter(c => c.nodeDataMap.puNode != null);
-            var fuListThatDoesNotHaveChildren = nodeDataList.filter(c => c.nodeDataMap.fuNode != null && nodeDataList.filter(f => f.parent == c.id).length == 0);
+            var planningUnitList = nodeDataList.filter(c => c.flatItem.payload.nodeType.id == 5);
+            var fuListThatDoesNotHaveChildren = nodeDataList.filter(c => c.flatItem.payload.nodeType.id == 4 && nodeDataList.filter(f => f.flatItem.parent == c.flatItem.id).length == 0);
             planningUnitList = planningUnitList.concat(fuListThatDoesNotHaveChildren);
             console.log("PlanningUnitList+++", planningUnitList);
             console.log("fuListThatDoesNotHaveChildren+++", fuListThatDoesNotHaveChildren);
             var finalData = [];
             for (var i = 0; i < planningUnitList.length; i++) {
-                if (planningUnitList[i].nodeDataMap.puNode != null) {
+                var parentLabelList = [];
+                if (planningUnitList[i].flatItem.payload.nodeType.id == 5) {
                     var fuNode = nodeDataList.filter(c => c.flatItem.id == planningUnitList[i].flatItem.parent)[0];
                     var node = nodeDataList.filter(c => c.flatItem.id == planningUnitList[i].flatItem.parent)[0];
-                    var parentLabelList = [];
                     for (var j = 0; j < maxLevel - 1; j++) {
                         var parentNode = nodeDataList.filter(c => c.flatItem.id == node.flatItem.parent)[0];
                         console.log("ParentNode+++", parentNode)
@@ -340,6 +347,7 @@ class ProductValidation extends Component {
                     finalData.push({ name: name, nodeDataMap: planningUnitList[i].nodeDataMap, flatItem: planningUnitList[i].flatItem, parentNodeNodeDataMap: fuNode.nodeDataMap, parentNodeFlatItem: fuNode.flatItem })
                 } else {
                     for (var j = 0; j < maxLevel - 2; j++) {
+                        var node = nodeDataList.filter(c => c.flatItem.id == planningUnitList[i].flatItem.parent)[0];
                         var parentNode = nodeDataList.filter(c => c.flatItem.id == node.flatItem.parent)[0];
                         parentLabelList.push(getLabelText(parentNode.flatItem.payload.label, this.state.lang));
                         node = parentNode;
@@ -371,20 +379,22 @@ class ProductValidation extends Component {
                 var selectedText;
                 var selectedText1;
                 var selectedText2;
+                console.log("finalData[i].parentNodeNodeDataMap+++", finalData[i])
                 noOfPersons = finalData[i].parentNodeNodeDataMap.fuNode.noOfPersons;
                 noOfForecastingUnitsPerPerson = finalData[i].parentNodeNodeDataMap.fuNode.noOfForecastingUnitsPerPerson;
                 usageFrequency = finalData[i].parentNodeNodeDataMap.fuNode.usageFrequency;
                 // selectedText = this.state.currentItemConfig.parentItem.payload.nodeUnit.label.label_en
                 selectedText = getLabelText(nodeDataList.filter(c => c.flatItem.id == finalData[i].parentNodeFlatItem.parent)[0].flatItem.payload.nodeUnit.label, this.state.lang);
                 console.log("+++UNit Label", getLabelText(nodeDataList.filter(c => c.flatItem.id == finalData[i].parentNodeFlatItem.parent)[0].flatItem.payload.nodeUnit.label, this.state.lang));
-                selectedText1 = getLabelText(finalData[i].parentNodeNodeDataMap.fuNode.forecastingUnit.unit.label, this.state.lang);
+                var unitListFilterForFu = this.state.unitList.filter(c => c.unitId == finalData[i].parentNodeNodeDataMap.fuNode.forecastingUnit.unit.id);
+                selectedText1 = getLabelText(unitListFilterForFu[0].label, this.state.lang);
                 if (finalData[i].parentNodeNodeDataMap.fuNode.usageType.id == 2 || finalData[i].parentNodeNodeDataMap.fuNode.oneTimeUsage != "true") {
                     selectedText2 = getLabelText(finalData[i].parentNodeNodeDataMap.fuNode.usagePeriod.label, this.state.lang);
                 }
                 if (finalData[i].parentNodeNodeDataMap.fuNode.usageType.id == 1) {
                     if (finalData[i].parentNodeNodeDataMap.fuNode.oneTimeUsage != "true") {
                         var selectedText3 = finalData[i].parentNodeNodeDataMap.fuNode.repeatUsagePeriod != null ? finalData[i].parentNodeNodeDataMap.fuNode.repeatUsagePeriod.label.label_en : '';
-                        usageText = "Every " + noOfPersons + " " + selectedText + " requires " + noOfForecastingUnitsPerPerson + " " + selectedText1 + ", " + usageFrequency + " times per " + selectedText2 + " for " + this.state.currentScenario.fuNode.repeatCount + " " + selectedText3;
+                        usageText = "Every " + noOfPersons + " " + selectedText + " requires " + noOfForecastingUnitsPerPerson + " " + selectedText1 + ", " + usageFrequency + " times per " + selectedText2 + " for " + finalData[i].parentNodeNodeDataMap.fuNode.repeatCount + " " + selectedText3;
                     } else {
                         usageText = "Every " + noOfPersons + " " + selectedText + " requires " + noOfForecastingUnitsPerPerson + " " + selectedText1;
                     }
@@ -393,7 +403,13 @@ class ProductValidation extends Component {
                 }
                 var usageTextPU = "";
                 if (finalData[i].nodeDataMap != "") {
-                    var planningUnit = getLabelText(finalData[i].nodeDataMap.puNode.planningUnit.label);
+                    console.log("finalData[i]@@@", finalData[i]);
+                    console.log("PlanningUnitList@@@", this.state.datasetData.planningUnitList);
+                    var planningUnitObj = this.state.datasetData.planningUnitList.filter(c => c.planningUnit.id == finalData[i].nodeDataMap.puNode.planningUnit.id);
+                    var planningUnit = ""
+                    if (planningUnitObj.length > 0) {
+                        planningUnit = getLabelText(planningUnitObj[0].planningUnit.label, this.state.lang);
+                    }
                     var usagePeriodId;
                     var usageTypeId;
                     var usageFrequency;
@@ -403,7 +419,9 @@ class ProductValidation extends Component {
                     usageFrequency = finalData[i].parentNodeNodeDataMap.fuNode.usageFrequency;
                     var noOfMonthsInUsagePeriod = 0;
                     if (usagePeriodId != null && usagePeriodId != "") {
-                        var convertToMonth = finalData[i].parentNodeNodeDataMap.fuNode.usagePeriod.convertToMonth;
+                        console.log("finalData[i].parentNodeNodeDataMap.fuNode.usagePeriod@@@", finalData[i].parentNodeNodeDataMap.fuNode.usagePeriod);
+                        var usagePeriodObj = this.state.upList.filter(c => c.usagePeriodId == finalData[i].parentNodeNodeDataMap.fuNode.usagePeriod.usagePeriodId);
+                        var convertToMonth = usagePeriodObj[0].convertToMonth;
                         console.log("convertToMonth---", convertToMonth);
                         if (usageTypeId == 2) {
                             var div = (convertToMonth * usageFrequency);
@@ -432,6 +450,7 @@ class ProductValidation extends Component {
                         console.log("noOfMonthsInUsagePeriod+++", noOfMonthsInUsagePeriod);
                         console.log("finalData[i].nodeDataMap.puNode.refillMonths+++", finalData[i].nodeDataMap.puNode.refillMonths);
                         var puPerInterval = (((finalData[i].parentNodeNodeDataMap.fuNode.noOfForecastingUnitsPerPerson / noOfMonthsInUsagePeriod) / 1) / finalData[i].nodeDataMap.puNode.refillMonths);
+                        console.log("puPerInterval###", puPerInterval);
                         usageTextPU = "For each " + selectedText + " we need " + puPerInterval.toFixed(2) + " " + planningUnit + " every " + finalData[i].nodeDataMap.puNode.refillMonths + " months";
                     }
                     var currency = this.state.currencyList.filter(c => c.id == this.state.currencyId)[0];
@@ -441,30 +460,38 @@ class ProductValidation extends Component {
                     if (selectedPlanningUnit.length > 0) {
                         price = selectedPlanningUnit[0].price;
                     }
+                    var qty = "";
 
                     if (finalData[i].parentNodeNodeDataMap.fuNode.usageType.id == 1) {
                         cost = (sharePu * price) / currency.conversionRateToUsd;
+                        qty = sharePu;
                     } else {
                         if (finalData[i].nodeDataMap.puNode.sharePlanningUnit == "true") {
                             console.log("puPerInterval+++", puPerInterval)
                             console.log("REfill+++", finalData[i].nodeDataMap.puNode.refillMonths);
                             console.log("currency.conversionRateToUsd+++", currency.conversionRateToUsd)
                             cost = ((puPerInterval * (12 / finalData[i].nodeDataMap.puNode.refillMonths)) * price) / currency.conversionRateToUsd;
+                            qty = (puPerInterval * (12 / finalData[i].nodeDataMap.puNode.refillMonths));
                         } else {
                             cost = ((12 / finalData[i].nodeDataMap.puNode.refillMonths) * puPerInterval * price) / currency.conversionRateToUsd;
+                            qty = (12 / finalData[i].nodeDataMap.puNode.refillMonths) * puPerInterval;
                         }
                     }
                     totalCost += cost;
                 }
+                console.log("selectedPlanningUnit@@@", selectedPlanningUnit);
                 data = [];
                 data[0] = finalData[i].name;
                 data[1] = getLabelText(finalData[i].parentNodeNodeDataMap.fuNode.usageType.label, this.state.lang);
                 data[2] = getLabelText(finalData[i].parentNodeNodeDataMap.fuNode.forecastingUnit.label, this.state.lang);
                 data[3] = usageText;
-                data[4] = finalData[i].nodeDataMap != "" ? getLabelText(finalData[i].nodeDataMap.puNode.planningUnit.label, this.state.lang) : "";
+                var planningUnitObj = finalData[i].nodeDataMap != "" ? this.state.datasetData.planningUnitList.filter(c => c.planningUnit.id == finalData[i].nodeDataMap.puNode.planningUnit.id) : [];
+                data[4] = finalData[i].nodeDataMap != "" && planningUnitObj.length>0 ? getLabelText(planningUnitObj[0].planningUnit.label, this.state.lang) : "";
                 data[5] = usageTextPU;
-                data[6] = selectedPlanningUnit.length > 0 ? cost.toFixed(2) : "";
-                data[7] = 0;
+                data[6] = selectedPlanningUnit != undefined && selectedPlanningUnit.length > 0 && finalData[i].nodeDataMap != "" ? qty.toFixed(2) : "";
+                data[7] = selectedPlanningUnit != undefined && selectedPlanningUnit.length > 0 && finalData[i].nodeDataMap != "" ? price.toFixed(2) : "";
+                data[8] = selectedPlanningUnit != undefined && selectedPlanningUnit.length > 0 && finalData[i].nodeDataMap != "" ? cost.toFixed(2) : "";
+                data[9] = 0;
 
                 dataArray.push(data);
                 if (parentId != finalData[i].parentNodeFlatItem.id || i == finalData.length - 1) {
@@ -475,8 +502,10 @@ class ProductValidation extends Component {
                     data[3] = "";
                     data[4] = "";
                     data[5] = i18n.t('static.productValidation.subTotal');
-                    data[6] = totalCost.toFixed(2);
-                    data[7] = 1;
+                    data[6] = "";
+                    data[7] = "";
+                    data[8] = totalCost.toFixed(2);
+                    data[9] = 1;
                     totalCost = 0;
                     dataArray.push(data);
                 }
@@ -515,8 +544,16 @@ class ProductValidation extends Component {
                         type: 'text'
                     },
                     {
+                        title: i18n.t('static.report.qty'),
+                        type: 'numeric', mask: '#,##.00', decimal: '.'
+                    },
+                    {
+                        title: i18n.t('static.supplyPlan.pricePerPlanningUnit'),
+                        type: 'numeric', mask: '#,##.00', decimal: '.'
+                    },
+                    {
                         title: i18n.t('static.productValidation.cost'),
-                        type: 'numeric'
+                        type: 'numeric', mask: '#,##.00', decimal: '.'
                     },
                     {
                         title: "IsTotal",
@@ -570,9 +607,9 @@ class ProductValidation extends Component {
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunctionOnlyHideRow(instance);
         var json = instance.jexcel.getJson(null, false);
-        var colArr = ["A", "B", "C", "D", "E", "F", "G"]
+        var colArr = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"]
         for (var j = 0; j < json.length; j++) {
-            if (json[j][7] == 1) {
+            if (json[j][9] == 1) {
                 for (var i = 0; i < colArr.length; i++) {
                     instance.jexcel.setStyle(colArr[i] + (j + 1), "background-color", "#808080")
                 }
@@ -603,7 +640,7 @@ class ProductValidation extends Component {
             if (versionList.length == 1) {
                 versionId = versionList[0];
                 event.target.value = versionList[0];
-            } else if (localStorage.getItem("sesVersionId") != "") {
+            } else if (localStorage.getItem("sesDatasetVersionId") != "" && versionList.filter(c => c == localStorage.getItem("sesDatasetVersionId")).length > 0) {
                 versionId = localStorage.getItem("sesDatasetVersionId");
                 event.target.value = localStorage.getItem("sesDatasetVersionId");
             }
@@ -680,71 +717,326 @@ class ProductValidation extends Component {
             getRequest.onerror = function (event) {
             }.bind(this);
             getRequest.onsuccess = function (event) {
-
-
-                var currencyTransaction = db1.transaction(['currency'], 'readwrite');
-                var currencyOs = currencyTransaction.objectStore('currency');
-                var currencyRequest = currencyOs.getAll();
-                currencyRequest.onerror = function (event) {
+                var unitTransaction = db1.transaction(['unit'], 'readwrite');
+                var unitOs = unitTransaction.objectStore('unit');
+                var unitRequest = unitOs.getAll();
+                unitRequest.onerror = function (event) {
                 }.bind(this);
-                currencyRequest.onsuccess = function (event) {
-                    var myResult = [];
-                    myResult = getRequest.result;
+                unitRequest.onsuccess = function (event) {
 
-                    var currencyResult = [];
-                    currencyResult = currencyRequest.result;
-                    var currencyList = [];
-                    currencyResult.map(item => {
-                        currencyList.push({ id: item.currencyId, name: getLabelText(item.label), currencyCode: item.currencyCode, conversionRateToUsd: item.conversionRateToUsd })
-                    })
-                    console.log("MyResult+++", myResult);
-                    var datasetList = this.state.datasetList;
-                    for (var mr = 0; mr < myResult.length; mr++) {
-                        var index = datasetList.findIndex(c => c.id == myResult[mr].programId);
-                        if (index == -1) {
-                            var programNameBytes = CryptoJS.AES.decrypt(myResult[mr].programName, SECRET_KEY);
-                            var programNameLabel = programNameBytes.toString(CryptoJS.enc.Utf8);
-                            console.log("programNamelabel+++", programNameLabel);
-                            var programNameJson = JSON.parse(programNameLabel)
-                            var json = {
-                                id: myResult[mr].programId,
-                                name: getLabelText(programNameJson, this.state.lang),
-                                versionList: [{ versionId: myResult[mr].version + "  (Local)" }]
+                    var upTransaction = db1.transaction(['usagePeriod'], 'readwrite');
+                    var upOs = upTransaction.objectStore('usagePeriod');
+                    var upRequest = upOs.getAll();
+                    upRequest.onerror = function (event) {
+                    }.bind(this);
+                    upRequest.onsuccess = function (event) {
+
+
+                        var currencyTransaction = db1.transaction(['currency'], 'readwrite');
+                        var currencyOs = currencyTransaction.objectStore('currency');
+                        var currencyRequest = currencyOs.getAll();
+                        currencyRequest.onerror = function (event) {
+                        }.bind(this);
+                        currencyRequest.onsuccess = function (event) {
+                            var unitList = unitRequest.result;
+                            var upList = upRequest.result;
+                            var myResult = [];
+                            myResult = getRequest.result;
+
+                            var currencyResult = [];
+                            currencyResult = currencyRequest.result;
+                            var currencyList = [];
+                            currencyResult.map(item => {
+                                currencyList.push({ id: item.currencyId, name: getLabelText(item.label, this.state.lang), currencyCode: item.currencyCode, conversionRateToUsd: item.conversionRateToUsd })
+                            })
+                            console.log("MyResult+++", myResult);
+                            var datasetList = this.state.datasetList;
+                            for (var mr = 0; mr < myResult.length; mr++) {
+                                var index = datasetList.findIndex(c => c.id == myResult[mr].programId);
+                                if (index == -1) {
+                                    var programNameBytes = CryptoJS.AES.decrypt(myResult[mr].programName, SECRET_KEY);
+                                    var programNameLabel = programNameBytes.toString(CryptoJS.enc.Utf8);
+                                    console.log("programNamelabel+++", programNameLabel);
+                                    var programNameJson = JSON.parse(programNameLabel)
+                                    var json = {
+                                        id: myResult[mr].programId,
+                                        name: getLabelText(programNameJson, this.state.lang),
+                                        versionList: [{ versionId: myResult[mr].version + "  (Local)" }]
+                                    }
+                                    datasetList.push(json)
+                                } else {
+                                    var existingVersionList = datasetList[index].versionList;
+                                    console.log("existingVersionList+++", datasetList[index].versionList)
+                                    existingVersionList.push({ versionId: myResult[mr].version + "  (Local)" })
+                                    datasetList[index].versionList = existingVersionList
+                                }
                             }
-                            datasetList.push(json)
-                        } else {
-                            var existingVersionList = datasetList[index].versionList;
-                            console.log("existingVersionList+++", datasetList[index].versionList)
-                            existingVersionList.push({ versionId: myResult[mr].version + "  (Local)" })
-                            datasetList[index].versionList = existingVersionList
-                        }
-                    }
-                    var datasetId = "";
-                    var event = {
-                        target: {
-                            value: ""
-                        }
-                    };
-                    if (datasetList.length == 1) {
-                        console.log("in if%%%", datasetList.length)
-                        datasetId = datasetList[0].id;
-                        event.target.value = datasetList[0].id;
-                    } else if (localStorage.getItem("sesLiveDatasetId") != "") {
-                        datasetId = localStorage.getItem("sesLiveDatasetId");
-                        event.target.value = localStorage.getItem("sesLiveDatasetId");
-                    }
-                    this.setState({
-                        datasetList: datasetList,
-                        currencyList: currencyList,
-                        loading: false
-                    }, () => {
-                        if (datasetId != "") {
-                            this.setDatasetId(event);
-                        }
-                    })
+                            var datasetId = "";
+                            var event = {
+                                target: {
+                                    value: ""
+                                }
+                            };
+                            if (datasetList.length == 1) {
+                                console.log("in if%%%", datasetList.length)
+                                datasetId = datasetList[0].id;
+                                event.target.value = datasetList[0].id;
+                            } else if (localStorage.getItem("sesLiveDatasetId") != "" && datasetList.filter(c => c.id == localStorage.getItem("sesLiveDatasetId")).length > 0) {
+                                datasetId = localStorage.getItem("sesLiveDatasetId");
+                                event.target.value = localStorage.getItem("sesLiveDatasetId");
+                            }
+                            this.setState({
+                                datasetList: datasetList,
+                                currencyList: currencyList,
+                                unitList: unitList,
+                                upList: upList,
+                                loading: false
+                            }, () => {
+                                if (datasetId != "") {
+                                    this.setDatasetId(event);
+                                }
+                            })
+                        }.bind(this)
+                    }.bind(this)
                 }.bind(this)
             }.bind(this)
         }.bind(this)
+    }
+
+    addDoubleQuoteToRowContent = (arr) => {
+        return arr.map(ele => '"' + ele + '"')
+    }
+
+    formatter = value => {
+
+        var cell1 = value
+        cell1 += '';
+        var x = cell1.split('.');
+        var x1 = x[0];
+        var x2 = x.length > 1 ? '.' + x[1] : '';
+        var rgx = /(\d+)(\d{3})/;
+        while (rgx.test(x1)) {
+            x1 = x1.replace(rgx, '$1' + ',' + '$2');
+        }
+        return x1 + x2;
+    }
+
+    exportPDF() {
+        const addFooters = doc => {
+
+            const pageCount = doc.internal.getNumberOfPages()
+
+            doc.setFont('helvetica', 'bold')
+            doc.setFontSize(6)
+            for (var i = 1; i <= pageCount; i++) {
+                doc.setPage(i)
+
+                doc.setPage(i)
+                doc.text('Page ' + String(i) + ' of ' + String(pageCount), doc.internal.pageSize.width / 9, doc.internal.pageSize.height - 30, {
+                    align: 'center'
+                })
+                doc.text('Copyright © 2020 ' + i18n.t('static.footer'), doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
+                    align: 'center'
+                })
+
+
+            }
+        }
+        const addHeaders = doc => {
+
+            const pageCount = doc.internal.getNumberOfPages()
+
+
+            //  var file = new File('QAT-logo.png','../../../assets/img/QAT-logo.png');
+            // var reader = new FileReader();
+
+            //var data='';
+            // Use fs.readFile() method to read the file 
+            //fs.readFile('../../assets/img/logo.svg', 'utf8', function(err, data){ 
+            //}); 
+            for (var i = 1; i <= pageCount; i++) {
+                doc.setFontSize(12)
+                doc.setFont('helvetica', 'bold')
+                doc.setPage(i)
+                doc.addImage(LOGO, 'png', 0, 10, 180, 50, 'FAST');
+                /*doc.addImage(data, 10, 30, {
+                  align: 'justify'
+                });*/
+                doc.setTextColor("#002f6c");
+                doc.text(i18n.t('static.dashboard.productValidation'), doc.internal.pageSize.width / 2, 60, {
+                    align: 'center'
+                })
+                if (i == 1) {
+                    doc.setFont('helvetica', 'normal')
+                    doc.setFontSize(8)
+                    doc.text(i18n.t('static.dashboard.programheader') + ' : ' + document.getElementById("datasetId").selectedOptions[0].text, doc.internal.pageSize.width / 20, 90, {
+                        align: 'left'
+                    })
+
+                }
+
+            }
+        }
+
+
+        const unit = "pt";
+        const size = "A4"; // Use A1, A2, A3 or A4
+        const orientation = "landscape"; // portrait or landscape
+
+        const marginLeft = 10;
+        const doc = new jsPDF(orientation, unit, size, true);
+
+        doc.setFontSize(8);
+        doc.setFont('helvetica', 'normal')
+        doc.setTextColor("#002f6c");
+
+
+        var y = 110;
+        var planningText = doc.splitTextToSize(i18n.t('static.report.version') + ' : ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width * 3 / 4);
+        // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+        for (var i = 0; i < planningText.length; i++) {
+            if (y > doc.internal.pageSize.height - 100) {
+                doc.addPage();
+                y = 80;
+
+            }
+            doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
+            y = y + 10;
+            console.log(y)
+        }
+        planningText = doc.splitTextToSize(i18n.t('static.common.treeName') + ' : ' + document.getElementById("treeId").selectedOptions[0].text, doc.internal.pageSize.width * 3 / 4);
+        //  doc.text(doc.internal.pageSize.width / 8, 130, planningText)
+        y = y + 10;
+        for (var i = 0; i < planningText.length; i++) {
+            if (y > doc.internal.pageSize.height - 100) {
+                doc.addPage();
+                y = 80;
+
+            }
+            doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
+            y = y + 10;
+            console.log(y)
+        }
+
+        planningText = doc.splitTextToSize((i18n.t('static.whatIf.scenario') + ' : ' + document.getElementById("scenarioId").selectedOptions[0].text), doc.internal.pageSize.width * 3 / 4);
+        // doc.text(doc.internal.pageSize.width / 9, this.state.programLabels.size > 5 ? 190 : 150, planningText)
+        y = y + 10;
+        for (var i = 0; i < planningText.length; i++) {
+            if (y > doc.internal.pageSize.height - 100) {
+                doc.addPage();
+                y = 80;
+
+            }
+            doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
+            y = y + 10;
+            console.log(y)
+        }
+        y = y + 10;
+        doc.text(i18n.t('static.country.currency') + ' : ' + document.getElementById("currencyId").selectedOptions[0].text, doc.internal.pageSize.width / 20, y, {
+            align: 'left'
+        })
+        y = y + 10;
+
+
+
+
+
+        //   const title = i18n.t('static.dashboard.globalconsumption');
+        //   var canvas = document.getElementById("cool-canvas");
+        //   //creates image
+
+        //   var canvasImg = canvas.toDataURL("image/png", 1.0);
+        //   var width = doc.internal.pageSize.width;
+        var height = doc.internal.pageSize.height;
+        var h1 = 50;
+        //   var aspectwidth1 = (width - h1);
+        let startY = y + 10
+        //   console.log('startY', startY)
+        let pages = Math.ceil(startY / height)
+        for (var j = 1; j < pages; j++) {
+            doc.addPage()
+        }
+        let startYtable = startY - ((height - h1) * (pages - 1))
+        //   doc.setTextColor("#fff");
+        //   if (startYtable > (height - 400)) {
+        //     doc.addPage()
+        //     startYtable = 80
+        //   }
+        //   doc.addImage(canvasImg, 'png', 50, startYtable, 750, 260, 'CANVAS');
+        var columns = [];
+        columns.push(i18n.t('static.common.level'));
+        columns.push(i18n.t('static.supplyPlan.type'));
+        columns.push(i18n.t('static.forecastingunit.forecastingunit'));
+        columns.push(i18n.t('static.forecastingunit.forecastingunit') + " " + i18n.t('static.common.text'));
+        columns.push(i18n.t('static.common.product'));
+        columns.push(i18n.t('static.common.product') + " " + i18n.t('static.common.text'));
+        columns.push(i18n.t('static.productValidation.cost'));
+        const headers = [columns]
+        const data = this.state.dataEl.getJson(null, false).map(ele => [ele[0], ele[1], ele[2], ele[3], ele[4], ele[5], this.formatter(ele[6])]);
+        // doc.addPage()
+        let content = {
+            margin: { top: 80, bottom: 50 },
+            startY: startYtable,
+            head: headers,
+            body: data,
+            styles: { lineWidth: 1, fontSize: 8, halign: 'center' }
+
+        };
+
+
+        //doc.text(title, marginLeft, 40);
+        doc.autoTable(content);
+        addHeaders(doc)
+        addFooters(doc)
+        doc.save(i18n.t('static.dashboard.productValidation').concat('.pdf'));
+        //creates PDF from img
+        /*  var doc = new jsPDF('landscape');
+          doc.setFontSize(20);
+          doc.text(15, 15, "Cool Chart");
+          doc.save('canvas.pdf');*/
+    }
+
+    exportCSV() {
+        var csvRow = [];
+        csvRow.push('"' + (i18n.t('static.dashboard.programheader') + ' : ' + document.getElementById("datasetId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+        csvRow.push('')
+        csvRow.push('"' + (i18n.t('static.report.version') + ' : ' + document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+        csvRow.push('')
+        csvRow.push('"' + (i18n.t('static.common.treeName') + ' : ' + document.getElementById("treeId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+        csvRow.push('')
+        csvRow.push('"' + (i18n.t('static.whatIf.scenario') + ' : ' + document.getElementById("scenarioId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+        csvRow.push('')
+        csvRow.push('"' + (i18n.t('static.country.currency') + ' : ' + document.getElementById("currencyId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+        csvRow.push('')
+
+        csvRow.push('')
+        csvRow.push('"' + (i18n.t('static.common.youdatastart')).replaceAll(' ', '%20') + '"')
+        csvRow.push('')
+        var re;
+        var columns = [];
+        columns.push(i18n.t('static.common.level'));
+        columns.push(i18n.t('static.supplyPlan.type'));
+        columns.push(i18n.t('static.forecastingunit.forecastingunit'));
+        columns.push(i18n.t('static.forecastingunit.forecastingunit') + " " + i18n.t('static.common.text'));
+        columns.push(i18n.t('static.common.product'));
+        columns.push(i18n.t('static.common.product') + " " + i18n.t('static.common.text'));
+        columns.push(i18n.t('static.productValidation.cost'));
+        const headers = [];
+        columns.map((item, idx) => { headers[idx] = (item).replaceAll(' ', '%20') });
+
+        var A = [this.addDoubleQuoteToRowContent(headers)];
+        this.state.dataEl.getJson(null, false).map(ele => A.push(this.addDoubleQuoteToRowContent([ele[0].replaceAll(',', ' ').replaceAll(' ', '%20'), ele[1].replaceAll(',', ' ').replaceAll(' ', '%20'), ele[2].replaceAll(',', ' ').replaceAll(' ', '%20'), ele[3].replaceAll(',', ' ').replaceAll(' ', '%20'), ele[4].replaceAll(',', ' ').replaceAll(' ', '%20'), ele[5].replaceAll(',', ' ').replaceAll(' ', '%20'), ele[6].replaceAll(',', ' ').replaceAll(' ', '%20')])));
+
+        for (var i = 0; i < A.length; i++) {
+            csvRow.push(A[i].join(","))
+        }
+        var csvString = csvRow.join("%0A")
+        var a = document.createElement("a")
+        a.href = 'data:attachment/csv,' + csvString
+        a.target = "_Blank"
+        a.download = i18n.t('static.dashboard.productValidation') + ".csv"
+        document.body.appendChild(a)
+        a.click()
     }
 
     setCurrencyId(e) {
@@ -819,13 +1111,13 @@ class ProductValidation extends Component {
                     <div className="Card-header-reporticon pb-2">
                         {/* {this.state.dataList.length > 0 && */}
                         <div className="card-header-actions">
+                            {this.state.treeId > 0 && this.state.scenarioId > 0 && this.state.localProgramId != "" && <a className="card-header-action">
+                                <a href={`/#/dataSet/buildTree/tree/` + this.state.treeId + `/` + this.state.localProgramId + `/` + this.state.scenarioId}><span style={{ cursor: 'pointer' }}><small className="supplyplanformulas">{i18n.t('static.common.managetree')}</small></span></a>
+                            </a>}
                             <a className="card-header-action">
-
-                                <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.exportPDF()} />
-
-
+                                {this.state.dataEl != "" && <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.exportPDF()} />}
                             </a>
-                            <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
+                            {this.state.dataEl != "" && <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />}
                         </div>
                         {/* } */}
                     </div>
@@ -932,7 +1224,7 @@ class ProductValidation extends Component {
                                                         value={this.state.currencyId}
 
                                                     >
-                                                        <option value="">{i18n.t('static.common.select')}</option>
+                                                        {/* <option value="">{i18n.t('static.common.select')}</option> */}
                                                         {currencies}
                                                     </Input>
 

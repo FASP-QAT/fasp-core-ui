@@ -17,7 +17,17 @@ import getLabelText from '../../CommonComponent/getLabelText'
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import classNames from 'classnames';
+import Picker from 'react-month-picker';
+import MonthBox from '../../CommonComponent/MonthBox.js';
+import moment from 'moment';
+// const ref = React.createRef();
+export const DEFAULT_MIN_MONTHS_OF_STOCK = 3
+export const DEFAULT_MAX_MONTHS_OF_STOCK = 18
 
+const pickerLang = {
+    months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
+    from: 'From', to: 'To',
+}
 
 const entityname = i18n.t('static.program.programMaster');
 let initialValues = {
@@ -134,7 +144,10 @@ export default class AddForecastProgram extends Component {
                 programNotes: '',
                 healthAreaArray: [],
                 regionArray: [],
-
+                currentVersion: {
+                    forecastStartDate: '',
+                    forecastStopDate: '',
+                }
 
             },
             lang: localStorage.getItem('lang'),
@@ -154,10 +167,14 @@ export default class AddForecastProgram extends Component {
 
             organisationCode: '',
             realmCountryCode: '',
+            forecastProgramInMonth: '',
 
             regionList: [],
             regionId: [],
-
+            singleValue1: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 },
+            singleValue2: { year: new Date().getFullYear() + 1, month: new Date().getMonth() + 1 },
+            minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
+            maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
         }
 
         this.dataChange = this.dataChange.bind(this);
@@ -178,6 +195,36 @@ export default class AddForecastProgram extends Component {
         this.updateFieldData = this.updateFieldData.bind(this);
         this.getRegionList = this.getRegionList.bind(this);
         this.updateFieldDataHealthArea = this.updateFieldDataHealthArea.bind(this);
+        this.pickRange = React.createRef();
+        this.pickRange1 = React.createRef();
+        this.calculateForecastProgramInMonth = this.calculateForecastProgramInMonth.bind(this);
+        this.calculateForecastEndDate = this.calculateForecastEndDate.bind(this);
+    }
+
+    calculateForecastProgramInMonth() {
+        let value = this.state.forecastProgramInMonth;
+        console.log("singleValue1------->1", this.state.singleValue1);
+        let stopDate = new Date(this.state.singleValue1.year + '-' + this.state.singleValue1.month + '-01');
+        console.log("singleValue1------->1", stopDate);
+        stopDate.setMonth(stopDate.getMonth() + (value - 1));
+        console.log("singleValue1------->2", stopDate);
+        this.setState({
+            forecastProgramInMonth: value,
+            singleValue2: { year: new Date(stopDate).getFullYear(), month: new Date(stopDate).getMonth() + 1 },
+        });
+    }
+
+    calculateForecastEndDate() {
+        let d1 = new Date(this.state.singleValue1.year + '-' + this.state.singleValue1.month + '-01');
+        let d2 = new Date(this.state.singleValue2.year + '-' + this.state.singleValue2.month + '-01');
+        var months;
+        months = (d2.getFullYear() - d1.getFullYear()) * 12;
+        months += d2.getMonth() - d1.getMonth();
+        // months = months - 1;
+        months = months + 1;
+        this.setState({
+            forecastProgramInMonth: months,
+        });
     }
 
     updateFieldDataHealthArea(value) {
@@ -190,6 +237,43 @@ export default class AddForecastProgram extends Component {
         }
         program.healthAreaArray = healthAreaIdArray;
         this.setState({ program: program });
+    }
+
+    makeText = m => {
+        if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
+        return '?'
+    }
+
+    handleClickMonthBox2 = (e) => {
+        // this.refs.pickAMonth2.show()
+        this.pickRange.current.show()
+    }
+    handleAMonthChange2 = (value, text) => {
+        //
+        //
+    }
+    handleAMonthDissmis2 = (value) => {
+        this.setState({ singleValue2: value, }, () => {
+            this.calculateForecastEndDate();
+        })
+    }
+
+    handleAMonthDissmis1 = (value) => {
+        // console.log("singleValue1------->1", value);
+        this.setState({ singleValue1: value, }, () => {
+            // this.fetchData();
+        }, () => {
+
+        })
+    }
+
+    handleClickMonthBox1 = (e) => {
+        // this.refs.pickAMonth2.show()
+        this.pickRange1.current.show()
+    }
+    handleAMonthChange1 = (value, text) => {
+        //
+        //
     }
 
     getRegionList() {
@@ -697,8 +781,9 @@ export default class AddForecastProgram extends Component {
             })
         } else if (event.target.name == 'programNotes') {
             program.programNotes = event.target.value;
+        } else if (event.target.name == 'forecastProgramInMonth') {
+            this.setState({ forecastProgramInMonth: event.target.value }, () => { })
         }
-
         this.setState({ program }, () => { console.log(this.state) })
 
     }
@@ -732,6 +817,9 @@ export default class AddForecastProgram extends Component {
     }
 
     render() {
+        const { singleValue2 } = this.state
+        const { singleValue1 } = this.state
+
         const { realmList } = this.state;
         let realms = realmList.length > 0
             && realmList.map((item, i) => {
@@ -817,8 +905,13 @@ export default class AddForecastProgram extends Component {
                                     // AuthenticationService.setupAxiosInterceptors();
                                     let pro = this.state.program;
                                     // pro.programCode = this.state.realmCountryCode + "-" + this.state.healthAreaCode + "-" + this.state.organisationCode + (this.state.uniqueCode.toString().length > 0 ? ("-" + this.state.uniqueCode) : "");
-                                    pro.programCode =(this.state.uniqueCode.toString().length > 0 ? (this.state.uniqueCode) : "");
-                                    // console.log("Pro=---------------->+++", pro)
+                                    pro.programCode = (this.state.uniqueCode.toString().length > 0 ? (this.state.uniqueCode) : "");
+
+                                    // pro.currentVersion.forecastStartDate = new Date(this.state.singleValue1.year + '-' + this.state.singleValue1.month + '-01');
+                                    // pro.currentVersion.forecastStopDate = new Date(new Date(this.state.singleValue2.year + '-' + this.state.singleValue2.month + '-01'));
+                                    pro.currentVersion.forecastStartDate = this.state.singleValue1.year + '-' + this.state.singleValue1.month + '-01';
+                                    pro.currentVersion.forecastStopDate = this.state.singleValue2.year + '-' + this.state.singleValue2.month + '-01';
+                                    console.log("Pro=---------------->+++", pro)
                                     ProgramService.addDataset(pro).then(response => {
                                         if (response.status == 200) {
                                             this.props.history.push(`/dataSet/listDataSet/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
@@ -1069,6 +1162,58 @@ export default class AddForecastProgram extends Component {
                                                     <FormFeedback>{errors.userId}</FormFeedback>
 
                                                 </FormGroup>
+
+                                                <FormGroup>
+                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.program.forecastStart')}<span class="red Reqasterisk">*</span></Label>
+                                                    <div className="controls edit">
+                                                        <Picker
+                                                            // ref="pickAMonth2"
+                                                            ref={this.pickRange1}
+                                                            years={{ min: this.state.minDate, max: this.state.maxDate }}
+                                                            value={singleValue1}
+                                                            lang={pickerLang.months}
+                                                            theme="dark"
+                                                            onChange={this.handleAMonthChange1}
+                                                            onDismiss={this.handleAMonthDissmis1}
+                                                        >
+                                                            <MonthBox value={this.makeText(singleValue1)} onClick={this.handleClickMonthBox1} />
+                                                        </Picker>
+                                                    </div>
+
+                                                </FormGroup>
+
+                                                <FormGroup>
+                                                    <Label htmlFor="company">{i18n.t('static.versionSettings.ForecastPeriodInMonth')}</Label>
+                                                    <Input
+                                                        type="number" name="forecastProgramInMonth"
+                                                        bsSize="sm"
+                                                        onChange={(e) => { this.dataChange(e) }}
+                                                        // onBlur={handleBlur}
+                                                        onBlur={(e) => { handleBlur(e); this.calculateForecastProgramInMonth() }}
+                                                        value={this.state.forecastProgramInMonth}
+                                                        id="forecastProgramInMonth" />
+                                                    <FormFeedback>{errors.forecastProgramInMonth}</FormFeedback>
+                                                </FormGroup>
+
+                                                <FormGroup>
+                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.program.forecastEnd')}<span class="red Reqasterisk">*</span></Label>
+                                                    <div className="controls edit">
+                                                        <Picker
+                                                            // ref="pickAMonth2"
+                                                            ref={this.pickRange}
+                                                            years={{ min: this.state.minDate, max: this.state.maxDate }}
+                                                            value={singleValue2}
+                                                            lang={pickerLang.months}
+                                                            theme="dark"
+                                                            onChange={this.handleAMonthChange2}
+                                                            onDismiss={this.handleAMonthDissmis2}
+                                                        >
+                                                            <MonthBox value={this.makeText(singleValue2)} onClick={this.handleClickMonthBox2} />
+                                                        </Picker>
+                                                    </div>
+
+                                                </FormGroup>
+
                                                 <FormGroup>
 
                                                     <Label htmlFor="select">{i18n.t('static.program.notes')}</Label>
@@ -1137,6 +1282,12 @@ export default class AddForecastProgram extends Component {
         program.healthAreaArray = [];
         this.state.regionList = [];
         program.regionArray = [];
+
+        this.state.forecastProgramInMonth = '';
+        this.state.singleValue1 = { year: new Date().getFullYear(), month: new Date().getMonth() + 1 };
+        this.state.singleValue2 = { year: new Date().getFullYear() + 1, month: new Date().getMonth() + 1 };
+        this.state.minDate = { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 };
+        this.state.maxDate = { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 };
 
         this.setState({
             program
