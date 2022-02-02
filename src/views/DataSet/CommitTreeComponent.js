@@ -198,7 +198,8 @@ export default class CommitTreeComponent extends React.Component {
 
     setProgramId(e) {
         this.setState({
-            loading: true
+            loading: true,
+            showCompare: false,
         })
         var programId = e.target.value;
         var myResult = [];

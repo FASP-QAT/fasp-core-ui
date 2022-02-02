@@ -378,17 +378,17 @@ export default class ImportDataset extends Component {
                                                 var programJson1 = JSON.parse(programData1);
 
                                                 // Adding data to program QPL details
-                                                var paList = programJson.problemReportList;
-                                                var lastModifiedDate = moment.max(moment.max(programJson.consumptionList.map(d => moment(d.lastModifiedDate))), moment.max(programJson.inventoryList.map(d => moment(d.lastModifiedDate))), moment.max(programJson.shipmentList.map(d => moment(d.lastModifiedDate))));
-                                                var lastModifiedDate1 = moment.max(moment.max(programJson1.consumptionList.map(d => moment(d.lastModifiedDate))), moment.max(programJson1.inventoryList.map(d => moment(d.lastModifiedDate))), moment.max(programJson1.shipmentList.map(d => moment(d.lastModifiedDate))));
-                                                console.log("LastModifiedDate@@@", lastModifiedDate);
-                                                console.log("LastModifiedDate1@@@", lastModifiedDate1);
+                                                // var paList = programJson.problemReportList;
+                                                // var lastModifiedDate = moment.max(moment.max(programJson.consumptionList.map(d => moment(d.lastModifiedDate))), moment.max(programJson.inventoryList.map(d => moment(d.lastModifiedDate))), moment.max(programJson.shipmentList.map(d => moment(d.lastModifiedDate))));
+                                                // var lastModifiedDate1 = moment.max(moment.max(programJson1.consumptionList.map(d => moment(d.lastModifiedDate))), moment.max(programJson1.inventoryList.map(d => moment(d.lastModifiedDate))), moment.max(programJson1.shipmentList.map(d => moment(d.lastModifiedDate))));
+                                                // console.log("LastModifiedDate@@@", lastModifiedDate);
+                                                // console.log("LastModifiedDate1@@@", lastModifiedDate1);
                                                 // var openCount = (paList.filter(c => c.problemStatus.id == 1 && c.planningUnitActive != false && c.regionActive != false)).length;
                                                 // var addressedCount = (paList.filter(c => c.problemStatus.id == 3 && c.planningUnitActive != false && c.regionActive != false)).length;
-                                                var programModified = 0;
-                                                if (moment(lastModifiedDate).format("YYYY-MM-DD HH:mm:ss") > moment(lastModifiedDate1).format("YYYY-MM-DD HH:mm:ss")) {
-                                                    programModified = 1;
-                                                }
+                                                // var programModified = 0;
+                                                // if (moment(lastModifiedDate).format("YYYY-MM-DD HH:mm:ss") > moment(lastModifiedDate1).format("YYYY-MM-DD HH:mm:ss")) {
+                                                    // programModified = 1;
+                                                // }
                                                 var item = {
                                                     id: json.programId + "_v" + json.version + "_uId_" + userId,
                                                     programId: json.programId,
@@ -397,8 +397,8 @@ export default class ImportDataset extends Component {
                                                     programCode: programJson.programCode,
                                                     // openCount: openCount,
                                                     // addressedCount: addressedCount,
-                                                    changed: programModified,
-                                                    readonly:0
+                                                    changed: json.changed,
+                                                    readonly:json.readonly
                                                 }
                                                 var programQPLDetailsTransaction = db1.transaction(['datasetDetails'], 'readwrite');
                                                 var programQPLDetailsOs = programQPLDetailsTransaction.objectStore('datasetDetails');
