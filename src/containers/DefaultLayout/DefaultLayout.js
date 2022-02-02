@@ -1529,7 +1529,7 @@ class DefaultLayout extends Component {
                           {
                             name: i18n.t('static.updatePlanningUnit.updatePlanningUnit'),
                             url: '/planningUnitSetting/listPlanningUnitSetting',
-                            icon: 'fa fa-cog',
+                            icon: 'fa fa-list-alt',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_PLANNING_UNIT_SETTING') && this.state.activeTab == 1 ? false : true) }
                           },
                           // {
@@ -1547,7 +1547,7 @@ class DefaultLayout extends Component {
                           {
                             name: 'Export Program',
                             url: '/dataset/exportDataset',
-                            icon: 'fa fa-arrow-circle-o-right',
+                            icon: 'fa fa-sign-in',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true) }
                           },
                           {
@@ -1559,7 +1559,7 @@ class DefaultLayout extends Component {
                           {
                             name: i18n.t('static.commitProgram.commitProgram'),
                             url: '/dataset/commitTree',
-                            icon: 'fa fa-th',
+                            icon: 'fa fa-upload',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_COMMIT_DATASET') && this.state.activeTab == 1 ? false : true) }
                           },
                          
@@ -1705,7 +1705,7 @@ class DefaultLayout extends Component {
                           {
                             name: i18n.t('static.dashboard.compareAndSelect'),
                             url: '/report/compareAndSelectScenario',
-                            icon: 'fa fa-line-chart',
+                            icon: 'fa fa-bar-chart',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_COMPARE_AND_SELECT') && this.state.activeTab == 1 ? false : true) }
                             // attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true) }
                           },
@@ -1713,7 +1713,7 @@ class DefaultLayout extends Component {
                           {
                             name: i18n.t('static.MonthlyForecast.MonthlyForecast'),
                             url: '/forecastReport/forecastOutput',
-                            icon: 'fa fa-bar-chart',
+                            icon: 'fa fa-line-chart',
                             attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_MONTHLY_FORECAST') && this.state.activeTab == 1 ? false : true) }
                           },
                           {
