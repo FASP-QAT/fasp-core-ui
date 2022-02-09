@@ -94,8 +94,9 @@ class forecastMethod extends Component {
                 data = [];
                 data[0] = papuList[j].forecastMethodId
                 // data[1] = papuList[j].realm.id
-                data[1] = getLabelText(papuList[j].label, this.state.lang)
-                data[2] = papuList[j].forecastMethodTypeId
+
+                data[1] = papuList[j].forecastMethodTypeId
+                data[2] = getLabelText(papuList[j].label, this.state.lang)
                 data[3] = papuList[j].active
                 data[4] = papuList[j].lastModifiedBy.username;
                 data[5] = (papuList[j].lastModifiedDate ? moment(papuList[j].lastModifiedDate).format(`YYYY-MM-DD`) : null)
@@ -147,12 +148,6 @@ class forecastMethod extends Component {
                 //     readOnly: true
                 // },
                 {
-                    title: i18n.t('static.forecastMethod.forecastMethod'),
-                    type: 'text',
-                    // readOnly: true
-                    textEditor: true,
-                },
-                {
                     title: i18n.t('static.forecastMethod.methodology'),
                     // readOnly: true,
                     type: 'dropdown',
@@ -162,6 +157,13 @@ class forecastMethod extends Component {
                     //     { id: 2, name: i18n.t('static.forecastMethod.tree') }
                     // ]
                 },
+                {
+                    title: i18n.t('static.forecastMethod.forecastMethod'),
+                    type: 'text',
+                    // readOnly: true
+                    textEditor: true,
+                },
+
                 {
                     title: i18n.t('static.checkbox.active'),
                     type: 'checkbox',
@@ -201,7 +203,7 @@ class forecastMethod extends Component {
                     var forecastMethodId = rowData[6];
                     // console.log("updateTable------>", rowData[6]);
                     if (forecastMethodId == 0) {
-                        var cell1 = elInstance.getCell(`C${parseInt(y) + 1}`)
+                        var cell1 = elInstance.getCell(`B${parseInt(y) + 1}`)
                         cell1.classList.remove('readonly');
 
                         // var cell2 = elInstance.getCell(`C${parseInt(y) + 1}`)
@@ -209,7 +211,7 @@ class forecastMethod extends Component {
 
 
                     } else {
-                        var cell1 = elInstance.getCell(`C${parseInt(y) + 1}`)
+                        var cell1 = elInstance.getCell(`B${parseInt(y) + 1}`)
                         cell1.classList.add('readonly');
 
                         // var cell2 = elInstance.getCell(`C${parseInt(y) + 1}`)
@@ -764,9 +766,9 @@ class forecastMethod extends Component {
                     let json = {
                         forecastMethodId: parseInt(map1.get("0")),
                         label: {
-                            label_en: map1.get("1"),
+                            label_en: map1.get("2"),
                         },
-                        forecastMethodTypeId: parseInt(map1.get("2")),
+                        forecastMethodTypeId: parseInt(map1.get("1")),
                         active: map1.get("3"),
                         // capacityCbm: map1.get("2").replace(",", ""),
                         // capacityCbm: map1.get("2").replace(/,/g, ""),
@@ -871,9 +873,9 @@ class forecastMethod extends Component {
     changed = function (instance, cell, x, y, value) {
 
         //Forecast Method
-        if (x == 1) {
+        if (x == 2) {
             var budgetRegx = /^\S+(?: \S+)*$/;
-            var col = ("B").concat(parseInt(y) + 1);
+            var col = ("C").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
@@ -882,7 +884,7 @@ class forecastMethod extends Component {
                 if (!(budgetRegx.test(value))) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.message.spacetext'));
+                    this.el.setComments(col, i18n.t('static.validSpace.string'));
                 } else {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
@@ -892,8 +894,8 @@ class forecastMethod extends Component {
 
 
         //Methodlogy
-        if (x == 2) {
-            var col = ("C").concat(parseInt(y) + 1);
+        if (x == 1) {
+            var col = ("B").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
@@ -923,20 +925,34 @@ class forecastMethod extends Component {
             if (parseInt(value) == 1) {
                 //Region
                 var budgetRegx = /^\S+(?: \S+)*$/;
-                var col = ("B").concat(parseInt(y) + 1);
-                var value = this.el.getValueFromCoords(1, y);
+                var col = ("C").concat(parseInt(y) + 1);
+                var value = this.el.getValueFromCoords(2, y);
                 console.log("value-----", value);
                 if (value == "") {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.label.fieldRequired'));
                     valid = false;
+                    this.setState({
+                        message: i18n.t('static.supplyPlan.validationFailed'),
+                        color: 'red'
+                    },
+                        () => {
+                            this.hideSecondComponent();
+                        })
                 } else {
                     if (!(budgetRegx.test(value))) {
                         this.el.setStyle(col, "background-color", "transparent");
                         this.el.setStyle(col, "background-color", "yellow");
-                        this.el.setComments(col, i18n.t('static.message.spacetext'));
+                        this.el.setComments(col, i18n.t('static.validSpace.string'));
                         valid = false;
+                        this.setState({
+                            message: i18n.t('static.supplyPlan.validationFailed'),
+                            color: 'red'
+                        },
+                            () => {
+                                this.hideSecondComponent();
+                            })
                     } else {
                         this.el.setStyle(col, "background-color", "transparent");
                         this.el.setComments(col, "");
@@ -946,13 +962,20 @@ class forecastMethod extends Component {
 
 
                 //ForecastMethod
-                var col = ("C").concat(parseInt(y) + 1);
-                var value = this.el.getValueFromCoords(2, y);
+                var col = ("B").concat(parseInt(y) + 1);
+                var value = this.el.getValueFromCoords(1, y);
                 if (value == "") {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.label.fieldRequired'));
                     valid = false;
+                    this.setState({
+                        message: i18n.t('static.supplyPlan.validationFailed'),
+                        color: 'red'
+                    },
+                        () => {
+                            this.hideSecondComponent();
+                        })
                 } else {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
@@ -979,7 +1002,8 @@ class forecastMethod extends Component {
                     <CardBody className="p-0">
 
                         <Col xs="12" sm="12">
-                            <h5 className="red" >{i18n.t('static.common.customWarningMessage')}</h5>
+                            {/* <h5 className="red" >{i18n.t('static.common.customWarningMessage')}</h5> */}
+                            <h5>{i18n.t('static.common.customWarningMessage')}</h5>
                             <div id="paputableDiv" style={{ display: this.state.loading ? "none" : "block", marginTop: '-13px' }} className={(AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_FORECAST_METHOD') || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_FORECAST_METHOD')) ? "RowClickable" : "jexcelremoveReadonlybackground"}>
                             </div>
                             <div style={{ display: this.state.loading ? "block" : "none" }}>

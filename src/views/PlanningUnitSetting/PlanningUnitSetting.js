@@ -53,6 +53,13 @@ const pickerLang = {
     from: 'From', to: 'To',
 }
 const months = [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')]
+
+const sortArray = (sourceArray) => {
+    // const sortByName = (a, b) => getLabelText(a.label, this.state.lang).localeCompare(getLabelText(b.label, this.state.lang), 'en', { numeric: true });
+    const sortByName = (a, b) => a.label.label_en.localeCompare(b.label.label_en, 'en', { numeric: true });
+    return sourceArray.sort(sortByName);
+};
+
 export default class PlanningUnitSetting extends Component {
     constructor(props) {
         super(props);
@@ -82,7 +89,7 @@ export default class PlanningUnitSetting extends Component {
             filterProcurementAgent: '',
             responsePa: [],
             forecastProgramId: '',
-            forecastProgramVersionId: ''
+            forecastProgramVersionId: '',
 
         }
         this.changed = this.changed.bind(this);
@@ -120,10 +127,14 @@ export default class PlanningUnitSetting extends Component {
     oneditionend = function (instance, cell, x, y, value) {
         var elInstance = instance.jexcel;
         var rowData = elInstance.getRowData(y);
+        var reg = /^0[0-9].*$/; //any no start with 0;
 
         if (x == 8 && !isNaN(rowData[8]) && rowData[8].toString().indexOf('.') != -1) {
             // console.log("RESP---------", parseFloat(rowData[8]));
             elInstance.setValueFromCoords(8, y, parseFloat(rowData[8]), true);
+        }
+        if (x == 8 && reg.test(value)) {
+            elInstance.setValueFromCoords(8, y, Number(rowData[8]), true);
         }
         elInstance.setValueFromCoords(10, y, 1, true);
 
@@ -176,10 +187,20 @@ export default class PlanningUnitSetting extends Component {
                     // this.el.setComments(col, i18n.t('static.label.fieldRequired'));
                     // valid = false;
                 } else {
-                    if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                    if (isNaN(parseInt(value))) {//string value check
                         this.el.setStyle(col, "background-color", "transparent");
                         this.el.setStyle(col, "background-color", "yellow");
-                        this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                        this.el.setComments(col, 'String value not allowed');
+                        valid = false;
+                    } else if (!Number.isInteger(Number(value))) {//decimal value check
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setStyle(col, "background-color", "yellow");
+                        this.el.setComments(col, 'Decimal value not allowed');
+                        valid = false;
+                    } else if (!(reg.test(value))) {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setStyle(col, "background-color", "yellow");
+                        this.el.setComments(col, 'Please enter 10 digit whole number');
                         valid = false;
                     } else {
                         this.el.setStyle(col, "background-color", "transparent");
@@ -197,10 +218,30 @@ export default class PlanningUnitSetting extends Component {
                     // this.el.setComments(col, i18n.t('static.label.fieldRequired'));
                     // valid = false;
                 } else {
-                    if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                    // if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                    //     this.el.setStyle(col, "background-color", "transparent");
+                    //     this.el.setStyle(col, "background-color", "yellow");
+                    //     this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                    //     valid = false;
+                    // } else {
+                    //     this.el.setStyle(col, "background-color", "transparent");
+                    //     this.el.setComments(col, "");
+                    // }
+
+                    if (isNaN(parseInt(value))) {//string value check
                         this.el.setStyle(col, "background-color", "transparent");
                         this.el.setStyle(col, "background-color", "yellow");
-                        this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                        this.el.setComments(col, 'String value not allowed');
+                        valid = false;
+                    } else if (!Number.isInteger(Number(value))) {//decimal value check
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setStyle(col, "background-color", "yellow");
+                        this.el.setComments(col, 'Decimal value not allowed');
+                        valid = false;
+                    } else if (!(reg.test(value))) {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setStyle(col, "background-color", "yellow");
+                        this.el.setComments(col, 'Please enter 10 digit whole number');
                         valid = false;
                     } else {
                         this.el.setStyle(col, "background-color", "transparent");
@@ -218,10 +259,25 @@ export default class PlanningUnitSetting extends Component {
                     // this.el.setComments(col, i18n.t('static.label.fieldRequired'));
                     // valid = false;
                 } else {
-                    if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                    if (isNaN(parseInt(value))) {//string value check
                         this.el.setStyle(col, "background-color", "transparent");
                         this.el.setStyle(col, "background-color", "yellow");
-                        this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                        this.el.setComments(col, 'String value not allowed');
+                        valid = false;
+                    } else if (!Number.isInteger(Number(value))) {//decimal value check
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setStyle(col, "background-color", "yellow");
+                        this.el.setComments(col, 'Decimal value not allowed');
+                        valid = false;
+                    } else if (!(reg.test(value))) {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setStyle(col, "background-color", "yellow");
+                        this.el.setComments(col, 'Please enter 10 digit whole number');
+                        valid = false;
+                    } else if (parseInt(value) > 99) {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setStyle(col, "background-color", "yellow");
+                        this.el.setComments(col, 'Maximum 99 months are allowed');
                         valid = false;
                     } else {
                         this.el.setStyle(col, "background-color", "transparent");
@@ -252,11 +308,22 @@ export default class PlanningUnitSetting extends Component {
                     this.el.setComments(col, i18n.t('static.label.fieldRequired'));
                     valid = false;
                 } else {
+                    console.log("Value--------->", value);
                     // if (isNaN(Number.parseInt(value)) || value < 0 || !(reg.test(value))) {
-                    if (!(reg.test(value))) {
+                    if (isNaN(parseInt(value))) {//string value check
                         this.el.setStyle(col, "background-color", "transparent");
                         this.el.setStyle(col, "background-color", "yellow");
-                        this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                        this.el.setComments(col, 'String value not allowed');
+                        valid = false;
+                    } else if (Number(value) < 0) {//negative value check
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setStyle(col, "background-color", "yellow");
+                        this.el.setComments(col, 'Negative value not allowed');
+                        valid = false;
+                    } else if (!(reg.test(value))) {//regex check
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setStyle(col, "background-color", "yellow");
+                        this.el.setComments(col, 'Max 10 digit number and 4 digits after decimal are allowed.');
                         valid = false;
                     } else {
                         this.el.setStyle(col, "background-color", "transparent");
@@ -345,12 +412,22 @@ export default class PlanningUnitSetting extends Component {
             var col = ("E").concat(parseInt(y) + 1);
             // value = this.el.getValue(`E${parseInt(y) + 1}`, true).toString().replaceAll(",", "");            
             // var reg = /^[0-9\b]+$/;
+            console.log("Stock------------------->", value);
+
             var reg = JEXCEL_INTEGER_REGEX;
             if (value != "") {
-                if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                if (isNaN(parseInt(value))) {//string value check
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.message.invalidnumber'))
+                    this.el.setComments(col, 'String value not allowed')
+                } else if (!Number.isInteger(Number(value))) {//decimal value check
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, 'Decimal value not allowed')
+                } else if (!(reg.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, 'Please enter 10 digit whole number')
                 } else {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
@@ -363,6 +440,26 @@ export default class PlanningUnitSetting extends Component {
                 // this.el.setStyle(col, "background-color", "yellow");
                 // this.el.setComments(col, i18n.t('static.label.fieldRequired'));
             }
+
+
+            // var reg = JEXCEL_INTEGER_REGEX;
+            // if (value != "") {
+            //     if (isNaN(parseInt(value)) || !(reg.test(value))) {
+            //         this.el.setStyle(col, "background-color", "transparent");
+            //         this.el.setStyle(col, "background-color", "yellow");
+            //         this.el.setComments(col, 'Please enter valid whole number')
+            //     } else {
+            //         this.el.setStyle(col, "background-color", "transparent");
+            //         this.el.setComments(col, "");
+            //     }
+            // } else {
+            //     this.el.setStyle(col, "background-color", "transparent");
+            //     this.el.setComments(col, "");
+
+            //     // this.el.setStyle(col, "background-color", "transparent");
+            //     // this.el.setStyle(col, "background-color", "yellow");
+            //     // this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            // }
         }
 
         //existing shipments
@@ -372,10 +469,26 @@ export default class PlanningUnitSetting extends Component {
             // var reg = /^[0-9\b]+$/;
             var reg = JEXCEL_INTEGER_REGEX;
             if (value != "") {
-                if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                // if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                //     this.el.setStyle(col, "background-color", "transparent");
+                //     this.el.setStyle(col, "background-color", "yellow");
+                //     this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                // } else {
+                //     this.el.setStyle(col, "background-color", "transparent");
+                //     this.el.setComments(col, "");
+                // }
+                if (isNaN(parseInt(value))) {//string value check
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                    this.el.setComments(col, 'String value not allowed')
+                } else if (!Number.isInteger(Number(value))) {//decimal value check
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, 'Decimal value not allowed')
+                } else if (!(reg.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, 'Please enter 10 digit whole number')
                 } else {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
@@ -396,15 +509,30 @@ export default class PlanningUnitSetting extends Component {
             // var reg = /^[0-9\b]+$/;
             var reg = JEXCEL_INTEGER_REGEX;
             if (value != "") {
-                if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                if (isNaN(parseInt(value))) {//string value check
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                    this.el.setComments(col, 'String value not allowed')
+                } else if (!Number.isInteger(Number(value))) {//decimal value check
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, 'Decimal value not allowed')
+                } else if (!(reg.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, 'Please enter 10 digit whole number')
+                } else if (parseInt(value) > 99) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, 'Maximum 99 months are allowed');
                 } else {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
                 }
             } else {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+
                 // this.el.setStyle(col, "background-color", "transparent");
                 // this.el.setStyle(col, "background-color", "yellow");
                 // this.el.setComments(col, i18n.t('static.label.fieldRequired'));
@@ -429,7 +557,7 @@ export default class PlanningUnitSetting extends Component {
         //unit price
         if (x == 8) {
             var col = ("I").concat(parseInt(y) + 1);
-            value = this.el.getValue(`I${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+            // value = this.el.getValue(`I${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             // var reg = DECIMAL_NO_REGEX;
             var reg = JEXCEL_DECIMAL_CATELOG_PRICE;
             if (value == "") {
@@ -437,15 +565,36 @@ export default class PlanningUnitSetting extends Component {
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
             } else {
-                // if (isNaN(Number.parseInt(value)) || value < 0 || !(reg.test(value))) {
-                if (!(reg.test(value))) {
+
+                if (isNaN(parseInt(value))) {//string value check
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                    this.el.setComments(col, 'String value not allowed')
+                } else if (Number(value) < 0) {//negative value check
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, 'Negative value not allowed')
+                } else if (!(reg.test(value))) {//regex check
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, 'Max 10 digit number and 4 digits after decimal are allowed.')
                 } else {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
                 }
+
+
+
+
+
+                // if (!(reg.test(value))) {
+                //     this.el.setStyle(col, "background-color", "transparent");
+                //     this.el.setStyle(col, "background-color", "yellow");
+                //     this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                // } else {
+                //     this.el.setStyle(col, "background-color", "transparent");
+                //     this.el.setComments(col, "");
+                // }
 
             }
         }
@@ -598,11 +747,15 @@ export default class PlanningUnitSetting extends Component {
                 if (response.status == 200) {
                     console.log("List------->tr-original", response.data)
                     var listArray = response.data;
-                    listArray.sort((a, b) => {
-                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
-                        return itemLabelA > itemLabelB ? 1 : -1;
-                    });
+
+                    if (listArray.length > 0) {
+                        sortArray(listArray);
+                    }
+                    // listArray.sort((a, b) => {
+                    //     var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                    //     var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                    //     return itemLabelA > itemLabelB ? 1 : -1;
+                    // });
 
                     let tempList = [];
 
@@ -993,7 +1146,7 @@ export default class PlanningUnitSetting extends Component {
                     if (listArray.length > 0) {
                         for (var i = 0; i < listArray.length; i++) {
                             var paJson = {
-                                name: getLabelText(listArray[i].label, this.state.lang),
+                                name: getLabelText(listArray[i].label, this.state.lang) + ' - ' + parseInt(listArray[i].planningUnitId),
                                 id: parseInt(listArray[i].planningUnitId),
                                 active: listArray[i].active,
                                 forecastingUnit: listArray[i].forecastingUnit,
@@ -1208,27 +1361,33 @@ export default class PlanningUnitSetting extends Component {
             data[12] = outPutList[j].selectedForecastMap;
             data[13] = indexVar;
             data[14] = outPutList[j].treeForecast;
+            data[15] = outPutList[j].consumptionNotes;
 
-            // data[0] = outPutList[j].a1a;
-            // data[1] = outPutList[j].a2a;
-            // data[2] = outPutList[j].a3a;
-            // data[3] = outPutList[j].a4a;
-            // data[4] = outPutList[j].a5a;
-            // data[5] = outPutList[j].a6a;
-            // data[6] = outPutList[j].a7a;
-            // data[7] = outPutList[j].a8a;
-            // data[8] = outPutList[j].a9a;
-            // data[9] = 0;
-            // data[10] = 0;
 
             outPutListArray[count] = data;
             count++;
             indexVar++;
         }
-        // if (costOfInventory.length == 0) {
-        //     data = [];
-        //     outPutListArray[0] = data;
-        // }
+        if (outPutList.length == 0) {
+            data = [];
+            data[0] = "";
+            data[1] = "";
+            data[2] = true;
+            data[3] = true;
+            data[4] = "";
+            data[5] = "";
+            data[6] = "";
+            data[7] = "";
+            data[8] = "";
+            data[9] = 0;
+            data[10] = 1;
+            data[11] = 1;
+            data[12] = {};
+            data[13] = -1;
+            data[14] = true;
+            data[15] = "";
+            outPutListArray[0] = data;
+        }
         // console.log("outPutListArray---->", outPutListArray);
         this.el = jexcel(document.getElementById("tableDiv"), '');
         this.el.destroy();
@@ -1238,11 +1397,11 @@ export default class PlanningUnitSetting extends Component {
         var options = {
             data: data,
             columnDrag: true,
-            colWidths: [100, 150, 60, 60, 60, 60, 60, 100, 60],
+            colWidths: [100, 150, 60, 60, 60, 60, 60, 100, 60, 60, 60, 60, 60, 60, 60, 100],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
-                    title: 'Planning Unit Category',
+                    title: i18n.t('static.tracercategory.tracercategory'),
                     type: 'autocomplete',
                     source: this.state.allTracerCategoryList,
                     filter: this.filterTracerCategoryByHealthArea
@@ -1304,8 +1463,8 @@ export default class PlanningUnitSetting extends Component {
                     type: 'numeric',
                     textEditor: true,
                     decimal: '.',
-                    // mask: '#,##.00',
-                    // disabledMaskOnEdition: true
+                    mask: '#,##.00',
+                    disabledMaskOnEdition: true
                     // readOnly: true //8I
                 },
                 {
@@ -1338,62 +1497,11 @@ export default class PlanningUnitSetting extends Component {
                     type: 'hidden',
                     // readOnly: true //14O
                 },
-                //-----------------
-                // {
-                //     title: 'Planning Unit Category',
-                //     type: 'text',
-                //     readOnly: true
-                // },
-                // {
-                //     title: 'Planning Unit',
-                //     type: 'text',
-                //     readOnly: true
-                // },
-                // {
-                //     title: 'Consumption Forecast?',
-                //     type: 'checkbox',
-                //     // readOnly: true
-                // },
-                // {
-                //     title: 'Tree Forecast?',
-                //     type: 'checkbox',
-                //     // readOnly: true
-                // },
-                // {
-                //     title: 'Stock (end of Dec 2020)',
-                //     type: 'text',
-                //     // readOnly: true
-                // },
-                // {
-                //     title: 'Existing Shipments (Jan 2021 - Dec 2023)',
-                //     type: 'text',
-                //     // readOnly: true
-                // },
-                // {
-                //     title: 'Desired Months of Stock (end of Dec 2023)',
-                //     type: 'text',
-                //     // readOnly: true
-                // },
-                // {
-                //     title: 'Price Type',
-                //     type: 'text',
-                //     // readOnly: true
-                // },
-                // {
-                //     title: 'Unit Price',
-                //     type: 'text',
-                //     // readOnly: true
-                // },
-                // {
-                //     title: 'Unit Price',
-                //     type: 'hidden',
-                //     // readOnly: true
-                // },
-                // {
-                //     title: 'Unit Price',
-                //     type: 'hidden',
-                //     // readOnly: true
-                // },
+                {
+                    title: i18n.t('static.program.notes'),
+                    type: 'text',
+                    // width: 400
+                },
             ],
             updateTable: function (el, cell, x, y, source, value, id) {
                 var elInstance = el.jexcel;
@@ -1427,6 +1535,7 @@ export default class PlanningUnitSetting extends Component {
                 entries: '',
             },
             onload: this.loaded,
+            selectionCopy: false,
             pagination: localStorage.getItem("sesRecordCount"),
             search: true,
             columnSorting: true,
@@ -1434,9 +1543,13 @@ export default class PlanningUnitSetting extends Component {
             wordWrap: true,
             allowInsertColumn: false,
             allowManualInsertColumn: false,
+            copyCompatibility: true,
+            allowManualInsertRow: false,
+            parseFormulas: true,
             allowDeleteRow: true,
             // onselection: this.selected,
             onchange: this.changed,
+            onpaste: this.onPaste,
             contextMenu: function (obj, x, y, e) {
                 var items = [];
                 //Add consumption batch info
@@ -1517,6 +1630,19 @@ export default class PlanningUnitSetting extends Component {
 
     }.bind(this)
 
+    onPaste(instance, data) {
+        var z = -1;
+        for (var i = 0; i < data.length; i++) {
+            if (z != data[i].y) {
+
+                (instance.jexcel).setValueFromCoords(10, data[i].y, 1, true);
+                (instance.jexcel).setValueFromCoords(11, data[i].y, 1, true);
+                z = data[i].y;
+
+            }
+        }
+    }
+
 
 
     filterPlanningUnitListByTracerCategoryId = function (instance, cell, c, r, source) {
@@ -1531,8 +1657,19 @@ export default class PlanningUnitSetting extends Component {
         // }
 
         mylist = this.state.allPlanningUnitList.filter(c => c.forecastingUnit.tracerCategory.id == tracerCategoryId);
-
         console.log("mylist--------->32", mylist);
+
+        var tableJson = this.el.getJson(null, false);
+        let tempList = [];
+        for (var i = 0; i < tableJson.length; i++) {
+            var map1 = new Map(Object.entries(tableJson[i]));
+            tempList.push(parseInt(map1.get("1")));
+        }
+
+        for (var i = 0; i < tempList.length; i++) {
+            mylist = mylist.filter(c => c.id != tempList[i]);
+        }
+
         return mylist;
 
     }.bind(this)
@@ -1638,7 +1775,7 @@ export default class PlanningUnitSetting extends Component {
                         "price": this.el.getValue(`I${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
                         "higherThenConsumptionThreshold": null,
                         "lowerThenConsumptionThreshold": null,
-                        "consumptionNotes": null,
+                        "consumptionNotes": map1.get("15"),
                         "consumptionDataType": 2,
                         "otherUnit": null,
                         "selectedForecastMap": map1.get("12"),
@@ -1682,7 +1819,8 @@ export default class PlanningUnitSetting extends Component {
                         "price": this.el.getValue(`I${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
                         "higherThenConsumptionThreshold": planningUnitobj1.higherThenConsumptionThreshold,
                         "lowerThenConsumptionThreshold": planningUnitobj1.lowerThenConsumptionThreshold,
-                        "consumptionNotes": planningUnitobj1.consumptionNotes,
+                        // "consumptionNotes": planningUnitobj1.consumptionNotes,
+                        "consumptionNotes": map1.get("15"),
                         "consumptionDataType": planningUnitobj1.consumptionDataType,
                         "otherUnit": planningUnitobj1.otherUnit,
                         "selectedForecastMap": map1.get("12"),
@@ -1945,6 +2083,7 @@ export default class PlanningUnitSetting extends Component {
         data[12] = {};
         data[13] = -1;
         data[14] = true;
+        data[15] = "";
 
         this.el.insertRow(
             data, 0, 1

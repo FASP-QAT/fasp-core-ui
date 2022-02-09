@@ -55,7 +55,8 @@ const validationSchema = function (values) {
             .required(i18n.t('static.program.validorganisationtext')),
         programName: Yup.string()
             .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
-            .required(i18n.t('static.program.validprogramtext')),
+            // .required(i18n.t('static.program.validprogramtext')),
+            .required('Enter forecasting program name'),
         userId: Yup.string()
             .required(i18n.t('static.program.validmanagertext')),
         regionId: Yup.string()
@@ -203,15 +204,41 @@ export default class AddForecastProgram extends Component {
 
     calculateForecastProgramInMonth() {
         let value = this.state.forecastProgramInMonth;
-        console.log("singleValue1------->1", this.state.singleValue1);
-        let stopDate = new Date(this.state.singleValue1.year + '-' + this.state.singleValue1.month + '-01');
-        console.log("singleValue1------->1", stopDate);
-        stopDate.setMonth(stopDate.getMonth() + (value - 1));
-        console.log("singleValue1------->2", stopDate);
-        this.setState({
-            forecastProgramInMonth: value,
-            singleValue2: { year: new Date(stopDate).getFullYear(), month: new Date(stopDate).getMonth() + 1 },
-        });
+        console.log("singleValue1------->1--- ", value);
+        console.log("singleValue1------->1--- ", typeof value);
+
+        if (value == '') {
+            this.setState({
+                message: 'Forecast period (Months) should not be character/null value'
+            },
+                () => {
+                    this.hideSecondComponent();
+                })
+        } else if (!Number.isInteger(Number(value))) {//decimal
+            this.setState({
+                message: 'Forecast period (Months) should not be decimal value'
+            },
+                () => {
+                    this.hideSecondComponent();
+                })
+        } else if (Number(value) < 0) {
+            this.setState({
+                message: 'Forecast period (Months) should not be negative value'
+            },
+                () => {
+                    this.hideSecondComponent();
+                })
+        } else {//whole
+            let stopDate = new Date(this.state.singleValue1.year + '-' + this.state.singleValue1.month + '-01');
+            console.log("singleValue1------->1", stopDate);
+            stopDate.setMonth(stopDate.getMonth() + (value - 1));
+            console.log("singleValue1------->2", stopDate);
+            this.setState({
+                forecastProgramInMonth: value,
+                singleValue2: { year: new Date(stopDate).getFullYear(), month: new Date(stopDate).getMonth() + 1 },
+            });
+        }
+
     }
 
     calculateForecastEndDate() {
@@ -356,7 +383,8 @@ export default class AddForecastProgram extends Component {
         this.setState({ loading: loading })
     }
     hideSecondComponent() {
-        setTimeout(function () {
+        document.getElementById('div2').style.display = 'block';
+        this.state.timeout = setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 8000);
     }
@@ -651,6 +679,7 @@ export default class AddForecastProgram extends Component {
                         var itemLabelB = b.username.toUpperCase(); // ignore upper and lowercase                   
                         return itemLabelA > itemLabelB ? 1 : -1;
                     });
+                    listArray = listArray.filter(c => c.active == true);
                     this.setState({
                         programManagerList: listArray
                     })
@@ -1164,6 +1193,18 @@ export default class AddForecastProgram extends Component {
                                                 </FormGroup>
 
                                                 <FormGroup>
+                                                    <Label htmlFor="select">{i18n.t('static.program.notes')}</Label>
+                                                    <Input
+                                                        value={this.state.program.programNotes}
+                                                        bsSize="sm"
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                        onBlur={handleBlur}
+                                                        // maxLength={600}
+                                                        type="textarea" name="programNotes" id="programNotes" />
+                                                    <FormFeedback>{errors.programNotes}</FormFeedback>
+                                                </FormGroup>
+
+                                                <FormGroup>
                                                     <Label htmlFor="appendedInputButton">{i18n.t('static.program.forecastStart')}<span class="red Reqasterisk">*</span></Label>
                                                     <div className="controls edit">
                                                         <Picker
@@ -1214,20 +1255,7 @@ export default class AddForecastProgram extends Component {
 
                                                 </FormGroup>
 
-                                                <FormGroup>
 
-                                                    <Label htmlFor="select">{i18n.t('static.program.notes')}</Label>
-
-                                                    <Input
-                                                        value={this.state.program.programNotes}
-                                                        bsSize="sm"
-                                                        onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                        onBlur={handleBlur}
-                                                        // maxLength={600}
-                                                        type="textarea" name="programNotes" id="programNotes" />
-                                                    <FormFeedback>{errors.programNotes}</FormFeedback>
-
-                                                </FormGroup>
 
 
 
