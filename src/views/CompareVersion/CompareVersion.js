@@ -37,6 +37,7 @@ class CompareVersion extends Component {
             lang: localStorage.getItem("lang"),
             versionId: "",
             versionList: [],
+            versionList1: [],
             versionId1: "",
             datasetData: {},
             firstDataSet: 0,
@@ -46,6 +47,7 @@ class CompareVersion extends Component {
         this.setDatasetId = this.setDatasetId.bind(this);
         this.getOfflineDatasetList = this.getOfflineDatasetList.bind(this);
         this.getVersionList = this.getVersionList.bind(this);
+        this.getVersionList1 = this.getVersionList1.bind(this);
         this.setVersionId = this.setVersionId.bind(this);
         this.setVersionId1 = this.setVersionId1.bind(this);
         this.updateState = this.updateState.bind(this);
@@ -56,9 +58,12 @@ class CompareVersion extends Component {
         localStorage.setItem("sesDatasetVersionId", versionId);
         this.setState({
             versionId: versionId,
+            versionList1: [],
             firstDataSet: 0
         }, () => {
-            this.getData();
+            if (versionId != "") {
+                this.getData();
+            }
         })
     }
 
@@ -79,6 +84,7 @@ class CompareVersion extends Component {
         this.setState({
             datasetId: datasetId,
             versionList: [],
+            versionList1:[],
             versionId: "",
             versionId1: ""
         }, () => {
@@ -127,6 +133,67 @@ class CompareVersion extends Component {
                 event.target.value = localStorage.getItem("sesDatasetVersionId");
             }
 
+            // var versionId1 = "";
+            // var event1 = {
+            //     target: {
+            //         value: ""
+            //     }
+            // };
+            // if (versionList.length == 1) {
+            //     versionId1 = versionList[0];
+            //     event1.target.value = versionList[0];
+            // } else if (localStorage.getItem("sesDatasetCompareVersionId") != "" && versionList.filter(c => c == localStorage.getItem("sesDatasetCompareVersionId")).length > 0) {
+            //     versionId1 = localStorage.getItem("sesDatasetCompareVersionId");
+            //     event1.target.value = localStorage.getItem("sesDatasetCompareVersionId");
+            // }
+
+
+            this.setState({
+                versionList: versionList,
+                loading: false
+            }, () => {
+                if (versionId != "") {
+                    this.setVersionId(event)
+                } else {
+                    this.setState({
+                        firstDataSet: 0
+                    })
+                }
+                // if (versionId1 != "") {
+                //     this.setVersionId1(event1)
+                // } else {
+                //     this.setState({
+                //         secondDataSet: 0
+                //     })
+                // }
+            })
+        } else {
+            this.setState({
+                versionList: [],
+                versionList1:[],
+                versionId: "",
+                versionId1: "",
+                firstDataSet: 0,
+                secondDataSet: 0,
+                loading: false
+            })
+        }
+    }
+
+    getVersionList1() {
+        this.setState({
+            loading: true
+        })
+        var datasetList = this.state.datasetList;
+        if (this.state.datasetId > 0) {
+            var selectedDataset = datasetList.filter(c => c.id == this.state.datasetId)[0];
+            var versionList = [];
+            var vList = selectedDataset.versionList;
+            for (var v = 0; v < vList.length; v++) {
+                versionList.push(vList[v].versionId)
+            }
+            versionList=versionList.filter(c=>c!=this.state.versionId);
+
             var versionId1 = "";
             var event1 = {
                 target: {
@@ -143,27 +210,28 @@ class CompareVersion extends Component {
 
 
             this.setState({
-                versionList: versionList,
+                versionList1: versionList,
                 loading: false
             }, () => {
-                if (versionId != "") {
-                    this.setVersionId(event)
-                }else{
-                    this.setState({
-                        firstDataSet:0
-                    })
-                }
+                // if (versionId != "") {
+                //     this.setVersionId(event)
+                // } else {
+                //     this.setState({
+                //         firstDataSet: 0
+                //     })
+                // }
                 if (versionId1 != "") {
                     this.setVersionId1(event1)
-                }else{
+                } else {
                     this.setState({
-                        secondDataSet:0
+                        secondDataSet: 0
                     })
                 }
             })
         } else {
             this.setState({
                 versionList: [],
+                versionList1:[],
                 versionId: "",
                 versionId1: "",
                 firstDataSet: 0,
@@ -319,6 +387,7 @@ class CompareVersion extends Component {
                         firstDataSet: 1,
                         loading: false
                     }, () => {
+                        this.getVersionList1()
                     })
                 }.bind(this)
             }.bind(this)
@@ -331,7 +400,9 @@ class CompareVersion extends Component {
                     this.setState({
                         datasetData: responseData,
                         firstDataSet: 1,
-                        loading: false
+                        loading: false,
+                    }, () => {
+                        this.getVersionList1()
                     })
                 } else {
                     this.setState({
@@ -446,6 +517,16 @@ class CompareVersion extends Component {
         const { versionList } = this.state;
         let versions = versionList.length > 0
             && versionList.map((item, i) => {
+                return (
+                    <option key={i} value={item}>
+                        {item}
+                    </option>
+                )
+            }, this);
+
+            const { versionList1 } = this.state;
+        let versions1 = versionList1.length > 0
+            && versionList1.map((item, i) => {
                 return (
                     <option key={i} value={item}>
                         {item}
@@ -574,7 +655,7 @@ class CompareVersion extends Component {
 
                                                     >
                                                         <option value="">{i18n.t('static.common.select')}</option>
-                                                        {versions}
+                                                        {versions1}
                                                     </Input>
 
                                                 </InputGroup>
