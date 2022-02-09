@@ -5959,6 +5959,40 @@ export default class CreateTreeTemplate extends Component {
         }
         console.log("Items+++", items);
         var dataArray = [];
+        dataArray.push(new Paragraph({
+            children: [new TextRun({ "text": "Tree Validation", bold: true,size:30 })],
+            spacing: {
+                after: 150,
+            },
+        }));
+        dataArray.push(new Paragraph({
+        }));
+        dataArray.push(new Paragraph({
+            children: [new TextRun({ "text": i18n.t('static.forecastMethod.forecastMethod') +" : ", bold: true }), new TextRun({ "text": document.getElementById("forecastMethodId").selectedOptions[0].text })],
+            spacing: {
+                after: 150,
+            },
+        }));
+        dataArray.push(new Paragraph({
+            children: [new TextRun({ "text": "Template Name" +" : ", bold: true }), new TextRun({ "text": document.getElementById("treeName").value })],
+            spacing: {
+                after: 150,
+            },
+        }));
+        dataArray.push(new Paragraph({
+            children: [new TextRun({ "text": i18n.t('static.program.monthsInPast') +" : ", bold: true }), new TextRun({ "text": document.getElementById("monthsInPast").value })],
+            spacing: {
+                after: 150,
+            },
+        }));
+        dataArray.push(new Paragraph({
+            children: [new TextRun({ "text": i18n.t('static.program.monthsInFuture') +" : ", bold: true }), new TextRun({ "text": document.getElementById("monthsInFuture").value })],
+            spacing: {
+                after: 150,
+            },
+        }));
+        dataArray.push(new Paragraph({
+        }));
         for (var i = 0; i < items.length; i++) {
             var row = "";
             var row1 = "";

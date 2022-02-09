@@ -21,7 +21,7 @@ import getLabelText from '../../CommonComponent/getLabelText';
 import moment from 'moment';
 import Picker from 'react-month-picker';
 import MonthBox from '../../CommonComponent/MonthBox.js';
-import { INDEXED_DB_NAME, INDEXED_DB_VERSION, TREE_DIMENSION_ID, SECRET_KEY, JEXCEL_MONTH_PICKER_FORMAT, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, JEXCEL_DECIMAL_NO_REGEX_LONG, DATE_FORMAT_CAP_WITHOUT_DATE,JEXCEL_DECIMAL_MONTHLY_CHANGE } from '../../Constants.js'
+import { INDEXED_DB_NAME, INDEXED_DB_VERSION, TREE_DIMENSION_ID, SECRET_KEY, JEXCEL_MONTH_PICKER_FORMAT, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, JEXCEL_DECIMAL_NO_REGEX_LONG, DATE_FORMAT_CAP_WITHOUT_DATE, JEXCEL_DECIMAL_MONTHLY_CHANGE } from '../../Constants.js'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import jexcel from 'jexcel-pro';
 import "../../../node_modules/jexcel-pro/dist/jexcel.css";
@@ -2902,6 +2902,41 @@ export default class BuildTree extends Component {
         }
         console.log("Items+++", items);
         var dataArray = [];
+        dataArray.push(new Paragraph({
+            children: [new TextRun({ "text": "Tree Validation", bold: true,size:30 })],
+            spacing: {
+                after: 150,
+            },
+        }));
+        dataArray.push(new Paragraph({
+        }));
+        dataArray.push(new Paragraph({
+            children: [new TextRun({ "text": i18n.t('static.consumption.program') +" : ", bold: true }), new TextRun({ "text": document.getElementById("datasetId").selectedOptions[0].text })],
+            spacing: {
+                after: 150,
+            },
+        }));
+        dataArray.push(new Paragraph({
+            children: [new TextRun({ "text": i18n.t('static.forecastMethod.tree') +" : ", bold: true }), new TextRun({ "text": document.getElementById("treeId").selectedOptions[0].text })],
+            spacing: {
+                after: 150,
+            },
+        }));
+        dataArray.push(new Paragraph({
+            children: [new TextRun({ "text": i18n.t('static.whatIf.scenario') +" : ", bold: true }), new TextRun({ "text": document.getElementById("scenarioId").selectedOptions[0].text })],
+            spacing: {
+                after: 150,
+            },
+        }));
+        dataArray.push(new Paragraph({
+            children: [new TextRun({ "text": i18n.t('static.supplyPlan.date') +" : ", bold: true }), new TextRun({ "text": this.makeText(this.state.singleValue2) })],
+            spacing: {
+                after: 150,
+            },
+        }));
+        dataArray.push(new Paragraph({
+        }));
+
         for (var i = 0; i < items.length; i++) {
             var row = "";
             var row1 = "";
