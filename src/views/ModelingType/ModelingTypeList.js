@@ -629,12 +629,26 @@ class ScaleUpType extends Component {
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.label.fieldRequired'));
                     valid = false;
+                    this.setState({
+                        message: i18n.t('static.supplyPlan.validationFailed'),
+                        color: 'red'
+                    },
+                        () => {
+                            this.hideSecondComponent();
+                        })
                 } else {
                     if (!(budgetRegx.test(value))) {
                         this.el.setStyle(col, "background-color", "transparent");
                         this.el.setStyle(col, "background-color", "yellow");
                         this.el.setComments(col, i18n.t('static.message.spacetext'));
                         valid = false;
+                        this.setState({
+                            message: i18n.t('static.supplyPlan.validationFailed'),
+                            color: 'red'
+                        },
+                            () => {
+                                this.hideSecondComponent();
+                            })
                     } else {
                         this.el.setStyle(col, "background-color", "transparent");
                         this.el.setComments(col, "");

@@ -5,7 +5,7 @@ import {
     CardFooter, Button, Table, Col, Row, FormFeedback, Form,
     Modal, ModalBody, ModalFooter, ModalHeader, InputGroup
 } from 'reactstrap';
-import { Formik } from 'formik';
+import { FastField, Formik } from 'formik';
 import * as Yup from 'yup'
 import i18n from '../../i18n'
 import jexcel from 'jexcel-pro';
@@ -59,7 +59,9 @@ class EquivalancyUnit extends Component {
 
             loading: true,
             loading1: true,
-            loading2: true
+            loading2: true,
+            isChanged: false,
+            isChanged1: false
         }
 
         this.cancelClicked = this.cancelClicked.bind(this);
@@ -184,12 +186,20 @@ class EquivalancyUnit extends Component {
         if (x != 8) {
             elInstance.setValueFromCoords(8, y, 1, true);
         }
+        this.setState({ isChanged1: true })
     }.bind(this);
 
     hideSecondComponent() {
         document.getElementById('div2').style.display = 'block';
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
+        }, 8000);
+    }
+
+    hideThirdComponent() {
+        document.getElementById('div3').style.display = 'block';
+        setTimeout(function () {
+            document.getElementById('div3').style.display = 'none';
         }, 8000);
     }
 
@@ -270,7 +280,7 @@ class EquivalancyUnit extends Component {
 
                 {
                     title: i18n.t('static.healtharea.realm'),
-                    type: 'text',
+                    type: 'hidden',
                     readOnly: true
                     // textEditor: true,
                 },
@@ -363,6 +373,16 @@ class EquivalancyUnit extends Component {
                 if (y == null) {
 
                 } else {
+
+                    // Insert new row before
+                    if (obj.options.allowInsertRow == true) {
+                        items.push({
+                            title: i18n.t('static.common.addRow'),
+                            onclick: function () {
+                                this.addRow1();
+                            }.bind(this)
+                        });
+                    }
 
                     // Delete a row
                     if (obj.options.allowDeleteRow == true) {
@@ -491,6 +511,7 @@ class EquivalancyUnit extends Component {
         }
         this.setState({
             isModalOpen: !this.state.isModalOpen,
+            isChanged1: false
             // loading: true
         },
             () => {
@@ -821,6 +842,16 @@ class EquivalancyUnit extends Component {
 
                 } else {
 
+                    // Insert new row before
+                    if (obj.options.allowInsertRow == true) {
+                        items.push({
+                            title: i18n.t('static.common.addRow'),
+                            onclick: function () {
+                                this.addRow();
+                            }.bind(this)
+                        });
+                    }
+
                     // Delete a row
                     if (obj.options.allowDeleteRow == true) {
                         // region id
@@ -918,11 +949,12 @@ class EquivalancyUnit extends Component {
         if (!this.state.roleArray.includes('ROLE_REALM_ADMIN')) {
             mylist.splice(0, 1);
         }
-        return mylist.sort(function (a, b) {
-            a = a.name.toLowerCase();
-            b = b.name.toLowerCase();
-            return a < b ? -1 : a > b ? 1 : 0;
-        });
+        return mylist;
+        // return mylist.sort(function (a, b) {
+        //     a = a.name.toLowerCase();
+        //     b = b.name.toLowerCase();
+        //     return a < b ? -1 : a > b ? 1 : 0;
+        // });
     }.bind(this)
 
     getEquivalancyUnitMappingData() {
@@ -930,13 +962,23 @@ class EquivalancyUnit extends Component {
         EquivalancyUnitService.getEquivalancyUnitMappingList().then(response => {
             if (response.status == 200) {
                 console.log("response.data---->", response.data);
+                let listArray = response.data;
+
+                listArray.sort((a, b) => {
+                    if (a.equivalencyUnit.label.label_en === b.equivalencyUnit.label.label_en) {
+                        return a.forecastingUnit.label.label_en < b.forecastingUnit.label.label_en ? -1 : 1
+                    } else {
+                        return a.equivalencyUnit.label.label_en < b.equivalencyUnit.label.label_en ? -1 : 1
+                    }
+                })
 
                 this.setState({
-                    equivalancyUnitMappingList: response.data,
-                    selSource: response.data,
+                    equivalancyUnitMappingList: listArray,
+                    selSource: listArray,
                 },
                     () => {
-                        this.buildJexcel()
+                        // this.buildJexcel()
+                        this.filterData();
                     })
 
             }
@@ -1673,7 +1715,7 @@ class EquivalancyUnit extends Component {
                         console.log(response);
                         // window.location.reload();
                         this.setState({
-                            message: i18n.t('static.usagePeriod.addUpdateMessage'), loading: true, color: 'green'
+                            message: i18n.t('static.usagePeriod.addUpdateMessage'), loading: true, color: 'green', isChanged1: false
                         },
                             () => {
                                 this.modelOpenClose();
@@ -1796,7 +1838,7 @@ class EquivalancyUnit extends Component {
                         console.log(response);
                         // this.props.history.push(`/realmCountry/listRealmCountry/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                         this.setState({
-                            message: i18n.t('static.usagePeriod.addUpdateMessage'), color: 'green'
+                            message: i18n.t('static.usagePeriod.addUpdateMessage'), color: 'green', isChanged: false
                         },
                             () => {
                                 this.hideSecondComponent();
@@ -1876,7 +1918,8 @@ class EquivalancyUnit extends Component {
         tr.children[4].classList.add('AsteriskTheadtrTd');
         tr.children[5].classList.add('AsteriskTheadtrTd');
         tr.children[6].classList.add('AsteriskTheadtrTd');
-        tr.children[8].classList.add('AsteriskTheadtrTd');
+        tr.children[7].classList.add('AsteriskTheadtrTd');
+        tr.children[9].classList.add('AsteriskTheadtrTd');
     }
     // -----------start of changed function
     changed = function (instance, cell, x, y, value) {
@@ -2059,6 +2102,11 @@ class EquivalancyUnit extends Component {
             elInstance.setValueFromCoords(12, y, 1, true);
         }
 
+        this.setState({
+            isChanged: true,
+
+        }, () => { });
+
 
 
     }.bind(this);
@@ -2082,12 +2130,26 @@ class EquivalancyUnit extends Component {
                     elInstance.setStyle(col, "background-color", "yellow");
                     elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
                     valid = false;
+                    this.setState({
+                        message: i18n.t('static.supplyPlan.validationFailed'),
+                        color: 'red'
+                    },
+                        () => {
+                            this.hideThirdComponent();
+                        })
                 } else {
                     if (!(budgetRegx.test(value))) {
                         elInstance.setStyle(col, "background-color", "transparent");
                         elInstance.setStyle(col, "background-color", "yellow");
                         elInstance.setComments(col, i18n.t('static.message.spacetext'));
                         valid = false;
+                        this.setState({
+                            message: i18n.t('static.supplyPlan.validationFailed'),
+                            color: 'red'
+                        },
+                            () => {
+                                this.hideThirdComponent();
+                            })
                     } else {
                         elInstance.setStyle(col, "background-color", "transparent");
                         elInstance.setComments(col, "");
@@ -2103,6 +2165,13 @@ class EquivalancyUnit extends Component {
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.label.fieldRequired'));
                     valid = false;
+                    this.setState({
+                        message: i18n.t('static.supplyPlan.validationFailed'),
+                        color: 'red'
+                    },
+                        () => {
+                            this.hideThirdComponent();
+                        })
                 } else {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
@@ -2131,6 +2200,13 @@ class EquivalancyUnit extends Component {
                     elInstance.setStyle(col, "background-color", "yellow");
                     elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
                     valid = false;
+                    this.setState({
+                        message: i18n.t('static.supplyPlan.validationFailed'),
+                        color: 'red'
+                    },
+                        () => {
+                            this.hideSecondComponent();
+                        })
                 } else {
                     elInstance.setStyle(col, "background-color", "transparent");
                     elInstance.setComments(col, "");
@@ -2157,6 +2233,13 @@ class EquivalancyUnit extends Component {
                     elInstance.setStyle(col, "background-color", "yellow");
                     elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
                     valid = false;
+                    this.setState({
+                        message: i18n.t('static.supplyPlan.validationFailed'),
+                        color: 'red'
+                    },
+                        () => {
+                            this.hideSecondComponent();
+                        })
                 } else {
                     elInstance.setStyle(col, "background-color", "transparent");
                     elInstance.setComments(col, "");
@@ -2171,6 +2254,13 @@ class EquivalancyUnit extends Component {
                     elInstance.setStyle(col, "background-color", "yellow");
                     elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
                     valid = false;
+                    this.setState({
+                        message: i18n.t('static.supplyPlan.validationFailed'),
+                        color: 'red'
+                    },
+                        () => {
+                            this.hideSecondComponent();
+                        })
                 } else {
                     elInstance.setStyle(col, "background-color", "transparent");
                     elInstance.setComments(col, "");
@@ -2186,18 +2276,39 @@ class EquivalancyUnit extends Component {
                     elInstance.setStyle(col, "background-color", "yellow");
                     elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
                     valid = false;
+                    this.setState({
+                        message: i18n.t('static.supplyPlan.validationFailed'),
+                        color: 'red'
+                    },
+                        () => {
+                            this.hideSecondComponent();
+                        })
                 } else {
                     if (!(reg.test(value))) {
                         elInstance.setStyle(col, "background-color", "transparent");
                         elInstance.setStyle(col, "background-color", "yellow");
                         elInstance.setComments(col, i18n.t('static.usagePeriod.conversionTOFUTest'));
                         valid = false;
+                        this.setState({
+                            message: i18n.t('static.supplyPlan.validationFailed'),
+                            color: 'red'
+                        },
+                            () => {
+                                this.hideSecondComponent();
+                            })
                     } else {
                         if (isNaN(Number.parseInt(value)) || value <= 0) {
                             elInstance.setStyle(col, "background-color", "transparent");
                             elInstance.setStyle(col, "background-color", "yellow");
                             elInstance.setComments(col, i18n.t('static.program.validvaluetext'));
                             valid = false;
+                            this.setState({
+                                message: i18n.t('static.supplyPlan.validationFailed'),
+                                color: 'red'
+                            },
+                                () => {
+                                    this.hideSecondComponent();
+                                })
                         } else {
                             elInstance.setStyle(col, "background-color", "transparent");
                             elInstance.setComments(col, "");
@@ -2214,6 +2325,13 @@ class EquivalancyUnit extends Component {
                     elInstance.setStyle(col, "background-color", "yellow");
                     elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
                     valid = false;
+                    this.setState({
+                        message: i18n.t('static.supplyPlan.validationFailed'),
+                        color: 'red'
+                    },
+                        () => {
+                            this.hideSecondComponent();
+                        })
                 } else {
                     elInstance.setStyle(col, "background-color", "transparent");
                     elInstance.setComments(col, "");
@@ -2229,29 +2347,56 @@ class EquivalancyUnit extends Component {
     filterData() {
         let tracerCategoryId = document.getElementById("tracerCategoryId").value;
         let typeId = document.getElementById("typeId").value;
+        let statusId = document.getElementById("statusId").value;
 
         if (typeId != 0 && tracerCategoryId != 0) {
-            const selSource = this.state.equivalancyUnitMappingList.filter(c => (typeId == 2 ? c.program != null : c.program == null) && c.tracerCategory.id == tracerCategoryId)
+            console.log("statusId------->11");
+            let selSource = this.state.equivalancyUnitMappingList.filter(c => (typeId == 2 ? c.program != null : c.program == null) && c.tracerCategory.id == tracerCategoryId)
+            if (statusId == 1) {
+                selSource = selSource.filter(c => c.active == true);
+            } else if (statusId == 2) {
+                selSource = selSource.filter(c => c.active == false);
+            }
             this.setState({
                 selSource
             },
                 () => { this.buildJexcel() });
         } else if (typeId != 0) {
-            const selSource = this.state.equivalancyUnitMappingList.filter(c => (typeId == 2 ? c.program != null : c.program == null))
-
+            console.log("statusId------->111");
+            let selSource = this.state.equivalancyUnitMappingList.filter(c => (typeId == 2 ? c.program != null : c.program == null))
+            if (statusId == 1) {
+                selSource = selSource.filter(c => c.active == true);
+            } else if (statusId == 2) {
+                selSource = selSource.filter(c => c.active == false);
+            }
             this.setState({
                 selSource
             },
                 () => { this.buildJexcel() });
         } else if (tracerCategoryId != 0) {
-            const selSource = this.state.equivalancyUnitMappingList.filter(c => c.tracerCategory.id == tracerCategoryId)
+            console.log("statusId------->1111");
+            let selSource = this.state.equivalancyUnitMappingList.filter(c => c.tracerCategory.id == tracerCategoryId)
+            if (statusId == 1) {
+                selSource = selSource.filter(c => c.active == true);
+            } else if (statusId == 2) {
+                selSource = selSource.filter(c => c.active == false);
+            }
             this.setState({
                 selSource
             },
                 () => { this.buildJexcel() });
         } else {
+            console.log("statusId------->1111", statusId);
+            let selSource = this.state.equivalancyUnitMappingList;
+            if (statusId == 1) {
+                console.log("statusId------->IF");
+                selSource = selSource.filter(c => c.active == true);
+            } else if (statusId == 2) {
+                console.log("statusId------->ELSE");
+                selSource = selSource.filter(c => c.active == false);
+            }
             this.setState({
-                selSource: this.state.equivalancyUnitMappingList
+                selSource: selSource
             },
                 () => { this.buildJexcel() });
         }
@@ -2278,7 +2423,8 @@ class EquivalancyUnit extends Component {
                 <h5 style={{ color: this.state.color }} id="div2">{this.state.message}</h5>
                 <Card>
                     <Col md="12 pl-3">
-                        <h5 className="red">{i18n.t('static.common.customWarningEquivalencyUnit')}</h5>
+                        {/* <h5 className="red">{i18n.t('static.common.customWarningEquivalencyUnit')}</h5> */}
+                        <h5>{i18n.t('static.common.customWarningEquivalencyUnit')}</h5>
                     </Col>
                     <div className="Card-header-addicon problemListMarginTop">
                         <div className="card-header-actions">
@@ -2335,6 +2481,24 @@ class EquivalancyUnit extends Component {
                                         </InputGroup>
                                     </div>
                                 </FormGroup>
+                                <FormGroup className="tab-ml-1 mt-md-2 mb-md-0 ">
+                                    <Label htmlFor="appendedInputButton">{i18n.t('static.common.status')}</Label>
+                                    <div className="controls SelectGo">
+                                        <InputGroup>
+                                            <Input
+                                                type="select"
+                                                name="statusId"
+                                                id="statusId"
+                                                bsSize="sm"
+                                                onChange={this.filterData}
+                                            >
+                                                <option value="0">{i18n.t('static.common.all')}</option>
+                                                <option value="1" selected>{i18n.t('static.common.active')}</option>
+                                                <option value="2">{i18n.t('static.common.disabled')}</option>
+                                            </Input>
+                                        </InputGroup>
+                                    </div>
+                                </FormGroup>
                             </div>
                         </Col>
 
@@ -2357,8 +2521,8 @@ class EquivalancyUnit extends Component {
                     <CardFooter>
                         {(this.state.roleArray.includes('ROLE_REALM_ADMIN') || this.state.roleArray.includes('ROLE_DATASET_ADMIN')) &&
                             <FormGroup>
-                                {/* <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button> */}
-                                <Button type="submit" size="md" color="success" onClick={this.formSubmit} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                {this.state.isChanged && <Button type="submit" size="md" color="success" onClick={this.formSubmit} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>}
                                 <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i>{i18n.t('static.common.addRow')}</Button>
                                 &nbsp;
                             </FormGroup>
@@ -2374,7 +2538,8 @@ class EquivalancyUnit extends Component {
                             <strong>{i18n.t('static.equivalancyUnit.equivalancyUnits')}</strong>
                         </ModalHeader>
                         <ModalBody>
-                            <h6 className="red" id="div3"></h6>
+                            <span><h5 style={{ color: this.state.color }} id="div3">{this.state.message}</h5></span>
+                            {/* <h6 className="red" id="div3"></h6> */}
                             <div>
                                 <div id="eqUnitInfoTable" className="AddListbatchtrHeight RemoveStriped">
                                 </div>
@@ -2385,7 +2550,7 @@ class EquivalancyUnit extends Component {
                         <ModalFooter>
                             {(this.state.roleArray.includes('ROLE_REALM_ADMIN') || this.state.roleArray.includes('ROLE_DATASET_ADMIN')) &&
                                 <div className="mr-0">
-                                    <Button type="submit" size="md" color="success" className="float-right" onClick={this.formSubmit1} ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                    {this.state.isChanged1 && <Button type="submit" size="md" color="success" className="float-right" onClick={this.formSubmit1} ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>}
                                     <Button color="info" size="md" className="float-right mr-1" id="eqUnitAddRow" type="button" onClick={() => this.addRow1()}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>
                                 </div>
                             }
@@ -2397,7 +2562,8 @@ class EquivalancyUnit extends Component {
         )
     }
     cancelClicked() {
-        this.props.history.push(`/realmCountry/listRealmCountry/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
+        let id = AuthenticationService.displayDashboardBasedOnRole();
+        this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.message.cancelled'))
     }
 
 }

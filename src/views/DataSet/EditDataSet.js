@@ -37,7 +37,8 @@ const validationSchema = function (values) {
     return Yup.object().shape({
         programName: Yup.string()
             .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
-            .required(i18n.t('static.program.validprogramtext')),
+            // .required(i18n.t('static.program.validprogramtext')),
+            .required('Enter forecasting program name'),
         realmId: Yup.string()
             .required(i18n.t('static.common.realmtext')),
         realmCountryId: Yup.string()
@@ -248,8 +249,9 @@ export default class EditProgram extends Component {
                             var itemLabelB = b.username.toUpperCase(); // ignore upper and lowercase                   
                             return itemLabelA > itemLabelB ? 1 : -1;
                         });
+                        listArray = listArray.filter(c => c.active == true);
                         this.setState({
-                            programManagerList: response.data, loading: false
+                            programManagerList: listArray, loading: false
                         })
                     } else {
                         this.setState({
