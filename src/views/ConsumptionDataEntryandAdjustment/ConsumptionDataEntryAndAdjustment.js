@@ -881,7 +881,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     var adjustedConsumptionCount = 19;
     var consumptionUnit = {};
     var consumptionList = this.state.consumptionList;
-    console.log("document.getElementByIdplanningUnitId",document.getElementById("planningUnitId").selectedOptions[0])
+    console.log("document.getElementByIdplanningUnitId", document.getElementById("planningUnitId").selectedOptions[0])
     var consumptionUnitId = document.getElementById("planningUnitId").selectedOptions[0].value;
     consumptionUnit = this.state.planningUnitList.filter(c => c.planningUnit.id == consumptionUnitId)[0];
     var multiplier = 1;
@@ -949,9 +949,9 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     var B = [];
     var monthArray = this.state.monthArray;
     var regionList = this.state.regionList;
-    console.log("777777777777777777",consumptionUnitId)
+    console.log("777777777777777777", consumptionUnitId)
     var consumptionList = consumptionList.filter(c => c.planningUnit.id == consumptionUnitId);
-    console.log("consumptionList",consumptionList)
+    console.log("consumptionList", consumptionList)
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF', 'AG', 'AH', 'AI', 'AJ', 'AK', 'AL', 'AM', 'AN']
     // B.push(i18n.t('static.program.noOfDaysInMonth').replaceAll(' ', '%20') + '"')
     for (var j = 0; j < monthArray.length; j++) {
@@ -1257,7 +1257,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                 planningUnitTotalListRegion: planningUnitTotalListRegion,
                 allPlanningUnitList: allPlanningUnitList
               }, () => {
-                console.log("this.props.match.params.planningUnitId+++",this.props.match.params.planningUnitId)
+                console.log("this.props.match.params.planningUnitId+++", this.props.match.params.planningUnitId)
                 if (this.props.match.params.planningUnitId > 0) {
                   this.buildDataJexcel(this.props.match.params.planningUnitId)
                 }
@@ -1308,7 +1308,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
   }
 
 
-  exportPDFDataCheck(){
+  exportPDFDataCheck() {
     const addFooters = doc => {
 
       const pageCount = doc.internal.getNumberOfPages()
@@ -1316,20 +1316,20 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       doc.setFont('helvetica', 'bold')
       doc.setFontSize(6)
       for (var i = 1; i <= pageCount; i++) {
-          doc.setPage(i)
+        doc.setPage(i)
 
-          doc.setPage(i)
-          doc.text('Page ' + String(i) + ' of ' + String(pageCount), doc.internal.pageSize.width / 9, doc.internal.pageSize.height - 30, {
-              align: 'center'
-          })
-          doc.text('Copyright © 2020 ' + i18n.t('static.footer'), doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
-              align: 'center'
-          })
+        doc.setPage(i)
+        doc.text('Page ' + String(i) + ' of ' + String(pageCount), doc.internal.pageSize.width / 9, doc.internal.pageSize.height - 30, {
+          align: 'center'
+        })
+        doc.text('Copyright © 2020 ' + i18n.t('static.footer'), doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
+          align: 'center'
+        })
 
 
       }
-  }
-  const addHeaders = doc => {
+    }
+    const addHeaders = doc => {
 
       const pageCount = doc.internal.getNumberOfPages()
 
@@ -1342,143 +1342,143 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       //fs.readFile('../../assets/img/logo.svg', 'utf8', function(err, data){ 
       //}); 
       for (var i = 1; i <= pageCount; i++) {
-          doc.setFontSize(12)
-          doc.setFont('helvetica', 'bold')
-          doc.setPage(i)
-          doc.addImage(LOGO, 'png', 0, 10, 180, 50, 'FAST');
-          /*doc.addImage(data, 10, 30, {
-            align: 'justify'
-          });*/
-          doc.setTextColor("#002f6c");
-          doc.text(i18n.t('static.common.dataCheck'), doc.internal.pageSize.width / 2, 60, {
-              align: 'center'
+        doc.setFontSize(12)
+        doc.setFont('helvetica', 'bold')
+        doc.setPage(i)
+        doc.addImage(LOGO, 'png', 0, 10, 180, 50, 'FAST');
+        /*doc.addImage(data, 10, 30, {
+          align: 'justify'
+        });*/
+        doc.setTextColor("#002f6c");
+        doc.text(i18n.t('static.common.dataCheck'), doc.internal.pageSize.width / 2, 60, {
+          align: 'center'
+        })
+        if (i == 1) {
+          doc.setFont('helvetica', 'normal')
+          doc.setFontSize(8)
+          doc.text(i18n.t('static.dashboard.programheader') + ' : ' + document.getElementById("datasetId").selectedOptions[0].text, doc.internal.pageSize.width / 20, 90, {
+            align: 'left'
           })
-          if (i == 1) {
-              doc.setFont('helvetica', 'normal')
-              doc.setFontSize(8)
-              doc.text(i18n.t('static.dashboard.programheader') + ' : ' + document.getElementById("datasetId").selectedOptions[0].text, doc.internal.pageSize.width / 20, 90, {
-                  align: 'left'
-              })
 
-          }
+        }
 
       }
-  }
+    }
 
 
-  const unit = "pt";
-  const size = "A4"; // Use A1, A2, A3 or A4
-  const orientation = "landscape"; // portrait or landscape
+    const unit = "pt";
+    const size = "A4"; // Use A1, A2, A3 or A4
+    const orientation = "landscape"; // portrait or landscape
 
-  const marginLeft = 10;
-  const doc = new jsPDF(orientation, unit, size, true);
+    const marginLeft = 10;
+    const doc = new jsPDF(orientation, unit, size, true);
 
-  doc.setFontSize(8);
-  doc.setFont('helvetica', 'normal')
+    doc.setFontSize(8);
+    doc.setFont('helvetica', 'normal')
 
 
-  var y = 110;
+    var y = 110;
 
-  doc.setFont('helvetica', 'bold')
-  var planningText = doc.splitTextToSize(i18n.t('static.commitTree.consumptionForecast'), doc.internal.pageSize.width * 3 / 4);
-  // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
-  y = y + 20;
-  for (var i = 0; i < planningText.length; i++) {
+    doc.setFont('helvetica', 'bold')
+    var planningText = doc.splitTextToSize(i18n.t('static.commitTree.consumptionForecast'), doc.internal.pageSize.width * 3 / 4);
+    // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+    y = y + 20;
+    for (var i = 0; i < planningText.length; i++) {
       if (y > doc.internal.pageSize.height - 100) {
-          doc.addPage();
-          y = 80;
+        doc.addPage();
+        y = 80;
 
       }
       doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
       y = y + 10;
-  }
+    }
 
-  doc.setFont('helvetica', 'normal')
-  planningText = doc.splitTextToSize("a. " + i18n.t('static.commitTree.monthsMissingActualConsumptionValues'), doc.internal.pageSize.width * 3 / 4);
-  // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
-  y = y + 10;
-  for (var i = 0; i < planningText.length; i++) {
+    doc.setFont('helvetica', 'normal')
+    planningText = doc.splitTextToSize("a. " + i18n.t('static.commitTree.monthsMissingActualConsumptionValues'), doc.internal.pageSize.width * 3 / 4);
+    // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+    y = y + 10;
+    for (var i = 0; i < planningText.length; i++) {
       if (y > doc.internal.pageSize.height - 100) {
-          doc.addPage();
-          y = 80;
+        doc.addPage();
+        y = 80;
 
       }
       doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
       y = y + 10;
-  }
-  this.state.missingMonthList.map((item, i) => {
+    }
+    this.state.missingMonthList.map((item, i) => {
       doc.setFont('helvetica', 'bold')
       planningText = doc.splitTextToSize(getLabelText(item.planningUnitLabel, this.state.lang) + " - " + getLabelText(item.regionLabel, this.state.lang) + " : ", doc.internal.pageSize.width * 3 / 4);
       // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
       y = y + 10;
       for (var i = 0; i < planningText.length; i++) {
-          if (y > doc.internal.pageSize.height - 100) {
-              doc.addPage();
-              y = 80;
+        if (y > doc.internal.pageSize.height - 100) {
+          doc.addPage();
+          y = 80;
 
-          }
-          doc.text(doc.internal.pageSize.width / 15, y, planningText[i]);
-          y = y + 10;
+        }
+        doc.text(doc.internal.pageSize.width / 15, y, planningText[i]);
+        y = y + 10;
       }
       doc.setFont('helvetica', 'normal')
       planningText = doc.splitTextToSize("" + item.monthsArray, doc.internal.pageSize.width * 3 / 4);
       // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
       y = y + 3;
       for (var i = 0; i < planningText.length; i++) {
-          if (y > doc.internal.pageSize.height - 100) {
-              doc.addPage();
-              y = 80;
-
-          }
-          doc.text(doc.internal.pageSize.width / 15, y, planningText[i]);
-          y = y + 10;
-      }
-  })
-
-  doc.setFont('helvetica', 'normal')
-  planningText = doc.splitTextToSize("b. " + i18n.t('static.commitTree.puThatDoNotHaveAtleast24MonthsOfActualConsumptionValues'), doc.internal.pageSize.width * 3 / 4);
-  // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
-  y = y + 20;
-  for (var i = 0; i < planningText.length; i++) {
-      if (y > doc.internal.pageSize.height - 100) {
+        if (y > doc.internal.pageSize.height - 100) {
           doc.addPage();
           y = 80;
+
+        }
+        doc.text(doc.internal.pageSize.width / 15, y, planningText[i]);
+        y = y + 10;
+      }
+    })
+
+    doc.setFont('helvetica', 'normal')
+    planningText = doc.splitTextToSize("b. " + i18n.t('static.commitTree.puThatDoNotHaveAtleast24MonthsOfActualConsumptionValues'), doc.internal.pageSize.width * 3 / 4);
+    // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+    y = y + 20;
+    for (var i = 0; i < planningText.length; i++) {
+      if (y > doc.internal.pageSize.height - 100) {
+        doc.addPage();
+        y = 80;
 
       }
       doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
       y = y + 10;
-  }
-  this.state.consumptionListlessTwelve.map((item, i) => {
+    }
+    this.state.consumptionListlessTwelve.map((item, i) => {
       doc.setFont('helvetica', 'bold')
       planningText = doc.splitTextToSize(getLabelText(item.planningUnitLabel, this.state.lang) + " - " + getLabelText(item.regionLabel, this.state.lang) + " : ", doc.internal.pageSize.width * 3 / 4);
       // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
       y = y + 10;
       for (var i = 0; i < planningText.length; i++) {
-          if (y > doc.internal.pageSize.height - 100) {
-              doc.addPage();
-              y = 80;
+        if (y > doc.internal.pageSize.height - 100) {
+          doc.addPage();
+          y = 80;
 
-          }
-          doc.text(doc.internal.pageSize.width / 15, y, planningText[i]);
-          y = y + 10;
+        }
+        doc.text(doc.internal.pageSize.width / 15, y, planningText[i]);
+        y = y + 10;
       }
       doc.setFont('helvetica', 'normal')
       planningText = doc.splitTextToSize("" + item.noOfMonths + " month(s)", doc.internal.pageSize.width * 3 / 4);
       // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
       y = y + 3;
       for (var i = 0; i < planningText.length; i++) {
-          if (y > doc.internal.pageSize.height - 100) {
-              doc.addPage();
-              y = 80;
+        if (y > doc.internal.pageSize.height - 100) {
+          doc.addPage();
+          y = 80;
 
-          }
-          doc.text(doc.internal.pageSize.width / 15, y, planningText[i]);
-          y = y + 10;
+        }
+        doc.text(doc.internal.pageSize.width / 15, y, planningText[i]);
+        y = y + 10;
       }
-  })
-  addHeaders(doc)
-  addFooters(doc)
-  doc.save(i18n.t('static.common.dataCheck').concat('.pdf'));
+    })
+    addHeaders(doc)
+    addFooters(doc)
+    doc.save(i18n.t('static.common.dataCheck').concat('.pdf'));
   }
 
   render() {
@@ -1660,8 +1660,8 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         <Card>
           <div className="card-header-actions">
             <div className="Card-header-reporticon">
-              <span className="compareAndSelect-larrow"> <i className="cui-arrow-left icons " > </i></span> 
-              <span className="compareAndSelect-rarrow"> <i className="cui-arrow-right icons " > </i></span> 
+              <span className="compareAndSelect-larrow"> <i className="cui-arrow-left icons " > </i></span>
+              <span className="compareAndSelect-rarrow"> <i className="cui-arrow-right icons " > </i></span>
               <span className="compareAndSelect-larrowText"> {i18n.t('static.common.backTo')} <a href="/#/importFromQATSupplyPlan/listImportFromQATSupplyPlan" className="supplyplanformulas">{i18n.t('static.importFromQATSupplyPlan.importFromQATSupplyPlan')}</a></span>
               <span className="compareAndSelect-rarrowText"> {i18n.t('static.common.continueTo')} <a href="/#/extrapolation/extrapolateData" className="supplyplanformulas">{i18n.t('static.dashboard.extrapolation')}</a></span><br />
               {/* <strong>{i18n.t('static.dashboard.supplyPlan')}</strong> */}
@@ -1675,12 +1675,12 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           </div>
           <div className="Card-header-addicon pb-0">
             <div className="card-header-actions">
-            <img style={{ height: '23px', width: '23px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
+              <img style={{ height: '23px', width: '23px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
               <a className="card-header-action">
                 <span style={{ cursor: 'pointer' }} onClick={() => { this.toggleShowGuidance() }}><small className="supplyplanformulas">{i18n.t('static.common.showGuidance')}</small></span>
               </a>
               <span className="card-header-action">
-              {this.state.datasetId != "" && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} ><i className="fa fa-plus-square" style={{fontSize:'20px'}} onClick={() => this.buildDataJexcel(0)}></i></a>}</span>
+                {this.state.datasetId != "" && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} ><i className="fa fa-plus-square" style={{ fontSize: '20px' }} onClick={() => this.buildDataJexcel(0)}></i></a>}</span>
               {/* <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} /> */}
             </div>
           </div>
@@ -1824,8 +1824,8 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                             </Input>
                           </InputGroup>
                         </div>
-                        </FormGroup>
-                        <FormGroup className="col-md-4" style={{paddingTop:'30px',display: this.state.showDetailTable ? 'block' : 'none' }}>
+                      </FormGroup>
+                      <FormGroup className="col-md-4" style={{ paddingTop: '30px', display: this.state.showDetailTable ? 'block' : 'none' }}>
                         <Button type="button" id="formSubmitButton" size="md" color="success" className="float-right mr-1" onClick={() => this.interpolationMissingActualConsumption()}>
                           <i className="fa fa-check"></i>{i18n.t('static.pipeline.interpolateMissingValues')}</Button>
                       </FormGroup>
@@ -1968,8 +1968,11 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         //Consumption : missing months
         for (var i = 0; moment(curDate).format("YYYY-MM") < moment(stopDate).format("YYYY-MM"); i++) {
           curDate = moment(startDate).add(i, 'months').format("YYYY-MM-DD");
-          var consumptionListFilteredForMonth = consumptionList.filter(c => c.planningUnit.id == puId && c.region.id == regionId && c.month == curDate);
-          if (consumptionListFilteredForMonth.length == 0) {
+          var consumptionListFilteredForMonth = consumptionList.filter(c => c.planningUnit.id == puId && c.region.id == regionId);
+          var consumptionListForCurrentMonth = consumptionListFilteredForMonth.filter(c => moment(c.month).format("YYYY-MM") == moment(curDate).format("YYYY-MM"));
+          var checkIfPrevMonthConsumptionAva = consumptionListFilteredForMonth.filter(c => moment(c.month).format("YYYY-MM") < moment(curDate).format("YYYY-MM"));
+          var checkIfNextMonthConsumptionAva = consumptionListFilteredForMonth.filter(c => moment(c.month).format("YYYY-MM") > moment(curDate).format("YYYY-MM"));
+          if (consumptionListForCurrentMonth.length == 0 && checkIfPrevMonthConsumptionAva.length > 0 && checkIfNextMonthConsumptionAva.length > 0) {
             monthsArray.push(moment(curDate).format(DATE_FORMAT_CAP_WITHOUT_DATE));
           }
         }

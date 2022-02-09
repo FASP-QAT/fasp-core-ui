@@ -7,6 +7,7 @@ import QAT from '../../assets/img/brand/QAT-minimize.png';
 import imageNotificationCount from '../../assets/img/icons-truck.png';
 import logo from '../../assets/img/QAT-logo.png';
 import imageUsermanual from '../../assets/img/User-manual-icon.png';
+import ShowGuidanceImg from '../../assets/img/ShowGuidance.png';
 import { getDatabase } from '../../CommonComponent/IndexedDbFunctions';
 import { API_URL, INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY } from '../../Constants';
 import i18n from '../../i18n';
@@ -161,7 +162,8 @@ class DefaultHeader extends Component {
               "../../../../src/ShowGuidanceHtmlFile/ShowGuidanceSp.html":
               "../../../../src/ShowGuidanceHtmlFile/ShowGuidancePr.html"
             } target="_blank">
-              <i class="nav-icon fa fa-compass ShowGuidanceIcon" title={'Show Guidance'}></i>
+              {/* <i class="nav-icon fa fa-compass ShowGuidanceIcon" title={'Show Guidance'}></i> */}
+              <img src={ShowGuidanceImg} className="HelpIcon" title={i18n.t('static.user.usermanual')} style={{ width: '25px', height: '25px' }} />
               </a>
             </span>
           </NavItem>

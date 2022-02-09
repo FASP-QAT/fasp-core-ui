@@ -1700,6 +1700,12 @@ export default class PlanningUnitSetting extends Component {
         tr.children[4].classList.add('AsteriskTheadtrTd');
         tr.children[8].classList.add('AsteriskTheadtrTd');
         tr.children[9].classList.add('AsteriskTheadtrTd');
+
+        tr.children[5].classList.add('InfoTr');
+        tr.children[6].classList.add('InfoTr');
+        tr.children[7].classList.add('InfoTr');
+        // tr.children[8].classList.add('InfoTr');
+       
     }
 
     formSubmit = function () {
