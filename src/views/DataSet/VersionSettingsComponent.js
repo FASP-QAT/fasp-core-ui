@@ -21,7 +21,7 @@ class VersionSettingsComponent extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            noOfDays: [{ id: "0", name: 'Default' }, { id: 15, name: '15' },
+            noOfDays: [{ id: "0", name: i18n.t('static.versionSettings.calendardays') }, { id: 15, name: '15' },
             { id: 16, name: '16' },
             { id: 17, name: '17' },
             { id: 18, name: '18' },
@@ -109,7 +109,7 @@ class VersionSettingsComponent extends Component {
                 var col = ("N").concat(parseInt(y) + 1);
                 var reg = JEXCEL_INTEGER_REGEX;
                 var value = this.el.getValueFromCoords(13, y);
-                console.log("Value@@@",value)
+                console.log("Value@@@", value)
                 if (value === "") {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
@@ -127,6 +127,25 @@ class VersionSettingsComponent extends Component {
                 }
 
 
+                var col = ("I").concat(parseInt(y) + 1);
+                var reg = /^[0-9]*[1-9][0-9]*$/;
+                var value = this.el.getValueFromCoords(8, y);
+                console.log("Value@@@", value)
+                if (value === "") {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                } else if (!(reg.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.common.onlyPositiveIntegerGreaterThan0AreAllowed'));
+                    valid = false;
+                }
+                else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
 
                 var col = ("O").concat(parseInt(y) + 1);
                 var value = this.el.getValue(`O${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
@@ -140,7 +159,7 @@ class VersionSettingsComponent extends Component {
                     if (isNaN(parseInt(value)) || !(reg.test(value))) {
                         this.el.setStyle(col, "background-color", "transparent");
                         this.el.setStyle(col, "background-color", "yellow");
-                        this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                        this.el.setComments(col, i18n.t('static.common.positiveIntegerWithLength'));
                         valid = false;
                     } else {
                         this.el.setStyle(col, "background-color", "transparent");
@@ -161,7 +180,7 @@ class VersionSettingsComponent extends Component {
                     if (isNaN(parseInt(value)) || !(reg.test(value))) {
                         this.el.setStyle(col, "background-color", "transparent");
                         this.el.setStyle(col, "background-color", "yellow");
-                        this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                        this.el.setComments(col, i18n.t('static.common.positiveIntegerWithLength'));
                         valid = false;
                     } else {
                         this.el.setStyle(col, "background-color", "transparent");
@@ -182,7 +201,7 @@ class VersionSettingsComponent extends Component {
                     if (isNaN(parseInt(value)) || !(reg.test(value))) {
                         this.el.setStyle(col, "background-color", "transparent");
                         this.el.setStyle(col, "background-color", "yellow");
-                        this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                        this.el.setComments(col, i18n.t('static.common.positiveIntegerWithLength'));
                         valid = false;
                     } else {
                         this.el.setStyle(col, "background-color", "transparent");
@@ -227,6 +246,25 @@ class VersionSettingsComponent extends Component {
             }
         }
 
+        if (x == 8) {
+            var col = ("I").concat(parseInt(y) + 1);
+            var reg = /^[0-9]*[1-9][0-9]*$/;
+            var value = this.el.getValueFromCoords(8, y);
+            console.log("Value@@@", value)
+            if (value === "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else if (!(reg.test(value))) {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.common.onlyPositiveIntegerGreaterThan0AreAllowed'));
+            }
+            else {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+            }
+        }
 
         var startDate = this.el.getValue(`H${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
         var stopDate = this.el.getValue(`J${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
@@ -295,7 +333,7 @@ class VersionSettingsComponent extends Component {
         }
 
 
-        if (x == 9 && this.el.getValueFromCoords(17, y) == 0) {//endDate
+        if ((x == 9 || x ==7) && this.el.getValueFromCoords(17, y) == 0) {//endDate
             console.log("startDate--------->1111111");
             let startDate = this.el.getValueFromCoords(7, y);
             let endDate = this.el.getValueFromCoords(9, y);
@@ -325,7 +363,7 @@ class VersionSettingsComponent extends Component {
                 if (isNaN(parseInt(value)) || !(reg.test(value))) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                    this.el.setComments(col, i18n.t('static.common.positiveIntegerWithLength'));
                 } else {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
@@ -343,7 +381,7 @@ class VersionSettingsComponent extends Component {
                 if (isNaN(parseInt(value)) || !(reg.test(value))) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                    this.el.setComments(col, i18n.t('static.common.positiveIntegerWithLength'));
                 } else {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
@@ -361,7 +399,7 @@ class VersionSettingsComponent extends Component {
                 if (isNaN(parseInt(value)) || !(reg.test(value))) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                    this.el.setComments(col, i18n.t('static.common.positiveIntegerWithLength'));
                 } else {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
@@ -560,6 +598,7 @@ class VersionSettingsComponent extends Component {
                 myResult = getRequest.result;
                 var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
                 var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                var list=[];
                 for (var i = 0; i < myResult.length; i++) {
                     if (myResult[i].userId == userId) {
                         // var obj = myResult[i];
@@ -567,6 +606,7 @@ class VersionSettingsComponent extends Component {
                         // var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
                         // obj.programData = programData;
                         proList.push(myResult[i])
+                        list.push({label: myResult[i].programCode, value: myResult[i].programId})
                     }
                 }
                 console.log("proList---", proList);
@@ -595,6 +635,8 @@ class VersionSettingsComponent extends Component {
                         uniquePrograms: proList.filter((v, i, a) => a.findIndex(t => (t.programId === v.programId)) === i),
                         loading: false
 
+                    },()=>{
+                        this.handleChangeProgram(list);
                     });
                 }
 
@@ -619,6 +661,13 @@ class VersionSettingsComponent extends Component {
     oneditionend = function (instance, cell, x, y, value) {
         var elInstance = instance.jexcel;
         elInstance.setValueFromCoords(12, y, 1, true);
+    }
+
+    filterStopDate = function(o, cell, x, y, value, config) {
+        var previousColumnValue = o.getValueFromCoords(x - 2, y);
+        // console.log("@@@",o.options.columns[9])
+        config.options.validRange = [ previousColumnValue, null ];
+        return config;
     }
 
     buildJExcel() {
@@ -798,6 +847,7 @@ class VersionSettingsComponent extends Component {
                 {
                     title: i18n.t('static.program.forecastEnd'),
                     type: 'calendar',
+                    filterOptions: this.filterStopDate,
                     options: {
                         format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker'
                     }// 9 J
@@ -915,6 +965,9 @@ class VersionSettingsComponent extends Component {
             position: 'top',
             filters: true,
             license: JEXCEL_PRO_KEY,
+            contextMenu: function (obj, x, y, e) {
+                return false;
+            }.bind(this),
 
 
         };
