@@ -4150,3 +4150,11 @@ z-index:999;
 .consumptionSearchMarginTop {
   margin-top: -25px;
 }
+
+  .jexcel_contextmenu>.header{
+    display:none
+  }
+
+  .jexcel > thead.resizable > tr > .arrow-down:not(.AsteriskTheadtrTd)::after {
+    content: ""!important;
+  }
