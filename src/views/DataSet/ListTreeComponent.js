@@ -120,6 +120,14 @@ export default class ListTreeComponent extends Component {
                     treeList[j].active = false;
                 }
             }
+
+            const index = treeList.findIndex(c => c.treeId == treeId);
+            console.log(" tree index--------->", index);
+            if (index > 0) {
+                const result = treeList.splice(index, 1);
+                console.log("result---",result);
+            }
+
             tempProgram.programData.treeList = treeList;
         } else {//copy
             // alert("Else");
