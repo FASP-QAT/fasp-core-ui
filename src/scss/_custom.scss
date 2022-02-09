@@ -4138,3 +4138,7 @@ z-index:999;
   .jexcel > thead.resizable > tr > .arrow-down:not(.AsteriskTheadtrTd)::after {
     content: ""!important;
   }
+
+  .jexcel > thead.resizable > tr > .arrow-up:not(.AsteriskTheadtrTd)::after {
+    content: ""!important;
+  }
