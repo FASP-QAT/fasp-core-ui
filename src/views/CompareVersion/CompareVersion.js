@@ -148,9 +148,17 @@ class CompareVersion extends Component {
             }, () => {
                 if (versionId != "") {
                     this.setVersionId(event)
+                }else{
+                    this.setState({
+                        firstDataSet:0
+                    })
                 }
                 if (versionId1 != "") {
                     this.setVersionId1(event1)
+                }else{
+                    this.setState({
+                        secondDataSet:0
+                    })
                 }
             })
         } else {
@@ -259,7 +267,11 @@ class CompareVersion extends Component {
                     event.target.value = localStorage.getItem("sesLiveDatasetId");
                 }
                 this.setState({
-                    datasetList: datasetList,
+                    datasetList: datasetList.sort(function (a, b) {
+                        a = a.name.toLowerCase();
+                        b = b.name.toLowerCase();
+                        return a < b ? -1 : a > b ? 1 : 0;
+                    }),
                     loading: false
                 }, () => {
                     if (datasetId != "") {
@@ -519,6 +531,7 @@ class CompareVersion extends Component {
                                                         id="forecastPeriod"
                                                         bsSize="sm"
                                                         readonly={true}
+                                                        className="greyColor"
                                                         value={moment(this.state.datasetData.currentVersion.forecastStartDate).format(DATE_FORMAT_CAP_WITHOUT_DATE) + " - " + moment(this.state.datasetData.currentVersion.forecastStopDate).format(DATE_FORMAT_CAP_WITHOUT_DATE)}
 
                                                     >
@@ -538,7 +551,7 @@ class CompareVersion extends Component {
                                                         bsSize="sm"
                                                         readonly={true}
                                                         value={this.state.datasetData.currentVersion.notes}
-
+                                                        className="greyColor"
                                                     >
                                                     </Input>
 
@@ -578,7 +591,7 @@ class CompareVersion extends Component {
                                                         bsSize="sm"
                                                         readonly={true}
                                                         value={moment(this.state.datasetData1.currentVersion.forecastStartDate).format(DATE_FORMAT_CAP_WITHOUT_DATE) + " - " + moment(this.state.datasetData1.currentVersion.forecastStopDate).format(DATE_FORMAT_CAP_WITHOUT_DATE)}
-
+                                                        className="greyColor"
                                                     >
                                                     </Input>
 
@@ -596,7 +609,7 @@ class CompareVersion extends Component {
                                                         bsSize="sm"
                                                         readonly={true}
                                                         value={this.state.datasetData1.currentVersion.notes}
-
+                                                        className="greyColor"
                                                     >
                                                     </Input>
 

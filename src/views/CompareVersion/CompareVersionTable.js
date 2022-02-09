@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import i18n from '../../i18n'
-import { JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, LATEST_VERSION_COLOUR, LOCAL_VERSION_COLOUR, OPEN_PROBLEM_STATUS_ID } from '../../Constants';
+import { DATE_FORMAT_CAP_WITHOUT_DATE, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, LATEST_VERSION_COLOUR, LOCAL_VERSION_COLOUR, OPEN_PROBLEM_STATUS_ID } from '../../Constants';
 import jexcel from 'jexcel-pro';
 import "../../../node_modules/jexcel-pro/dist/jexcel.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
@@ -15,6 +15,7 @@ import {
 import { jExcelLoadedFunctionWithoutPagination, jExcelLoadedFunctionOnlyHideRow, inValid, inValidWithColor, jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js'
 import jsPDF from "jspdf";
 import { LOGO } from '../../CommonComponent/Logo';
+import moment from "moment";
 
 export default class CompareVersion extends Component {
     constructor(props) {
@@ -123,21 +124,23 @@ export default class CompareVersion extends Component {
 
 
         var y = 110;
-        var planningText = doc.splitTextToSize(i18n.t('static.report.version') + ' : ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width * 3 / 4);
-        // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
-        for (var i = 0; i < planningText.length; i++) {
-            if (y > doc.internal.pageSize.height - 100) {
-                doc.addPage();
-                y = 80;
-
-            }
-            doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
-            y = y + 10;
-            console.log(y)
-        }
-
+        doc.text(i18n.t('static.report.version') + ' : ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width / 20, y, {
+            align: 'left'
+        })
+        doc.text(i18n.t('static.common.forecastPeriod') + ' : ' + moment(this.props.datasetData.currentVersion.forecastStartDate).format(DATE_FORMAT_CAP_WITHOUT_DATE) + " - " + moment(this.props.datasetData.currentVersion.forecastStopDate).format(DATE_FORMAT_CAP_WITHOUT_DATE), doc.internal.pageSize.width / 5, y, {
+            align: 'left'
+        })
+        doc.text(i18n.t('static.common.note') + ' : ' + this.props.datasetData.currentVersion.notes, doc.internal.pageSize.width / 2.8, y, {
+            align: 'left'
+        })
         y = y + 10;
         doc.text(i18n.t('static.compareVersion.compareWithVersion') + ' : ' + document.getElementById("versionId1").selectedOptions[0].text, doc.internal.pageSize.width / 20, y, {
+            align: 'left'
+        })
+        doc.text(i18n.t('static.common.forecastPeriod') + ' : ' + moment(this.props.datasetData1.currentVersion.forecastStartDate).format(DATE_FORMAT_CAP_WITHOUT_DATE) + " - " + moment(this.props.datasetData1.currentVersion.forecastStopDate).format(DATE_FORMAT_CAP_WITHOUT_DATE), doc.internal.pageSize.width / 5, y, {
+            align: 'left'
+        })
+        doc.text(i18n.t('static.common.note') + ' : ' + this.props.datasetData1.currentVersion.notes, doc.internal.pageSize.width / 2.8, y, {
             align: 'left'
         })
         y = y + 10;
@@ -221,7 +224,15 @@ export default class CompareVersion extends Component {
         csvRow.push('')
         csvRow.push('"' + (i18n.t('static.report.version') + ' : ' + document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
         csvRow.push('')
+        csvRow.push('"' + (i18n.t('static.common.forecastPeriod') + ' : ' + moment(this.props.datasetData.currentVersion.forecastStartDate).format(DATE_FORMAT_CAP_WITHOUT_DATE) + " - " + moment(this.props.datasetData.currentVersion.forecastStopDate).format(DATE_FORMAT_CAP_WITHOUT_DATE)).replaceAll(" ",'%20') + '"')
+        csvRow.push('')
+        csvRow.push('"' + (i18n.t('static.common.note') + ' : ' + this.props.datasetData.currentVersion.notes).replaceAll(' ', '%20').replaceAll('#', '%23') + '"')
+        csvRow.push('')
         csvRow.push('"' + (i18n.t('static.compareVersion.compareWithVersion') + ' : ' + document.getElementById("versionId1").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+        csvRow.push('')
+        csvRow.push('"' + (i18n.t('static.common.forecastPeriod') + ' : ' + moment(this.props.datasetData1.currentVersion.forecastStartDate).format(DATE_FORMAT_CAP_WITHOUT_DATE) + " - " + moment(this.props.datasetData1.currentVersion.forecastStopDate).format(DATE_FORMAT_CAP_WITHOUT_DATE)).replaceAll(" ",'%20') + '"')
+        csvRow.push('')
+        csvRow.push('"' + (i18n.t('static.common.note') + ' : ' + this.props.datasetData1.currentVersion.notes).replaceAll(' ', '%20').replaceAll('#', '%23') + '"')
         csvRow.push('')
 
 
@@ -247,7 +258,7 @@ export default class CompareVersion extends Component {
             B = [];
             this.state.columns.map((item, idx) => {
                 if (item.type != 'hidden') {
-                    B.push(ele[idx].toString().replaceAll(',', ' ').replaceAll(' ', '%20'));
+                    B.push(ele[idx].toString().replaceAll(',', ' ').replaceAll(' ', '%20').replaceAll('#', '%23'));
                 }
             })
             A.push(this.addDoubleQuoteToRowContent(B));
@@ -277,7 +288,11 @@ export default class CompareVersion extends Component {
         var datasetData1 = this.props.datasetData1;//server latest version
         var datasetData2 = this.props.datasetData2;// local downloaded data
 
-        var planningUnitList = (datasetData.planningUnitList).concat(datasetData1.planningUnitList).concat(datasetData2.planningUnitList);
+        var planningUnitList = (datasetData.planningUnitList).concat(datasetData1.planningUnitList).concat(datasetData2.planningUnitList).sort(function (a, b) {
+            a = getLabelText(a.planningUnit.label, this.state.lang).toLowerCase();
+            b = getLabelText(b.planningUnit.label, this.state.lang).toLowerCase();
+            return a < b ? -1 : a > b ? 1 : 0;
+        }.bind(this));
 
         var planningUnitSet = [...new Set(planningUnitList.map(ele => (ele.planningUnit.id)))]
         let dataArray = [];
@@ -288,7 +303,11 @@ export default class CompareVersion extends Component {
         var regionList1 = datasetData1.regionList;
         var regionList2 = datasetData2.regionList;
 
-        var combineRegionList = (regionList).concat(regionList1).concat(regionList2);
+        var combineRegionList = (regionList).concat(regionList1).concat(regionList2).sort(function (a, b) {
+            a = getLabelText(a.label, this.state.lang).toLowerCase();
+            b = getLabelText(b.label, this.state.lang).toLowerCase();
+            return a < b ? -1 : a > b ? 1 : 0;
+        }.bind(this));
 
         var regionSet = [...new Set(combineRegionList.map(ele => (ele.regionId)))]
         this.setState({
@@ -366,7 +385,7 @@ export default class CompareVersion extends Component {
             scenarioList = scenarioList.concat(datasetData.treeList[t].scenarioList);
             var sl = datasetData.treeList[t].scenarioList;
             for (var s = 0; s < sl.length; s++) {
-                treeScenarioList.push({ treeLabel: getLabelText(datasetData.treeList[t].label), scenarioId: sl[s].id,treeId:datasetData.treeList[t].treeId, scenarioLabel: getLabelText(sl[s].label) })
+                treeScenarioList.push({ treeLabel: getLabelText(datasetData.treeList[t].label), scenarioId: sl[s].id, treeId: datasetData.treeList[t].treeId, scenarioLabel: getLabelText(sl[s].label) })
             }
 
         }
@@ -377,7 +396,7 @@ export default class CompareVersion extends Component {
             scenarioList1 = scenarioList1.concat(datasetData1.treeList[t].scenarioList);
             var sl = datasetData1.treeList[t].scenarioList;
             for (var s = 0; s < sl.length; s++) {
-                treeScenarioList1.push({ treeLabel: getLabelText(datasetData1.treeList[t].label), scenarioId: sl[s].id,treeId:datasetData1.treeList[t].treeId, scenarioLabel: getLabelText(sl[s].label) })
+                treeScenarioList1.push({ treeLabel: getLabelText(datasetData1.treeList[t].label), scenarioId: sl[s].id, treeId: datasetData1.treeList[t].treeId, scenarioLabel: getLabelText(sl[s].label) })
             }
         }
 
@@ -387,7 +406,7 @@ export default class CompareVersion extends Component {
             scenarioList2 = scenarioList2.concat(datasetData2.treeList[t].scenarioList);
             var sl = datasetData2.treeList[t].scenarioList;
             for (var s = 0; s < sl.length; s++) {
-                treeScenarioList2.push({ treeLabel: getLabelText(datasetData2.treeList[t].label), scenarioId: sl[s].id,treeId:datasetData2.treeList[t].treeId, scenarioLabel: getLabelText(sl[s].label) })
+                treeScenarioList2.push({ treeLabel: getLabelText(datasetData2.treeList[t].label), scenarioId: sl[s].id, treeId: datasetData2.treeList[t].treeId, scenarioLabel: getLabelText(sl[s].label) })
             }
         }
 
@@ -420,36 +439,36 @@ export default class CompareVersion extends Component {
                 // for (var r = 0; r < regionList.length; r++) {
                 var regionalSelectedForecastData = selectedForecastData[regionSet[k]];
                 console.log("regionalSelectedForecastData", regionalSelectedForecastData);
-                var ce = regionalSelectedForecastData != undefined && regionalSelectedForecastData.consumptionExtrapolationId != null ?consumptionExtrapolation.filter(c => c.consumptionExtrapolationId == regionalSelectedForecastData.consumptionExtrapolationId):[];
-                var selectedTreeScenario=[];
-                if(regionalSelectedForecastData != undefined && regionalSelectedForecastData.scenarioId != "" && regionalSelectedForecastData.scenarioId != null){
-                    selectedTreeScenario=treeScenarioList.filter(c => c.scenarioId == regionalSelectedForecastData.scenarioId && c.treeId==regionalSelectedForecastData.treeId);
+                var ce = regionalSelectedForecastData != undefined && regionalSelectedForecastData.consumptionExtrapolationId != null ? consumptionExtrapolation.filter(c => c.consumptionExtrapolationId == regionalSelectedForecastData.consumptionExtrapolationId) : [];
+                var selectedTreeScenario = [];
+                if (regionalSelectedForecastData != undefined && regionalSelectedForecastData.scenarioId != "" && regionalSelectedForecastData.scenarioId != null) {
+                    selectedTreeScenario = treeScenarioList.filter(c => c.scenarioId == regionalSelectedForecastData.scenarioId && c.treeId == regionalSelectedForecastData.treeId);
                 }
-                data[2] = regionalSelectedForecastData != undefined ? regionalSelectedForecastData.scenarioId != "" && regionalSelectedForecastData.scenarioId != null ? selectedTreeScenario.length>0?selectedTreeScenario[0].treeLabel + " ~ " + selectedTreeScenario[0].scenarioLabel:"" : regionalSelectedForecastData.consumptionExtrapolationId != "" && regionalSelectedForecastData.consumptionExtrapolationId != null && ce.length > 0 ? getLabelText(ce[0].extrapolationMethod.label, this.state.lang) : "" : ""
+                data[2] = regionalSelectedForecastData != undefined ? regionalSelectedForecastData.scenarioId != "" && regionalSelectedForecastData.scenarioId != null ? selectedTreeScenario.length > 0 ? selectedTreeScenario[0].treeLabel + " ~ " + selectedTreeScenario[0].scenarioLabel : "" : regionalSelectedForecastData.consumptionExtrapolationId != "" && regionalSelectedForecastData.consumptionExtrapolationId != null && ce.length > 0 ? getLabelText(ce[0].extrapolationMethod.label, this.state.lang) : "" : ""
                 data[3] = regionalSelectedForecastData != undefined ? regionalSelectedForecastData.totalForecast > 0 ? regionalSelectedForecastData.totalForecast.toFixed(2) : "" : "";
                 data[4] = regionalSelectedForecastData != undefined ? regionalSelectedForecastData.notes : "";
                 // count += 3;
                 // }
                 // for (var r = 0; r < regionList1.length; r++) {
                 var regionalSelectedForecastData1 = selectedForecastData1[regionSet[k]];
-                var ce1 = regionalSelectedForecastData1 != undefined && regionalSelectedForecastData1.consumptionExtrapolationId != null ?consumptionExtrapolation1.filter(c => c.consumptionExtrapolationId == regionalSelectedForecastData1.consumptionExtrapolationId):[];
-                var selectedTreeScenario1=[];
-                if(regionalSelectedForecastData1 != undefined && regionalSelectedForecastData1.scenarioId != "" && regionalSelectedForecastData1.scenarioId != null){
-                    selectedTreeScenario1=treeScenarioList1.filter(c => c.scenarioId == regionalSelectedForecastData1.scenarioId && c.treeId==regionalSelectedForecastData1.treeId);
+                var ce1 = regionalSelectedForecastData1 != undefined && regionalSelectedForecastData1.consumptionExtrapolationId != null ? consumptionExtrapolation1.filter(c => c.consumptionExtrapolationId == regionalSelectedForecastData1.consumptionExtrapolationId) : [];
+                var selectedTreeScenario1 = [];
+                if (regionalSelectedForecastData1 != undefined && regionalSelectedForecastData1.scenarioId != "" && regionalSelectedForecastData1.scenarioId != null) {
+                    selectedTreeScenario1 = treeScenarioList1.filter(c => c.scenarioId == regionalSelectedForecastData1.scenarioId && c.treeId == regionalSelectedForecastData1.treeId);
                 }
-                data[5] = regionalSelectedForecastData1 != undefined ? regionalSelectedForecastData1.scenarioId != "" && regionalSelectedForecastData1.scenarioId != null ? selectedTreeScenario1.length>0?selectedTreeScenario1[0].treeLabel + " ~ " + selectedTreeScenario1[0].scenarioLabel:"" : regionalSelectedForecastData1.consumptionExtrapolationId != "" && regionalSelectedForecastData1.consumptionExtrapolationId != null && ce1.length > 0 ? getLabelText(ce1[0].extrapolationMethod.label, this.state.lang) : "" : ""
+                data[5] = regionalSelectedForecastData1 != undefined ? regionalSelectedForecastData1.scenarioId != "" && regionalSelectedForecastData1.scenarioId != null ? selectedTreeScenario1.length > 0 ? selectedTreeScenario1[0].treeLabel + " ~ " + selectedTreeScenario1[0].scenarioLabel : "" : regionalSelectedForecastData1.consumptionExtrapolationId != "" && regionalSelectedForecastData1.consumptionExtrapolationId != null && ce1.length > 0 ? getLabelText(ce1[0].extrapolationMethod.label, this.state.lang) : "" : ""
                 data[6] = regionalSelectedForecastData1 != undefined ? regionalSelectedForecastData1.totalForecast > 0 ? regionalSelectedForecastData1.totalForecast.toFixed(2) : "" : "";
                 data[7] = regionalSelectedForecastData1 != undefined ? regionalSelectedForecastData1.notes : "";
                 //     count += 3;
                 // }
                 // for (var r = 0; r < regionList2.length; r++) {
                 var regionalSelectedForecastData2 = selectedForecastData2[regionSet[k]];
-                var ce2 = regionalSelectedForecastData2 != undefined && regionalSelectedForecastData2.consumptionExtrapolationId != null?consumptionExtrapolation2.filter(c => c.consumptionExtrapolationId == regionalSelectedForecastData2.consumptionExtrapolationId):[];
-                var selectedTreeScenario2=[];
-                if(regionalSelectedForecastData2 != undefined && regionalSelectedForecastData2.scenarioId != "" && regionalSelectedForecastData2.scenarioId != null){
-                    selectedTreeScenario2=treeScenarioList2.filter(c => c.scenarioId == regionalSelectedForecastData2.scenarioId && c.treeId==regionalSelectedForecastData2.treeId);
+                var ce2 = regionalSelectedForecastData2 != undefined && regionalSelectedForecastData2.consumptionExtrapolationId != null ? consumptionExtrapolation2.filter(c => c.consumptionExtrapolationId == regionalSelectedForecastData2.consumptionExtrapolationId) : [];
+                var selectedTreeScenario2 = [];
+                if (regionalSelectedForecastData2 != undefined && regionalSelectedForecastData2.scenarioId != "" && regionalSelectedForecastData2.scenarioId != null) {
+                    selectedTreeScenario2 = treeScenarioList2.filter(c => c.scenarioId == regionalSelectedForecastData2.scenarioId && c.treeId == regionalSelectedForecastData2.treeId);
                 }
-                data[8] = regionalSelectedForecastData2 != undefined ? regionalSelectedForecastData2.scenarioId != "" && regionalSelectedForecastData2.scenarioId != null ? selectedTreeScenario2.length>0?selectedTreeScenario2[0].treeLabel + " ~ " + selectedTreeScenario2[0].scenarioLabel:"" : regionalSelectedForecastData2.consumptionExtrapolationId != "" && regionalSelectedForecastData2.consumptionExtrapolationId != null && ce2.length > 0 ? getLabelText(ce2[0].extrapolationMethod.label, this.state.lang) : "" : ""
+                data[8] = regionalSelectedForecastData2 != undefined ? regionalSelectedForecastData2.scenarioId != "" && regionalSelectedForecastData2.scenarioId != null ? selectedTreeScenario2.length > 0 ? selectedTreeScenario2[0].treeLabel + " ~ " + selectedTreeScenario2[0].scenarioLabel : "" : regionalSelectedForecastData2.consumptionExtrapolationId != "" && regionalSelectedForecastData2.consumptionExtrapolationId != null && ce2.length > 0 ? getLabelText(ce2[0].extrapolationMethod.label, this.state.lang) : "" : ""
                 data[9] = regionalSelectedForecastData2 != undefined ? regionalSelectedForecastData2.totalForecast : "";
                 data[10] = regionalSelectedForecastData2 != undefined ? regionalSelectedForecastData2.notes : "";
 
