@@ -14,12 +14,22 @@ import { JEXCEL_INTEGER_REGEX, INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY, 
 import { MultiSelect } from 'react-multi-select-component';
 import CryptoJS from 'crypto-js';
 import moment from 'moment';
+import Picker from 'react-month-picker'
+import MonthBox from '../../CommonComponent/MonthBox.js'
+
+const ref = React.createRef();
+const pickerLang = {
+    months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
+    from: 'From', to: 'To',
+}
 
 const entityname = i18n.t('static.versionSettings.versionSettings');
 class VersionSettingsComponent extends Component {
 
     constructor(props) {
         super(props);
+        var dt = new Date();
+        dt.setMonth(dt.getMonth() - 10);
         this.state = {
             noOfDays: [{ id: "0", name: i18n.t('static.versionSettings.calendardays') }, { id: 15, name: '15' },
             { id: 16, name: '16' },
@@ -48,7 +58,10 @@ class VersionSettingsComponent extends Component {
             lang: localStorage.getItem('lang'),
             loading: true,
             versionTypeList: [],
-            versionSettingsList: []
+            versionSettingsList: [],
+            rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
+            minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
+            maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
         }
         this.hideFirstComponent = this.hideFirstComponent.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
@@ -59,7 +72,30 @@ class VersionSettingsComponent extends Component {
         this.cancelClicked = this.cancelClicked.bind(this);
         this.formSubmit = this.formSubmit.bind(this);
         this.checkValidation = this.checkValidation.bind(this);
+        this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
+        this.handleRangeChange = this.handleRangeChange.bind(this);
+        this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
     }
+
+    makeText = m => {
+        if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
+        return '?'
+    }
+
+    handleRangeChange(value, text, listIndex) {
+
+    }
+    handleRangeDissmis(value) {
+        this.setState({ rangeValue: value }, () => {
+            this.buildJExcel()
+        })
+
+    }
+
+    _handleClickRangeBox(e) {
+        this.refs.pickRange.show()
+    }
+
     cancelClicked() {
         let id = AuthenticationService.displayDashboardBasedOnRole();
         this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.message.cancelled', { entityname }))
@@ -321,7 +357,7 @@ class VersionSettingsComponent extends Component {
             let startDate = this.el.getValueFromCoords(7, y);
             let month = this.el.getValueFromCoords(8, y);
             console.log("startDate--------->", startDate);
-            if (startDate != null && month != null) {
+            if (startDate != null && month != null && month!="" && startDate!="") {
                 let newStartDate = new Date(startDate);
                 newStartDate.setMonth(newStartDate.getMonth() + (month - 1));
                 // console.log("startDate--------->1", new Date(newStartDate));
@@ -333,12 +369,12 @@ class VersionSettingsComponent extends Component {
         }
 
 
-        if ((x == 9 || x ==7) && this.el.getValueFromCoords(17, y) == 0) {//endDate
+        if ((x == 9 || x == 7) && this.el.getValueFromCoords(17, y) == 0) {//endDate
             console.log("startDate--------->1111111");
             let startDate = this.el.getValueFromCoords(7, y);
             let endDate = this.el.getValueFromCoords(9, y);
 
-            if (startDate != null & endDate != null) {
+            if (startDate != null & endDate != null && startDate!="" && endDate!="" && startDate!="") {
                 let d1 = new Date(startDate);
                 let d2 = new Date(endDate)
                 var months;
@@ -598,7 +634,7 @@ class VersionSettingsComponent extends Component {
                 myResult = getRequest.result;
                 var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
                 var userId = userBytes.toString(CryptoJS.enc.Utf8);
-                var list=[];
+                var list = [];
                 for (var i = 0; i < myResult.length; i++) {
                     if (myResult[i].userId == userId) {
                         // var obj = myResult[i];
@@ -606,7 +642,7 @@ class VersionSettingsComponent extends Component {
                         // var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
                         // obj.programData = programData;
                         proList.push(myResult[i])
-                        list.push({label: myResult[i].programCode, value: myResult[i].programId})
+                        list.push({ label: myResult[i].programCode, value: myResult[i].programId })
                     }
                 }
                 console.log("proList---", proList);
@@ -635,7 +671,7 @@ class VersionSettingsComponent extends Component {
                         uniquePrograms: proList.filter((v, i, a) => a.findIndex(t => (t.programId === v.programId)) === i),
                         loading: false
 
-                    },()=>{
+                    }, () => {
                         this.handleChangeProgram(list);
                     });
                 }
@@ -663,10 +699,10 @@ class VersionSettingsComponent extends Component {
         elInstance.setValueFromCoords(12, y, 1, true);
     }
 
-    filterStopDate = function(o, cell, x, y, value, config) {
+    filterStopDate = function (o, cell, x, y, value, config) {
         var previousColumnValue = o.getValueFromCoords(x - 2, y);
         // console.log("@@@",o.options.columns[9])
-        config.options.validRange = [ previousColumnValue, null ];
+        config.options.validRange = [previousColumnValue, null];
         return config;
     }
 
@@ -735,7 +771,10 @@ class VersionSettingsComponent extends Component {
         for (var j = 0; j < versionSettingsList.length; j++) {
             var databytes = CryptoJS.AES.decrypt(versionSettingsList[j].programData, SECRET_KEY);
             var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
-            var versionList = programData.versionList;
+            var rangeValue = this.state.rangeValue;
+            let startDate = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
+            let stopDate = rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
+            var versionList = programData.versionList.filter(c => moment(c.createdDate).format("YYYY-MM") >= moment(startDate).format("YYYY-MM") && moment(c.createdDate).format("YYYY-MM") <= moment(stopDate).format("YYYY-MM"));
             for (var k = 0; k < versionList.length; k++) {
 
                 data = [];
@@ -1049,6 +1088,18 @@ class VersionSettingsComponent extends Component {
                 )
             }, this);
 
+        const pickerLang = {
+            months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
+            from: 'From', to: 'To',
+        }
+        const { rangeValue } = this.state
+        const checkOnline = localStorage.getItem('sessionType');
+
+        const makeText = m => {
+            if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
+            return '?'
+        }
+
 
 
         return (
@@ -1092,6 +1143,22 @@ class VersionSettingsComponent extends Component {
 
                                             </Input>
                                         </InputGroup>
+                                    </div>
+                                </FormGroup>
+                                <FormGroup className="mt-md-2 mb-md-0 col-md-4">
+                                    <Label htmlFor="appendedInputButton">{i18n.t('static.versionSettings.committedDate')}<span className="stock-box-icon fa fa-sort-desc ml-1"></span></Label>
+                                    <div className="controls edit">
+                                        <Picker
+                                            ref="pickRange"
+                                            years={{ min: this.state.minDate, max: this.state.maxDate }}
+                                            value={rangeValue}
+                                            lang={pickerLang}
+                                            //theme="light"
+                                            onChange={this.handleRangeChange}
+                                            onDismiss={this.handleRangeDissmis}
+                                        >
+                                            <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
+                                        </Picker>
                                     </div>
                                 </FormGroup>
                             </div>
