@@ -177,8 +177,11 @@ export default class PlanningUnitSetting extends Component {
                 }
 
                 var col = ("E").concat(parseInt(y) + 1);
-                // var value = this.el.getValue(`E${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-                var value = this.el.getValueFromCoords(4, y);
+                var value = this.el.getValue(`E${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+                if (value == '' || value == null) {
+                    value = this.el.getValueFromCoords(4, y);
+                }
+                // var value = this.el.getValueFromCoords(4, y);
                 var reg = JEXCEL_INTEGER_REGEX;
                 console.log("value------------->E", value);
                 if (value == "") {
@@ -209,8 +212,11 @@ export default class PlanningUnitSetting extends Component {
                 }
 
                 var col = ("F").concat(parseInt(y) + 1);
-                // var value = this.el.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-                var value = this.el.getValueFromCoords(5, y);
+                var value = this.el.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+                if (value == '' || value == null) {
+                    value = this.el.getValueFromCoords(5, y);
+                }
+                // var value = this.el.getValueFromCoords(5, y);
                 var reg = JEXCEL_INTEGER_REGEX;
                 if (value == "") {
                     // this.el.setStyle(col, "background-color", "transparent");
@@ -250,8 +256,11 @@ export default class PlanningUnitSetting extends Component {
                 }
 
                 var col = ("G").concat(parseInt(y) + 1);
-                // var value = this.el.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-                var value = this.el.getValueFromCoords(6, y);
+                var value = this.el.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+                if (value == '' || value == null) {
+                    value = this.el.getValueFromCoords(6, y);
+                }
+                // var value = this.el.getValueFromCoords(6, y);
                 var reg = JEXCEL_INTEGER_REGEX;
                 if (value == "") {
                     // this.el.setStyle(col, "background-color", "transparent");
@@ -410,9 +419,13 @@ export default class PlanningUnitSetting extends Component {
         //stock
         if (x == 4) {
             var col = ("E").concat(parseInt(y) + 1);
-            // value = this.el.getValue(`E${parseInt(y) + 1}`, true).toString().replaceAll(",", "");            
+            value = this.el.getValue(`E${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+            console.log("Stock------------------->1", value);
+            if (value == '' || value == null) {
+                value = this.el.getValueFromCoords(4, y);
+            }
             // var reg = /^[0-9\b]+$/;
-            console.log("Stock------------------->", value);
+            console.log("Stock------------------->2", value);
 
             var reg = JEXCEL_INTEGER_REGEX;
             if (value != "") {
@@ -435,6 +448,7 @@ export default class PlanningUnitSetting extends Component {
             } else {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setComments(col, "");
+                // this.el.setValueFromCoords(4, y, '', true);
 
                 // this.el.setStyle(col, "background-color", "transparent");
                 // this.el.setStyle(col, "background-color", "yellow");
@@ -465,7 +479,10 @@ export default class PlanningUnitSetting extends Component {
         //existing shipments
         if (x == 5) {
             var col = ("F").concat(parseInt(y) + 1);
-            // value = this.el.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+            value = this.el.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+            if (value == '' || value == null) {
+                value = this.el.getValueFromCoords(5, y);
+            }
             // var reg = /^[0-9\b]+$/;
             var reg = JEXCEL_INTEGER_REGEX;
             if (value != "") {
@@ -505,7 +522,10 @@ export default class PlanningUnitSetting extends Component {
         //desired months of stock
         if (x == 6) {
             var col = ("G").concat(parseInt(y) + 1);
-            // value = this.el.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+            value = this.el.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+            if (value == '' || value == null) {
+                value = this.el.getValueFromCoords(6, y);
+            }
             // var reg = /^[0-9\b]+$/;
             var reg = JEXCEL_INTEGER_REGEX;
             if (value != "") {
@@ -1146,7 +1166,7 @@ export default class PlanningUnitSetting extends Component {
                     if (listArray.length > 0) {
                         for (var i = 0; i < listArray.length; i++) {
                             var paJson = {
-                                name: getLabelText(listArray[i].label, this.state.lang) + ' - ' + parseInt(listArray[i].planningUnitId),
+                                name: getLabelText(listArray[i].label, this.state.lang) + ' | ' + parseInt(listArray[i].planningUnitId),
                                 id: parseInt(listArray[i].planningUnitId),
                                 active: listArray[i].active,
                                 forecastingUnit: listArray[i].forecastingUnit,
@@ -1275,9 +1295,15 @@ export default class PlanningUnitSetting extends Component {
 
             let selectedForecastProgram = this.state.datasetList.filter(c => c.programId == this.state.forecastProgramId && c.versionId == this.state.forecastProgramVersionId)[0];
             console.log("selectedForecastProgram---------->", selectedForecastProgram);
+            let planningUnitList = selectedForecastProgram.planningUnitList;
+            planningUnitList.sort((a, b) => {
+                var itemLabelA = getLabelText(a.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                var itemLabelB = getLabelText(b.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                return itemLabelA > itemLabelB ? 1 : -1;
+            });
             this.setState(
                 {
-                    selsource: selectedForecastProgram.planningUnitList,
+                    selsource: planningUnitList,
                     loading: true,
                     selectedForecastProgram: selectedForecastProgram,
                 }, () => {
@@ -1761,11 +1787,14 @@ export default class PlanningUnitSetting extends Component {
                         "consuptionForecast": map1.get("2"),
                         "treeForecast": map1.get("3"),
                         // "stock": (map1.get("4")).replaceAll(",", "").replace(/[^\d]/g, ''),
-                        "stock": parseInt((map1.get("4")).toString().replaceAll(",", "")),
+                        // "stock": parseInt((map1.get("4")).toString().replaceAll(",", "")),
+                        "stock": this.el.getValue(`E${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
                         // "existingShipments": (map1.get("5")).replaceAll(",", "").replace(/[^\d]/g, ''),
                         // "monthsOfStock": (map1.get("6")).replaceAll(",", "").replace(/[^\d]/g, ''),
-                        "existingShipments": parseInt((map1.get("5")).toString().replaceAll(",", "")),
-                        "monthsOfStock": parseInt((map1.get("6")).toString().replaceAll(",", "")),
+                        // "existingShipments": parseInt((map1.get("5")).toString().replaceAll(",", "")),
+                        "existingShipments": this.el.getValue(`F${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                        // "monthsOfStock": parseInt((map1.get("6")).toString().replaceAll(",", "")),
+                        "monthsOfStock": this.el.getValue(`G${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
                         "procurementAgent": (procurementAgentObj == null ? null : {
                             "id": parseInt(map1.get("7")),
                             "label": procurementAgentObj.label,
@@ -1807,9 +1836,12 @@ export default class PlanningUnitSetting extends Component {
                         // "stock": (map1.get("4")).replaceAll(",", "").replace(/[^\d]/g, ''),
                         // "existingShipments": (map1.get("5")).replaceAll(",", "").replace(/[^\d]/g, ''),
                         // "monthsOfStock": (map1.get("6")).replaceAll(",", "").replace(/[^\d]/g, ''),
-                        "stock": parseInt((map1.get("4")).toString().replaceAll(",", "")),
-                        "existingShipments": parseInt((map1.get("5")).toString().replaceAll(",", "")),
-                        "monthsOfStock": parseInt((map1.get("6")).toString().replaceAll(",", "")),
+                        // "stock": parseInt((map1.get("4")).toString().replaceAll(",", "")),
+                        "stock": this.el.getValue(`E${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                        // "existingShipments": parseInt((map1.get("5")).toString().replaceAll(",", "")),
+                        // "monthsOfStock": parseInt((map1.get("6")).toString().replaceAll(",", "")),
+                        "existingShipments": this.el.getValue(`F${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
+                        "monthsOfStock": this.el.getValue(`G${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
                         "procurementAgent": (procurementAgentObj == null ? null : {
                             "id": parseInt(map1.get("7")),
                             "label": procurementAgentObj.label,

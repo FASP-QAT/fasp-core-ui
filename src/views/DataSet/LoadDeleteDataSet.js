@@ -1160,11 +1160,23 @@ class LoadDeleteDataSet extends Component {
                     // var version = (checkboxesChecked[i]).versionId;
                     if (isSiteOnline()) {
                         // AuthenticationService.setupAxiosInterceptors();
-                        console.log("checkBoxValues>>>", checkboxesChecked)
+                        console.log("checkBoxValues>>>", JSON.stringify(checkboxesChecked))
                         var checkboxesCheckedProgram = checkboxesChecked.filter(c => c.versionId == -1);
                         var checkboxesCheckedVersion = checkboxesChecked.filter(c => c.versionId != -1);
-                        var versionsThatNeedsToBeDeleted = []
-                        if (checkboxesCheckedProgram.length > 0) {
+                        var versionsThatNeedsToBeDeleted = [];
+
+                        var isExists1 = 0;
+                        for (var ccv = 0; ccv < checkboxesChecked.length; ccv++) {
+                            var datasetListForProgramExists = datasetList.filter(c => c.programId == checkboxesChecked[ccv].programId);
+                            if (datasetListForProgramExists.length > 0) {
+                                isExists1 = 1;
+                                break;
+                            }
+                        }
+                        // console.log("isExist------>1", checkboxesCheckedVersion);
+                        // console.log("isExist------>2", datasetList);
+                        // console.log("isExist------>3", isExists1);
+                        if (checkboxesCheckedProgram.length > 0 && isExists1 == 1) {
                             var cf = window.confirm("All the older modified/non modified versions including latest version will get deleted and new latest version will get loaded do you want to continue?")
                             if (cf == true) {
                                 for (var cbcp = 0; cbcp < checkboxesCheckedProgram.length; cbcp++) {

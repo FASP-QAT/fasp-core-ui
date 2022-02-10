@@ -469,7 +469,8 @@ class UsagePeriod extends Component {
                         label: {
                             label_en: map1.get("1"),
                         },
-                        convertToMonth: map1.get("2").toString().replace(/,/g, ""),
+                        // convertToMonth: map1.get("2").toString().replace(/,/g, ""),
+                        convertToMonth: this.el.getValue(`C${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
                         active: map1.get("3"),
 
                         // capacityCbm: map1.get("2").replace(",", ""),
@@ -686,7 +687,8 @@ class UsagePeriod extends Component {
 
                 //conversion factor decimal 9,4
                 var col = ("C").concat(parseInt(y) + 1);
-                var value = this.el.getValueFromCoords(2, y);
+                // var value = this.el.getValueFromCoords(2, y);
+                var value = this.el.getValue(`C${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
                 var reg = /^\d{1,5}(\.\d{1,8})?$/;
                 if (value == "") {
                     this.el.setStyle(col, "background-color", "transparent");
