@@ -4,6 +4,7 @@ import { OrgDiagram } from 'basicprimitivesreact';
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 import cleanUp from '../../assets/img/calculator.png';
+import AggregationNode from '../../assets/img/Aggregation-icon.png';
 import { LOGO } from '../../CommonComponent/Logo.js';
 import { LCA, Tree, Colors, PageFitMode, Enabled, OrientationType, LevelAnnotationConfig, AnnotationType, LineType, Thickness, TreeLevels } from 'basicprimitives';
 import { DropTarget, DragSource } from 'react-dnd';
@@ -7181,7 +7182,7 @@ export default class BuildTree extends Component {
                             "ContactTitle TitleColor"}>
                             <div title={itemConfig.payload.label.label_en} style={{ fontSize: '13px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', width: '157px', float: 'left', fontWeight: 'bold' }}>
                                 {itemConfig.payload.label.label_en}</div>
-                            {this.getPayloadData(itemConfig, 4) == true && <i class="fa fa-arrow-up" style={{ fontSize: '11px', color: (itemConfig.payload.nodeType.id == 4 || itemConfig.payload.nodeType.id == 5 ? '#fff' : '#002f6c') }}></i>}
+                            {this.getPayloadData(itemConfig, 4) == true && <i class="fa fa-exchange fa-rotate-90" style={{ fontSize: '11px', color: (itemConfig.payload.nodeType.id == 4 || itemConfig.payload.nodeType.id == 5 ? '#fff' : '#002f6c') }}></i>}
                             <b style={{ color: '#212721', float: 'right' }}>
                                 {itemConfig.payload.nodeType.id == 2 ?
                                     <i class="fa fa-hashtag" style={{ fontSize: '11px', color: '#002f6c' }}></i> :
@@ -7192,7 +7193,10 @@ export default class BuildTree extends Component {
                                             (itemConfig.payload.nodeType.id == 5 ?
                                                 <i class="fa fa-cubes" style={{ fontSize: '11px', color: '#fff' }} ></i> :
                                                 (itemConfig.payload.nodeType.id == 1 ?
-                                                    <i class="fa fa-plus" style={{ fontSize: '11px', color: '#002f6c' }} ></i> : ""))))}</b>
+                                                    // <i class="fa fa-plus" style={{ fontSize: '11px', color: '#002f6c' }} ></i> : ""))))}</b>
+                                                     <i><img src={AggregationNode} className="AggregationNodeSize"/></i> : ""))))}</b>
+    
+                                                    
                         </div>
                     </div>
                     <div className="ContactPhone ContactPhoneValue">
