@@ -1282,7 +1282,8 @@ class AccessControlComponent extends Component {
         if (selProgram.length > 0) {
             for (var i = 0; i < selProgram.length; i++) {
                 var paJson = {
-                    name: (selProgram[i].programTypeId == 1 ? i18n.t('static.common.pr') : i18n.t('static.common.fr')) + "" + getLabelText(selProgram[i].label, this.state.lang),
+                    // name: (selProgram[i].programTypeId == 1 ? i18n.t('static.common.pr') : i18n.t('static.common.fr')) + "" + getLabelText(selProgram[i].label, this.state.lang),
+                    name: getLabelText(selProgram[i].label, this.state.lang) +' - '+ (selProgram[i].programTypeId == 1 ? i18n.t('static.common.pr') : i18n.t('static.common.fr')),
                     // name: (getLabelText(selProgram[i].label, this.state.lang)),
                     id: parseInt(selProgram[i].programId),
                     active: selProgram[i].active
@@ -1420,7 +1421,7 @@ class AccessControlComponent extends Component {
 
                 },
                 {
-                    title: i18n.t('static.common.programAndDataset'),
+                    title: i18n.t('static.dashboard.programheader'),
                     type: 'autocomplete',
                     source: programList,
                     // filter: this.filterProgram

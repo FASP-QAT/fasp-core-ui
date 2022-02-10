@@ -442,7 +442,7 @@ class usageTemplate extends Component {
                 if (listArray.length > 0) {
                     for (var i = 0; i < listArray.length; i++) {
                         var paJson = {
-                            name: getLabelText(listArray[i].label, this.state.lang),
+                            name: getLabelText(listArray[i].label, this.state.lang) + ' | ' + parseInt(listArray[i].forecastingUnitId),
                             id: parseInt(listArray[i].forecastingUnitId),
                             active: listArray[i].active,
                             tracerCategoryId: listArray[i].tracerCategory.id,

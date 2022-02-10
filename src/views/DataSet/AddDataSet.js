@@ -164,6 +164,7 @@ export default class AddForecastProgram extends Component {
 
             programManagerList: [],
             message: '',
+            message1: '',
             loading: true,
 
             organisationCode: '',
@@ -209,21 +210,21 @@ export default class AddForecastProgram extends Component {
 
         if (value == '') {
             this.setState({
-                message: 'Forecast period (Months) should not be character/null value'
+                message1: 'Forecast period (Months) should not be character/null value'
             },
                 () => {
                     this.hideSecondComponent();
                 })
         } else if (!Number.isInteger(Number(value))) {//decimal
             this.setState({
-                message: 'Forecast period (Months) should not be decimal value'
+                message1: 'Forecast period (Months) should not be decimal value'
             },
                 () => {
                     this.hideSecondComponent();
                 })
         } else if (Number(value) < 0) {
             this.setState({
-                message: 'Forecast period (Months) should not be negative value'
+                message1: 'Forecast period (Months) should not be negative value'
             },
                 () => {
                     this.hideSecondComponent();
@@ -1233,7 +1234,8 @@ export default class AddForecastProgram extends Component {
                                                         onBlur={(e) => { handleBlur(e); this.calculateForecastProgramInMonth() }}
                                                         value={this.state.forecastProgramInMonth}
                                                         id="forecastProgramInMonth" />
-                                                    <FormFeedback>{errors.forecastProgramInMonth}</FormFeedback>
+                                                    {/* <FormFeedback>{errors.forecastProgramInMonth}</FormFeedback> */}
+                                                    <h5 className="red">{this.state.message1}</h5>
                                                 </FormGroup>
 
                                                 <FormGroup>

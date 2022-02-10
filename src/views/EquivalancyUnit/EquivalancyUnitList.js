@@ -687,55 +687,13 @@ class EquivalancyUnit extends Component {
                 if (y != null) {
                     var elInstance = el.jexcel;
                     var rowData = elInstance.getRowData(y);
-                    // var productCategoryId = rowData[0];
-                    var forecastingUnitId = rowData[13];
+
                     var typeId = rowData[14];
-                    // console.log("updateTable------>", rowData[11]);
-                    if (forecastingUnitId == 0) {
-                        // var cell1 = elInstance.getCell(`C${parseInt(y) + 1}`)
-                        // cell1.classList.remove('readonly');
-
-                        var cell1 = elInstance.getCell(`D${parseInt(y) + 1}`)
-                        cell1.classList.remove('readonly');
-
-                        var cell1 = elInstance.getCell(`E${parseInt(y) + 1}`)
-                        cell1.classList.remove('readonly');
-
-                        var cell1 = elInstance.getCell(`B${parseInt(y) + 1}`)
-                        cell1.classList.remove('readonly');
-
-                        var cell1 = elInstance.getCell(`I${parseInt(y) + 1}`)
-                        cell1.classList.remove('readonly');
-
-                        // var cell2 = elInstance.getCell(`C${parseInt(y) + 1}`)
-                        // cell2.classList.remove('readonly');
-
-
-                    } else {
-                        // var cell1 = elInstance.getCell(`C${parseInt(y) + 1}`)
-                        // cell1.classList.add('readonly');
-
-                        var cell1 = elInstance.getCell(`D${parseInt(y) + 1}`)
-                        cell1.classList.add('readonly');
-
-                        var cell1 = elInstance.getCell(`E${parseInt(y) + 1}`)
-                        cell1.classList.add('readonly');
-
-                        var cell1 = elInstance.getCell(`B${parseInt(y) + 1}`)
-                        cell1.classList.add('readonly');
-
-                        var cell1 = elInstance.getCell(`I${parseInt(y) + 1}`)
-                        cell1.classList.add('readonly');
-
-                        // var cell2 = elInstance.getCell(`C${parseInt(y) + 1}`)
-                        // cell2.classList.add('readonly');
-
-
-                    }
+                    // console.log("updateTable------>", rowData[11]);                    
 
                     let roleArray = this.state.roleArray;
                     let checkReadOnly = 0;
-                    if ((roleArray.includes('ROLE_REALM_ADMIN') && typeId != -1 && typeId != 0) || (roleArray.includes('ROLE_DATASET_ADMIN') && typeId == -1 && typeId != 0)) {
+                    if ((roleArray.includes('ROLE_DATASET_ADMIN') && typeId == -1 && typeId != 0)) {
                         checkReadOnly = checkReadOnly + 1;
 
                         // var cell1 = elInstance.getCell(`C${parseInt(y) + 1}`)
@@ -805,6 +763,128 @@ class EquivalancyUnit extends Component {
 
                 }
             }.bind(this),
+            // updateTable: function (el, cell, x, y, source, value, id) {
+            //     if (y != null) {
+            //         var elInstance = el.jexcel;
+            //         var rowData = elInstance.getRowData(y);
+            //         // var productCategoryId = rowData[0];
+            //         var forecastingUnitId = rowData[13];
+            //         var typeId = rowData[14];
+            //         // console.log("updateTable------>", rowData[11]);
+            //         if (forecastingUnitId == 0) {
+            //             // var cell1 = elInstance.getCell(`C${parseInt(y) + 1}`)
+            //             // cell1.classList.remove('readonly');
+
+            //             var cell1 = elInstance.getCell(`D${parseInt(y) + 1}`)
+            //             cell1.classList.remove('readonly');
+
+            //             var cell1 = elInstance.getCell(`E${parseInt(y) + 1}`)
+            //             cell1.classList.remove('readonly');
+
+            //             var cell1 = elInstance.getCell(`B${parseInt(y) + 1}`)
+            //             cell1.classList.remove('readonly');
+
+            //             var cell1 = elInstance.getCell(`I${parseInt(y) + 1}`)
+            //             cell1.classList.remove('readonly');
+
+            //             // var cell2 = elInstance.getCell(`C${parseInt(y) + 1}`)
+            //             // cell2.classList.remove('readonly');
+
+
+            //         } else {
+            //             // var cell1 = elInstance.getCell(`C${parseInt(y) + 1}`)
+            //             // cell1.classList.add('readonly');
+
+            //             var cell1 = elInstance.getCell(`D${parseInt(y) + 1}`)
+            //             cell1.classList.add('readonly');
+
+            //             var cell1 = elInstance.getCell(`E${parseInt(y) + 1}`)
+            //             cell1.classList.add('readonly');
+
+            //             var cell1 = elInstance.getCell(`B${parseInt(y) + 1}`)
+            //             cell1.classList.add('readonly');
+
+            //             var cell1 = elInstance.getCell(`I${parseInt(y) + 1}`)
+            //             cell1.classList.add('readonly');
+
+            //             // var cell2 = elInstance.getCell(`C${parseInt(y) + 1}`)
+            //             // cell2.classList.add('readonly');
+
+
+            //         }
+
+            //         let roleArray = this.state.roleArray;
+            //         let checkReadOnly = 0;
+            //         if ((roleArray.includes('ROLE_REALM_ADMIN') && typeId != -1 && typeId != 0) || (roleArray.includes('ROLE_DATASET_ADMIN') && typeId == -1 && typeId != 0)) {
+            //             checkReadOnly = checkReadOnly + 1;
+
+            //             // var cell1 = elInstance.getCell(`C${parseInt(y) + 1}`)
+            //             // cell1.classList.add('readonly');
+
+            //             var cell1 = elInstance.getCell(`D${parseInt(y) + 1}`)
+            //             cell1.classList.add('readonly');
+
+            //             var cell1 = elInstance.getCell(`E${parseInt(y) + 1}`)
+            //             cell1.classList.add('readonly');
+
+            //             var cell1 = elInstance.getCell(`B${parseInt(y) + 1}`)
+            //             cell1.classList.add('readonly');
+
+            //             var cell1 = elInstance.getCell(`G${parseInt(y) + 1}`)
+            //             cell1.classList.add('readonly');
+
+            //             var cell1 = elInstance.getCell(`H${parseInt(y) + 1}`)
+            //             cell1.classList.add('readonly');
+
+            //             var cell1 = elInstance.getCell(`I${parseInt(y) + 1}`)
+            //             cell1.classList.add('readonly');
+
+            //             var cell1 = elInstance.getCell(`J${parseInt(y) + 1}`)
+            //             cell1.classList.add('readonly');
+            //         }
+
+            //         var addRowId = rowData[15];
+            //         // console.log("addRowId------>", addRowId);
+            //         if (addRowId == 1) {//active grade out
+            //             var cell1 = elInstance.getCell(`J${parseInt(y) + 1}`)
+            //             cell1.classList.add('readonly');
+            //         } else if (checkReadOnly == 0) {
+            //             var cell1 = elInstance.getCell(`J${parseInt(y) + 1}`)
+            //             cell1.classList.remove('readonly');
+            //         }
+
+
+
+
+            //         if (!roleArray.includes('ROLE_REALM_ADMIN') && !roleArray.includes('ROLE_DATASET_ADMIN')) {
+            //             // var cell1 = elInstance.getCell(`C${parseInt(y) + 1}`)
+            //             // cell1.classList.add('readonly');
+
+            //             var cell1 = elInstance.getCell(`D${parseInt(y) + 1}`)
+            //             cell1.classList.add('readonly');
+
+            //             var cell1 = elInstance.getCell(`E${parseInt(y) + 1}`)
+            //             cell1.classList.add('readonly');
+
+            //             var cell1 = elInstance.getCell(`B${parseInt(y) + 1}`)
+            //             cell1.classList.add('readonly');
+
+            //             var cell1 = elInstance.getCell(`G${parseInt(y) + 1}`)
+            //             cell1.classList.add('readonly');
+
+            //             var cell1 = elInstance.getCell(`H${parseInt(y) + 1}`)
+            //             cell1.classList.add('readonly');
+
+            //             var cell1 = elInstance.getCell(`I${parseInt(y) + 1}`)
+            //             cell1.classList.add('readonly');
+
+            //             var cell1 = elInstance.getCell(`J${parseInt(y) + 1}`)
+            //             cell1.classList.add('readonly');
+            //         }
+
+
+            //     }
+            // }.bind(this),
             pagination: localStorage.getItem("sesRecordCount"),
             filters: true,
             search: true,
@@ -1139,7 +1219,7 @@ class EquivalancyUnit extends Component {
                 if (listArray.length > 0) {
                     for (var i = 0; i < listArray.length; i++) {
                         var paJson = {
-                            name: getLabelText(listArray[i].label, this.state.lang),
+                            name: getLabelText(listArray[i].label, this.state.lang) + ' | ' + parseInt(listArray[i].forecastingUnitId),
                             id: parseInt(listArray[i].forecastingUnitId),
                             active: listArray[i].active,
                             tracerCategoryId: listArray[i].tracerCategory.id,
