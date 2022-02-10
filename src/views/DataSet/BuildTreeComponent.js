@@ -5610,7 +5610,7 @@ export default class BuildTree extends Component {
                                                 <PopoverBody>{i18n.t('static.tree.lagMessage')}</PopoverBody>
                                             </Popover>
                                         </div>
-                                        <FormGroup className="col-md-6">
+                                        <FormGroup className={this.state.currentItemConfig.context.payload.nodeType.id == 2 ? "col-md-5" : "col-md-6"}>
                                             <Label htmlFor="currencyId">{i18n.t('static.tree.nodeType')}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={this.toggle} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                             <Input
                                                 type="select"
@@ -5635,6 +5635,25 @@ export default class BuildTree extends Component {
                                                     }, this)}
                                             </Input>
                                             <FormFeedback className="red">{errors.nodeTypeId}</FormFeedback>
+                                        </FormGroup>
+                                        <FormGroup className={this.state.currentItemConfig.context.payload.nodeType.id == 2 ? "col-md-1" : "col-md-1"} style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 2 ? "block" : "none" }}>
+                                            <Label htmlFor="currencyId" style={{ visibility: 'hidden' }}></Label>
+                                            <div style={{marginTop: '13px'}}>
+                                                <Input
+                                                    className="form-check-input checkboxMargin"
+                                                    type="checkbox"
+                                                    id="extrapolate"
+                                                    name="extrapolate"
+                                                // checked={true}
+                                                // checked={this.state.currentScenario.manualChangesEffectFuture}
+                                                // onClick={(e) => { this.momCheckbox(e); }}
+                                                />
+                                                <Label
+                                                    className="form-check-label"
+                                                    check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                    <b>{'Extrapolate'}</b>
+                                                </Label>
+                                            </div>
                                         </FormGroup>
 
                                         {/* {this.state.aggregationNode && */}
@@ -8202,7 +8221,7 @@ export default class BuildTree extends Component {
                                         {i18n.t('static.tree.Modeling/Transfer')}
                                     </NavLink>
                                 </NavItem>
-                                <NavItem style={{display:this.state.currentItemConfig.context.payload.nodeType.id == 2 ? 'block' : 'none'}}>
+                                <NavItem style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 2 ? 'block' : 'none' }}>
                                     <NavLink
                                         active={this.state.activeTab1[0] === '3'}
                                         onClick={() => { this.toggleModal(0, '3'); }}
