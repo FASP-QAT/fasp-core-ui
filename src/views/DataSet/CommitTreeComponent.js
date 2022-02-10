@@ -32,6 +32,9 @@ import "jspdf-autotable";
 import html2canvas from 'html2canvas';
 import pdfIcon from '../../assets/img/pdf.png';
 import { LOGO } from "../../CommonComponent/Logo";
+import {dataCheck} from '../DataSet/DataCheckComponent.js';
+import {buildJxl} from '../DataSet/DataCheckComponent.js';
+import {exportPDF,noForecastSelectedClicked,missingMonthsClicked,missingBranchesClicked,nodeWithPercentageChildrenClicked} from '../DataSet/DataCheckComponent.js';
 
 const entityname = i18n.t('static.button.commit');
 const initialValues = {
@@ -240,201 +243,6 @@ export default class CommitTreeComponent extends React.Component {
                     notes: programData[0].datasetJson.currentVersion.notes
                 })
 
-                var PgmTreeList = programData[0].datasetJson.treeList;
-
-                var treeScenarioNotes = [];
-                var missingBranchesList = [];
-                for (var tl = 0; tl < PgmTreeList.length; tl++) {
-                    var treeList = PgmTreeList[tl];
-                    var scenarioList = treeList.scenarioList;
-                    for (var ndm = 0; ndm < scenarioList.length; ndm++) {
-                        treeScenarioNotes.push({
-                            tree: PgmTreeList[tl].label,
-                            scenario: scenarioList[ndm].label,
-                            treeId: PgmTreeList[tl].treeId,
-                            scenarioId: scenarioList[ndm].id,
-                            scenarioNotes: scenarioList[ndm].notes
-                        });
-                    }
-                }
-                var treePlanningUnitList = [];
-                var treeNodeList = [];
-                var treeScenarioList = [];
-                var missingBranchesList = [];
-                for (var tl = 0; tl < PgmTreeList.length; tl++) {
-                    var treeList = PgmTreeList[tl];
-                    var flatList = treeList.tree.flatList;
-                    for (var fl = 0; fl < flatList.length; fl++) {
-                        var payload = flatList[fl].payload;
-                        var nodeDataMap = payload.nodeDataMap;
-                        var scenarioList = treeList.scenarioList;
-                        for (var ndm = 0; ndm < scenarioList.length; ndm++) {
-                            if (payload.nodeType.id == 5) {
-                                var nodePlanningUnit = ((nodeDataMap[scenarioList[ndm].id])[0].puNode.planningUnit);
-                                treePlanningUnitList.push(nodePlanningUnit);
-                            }
-
-                            //Tree scenario and node notes
-                            var nodeNotes = ((nodeDataMap[scenarioList[ndm].id])[0].notes);
-                            var modelingList = ((nodeDataMap[scenarioList[ndm].id])[0].nodeDataModelingList);
-                            var madelingNotes = "";
-                            for (var ml = 0; ml < modelingList.length; ml++) {
-                                madelingNotes = madelingNotes.concat(modelingList[ml].notes).concat(" ")
-                            }
-                            treeNodeList.push({
-                                tree: PgmTreeList[tl].label,
-                                scenario: scenarioList[ndm].label,
-                                treeId: PgmTreeList[tl].treeId,
-                                scenarioId: scenarioList[ndm].id,
-                                node: payload.label,
-                                notes: nodeNotes,
-                                madelingNotes: madelingNotes,
-                                scenarioNotes: scenarioList[ndm].notes
-                            });
-                        }
-                        // Tree Forecast : branches missing PU
-                        var flatListFiltered = flatList.filter(c => flatList.filter(f => f.parent == c.id).length == 0);
-                        var flatListArray = []
-                        for (var flf = 0; flf < flatListFiltered.length; flf++) {
-                            var nodeTypeId = flatListFiltered[flf].payload.nodeType.id;
-                            if (nodeTypeId != 5) {
-                                flatListArray.push(flatListFiltered[flf]);
-                            }
-                        }
-                    }
-                    missingBranchesList.push({
-                        treeId: PgmTreeList[tl].treeId,
-                        treeLabel: PgmTreeList[tl].label,
-                        flatList: flatListArray
-                    })
-
-                    //Nodes less than 100%
-                    var scenarioList = PgmTreeList[tl].scenarioList;
-                    var treeId = PgmTreeList[tl].treeId;
-                    for (var sc = 0; sc < scenarioList.length; sc++) {
-                        treeScenarioList.push(
-                            {
-                                "treeId": treeId,
-                                "treeLabel": PgmTreeList[tl].label,
-                                "scenarioId": scenarioList[sc].id,
-                                "scenarioLabel": scenarioList[sc].label
-                            });
-                    }
-                }
-                this.setState({
-                    treeNodeList: treeNodeList,
-                    treeScenarioList: treeScenarioList,
-                    missingBranchesList: missingBranchesList,
-                    treeScenarioNotes: treeScenarioNotes
-                })
-
-                // Tree Forecast : planing unit missing on tree
-                var puRegionList = []
-                var datasetRegionList = programData[0].datasetJson.regionList;
-                for (var drl = 0; drl < datasetRegionList.length; drl++) {
-                    for (var ptl = 0; ptl < PgmTreeList.length; ptl++) {
-                        let regionListFiltered = PgmTreeList[ptl].regionList.filter(c => (c.id == datasetRegionList[drl].regionId));
-                        if (regionListFiltered.length == 0) {
-                            var regionIndex = puRegionList.findIndex(i => i == getLabelText(datasetRegionList[drl].label, this.state.lang))
-                            if (regionIndex == -1) {
-                                puRegionList.push(getLabelText(datasetRegionList[drl].label, this.state.lang))
-                            }
-                        }
-                    }
-                }
-                var datasetPlanningUnit = programData[0].datasetJson.planningUnitList;
-                var notSelectedPlanningUnitList = [];
-                for (var dp = 0; dp < datasetPlanningUnit.length; dp++) {
-                    var puId = datasetPlanningUnit[dp].planningUnit.id;
-                    let planningUnitNotSelected = treePlanningUnitList.filter(c => (c.id == puId));
-                    if (planningUnitNotSelected.length == 0) {
-                        notSelectedPlanningUnitList.push({
-                            planningUnit: datasetPlanningUnit[dp].planningUnit,
-                            regionsArray: datasetRegionList.map(c => getLabelText(c.label, this.state.lang))
-                        });
-                    } else {
-                        notSelectedPlanningUnitList.push({
-                            planningUnit: datasetPlanningUnit[dp].planningUnit,
-                            regionsArray: puRegionList
-                        });
-                    }
-                }
-                this.setState({
-                    notSelectedPlanningUnitList: notSelectedPlanningUnitList,
-                    datasetPlanningUnit: datasetPlanningUnit
-                })
-                //*** */
-
-                this.setState({
-                }, () => {
-                    var startDate = moment(programData[0].datasetJson.currentVersion.forecastStartDate).format("YYYY-MM-DD");
-                    var stopDate = moment(programData[0].datasetJson.currentVersion.forecastStopDate).format("YYYY-MM-DD");
-                    var curDate = startDate;
-                    var nodeDataModelingList = programData[0].datasetJson.nodeDataModelingList;
-                    var childrenWithoutHundred = [];
-                    var nodeWithPercentageChildren = [];
-
-                    for (var i = 0; curDate < stopDate; i++) {
-                        curDate = moment(startDate).add(i, 'months').format("YYYY-MM-DD");
-                        for (var tl = 0; tl < PgmTreeList.length; tl++) {
-                            var treeList = PgmTreeList[tl];
-                            var flatList = treeList.tree.flatList;
-                            for (var fl = 0; fl < flatList.length; fl++) {
-                                var payload = flatList[fl].payload;
-                                var nodeDataMap = payload.nodeDataMap;
-                                var scenarioList = treeList.scenarioList;
-                                for (var ndm = 0; ndm < scenarioList.length; ndm++) {
-                                    // var nodeModellingList = nodeDataModelingList.filter(c => c.month == curDate);
-                                    var nodeChildrenList = flatList.filter(c => flatList[fl].id == c.parent && (c.payload.nodeType.id == 3 || c.payload.nodeType.id == 4 || c.payload.nodeType.id == 5));
-                                    if (nodeChildrenList.length > 0) {
-                                        var totalPercentage = 0;
-                                        for (var ncl = 0; ncl < nodeChildrenList.length; ncl++) {
-                                            var payloadChild = nodeChildrenList[ncl].payload;
-                                            var nodeDataMapChild = payloadChild.nodeDataMap;
-                                            var nodeDataMapForScenario = (nodeDataMapChild[scenarioList[ndm].id])[0];
-
-                                            var nodeModellingList = nodeDataMapForScenario.nodeDataMomList.filter(c => c.month == curDate);
-                                            var nodeModellingListFiltered = nodeModellingList;
-                                            if (nodeModellingListFiltered.length > 0) {
-                                                totalPercentage += nodeModellingListFiltered[0].endValue;
-                                            }
-                                        }
-                                        childrenWithoutHundred.push(
-                                            {
-                                                "treeId": PgmTreeList[tl].treeId,
-                                                "scenarioId": scenarioList[ndm].id,
-                                                "month": curDate,
-                                                "label": payload.label,
-                                                "id": flatList[fl].id,
-                                                "percentage": totalPercentage
-                                            }
-                                        )
-                                        if (i == 0) {
-                                            var index = nodeWithPercentageChildren.findIndex(c => c.id == flatList[fl].id);
-                                            if (index == -1) {
-                                                nodeWithPercentageChildren.push(
-                                                    {
-                                                        "id": flatList[fl].id,
-                                                        "label": payload.label,
-                                                        "treeId": PgmTreeList[tl].treeId,
-                                                        "scenarioId": scenarioList[ndm].id,
-                                                    }
-                                                )
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    this.setState({
-                        childrenWithoutHundred: childrenWithoutHundred,
-                        nodeWithPercentageChildren: nodeWithPercentageChildren,
-                        startDate: startDate,
-                        stopDate: stopDate
-                    })
-                })
-
                 var programVersionJson = [];
                 var json = {
                     programId: programData[0].datasetJson.programId,
@@ -449,77 +257,10 @@ export default class CommitTreeComponent extends React.Component {
                             comparedLatestVersion: response.data[0].currentVersion.versionId
                         })
                     })
-
-                // Consumption Forecast
-                var startDate = moment(programData[0].datasetJson.currentVersion.forecastStartDate).format("YYYY-MM-DD");
-                var stopDate = moment(programData[0].datasetJson.currentVersion.forecastStopDate).format("YYYY-MM-DD");
-
-                var consumptionList = programData[0].datasetJson.actualConsumptionList;
-                var missingMonthList = [];
-
-                //Consumption : planning unit less 24 month
-                var consumptionListlessTwelve = [];
-                var noForecastSelectedList = [];
-                for (var dpu = 0; dpu < datasetPlanningUnit.length; dpu++) {
-                    for (var drl = 0; drl < datasetRegionList.length; drl++) {
-                        var curDate = startDate;
-                        var monthsArray = [];
-                        var puId = datasetPlanningUnit[dpu].planningUnit.id;
-                        var regionId = datasetRegionList[drl].regionId;
-                        var consumptionListFiltered = consumptionList.filter(c => c.planningUnit.id == puId && c.region.id == regionId);
-                        if (consumptionListFiltered.length < 24) {
-                            consumptionListlessTwelve.push({
-                                planningUnitId: datasetPlanningUnit[dpu].planningUnit.id,
-                                planningUnitLabel: datasetPlanningUnit[dpu].planningUnit.label,
-                                regionId: datasetRegionList[drl].regionId,
-                                regionLabel: datasetRegionList[drl].label,
-                                noOfMonths: consumptionListFiltered.length
-                            })
-                        }
-
-                        //Consumption : missing months
-                        for (var i = 0; moment(curDate).format("YYYY-MM") < moment(Date.now()).format("YYYY-MM"); i++) {
-                            curDate = moment(startDate).add(i, 'months').format("YYYY-MM-DD");
-                            var consumptionListFilteredForMonth = consumptionList.filter(c => c.planningUnit.id == puId && c.region.id == regionId && c.month == curDate);
-                            if (consumptionListFilteredForMonth.length == 0) {
-                                monthsArray.push(moment(curDate).format(DATE_FORMAT_CAP_WITHOUT_DATE));
-                            }
-                        }
-
-                        if (monthsArray.length > 0) {
-                            missingMonthList.push({
-                                planningUnitId: datasetPlanningUnit[dpu].planningUnit.id,
-                                planningUnitLabel: datasetPlanningUnit[dpu].planningUnit.label,
-                                regionId: datasetRegionList[drl].regionId,
-                                regionLabel: datasetRegionList[drl].label,
-                                monthsArray: monthsArray
-                            })
-                        }
-                    }
-                    //No Forecast selected
-                    var selectedForecast = datasetPlanningUnit[dpu].selectedForecastMap;
-                    var regionArray = [];
-                    for (var drl = 0; drl < datasetRegionList.length; drl++) {
-                        if (selectedForecast[datasetRegionList[drl].regionId] == undefined || (selectedForecast[datasetRegionList[drl].regionId].scenarioId == null && selectedForecast[datasetRegionList[drl].regionId].consumptionExtrapolationId == null)) {
-                            regionArray.push({ id: datasetRegionList[drl].regionId, label: getLabelText(datasetRegionList[drl].label, this.state.lang) });
-                        }
-                    }
-                    noForecastSelectedList.push({
-                        planningUnit: datasetPlanningUnit[dpu],
-                        regionList: regionArray
-                    })
-                }
-                this.setState({
-                    consumptionListlessTwelve: consumptionListlessTwelve,
-                    missingMonthList: missingMonthList,
-                    noForecastSelectedList: noForecastSelectedList,
-                    progressPer: 25,
-                    loading: false
-                })
+                dataCheck(this,programData[0].datasetJson)
 
             }.bind(this)
         }.bind(this)
-        //*** */
     }
 
 
@@ -529,103 +270,6 @@ export default class CommitTreeComponent extends React.Component {
         })
     }
 
-
-    buildJxl() {
-        this.setState({ loading: true })
-        var treeScenarioList = this.state.treeScenarioList;
-        var treeScenarioListFilter = treeScenarioList;
-        for (var tsl = 0; tsl < treeScenarioListFilter.length; tsl++) {
-            var nodeWithPercentageChildren = this.state.nodeWithPercentageChildren.filter(c => c.treeId == treeScenarioListFilter[tsl].treeId && c.scenarioId == treeScenarioListFilter[tsl].scenarioId);
-            if (nodeWithPercentageChildren.length > 0) {
-                let childrenList = this.state.childrenWithoutHundred;
-                let childrenArray = [];
-                var data = [];
-                let startDate = this.state.startDate;
-                let stopDate = this.state.stopDate;
-                var curDate = startDate;
-                var nodeWithPercentageChildrenWithHundredCent = [];
-                for (var i = 0; curDate < stopDate; i++) {
-                    curDate = moment(startDate).add(i, 'months').format("YYYY-MM-DD");
-                    data = [];
-                    data[0] = curDate;
-                    for (var nwp = 0; nwp < nodeWithPercentageChildren.length; nwp++) {
-                        var child = childrenList.filter(c => c.id == nodeWithPercentageChildren[nwp].id && c.month == curDate);
-                        data[nwp + 1] = child.length > 0 ? (child[0].percentage).toFixed(2) : '';
-                        nodeWithPercentageChildrenWithHundredCent[nwp] = nodeWithPercentageChildrenWithHundredCent[nwp] != 1 ? (child.length > 0 && (child[0].percentage).toFixed(2) != 100) ? 1 : 0 : 1;
-                    }
-                    childrenArray.push(data);
-                }
-
-                this.el = jexcel(document.getElementById("tableDiv" + tsl), '');
-                this.el.destroy();
-
-                var columnsArray = [];
-                columnsArray.push({
-                    title: i18n.t('static.inventoryDate.inventoryReport'),
-                    type: 'calendar', options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker' }, width: 100,
-                    // readOnly: true
-                });
-                for (var nwp = 0; nwp < nodeWithPercentageChildren.length; nwp++) {
-                    columnsArray.push({
-                        title: getLabelText(nodeWithPercentageChildren[nwp].label, this.state.lang),
-                        type: nodeWithPercentageChildrenWithHundredCent[nwp] == 1 ? 'numeric' : 'hidden',
-                        mask: '#,##.00%', decimal: '.'
-                        // readOnly: true
-                    });
-                }
-                treeScenarioListFilter[tsl].columnArray = columnsArray;
-                treeScenarioListFilter[tsl].dataArray = childrenArray;
-                var options = {
-                    data: childrenArray,
-                    columnDrag: true,
-                    colWidths: [0, 150, 150, 150, 100, 100, 100],
-                    colHeaderClasses: ["Reqasterisk"],
-                    columns: columnsArray,
-                    text: {
-                        showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
-                        show: '',
-                        entries: '',
-                    },
-                    onload: function (instance, cell, x, y, value) {
-                        jExcelLoadedFunctionOnlyHideRow(instance);
-                    },
-                    updateTable: function (el, cell, x, y, source, value, id) {
-                        if (y != null && x != 0) {
-                            if (value != "100.00%") {
-                                var elInstance = el.jexcel;
-                                cell.classList.add('red');
-                            }
-                        }
-                    },
-
-                    // pagination: localStorage.getItem("sesRecordCount"),
-                    pagination: false,
-                    search: false,
-                    columnSorting: true,
-                    tableOverflow: true,
-                    wordWrap: true,
-                    allowInsertColumn: false,
-                    allowManualInsertColumn: false,
-                    allowDeleteRow: false,
-                    onselection: this.selected,
-                    oneditionend: this.onedit,
-                    copyCompatibility: true,
-                    allowExport: false,
-                    paginationOptions: JEXCEL_PAGINATION_OPTION,
-                    position: 'top',
-                    filters: true,
-                    license: JEXCEL_PRO_KEY,
-                    contextMenu: function (obj, x, y, e) {
-                        return [];
-                    }.bind(this),
-                };
-                var languageEl = jexcel(document.getElementById("tableDiv" + tsl), options);
-                this.el = languageEl;
-            }
-        }
-        this.setState({ loading: false, treeScenarioListFilter: treeScenarioListFilter })
-    }
-
     toggleShowValidation() {
         this.setState({
             showValidation: !this.state.showValidation
@@ -633,7 +277,7 @@ export default class CommitTreeComponent extends React.Component {
             if (this.state.showValidation) {
                 this.setState({
                 }, () => {
-                    this.buildJxl();
+                    buildJxl(this);
                 })
             }
         })
@@ -1009,568 +653,11 @@ export default class CommitTreeComponent extends React.Component {
         this.setState({ loading: false })
     }
 
-    exportPDF() {
-        const addFooters = doc => {
-
-            const pageCount = doc.internal.getNumberOfPages()
-
-            doc.setFont('helvetica', 'bold')
-            doc.setFontSize(6)
-            for (var i = 1; i <= pageCount; i++) {
-                doc.setPage(i)
-
-                doc.setPage(i)
-                doc.text('Page ' + String(i) + ' of ' + String(pageCount), doc.internal.pageSize.width / 9, doc.internal.pageSize.height - 30, {
-                    align: 'center'
-                })
-                doc.text('Copyright © 2020 ' + i18n.t('static.footer'), doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
-                    align: 'center'
-                })
-
-
-            }
-        }
-        const addHeaders = doc => {
-
-            const pageCount = doc.internal.getNumberOfPages()
-
-
-            //  var file = new File('QAT-logo.png','../../../assets/img/QAT-logo.png');
-            // var reader = new FileReader();
-
-            //var data='';
-            // Use fs.readFile() method to read the file 
-            //fs.readFile('../../assets/img/logo.svg', 'utf8', function(err, data){ 
-            //}); 
-            for (var i = 1; i <= pageCount; i++) {
-                doc.setFontSize(12)
-                doc.setFont('helvetica', 'bold')
-                doc.setPage(i)
-                doc.addImage(LOGO, 'png', 0, 10, 180, 50, 'FAST');
-                /*doc.addImage(data, 10, 30, {
-                  align: 'justify'
-                });*/
-                doc.setTextColor("#002f6c");
-                doc.text(i18n.t('static.commitTree.forecastValidation'), doc.internal.pageSize.width / 2, 60, {
-                    align: 'center'
-                })
-                if (i == 1) {
-                    doc.setFont('helvetica', 'normal')
-                    doc.setFontSize(8)
-                    doc.text(i18n.t('static.dashboard.programheader') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 20, 90, {
-                        align: 'left'
-                    })
-
-                }
-
-            }
-        }
-
-
-        const unit = "pt";
-        const size = "A4"; // Use A1, A2, A3 or A4
-        const orientation = "landscape"; // portrait or landscape
-
-        const marginLeft = 10;
-        const doc = new jsPDF(orientation, unit, size, true);
-
-        doc.setFontSize(8);
-        doc.setFont('helvetica', 'normal')
-
-
-        var y = 110;
-        var planningText = doc.splitTextToSize(i18n.t('static.common.forecastPeriod') + ' : ' + moment(this.state.forecastStartDate).format('MMM-YYYY') + ' to ' + moment(this.state.forecastStopDate).format('MMM-YYYY'), doc.internal.pageSize.width * 3 / 4);
-        // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
-        for (var i = 0; i < planningText.length; i++) {
-            if (y > doc.internal.pageSize.height - 100) {
-                doc.addPage();
-                y = 80;
-
-            }
-            doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
-            y = y + 10;
-        }
-
-
-        doc.setFont('helvetica', 'bold')
-        planningText = doc.splitTextToSize("1. " + i18n.t('static.commitTree.noForecastSelected'), doc.internal.pageSize.width * 3 / 4);
-        // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
-        y = y + 20;
-        for (var i = 0; i < planningText.length; i++) {
-            if (y > doc.internal.pageSize.height - 100) {
-                doc.addPage();
-                y = 80;
-
-            }
-            doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
-            y = y + 10;
-        }
-
-        doc.setFont('helvetica', 'normal')
-        this.state.noForecastSelectedList.map((item, i) => {
-            item.regionList.map(item1 => {
-                planningText = doc.splitTextToSize(getLabelText(item.planningUnit.planningUnit.label, this.state.lang) + " - " + item1.label, doc.internal.pageSize.width * 3 / 4);
-                // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
-                y = y + 3;
-                for (var i = 0; i < planningText.length; i++) {
-                    if (y > doc.internal.pageSize.height - 100) {
-                        doc.addPage();
-                        y = 80;
-
-                    }
-                    doc.text(doc.internal.pageSize.width / 15, y, planningText[i]);
-                    y = y + 10;
-                }
-            })
-        })
-
-        doc.setFont('helvetica', 'bold')
-        planningText = doc.splitTextToSize("2. " + i18n.t('static.commitTree.consumptionForecast'), doc.internal.pageSize.width * 3 / 4);
-        // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
-        y = y + 20;
-        for (var i = 0; i < planningText.length; i++) {
-            if (y > doc.internal.pageSize.height - 100) {
-                doc.addPage();
-                y = 80;
-
-            }
-            doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
-            y = y + 10;
-        }
-
-        doc.setFont('helvetica', 'normal')
-        planningText = doc.splitTextToSize("a. " + i18n.t('static.commitTree.monthsMissingActualConsumptionValues'), doc.internal.pageSize.width * 3 / 4);
-        // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
-        y = y + 10;
-        for (var i = 0; i < planningText.length; i++) {
-            if (y > doc.internal.pageSize.height - 100) {
-                doc.addPage();
-                y = 80;
-
-            }
-            doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
-            y = y + 10;
-        }
-        this.state.missingMonthList.map((item, i) => {
-            doc.setFont('helvetica', 'bold')
-            planningText = doc.splitTextToSize(getLabelText(item.planningUnitLabel, this.state.lang) + " - " + getLabelText(item.regionLabel, this.state.lang) + " : ", doc.internal.pageSize.width * 3 / 4);
-            // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
-            y = y + 10;
-            for (var i = 0; i < planningText.length; i++) {
-                if (y > doc.internal.pageSize.height - 100) {
-                    doc.addPage();
-                    y = 80;
-
-                }
-                doc.text(doc.internal.pageSize.width / 15, y, planningText[i]);
-                y = y + 10;
-            }
-            doc.setFont('helvetica', 'normal')
-            planningText = doc.splitTextToSize("" + item.monthsArray, doc.internal.pageSize.width * 3 / 4);
-            // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
-            y = y + 3;
-            for (var i = 0; i < planningText.length; i++) {
-                if (y > doc.internal.pageSize.height - 100) {
-                    doc.addPage();
-                    y = 80;
-
-                }
-                doc.text(doc.internal.pageSize.width / 15, y, planningText[i]);
-                y = y + 10;
-            }
-        })
-
-        doc.setFont('helvetica', 'normal')
-        planningText = doc.splitTextToSize("b. " + i18n.t('static.commitTree.puThatDoNotHaveAtleast24MonthsOfActualConsumptionValues'), doc.internal.pageSize.width * 3 / 4);
-        // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
-        y = y + 20;
-        for (var i = 0; i < planningText.length; i++) {
-            if (y > doc.internal.pageSize.height - 100) {
-                doc.addPage();
-                y = 80;
-
-            }
-            doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
-            y = y + 10;
-        }
-        this.state.consumptionListlessTwelve.map((item, i) => {
-            doc.setFont('helvetica', 'bold')
-            planningText = doc.splitTextToSize(getLabelText(item.planningUnitLabel, this.state.lang) + " - " + getLabelText(item.regionLabel, this.state.lang) + " : ", doc.internal.pageSize.width * 3 / 4);
-            // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
-            y = y + 10;
-            for (var i = 0; i < planningText.length; i++) {
-                if (y > doc.internal.pageSize.height - 100) {
-                    doc.addPage();
-                    y = 80;
-
-                }
-                doc.text(doc.internal.pageSize.width / 15, y, planningText[i]);
-                y = y + 10;
-            }
-            doc.setFont('helvetica', 'normal')
-            planningText = doc.splitTextToSize("" + item.noOfMonths + " month(s)", doc.internal.pageSize.width * 3 / 4);
-            // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
-            y = y + 3;
-            for (var i = 0; i < planningText.length; i++) {
-                if (y > doc.internal.pageSize.height - 100) {
-                    doc.addPage();
-                    y = 80;
-
-                }
-                doc.text(doc.internal.pageSize.width / 15, y, planningText[i]);
-                y = y + 10;
-            }
-        })
-
-        doc.setFont('helvetica', 'bold')
-        planningText = doc.splitTextToSize("3. " + i18n.t('static.commitTree.treeForecast'), doc.internal.pageSize.width * 3 / 4);
-        // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
-        y = y + 20;
-        for (var i = 0; i < planningText.length; i++) {
-            if (y > doc.internal.pageSize.height - 100) {
-                doc.addPage();
-                y = 80;
-
-            }
-            doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
-            y = y + 10;
-        }
-
-        doc.setFont('helvetica', 'normal')
-        planningText = doc.splitTextToSize("a. " + i18n.t('static.commitTree.puThatDoesNotAppearOnAnyTree'), doc.internal.pageSize.width * 3 / 4);
-        // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
-        y = y + 10;
-        for (var i = 0; i < planningText.length; i++) {
-            if (y > doc.internal.pageSize.height - 100) {
-                doc.addPage();
-                y = 80;
-
-            }
-            doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
-            y = y + 10;
-        }
-        doc.setFont('helvetica', 'normal')
-        this.state.notSelectedPlanningUnitList.map((item, i) => {
-            planningText = doc.splitTextToSize(getLabelText(item.planningUnit.label, this.state.lang) + " - " + item.regionsArray, doc.internal.pageSize.width * 3 / 4);
-            // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
-            y = y + 3;
-            for (var i = 0; i < planningText.length; i++) {
-                if (y > doc.internal.pageSize.height - 100) {
-                    doc.addPage();
-                    y = 80;
-
-                }
-                doc.text(doc.internal.pageSize.width / 15, y, planningText[i]);
-                y = y + 10;
-            }
-        })
-
-        doc.setFont('helvetica', 'normal')
-        planningText = doc.splitTextToSize("b. " + i18n.t('static.commitTree.branchesMissingPlanningUnit'), doc.internal.pageSize.width * 3 / 4);
-        // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
-        y = y + 10;
-        for (var i = 0; i < planningText.length; i++) {
-            if (y > doc.internal.pageSize.height - 100) {
-                doc.addPage();
-                y = 80;
-
-            }
-            doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
-            y = y + 10;
-        }
-
-        this.state.missingBranchesList.map((item, i) => {
-            doc.setFont('helvetica', 'normal')
-            planningText = doc.splitTextToSize(getLabelText(item.treeLabel, this.state.lang), doc.internal.pageSize.width * 3 / 4);
-            // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
-            y = y + 10;
-            for (var i = 0; i < planningText.length; i++) {
-                if (y > doc.internal.pageSize.height - 100) {
-                    doc.addPage();
-                    y = 80;
-
-                }
-                doc.text(doc.internal.pageSize.width / 15, y, planningText[i]);
-                y = y + 10;
-            }
-            item.flatList.length > 0 && item.flatList.map((item1, j) => {
-                doc.setFont('helvetica', 'normal')
-                if (item1.payload.nodeType.id == 4) {
-                    doc.setTextColor("red")
-                } else {
-                    doc.setTextColor("black")
-                }
-
-                planningText = doc.splitTextToSize(getLabelText(item1.payload.label, this.state.lang), doc.internal.pageSize.width * 3 / 4);
-                // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
-                y = y + 10;
-                for (var i = 0; i < planningText.length; i++) {
-                    if (y > doc.internal.pageSize.height - 100) {
-                        doc.addPage();
-                        y = 80;
-
-                    }
-                    doc.text(doc.internal.pageSize.width / 10, y, planningText[i]);
-                    y = y + 10;
-                }
-            })
-
-        })
-
-        doc.setFont('helvetica', 'normal')
-        planningText = doc.splitTextToSize("c. " + i18n.t('static.commitTree.NodesWithChildrenThatDoNotAddUpTo100Prcnt'), doc.internal.pageSize.width * 3 / 4);
-        // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
-        y = y + 10;
-        for (var i = 0; i < planningText.length; i++) {
-            if (y > doc.internal.pageSize.height - 100) {
-                doc.addPage();
-                y = 80;
-
-            }
-            doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
-            y = y + 10;
-        }
-        var height = doc.internal.pageSize.height - 50;
-        var h1 = 50;
-        //   var aspectwidth1 = (width - h1);
-        var startY = y + 10
-        var pages = Math.ceil(startY / height)
-        for (var j = 1; j < pages; j++) {
-            doc.addPage()
-        }
-        y = startY - ((height - h1) * (pages - 1))
-        this.state.treeScenarioList.map((item1, count) => {
-            var nodeWithPercentageChildren = this.state.nodeWithPercentageChildren.filter(c => c.treeId == item1.treeId && c.scenarioId == item1.scenarioId);
-            if (nodeWithPercentageChildren.length > 0) {
-                doc.setFont('helvetica', 'normal')
-                planningText = doc.splitTextToSize(getLabelText(item1.treeLabel, this.state.lang) + " / " + getLabelText(item1.scenarioLabel, this.state.lang), doc.internal.pageSize.width * 3 / 4);
-                // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
-                y = y + 10;
-                for (var i = 0; i < planningText.length; i++) {
-                    if (y > doc.internal.pageSize.height - 100) {
-                        doc.addPage();
-                        y = 80;
-
-                    }
-                    doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
-                    y = y + 10;
-                }
-
-
-                var columnsArray = [];
-                item1.columnArray.filter(c => c.type != 'hidden').map(item4 => {
-                    columnsArray.push(item4.title)
-                })
-                var dataArr = [];
-                item1.dataArray.map(item3 => {
-                    var dataArr1 = []
-                    item1.columnArray.map((item2, count) => {
-                        if (item2.type != 'hidden') {
-                            dataArr1.push(item3[count])
-                        }
-                    })
-                    dataArr.push(dataArr1);
-                })
-
-                var data = dataArr;
-                var content = {
-                    margin: { top: 80, bottom: 50 },
-                    startY: y,
-                    head: [columnsArray],
-                    body: data,
-                    styles: { lineWidth: 1, fontSize: 8, halign: 'center' }
-
-                };
-                doc.autoTable(content);
-                doc.addPage();
-                y = 80;
-            }
-        })
-
-        doc.setFont('helvetica', 'bold')
-        planningText = doc.splitTextToSize("4. " + i18n.t('static.program.notes'), doc.internal.pageSize.width * 3 / 4);
-        // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
-        y = y + 20;
-        for (var i = 0; i < planningText.length; i++) {
-            if (y > doc.internal.pageSize.height - 100) {
-                doc.addPage();
-                y = 80;
-
-            }
-            doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
-            y = y + 10;
-        }
-
-        doc.setFont('helvetica', 'normal')
-        planningText = doc.splitTextToSize("a. " + i18n.t('static.forecastMethod.historicalData'), doc.internal.pageSize.width * 3 / 4);
-        // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
-        y = y + 10;
-        for (var i = 0; i < planningText.length; i++) {
-            if (y > doc.internal.pageSize.height - 100) {
-                doc.addPage();
-                y = 80;
-
-            }
-            doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
-            y = y + 10;
-        }
-        var height = doc.internal.pageSize.height;
-        var h1 = 50;
-        var startY = y + 10
-        var pages = Math.ceil(startY / height)
-        for (var j = 1; j < pages; j++) {
-            doc.addPage()
-        }
-        var startYtable = startY - ((height - h1) * (pages - 1))
-        var columns = [];
-        columns.push(i18n.t('static.dashboard.planningunitheader'));
-        columns.push(i18n.t('static.program.notes'));
-        var headers = [columns]
-        var dataArr2 = [];
-        this.state.datasetPlanningUnit.map((item5, i) => {
-            dataArr2.push([
-                getLabelText(item5.planningUnit.label, this.state.lang),
-                item5.consumtionNotes])
-        });
-        var content1 = {
-            margin: { top: 80, bottom: 50 },
-            startY: startYtable,
-            head: headers,
-            body: dataArr2,
-            styles: { lineWidth: 1, fontSize: 8, halign: 'center' }
-
-        };
-        doc.autoTable(content1);
-        doc.addPage()
-
-        doc.setFont('helvetica', 'normal')
-        y = 80;
-        planningText = doc.splitTextToSize("b. " + i18n.t('static.commitTree.treeScenarios'), doc.internal.pageSize.width * 3 / 4);
-        // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
-        y = y + 10;
-        for (var i = 0; i < planningText.length; i++) {
-            if (y > doc.internal.pageSize.height - 100) {
-                doc.addPage();
-                y = 80;
-
-            }
-            doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
-            y = y + 10;
-        }
-
-        var height = doc.internal.pageSize.height;
-        var h1 = 50;
-        var startY = y + 10
-        var pages = Math.ceil(startY / height)
-        for (var j = 1; j < pages; j++) {
-            doc.addPage()
-        }
-        var startYtable = startY - ((height - h1) * (pages - 1))
-        var columns = [];
-        columns.push(i18n.t('static.forecastMethod.tree'));
-        columns.push(i18n.t('static.whatIf.scenario'));
-        columns.push(i18n.t('static.program.notes'));
-        var headers = [columns]
-        var dataArr2 = [];
-        this.state.treeScenarioNotes.map((item5, i) => {
-            dataArr2.push([
-                getLabelText(item5.tree, this.state.lang),
-                getLabelText(item5.scenario, this.state.lang),
-                item5.scenarioNotes
-            ])
-        });
-        var content2 = {
-            margin: { top: 80, bottom: 50 },
-            startY: startYtable,
-            head: headers,
-            body: dataArr2,
-            styles: { lineWidth: 1, fontSize: 8, halign: 'center' }
-
-        };
-        doc.autoTable(content2);
-        y = 80;
-        doc.addPage()
-        doc.setFont('helvetica', 'normal')
-        planningText = doc.splitTextToSize("c. " + i18n.t('static.commitTree.treeNodes'), doc.internal.pageSize.width * 3 / 4);
-        // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
-        y = y + 10;
-        for (var i = 0; i < planningText.length; i++) {
-            if (y > doc.internal.pageSize.height - 100) {
-                doc.addPage();
-                y = 80;
-
-            }
-            doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
-            y = y + 10;
-        }
-        var height = doc.internal.pageSize.height;
-        var h1 = 50;
-        var startY = y + 10
-        var pages = Math.ceil(startY / height)
-        for (var j = 1; j < pages; j++) {
-            doc.addPage()
-        }
-        var startYtable = startY - ((height - h1) * (pages - 1))
-        var columns = [];
-        columns.push(i18n.t('static.forecastMethod.tree'));
-        columns.push(i18n.t('static.common.node'));
-        columns.push(i18n.t('static.whatIf.scenario'));
-        columns.push(i18n.t('static.program.notes'));
-        var headers = [columns]
-        var dataArr2 = [];
-        this.state.treeNodeList.map((item6, i) => {
-            dataArr2.push([
-                getLabelText(item6.tree, this.state.lang),
-                getLabelText(item6.node, this.state.lang),
-                getLabelText(item6.scenario, this.state.lang),
-                ((item6.notes != "" && item6.notes != null) ? i18n.t('static.commitTree.main') + " : " + item6.notes : "" + "" +
-                    ((item6.madelingNotes != "" && item6.madelingNotes != null) ? i18n.t('static.commitTree.modeling') + " : " + item6.madelingNotes : ""))
-            ])
-        });
-        var content3 = {
-            margin: { top: 80, bottom: 50 },
-            startY: startYtable,
-            head: headers,
-            body: dataArr2,
-            styles: { lineWidth: 1, fontSize: 8, halign: 'center' }
-
-        };
-        doc.autoTable(content3);
-
-
-        addHeaders(doc)
-        addFooters(doc)
-        doc.save(i18n.t('static.commitTree.forecastValidation').concat('.pdf'));
-    }
-
     hideFirstComponent() {
         document.getElementById('div1').style.display = 'block';
         this.state.timeout = setTimeout(function () {
             document.getElementById('div1').style.display = 'none';
         }, 8000);
-    }
-
-    noForecastSelectedClicked(planningUnitId, regionId) {
-        localStorage.setItem("sesDatasetPlanningUnitId", planningUnitId);
-        localStorage.setItem("sesDatasetRegionId", regionId);
-        const win = window.open("/#/report/compareAndSelectScenario", "_blank");
-        win.focus();
-        // this.props.history.push(``);
-    }
-
-    missingMonthsClicked(planningUnitId) {
-        const win = window.open("/#/dataentry/consumptionDataEntryAndAdjustment/" + planningUnitId, "_blank");
-        win.focus();
-    }
-
-    missingBranchesClicked(treeId) {
-        const win = window.open(`/#/dataSet/buildTree/tree/${treeId}/${this.state.programId}`, "_blank");
-        win.focus();
-    }
-
-    nodeWithPercentageChildrenClicked(treeId, scenarioId) {
-        const win = window.open(`/#/dataSet/buildTree/tree/${treeId}/${this.state.programId}/${scenarioId}`, "_blank");
-        win.focus();
     }
 
     render() {
@@ -1591,7 +678,7 @@ export default class CommitTreeComponent extends React.Component {
                     item.regionList.map(item1 => {
                         return (
                             <li key={i}>
-                                <div className="hoverDiv" onClick={() => this.noForecastSelectedClicked(item.planningUnit.planningUnit.id, item1.id)}>{getLabelText(item.planningUnit.planningUnit.label, this.state.lang) + " - " + item1.label}</div>
+                                <div className="hoverDiv" onClick={() => noForecastSelectedClicked(item.planningUnit.planningUnit.id, item1.id,this)}>{getLabelText(item.planningUnit.planningUnit.label, this.state.lang) + " - " + item1.label}</div>
                             </li>
                         )
                     }, this)
@@ -1603,7 +690,7 @@ export default class CommitTreeComponent extends React.Component {
         let missingMonths = missingMonthList.length > 0 && missingMonthList.map((item, i) => {
             return (
                 <li key={i}>
-                    <div><span><div className="hoverDiv" onClick={() => this.missingMonthsClicked(item.planningUnitId)}><b>{getLabelText(item.planningUnitLabel, this.state.lang) + " - " + getLabelText(item.regionLabel, this.state.lang) + " : "}</b></div>{"" + item.monthsArray}</span></div>
+                    <div><span><div className="hoverDiv" onClick={() => missingMonthsClicked(item.planningUnitId,this)}><b>{getLabelText(item.planningUnitLabel, this.state.lang) + " - " + getLabelText(item.regionLabel, this.state.lang) + " : "}</b></div>{"" + item.monthsArray}</span></div>
                 </li>
             )
         }, this);
@@ -1613,7 +700,7 @@ export default class CommitTreeComponent extends React.Component {
         let consumption = consumptionListlessTwelve.length > 0 && consumptionListlessTwelve.map((item, i) => {
             return (
                 <li key={i}>
-                    <div><span><div className="hoverDiv" onClick={() => this.missingMonthsClicked(item.planningUnitId)}><b>{getLabelText(item.planningUnitLabel, this.state.lang) + " - " + getLabelText(item.regionLabel, this.state.lang) + " : "}</b></div></span><span>{item.noOfMonths + " month(s)"}</span></div>
+                    <div><span><div className="hoverDiv" onClick={() => missingMonthsClicked(item.planningUnitId,this)}><b>{getLabelText(item.planningUnitLabel, this.state.lang) + " - " + getLabelText(item.regionLabel, this.state.lang) + " : "}</b></div></span><span>{item.noOfMonths + " month(s)"}</span></div>
                 </li>
             )
         }, this);
@@ -1634,7 +721,7 @@ export default class CommitTreeComponent extends React.Component {
             return (
                 <ul>
                     <li key={i}>
-                        <div className="hoverDiv" onClick={() => this.missingBranchesClicked(item.treeId)}><span>{getLabelText(item.treeLabel, this.state.lang)}</span></div>
+                        <div className="hoverDiv" onClick={() => missingBranchesClicked(item.treeId,this)}><span>{getLabelText(item.treeLabel, this.state.lang)}</span></div>
                         {item.flatList.length > 0 && item.flatList.map((item1, j) => {
                             return (
                                 <ul>
@@ -1653,7 +740,7 @@ export default class CommitTreeComponent extends React.Component {
         let jxlTable = this.state.treeScenarioList.map((item1, count) => {
             var nodeWithPercentageChildren = this.state.nodeWithPercentageChildren.filter(c => c.treeId == item1.treeId && c.scenarioId == item1.scenarioId);
             if (nodeWithPercentageChildren.length > 0) {
-                return (<><span className="hoverDiv" onClick={() => this.nodeWithPercentageChildrenClicked(item1.treeId, item1.scenarioId)}>{getLabelText(item1.treeLabel, this.state.lang) + " / " + getLabelText(item1.scenarioLabel, this.state.lang)}</span><div className="table-responsive">
+                return (<><span className="hoverDiv" onClick={() => nodeWithPercentageChildrenClicked(item1.treeId, item1.scenarioId,this)}>{getLabelText(item1.treeLabel, this.state.lang) + " / " + getLabelText(item1.scenarioLabel, this.state.lang)}</span><div className="table-responsive">
                     <div id={"tableDiv" + count} className="jexcelremoveReadonlybackground consumptionDataEntryTable" name='jxlTableData' />
                 </div><br /></>)
             }
@@ -1663,7 +750,7 @@ export default class CommitTreeComponent extends React.Component {
         const { datasetPlanningUnit } = this.state;
         let consumtionNotes = datasetPlanningUnit.length > 0 && datasetPlanningUnit.map((item, i) => {
             return (
-                <tr key={i} className="hoverTd" onClick={() => this.missingMonthsClicked(item.planningUnit.id)}>
+                <tr key={i} className="hoverTd" onClick={() => missingMonthsClicked(item.planningUnit.id,this)}>
                     <td>{getLabelText(item.planningUnit.label, this.state.lang)}</td>
                     <td>{item.consumtionNotes}</td>
                 </tr>
@@ -1674,7 +761,7 @@ export default class CommitTreeComponent extends React.Component {
         const { treeScenarioNotes } = this.state;
         let scenarioNotes = treeScenarioNotes.length > 0 && treeScenarioNotes.map((item, i) => {
             return (
-                <tr key={i} className="hoverTd" onClick={() => this.nodeWithPercentageChildrenClicked(item.treeId, item.scenarioId)}>
+                <tr key={i} className="hoverTd" onClick={() => nodeWithPercentageChildrenClicked(item.treeId, item.scenarioId,this)}>
                     <td>{getLabelText(item.tree, this.state.lang)}</td>
                     <td>{getLabelText(item.scenario, this.state.lang)}</td>
                     <td>{item.scenarioNotes}</td>
@@ -1686,7 +773,7 @@ export default class CommitTreeComponent extends React.Component {
         const { treeNodeList } = this.state;
         let treeNodes = treeNodeList.length > 0 && treeNodeList.map((item, i) => {
             return (
-                <tr key={i} className="hoverTd" onClick={() => this.nodeWithPercentageChildrenClicked(item.treeId, item.scenarioId)}>
+                <tr key={i} className="hoverTd" onClick={() => nodeWithPercentageChildrenClicked(item.treeId, item.scenarioId,this)}>
                     <td>{getLabelText(item.tree, this.state.lang)}</td>
                     <td>{getLabelText(item.node, this.state.lang)}</td>
                     <td>{getLabelText(item.scenario, this.state.lang)}</td>
@@ -1908,7 +995,7 @@ export default class CommitTreeComponent extends React.Component {
                     </ModalHeader> */}
                     <ModalHeader toggle={() => this.toggleShowValidation()} className="modalHeaderSupplyPlan">
                         <div>
-                            <img className=" pull-right iconClass cursor ml-lg-2" style={{ height: '22px', width: '22px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.exportPDF()} />
+                            <img className=" pull-right iconClass cursor ml-lg-2" style={{ height: '22px', width: '22px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => exportPDF(this)} />
                             <i className="fa fa-print pull-right iconClassCommit cursor" onClick={() => this.print()}></i>
                             <h3><strong>{i18n.t('static.commitTree.forecastValidation')}</strong></h3>
                         </div>

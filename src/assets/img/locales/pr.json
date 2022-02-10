@@ -1544,6 +1544,7 @@
     "static.productCategoryName.productCategoryNameRequired": "O nome da categoria da unidade de planeamento é obrigatório.",
     "static.planningunit.planningunit": "Unidade de planeamento",
     "static.dataEntry.batchDetails": "Detalhes do lote",
+    "static.versionSettings.committedDate": "Data confirmada",
     "static.forecastingUnit.forecastingUnitName": "Nome da unidade de previsão",
     "static.extrapolation.tripleExponential": "Suavização Exponencial Tripla (TES, Holt-Winters)",
     "static.user.validphonemindigit": "O número de telefone deve conter pelo menos 6 dígitos",

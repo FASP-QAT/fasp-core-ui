@@ -1545,6 +1545,7 @@
     "static.productCategoryName.productCategoryNameRequired": "Planning Unit Category Name Is Required.",
     "static.planningunit.planningunit": "Planning Unit",
     "static.dataEntry.batchDetails": "Batch Details",
+    "static.versionSettings.committedDate": "Committed date",
     "static.forecastingUnit.forecastingUnitName": "Forecasting Unit Name",
     "static.extrapolation.tripleExponential": "Triple-Exponential Smoothing (TES, Holt-Winters)",
     "static.user.validphonemindigit": "Phone number must be at least 6 digits",
