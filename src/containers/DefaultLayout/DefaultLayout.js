@@ -1398,7 +1398,8 @@ class DefaultLayout extends Component {
                             name: i18n.t('static.dashboard.procurementagent'),
                             url: '/procurementAgent/listProcurementAgent',
                             icon: 'fa fa-link',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_PROCUREMENT_AGENT') && this.state.activeTab == 2 ? false : true) }
+                            // attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_PROCUREMENT_AGENT') && this.state.activeTab == 2 ? false : true) }
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_PROCUREMENT_AGENT') ? false : true) }
                           },
 
                           ////Product
