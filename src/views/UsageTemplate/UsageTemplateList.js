@@ -1256,11 +1256,12 @@ class usageTemplate extends Component {
         if (!this.state.roleArray.includes('ROLE_REALM_ADMIN')) {
             mylist.splice(0, 1);
         }
-        return mylist.sort(function (a, b) {
-            a = a.name.toLowerCase();
-            b = b.name.toLowerCase();
-            return a < b ? -1 : a > b ? 1 : 0;
-        });
+        return mylist;
+        // return mylist.sort(function (a, b) {
+        //     a = a.name.toLowerCase();
+        //     b = b.name.toLowerCase();
+        //     return a < b ? -1 : a > b ? 1 : 0;
+        // });
     }.bind(this)
 
     filterForecastingUnitBasedOnTracerCategory = function (instance, cell, c, r, source) {
@@ -2258,6 +2259,13 @@ class usageTemplate extends Component {
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.label.fieldRequired'));
                     valid = false;
+                    this.setState({
+                        message: i18n.t('static.supplyPlan.validationFailed'),
+                        color: 'red'
+                    },
+                        () => {
+                            this.hideSecondComponent();
+                        })
                 } else {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
@@ -2271,6 +2279,13 @@ class usageTemplate extends Component {
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.label.fieldRequired'));
                     valid = false;
+                    this.setState({
+                        message: i18n.t('static.supplyPlan.validationFailed'),
+                        color: 'red'
+                    },
+                        () => {
+                            this.hideSecondComponent();
+                        })
                 } else {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
@@ -2284,6 +2299,13 @@ class usageTemplate extends Component {
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.label.fieldRequired'));
                     valid = false;
+                    this.setState({
+                        message: i18n.t('static.supplyPlan.validationFailed'),
+                        color: 'red'
+                    },
+                        () => {
+                            this.hideSecondComponent();
+                        })
                 } else {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
@@ -2298,6 +2320,13 @@ class usageTemplate extends Component {
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.label.fieldRequired'));
                     valid = false;
+                    this.setState({
+                        message: i18n.t('static.supplyPlan.validationFailed'),
+                        color: 'red'
+                    },
+                        () => {
+                            this.hideSecondComponent();
+                        })
                 } else {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
@@ -2314,18 +2343,39 @@ class usageTemplate extends Component {
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.label.fieldRequired'));
                     valid = false;
+                    this.setState({
+                        message: i18n.t('static.supplyPlan.validationFailed'),
+                        color: 'red'
+                    },
+                        () => {
+                            this.hideSecondComponent();
+                        })
                 } else {
                     if (!(reg.test(value))) {
                         this.el.setStyle(col, "background-color", "transparent");
                         this.el.setStyle(col, "background-color", "yellow");
                         this.el.setComments(col, i18n.t('static.common.onlyIntegers'));
                         valid = false;
+                        this.setState({
+                            message: i18n.t('static.supplyPlan.validationFailed'),
+                            color: 'red'
+                        },
+                            () => {
+                                this.hideSecondComponent();
+                            })
                     } else {
                         if (isNaN(Number.parseInt(value)) || value < 0) {
                             this.el.setStyle(col, "background-color", "transparent");
                             this.el.setStyle(col, "background-color", "yellow");
                             this.el.setComments(col, i18n.t('static.program.validvaluetext'));
                             valid = false;
+                            this.setState({
+                                message: i18n.t('static.supplyPlan.validationFailed'),
+                                color: 'red'
+                            },
+                                () => {
+                                    this.hideSecondComponent();
+                                })
                         } else {
                             this.el.setStyle(col, "background-color", "transparent");
                             this.el.setComments(col, "");
@@ -2342,6 +2392,13 @@ class usageTemplate extends Component {
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.label.fieldRequired'));
                     valid = false;
+                    this.setState({
+                        message: i18n.t('static.supplyPlan.validationFailed'),
+                        color: 'red'
+                    },
+                        () => {
+                            this.hideSecondComponent();
+                        })
                 } else {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
@@ -2357,18 +2414,39 @@ class usageTemplate extends Component {
                         this.el.setStyle(col, "background-color", "yellow");
                         this.el.setComments(col, i18n.t('static.label.fieldRequired'));
                         valid = false;
+                        this.setState({
+                            message: i18n.t('static.supplyPlan.validationFailed'),
+                            color: 'red'
+                        },
+                            () => {
+                                this.hideSecondComponent();
+                            })
                     } else {
                         if (!(reg.test(value))) {
                             this.el.setStyle(col, "background-color", "transparent");
                             this.el.setStyle(col, "background-color", "yellow");
                             this.el.setComments(col, i18n.t('static.common.onlyIntegers'));
                             valid = false;
+                            this.setState({
+                                message: i18n.t('static.supplyPlan.validationFailed'),
+                                color: 'red'
+                            },
+                                () => {
+                                    this.hideSecondComponent();
+                                })
                         } else {
                             if (isNaN(Number.parseInt(value)) || value <= 0) {
                                 this.el.setStyle(col, "background-color", "transparent");
                                 this.el.setStyle(col, "background-color", "yellow");
                                 this.el.setComments(col, i18n.t('static.program.validvaluetext'));
                                 valid = false;
+                                this.setState({
+                                    message: i18n.t('static.supplyPlan.validationFailed'),
+                                    color: 'red'
+                                },
+                                    () => {
+                                        this.hideSecondComponent();
+                                    })
                             } else {
                                 this.el.setStyle(col, "background-color", "transparent");
                                 this.el.setComments(col, "");
@@ -2386,18 +2464,39 @@ class usageTemplate extends Component {
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.label.fieldRequired'));
                     valid = false;
+                    this.setState({
+                        message: i18n.t('static.supplyPlan.validationFailed'),
+                        color: 'red'
+                    },
+                        () => {
+                            this.hideSecondComponent();
+                        })
                 } else {
                     if (!(reg.test(value))) {
                         this.el.setStyle(col, "background-color", "transparent");
                         this.el.setStyle(col, "background-color", "yellow");
                         this.el.setComments(col, i18n.t('static.common.onlyIntegers'));
                         valid = false;
+                        this.setState({
+                            message: i18n.t('static.supplyPlan.validationFailed'),
+                            color: 'red'
+                        },
+                            () => {
+                                this.hideSecondComponent();
+                            })
                     } else {
                         if (isNaN(Number.parseInt(value)) || value <= 0) {
                             this.el.setStyle(col, "background-color", "transparent");
                             this.el.setStyle(col, "background-color", "yellow");
                             this.el.setComments(col, i18n.t('static.program.validvaluetext'));
                             valid = false;
+                            this.setState({
+                                message: i18n.t('static.supplyPlan.validationFailed'),
+                                color: 'red'
+                            },
+                                () => {
+                                    this.hideSecondComponent();
+                                })
                         } else {
                             this.el.setStyle(col, "background-color", "transparent");
                             this.el.setComments(col, "");
@@ -2416,18 +2515,39 @@ class usageTemplate extends Component {
                         this.el.setStyle(col, "background-color", "yellow");
                         this.el.setComments(col, i18n.t('static.label.fieldRequired'));
                         valid = false;
+                        this.setState({
+                            message: i18n.t('static.supplyPlan.validationFailed'),
+                            color: 'red'
+                        },
+                            () => {
+                                this.hideSecondComponent();
+                            })
                     } else {
                         if (!(reg.test(value))) {
                             this.el.setStyle(col, "background-color", "transparent");
                             this.el.setStyle(col, "background-color", "yellow");
                             this.el.setComments(col, i18n.t('static.common.onlyIntegers'));
                             valid = false;
+                            this.setState({
+                                message: i18n.t('static.supplyPlan.validationFailed'),
+                                color: 'red'
+                            },
+                                () => {
+                                    this.hideSecondComponent();
+                                })
                         } else {
                             if (isNaN(Number.parseInt(value)) || value <= 0) {
                                 this.el.setStyle(col, "background-color", "transparent");
                                 this.el.setStyle(col, "background-color", "yellow");
                                 this.el.setComments(col, i18n.t('static.program.validvaluetext'));
                                 valid = false;
+                                this.setState({
+                                    message: i18n.t('static.supplyPlan.validationFailed'),
+                                    color: 'red'
+                                },
+                                    () => {
+                                        this.hideSecondComponent();
+                                    })
                             } else {
                                 this.el.setStyle(col, "background-color", "transparent");
                                 this.el.setComments(col, "");
@@ -2443,6 +2563,13 @@ class usageTemplate extends Component {
                         this.el.setStyle(col, "background-color", "yellow");
                         this.el.setComments(col, i18n.t('static.label.fieldRequired'));
                         valid = false;
+                        this.setState({
+                            message: i18n.t('static.supplyPlan.validationFailed'),
+                            color: 'red'
+                        },
+                            () => {
+                                this.hideSecondComponent();
+                            })
                     } else {
                         this.el.setStyle(col, "background-color", "transparent");
                         this.el.setComments(col, "");
@@ -2462,18 +2589,39 @@ class usageTemplate extends Component {
                         this.el.setStyle(col, "background-color", "yellow");
                         this.el.setComments(col, i18n.t('static.label.fieldRequired'));
                         valid = false;
+                        this.setState({
+                            message: i18n.t('static.supplyPlan.validationFailed'),
+                            color: 'red'
+                        },
+                            () => {
+                                this.hideSecondComponent();
+                            })
                     } else {
                         if (!(reg.test(value))) {
                             this.el.setStyle(col, "background-color", "transparent");
                             this.el.setStyle(col, "background-color", "yellow");
                             this.el.setComments(col, i18n.t('static.common.onlyIntegers'));
                             valid = false;
+                            this.setState({
+                                message: i18n.t('static.supplyPlan.validationFailed'),
+                                color: 'red'
+                            },
+                                () => {
+                                    this.hideSecondComponent();
+                                })
                         } else {
                             if (isNaN(Number.parseInt(value)) || value <= 0) {
                                 this.el.setStyle(col, "background-color", "transparent");
                                 this.el.setStyle(col, "background-color", "yellow");
                                 this.el.setComments(col, i18n.t('static.program.validvaluetext'));
                                 valid = false;
+                                this.setState({
+                                    message: i18n.t('static.supplyPlan.validationFailed'),
+                                    color: 'red'
+                                },
+                                    () => {
+                                        this.hideSecondComponent();
+                                    })
                             } else {
                                 this.el.setStyle(col, "background-color", "transparent");
                                 this.el.setComments(col, "");
@@ -2490,6 +2638,13 @@ class usageTemplate extends Component {
                         this.el.setStyle(col, "background-color", "yellow");
                         this.el.setComments(col, i18n.t('static.label.fieldRequired'));
                         valid = false;
+                        this.setState({
+                            message: i18n.t('static.supplyPlan.validationFailed'),
+                            color: 'red'
+                        },
+                            () => {
+                                this.hideSecondComponent();
+                            })
                     } else {
                         this.el.setStyle(col, "background-color", "transparent");
                         this.el.setComments(col, "");
@@ -2533,9 +2688,9 @@ class usageTemplate extends Component {
                     <CardBody className="p-0">
 
                         <Col xs="12" sm="12">
-                            <h5 className="red">{i18n.t('static.common.customWarningMessage')}</h5>
-                            <h5 className="red">{i18n.t('static.usageTemplate.usageTemplateText')}</h5>
-                            <span className=""><h5 className="red"><i class="fa fa-calculator" aria-hidden="true"></i>  {i18n.t('static.usageTemplate.calculatorReminderText')}</h5></span>
+                            <h5>{i18n.t('static.common.customWarningMessage')}</h5>
+                            <h5>{i18n.t('static.usageTemplate.usageTemplateText')}</h5>
+                            <span className=""><h5><i class="fa fa-calculator" aria-hidden="true"></i>  {i18n.t('static.usageTemplate.calculatorReminderText')}</h5></span>
                             <div id="paputableDiv" className="table-responsive consumptionDataEntryTable" style={{ display: this.state.loading ? "none" : "block" }}>
                             </div>
                             <div style={{ display: this.state.loading ? "block" : "none" }}>
@@ -2555,7 +2710,7 @@ class usageTemplate extends Component {
                     <CardFooter>
                         {(this.state.roleArray.includes('ROLE_REALM_ADMIN') || this.state.roleArray.includes('ROLE_DATASET_ADMIN')) &&
                             <FormGroup>
-                                {/* <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button> */}
+                                <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                 <Button type="submit" size="md" color="success" onClick={this.formSubmit} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                 <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i>{i18n.t('static.common.addRow')}</Button>
                                 &nbsp;
@@ -2778,7 +2933,8 @@ class usageTemplate extends Component {
             })
     }
     cancelClicked() {
-        this.props.history.push(`/realmCountry/listRealmCountry/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
+        let id = AuthenticationService.displayDashboardBasedOnRole();
+        this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.message.cancelled'))
     }
 
     dataChange(event) {

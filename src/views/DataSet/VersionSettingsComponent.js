@@ -848,6 +848,9 @@ class VersionSettingsComponent extends Component {
             wordWrap: true,
             allowInsertColumn: false,
             allowManualInsertColumn: false,
+            copyCompatibility: true,
+            allowManualInsertRow: false,
+            parseFormulas: true,
             allowDeleteRow: false,
             onselection: this.selected,
             updateTable: function (el, cell, x, y, source, value, id) {

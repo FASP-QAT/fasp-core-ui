@@ -1361,22 +1361,42 @@ export default class BuildTree extends Component {
 
         } else {
             if (this.state.selectedScenario != "") {
+                var scenarioList = this.state.scenarioList;
+                var minScenarioId = Math.min(...scenarioList.map(o => o.id));
+                if (minScenarioId != this.state.selectedScenario) {
+                    confirmAlert({
+                        message: "Are you sure you want to delete this scenario.",
+                        buttons: [
+                            {
+                                label: i18n.t('static.program.yes'),
+                                onClick: () => {
+                                    this.addScenario();
+                                }
+                            },
+                            {
+                                label: i18n.t('static.program.no')
+                            }
+                        ]
+                    });
+                } else {
+                    confirmAlert({
+                        message: "You can't delete the default scenario.",
+                        buttons: [
+                            {
+                                label: i18n.t('static.report.ok')
+                            }
+                        ]
+                    });
+                }
+            } else {
                 confirmAlert({
-                    message: "Are you sure you want to delete this scenario.",
+                    message: "Please select scenario first.",
                     buttons: [
                         {
-                            label: i18n.t('static.program.yes'),
-                            onClick: () => {
-                                this.addScenario();
-                            }
-                        },
-                        {
-                            label: i18n.t('static.program.no')
+                            label: i18n.t('static.report.ok')
                         }
                     ]
                 });
-            } else {
-                alert("Please select scenario first.")
             }
         }
     }
@@ -6994,7 +7014,7 @@ export default class BuildTree extends Component {
             })
         } else {
             if (type == 1) {
-                alert("Please select date withing forecast range");
+                alert("Please select date within forecast range");
             }
         }
     }
@@ -7492,13 +7512,13 @@ export default class BuildTree extends Component {
                     </button> */}
                     {itemConfig.parent != null &&
                         <>
-                            {/* <button key="2" type="button" className="StyledButton TreeIconStyle" style={{ background: 'none' }}
+                            <button key="2" type="button" className="StyledButton TreeIconStyle" style={{ background: 'none' }}
                                 onClick={(event) => {
                                     event.stopPropagation();
                                     this.duplicateNode(itemConfig);
                                 }}>
                                 <i class="fa fa-clone" aria-hidden="true"></i>
-                            </button> */}
+                            </button>
 
 
                             <button key="3" type="button" className="StyledButton TreeIconStyle" style={{ background: 'none' }}
@@ -7918,7 +7938,7 @@ export default class BuildTree extends Component {
                                                                 </FormGroup>
                                                                 <FormGroup className="col-md-3 pt-lg-4">
 
-                                                                    <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setState({ showDiv: false })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                                                    {/* <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setState({ showDiv: false })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button> */}
                                                                     <Button type="submit" size="md" onClick={() => this.touchAll(setTouched, errors)} color="success" className="submitBtn float-right mr-1"> <i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
                                                                 </FormGroup>
                                                             </Row>

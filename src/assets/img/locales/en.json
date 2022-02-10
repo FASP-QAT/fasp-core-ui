@@ -1924,7 +1924,7 @@
     "static.supplyPlanFormula.whenToSuggestEx1": "Inventory of current month = 24,890",
     "static.supplyPlanFormula.whenToSuggestEx2": "Min = 25,568",
     "static.supplyPlanFormula.whenToSuggestEx3": "Suggest Order = True",
-    "static.tree.blank": "(blank)",
+    "static.tree.blank": "Draw your own tree",
     "static.month.aug": "Aug",
     "static.mapProcurementUnit.validApprovedToShippedLeadTimeText": "Enter `Approved to Shipped` lead time (in months)",
     "static.message.addFailed": "Failed to add {{entityname}}",
@@ -2135,5 +2135,7 @@
     "static.supplyPlanFormula.maxMonthOfStockEx2": "Max = MIN ([ MAX(4,3)+3 ] ,18 )",
     "static.organisation.organisationheader": "Organization",
     "static.supplyPlanFormula.maxMonthOfStockEx5": "Max = 7",
-    "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18 )"
+    "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18 )",
+    "static.common.deleteTree": "Delete Tree",
+    "static.common.duplicateTree":"Duplicate Tree"
 }
