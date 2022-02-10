@@ -4537,10 +4537,10 @@ export default class BuildTree extends Component {
         this.setState({
             activeTab1: newArray,
         });
-        if (tab == 2) {
+        if (tab == 3) {
             this.refs.extrapolationChild.buildJexcel();
         }
-        if (tab == 3) {
+        if (tab == 2) {
             console.log("***>>>", this.state.currentItemConfig);
             if (this.state.currentItemConfig.context.payload.nodeType.id != 1) {
                 var curDate = (moment(Date.now()).utcOffset('-0500').format('YYYY-MM-DD'));
@@ -6464,10 +6464,6 @@ export default class BuildTree extends Component {
                             )} />
                 </TabPane>
                 <TabPane tabId="2">
-                    {/* <ConsumptionInSupplyPlanComponent ref="consumptionChild" items={this.state} toggleLarge={this.toggleLarge} updateState={this.updateState} formSubmit={this.formSubmit} hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} consumptionPage="consumptionDataEntry" useLocalData={1} /> */}
-                    <TreeExtrapolationComponent ref="extrapolationChild" items={this.state} />
-                </TabPane>
-                <TabPane tabId="3">
 
                     <div className="row pl-lg-5 pb-lg-3 pt-lg-0">
                         <div className="offset-md-10 col-md-6 pl-lg-4">
@@ -6928,6 +6924,10 @@ export default class BuildTree extends Component {
                             </fieldset>
                         </div>
                     }
+                </TabPane>
+                <TabPane tabId="3">
+                    {/* <ConsumptionInSupplyPlanComponent ref="consumptionChild" items={this.state} toggleLarge={this.toggleLarge} updateState={this.updateState} formSubmit={this.formSubmit} hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} consumptionPage="consumptionDataEntry" useLocalData={1} /> */}
+                    <TreeExtrapolationComponent ref="extrapolationChild" items={this.state} />
                 </TabPane>
 
             </>
@@ -8202,7 +8202,7 @@ export default class BuildTree extends Component {
                                         {i18n.t('static.tree.Modeling/Transfer')}
                                     </NavLink>
                                 </NavItem>
-                                <NavItem>
+                                <NavItem style={{display:this.state.currentItemConfig.context.payload.nodeType.id == 2 ? 'block' : 'none'}}>
                                     <NavLink
                                         active={this.state.activeTab1[0] === '3'}
                                         onClick={() => { this.toggleModal(0, '3'); }}
