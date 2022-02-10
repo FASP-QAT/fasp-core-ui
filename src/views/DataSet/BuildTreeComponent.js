@@ -21,7 +21,7 @@ import getLabelText from '../../CommonComponent/getLabelText';
 import moment from 'moment';
 import Picker from 'react-month-picker';
 import MonthBox from '../../CommonComponent/MonthBox.js';
-import { INDEXED_DB_NAME, INDEXED_DB_VERSION, TREE_DIMENSION_ID, SECRET_KEY, JEXCEL_MONTH_PICKER_FORMAT, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, JEXCEL_DECIMAL_NO_REGEX_LONG, DATE_FORMAT_CAP_WITHOUT_DATE,JEXCEL_DECIMAL_MONTHLY_CHANGE } from '../../Constants.js'
+import { INDEXED_DB_NAME, INDEXED_DB_VERSION, TREE_DIMENSION_ID, SECRET_KEY, JEXCEL_MONTH_PICKER_FORMAT, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, JEXCEL_DECIMAL_NO_REGEX_LONG, DATE_FORMAT_CAP_WITHOUT_DATE, JEXCEL_DECIMAL_MONTHLY_CHANGE } from '../../Constants.js'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import jexcel from 'jexcel-pro';
 import "../../../node_modules/jexcel-pro/dist/jexcel.css";
@@ -8179,18 +8179,19 @@ export default class BuildTree extends Component {
                                         active={this.state.activeTab1[0] === '2'}
                                         onClick={() => { this.toggleModal(0, '2'); }}
                                     >
-                                        {/* {i18n.t('static.tree.extrapolation')} */}
-                                        Extrapolation
+                                        {i18n.t('static.tree.Modeling/Transfer')}
                                     </NavLink>
                                 </NavItem>
-                                {/* <NavItem>
+                                <NavItem>
                                     <NavLink
                                         active={this.state.activeTab1[0] === '3'}
                                         onClick={() => { this.toggleModal(0, '3'); }}
                                     >
-                                        {i18n.t('static.tree.Modeling/Transfer')}
+                                        {/* {i18n.t('static.tree.extrapolation')} */}
+                                        Extrapolation
                                     </NavLink>
-                                </NavItem> */}
+                                </NavItem>
+
 
                             </Nav>
                             <TabContent activeTab={this.state.activeTab1[0]}>
