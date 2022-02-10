@@ -349,6 +349,7 @@ export function buildJxl(props) {
                 position: 'top',
                 filters: true,
                 license: JEXCEL_PRO_KEY,
+                editable:false,
                 contextMenu: function (obj, x, y, e) {
                     return [];
                 }.bind(this),
@@ -718,7 +719,11 @@ export function exportPDF(props) {
                 var dataArr1 = []
                 item1.columnArray.map((item2, count) => {
                     if (item2.type != 'hidden') {
-                        dataArr1.push(item3[count])
+                        if(item2.type=='calendar'){
+                            dataArr1.push(moment(item3[count]).format(DATE_FORMAT_CAP_WITHOUT_DATE))
+                        }else{
+                            dataArr1.push(item3[count]+"%")
+                        }
                     }
                 })
                 dataArr.push(dataArr1);

@@ -32,9 +32,9 @@ import "jspdf-autotable";
 import html2canvas from 'html2canvas';
 import pdfIcon from '../../assets/img/pdf.png';
 import { LOGO } from "../../CommonComponent/Logo";
-import {dataCheck} from '../DataSet/DataCheckComponent.js';
-import {buildJxl} from '../DataSet/DataCheckComponent.js';
-import {exportPDF,noForecastSelectedClicked,missingMonthsClicked,missingBranchesClicked,nodeWithPercentageChildrenClicked} from '../DataSet/DataCheckComponent.js';
+import { dataCheck } from '../DataSet/DataCheckComponent.js';
+import { buildJxl } from '../DataSet/DataCheckComponent.js';
+import { exportPDF, noForecastSelectedClicked, missingMonthsClicked, missingBranchesClicked, nodeWithPercentageChildrenClicked } from '../DataSet/DataCheckComponent.js';
 
 const entityname = i18n.t('static.button.commit');
 const initialValues = {
@@ -172,29 +172,29 @@ export default class CommitTreeComponent extends React.Component {
                         datasetJson: datasetJson
                     }
                     programList.push(programJson)
-                    var programId = "";
-                    var event = {
-                        target: {
-                            value: ""
-                        }
-                    };
-                    if (programList.length == 1) {
-                        programId = programList[0].id;
-                        event.target.value = programList[0].id;
-                    } else if (localStorage.getItem("sesDatasetId") != "" && programList.filter(c => c.id == localStorage.getItem("sesDatasetId")).length > 0) {
-                        programId = localStorage.getItem("sesDatasetId");
-                        event.target.value = localStorage.getItem("sesDatasetId");
-                    }
-                    this.setState({
-                        programList: programList,
-                        loading: false,
-                        programId: programId
-                    }, () => {
-                        if (programId != "") {
-                            this.setProgramId(event);
-                        }
-                    })
                 }
+                var programId = "";
+                var event = {
+                    target: {
+                        value: ""
+                    }
+                };
+                if (programList.length == 1) {
+                    programId = programList[0].id;
+                    event.target.value = programList[0].id;
+                } else if (localStorage.getItem("sesDatasetId") != "" && programList.filter(c => c.id == localStorage.getItem("sesDatasetId")).length > 0) {
+                    programId = localStorage.getItem("sesDatasetId");
+                    event.target.value = localStorage.getItem("sesDatasetId");
+                }
+                this.setState({
+                    programList: programList,
+                    loading: false,
+                    programId: programId
+                }, () => {
+                    if (programId != "") {
+                        this.setProgramId(event);
+                    }
+                })
             }.bind(this)
         }.bind(this)
     }
@@ -237,7 +237,7 @@ export default class CommitTreeComponent extends React.Component {
                 this.setState({
                     programDataLocal: programData[0].datasetJson,
                     programDataDownloaded: datasetJson,
-                    programName: programData[0].name + 'v' + programData[0].version + ' (local)',
+                    programName: programData[0].name + '~v' + programData[0].version + ' (local)',
                     forecastStartDate: programData[0].datasetJson.currentVersion.forecastStartDate,
                     forecastStopDate: programData[0].datasetJson.currentVersion.forecastStopDate,
                     notes: programData[0].datasetJson.currentVersion.notes
@@ -257,7 +257,7 @@ export default class CommitTreeComponent extends React.Component {
                             comparedLatestVersion: response.data[0].currentVersion.versionId
                         })
                     })
-                dataCheck(this,programData[0].datasetJson)
+                dataCheck(this, programData[0].datasetJson)
 
             }.bind(this)
         }.bind(this)
@@ -578,7 +578,13 @@ export default class CommitTreeComponent extends React.Component {
                                                     }, () => {
                                                         this.hideFirstComponent()
                                                         if (error.response.data.messageCode == 'static.commitVersion.versionIsOutDated') {
-                                                            this.checkLastModifiedDateForProgram(this.state.programId);
+                                                            var event = {
+                                                                target: {
+                                                                    value: this.state.programId
+                                                                }
+                                                            };
+
+                                                            this.setProgramId(event);
                                                         }
                                                     });
                                                     break;
@@ -665,7 +671,7 @@ export default class CommitTreeComponent extends React.Component {
         let programs = programList.length > 0 && programList.map((item, i) => {
             return (
                 <option key={i} value={item.id}>
-                    {item.name}-v{item.version}
+                    {item.name}~v{item.version}
                 </option>
             )
         }, this);
@@ -678,7 +684,7 @@ export default class CommitTreeComponent extends React.Component {
                     item.regionList.map(item1 => {
                         return (
                             <li key={i}>
-                                <div className="hoverDiv" onClick={() => noForecastSelectedClicked(item.planningUnit.planningUnit.id, item1.id,this)}>{getLabelText(item.planningUnit.planningUnit.label, this.state.lang) + " - " + item1.label}</div>
+                                <div className="hoverDiv" onClick={() => noForecastSelectedClicked(item.planningUnit.planningUnit.id, item1.id, this)}><span>{getLabelText(item.planningUnit.planningUnit.label, this.state.lang) + " - " + item1.label}</span></div>
                             </li>
                         )
                     }, this)
@@ -690,7 +696,7 @@ export default class CommitTreeComponent extends React.Component {
         let missingMonths = missingMonthList.length > 0 && missingMonthList.map((item, i) => {
             return (
                 <li key={i}>
-                    <div><span><div className="hoverDiv" onClick={() => missingMonthsClicked(item.planningUnitId,this)}><b>{getLabelText(item.planningUnitLabel, this.state.lang) + " - " + getLabelText(item.regionLabel, this.state.lang) + " : "}</b></div>{"" + item.monthsArray}</span></div>
+                    <div><span><div className="hoverDiv" onClick={() => missingMonthsClicked(item.planningUnitId, this)}><b>{getLabelText(item.planningUnitLabel, this.state.lang) + " - " + getLabelText(item.regionLabel, this.state.lang) + " : "}</b></div>{"" + item.monthsArray}</span></div>
                 </li>
             )
         }, this);
@@ -700,7 +706,7 @@ export default class CommitTreeComponent extends React.Component {
         let consumption = consumptionListlessTwelve.length > 0 && consumptionListlessTwelve.map((item, i) => {
             return (
                 <li key={i}>
-                    <div><span><div className="hoverDiv" onClick={() => missingMonthsClicked(item.planningUnitId,this)}><b>{getLabelText(item.planningUnitLabel, this.state.lang) + " - " + getLabelText(item.regionLabel, this.state.lang) + " : "}</b></div></span><span>{item.noOfMonths + " month(s)"}</span></div>
+                    <div><span><div className="hoverDiv" onClick={() => missingMonthsClicked(item.planningUnitId, this)}><b>{getLabelText(item.planningUnitLabel, this.state.lang) + " - " + getLabelText(item.regionLabel, this.state.lang) + " : "}</b></div></span><span>{item.noOfMonths + " month(s)"}</span></div>
                 </li>
             )
         }, this);
@@ -721,7 +727,7 @@ export default class CommitTreeComponent extends React.Component {
             return (
                 <ul>
                     <li key={i}>
-                        <div className="hoverDiv" onClick={() => missingBranchesClicked(item.treeId,this)}><span>{getLabelText(item.treeLabel, this.state.lang)}</span></div>
+                        <div className="hoverDiv" onClick={() => missingBranchesClicked(item.treeId, this)}><span>{getLabelText(item.treeLabel, this.state.lang)}</span></div>
                         {item.flatList.length > 0 && item.flatList.map((item1, j) => {
                             return (
                                 <ul>
@@ -740,7 +746,7 @@ export default class CommitTreeComponent extends React.Component {
         let jxlTable = this.state.treeScenarioList.map((item1, count) => {
             var nodeWithPercentageChildren = this.state.nodeWithPercentageChildren.filter(c => c.treeId == item1.treeId && c.scenarioId == item1.scenarioId);
             if (nodeWithPercentageChildren.length > 0) {
-                return (<><span className="hoverDiv" onClick={() => nodeWithPercentageChildrenClicked(item1.treeId, item1.scenarioId,this)}>{getLabelText(item1.treeLabel, this.state.lang) + " / " + getLabelText(item1.scenarioLabel, this.state.lang)}</span><div className="table-responsive">
+                return (<><span className="hoverDiv" onClick={() => nodeWithPercentageChildrenClicked(item1.treeId, item1.scenarioId, this)}><span>{getLabelText(item1.treeLabel, this.state.lang) + " / " + getLabelText(item1.scenarioLabel, this.state.lang)}</span></span><div className="table-responsive">
                     <div id={"tableDiv" + count} className="jexcelremoveReadonlybackground consumptionDataEntryTable" name='jxlTableData' />
                 </div><br /></>)
             }
@@ -750,7 +756,7 @@ export default class CommitTreeComponent extends React.Component {
         const { datasetPlanningUnit } = this.state;
         let consumtionNotes = datasetPlanningUnit.length > 0 && datasetPlanningUnit.map((item, i) => {
             return (
-                <tr key={i} className="hoverTd" onClick={() => missingMonthsClicked(item.planningUnit.id,this)}>
+                <tr key={i} className="hoverTd" onClick={() => missingMonthsClicked(item.planningUnit.id, this)}>
                     <td>{getLabelText(item.planningUnit.label, this.state.lang)}</td>
                     <td>{item.consumtionNotes}</td>
                 </tr>
@@ -761,7 +767,7 @@ export default class CommitTreeComponent extends React.Component {
         const { treeScenarioNotes } = this.state;
         let scenarioNotes = treeScenarioNotes.length > 0 && treeScenarioNotes.map((item, i) => {
             return (
-                <tr key={i} className="hoverTd" onClick={() => nodeWithPercentageChildrenClicked(item.treeId, item.scenarioId,this)}>
+                <tr key={i} className="hoverTd" onClick={() => nodeWithPercentageChildrenClicked(item.treeId, item.scenarioId, this)}>
                     <td>{getLabelText(item.tree, this.state.lang)}</td>
                     <td>{getLabelText(item.scenario, this.state.lang)}</td>
                     <td>{item.scenarioNotes}</td>
@@ -773,7 +779,7 @@ export default class CommitTreeComponent extends React.Component {
         const { treeNodeList } = this.state;
         let treeNodes = treeNodeList.length > 0 && treeNodeList.map((item, i) => {
             return (
-                <tr key={i} className="hoverTd" onClick={() => nodeWithPercentageChildrenClicked(item.treeId, item.scenarioId,this)}>
+                <tr key={i} className="hoverTd" onClick={() => nodeWithPercentageChildrenClicked(item.treeId, item.scenarioId, this)}>
                     <td>{getLabelText(item.tree, this.state.lang)}</td>
                     <td>{getLabelText(item.node, this.state.lang)}</td>
                     <td>{getLabelText(item.scenario, this.state.lang)}</td>
@@ -996,7 +1002,7 @@ export default class CommitTreeComponent extends React.Component {
                     <ModalHeader toggle={() => this.toggleShowValidation()} className="modalHeaderSupplyPlan">
                         <div>
                             <img className=" pull-right iconClass cursor ml-lg-2" style={{ height: '22px', width: '22px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => exportPDF(this)} />
-                            <i className="fa fa-print pull-right iconClassCommit cursor" onClick={() => this.print()}></i>
+                            {/* <i className="fa fa-print pull-right iconClassCommit cursor" onClick={() => this.print()}></i> */}
                             <h3><strong>{i18n.t('static.commitTree.forecastValidation')}</strong></h3>
                         </div>
                     </ModalHeader>
@@ -1005,29 +1011,29 @@ export default class CommitTreeComponent extends React.Component {
                             <span><b>{this.state.programName}</b></span><br />
                             <span><b>{i18n.t('static.common.forecastPeriod')}: </b> {moment(this.state.forecastStartDate).format('MMM-YYYY')} to {moment(this.state.forecastStopDate).format('MMM-YYYY')} </span><br /><br />
 
-                            <span><b>1. {i18n.t('static.commitTree.noForecastSelected')} : </b>(<a href="/#/report/compareAndSelectScenario" target="_blank">{i18n.t('static.commitTree.compare&Select')}</a>, <a href="/#/forecastReport/forecastSummary" target="_blank">{i18n.t('static.commitTree.forecastSummary')}</a>)</span><br />
+                            <span><b>1. {i18n.t('static.commitTree.noForecastSelected')}: </b>(<a href="/#/report/compareAndSelectScenario" target="_blank">{i18n.t('static.commitTree.compare&Select')}</a>, <a href="/#/forecastReport/forecastSummary" target="_blank">{i18n.t('static.commitTree.forecastSummary')}</a>)</span><br />
                             <ul>{noForecastSelected}</ul>
 
-                            <span><b>2. {i18n.t('static.commitTree.consumptionForecast')} : </b>(<a href="/#/dataentry/consumptionDataEntryAndAdjustment" target="_blank">{i18n.t('static.commitTree.dataEntry&Adjustment')}</a>, <a href="/#/extrapolation/extrapolateData" target="_blank">{i18n.t('static.commitTree.extrapolation')}</a>)</span><br />
-                            <span>a. {i18n.t('static.commitTree.monthsMissingActualConsumptionValues')} :</span><br />
+                            <span><b>2. {i18n.t('static.commitTree.consumptionForecast')}: </b>(<a href="/#/dataentry/consumptionDataEntryAndAdjustment" target="_blank">{i18n.t('static.commitTree.dataEntry&Adjustment')}</a>, <a href="/#/extrapolation/extrapolateData" target="_blank">{i18n.t('static.commitTree.extrapolation')}</a>)</span><br />
+                            <span>a. {i18n.t('static.commitTree.monthsMissingActualConsumptionValues')}:</span><br />
                             <ul>{missingMonths}</ul>
-                            <span>b. {i18n.t('static.commitTree.puThatDoNotHaveAtleast24MonthsOfActualConsumptionValues')} :</span><br />
+                            <span>b. {i18n.t('static.commitTree.puThatDoNotHaveAtleast24MonthsOfActualConsumptionValues')}:</span><br />
                             <ul>{consumption}</ul>
 
-                            <span><b>3. {i18n.t('static.commitTree.treeForecast')} </b>(<a href="/#/dataset/listTree" target="_blank">{i18n.t('static.common.managetree')}</a>)</span><br />
-                            <span>a. {i18n.t('static.commitTree.puThatDoesNotAppearOnAnyTree')} </span><br />
+                            <span><b>3. {i18n.t('static.commitTree.treeForecast')}: </b>(<a href="/#/dataset/listTree" target="_blank">{i18n.t('static.common.managetree')}</a>)</span><br />
+                            <span>a. {i18n.t('static.commitTree.puThatDoesNotAppearOnAnyTree')}: </span><br />
                             <ul>{pu}</ul>
 
-                            <span>b. {i18n.t('static.commitTree.branchesMissingPlanningUnit')}</span><br />
+                            <span>b. {i18n.t('static.commitTree.branchesMissingPlanningUnit')}:</span><br />
                             {missingBranches}
 
-                            <span>c. {i18n.t('static.commitTree.NodesWithChildrenThatDoNotAddUpTo100Prcnt')}</span><br />
+                            <span>c. {i18n.t('static.commitTree.NodesWithChildrenThatDoNotAddUpTo100Prcnt')}:</span><br />
                             {jxlTable}
 
 
                             <span><b>4. {i18n.t('static.program.notes')}:</b></span><br />
 
-                            <span><b>a. {i18n.t('static.forecastMethod.historicalData')} :</b></span>
+                            <span>a. {i18n.t('static.forecastMethod.historicalData')}:</span>
                             <div className="table-scroll">
                                 <div className="table-wrap table-responsive fixTableHead">
                                     <Table className="table-bordered text-center mt-2 overflowhide main-table " bordered size="sm" >
@@ -1041,7 +1047,7 @@ export default class CommitTreeComponent extends React.Component {
                                     </Table>
                                 </div>
                             </div><br />
-                            <span><b>b. {i18n.t('static.commitTree.treeScenarios')}</b></span>
+                            <span>b. {i18n.t('static.commitTree.treeScenarios')}:</span>
                             <div className="table-scroll">
                                 <div className="table-wrap table-responsive fixTableHead">
                                     <Table className="table-bordered text-center mt-2 overflowhide main-table " bordered size="sm" >
@@ -1056,7 +1062,7 @@ export default class CommitTreeComponent extends React.Component {
                                     </Table>
                                 </div>
                             </div><br />
-                            <span><b>c. {i18n.t('static.commitTree.treeNodes')}</b></span>
+                            <span>c. {i18n.t('static.commitTree.treeNodes')}:</span>
                             {/* <div className="table-scroll"> */}
                             <div className="">
                                 <div className="table-wrap table-responsive fixTableHead">

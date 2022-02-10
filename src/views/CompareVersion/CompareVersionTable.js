@@ -524,24 +524,24 @@ export default class CompareVersion extends Component {
             editable: false,
             license: JEXCEL_PRO_KEY,
             editable: false,
-            // contextMenu: function (obj, x, y, e) {
-            //     var items = [];
-            //     //Resolve conflicts
-            //     var rowData = obj.getRowData(y)
-            //     // if (rowData[11].toString() == 2) {
-            //     items.push({
-            //         title: "Resolve conflicts",
-            //         onclick: function () {
-            //             this.setState({ loading: true })
-            //             this.toggleLarge(rowData, y);
-            //         }.bind(this)
-            //     })
-            //     // } else {
-            //     //     return false;
-            //     // }
+            contextMenu: function (obj, x, y, e) {
+                var items = [];
+                // //Resolve conflicts
+                // var rowData = obj.getRowData(y)
+                // // if (rowData[11].toString() == 2) {
+                // items.push({
+                //     title: "Resolve conflicts",
+                //     onclick: function () {
+                //         this.setState({ loading: true })
+                //         this.toggleLarge(rowData, y);
+                //     }.bind(this)
+                // })
+                // // } else {
+                // //     return false;
+                // // }
 
-            //     return items;
-            // }.bind(this),
+                return items;
+            }.bind(this),
         };
         var dataEl = jexcel(document.getElementById("tableDiv"), options);
         this.el = dataEl;
