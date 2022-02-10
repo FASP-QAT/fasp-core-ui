@@ -16,13 +16,14 @@ import * as Yup from 'yup'
 import '../Forms/ValidationForms/ValidationForms.css';
 import { INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY } from '../../Constants.js'
 import CryptoJS from 'crypto-js'
-import { ItemMeta } from 'semantic-ui-react';
+import { confirmAlert } from 'react-confirm-alert'; // Import
+import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 const entityname = i18n.t('static.common.listtree');
 
 const validationSchema = function (values) {
     return Yup.object().shape({
         treeName: Yup.string()
-            .required(i18n.t('static.label.fieldRequired')),
+            .required(i18n.t('static.validation.selectTreeName')),
     })
 }
 
@@ -109,29 +110,16 @@ export default class ListTreeComponent extends Component {
 
         console.log("TreeId--------------->", treeId, programId, versionId, operationId);
         var program = (this.state.datasetList.filter(x => x.programId == programId && x.version == versionId)[0]);
-        // console.log("TreeId--------------->", program.programData.treeList);
         let tempProgram = JSON.parse(JSON.stringify(program))
 
         if (operationId == 1) {//delete
-            // alert("If");
             let treeList = program.programData.treeList;
-            for (var j = 0; j < treeList.length; j++) {
-                if (treeList[j].treeId == treeId) {
-                    treeList[j].active = false;
-                }
-            }
-
             const index = treeList.findIndex(c => c.treeId == treeId);
-            console.log(" tree index--------->", index);
             if (index > 0) {
                 const result = treeList.splice(index, 1);
-                console.log("result---",result);
             }
-
             tempProgram.programData.treeList = treeList;
         } else {//copy
-            // alert("Else");
-            // let treeList = JSON.parse(JSON.stringify(program.programData.treeList));
             let treeList = program.programData.treeList;
             let treeName = this.state.treeName;
 
@@ -158,35 +146,12 @@ export default class ListTreeComponent extends Component {
                 }
             }
 
-
-
-            // let treeObj = treeList.filter(c => c.treeId == treeId)[0];
-            // console.log("TreeId--------------->11", treeObj + '-----------' + treeName);
-            // //operationOnTreeObj
-            // treeObj.label = {
-            //     "createdBy": null,
-            //     "createdDate": null,
-            //     "lastModifiedBy": null,
-            //     "lastModifiedDate": null,
-            //     "active": true,
-            //     "labelId": '',
-            //     "label_en": treeName,
-            //     "label_sp": null,
-            //     "label_fr": null,
-            //     "label_pr": null
-            // }
-
             console.log("TreeId--------------->12", treeList);
             tempProgram.programData.treeList = treeList;
         }
 
-        console.log("TreeId--------------->13", tempProgram.programData.treeList);
-
-
         var programData = (CryptoJS.AES.encrypt(JSON.stringify(tempProgram.programData), SECRET_KEY)).toString();
         tempProgram.programData = programData;
-        // programs.push(program);
-        console.log("programs to update---1", tempProgram);
 
         var db1;
         getDatabase();
@@ -251,8 +216,14 @@ export default class ListTreeComponent extends Component {
             getRequest.onsuccess = function (event) {
                 var myResult = [];
                 myResult = getRequest.result;
+                var treeTemplateList = myResult.filter(x => x.active == true);
+                treeTemplateList.sort((a, b) => {
+                    var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                    var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                    return itemLabelA > itemLabelB ? 1 : -1;
+                });
                 this.setState({
-                    treeTemplateList: myResult.filter(x => x.active == true)
+                    treeTemplateList
                 });
                 // for (var i = 0; i < myResult.length; i++) {
                 //     console.log("treeTemplateList--->", myResult[i])
@@ -350,7 +321,7 @@ export default class ListTreeComponent extends Component {
                     data[0] = treeList[k].treeId
                     data[1] = programList[j].programCode + "~v" + programList[j].programData.currentVersion.versionId
                     // data[1] = programList[j].programCode
-                    data[2] = (getLabelText(treeList[k].label, this.state.lang)).toUpperCase()
+                    data[2] = getLabelText(treeList[k].label, this.state.lang)
                     data[3] = treeList[k].regionList.map(x => getLabelText(x.label, this.state.lang)).join(", ")
                     console.log("forecast method--->", treeList[k].forecastMethod.label)
                     data[4] = getLabelText(treeList[k].forecastMethod.label, this.state.lang)
@@ -461,8 +432,6 @@ export default class ListTreeComponent extends Component {
             allowManualInsertColumn: false,
             allowDeleteRow: false,
             onselection: this.selected,
-
-
             oneditionend: this.onedit,
             copyCompatibility: true,
             allowExport: false,
@@ -475,30 +444,36 @@ export default class ListTreeComponent extends Component {
                 if (y != null) {
                     if (obj.options.allowInsertRow == true) {
                         items.push({
-                            title: i18n.t('static.common.delete'),
+                            title: i18n.t('static.common.deleteTree'),
                             onclick: function () {
-                                this.copyDeleteTree(this.el.getValueFromCoords(0, y), this.el.getValueFromCoords(7, y), this.el.getValueFromCoords(9, y), 1);
+                                confirmAlert({
+                                    message: "Are you sure you want to delete this tree.",
+                                    buttons: [
+                                        {
+                                            label: i18n.t('static.program.yes'),
+                                            onClick: () => {
+                                                this.copyDeleteTree(this.el.getValueFromCoords(0, y), this.el.getValueFromCoords(7, y), this.el.getValueFromCoords(9, y), 1);
+                                            }
+                                        },
+                                        {
+                                            label: i18n.t('static.program.no')
+                                        }
+                                    ]
+                                });
+
                             }.bind(this)
                         });
 
                         items.push({
-                            title: i18n.t('static.common.copyRow'),
+                            title: i18n.t('static.common.duplicateTree'),
                             onclick: function () {
                                 this.setState({
                                     programId: this.el.getValueFromCoords(7, y),
                                     versionId: this.el.getValueFromCoords(9, y),
                                     treeId: this.el.getValueFromCoords(0, y),
                                     isModalOpen: !this.state.isModalOpen,
+                                    treeName: ''
                                 })
-                                // this.copyDeleteTree(this.el.getValueFromCoords(0, y), this.el.getValueFromCoords(7, y), this.el.getValueFromCoords(9, y), 2);
-                                // var rowData = obj.getRowData(y);
-                                // console.log("rowData===>", rowData);
-                                // rowData[0] = "";
-                                // // rowData[1] = "";
-                                // var data = rowData;
-                                // this.el.insertRow(
-                                //     data, 0, 1
-                                // );
                             }.bind(this)
                         });
                     }
@@ -603,7 +578,7 @@ export default class ListTreeComponent extends Component {
                     this.setState({ loading: loading })
                 }} />
                 <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
-                <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
+                <h5 className={this.state.color} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <Card>
                     <div className="Card-header-addicon">
                         {/* <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong> */}
@@ -690,7 +665,7 @@ export default class ListTreeComponent extends Component {
                             <strong>Tree Details</strong>
                         </ModalHeader>
                         <ModalBody className='pb-lg-0'>
-                            <h6 className="red" id="div3"></h6>
+                            {/* <h6 className="red" id="div3"></h6> */}
                             <Col sm={12} style={{ flexBasis: 'auto' }}>
                                 {/* <Card> */}
                                 <Formik
@@ -737,8 +712,9 @@ export default class ListTreeComponent extends Component {
                                                                 required
                                                                 value={this.state.treeName}
                                                             />
+                                                            <FormFeedback className="red">{errors.treeName}</FormFeedback>
                                                         </div>
-                                                        <FormFeedback className="red">{errors.treeName}</FormFeedback>
+
                                                     </FormGroup>
                                                     <FormGroup className="col-md-12 float-right pt-lg-4">
                                                         <Button type="button" color="danger" className="mr-1 float-right" size="md" onClick={this.modelOpenClose}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>

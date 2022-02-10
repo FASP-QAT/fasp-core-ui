@@ -31,7 +31,7 @@ import TracerCategoryService from '../../api/TracerCategoryService';
 import ForecastingUnitService from '../../api/ForecastingUnitService';
 import PlanningUnitService from '../../api/PlanningUnitService';
 import UsageTemplateService from '../../api/UsageTemplateService';
-import { INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY, JEXCEL_PAGINATION_OPTION,JEXCEL_DECIMAL_MONTHLY_CHANGE, JEXCEL_PRO_KEY, TREE_DIMENSION_ID, JEXCEL_MONTH_PICKER_FORMAT, DATE_FORMAT_CAP_WITHOUT_DATE, JEXCEL_DECIMAL_NO_REGEX_LONG } from '../../Constants.js'
+import { INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY, JEXCEL_PAGINATION_OPTION, JEXCEL_DECIMAL_MONTHLY_CHANGE, JEXCEL_PRO_KEY, TREE_DIMENSION_ID, JEXCEL_MONTH_PICKER_FORMAT, DATE_FORMAT_CAP_WITHOUT_DATE, JEXCEL_DECIMAL_NO_REGEX_LONG } from '../../Constants.js'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import TextField from '@material-ui/core/TextField';
@@ -337,7 +337,7 @@ export default class CreateTreeTemplate extends Component {
         this.pickAMonth2 = React.createRef()
         this.pickAMonth1 = React.createRef()
         this.state = {
-            hidePlanningUnit : false,
+            hidePlanningUnit: false,
             maxNodeDataId: '',
             nodeDataMomList: [],
             modelingJexcelLoader: false,
@@ -582,19 +582,19 @@ export default class CreateTreeTemplate extends Component {
         //         maxNodeDataId
         //     })
         // } else {
-            var items = this.state.items;
-            var nodeDataMap = [];
-            for (let i = 0; i < items.length; i++) {
-                if (items[i].payload.nodeDataMap.hasOwnProperty(0)) {
-                    nodeDataMap.push(items[i].payload.nodeDataMap[0][0]);
-                }
+        var items = this.state.items;
+        var nodeDataMap = [];
+        for (let i = 0; i < items.length; i++) {
+            if (items[i].payload.nodeDataMap.hasOwnProperty(0)) {
+                nodeDataMap.push(items[i].payload.nodeDataMap[0][0]);
             }
-            maxNodeDataId = nodeDataMap.length > 0 ? Math.max(...nodeDataMap.map(o => o.nodeDataId)) : 0;
-            console.log("nodeDataMap array---", nodeDataMap);
-            console.log("maxNodeDataId 2---", maxNodeDataId)
-            this.setState({
-                maxNodeDataId
-            })
+        }
+        maxNodeDataId = nodeDataMap.length > 0 ? Math.max(...nodeDataMap.map(o => o.nodeDataId)) : 0;
+        console.log("nodeDataMap array---", nodeDataMap);
+        console.log("maxNodeDataId 2---", maxNodeDataId)
+        this.setState({
+            maxNodeDataId
+        })
         // }
         return maxNodeDataId;
     }
@@ -3516,7 +3516,7 @@ export default class CreateTreeTemplate extends Component {
                             },
                             nodeDataMap: [
                                 [{
-                                    nodeDataId : 1,
+                                    nodeDataId: 1,
                                     notes: '',
                                     month: new Date(),
                                     dataValue: '',
@@ -3568,7 +3568,7 @@ export default class CreateTreeTemplate extends Component {
                         },
                         nodeDataMap: [
                             [{
-                                nodeDataId : 1,
+                                nodeDataId: 1,
                                 notes: '',
                                 nodeDataModelingList: [],
                                 nodeDataOverrideList: [],
@@ -6356,15 +6356,13 @@ export default class CreateTreeTemplate extends Component {
                     </button> */}
                     {itemConfig.parent != null &&
                         <>
-                            {/* <button key="2" type="button" className="StyledButton TreeIconStyle" style={{ background: 'none' }}
+                            <button key="2" type="button" className="StyledButton TreeIconStyle" style={{ background: 'none' }}
                                 onClick={(event) => {
                                     event.stopPropagation();
                                     this.duplicateNode(itemConfig);
                                 }}>
                                 <i class="fa fa-clone" aria-hidden="true"></i>
-                            </button> */}
-
-
+                            </button>
                             <button key="3" type="button" className="StyledButton TreeIconStyle" style={{ background: 'none' }}
                                 onClick={(event) => {
                                     event.stopPropagation();
