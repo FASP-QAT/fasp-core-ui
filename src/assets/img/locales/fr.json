@@ -1544,6 +1544,7 @@
     "static.productCategoryName.productCategoryNameRequired": "Le nom de la catégorie de produit est obligatoire.",
     "static.planningunit.planningunit": "Unité de planification",
     "static.dataEntry.batchDetails": "Détails du lot",
+    "static.versionSettings.committedDate": "Date d`engagement",
     "static.forecastingUnit.forecastingUnitName": "Nom de l`unité de prévision",
     "static.extrapolation.tripleExponential": "Lissage triple exponentiel (TES, Holt-Winters)",
     "static.user.validphonemindigit": "Le numéro de téléphone doit comporter au moins 6 chiffres",

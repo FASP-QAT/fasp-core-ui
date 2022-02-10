@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Card, CardBody, CardFooter, FormGroup, Input, InputGroup, Label, Col, Button } from 'reactstrap';
+import { Card, CardBody, CardFooter, FormGroup, Input, InputGroup, Label, Col, Button, ModalHeader, ModalBody, Table, Modal } from 'reactstrap';
 // import 'react-bootstrap-table/dist/react-bootstrap-table-all.min.css';
 import getLabelText from '../../CommonComponent/getLabelText';
 import AuthenticationService from '../Common/AuthenticationService.js';
@@ -16,6 +16,9 @@ import CryptoJS from 'crypto-js';
 import moment from 'moment';
 import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
+import { buildJxl, dataCheck } from "./DataCheckComponent";
+import {exportPDF,noForecastSelectedClicked,missingMonthsClicked,missingBranchesClicked,nodeWithPercentageChildrenClicked} from '../DataSet/DataCheckComponent.js';
+import pdfIcon from '../../assets/img/pdf.png';
 
 const ref = React.createRef();
 const pickerLang = {
@@ -62,6 +65,18 @@ class VersionSettingsComponent extends Component {
             rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
             minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
             maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
+            showValidation: false,
+            treeScenarioList: [],
+            childrenWithoutHundred: [],
+            nodeWithPercentageChildren: [],
+            consumptionListlessTwelve: [],
+            missingMonthList: [],
+            treeNodeList: [],
+            treeScenarioNotes: [],
+            missingBranchesList: [],
+            noForecastSelectedList: [],
+            datasetPlanningUnit: [],
+            notSelectedPlanningUnitList: [],
         }
         this.hideFirstComponent = this.hideFirstComponent.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
@@ -75,6 +90,17 @@ class VersionSettingsComponent extends Component {
         this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
         this.handleRangeChange = this.handleRangeChange.bind(this);
         this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
+        this.updateState = this.updateState.bind(this);
+    }
+
+    updateState(parameterName, value) {
+        this.setState({
+            [parameterName]: value
+        },()=>{
+            if(parameterName=="treeScenarioList"){
+                buildJxl(this)
+            }
+        })
     }
 
     makeText = m => {
@@ -357,7 +383,7 @@ class VersionSettingsComponent extends Component {
             let startDate = this.el.getValueFromCoords(7, y);
             let month = this.el.getValueFromCoords(8, y);
             console.log("startDate--------->", startDate);
-            if (startDate != null && month != null && month!="" && startDate!="") {
+            if (startDate != null && month != null && month != "" && startDate != "") {
                 let newStartDate = new Date(startDate);
                 newStartDate.setMonth(newStartDate.getMonth() + (month - 1));
                 // console.log("startDate--------->1", new Date(newStartDate));
@@ -374,7 +400,7 @@ class VersionSettingsComponent extends Component {
             let startDate = this.el.getValueFromCoords(7, y);
             let endDate = this.el.getValueFromCoords(9, y);
 
-            if (startDate != null & endDate != null && startDate!="" && endDate!="" && startDate!="") {
+            if (startDate != null & endDate != null && startDate != "" && endDate != "" && startDate != "") {
                 let d1 = new Date(startDate);
                 let d2 = new Date(endDate)
                 var months;
@@ -760,6 +786,7 @@ class VersionSettingsComponent extends Component {
             data[15] = (pd.currentVersion.forecastThresholdHighPerc == null ? '' : pd.currentVersion.forecastThresholdHighPerc)
             data[16] = (pd.currentVersion.forecastThresholdLowPerc == null ? '' : pd.currentVersion.forecastThresholdLowPerc)
             data[17] = 0;
+            data[18] = pd;
             if (versionTypeId == "") {
                 versionSettingsArray[count] = data;
                 count++;
@@ -807,6 +834,7 @@ class VersionSettingsComponent extends Component {
                 data[15] = versionList[k].forecastThresholdHighPerc
                 data[16] = versionList[k].forecastThresholdLowPerc
                 data[17] = 0;
+                data[18] = {};
 
                 if (versionTypeId != "") {
                     if (versionList[k].versionType.id == versionTypeId) {
@@ -932,6 +960,10 @@ class VersionSettingsComponent extends Component {
                     title: 'localCalling',
                     type: 'hidden',//17 R
                 },
+                {
+                    title: 'datasetData',
+                    type: 'hidden',//17 R
+                },
 
             ],
             text: {
@@ -1005,7 +1037,25 @@ class VersionSettingsComponent extends Component {
             filters: true,
             license: JEXCEL_PRO_KEY,
             contextMenu: function (obj, x, y, e) {
-                return false;
+                var items = [];
+                //Add consumption batch info
+                if (y != null) {
+                    var rowData = obj.getRowData(y);
+                    if (rowData[10] == 1) {
+                        items.push({
+                            title: i18n.t('static.commitTree.forecastValidation'),
+                            onclick: function () {
+                                this.setState({
+                                    programName:rowData[1]+" v"+rowData[2],
+                                    programId:rowData[11]
+                                })
+                                this.openModalPopup(rowData[18]);
+                            }.bind(this)
+                        });
+                    }
+                    // -------------------------------------
+                }
+                return items;
             }.bind(this),
 
 
@@ -1014,6 +1064,19 @@ class VersionSettingsComponent extends Component {
         this.el = languageEl;
         this.setState({
             languageEl: languageEl, loading: false
+        })
+    }
+
+    openModalPopup(programData) {
+        this.setState({
+            showValidation: !this.state.showValidation
+        }, () => {
+            if (this.state.showValidation) {
+                this.setState({
+                }, () => {
+                    dataCheck(this,programData,"versionSettings")
+                })
+            }
         })
     }
 
@@ -1099,7 +1162,118 @@ class VersionSettingsComponent extends Component {
             if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
             return '?'
         }
+        //No forecast selected
+        const { noForecastSelectedList } = this.state;
+        let noForecastSelected = noForecastSelectedList.length > 0 &&
+            noForecastSelectedList.map((item, i) => {
+                return (
+                    item.regionList.map(item1 => {
+                        return (
+                            <li key={i}>
+                                <div className="hoverDiv" onClick={() => noForecastSelectedClicked(item.planningUnit.planningUnit.id, item1.id,this)}>{getLabelText(item.planningUnit.planningUnit.label, this.state.lang) + " - " + item1.label}</div>
+                            </li>
+                        )
+                    }, this)
+                )
+            }, this);
 
+        //Consumption : missing months
+        const { missingMonthList } = this.state;
+        let missingMonths = missingMonthList.length > 0 && missingMonthList.map((item, i) => {
+            return (
+                <li key={i}>
+                    <div><span><div className="hoverDiv" onClick={() => missingMonthsClicked(item.planningUnitId,this)}><b>{getLabelText(item.planningUnitLabel, this.state.lang) + " - " + getLabelText(item.regionLabel, this.state.lang) + " : "}</b></div>{"" + item.monthsArray}</span></div>
+                </li>
+            )
+        }, this);
+
+        //Consumption : planning unit less 12 month
+        const { consumptionListlessTwelve } = this.state;
+        let consumption = consumptionListlessTwelve.length > 0 && consumptionListlessTwelve.map((item, i) => {
+            return (
+                <li key={i}>
+                    <div><span><div className="hoverDiv" onClick={() => missingMonthsClicked(item.planningUnitId,this)}><b>{getLabelText(item.planningUnitLabel, this.state.lang) + " - " + getLabelText(item.regionLabel, this.state.lang) + " : "}</b></div></span><span>{item.noOfMonths + " month(s)"}</span></div>
+                </li>
+            )
+        }, this);
+
+        // Tree Forecast : planing unit missing on tree
+        const { notSelectedPlanningUnitList } = this.state;
+        let pu = notSelectedPlanningUnitList.length > 0 && notSelectedPlanningUnitList.map((item, i) => {
+            return (
+                <li key={i}>
+                    <div>{getLabelText(item.planningUnit.label, this.state.lang) + " - " + item.regionsArray}</div>
+                </li>
+            )
+        }, this);
+
+        // Tree Forecast : branches missing PU
+        const { missingBranchesList } = this.state;
+        let missingBranches = missingBranchesList.length > 0 && missingBranchesList.map((item, i) => {
+            return (
+                <ul>
+                    <li key={i}>
+                        <div className="hoverDiv" onClick={() => missingBranchesClicked(item.treeId,this)}><span>{getLabelText(item.treeLabel, this.state.lang)}</span></div>
+                        {item.flatList.length > 0 && item.flatList.map((item1, j) => {
+                            return (
+                                <ul>
+                                    <li key={j}>
+                                        <div><span className={item1.payload.nodeType.id == 4 ? "red" : ""}>{getLabelText(item1.payload.label, this.state.lang)}</span></div>
+                                    </li>
+                                </ul>
+                            )
+                        }, this)}
+                    </li>
+                </ul>
+            )
+        }, this);
+
+        //Nodes less than 100%
+        let jxlTable = this.state.treeScenarioList.map((item1, count) => {
+            var nodeWithPercentageChildren = this.state.nodeWithPercentageChildren.filter(c => c.treeId == item1.treeId && c.scenarioId == item1.scenarioId);
+            if (nodeWithPercentageChildren.length > 0) {
+                return (<><span className="hoverDiv" onClick={() => nodeWithPercentageChildrenClicked(item1.treeId, item1.scenarioId,this)}>{getLabelText(item1.treeLabel, this.state.lang) + " / " + getLabelText(item1.scenarioLabel, this.state.lang)}</span><div className="table-responsive">
+                    <div id={"tableDiv" + count} className="jexcelremoveReadonlybackground consumptionDataEntryTable" name='jxlTableData' />
+                </div><br /></>)
+            }
+        }, this)
+
+        //Consumption Notes
+        const { datasetPlanningUnit } = this.state;
+        let consumtionNotes = datasetPlanningUnit.length > 0 && datasetPlanningUnit.map((item, i) => {
+            return (
+                <tr key={i} className="hoverTd" onClick={() => missingMonthsClicked(item.planningUnit.id,this)}>
+                    <td>{getLabelText(item.planningUnit.label, this.state.lang)}</td>
+                    <td>{item.consumtionNotes}</td>
+                </tr>
+            )
+        }, this);
+
+        //Tree scenario Notes
+        const { treeScenarioNotes } = this.state;
+        let scenarioNotes = treeScenarioNotes.length > 0 && treeScenarioNotes.map((item, i) => {
+            return (
+                <tr key={i} className="hoverTd" onClick={() => nodeWithPercentageChildrenClicked(item.treeId, item.scenarioId,this)}>
+                    <td>{getLabelText(item.tree, this.state.lang)}</td>
+                    <td>{getLabelText(item.scenario, this.state.lang)}</td>
+                    <td>{item.scenarioNotes}</td>
+                </tr>
+            )
+        }, this);
+
+        //Tree Nodes Notes
+        const { treeNodeList } = this.state;
+        let treeNodes = treeNodeList.length > 0 && treeNodeList.map((item, i) => {
+            return (
+                <tr key={i} className="hoverTd" onClick={() => nodeWithPercentageChildrenClicked(item.treeId, item.scenarioId,this)}>
+                    <td>{getLabelText(item.tree, this.state.lang)}</td>
+                    <td>{getLabelText(item.node, this.state.lang)}</td>
+                    <td>{getLabelText(item.scenario, this.state.lang)}</td>
+                    <td>{(item.notes != "" && item.notes != null) ? i18n.t('static.commitTree.main') + " : " + item.notes : ""}<br />
+                        {(item.madelingNotes != "" && item.madelingNotes != null) ? i18n.t('static.commitTree.modeling') + " : " + item.madelingNotes : ""}</td>
+                </tr>
+            )
+        }, this);
 
 
         return (
@@ -1192,7 +1366,98 @@ class VersionSettingsComponent extends Component {
                         {/* } */}
                     </CardFooter>
                 </Card>
+                <Modal isOpen={this.state.showValidation}
+                    className={'modal-lg ' + this.props.className} id='divcontents'>
+                    {/* <ModalHeader toggle={() => this.toggleShowValidation()} className="modalHeaderSupplyPlan">
+                        <h3 style={{textAlign:'left'}}><strong>{i18n.t('static.commitTree.forecastValidation')}</strong><i className="fa fa-print pull-right iconClass cursor" onClick={() => this.print()}></i></h3>
+                    </ModalHeader> */}
+                    <ModalHeader toggle={() => this.openModalPopup()} className="modalHeaderSupplyPlan">
+                        <div>
+                            <img className=" pull-right iconClass cursor ml-lg-2" style={{ height: '22px', width: '22px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => exportPDF(this)} />
+                            {/* <i className="fa fa-print pull-right iconClassCommit cursor" onClick={() => this.print()}></i> */}
+                            <h3><strong>{i18n.t('static.commitTree.forecastValidation')}</strong></h3>
+                        </div>
+                    </ModalHeader>
+                    <div>
+                        <ModalBody>
+                            <span><b>{this.state.programName}</b></span><br />
+                            <span><b>{i18n.t('static.common.forecastPeriod')}: </b> {moment(this.state.forecastStartDate).format('MMM-YYYY')} to {moment(this.state.forecastStopDate).format('MMM-YYYY')} </span><br /><br />
 
+                            <span><b>1. {i18n.t('static.commitTree.noForecastSelected')} : </b>(<a href="/#/report/compareAndSelectScenario" target="_blank">{i18n.t('static.commitTree.compare&Select')}</a>, <a href="/#/forecastReport/forecastSummary" target="_blank">{i18n.t('static.commitTree.forecastSummary')}</a>)</span><br />
+                            <ul>{noForecastSelected}</ul>
+
+                            <span><b>2. {i18n.t('static.commitTree.consumptionForecast')} : </b>(<a href="/#/dataentry/consumptionDataEntryAndAdjustment" target="_blank">{i18n.t('static.commitTree.dataEntry&Adjustment')}</a>, <a href="/#/extrapolation/extrapolateData" target="_blank">{i18n.t('static.commitTree.extrapolation')}</a>)</span><br />
+                            <span>a. {i18n.t('static.commitTree.monthsMissingActualConsumptionValues')} :</span><br />
+                            <ul>{missingMonths}</ul>
+                            <span>b. {i18n.t('static.commitTree.puThatDoNotHaveAtleast24MonthsOfActualConsumptionValues')} :</span><br />
+                            <ul>{consumption}</ul>
+
+                            <span><b>3. {i18n.t('static.commitTree.treeForecast')} </b>(<a href="/#/dataset/listTree" target="_blank">{i18n.t('static.common.managetree')}</a>)</span><br />
+                            <span>a. {i18n.t('static.commitTree.puThatDoesNotAppearOnAnyTree')} </span><br />
+                            <ul>{pu}</ul>
+
+                            <span>b. {i18n.t('static.commitTree.branchesMissingPlanningUnit')}</span><br />
+                            {missingBranches}
+
+                            <span>c. {i18n.t('static.commitTree.NodesWithChildrenThatDoNotAddUpTo100Prcnt')}</span><br />
+                            {jxlTable}
+
+
+                            <span><b>4. {i18n.t('static.program.notes')}:</b></span><br />
+
+                            <span><b>a. {i18n.t('static.forecastMethod.historicalData')} :</b></span>
+                            <div className="table-scroll">
+                                <div className="table-wrap table-responsive fixTableHead">
+                                    <Table className="table-bordered text-center mt-2 overflowhide main-table " bordered size="sm" >
+                                        <thead>
+                                            <tr>
+                                                <th><b>{i18n.t('static.dashboard.planningunitheader')}</b></th>
+                                                <th><b>{i18n.t('static.program.notes')}</b></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>{consumtionNotes}</tbody>
+                                    </Table>
+                                </div>
+                            </div><br />
+                            <span><b>b. {i18n.t('static.commitTree.treeScenarios')}</b></span>
+                            <div className="table-scroll">
+                                <div className="table-wrap table-responsive fixTableHead">
+                                    <Table className="table-bordered text-center mt-2 overflowhide main-table " bordered size="sm" >
+                                        <thead>
+                                            <tr>
+                                                <th><b>{i18n.t('static.forecastMethod.tree')}</b></th>
+                                                <th><b>{i18n.t('static.whatIf.scenario')}</b></th>
+                                                <th><b>{i18n.t('static.program.notes')}</b></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>{scenarioNotes}</tbody>
+                                    </Table>
+                                </div>
+                            </div><br />
+                            <span><b>c. {i18n.t('static.commitTree.treeNodes')}</b></span>
+                            {/* <div className="table-scroll"> */}
+                            <div className="">
+                                <div className="table-wrap table-responsive fixTableHead">
+                                    <Table className="table-bordered text-center mt-2 overflowhide main-table " bordered size="sm" >
+                                        <thead>
+                                            <tr>
+                                                <th><b>{i18n.t('static.forecastMethod.tree')}</b></th>
+                                                <th><b>{i18n.t('static.common.node')}</b></th>
+                                                <th><b>{i18n.t('static.whatIf.scenario')}</b></th>
+                                                <th><b>{i18n.t('static.program.notes')}</b></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>{treeNodes}</tbody>
+                                    </Table>
+                                </div>
+                            </div>
+                            <div className="col-md-12 pb-lg-5 pt-lg-3">
+                                <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={() => { this.openModalPopup() }}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={this.synchronize}><i className="fa fa-check"></i>{i18n.t('static.report.ok')}</Button>
+                            </div>
+                        </ModalBody>
+                    </div>
+                </Modal >
             </div>
         )
     }
