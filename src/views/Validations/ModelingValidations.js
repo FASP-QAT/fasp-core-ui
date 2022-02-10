@@ -270,7 +270,7 @@ class ModelingValidation extends Component {
     getTreeList() {
         this.setState({ loading: true })
         var datasetJson = this.state.datasetData;
-        var treeList = datasetJson.treeList;
+        var treeList = datasetJson.treeList.filter(c=>c.active.toString()=="true");
         var startDate = moment(datasetJson.currentVersion.forecastStartDate).format("YYYY-MM-DD");
         var stopDate = moment(datasetJson.currentVersion.forecastStopDate).format("YYYY-MM-DD");
         var rangeValue = { from: { year: new Date(startDate).getFullYear(), month: new Date(startDate).getMonth() + 1 }, to: { year: new Date(stopDate).getFullYear(), month: new Date(stopDate).getMonth() + 1 } }
@@ -667,8 +667,19 @@ class ModelingValidation extends Component {
             var selectedDataset = datasetList.filter(c => c.id == this.state.datasetId)[0];
             var versionList = [];
             var vList = selectedDataset.versionList;
-            for (var v = 0; v < vList.length; v++) {
-                versionList.push(vList[v].versionId)
+            var onlineVersionList=vList.filter(c=>!c.versionId.toString().includes("Local")).sort(function (a, b) {
+                a = a.versionId;
+                b = b.versionId;
+                return a > b ? -1 : a < b ? 1 : 0;
+            });
+            var offlineVersionList=vList.filter(c=>c.versionId.toString().includes("Local")).sort(function (a, b) {
+                a = a.versionId.split(" ")[0];
+                b = b.versionId.split(" ")[0];
+                return a > b ? -1 : a < b ? 1 : 0;
+            });
+            var newVList=offlineVersionList.concat(onlineVersionList)
+            for (var v = 0; v < newVList.length; v++) {
+                versionList.push(newVList[v].versionId)
             }
             var versionId = "";
             var event = {
@@ -810,7 +821,11 @@ class ModelingValidation extends Component {
                         event.target.value = localStorage.getItem("sesLiveDatasetId");
                     }
                     this.setState({
-                        datasetList: datasetList,
+                        datasetList: datasetList.sort(function (a, b) {
+                            a = a.name.toLowerCase();
+                            b = b.name.toLowerCase();
+                            return a < b ? -1 : a > b ? 1 : 0;
+                        }),
                         unitList: unitList,
                         loading: false
                     }, () => {
@@ -1581,7 +1596,7 @@ class ModelingValidation extends Component {
                                                     </div>
                                                 </div>
                                                 <div className="col-md-12">
-                                                    <button className="mr-1 mb-2 float-right btn btn-info btn-md showdatabtn" onClick={this.toggledata}>
+                                                    <button className="mr-1 mb-2 float-right btn btn-info btn-md" onClick={this.toggledata}>
                                                         {this.state.show ? i18n.t('static.common.hideData') : i18n.t('static.common.showData')}
                                                     </button>
 

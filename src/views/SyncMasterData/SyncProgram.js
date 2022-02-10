@@ -113,6 +113,7 @@ export default class SyncProgram extends Component {
                             if (programList.length > 0) {
                                 this.syncPrograms(programList);
                             } else {
+                                console.log("In else###")
                                 var syncedMasters = this.state.syncedMasters;
                                 this.setState({
                                     syncedMasters: syncedMasters + 1,
@@ -139,6 +140,7 @@ export default class SyncProgram extends Component {
     }
 
     syncDataset(programList) {
+        console.log("In syncDataset###")
         var programIdsToLoad = this.state.datasetIdsToLoad;
         var pIds = [];
         var uniqueProgramList = []
