@@ -1335,7 +1335,7 @@ class DefaultLayout extends Component {
                             || (this.state.businessFunctions.includes('ROLE_BF_LIST_FUNDING_SOURCE')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_SUPPLIER')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_ORGANIZATION')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_ORGANIZATION_TYPE'))
                             || (this.state.businessFunctions.includes('ROLE_BF_LIST_PROCUREMENT_AGENT')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_ALTERNATE_REPORTING_UNIT')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_FORECASTING_UNIT'))
                             || (this.state.businessFunctions.includes('ROLE_BF_LIST_PLANNING_UNIT')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_PRODUCT_CATEGORY')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_PLANNING_UNIT_CAPACITY'))
-                            || (this.state.businessFunctions.includes('ROLE_BF_LIST_PROCUREMENT_UNIT')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_TRACER_CATEGORY')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_HEALTH_AREA')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_FORECAST_METHOD')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_USAGE_PERIOD')))) ? false : true)
+                            || (this.state.businessFunctions.includes('ROLE_BF_LIST_PROCUREMENT_UNIT')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_TRACER_CATEGORY')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_HEALTH_AREA')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_FORECAST_METHOD')))) ? false : true)
                         },
                         children: [
                           {
