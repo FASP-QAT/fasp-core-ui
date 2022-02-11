@@ -21,6 +21,7 @@ export default class TreeExtrapolationComponent extends React.Component {
  var startDate = moment("2021-05-01").format("YYYY-MM-DD");
  var endDate = moment("2022-02-01").format("YYYY-MM-DD")
  this.state = {
+ show: false,
  jexcelData: [
  {
  month: '2020-05-01',
@@ -716,6 +717,7 @@ export default class TreeExtrapolationComponent extends React.Component {
         popoverChooseMethod: !this.state.popoverChooseMethod,
     });
   }
+  toggledata = () => this.setState((currentState) => ({ show: !currentState.show }));
 
  render() {
  const pickerLang = {
@@ -981,7 +983,7 @@ export default class TreeExtrapolationComponent extends React.Component {
  return (
  <div className="animated fadeIn">
  <CardBody className="pb-lg-2 pt-lg-0">
- <div className="row pt-lg-0" style={{ float: 'right' }}>
+ <div className="row pt-lg-0" style={{ float: 'right',marginTop:'-42px' }}>
  <div className="col-md-12">
  {/* <SupplyPlanFormulas ref="formulaeChild" /> */}
  <a className="">
@@ -1040,8 +1042,9 @@ export default class TreeExtrapolationComponent extends React.Component {
  </FormGroup> */}
  </div>
  <div className="row">
- <FormGroup className="col-md-12 ">
+ <FormGroup className="col-md-12 " style={{ display: this.state.show ? "block" : "none" }}>
  <div className="check inline pl-lg-3 pt-lg-2">
+  <div className="row pl-lg-1 pb-lg-2">   
  <div>
  <Popover placement="top" isOpen={this.state.popoverOpenMa} target="Popover1" trigger="hover" toggle={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)}>
  <PopoverBody>Need to add Info.</PopoverBody>
@@ -1064,7 +1067,7 @@ export default class TreeExtrapolationComponent extends React.Component {
  </Label>
  </div>
  {this.state.movingAvgId &&
- <div className="col-md-3 pt-lg-2">
+ <div className="col-md-3 pt-lg-0">
  <Label htmlFor="appendedInputButton"># of Months</Label>
  <Input
  className="controls"
@@ -1076,6 +1079,8 @@ export default class TreeExtrapolationComponent extends React.Component {
  />
  </div>
  }
+ </div>
+ <div className="row pl-lg-1 pb-lg-2">
  <div>
  <Popover placement="top" isOpen={this.state.popoverOpenSa} target="Popover1" trigger="hover" toggle={() => this.toggle('popoverOpenMa', !this.state.popoverOpenSa)}>
  <PopoverBody>Need to add Info.</PopoverBody>
@@ -1097,6 +1102,8 @@ export default class TreeExtrapolationComponent extends React.Component {
  <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenSa', !this.state.popoverOpenSa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
  </Label>
  </div>
+ </div>
+ <div className="row pl-lg-1 pb-lg-2">
  <div>
  <Popover placement="top" isOpen={this.state.popoverOpenLr} target="Popover1" trigger="hover" toggle={() => this.toggle('popoverOpenLr', !this.state.popoverOpenLr)}>
  <PopoverBody>Need to add Info.</PopoverBody>
@@ -1118,6 +1125,8 @@ export default class TreeExtrapolationComponent extends React.Component {
  <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenLr', !this.state.popoverOpenLr)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
  </Label>
  </div>
+ </div>
+ <div className="row pl-lg-1 pb-lg-2">
  <div>
  <Popover placement="top" isOpen={this.state.popoverOpenTes} target="Popover1" trigger="hover" toggle={() => this.toggle('popoverOpenMa', !this.state.popoverOpenTes)}>
  <PopoverBody>Need to add Info.</PopoverBody>
@@ -1140,8 +1149,8 @@ export default class TreeExtrapolationComponent extends React.Component {
  </Label>
  </div>
  {this.state.smoothingId &&
- <div className="row col-md-12 pt-lg-3">
- <div className="col-md-2">
+ <div className="pt-lg-0" style={{display:'contents'}}>
+ <div className="tab-ml-1 mt-md-2 mb-md-0 ExtraCheckboxFieldWidth">
  <Label htmlFor="appendedInputButton">Confidence level</Label>
  <Input
  className="controls"
@@ -1151,7 +1160,7 @@ export default class TreeExtrapolationComponent extends React.Component {
  name="confidenceLevelId"
  />
  </div>
- <div className="col-md-2">
+ <div className="tab-ml-1 mt-md-2 mb-md-0 ExtraCheckboxFieldWidth">
  <Label htmlFor="appendedInputButton">Seasonality</Label>
  <Input
  className="controls"
@@ -1177,7 +1186,7 @@ export default class TreeExtrapolationComponent extends React.Component {
  </Label>
  </div> */}
 
- <div className="col-md-2">
+<div className="tab-ml-1 mt-md-2 mb-md-0 ExtraCheckboxFieldWidth">
  <Label htmlFor="appendedInputButton">Alpha</Label>
  <Input
  className="controls"
@@ -1187,7 +1196,7 @@ export default class TreeExtrapolationComponent extends React.Component {
  name="alphaId"
  />
  </div>
- <div className="col-md-2">
+ <div className="tab-ml-1 mt-md-2 mb-md-0 ExtraCheckboxFieldWidth">
  <Label htmlFor="appendedInputButton">Beta</Label>
  <Input
  className="controls"
@@ -1197,7 +1206,7 @@ export default class TreeExtrapolationComponent extends React.Component {
  name="betaId"
  />
  </div>
- <div className="col-md-2">
+ <div className="tab-ml-1 mt-md-2 mb-md-0 ExtraCheckboxFieldWidth">
  <Label htmlFor="appendedInputButton">Gamma</Label>
  <Input
  className="controls"
@@ -1207,7 +1216,7 @@ export default class TreeExtrapolationComponent extends React.Component {
  name="gammaId"
  />
  </div>
- <div className="col-md-2">
+ <div className="tab-ml-1 mt-md-2 mb-md-0 ExtraCheckboxFieldWidth">
  <Label htmlFor="appendedInputButton">Phi</Label>
  <Input
  className="controls"
@@ -1219,6 +1228,8 @@ export default class TreeExtrapolationComponent extends React.Component {
  </div>
  </div>
  }
+ </div>
+ <div className="row pl-lg-1 pb-lg-2">
  <div>
  <Popover placement="top" isOpen={this.state.popoverOpenArima} target="Popover1" trigger="hover" toggle={() => this.toggle('popoverOpenArima', !this.state.popoverOpenArima)}>
  <PopoverBody>Need to add Info.</PopoverBody>
@@ -1241,8 +1252,8 @@ export default class TreeExtrapolationComponent extends React.Component {
  </Label>
  </div>
  {this.state.arimaId &&
- <div className="row col-md-12 pt-lg-3">
- <div className="col-md-3">
+ <div className="pt-lg-0" style={{display:'contents'}}>
+ <div className="tab-ml-1 mt-md-2 mb-md-0 ExtraCheckboxFieldWidth">
  <Label htmlFor="appendedInputButton">p</Label>
  <Input
  className="controls"
@@ -1252,7 +1263,7 @@ export default class TreeExtrapolationComponent extends React.Component {
  name="pId"
  />
  </div>
- <div className="col-md-3">
+ <div className="tab-ml-1 mt-md-2 mb-md-0 ExtraCheckboxFieldWidth">
  <Label htmlFor="appendedInputButton">d</Label>
  <Input
  className="controls"
@@ -1262,7 +1273,7 @@ export default class TreeExtrapolationComponent extends React.Component {
  name="dId"
  />
  </div>
- <div className="col-md-3">
+ <div className="tab-ml-1 mt-md-2 mb-md-0 ExtraCheckboxFieldWidth">
  <Label htmlFor="appendedInputButton">q</Label>
  <Input
  className="controls"
@@ -1275,9 +1286,13 @@ export default class TreeExtrapolationComponent extends React.Component {
  </div>
  }
  </div>
+ </div>
  </FormGroup>
  </div>
  <div className="col-md-12 text-center pt-lg-3">
+ <Button className="mr-1 btn btn-info btn-md " onClick={this.toggledata}>
+  {this.state.show ? i18n.t('static.common.hideData') : i18n.t('static.common.showData')}
+</Button>
  <Button type="submit" color="success" className="mr-1" size="md">Interpolate</Button>
  </div>
  </div>
@@ -1286,7 +1301,7 @@ export default class TreeExtrapolationComponent extends React.Component {
  <div className="col-md-6">
  {/* <Button type="button" size="md" color="info" className="float-left mr-1" onClick={this.resetTree}>{'Show/hide data'}</Button> */}
  </div>
- <div className="col-md-6 float-right">
+ <div className="col-md-4 float-right" style={{marginTop:'-42px'}}>
  <FormGroup className="float-right" >
  <div className="check inline pl-lg-1 pt-lg-0">
  <div>

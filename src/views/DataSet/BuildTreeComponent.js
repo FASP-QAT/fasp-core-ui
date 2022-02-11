@@ -6485,7 +6485,7 @@ export default class BuildTree extends Component {
                 </TabPane>
                 <TabPane tabId="2">
 
-                    <div className="row pl-lg-5 pb-lg-3 pt-lg-0">
+                    {/* <div className="row pl-lg-5 pb-lg-3 pt-lg-0">
                         <div className="offset-md-10 col-md-6 pl-lg-4">
                             <SupplyPlanFormulas ref="formulaeChild" />
                             <a className="">
@@ -6493,7 +6493,7 @@ export default class BuildTree extends Component {
 
                             </a>
                         </div>
-                    </div>
+                    </div> */}
                     <div className="row pl-lg-2 pr-lg-2">
                         {/* 
                         <FormGroup className="col-md-2 pt-lg-1">
@@ -7965,7 +7965,7 @@ export default class BuildTree extends Component {
                                                                     <Button type="submit" size="md" onClick={() => this.touchAll(setTouched, errors)} color="success" className="submitBtn float-right mr-1"> <i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
                                                                 </FormGroup>
 
-                                                                        
+                                                                <div className="col-md-12 row ml-lg-1">
                                                     <FormGroup className="col-md-2" >
                                                         <div className="check inline  pl-lg-1 pt-lg-0">
                                                             <div>
@@ -8023,6 +8023,8 @@ export default class BuildTree extends Component {
                                                             </div>
                                                         </div>
                                                     </FormGroup>
+                                        
+                                                    </div>
                                                             </Row>
                                                         </Form>
                                                     )} />

@@ -5392,7 +5392,7 @@ export default class CreateTreeTemplate extends Component {
                             )} />
                 </TabPane>
                 <TabPane tabId="2">
-                    <div className="row pl-lg-5 pb-lg-3 pt-lg-0">
+                    {/* <div className="row pl-lg-5 pb-lg-3 pt-lg-0">
                         <div className="offset-md-10 col-md-6 pl-lg-4 ">
                             <SupplyPlanFormulas ref="formulaeChild" />
                             <a className="">
@@ -5400,7 +5400,7 @@ export default class CreateTreeTemplate extends Component {
 
                             </a>
                         </div>
-                    </div>
+                    </div> */}
                     <div className="row pl-lg-2 pr-lg-2">
                         {/* 
                         <FormGroup className="col-md-2 pt-lg-1">
