@@ -372,8 +372,13 @@ export default class PlanningUnitSetting extends Component {
                 console.log("mylist--------->1112", planningUnitId);
 
                 let obj = tempPaList.filter(c => c.procurementAgent.id == value)[0];
+                console.log("mylist--------->1113", obj);
+                if (typeof obj != 'undefined') {
+                    this.el.setValueFromCoords(8, y, obj.catalogPrice, true);
+                } else {
+                    this.el.setValueFromCoords(8, y, '', true);
+                }
 
-                this.el.setValueFromCoords(8, y, obj.catalogPrice, true);
             } else {
                 this.el.setValueFromCoords(8, y, '', true);
             }
@@ -1481,7 +1486,7 @@ export default class PlanningUnitSetting extends Component {
                     title: 'Price Type',
                     type: 'autocomplete',
                     source: this.state.allProcurementAgentList,
-                    filter: this.filterProcurementAgentByPlanningUnit
+                    // filter: this.filterProcurementAgentByPlanningUnit
                     // readOnly: true //7H
                 },
                 {
@@ -1531,6 +1536,11 @@ export default class PlanningUnitSetting extends Component {
             ],
             updateTable: function (el, cell, x, y, source, value, id) {
                 var elInstance = el.jexcel;
+
+                //left align
+                elInstance.setStyle(`A${parseInt(y) + 1}`, 'text-align', 'left');
+                elInstance.setStyle(`B${parseInt(y) + 1}`, 'text-align', 'left');
+
                 var rowData = elInstance.getRowData(y);
                 var programPlanningUnitId = rowData[11];
                 if (programPlanningUnitId == 1) {
@@ -1545,14 +1555,14 @@ export default class PlanningUnitSetting extends Component {
                     cellA.classList.add('readonly');
                 }
 
-                var procurementAgentId = rowData[7];
-                if (procurementAgentId == -1) {
-                    var cell = elInstance.getCell(`I${parseInt(y) + 1}`)
-                    cell.classList.remove('readonly');
-                } else {
-                    var cell = elInstance.getCell(`I${parseInt(y) + 1}`)
-                    cell.classList.add('readonly');
-                }
+                // var procurementAgentId = rowData[7];
+                // if (procurementAgentId == -1) {
+                //     var cell = elInstance.getCell(`I${parseInt(y) + 1}`)
+                //     cell.classList.remove('readonly');
+                // } else {
+                //     var cell = elInstance.getCell(`I${parseInt(y) + 1}`)
+                //     cell.classList.add('readonly');
+                // }
 
             },
             text: {
@@ -1731,7 +1741,7 @@ export default class PlanningUnitSetting extends Component {
         tr.children[6].classList.add('InfoTr');
         tr.children[7].classList.add('InfoTr');
         // tr.children[8].classList.add('InfoTr');
-       
+
     }
 
     formSubmit = function () {
