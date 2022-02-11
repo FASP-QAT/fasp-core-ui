@@ -723,7 +723,7 @@ export default class CommitTreeComponent extends React.Component {
 
         // Tree Forecast : branches missing PU
         const { missingBranchesList } = this.state;
-        let missingBranches = missingBranchesList.length > 0 && missingBranchesList.map((item, i) => {
+        let missingBranches = missingBranchesList.length > 0 ? missingBranchesList.map((item, i) => {
             return (
                 <ul>
                     <li key={i}>
@@ -740,17 +740,17 @@ export default class CommitTreeComponent extends React.Component {
                     </li>
                 </ul>
             )
-        }, this);
+        }, this):<ul></ul>;
 
         //Nodes less than 100%
-        let jxlTable = this.state.treeScenarioList.map((item1, count) => {
+        let jxlTable = this.state.treeScenarioList.length>0?this.state.treeScenarioList.map((item1, count) => {
             var nodeWithPercentageChildren = this.state.nodeWithPercentageChildren.filter(c => c.treeId == item1.treeId && c.scenarioId == item1.scenarioId);
             if (nodeWithPercentageChildren.length > 0) {
                 return (<><span className="hoverDiv" onClick={() => nodeWithPercentageChildrenClicked(item1.treeId, item1.scenarioId, this)}><span>{getLabelText(item1.treeLabel, this.state.lang) + " / " + getLabelText(item1.scenarioLabel, this.state.lang)}</span></span><div className="table-responsive">
                     <div id={"tableDiv" + count} className="jexcelremoveReadonlybackground consumptionDataEntryTable" name='jxlTableData' />
                 </div><br /></>)
             }
-        }, this)
+        }, this):<br/>
 
         //Consumption Notes
         const { datasetPlanningUnit } = this.state;

@@ -1170,7 +1170,7 @@ class VersionSettingsComponent extends Component {
                     item.regionList.map(item1 => {
                         return (
                             <li key={i}>
-                                <div className="hoverDiv" onClick={() => noForecastSelectedClicked(item.planningUnit.planningUnit.id, item1.id, this)}>{getLabelText(item.planningUnit.planningUnit.label, this.state.lang) + " - " + item1.label}</div>
+                                <div className="hoverDiv" onClick={() => noForecastSelectedClicked(item.planningUnit.planningUnit.id, item1.id, this)}><span>{getLabelText(item.planningUnit.planningUnit.label, this.state.lang) + " - " + item1.label}</span></div>
                             </li>
                         )
                     }, this)
@@ -1209,7 +1209,7 @@ class VersionSettingsComponent extends Component {
 
         // Tree Forecast : branches missing PU
         const { missingBranchesList } = this.state;
-        let missingBranches = missingBranchesList.length > 0 && missingBranchesList.map((item, i) => {
+        let missingBranches = missingBranchesList.length > 0 ? missingBranchesList.map((item, i) => {
             return (
                 <ul>
                     <li key={i}>
@@ -1226,17 +1226,17 @@ class VersionSettingsComponent extends Component {
                     </li>
                 </ul>
             )
-        }, this);
+        }, this):<ul></ul>;
 
         //Nodes less than 100%
-        let jxlTable = this.state.treeScenarioList.map((item1, count) => {
+        let jxlTable = this.state.treeScenarioList.length>0?this.state.treeScenarioList.map((item1, count) => {
             var nodeWithPercentageChildren = this.state.nodeWithPercentageChildren.filter(c => c.treeId == item1.treeId && c.scenarioId == item1.scenarioId);
             if (nodeWithPercentageChildren.length > 0) {
-                return (<><span className="hoverDiv" onClick={() => nodeWithPercentageChildrenClicked(item1.treeId, item1.scenarioId, this)}>{getLabelText(item1.treeLabel, this.state.lang) + " / " + getLabelText(item1.scenarioLabel, this.state.lang)}</span><div className="table-responsive">
+                return (<><span className="hoverDiv" onClick={() => nodeWithPercentageChildrenClicked(item1.treeId, item1.scenarioId, this)}><span>{getLabelText(item1.treeLabel, this.state.lang) + " / " + getLabelText(item1.scenarioLabel, this.state.lang)}</span></span><div className="table-responsive">
                     <div id={"tableDiv" + count} className="jexcelremoveReadonlybackground consumptionDataEntryTable" name='jxlTableData' />
                 </div><br /></>)
             }
-        }, this)
+        }, this):<br/>
 
         //Consumption Notes
         const { datasetPlanningUnit } = this.state;
