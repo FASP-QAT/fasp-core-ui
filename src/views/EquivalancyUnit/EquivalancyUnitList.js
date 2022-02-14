@@ -2502,10 +2502,15 @@ class EquivalancyUnit extends Component {
                 {/* <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5> */}
                 <h5 style={{ color: this.state.color }} id="div2">{this.state.message}</h5>
                 <Card>
-                    <Col md="12 pl-3">
+                    <div className="row pl-lg-3 pr-lg-3">
+                    <div className="col-md-8">
                         {/* <h5 className="red">{i18n.t('static.common.customWarningEquivalencyUnit')}</h5> */}
                         <h5>{i18n.t('static.common.customWarningEquivalencyUnit')}</h5>
-                    </Col>
+                    </div>
+                    <div className="col-md-4">
+                    <span className="pr-lg-2 pt-lg-1 float-right" style={{ cursor: 'pointer' }} onClick={() => { this.toggleShowGuidance() }}><small className="supplyplanformulas">{i18n.t('static.common.showGuidance')}</small></span>
+                    </div>
+                    </div>
                     <div className="Card-header-addicon problemListMarginTop">
                         <div className="card-header-actions">
                             <div className="card-header-action">
