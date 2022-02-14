@@ -339,6 +339,8 @@ export default class BuildTree extends Component {
         this.pickAMonth4 = React.createRef()
         this.pickAMonth5 = React.createRef()
         this.state = {
+            extrapolate : false,
+            forecastPeriod: '',
             maxNodeDataId: '',
             message1: '',
             updatedPlanningUnitList: [],
@@ -607,6 +609,7 @@ export default class BuildTree extends Component {
         this.getModelingTypeList = this.getModelingTypeList.bind(this);
         this.getSameLevelNodeList = this.getSameLevelNodeList.bind(this);
         this.momCheckbox = this.momCheckbox.bind(this);
+        this.extrapolate = this.extrapolate.bind(this);
         this.calculateScalingTotal = this.calculateScalingTotal.bind(this);
         this.formSubmit = this.formSubmit.bind(this);
         this.formSubmitLoader = this.formSubmitLoader.bind(this);
@@ -1707,7 +1710,11 @@ export default class BuildTree extends Component {
                 proList.push(this.state.treeTemplateObj);
                 // this.setState
             }
+            //Display forecast period
+            var forecastPeriod = moment(programData.currentVersion.forecastStartDate).format(`MMM.YYYY`) + "-" + moment(programData.currentVersion.forecastStopDate).format(`MMM.YYYY`);
+            console.log("forecastPeriod---", forecastPeriod);
             this.setState({
+                forecastPeriod,
                 dataSetObj,
                 realmCountryId: programData.realmCountry.realmCountryId,
                 treeData: proList,
@@ -1744,10 +1751,16 @@ export default class BuildTree extends Component {
                 items: [],
                 selectedScenario: '',
                 programId,
+                forecastPeriod: '',
                 treeData: proList
             })
         }
         this.getRegionList();
+    }
+    extrapolate(e) {
+        this.setState({
+            extrapolate: e.target.checked == true ? true : false
+        });
     }
     momCheckbox(e) {
         var checked = e.target.checked;
@@ -3052,9 +3065,10 @@ export default class BuildTree extends Component {
                         dataEnc.programData = programData;
                         var minDate = { year: new Date(programData.currentVersion.forecastStartDate).getFullYear(), month: new Date(programData.currentVersion.forecastStartDate).getMonth() + 1 };
                         var maxDate = { year: new Date(programData.currentVersion.forecastStopDate).getFullYear(), month: new Date(programData.currentVersion.forecastStopDate).getMonth() + 1 };
-
+                        var forecastPeriod = moment(programData.currentVersion.forecastStartDate).format(`MMM.YYYY`) + "-" + moment(programData.currentVersion.forecastStopDate).format(`MMM.YYYY`);
+                        console.log("forecastPeriod 1---", forecastPeriod);
                         console.log("dataSetObj.programData***>>>", dataEnc);
-                        this.setState({ dataSetObj: dataEnc, minDate, maxDate, forecastStartDate: programData.currentVersion.forecastStartDate, forecastStopDate: programData.currentVersion.forecastStopDate }, () => {
+                        this.setState({ dataSetObj: dataEnc, minDate, maxDate, forecastStartDate: programData.currentVersion.forecastStartDate, forecastStopDate: programData.currentVersion.forecastStopDate, forecastPeriod }, () => {
                             this.fetchTracerCategoryList(programData);
                             this.setState({ loading: false })
                         });
@@ -5677,9 +5691,9 @@ export default class BuildTree extends Component {
                                                     type="checkbox"
                                                     id="extrapolate"
                                                     name="extrapolate"
-                                                // checked={true}
-                                                // checked={this.state.currentScenario.manualChangesEffectFuture}
-                                                // onClick={(e) => { this.momCheckbox(e); }}
+                                                    // checked={true}
+                                                    checked={this.state.extrapolate}
+                                                    onClick={(e) => { this.extrapolate(e); }}
                                                 />
                                                 <Label
                                                     className="form-check-label"
@@ -7741,7 +7755,7 @@ export default class BuildTree extends Component {
                                                         {/* <FormFeedback>{errors.languageId}</FormFeedback> */}
                                                     </FormGroup>
                                                     <FormGroup className="col-md-3 pl-lg-0">
-                                                        <Label htmlFor="languageId">{i18n.t('static.supplyPlan.date')}</Label>
+                                                        <Label htmlFor="languageId">{i18n.t('static.supplyPlan.date')} <b><i>({this.state.forecastPeriod})</i></b></Label>
                                                         <div className="controls edit">
                                                             <Picker
                                                                 ref={this.pickAMonth3}
@@ -8282,7 +8296,7 @@ export default class BuildTree extends Component {
             <Modal isOpen={this.state.openAddNodeModal}
                 className={'modal-xl '} >
                 <ModalHeader className="modalHeaderSupplyPlan hideCross">
-                    <strong>{i18n.t('static.tree.Add/EditNode')}</strong>  {this.state.activeTab1[0] === '3' && <div className="HeaderNodeText"> {
+                    <strong>{i18n.t('static.tree.Add/EditNode')}</strong>  {this.state.activeTab1[0] != '1' && <div className="HeaderNodeText"> {
                         this.state.currentItemConfig.context.payload.nodeType.id == 2 ? <i class="fa fa-hashtag" style={{ fontSize: '11px', color: '#20a8d8' }}></i> :
                             (this.state.currentItemConfig.context.payload.nodeType.id == 3 ? <i class="fa fa-percent " style={{ fontSize: '11px', color: '#20a8d8' }} ></i> :
                                 (this.state.currentItemConfig.context.payload.nodeType.id == 4 ? <i class="fa fa-cube" style={{ fontSize: '11px', color: '#20a8d8' }} ></i> :
@@ -8305,7 +8319,7 @@ export default class BuildTree extends Component {
                                         {i18n.t('static.tree.nodeData')}
                                     </NavLink>
                                 </NavItem>
-                                <NavItem>
+                                <NavItem style={{ display: !this.state.extrapolate ? 'block' : 'none' }}>
                                     <NavLink
                                         active={this.state.activeTab1[0] === '2'}
                                         onClick={() => { this.toggleModal(0, '2'); }}
@@ -8313,7 +8327,7 @@ export default class BuildTree extends Component {
                                         {i18n.t('static.tree.Modeling/Transfer')}
                                     </NavLink>
                                 </NavItem>
-                                <NavItem style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 2 ? 'block' : 'none' }}>
+                                <NavItem style={{ display: this.state.extrapolate ? 'block' : 'none' }}>
                                     <NavLink
                                         active={this.state.activeTab1[0] === '3'}
                                         onClick={() => { this.toggleModal(0, '3'); }}
