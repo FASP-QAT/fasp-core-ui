@@ -1734,7 +1734,7 @@ export default class PlanningUnitSetting extends Component {
         tr.children[2].classList.add('AsteriskTheadtrTd');
         tr.children[3].classList.add('AsteriskTheadtrTd');
         tr.children[4].classList.add('AsteriskTheadtrTd');
-        tr.children[8].classList.add('AsteriskTheadtrTd');
+        tr.children[8].classList.add('InfoTrAsteriskTheadtrTd');
         tr.children[9].classList.add('AsteriskTheadtrTd');
 
         tr.children[5].classList.add('InfoTr');
