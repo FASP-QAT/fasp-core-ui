@@ -665,6 +665,14 @@ export default class StepThreeImportMapPlanningUnits extends Component {
 
 
             ],
+            updateTable: function (el, cell, x, y, source, value, id) {
+                if (y != null) {
+                    var elInstance = el.jexcel;
+                    //left align
+                    elInstance.setStyle(`A${parseInt(y) + 1}`, 'text-align', 'left');
+                }
+
+            }.bind(this),
             // updateTable: function (el, cell, x, y, source, value, id) {
             //     console.log("INSIDE UPDATE TABLE");
             //     var elInstance = el.jexcel;

@@ -319,6 +319,9 @@ class EquivalancyUnit extends Component {
             updateTable: function (el, cell, x, y, source, value, id) {
                 if (y != null) {
                     var elInstance = el.jexcel;
+                    //left align
+                    elInstance.setStyle(`B${parseInt(y) + 1}`, 'text-align', 'left');
+
                     var rowData = elInstance.getRowData(y);
                     var addRowId = rowData[9];
                     console.log("addRowId------>", addRowId);
@@ -687,6 +690,9 @@ class EquivalancyUnit extends Component {
                 if (y != null) {
                     var elInstance = el.jexcel;
                     var rowData = elInstance.getRowData(y);
+
+                    //left align
+                    elInstance.setStyle(`B${parseInt(y) + 1}`, 'text-align', 'left');
 
                     var typeId = rowData[14];
                     // console.log("updateTable------>", rowData[11]);                    

@@ -357,7 +357,7 @@ class VersionSettingsComponent extends Component {
             let startDate = this.el.getValueFromCoords(7, y);
             let month = this.el.getValueFromCoords(8, y);
             console.log("startDate--------->", startDate);
-            if (startDate != null && month != null && month!="" && startDate!="") {
+            if (startDate != null && month != null && month != "" && startDate != "") {
                 let newStartDate = new Date(startDate);
                 newStartDate.setMonth(newStartDate.getMonth() + (month - 1));
                 // console.log("startDate--------->1", new Date(newStartDate));
@@ -374,7 +374,7 @@ class VersionSettingsComponent extends Component {
             let startDate = this.el.getValueFromCoords(7, y);
             let endDate = this.el.getValueFromCoords(9, y);
 
-            if (startDate != null & endDate != null && startDate!="" && endDate!="" && startDate!="") {
+            if (startDate != null & endDate != null && startDate != "" && endDate != "" && startDate != "") {
                 let d1 = new Date(startDate);
                 let d2 = new Date(endDate)
                 var months;
@@ -603,6 +603,11 @@ class VersionSettingsComponent extends Component {
                 var myResult = [];
                 myResult = getRequest.result;
                 console.log("myResult version type---", myResult)
+                myResult = myResult.sort((a, b) => {
+                    var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                    var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                    return itemLabelA > itemLabelB ? 1 : -1;
+                });
                 this.setState({
                     versionTypeList: myResult
                 });
@@ -646,6 +651,11 @@ class VersionSettingsComponent extends Component {
                     }
                 }
                 console.log("proList---", proList);
+                proList = proList.sort(function (a, b) {
+                    a = a.programCode.toLowerCase();
+                    b = b.programCode.toLowerCase();
+                    return a < b ? -1 : a > b ? 1 : 0;
+                });
 
                 if (localStorage.getItem("sesForecastProgramIds") != '' && localStorage.getItem("sesForecastProgramIds") != undefined) {
                     // console.log("program---->>>", JSON.parse(localStorage.getItem("sesForecastProgramIds")));
@@ -955,6 +965,9 @@ class VersionSettingsComponent extends Component {
             updateTable: function (el, cell, x, y, source, value, id) {
                 var elInstance = el.jexcel;
                 if (y != null) {
+                    //left align
+                    elInstance.setStyle(`B${parseInt(y) + 1}`, 'text-align', 'left');
+
                     var rowData = elInstance.getRowData(y);
                     if (rowData[10] == 1) {
                         var cell = elInstance.getCell(("E").concat(parseInt(y) + 1))

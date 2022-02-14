@@ -147,6 +147,9 @@ class ScaleUpType extends Component {
             updateTable: function (el, cell, x, y, source, value, id) {
                 if (y != null) {
                     var elInstance = el.jexcel;
+                    //left align
+                    elInstance.setStyle(`B${parseInt(y) + 1}`, 'text-align', 'left');
+
                     var rowData = elInstance.getRowData(y);
                     var addRowId = rowData[6];
                     console.log("addRowId------>", addRowId);
@@ -209,7 +212,7 @@ class ScaleUpType extends Component {
                             });
                             // Line
                             // items.push({ type: 'line' });
-                        } 
+                        }
                     }
                 }
 
@@ -674,8 +677,8 @@ class ScaleUpType extends Component {
                     <CardBody className="p-0">
 
                         <Col xs="12" sm="12">
-                        <h5 className="red">{i18n.t('static.common.customWarningMessage')}</h5>
-                            <div id="paputableDiv" style={{ display: this.state.loading ? "none" : "block",marginTop:'-13px' }} className={(AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_MODELING_TYPE') || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_MODELING_TYPE')) ? "RowClickable" : "jexcelremoveReadonlybackground"}>
+                            <h5 className="red">{i18n.t('static.common.customWarningMessage')}</h5>
+                            <div id="paputableDiv" style={{ display: this.state.loading ? "none" : "block", marginTop: '-13px' }} className={(AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_MODELING_TYPE') || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_MODELING_TYPE')) ? "RowClickable" : "jexcelremoveReadonlybackground"}>
                             </div>
                             <div style={{ display: this.state.loading ? "block" : "none" }}>
                                 <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >

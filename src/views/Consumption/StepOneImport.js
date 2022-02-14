@@ -312,7 +312,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 console.log("MYVALUE----------->3", index);
                 if (index.length > 0) {
                     console.log("MYVALUE----------->41", forecastPlanignUnitListForNotDuplicate.filter(c => c.supplyPlanPlanningUnitId != SupplyPlanningUnitId));
-                    
+
                     this.setState({
                         forecastPlanignUnitListForNotDuplicate: forecastPlanignUnitListForNotDuplicate.filter(c => c.supplyPlanPlanningUnitId != SupplyPlanningUnitId)
                     })
@@ -506,6 +506,11 @@ export default class StepOneImportMapPlanningUnits extends Component {
                     // }
                 }
                 console.log("DATASET-------->", datasetList);
+                datasetList = datasetList.sort(function (a, b) {
+                    a = a.programCode.toLowerCase();
+                    b = b.programCode.toLowerCase();
+                    return a < b ? -1 : a > b ? 1 : 0;
+                });
                 this.setState({
                     datasetList: datasetList,
                     datasetList1: datasetList1
@@ -963,6 +968,8 @@ export default class StepOneImportMapPlanningUnits extends Component {
             updateTable: function (el, cell, x, y, source, value, id) {
                 if (y != null) {
                     var elInstance = el.jexcel;
+                    //left align
+                    elInstance.setStyle(`B${parseInt(y) + 1}`, 'text-align', 'left');
                     var rowData = elInstance.getRowData(y);
 
 

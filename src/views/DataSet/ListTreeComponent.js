@@ -296,6 +296,11 @@ export default class ListTreeComponent extends Component {
                     console.log("myResult[i].programData after---", programData);
                     myResult[i].programData = programData;
                 }
+                myResult = myResult.sort(function (a, b) {
+                    a = a.programCode.toLowerCase();
+                    b = b.programCode.toLowerCase();
+                    return a < b ? -1 : a > b ? 1 : 0;
+                });
                 this.setState({
                     datasetList: myResult
                 }, () => {
