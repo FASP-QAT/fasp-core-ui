@@ -2123,13 +2123,15 @@ class EquivalancyUnit extends Component {
                 } else {
                     elInstance.setStyle(col, "background-color", "transparent");
                     elInstance.setComments(col, "");
+
+                    let obj = this.state.forecastingUnitList.filter(c => c.id == parseInt(value))[0];
+                    console.log("-----------XXXXXXXXXXXXXXXXXX", obj);
+                    if (obj != undefined && obj != null) {
+                        this.el.setValueFromCoords(5, y, obj.unit.id, true);
+                    }
                 }
             }
-            let obj = this.state.forecastingUnitList.filter(c => c.id == parseInt(value))[0];
-            console.log("-----------XXXXXXXXXXXXXXXXXX", obj);
-            if (obj != undefined && obj != null) {
-                this.el.setValueFromCoords(5, y, obj.unit.id, true);
-            }
+
         }
 
         //conversion To FU 14,4

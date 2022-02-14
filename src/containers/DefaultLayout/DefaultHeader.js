@@ -2,7 +2,7 @@ import { AppNavbarBrand, AppSidebarToggler } from '@coreui/react';
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import { NavLink } from 'react-router-dom';
-import { Alert, Col, Nav, NavItem ,Row} from 'reactstrap';
+import { Alert, Col, Nav, NavItem, Row } from 'reactstrap';
 import QAT from '../../assets/img/brand/QAT-minimize.png';
 import imageNotificationCount from '../../assets/img/icons-truck.png';
 import logo from '../../assets/img/QAT-logo.png';
@@ -26,7 +26,14 @@ const defaultProps = {};
 class DefaultHeader extends Component {
   constructor(props) {
     super(props);
-    this.changeLanguage = this.changeLanguage.bind(this)
+    this.changeLanguage = this.changeLanguage.bind(this);
+    this.refreshPage = this.refreshPage.bind(this);
+  }
+
+  refreshPage() {
+    setTimeout(() => {
+      window.location.reload(false);
+    }, 0);
   }
 
   changeLanguage(lang) {
@@ -36,7 +43,7 @@ class DefaultHeader extends Component {
   }
 
   componentDidMount() {
-    
+
   }
 
   render() {
@@ -69,7 +76,7 @@ class DefaultHeader extends Component {
     </NavItem>*/}
           <NavItem className="px-3">
             {console.log("Inside header called---", this)}
-            <NavLink to="#" className={this.props.activeModule==2?"nav-link titleColorModule1":"nav-link titleColorModule2"} ><b>{this.props.activeModule==2?i18n.t('static.module.supplyPlanningModule'):i18n.t('static.module.forecastingModule')}</b><br></br><b>{this.props.title}</b></NavLink>
+            <NavLink to="#" onClick={this.refreshPage} className={this.props.activeModule == 2 ? "nav-link titleColorModule1" : "nav-link titleColorModule2"} ><b>{this.props.activeModule == 2 ? i18n.t('static.module.supplyPlanningModule') : i18n.t('static.module.forecastingModule')}</b><br></br><b>{this.props.title}</b></NavLink>
           </NavItem>
         </Nav>
         <Nav className="ml-auto " navbar>
@@ -95,7 +102,7 @@ class DefaultHeader extends Component {
               <DropdownItem onClick={this.changeLanguage.bind(this, 'pr')}> {i18n.t('static.language.Portuguese')}</DropdownItem>
             </DropdownMenu>
           </UncontrolledDropdown> */}
-          
+
           {checkOnline === 'Online' && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANUAL_TAGGING') && this.props.activeModule == 2 &&
             <NavItem className="">
               <NavLink to="#" className="nav-link">
@@ -152,18 +159,18 @@ class DefaultHeader extends Component {
             </span>
           </NavItem> */}
 
-        <NavItem className="">
+          <NavItem className="">
             <span className="nav-link">
-              <a href={localStorage.getItem('lang')=='en'?
-              "../../../../src/ShowGuidanceHtmlFile/ShowGuidanceEn.html":
-              localStorage.getItem('lang')=='fr'?
-              "../../../../src/ShowGuidanceHtmlFile/ShowGuidanceFr.html":
-              localStorage.getItem('lang')=='sp'?
-              "../../../../src/ShowGuidanceHtmlFile/ShowGuidanceSp.html":
-              "../../../../src/ShowGuidanceHtmlFile/ShowGuidancePr.html"
-            } target="_blank">
-              {/* <i class="nav-icon fa fa-compass ShowGuidanceIcon" title={'Show Guidance'}></i> */}
-              <img src={ShowGuidanceImg} className="HelpIcon" title={i18n.t('static.user.usermanual')} style={{ width: '25px', height: '25px' }} />
+              <a href={localStorage.getItem('lang') == 'en' ?
+                "../../../../src/ShowGuidanceHtmlFile/ShowGuidanceEn.html" :
+                localStorage.getItem('lang') == 'fr' ?
+                  "../../../../src/ShowGuidanceHtmlFile/ShowGuidanceFr.html" :
+                  localStorage.getItem('lang') == 'sp' ?
+                    "../../../../src/ShowGuidanceHtmlFile/ShowGuidanceSp.html" :
+                    "../../../../src/ShowGuidanceHtmlFile/ShowGuidancePr.html"
+              } target="_blank">
+                {/* <i class="nav-icon fa fa-compass ShowGuidanceIcon" title={'Show Guidance'}></i> */}
+                <img src={ShowGuidanceImg} className="HelpIcon" title={i18n.t('static.user.usermanual')} style={{ width: '25px', height: '25px' }} />
               </a>
             </span>
           </NavItem>
