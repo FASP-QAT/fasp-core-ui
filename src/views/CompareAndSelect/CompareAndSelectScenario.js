@@ -158,11 +158,11 @@ class CompareAndSelectScenario extends Component {
     showData() {
         console.log("In show data@@@")
         if (this.state.planningUnitId != "" && this.state.regionId != "") {
-            console.log("In If@@@",this.state.datasetJson);
+            console.log("In If@@@", this.state.datasetJson);
             this.setState({ loading: true })
             var datasetJson = this.state.datasetJson;
             var multiplier = 1;
-            console.log("this.state.planningUnitList@@@",this.state.planningUnitList)
+            console.log("this.state.planningUnitList@@@", this.state.planningUnitList)
             var selectedPlanningUnit = this.state.planningUnitList.filter(c => c.planningUnit.id == this.state.planningUnitId);
             if (this.state.viewById == 2) {
                 multiplier = selectedPlanningUnit.length > 0 ? selectedPlanningUnit[0].planningUnit.multiplier : 1;
@@ -290,7 +290,7 @@ class CompareAndSelectScenario extends Component {
         }
         var actualDiff = [];
         var countArray = [];
-        
+
         for (var tsl = 0; tsl < treeScenarioList.length; tsl++) {
             totalArray.push(0);
             actualDiff.push(0);
@@ -1028,6 +1028,11 @@ class CompareAndSelectScenario extends Component {
                         datasetId = localStorage.getItem("sesDatasetId");
                         event.target.value = localStorage.getItem("sesDatasetId");
                     }
+                    datasetList = datasetList.sort(function (a, b) {
+                        a = a.name.toLowerCase();
+                        b = b.name.toLowerCase();
+                        return a < b ? -1 : a > b ? 1 : 0;
+                    });
                     this.setState({
                         datasetList: datasetList,
                         equivalencyUnitList: euList,
@@ -1140,7 +1145,7 @@ class CompareAndSelectScenario extends Component {
             datasetId: datasetId,
         }, () => {
             if (datasetId != "") {
-console.log("in if for set@@@",this.state.datasetList);
+                console.log("in if for set@@@", this.state.datasetList);
                 var datasetFiltered = this.state.datasetList.filter(c => c.id == datasetId)[0];
                 var datasetDataBytes = CryptoJS.AES.decrypt(datasetFiltered.programJson, SECRET_KEY);
                 var datasetData = datasetDataBytes.toString(CryptoJS.enc.Utf8);
@@ -1827,7 +1832,7 @@ console.log("in if for set@@@",this.state.datasetList);
                                                             <td><i class="fa fa-circle" style={{ color: item.color }} aria-hidden="true"></i> {" "}{item.type == "T" ? getLabelText(item.tree.label, this.state.lang) + " - " + getLabelText(item.scenario.label, this.state.lang) : getLabelText(item.scenario.extrapolationMethod.label, this.state.lang)}{"  "}{item.readonly && <i class="fa fa-exclamation-triangle"></i>}</td>
                                                             <td align="center"><input type="radio" id="selectAsForecast" name="selectAsForecast" checked={this.state.selectedTreeScenarioId == item.id ? true : false} onClick={() => this.scenarioOrderChanged(item.id)} disabled={item.readonly}></input></td>
                                                             <td align="center">{item.readonly ? "" : <NumberFormat displayType={'text'} thousandSeparator={true} value={Math.round(this.state.totalArray[idx])} />}</td>
-                                                            <td align="center" style={{ color: Math.min(...this.state.actualDiff.filter(c => c != 0)) == this.state.actualDiff[idx] ? "#118b70" : "#000000" }}>{item.readonly ? i18n.t('static.supplyPlanFormula.na') : this.state.totalArray[idx] > 0 && this.state.actualDiff.length > 0 ? <NumberFormat displayType={'text'} thousandSeparator={true} value={(((this.state.actualDiff[idx]) / this.state.totalActual)*100).toFixed(4)} /> : ""}</td>
+                                                            <td align="center" style={{ color: Math.min(...this.state.actualDiff.filter(c => c != 0)) == this.state.actualDiff[idx] ? "#118b70" : "#000000" }}>{item.readonly ? i18n.t('static.supplyPlanFormula.na') : this.state.totalArray[idx] > 0 && this.state.actualDiff.length > 0 ? <NumberFormat displayType={'text'} thousandSeparator={true} value={(((this.state.actualDiff[idx]) / this.state.totalActual) * 100).toFixed(4)} /> : ""}</td>
                                                             <td align="center">{item.readonly ? i18n.t('static.supplyPlanFormula.na') : <NumberFormat displayType={'text'} thousandSeparator={true} value={this.state.countArray.length > 0 && this.state.countArray[idx] != undefined ? this.state.countArray[idx] + 1 : ""} />}</td>
                                                             {item.type == "T" ? <td align="center" className={!item.readonly && this.state.totalArray[idx] > 0 && this.state.lowerThenConsumptionThreshold != "" && this.state.higherThenConsumptionThreshold != "" && this.state.lowerThenConsumptionThreshold > 0 && this.state.higherThenConsumptionThreshold > 0 ? this.state.totalArray[idx] < this.state.lowerThenConsumptionThreshold ? (((Number(this.state.lowerThenConsumptionThreshold) - Number(this.state.totalArray[idx])) / Number(this.state.lowerThenConsumptionThreshold)) * 100).toFixed(2) > this.state.lowerThenConsumptionThresholdPU && (((Number(this.state.lowerThenConsumptionThreshold) - Number(this.state.totalArray[idx])) / Number(this.state.lowerThenConsumptionThreshold)) * 100).toFixed(2) < this.state.higherThenConsumptionThresholdPU ? "" : "red" : this.state.totalArray[idx] > this.state.higherThenConsumptionThreshold ? (((Number(this.state.totalArray[idx]) - Number(this.state.higherThenConsumptionThreshold)) / Number(this.state.higherThenConsumptionThreshold)) * 100).toFixed(2) > this.state.lowerThenConsumptionThresholdPU && (((Number(this.state.totalArray[idx]) - Number(this.state.higherThenConsumptionThreshold)) / Number(this.state.higherThenConsumptionThreshold)) * 100).toFixed(2) < this.state.higherThenConsumptionThresholdPU ? "" : "red" : "" : ""}>{!item.readonly && this.state.totalArray[idx] > 0 && this.state.lowerThenConsumptionThreshold != "" && this.state.higherThenConsumptionThreshold != "" && this.state.lowerThenConsumptionThreshold > 0 && this.state.higherThenConsumptionThreshold > 0 ? this.state.totalArray[idx] < this.state.lowerThenConsumptionThreshold ? (((Number(this.state.lowerThenConsumptionThreshold) - Number(this.state.totalArray[idx])) / Number(this.state.lowerThenConsumptionThreshold)) * 100).toFixed(2) + i18n.t('static.compareAndSelect.belowLowestConsumption') : this.state.totalArray[idx] > this.state.higherThenConsumptionThreshold ? (((Number(this.state.totalArray[idx]) - Number(this.state.higherThenConsumptionThreshold)) / Number(this.state.higherThenConsumptionThreshold)) * 100).toFixed(2) + i18n.t('static.compareAndSelect.aboveHighestConsumption') : i18n.t('static.supplyPlanFormula.na') : i18n.t('static.supplyPlanFormula.na')}</td> : <td align="center" >{i18n.t('static.supplyPlanFormula.na')}</td>}
                                                         </tr>

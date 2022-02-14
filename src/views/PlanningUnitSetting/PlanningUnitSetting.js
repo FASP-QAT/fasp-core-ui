@@ -110,6 +110,7 @@ export default class PlanningUnitSetting extends Component {
         this.cancelClicked = this.cancelClicked.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.disablePUNode = this.disablePUNode.bind(this);
+        this.onPaste = this.onPaste.bind(this);
     }
 
     hideSecondComponent() {
@@ -1088,6 +1089,11 @@ export default class PlanningUnitSetting extends Component {
                     // }
                 }
                 console.log("DATASET-------->", datasetList);
+                datasetList = datasetList.sort(function (a, b) {
+                    a = a.programCode.toLowerCase();
+                    b = b.programCode.toLowerCase();
+                    return a < b ? -1 : a > b ? 1 : 0;
+                });
                 if (localStorage.getItem("sesForecastProgramIdReport") != '' && localStorage.getItem("sesForecastProgramIdReport") != undefined && localStorage.getItem("sesForecastVersionIdReport") != '' && localStorage.getItem("sesForecastVersionIdReport") != undefined && !localStorage.getItem("sesForecastVersionIdReport").includes('Local')) {
 
                     this.setState({
@@ -1372,7 +1378,7 @@ export default class PlanningUnitSetting extends Component {
         // console.log("outPutList---->", outPutList);
         let outPutListArray = [];
         let count = 0;
-        let indexVar = 0;
+        let indexVar = 1;
 
         for (var j = 0; j < outPutList.length; j++) {
             data = [];
@@ -1397,7 +1403,7 @@ export default class PlanningUnitSetting extends Component {
 
             outPutListArray[count] = data;
             count++;
-            indexVar++;
+            indexVar = indexVar + 1;
         }
         if (outPutList.length == 0) {
             data = [];
@@ -1414,7 +1420,7 @@ export default class PlanningUnitSetting extends Component {
             data[10] = 1;
             data[11] = 1;
             data[12] = {};
-            data[13] = -1;
+            data[13] = 0;
             data[14] = true;
             data[15] = "";
             outPutListArray[0] = data;
@@ -1571,7 +1577,7 @@ export default class PlanningUnitSetting extends Component {
                 entries: '',
             },
             onload: this.loaded,
-            selectionCopy: false,
+            // selectionCopy: false,
             pagination: localStorage.getItem("sesRecordCount"),
             search: true,
             columnSorting: true,
@@ -1669,12 +1675,22 @@ export default class PlanningUnitSetting extends Component {
     onPaste(instance, data) {
         var z = -1;
         for (var i = 0; i < data.length; i++) {
+            console.log("-----------------onPaste---------------------1", data[i]);
             if (z != data[i].y) {
-
-                (instance.jexcel).setValueFromCoords(10, data[i].y, 1, true);
-                (instance.jexcel).setValueFromCoords(11, data[i].y, 1, true);
-                z = data[i].y;
-
+                console.log("-----------------onPaste---------------------2");
+                var index = (instance.jexcel).getValue(`N${parseInt(data[i].y) + 1}`, true);
+                if (index == "" || index == null || index == undefined) {
+                    console.log("-----------------onPaste---------------------3");
+                    (instance.jexcel).setValueFromCoords(8, data[i].y, true, true);
+                    (instance.jexcel).setValueFromCoords(9, data[i].y, true, true);                    
+                    (instance.jexcel).setValueFromCoords(10, data[i].y, 1, true);
+                    (instance.jexcel).setValueFromCoords(11, data[i].y, 1, true);
+                    (instance.jexcel).setValueFromCoords(12, data[i].y, {}, true);
+                    (instance.jexcel).setValueFromCoords(13, data[i].y, 0, true);
+                    (instance.jexcel).setValueFromCoords(14, data[i].y, true, true);
+                    (instance.jexcel).setValueFromCoords(15, data[i].y, "", true);
+                    z = data[i].y;
+                }
             }
         }
     }
@@ -2129,7 +2145,7 @@ export default class PlanningUnitSetting extends Component {
         data[10] = 1;
         data[11] = 1;
         data[12] = {};
-        data[13] = -1;
+        data[13] = 0;
         data[14] = true;
         data[15] = "";
 
@@ -2153,7 +2169,7 @@ export default class PlanningUnitSetting extends Component {
             && datasetList.map((item, i) => {
                 return (
                     <option key={i} value={item.id}>
-                        {item.programCode + '~' + item.versionId}
+                        {item.programCode + '~v' + item.versionId}
                     </option>
                 )
             }, this);

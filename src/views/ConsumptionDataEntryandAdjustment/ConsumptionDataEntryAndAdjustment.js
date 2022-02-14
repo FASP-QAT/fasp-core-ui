@@ -1076,6 +1076,11 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           datasetId = localStorage.getItem("sesDatasetId");
           event.target.value = localStorage.getItem("sesDatasetId");
         }
+        datasetList = datasetList.sort(function (a, b) {
+          a = a.name.toLowerCase();
+          b = b.name.toLowerCase();
+          return a < b ? -1 : a > b ? 1 : 0;
+        });
         this.setState({
           datasetList: datasetList,
           loading: false

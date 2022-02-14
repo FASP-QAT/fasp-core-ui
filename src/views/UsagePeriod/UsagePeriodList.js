@@ -156,6 +156,9 @@ class UsagePeriod extends Component {
             updateTable: function (el, cell, x, y, source, value, id) {
                 if (y != null) {
                     var elInstance = el.jexcel;
+                    //left align
+                    elInstance.setStyle(`B${parseInt(y) + 1}`, 'text-align', 'left');
+
                     var rowData = elInstance.getRowData(y);
                     var addRowId = rowData[7];
                     console.log("addRowId------>", addRowId);
@@ -758,7 +761,7 @@ class UsagePeriod extends Component {
                             <div className="table-responsive consumptionDataEntryTable">
                                 {/* <div id="paputableDiv" style={{ display: this.state.loading ? "none" : "block" }} className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_PERIOD') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"}> */}
 
-                                <div id="paputableDiv" style={{ display: this.state.loading ? "none" : "block"}} className={(AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_PERIOD') || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_USAGE_PERIOD')) ? "RowClickable" : "jexcelremoveReadonlybackground"}>
+                                <div id="paputableDiv" style={{ display: this.state.loading ? "none" : "block" }} className={(AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_PERIOD') || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_USAGE_PERIOD')) ? "RowClickable" : "jexcelremoveReadonlybackground"}>
                                 </div>
                             </div>
                             <div style={{ display: this.state.loading ? "block" : "none" }}>

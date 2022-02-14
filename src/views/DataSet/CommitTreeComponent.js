@@ -186,6 +186,11 @@ export default class CommitTreeComponent extends React.Component {
                     programId = localStorage.getItem("sesDatasetId");
                     event.target.value = localStorage.getItem("sesDatasetId");
                 }
+                programList = programList.sort(function (a, b) {
+                    a = a.name.toLowerCase();
+                    b = b.name.toLowerCase();
+                    return a < b ? -1 : a > b ? 1 : 0;
+                });
                 this.setState({
                     programList: programList,
                     loading: false,
@@ -740,17 +745,17 @@ export default class CommitTreeComponent extends React.Component {
                     </li>
                 </ul>
             )
-        }, this):<ul></ul>;
+        }, this) : <ul></ul>;
 
         //Nodes less than 100%
-        let jxlTable = this.state.treeScenarioList.length>0?this.state.treeScenarioList.map((item1, count) => {
+        let jxlTable = this.state.treeScenarioList.length > 0 ? this.state.treeScenarioList.map((item1, count) => {
             var nodeWithPercentageChildren = this.state.nodeWithPercentageChildren.filter(c => c.treeId == item1.treeId && c.scenarioId == item1.scenarioId);
             if (nodeWithPercentageChildren.length > 0) {
                 return (<><span className="hoverDiv" onClick={() => nodeWithPercentageChildrenClicked(item1.treeId, item1.scenarioId, this)}><span>{getLabelText(item1.treeLabel, this.state.lang) + " / " + getLabelText(item1.scenarioLabel, this.state.lang)}</span></span><div className="table-responsive">
                     <div id={"tableDiv" + count} className="jexcelremoveReadonlybackground consumptionDataEntryTable" name='jxlTableData' />
                 </div><br /></>)
             }
-        }, this):<br/>
+        }, this) : <br />
 
         //Consumption Notes
         const { datasetPlanningUnit } = this.state;

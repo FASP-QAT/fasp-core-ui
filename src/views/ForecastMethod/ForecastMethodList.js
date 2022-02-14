@@ -198,6 +198,9 @@ class forecastMethod extends Component {
             updateTable: function (el, cell, x, y, source, value, id) {
                 if (y != null) {
                     var elInstance = el.jexcel;
+                    //left align
+                    elInstance.setStyle(`B${parseInt(y) + 1}`, 'text-align', 'left');
+
                     var rowData = elInstance.getRowData(y);
                     // var productCategoryId = rowData[0];
                     var forecastMethodId = rowData[6];

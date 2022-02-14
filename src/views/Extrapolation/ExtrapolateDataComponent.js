@@ -190,6 +190,11 @@ export default class ExtrapolateDataComponent extends React.Component {
                     forecastProgramId = localStorage.getItem("sesLiveDatasetId");
                     event.target.value = localStorage.getItem("sesLiveDatasetId");
                 }
+                forecastProgramList = forecastProgramList.sort(function (a, b) {
+                    a = a.name.toLowerCase();
+                    b = b.name.toLowerCase();
+                    return a < b ? -1 : a > b ? 1 : 0;
+                });
                 this.setState({
                     forecastProgramList: forecastProgramList,
                     loading: false
