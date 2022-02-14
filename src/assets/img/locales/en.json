@@ -861,7 +861,7 @@
     "static.dashboard.productcategory": "Planning unit category",
     "static.dashboard.programmaster": "Program management",
     "static.commit.newDataLatestVersion": "New data from latest version",
-    "static.tree.QATEstimateForIntervalEvery_months": "QAT estimate for interval (Every _ months)",
+    "static.tree.QATEstimateForIntervalEvery_months": "QAT estimate for interval (Every X months)",
     "static.commit.negativeStock": "Batches have negative stock!",
     "static.supplyPlan.includeInProjectedShipment": "Include in projected balance",
     "static.report.consumptionReport": "Consumption Report",

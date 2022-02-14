@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { OrgDiagram } from 'basicprimitivesreact';
 // import { PDFDocument } from 'pdfkit';
-import jsPDF from "jspdf";
 import "jspdf-autotable";
 import cleanUp from '../../assets/img/calculator.png';
 import { LOGO } from '../../CommonComponent/Logo.js';
@@ -26,7 +25,7 @@ import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import jexcel from 'jexcel-pro';
 import "../../../node_modules/jexcel-pro/dist/jexcel.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
-import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
+import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js'
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import TextField from '@material-ui/core/TextField';
 import pdfIcon from '../../assets/img/pdf.png';
@@ -282,6 +281,7 @@ const validationSchema = function (values) {
         forecastMethodId: Yup.string()
             .required(i18n.t('static.validation.selectForecastMethod')),
         treeName: Yup.string()
+            .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
             .required(i18n.t('static.validation.selectTreeName')),
         regionId: Yup.string()
             .required(i18n.t('static.common.regiontext')),
@@ -3136,12 +3136,14 @@ export default class BuildTree extends Component {
             var e = items1[i];
             e.scenarioId = this.state.selectedScenario
             e.showModelingValidation = this.state.showModelingValidation
+            console.log("1------------------->>>>", this.getPayloadData(items1[i], 4))
+            console.log("2------------------->>>>", this.getPayloadData(items1[i], 3))
             e.result = this.getPayloadData(items1[i], 4)
             var text = this.getPayloadData(items1[i], 3)
             e.text = text;
             newItems.push(e)
         }
-
+        console.log("newItems---", newItems);
         var sampleChart = new OrgDiagramPdfkit({
             ...this.state,
             pageFitMode: PageFitMode.Enabled,
@@ -3507,19 +3509,43 @@ export default class BuildTree extends Component {
         console.log("duplicate node called 1---", this.state.currentItemConfig);
         console.log("duplicate node called 2---", itemConfig);
         const { items } = this.state;
+        var maxNodeId = items.length > 0 ? Math.max(...items.map(o => o.id)) : 0;
+        var nodeId = parseInt(maxNodeId + 1);
         var newItem = {
-            id: parseInt(items.length + 1),
+            id: nodeId,
             level: itemConfig.level,
             parent: itemConfig.parent,
             payload: itemConfig.payload
         };
-        console.log("add button clicked value after update---", newItem);
+        newItem.payload.nodeId = nodeId;
+        var parentSortOrder = items.filter(c => c.id == itemConfig.parent)[0].sortOrder;
+        var childList = items.filter(c => c.parent == itemConfig.parent);
+        newItem.sortOrder = parentSortOrder.concat(".").concat(("0" + (Number(childList.length) + 1)).slice(-2));
+        // (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].nodeDataId = this.getMaxNodeDataId();
+        var scenarioList = this.state.scenarioList;
+        if (scenarioList.length > 0) {
+            for (let i = 0; i < scenarioList.length; i++) {
+                (newItem.payload.nodeDataMap[scenarioList[i].id])[0].nodeDataId = this.getMaxNodeDataId();
+                // var tempArray = [];
+                // var nodeDataMap = {};
+                // tempArray.push(JSON.parse(JSON.stringify((newItem.payload.nodeDataMap[this.state.selectedScenario])[0])));
+                // console.log("tempArray---", tempArray);
+                // nodeDataMap = newItem.payload.nodeDataMap;
+                // tempArray[0].nodeDataId = this.getMaxNodeDataId();
+                // nodeDataMap[scenarioList[i].id] = tempArray;
+                // // nodeDataMap[scenarioList[i].id][0].nodeDataId = scenarioList[i].id;
+                // newItem.payload.nodeDataMap = nodeDataMap;
+                // (newItem.payload.nodeDataMap[scenarioList[i].id])[0] = (newItem.payload.nodeDataMap[this.state.selectedScenario]);
+            }
+        }
+        console.log("duplicate button clicked value after update---", newItem);
         this.setState({
             items: [...items, newItem],
-            cursorItem: parseInt(items.length + 1)
+            cursorItem: nodeId
         }, () => {
             console.log("on add items-------", this.state.items);
-            this.calculateValuesForAggregateNode(this.state.items);
+            this.calculateMOMData(newItem.id, 0);
+            // this.calculateValuesForAggregateNode(this.state.items);
         });
     }
     cancelClicked() {
@@ -5638,7 +5664,7 @@ export default class BuildTree extends Component {
                                         </FormGroup>
                                         <FormGroup className={this.state.currentItemConfig.context.payload.nodeType.id == 2 ? "col-md-1" : "col-md-1"} style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 2 ? "block" : "none" }}>
                                             <Label htmlFor="currencyId" style={{ visibility: 'hidden' }}></Label>
-                                            <div style={{marginTop: '13px'}}>
+                                            <div style={{ marginTop: '13px' }}>
                                                 <Input
                                                     className="form-check-input checkboxMargin"
                                                     type="checkbox"
@@ -7667,8 +7693,8 @@ export default class BuildTree extends Component {
                                                                 <option value="">{i18n.t('static.common.select')}</option>
                                                                 {treeList}
                                                             </Input>
-                                                            <InputGroupAddon addonType="append">
-                                                                <InputGroupText><i class="fa fa-cog icons" data-toggle="collapse" aria-expanded="false" onClick={this.toggleCollapse}></i></InputGroupText>
+                                                            <InputGroupAddon addonType="append" onClick={this.toggleCollapse}>
+                                                                <InputGroupText><i class="fa fa-cog icons" data-toggle="collapse" aria-expanded="false"></i></InputGroupText>
 
                                                             </InputGroupAddon>
                                                         </InputGroup>
@@ -7696,9 +7722,9 @@ export default class BuildTree extends Component {
                                                                 <option value="">{i18n.t('static.common.select')}</option>
                                                                 {scenarios}
                                                             </Input>
-                                                            <InputGroupAddon addonType="append">
+                                                            <InputGroupAddon addonType="append" onClick={this.toggleDropdown}>
                                                                 {/* <InputGroupText><i class="fa fa-plus icons" aria-hidden="true" data-toggle="tooltip" data-html="true" data-placement="bottom" onClick={this.openScenarioModal} title=""></i></InputGroupText> */}
-                                                                <InputGroupText><i class="fa fa-caret-down icons " onClick={this.toggleDropdown} title=""></i></InputGroupText>
+                                                                <InputGroupText><i class="fa fa-caret-down icons " title=""></i></InputGroupText>
                                                             </InputGroupAddon>
                                                         </InputGroup>
                                                         <div class="list-group DropdownScenario" style={{ display: this.state.showDiv1 ? 'block' : 'none' }}>

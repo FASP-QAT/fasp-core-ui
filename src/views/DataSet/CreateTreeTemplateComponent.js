@@ -10,6 +10,7 @@ import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 import { Formik } from 'formik';
 import * as Yup from 'yup'
+import pdfIcon from '../../assets/img/pdf.png';
 import jexcel from 'jexcel-pro';
 import "../../../node_modules/jexcel-pro/dist/jexcel.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
@@ -46,7 +47,10 @@ import docicon from '../../assets/img/doc.png'
 import { saveAs } from "file-saver";
 import { Document, ImageRun, Packer, Paragraph, ShadingType, TextRun } from "docx";
 import { calculateModelingData } from '../../views/DataSet/ModelingDataCalculation2';
-import CryptoJS from 'crypto-js'
+import PDFDocument from 'pdfkit-nodejs-webpack';
+import blobStream from 'blob-stream';
+import OrgDiagramPdfkit from '../TreePDF/OrgDiagramPdfkit';
+import Size from '../../../node_modules/basicprimitives/src/graphics/structs/Size';
 
 
 const entityname = 'Tree Template';
@@ -276,16 +280,14 @@ const validationSchema = function (values) {
         forecastMethodId: Yup.string()
             .required("Please select forecast method"),
         treeName: Yup.string()
+            .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
             .required("Please enter template name"),
-        monthsInPast: Yup.number()
-            .typeError('Please enter months in past')
-            .integer("Please enter only values")
-            .required("Please enter months in past"),
-        monthsInFuture: Yup.number()
-            .typeError('Please enter months in future')
-            .integer("Please enter only values")
-            .required("Please enter months in future")
-            .positive("Please enter positive values")
+        monthsInPast: Yup.string()
+            .matches(/^\d{0,15}(,\d{3})*(\.\d{1,2})?$/, 'Enter valid positive numbers')
+            .required("Please enter a number"),
+        monthsInFuture: Yup.string()
+            .matches(/^\d{0,15}(,\d{3})*(\.\d{1,2})?$/, 'Enter valid positive numbers')
+            .required("Please enter a number")
 
     })
 }
@@ -337,6 +339,7 @@ export default class CreateTreeTemplate extends Component {
         this.pickAMonth2 = React.createRef()
         this.pickAMonth1 = React.createRef()
         this.state = {
+            showModelingValidation: true,
             hidePlanningUnit: false,
             maxNodeDataId: '',
             nodeDataMomList: [],
@@ -572,7 +575,123 @@ export default class CreateTreeTemplate extends Component {
         this.calculateMOMData = this.calculateMOMData.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.getMaxNodeDataId = this.getMaxNodeDataId.bind(this);
+        this.exportPDF = this.exportPDF.bind(this);
     }
+
+    exportPDF = () => {
+        let treeLevel = this.state.items.length;
+        var treeLevelItems = []
+        for (var i = 0; i <= treeLevel; i++) {
+            if (i == 0) {
+                treeLevelItems.push({
+                    annotationType: AnnotationType.Level,
+                    levels: [0],
+                    title: "Level 0",
+                    titleColor: "#002f6c",
+                    fontWeight: "bold",
+                    transForm: 'rotate(270deg)',
+                    offset: new Thickness(0, 0, 0, -1),
+                    lineWidth: new Thickness(0, 0, 0, 0),
+                    opacity: 0,
+                    borderColor: Colors.Gray,
+                    // fillColor: "#f5f5f5",
+                    lineType: LineType.Dotted
+                });
+            }
+            else if (i % 2 == 0) {
+                treeLevelItems.push(new LevelAnnotationConfig({
+                    levels: [i],
+                    title: "Level " + i,
+                    titleColor: "#002f6c",
+                    fontWeight: "bold",
+                    transForm: 'rotate(270deg)',
+                    offset: new Thickness(0, 0, 0, -1),
+                    lineWidth: new Thickness(0, 0, 0, 0),
+                    opacity: 0,
+                    borderColor: Colors.Gray,
+                    // fillColor: "#f5f5f5",
+                    lineType: LineType.Solid
+                })
+                );
+            }
+            else {
+                treeLevelItems.push(new LevelAnnotationConfig({
+                    levels: [i],
+                    title: "Level " + i,
+                    titleColor: "#002f6c",
+                    fontWeight: "bold",
+                    transForm: 'rotate(270deg)',
+                    offset: new Thickness(0, 0, 0, -1),
+                    lineWidth: new Thickness(0, 0, 0, 0),
+                    opacity: 0.08,
+                    borderColor: Colors.Gray,
+                    // fillColor: "#f5f5f5",
+                    lineType: LineType.Dotted
+                }));
+            }
+            console.log("level json***", treeLevelItems);
+        }
+
+        var templates = [
+            {
+                itemSize: new Size(200, 85)
+            }
+        ]
+        var items1 = this.state.items;
+        var newItems = [];
+        for (var i = 0; i < items1.length; i++) {
+            var e = items1[i];
+            console.log("items1[i]--------------", items1[i]);
+            e.scenarioId = 0
+            e.showModelingValidation = this.state.showModelingValidation
+            console.log("1------------------->>>>", this.getPayloadData(items1[i], 4))
+            console.log("2------------------->>>>", this.getPayloadData(items1[i], 3))
+            e.result = this.getPayloadData(items1[i], 4)
+            var text = this.getPayloadData(items1[i], 3)
+            e.text = text;
+            newItems.push(e)
+        }
+        console.log("newItems---", newItems);
+        var sampleChart = new OrgDiagramPdfkit({
+            ...this.state,
+            pageFitMode: PageFitMode.Enabled,
+            hasSelectorCheckbox: Enabled.False,
+            hasButtons: Enabled.True,
+            buttonsPanelSize: 40,
+            orientationType: OrientationType.Top,
+            defaultTemplateName: "ContactTemplate",
+            linesColor: Colors.Black,
+            annotations: treeLevelItems,
+            items: newItems,
+            templates: (templates || [])
+        });
+        var sample3size = sampleChart.getSize();
+        var doc = new PDFDocument({ size: 'LEGAL' });
+        var stream = doc.pipe(blobStream());
+
+        var legalSize = { width: 612.00, height: 1008.00 }
+        var scale = Math.min(legalSize.width / (sample3size.width + 300), legalSize.height / (sample3size.height + 300))
+        doc.scale(scale);
+        doc.fontSize(25)
+            .text('Tree Template PDF', 30, 30);
+
+        sampleChart.draw(doc, 60, 100);
+
+        doc.restore();
+
+        doc.end();
+
+        if (typeof stream !== 'undefined') {
+            stream.on('finish', function () {
+                var string = stream.toBlob('application/pdf');
+                window.saveAs(string, 'Tree Template.pdf');
+            });
+        } else {
+            alert('Error: Failed to create file stream.');
+        }
+
+    }
+
     getMaxNodeDataId() {
         var maxNodeDataId = 0;
         // if (this.state.maxNodeDataId != "" && this.state.maxNodeDataId != 0) {
@@ -1202,7 +1321,12 @@ export default class CreateTreeTemplate extends Component {
             } else {
                 if (itemConfig.payload.nodeType.id == 1 || itemConfig.payload.nodeType.id == 2) {
                     if (type == 1) {
-                        return addCommas((itemConfig.payload.nodeDataMap[0])[0].dataValue);
+                        if (itemConfig.payload.nodeType.id == 1) {
+                            (itemConfig.payload.nodeDataMap[0])[0].displayDataValue = (itemConfig.payload.nodeDataMap[0])[0].dataValue;
+                            return addCommas((itemConfig.payload.nodeDataMap[0])[0].displayDataValue);
+                        } else {
+                            return addCommas((itemConfig.payload.nodeDataMap[0])[0].dataValue);
+                        }
                     } else if (type == 3) {
                         var childList = this.state.items.filter(c => c.parent == itemConfig.id && (c.payload.nodeType.id == 3 || c.payload.nodeType.id == 4 || c.payload.nodeType.id == 5));
                         if (childList.length > 0) {
@@ -1242,6 +1366,14 @@ export default class CreateTreeTemplate extends Component {
                                 }
                             }
                             (itemConfig.payload.nodeDataMap[0])[0].totalValue = totalValue;
+                            (itemConfig.payload.nodeDataMap[0])[0].fuPerMonth = addCommas(Math.round(fuPerMonth));
+                            // var items = this.state.items;
+                            // var tempItem = items.filter(x=>x.id == itemConfig.id);
+                            // tempItem.fuPerMonth = fuPerMonth;
+                            // tempItem.displayCalculatedDataValue = totalValue;
+                            // var findNodeIndex = items.findIndex(n => n.id == itemConfig.id);
+                            // items[findNodeIndex] = tempItem;
+
                             return addCommas((itemConfig.payload.nodeDataMap[0])[0].dataValue) + "% of parent, " + addCommas(Math.round(fuPerMonth)) + "/" + 'Month';
                         } else if (itemConfig.payload.nodeType.id == 5) {
                             return addCommas((itemConfig.payload.nodeDataMap[0])[0].dataValue) + "% of parent, conversion = " + (itemConfig.payload.nodeDataMap[0])[0].puNode.planningUnit.multiplier;
@@ -1261,9 +1393,11 @@ export default class CreateTreeTemplate extends Component {
                         }
                     } else {
                         if (itemConfig.payload.nodeType.id == 4) {
+                            (itemConfig.payload.nodeDataMap[0])[0].displayCalculatedDataValue = ((itemConfig.payload.nodeDataMap[0])[0].totalValue != null ? addCommas(Math.round((itemConfig.payload.nodeDataMap[0])[0].totalValue)) : "");
                             return "= " + ((itemConfig.payload.nodeDataMap[0])[0].totalValue != null ? addCommas(Math.round((itemConfig.payload.nodeDataMap[0])[0].totalValue)) : "");
                         } else if (itemConfig.payload.nodeType.id == 5) {
                             totalValue = (this.state.items.filter(x => x.id == itemConfig.parent)[0].payload.nodeDataMap[0][0].totalValue * (itemConfig.payload.nodeDataMap[0])[0].dataValue) / 100;
+                            (itemConfig.payload.nodeDataMap[0])[0].displayCalculatedDataValue = (totalValue != null ? addCommas(Math.round(totalValue)) : "");
                             return "= " + (totalValue != null ? addCommas(Math.round(totalValue)) : "");
                         }
                         else {
@@ -2305,19 +2439,27 @@ export default class CreateTreeTemplate extends Component {
     duplicateNode(itemConfig) {
         console.log("duplicate node called---", this.state.currentItemConfig);
         const { items } = this.state;
+        var maxNodeId = items.length > 0 ? Math.max(...items.map(o => o.id)) : 0;
+        var nodeId = parseInt(maxNodeId + 1);
         var newItem = {
-            id: parseInt(items.length + 1),
+            id: nodeId,
             level: itemConfig.level,
             parent: itemConfig.parent,
             payload: itemConfig.payload
         };
+        newItem.payload.nodeId = nodeId;
+        var parentSortOrder = items.filter(c => c.id == itemConfig.parent)[0].sortOrder;
+        var childList = items.filter(c => c.parent == itemConfig.parent);
+        newItem.sortOrder = parentSortOrder.concat(".").concat(("0" + (Number(childList.length) + 1)).slice(-2));
+        (newItem.payload.nodeDataMap[0])[0].nodeDataId = this.getMaxNodeDataId() + 1;
         console.log("add button clicked value after update---", newItem);
         this.setState({
             items: [...items, newItem],
-            cursorItem: parseInt(items.length + 1)
+            cursorItem: nodeId
         }, () => {
             console.log("on add items-------", this.state.items);
-            this.calculateValuesForAggregateNode(this.state.items);
+            this.calculateMOMData(newItem.id, 0);
+            // this.calculateValuesForAggregateNode(this.state.items);
         });
     }
     cancelClicked() {
@@ -3416,6 +3558,8 @@ export default class CreateTreeTemplate extends Component {
 
                     if (items[i].payload.nodeType.id == 1 || items[i].payload.nodeType.id == 2) {
                         (items[i].payload.nodeDataMap[0])[0].calculatedDataValue = (items[i].payload.nodeDataMap[0])[0].dataValue;
+                        (items[i].payload.nodeDataMap[0])[0].displayCalculatedDataValue = (items[i].payload.nodeDataMap[0])[0].dataValue;
+                        (items[i].payload.nodeDataMap[0])[0].displayDataValue = (items[i].payload.nodeDataMap[0])[0].dataValue;
                     } else {
 
                         var findNodeIndex = items.findIndex(n => n.id == items[i].parent);
@@ -3423,6 +3567,8 @@ export default class CreateTreeTemplate extends Component {
                         console.log("api parent value---", parentValue);
 
                         (items[i].payload.nodeDataMap[0])[0].calculatedDataValue = (parentValue * (items[i].payload.nodeDataMap[0])[0].dataValue) / 100;
+                        (items[i].payload.nodeDataMap[0])[0].displayCalculatedDataValue = (parentValue * (items[i].payload.nodeDataMap[0])[0].dataValue) / 100;
+                        (items[i].payload.nodeDataMap[0])[0].displayDataValue = (items[i].payload.nodeDataMap[0])[0].dataValue;
                     }
                     console.log("load---", items[i])
                     // arr.push(items[i]);
@@ -3819,7 +3965,9 @@ export default class CreateTreeTemplate extends Component {
 
             console.log("parentValue---", parentValue);
             parentValue = parentValue1;
-            (currentItemConfig.context.payload.nodeDataMap[0])[0].calculatedDataValue = parseInt(parentValue * value) / 100
+            (currentItemConfig.context.payload.nodeDataMap[0])[0].calculatedDataValue = parseInt(parentValue * value) / 100;
+            (currentItemConfig.context.payload.nodeDataMap[0])[0].displayDataValue = value;
+            (currentItemConfig.context.payload.nodeDataMap[0])[0].displayCalculatedDataValue = parseInt(parentValue * value) / 100;
             console.log("calculatedDataValue---", currentItemConfig);
             this.setState({
                 parentValue
@@ -3830,6 +3978,8 @@ export default class CreateTreeTemplate extends Component {
             var value = (event.target.value).replaceAll(",", "");
             (currentItemConfig.context.payload.nodeDataMap[0])[0].dataValue = value;
             (currentItemConfig.context.payload.nodeDataMap[0])[0].calculatedDataValue = value;
+            (currentItemConfig.context.payload.nodeDataMap[0])[0].displayDataValue = value;
+            (currentItemConfig.context.payload.nodeDataMap[0])[0].displayCalculatedDataValue = value;
         }
         if (event.target.name === "notes") {
             (currentItemConfig.context.payload.nodeDataMap[0])[0].notes = event.target.value;
@@ -6428,6 +6578,9 @@ export default class CreateTreeTemplate extends Component {
                                     <span style={{ cursor: 'pointer' }} onClick={this.cancelClicked}><i className="fa fa-long-arrow-left" style={{ color: '#20a8d8' }}></i> <small className="supplyplanformulas">{'Return To List'}</small></span>
                                     {/* <Link to='/supplyPlanFormulas' target="_blank"><small className="supplyplanformulas">{i18n.t('static.supplyplan.supplyplanformula')}</small></Link> */}
                                 </a>
+                                <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')}
+                                    onClick={() => this.exportPDF()}
+                                />
                                 <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={docicon} title={i18n.t('static.report.exportWordDoc')} onClick={() => this.exportDoc()} />
                                 {/* <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-arrow-left"></i> {'Return To List'}</Button> */}
                                 {/* </div> */}
