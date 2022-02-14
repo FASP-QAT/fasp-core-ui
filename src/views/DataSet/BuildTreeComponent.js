@@ -7629,16 +7629,16 @@ export default class BuildTree extends Component {
             <Row>
                 <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
                     <Card className="mb-lg-0">
-                        {/* <div className="pb-lg-0">
-                            <div className="card-header-actions">
+                        <div className="pb-lg-0">
+                         {/* <div className="card-header-actions">
                                 <div className="card-header-action pr-4 pt-lg-0">
 
                                     <Col md="12 pl-0">
                                         <div className="d-md-flex">
-                                            <a className="pr-lg-0 pt-lg-1">
+                                            <a className="pr-lg-0 pt-lg-1 compareAndSelect-larrowText">
                                                 <span style={{ cursor: 'pointer' }} onClick={this.cancelClicked}><i className="fa fa-long-arrow-left" style={{ color: '#20a8d8', fontSize: '13px' }}></i> <small className="supplyplanformulas">{'Return To List'}</small></span>
                                             </a>
-                                            <FormGroup className="tab-ml-1 mt-md-0 mb-md-0 ">
+                                             <FormGroup className="tab-ml-1 mt-md-0 mb-md-0 ">
 
                                                 <a className="pr-lg-1" href="javascript:void();" title={i18n.t('static.common.addEntity')} onClick={() => {
                                                     this.setState({
@@ -7649,13 +7649,28 @@ export default class BuildTree extends Component {
                                                     onClick={() => this.exportPDF()}
                                                 />
                                                 {this.state.selectedScenario > 0 && <img style={{ height: '25px', width: '25px', cursor: 'pointer', marginTop: '-10px' }} src={docicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportDoc()} />}
-                                            </FormGroup>
+                                            </FormGroup> 
 
                                         </div>
                                     </Col>
                                 </div>
-                            </div>
-                        </div> */}
+                            </div>  */}
+                            <div className="row">
+                             <div className="col-md-12 pl-lg-3">
+                            <div className='col-md-4 pt-lg-2'>
+                            <a className="pr-lg-0 pt-lg-1 float-left">
+                            <span style={{ cursor: 'pointer' }} onClick={this.cancelClicked}><i className="fa fa-long-arrow-left" style={{ color: '#20a8d8', fontSize: '13px' }}></i> <small className="supplyplanformulas">{'Return To List'}</small></span>
+                            </a>
+                           </div>
+                           <div className="col-md-6"> 
+                             <span className="pr-lg-0 pt-lg-0 float-right">
+                                <h5 style={{ color: '#BA0C2F' }}>{i18n.t('static.tree.pleaseSaveAndDoARecalculateAfterDragAndDrop.')}</h5>
+                             </span>
+                             </div>
+                            
+                        </div>
+                    </div>
+                        </div> 
                         <CardBody className="pt-lg-1 pl-lg-0 pr-lg-0">
                             <div className="container-fluid pl-lg-3 pr-lg-3">
                                 <>
@@ -7991,7 +8006,13 @@ export default class BuildTree extends Component {
                                                                     <Button type="submit" size="md" onClick={() => this.touchAll(setTouched, errors)} color="success" className="submitBtn float-right mr-1"> <i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
                                                                 </FormGroup>
 
-                                                                <div className="col-md-12 row ml-lg-1">
+                                                            </Row>
+                                                        </Form>
+                                                    )} />
+                                        </div>
+
+
+                                        <div className="row ml-lg-1 pb-lg-2">
                                                     <FormGroup className="col-md-2" >
                                                         <div className="check inline  pl-lg-1 pt-lg-0">
                                                             <div>
@@ -8051,20 +8072,16 @@ export default class BuildTree extends Component {
                                                     </FormGroup>
                                         
                                                     </div>
-                                                            </Row>
-                                                        </Form>
-                                                    )} />
-                                        </div>
 
                                         <div className="pb-lg-0" style={{ marginTop: '-2%' }}>
                                             <div className="card-header-actions">
-                                                <div className="card-header-action pr-4 pt-lg-0">
+                                                <div className="card-header-action pr-0 pt-lg-0">
 
                                                     <Col md="12 pl-0">
                                                         <div className="d-md-flex">
-                                                            <a className="pr-lg-0 pt-lg-1">
+                                                            {/* <a className="pr-lg-0 pt-lg-1">
                                                                 <span style={{ cursor: 'pointer' }} onClick={this.cancelClicked}><i className="fa fa-long-arrow-left" style={{ color: '#20a8d8', fontSize: '13px' }}></i> <small className="supplyplanformulas">{'Return To List'}</small></span>
-                                                            </a>
+                                                            </a> */}
                                                             <FormGroup className="tab-ml-1 mt-md-0 mb-md-0 ">
 
                                                                 {/* <a className="pr-lg-1" href="javascript:void();" title={i18n.t('static.common.addEntity')} onClick={() => {
@@ -8106,7 +8123,8 @@ export default class BuildTree extends Component {
                                         </div>
                                         <CardFooter style={{ backgroundColor: 'transparent', borderTop: '0px solid #c8ced3', display: this.state.selectedScenario != '' ? "block" : "none" }}>
                                             <div class="row">
-                                                <div className="col-md-6 pl-lg-0"> <h5 style={{ color: '#BA0C2F' }}>{i18n.t('static.tree.pleaseSaveAndDoARecalculateAfterDragAndDrop.')}</h5></div>
+                                                {/* <div className="col-md-6 pl-lg-0"> <h5 style={{ color: '#BA0C2F' }}>{i18n.t('static.tree.pleaseSaveAndDoARecalculateAfterDragAndDrop.')}</h5></div> */}
+                                                 <div className="col-md-6 pl-lg-0"> </div>
                                                 <div className="col-md-6 pr-lg-0"> <Button type="button" size="md" color="info" className="float-right mr-1" onClick={() => this.callAfterScenarioChange(this.state.selectedScenario)}><i className="fa fa-calculator"></i> {i18n.t('static.tree.calculated')}</Button>
                                                     {/* <Button type="button" size="md" color="warning" className="float-right mr-1" onClick={this.resetTree}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button> */}
                                                     <Button type="button" color="success" className="mr-1 float-right" size="md" onClick={() => this.saveTreeData()}><i className="fa fa-check"> </i>{i18n.t('static.pipeline.save')}</Button>
