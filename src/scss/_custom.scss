@@ -5116,6 +5116,7 @@ height: 0px;
         border: 2px solid #000000a8;
         border-radius: 3px;
         font-size: 10px;
+        cursor: pointer;
     }
     .btn-danger {
       color: #fff;
@@ -5843,3 +5844,28 @@ font-style: italic!important;
         display : block ;
     }
 }
+.jexcel > thead.resizable > tr > .InfoTrAsteriskTheadtrTd::after {
+  font-family: 'FontAwesome';
+  content: '\f05a';
+    position: relative;
+     width: 3px;
+     height: 100%;
+     top: 0px;
+     left: 7px;
+     cursor: col-resize;
+     font-size: 14px;
+     color:#002f6c;
+}
+.jexcel > thead.resizable > tr > .InfoTrAsteriskTheadtrTd::before {
+  font-family: 'FontAwesome';
+  content: '*';
+    position: relative;
+     width: 3px;
+     height: 100%;
+     top: 0px;
+     left: 68px;
+     cursor: col-resize;
+     font-size: 14px;
+     color:#BA0C2F;
+   }
+ 
