@@ -23,7 +23,8 @@ export function dataCheck(props, datasetJson) {
                 scenario: scenarioList[ndm].label,
                 treeId: PgmTreeList[tl].treeId,
                 scenarioId: scenarioList[ndm].id,
-                scenarioNotes: scenarioList[ndm].notes
+                scenarioNotes: scenarioList[ndm].notes,
+                treeNotes: PgmTreeList[tl].notes
             });
         }
     }
@@ -72,11 +73,13 @@ export function dataCheck(props, datasetJson) {
                 }
             }
         }
-        missingBranchesList.push({
-            treeId: PgmTreeList[tl].treeId,
-            treeLabel: PgmTreeList[tl].label,
-            flatList: flatListArray
-        })
+        if (flatListArray.length > 0) {
+            missingBranchesList.push({
+                treeId: PgmTreeList[tl].treeId,
+                treeLabel: PgmTreeList[tl].label,
+                flatList: flatListArray
+            })
+        }
 
         //Nodes less than 100%
         var scenarioList = PgmTreeList[tl].scenarioList;
@@ -109,18 +112,20 @@ export function dataCheck(props, datasetJson) {
     var datasetPlanningUnit = datasetJson.planningUnitList;
     var notSelectedPlanningUnitList = [];
     for (var dp = 0; dp < datasetPlanningUnit.length; dp++) {
-        var puId = datasetPlanningUnit[dp].planningUnit.id;
-        let planningUnitNotSelected = treePlanningUnitList.filter(c => (c.id == puId));
-        if (planningUnitNotSelected.length == 0) {
-            notSelectedPlanningUnitList.push({
-                planningUnit: datasetPlanningUnit[dp].planningUnit,
-                regionsArray: datasetRegionList.map(c => getLabelText(c.label, props.state.lang))
-            });
-        } else {
-            notSelectedPlanningUnitList.push({
-                planningUnit: datasetPlanningUnit[dp].planningUnit,
-                regionsArray: puRegionList
-            });
+        if (datasetPlanningUnit[dp].treeForecast.toString() == "true") {
+            var puId = datasetPlanningUnit[dp].planningUnit.id;
+            let planningUnitNotSelected = treePlanningUnitList.filter(c => (c.id == puId));
+            if (planningUnitNotSelected.length == 0) {
+                notSelectedPlanningUnitList.push({
+                    planningUnit: datasetPlanningUnit[dp].planningUnit,
+                    regionsArray: datasetRegionList.map(c => getLabelText(c.label, props.state.lang))
+                });
+            } else {
+                notSelectedPlanningUnitList.push({
+                    planningUnit: datasetPlanningUnit[dp].planningUnit,
+                    regionsArray: puRegionList
+                });
+            }
         }
     }
     //*** */
@@ -216,7 +221,7 @@ export function dataCheck(props, datasetJson) {
             for (var i = 0; moment(curDate).format("YYYY-MM") < moment(Date.now()).format("YYYY-MM"); i++) {
                 curDate = moment(startDate).add(i, 'months').format("YYYY-MM-DD");
                 var consumptionListFilteredForMonth = consumptionList.filter(c => c.planningUnit.id == puId && c.region.id == regionId);
-                var consumptionListForCurrentMonth=consumptionListFilteredForMonth.filter(c => moment(c.month).format("YYYY-MM") == moment(curDate).format("YYYY-MM"));
+                var consumptionListForCurrentMonth = consumptionListFilteredForMonth.filter(c => moment(c.month).format("YYYY-MM") == moment(curDate).format("YYYY-MM"));
                 var checkIfPrevMonthConsumptionAva = consumptionListFilteredForMonth.filter(c => moment(c.month).format("YYYY-MM") < moment(curDate).format("YYYY-MM"));
                 var checkIfNextMonthConsumptionAva = consumptionListFilteredForMonth.filter(c => moment(c.month).format("YYYY-MM") > moment(curDate).format("YYYY-MM"));
                 if (consumptionListForCurrentMonth.length == 0 && checkIfPrevMonthConsumptionAva.length > 0 && checkIfNextMonthConsumptionAva.length > 0) {
@@ -267,7 +272,7 @@ export function dataCheck(props, datasetJson) {
 export function buildJxl(props) {
     props.updateState("loading", true)
     var treeScenarioList = props.state.treeScenarioList;
-    console.log("TreeScenarioList@@@",treeScenarioList)
+    console.log("TreeScenarioList@@@", treeScenarioList)
     var treeScenarioListFilter = treeScenarioList;
     for (var tsl = 0; tsl < treeScenarioListFilter.length; tsl++) {
         var nodeWithPercentageChildren = props.state.nodeWithPercentageChildren.filter(c => c.treeId == treeScenarioListFilter[tsl].treeId && c.scenarioId == treeScenarioListFilter[tsl].scenarioId);
@@ -349,7 +354,7 @@ export function buildJxl(props) {
                 position: 'top',
                 filters: true,
                 license: JEXCEL_PRO_KEY,
-                editable:false,
+                editable: false,
                 contextMenu: function (obj, x, y, e) {
                     return [];
                 }.bind(this),
@@ -358,8 +363,8 @@ export function buildJxl(props) {
             props.el = languageEl;
         }
     }
-    props.updateState("loading",false);
-    props.updateState("treeScenarioListFilter",treeScenarioListFilter);
+    props.updateState("loading", false);
+    props.updateState("treeScenarioListFilter", treeScenarioListFilter);
 }
 
 export function exportPDF(props) {
@@ -719,10 +724,10 @@ export function exportPDF(props) {
                 var dataArr1 = []
                 item1.columnArray.map((item2, count) => {
                     if (item2.type != 'hidden') {
-                        if(item2.type=='calendar'){
+                        if (item2.type == 'calendar') {
                             dataArr1.push(moment(item3[count]).format(DATE_FORMAT_CAP_WITHOUT_DATE))
-                        }else{
-                            dataArr1.push(item3[count]+"%")
+                        } else {
+                            dataArr1.push(item3[count] + "%")
                         }
                     }
                 })
@@ -784,7 +789,7 @@ export function exportPDF(props) {
     columns.push(i18n.t('static.program.notes'));
     var headers = [columns]
     var dataArr2 = [];
-    props.state.datasetPlanningUnit.map((item5, i) => {
+    props.state.datasetPlanningUnit.filter(c=>c.consuptionForecast.toString()=="true").map((item5, i) => {
         dataArr2.push([
             getLabelText(item5.planningUnit.label, props.state.lang),
             item5.consumtionNotes])
@@ -826,13 +831,15 @@ export function exportPDF(props) {
     var columns = [];
     columns.push(i18n.t('static.forecastMethod.tree'));
     columns.push(i18n.t('static.whatIf.scenario'));
-    columns.push(i18n.t('static.program.notes'));
+    columns.push(i18n.t('static.dataValidation.treeNotes'));
+    columns.push(i18n.t('static.dataValidation.scenarioNotes'));
     var headers = [columns]
     var dataArr2 = [];
     props.state.treeScenarioNotes.map((item5, i) => {
         dataArr2.push([
             getLabelText(item5.tree, props.state.lang),
             getLabelText(item5.scenario, props.state.lang),
+            item5.treeNotes,
             item5.scenarioNotes
         ])
     });
@@ -875,7 +882,7 @@ export function exportPDF(props) {
     columns.push(i18n.t('static.program.notes'));
     var headers = [columns]
     var dataArr2 = [];
-    props.state.treeNodeList.map((item6, i) => {
+    props.state.treeNodeList.filter(c=>(c.notes!=null && c.notes!="") || (c.madelingNotes!=null && c.madelingNotes!="")).map((item6, i) => {
         dataArr2.push([
             getLabelText(item6.tree, props.state.lang),
             getLabelText(item6.node, props.state.lang),
@@ -900,29 +907,29 @@ export function exportPDF(props) {
     doc.save(i18n.t('static.commitTree.forecastValidation').concat('.pdf'));
 }
 
-export function noForecastSelectedClicked(planningUnitId, regionId,props) {
+export function noForecastSelectedClicked(planningUnitId, regionId, props) {
     localStorage.setItem("sesDatasetPlanningUnitId", planningUnitId);
     localStorage.setItem("sesDatasetRegionId", regionId);
-    localStorage.setItem("sesDatasetId",props.state.programId);
+    localStorage.setItem("sesDatasetId", props.state.programId);
     const win = window.open("/#/report/compareAndSelectScenario", "_blank");
     win.focus();
     // this.props.history.push(``);
 }
 
-export function missingMonthsClicked(planningUnitId,props) {
-    localStorage.setItem("sesDatasetId",props.state.programId);
+export function missingMonthsClicked(planningUnitId, props) {
+    localStorage.setItem("sesDatasetId", props.state.programId);
     const win = window.open("/#/dataentry/consumptionDataEntryAndAdjustment/" + planningUnitId, "_blank");
     win.focus();
 }
 
-export function missingBranchesClicked(treeId,props) {
-    localStorage.setItem("sesDatasetId",props.state.programId);
+export function missingBranchesClicked(treeId, props) {
+    localStorage.setItem("sesDatasetId", props.state.programId);
     const win = window.open(`/#/dataSet/buildTree/tree/${treeId}/${props.state.programId}`, "_blank");
     win.focus();
 }
 
-export function nodeWithPercentageChildrenClicked(treeId, scenarioId,props) {
-    localStorage.setItem("sesDatasetId",props.state.programId);
+export function nodeWithPercentageChildrenClicked(treeId, scenarioId, props) {
+    localStorage.setItem("sesDatasetId", props.state.programId);
     const win = window.open(`/#/dataSet/buildTree/tree/${treeId}/${props.state.programId}/${scenarioId}`, "_blank");
     win.focus();
 }

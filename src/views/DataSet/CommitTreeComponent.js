@@ -754,11 +754,11 @@ export default class CommitTreeComponent extends React.Component {
 
         //Consumption Notes
         const { datasetPlanningUnit } = this.state;
-        let consumtionNotes = datasetPlanningUnit.length > 0 && datasetPlanningUnit.map((item, i) => {
+        let consumtionNotes = datasetPlanningUnit.length > 0 && datasetPlanningUnit.filter(c=>c.consuptionForecast.toString()=="true").map((item, i) => {
             return (
                 <tr key={i} className="hoverTd" onClick={() => missingMonthsClicked(item.planningUnit.id, this)}>
                     <td>{getLabelText(item.planningUnit.label, this.state.lang)}</td>
-                    <td>{item.consumtionNotes}</td>
+                    <td>{item.consumptionNotes}</td>
                 </tr>
             )
         }, this);
@@ -770,6 +770,7 @@ export default class CommitTreeComponent extends React.Component {
                 <tr key={i} className="hoverTd" onClick={() => nodeWithPercentageChildrenClicked(item.treeId, item.scenarioId, this)}>
                     <td>{getLabelText(item.tree, this.state.lang)}</td>
                     <td>{getLabelText(item.scenario, this.state.lang)}</td>
+                    <td>{item.treeNotes}</td>
                     <td>{item.scenarioNotes}</td>
                 </tr>
             )
@@ -777,7 +778,7 @@ export default class CommitTreeComponent extends React.Component {
 
         //Tree Nodes Notes
         const { treeNodeList } = this.state;
-        let treeNodes = treeNodeList.length > 0 && treeNodeList.map((item, i) => {
+        let treeNodes = treeNodeList.length > 0 && treeNodeList.filter(c=>(c.notes!=null && c.notes!="") || (c.madelingNotes!=null && c.madelingNotes!="")).map((item, i) => {
             return (
                 <tr key={i} className="hoverTd" onClick={() => nodeWithPercentageChildrenClicked(item.treeId, item.scenarioId, this)}>
                     <td>{getLabelText(item.tree, this.state.lang)}</td>
@@ -1055,7 +1056,8 @@ export default class CommitTreeComponent extends React.Component {
                                             <tr>
                                                 <th><b>{i18n.t('static.forecastMethod.tree')}</b></th>
                                                 <th><b>{i18n.t('static.whatIf.scenario')}</b></th>
-                                                <th><b>{i18n.t('static.program.notes')}</b></th>
+                                                <th><b>{i18n.t('static.dataValidation.treeNotes')}</b></th>
+                                                <th><b>{i18n.t('static.dataValidation.scenarioNotes')}</b></th>
                                             </tr>
                                         </thead>
                                         <tbody>{scenarioNotes}</tbody>
