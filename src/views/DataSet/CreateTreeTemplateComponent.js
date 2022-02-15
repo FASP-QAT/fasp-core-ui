@@ -6574,18 +6574,21 @@ export default class CreateTreeTemplate extends Component {
                 <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
                     <Card className="mb-lg-0">
                         <div className="Card-header-reporticon pb-lg-0">
-                            <div className="card-header-actions">
+                            <div className="card-header-actions col-md-12 pl-lg-0 pr-lg-0 pt-lg-2">
                                 {/* <div className="card-header-actions pr-4 pt-1"> */}
-                                <a className="card-header-action">
+                                <a className="pr-lg-0 pt-lg-0 float-left">
                                     <span style={{ cursor: 'pointer' }} onClick={this.cancelClicked}><i className="fa fa-long-arrow-left" style={{ color: '#20a8d8' }}></i> <small className="supplyplanformulas">{'Return To List'}</small></span>
                                     {/* <Link to='/supplyPlanFormulas' target="_blank"><small className="supplyplanformulas">{i18n.t('static.supplyplan.supplyplanformula')}</small></Link> */}
                                 </a>
+                                <a className="pr-lg-0 pt-lg-0 float-right">
                                 <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')}
                                     onClick={() => this.exportPDF()}
                                 />
                                 <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={docicon} title={i18n.t('static.report.exportWordDoc')} onClick={() => this.exportDoc()} />
+                                </a>
                                 {/* <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-arrow-left"></i> {'Return To List'}</Button> */}
                                 {/* </div> */}
+                                
                             </div>
                         </div>
                         <CardBody className="pt-lg-0 pl-lg-0 pr-lg-0">

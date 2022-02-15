@@ -1289,7 +1289,7 @@ export default class TreeExtrapolationComponent extends React.Component {
  </div>
  </FormGroup>
  </div>
- <div className="col-md-12 text-center pt-lg-3">
+ <div className="col-md-12 text-left pt-lg-3 pl-lg-0">
  <Button className="mr-1 btn btn-info btn-md " onClick={this.toggledata}>
   {this.state.show ? i18n.t('static.common.hideData') : i18n.t('static.common.showData')}
 </Button>

@@ -7399,7 +7399,7 @@ export default class BuildTree extends Component {
                 return <>
                     {itemConfig.parent != null &&
                         <>
-                            <button key="2" type="button" className="StyledButton TreeIconStyle" style={{ background: 'none' }}
+                            <button key="2" type="button" className="StyledButton TreeIconStyle TreeIconStyleCopyPaddingTop" style={{ background: 'none' }}
                                 onClick={(event) => {
                                     event.stopPropagation();
                                     this.duplicateNode(itemConfig);
@@ -7408,7 +7408,7 @@ export default class BuildTree extends Component {
                             </button>
 
 
-                            <button key="3" type="button" className="StyledButton TreeIconStyle" style={{ background: 'none' }}
+                            <button key="3" type="button" className="StyledButton TreeIconStyle TreeIconStyleDeletePaddingTop" style={{ background: 'none' }}
                                 onClick={(event) => {
                                     event.stopPropagation();
                                     confirmAlert({
@@ -7430,7 +7430,7 @@ export default class BuildTree extends Component {
                                 <i class="fa fa-trash-o" aria-hidden="true" style={{ fontSize: '16px' }}></i>
                             </button></>}
                     {parseInt(itemConfig.payload.nodeType.id) != 5 &&
-                        <button key="1" type="button" className="StyledButton TreeIconStyle" style={{ background: 'none' }}
+                        <button key="1" type="button" className="StyledButton TreeIconStyle TreeIconStylePlusPaddingTop" style={{ background: 'none' }}
                             onClick={(event) => {
                                 console.log("add button called---------");
                                 event.stopPropagation();
@@ -8020,67 +8020,6 @@ export default class BuildTree extends Component {
                                                                     {/* <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setState({ showDiv: false })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button> */}
                                                                     <Button type="submit" size="md" onClick={() => this.touchAll(setTouched, errors)} color="success" className="submitBtn float-right mr-1"> <i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
                                                                 </FormGroup>
-
-                                                                {/* <div className="col-md-12 row ml-lg-1">
-                                                                    <FormGroup className="col-md-2" >
-                                                                        <div className="check inline  pl-lg-1 pt-lg-0">
-                                                                            <div>
-                                                                                <Input
-                                                                                    className="form-check-input checkboxMargin"
-                                                                                    type="checkbox"
-                                                                                    id="active6"
-                                                                                    name="active6"
-                                                                                    // checked={false}
-                                                                                    onClick={(e) => { this.filterPlanningUnitNode(e); }}
-                                                                                />
-                                                                                <Label
-                                                                                    className="form-check-label"
-                                                                                    check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                                                                                    <b>{'Hide Planning Unit'}</b>
-                                                                                </Label>
-                                                                            </div>
-                                                                        </div>
-                                                                    </FormGroup>
-                                                                    <FormGroup className="col-md-3" style={{ marginLeft: '-2%' }}>
-                                                                        <div className="check inline  pl-lg-0 pt-lg-0">
-                                                                            <div>
-                                                                                <Input
-                                                                                    className="form-check-input checkboxMargin"
-                                                                                    type="checkbox"
-                                                                                    id="active7"
-                                                                                    name="active7"
-                                                                                    // checked={false}
-                                                                                    onClick={(e) => { this.filterPlanningUnitAndForecastingUnitNodes(e) }}
-                                                                                />
-                                                                                <Label
-                                                                                    className="form-check-label"
-                                                                                    check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                                                                                    <b>{'Hide Forecasting Unit & Planning Unit'}</b>
-                                                                                </Label>
-                                                                            </div>
-                                                                        </div>
-                                                                    </FormGroup>
-                                                                    <FormGroup className="col-md-6" >
-                                                                        <div className="check inline  pl-lg-0 pt-lg-0">
-                                                                            <div>
-                                                                                <Input
-                                                                                    className="form-check-input checkboxMargin"
-                                                                                    type="checkbox"
-                                                                                    id="active7"
-                                                                                    name="active7"
-                                                                                    // checked={false}
-                                                                                    onClick={(e) => { this.hideTreeValidation(e); }}
-                                                                                />
-                                                                                <Label
-                                                                                    className="form-check-label"
-                                                                                    check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                                                                                    <b>{'Hide Tree Validation'}</b>
-                                                                                </Label>
-                                                                            </div>
-                                                                        </div>
-                                                                    </FormGroup>
-
-                                                                </div> */}
                                                             </Row>
                                                         </Form>
                                                     )} />
