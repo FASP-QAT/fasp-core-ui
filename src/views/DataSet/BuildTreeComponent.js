@@ -1711,7 +1711,7 @@ export default class BuildTree extends Component {
                 // this.setState
             }
             //Display forecast period
-            var forecastPeriod = moment(programData.currentVersion.forecastStartDate).format(`MMM.YYYY`) + "-" + moment(programData.currentVersion.forecastStopDate).format(`MMM.YYYY`);
+            var forecastPeriod = moment(programData.currentVersion.forecastStartDate).format(`MMM-YYYY`) + " ~ " + moment(programData.currentVersion.forecastStopDate).format(`MMM-YYYY`);
             console.log("forecastPeriod---", forecastPeriod);
             this.setState({
                 forecastPeriod,
@@ -3065,7 +3065,7 @@ export default class BuildTree extends Component {
                         dataEnc.programData = programData;
                         var minDate = { year: new Date(programData.currentVersion.forecastStartDate).getFullYear(), month: new Date(programData.currentVersion.forecastStartDate).getMonth() + 1 };
                         var maxDate = { year: new Date(programData.currentVersion.forecastStopDate).getFullYear(), month: new Date(programData.currentVersion.forecastStopDate).getMonth() + 1 };
-                        var forecastPeriod = moment(programData.currentVersion.forecastStartDate).format(`MMM.YYYY`) + "-" + moment(programData.currentVersion.forecastStopDate).format(`MMM.YYYY`);
+                        var forecastPeriod = moment(programData.currentVersion.forecastStartDate).format(`MMM-YYYY`) + " ~ " + moment(programData.currentVersion.forecastStopDate).format(`MMM-YYYY`);
                         console.log("forecastPeriod 1---", forecastPeriod);
                         console.log("dataSetObj.programData***>>>", dataEnc);
                         this.setState({ dataSetObj: dataEnc, minDate, maxDate, forecastStartDate: programData.currentVersion.forecastStartDate, forecastStopDate: programData.currentVersion.forecastStopDate, forecastPeriod }, () => {
@@ -7755,7 +7755,9 @@ export default class BuildTree extends Component {
                                                         {/* <FormFeedback>{errors.languageId}</FormFeedback> */}
                                                     </FormGroup>
                                                     <FormGroup className="col-md-3 pl-lg-0">
-                                                        <Label htmlFor="languageId">{i18n.t('static.supplyPlan.date')} <b><i>({this.state.forecastPeriod})</i></b></Label>
+                                                        <Label htmlFor="languageId">
+                                                            {/* {i18n.t('static.supplyPlan.date')}  */}
+                                                            Display Date <i>(Forecast: {this.state.forecastPeriod})</i></Label>
                                                         <div className="controls edit">
                                                             <Picker
                                                                 ref={this.pickAMonth3}
