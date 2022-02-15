@@ -6345,14 +6345,14 @@ export default class CreateTreeTemplate extends Component {
                 return <>
                     {itemConfig.parent != null &&
                         <>
-                            <button key="2" type="button" className="StyledButton TreeIconStyle" style={{ background: 'none' }}
+                            <button key="2" type="button" className="StyledButton TreeIconStyle TreeIconStyleCopyPaddingTop" style={{ background: 'none' }}
                                 onClick={(event) => {
                                     event.stopPropagation();
                                     this.duplicateNode(itemConfig);
                                 }}>
                                 <i class="fa fa-clone" aria-hidden="true"></i>
                             </button>
-                            <button key="3" type="button" className="StyledButton TreeIconStyle" style={{ background: 'none' }}
+                            <button key="3" type="button" className="StyledButton TreeIconStyle TreeIconStyleDeletePaddingTop" style={{ background: 'none' }}
                                 onClick={(event) => {
                                     event.stopPropagation();
                                     confirmAlert({
@@ -6374,7 +6374,7 @@ export default class CreateTreeTemplate extends Component {
                                 <i class="fa fa-trash-o" aria-hidden="true" style={{ fontSize: '16px' }}></i>
                             </button></>}
                     {parseInt(itemConfig.payload.nodeType.id) != 5 &&
-                        <button key="1" type="button" className="StyledButton TreeIconStyle" style={{ background: 'none' }}
+                        <button key="1" type="button" className="StyledButton TreeIconStyle TreeIconStylePlusPaddingTop" style={{ background: 'none' }}
                             onClick={(event) => {
                                 console.log("add button called---------");
                                 event.stopPropagation();
@@ -6574,7 +6574,7 @@ export default class CreateTreeTemplate extends Component {
                 <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
                     <Card className="mb-lg-0">
                         <div className="Card-header-reporticon pb-lg-0">
-                            <div className="card-header-actions col-md-12 pl-lg-0 pr-lg-0 pt-lg-2">
+                            <div className="card-header-actions col-md-12 pl-lg-0 pr-lg-0 pt-lg-0">
                                 {/* <div className="card-header-actions pr-4 pt-1"> */}
                                 <a className="pr-lg-0 pt-lg-0 float-left">
                                     <span style={{ cursor: 'pointer' }} onClick={this.cancelClicked}><i className="fa fa-long-arrow-left" style={{ color: '#20a8d8' }}></i> <small className="supplyplanformulas">{'Return To List'}</small></span>

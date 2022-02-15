@@ -5894,5 +5894,9 @@ font-style: italic!important;
   padding-top: 3px;
 }
 .TreeIconStylePlusPaddingTop{
-  padding-top: 21px;
+  // padding-top: 21px;
+  padding-top: 10px;
+    position: inherit;
+    bottom: 0px;
+    left:1px;
 }
