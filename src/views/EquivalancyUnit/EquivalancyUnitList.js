@@ -81,6 +81,7 @@ class EquivalancyUnit extends Component {
         //jumper
         this.getTracerCategory = this.getTracerCategory.bind(this);
         this.getForecastingUnit = this.getForecastingUnit.bind(this);
+        this.getForecastingUnitByTracerCategoriesId = this.getForecastingUnitByTracerCategoriesId.bind(this);
         this.getUnit = this.getUnit.bind(this);
         this.getType = this.getType.bind(this);
         this.getEquivalancyUnit = this.getEquivalancyUnit.bind(this);
@@ -1064,7 +1065,8 @@ class EquivalancyUnit extends Component {
                 },
                     () => {
                         // this.buildJexcel()
-                        this.filterData();
+                        this.getForecastingUnitByTracerCategoriesId();
+                        // this.filterData();
                     })
 
             }
@@ -1125,6 +1127,117 @@ class EquivalancyUnit extends Component {
 
     }
 
+    getForecastingUnitByTracerCategoriesId() {
+
+        let healthAreaList = [];
+        let equivalancyUnitList = this.state.equivalancyUnitList;
+        for (var i = 0; i < equivalancyUnitList.length; i++) {
+            let localHealthAreaList = equivalancyUnitList[i].healthAreaList;
+            localHealthAreaList = localHealthAreaList.map(ele => ele.id)
+            healthAreaList = healthAreaList.concat(localHealthAreaList);
+        }
+
+        let tracerCategoryIdList = [];
+        let tracerCategoryList = this.state.tracerCategoryList;
+        for (var i = 0; i < healthAreaList.length; i++) {
+            tracerCategoryIdList = tracerCategoryIdList.concat(tracerCategoryList.filter(c => c.healthArea.id == healthAreaList[i]));
+        }
+
+        tracerCategoryIdList = tracerCategoryIdList.map(ele => (ele.id).toString());
+
+        let tracerCategoryListOfMappingData = this.state.equivalancyUnitMappingList.map(ele => (ele.tracerCategory.id).toString());
+
+        let newTracerCategoryIdList = tracerCategoryIdList.concat(tracerCategoryListOfMappingData);
+        newTracerCategoryIdList = [... new Set(newTracerCategoryIdList)];
+
+        console.log("response------->123", tracerCategoryIdList);
+        console.log("response------->124", tracerCategoryListOfMappingData);
+        console.log("response------->125", newTracerCategoryIdList);
+
+        ForecastingUnitService.getForecastingUnitByTracerCategoriesId(newTracerCategoryIdList).then(response => {
+            console.log("response------->126", response.data);
+            if (response.status == 200) {
+                var listArray = response.data;
+                listArray.sort((a, b) => {
+                    var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                    var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                    return itemLabelA > itemLabelB ? 1 : -1;
+                });
+
+                let tempList = [];
+                if (listArray.length > 0) {
+                    for (var i = 0; i < listArray.length; i++) {
+                        var paJson = {
+                            name: getLabelText(listArray[i].label, this.state.lang) + ' | ' + parseInt(listArray[i].forecastingUnitId),
+                            id: parseInt(listArray[i].forecastingUnitId),
+                            active: listArray[i].active,
+                            tracerCategoryId: listArray[i].tracerCategory.id,
+                            unit: listArray[i].unit
+                        }
+                        tempList[i] = paJson
+                    }
+                }
+
+                this.setState({
+                    forecastingUnitList: tempList,
+                    // loading: false
+                },
+                    () => {
+                        // this.getEquivalancyUnit();
+                        this.filterData();
+                    })
+            } else {
+                this.setState({
+                    message: response.data.messageCode, loading: false
+                },
+                    () => {
+                        this.hideSecondComponent();
+                    })
+            }
+
+
+        }).catch(
+            error => {
+                if (error.message === "Network Error") {
+                    this.setState({
+                        message: 'static.unkownError',
+                        loading: false
+                    });
+                } else {
+                    switch (error.response ? error.response.status : "") {
+
+                        case 401:
+                            this.props.history.push(`/login/static.message.sessionExpired`)
+                            break;
+                        case 403:
+                            this.props.history.push(`/accessDenied`)
+                            break;
+                        case 500:
+                        case 404:
+                        case 406:
+                            this.setState({
+                                message: error.response.data.messageCode,
+                                loading: false
+                            });
+                            break;
+                        case 412:
+                            this.setState({
+                                message: error.response.data.messageCode,
+                                loading: false
+                            });
+                            break;
+                        default:
+                            this.setState({
+                                message: 'static.unkownError',
+                                loading: false
+                            });
+                            break;
+                    }
+                }
+            }
+        );
+    }
+
     getTracerCategory() {
         TracerCategoryService.getTracerCategoryListAll()
             .then(response => {
@@ -1157,7 +1270,8 @@ class EquivalancyUnit extends Component {
                     },
                         () => {
                             console.log("TracerCategory------->", this.state.tracerCategoryList)
-                            this.getForecastingUnit();
+                            // this.getForecastingUnit();
+                            this.getUnit();
                         })
                 } else {
                     this.setState({
@@ -1807,7 +1921,8 @@ class EquivalancyUnit extends Component {
                                 this.modelOpenClose();
                                 this.hideSecondComponent();
                                 // this.getUsagePeriodData();
-                                this.getTracerCategory();
+                                // this.getTracerCategory();
+                                this.getEquivalancyUnit();
                             })
                     } else {
                         this.setState({
@@ -1929,7 +2044,7 @@ class EquivalancyUnit extends Component {
                             () => {
                                 this.hideSecondComponent();
                                 // this.getEquivalancyUnitMappingData();
-                                this.getTracerCategory();
+                                this.getEquivalancyUnit();
                             })
                     } else {
                         this.setState({

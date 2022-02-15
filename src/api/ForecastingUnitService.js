@@ -36,5 +36,10 @@ class ForecastingUnitService {
         return axios.get(`${API_URL}/api/forecastingUnit/tracerCategory/${tracerCategoryId}`, {}
         );
     }
+
+    getForecastingUnitByTracerCategoriesId(json) {
+        return axios.post(`${API_URL}/api/forecastingUnit/tracerCategorys`, json, {}
+        );
+    }
 }
 export default new ForecastingUnitService();
