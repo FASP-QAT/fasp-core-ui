@@ -1040,13 +1040,13 @@ export default class CommitTreeComponent extends React.Component {
                             <span><b>4. {i18n.t('static.program.notes')}:</b></span><br />
 
                             <span>a. {i18n.t('static.forecastMethod.historicalData')}:</span>
-                            <div className="table-scroll">
+                            <div className="">
                                 <div className="table-wrap table-responsive fixTableHead">
-                                    <Table className="table-bordered text-center mt-2 overflowhide main-table " bordered size="sm" >
+                                    <Table className="table-bordered text-center mt-2 overflowhide main-table table-striped1" bordered size="sm" >
                                         <thead>
                                             <tr>
-                                                <th><b>{i18n.t('static.dashboard.planningunitheader')}</b></th>
-                                                <th><b>{i18n.t('static.program.notes')}</b></th>
+                                                <th style={{width:'30%'}}><b>{i18n.t('static.dashboard.planningunitheader')}</b></th>
+                                                <th style={{width:'80%'}}><b>{i18n.t('static.program.notes')}</b></th>
                                             </tr>
                                         </thead>
                                         <tbody>{consumtionNotes}</tbody>
@@ -1054,15 +1054,15 @@ export default class CommitTreeComponent extends React.Component {
                                 </div>
                             </div><br />
                             <span>b. {i18n.t('static.commitTree.treeScenarios')}:</span>
-                            <div className="table-scroll">
+                            <div className="">
                                 <div className="table-wrap table-responsive fixTableHead">
-                                    <Table className="table-bordered text-center mt-2 overflowhide main-table " bordered size="sm" >
+                                    <Table className="table-bordered text-center mt-2 overflowhide main-table table-striped1" bordered size="sm" >
                                         <thead>
                                             <tr>
-                                                <th><b>{i18n.t('static.forecastMethod.tree')}</b></th>
-                                                <th><b>{i18n.t('static.whatIf.scenario')}</b></th>
-                                                <th><b>{i18n.t('static.dataValidation.treeNotes')}</b></th>
-                                                <th><b>{i18n.t('static.dataValidation.scenarioNotes')}</b></th>
+                                                <th style={{width:'15%'}}><b>{i18n.t('static.forecastMethod.tree')}</b></th>
+                                                <th style={{width:'15%'}}><b>{i18n.t('static.whatIf.scenario')}</b></th>
+                                                <th style={{width:'35%'}}><b>{i18n.t('static.dataValidation.treeNotes')}</b></th>
+                                                <th style={{width:'35%'}}><b>{i18n.t('static.dataValidation.scenarioNotes')}</b></th>
                                             </tr>
                                         </thead>
                                         <tbody>{scenarioNotes}</tbody>
@@ -1073,7 +1073,7 @@ export default class CommitTreeComponent extends React.Component {
                             {/* <div className="table-scroll"> */}
                             <div className="">
                                 <div className="table-wrap table-responsive fixTableHead">
-                                    <Table className="table-bordered text-center mt-2 overflowhide main-table " bordered size="sm" >
+                                    <Table className="table-bordered text-center mt-2 overflowhide main-table table-striped1" bordered size="sm" >
                                         <thead>
                                             <tr>
                                                 <th><b>{i18n.t('static.forecastMethod.tree')}</b></th>

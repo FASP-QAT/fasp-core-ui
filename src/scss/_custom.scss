@@ -5868,4 +5868,9 @@ font-style: italic!important;
      font-size: 14px;
      color:#BA0C2F;
    }
- 
+   .table-striped1 tbody tr:nth-of-type(odd) {
+    background-color: #e5edf5;
+}
+.table-striped1 tbody tr:nth-of-type(even):hover {
+  background-color: transparent;
+}
