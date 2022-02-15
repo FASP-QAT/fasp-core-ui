@@ -1407,6 +1407,7 @@ class AuthenticationService {
                         break;
 
                     case "/forecastReport/forecastSummary":
+                    case "/forecastReport/forecastSummary/:programId/:versionId":
                         if (bfunction.includes("ROLE_BF_LIST_FORECAST_SUMMARY")) {
                             return true;
                         }

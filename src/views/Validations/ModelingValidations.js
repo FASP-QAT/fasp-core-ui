@@ -224,7 +224,7 @@ class ModelingValidation extends Component {
                 }
             }).catch(
                 error => {
-                    console.log("In catch error",error);
+                    console.log("In catch error", error);
                     this.el = jexcel(document.getElementById("tableDiv"), '');
                     this.el.destroy();
                     this.setState({
@@ -270,7 +270,7 @@ class ModelingValidation extends Component {
     getTreeList() {
         this.setState({ loading: true })
         var datasetJson = this.state.datasetData;
-        var treeList = datasetJson.treeList.filter(c=>c.active.toString()=="true");
+        var treeList = datasetJson.treeList.filter(c => c.active.toString() == "true");
         var startDate = moment(datasetJson.currentVersion.forecastStartDate).format("YYYY-MM-DD");
         var stopDate = moment(datasetJson.currentVersion.forecastStopDate).format("YYYY-MM-DD");
         var rangeValue = { from: { year: new Date(startDate).getFullYear(), month: new Date(startDate).getMonth() + 1 }, to: { year: new Date(stopDate).getFullYear(), month: new Date(stopDate).getMonth() + 1 } }
@@ -335,6 +335,7 @@ class ModelingValidation extends Component {
         var treeList = this.state.treeList;
         if (this.state.treeId > 0) {
             var treeListFiltered = treeList.filter(c => c.treeId == this.state.treeId)[0];
+            console.log("treeListFiltered@@@", treeListFiltered);
             var levelList = [...new Set(treeListFiltered.tree.flatList.map(ele => (ele.level)))]
             var scenarioList = treeListFiltered.scenarioList;
             var scenarioId = "";
@@ -667,17 +668,17 @@ class ModelingValidation extends Component {
             var selectedDataset = datasetList.filter(c => c.id == this.state.datasetId)[0];
             var versionList = [];
             var vList = selectedDataset.versionList;
-            var onlineVersionList=vList.filter(c=>!c.versionId.toString().includes("Local")).sort(function (a, b) {
+            var onlineVersionList = vList.filter(c => !c.versionId.toString().includes("Local")).sort(function (a, b) {
                 a = a.versionId;
                 b = b.versionId;
                 return a > b ? -1 : a < b ? 1 : 0;
             });
-            var offlineVersionList=vList.filter(c=>c.versionId.toString().includes("Local")).sort(function (a, b) {
+            var offlineVersionList = vList.filter(c => c.versionId.toString().includes("Local")).sort(function (a, b) {
                 a = a.versionId.split(" ")[0];
                 b = b.versionId.split(" ")[0];
                 return a > b ? -1 : a < b ? 1 : 0;
             });
-            var newVList=offlineVersionList.concat(onlineVersionList)
+            var newVList = offlineVersionList.concat(onlineVersionList)
             for (var v = 0; v < newVList.length; v++) {
                 versionList.push(newVList[v].versionId)
             }
@@ -1122,24 +1123,24 @@ class ModelingValidation extends Component {
 
     exportCSV() {
         var csvRow = [];
-        csvRow.push('"' + (i18n.t('static.dashboard.programheader') + ' : ' + document.getElementById("datasetId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+        csvRow.push('"' + (i18n.t('static.dashboard.programheader') + ' : ' + document.getElementById("datasetId").selectedOptions[0].text).replaceAll(' ', '%20').replaceAll('#', '%23') + '"')
         csvRow.push('')
         csvRow.push('"' + (i18n.t('static.report.version') + ' : ' + document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
         csvRow.push('')
-        csvRow.push('"' + (i18n.t('static.common.treeName') + ' : ' + document.getElementById("treeId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+        csvRow.push('"' + (i18n.t('static.common.treeName') + ' : ' + document.getElementById("treeId").selectedOptions[0].text).replaceAll(' ', '%20').replaceAll('#', '%23') + '"')
         csvRow.push('')
-        csvRow.push('"' + (i18n.t('static.whatIf.scenario') + ' : ' + document.getElementById("scenarioId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+        csvRow.push('"' + (i18n.t('static.whatIf.scenario') + ' : ' + document.getElementById("scenarioId").selectedOptions[0].text).replaceAll(' ', '%20').replaceAll('#', '%23') + '"')
         csvRow.push('')
         csvRow.push('"' + (i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ', '%20') + '"')
         csvRow.push('')
         csvRow.push('"' + (i18n.t('static.common.level') + ' : ' + document.getElementById("levelId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
         csvRow.push('')
-        csvRow.push('"' + (i18n.t('static.modelingValidation.levelUnit') + ' : ' + document.getElementById("levelUnit").value).replaceAll(' ', '%20') + '"')
+        csvRow.push('"' + (i18n.t('static.modelingValidation.levelUnit') + ' : ' + document.getElementById("levelUnit").value).replaceAll(' ', '%20').replaceAll('#', '%23') + '"')
         csvRow.push('')
         this.state.nodeLabelArr.map(ele =>
-            csvRow.push('"' + (i18n.t('static.common.node')).replaceAll(' ', '%20') + ' : ' + (ele.toString()).replaceAll(' ', '%20') + '"'))
+            csvRow.push('"' + (i18n.t('static.common.node')).replaceAll(' ', '%20') + ' : ' + (ele.toString()).replaceAll(' ', '%20').replaceAll('#', '%23') + '"'))
         csvRow.push('')
-        csvRow.push('"' + (i18n.t('static.modelingValidation.displayBy') + ' : ' + document.getElementById("displayBy").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+        csvRow.push('"' + (i18n.t('static.modelingValidation.displayBy') + ' : ' + document.getElementById("displayBy").selectedOptions[0].text).replaceAll(' ', '%20').replaceAll('#', '%23') + '"')
         csvRow.push('')
 
 
@@ -1156,7 +1157,7 @@ class ModelingValidation extends Component {
         // columns.push(i18n.t('static.common.product') + " " + i18n.t('static.common.text'));
         // columns.push(i18n.t('static.productValidation.cost'));
         const headers = [];
-        this.state.columns.filter(c => c.type != 'hidden').map((item, idx) => { headers[idx] = (item.title).replaceAll(' ', '%20') });
+        this.state.columns.filter(c => c.type != 'hidden').map((item, idx) => { headers[idx] = (item.title).replaceAll(' ', '%20').replaceAll('#', '%23') });
 
         var A = [this.addDoubleQuoteToRowContent(headers)];
         var B = []
@@ -1165,11 +1166,11 @@ class ModelingValidation extends Component {
             this.state.columns.map((item, idx) => {
                 if (item.type != 'hidden') {
                     if (item.mask != undefined && item.mask.toString().includes("%")) {
-                        B.push((ele[idx] + (" %")).toString().replaceAll(',', ' ').replaceAll(' ', '%20'));
+                        B.push((ele[idx] + (" %")).toString().replaceAll(',', ' ').replaceAll(' ', '%20').replaceAll(' ', '%20'));
                     } else if (item.type == 'calendar') {
-                        B.push(moment(ele[idx]).format(DATE_FORMAT_CAP_WITHOUT_DATE).toString().replaceAll(',', ' ').replaceAll(' ', '%20'));
+                        B.push(moment(ele[idx]).format(DATE_FORMAT_CAP_WITHOUT_DATE).toString().replaceAll(',', ' ').replaceAll(' ', '%20').replaceAll(' ', '%20'));
                     } else {
-                        B.push(ele[idx].toString().replaceAll(',', ' ').replaceAll(' ', '%20'));
+                        B.push(ele[idx].toString().replaceAll(',', ' ').replaceAll(' ', '%20').replaceAll(' ', '%20'));
                     }
                 }
             })

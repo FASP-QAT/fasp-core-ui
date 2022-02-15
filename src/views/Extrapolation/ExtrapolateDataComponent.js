@@ -186,9 +186,9 @@ export default class ExtrapolateDataComponent extends React.Component {
                 if (forecastProgramList.length == 1) {
                     forecastProgramId = forecastProgramList[0].id;
                     event.target.value = forecastProgramList[0].id;
-                } else if (localStorage.getItem("sesLiveDatasetId") != "" && forecastProgramList.filter(c => c.id == localStorage.getItem("sesLiveDatasetId")).length > 0) {
-                    forecastProgramId = localStorage.getItem("sesLiveDatasetId");
-                    event.target.value = localStorage.getItem("sesLiveDatasetId");
+                } else if (localStorage.getItem("sesDatasetId") != "" && forecastProgramList.filter(c => c.id == localStorage.getItem("sesDatasetId")).length > 0) {
+                    forecastProgramId = localStorage.getItem("sesDatasetId");
+                    event.target.value = localStorage.getItem("sesDatasetId");
                 }
                 forecastProgramList = forecastProgramList.sort(function (a, b) {
                     a = a.name.toLowerCase();
