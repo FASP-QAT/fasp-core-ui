@@ -237,6 +237,7 @@ export default class AddForecastProgram extends Component {
             this.setState({
                 forecastProgramInMonth: value,
                 singleValue2: { year: new Date(stopDate).getFullYear(), month: new Date(stopDate).getMonth() + 1 },
+                message1: ''
             });
         }
 
