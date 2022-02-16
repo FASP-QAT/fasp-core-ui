@@ -85,6 +85,7 @@ const validationSchemaNodeData = function (values) {
         nodeTypeId: Yup.string()
             .required(i18n.t('static.validation.fieldRequired')),
         nodeTitle: Yup.string()
+            .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
             .required(i18n.t('static.validation.fieldRequired')),
         nodeUnitId: Yup.string()
             .test('nodeUnitId', i18n.t('static.validation.fieldRequired'),
@@ -339,7 +340,6 @@ export default class BuildTree extends Component {
         this.pickAMonth4 = React.createRef()
         this.pickAMonth5 = React.createRef()
         this.state = {
-            extrapolate : false,
             forecastPeriod: '',
             maxNodeDataId: '',
             message1: '',
@@ -1042,7 +1042,7 @@ export default class BuildTree extends Component {
             var tempJson = {
                 nodeDataId: 1,
                 notes: '',
-                month: moment(new Date()).startOf('month').format("YYYY-MM-DD"),
+                month: moment(this.state.forecastStartDate).startOf('month').format("YYYY-MM-DD"),
                 dataValue: "",
                 calculatedDataValue: '',
                 displayDataValue: '',
@@ -1758,8 +1758,10 @@ export default class BuildTree extends Component {
         this.getRegionList();
     }
     extrapolate(e) {
+        const { currentItemConfig } = this.state;
+        currentItemConfig.context.payload.extrapolation = e.target.checked == true ? true : false;
         this.setState({
-            extrapolate: e.target.checked == true ? true : false
+            currentItemConfig
         });
     }
     momCheckbox(e) {
@@ -2210,11 +2212,11 @@ export default class BuildTree extends Component {
     }
 
 
-    getSameLevelNodeList(level, id, parent, nodeTypeId) {
+    getSameLevelNodeList(level, id, nodeTypeId) {
         console.log("level---", level);
         console.log("id---", id);
         var sameLevelNodeList = [];
-        var arr = this.state.items.filter(x => x.level == level && x.id != id && x.id > id && x.parent == parent && x.payload.nodeType.id == nodeTypeId);
+        var arr = this.state.items.filter(x => x.level == level && x.id != id && x.payload.nodeType.id == nodeTypeId);
         console.log("arr---", arr);
         for (var i = 0; i < arr.length; i++) {
             sameLevelNodeList[i] = { id: arr[i].payload.nodeDataMap[this.state.selectedScenario][0].nodeDataId, name: getLabelText(arr[i].payload.label, this.state.lang) }
@@ -5255,7 +5257,7 @@ export default class BuildTree extends Component {
                 }
 
                 if (data.context.payload.nodeType.id != 1) {
-                    this.getSameLevelNodeList(data.context.level, data.context.id, data.context.parent, data.context.payload.nodeType.id);
+                    this.getSameLevelNodeList(data.context.level, data.context.id, data.context.payload.nodeType.id);
                 }
                 // this.setState({
 
@@ -5692,7 +5694,7 @@ export default class BuildTree extends Component {
                                                     id="extrapolate"
                                                     name="extrapolate"
                                                     // checked={true}
-                                                    checked={this.state.extrapolate}
+                                                    checked={this.state.currentItemConfig.context.payload.extrapolation}
                                                     onClick={(e) => { this.extrapolate(e); }}
                                                 />
                                                 <Label
@@ -7399,7 +7401,7 @@ export default class BuildTree extends Component {
                 return <>
                     {itemConfig.parent != null &&
                         <>
-                            <button key="2" type="button" className="StyledButton TreeIconStyle" style={{ background: 'none' }}
+                            <button key="2" type="button" className="StyledButton TreeIconStyle TreeIconStyleCopyPaddingTop" style={{ background: 'none' }}
                                 onClick={(event) => {
                                     event.stopPropagation();
                                     this.duplicateNode(itemConfig);
@@ -7408,7 +7410,7 @@ export default class BuildTree extends Component {
                             </button>
 
 
-                            <button key="3" type="button" className="StyledButton TreeIconStyle" style={{ background: 'none' }}
+                            <button key="3" type="button" className="StyledButton TreeIconStyle TreeIconStyleDeletePaddingTop" style={{ background: 'none' }}
                                 onClick={(event) => {
                                     event.stopPropagation();
                                     confirmAlert({
@@ -7430,7 +7432,7 @@ export default class BuildTree extends Component {
                                 <i class="fa fa-trash-o" aria-hidden="true" style={{ fontSize: '16px' }}></i>
                             </button></>}
                     {parseInt(itemConfig.payload.nodeType.id) != 5 &&
-                        <button key="1" type="button" className="StyledButton TreeIconStyle" style={{ background: 'none' }}
+                        <button key="1" type="button" className="StyledButton TreeIconStyle TreeIconStylePlusPaddingTop" style={{ background: 'none' }}
                             onClick={(event) => {
                                 console.log("add button called---------");
                                 event.stopPropagation();
@@ -7439,7 +7441,7 @@ export default class BuildTree extends Component {
                                 var tempArray = [];
                                 var tempJson = {
                                     notes: '',
-                                    month: new Date(),
+                                    month: moment(this.state.forecastStartDate).startOf('month').format("YYYY-MM-DD"),
                                     dataValue: "",
                                     calculatedDataValue: '',
                                     nodeDataModelingList: [],
@@ -7491,7 +7493,7 @@ export default class BuildTree extends Component {
                                     currentScenario: {
                                         notes: '',
                                         dataValue: '',
-                                        month: new Date(),
+                                        month: moment(this.state.forecastStartDate).startOf('month').format("YYYY-MM-DD"),
                                         fuNode: {
                                             noOfForecastingUnitsPerPerson: '',
                                             usageFrequency: '',
@@ -7644,16 +7646,16 @@ export default class BuildTree extends Component {
             <Row>
                 <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
                     <Card className="mb-lg-0">
-                        {/* <div className="pb-lg-0">
-                            <div className="card-header-actions">
+                        <div className="pb-lg-0">
+                            {/* <div className="card-header-actions">
                                 <div className="card-header-action pr-4 pt-lg-0">
 
                                     <Col md="12 pl-0">
                                         <div className="d-md-flex">
-                                            <a className="pr-lg-0 pt-lg-1">
+                                            <a className="pr-lg-0 pt-lg-1 compareAndSelect-larrowText">
                                                 <span style={{ cursor: 'pointer' }} onClick={this.cancelClicked}><i className="fa fa-long-arrow-left" style={{ color: '#20a8d8', fontSize: '13px' }}></i> <small className="supplyplanformulas">{'Return To List'}</small></span>
                                             </a>
-                                            <FormGroup className="tab-ml-1 mt-md-0 mb-md-0 ">
+                                             <FormGroup className="tab-ml-1 mt-md-0 mb-md-0 ">
 
                                                 <a className="pr-lg-1" href="javascript:void();" title={i18n.t('static.common.addEntity')} onClick={() => {
                                                     this.setState({
@@ -7664,13 +7666,28 @@ export default class BuildTree extends Component {
                                                     onClick={() => this.exportPDF()}
                                                 />
                                                 {this.state.selectedScenario > 0 && <img style={{ height: '25px', width: '25px', cursor: 'pointer', marginTop: '-10px' }} src={docicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportDoc()} />}
-                                            </FormGroup>
+                                            </FormGroup> 
 
                                         </div>
                                     </Col>
                                 </div>
+                            </div>  */}
+                            <div className="row">
+                                <div className="col-md-12 pl-lg-3">
+                                    <div className='col-md-4 pt-lg-2'>
+                                        <a className="pr-lg-0 pt-lg-1 float-left">
+                                            <span style={{ cursor: 'pointer' }} onClick={this.cancelClicked}><i className="fa fa-long-arrow-left" style={{ color: '#20a8d8', fontSize: '13px' }}></i> <small className="supplyplanformulas">{'Return To List'}</small></span>
+                                        </a>
+                                    </div>
+                                    <div className="col-md-6">
+                                        <span className="pr-lg-0 pt-lg-0 float-right">
+                                            <h5 style={{ color: '#BA0C2F' }}>{i18n.t('static.tree.pleaseSaveAndDoARecalculateAfterDragAndDrop.')}</h5>
+                                        </span>
+                                    </div>
+
+                                </div>
                             </div>
-                        </div> */}
+                        </div>
                         <CardBody className="pt-lg-1 pl-lg-0 pr-lg-0">
                             <div className="container-fluid pl-lg-3 pr-lg-3">
                                 <>
@@ -8007,81 +8024,82 @@ export default class BuildTree extends Component {
                                                                     {/* <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setState({ showDiv: false })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button> */}
                                                                     <Button type="submit" size="md" onClick={() => this.touchAll(setTouched, errors)} color="success" className="submitBtn float-right mr-1"> <i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
                                                                 </FormGroup>
-
-                                                                <div className="col-md-12 row ml-lg-1">
-                                                                    <FormGroup className="col-md-2" >
-                                                                        <div className="check inline  pl-lg-1 pt-lg-0">
-                                                                            <div>
-                                                                                <Input
-                                                                                    className="form-check-input checkboxMargin"
-                                                                                    type="checkbox"
-                                                                                    id="active6"
-                                                                                    name="active6"
-                                                                                    // checked={false}
-                                                                                    onClick={(e) => { this.filterPlanningUnitNode(e); }}
-                                                                                />
-                                                                                <Label
-                                                                                    className="form-check-label"
-                                                                                    check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                                                                                    <b>{'Hide Planning Unit'}</b>
-                                                                                </Label>
-                                                                            </div>
-                                                                        </div>
-                                                                    </FormGroup>
-                                                                    <FormGroup className="col-md-3" style={{ marginLeft: '-2%' }}>
-                                                                        <div className="check inline  pl-lg-0 pt-lg-0">
-                                                                            <div>
-                                                                                <Input
-                                                                                    className="form-check-input checkboxMargin"
-                                                                                    type="checkbox"
-                                                                                    id="active7"
-                                                                                    name="active7"
-                                                                                    // checked={false}
-                                                                                    onClick={(e) => { this.filterPlanningUnitAndForecastingUnitNodes(e) }}
-                                                                                />
-                                                                                <Label
-                                                                                    className="form-check-label"
-                                                                                    check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                                                                                    <b>{'Hide Forecasting Unit & Planning Unit'}</b>
-                                                                                </Label>
-                                                                            </div>
-                                                                        </div>
-                                                                    </FormGroup>
-                                                                    <FormGroup className="col-md-6" >
-                                                                        <div className="check inline  pl-lg-0 pt-lg-0">
-                                                                            <div>
-                                                                                <Input
-                                                                                    className="form-check-input checkboxMargin"
-                                                                                    type="checkbox"
-                                                                                    id="active7"
-                                                                                    name="active7"
-                                                                                    // checked={false}
-                                                                                    onClick={(e) => { this.hideTreeValidation(e); }}
-                                                                                />
-                                                                                <Label
-                                                                                    className="form-check-label"
-                                                                                    check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                                                                                    <b>{'Hide Tree Validation'}</b>
-                                                                                </Label>
-                                                                            </div>
-                                                                        </div>
-                                                                    </FormGroup>
-
-                                                                </div>
                                                             </Row>
                                                         </Form>
                                                     )} />
                                         </div>
 
+
+                                        <div className="row ml-lg-1 pb-lg-2">
+                                            <FormGroup className="col-md-2" >
+                                                <div className="check inline  pl-lg-1 pt-lg-0">
+                                                    <div>
+                                                        <Input
+                                                            className="form-check-input checkboxMargin"
+                                                            type="checkbox"
+                                                            id="active6"
+                                                            name="active6"
+                                                            // checked={false}
+                                                            onClick={(e) => { this.filterPlanningUnitNode(e); }}
+                                                        />
+                                                        <Label
+                                                            className="form-check-label"
+                                                            check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                            <b>{'Hide Planning Unit'}</b>
+                                                        </Label>
+                                                    </div>
+                                                </div>
+                                            </FormGroup>
+                                            <FormGroup className="col-md-3" style={{ marginLeft: '-2%' }}>
+                                                <div className="check inline  pl-lg-0 pt-lg-0">
+                                                    <div>
+                                                        <Input
+                                                            className="form-check-input checkboxMargin"
+                                                            type="checkbox"
+                                                            id="active7"
+                                                            name="active7"
+                                                            // checked={false}
+                                                            onClick={(e) => { this.filterPlanningUnitAndForecastingUnitNodes(e) }}
+                                                        />
+                                                        <Label
+                                                            className="form-check-label"
+                                                            check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                            <b>{'Hide Forecasting Unit & Planning Unit'}</b>
+                                                        </Label>
+                                                    </div>
+                                                </div>
+                                            </FormGroup>
+                                            <FormGroup className="col-md-6" >
+                                                <div className="check inline  pl-lg-0 pt-lg-0">
+                                                    <div>
+                                                        <Input
+                                                            className="form-check-input checkboxMargin"
+                                                            type="checkbox"
+                                                            id="active7"
+                                                            name="active7"
+                                                            // checked={false}
+                                                            onClick={(e) => { this.hideTreeValidation(e); }}
+                                                        />
+                                                        <Label
+                                                            className="form-check-label"
+                                                            check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                            <b>{'Hide Tree Validation'}</b>
+                                                        </Label>
+                                                    </div>
+                                                </div>
+                                            </FormGroup>
+
+                                        </div>
+
                                         <div className="pb-lg-0" style={{ marginTop: '-2%' }}>
                                             <div className="card-header-actions">
-                                                <div className="card-header-action pr-4 pt-lg-0">
+                                                <div className="card-header-action pr-0 pt-lg-0">
 
                                                     <Col md="12 pl-0">
                                                         <div className="d-md-flex">
-                                                            <a className="pr-lg-0 pt-lg-1">
+                                                            {/* <a className="pr-lg-0 pt-lg-1">
                                                                 <span style={{ cursor: 'pointer' }} onClick={this.cancelClicked}><i className="fa fa-long-arrow-left" style={{ color: '#20a8d8', fontSize: '13px' }}></i> <small className="supplyplanformulas">{'Return To List'}</small></span>
-                                                            </a>
+                                                            </a> */}
                                                             <FormGroup className="tab-ml-1 mt-md-0 mb-md-0 ">
 
                                                                 {/* <a className="pr-lg-1" href="javascript:void();" title={i18n.t('static.common.addEntity')} onClick={() => {
@@ -8123,7 +8141,8 @@ export default class BuildTree extends Component {
                                         </div>
                                         <CardFooter style={{ backgroundColor: 'transparent', borderTop: '0px solid #c8ced3', display: this.state.selectedScenario != '' ? "block" : "none" }}>
                                             <div class="row">
-                                                <div className="col-md-6 pl-lg-0"> <h5 style={{ color: '#BA0C2F' }}>{i18n.t('static.tree.pleaseSaveAndDoARecalculateAfterDragAndDrop.')}</h5></div>
+                                                {/* <div className="col-md-6 pl-lg-0"> <h5 style={{ color: '#BA0C2F' }}>{i18n.t('static.tree.pleaseSaveAndDoARecalculateAfterDragAndDrop.')}</h5></div> */}
+                                                <div className="col-md-6 pl-lg-0"> </div>
                                                 <div className="col-md-6 pr-lg-0"> <Button type="button" size="md" color="info" className="float-right mr-1" onClick={() => this.callAfterScenarioChange(this.state.selectedScenario)}><i className="fa fa-calculator"></i> {i18n.t('static.tree.calculated')}</Button>
                                                     {/* <Button type="button" size="md" color="warning" className="float-right mr-1" onClick={this.resetTree}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button> */}
                                                     <Button type="button" color="success" className="mr-1 float-right" size="md" onClick={() => this.saveTreeData()}><i className="fa fa-check"> </i>{i18n.t('static.pipeline.save')}</Button>
@@ -8321,7 +8340,7 @@ export default class BuildTree extends Component {
                                         {i18n.t('static.tree.nodeData')}
                                     </NavLink>
                                 </NavItem>
-                                <NavItem style={{ display: !this.state.extrapolate ? 'block' : 'none' }}>
+                                <NavItem style={{ display: !this.state.currentItemConfig.context.payload.extrapolation ? 'block' : 'none' }}>
                                     <NavLink
                                         active={this.state.activeTab1[0] === '2'}
                                         onClick={() => { this.toggleModal(0, '2'); }}
@@ -8329,7 +8348,7 @@ export default class BuildTree extends Component {
                                         {i18n.t('static.tree.Modeling/Transfer')}
                                     </NavLink>
                                 </NavItem>
-                                <NavItem style={{ display: this.state.extrapolate ? 'block' : 'none' }}>
+                                <NavItem style={{ display: this.state.currentItemConfig.context.payload.extrapolation ? 'block' : 'none' }}>
                                     <NavLink
                                         active={this.state.activeTab1[0] === '3'}
                                         onClick={() => { this.toggleModal(0, '3'); }}

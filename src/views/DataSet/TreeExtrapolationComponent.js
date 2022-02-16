@@ -575,7 +575,7 @@ export default class TreeExtrapolationComponent extends React.Component {
         var monthArray = [];
         var curDate1 = minStartDate;
         // monthArray.push('2019-01-01');
-        
+
         for (var m = 0; curDate1 < moment(forecastStopDate).add(-1, 'months').format("YYYY-MM-DD"); m++) {
             curDate1 = moment(minStartDate).add(m, 'months').format("YYYY-MM-DD");
             monthArray.push(curDate1)
@@ -585,16 +585,17 @@ export default class TreeExtrapolationComponent extends React.Component {
         let count = 0;
         for (var j = 0; j < monthArray.length; j++) {
             data = [];
-            data[0] = monthArray[j] 
-            data[1] = ""
+            data[0] = monthArray[j]
+            data[1] = moment(monthArray[j]).isSame(this.props.items.currentItemConfig.context.payload.nodeDataMap[this.props.items.selectedScenario][0].month) ? this.props.items.currentItemConfig.context.payload.nodeDataMap[this.props.items.selectedScenario][0].calculatedDataValue : "";
             data[2] = 100
-            data[3] =`=ROUND((B${parseInt(j) + 1}*C${parseInt(j) + 1})/100,2)`
+            data[3] = `=ROUND((B${parseInt(j) + 1}*C${parseInt(j) + 1})/100,2)`
             data[4] = ""
             data[5] = ""
             data[6] = ""
             data[7] = ""
             data[8] = ""
-            data[9] = ""
+            // data[9] = `=IF(ISBLANK(B${parseInt(j) + 1}),10,ROUND(B${parseInt(j) + 1},2))`
+            data[9] = `=IF(B${parseInt(j) + 1} != "",ROUND(B${parseInt(j) + 1},2),'')`
             data[10] = ""
             data[11] = ""
             // data[0] = list[j].month
@@ -648,7 +649,8 @@ export default class TreeExtrapolationComponent extends React.Component {
                 },
                 {
                     title: getLabelText(this.props.items.currentItemConfig.context.payload.label, this.state.lang),
-                    type: 'number'
+                    type: 'number',
+                    mask: '#,##.00'
                 },
                 {
                     title: 'Reporting Rate',
@@ -658,7 +660,8 @@ export default class TreeExtrapolationComponent extends React.Component {
                 {
                     title: getLabelText(this.props.items.currentItemConfig.context.payload.label, this.state.lang) + '(Adjusted)',
                     type: 'number',
-                    readOnly: true
+                    readOnly: true,
+                    mask: '#,##.00'
                 },
                 {
                     title: 'Moving Averages',
@@ -689,15 +692,18 @@ export default class TreeExtrapolationComponent extends React.Component {
                 {
                     title: 'Selected Forecast',
                     type: 'number',
-                    readOnly: true
+                    mask: '#,##.00'
+                    // readOnly: true
                 },
                 {
                     title: 'Manual Change (+/-)',
-                    type: 'number'
+                    type: 'number',
+                    mask: '#,##.00'
                 },
                 {
                     title: 'Month End (Final)',
                     type: 'number',
+                    mask: '#,##.00',
                     readOnly: true
                 },
             ],
@@ -724,14 +730,14 @@ export default class TreeExtrapolationComponent extends React.Component {
                 if (y != null) {
                     var rowData = elInstance.getRowData(y);
                     // if (rowData[0] != "") {
-                        if (moment(rowData[0]).isBetween(this.props.items.forecastStartDate, this.props.items.forecastStopDate, undefined, '[)')) {
-                            var cell = elInstance.getCell(("A").concat(parseInt(y) + 1))
-                            cell.classList.add('bold');
-                        } else {
-                            var cell = elInstance.getCell(("A").concat(parseInt(y) + 1))
-                            cell.classList.remove('bold');
-                            // elInstance.showIndex(6);
-                        }
+                    if (moment(rowData[0]).isBetween(this.props.items.forecastStartDate, this.props.items.forecastStopDate, undefined, '[)')) {
+                        var cell = elInstance.getCell(("A").concat(parseInt(y) + 1))
+                        cell.classList.add('bold');
+                    } else {
+                        var cell = elInstance.getCell(("A").concat(parseInt(y) + 1))
+                        cell.classList.remove('bold');
+                        // elInstance.showIndex(6);
+                    }
                     // } 
                     // if (rowData[3] != "" && moment(this.state.minMonth).diff(moment(rowData[3]), 'months') == 0) {
                     //     var cell = elInstance.getCell(("D").concat(parseInt(y) + 1))
@@ -1401,7 +1407,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                     </div>
                                 </FormGroup>
                             </div>
-                            <div className="col-md-12 text-center pt-lg-3">
+                            <div className="col-md-12 text-left pt-lg-3 pl-lg-0">
                                 <Button className="mr-1 btn btn-info btn-md " onClick={this.toggledata}>
                                     {this.state.show ? i18n.t('static.common.hideData') : i18n.t('static.common.showData')}
                                 </Button>

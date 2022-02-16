@@ -5539,7 +5539,7 @@ border: 1px solid #eee;
   z-index: 10;
 }
 .MarginBottomTree{
-  margin-bottom: 4%;
+  margin-bottom: 2%;
 }
 
   .notification-failed {
@@ -5880,12 +5880,26 @@ font-style: italic!important;
     }
 }
 .AggregationNodeSize{
-  width: 15px;
-  height: 15px;
+  width: 13px;
+  height: 13px;
 }
 .ExtraCheckboxFieldWidth{
   width: 106px;
 }
 .bold{
   font-weight: bold;
+}
+.TreeIconStyleCopyPaddingTop{
+  padding-top: 0px;
+}
+
+.TreeIconStyleDeletePaddingTop{
+  padding-top: 3px;
+}
+.TreeIconStylePlusPaddingTop{
+  // padding-top: 21px;
+  padding-top: 10px;
+    position: inherit;
+    bottom: 0px;
+    left:1px;
 }
