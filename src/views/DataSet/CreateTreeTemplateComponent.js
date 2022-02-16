@@ -84,6 +84,7 @@ const validationSchemaNodeData = function (values) {
         nodeTypeId: Yup.string()
             .required(i18n.t('static.validation.fieldRequired')),
         nodeTitle: Yup.string()
+            .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
             .required(i18n.t('static.validation.fieldRequired')),
         nodeUnitId: Yup.string()
             .test('nodeUnitId', i18n.t('static.validation.fieldRequired'),
@@ -1412,9 +1413,9 @@ export default class CreateTreeTemplate extends Component {
         }
     }
 
-    getSameLevelNodeList(level, id, parent, nodeTypeId) {
+    getSameLevelNodeList(level, id, nodeTypeId) {
         var sameLevelNodeList = [];
-        var arr = this.state.items.filter(x => x.level == level && x.id != id && x.id > id && x.parent == parent && x.payload.nodeType.id == nodeTypeId);
+        var arr = this.state.items.filter(x => x.level == level && x.id != id && x.payload.nodeType.id == nodeTypeId);
         for (var i = 0; i < arr.length; i++) {
             sameLevelNodeList[i] = { id: (arr[i].payload.nodeDataMap[0])[0].nodeDataId, name: getLabelText(arr[i].payload.label, this.state.lang) }
         }
@@ -4349,7 +4350,7 @@ export default class CreateTreeTemplate extends Component {
                     this.state.currentItemConfig.context.payload.nodeUnit.id = this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id;
                 }
                 if (data.context.payload.nodeType.id != 1) {
-                    this.getSameLevelNodeList(data.context.level, data.context.id, data.context.parent, data.context.payload.nodeType.id);
+                    this.getSameLevelNodeList(data.context.level, data.context.id, data.context.payload.nodeType.id);
                 }
 
 
@@ -6581,14 +6582,14 @@ export default class CreateTreeTemplate extends Component {
                                     {/* <Link to='/supplyPlanFormulas' target="_blank"><small className="supplyplanformulas">{i18n.t('static.supplyplan.supplyplanformula')}</small></Link> */}
                                 </a>
                                 <a className="pr-lg-0 pt-lg-0 float-right">
-                                <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')}
-                                    onClick={() => this.exportPDF()}
-                                />
-                                <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={docicon} title={i18n.t('static.report.exportWordDoc')} onClick={() => this.exportDoc()} />
+                                    <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')}
+                                        onClick={() => this.exportPDF()}
+                                    />
+                                    <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={docicon} title={i18n.t('static.report.exportWordDoc')} onClick={() => this.exportDoc()} />
                                 </a>
                                 {/* <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-arrow-left"></i> {'Return To List'}</Button> */}
                                 {/* </div> */}
-                                
+
                             </div>
                         </div>
                         <CardBody className="pt-lg-0 pl-lg-0 pr-lg-0">
