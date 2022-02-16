@@ -6848,10 +6848,12 @@ export default class BuildTree extends Component {
                                             </div>
                                         </div>
                                     </div>
-
+                                    </div>
                                     <div className="col-md-6 float-right">
-                                        <FormGroup className="float-right" >
-                                            <div className="check inline  pl-lg-1 pt-lg-0">
+                                    {/* <div className="col-md-12"> */}
+                                    <FormGroup className="float-right" >
+                                    <div className="check inline  pl-lg-1 pt-lg-0">
+                    
                                                 <div style={{ display: this.state.aggregationNode ? 'block' : 'none' }}>
                                                     <Input
                                                         className="form-check-input checkboxMargin"
@@ -6886,12 +6888,15 @@ export default class BuildTree extends Component {
                                                 </div>
                                             </div>
                                         </FormGroup>
+                                    {/* </div> */}
                                     </div>
-                                </div>
-                                <div className="col-md-12 pl-lg-0 pr-lg-0" style={{ display: 'inline-block' }}>
+                                    
+                               {/* <div className='row'> */}
+                                <div className="col-md-12 pl-lg-0 pr-lg-0 modelingTransferTable" style={{ display: 'inline-block'}}>
                                     <div id="momJexcel" className="RowClickable" style={{ display: this.state.momJexcelLoader ? "none" : "block" }}>
                                     </div>
                                 </div>
+                                {/* </div> */}
                                 <div style={{ display: this.state.momJexcelLoader ? "block" : "none" }}>
                                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                                         <div class="align-items-center">
