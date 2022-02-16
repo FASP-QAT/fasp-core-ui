@@ -10,6 +10,7 @@ import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 import { Formik } from 'formik';
 import * as Yup from 'yup'
+import pdfIcon from '../../assets/img/pdf.png';
 import jexcel from 'jexcel-pro';
 import "../../../node_modules/jexcel-pro/dist/jexcel.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
@@ -31,7 +32,7 @@ import TracerCategoryService from '../../api/TracerCategoryService';
 import ForecastingUnitService from '../../api/ForecastingUnitService';
 import PlanningUnitService from '../../api/PlanningUnitService';
 import UsageTemplateService from '../../api/UsageTemplateService';
-import { INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY, JEXCEL_PAGINATION_OPTION,JEXCEL_DECIMAL_MONTHLY_CHANGE, JEXCEL_PRO_KEY, TREE_DIMENSION_ID, JEXCEL_MONTH_PICKER_FORMAT, DATE_FORMAT_CAP_WITHOUT_DATE, JEXCEL_DECIMAL_NO_REGEX_LONG } from '../../Constants.js'
+import { INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY, JEXCEL_PAGINATION_OPTION, JEXCEL_DECIMAL_MONTHLY_CHANGE, JEXCEL_PRO_KEY, TREE_DIMENSION_ID, JEXCEL_MONTH_PICKER_FORMAT, DATE_FORMAT_CAP_WITHOUT_DATE, JEXCEL_DECIMAL_NO_REGEX_LONG } from '../../Constants.js'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import TextField from '@material-ui/core/TextField';
@@ -42,11 +43,15 @@ import { grey } from '@material-ui/core/colors';
 // import Draggable from 'react-draggable';
 import SupplyPlanFormulas from "../SupplyPlan/SupplyPlanFormulas";
 import ModelingTypeService from "../../api/ModelingTypeService";
-import docicon from '../../assets/img/doc.png'
+import docicon from '../../assets/img/doc.png';
+import AggregationNode from '../../assets/img/Aggregation-icon.png';
 import { saveAs } from "file-saver";
 import { Document, ImageRun, Packer, Paragraph, ShadingType, TextRun } from "docx";
 import { calculateModelingData } from '../../views/DataSet/ModelingDataCalculation2';
-import CryptoJS from 'crypto-js'
+import PDFDocument from 'pdfkit-nodejs-webpack';
+import blobStream from 'blob-stream';
+import OrgDiagramPdfkit from '../TreePDF/OrgDiagramPdfkit';
+import Size from '../../../node_modules/basicprimitives/src/graphics/structs/Size';
 
 
 const entityname = 'Tree Template';
@@ -79,6 +84,7 @@ const validationSchemaNodeData = function (values) {
         nodeTypeId: Yup.string()
             .required(i18n.t('static.validation.fieldRequired')),
         nodeTitle: Yup.string()
+            .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
             .required(i18n.t('static.validation.fieldRequired')),
         nodeUnitId: Yup.string()
             .test('nodeUnitId', i18n.t('static.validation.fieldRequired'),
@@ -276,16 +282,14 @@ const validationSchema = function (values) {
         forecastMethodId: Yup.string()
             .required("Please select forecast method"),
         treeName: Yup.string()
+            .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
             .required("Please enter template name"),
-        monthsInPast: Yup.number()
-            .typeError('Please enter months in past')
-            .integer("Please enter only values")
-            .required("Please enter months in past"),
-        monthsInFuture: Yup.number()
-            .typeError('Please enter months in future')
-            .integer("Please enter only values")
-            .required("Please enter months in future")
-            .positive("Please enter positive values")
+        monthsInPast: Yup.string()
+            .matches(/^\d{0,15}(,\d{3})*(\.\d{1,2})?$/, 'Enter valid positive numbers')
+            .required("Please enter a number"),
+        monthsInFuture: Yup.string()
+            .matches(/^\d{0,15}(,\d{3})*(\.\d{1,2})?$/, 'Enter valid positive numbers')
+            .required("Please enter a number")
 
     })
 }
@@ -337,7 +341,8 @@ export default class CreateTreeTemplate extends Component {
         this.pickAMonth2 = React.createRef()
         this.pickAMonth1 = React.createRef()
         this.state = {
-            hidePlanningUnit : false,
+            showModelingValidation: true,
+            hidePlanningUnit: false,
             maxNodeDataId: '',
             nodeDataMomList: [],
             modelingJexcelLoader: false,
@@ -572,7 +577,123 @@ export default class CreateTreeTemplate extends Component {
         this.calculateMOMData = this.calculateMOMData.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.getMaxNodeDataId = this.getMaxNodeDataId.bind(this);
+        this.exportPDF = this.exportPDF.bind(this);
     }
+
+    exportPDF = () => {
+        let treeLevel = this.state.items.length;
+        var treeLevelItems = []
+        for (var i = 0; i <= treeLevel; i++) {
+            if (i == 0) {
+                treeLevelItems.push({
+                    annotationType: AnnotationType.Level,
+                    levels: [0],
+                    title: "Level 0",
+                    titleColor: "#002f6c",
+                    fontWeight: "bold",
+                    transForm: 'rotate(270deg)',
+                    offset: new Thickness(0, 0, 0, -1),
+                    lineWidth: new Thickness(0, 0, 0, 0),
+                    opacity: 0,
+                    borderColor: Colors.Gray,
+                    // fillColor: "#f5f5f5",
+                    lineType: LineType.Dotted
+                });
+            }
+            else if (i % 2 == 0) {
+                treeLevelItems.push(new LevelAnnotationConfig({
+                    levels: [i],
+                    title: "Level " + i,
+                    titleColor: "#002f6c",
+                    fontWeight: "bold",
+                    transForm: 'rotate(270deg)',
+                    offset: new Thickness(0, 0, 0, -1),
+                    lineWidth: new Thickness(0, 0, 0, 0),
+                    opacity: 0,
+                    borderColor: Colors.Gray,
+                    // fillColor: "#f5f5f5",
+                    lineType: LineType.Solid
+                })
+                );
+            }
+            else {
+                treeLevelItems.push(new LevelAnnotationConfig({
+                    levels: [i],
+                    title: "Level " + i,
+                    titleColor: "#002f6c",
+                    fontWeight: "bold",
+                    transForm: 'rotate(270deg)',
+                    offset: new Thickness(0, 0, 0, -1),
+                    lineWidth: new Thickness(0, 0, 0, 0),
+                    opacity: 0.08,
+                    borderColor: Colors.Gray,
+                    // fillColor: "#f5f5f5",
+                    lineType: LineType.Dotted
+                }));
+            }
+            console.log("level json***", treeLevelItems);
+        }
+
+        var templates = [
+            {
+                itemSize: new Size(200, 85)
+            }
+        ]
+        var items1 = this.state.items;
+        var newItems = [];
+        for (var i = 0; i < items1.length; i++) {
+            var e = items1[i];
+            console.log("items1[i]--------------", items1[i]);
+            e.scenarioId = 0
+            e.showModelingValidation = this.state.showModelingValidation
+            console.log("1------------------->>>>", this.getPayloadData(items1[i], 4))
+            console.log("2------------------->>>>", this.getPayloadData(items1[i], 3))
+            e.result = this.getPayloadData(items1[i], 4)
+            var text = this.getPayloadData(items1[i], 3)
+            e.text = text;
+            newItems.push(e)
+        }
+        console.log("newItems---", newItems);
+        var sampleChart = new OrgDiagramPdfkit({
+            ...this.state,
+            pageFitMode: PageFitMode.Enabled,
+            hasSelectorCheckbox: Enabled.False,
+            hasButtons: Enabled.True,
+            buttonsPanelSize: 40,
+            orientationType: OrientationType.Top,
+            defaultTemplateName: "ContactTemplate",
+            linesColor: Colors.Black,
+            annotations: treeLevelItems,
+            items: newItems,
+            templates: (templates || [])
+        });
+        var sample3size = sampleChart.getSize();
+        var doc = new PDFDocument({ size: 'LEGAL' });
+        var stream = doc.pipe(blobStream());
+
+        var legalSize = { width: 612.00, height: 1008.00 }
+        var scale = Math.min(legalSize.width / (sample3size.width + 300), legalSize.height / (sample3size.height + 300))
+        doc.scale(scale);
+        doc.fontSize(25)
+            .text('Tree Template PDF', 30, 30);
+
+        sampleChart.draw(doc, 60, 100);
+
+        doc.restore();
+
+        doc.end();
+
+        if (typeof stream !== 'undefined') {
+            stream.on('finish', function () {
+                var string = stream.toBlob('application/pdf');
+                window.saveAs(string, 'Tree Template.pdf');
+            });
+        } else {
+            alert('Error: Failed to create file stream.');
+        }
+
+    }
+
     getMaxNodeDataId() {
         var maxNodeDataId = 0;
         // if (this.state.maxNodeDataId != "" && this.state.maxNodeDataId != 0) {
@@ -582,19 +703,19 @@ export default class CreateTreeTemplate extends Component {
         //         maxNodeDataId
         //     })
         // } else {
-            var items = this.state.items;
-            var nodeDataMap = [];
-            for (let i = 0; i < items.length; i++) {
-                if (items[i].payload.nodeDataMap.hasOwnProperty(0)) {
-                    nodeDataMap.push(items[i].payload.nodeDataMap[0][0]);
-                }
+        var items = this.state.items;
+        var nodeDataMap = [];
+        for (let i = 0; i < items.length; i++) {
+            if (items[i].payload.nodeDataMap.hasOwnProperty(0)) {
+                nodeDataMap.push(items[i].payload.nodeDataMap[0][0]);
             }
-            maxNodeDataId = nodeDataMap.length > 0 ? Math.max(...nodeDataMap.map(o => o.nodeDataId)) : 0;
-            console.log("nodeDataMap array---", nodeDataMap);
-            console.log("maxNodeDataId 2---", maxNodeDataId)
-            this.setState({
-                maxNodeDataId
-            })
+        }
+        maxNodeDataId = nodeDataMap.length > 0 ? Math.max(...nodeDataMap.map(o => o.nodeDataId)) : 0;
+        console.log("nodeDataMap array---", nodeDataMap);
+        console.log("maxNodeDataId 2---", maxNodeDataId)
+        this.setState({
+            maxNodeDataId
+        })
         // }
         return maxNodeDataId;
     }
@@ -1202,7 +1323,12 @@ export default class CreateTreeTemplate extends Component {
             } else {
                 if (itemConfig.payload.nodeType.id == 1 || itemConfig.payload.nodeType.id == 2) {
                     if (type == 1) {
-                        return addCommas((itemConfig.payload.nodeDataMap[0])[0].dataValue);
+                        if (itemConfig.payload.nodeType.id == 1) {
+                            (itemConfig.payload.nodeDataMap[0])[0].displayDataValue = (itemConfig.payload.nodeDataMap[0])[0].dataValue;
+                            return addCommas((itemConfig.payload.nodeDataMap[0])[0].displayDataValue);
+                        } else {
+                            return addCommas((itemConfig.payload.nodeDataMap[0])[0].dataValue);
+                        }
                     } else if (type == 3) {
                         var childList = this.state.items.filter(c => c.parent == itemConfig.id && (c.payload.nodeType.id == 3 || c.payload.nodeType.id == 4 || c.payload.nodeType.id == 5));
                         if (childList.length > 0) {
@@ -1242,6 +1368,14 @@ export default class CreateTreeTemplate extends Component {
                                 }
                             }
                             (itemConfig.payload.nodeDataMap[0])[0].totalValue = totalValue;
+                            (itemConfig.payload.nodeDataMap[0])[0].fuPerMonth = addCommas(Math.round(fuPerMonth));
+                            // var items = this.state.items;
+                            // var tempItem = items.filter(x=>x.id == itemConfig.id);
+                            // tempItem.fuPerMonth = fuPerMonth;
+                            // tempItem.displayCalculatedDataValue = totalValue;
+                            // var findNodeIndex = items.findIndex(n => n.id == itemConfig.id);
+                            // items[findNodeIndex] = tempItem;
+
                             return addCommas((itemConfig.payload.nodeDataMap[0])[0].dataValue) + "% of parent, " + addCommas(Math.round(fuPerMonth)) + "/" + 'Month';
                         } else if (itemConfig.payload.nodeType.id == 5) {
                             return addCommas((itemConfig.payload.nodeDataMap[0])[0].dataValue) + "% of parent, conversion = " + (itemConfig.payload.nodeDataMap[0])[0].puNode.planningUnit.multiplier;
@@ -1261,9 +1395,11 @@ export default class CreateTreeTemplate extends Component {
                         }
                     } else {
                         if (itemConfig.payload.nodeType.id == 4) {
+                            (itemConfig.payload.nodeDataMap[0])[0].displayCalculatedDataValue = ((itemConfig.payload.nodeDataMap[0])[0].totalValue != null ? addCommas(Math.round((itemConfig.payload.nodeDataMap[0])[0].totalValue)) : "");
                             return "= " + ((itemConfig.payload.nodeDataMap[0])[0].totalValue != null ? addCommas(Math.round((itemConfig.payload.nodeDataMap[0])[0].totalValue)) : "");
                         } else if (itemConfig.payload.nodeType.id == 5) {
                             totalValue = (this.state.items.filter(x => x.id == itemConfig.parent)[0].payload.nodeDataMap[0][0].totalValue * (itemConfig.payload.nodeDataMap[0])[0].dataValue) / 100;
+                            (itemConfig.payload.nodeDataMap[0])[0].displayCalculatedDataValue = (totalValue != null ? addCommas(Math.round(totalValue)) : "");
                             return "= " + (totalValue != null ? addCommas(Math.round(totalValue)) : "");
                         }
                         else {
@@ -1277,9 +1413,9 @@ export default class CreateTreeTemplate extends Component {
         }
     }
 
-    getSameLevelNodeList(level, id, parent, nodeTypeId) {
+    getSameLevelNodeList(level, id, nodeTypeId) {
         var sameLevelNodeList = [];
-        var arr = this.state.items.filter(x => x.level == level && x.id != id && x.id > id && x.parent == parent && x.payload.nodeType.id == nodeTypeId);
+        var arr = this.state.items.filter(x => x.level == level && x.id != id && x.payload.nodeType.id == nodeTypeId);
         for (var i = 0; i < arr.length; i++) {
             sameLevelNodeList[i] = { id: (arr[i].payload.nodeDataMap[0])[0].nodeDataId, name: getLabelText(arr[i].payload.label, this.state.lang) }
         }
@@ -1878,7 +2014,7 @@ export default class CreateTreeTemplate extends Component {
         if (y == 7) {
             this.setState({
                 currentRowIndex: '',
-                showCalculatorFields: '',
+                // showCalculatorFields: '',
                 currentModelingType: '',
                 currentCalculatorStartDate: '',
                 currentCalculatorStopDate: '',
@@ -1889,7 +2025,7 @@ export default class CreateTreeTemplate extends Component {
                 var rowData = elInstance.getRowData(x);
                 this.setState({
                     currentRowIndex: x,
-                    showCalculatorFields: this.state.aggregationNode ? true : false,
+                    showCalculatorFields: this.state.aggregationNode ? !this.state.showCalculatorFields : false,
                     currentModelingType: rowData[2],
                     currentCalculatorStartDate: rowData[3],
                     currentCalculatorStopDate: rowData[4],
@@ -2002,6 +2138,11 @@ export default class CreateTreeTemplate extends Component {
                 instance.jexcel.setStyle(col, "background-color", "yellow");
                 instance.jexcel.setComments(col, i18n.t('static.label.fieldRequired'));
             } else {
+                if (value == 2) {
+                    this.state.modelingEl.setValueFromCoords(5, y, "", true);
+                } else {
+                    this.state.modelingEl.setValueFromCoords(6, y, "", true);
+                }
                 instance.jexcel.setStyle(col, "background-color", "transparent");
                 instance.jexcel.setComments(col, "");
             }
@@ -2073,6 +2214,7 @@ export default class CreateTreeTemplate extends Component {
                     }
                     this.state.modelingEl.setValueFromCoords(8, y, calculatedChangeForMonth, true);
                 }
+
             }
             // Monthly change #
             if (x == 6 && rowData[2] == 2) {
@@ -2093,6 +2235,7 @@ export default class CreateTreeTemplate extends Component {
                     instance.jexcel.setComments(col, "");
                     this.state.modelingEl.setValueFromCoords(8, y, parseFloat(value).toFixed(2), true);
                 }
+
             }
         }
         if (x != 10) {
@@ -2305,19 +2448,27 @@ export default class CreateTreeTemplate extends Component {
     duplicateNode(itemConfig) {
         console.log("duplicate node called---", this.state.currentItemConfig);
         const { items } = this.state;
+        var maxNodeId = items.length > 0 ? Math.max(...items.map(o => o.id)) : 0;
+        var nodeId = parseInt(maxNodeId + 1);
         var newItem = {
-            id: parseInt(items.length + 1),
+            id: nodeId,
             level: itemConfig.level,
             parent: itemConfig.parent,
             payload: itemConfig.payload
         };
+        newItem.payload.nodeId = nodeId;
+        var parentSortOrder = items.filter(c => c.id == itemConfig.parent)[0].sortOrder;
+        var childList = items.filter(c => c.parent == itemConfig.parent);
+        newItem.sortOrder = parentSortOrder.concat(".").concat(("0" + (Number(childList.length) + 1)).slice(-2));
+        (newItem.payload.nodeDataMap[0])[0].nodeDataId = this.getMaxNodeDataId() + 1;
         console.log("add button clicked value after update---", newItem);
         this.setState({
             items: [...items, newItem],
-            cursorItem: parseInt(items.length + 1)
+            cursorItem: nodeId
         }, () => {
             console.log("on add items-------", this.state.items);
-            this.calculateValuesForAggregateNode(this.state.items);
+            this.calculateMOMData(newItem.id, 0);
+            // this.calculateValuesForAggregateNode(this.state.items);
         });
     }
     cancelClicked() {
@@ -3416,6 +3567,8 @@ export default class CreateTreeTemplate extends Component {
 
                     if (items[i].payload.nodeType.id == 1 || items[i].payload.nodeType.id == 2) {
                         (items[i].payload.nodeDataMap[0])[0].calculatedDataValue = (items[i].payload.nodeDataMap[0])[0].dataValue;
+                        (items[i].payload.nodeDataMap[0])[0].displayCalculatedDataValue = (items[i].payload.nodeDataMap[0])[0].dataValue;
+                        (items[i].payload.nodeDataMap[0])[0].displayDataValue = (items[i].payload.nodeDataMap[0])[0].dataValue;
                     } else {
 
                         var findNodeIndex = items.findIndex(n => n.id == items[i].parent);
@@ -3423,6 +3576,8 @@ export default class CreateTreeTemplate extends Component {
                         console.log("api parent value---", parentValue);
 
                         (items[i].payload.nodeDataMap[0])[0].calculatedDataValue = (parentValue * (items[i].payload.nodeDataMap[0])[0].dataValue) / 100;
+                        (items[i].payload.nodeDataMap[0])[0].displayCalculatedDataValue = (parentValue * (items[i].payload.nodeDataMap[0])[0].dataValue) / 100;
+                        (items[i].payload.nodeDataMap[0])[0].displayDataValue = (items[i].payload.nodeDataMap[0])[0].dataValue;
                     }
                     console.log("load---", items[i])
                     // arr.push(items[i]);
@@ -3516,7 +3671,7 @@ export default class CreateTreeTemplate extends Component {
                             },
                             nodeDataMap: [
                                 [{
-                                    nodeDataId : 1,
+                                    nodeDataId: 1,
                                     notes: '',
                                     month: new Date(),
                                     dataValue: '',
@@ -3568,7 +3723,7 @@ export default class CreateTreeTemplate extends Component {
                         },
                         nodeDataMap: [
                             [{
-                                nodeDataId : 1,
+                                nodeDataId: 1,
                                 notes: '',
                                 nodeDataModelingList: [],
                                 nodeDataOverrideList: [],
@@ -3667,6 +3822,7 @@ export default class CreateTreeTemplate extends Component {
         newArray[tabPane] = tab
         this.setState({
             activeTab1: newArray,
+            showCalculatorFields: false
         });
         if (tab == 2) {
             console.log("***>>>", this.state.currentItemConfig);
@@ -3819,7 +3975,9 @@ export default class CreateTreeTemplate extends Component {
 
             console.log("parentValue---", parentValue);
             parentValue = parentValue1;
-            (currentItemConfig.context.payload.nodeDataMap[0])[0].calculatedDataValue = parseInt(parentValue * value) / 100
+            (currentItemConfig.context.payload.nodeDataMap[0])[0].calculatedDataValue = parseInt(parentValue * value) / 100;
+            (currentItemConfig.context.payload.nodeDataMap[0])[0].displayDataValue = value;
+            (currentItemConfig.context.payload.nodeDataMap[0])[0].displayCalculatedDataValue = parseInt(parentValue * value) / 100;
             console.log("calculatedDataValue---", currentItemConfig);
             this.setState({
                 parentValue
@@ -3830,6 +3988,8 @@ export default class CreateTreeTemplate extends Component {
             var value = (event.target.value).replaceAll(",", "");
             (currentItemConfig.context.payload.nodeDataMap[0])[0].dataValue = value;
             (currentItemConfig.context.payload.nodeDataMap[0])[0].calculatedDataValue = value;
+            (currentItemConfig.context.payload.nodeDataMap[0])[0].displayDataValue = value;
+            (currentItemConfig.context.payload.nodeDataMap[0])[0].displayCalculatedDataValue = value;
         }
         if (event.target.name === "notes") {
             (currentItemConfig.context.payload.nodeDataMap[0])[0].notes = event.target.value;
@@ -4190,7 +4350,7 @@ export default class CreateTreeTemplate extends Component {
                     this.state.currentItemConfig.context.payload.nodeUnit.id = this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id;
                 }
                 if (data.context.payload.nodeType.id != 1) {
-                    this.getSameLevelNodeList(data.context.level, data.context.id, data.context.parent, data.context.payload.nodeType.id);
+                    this.getSameLevelNodeList(data.context.level, data.context.id, data.context.payload.nodeType.id);
                 }
 
 
@@ -5391,7 +5551,7 @@ export default class CreateTreeTemplate extends Component {
                             )} />
                 </TabPane>
                 <TabPane tabId="2">
-                    <div className="row pl-lg-5 pb-lg-3 pt-lg-0">
+                    {/* <div className="row pl-lg-5 pb-lg-3 pt-lg-0">
                         <div className="offset-md-10 col-md-6 pl-lg-4 ">
                             <SupplyPlanFormulas ref="formulaeChild" />
                             <a className="">
@@ -5399,7 +5559,7 @@ export default class CreateTreeTemplate extends Component {
 
                             </a>
                         </div>
-                    </div>
+                    </div> */}
                     <div className="row pl-lg-2 pr-lg-2">
                         {/* 
                         <FormGroup className="col-md-2 pt-lg-1">
@@ -5471,7 +5631,7 @@ export default class CreateTreeTemplate extends Component {
                         {this.state.showCalculatorFields &&
                             <div className="col-md-12 pl-lg-0 pr-lg-0">
                                 <fieldset className="scheduler-border">
-                                    <legend className="scheduler-border">{i18n.t('static.tree.modelingCalculaterTool:')}</legend>
+                                    <legend className="scheduler-border">{i18n.t('static.tree.modelingCalculaterTool')}</legend>
                                     <div className="row">
                                         {/* <div className="row"> */}
                                         {/* <FormGroup className="col-md-12 pt-lg-1">
@@ -6093,8 +6253,8 @@ export default class CreateTreeTemplate extends Component {
                     >
                         <div className={itemConfig.payload.nodeType.id == 5 || itemConfig.payload.nodeType.id == 4 ? "ContactTitle TitleColorWhite" : "ContactTitle TitleColor"}>
                             <div title={itemConfig.payload.label.label_en} style={{ fontSize: '13px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', width: '157px', float: 'left', fontWeight: 'bold' }}>{itemConfig.payload.label.label_en}</div>
-                            {this.getPayloadData(itemConfig, 4) == true && <i class="fa fa-arrow-up" style={{ fontSize: '11px', color: (itemConfig.payload.nodeType.id == 4 || itemConfig.payload.nodeType.id == 5 ? '#fff' : '#002f6c') }}></i>}
-                            <b style={{ color: '#212721', float: 'right' }}>{itemConfig.payload.nodeType.id == 2 ? <i class="fa fa-hashtag" style={{ fontSize: '11px', color: '#002f6c' }}></i> : (itemConfig.payload.nodeType.id == 3 ? <i class="fa fa-percent " style={{ fontSize: '11px', color: '#002f6c' }} ></i> : (itemConfig.payload.nodeType.id == 4 ? <i class="fa fa-cube" style={{ fontSize: '11px', color: '#fff' }} ></i> : (itemConfig.payload.nodeType.id == 5 ? <i class="fa fa-cubes" style={{ fontSize: '11px', color: '#fff' }} ></i> : (itemConfig.payload.nodeType.id == 1 ? <i class="fa fa-plus" style={{ fontSize: '11px', color: '#002f6c' }} ></i> : ""))))}</b></div>
+                            {this.getPayloadData(itemConfig, 4) == true && <i class="fa fa-exchange fa-rotate-90" style={{ fontSize: '11px', color: (itemConfig.payload.nodeType.id == 4 || itemConfig.payload.nodeType.id == 5 ? '#fff' : '#002f6c') }}></i>}
+                            <b style={{ color: '#212721', float: 'right' }}>{itemConfig.payload.nodeType.id == 2 ? <i class="fa fa-hashtag" style={{ fontSize: '11px', color: '#002f6c' }}></i> : (itemConfig.payload.nodeType.id == 3 ? <i class="fa fa-percent " style={{ fontSize: '11px', color: '#002f6c' }} ></i> : (itemConfig.payload.nodeType.id == 4 ? <i class="fa fa-cube" style={{ fontSize: '11px', color: '#fff' }} ></i> : (itemConfig.payload.nodeType.id == 5 ? <i class="fa fa-cubes" style={{ fontSize: '11px', color: '#fff' }} ></i> : (itemConfig.payload.nodeType.id == 1 ? <i><img src={AggregationNode} className="AggregationNodeSize" /></i> : ""))))}</b></div>
                     </div>
                     <div className="ContactPhone ContactPhoneValue">
                         <span style={{ textAlign: 'center', fontWeight: '500' }}>{this.getPayloadData(itemConfig, 1)}</span>
@@ -6218,8 +6378,38 @@ export default class CreateTreeTemplate extends Component {
             annotations: treeLevelItems,
             onButtonsRender: (({ context: itemConfig }) => {
                 return <>
+                    {itemConfig.parent != null &&
+                        <>
+                            <button key="2" type="button" className="StyledButton TreeIconStyle TreeIconStyleCopyPaddingTop" style={{ background: 'none' }}
+                                onClick={(event) => {
+                                    event.stopPropagation();
+                                    this.duplicateNode(itemConfig);
+                                }}>
+                                <i class="fa fa-clone" aria-hidden="true"></i>
+                            </button>
+                            <button key="3" type="button" className="StyledButton TreeIconStyle TreeIconStyleDeletePaddingTop" style={{ background: 'none' }}
+                                onClick={(event) => {
+                                    event.stopPropagation();
+                                    confirmAlert({
+                                        message: "Are you sure you want to delete this node.",
+                                        buttons: [
+                                            {
+                                                label: i18n.t('static.program.yes'),
+                                                onClick: () => {
+                                                    this.onRemoveButtonClick(itemConfig);
+                                                }
+                                            },
+                                            {
+                                                label: i18n.t('static.program.no')
+                                            }
+                                        ]
+                                    });
+                                }}>
+                                {/* <FontAwesomeIcon icon={faTrash} /> */}
+                                <i class="fa fa-trash-o" aria-hidden="true" style={{ fontSize: '16px' }}></i>
+                            </button></>}
                     {parseInt(itemConfig.payload.nodeType.id) != 5 &&
-                        <button key="1" type="button" className="StyledButton TreeIconStyle" style={{ background: 'none' }}
+                        <button key="1" type="button" className="StyledButton TreeIconStyle TreeIconStylePlusPaddingTop" style={{ background: 'none' }}
                             onClick={(event) => {
                                 console.log("add button called---------");
                                 event.stopPropagation();
@@ -6382,45 +6572,6 @@ export default class CreateTreeTemplate extends Component {
                             {/* <FontAwesomeIcon icon={faPlus} /> */}
                             <i class="fa fa-plus-square-o" aria-hidden="true"></i>
                         </button>}
-                    {/* <button key="2" className="StyledButton" style={{ width: '23px', height: '23px' }}
-                        onClick={(event) => {
-                            event.stopPropagation();
-                        }}>
-                        <FontAwesomeIcon icon={faEdit} />
-                    </button> */}
-                    {itemConfig.parent != null &&
-                        <>
-                            {/* <button key="2" type="button" className="StyledButton TreeIconStyle" style={{ background: 'none' }}
-                                onClick={(event) => {
-                                    event.stopPropagation();
-                                    this.duplicateNode(itemConfig);
-                                }}>
-                                <i class="fa fa-clone" aria-hidden="true"></i>
-                            </button> */}
-
-
-                            <button key="3" type="button" className="StyledButton TreeIconStyle" style={{ background: 'none' }}
-                                onClick={(event) => {
-                                    event.stopPropagation();
-                                    confirmAlert({
-                                        message: "Are you sure you want to delete this node.",
-                                        buttons: [
-                                            {
-                                                label: i18n.t('static.program.yes'),
-                                                onClick: () => {
-                                                    this.onRemoveButtonClick(itemConfig);
-                                                }
-                                            },
-                                            {
-                                                label: i18n.t('static.program.no')
-                                            }
-                                        ]
-                                    });
-                                }}>
-                                {/* <FontAwesomeIcon icon={faTrash} /> */}
-                                <i class="fa fa-trash-o" aria-hidden="true" style={{ fontSize: '16px' }}></i>
-                            </button></>}
-
                 </>
             }),
             // itemTitleFirstFontColor: Colors.White,
@@ -6458,15 +6609,21 @@ export default class CreateTreeTemplate extends Component {
                 <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
                     <Card className="mb-lg-0">
                         <div className="Card-header-reporticon pb-lg-0">
-                            <div className="card-header-actions">
+                            <div className="card-header-actions col-md-12 pl-lg-0 pr-lg-0 pt-lg-0">
                                 {/* <div className="card-header-actions pr-4 pt-1"> */}
-                                <a className="card-header-action">
+                                <a className="pr-lg-0 pt-lg-0 float-left">
                                     <span style={{ cursor: 'pointer' }} onClick={this.cancelClicked}><i className="fa fa-long-arrow-left" style={{ color: '#20a8d8' }}></i> <small className="supplyplanformulas">{'Return To List'}</small></span>
                                     {/* <Link to='/supplyPlanFormulas' target="_blank"><small className="supplyplanformulas">{i18n.t('static.supplyplan.supplyplanformula')}</small></Link> */}
                                 </a>
-                                <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={docicon} title={i18n.t('static.report.exportWordDoc')} onClick={() => this.exportDoc()} />
+                                <a className="pr-lg-0 pt-lg-0 float-right">
+                                    <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')}
+                                        onClick={() => this.exportPDF()}
+                                    />
+                                    <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={docicon} title={i18n.t('static.report.exportWordDoc')} onClick={() => this.exportDoc()} />
+                                </a>
                                 {/* <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-arrow-left"></i> {'Return To List'}</Button> */}
                                 {/* </div> */}
+
                             </div>
                         </div>
                         <CardBody className="pt-lg-0 pl-lg-0 pr-lg-0">
@@ -6929,7 +7086,7 @@ export default class CreateTreeTemplate extends Component {
                             (this.state.currentItemConfig.context.payload.nodeType.id == 3 ? <i class="fa fa-percent " style={{ fontSize: '11px', color: '#20a8d8' }} ></i> :
                                 (this.state.currentItemConfig.context.payload.nodeType.id == 4 ? <i class="fa fa-cube" style={{ fontSize: '11px', color: '#20a8d8' }} ></i> :
                                     (this.state.currentItemConfig.context.payload.nodeType.id == 5 ? <i class="fa fa-cubes" style={{ fontSize: '11px', color: '#20a8d8' }} ></i> :
-                                        (this.state.currentItemConfig.context.payload.nodeType.id == 1 ? <i class="fa fa-plus" style={{ fontSize: '11px', color: '#20a8d8' }} ></i> : "")
+                                        (this.state.currentItemConfig.context.payload.nodeType.id == 1 ? <i><img src={AggregationNode} className="AggregationNodeSize" /></i> : "")
                                     )))}
                         <b className="supplyplanformulas ScalingheadTitle">{this.state.currentItemConfig.context.payload.label.label_en}</b></div>}
                     <Button size="md" onClick={() => this.setState({ openAddNodeModal: false, cursorItem: 0, highlightItem: 0, activeTab1: new Array(2).fill('1') })} color="danger" style={{ paddingTop: '0px', paddingBottom: '0px', paddingLeft: '3px', paddingRight: '3px' }} className="submitBtn float-right mr-1"> <i className="fa fa-times"></i></Button>
