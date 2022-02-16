@@ -797,6 +797,13 @@ export default class PlanningUnitSetting extends Component {
                         }
                     }
 
+                    tempList.unshift({
+                        name: 'All',
+                        id: -1,
+                        active: true,
+                        healthArea: {}
+                    });
+
                     this.setState({
                         allTracerCategoryList: tempList,
                         // tracerCategoryList1: response.data
@@ -1407,7 +1414,7 @@ export default class PlanningUnitSetting extends Component {
         }
         if (outPutList.length == 0) {
             data = [];
-            data[0] = "";
+            data[0] = -1;
             data[1] = "";
             data[2] = true;
             data[3] = true;
@@ -1682,7 +1689,7 @@ export default class PlanningUnitSetting extends Component {
                 if (index == "" || index == null || index == undefined) {
                     console.log("-----------------onPaste---------------------3");
                     (instance.jexcel).setValueFromCoords(8, data[i].y, true, true);
-                    (instance.jexcel).setValueFromCoords(9, data[i].y, true, true);                    
+                    (instance.jexcel).setValueFromCoords(9, data[i].y, true, true);
                     (instance.jexcel).setValueFromCoords(10, data[i].y, 1, true);
                     (instance.jexcel).setValueFromCoords(11, data[i].y, 1, true);
                     (instance.jexcel).setValueFromCoords(12, data[i].y, {}, true);
@@ -1707,8 +1714,12 @@ export default class PlanningUnitSetting extends Component {
         //     let list = allPlanningUnitList.filter(c => c.id == planningUnitId[i].id)[0];
         //     mylist.push(list);
         // }
+        if (tracerCategoryId == -1) {
+            mylist = this.state.allPlanningUnitList
+        } else {
+            mylist = this.state.allPlanningUnitList.filter(c => c.forecastingUnit.tracerCategory.id == tracerCategoryId);
+        }
 
-        mylist = this.state.allPlanningUnitList.filter(c => c.forecastingUnit.tracerCategory.id == tracerCategoryId);
         console.log("mylist--------->32", mylist);
 
         var tableJson = this.el.getJson(null, false);
@@ -1730,13 +1741,21 @@ export default class PlanningUnitSetting extends Component {
         var mylist = [];
         let selectedForecastProgramHealthAreaList = this.state.selectedForecastProgram.healthAreaList;
         for (var i = 0; i < selectedForecastProgramHealthAreaList.length; i++) {
-            let list = this.state.allTracerCategoryList.filter(c => c.healthArea.id == selectedForecastProgramHealthAreaList[i].id);
+            // let list = this.state.allTracerCategoryList.filter(c => c.healthArea.id == selectedForecastProgramHealthAreaList[i].id);
+            let list = [];
+            if (i == 0) {
+                list = this.state.allTracerCategoryList.filter(c => (c.id == -1 ? c : c.healthArea.id == selectedForecastProgramHealthAreaList[i].id));
+            } else {
+                list = this.state.allTracerCategoryList.filter(c => c.id != -1 && c.healthArea.id == selectedForecastProgramHealthAreaList[i].id);
+            }
+
             // mylist.push(list);
             if (list.length != 0) {
                 mylist = mylist.concat(list);
             }
 
         }
+
         console.log("mylist--------->32", mylist);
         return mylist;
 
@@ -1750,7 +1769,7 @@ export default class PlanningUnitSetting extends Component {
         tr.children[2].classList.add('AsteriskTheadtrTd');
         tr.children[3].classList.add('AsteriskTheadtrTd');
         tr.children[4].classList.add('AsteriskTheadtrTd');
-        tr.children[8].classList.add('InfoTrAsteriskTheadtrTd');
+        tr.children[8].classList.add('AsteriskTheadtrTd');
         tr.children[9].classList.add('AsteriskTheadtrTd');
 
         tr.children[5].classList.add('InfoTr');
@@ -2132,7 +2151,7 @@ export default class PlanningUnitSetting extends Component {
 
         var json = this.el.getJson(null, false);
         var data = [];
-        data[0] = "";
+        data[0] = -1;
         data[1] = "";
         data[2] = true;
         data[3] = true;

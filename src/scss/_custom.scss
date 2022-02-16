@@ -5484,31 +5484,44 @@ border: 1px solid #eee;
 }
 
 .extrapolateTable .jexcel_content .draggable tr td:nth-child(4) {
-	color: rgb(170, 85, 161);
+	// color: rgb(170, 85, 161);
+  color: #212721;
   font-style: italic;
 }
+.extrapolateTable .jexcel > thead.resizable > tr > .InfoTr::after {
+  font-family: 'FontAwesome';
+  content: '\f05a';
+    position: relative;
+     width: 3px;
+     height: 100%;
+     top: 0px;
+     left: 2px;
+     cursor: col-resize;
+     font-size: 14px;
+     color:#002f6c;
+   }
 .extrapolateTable .jexcel_content .draggable tr td:nth-child(5) {
-	color: rgb(170, 85, 161);
+  color: #212721;
   font-style: italic;
 }
 .extrapolateTable .jexcel_content .draggable tr td:nth-child(6) {
-	color: rgb(170, 85, 161);
+  color: #212721;
   font-style: italic;
 }
 .extrapolateTable .jexcel_content .draggable tr td:nth-child(7) {
-	color: rgb(170, 85, 161);
+  color: #212721;
   font-style: italic;
 }
 .extrapolateTable .jexcel_content .draggable tr td:nth-child(8) {
-	color: rgb(170, 85, 161);
+  color: #212721;
   font-style: italic;
 }
 .extrapolateTable .jexcel_content .draggable tr td:nth-child(9) {
-	color: rgb(170, 85, 161);
+  color: #212721;
   font-style: italic;
 }
 .extrapolateTable .jexcel_content .draggable tr td:nth-child(10) {
-	color: rgb(170, 85, 161);
+  color: #212721;
   font-style: italic;
 }
 .jexcel > thead.resizable > tr > .InfoTr::after {
@@ -5529,7 +5542,7 @@ border: 1px solid #eee;
   z-index: 10;
 }
 .MarginBottomTree{
-  margin-bottom: 4%;
+  margin-bottom: 2%;
 }
 
   .notification-failed {
@@ -5597,6 +5610,28 @@ font-style: italic!important;
 .jexcelPurpleCell{
 color:rgb(170, 85, 161)!important;
 font-style: italic!important;
+}
+
+.ExtrapolateSaveBtn{
+  margin-top: 32px;
+}
+
+.ErrortdBg{
+  background-color: #86cd99;
+  font-weight: bold;
+  text-align: right;
+  // padding-right: 21px!important;
+}
+.table th, .table td.ErrortdBg {
+  padding: 5px 19px 0px 0px !important;
+}
+.lowestErrorGreenLegend{
+  // background-color: #16b895;
+  background-color: #86cd99;
+}
+.extrapolateTable .jexcel > thead {
+  position: sticky;
+  top: 0;
 }
  .CommitTableMarginTop{
    margin-top: -31px;
@@ -5873,4 +5908,28 @@ font-style: italic!important;
 }
 .table-striped1 tbody tr:nth-of-type(even):hover {
   background-color: transparent;
+}
+.AggregationNodeSize{
+  width: 13px;
+  height: 13px;
+}
+.ExtraCheckboxFieldWidth{
+  width: 106px;
+}
+.bold{
+  font-weight: bold;
+}
+.TreeIconStyleCopyPaddingTop{
+  padding-top: 0px;
+}
+
+.TreeIconStyleDeletePaddingTop{
+  padding-top: 3px;
+}
+.TreeIconStylePlusPaddingTop{
+  // padding-top: 21px;
+  padding-top: 10px;
+    position: inherit;
+    bottom: 0px;
+    left:1px;
 }
