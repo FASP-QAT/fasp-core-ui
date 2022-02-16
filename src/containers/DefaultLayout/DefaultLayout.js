@@ -1337,7 +1337,7 @@ class DefaultLayout extends Component {
                           {
                             name: i18n.t('static.usagePeriod.usagePeriod'),
                             url: '/usagePeriod/listUsagePeriod',
-                            icon: 'fa fa-cube',
+                            icon: 'fa fa-calendar',
                             attributes: {
                               hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_USAGE_PERIOD') && this.state.activeTab == 1 ? false : true),
                               onClick: e => {
@@ -1482,7 +1482,7 @@ class DefaultLayout extends Component {
                           {
                             name: i18n.t('static.organisationHead.organisation'),
                             url: '/organisation/listOrganisation',
-                            icon: 'fa fa-building',
+                            icon: 'fa fa-sitemap',
                             attributes: {
                               hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_ORGANIZATION') ? false : true),
                               onClick: e => {
@@ -1493,7 +1493,7 @@ class DefaultLayout extends Component {
                           {
                             name: i18n.t('static.organisationType.organisationType'),
                             url: '/organisationType/listOrganisationType',
-                            icon: 'fa fa-building',
+                            icon: 'fa fa-object-group',
                             attributes: {
                               hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_ORGANIZATION_TYPE') ? false : true),
                               onClick: e => {
@@ -1504,7 +1504,7 @@ class DefaultLayout extends Component {
                           {
                             name: i18n.t('static.dashboard.procurementagent'),
                             url: '/procurementAgent/listProcurementAgent',
-                            icon: 'fa fa-link',
+                            icon: 'fa fa-user-circle-o',
                             // attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_PROCUREMENT_AGENT') && this.state.activeTab == 2 ? false : true) }
                             attributes: {
                               hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_PROCUREMENT_AGENT') ? false : true),
@@ -1528,7 +1528,7 @@ class DefaultLayout extends Component {
                               {
                                 name: i18n.t('static.dashboard.forecastingunit'),
                                 url: '/forecastingUnit/listforecastingUnit',
-                                icon: 'fa fa-line-chart',
+                                icon: 'fa fa-cube',
                                 attributes: {
                                   hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_FORECASTING_UNIT') ? false : true),
                                   onClick: e => {
@@ -1538,7 +1538,7 @@ class DefaultLayout extends Component {
                               }, {
                                 name: i18n.t('static.dashboard.planningunit'),
                                 url: '/planningUnit/listPlanningUnit',
-                                icon: 'fa fa-list-alt',
+                                icon: 'fa fa-cubes',
                                 attributes: {
                                   hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_PLANNING_UNIT') ? false : true),
                                   onClick: e => {
@@ -1549,7 +1549,7 @@ class DefaultLayout extends Component {
                               {
                                 name: i18n.t('static.product.productcategory'),
                                 url: '/productCategory/productCategoryTree',
-                                icon: 'fa fa-cubes',
+                                icon: 'fa fa-th',
                                 attributes: {
                                   hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_PRODUCT_CATEGORY') ? false : true),
                                   onClick: e => {
@@ -1584,7 +1584,7 @@ class DefaultLayout extends Component {
                               {
                                 name: i18n.t('static.tracerCategoryHead.tracerCategory'),
                                 url: '/tracerCategory/listTracerCategory',
-                                icon: 'fa fa-th-large',
+                                icon: 'fa fa-th',
                                 attributes: {
                                   hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_TRACER_CATEGORY') ? false : true),
                                   onClick: e => {
@@ -1598,7 +1598,7 @@ class DefaultLayout extends Component {
                           {
                             name: i18n.t('static.equivalancyUnit.equivalancyUnits'),
                             url: '/equivalancyUnit/listEquivalancyUnit',
-                            icon: 'fa fa-link',
+                            icon: 'fa fa-exchange',
                             attributes: {
                               hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_EQUIVALENCY_UNIT_MAPPING') && this.state.activeTab == 1 ? false : true),
                               onClick: e => {
