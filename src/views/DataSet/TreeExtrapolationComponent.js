@@ -1173,7 +1173,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                             <div className="row">
                                 <FormGroup className="col-md-3 pl-lg-0">
                                     <Label htmlFor="appendedInputButton">Start Month for Historical Data<span className="stock-box-icon fa fa-sort-desc ml-1"></span></Label>
-                                    <div className="controls edit">
+                                    <div className="controls edit readonly">
                                         <Picker
 
                                             id="month"
