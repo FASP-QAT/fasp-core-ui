@@ -367,7 +367,7 @@ class ModelingValidation extends Component {
             }
 
             this.setState({
-                scenarioList: treeListFiltered.scenarioList,
+                scenarioList: treeListFiltered.scenarioList.filter(c => c.active.toString() == "true"),
                 levelList: levelList,
                 treeListFiltered: treeListFiltered,
                 loading: false

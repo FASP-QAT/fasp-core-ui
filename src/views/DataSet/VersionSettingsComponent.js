@@ -1056,7 +1056,7 @@ class VersionSettingsComponent extends Component {
                     var rowData = obj.getRowData(y);
                     if (rowData[10] == 1) {
                         items.push({
-                            title: i18n.t('static.commitTree.forecastValidation'),
+                            title: i18n.t('static.commitTree.showValidation'),
                             onclick: function () {
                                 this.setState({
                                     programName: rowData[1] + "~v" + rowData[2],
