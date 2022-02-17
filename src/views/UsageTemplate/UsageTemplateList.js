@@ -261,6 +261,7 @@ class usageTemplate extends Component {
                                 name: listArray[i].programCode,
                                 id: listArray[i].programId,
                                 active: listArray[i].active,
+                                healthAreaList: listArray[i].healthAreaList
                             }
                             tempProgramList[i] = paJson
                         }
@@ -348,6 +349,7 @@ class usageTemplate extends Component {
         TracerCategoryService.getTracerCategoryListAll()
             .then(response => {
                 if (response.status == 200) {
+                    console.log("TracerCategory------->123", response.data);
                     var listArray = response.data;
                     listArray.sort((a, b) => {
                         var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
@@ -362,6 +364,7 @@ class usageTemplate extends Component {
                                 name: getLabelText(listArray[i].label, this.state.lang),
                                 id: parseInt(listArray[i].tracerCategoryId),
                                 active: listArray[i].active,
+                                healthAreaId: listArray[i].healthArea.id
                             }
                             tempList[i] = paJson
                         }
@@ -835,35 +838,36 @@ class usageTemplate extends Component {
                 {
                     title: 'usageTemplateId',
                     type: 'hidden',
-                    readOnly: true //0
+                    readOnly: true //0 A
                 },
                 {
                     title: i18n.t('static.forecastProgram.forecastProgram'),
                     type: 'autocomplete',
                     source: this.state.typeList,
-                    filter: this.filterDataset //1
+                    filter: this.filterDataset //1 B
                 },
                 {
                     title: i18n.t('static.usageTemplate.usageName'),
                     type: 'text',
-                    textEditor: true,//2
+                    textEditor: true,//2 C
                 },
                 {
                     title: i18n.t('static.tracercategory.tracercategory'),
                     type: 'autocomplete',
-                    source: this.state.tracerCategoryList, //3
+                    source: this.state.tracerCategoryList, //3 D
+                    filter: this.filterTracerCategoryByProgramId
 
                 },
                 {
                     title: i18n.t('static.product.unit1'),
                     type: 'autocomplete',
                     source: this.state.forecastingUnitList,
-                    filter: this.filterForecastingUnitBasedOnTracerCategory //4
+                    filter: this.filterForecastingUnitBasedOnTracerCategory //4 E
                 },
                 {
                     title: i18n.t('static.usageTemplate.lagInMonth'),
                     type: 'numeric',
-                    textEditor: true, //5
+                    textEditor: true, //5 F
                 },
                 {
                     title: i18n.t('static.supplyPlan.type'),
@@ -871,128 +875,128 @@ class usageTemplate extends Component {
                     source: [
                         { id: 1, name: i18n.t('static.usageTemplate.discrete') },
                         { id: 2, name: i18n.t('static.usageTemplate.continuous') }
-                    ] //6
+                    ] //6 G
                 },
                 {
                     title: i18n.t('static.usageTemplate.people'),
                     type: 'text',
                     readOnly: true,
-                    textEditor: true, //7
+                    textEditor: true, //7 H
                 },
                 {
                     title: i18n.t('static.usageTemplate.people'),
                     type: 'numeric',
                     // readOnly: true
-                    textEditor: true, //8
+                    textEditor: true, //8 I
                 },
                 {
                     title: i18n.t('static.usageTemplate.people'),
                     type: 'text',
                     readOnly: true,
-                    textEditor: true, //9
+                    textEditor: true, //9 J
                 },
                 {
                     title: i18n.t('static.usageTemplate.fuPerPersonPerTime'),
                     type: 'text',
                     readOnly: true,
-                    textEditor: true, //10
+                    textEditor: true, //10 K
                 },
                 {
                     title: i18n.t('static.usageTemplate.fuPerPersonPerTime'),
                     type: 'numeric',
                     // readOnly: true
-                    textEditor: true, //11
+                    textEditor: true, //11 L
                 },
                 {
                     title: i18n.t('static.usageTemplate.fuPerPersonPerTime'),
                     type: 'autocomplete',
                     readOnly: true,
-                    source: this.state.unitList, //12
+                    source: this.state.unitList, //12 M
                 },
                 {
                     title: i18n.t('static.usageTemplate.fuPerPersonPerTime'),
                     type: 'text',//hidden black
                     readOnly: true,
-                    textEditor: true, //13
+                    textEditor: true, //13 N
                 },
                 {
                     title: i18n.t('static.usageTemplate.onTimeUsage?'),
                     type: 'checkbox',
                     readOnly: false
-                    // readOnly: true //14
+                    // readOnly: true //14 O
                 },
                 {
                     title: i18n.t('static.usageTemplate.usageFrequency'),
                     type: 'numeric',
                     // readOnly: true
                     textEditor: true,
-                    decimal: '.', //15
+                    decimal: '.', //15 P
                 },
                 {
                     title: i18n.t('static.usageTemplate.usageFrequency'),
                     type: 'text',
                     readOnly: true,
-                    textEditor: true, //16
+                    textEditor: true, //16 Q
                 },
                 {
                     title: i18n.t('static.usageTemplate.usageFrequency'),
                     type: 'autocomplete',
-                    source: this.state.usagePeriodList, //17
+                    source: this.state.usagePeriodList, //17 R
                     filter: this.filterUsagePeriod1
                 },
                 {
                     title: i18n.t('static.usageTemplate.fuPerPersonPerMonth'),
                     type: 'text',//hidden black
                     readOnly: true,
-                    textEditor: true, //18
+                    textEditor: true, //18 S
                 },
                 {
                     title: ' ',//empty for
                     type: 'text',
                     readOnly: true,
-                    textEditor: true, //19
+                    textEditor: true, //19 T
                 },
                 {
                     title: i18n.t('static.usagePeriod.usagePeriod'),
                     type: 'numeric',
                     // readOnly: true
-                    textEditor: true, //20
+                    textEditor: true, //20 U
                 },
                 {
                     title: i18n.t('static.usagePeriod.usagePeriod'),
                     type: 'autocomplete',
-                    source: this.state.usagePeriodList, //21
+                    source: this.state.usagePeriodList, //21 V
                     filter: this.filterUsagePeriod2
                 },
                 {
                     title: i18n.t('static.usagePeriod.fuRequired'),
                     type: 'text',//hidden black
                     readOnly: true,
-                    textEditor: true, //22
+                    textEditor: true, //22 W
                 },
                 {
                     title: i18n.t('static.usagePeriod.usageInWords'),
                     type: 'text',
                     readOnly: true,
                     width: 200,
-                    textEditor: true, //23
+                    textEditor: true, //23 X
                 },
                 {
                     title: 'isChange',
-                    type: 'hidden' //24
+                    type: 'hidden' //24 Y
                 },
                 {
                     title: 'addNewRow',
-                    type: 'hidden'//25
+                    type: 'hidden'//25 Z
                 },
                 {
                     title: 'typeId',
-                    type: 'hidden'//26
+                    type: 'hidden'//26 AA
                 },
                 {
                     title: i18n.t('static.program.notes'),
                     type: 'text',
-                    // width: 400
+                    // width: 400 //27 AB
                 },
 
 
@@ -1199,26 +1203,27 @@ class usageTemplate extends Component {
                                 onclick: function () {
                                     // console.log("onclick------>", this.el.getValueFromCoords(0, y));
                                     let value = this.el.getValueFromCoords(17, y);
+                                    value = Number(value);
                                     let tempUsagePeriodList = [];
+                                    console.log("number---------------------->0", value);
+                                    console.log("number---------------------->0", typeof value);
 
                                     if (typeof value === 'number') {
                                         //it's a number
-
+                                        console.log("number---------------------->1");
                                         let tempList = this.state.usagePeriodListLong;
                                         let selectedPickerConvertTOMonth = tempList.filter(c => c.usagePeriodId == value)[0].convertToMonth;
 
-
                                         for (var i = 0; i < tempList.length; i++) {
+                                            console.log("number---------------------->1.1");
                                             if (parseFloat(tempList[i].convertToMonth) <= parseFloat(selectedPickerConvertTOMonth)) {
                                                 tempUsagePeriodList.push(tempList[i]);
                                             }
                                         }
-
-                                        // this.setState({
-                                        //     usagePeriodDisplayList: tempUsagePeriodList,
-                                        // }, () => { });
-
+                                        console.log("number---------------------->2", tempUsagePeriodList);
                                     }
+
+                                    console.log("number---------------------->3");
 
 
 
@@ -1226,11 +1231,16 @@ class usageTemplate extends Component {
                                         isModalOpen: true,
                                         x: x,
                                         y: y,
-                                        number1: (this.el.getValueFromCoords(15, y) != '' ? this.el.getValueFromCoords(15, y) : ''),
-                                        number2: (this.el.getValueFromCoords(15, y) != '' ? this.el.getValueFromCoords(15, y) : ''),
-                                        picker1: (this.el.getValueFromCoords(17, y) != '' ? this.el.getValueFromCoords(17, y) : ''),
-                                        picker2: (this.el.getValueFromCoords(17, y) != '' ? this.el.getValueFromCoords(17, y) : ''),
-                                        usagePeriodDisplayList: (tempUsagePeriodList.length == 0 ? [] : tempUsagePeriodList)
+                                        // number1: (this.el.getValueFromCoords(15, y) != '' ? this.el.getValueFromCoords(15, y) : ''),
+                                        // number2: (this.el.getValueFromCoords(15, y) != '' ? this.el.getValueFromCoords(15, y) : ''),
+                                        // picker1: (this.el.getValueFromCoords(17, y) != '' ? this.el.getValueFromCoords(17, y) : ''),
+                                        // picker2: (this.el.getValueFromCoords(17, y) != '' ? this.el.getValueFromCoords(17, y) : ''),
+                                        // usagePeriodDisplayList: (tempUsagePeriodList.length == 0 ? [] : tempUsagePeriodList)
+                                        number1: '',
+                                        number2: '',
+                                        picker1: '',
+                                        picker2: '',
+                                        usagePeriodDisplayList: this.state.usagePeriodListLong
                                     })
 
                                 }.bind(this)
@@ -1269,6 +1279,27 @@ class usageTemplate extends Component {
         //     b = b.name.toLowerCase();
         //     return a < b ? -1 : a > b ? 1 : 0;
         // });
+    }.bind(this)
+
+    filterTracerCategoryByProgramId = function (instance, cell, c, r, source) {
+        var mylist = this.state.tracerCategoryList;
+        var programList = this.state.typeList;
+        var value = (instance.jexcel.getJson(null, false)[r])[1];
+        value = Number(value);
+        if (value != -1) {
+            let programObj = this.state.typeList.filter(c => c.id == parseInt(value))[0];
+            let programHealthAreaList = programObj.healthAreaList;
+            let tempMyList = [];
+
+            for (let k = 0; k < programHealthAreaList.length; k++) {
+                tempMyList = tempMyList.concat(mylist.filter(c => c.healthAreaId == programHealthAreaList[k].id));
+            }
+            mylist = tempMyList;
+        }
+        console.log("check---------------->3", mylist);
+        return mylist;
+
+
     }.bind(this)
 
     filterForecastingUnitBasedOnTracerCategory = function (instance, cell, c, r, source) {
@@ -1944,6 +1975,9 @@ class usageTemplate extends Component {
 
         //Dataset
         if (x == 1) {
+            this.el.setValueFromCoords(3, y, '', true);
+            this.el.setValueFromCoords(4, y, '', true);
+
             var budgetRegx = /^\S+(?: \S+)*$/;
             var col = ("B").concat(parseInt(y) + 1);
             if (value == "") {
