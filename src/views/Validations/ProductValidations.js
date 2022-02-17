@@ -172,7 +172,7 @@ class ProductValidation extends Component {
         this.setState({ loading: true })
         var datasetJson = this.state.datasetData;
         console.log("datasetJson+++", datasetJson);
-        var treeList = datasetJson.treeList;
+        var treeList = datasetJson.treeList.filter(c => c.active.toString() == "true");
         var treeId = "";
         var event = {
             target: {
@@ -238,7 +238,7 @@ class ProductValidation extends Component {
                 event.target.value = localStorage.getItem("sesScenarioId");
             }
             this.setState({
-                scenarioList: treeListFiltered.scenarioList,
+                scenarioList: treeListFiltered.scenarioList.filter(c => c.active.toString() == "true"),
                 // levelList: levelList,
                 treeListFiltered: treeListFiltered,
                 loading: false
@@ -271,9 +271,18 @@ class ProductValidation extends Component {
         localStorage.setItem("sesLiveDatasetId", datasetId);
         if (datasetId > 0) {
             this.setState({
-                datasetId: datasetId
+                datasetId: datasetId,
+                versionList: [],
+                versionId: "",
+                treeList: [],
+                treeId: "",
+                scenarioList: [],
+                scenarioId: "",
+                dataEl: ""
             }, () => {
                 this.getVersionList();
+                this.el = jexcel(document.getElementById("tableDiv"), '');
+                this.el.destroy();
             })
         } else {
             this.setState({
@@ -486,7 +495,7 @@ class ProductValidation extends Component {
                 data[2] = getLabelText(finalData[i].parentNodeNodeDataMap.fuNode.forecastingUnit.label, this.state.lang);
                 data[3] = usageText;
                 var planningUnitObj = finalData[i].nodeDataMap != "" ? this.state.datasetData.planningUnitList.filter(c => c.planningUnit.id == finalData[i].nodeDataMap.puNode.planningUnit.id) : [];
-                data[4] = finalData[i].nodeDataMap != "" && planningUnitObj.length>0 ? getLabelText(planningUnitObj[0].planningUnit.label, this.state.lang) : "";
+                data[4] = finalData[i].nodeDataMap != "" && planningUnitObj.length > 0 ? getLabelText(planningUnitObj[0].planningUnit.label, this.state.lang) : "";
                 data[5] = usageTextPU;
                 data[6] = selectedPlanningUnit != undefined && selectedPlanningUnit.length > 0 && finalData[i].nodeDataMap != "" ? qty.toFixed(2) : "";
                 data[7] = selectedPlanningUnit != undefined && selectedPlanningUnit.length > 0 && finalData[i].nodeDataMap != "" ? price.toFixed(2) : "";
@@ -786,7 +795,11 @@ class ProductValidation extends Component {
                                 event.target.value = localStorage.getItem("sesLiveDatasetId");
                             }
                             this.setState({
-                                datasetList: datasetList,
+                                datasetList: datasetList.sort(function (a, b) {
+                                    a = a.name.toLowerCase();
+                                    b = b.name.toLowerCase();
+                                    return a < b ? -1 : a > b ? 1 : 0;
+                                }),
                                 currencyList: currencyList,
                                 unitList: unitList,
                                 upList: upList,
@@ -974,7 +987,7 @@ class ProductValidation extends Component {
         columns.push(i18n.t('static.supplyPlan.pricePerPlanningUnit'));
         columns.push(i18n.t('static.productValidation.cost'));
         const headers = [columns]
-        const data = this.state.dataEl.getJson(null, false).map(ele => [ele[0], ele[1], ele[2], ele[3], ele[4], ele[5], this.formatter(ele[6]),this.formatter(ele[7]),ele[9]!=1?this.formatter((Number(ele[6]*ele[7])).toFixed(2)):this.formatter(Number(ele[8]))]);
+        const data = this.state.dataEl.getJson(null, false).map(ele => [ele[0], ele[1], ele[2], ele[3], ele[4], ele[5], this.formatter(ele[6]), this.formatter(ele[7]), ele[9] != 1 ? this.formatter((Number(ele[6] * ele[7])).toFixed(2)) : this.formatter(Number(ele[8]))]);
         // doc.addPage()
         let content = {
             margin: { top: 80, bottom: 50 },
@@ -1033,7 +1046,7 @@ class ProductValidation extends Component {
         columns.map((item, idx) => { headers[idx] = (item).replaceAll(' ', '%20') });
 
         var A = [this.addDoubleQuoteToRowContent(headers)];
-        this.state.dataEl.getJson(null, false).map(ele => A.push(this.addDoubleQuoteToRowContent([ele[0].replaceAll(',', ' ').replaceAll(' ', '%20'), ele[1].replaceAll(',', ' ').replaceAll(' ', '%20'), ele[2].replaceAll(',', ' ').replaceAll(' ', '%20'), ele[3].replaceAll(',', ' ').replaceAll(' ', '%20'), ele[4].replaceAll(',', ' ').replaceAll(' ', '%20'), ele[5].replaceAll(',', ' ').replaceAll(' ', '%20'), ele[6].replaceAll(',', ' ').replaceAll(' ', '%20'),ele[7].replaceAll(',', ' ').replaceAll(' ', '%20'),ele[9]!=1?(Number(ele[6]*ele[7])).toString().replaceAll(',', ' ').replaceAll(' ', '%20'):ele[8].toString().replaceAll(',', ' ').replaceAll(' ', '%20')])));
+        this.state.dataEl.getJson(null, false).map(ele => A.push(this.addDoubleQuoteToRowContent([ele[0].replaceAll(',', ' ').replaceAll(' ', '%20'), ele[1].replaceAll(',', ' ').replaceAll(' ', '%20'), ele[2].replaceAll(',', ' ').replaceAll(' ', '%20'), ele[3].replaceAll(',', ' ').replaceAll(' ', '%20'), ele[4].replaceAll(',', ' ').replaceAll(' ', '%20'), ele[5].replaceAll(',', ' ').replaceAll(' ', '%20'), ele[6].replaceAll(',', ' ').replaceAll(' ', '%20'), ele[7].replaceAll(',', ' ').replaceAll(' ', '%20'), ele[9] != 1 ? (Number(ele[6] * ele[7])).toString().replaceAll(',', ' ').replaceAll(' ', '%20') : ele[8].toString().replaceAll(',', ' ').replaceAll(' ', '%20')])));
 
         for (var i = 0; i < A.length; i++) {
             csvRow.push(A[i].join(","))
@@ -1118,15 +1131,23 @@ class ProductValidation extends Component {
                 <Card>
                     <div className="Card-header-reporticon pb-2">
                         {/* {this.state.dataList.length > 0 && */}
-                        <div className="card-header-actions">
-                            {this.state.treeId > 0 && this.state.scenarioId > 0 && this.state.localProgramId != "" && <a className="card-header-action">
-                                <a href={`/#/dataSet/buildTree/tree/` + this.state.treeId + `/` + this.state.localProgramId + `/` + this.state.scenarioId}><span style={{ cursor: 'pointer' }}><small className="supplyplanformulas">{i18n.t('static.common.managetree')}</small></span></a>
-                            </a>}
-                            <a className="card-header-action">
+                        <div className="card-header-actions BacktoLink col-md-12 pl-lg-0 pr-lg-0 pt-lg-2">
+                            {this.state.treeId > 0 && this.state.scenarioId > 0 && this.state.localProgramId != "" &&
+                                <a className="pr-lg-0 pt-lg-3 float-left">
+                                    <span className="compareAndSelect-larrow"> <i className="cui-arrow-left icons " > </i></span>
+                                    <span className="compareAndSelect-larrowText"> {i18n.t('static.common.backTo')} <a href={`/#/dataSet/buildTree/tree/` + this.state.treeId + `/` + this.state.localProgramId + `/` + this.state.scenarioId} className="supplyplanformulas">{i18n.t('static.common.managetree')}</a></span>
+                                </a>
+                            }
+                            <a className="pr-lg-0 pt-lg-3 float-right">
+                                {this.state.dataEl != "" && <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />}
+                            </a>
+                            <a className="pr-lg-2 pt-lg-3 float-right">
                                 {this.state.dataEl != "" && <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.exportPDF()} />}
                             </a>
-                            {this.state.dataEl != "" && <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />}
+
+
                         </div>
+
                         {/* } */}
                     </div>
                     <CardBody className="pb-lg-2 pt-lg-0 ">
