@@ -131,19 +131,31 @@ const validationSchemaNodeData = function (values) {
         //                 return true;
         //             }
         //         }),
+        needFUValidation: Yup.boolean(),
         forecastingUnitId: Yup.string()
-            .test('forecastingUnitId', 'Please select forecasting unit 1',
-                function (value) {
-                    console.log("showFUValidation 1--->", document.getElementById("showFUValidation").value);
-                    console.log("showFUValidation 2--->", value);
-                    if ((parseInt(document.getElementById("nodeTypeId").value) == 4 && (document.getElementById("showFUValidation").value == true) && value == 'undefined')) {
-                        console.log("inside if validation")
-                        return false;
-                    } else {
-                        console.log("inside else validation")
-                        return true;
-                    }
-                }).typeError('Please select forecasting unit'),
+            .when("needFUValidation", {
+                is: val => {
+                    return document.getElementById("needFUValidation").value === "true";
+
+                },
+                then: Yup.string()
+                    .required('Please select forecasting unit')
+                    .typeError('Please select forecasting unit'),
+                otherwise: Yup.string().notRequired()
+            }),
+        // forecastingUnitId: Yup.string()
+        //     .test('forecastingUnitId', 'Please select forecasting unit 1',
+        //         function (value) {
+        //             console.log("showFUValidation 1--->", document.getElementById("showFUValidation").value);
+        //             console.log("showFUValidation 2--->", value);
+        //             if ((parseInt(document.getElementById("nodeTypeId").value) == 4 && (document.getElementById("showFUValidation").value == true) && value == 'undefined')) {
+        //                 console.log("inside if validation")
+        //                 return false;
+        //             } else {
+        //                 console.log("inside else validation")
+        //                 return true;
+        //             }
+        //         }).typeError('Please select forecasting unit'),
         usageTypeIdFU: Yup.string()
             .test('usageTypeIdFU', i18n.t('static.validation.fieldRequired'),
                 function (value) {
@@ -5693,7 +5705,7 @@ export default class BuildTree extends Component {
                             nodeTitle: this.state.currentItemConfig.context.payload.label.label_en,
                             nodeTypeId: this.state.currentItemConfig.context.payload.nodeType.id,
                             nodeUnitId: this.state.currentItemConfig.context.payload.nodeUnit.id,
-                            // forecastingUnitId: "",
+                            forecastingUnitId: this.state.fuValues,
                             // showFUValidation : true
                             // percentageOfParent: (this.state.currentItemConfig.context.payload.nodeDataMap[1])[0].dataValue
                         }}
@@ -6254,14 +6266,24 @@ export default class BuildTree extends Component {
                                                 id="showFUValidation"
                                                 value={this.state.showFUValidation}
                                             />
+                                            <Input
+                                                type="hidden"
+                                                name="needFUValidation"
+                                                id="needFUValidation"
+                                                value={(this.state.currentItemConfig.context.payload.nodeType.id != 4 ? false : true)}
+                                            />
                                             <FormGroup className="col-md-12" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 4 ? 'block' : 'none' }}>
                                                 <Label htmlFor="currencyId">{i18n.t('static.product.unit1')}<span class="red Reqasterisk">*</span></Label>
                                                 <div className="controls ">
                                                     {/* <InMultiputGroup> */}
                                                     <Select
+                                                        // className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
+                                                        //     { 'is-valid': !errors.forecastingUnitId },
+                                                        //     { 'is-invalid': (touched.forecastingUnitId && !!errors.forecastingUnitId) }
+                                                        // )}
                                                         className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
-                                                            { 'is-valid': !errors.forecastingUnitId },
-                                                            { 'is-invalid': (touched.forecastingUnitId && !!errors.forecastingUnitId) }
+                                                            { 'is-valid': !errors.forecastingUnitId && this.state.fuValues != '' },
+                                                            { 'is-invalid': (touched.forecastingUnitId && !!errors.forecastingUnitId && (this.state.currentItemConfig.context.payload.nodeType.id != 4 ? false : true) || !!errors.forecastingUnitId) }
                                                         )}
                                                         id="forecastingUnitId"
                                                         name="forecastingUnitId"
@@ -6978,51 +7000,51 @@ export default class BuildTree extends Component {
                                             </div>
                                         </div>
                                     </div>
-                                    </div>
-                                    <div className="col-md-6 float-right">
+                                </div>
+                                <div className="col-md-6 float-right">
                                     {/* <div className="col-md-12"> */}
                                     <FormGroup className="float-right" >
-                                    <div className="check inline  pl-lg-1 pt-lg-0">
-                    
-                                                <div style={{ display: this.state.aggregationNode ? 'block' : 'none' }}>
-                                                    <Input
-                                                        className="form-check-input checkboxMargin"
-                                                        type="checkbox"
-                                                        id="manualChange"
-                                                        name="manualChange"
-                                                        // checked={true}
-                                                        checked={this.state.currentScenario.manualChangesEffectFuture}
-                                                        onClick={(e) => { this.momCheckbox(e); }}
-                                                    />
-                                                    <Label
-                                                        className="form-check-label"
-                                                        check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                                                        <b>{'Manual Change affects future month'}</b>
-                                                    </Label>
-                                                </div>
-                                                <div>
-                                                    <Input
-                                                        className="form-check-input checkboxMargin"
-                                                        type="checkbox"
-                                                        id="seasonality"
-                                                        name="seasonality"
-                                                        // checked={true}
-                                                        checked={this.state.seasonality}
-                                                        onClick={(e) => { this.momCheckbox(e) }}
-                                                    />
-                                                    <Label
-                                                        className="form-check-label"
-                                                        check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                                                        <b>{'Show Seasonality & manual change'}</b>
-                                                    </Label>
-                                                </div>
+                                        <div className="check inline  pl-lg-1 pt-lg-0">
+
+                                            <div style={{ display: this.state.aggregationNode ? 'block' : 'none' }}>
+                                                <Input
+                                                    className="form-check-input checkboxMargin"
+                                                    type="checkbox"
+                                                    id="manualChange"
+                                                    name="manualChange"
+                                                    // checked={true}
+                                                    checked={this.state.currentScenario.manualChangesEffectFuture}
+                                                    onClick={(e) => { this.momCheckbox(e); }}
+                                                />
+                                                <Label
+                                                    className="form-check-label"
+                                                    check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                    <b>{'Manual Change affects future month'}</b>
+                                                </Label>
                                             </div>
-                                        </FormGroup>
+                                            <div>
+                                                <Input
+                                                    className="form-check-input checkboxMargin"
+                                                    type="checkbox"
+                                                    id="seasonality"
+                                                    name="seasonality"
+                                                    // checked={true}
+                                                    checked={this.state.seasonality}
+                                                    onClick={(e) => { this.momCheckbox(e) }}
+                                                />
+                                                <Label
+                                                    className="form-check-label"
+                                                    check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                    <b>{'Show Seasonality & manual change'}</b>
+                                                </Label>
+                                            </div>
+                                        </div>
+                                    </FormGroup>
                                     {/* </div> */}
-                                    </div>
-                                    
-                               {/* <div className='row'> */}
-                                <div className="col-md-12 pl-lg-0 pr-lg-0 modelingTransferTable" style={{ display: 'inline-block'}}>
+                                </div>
+
+                                {/* <div className='row'> */}
+                                <div className="col-md-12 pl-lg-0 pr-lg-0 modelingTransferTable" style={{ display: 'inline-block' }}>
                                     <div id="momJexcel" className="RowClickable" style={{ display: this.state.momJexcelLoader ? "none" : "block" }}>
                                     </div>
                                 </div>
