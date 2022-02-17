@@ -25,6 +25,12 @@ export default class TreeExtrapolationComponent extends React.Component {
         var startDate = moment("2021-05-01").format("YYYY-MM-DD");
         var endDate = moment("2022-02-01").format("YYYY-MM-DD")
         this.state = {
+            nodeDataExtrapolation: {
+                // reportingRate
+                // month
+                // amount
+                extrapolationDataList: []
+            },
             monthArray: [],
             extrapolationMethodList: [],
             show: false,
@@ -548,7 +554,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                 .sort(function (a, b) {
                     return new Date(a.month) - new Date(b.month);
                 });
-            console.log("endValList---", endValList);
+            console.log(moment(monthArray[j]).format("YYYY-MM") + " " + "endValList---", endValList);
             if (startValList.length > 0 && endValList.length > 0) {
                 var startVal = startValList[startValList.length - 1].value;
                 var startMonthVal = startValList[startValList.length - 1].month;
@@ -557,8 +563,8 @@ export default class TreeExtrapolationComponent extends React.Component {
                 const monthDifference = moment(new Date(monthArray[j])).diff(new Date(startMonthVal), 'months', true);
                 const monthDiff = moment(new Date(endMonthVal)).diff(new Date(startMonthVal), 'months', true);
                 var missingActualData = Number(startVal) + (monthDifference * ((Number(endVal) - Number(startVal)) / monthDiff));
-                console.log("month---",monthArray[j]);
-                console.log("missingActualData---",missingActualData);
+                console.log("month---", monthArray[j]);
+                console.log(moment(monthArray[j]).format("YYYY-MM") + " " + "missingActualData---", missingActualData);
             }
         }
 
