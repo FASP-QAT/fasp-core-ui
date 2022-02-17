@@ -25,6 +25,7 @@ export default class TreeExtrapolationComponent extends React.Component {
         var startDate = moment("2021-05-01").format("YYYY-MM-DD");
         var endDate = moment("2022-02-01").format("YYYY-MM-DD")
         this.state = {
+            monthArray: [],
             extrapolationMethodList: [],
             show: false,
             jexcelData: [
@@ -518,6 +519,57 @@ export default class TreeExtrapolationComponent extends React.Component {
         }
         this.buildJexcel = this.buildJexcel.bind(this);
         this.getExtrapolationMethodList = this.getExtrapolationMethodList.bind(this);
+        this.manualChangeExtrapolation = this.manualChangeExtrapolation.bind(this);
+        this.interpolate = this.interpolate.bind(this);
+    }
+    interpolate() {
+        var monthArray = this.state.monthArray;
+        var jexcelDataArr = [];
+        var tableJson = this.state.dataExtrapolation.getJson(null, false);
+        console.log("tableJson length---", tableJson.length);
+        console.log("tableJson---", tableJson);
+        for (var i = 0; i < tableJson.length; i++) {
+            var map1 = new Map(Object.entries(tableJson[i]));
+            console.log("10 map---" + map1.get("10"));
+            var json = {
+                month: map1.get("0"),
+                value: map1.get("1")
+            }
+            jexcelDataArr.push(json);
+        }
+        for (var j = 0; j < monthArray.length; j++) {
+            var dataArr = jexcelDataArr.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArray[j]).format("YYYY-MM") && c.value > 0);
+            var startValList = jexcelDataArr.filter(c => moment(c.month).format("YYYY-MM") < moment(monthArray[j]).format("YYYY-MM") && c.value > 0)
+                .sort(function (a, b) {
+                    return new Date(a.month) - new Date(b.month);
+                });
+            console.log("startValList---", startValList);
+            var endValList = jexcelDataArr.filter(c => moment(c.month).format("YYYY-MM") > moment(monthArray[j]).format("YYYY-MM") && c.value > 0)
+                .sort(function (a, b) {
+                    return new Date(a.month) - new Date(b.month);
+                });
+            console.log("endValList---", endValList);
+            if (startValList.length > 0 && endValList.length > 0) {
+                var startVal = startValList[startValList.length - 1].value;
+                var startMonthVal = startValList[startValList.length - 1].month;
+                var endVal = endValList[0].value;
+                var endMonthVal = endValList[0].month;
+                const monthDifference = moment(new Date(monthArray[j])).diff(new Date(startMonthVal), 'months', true);
+                const monthDiff = moment(new Date(endMonthVal)).diff(new Date(startMonthVal), 'months', true);
+                var missingActualData = Number(startVal) + (monthDifference * ((Number(endVal) - Number(startVal)) / monthDiff));
+                console.log("month---",monthArray[j]);
+                console.log("missingActualData---",missingActualData);
+            }
+        }
+
+    }
+
+    manualChangeExtrapolation(e) {
+        const { currentItemConfig } = this.props.items;
+        (currentItemConfig.context.payload.nodeDataMap[this.props.items.selectedScenario])[0].manualChangesEffectFuture = (e.target.checked == true ? true : false)
+        this.state.dataExtrapolation.setValueFromCoords(12, 0, (e.target.checked == true ? true : false), true);
+        this.props.updateState("currentItemConfig", currentItemConfig);
+
     }
     makeText = m => {
         if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
@@ -580,6 +632,7 @@ export default class TreeExtrapolationComponent extends React.Component {
             curDate1 = moment(minStartDate).add(m, 'months').format("YYYY-MM-DD");
             monthArray.push(curDate1)
         }
+        this.setState({ monthArray });
         // monthArray.push('2025-01-01');
         console.log("monthArray---", monthArray);
         let count = 0;
@@ -595,9 +648,10 @@ export default class TreeExtrapolationComponent extends React.Component {
             data[7] = ""
             data[8] = ""
             // data[9] = `=IF(ISBLANK(B${parseInt(j) + 1}),10,ROUND(B${parseInt(j) + 1},2))`
-            data[9] = `=IF(B${parseInt(j) + 1} != "",ROUND(B${parseInt(j) + 1},2),'')`
-            data[10] = ""
-            data[11] = ""
+            data[9] = `=IF(B${parseInt(j) + 1} != "",ROUND(B${parseInt(j) + 1},2),'')` // J
+            data[10] = "" // K
+            data[11] = `=IF(M1 == true,ROUND(J${parseInt(j)} + K${parseInt(j)},2),ROUND(J${parseInt(j) + 1} + K${parseInt(j) + 1},2))`
+            data[12] = this.props.items.currentItemConfig.context.payload.nodeDataMap[this.props.items.selectedScenario][0].manualChangesEffectFuture
             // data[0] = list[j].month
             // data[1] = list[j].node
             // data[2] = list[j].reportingRate
@@ -692,8 +746,8 @@ export default class TreeExtrapolationComponent extends React.Component {
                 {
                     title: 'Selected Forecast',
                     type: 'number',
-                    mask: '#,##.00'
-                    // readOnly: true
+                    mask: '#,##.00',
+                    readOnly: true
                 },
                 {
                     title: 'Manual Change (+/-)',
@@ -706,6 +760,10 @@ export default class TreeExtrapolationComponent extends React.Component {
                     mask: '#,##.00',
                     readOnly: true
                 },
+                {
+                    title: 'manualChangeAffectsFutureMonth',
+                    type: 'hidden'
+                }
             ],
 
             text: {
@@ -759,9 +817,10 @@ export default class TreeExtrapolationComponent extends React.Component {
                 return [];
             }.bind(this),
         };
-        var dataEl = jexcel(document.getElementById("tableDiv"), options);
-        this.el = dataEl;
+        var dataExtrapolation = jexcel(document.getElementById("tableDiv"), options);
+        this.el = dataExtrapolation;
         this.setState({
+            dataExtrapolation
             // dataEl: dataEl, loading: false,
             // inputDataFilter: inputData,
             // inputDataAverageFilter: inputDataAverage,
@@ -1411,7 +1470,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                 <Button className="mr-1 btn btn-info btn-md " onClick={this.toggledata}>
                                     {this.state.show ? i18n.t('static.common.hideData') : i18n.t('static.common.showData')}
                                 </Button>
-                                <Button type="submit" color="success" className="mr-1" size="md">Interpolate</Button>
+                                <Button type="button" color="success" className="mr-1" size="md" onClick={this.interpolate}>Interpolate</Button>
                             </div>
                         </div>
                     </Form>
@@ -1429,8 +1488,8 @@ export default class TreeExtrapolationComponent extends React.Component {
                                             id="manualChangeExtrapolation"
                                             name="manualChangeExtrapolation"
                                             // checked={true}
-                                            checked={false}
-                                        // onClick={(e) => { this.momCheckbox(e); }}
+                                            checked={this.props.items.currentItemConfig.context.payload.nodeDataMap[this.props.items.selectedScenario][0].manualChangesEffectFuture}
+                                            onClick={(e) => { this.manualChangeExtrapolation(e); }}
                                         />
                                         <Label
                                             className="form-check-label"
