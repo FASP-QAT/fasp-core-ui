@@ -21,6 +21,7 @@ import StatusUpdateButtonFeature from "../../CommonComponent/StatusUpdateButtonF
 import UpdateButtonFeature from '../../CommonComponent/UpdateButtonFeature';
 import moment from 'moment';
 import RealmService from "../../api/RealmService";
+import { Prompt } from 'react-router';
 import ForecastMethodService from "../../api/ForecastMethodService";
 import { JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, JEXCEL_DATE_FORMAT_SM } from "../../Constants";
 
@@ -36,7 +37,8 @@ class forecastMethod extends Component {
             selSource: [],
             realms: [],
             loading: true,
-            forecastMethodTypeList: []
+            forecastMethodTypeList: [],
+            isChanged: false
         }
         // this.setTextAndValue = this.setTextAndValue.bind(this);
         // this.disableRow = this.disableRow.bind(this);
@@ -63,6 +65,19 @@ class forecastMethod extends Component {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
         }, 8000);
+    }
+
+    componentWillUnmount() {
+        clearTimeout(this.timeout);
+        window.onbeforeunload = null;
+    }
+
+    componentDidUpdate = () => {
+        if (this.state.isChanged == true) {
+            window.onbeforeunload = () => true
+        } else {
+            window.onbeforeunload = undefined
+        }
     }
 
     buildJexcel() {
@@ -795,7 +810,7 @@ class forecastMethod extends Component {
                         console.log(response);
                         // this.props.history.push(`/realmCountry/listRealmCountry/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                         this.setState({
-                            message: i18n.t('static.usagePeriod.addUpdateMessage'), color: 'green'
+                            message: i18n.t('static.usagePeriod.addUpdateMessage'), color: 'green', isChanged: false
                         },
                             () => {
                                 this.hideSecondComponent();
@@ -914,6 +929,10 @@ class forecastMethod extends Component {
             this.el.setValueFromCoords(7, y, 1, true);
         }
 
+        this.setState({
+            isChanged: true,
+        });
+
 
 
     }.bind(this);
@@ -996,6 +1015,10 @@ class forecastMethod extends Component {
     render() {
         return (
             <div className="animated fadeIn">
+                <Prompt
+                    when={this.state.isChanged == true}
+                    message={i18n.t("static.dataentry.confirmmsg")}
+                />
                 <AuthenticationServiceComponent history={this.props.history} />
                 {/* <h5 style={{ color: "red" }}>{i18n.t('static.common.customWarningMessage')}</h5> */}
                 <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
