@@ -325,6 +325,7 @@ const routes = [
   { path: '/validation/productValidation', exact: true, name: 'static.dashboard.productValidation', component: ProductValidation },
   { path: '/report/compareAndSelectScenario', exact: true, name: 'static.dashboard.compareAndSelect', component: CompareAndSelectScenario },
   { path: '/dataentry/consumptionDataEntryAndAdjustment', exact: true, name: 'static.dashboard.dataEntryAndAdjustments', component: ConsumptionDataEntryAndAdjustment },
+  { path: '/dataentry/consumptionDataEntryAndAdjustment/:color/:message', exact: true, name: 'static.dashboard.dataEntryAndAdjustments', component: ConsumptionDataEntryAndAdjustment },
   { path: '/dataentry/consumptionDataEntryAndAdjustment/:planningUnitId', exact: true, name: 'static.dashboard.dataEntryAndAdjustments', component: ConsumptionDataEntryAndAdjustment },
   { path: '/dataset/createTreeTemplate/:templateId', name: 'Create Tree Template', component: CreateTreeTemplate },
   { path: '/dataSet/buildTree/', exact: true, name: 'static.common.managetree', component: BuildTree },
