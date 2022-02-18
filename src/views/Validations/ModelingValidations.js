@@ -1282,8 +1282,12 @@ class ModelingValidation extends Component {
                         while (rgx.test(x1)) {
                             x1 = x1.replace(rgx, '$1' + ',' + '$2');
                         }
-                        return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
-                    }
+                        if (this.state.displayBy == 1) {
+                            return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
+                        } else {
+                            return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2 + " %";
+                        }
+                    }.bind(this)
                 }
             },
         }
