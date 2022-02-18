@@ -167,7 +167,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           data[0] = i18n.t('static.dataentry.reportingRate')
           for (var j = 0; j < monthArray.length; j++) {
             var consumptionData = consumptionList.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArray[j].date).format("YYYY-MM") && c.region.id == regionList[r].regionId);
-            data[j + 1] = consumptionData.length > 0 && consumptionData[0].reportingRate > 0 ? consumptionData[0].reportingRate+"%" : 100+"%";
+            data[j + 1] = consumptionData.length > 0 && consumptionData[0].reportingRate > 0 ? consumptionData[0].reportingRate + "%" : 100 + "%";
           }
           data[monthArray.length + 1] = multiplier;
           dataArray.push(data);
@@ -184,7 +184,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           data = [];
           data[0] = i18n.t('static.dataentry.stockedOutPer')
           for (var j = 0; j < monthArray.length; j++) {
-            data[j + 1] = `=ROUND(${colArr[j + 1]}${parseInt(dataArray.length)}/${colArr[j + 1] + "1"}*100,0)`+"%";
+            data[j + 1] = `=ROUND(${colArr[j + 1]}${parseInt(dataArray.length)}/${colArr[j + 1] + "1"}*100,0)` + "%";
           }
           data[monthArray.length + 1] = multiplier;
           dataArray.push(data);
@@ -604,7 +604,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
             var endMonthVal = endValList[0].month;
             notes += regionList[r].label + " " + moment(monthArray[j].date).format("YYYY-MM");
             //y=y1+(x-x1)*(y2-y1)/(x2-x1);
-// missingActualConsumption = startValKaAmount +( currentMonthAndStartMonthKaDifference ((endValKaAmount - startValKaAmount)/ endMonthAndStartMonthKaDiffrence))
+            // missingActualConsumption = startValKaAmount +( currentMonthAndStartMonthKaDifference ((endValKaAmount - startValKaAmount)/ endMonthAndStartMonthKaDiffrence))
             const monthDifference = moment(new Date(monthArray[j].date)).diff(new Date(startMonthVal), 'months', true);
             const monthDiff = moment(new Date(endMonthVal)).diff(new Date(startMonthVal), 'months', true);
             var missingActualConsumption = Number(startVal) + (monthDifference * ((Number(endVal) - Number(startVal)) / monthDiff));
@@ -788,9 +788,9 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           //this.el = jexcel(document.getElementById("tableDiv"), '');
           //this.el.destroy();
           //this.el = jexcel(document.getElementById("smallTableDiv"), '');
-         //this.el.destroy();
-         
-  
+          //this.el.destroy();
+
+
           this.setState({
             dataEl: "",
             showDetailTable: true,
@@ -810,6 +810,13 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     document.getElementById('div1').style.display = 'block';
     this.state.timeout = setTimeout(function () {
       document.getElementById('div1').style.display = 'none';
+    }, 8000);
+  }
+
+  hideSecondComponent() {
+    document.getElementById('div2').style.display = 'block';
+    this.state.timeout = setTimeout(function () {
+      document.getElementById('div2').style.display = 'none';
     }, 8000);
   }
 
@@ -869,7 +876,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     this.setState({
       consumptionUnitShowArr: consumptionUnitShowArr
     })
-    componentDidMount();
+    this.componentDidMount();
     this.getDatasetList();
   }
 
@@ -1185,9 +1192,9 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
               var regionList = datasetJson.regionList;
 
               regionList.sort((a, b) => {
-                  var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-                  var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
-                  return itemLabelA > itemLabelB ? 1 : -1;
+                var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                return itemLabelA > itemLabelB ? 1 : -1;
               });
 
               var startDate = moment(Date.now()).add(-36, 'months').format("YYYY-MM-DD");
@@ -1306,9 +1313,9 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
 
   toggleShowGuidance() {
     this.setState({
-        showGuidance: !this.state.showGuidance
+      showGuidance: !this.state.showGuidance
     })
-}
+  }
 
   setShowInPlanningUnits(e) {
     this.setState({
@@ -1679,6 +1686,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         />
         <AuthenticationServiceComponent history={this.props.history} />
         <h5 className={"green"} id="div1">{this.state.message}</h5>
+        <h5 className={this.props.match.params.color} id="div2">{i18n.t(this.props.match.params.message, { entityname })}</h5>
         <Card>
           <div className="card-header-actions">
             <div className="Card-header-reporticon">
@@ -1898,7 +1906,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
 
                           </div>
                         </div>
-                       <b>{i18n.t('static.dataentry.graphNotes')}</b> 
+                        <b>{i18n.t('static.dataentry.graphNotes')}</b>
                       </div>
                     }
                   </>
@@ -1928,21 +1936,21 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           </CardFooter>
         </Card>
         <Modal isOpen={this.state.showGuidance}
-                    className={'modal-lg ' + this.props.className} >
-                    <ModalHeader toggle={() => this.toggleShowGuidance()} className="modalHeaderSupplyPlan">
-                        <strong>Show Guidance</strong>
-                    </ModalHeader>
-                    <div>
-                        <ModalBody>
-                            <p>Methods are organized from simple to robust
+          className={'modal-lg ' + this.props.className} >
+          <ModalHeader toggle={() => this.toggleShowGuidance()} className="modalHeaderSupplyPlan">
+            <strong>Show Guidance</strong>
+          </ModalHeader>
+          <div>
+            <ModalBody>
+              <p>Methods are organized from simple to robust
 
-                                More sophisticated models are more sensitive to problems in the data
+                More sophisticated models are more sensitive to problems in the data
 
-                                If you have poorer data (missing data points, variable reporting rates, less than 12 months of data), use simpler forecast methods
-                            </p>
-                        </ModalBody>
-                    </div>
-                </Modal>
+                If you have poorer data (missing data points, variable reporting rates, less than 12 months of data), use simpler forecast methods
+              </p>
+            </ModalBody>
+          </div>
+        </Modal>
         <Modal isOpen={this.state.toggleDataCheck}
           className={'modal-lg ' + this.props.className} >
           <ModalHeader toggle={() => this.openDataCheckModel()} className="modalHeaderSupplyPlan">
@@ -2010,7 +2018,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           curDate = moment(startDate).add(i, 'months').format("YYYY-MM-DD");
           var consumptionListFilteredForMonth = consumptionList.filter(c => c.planningUnit.id == puId && c.region.id == regionId && c.month == curDate);
           if (consumptionListFilteredForMonth.length == 0) {
-            monthsArray.push(" "+moment(curDate).format(DATE_FORMAT_CAP_WITHOUT_DATE));
+            monthsArray.push(" " + moment(curDate).format(DATE_FORMAT_CAP_WITHOUT_DATE));
           }
         }
 
