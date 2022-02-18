@@ -1294,7 +1294,7 @@ class ModelingValidation extends Component {
 
         let bar = {}
         var datasetListForGraph = [];
-        var colourArray = ["#002F6C", "#BA0C2F", "#65ID32", "#49A4A1", "#A7C6ED", "#212721", "#6C6463", "#49A4A1", "#EDB944", "#F48521"]
+        var colourArray = ["#002F6C", "#BA0C2F", "#65ID32", "#49A4A1", "#A7C6ED", "#212721", "#6C6463", "#EDB944", "#F48521", "#86cd99", "#696969", "#FA8072"]
         if (this.state.monthList.length > 0 && this.state.dataEl != undefined && this.state.dataEl != "") {
             var elInstance = this.state.dataEl;
             if (elInstance != undefined && this.state.dataEl != "") {
@@ -1313,11 +1313,35 @@ class ModelingValidation extends Component {
                 })
             }
         }
+        var aggregatedData = [];
+        for (var i = 0; i < datasetListForGraph.length; i++) {
+            var index = aggregatedData.findIndex(c => c.label == datasetListForGraph[i].label);
+            if (index == -1) {
+                var filter = datasetListForGraph.filter(c => c.label == datasetListForGraph[i].label);
+                console.log("Filter@@@",filter);
+                var dataArr = filter[0].data;
+                console.log("DataArra@@@",dataArr);
+                for (var f = 1; f < filter.length; f++) {
+                    console.log("Filter[fdata@@@",filter[f].data);
+                    filter[f].data.map(function (num, idx) {
+                        console.log("add@@@",num + dataArr[idx]);
+                        dataArr[idx] = (Number(num) + Number(dataArr[idx])).toFixed(2);
+                    })
+                }
+                console.log("FinalArra@@@",dataArr)
+                aggregatedData.push({
+                    label: filter[0].label,
+                    data: dataArr,
+                    backgroundColor: filter[0].backgroundColor,
+                    stack: filter[0].stack
+                })
+            }
+        }
         if (this.state.monthList.length > 0 && this.state.dataEl != undefined && this.state.dataEl != "") {
             bar = {
 
                 labels: [...new Set(this.state.monthList.map(ele => moment(ele).format("MMM-YYYY")))],
-                datasets: datasetListForGraph
+                datasets: aggregatedData
 
             };
         }
