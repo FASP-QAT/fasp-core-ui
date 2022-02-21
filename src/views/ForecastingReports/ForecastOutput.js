@@ -1316,8 +1316,22 @@ class ForecastOutput extends Component {
                         console.log("programs------------------>1", this.state.programs);
                     })
                 } else {
-
-                    if (localStorage.getItem("sesForecastProgramIdReport") != '' && localStorage.getItem("sesForecastProgramIdReport") != undefined) {
+                    if (this.props.match.params.programId != "" && this.props.match.params.programId != undefined) {
+                        this.setState({
+                            programs: proList.sort(function (a, b) {
+                                a = getLabelText(a.label, lang).toLowerCase();
+                                b = getLabelText(b.label, lang).toLowerCase();
+                                return a < b ? -1 : a > b ? 1 : 0;
+                            }),
+                            programId: this.props.match.params.programId,
+                            downloadedProgramData: downloadedProgramData,
+                            loading: false
+                        }, () => {
+                            this.getVersionIds();
+                            console.log("programs------------------>", this.state.programs);
+                        })
+                    }
+                    else if (localStorage.getItem("sesForecastProgramIdReport") != '' && localStorage.getItem("sesForecastProgramIdReport") != undefined) {
                         this.setState({
                             programs: proList.sort(function (a, b) {
                                 a = getLabelText(a.label, lang).toLowerCase();
@@ -1780,8 +1794,16 @@ class ForecastOutput extends Component {
                     return a.indexOf(x) === i;
                 })
                 versionList.reverse();
-
-                if (localStorage.getItem("sesForecastVersionIdReport") != '' && localStorage.getItem("sesForecastVersionIdReport") != undefined) {
+                if (this.props.match.params.versionId != "" && this.props.match.params.versionId != undefined) {
+                    // let versionVar = versionList.filter(c => c.versionId == this.props.match.params.versionId+" (Local)");
+                    this.setState({
+                        versions: versionList,
+                        versionId: this.props.match.params.versionId + " (Local)",
+                    }, () => {
+                        this.filterData();
+                        this.setVersionId();
+                    })
+                }else if (localStorage.getItem("sesForecastVersionIdReport") != '' && localStorage.getItem("sesForecastVersionIdReport") != undefined) {
                     let versionVar = versionList.filter(c => c.versionId == localStorage.getItem("sesForecastVersionIdReport"));
                     this.setState({
                         versions: versionList,

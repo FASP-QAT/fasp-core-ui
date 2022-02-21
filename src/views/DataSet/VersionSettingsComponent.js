@@ -952,18 +952,21 @@ class VersionSettingsComponent extends Component {
                     title: i18n.t('static.versionSettings.freight%'),
                     type: 'numeric',
                     textEditor: true,
+                    mask: '#,##.00', decimal: '.', disabledMaskOnEdition: false
                     // readOnly: true
                 },//14 O
                 {
                     title: i18n.t('static.versionSettings.forecastThresholdHigh'),
                     type: 'numeric',
                     textEditor: true,
+                    mask: '#,##.00', decimal: '.', disabledMaskOnEdition: false
                     // readOnly: true
                 },//15 P
                 {
                     title: i18n.t('static.versionSettings.ForecastThresholdLow'),
                     type: 'numeric',
                     textEditor: true,
+                    mask: '#,##.00', decimal: '.', disabledMaskOnEdition: false
                     // readOnly: true
                 },//16 Q
                 {

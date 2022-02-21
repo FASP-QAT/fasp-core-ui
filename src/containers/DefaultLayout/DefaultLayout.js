@@ -731,7 +731,8 @@ const routes = [
   { path: '/planningUnitSetting/listPlanningUnitSetting', exact: true, name: 'static.updatePlanningUnit.updatePlanningUnit', component: PlanningUnitSetting },
 
   { path: '/forecastReport/consumptionForecastError', name: 'Consumption Forecast Error', component: ConsumptionForecastError },
-  { path: '/forecastReport/forecastOutput', name: 'static.MonthlyForecast.MonthlyForecast', component: ForecastOutput },
+  { path: '/forecastReport/forecastOutput',exact:true, name: 'static.MonthlyForecast.MonthlyForecast', component: ForecastOutput },
+  { path: '/forecastReport/forecastOutput/:programId/:versionId', name: 'static.MonthlyForecast.MonthlyForecast', component: ForecastOutput },
   { path: '/forecastReport/forecastSummary',exact:true ,name: 'static.ForecastSummary.ForecastSummary', component: ForecastSummary },
   { path: '/forecastReport/forecastSummary/:programId/:versionId', name: 'static.ForecastSummary.ForecastSummary', component: ForecastSummary },
 

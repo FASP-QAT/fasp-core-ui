@@ -632,9 +632,9 @@ class ProductValidation extends Component {
         for (var j = 0; j < json.length; j++) {
             if (json[j][9] == 1) {
                 for (var i = 0; i < colArr.length; i++) {
-                    instance.jexcel.setStyle(colArr[i] + (j + 1), "background-color", "#808080")
-                    // instance.jexcel.setStyle(colArr[i] + (j + 1), "background-color", "#ccc")
-                    instance.jexcel.setStyle(colArr[i] + (j + 1), "color", "#FFFFFF")
+                    // instance.jexcel.setStyle(colArr[i] + (j + 1), "background-color", "#808080")
+                    instance.jexcel.setStyle(colArr[i] + (j + 1), "background-color", "#ccc")
+                    // instance.jexcel.setStyle(colArr[i] + (j + 1), "color", "#000")
                     instance.jexcel.setStyle(colArr[i] + (j + 1), "font-weight", "bold")
                 }
             }
@@ -664,7 +664,7 @@ class ProductValidation extends Component {
             });
             var newVList = offlineVersionList.concat(onlineVersionList)
             for (var v = 0; v < newVList.length; v++) {
-                versionList.push(vList[v].versionId)
+                versionList.push(newVList[v].versionId)
             }
             var versionId = "";
             var event = {

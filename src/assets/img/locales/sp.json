@@ -1628,7 +1628,7 @@
     "static.syncProgram.loadAndDeleteWithoutUncommittedChanges": "Para el programa {{programCode}}, hay una versión de servidor más reciente. ¿Quieres cargar y borrar? (No se eliminarán los datos del servidor)",
     "static.translation.labelCode": "Código de etiqueta",
     "static.shipment.shipmentfundingSource": "Fuente de financiamiento de envíos / pedidos",
-    "static.compareAndSelect.startMonthForGraph": "Mes de inicio para gráfico / tabla",
+    "static.compareAndSelect.startMonthForGraph": "Período para Gráfico/Tabla",
     "static.header.notLatestVersion": "Cargar la más reciente versión del programa",
     "static.common.spacenotallowed": "No se permiten espacios al principio ni al final",
     "static.problemReport.inCompliance": "En conformidad",
