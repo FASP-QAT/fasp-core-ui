@@ -10,13 +10,13 @@ import jsPDF from 'jspdf';
 import "jspdf-autotable";
 
 export function dataCheck(props, datasetJson) {
-    var PgmTreeList = datasetJson.treeList.filter(c=>c.active.toString()=="true");
+    var PgmTreeList = datasetJson.treeList.filter(c => c.active.toString() == "true");
 
     var treeScenarioNotes = [];
     var missingBranchesList = [];
     for (var tl = 0; tl < PgmTreeList.length; tl++) {
         var treeList = PgmTreeList[tl];
-        var scenarioList = treeList.scenarioList.filter(c=>c.active.toString()=="true");
+        var scenarioList = treeList.scenarioList.filter(c => c.active.toString() == "true");
         for (var ndm = 0; ndm < scenarioList.length; ndm++) {
             treeScenarioNotes.push({
                 tree: PgmTreeList[tl].label,
@@ -38,7 +38,7 @@ export function dataCheck(props, datasetJson) {
         for (var fl = 0; fl < flatList.length; fl++) {
             var payload = flatList[fl].payload;
             var nodeDataMap = payload.nodeDataMap;
-            var scenarioList = treeList.scenarioList.filter(c=>c.active.toString()=="true");
+            var scenarioList = treeList.scenarioList.filter(c => c.active.toString() == "true");
             for (var ndm = 0; ndm < scenarioList.length; ndm++) {
                 if (payload.nodeType.id == 5) {
                     var nodePlanningUnit = ((nodeDataMap[scenarioList[ndm].id])[0].puNode.planningUnit);
@@ -50,7 +50,7 @@ export function dataCheck(props, datasetJson) {
                 var modelingList = ((nodeDataMap[scenarioList[ndm].id])[0].nodeDataModelingList);
                 var madelingNotes = "";
                 for (var ml = 0; ml < modelingList.length; ml++) {
-                    madelingNotes = madelingNotes.concat(modelingList[ml].notes).concat(" ")
+                    madelingNotes = madelingNotes.concat(modelingList[ml].notes).concat(" | ")
                 }
                 treeNodeList.push({
                     tree: PgmTreeList[tl].label,
@@ -59,7 +59,7 @@ export function dataCheck(props, datasetJson) {
                     scenarioId: scenarioList[ndm].id,
                     node: payload.label,
                     notes: nodeNotes,
-                    madelingNotes: madelingNotes,
+                    madelingNotes: madelingNotes.slice(0, -1),
                     scenarioNotes: scenarioList[ndm].notes
                 });
             }
@@ -82,7 +82,7 @@ export function dataCheck(props, datasetJson) {
         }
 
         //Nodes less than 100%
-        var scenarioList = PgmTreeList[tl].scenarioList.filter(c=>c.active.toString()=="true");
+        var scenarioList = PgmTreeList[tl].scenarioList.filter(c => c.active.toString() == "true");
         var treeId = PgmTreeList[tl].treeId;
         for (var sc = 0; sc < scenarioList.length; sc++) {
             treeScenarioList.push(
@@ -145,7 +145,7 @@ export function dataCheck(props, datasetJson) {
             for (var fl = 0; fl < flatList.length; fl++) {
                 var payload = flatList[fl].payload;
                 var nodeDataMap = payload.nodeDataMap;
-                var scenarioList = treeList.scenarioList.filter(c=>c.active.toString()=="true");
+                var scenarioList = treeList.scenarioList.filter(c => c.active.toString() == "true");
                 for (var ndm = 0; ndm < scenarioList.length; ndm++) {
                     // var nodeModellingList = nodeDataModelingList.filter(c => c.month == curDate);
                     var nodeChildrenList = flatList.filter(c => flatList[fl].id == c.parent && (c.payload.nodeType.id == 3 || c.payload.nodeType.id == 4 || c.payload.nodeType.id == 5));
@@ -748,8 +748,11 @@ export function exportPDF(props) {
 
             };
             doc.autoTable(content);
-            doc.addPage();
-            y = 80;
+            y = doc.lastAutoTable.finalY + 20
+            if (y + 100 > height) {
+                doc.addPage();
+                y = 80
+            }
         }
     })
 
@@ -807,10 +810,15 @@ export function exportPDF(props) {
 
     };
     doc.autoTable(content1);
-    doc.addPage()
+    // doc.addPage()
+    y = doc.lastAutoTable.finalY + 20
+    if (y + 100 > height) {
+        doc.addPage();
+        y = 80
+    }
 
     doc.setFont('helvetica', 'normal')
-    y = 80;
+    // y = 80;
     planningText = doc.splitTextToSize("b. " + i18n.t('static.commitTree.treeScenarios'), doc.internal.pageSize.width * 3 / 4);
     // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
     y = y + 10;
@@ -856,8 +864,13 @@ export function exportPDF(props) {
 
     };
     doc.autoTable(content2);
-    y = 80;
-    doc.addPage()
+    // y = 80;
+    // doc.addPage()
+    y = doc.lastAutoTable.finalY + 20
+    if (y + 100 > height) {
+        doc.addPage();
+        y = 80
+    }
     doc.setFont('helvetica', 'normal')
     planningText = doc.splitTextToSize("c. " + i18n.t('static.commitTree.treeNodes'), doc.internal.pageSize.width * 3 / 4);
     // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
