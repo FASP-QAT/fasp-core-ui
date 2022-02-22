@@ -84,6 +84,10 @@ class UserService {
     acceptUserAgreement() {
         return axios.post(`${API_URL}/api/user/agreement/`, {}, {})
     }
+    updateUserModule(json) {
+        return axios.post(`${API_URL}/api/user/module/${json}`, {}
+        );
+    }
 }
 
 export default new UserService()

@@ -25,12 +25,17 @@ class TracerCategoryService {
         return axios.get(`${API_URL}/api/tracerCategory/realmId/${json}`, {}
         );
     }
-    getTracerCategoryByProgramId(realmId,programId) {
+    getTracerCategoryByProgramId(realmId, programId) {
         return axios.get(`${API_URL}/api/tracerCategory/realmId/${realmId}/programId/${programId}`, {}
         );
     }
-    getTracerCategoryByProgramIds(realmId,programIds) {
-        return axios.post(`${API_URL}/api/tracerCategory/realmId/${realmId}/programIds/`,programIds ,{}
+    getTracerCategoryByProgramIds(realmId, programIds) {
+        return axios.post(`${API_URL}/api/tracerCategory/realmId/${realmId}/programIds/`, programIds, {}
+        );
+    }
+
+    getPlanningUnitByTracerCategoryId(tracerCategoryId) {
+        return axios.get(`${API_URL}/api/planningUnit/tracerCategory/${tracerCategoryId}`, {}
         );
     }
 

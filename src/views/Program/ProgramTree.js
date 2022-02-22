@@ -344,7 +344,7 @@ class Program extends Component {
                                 if (response.status == 200) {
                                     // console.log("Program List", response.data);
                                     this.setState({
-                                        prgList: response.data,
+                                        prgList: response.data.programList,
                                         loading: false
                                     })
                                 } else {

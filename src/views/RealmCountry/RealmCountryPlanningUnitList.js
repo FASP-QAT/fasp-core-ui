@@ -17,7 +17,7 @@ import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../Com
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 import moment from 'moment';
 import ProgramService from '../../api/ProgramService';
-import MultiSelect from "react-multi-select-component";
+import { MultiSelect } from "react-multi-select-component";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import CryptoJS from 'crypto-js';
 import { SECRET_KEY, INDEXED_DB_NAME, INDEXED_DB_VERSION, DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_DECIMAL_NO_REGEX, JEXCEL_PRO_KEY, JEXCEL_DECIMAL_NO_REGEX_FOR_MULTIPLIER } from '../../Constants';

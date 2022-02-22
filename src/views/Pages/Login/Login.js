@@ -331,7 +331,7 @@ class Login extends Component {
   }
   render() {
     return (
-      <div className="main-content flex-row align-items-center">
+      <div className="main-content flex-row align-items-center bg-height">
 
         <div className="Login-component" style={{ backgroundImage: "url(" + InnerBgImg + ")" }}>
           <Container className="container-login">

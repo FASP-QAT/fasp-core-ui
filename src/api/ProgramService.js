@@ -17,10 +17,22 @@ class ProgramService {
         return axios.get(`${API_URL}/api/program/`, {
         });
     }
+
+    getDataSetList() {
+        return axios.get(`${API_URL}/api/dataset/`, {
+        });
+    }
+
     getProgramListAll() {
         return axios.get(`${API_URL}/api/program/all`, {
         });
     }
+
+    getDataSetListAll() {
+        return axios.get(`${API_URL}/api/dataset/all`, {
+        });
+    }
+
     loadProgramList() {
         return axios.get(`${API_URL}/api/loadProgram/`, {
         });
@@ -94,7 +106,7 @@ class ProgramService {
         );
     }
 
-    saveProgramData(json,comparedVersionId) {
+    saveProgramData(json, comparedVersionId) {
         return axios.put(`${API_URL}/api/programData/${comparedVersionId}`, json, {}
         );
     }
@@ -180,7 +192,7 @@ class ProgramService {
     }
 
     getLatestVersionsForPrograms(programIds) {
-        return axios.post(`${API_URL}/api/programData/getLatestVersionForPrograms/`,programIds, {}
+        return axios.post(`${API_URL}/api/programData/getLatestVersionForPrograms/`, programIds, {}
         );
     }
 
@@ -189,12 +201,32 @@ class ProgramService {
         );
     }
 
-    checkIfCommitRequestExists(programId){
+    addDataset(json) {
+        return axios.post(`${API_URL}/api/dataset/`, json, {}
+        );
+    }
+
+    getDatasetById(json) {
+        return axios.get(`${API_URL}/api/dataset/${json}`, {}
+        );
+    }
+
+    editDataset(json) {
+        return axios.put(`${API_URL}/api/dataset/`, json, {}
+        );
+    }
+
+    getActualConsumptionData(json) {
+        return axios.post(`${API_URL}/api/program/actualConsumptionReport`, json, {}
+
+        );
+    }
+    checkIfCommitRequestExists(programId) {
         return axios.get(`${API_URL}/api/programData/checkIfCommitRequestExistsForProgram/${programId}`, {}
         );
     }
 
-    getCommitRequests(json,requestStatus){
+    getCommitRequests(json, requestStatus) {
         return axios.post(`${API_URL}/api/getCommitRequest/${requestStatus}`, json, {}
         );
     }

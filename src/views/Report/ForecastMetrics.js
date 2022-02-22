@@ -812,7 +812,7 @@ class ForecastMetrics extends Component {
 
       }
       // AuthenticationService.setupAxiosInterceptors();
-
+      console.log("report json---", inputjson);
       ReportService.getForecastError(inputjson)
         .then(response => {
           console.log(JSON.stringify(response.data));

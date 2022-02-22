@@ -235,6 +235,21 @@ const StockStatusReportAcrossPlanningUnits = React.lazy(() => import('./views/Re
 const ExpiredInventory = React.lazy(() => import('./views/Report/ExpiredInventory'));
 const Budgets = React.lazy(() => import('./views/Report/Budgets'));
 
+const UsagePeriodList = React.lazy(() => import('./views/UsagePeriod/UsagePeriodList'));
+const ModelingTypeList = React.lazy(() => import('./views/ModelingType/ModelingTypeList'));
+const ForecastMethodList = React.lazy(() => import('./views/ForecastMethod/ForecastMethodList'));
+const EquivalancyUnitList = React.lazy(() => import('./views/EquivalancyUnit/EquivalancyUnitList'));
+const UsageTemplateList = React.lazy(() => import('./views/UsageTemplate/UsageTemplateList'));
+
+const AddDataSet = React.lazy(() => import('./views/DataSet/AddDataSet'));
+const DataSetList = React.lazy(() => import('./views/DataSet/DataSetList'));
+const EditDataSet = React.lazy(() => import('./views/DataSet/EditDataSet'));
+const ListTree = React.lazy(() => import('./views/DataSet/ListTreeComponent'));
+
+const ImportFromQATSupplyPlan = React.lazy(() => import('./views/Consumption/ImportFromQATSupplyPlan'));
+const ImportIntoQATSupplyPlan = React.lazy(() => import('./views/Consumption/ImportIntoQATSupplyPlan'));
+const PlanningUnitSetting = React.lazy(() => import('./views/PlanningUnitSetting/PlanningUnitSetting'));
+
 // const EditProblem = React.lazy(() => import('./views/Problem/EditProblem'));
 
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
@@ -338,7 +353,7 @@ const routes = [
   { path: '/ApplicationDashboard', exact: true, name: i18n.t('static.dashboard.applicationdashboard'), component: ApplicationDashboard },
   // { path: '/ApplicationDashboard/:message', component: ApplicationDashboard },
   { path: '/ApplicationDashboard/:color/:message', exact: true, name: i18n.t('static.dashboard.applicationdashboard'), component: ApplicationDashboard },
-  
+
   { path: '/shipmentLinkingNotification', exact: true, name: i18n.t('static.mt.shipmentLinkingNotification'), component: ShipmentLinkingNotifications },
   { path: '/RealmDashboard', name: i18n.t('static.dashboard.realmdashboard'), component: RealmDashboard },
   { path: '/ProgramDashboard', name: i18n.t('static.dashboard.programdashboard'), component: ProgramDashboard },
@@ -586,5 +601,36 @@ const routes = [
   { path: '/report/stockAdjustment', name: i18n.t('static.report.stockAdjustment'), component: StockAdjustment },
   // { path: '/report/expiredInventory', name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.report.expiredInventory'), component: ExpiredInventory },
   { path: '/report/expiredInventory', name: i18n.t('static.report.expiredInventory'), component: ExpiredInventory },
+
+  { path: '/usagePeriod/listUsagePeriod/:color/:message', name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.usagePeriod.usagePeriod') }), component: UsagePeriodList },
+  { path: '/usagePeriod/listUsagePeriod', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.usagePeriod.usagePeriod') }), component: UsagePeriodList },
+
+  { path: '/forecastMethod/listForecastMethod/:color/:message', name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.forecastMethod.forecastMethod') }), component: ForecastMethodList },
+  { path: '/forecastMethod/listForecastMethod', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.forecastMethod.forecastMethod') }), component: ForecastMethodList },
+
+  { path: '/modelingTypeType/listModelingType/:color/:message', name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.modelingType.modelingType') }), component: ModelingTypeList },
+  { path: '/modelingTypeType/listModelingType', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.modelingType.modelingType') }), component: ModelingTypeList },
+
+  { path: '/equivalancyUnit/listEquivalancyUnit/:color/:message', name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.equivalancyUnit.equivalancyUnits') }), component: EquivalancyUnitList },
+  { path: '/equivalancyUnit/listEquivalancyUnit', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.equivalancyUnit.equivalancyUnits') }), component: EquivalancyUnitList },
+
+  { path: '/usageTemplate/listUsageTemplate/:color/:message', name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.usageTemplate.usageTemplate') }), component: UsageTemplateList },
+  { path: '/usageTemplate/listUsageTemplate', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.usageTemplate.usageTemplate') }), component: UsageTemplateList },
+
+  { path: '/dataset/addDataSet', name: i18n.t('static.breadcrum.add', { entityname: i18n.t('static.dataset.manageProgram') }), component: AddDataSet },
+  { path: '/dataset/listDataSet', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.dataset.manageProgram') }), component: DataSetList },
+  { path: '/dataset/listDataSet/:color/:message', name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.dataset.manageProgram') }), component: DataSetList },
+  { path: '/dataset/editDataSet/:dataSetId', name: i18n.t('static.breadcrum.edit', { entityname: i18n.t('static.dataset.manageProgram') }), component: EditDataSet },
+  { path: '/dataset/listTree/:color/:message', name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.common.listtree') }), component: ListTree },
+  { path: '/dataset/listTree', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.common.listtree') }), component: ListTree },
+
+  { path: '/importFromQATSupplyPlan/listImportFromQATSupplyPlan/:color/:message', name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.importFromQATSupplyPlan.importFromQATSupplyPlan') }), component: ImportFromQATSupplyPlan },
+  { path: '/importFromQATSupplyPlan/listImportFromQATSupplyPlan', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.importFromQATSupplyPlan.importFromQATSupplyPlan') }), component: ImportFromQATSupplyPlan },
+
+  { path: '/importIntoQATSupplyPlan/listImportIntoQATSupplyPlan/:color/:message', name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.importIntoQATSupplyPlan.importIntoQATSupplyPlan') }), component: ImportIntoQATSupplyPlan },
+  { path: '/importIntoQATSupplyPlan/listImportIntoQATSupplyPlan', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.importIntoQATSupplyPlan.importIntoQATSupplyPlan') }), component: ImportIntoQATSupplyPlan },
+
+  { path: '/planningUnitSetting/listPlanningUnitSetting/:color/:message', name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.planningUnitSetting.planningUnitSetting') }), component: PlanningUnitSetting },
+  { path: '/planningUnitSetting/listPlanningUnitSetting', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.planningUnitSetting.planningUnitSetting') }), component: PlanningUnitSetting },
 ];
 export default routes;

@@ -146,6 +146,15 @@ class AuthenticationService {
         // console.log(decryptedUser);
         return decryptedUser.realm.realmId;
     }
+    getLoggedInUserRealm() {
+        let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
+        // console.log("get realm id decryptedCurUser---", decryptedCurUser);
+        // console.log("user before decrypt---", localStorage.getItem("user-" + decryptedCurUser))
+        let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
+        // console.log("get realm id decryptedUser---", decryptedUser);
+        // console.log(decryptedUser);
+        return decryptedUser.realm;
+    }
 
     checkTypeOfSession(url) {
         let sessionType = localStorage.getItem('sessionType');
@@ -1228,6 +1237,7 @@ class AuthenticationService {
                         }
                         break;
                     case "/changePassword":
+                        // case "/ShowGuidance":
                         // if (bfunction.includes("ROLE_BF_CHANGE_PASSWORD")) {
                         return true;
                         // }
@@ -1235,6 +1245,7 @@ class AuthenticationService {
                     case "/logout/:message":
                     case "/logout":
                     case "/accessDenied":
+
                         return true;
                         break;
                     case "/problem/editProblem":
@@ -1266,6 +1277,148 @@ class AuthenticationService {
                             return true;
                         }
                         break;
+
+                    case "/usagePeriod/listUsagePeriod":
+                    case "/usagePeriod/listUsagePeriod/:color/:message":
+                        if (bfunction.includes("ROLE_BF_LIST_USAGE_PERIOD")) {
+                            return true;
+                        }
+                        break;
+
+                    case "/forecastMethod/listForecastMethod":
+                    case "/forecastMethod/listForecastMethod/:color/:message":
+                        if (bfunction.includes("ROLE_BF_LIST_FORECAST_METHOD")) {
+                            return true;
+                        }
+                        break;
+
+                    case "/modelingType/listModelingType":
+                    case "/modelingType/listModelingType/:color/:message":
+                        if (bfunction.includes("ROLE_BF_LIST_MODELING_TYPE")) {
+                            return true;
+                        }
+                        break;
+
+                    case "/planningUnitSetting/listPlanningUnitSetting":
+                    case "/planningUnitSetting/listPlanningUnitSetting/:color/:message":
+                        if (bfunction.includes("ROLE_BF_LIST_PLANNING_UNIT_SETTING")) {
+                            return true;
+                        }
+                        break;
+
+                    case "/equivalancyUnit/listEquivalancyUnit":
+                    case "/equivalancyUnit/listEquivalancyUnit/:color/:message":
+                        if (bfunction.includes("ROLE_BF_LIST_EQUIVALENCY_UNIT_MAPPING")) {
+                            return true;
+                        }
+                        break;
+                    case "/extrapolation/extrapolateData":
+                        if (bfunction.includes("ROLE_BF_EXTRAPOLATION")) {
+                            return true;
+                        }
+                        break;
+                    case "/importFromQATSupplyPlan/listImportFromQATSupplyPlan":
+                    case "/importFromQATSupplyPlan/listImportFromQATSupplyPlan/:color/:message":
+                    case "/importIntoQATSupplyPlan/listImportIntoQATSupplyPlan":
+                    case "/importIntoQATSupplyPlan/listImportIntoQATSupplyPlan/:color/:message":
+                        if (bfunction.includes("ROLE_BF_LIST_IMPORT_FROM_QAT_SUPPLY_PLAN")) {
+                            return true;
+                        }
+                        break;
+                    case "/report/compareAndSelectScenario":
+                        if (bfunction.includes("ROLE_BF_COMPARE_AND_SELECT")) {
+                            return true;
+                        }
+                        break;
+                    case "/validation/productValidation":
+                        if (bfunction.includes("ROLE_BF_PRODUCT_VALIDATION")) {
+                            return true;
+                        }
+                        break;
+                    case "/validation/modelingValidation":
+                        if (bfunction.includes("ROLE_BF_MODELING_VALIDATION")) {
+                            return true;
+                        }
+                        break;
+                    case "/report/compareVersion":
+                        if (bfunction.includes("ROLE_BF_COMPARE_VERSION")) {
+                            return true;
+                        }
+                        break;
+                    case "/dataset/commitTree":
+                        if (bfunction.includes("ROLE_BF_COMMIT_DATASET")) {
+                            return true;
+                        }
+                        break;
+                    case "/dataentry/consumptionDataEntryAndAdjustment":
+                    case "/dataentry/consumptionDataEntryAndAdjustment/:color/:message":
+                    case "/dataentry/consumptionDataEntryAndAdjustment/:planningUnitId":
+                        if (bfunction.includes("ROLE_BF_CONSUMPTION_DATA_ENTRY_ADJUSTMENT")) {
+                            return true;
+                        }
+                        break;
+                    case "/dataset/listTree":
+                    case "/dataset/loadDeleteDataSet":
+                    case "/dataset/exportDataset":
+                    case "/dataset/importDataset":
+                    case "/dataset/loadDeleteDataSet/:message":
+                    case "/dataSet/buildTree/tree/:treeId/:programId":
+                    case "/dataSet/buildTree/tree/:treeId/:programId/:scenarioId":
+                    case "/dataSet/buildTree/":
+                    case "/dataset/createTreeTemplate/:templateId":
+                    case "/dataset/listTreeTemplate/":
+                    case "/dataset/listTreeTemplate/:color/:message":
+                    case "/dataSet/buildTree/template/:templateId":
+                    case "/dataset/listTree/:color/:message":
+                    case "/dataset/versionSettings":
+                        if (bfunction.includes("ROLE_BF_LIST_REALM_COUNTRY")) {
+                            return true;
+                        }
+                        break;
+
+
+                    case "/usageTemplate/listUsageTemplate":
+                    case "/usageTemplate/listUsageTemplate/:color/:message":
+                        if (bfunction.includes("ROLE_BF_LIST_USAGE_TEMPLATE")) {
+                            return true;
+                        }
+                        break;
+
+                    case "/dataset/addDataSet":
+                        if (bfunction.includes("ROLE_BF_ADD_DATASET")) {
+                            return true;
+                        }
+                        break;
+                    case "/dataset/editDataSet/:dataSetId":
+                        if (bfunction.includes("ROLE_BF_EDIT_DATASET")) {
+                            return true;
+                        }
+                        break;
+                    case "/dataset/listDataSet":
+                    case "/dataset/listDataSet/:color/:message":
+                        if (bfunction.includes("ROLE_BF_LIST_DATASET")) {
+                            return true;
+                        }
+                        break;
+
+                    case "/forecastReport/forecastOutput":
+                        case "/forecastReport/forecastOutput/:programId/:versionId":
+                        if (bfunction.includes("ROLE_BF_LIST_MONTHLY_FORECAST")) {
+                            return true;
+                        }
+                        break;
+
+                    case "/forecastReport/forecastSummary":
+                    case "/forecastReport/forecastSummary/:programId/:versionId":
+                        if (bfunction.includes("ROLE_BF_LIST_FORECAST_SUMMARY")) {
+                            return true;
+                        }
+                        break;
+
+                    case "/forecastReport/consumptionForecastError":
+                    case "/forecastReport/compareScenario":
+                        return true;
+
                     default:
                         console.log("default case");
                         return false;
@@ -1358,9 +1511,9 @@ class AuthenticationService {
         console.log("timeout going to clear cache");
         let keysToRemove;
         if (localStorage.getItem('curUser') != null && localStorage.getItem('curUser') != "") {
-            keysToRemove = ["token-" + this.getLoggedInUserId(), "curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken", "sesRecordCount", "sesRangeValue", "sesProgramId", "sesPlanningUnitId", "sesLocalVersionChange", "sesLatestProgram", "sesProblemStatus", "sesProblemType", "sesProblemCategory", "sesReviewed", "sesStartDate", "sesProgramIdReport", "sesVersionIdReport", "sessionType", "sesBudPro", "sesBudFs", "sesBudStatus"];
+            keysToRemove = ["token-" + this.getLoggedInUserId(), "curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken", "sesRecordCount", "sesRangeValue", "sesProgramId", "sesPlanningUnitId", "sesLocalVersionChange", "sesLatestProgram", "sesProblemStatus", "sesProblemType", "sesProblemCategory", "sesReviewed", "sesStartDate", "sesProgramIdReport", "sesVersionIdReport", "sessionType", "sesBudPro", "sesBudFs", "sesBudStatus", "sesForecastProgramIds", "sesDatasetId", "sesDatasetPlanningUnitId", "sesDatasetRegionId", "sesLiveDatasetId", "sesDatasetVersionId", "sesTreeId", "sesScenarioId", "sesLevelId", "sesDatasetCompareVersionId", "sesForecastProgramIdReport", "sesForecastVersionIdReport"];
         } else {
-            keysToRemove = ["curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken", "sesRecordCount", "sesRangeValue", "sesProgramId", "sesPlanningUnitId", "sesLocalVersionChange", "sesLatestProgram", "sesProblemStatus", "sesProblemType", "sesProblemCategory", "sesReviewed", "sesStartDate", "sesProgramIdReport", "sesVersionIdReport", "sessionType", "sesBudPro", "sesBudFs", "sesBudStatus"];
+            keysToRemove = ["curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken", "sesRecordCount", "sesRangeValue", "sesProgramId", "sesPlanningUnitId", "sesLocalVersionChange", "sesLatestProgram", "sesProblemStatus", "sesProblemType", "sesProblemCategory", "sesReviewed", "sesStartDate", "sesProgramIdReport", "sesVersionIdReport", "sessionType", "sesBudPro", "sesBudFs", "sesBudStatus", "sesForecastProgramIds", "sesDatasetId", "sesDatasetPlanningUnitId", "sesDatasetRegionId", "sesLiveDatasetId", "sesDatasetVersionId", "sesTreeId", "sesScenarioId", "sesLevelId", "sesDatasetCompareVersionId", "sesForecastProgramIdReport", "sesForecastVersionIdReport"];
         }
         keysToRemove.forEach(k => localStorage.removeItem(k));
     }
@@ -1383,6 +1536,15 @@ class AuthenticationService {
         localStorage.setItem('sesRecordCount', count);
         localStorage.setItem('sesRangeValue', JSON.stringify({ from: { year: new Date(startDate).getFullYear(), month: new Date(startDate).getMonth() + 1 }, to: { year: new Date(endDate).getFullYear(), month: new Date(endDate).getMonth() + 1 } }));
         localStorage.setItem('sesProgramId', "");
+        localStorage.setItem('sesDatasetId', "");
+        localStorage.setItem('sesLevelId', "");
+        localStorage.setItem('sesLiveDatasetId', "");
+        localStorage.setItem('sesTreeId', "");
+        localStorage.setItem('sesScenarioId', "");
+        localStorage.setItem('sesDatasetVersionId', "");
+        localStorage.setItem('sesDatasetCompareVersionId', "");
+        localStorage.setItem('sesDatasetPlanningUnitId', "");
+        localStorage.setItem('sesDatasetRegionId', "");
         localStorage.setItem('sesPlanningUnitId', "");
         // localStorage.setItem('sesLocalVersionChange', false);
         localStorage.setItem("sesLatestProgram", false);
@@ -1392,9 +1554,12 @@ class AuthenticationService {
         localStorage.setItem('sesReviewed', "-1");
         localStorage.setItem('sesProgramIdReport', "");
         localStorage.setItem('sesVersionIdReport', "");
+        localStorage.setItem('sesForecastProgramIdReport', "");
+        localStorage.setItem('sesForecastVersionIdReport', "");
         localStorage.setItem('sesBudPro', "");
         localStorage.setItem('sesBudFs', "");
         localStorage.setItem('sesBudStatus', "");
+        localStorage.setItem('sesForecastProgramIds', "");
         var currentDate = moment(Date.now()).utcOffset('-0500')
         var curDate = moment(currentDate).startOf('month').subtract(MONTHS_IN_PAST_FOR_SUPPLY_PLAN, 'months').format("YYYY-MM-DD");
         localStorage.setItem('sesStartDate', JSON.stringify({ year: parseInt(moment(curDate).format("YYYY")), month: parseInt(moment(curDate).format("M")) }))

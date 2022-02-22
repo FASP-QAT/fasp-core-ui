@@ -218,6 +218,7 @@ class ApplicationDashboard extends Component {
       activeIndexProgram: 0,
       problemActionList: [],
       programList: [],
+      datasetList: [],
 
       message: '',
       dashboard: '',
@@ -248,6 +249,8 @@ class ApplicationDashboard extends Component {
     this.getPrograms = this.getPrograms.bind(this);
     this.checkNewerVersions = this.checkNewerVersions.bind(this);
     this.updateState = this.updateState.bind(this);
+    this.getDataSetList = this.getDataSetList.bind(this)
+      ;
   }
 
   rowClassNameFormat(row, rowIdx) {
@@ -382,6 +385,78 @@ class ApplicationDashboard extends Component {
 
   }
 
+  getDataSetList() {
+
+    var db1;
+    getDatabase();
+    var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+    openRequest.onerror = function (event) {
+      this.setState({
+        message: i18n.t('static.program.errortext'),
+        color: 'red'
+      })
+      // if (this.props.updateState != undefined) {
+      //     this.props.updateState(false);
+      // }
+    }.bind(this);
+    openRequest.onsuccess = function (e) {
+      db1 = e.target.result;
+      var transaction = db1.transaction(['datasetData'], 'readwrite');
+      var program = transaction.objectStore('datasetData');
+      var getRequest = program.getAll();
+      var datasetList = [];
+      getRequest.onerror = function (event) {
+        this.setState({
+          message: i18n.t('static.program.errortext'),
+          color: 'red',
+          loading: false
+        })
+        // if (this.props.updateState != undefined) {
+        //     this.props.updateState(false);
+        // }
+      }.bind(this);
+      getRequest.onsuccess = function (event) {
+        var myResult = [];
+        myResult = getRequest.result;
+        var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+        var userId = userBytes.toString(CryptoJS.enc.Utf8);
+        var filteredGetRequestList = myResult.filter(c => c.userId == userId);
+        for (var i = 0; i < filteredGetRequestList.length; i++) {
+
+          var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
+          var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
+          var programDataBytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+          var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+          var programJson1 = JSON.parse(programData);
+
+          datasetList.push({
+            programCode: filteredGetRequestList[i].programCode,
+            programVersion: filteredGetRequestList[i].version,
+            programId: filteredGetRequestList[i].programId,
+            versionId: filteredGetRequestList[i].version,
+            id: filteredGetRequestList[i].id,
+            loading: false,
+            forecastStartDate: (programJson1.currentVersion.forecastStartDate ? moment(programJson1.currentVersion.forecastStartDate).format(`MMM-YYYY`) : ''),
+            forecastStopDate: (programJson1.currentVersion.forecastStopDate ? moment(programJson1.currentVersion.forecastStopDate).format(`MMM-YYYY`) : ''),
+          });
+          // }
+        }
+        console.log("DATSET-------->", datasetList);
+        this.setState({
+          datasetList: datasetList
+        })
+        // this.setState({
+        //     programs: proList
+        // })
+        // this.checkNewerVersions(programList);
+        // if (this.props.updateState != undefined) {
+        //     this.props.updateState(false);
+        //     this.props.fetchData();
+        // }
+      }.bind(this);
+    }.bind(this)
+
+  }
   componentDidMount() {
     if (isSiteOnline()) {
       if (this.state.id == 1) {
@@ -444,6 +519,7 @@ class ApplicationDashboard extends Component {
 
     }
     this.getPrograms();
+    this.getDataSetList();
     DashboardService.openIssues()
       .then(response => {
         console.log("Customer Open Issues===", response);
@@ -673,6 +749,7 @@ class ApplicationDashboard extends Component {
 
   render() {
     const checkOnline = localStorage.getItem('sessionType');
+    const activeTab1 = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8)), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8)).defaultModuleId;
     const { activeIndex } = this.state;
     const { activeIndexProgram } = this.state;
     // const { problemActionlist } = this.state;
@@ -1038,17 +1115,24 @@ class ApplicationDashboard extends Component {
                   <div class="h1 text-muted text-left mb-2  ">
                     <i class="fa fa-calculator  icon-color"></i>
 
-                    <ButtonGroup className="float-right">
-                      <Dropdown id='card4' isOpen={this.state.card4} toggle={() => { this.setState({ card4: !this.state.card4 }); }}>
-                        <DropdownToggle caret className="p-0" color="transparent">
-                        </DropdownToggle>
-                        <DropdownMenu right>
-                          <DropdownItem onClick={() => this.redirectToCrud("/report/supplyPlanVersionAndReview")}>{i18n.t('static.dashboard.viewSupplyPlan')}</DropdownItem>
+            {activeTab1 == 2 &&
+              <Col xs="12" sm="6" lg="3">
+                <Card className=" CardHeight">
+                  <CardBody className="box-p">
+                    <div class="h1 text-muted text-left mb-2  ">
+                      <i class="fa fa-calculator  icon-color"></i>
 
-                        </DropdownMenu>
-                      </Dropdown>
-                    </ButtonGroup>
-                  </div>
+                      <ButtonGroup className="float-right">
+                        <Dropdown id='card4' isOpen={this.state.card4} toggle={() => { this.setState({ card4: !this.state.card4 }); }}>
+                          <DropdownToggle caret className="p-0" color="transparent">
+                          </DropdownToggle>
+                          <DropdownMenu right>
+                            <DropdownItem onClick={() => this.redirectToCrud("/report/supplyPlanVersionAndReview")}>{i18n.t('static.dashboard.viewSupplyPlan')}</DropdownItem>
+
+                          </DropdownMenu>
+                        </Dropdown>
+                      </ButtonGroup>
+                    </div>
 
                   <div className="TextTittle ">{i18n.t('static.dashboard.supplyPlanWaiting')} </div>
                   <div className="text-count">{this.state.dashboard.SUPPLY_PLAN_COUNT}</div>
@@ -1342,14 +1426,56 @@ class ApplicationDashboard extends Component {
 
 
 
-
+          {
+            this.state.datasetList.length > 0 &&
+            this.state.datasetList.map((item) => (
+              <Col xs="12" sm="6" lg="3">
+                <Card className=" CardHeight">
+                  <CardBody className="box-p">
+                    {/* <a href="javascript:void();" onClick={() => this.redirectToCrud("/report/problemList")} title={i18n.t('static.dashboard.qatProblemList')}>
+                      </a> */}
+                    <div style={{ display: item.loading ? "none" : "block" }}>
+                      <div class="h1 text-muted text-left mb-2">
+                        <i class="fa fa-list-alt icon-color"></i>
+                        {/* <ButtonGroup className="float-right BtnZindex">
+                          <Dropdown id={item.id} isOpen={this.state[item.id]} toggle={() => { this.setState({ [item.id]: !this.state[item.id] }); }}>
+                            <DropdownToggle caret className="p-0" color="transparent">
+                            </DropdownToggle>
+                            <DropdownMenu right>
+                              <DropdownItem onClick={() => this.getProblemListAfterCalculation(item.id)}>{i18n.t('static.qpl.calculate')}</DropdownItem>
+                              <DropdownItem onClick={() => this.redirectToCrud(/report/problemList/1/ + item.id + "/false")}>{i18n.t('static.dashboard.qatProblemList')}</DropdownItem>
+                            </DropdownMenu>
+                          </Dropdown>
+                        </ButtonGroup> */}
+                        {/* <i class="fa fa-list-alt icon-color"></i> &nbsp;
+                        <a href="javascript:void();" title="Recalculate" onClick={() => this.getProblemListAfterCalculation(item.id)}><i className="fa fa-refresh"></i></a> */}
+                      </div>
+                      <div className="TextTittle ">{item.programCode + "~v" + item.versionId}</div>
+                      <div className="TextTittle ">{item.forecastStartDate + " to " + item.forecastStopDate}</div>
+                      {/* <div className="TextTittle ">{i18n.t("static.problemReport.open")}:{item.openCount}</div> */}
+                      {/* <div className="TextTittle">{i18n.t("static.problemReport.addressed")}: {item.addressedCount}</div> */}
+                    </div>
+                    {/* <div style={{ display: item.loading ? "block" : "none" }}>
+                      <div className="d-flex align-items-center justify-content-center" style={{ height: "70px" }} >
+                        <div class="align-items-center">
+                          <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+                          <div class="spinner-border blue ml-4" role="status">
+                          </div>
+                        </div>
+                      </div>
+                    </div> */}
+                  </CardBody>
+                </Card>
+              </Col>
+            ))
+          }
 
 
 
 
           {/* <Row className="mt-2"> */}
           {
-            this.state.programList.length > 0 &&
+            this.state.programList.length > 0 && activeTab1 == 2 &&
             this.state.programList.map((item) => (
               <Col xs="12" sm="6" lg="3">
                 <Card className=" CardHeight">
@@ -1601,7 +1727,7 @@ class ApplicationDashboard extends Component {
         </Row> 
  */}
 
-      </div>
+      </div >
     );
   }
 }
