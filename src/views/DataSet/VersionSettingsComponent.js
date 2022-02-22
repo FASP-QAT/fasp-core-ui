@@ -1239,21 +1239,21 @@ class VersionSettingsComponent extends Component {
                     </li>
                 </ul>
             )
-        }, this):<ul></ul>;
+        }, this) : <ul></ul>;
 
         //Nodes less than 100%
-        let jxlTable = this.state.treeScenarioList.length>0?this.state.treeScenarioList.map((item1, count) => {
+        let jxlTable = this.state.treeScenarioList.length > 0 ? this.state.treeScenarioList.map((item1, count) => {
             var nodeWithPercentageChildren = this.state.nodeWithPercentageChildren.filter(c => c.treeId == item1.treeId && c.scenarioId == item1.scenarioId);
             if (nodeWithPercentageChildren.length > 0) {
                 return (<><span className="hoverDiv" onClick={() => nodeWithPercentageChildrenClicked(item1.treeId, item1.scenarioId, this)}><span>{getLabelText(item1.treeLabel, this.state.lang) + " / " + getLabelText(item1.scenarioLabel, this.state.lang)}</span></span><div className="table-responsive">
                     <div id={"tableDiv" + count} className="jexcelremoveReadonlybackground consumptionDataEntryTable" name='jxlTableData' />
                 </div><br /></>)
             }
-        }, this):<br/>
+        }, this) : <br />
 
         //Consumption Notes
         const { datasetPlanningUnit } = this.state;
-        let consumtionNotes = datasetPlanningUnit.length > 0 && datasetPlanningUnit.filter(c=>c.consuptionForecast.toString()=="true").map((item, i) => {
+        let consumtionNotes = datasetPlanningUnit.length > 0 && datasetPlanningUnit.filter(c => c.consuptionForecast.toString() == "true").map((item, i) => {
             return (
                 <tr key={i} className="hoverTd" onClick={() => missingMonthsClicked(item.planningUnit.id, this)}>
                     <td>{getLabelText(item.planningUnit.label, this.state.lang)}</td>
@@ -1277,7 +1277,7 @@ class VersionSettingsComponent extends Component {
 
         //Tree Nodes Notes
         const { treeNodeList } = this.state;
-        let treeNodes = treeNodeList.length > 0 && treeNodeList.filter(c=>(c.notes!=null && c.notes!="") || (c.madelingNotes!=null && c.madelingNotes!="")).map((item, i) => {
+        let treeNodes = treeNodeList.length > 0 && treeNodeList.filter(c => (c.notes != null && c.notes != "") || (c.madelingNotes != null && c.madelingNotes != "")).map((item, i) => {
             return (
                 <tr key={i} className="hoverTd" onClick={() => nodeWithPercentageChildrenClicked(item.treeId, item.scenarioId, this)}>
                     <td>{getLabelText(item.tree, this.state.lang)}</td>
@@ -1397,7 +1397,7 @@ class VersionSettingsComponent extends Component {
                             <span><b>{this.state.programName}</b></span><br />
                             <span><b>{i18n.t('static.common.forecastPeriod')}: </b> {moment(this.state.forecastStartDate).format('MMM-YYYY')} to {moment(this.state.forecastStopDate).format('MMM-YYYY')} </span><br /><br />
 
-                            <span><b>1. {i18n.t('static.commitTree.noForecastSelected')}: </b>(<a href="/#/report/compareAndSelectScenario" target="_blank">{i18n.t('static.commitTree.compare&Select')}</a>, <a href="/#/forecastReport/forecastSummary" target="_blank">{i18n.t('static.commitTree.forecastSummary')}</a>)</span><br />
+                            <span><b>1. {i18n.t('static.commitTree.noForecastSelected')}: </b>(<a href="/#/report/compareAndSelectScenario" target="_blank">{i18n.t('static.commitTree.compare&Select')}</a>, <a href={this.state.programId != -1 && this.state.programId != "" && this.state.programId != undefined ? "/#/forecastReport/forecastSummary/" + this.state.programId.toString().split("_")[0] + "/" + (this.state.programId.toString().split("_")[1]).toString().substring(1) : "/#/forecastReport/forecastSummary/"} target="_blank">{i18n.t('static.commitTree.forecastSummary')}</a>)</span><br />
                             <ul>{noForecastSelected}</ul>
 
                             <span><b>2. {i18n.t('static.commitTree.consumptionForecast')}: </b>(<a href="/#/dataentry/consumptionDataEntryAndAdjustment" target="_blank">{i18n.t('static.commitTree.dataEntry&Adjustment')}</a>, <a href="/#/extrapolation/extrapolateData" target="_blank">{i18n.t('static.commitTree.extrapolation')}</a>)</span><br />
@@ -1406,7 +1406,7 @@ class VersionSettingsComponent extends Component {
                             <span>b. {i18n.t('static.commitTree.puThatDoNotHaveAtleast24MonthsOfActualConsumptionValues')}:</span><br />
                             <ul>{consumption}</ul>
 
-                            <span><b>3. {i18n.t('static.commitTree.treeForecast')}: </b>(<a href="/#/dataset/listTree" target="_blank">{i18n.t('static.common.managetree')}</a>)</span><br />
+                            <span><b>3. {i18n.t('static.commitTree.treeForecast')}: </b>(<a href={"/#/dataSet/buildTree/tree/0/" + this.state.programId} target="_blank">{i18n.t('static.common.managetree')}</a>)</span><br />
                             <span>a. {i18n.t('static.commitTree.puThatDoesNotAppearOnAnyTree')}: </span><br />
                             <ul>{pu}</ul>
 
@@ -1425,8 +1425,8 @@ class VersionSettingsComponent extends Component {
                                     <Table className="table-bordered text-center mt-2 overflowhide main-table table-striped1" bordered size="sm" >
                                         <thead>
                                             <tr>
-                                                <th style={{width:'30%'}}><b>{i18n.t('static.dashboard.planningunitheader')}</b></th>
-                                                <th style={{width:'80%'}}><b>{i18n.t('static.program.notes')}</b></th>
+                                                <th style={{ width: '30%' }}><b>{i18n.t('static.dashboard.planningunitheader')}</b></th>
+                                                <th style={{ width: '80%' }}><b>{i18n.t('static.program.notes')}</b></th>
                                             </tr>
                                         </thead>
                                         <tbody>{consumtionNotes}</tbody>
@@ -1439,10 +1439,10 @@ class VersionSettingsComponent extends Component {
                                     <Table className="table-bordered text-center mt-2 overflowhide main-table table-striped1" bordered size="sm" >
                                         <thead>
                                             <tr>
-                                                <th style={{width:'15%'}}><b>{i18n.t('static.forecastMethod.tree')}</b></th>
-                                                <th style={{width:'15%'}}><b>{i18n.t('static.whatIf.scenario')}</b></th>
-                                                <th style={{width:'35%'}}><b>{i18n.t('static.dataValidation.treeNotes')}</b></th>
-                                                <th style={{width:'35%'}}><b>{i18n.t('static.dataValidation.scenarioNotes')}</b></th>
+                                                <th style={{ width: '15%' }}><b>{i18n.t('static.forecastMethod.tree')}</b></th>
+                                                <th style={{ width: '15%' }}><b>{i18n.t('static.whatIf.scenario')}</b></th>
+                                                <th style={{ width: '35%' }}><b>{i18n.t('static.dataValidation.treeNotes')}</b></th>
+                                                <th style={{ width: '35%' }}><b>{i18n.t('static.dataValidation.scenarioNotes')}</b></th>
                                             </tr>
                                         </thead>
                                         <tbody>{scenarioNotes}</tbody>

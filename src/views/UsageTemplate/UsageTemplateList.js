@@ -1071,7 +1071,8 @@ class usageTemplate extends Component {
 
                     var typeId = rowData[26];
                     let roleArray = this.state.roleArray;
-                    if ((roleArray.includes('ROLE_REALM_ADMIN') && typeId != -1 && typeId != 0) || (roleArray.includes('ROLE_DATASET_ADMIN') && typeId == -1 && typeId != 0)) {
+                    // if ((roleArray.includes('ROLE_REALM_ADMIN') && typeId != -1 && typeId != 0) || (roleArray.includes('ROLE_DATASET_ADMIN') && typeId == -1 && typeId != 0)) {
+                    if ((roleArray.includes('ROLE_DATASET_ADMIN') && typeId == -1 && typeId != 0)) {
                         var cell1 = elInstance.getCell(`B${parseInt(y) + 1}`)
                         cell1.classList.add('readonly');
                         var cell1 = elInstance.getCell(`C${parseInt(y) + 1}`)
@@ -1188,7 +1189,11 @@ class usageTemplate extends Component {
                             // items.push({ type: 'line' });
                         }
 
-                        if (!this.el.getValueFromCoords(14, y)) {
+                        var typeId = this.el.getValueFromCoords(26, y);
+                        let roleArray = this.state.roleArray;
+
+                        // if (!this.el.getValueFromCoords(14, y) && !(roleArray.includes('ROLE_REALM_ADMIN') && typeId != -1 && typeId != 0) || (roleArray.includes('ROLE_DATASET_ADMIN') && typeId == -1 && typeId != 0)) {
+                        if (!this.el.getValueFromCoords(14, y) && !(roleArray.includes('ROLE_DATASET_ADMIN') && typeId == -1 && typeId != 0)) {
                             items.push({
                                 title: i18n.t('static.usageTemplate.calculateUsageFrequency'),
                                 onclick: function () {

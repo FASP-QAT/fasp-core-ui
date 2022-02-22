@@ -865,7 +865,7 @@
     "static.dashboard.productcategory": "Planning unit category",
     "static.dashboard.programmaster": "Program management",
     "static.commit.newDataLatestVersion": "New data from latest version",
-    "static.tree.QATEstimateForIntervalEvery_months": "QAT estimate for interval (Every _ months)",
+    "static.tree.QATEstimateForIntervalEvery_months": "QAT estimate for interval (Every X months)",
     "static.commit.negativeStock": "Batches have negative stock!",
     "static.supplyPlan.includeInProjectedShipment": "Include in projected balance",
     "static.report.consumptionReport": "Consumption Report",
@@ -1088,7 +1088,7 @@
     "static.procurementAgent.selectProcurementAgent": "Select Procurement Agent",
     "static.period.selectPeriod": "Select Date Range",
     "static.common.submit": "Submit",
-    "static.tree.calculated": "Calculate",
+    "static.tree.calculated": "Recalculate",
     "static.budget.fundingtext": "Select funding source",
     "static.program.validsubmittoapprovetext": "Enter `Submitted to Approved` lead time (in months)",
     "static.common.lastModifiedBy": "Last Updated By",
@@ -2017,7 +2017,7 @@
     "static.report.localprocurement": "Local Procurement",
     "static.quantimed.quantimedImportScreenThird": "Select Date Range",
     "static.supplyPlan.adjustedContainers": "Adjusted Containers",
-    "static.tree.modelingCalculaterTool:": "Modeling Calculater Tool:",
+    "static.tree.modelingCalculaterTool": "Modeling Calculater Tool:",
     "static.shipment.dateIsLesserThanPrevDate": "Selected date is earlier than the date selected in previous columns.",
     "static.supplyPlan.consumptionMsg": "Consumption (* indicates actual)",
     "static.organisation.organisationcodemax4digittext": "Display name length should be 4 characters long",
@@ -2143,5 +2143,7 @@
     "static.supplyPlanFormula.maxMonthOfStockEx2": "Max = MIN ([ MAX(4,3)+3 ] ,18 )",
     "static.organisation.organisationheader": "Organization",
     "static.supplyPlanFormula.maxMonthOfStockEx5": "Max = 7",
-    "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18 )"
+    "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18 )",
+    "static.common.deleteTree": "Delete Tree",
+    "static.common.duplicateTree":"Duplicate Tree"
 }

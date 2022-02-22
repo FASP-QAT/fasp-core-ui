@@ -111,18 +111,19 @@ export function dataCheck(props, datasetJson) {
     }
     var datasetPlanningUnit = datasetJson.planningUnitList;
     var notSelectedPlanningUnitList = [];
-    for (var dp = 0; dp < datasetPlanningUnit.length; dp++) {
-        if (datasetPlanningUnit[dp].treeForecast.toString() == "true") {
-            var puId = datasetPlanningUnit[dp].planningUnit.id;
+    var datasetPlanningUnitTreeList = datasetPlanningUnit.filter(c => c.treeForecast.toString() == "true");
+    for (var dp = 0; dp < datasetPlanningUnitTreeList.length; dp++) {
+        if (datasetPlanningUnitTreeList[dp].treeForecast.toString() == "true") {
+            var puId = datasetPlanningUnitTreeList[dp].planningUnit.id;
             let planningUnitNotSelected = treePlanningUnitList.filter(c => (c.id == puId));
             if (planningUnitNotSelected.length == 0) {
                 notSelectedPlanningUnitList.push({
-                    planningUnit: datasetPlanningUnit[dp].planningUnit,
+                    planningUnit: datasetPlanningUnitTreeList[dp].planningUnit,
                     regionsArray: datasetRegionList.map(c => getLabelText(c.label, props.state.lang))
                 });
             } else {
                 notSelectedPlanningUnitList.push({
-                    planningUnit: datasetPlanningUnit[dp].planningUnit,
+                    planningUnit: datasetPlanningUnitTreeList[dp].planningUnit,
                     regionsArray: puRegionList
                 });
             }
@@ -201,42 +202,45 @@ export function dataCheck(props, datasetJson) {
     var consumptionListlessTwelve = [];
     var noForecastSelectedList = [];
     for (var dpu = 0; dpu < datasetPlanningUnit.length; dpu++) {
-        for (var drl = 0; drl < datasetRegionList.length; drl++) {
-            var curDate = startDate;
-            var monthsArray = [];
-            var puId = datasetPlanningUnit[dpu].planningUnit.id;
-            var regionId = datasetRegionList[drl].regionId;
-            var consumptionListFiltered = consumptionList.filter(c => c.planningUnit.id == puId && c.region.id == regionId);
-            if (consumptionListFiltered.length < 24) {
-                consumptionListlessTwelve.push({
-                    planningUnitId: datasetPlanningUnit[dpu].planningUnit.id,
-                    planningUnitLabel: datasetPlanningUnit[dpu].planningUnit.label,
-                    regionId: datasetRegionList[drl].regionId,
-                    regionLabel: datasetRegionList[drl].label,
-                    noOfMonths: consumptionListFiltered.length
-                })
-            }
-
-            //Consumption : missing months
-            for (var i = 0; moment(curDate).format("YYYY-MM") < moment(Date.now()).format("YYYY-MM"); i++) {
-                curDate = moment(startDate).add(i, 'months').format("YYYY-MM-DD");
-                var consumptionListFilteredForMonth = consumptionList.filter(c => c.planningUnit.id == puId && c.region.id == regionId);
-                var consumptionListForCurrentMonth = consumptionListFilteredForMonth.filter(c => moment(c.month).format("YYYY-MM") == moment(curDate).format("YYYY-MM"));
-                var checkIfPrevMonthConsumptionAva = consumptionListFilteredForMonth.filter(c => moment(c.month).format("YYYY-MM") < moment(curDate).format("YYYY-MM"));
-                var checkIfNextMonthConsumptionAva = consumptionListFilteredForMonth.filter(c => moment(c.month).format("YYYY-MM") > moment(curDate).format("YYYY-MM"));
-                if (consumptionListForCurrentMonth.length == 0 && checkIfPrevMonthConsumptionAva.length > 0 && checkIfNextMonthConsumptionAva.length > 0) {
-                    monthsArray.push(moment(curDate).format(DATE_FORMAT_CAP_WITHOUT_DATE));
+        if (datasetPlanningUnit[dpu].consuptionForecast.toString() == "true") {
+            for (var drl = 0; drl < datasetRegionList.length; drl++) {
+                var curDate = startDate;
+                var monthsArray = [];
+                var puId = datasetPlanningUnit[dpu].planningUnit.id;
+                var regionId = datasetRegionList[drl].regionId;
+                var consumptionListFiltered = consumptionList.filter(c => c.planningUnit.id == puId && c.region.id == regionId);
+                if (consumptionListFiltered.length < 24) {
+                    consumptionListlessTwelve.push({
+                        planningUnitId: datasetPlanningUnit[dpu].planningUnit.id,
+                        planningUnitLabel: datasetPlanningUnit[dpu].planningUnit.label,
+                        regionId: datasetRegionList[drl].regionId,
+                        regionLabel: datasetRegionList[drl].label,
+                        noOfMonths: consumptionListFiltered.length
+                    })
                 }
-            }
 
-            if (monthsArray.length > 0) {
-                missingMonthList.push({
-                    planningUnitId: datasetPlanningUnit[dpu].planningUnit.id,
-                    planningUnitLabel: datasetPlanningUnit[dpu].planningUnit.label,
-                    regionId: datasetRegionList[drl].regionId,
-                    regionLabel: datasetRegionList[drl].label,
-                    monthsArray: monthsArray
-                })
+                //Consumption : missing months
+                for (var i = 0; moment(curDate).format("YYYY-MM") < moment(Date.now()).format("YYYY-MM"); i++) {
+                    var consumptionListFilteredForMonth = consumptionList.filter(c => c.planningUnit.id == puId && c.region.id == regionId);
+                    let actualMin = moment.min(consumptionListFilteredForMonth.map(d => moment(d.month)));
+                    curDate = moment(actualMin).add(i, 'months').format("YYYY-MM-DD");
+                    var consumptionListForCurrentMonth = consumptionListFilteredForMonth.filter(c => moment(c.month).format("YYYY-MM") == moment(curDate).format("YYYY-MM"));
+                    var checkIfPrevMonthConsumptionAva = consumptionListFilteredForMonth.filter(c => moment(c.month).format("YYYY-MM") < moment(curDate).format("YYYY-MM"));
+                    var checkIfNextMonthConsumptionAva = consumptionListFilteredForMonth.filter(c => moment(c.month).format("YYYY-MM") > moment(curDate).format("YYYY-MM"));
+                    if (consumptionListForCurrentMonth.length == 0 && checkIfPrevMonthConsumptionAva.length > 0 && checkIfNextMonthConsumptionAva.length > 0) {
+                        monthsArray.push(moment(curDate).format(DATE_FORMAT_CAP_WITHOUT_DATE));
+                    }
+                }
+
+                if (monthsArray.length > 0) {
+                    missingMonthList.push({
+                        planningUnitId: datasetPlanningUnit[dpu].planningUnit.id,
+                        planningUnitLabel: datasetPlanningUnit[dpu].planningUnit.label,
+                        regionId: datasetRegionList[drl].regionId,
+                        regionLabel: datasetRegionList[drl].label,
+                        monthsArray: monthsArray
+                    })
+                }
             }
         }
         //No Forecast selected
@@ -789,7 +793,7 @@ export function exportPDF(props) {
     columns.push(i18n.t('static.program.notes'));
     var headers = [columns]
     var dataArr2 = [];
-    props.state.datasetPlanningUnit.filter(c=>c.consuptionForecast.toString()=="true").map((item5, i) => {
+    props.state.datasetPlanningUnit.filter(c => c.consuptionForecast.toString() == "true").map((item5, i) => {
         dataArr2.push([
             getLabelText(item5.planningUnit.label, props.state.lang),
             item5.consumtionNotes])
@@ -882,7 +886,7 @@ export function exportPDF(props) {
     columns.push(i18n.t('static.program.notes'));
     var headers = [columns]
     var dataArr2 = [];
-    props.state.treeNodeList.filter(c=>(c.notes!=null && c.notes!="") || (c.madelingNotes!=null && c.madelingNotes!="")).map((item6, i) => {
+    props.state.treeNodeList.filter(c => (c.notes != null && c.notes != "") || (c.madelingNotes != null && c.madelingNotes != "")).map((item6, i) => {
         dataArr2.push([
             getLabelText(item6.tree, props.state.lang),
             getLabelText(item6.node, props.state.lang),
