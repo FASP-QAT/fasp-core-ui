@@ -1351,6 +1351,7 @@ class AuthenticationService {
                         }
                         break;
                     case "/dataentry/consumptionDataEntryAndAdjustment":
+                    case "/dataentry/consumptionDataEntryAndAdjustment/:color/:message":
                     case "/dataentry/consumptionDataEntryAndAdjustment/:planningUnitId":
                         if (bfunction.includes("ROLE_BF_CONSUMPTION_DATA_ENTRY_ADJUSTMENT")) {
                             return true;
@@ -1401,6 +1402,7 @@ class AuthenticationService {
                         break;
 
                     case "/forecastReport/forecastOutput":
+                        case "/forecastReport/forecastOutput/:programId/:versionId":
                         if (bfunction.includes("ROLE_BF_LIST_MONTHLY_FORECAST")) {
                             return true;
                         }

@@ -244,6 +244,8 @@ class ForecastOutput extends Component {
                                     if (myResult[i].program.id == programId && myResult[i].active == true) {
                                         filteredEquList.push(myResult[i]);
                                     }
+                                } else {
+                                    filteredEquList.push(myResult[i]);
                                 }
                             }
                             console.log("EquivalencyUnitList---------->1", filteredEquList);
@@ -1314,8 +1316,22 @@ class ForecastOutput extends Component {
                         console.log("programs------------------>1", this.state.programs);
                     })
                 } else {
-
-                    if (localStorage.getItem("sesForecastProgramIdReport") != '' && localStorage.getItem("sesForecastProgramIdReport") != undefined) {
+                    if (this.props.match.params.programId != "" && this.props.match.params.programId != undefined) {
+                        this.setState({
+                            programs: proList.sort(function (a, b) {
+                                a = getLabelText(a.label, lang).toLowerCase();
+                                b = getLabelText(b.label, lang).toLowerCase();
+                                return a < b ? -1 : a > b ? 1 : 0;
+                            }),
+                            programId: this.props.match.params.programId,
+                            downloadedProgramData: downloadedProgramData,
+                            loading: false
+                        }, () => {
+                            this.getVersionIds();
+                            console.log("programs------------------>", this.state.programs);
+                        })
+                    }
+                    else if (localStorage.getItem("sesForecastProgramIdReport") != '' && localStorage.getItem("sesForecastProgramIdReport") != undefined) {
                         this.setState({
                             programs: proList.sort(function (a, b) {
                                 a = getLabelText(a.label, lang).toLowerCase();
@@ -1615,7 +1631,7 @@ class ForecastOutput extends Component {
 
             this.setState({
                 // forecastPeriod: (month[new Date((month[d1.getMonth()] + '-' + d1.getFullYear())).getMonth()]) + ' ' + (startDateSplit[1] - 3) + ' ~ ' + month[forecastStopDate.getMonth()] + ' ' + forecastStopDate.getFullYear(),
-                forecastPeriod: month[new Date(forecastStartDateNew).getMonth()] + ' ' + new Date(forecastStartDateNew).getFullYear() + ' ~ ' + month[new Date(forecastStartDateNew).getMonth()] + ' ' + new Date(forecastStopDateNew).getFullYear(),
+                forecastPeriod: month[new Date(forecastStartDateNew).getMonth()] + ' ' + new Date(forecastStartDateNew).getFullYear() + ' ~ ' + month[new Date(forecastStopDateNew).getMonth()] + ' ' + new Date(forecastStopDateNew).getFullYear(),
             }, () => {
 
             })
@@ -1778,8 +1794,16 @@ class ForecastOutput extends Component {
                     return a.indexOf(x) === i;
                 })
                 versionList.reverse();
-
-                if (localStorage.getItem("sesForecastVersionIdReport") != '' && localStorage.getItem("sesForecastVersionIdReport") != undefined) {
+                if (this.props.match.params.versionId != "" && this.props.match.params.versionId != undefined) {
+                    // let versionVar = versionList.filter(c => c.versionId == this.props.match.params.versionId+" (Local)");
+                    this.setState({
+                        versions: versionList,
+                        versionId: this.props.match.params.versionId + " (Local)",
+                    }, () => {
+                        this.filterData();
+                        this.setVersionId();
+                    })
+                }else if (localStorage.getItem("sesForecastVersionIdReport") != '' && localStorage.getItem("sesForecastVersionIdReport") != undefined) {
                     let versionVar = versionList.filter(c => c.versionId == localStorage.getItem("sesForecastVersionIdReport"));
                     this.setState({
                         versions: versionList,
@@ -1935,7 +1959,8 @@ class ForecastOutput extends Component {
         var chartOptions = {
             title: {
                 display: true,
-                text: (this.state.yaxisEquUnit > 0 ? this.state.equivalencyUnitLabel : 'Monthly Forecast ' + (this.state.viewById == 1 ? '(' + i18n.t('static.product.product') + ')' : '(' + i18n.t('static.forecastingunit.forecastingunit') + ')'))
+                // text: (this.state.yaxisEquUnit > 0 ? this.state.equivalencyUnitLabel : 'Monthly Forecast ' + (this.state.viewById == 1 ? '(' + i18n.t('static.product.product') + ')' : '(' + i18n.t('static.forecastingunit.forecastingunit') + ')'))
+                text: 'Monthly Forecast'
             },
             scales: {
                 yAxes: [
@@ -2220,12 +2245,17 @@ class ForecastOutput extends Component {
                     </div>
                     <div className="Card-header-reporticon ">
                         <div className="card-header-actions BacktoLink col-md-12 pl-lg-0 pr-lg-0 pt-lg-2">
-                            <a className="pr-lg-0 pt-lg-1 float-left">
+                            {/* <a className="pr-lg-0 pt-lg-1 float-left">
                                 <span style={{ cursor: 'pointer' }} onClick={() => { this.backToCompareAndSelect() }}><i className="fa fa-long-arrow-left" style={{ color: '#20a8d8', fontSize: '13px' }}></i> <small className="supplyplanformulas">{'Return To Compare And Select Forecast'}</small></span>
                             </a>
                             <a className="pr-lg-0 pt-lg-1 float-right">
                                 <span style={{ cursor: 'pointer' }} onClick={() => { this.continueToForecastSummary() }}><i className="fa fa-long-arrow-right" style={{ color: '#20a8d8', fontSize: '13px' }}></i> <small className="supplyplanformulas">{'Continue To Forecast Summary'}</small></span>
-                            </a>
+                            </a> */}
+
+                            <span className="compareAndSelect-larrow"> <i className="cui-arrow-left icons " > </i></span>
+                            <span className="compareAndSelect-rarrow"> <i className="cui-arrow-right icons " > </i></span>
+                            <span className="compareAndSelect-larrowText"> {i18n.t('static.common.backTo')} <a href="/#/report/compareAndSelectScenario">{'Compare And Select Forecast'}</a> </span>
+                            <span className="compareAndSelect-rarrowText"> {i18n.t('static.common.continueTo')} <a href="/#/forecastReport/forecastSummary">{'Forecast Summary'}</a></span><br />
 
                         </div>
                     </div>

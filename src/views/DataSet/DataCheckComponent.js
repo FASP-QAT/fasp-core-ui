@@ -10,13 +10,13 @@ import jsPDF from 'jspdf';
 import "jspdf-autotable";
 
 export function dataCheck(props, datasetJson) {
-    var PgmTreeList = datasetJson.treeList;
+    var PgmTreeList = datasetJson.treeList.filter(c=>c.active.toString()=="true");
 
     var treeScenarioNotes = [];
     var missingBranchesList = [];
     for (var tl = 0; tl < PgmTreeList.length; tl++) {
         var treeList = PgmTreeList[tl];
-        var scenarioList = treeList.scenarioList;
+        var scenarioList = treeList.scenarioList.filter(c=>c.active.toString()=="true");
         for (var ndm = 0; ndm < scenarioList.length; ndm++) {
             treeScenarioNotes.push({
                 tree: PgmTreeList[tl].label,
@@ -38,7 +38,7 @@ export function dataCheck(props, datasetJson) {
         for (var fl = 0; fl < flatList.length; fl++) {
             var payload = flatList[fl].payload;
             var nodeDataMap = payload.nodeDataMap;
-            var scenarioList = treeList.scenarioList;
+            var scenarioList = treeList.scenarioList.filter(c=>c.active.toString()=="true");
             for (var ndm = 0; ndm < scenarioList.length; ndm++) {
                 if (payload.nodeType.id == 5) {
                     var nodePlanningUnit = ((nodeDataMap[scenarioList[ndm].id])[0].puNode.planningUnit);
@@ -82,7 +82,7 @@ export function dataCheck(props, datasetJson) {
         }
 
         //Nodes less than 100%
-        var scenarioList = PgmTreeList[tl].scenarioList;
+        var scenarioList = PgmTreeList[tl].scenarioList.filter(c=>c.active.toString()=="true");
         var treeId = PgmTreeList[tl].treeId;
         for (var sc = 0; sc < scenarioList.length; sc++) {
             treeScenarioList.push(
@@ -145,7 +145,7 @@ export function dataCheck(props, datasetJson) {
             for (var fl = 0; fl < flatList.length; fl++) {
                 var payload = flatList[fl].payload;
                 var nodeDataMap = payload.nodeDataMap;
-                var scenarioList = treeList.scenarioList;
+                var scenarioList = treeList.scenarioList.filter(c=>c.active.toString()=="true");
                 for (var ndm = 0; ndm < scenarioList.length; ndm++) {
                     // var nodeModellingList = nodeDataModelingList.filter(c => c.month == curDate);
                     var nodeChildrenList = flatList.filter(c => flatList[fl].id == c.parent && (c.payload.nodeType.id == 3 || c.payload.nodeType.id == 4 || c.payload.nodeType.id == 5));

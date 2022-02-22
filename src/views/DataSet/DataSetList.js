@@ -680,7 +680,7 @@ export default class ProgramList extends Component {
 
                         <Col md="6 pl-0">
                             <div className="d-md-flex Selectdiv2">
-                                {/* <FormGroup className="tab-ml-1 mt-md-2 mb-md-0 ">
+                                <FormGroup className="tab-ml-1 mt-md-2 mb-md-0 ">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.region.country')}</Label>
 
                                     <div className="controls SelectGo">
@@ -697,14 +697,14 @@ export default class ProgramList extends Component {
                                             </Input>
                                         </InputGroup>
                                     </div>
-                                </FormGroup> */}
-                                <Input
+                                </FormGroup>
+                                {/* <Input
                                     type="hidden"
                                     name="countryId"
                                     id="countryId"
                                     bsSize="sm"
-                                ></Input>
-                                <FormGroup className="mt-md-2 mb-md-0 ">
+                                ></Input> */}
+                                <FormGroup className="tab-ml-1 mt-md-2 mb-md-0 ">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.common.status')}</Label>
                                     <div className="controls SelectGo">
                                         <InputGroup>
@@ -725,9 +725,9 @@ export default class ProgramList extends Component {
                                 </FormGroup>
                             </div>
                         </Col>
-                                <div className="table-responsive consumptionDataEntryTable">
-                        {/* <div id="loader" className="center"></div> */}<div id="tableDiv" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_DATASET') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
-                        </div>
+                        <div className="table-responsive consumptionDataEntryTable">
+                            {/* <div id="loader" className="center"></div> */}<div id="tableDiv" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_DATASET') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
+                            </div>
                         </div>
                         <div style={{ display: this.state.loading ? "block" : "none" }}>
                             <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >

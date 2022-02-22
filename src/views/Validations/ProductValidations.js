@@ -172,7 +172,7 @@ class ProductValidation extends Component {
         this.setState({ loading: true })
         var datasetJson = this.state.datasetData;
         console.log("datasetJson+++", datasetJson);
-        var treeList = datasetJson.treeList;
+        var treeList = datasetJson.treeList.filter(c => c.active.toString() == "true");
         var treeId = "";
         var event = {
             target: {
@@ -238,7 +238,7 @@ class ProductValidation extends Component {
                 event.target.value = localStorage.getItem("sesScenarioId");
             }
             this.setState({
-                scenarioList: treeListFiltered.scenarioList,
+                scenarioList: treeListFiltered.scenarioList.filter(c => c.active.toString() == "true"),
                 // levelList: levelList,
                 treeListFiltered: treeListFiltered,
                 loading: false
@@ -271,9 +271,18 @@ class ProductValidation extends Component {
         localStorage.setItem("sesLiveDatasetId", datasetId);
         if (datasetId > 0) {
             this.setState({
-                datasetId: datasetId
+                datasetId: datasetId,
+                versionList: [],
+                versionId: "",
+                treeList: [],
+                treeId: "",
+                scenarioList: [],
+                scenarioId: "",
+                dataEl: ""
             }, () => {
                 this.getVersionList();
+                this.el = jexcel(document.getElementById("tableDiv"), '');
+                this.el.destroy();
             })
         } else {
             this.setState({
@@ -325,10 +334,12 @@ class ProductValidation extends Component {
                 if (planningUnitList[i].flatItem.payload.nodeType.id == 5) {
                     var fuNode = nodeDataList.filter(c => c.flatItem.id == planningUnitList[i].flatItem.parent)[0];
                     var node = nodeDataList.filter(c => c.flatItem.id == planningUnitList[i].flatItem.parent)[0];
-                    for (var j = 0; j < maxLevel - 1; j++) {
+                    console.log("Node@@@+++",node);
+                    var levelForNode=node.flatItem.level
+                    for (var j = 0; j < (levelForNode); j++) {
                         var parentNode = nodeDataList.filter(c => c.flatItem.id == node.flatItem.parent)[0];
-                        console.log("ParentNode+++", parentNode)
-                        console.log("+++Id++", node.flatItem.parent)
+                        console.log("ParentNode@@@+++", parentNode)
+                        console.log("Node parent@@@+++", node.flatItem.parent)
                         parentLabelList.push(getLabelText(parentNode.flatItem.payload.label, this.state.lang));
                         node = parentNode;
                     }
@@ -346,9 +357,14 @@ class ProductValidation extends Component {
                     console.log("Name+++", name);
                     finalData.push({ name: name, nodeDataMap: planningUnitList[i].nodeDataMap, flatItem: planningUnitList[i].flatItem, parentNodeNodeDataMap: fuNode.nodeDataMap, parentNodeFlatItem: fuNode.flatItem })
                 } else {
-                    for (var j = 0; j < maxLevel - 2; j++) {
-                        var node = nodeDataList.filter(c => c.flatItem.id == planningUnitList[i].flatItem.parent)[0];
+                    var node = nodeDataList.filter(c => c.flatItem.id == planningUnitList[i].flatItem.parent)[0];
+                    console.log("Node@@@+++",node)
+                    var levelForNode=node.flatItem.level
+
+                    for (var j = 0; j < levelForNode; j++) {
                         var parentNode = nodeDataList.filter(c => c.flatItem.id == node.flatItem.parent)[0];
+                        console.log("ParentNode@@@+++", parentNode)
+                        console.log("Node parent@@@+++", node.flatItem.parent)
                         parentLabelList.push(getLabelText(parentNode.flatItem.payload.label, this.state.lang));
                         node = parentNode;
                     }
@@ -389,17 +405,22 @@ class ProductValidation extends Component {
                 var unitListFilterForFu = this.state.unitList.filter(c => c.unitId == finalData[i].parentNodeNodeDataMap.fuNode.forecastingUnit.unit.id);
                 selectedText1 = getLabelText(unitListFilterForFu[0].label, this.state.lang);
                 if (finalData[i].parentNodeNodeDataMap.fuNode.usageType.id == 2 || finalData[i].parentNodeNodeDataMap.fuNode.oneTimeUsage != "true") {
-                    selectedText2 = getLabelText(finalData[i].parentNodeNodeDataMap.fuNode.usagePeriod.label, this.state.lang);
+                    console.log("finalData[i].parentNodeNodeDataMap.fuNode+++", finalData[i].parentNodeNodeDataMap.fuNode)
+                    var upListFiltered = this.state.upList.filter(c => c.usagePeriodId == finalData[i].parentNodeNodeDataMap.fuNode.usagePeriod.usagePeriodId);
+                    if (upListFiltered.length > 0) {
+                        selectedText2 = getLabelText(upListFiltered[0].label, this.state.lang);
+                    }
                 }
                 if (finalData[i].parentNodeNodeDataMap.fuNode.usageType.id == 1) {
                     if (finalData[i].parentNodeNodeDataMap.fuNode.oneTimeUsage != "true") {
-                        var selectedText3 = finalData[i].parentNodeNodeDataMap.fuNode.repeatUsagePeriod != null ? finalData[i].parentNodeNodeDataMap.fuNode.repeatUsagePeriod.label.label_en : '';
-                        usageText = "Every " + noOfPersons + " " + selectedText + " requires " + noOfForecastingUnitsPerPerson + " " + selectedText1 + ", " + usageFrequency + " times per " + selectedText2 + " for " + finalData[i].parentNodeNodeDataMap.fuNode.repeatCount + " " + selectedText3;
+                        console.log("finalData[i].parentNodeNodeDataMap.fuNode.repeatUsagePeriod@@@",finalData[i].parentNodeNodeDataMap.fuNode.repeatUsagePeriod)
+                        var selectedText3 = finalData[i].parentNodeNodeDataMap.fuNode.repeatUsagePeriod != null && finalData[i].parentNodeNodeDataMap.fuNode.repeatUsagePeriod.usagePeriodId != '' ? this.state.upList.filter(c => c.usagePeriodId == finalData[i].parentNodeNodeDataMap.fuNode.repeatUsagePeriod.usagePeriodId)[0].label.label_en : '';
+                        usageText = i18n.t('static.usageTemplate.every') + " " + noOfPersons + " " + selectedText + " " + i18n.t('static.usageTemplate.requires') + " " + noOfForecastingUnitsPerPerson + " " + selectedText1 + "(s), " + " " + usageFrequency + " " + i18n.t('static.tree.timesPer') + " " + selectedText2 + " " + i18n.t('static.tree.for') + " " + (finalData[i].parentNodeNodeDataMap.fuNode.repeatCount != null ? finalData[i].parentNodeNodeDataMap.fuNode.repeatCount : '') + " " + selectedText3;
                     } else {
-                        usageText = "Every " + noOfPersons + " " + selectedText + " requires " + noOfForecastingUnitsPerPerson + " " + selectedText1;
+                        usageText = i18n.t('static.usageTemplate.every') + " " + noOfPersons + " " + selectedText + " " + i18n.t('static.usageTemplate.requires') + " " + noOfForecastingUnitsPerPerson + " " + selectedText1 + "(s)";
                     }
                 } else {
-                    usageText = "Every " + noOfPersons + " " + selectedText + " - requires " + noOfForecastingUnitsPerPerson + " " + selectedText1 + " every " + usageFrequency + " " + selectedText2;
+                    usageText = i18n.t('static.usageTemplate.every') + " " + noOfPersons + " " + selectedText + "" + i18n.t('static.usageTemplate.requires') + " " + noOfForecastingUnitsPerPerson + " " + selectedText1 + "(s) " + i18n.t('static.usageTemplate.every') + " " + usageFrequency + " " + selectedText2 + " indefinitely";
                 }
                 var usageTextPU = "";
                 if (finalData[i].nodeDataMap != "") {
@@ -482,26 +503,26 @@ class ProductValidation extends Component {
                 console.log("selectedPlanningUnit@@@", selectedPlanningUnit);
                 data = [];
                 data[0] = finalData[i].name;
-                data[1] = getLabelText(finalData[i].parentNodeNodeDataMap.fuNode.usageType.label, this.state.lang);
+                data[1] = getLabelText(this.state.utList.filter(c=>c.id==finalData[i].parentNodeNodeDataMap.fuNode.usageType.id)[0].label, this.state.lang);
                 data[2] = getLabelText(finalData[i].parentNodeNodeDataMap.fuNode.forecastingUnit.label, this.state.lang);
                 data[3] = usageText;
                 var planningUnitObj = finalData[i].nodeDataMap != "" ? this.state.datasetData.planningUnitList.filter(c => c.planningUnit.id == finalData[i].nodeDataMap.puNode.planningUnit.id) : [];
-                data[4] = finalData[i].nodeDataMap != "" && planningUnitObj.length>0 ? getLabelText(planningUnitObj[0].planningUnit.label, this.state.lang) : "";
+                data[4] = finalData[i].nodeDataMap != "" && planningUnitObj.length > 0 ? getLabelText(planningUnitObj[0].planningUnit.label, this.state.lang) : "";
                 data[5] = usageTextPU;
                 data[6] = selectedPlanningUnit != undefined && selectedPlanningUnit.length > 0 && finalData[i].nodeDataMap != "" ? qty.toFixed(2) : "";
-                data[7] = selectedPlanningUnit != undefined && selectedPlanningUnit.length > 0 && finalData[i].nodeDataMap != "" ? price.toFixed(2) : "";
-                data[8] = selectedPlanningUnit != undefined && selectedPlanningUnit.length > 0 && finalData[i].nodeDataMap != "" ? cost.toFixed(2) : "";
+                data[7] = selectedPlanningUnit != undefined && selectedPlanningUnit.length > 0 && finalData[i].nodeDataMap != "" ? (price/ currency.conversionRateToUsd).toFixed(2) : "";
+                data[8] = selectedPlanningUnit != undefined && selectedPlanningUnit.length > 0 && finalData[i].nodeDataMap != "" ? (qty.toFixed(2)*(price/ currency.conversionRateToUsd).toFixed(2)).toFixed(2) : "";
                 data[9] = 0;
 
                 dataArray.push(data);
                 if (parentId != finalData[i].parentNodeFlatItem.id || i == finalData.length - 1) {
                     data = [];
-                    data[0] = "";
+                    data[0] = i18n.t('static.productValidation.subTotal');
                     data[1] = "";
                     data[2] = "";
                     data[3] = "";
                     data[4] = "";
-                    data[5] = i18n.t('static.productValidation.subTotal');
+                    data[5] = "";
                     data[6] = "";
                     data[7] = "";
                     data[8] = totalCost.toFixed(2);
@@ -611,7 +632,10 @@ class ProductValidation extends Component {
         for (var j = 0; j < json.length; j++) {
             if (json[j][9] == 1) {
                 for (var i = 0; i < colArr.length; i++) {
-                    instance.jexcel.setStyle(colArr[i] + (j + 1), "background-color", "#808080")
+                    // instance.jexcel.setStyle(colArr[i] + (j + 1), "background-color", "#808080")
+                    instance.jexcel.setStyle(colArr[i] + (j + 1), "background-color", "#ccc")
+                    // instance.jexcel.setStyle(colArr[i] + (j + 1), "color", "#000")
+                    instance.jexcel.setStyle(colArr[i] + (j + 1), "font-weight", "bold")
                 }
             }
         }
@@ -628,8 +652,19 @@ class ProductValidation extends Component {
             var selectedDataset = datasetList.filter(c => c.id == this.state.datasetId)[0];
             var versionList = [];
             var vList = selectedDataset.versionList;
-            for (var v = 0; v < vList.length; v++) {
-                versionList.push(vList[v].versionId)
+            var onlineVersionList = vList.filter(c => !c.versionId.toString().includes("Local")).sort(function (a, b) {
+                a = a.versionId;
+                b = b.versionId;
+                return a > b ? -1 : a < b ? 1 : 0;
+            });
+            var offlineVersionList = vList.filter(c => c.versionId.toString().includes("Local")).sort(function (a, b) {
+                a = a.versionId.split(" ")[0];
+                b = b.versionId.split(" ")[0];
+                return a > b ? -1 : a < b ? 1 : 0;
+            });
+            var newVList = offlineVersionList.concat(onlineVersionList)
+            for (var v = 0; v < newVList.length; v++) {
+                versionList.push(newVList[v].versionId)
             }
             var versionId = "";
             var event = {
@@ -731,6 +766,13 @@ class ProductValidation extends Component {
                     }.bind(this);
                     upRequest.onsuccess = function (event) {
 
+                        var utTransaction = db1.transaction(['usageType'], 'readwrite');
+                    var utOs = utTransaction.objectStore('usageType');
+                    var utRequest = utOs.getAll();
+                    utRequest.onerror = function (event) {
+                    }.bind(this);
+                    utRequest.onsuccess = function (event) {
+
 
                         var currencyTransaction = db1.transaction(['currency'], 'readwrite');
                         var currencyOs = currencyTransaction.objectStore('currency');
@@ -740,6 +782,7 @@ class ProductValidation extends Component {
                         currencyRequest.onsuccess = function (event) {
                             var unitList = unitRequest.result;
                             var upList = upRequest.result;
+                            var utList=utRequest.result;
                             var myResult = [];
                             myResult = getRequest.result;
 
@@ -786,10 +829,15 @@ class ProductValidation extends Component {
                                 event.target.value = localStorage.getItem("sesLiveDatasetId");
                             }
                             this.setState({
-                                datasetList: datasetList,
+                                datasetList: datasetList.sort(function (a, b) {
+                                    a = a.name.toLowerCase();
+                                    b = b.name.toLowerCase();
+                                    return a < b ? -1 : a > b ? 1 : 0;
+                                }),
                                 currencyList: currencyList,
                                 unitList: unitList,
                                 upList: upList,
+                                utList:utList,
                                 loading: false
                             }, () => {
                                 if (datasetId != "") {
@@ -801,6 +849,7 @@ class ProductValidation extends Component {
                 }.bind(this)
             }.bind(this)
         }.bind(this)
+    }.bind(this)
     }
 
     addDoubleQuoteToRowContent = (arr) => {
@@ -974,7 +1023,7 @@ class ProductValidation extends Component {
         columns.push(i18n.t('static.supplyPlan.pricePerPlanningUnit'));
         columns.push(i18n.t('static.productValidation.cost'));
         const headers = [columns]
-        const data = this.state.dataEl.getJson(null, false).map(ele => [ele[0], ele[1], ele[2], ele[3], ele[4], ele[5], this.formatter(ele[6]),this.formatter(ele[7]),ele[9]!=1?this.formatter((Number(ele[6]*ele[7])).toFixed(2)):this.formatter(Number(ele[8]))]);
+        const data = this.state.dataEl.getJson(null, false).map(ele => [ele[0], ele[1], ele[2], ele[3], ele[4], ele[5], this.formatter(ele[6]), this.formatter(ele[7]), ele[9] != 1 ? this.formatter((Number(ele[6] * ele[7])).toFixed(2)) : this.formatter(Number(ele[8]))]);
         // doc.addPage()
         let content = {
             margin: { top: 80, bottom: 50 },
@@ -1033,7 +1082,7 @@ class ProductValidation extends Component {
         columns.map((item, idx) => { headers[idx] = (item).replaceAll(' ', '%20') });
 
         var A = [this.addDoubleQuoteToRowContent(headers)];
-        this.state.dataEl.getJson(null, false).map(ele => A.push(this.addDoubleQuoteToRowContent([ele[0].replaceAll(',', ' ').replaceAll(' ', '%20'), ele[1].replaceAll(',', ' ').replaceAll(' ', '%20'), ele[2].replaceAll(',', ' ').replaceAll(' ', '%20'), ele[3].replaceAll(',', ' ').replaceAll(' ', '%20'), ele[4].replaceAll(',', ' ').replaceAll(' ', '%20'), ele[5].replaceAll(',', ' ').replaceAll(' ', '%20'), ele[6].replaceAll(',', ' ').replaceAll(' ', '%20'),ele[7].replaceAll(',', ' ').replaceAll(' ', '%20'),ele[9]!=1?(Number(ele[6]*ele[7])).toString().replaceAll(',', ' ').replaceAll(' ', '%20'):ele[8].toString().replaceAll(',', ' ').replaceAll(' ', '%20')])));
+        this.state.dataEl.getJson(null, false).map(ele => A.push(this.addDoubleQuoteToRowContent([ele[0].replaceAll(',', ' ').replaceAll(' ', '%20'), ele[1].replaceAll(',', ' ').replaceAll(' ', '%20'), ele[2].replaceAll(',', ' ').replaceAll(' ', '%20'), ele[3].replaceAll(',', ' ').replaceAll(' ', '%20'), ele[4].replaceAll(',', ' ').replaceAll(' ', '%20'), ele[5].replaceAll(',', ' ').replaceAll(' ', '%20'), ele[6].replaceAll(',', ' ').replaceAll(' ', '%20'), ele[7].replaceAll(',', ' ').replaceAll(' ', '%20'), ele[9] != 1 ? (Number(ele[6] * ele[7])).toString().replaceAll(',', ' ').replaceAll(' ', '%20') : ele[8].toString().replaceAll(',', ' ').replaceAll(' ', '%20')])));
 
         for (var i = 0; i < A.length; i++) {
             csvRow.push(A[i].join(","))
@@ -1118,15 +1167,23 @@ class ProductValidation extends Component {
                 <Card>
                     <div className="Card-header-reporticon pb-2">
                         {/* {this.state.dataList.length > 0 && */}
-                        <div className="card-header-actions">
-                            {this.state.treeId > 0 && this.state.scenarioId > 0 && this.state.localProgramId != "" && <a className="card-header-action">
-                                <a href={`/#/dataSet/buildTree/tree/` + this.state.treeId + `/` + this.state.localProgramId + `/` + this.state.scenarioId}><span style={{ cursor: 'pointer' }}><small className="supplyplanformulas">{i18n.t('static.common.managetree')}</small></span></a>
-                            </a>}
-                            <a className="card-header-action">
+                        <div className="card-header-actions BacktoLink col-md-12 pl-lg-0 pr-lg-0 pt-lg-2">
+                            {this.state.treeId > 0 && this.state.scenarioId > 0 && this.state.localProgramId != "" &&
+                                <a className="pr-lg-0 pt-lg-3 float-left">
+                                    <span className="compareAndSelect-larrow"> <i className="cui-arrow-left icons " > </i></span>
+                                    <span className="compareAndSelect-larrowText"> {i18n.t('static.common.backTo')} <a href={`/#/dataSet/buildTree/tree/` + this.state.treeId + `/` + this.state.localProgramId + `/` + this.state.scenarioId} className="supplyplanformulas">{i18n.t('static.common.managetree')}</a></span>
+                                </a>
+                            }
+                            <a className="pr-lg-0 pt-lg-3 float-right">
+                                {this.state.dataEl != "" && <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />}
+                            </a>
+                            <a className="pr-lg-2 pt-lg-3 float-right">
                                 {this.state.dataEl != "" && <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.exportPDF()} />}
                             </a>
-                            {this.state.dataEl != "" && <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />}
+
+
                         </div>
+
                         {/* } */}
                     </div>
                     <CardBody className="pb-lg-2 pt-lg-0 ">
