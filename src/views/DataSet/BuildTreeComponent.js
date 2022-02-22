@@ -20,6 +20,7 @@ import { Nav, NavItem, NavLink, TabContent, TabPane } from 'reactstrap';
 import getLabelText from '../../CommonComponent/getLabelText';
 import moment from 'moment';
 import Picker from 'react-month-picker';
+import SelectSearch from 'react-select-search';
 import MonthBox from '../../CommonComponent/MonthBox.js';
 import { INDEXED_DB_NAME, INDEXED_DB_VERSION, TREE_DIMENSION_ID, SECRET_KEY, JEXCEL_MONTH_PICKER_FORMAT, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, JEXCEL_DECIMAL_NO_REGEX_LONG, DATE_FORMAT_CAP_WITHOUT_DATE, JEXCEL_DECIMAL_MONTHLY_CHANGE } from '../../Constants.js'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
@@ -77,7 +78,8 @@ let initialValuesNodeData = {
     usageTypeIdFU: "",
     lagInMonths: "",
     noOfPersons: "",
-    forecastingUnitPerPersonsFC: ""
+    forecastingUnitPerPersonsFC: "",
+    forecastingUnitId: ""
 }
 
 const validationSchemaNodeData = function (values) {
@@ -129,6 +131,31 @@ const validationSchemaNodeData = function (values) {
         //                 return true;
         //             }
         //         }),
+        needFUValidation: Yup.boolean(),
+        forecastingUnitId: Yup.string()
+            .when("needFUValidation", {
+                is: val => {
+                    return document.getElementById("needFUValidation").value === "true";
+
+                },
+                then: Yup.string()
+                    .required('Please select forecasting unit')
+                    .typeError('Please select forecasting unit'),
+                otherwise: Yup.string().notRequired()
+            }),
+        // forecastingUnitId: Yup.string()
+        //     .test('forecastingUnitId', 'Please select forecasting unit 1',
+        //         function (value) {
+        //             console.log("showFUValidation 1--->", document.getElementById("showFUValidation").value);
+        //             console.log("showFUValidation 2--->", value);
+        //             if ((parseInt(document.getElementById("nodeTypeId").value) == 4 && (document.getElementById("showFUValidation").value == true) && value == 'undefined')) {
+        //                 console.log("inside if validation")
+        //                 return false;
+        //             } else {
+        //                 console.log("inside else validation")
+        //                 return true;
+        //             }
+        //         }).typeError('Please select forecasting unit'),
         usageTypeIdFU: Yup.string()
             .test('usageTypeIdFU', i18n.t('static.validation.fieldRequired'),
                 function (value) {
@@ -176,6 +203,12 @@ const validationSchemaNodeData = function (values) {
                         return true;
                     }
                 }),
+
+        // .transform((currentValue, originalValue) => {
+        //     return originalValue === '' ? null : currentValue;
+        // })
+        // .nullable()
+        // .typeError('Must be a number'),
         // usageFrequency: Yup.string()
         //     .test('usageFrequency', 'Please enter a valid number having max 12 digits before decimal and max 2 digit after decimal.',
         //         function (value) {
@@ -340,6 +373,9 @@ export default class BuildTree extends Component {
         this.pickAMonth4 = React.createRef()
         this.pickAMonth5 = React.createRef()
         this.state = {
+            showFUValidation: true,
+            fuValues: [],
+            fuLabels: [],
             forecastPeriod: '',
             maxNodeDataId: '',
             message1: '',
@@ -399,7 +435,8 @@ export default class BuildTree extends Component {
                     repeatUsagePeriod: {
                         usagePeriodId: ''
                     }
-                }
+                },
+                nodeDataExtrapolationOptionList:[]
             },
             parentScenario: [],
             popoverOpen: false,
@@ -753,7 +790,14 @@ export default class BuildTree extends Component {
         console.log("unique fu list--->", forecastingUnitList);
         tracerCategoryList = [...new Map(tracerCategoryList.map(v => [v.id, v])).values()];
         // console.log("unique tc list--->", tracerCategoryList);
+
+        let forecastingUnitMultiList = forecastingUnitList.length > 0
+            && forecastingUnitList.map((item, i) => {
+                return ({ value: item.id, label: getLabelText(item.label, this.state.lang) })
+
+            }, this);
         this.setState({
+            forecastingUnitMultiList,
             tracerCategoryList,
             forecastingUnitList,
             planningUnitList: updatedPlanningUnitList,
@@ -789,6 +833,9 @@ export default class BuildTree extends Component {
         this.setState({
             currentItemConfig,
             currentScenario: (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0],
+            usageTemplateId: "",
+            fuValues: [],
+            fuLabels: []
         }, () => {
             console.log("currentItemConfig after---", this.state.orgCurrentItemConfig)
         });
@@ -2945,7 +2992,7 @@ export default class BuildTree extends Component {
         console.log("Items+++", items);
         var dataArray = [];
         dataArray.push(new Paragraph({
-            children: [new TextRun({ "text": "Tree Validation", bold: true,size:30 })],
+            children: [new TextRun({ "text": "Tree Validation", bold: true, size: 30 })],
             spacing: {
                 after: 150,
             },
@@ -2953,25 +3000,25 @@ export default class BuildTree extends Component {
         dataArray.push(new Paragraph({
         }));
         dataArray.push(new Paragraph({
-            children: [new TextRun({ "text": i18n.t('static.consumption.program') +" : ", bold: true }), new TextRun({ "text": document.getElementById("datasetId").selectedOptions[0].text })],
+            children: [new TextRun({ "text": i18n.t('static.consumption.program') + " : ", bold: true }), new TextRun({ "text": document.getElementById("datasetId").selectedOptions[0].text })],
             spacing: {
                 after: 150,
             },
         }));
         dataArray.push(new Paragraph({
-            children: [new TextRun({ "text": i18n.t('static.forecastMethod.tree') +" : ", bold: true }), new TextRun({ "text": document.getElementById("treeId").selectedOptions[0].text })],
+            children: [new TextRun({ "text": i18n.t('static.forecastMethod.tree') + " : ", bold: true }), new TextRun({ "text": document.getElementById("treeId").selectedOptions[0].text })],
             spacing: {
                 after: 150,
             },
         }));
         dataArray.push(new Paragraph({
-            children: [new TextRun({ "text": i18n.t('static.whatIf.scenario') +" : ", bold: true }), new TextRun({ "text": document.getElementById("scenarioId").selectedOptions[0].text })],
+            children: [new TextRun({ "text": i18n.t('static.whatIf.scenario') + " : ", bold: true }), new TextRun({ "text": document.getElementById("scenarioId").selectedOptions[0].text })],
             spacing: {
                 after: 150,
             },
         }));
         dataArray.push(new Paragraph({
-            children: [new TextRun({ "text": i18n.t('static.supplyPlan.date') +" : ", bold: true }), new TextRun({ "text": this.makeText(this.state.singleValue2) })],
+            children: [new TextRun({ "text": i18n.t('static.supplyPlan.date') + " : ", bold: true }), new TextRun({ "text": this.makeText(this.state.singleValue2) })],
             spacing: {
                 after: 150,
             },
@@ -3266,6 +3313,45 @@ export default class BuildTree extends Component {
             console.log("final regionList---", regionList);
             curTreeObj.regionList = regionList;
             this.setState({ curTreeObj });
+            // }
+        })
+    }
+
+    handleFUChange = (regionIds) => {
+        console.log("regionIds---", regionIds);
+        const { currentItemConfig } = this.state;
+
+        this.setState({
+            fuValues: regionIds != null ? regionIds : "",
+            fuLabels: regionIds != null ? regionIds.label : ""
+        }, () => {
+            if (regionIds != null) {
+                currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.forecastingUnit.id = regionIds.id;
+                currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.forecastingUnit.label.label_en = regionIds.label;
+                this.setState({ showFUValidation: false });
+            } else {
+                currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.forecastingUnit.id = "";
+                currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.forecastingUnit.label.label_en = "";
+                this.setState({ showFUValidation: true });
+            }
+            console.log("regionValues---", this.state.fuValues);
+            console.log("regionLabels---", this.state.fuLabels);
+            // if ((this.state.regionValues).length > 0) {
+            // var fuList = [];
+            // var fus = this.state.fuValues;
+            // console.log("fus---", fus)
+            // for (let i = 0; i < fus.length; i++) {
+            //     var json = {
+            //         id: fus[i].value,
+            //         label: {
+            //             label_en: fus[i].label
+            //         }
+            //     }
+            //     fuList.push(json);
+            // }
+            // console.log("final fuList---", fuList);
+            // curTreeObj.regionList = regionList;
+            this.setState({ currentItemConfig });
             // }
         })
     }
@@ -4166,7 +4252,8 @@ export default class BuildTree extends Component {
             repeatCount: true,
             planningUnitId: true,
             refillMonths: true,
-            sharePlanningUnit: true
+            sharePlanningUnit: true,
+            forecastingUnitId: true
             // usagePeriodId:true
         }
         )
@@ -4607,7 +4694,8 @@ export default class BuildTree extends Component {
             // Forecasting unit node
             this.setState({
                 numberNode: true,
-                aggregationNode: true
+                aggregationNode: true,
+                showFUValidation: true
             }, () => {
                 this.getNodeUnitOfPrent();
             });
@@ -5270,6 +5358,10 @@ export default class BuildTree extends Component {
                 if (data.context.payload.nodeType.id == 4) {
                     console.log("on curso tracer category---", (data.context.payload.nodeDataMap[scenarioId])[0].fuNode.forecastingUnit.id);
                     console.log("on curso tracer category list---", this.state.tracerCategoryList);
+                    this.setState({
+                        fuValues: { value: this.state.currentScenario.fuNode.forecastingUnit.id, label: getLabelText(this.state.currentScenario.fuNode.forecastingUnit.label, this.state.lang) },
+                        fuLabels: getLabelText(this.state.currentScenario.fuNode.forecastingUnit.label, this.state.lang)
+                    });
                     this.getForecastingUnitListByTracerCategoryId();
                     this.getNodeUnitOfPrent();
                     this.getNoOfFUPatient();
@@ -5615,7 +5707,9 @@ export default class BuildTree extends Component {
                         initialValues={{
                             nodeTitle: this.state.currentItemConfig.context.payload.label.label_en,
                             nodeTypeId: this.state.currentItemConfig.context.payload.nodeType.id,
-                            nodeUnitId: this.state.currentItemConfig.context.payload.nodeUnit.id
+                            nodeUnitId: this.state.currentItemConfig.context.payload.nodeUnit.id,
+                            forecastingUnitId: this.state.fuValues,
+                            // showFUValidation : true
                             // percentageOfParent: (this.state.currentItemConfig.context.payload.nodeDataMap[1])[0].dataValue
                         }}
                         validate={validateNodeData(validationSchemaNodeData)}
@@ -5650,6 +5744,8 @@ export default class BuildTree extends Component {
                                 isValid,
                                 setTouched,
                                 handleReset,
+                                setFieldValue,
+                                setFieldTouched
                             }) => (
                                 <Form className="needs-validation" onSubmit={handleSubmit} onReset={handleReset} noValidate name='nodeDataForm' autocomplete="off">
                                     <div className="row">
@@ -6167,9 +6263,47 @@ export default class BuildTree extends Component {
                                                 </Input>
                                                 {/* <FormFeedback className="red">{errors.usageTemplateId}</FormFeedback> */}
                                             </FormGroup>
+                                            <Input
+                                                type="hidden"
+                                                name="showFUValidation"
+                                                id="showFUValidation"
+                                                value={this.state.showFUValidation}
+                                            />
+                                            <Input
+                                                type="hidden"
+                                                name="needFUValidation"
+                                                id="needFUValidation"
+                                                value={(this.state.currentItemConfig.context.payload.nodeType.id != 4 ? false : true)}
+                                            />
                                             <FormGroup className="col-md-12" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 4 ? 'block' : 'none' }}>
                                                 <Label htmlFor="currencyId">{i18n.t('static.product.unit1')}<span class="red Reqasterisk">*</span></Label>
-                                                <div className="controls fuNodeAutocomplete"
+                                                <div className="controls ">
+                                                    {/* <InMultiputGroup> */}
+                                                    <Select
+                                                        // className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
+                                                        //     { 'is-valid': !errors.forecastingUnitId },
+                                                        //     { 'is-invalid': (touched.forecastingUnitId && !!errors.forecastingUnitId) }
+                                                        // )}
+                                                        className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
+                                                            { 'is-valid': !errors.forecastingUnitId && this.state.fuValues != '' },
+                                                            { 'is-invalid': (touched.forecastingUnitId && !!errors.forecastingUnitId && (this.state.currentItemConfig.context.payload.nodeType.id != 4 ? false : true) || !!errors.forecastingUnitId) }
+                                                        )}
+                                                        id="forecastingUnitId"
+                                                        name="forecastingUnitId"
+                                                        bsSize="sm"
+                                                        onChange={(e) => {
+                                                            handleChange(e);
+                                                            setFieldValue("forecastingUnitId", e);
+                                                            this.handleFUChange(e);
+                                                        }}
+                                                        onBlur={() => setFieldTouched("forecastingUnitId", true)}
+                                                        // multi
+                                                        options={this.state.forecastingUnitMultiList}
+                                                        value={this.state.fuValues}
+                                                    />
+                                                    <FormFeedback>{errors.forecastingUnitId}</FormFeedback>
+                                                </div><br />
+                                                {/* <div className="controls fuNodeAutocomplete"
                                                 >
                                                     <Autocomplete
                                                         id="forecastingUnitId"
@@ -6188,35 +6322,19 @@ export default class BuildTree extends Component {
                                                             if (value != null) {
                                                                 this.state.currentScenario.fuNode.forecastingUnit.label.label_en = value.label;
                                                                 (this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.forecastingUnit.label.label_en = value.label;
-                                                                // var items = this.state.items;
-                                                                // var item = items.filter(x => x.id == this.state.currentItemConfig.context.id)[0];
-                                                                // const itemIndex1 = items.findIndex(o => o.id === this.state.currentItemConfig.context.id);
-                                                                // (item.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode = (this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode;
-                                                                // console.log("item---", item);
-                                                                // items[itemIndex1] = item;
-                                                                // let { curTreeObj } = this.state;
-                                                                // let { treeData } = this.state;
-                                                                // let { dataSetObj } = this.state;
-                                                                // curTreeObj.tree.flatList = items;
-                                                                // var findTreeIndex = treeData.findIndex(n => n.treeId == curTreeObj.treeId);
-                                                                // treeData[findTreeIndex] = curTreeObj;
-                                                                // var programData = dataSetObj.programData;
-                                                                // programData.treeList = treeData;
-                                                                // console.log("dataSetDecrypt>>>", programData);
-                                                                // dataSetObj.programData = programData;
-                                                                // this.setState({ dataSetObj,items });
+                                                               
                                                             }
                                                             console.log("autocomplete data---", this.state.currentItemConfig)
                                                             this.getForecastingUnitUnitByFUId(value.value);
 
-                                                        }} // prints the selected value
+                                                        }} 
                                                         renderInput={(params) => <TextField {...params} variant="outlined"
                                                             onChange={(e) => {
                                                                 // this.searchErpOrderData(e.target.value)
                                                             }} />}
                                                     />
 
-                                                </div>
+                                                </div> */}
                                             </FormGroup>
 
                                             <FormGroup className="col-md-6" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 4 ? 'block' : 'none' }}>
@@ -6885,50 +7003,55 @@ export default class BuildTree extends Component {
                                             </div>
                                         </div>
                                     </div>
-
-                                    <div className="col-md-6 float-right">
-                                        <FormGroup className="float-right" >
-                                            <div className="check inline  pl-lg-1 pt-lg-0">
-                                                <div style={{ display: this.state.aggregationNode ? 'block' : 'none' }}>
-                                                    <Input
-                                                        className="form-check-input checkboxMargin"
-                                                        type="checkbox"
-                                                        id="manualChange"
-                                                        name="manualChange"
-                                                        // checked={true}
-                                                        checked={this.state.currentScenario.manualChangesEffectFuture}
-                                                        onClick={(e) => { this.momCheckbox(e); }}
-                                                    />
-                                                    <Label
-                                                        className="form-check-label"
-                                                        check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                                                        <b>{'Manual Change affects future month'}</b>
-                                                    </Label>
-                                                </div>
-                                                <div>
-                                                    <Input
-                                                        className="form-check-input checkboxMargin"
-                                                        type="checkbox"
-                                                        id="seasonality"
-                                                        name="seasonality"
-                                                        // checked={true}
-                                                        checked={this.state.seasonality}
-                                                        onClick={(e) => { this.momCheckbox(e) }}
-                                                    />
-                                                    <Label
-                                                        className="form-check-label"
-                                                        check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                                                        <b>{'Show Seasonality & manual change'}</b>
-                                                    </Label>
-                                                </div>
-                                            </div>
-                                        </FormGroup>
-                                    </div>
                                 </div>
-                                <div className="col-md-12 pl-lg-0 pr-lg-0" style={{ display: 'inline-block' }}>
+                                <div className="col-md-6 float-right">
+                                    {/* <div className="col-md-12"> */}
+                                    <FormGroup className="float-right" >
+                                        <div className="check inline  pl-lg-1 pt-lg-0">
+
+                                            <div style={{ display: this.state.aggregationNode ? 'block' : 'none' }}>
+                                                <Input
+                                                    className="form-check-input checkboxMargin"
+                                                    type="checkbox"
+                                                    id="manualChange"
+                                                    name="manualChange"
+                                                    // checked={true}
+                                                    checked={this.state.currentScenario.manualChangesEffectFuture}
+                                                    onClick={(e) => { this.momCheckbox(e); }}
+                                                />
+                                                <Label
+                                                    className="form-check-label"
+                                                    check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                    <b>{'Manual Change affects future month'}</b>
+                                                </Label>
+                                            </div>
+                                            <div>
+                                                <Input
+                                                    className="form-check-input checkboxMargin"
+                                                    type="checkbox"
+                                                    id="seasonality"
+                                                    name="seasonality"
+                                                    // checked={true}
+                                                    checked={this.state.seasonality}
+                                                    onClick={(e) => { this.momCheckbox(e) }}
+                                                />
+                                                <Label
+                                                    className="form-check-label"
+                                                    check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                    <b>{'Show Seasonality & manual change'}</b>
+                                                </Label>
+                                            </div>
+                                        </div>
+                                    </FormGroup>
+                                    {/* </div> */}
+                                </div>
+
+                                {/* <div className='row'> */}
+                                <div className="col-md-12 pl-lg-0 pr-lg-0 modelingTransferTable" style={{ display: 'inline-block' }}>
                                     <div id="momJexcel" className="RowClickable" style={{ display: this.state.momJexcelLoader ? "none" : "block" }}>
                                     </div>
                                 </div>
+                                {/* </div> */}
                                 <div style={{ display: this.state.momJexcelLoader ? "block" : "none" }}>
                                     <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                                         <div class="align-items-center">
@@ -7366,6 +7489,14 @@ export default class BuildTree extends Component {
 
             }, this);
 
+        const { forecastingUnitList } = this.state;
+        let forecastingUnitMultiList = forecastingUnitList.length > 0
+            && forecastingUnitList.map((item, i) => {
+                return ({ value: item.id, label: getLabelText(item.label, this.state.lang) })
+
+            }, this);
+        console.log("forecastingUnitMultiList---", forecastingUnitMultiList);
+
         // regionMultiList = Array.from(regionMultiList);
         let treeLevel = this.state.items.length;
         const treeLevelItems = []
@@ -7521,6 +7652,9 @@ export default class BuildTree extends Component {
                                 nodeDataMap[this.state.selectedScenario] = tempArray;
                                 // tempArray.push(nodeDataMap);
                                 this.setState({
+                                    fuValues: [],
+                                    fuLabels: [],
+                                    // showFUValidation : true,
                                     usageTemplateId: '',
                                     conversionFactor: '',
                                     parentScenario: itemConfig.level != 0 ? itemConfig.payload.nodeDataMap[this.state.selectedScenario][0] : {},
@@ -7566,7 +7700,8 @@ export default class BuildTree extends Component {
                                                 multiplier: ''
                                             },
                                             refillMonths: ''
-                                        }
+                                        },
+                                        nodeDataExtrapolationOptionList:[]
                                     },
                                     level0: true,
                                     numberNode: (itemConfig.payload.nodeType.id == 1 || itemConfig.payload.nodeType.id == 2 ? false : true),

@@ -5908,7 +5908,7 @@ export default class CreateTreeTemplate extends Component {
                                         </FormGroup>
                                     </div>
                                 </div>
-                                <div className="col-md-12 pl-lg-0 pr-lg-0" style={{ display: 'inline-block' }}>
+                                <div className="col-md-12 pl-lg-0 pr-lg-0 modelingTransferTable" style={{ display: 'inline-block' }}>
                                     <div id="momJexcel" className="RowClickable" style={{ display: this.state.momJexcelLoader ? "none" : "block" }}>
                                     </div>
                                 </div>
