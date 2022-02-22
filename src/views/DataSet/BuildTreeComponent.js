@@ -435,7 +435,8 @@ export default class BuildTree extends Component {
                     repeatUsagePeriod: {
                         usagePeriodId: ''
                     }
-                }
+                },
+                nodeDataExtrapolationOptionList:[]
             },
             parentScenario: [],
             popoverOpen: false,
@@ -832,7 +833,9 @@ export default class BuildTree extends Component {
         this.setState({
             currentItemConfig,
             currentScenario: (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0],
-            usageTemplateId: ""
+            usageTemplateId: "",
+            fuValues: [],
+            fuLabels: []
         }, () => {
             console.log("currentItemConfig after---", this.state.orgCurrentItemConfig)
         });
@@ -7697,7 +7700,8 @@ export default class BuildTree extends Component {
                                                 multiplier: ''
                                             },
                                             refillMonths: ''
-                                        }
+                                        },
+                                        nodeDataExtrapolationOptionList:[]
                                     },
                                     level0: true,
                                     numberNode: (itemConfig.payload.nodeType.id == 1 || itemConfig.payload.nodeType.id == 2 ? false : true),

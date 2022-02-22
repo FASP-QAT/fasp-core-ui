@@ -13,6 +13,10 @@ import CryptoJS from 'crypto-js'
 import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
 import { Bar, Line, Pie } from 'react-chartjs-2';
+import { calculateMovingAvg } from '../Extrapolation/MovingAverages';
+import { calculateSemiAverages } from '../Extrapolation/SemiAverages';
+import { calculateLinearRegression } from '../Extrapolation/LinearRegression';
+import { calculateTES } from '../Extrapolation/TES';
 const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
     from: 'From', to: 'To',
@@ -25,6 +29,14 @@ export default class TreeExtrapolationComponent extends React.Component {
         var startDate = moment("2021-05-01").format("YYYY-MM-DD");
         var endDate = moment("2022-02-01").format("YYYY-MM-DD")
         this.state = {
+            monthsForMovingAverage: 5,
+            confidenceLevelId: 0.95,
+            noOfMonthsForASeason: 4,
+            movingAvgData: [],
+            alpha: 0.2,
+            beta: 0.2,
+            gamma: 0.2,
+            nodeDataExtrapolationOptionList: [],
             nodeDataExtrapolation: {
                 // reportingRate
                 // month
@@ -528,9 +540,86 @@ export default class TreeExtrapolationComponent extends React.Component {
         this.manualChangeExtrapolation = this.manualChangeExtrapolation.bind(this);
         this.interpolate = this.interpolate.bind(this);
     }
+
+    setMonthsForMovingAverage(e) {
+        this.setState({
+            // loading: true
+        })
+        var monthsForMovingAverage = e.target.value;
+        this.setState({
+            monthsForMovingAverage: monthsForMovingAverage,
+            // dataChanged: true
+        }, () => {
+            // if (this.state.dataExtrapolation != "") {
+            //     if (e.target.checked) {
+            //         this.state.dataExtrapolation.showColumn(4);
+            //     } else {
+            //         this.state.dataExtrapolation.hideColumn(4);
+            //     }
+            // }
+            // this.buildJxl()
+        })
+    }
+
+
+    setAlpha(e) {
+        var alpha = e.target.value;
+        this.setState({
+            alpha: alpha,
+            // dataChanged: true
+        }, () => {
+            // this.buildJxl();
+        })
+    }
+
+    setBeta(e) {
+        var beta = e.target.value;
+        this.setState({
+            beta: beta,
+            // dataChanged: true
+        }, () => {
+            // this.buildJxl();
+        })
+    }
+
+    setGamma(e) {
+        var gamma = e.target.value;
+        this.setState({
+            gamma: gamma,
+            // dataChanged: true
+        }, () => {
+            // this.buildJxl();
+        })
+    }
+
+    setConfidenceLevelId(e) {
+        var confidenceLevelId = e.target.value;
+        this.setState({
+            confidenceLevelId: confidenceLevelId,
+            // dataChanged: true
+        }, () => {
+            // this.buildJxl()
+        })
+    }
+
+    setSeasonals(e) {
+        var seasonals = e.target.value;
+        this.setState({
+            noOfMonthsForASeason: seasonals,
+            // dataChanged: true
+        }, () => {
+            // this.buildJxl()
+        })
+    }
+
     interpolate() {
         var monthArray = this.state.monthArray;
         var jexcelDataArr = [];
+        var interpolatedData = [];
+        var inputDataMovingAvg = [];
+        var inputDataSemiAverage = [];
+        var inputDataLinearRegression = [];
+        var inputDataTes = [];
         var tableJson = this.state.dataExtrapolation.getJson(null, false);
         console.log("tableJson length---", tableJson.length);
         console.log("tableJson---", tableJson);
@@ -539,35 +628,81 @@ export default class TreeExtrapolationComponent extends React.Component {
             console.log("10 map---" + map1.get("10"));
             var json = {
                 month: map1.get("0"),
-                value: map1.get("1")
+                amount: map1.get("1") != "" ? map1.get("1").toString().replaceAll(",", "") : map1.get("1"),
+                reportingRate: map1.get("2")
             }
             jexcelDataArr.push(json);
         }
         for (var j = 0; j < monthArray.length; j++) {
-            var dataArr = jexcelDataArr.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArray[j]).format("YYYY-MM") && c.value > 0);
-            var startValList = jexcelDataArr.filter(c => moment(c.month).format("YYYY-MM") < moment(monthArray[j]).format("YYYY-MM") && c.value > 0)
-                .sort(function (a, b) {
-                    return new Date(a.month) - new Date(b.month);
-                });
-            console.log("startValList---", startValList);
-            var endValList = jexcelDataArr.filter(c => moment(c.month).format("YYYY-MM") > moment(monthArray[j]).format("YYYY-MM") && c.value > 0)
-                .sort(function (a, b) {
-                    return new Date(a.month) - new Date(b.month);
-                });
-            console.log(moment(monthArray[j]).format("YYYY-MM") + " " + "endValList---", endValList);
-            if (startValList.length > 0 && endValList.length > 0) {
-                var startVal = startValList[startValList.length - 1].value;
-                var startMonthVal = startValList[startValList.length - 1].month;
-                var endVal = endValList[0].value;
-                var endMonthVal = endValList[0].month;
-                const monthDifference = moment(new Date(monthArray[j])).diff(new Date(startMonthVal), 'months', true);
-                const monthDiff = moment(new Date(endMonthVal)).diff(new Date(startMonthVal), 'months', true);
-                var missingActualData = Number(startVal) + (monthDifference * ((Number(endVal) - Number(startVal)) / monthDiff));
-                console.log("month---", monthArray[j]);
-                console.log(moment(monthArray[j]).format("YYYY-MM") + " " + "missingActualData---", missingActualData);
-            }
-        }
+            var dataArr = jexcelDataArr.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArray[j]).format("YYYY-MM"))[0];
+            console.log(moment(monthArray[j]).format("YYYY-MM") + " " + "dataArr---", dataArr);
+            if (dataArr.amount == 0) {
+                var startValList = jexcelDataArr.filter(c => moment(c.month).format("YYYY-MM") < moment(monthArray[j]).format("YYYY-MM") && c.amount > 0)
+                    .sort(function (a, b) {
+                        return new Date(a.month) - new Date(b.month);
+                    });
+                console.log(moment(monthArray[j]).format("YYYY-MM") + " " + "startValList---", startValList);
+                var endValList = jexcelDataArr.filter(c => moment(c.month).format("YYYY-MM") > moment(monthArray[j]).format("YYYY-MM") && c.amount > 0)
+                    .sort(function (a, b) {
+                        return new Date(a.month) - new Date(b.month);
+                    });
+                console.log(moment(monthArray[j]).format("YYYY-MM") + " " + "endValList---", endValList);
+                if (startValList.length > 0 && endValList.length > 0) {
+                    var startVal = startValList[startValList.length - 1].amount;
+                    console.log(moment(monthArray[j]).format("YYYY-MM") + " " + "startVal---", startVal);
+                    var startMonthVal = startValList[startValList.length - 1].month;
+                    console.log(moment(monthArray[j]).format("YYYY-MM") + " " + "startMonthVal---", startMonthVal);
+                    var endVal = endValList[0].amount;
+                    console.log(moment(monthArray[j]).format("YYYY-MM") + " " + "endVal---", endVal);
+                    var endMonthVal = endValList[0].month;
+                    console.log(moment(monthArray[j]).format("YYYY-MM") + " " + "endMonthVal---", endMonthVal);
+                    const monthDifference = moment(new Date(monthArray[j])).diff(new Date(startMonthVal), 'months', true);
+                    const monthDiff = moment(new Date(endMonthVal)).diff(new Date(startMonthVal), 'months', true);
+                    var missingActualData = Number(startVal) + (monthDifference * ((Number(endVal) - Number(startVal)) / monthDiff));
+                    console.log("month--->>>", monthArray[j]);
+                    console.log(moment(monthArray[j]).format("YYYY-MM") + " " + "missingActualData---", missingActualData);
+                    const index = jexcelDataArr.findIndex(c => c.month == monthArray[j]);
+                    var json = {
+                        month: monthArray[j],
+                        amount: missingActualData,
+                        reportingRate: dataArr.reportingRate
+                    }
+                    jexcelDataArr.splice(index, 1, json);
+                    // interpolatedData.push(json);
 
+                }
+            }
+            // else {
+            //     // interpolatedData.push(dataArr);
+            // }
+        }
+        console.log("interpolatedData---", interpolatedData);
+        this.state.nodeDataExtrapolation.extrapolationDataList = jexcelDataArr;
+        for (let i = 0; i < jexcelDataArr.length; i++) {
+            inputDataMovingAvg.push({ "month": inputDataMovingAvg.length + 1, "actual": jexcelDataArr[i].amount > 0 ? Number(jexcelDataArr[i].amount) : null, "forecast": null })
+            inputDataSemiAverage.push({ "month": inputDataSemiAverage.length + 1, "actual": jexcelDataArr[i].amount > 0 ? Number(jexcelDataArr[i].amount) : null, "forecast": null })
+            inputDataLinearRegression.push({ "month": inputDataLinearRegression.length + 1, "actual": jexcelDataArr[i].amount > 0 ? Number(jexcelDataArr[i].amount) : null, "forecast": null })
+            inputDataTes.push({ "month": inputDataTes.length + 1, "actual": jexcelDataArr[i].amount > 0 ? Number(jexcelDataArr[i].amount) : null, "forecast": null })
+        }
+        var data = jexcelDataArr.filter(c => c.amount > 0)
+            .sort(function (a, b) {
+                return new Date(a.month) - new Date(b.month);
+            });
+        var lastMonth = data[data.length - 1].month;
+        var noOfMonthsForProjection = moment(new Date(this.props.items.forecastStopDate)).diff(new Date(lastMonth), 'months', true)
+        console.log("noOfMonthsForProjection", noOfMonthsForProjection);
+        calculateMovingAvg(inputDataMovingAvg, this.state.monthsForMovingAverage, noOfMonthsForProjection, this);
+        // this.buildJexcel();
+
+    }
+
+    updateState(parameterName, value) {
+        this.setState({
+            [parameterName]: value
+        }, () => {
+            console.log("value for avg---", value)
+            this.buildJexcel();
+        })
     }
 
     manualChangeExtrapolation(e) {
@@ -608,7 +743,41 @@ export default class TreeExtrapolationComponent extends React.Component {
                 this.setState({
                     extrapolationMethodList: myResult.filter(x => x.active == true)
                 }, () => {
-
+                    if (this.props.items.currentScenario.nodeDataExtrapolationOptionList == "") {
+                        var nodeDataExtrapolationOptionList = [];
+                        for (let i = 0; i < this.state.extrapolationMethodList.length; i++) {
+                            var e = this.state.extrapolationMethodList[i];
+                            var json;
+                            if (e.id == 7) { // moving avg
+                                json = {
+                                    extrapolationMethod: e.id,
+                                    jsonProperties: {
+                                        months: this.state.monthsForMovingAverage
+                                    }
+                                }
+                            } else if (e.id == 5 || e.id == 6) { // semi avg
+                                json = {
+                                    extrapolationMethod: e.id,
+                                    jsonProperties: {
+                                    }
+                                }
+                            }
+                            else if (e.id == 2) { // TES
+                                json = {
+                                    extrapolationMethod: e.id,
+                                    jsonProperties: {
+                                        confidenceLevel: this.state.confidenceLevelId,
+                                        seasonality: this.state.noOfMonthsForASeason,
+                                        alpha: this.state.alpha,
+                                        beta: this.state.beta,
+                                        gamma: this.state.gamma
+                                    }
+                                }
+                            }
+                            nodeDataExtrapolationOptionList.push(json);
+                        }
+                        this.setState({ nodeDataExtrapolationOptionList })
+                    }
                 })
             }.bind(this);
         }.bind(this)
@@ -643,10 +812,11 @@ export default class TreeExtrapolationComponent extends React.Component {
         console.log("monthArray---", monthArray);
         let count = 0;
         for (var j = 0; j < monthArray.length; j++) {
+            var cellData = this.state.nodeDataExtrapolation.extrapolationDataList.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArray[j]).format("YYYY-MM"))[0];
             data = [];
             data[0] = monthArray[j]
-            data[1] = moment(monthArray[j]).isSame(this.props.items.currentItemConfig.context.payload.nodeDataMap[this.props.items.selectedScenario][0].month) ? this.props.items.currentItemConfig.context.payload.nodeDataMap[this.props.items.selectedScenario][0].calculatedDataValue : "";
-            data[2] = 100
+            data[1] = cellData != null && cellData != "" ? cellData.amount : (moment(monthArray[j]).isSame(this.props.items.currentItemConfig.context.payload.nodeDataMap[this.props.items.selectedScenario][0].month) ? this.props.items.currentItemConfig.context.payload.nodeDataMap[this.props.items.selectedScenario][0].calculatedDataValue : "");
+            data[2] = cellData != null && cellData != "" ? cellData.reportingRate : 100
             data[3] = `=ROUND((B${parseInt(j) + 1}*C${parseInt(j) + 1})/100,2)`
             data[4] = ""
             data[5] = ""
@@ -855,30 +1025,70 @@ export default class TreeExtrapolationComponent extends React.Component {
         var movingAvgId = e.target.checked;
         this.setState({
             movingAvgId: movingAvgId
+        }, () => {
+            if (this.state.dataExtrapolation != "") {
+                if (movingAvgId) {
+                    this.state.dataExtrapolation.showColumn(4);
+                } else {
+                    this.state.dataExtrapolation.hideColumn(4);
+                }
+            }
         })
     }
     setSemiAvgId(e) {
         var semiAvgId = e.target.checked;
         this.setState({
             semiAvgId: semiAvgId
+        }, () => {
+            if (this.state.dataExtrapolation != "") {
+                if (semiAvgId) {
+                    this.state.dataExtrapolation.showColumn(5);
+                } else {
+                    this.state.dataExtrapolation.hideColumn(5);
+                }
+            }
         })
     }
     setLinearRegressionId(e) {
         var linearRegressionId = e.target.checked;
         this.setState({
             linearRegressionId: linearRegressionId
+        }, () => {
+            if (this.state.dataExtrapolation != "") {
+                if (linearRegressionId) {
+                    this.state.dataExtrapolation.showColumn(6);
+                } else {
+                    this.state.dataExtrapolation.hideColumn(6);
+                }
+            }
         })
     }
     setSmoothingId(e) {
         var smoothingId = e.target.checked;
         this.setState({
             smoothingId: smoothingId
+        }, () => {
+            if (this.state.dataExtrapolation != "") {
+                if (smoothingId) {
+                    this.state.dataExtrapolation.showColumn(7);
+                } else {
+                    this.state.dataExtrapolation.hideColumn(7);
+                }
+            }
         })
     }
     setArimaId(e) {
         var arimaId = e.target.checked;
         this.setState({
             arimaId: arimaId
+        }, () => {
+            if (this.state.dataExtrapolation != "") {
+                if (arimaId) {
+                    this.state.dataExtrapolation.showColumn(8);
+                } else {
+                    this.state.dataExtrapolation.hideColumn(8);
+                }
+            }
         })
     }
     getDatasetData(e) {
@@ -1249,19 +1459,20 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                     <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
                                                 </Label>
                                             </div>
-                                            {this.state.movingAvgId &&
-                                                <div className="col-md-3 pt-lg-0">
-                                                    <Label htmlFor="appendedInputButton"># of Months</Label>
-                                                    <Input
-                                                        className="controls"
-                                                        type="text"
-                                                        bsSize="sm"
-                                                        id="noOfMonthsId"
-                                                        name="noOfMonthsId"
-                                                        onChange={(e) => { this.getDatasetData(e); }}
-                                                    />
-                                                </div>
-                                            }
+                                            {/* {this.state.movingAvgId && */}
+                                            <div className="col-md-3 pt-lg-0" style={{ display: this.state.movingAvgId ? '' : 'none' }}>
+                                                <Label htmlFor="appendedInputButton"># of Months</Label>
+                                                <Input
+                                                    className="controls"
+                                                    type="text"
+                                                    bsSize="sm"
+                                                    id="noOfMonthsId"
+                                                    name="noOfMonthsId"
+                                                    value={this.state.monthsForMovingAverage}
+                                                    onChange={(e) => { this.setMonthsForMovingAverage(e); }}
+                                                />
+                                            </div>
+                                            {/* } */}
                                         </div>
                                         <div className="row pl-lg-1 pb-lg-2">
                                             <div>
@@ -1331,26 +1542,37 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                     <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenTes', !this.state.popoverOpenTes)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
                                                 </Label>
                                             </div>
-                                            {this.state.smoothingId &&
+                                            <div className="row col-md-12 pt-lg-2" style={{ display: this.state.smoothingId ? '' : 'none' }}>
                                                 <div className="pt-lg-0" style={{ display: 'contents' }}>
                                                     <div className="tab-ml-1 mt-md-2 mb-md-0 ExtraCheckboxFieldWidth">
-                                                        <Label htmlFor="appendedInputButton">Confidence level</Label>
+                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.confidenceLevel')}</Label>
                                                         <Input
                                                             className="controls"
-                                                            type="text"
+                                                            type="select"
                                                             bsSize="sm"
                                                             id="confidenceLevelId"
                                                             name="confidenceLevelId"
-                                                        />
+                                                            value={this.state.confidenceLevelId}
+                                                            onChange={(e) => { this.setConfidenceLevelId(e); }}
+                                                        >
+                                                            <option value="0.85">85%</option>
+                                                            <option value="0.90">90%</option>
+                                                            <option value="0.95">95%</option>
+                                                            <option value="0.99">99%</option>
+                                                            <option value="0.995">99.5%</option>
+                                                            <option value="0.999">99.9%</option>
+                                                        </Input>
                                                     </div>
                                                     <div className="tab-ml-1 mt-md-2 mb-md-0 ExtraCheckboxFieldWidth">
-                                                        <Label htmlFor="appendedInputButton">Seasonality</Label>
+                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.seasonality')}</Label>
                                                         <Input
                                                             className="controls"
                                                             type="text"
                                                             bsSize="sm"
                                                             id="seasonalityId"
                                                             name="seasonalityId"
+                                                            value={this.state.noOfMonthsForASeason}
+                                                            onChange={(e) => { this.setSeasonals(e); }}
                                                         />
                                                     </div>
                                                     {/* <div className="col-md-3">
@@ -1370,33 +1592,39 @@ export default class TreeExtrapolationComponent extends React.Component {
  </div> */}
 
                                                     <div className="tab-ml-1 mt-md-2 mb-md-0 ExtraCheckboxFieldWidth">
-                                                        <Label htmlFor="appendedInputButton">Alpha</Label>
+                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.alpha')}</Label>
                                                         <Input
                                                             className="controls"
                                                             type="text"
                                                             id="alphaId"
                                                             bsSize="sm"
                                                             name="alphaId"
+                                                            value={this.state.alpha}
+                                                            onChange={(e) => { this.setAlpha(e); }}
                                                         />
                                                     </div>
                                                     <div className="tab-ml-1 mt-md-2 mb-md-0 ExtraCheckboxFieldWidth">
-                                                        <Label htmlFor="appendedInputButton">Beta</Label>
+                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.beta')}</Label>
                                                         <Input
                                                             className="controls"
                                                             type="text"
                                                             id="betaId"
                                                             bsSize="sm"
                                                             name="betaId"
+                                                            value={this.state.beta}
+                                                            onChange={(e) => { this.setBeta(e); }}
                                                         />
                                                     </div>
                                                     <div className="tab-ml-1 mt-md-2 mb-md-0 ExtraCheckboxFieldWidth">
-                                                        <Label htmlFor="appendedInputButton">Gamma</Label>
+                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.gamma')}</Label>
                                                         <Input
                                                             className="controls"
                                                             type="text"
                                                             bsSize="sm"
                                                             id="gammaId"
                                                             name="gammaId"
+                                                            value={this.state.gamma}
+                                                            onChange={(e) => { this.setGamma(e); }}
                                                         />
                                                     </div>
                                                     <div className="tab-ml-1 mt-md-2 mb-md-0 ExtraCheckboxFieldWidth">
@@ -1410,7 +1638,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                         />
                                                     </div>
                                                 </div>
-                                            }
+                                            </div>
                                         </div>
                                         <div className="row pl-lg-1 pb-lg-2">
                                             <div>
@@ -1430,14 +1658,14 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                 <Label
                                                     className="form-check-label"
                                                     check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                                                    <b>Autoregressive Integrated Moving Average (ARIMA)</b>
+                                                    <b>{i18n.t('static.extrapolation.arimaFull')}</b>
                                                     <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenArima', !this.state.popoverOpenArima)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
                                                 </Label>
                                             </div>
                                             {this.state.arimaId &&
                                                 <div className="pt-lg-0" style={{ display: 'contents' }}>
                                                     <div className="tab-ml-1 mt-md-2 mb-md-0 ExtraCheckboxFieldWidth">
-                                                        <Label htmlFor="appendedInputButton">p</Label>
+                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.p')}</Label>
                                                         <Input
                                                             className="controls"
                                                             type="text"
@@ -1447,7 +1675,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                         />
                                                     </div>
                                                     <div className="tab-ml-1 mt-md-2 mb-md-0 ExtraCheckboxFieldWidth">
-                                                        <Label htmlFor="appendedInputButton">d</Label>
+                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.d')}</Label>
                                                         <Input
                                                             className="controls"
                                                             type="text"
