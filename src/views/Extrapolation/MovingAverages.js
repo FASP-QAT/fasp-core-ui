@@ -3,6 +3,8 @@ export function calculateMovingAvg(inputData, noOfMonths, noOfProjectionMonths, 
 
     const data = inputData;
     console.log("InputData@@@",inputData)
+    console.log("noOfMonths@@@",noOfMonths)
+    console.log("noOfProjectionMonths@@@",noOfProjectionMonths)
 
     const monthsForMovingAverage = noOfMonths;
     const noOfMonthsForProjection = noOfProjectionMonths;
@@ -15,6 +17,7 @@ export function calculateMovingAvg(inputData, noOfMonths, noOfProjectionMonths, 
         }
     }
     calculateError(data, "movingAvgError", props);
+    console.log("mvg data---",data)
     props.updateState("movingAvgData", data);
     // for (let y=1; y<=actualMonths+noOfMonthsForProjection; y++) {
     //     console.log(y+" = "+data[y-1].forecast);

@@ -84,7 +84,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
             stepOneData: [],
             forecastPlanignUnitListForNotDuplicate: [],
             selectedForecastProgram: '',
-
+            getDatasetFilterList: []
         }
         this.changed = this.changed.bind(this);
         this.buildJexcel = this.buildJexcel.bind(this);
@@ -1050,7 +1050,10 @@ export default class StepOneImportMapPlanningUnits extends Component {
             onload: this.loaded,
             editable: true,
             license: JEXCEL_PRO_KEY,
-            contextMenu: false
+            // contextMenu: false
+            contextMenu: function (obj, x, y, e) {
+                return false;
+            }.bind(this)
         };
 
         this.el = jexcel(document.getElementById("mapPlanningUnit"), options);
@@ -1112,6 +1115,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
             versionId: ''
         }, () => {
             this.filterVersion();
+            this.filterForcastUnit();
             this.filterData();
         })
 
@@ -1139,6 +1143,39 @@ export default class StepOneImportMapPlanningUnits extends Component {
 
             this.setState({
                 versions: [],
+
+            }, () => { })
+
+        }
+    }
+
+    filterForcastUnit = () => {
+        // let programId = document.getElementById("programId").value;
+        // let countryId = this.state.realmCountry.country.countryId;
+        let programId = this.state.programId;
+
+        if (programId != 0) {
+
+            const countryId = this.state.programs.filter(c => c.programId == programId)[0].realmCountry.country.countryId;
+            console.log("countryId", countryId)
+            console.log("datasetlist==>", this.state.datasetList);
+            this.state.getDatasetFilterList = this.state.datasetList
+            var datasetlist = this.state.getDatasetFilterList.filter(c => c.realmCountry.country.countryId == countryId);
+            console.log("datasetlist=based on country==>", datasetlist)
+            this.setState({
+                data: [],
+            }, () => {
+                this.setState({
+                    getDatasetFilterList: (datasetlist.filter(function (x, i, a) {
+                        return a.indexOf(x) === i;
+                    })).reverse()
+                }, () => { });
+            });
+
+        } else {
+
+            this.setState({
+                getDatasetFilterList: [],
 
             }, () => { })
 
@@ -1315,9 +1352,9 @@ export default class StepOneImportMapPlanningUnits extends Component {
             }, this);
 
 
-        const { datasetList } = this.state;
-        let datasets = datasetList.length > 0
-            && datasetList.map((item, i) => {
+        const { getDatasetFilterList } = this.state;
+        let datasets = getDatasetFilterList.length > 0
+            && getDatasetFilterList.map((item, i) => {
                 return (
                     <option key={i} value={item.programId}>
                         {item.programCode + '~' + item.versionId}

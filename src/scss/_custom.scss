@@ -5328,6 +5328,7 @@ height: 0px;
 }
 .checkboxMargin{
   margin-top: 3px!important;
+  cursor: pointer;
 }
 .VersionSettingMarginTop{
   margin-top: -40px;
@@ -5933,3 +5934,14 @@ font-style: italic!important;
     bottom: 0px;
     left:1px;
 }
+.modelingTransferTable .jexcel_container.with-tabs .jexcel_filter{
+  margin-top: 0px!important;
+    padding-top: 0px!important;
+}
+  .jexcel > thead.resizable > tr > .arrow-down:not(.AsteriskTheadtrTd)::after {
+    content: ""!important;
+  }
+
+  .jexcel > thead.resizable > tr > .arrow-up:not(.AsteriskTheadtrTd)::after {
+    content: ""!important;
+  }
