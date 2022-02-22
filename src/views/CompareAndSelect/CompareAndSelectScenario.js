@@ -157,6 +157,7 @@ class CompareAndSelectScenario extends Component {
     }
 
     showData() {
+
         if (this.state.planningUnitId != "" && this.state.regionId != "") {
             this.setState({ loading: true })
             var datasetJson = this.state.datasetJson;
@@ -209,7 +210,14 @@ class CompareAndSelectScenario extends Component {
                     }
                     var readonly = flatList.length > 0 ? false : true
                     var dataForPlanningUnit = treeList[tl].tree.flatList.filter(c => (c.payload.nodeDataMap[scenarioList[sl].id])[0].puNode != null && (c.payload.nodeDataMap[scenarioList[sl].id])[0].puNode.planningUnit.id == this.state.planningUnitId);
-                    treeScenarioList.push({ id: treeList[tl].treeId + "~" + scenarioList[sl].id, tree: treeList[tl], scenario: scenarioList[sl], checked: readonly ? false : true, color: colourArray[colourArrayCount], type: "T", data: dataForPlanningUnit.length > 0 ? (dataForPlanningUnit[0].payload.nodeDataMap[scenarioList[sl].id])[0].nodeDataMomList : [], readonly: readonly });
+                    console.log("dataForPlanningUnit####", dataForPlanningUnit);
+                    var data = [];
+                    if (dataForPlanningUnit.length > 0) {
+                        if ((dataForPlanningUnit[0].payload.nodeDataMap[scenarioList[sl].id])[0].nodeDataMomList != undefined) {
+                            data = (dataForPlanningUnit[0].payload.nodeDataMap[scenarioList[sl].id])[0].nodeDataMomList;
+                        }
+                    }
+                    treeScenarioList.push({ id: treeList[tl].treeId + "~" + scenarioList[sl].id, tree: treeList[tl], scenario: scenarioList[sl], checked: readonly ? false : true, color: colourArray[colourArrayCount], type: "T", data: data, readonly: readonly });
                     colourArrayCount += 1;
                     count += 1;
                 }
@@ -313,6 +321,7 @@ class CompareAndSelectScenario extends Component {
             if (monthArrayForErrorFilter.length > 0) {
                 // totalActual += actualFilter.length > 0 ? (Number(actualFilter[0].amount) * Number(multiplier)).toFixed(2) : 0;
             }
+            console.log("TreeScenarioList###", treeScenarioList)
             for (var tsl = 0; tsl < treeScenarioList.length; tsl++) {
                 // if (tsl == 0) {
                 //     totalArray[tsl] = 0;
@@ -1282,9 +1291,19 @@ class CompareAndSelectScenario extends Component {
                 }, () => {
                     if (planningUnitId != "") {
                         this.setPlanningUnitId(event);
+                    } else {
+                        this.setState({
+                            planningUnitId: "",
+                            showAllData: false
+                        })
                     }
                     if (regionId != "") {
                         this.setRegionId(regionEvent);
+                    } else {
+                        this.setState({
+                            regionId: "",
+                            showAllData: false
+                        })
                     }
                 })
             } else {
@@ -1315,7 +1334,9 @@ class CompareAndSelectScenario extends Component {
             regionId: event.target.value,
             regionName: regionName.length > 0 ? getLabelText(regionName[0].label, this.state.lang) : ""
         }, () => {
-            this.showData()
+            if (regionId > 0) {
+                this.showData()
+            }
             // localStorage.setItem("sesVersionIdReport", '');
             // this.filterVersion();
         })
@@ -1568,16 +1589,19 @@ class CompareAndSelectScenario extends Component {
                         },
                         ticks: {
                             callback: function (label) {
+                                var monthArrayList = [...new Set(this.state.monthList1.map(ele => moment(ele).format("MMM-YYYY")))];
                                 var xAxis2 = label
                                 xAxis2 += '';
                                 var month = xAxis2.split('-')[0];
                                 var year = xAxis2.split('-')[1];
-                                if (month === "Jul") {
+                                var filterByYear=monthArrayList.filter(c=>moment(c).format("YYYY")==moment(year).format("YYYY"));
+                                var divideByTwo=Math.round(filterByYear.length/2);
+                                if (moment(filterByYear[divideByTwo]).format("MMM") === month) {
                                     return year;
                                 } else {
                                     return "";
                                 }
-                            },
+                            }.bind(this),
                             maxRotation: 0,
                             minRotation: 0,
                             autoSkip: false
