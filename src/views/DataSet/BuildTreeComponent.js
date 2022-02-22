@@ -436,7 +436,7 @@ export default class BuildTree extends Component {
                         usagePeriodId: ''
                     }
                 },
-                nodeDataExtrapolationOptionList:[]
+                nodeDataExtrapolationOptionList: []
             },
             parentScenario: [],
             popoverOpen: false,
@@ -793,7 +793,7 @@ export default class BuildTree extends Component {
 
         let forecastingUnitMultiList = forecastingUnitList.length > 0
             && forecastingUnitList.map((item, i) => {
-                return ({ value: item.id, label: getLabelText(item.label, this.state.lang) })
+                return ({ value: item.id, label: getLabelText(item.label, this.state.lang) + " | " + item.id })
 
             }, this);
         this.setState({
@@ -834,8 +834,8 @@ export default class BuildTree extends Component {
             currentItemConfig,
             currentScenario: (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0],
             usageTemplateId: "",
-            fuValues: [],
-            fuLabels: []
+            fuValues: { value: orgCurrentItemConfig.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.forecastingUnit.id, label: getLabelText(orgCurrentItemConfig.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.forecastingUnit.label, this.state.lang) + " | " + orgCurrentItemConfig.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.forecastingUnit.id },
+            usageText: ""
         }, () => {
             console.log("currentItemConfig after---", this.state.orgCurrentItemConfig)
         });
@@ -3323,12 +3323,14 @@ export default class BuildTree extends Component {
 
         this.setState({
             fuValues: regionIds != null ? regionIds : "",
-            fuLabels: regionIds != null ? regionIds.label : ""
+            // fuLabels: regionIds != null ? regionIds.label : ""
         }, () => {
             if (regionIds != null) {
-                currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.forecastingUnit.id = regionIds.id;
-                currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.forecastingUnit.label.label_en = regionIds.label;
-                this.setState({ showFUValidation: false });
+                currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.forecastingUnit.id = regionIds.value;
+                currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.forecastingUnit.label.label_en = regionIds.label.split("|")[0];
+                this.setState({ showFUValidation: false },()=>{
+                    this.getForecastingUnitUnitByFUId(regionIds.value);
+                });
             } else {
                 currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.forecastingUnit.id = "";
                 currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.forecastingUnit.label.label_en = "";
@@ -5358,9 +5360,10 @@ export default class BuildTree extends Component {
                 if (data.context.payload.nodeType.id == 4) {
                     console.log("on curso tracer category---", (data.context.payload.nodeDataMap[scenarioId])[0].fuNode.forecastingUnit.id);
                     console.log("on curso tracer category list---", this.state.tracerCategoryList);
+                    // fuValues: { value: this.state.currentScenario.fuNode.forecastingUnit.id, label: getLabelText(this.state.currentScenario.fuNode.forecastingUnit.label, this.state.lang) + " | " + this.state.currentScenario.fuNode.forecastingUnit.id },
                     this.setState({
-                        fuValues: { value: this.state.currentScenario.fuNode.forecastingUnit.id, label: getLabelText(this.state.currentScenario.fuNode.forecastingUnit.label, this.state.lang) },
-                        fuLabels: getLabelText(this.state.currentScenario.fuNode.forecastingUnit.label, this.state.lang)
+                        fuValues: { value: this.state.currentScenario.fuNode.forecastingUnit.id, label: getLabelText(this.state.currentScenario.fuNode.forecastingUnit.label, this.state.lang) + " | " + this.state.currentScenario.fuNode.forecastingUnit.id }
+                        // fuLabels: getLabelText(this.state.currentScenario.fuNode.forecastingUnit.label, this.state.lang) + " | " + this.state.currentScenario.fuNode.forecastingUnit.id
                     });
                     this.getForecastingUnitListByTracerCategoryId();
                     this.getNodeUnitOfPrent();
@@ -7701,7 +7704,7 @@ export default class BuildTree extends Component {
                                             },
                                             refillMonths: ''
                                         },
-                                        nodeDataExtrapolationOptionList:[]
+                                        nodeDataExtrapolationOptionList: []
                                     },
                                     level0: true,
                                     numberNode: (itemConfig.payload.nodeType.id == 1 || itemConfig.payload.nodeType.id == 2 ? false : true),
