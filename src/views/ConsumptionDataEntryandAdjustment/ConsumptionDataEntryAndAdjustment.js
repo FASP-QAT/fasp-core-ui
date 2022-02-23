@@ -56,6 +56,8 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     }
     this.loaded = this.loaded.bind(this);
     this.buildDataJexcel = this.buildDataJexcel.bind(this);
+    this.cancelClicked = this.cancelClicked.bind(this);        
+  //  this.consumptionDataChanged = this.consumptionDataChanged.bind(this);
     this.filterList = this.filterList.bind(this)
   }
 
@@ -64,6 +66,23 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     return this.state.mixedList.filter(c => c.type == value);
   }
 
+  cancelClicked() {
+    var cont = false;
+    if (this.state.consumptionChanged) {
+        var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
+        if (cf == true) {
+            cont = true;
+        } else {
+
+        }
+    } else {
+        cont = true;
+    }
+    if (cont == true) {
+        let id = AuthenticationService.displayDashboardBasedOnRole();
+        this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.message.cancelled', { entityname }))
+    }
+}
   buildDataJexcel(consumptionUnitId) {
 
     var cont = false;
@@ -239,10 +258,12 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           },
           onload: this.loaded,
           onchange: function (instance, cell, x, y, value) {
+           // this.consumptionDataChanged()
             this.setState({
               consumptionChanged: true
             })
           }.bind(this),
+          
           pagination: false,
           search: false,
           columnSorting: false,
@@ -476,7 +497,10 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       })
     }
   }
-
+  // consumptionDataChanged = function (instance, cell, x, y, value) {
+  //   var elInstance = this.state.consumptionEl;
+  //   var rowData = elInstance.getRowData(y);
+  // }
 
   interpolationMissingActualConsumption() {
     var notes = "";
@@ -1681,7 +1705,8 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     return (
       <div className="animated fadeIn">
         <Prompt
-          when={this.state.consumptionChangedFlag == 1 || this.state.consumptionBatchInfoChangedFlag == 1}
+         // when={this.state.consumptionChangedFlag == 1 || this.state.consumptionBatchInfoChangedFlag == 1}
+          when={this.state.consumptionChanged == 1}
           message={i18n.t("static.dataentry.confirmmsg")}
         />
         <AuthenticationServiceComponent history={this.props.history} />
