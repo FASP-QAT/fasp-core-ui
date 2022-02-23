@@ -1233,7 +1233,7 @@
     "static.currency.currencycodemax4digittext": "Maximum 4 characters only",
     "static.quantimed.consumptionDate": "Consumption Month",
     "static.dashboard.tracercategorylist": "Tracer Categories",
-    "static.forecastReport.yAxisInEquivalencyUnit": "Y axis in equivalency unit",
+    "static.forecastReport.yAxisInEquivalencyUnit": "Y-axis in equivalency unit",
     "static.common.summarytext": "Enter summary",
     "static.status.status": "Status",
     "static.user.usermanual": "User Manual",
