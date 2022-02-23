@@ -1705,10 +1705,11 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           </div>
           <div className="Card-header-addicon pb-0">
             <div className="card-header-actions">
-              <img style={{ height: '23px', width: '23px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
+              {/* <img style={{ height: '23px', width: '23px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} /> */}
               <a className="card-header-action">
                 <span style={{ cursor: 'pointer' }} onClick={() => { this.toggleShowGuidance() }}><small className="supplyplanformulas">{i18n.t('static.common.showGuidance')}</small></span>
               </a>
+              <img style={{ height: '23px', width: '23px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
               {/* <span className="card-header-action">
                 {this.state.datasetId != "" && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} ><i className="fa fa-plus-square" style={{ fontSize: '20px' }} onClick={() => this.buildDataJexcel(0)}></i></a>}</span> */}
 
@@ -1937,8 +1938,8 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         </Card>
         <Modal isOpen={this.state.showGuidance}
           className={'modal-lg ' + this.props.className} >
-          <ModalHeader toggle={() => this.toggleShowGuidance()} className="modalHeaderSupplyPlan">
-            <strong>Show Guidance</strong>
+          <ModalHeader toggle={() => this.toggleShowGuidance()} className="ModalHead modal-info-Headher">
+            <strong className="TextWhite">Show Guidance</strong>
           </ModalHeader>
           <div>
             <ModalBody>
@@ -1953,9 +1954,9 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         </Modal>
         <Modal isOpen={this.state.toggleDataCheck}
           className={'modal-lg ' + this.props.className} >
-          <ModalHeader toggle={() => this.openDataCheckModel()} className="modalHeaderSupplyPlan">
+          <ModalHeader toggle={() => this.openDataCheckModel()} className="ModalHead modal-info-Headher">
             <div>
-              <img className=" pull-right iconClass cursor ml-lg-2" style={{ height: '22px', width: '22px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.exportPDFDataCheck()} />
+              <img className=" pull-right iconClass cursor ml-lg-2" style={{ height: '22px', width: '22px', cursor: 'pointer',marginTop:'-4px' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.exportPDFDataCheck()} />
               <strong>{i18n.t('static.common.dataCheck')}</strong>
             </div>
           </ModalHeader>

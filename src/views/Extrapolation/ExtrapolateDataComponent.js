@@ -2425,8 +2425,8 @@ export default class ExtrapolateDataComponent extends React.Component {
                 </Card>
                 <Modal isOpen={this.state.showGuidance}
                     className={'modal-lg ' + this.props.className} >
-                    <ModalHeader toggle={() => this.toggleShowGuidance()} className="modalHeaderSupplyPlan">
-                        <strong>Show Guidance</strong>
+                    <ModalHeader toggle={() => this.toggleShowGuidance()} className="ModalHead modal-info-Headher">
+                        <strong className="TextWhite">Show Guidance</strong>
                     </ModalHeader>
                     <div>
                         <ModalBody>
@@ -2442,9 +2442,9 @@ export default class ExtrapolateDataComponent extends React.Component {
 
                 <Modal isOpen={this.state.toggleDataCheck}
                     className={'modal-lg ' + this.props.className} >
-                    <ModalHeader toggle={() => this.openDataCheckModel()} className="modalHeaderSupplyPlan">
+                    <ModalHeader toggle={() => this.openDataCheckModel()} className="ModalHead modal-info-Headher">
                         <div>
-                            <img className=" pull-right iconClass cursor ml-lg-2" style={{ height: '22px', width: '22px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.exportPDFDataCheck()} />
+                            <img className=" pull-right iconClass cursor ml-lg-2" style={{ height: '22px', width: '22px', cursor: 'pointer',marginTop:'-4px' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.exportPDFDataCheck()} />
                             <strong>{i18n.t('static.common.dataCheck')}</strong>
                         </div>
                     </ModalHeader>

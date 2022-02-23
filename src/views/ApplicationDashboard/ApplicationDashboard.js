@@ -1427,7 +1427,7 @@ class ApplicationDashboard extends Component {
 
 
           {
-            this.state.datasetList.length > 0 &&
+            this.state.datasetList.length > 0 && activeTab1 == 1 &&
             this.state.datasetList.map((item) => (
               <Col xs="12" sm="6" lg="3">
                 <Card className=" CardHeight">
