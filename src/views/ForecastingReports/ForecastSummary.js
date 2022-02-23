@@ -105,6 +105,7 @@ class ForecastSummary extends Component {
             currencyId: '',
             dataArray: [],
             lang: localStorage.getItem('lang'),
+            downloadedProgramData: [],
 
         };
         this.getPrograms = this.getPrograms.bind(this);
@@ -130,6 +131,7 @@ class ForecastSummary extends Component {
         this.forecastChanged = this.forecastChanged.bind(this);
         this.backToMonthlyForecast = this.backToMonthlyForecast.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
+        this.setForecastPeriod = this.setForecastPeriod.bind(this);
 
     }
 
@@ -1469,6 +1471,7 @@ class ForecastSummary extends Component {
                 myResult = getRequest.result;
                 var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
                 var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                let downloadedProgramData = [];
                 for (var i = 0; i < myResult.length; i++) {
                     if (myResult[i].userId == userId) {
                         var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
@@ -1487,6 +1490,7 @@ class ForecastSummary extends Component {
                         if (f == 0) {
                             proList.push(programData)
                         }
+                        downloadedProgramData.push(programData);
                     }
 
                 }
@@ -1500,7 +1504,8 @@ class ForecastSummary extends Component {
                             return a < b ? -1 : a > b ? 1 : 0;
                         }),
                         programId: proList[0].programId,
-                        loading: false
+                        loading: false,
+                        downloadedProgramData: downloadedProgramData,
                     }, () => {
                         this.getVersionIds();
                         console.log("programs------------------>", this.state.programs);
@@ -1514,7 +1519,8 @@ class ForecastSummary extends Component {
                                 return a < b ? -1 : a > b ? 1 : 0;
                             }),
                             programId: localStorage.getItem("sesForecastProgramIdReport"),
-                            loading: false
+                            loading: false,
+                            downloadedProgramData: downloadedProgramData,
                         }, () => {
                             this.getVersionIds();
                             console.log("programs------------------>", this.state.programs);
@@ -1526,7 +1532,8 @@ class ForecastSummary extends Component {
                                 b = getLabelText(b.label, lang).toLowerCase();
                                 return a < b ? -1 : a > b ? 1 : 0;
                             }),
-                            loading: false
+                            loading: false,
+                            downloadedProgramData: downloadedProgramData,
                         }, () => {
                             console.log("programs------------------>", this.state.programs);
                         })
@@ -1565,83 +1572,144 @@ class ForecastSummary extends Component {
         })
     }
 
-    setVersionId(event) {
+    setForecastPeriod() {
+        let programId = this.state.programId;
+        let versionId = this.state.versionId;
+        if (programId != -1 && versionId.split('(')[0] != -1) {
 
-        var versionId = ((event == null || event == '' || event == undefined) ? ((this.state.versionId).toString().split('(')[0]) : (event.target.value.split('(')[0]).trim());
-        versionId = parseInt(versionId);
-        var programId = this.state.programId;
-        console.log("Test-----------------110", event);
-        console.log("Test-----------------111", versionId);
+            if (versionId.includes('Local')) {//Local version
+                versionId = versionId.split('(')[0];
+                versionId = parseInt(versionId);
+                let selectedForecastProgram = this.state.downloadedProgramData.filter(c => c.programId == programId && c.currentVersion.versionId == versionId)[0];
+                console.log("Test-----------------111", selectedForecastProgram);
+
+                let tempObj = {
+                    forecastStartDate: (selectedForecastProgram.currentVersion.forecastStartDate ? moment(selectedForecastProgram.currentVersion.forecastStartDate).format(`MMM-YYYY`) : ''),
+                    forecastStopDate: (selectedForecastProgram.currentVersion.forecastStopDate ? moment(selectedForecastProgram.currentVersion.forecastStopDate).format(`MMM-YYYY`) : ''),
+                }
+
+                selectedForecastProgram = {
+                    ...selectedForecastProgram,
+                    ...tempObj
+                }
+
+                let startDateSplit = selectedForecastProgram.forecastStartDate.split('-');
+                let stopDateSplit = selectedForecastProgram.forecastStopDate.split('-');
 
 
-        if (programId != -1 && versionId != -1) {
-            let selectedForecastProgram = this.state.programs.filter(c => c.programId == programId && c.currentVersion.versionId == versionId)[0];
-            console.log("Test-----------------111", selectedForecastProgram);
+                let forecastStopDate = new Date(selectedForecastProgram.forecastStartDate);
+                forecastStopDate.setMonth(forecastStopDate.getMonth() - 1);
 
-            let tempObj = {
-                forecastStartDate: (selectedForecastProgram.currentVersion.forecastStartDate ? moment(selectedForecastProgram.currentVersion.forecastStartDate).format(`MMM-YYYY`) : ''),
-                forecastStopDate: (selectedForecastProgram.currentVersion.forecastStopDate ? moment(selectedForecastProgram.currentVersion.forecastStopDate).format(`MMM-YYYY`) : ''),
+                let d11 = new Date(startDateSplit[1] - 3 + '-' + (new Date(selectedForecastProgram.currentVersion.forecastStartDate).getMonth() + 1) + '-01 00:00:00');
+                d11.setMonth(d11.getMonth() - 1);
+
+                let d1 = new Date(selectedForecastProgram.currentVersion.forecastStartDate);
+                let d2 = new Date(selectedForecastProgram.currentVersion.forecastStopDate);
+                var month = [
+                    "Jan",
+                    "Feb",
+                    "Mar",
+                    "Apr",
+                    "May",
+                    "Jun",
+                    "Jul",
+                    "Aug",
+                    "Sep",
+                    "Oct",
+                    "Nov",
+                    "Dec",
+                ]
+
+                let startDateSplit1 = ((month[d1.getMonth()] + '-' + d1.getFullYear())).split('-');
+                let stopDateSplit1 = ((month[d2.getMonth()] + '-' + d2.getFullYear())).split('-');
+
+                let forecastStopDate1 = new Date((month[d1.getMonth()] + '-' + d1.getFullYear()));
+                forecastStopDate1.setMonth(forecastStopDate1.getMonth() - 1);
+                console.log("Test-----------------111", startDateSplit);
+
+                let forecastStartDateNew = selectedForecastProgram.forecastStartDate;
+                let forecastStopDateNew = selectedForecastProgram.forecastStopDate;
+
+                let beforeEndDateDisplay = new Date(selectedForecastProgram.forecastStartDate);
+                beforeEndDateDisplay.setMonth(beforeEndDateDisplay.getMonth() - 1);
+
+                this.setState({
+                    forecastPeriod: months[new Date(forecastStartDateNew).getMonth()] + ' ' + new Date(forecastStartDateNew).getFullYear() + ' ~ ' + months[new Date(forecastStopDateNew).getMonth()] + ' ' + new Date(forecastStopDateNew).getFullYear(),
+                    rangeValue: { from: { year: new Date(forecastStartDateNew).getFullYear(), month: new Date(forecastStartDateNew).getMonth() + 1 }, to: { year: new Date(forecastStopDateNew).getFullYear(), month: new Date(forecastStopDateNew).getMonth() + 1 } },
+                    startDateDisplay: months[new Date(forecastStartDateNew).getMonth()] + ' ' + new Date(forecastStartDateNew).getFullYear(),
+                    endDateDisplay: months[new Date(forecastStopDateNew).getMonth()] + ' ' + new Date(forecastStopDateNew).getFullYear(),
+                    beforeEndDateDisplay: months[new Date(beforeEndDateDisplay).getMonth()] + ' ' + new Date(beforeEndDateDisplay).getFullYear(),
+                }, () => {
+
+                })
+
+
+
+            } else {//server version
+                // let selectedForecastProgram = this.state.programs.filter(c => c.programId == programId && c.currentVersion.versionId == versionId)[0];
+                // console.log("Test-----------------111", selectedForecastProgram);
+
+                // let tempObj = {
+                //     forecastStartDate: (selectedForecastProgram.currentVersion.forecastStartDate ? moment(selectedForecastProgram.currentVersion.forecastStartDate).format(`MMM-YYYY`) : ''),
+                //     forecastStopDate: (selectedForecastProgram.currentVersion.forecastStopDate ? moment(selectedForecastProgram.currentVersion.forecastStopDate).format(`MMM-YYYY`) : ''),
+                // }
+
+                // selectedForecastProgram = {
+                //     ...selectedForecastProgram,
+                //     ...tempObj
+                // }
+
+                // let startDateSplit = selectedForecastProgram.forecastStartDate.split('-');
+                // let stopDateSplit = selectedForecastProgram.forecastStopDate.split('-');
+
+
+                // let forecastStopDate = new Date(selectedForecastProgram.forecastStartDate);
+                // forecastStopDate.setMonth(forecastStopDate.getMonth() - 1);
+
+                // let d11 = new Date(startDateSplit[1] - 3 + '-' + (new Date(selectedForecastProgram.currentVersion.forecastStartDate).getMonth() + 1) + '-01 00:00:00');
+                // d11.setMonth(d11.getMonth() - 1);
+
+                // let d1 = new Date(selectedForecastProgram.currentVersion.forecastStartDate);
+                // let d2 = new Date(selectedForecastProgram.currentVersion.forecastStopDate);
+                // var month = [
+                //     "Jan",
+                //     "Feb",
+                //     "Mar",
+                //     "Apr",
+                //     "May",
+                //     "Jun",
+                //     "Jul",
+                //     "Aug",
+                //     "Sep",
+                //     "Oct",
+                //     "Nov",
+                //     "Dec",
+                // ]
+
+                // let startDateSplit1 = ((month[d1.getMonth()] + '-' + d1.getFullYear())).split('-');
+                // let stopDateSplit1 = ((month[d2.getMonth()] + '-' + d2.getFullYear())).split('-');
+
+                // let forecastStopDate1 = new Date((month[d1.getMonth()] + '-' + d1.getFullYear()));
+                // forecastStopDate1.setMonth(forecastStopDate1.getMonth() - 1);
+                // console.log("Test-----------------111", startDateSplit);
+
+                // let forecastStartDateNew = selectedForecastProgram.forecastStartDate;
+                // let forecastStopDateNew = selectedForecastProgram.forecastStopDate;
+
+                // let beforeEndDateDisplay = new Date(selectedForecastProgram.forecastStartDate);
+                // beforeEndDateDisplay.setMonth(beforeEndDateDisplay.getMonth() - 1);
+
+                // this.setState({
+                //     forecastPeriod: months[new Date(forecastStartDateNew).getMonth()] + ' ' + new Date(forecastStartDateNew).getFullYear() + ' ~ ' + months[new Date(forecastStopDateNew).getMonth()] + ' ' + new Date(forecastStopDateNew).getFullYear(),
+                //     rangeValue: { from: { year: new Date(forecastStartDateNew).getFullYear(), month: new Date(forecastStartDateNew).getMonth() + 1 }, to: { year: new Date(forecastStopDateNew).getFullYear(), month: new Date(forecastStopDateNew).getMonth() + 1 } },
+                //     startDateDisplay: months[new Date(forecastStartDateNew).getMonth()] + ' ' + new Date(forecastStartDateNew).getFullYear(),
+                //     endDateDisplay: months[new Date(forecastStopDateNew).getMonth()] + ' ' + new Date(forecastStopDateNew).getFullYear(),
+                //     beforeEndDateDisplay: months[new Date(beforeEndDateDisplay).getMonth()] + ' ' + new Date(beforeEndDateDisplay).getFullYear(),
+                // }, () => {
+
+                // })
             }
 
-            selectedForecastProgram = {
-                ...selectedForecastProgram,
-                ...tempObj
-            }
-
-            let startDateSplit = selectedForecastProgram.forecastStartDate.split('-');
-            let stopDateSplit = selectedForecastProgram.forecastStopDate.split('-');
-
-
-            let forecastStopDate = new Date(selectedForecastProgram.forecastStartDate);
-            forecastStopDate.setMonth(forecastStopDate.getMonth() - 1);
-
-            let d11 = new Date(startDateSplit[1] - 3 + '-' + (new Date(selectedForecastProgram.currentVersion.forecastStartDate).getMonth() + 1) + '-01 00:00:00');
-            d11.setMonth(d11.getMonth() - 1);
-
-            let d1 = new Date(selectedForecastProgram.currentVersion.forecastStartDate);
-            let d2 = new Date(selectedForecastProgram.currentVersion.forecastStopDate);
-            var month = [
-                "Jan",
-                "Feb",
-                "Mar",
-                "Apr",
-                "May",
-                "Jun",
-                "Jul",
-                "Aug",
-                "Sep",
-                "Oct",
-                "Nov",
-                "Dec",
-            ]
-
-            let startDateSplit1 = ((month[d1.getMonth()] + '-' + d1.getFullYear())).split('-');
-            let stopDateSplit1 = ((month[d2.getMonth()] + '-' + d2.getFullYear())).split('-');
-
-            let forecastStopDate1 = new Date((month[d1.getMonth()] + '-' + d1.getFullYear()));
-            forecastStopDate1.setMonth(forecastStopDate1.getMonth() - 1);
-            console.log("Test-----------------111", startDateSplit);
-
-            let forecastStartDateNew = selectedForecastProgram.forecastStartDate;
-            let forecastStopDateNew = selectedForecastProgram.forecastStopDate;
-
-            let beforeEndDateDisplay = new Date(selectedForecastProgram.forecastStartDate);
-            beforeEndDateDisplay.setMonth(beforeEndDateDisplay.getMonth() - 1);
-
-            this.setState({
-                // forecastPeriod: (month[new Date((month[d1.getMonth()] + '-' + d1.getFullYear())).getMonth()]) + ' ' + (startDateSplit1[1] - 3) + ' ~ ' + month[forecastStopDate1.getMonth()] + ' ' + forecastStopDate1.getFullYear(),
-                // rangeValue: { from: { year: startDateSplit[1] - 3, month: new Date(selectedForecastProgram.forecastStartDate).getMonth() + 1 }, to: { year: forecastStopDate.getFullYear(), month: forecastStopDate.getMonth() + 1 } },
-                // startDateDisplay: months[new Date(selectedForecastProgram.currentVersion.forecastStartDate).getMonth()] + ' ' + (startDateSplit[1] - 3),
-                // endDateDisplay: months[(forecastStopDate.getMonth())] + ' ' + forecastStopDate.getFullYear(),
-                // beforeEndDateDisplay: months[(d11.getMonth())] + ' ' + d11.getFullYear(),
-                forecastPeriod: months[new Date(forecastStartDateNew).getMonth()] + ' ' + new Date(forecastStartDateNew).getFullYear() + ' ~ ' + months[new Date(forecastStopDateNew).getMonth()] + ' ' + new Date(forecastStopDateNew).getFullYear(),
-                rangeValue: { from: { year: new Date(forecastStartDateNew).getFullYear(), month: new Date(forecastStartDateNew).getMonth() + 1 }, to: { year: new Date(forecastStopDateNew).getFullYear(), month: new Date(forecastStopDateNew).getMonth() + 1 } },
-                startDateDisplay: months[new Date(forecastStartDateNew).getMonth()] + ' ' + new Date(forecastStartDateNew).getFullYear(),
-                endDateDisplay: months[new Date(forecastStopDateNew).getMonth()] + ' ' + new Date(forecastStopDateNew).getFullYear(),
-                beforeEndDateDisplay: months[new Date(beforeEndDateDisplay).getMonth()] + ' ' + new Date(beforeEndDateDisplay).getFullYear(),
-            }, () => {
-
-            })
         } else {
             var dt = new Date();
             dt.setMonth(dt.getMonth() - REPORT_DATEPICKER_START_MONTH);
@@ -1657,12 +1725,102 @@ class ForecastSummary extends Component {
                 // this.filterData();
             })
         }
+    }
+
+    setVersionId(event) {
+
+        // var versionId = ((event == null || event == '' || event == undefined) ? ((this.state.versionId).toString().split('(')[0]) : (event.target.value.split('(')[0]).trim());
+        // versionId = parseInt(versionId);
+        // var programId = this.state.programId;
+        // console.log("Test-----------------110", event);
+        // console.log("Test-----------------111", versionId);
+
+
+        // if (programId != -1 && versionId != -1) {
+        //     let selectedForecastProgram = this.state.programs.filter(c => c.programId == programId && c.currentVersion.versionId == versionId)[0];
+        //     console.log("Test-----------------111", selectedForecastProgram);
+
+        //     let tempObj = {
+        //         forecastStartDate: (selectedForecastProgram.currentVersion.forecastStartDate ? moment(selectedForecastProgram.currentVersion.forecastStartDate).format(`MMM-YYYY`) : ''),
+        //         forecastStopDate: (selectedForecastProgram.currentVersion.forecastStopDate ? moment(selectedForecastProgram.currentVersion.forecastStopDate).format(`MMM-YYYY`) : ''),
+        //     }
+
+        //     selectedForecastProgram = {
+        //         ...selectedForecastProgram,
+        //         ...tempObj
+        //     }
+
+        //     let startDateSplit = selectedForecastProgram.forecastStartDate.split('-');
+        //     let stopDateSplit = selectedForecastProgram.forecastStopDate.split('-');
+
+
+        //     let forecastStopDate = new Date(selectedForecastProgram.forecastStartDate);
+        //     forecastStopDate.setMonth(forecastStopDate.getMonth() - 1);
+
+        //     let d11 = new Date(startDateSplit[1] - 3 + '-' + (new Date(selectedForecastProgram.currentVersion.forecastStartDate).getMonth() + 1) + '-01 00:00:00');
+        //     d11.setMonth(d11.getMonth() - 1);
+
+        //     let d1 = new Date(selectedForecastProgram.currentVersion.forecastStartDate);
+        //     let d2 = new Date(selectedForecastProgram.currentVersion.forecastStopDate);
+        //     var month = [
+        //         "Jan",
+        //         "Feb",
+        //         "Mar",
+        //         "Apr",
+        //         "May",
+        //         "Jun",
+        //         "Jul",
+        //         "Aug",
+        //         "Sep",
+        //         "Oct",
+        //         "Nov",
+        //         "Dec",
+        //     ]
+
+        //     let startDateSplit1 = ((month[d1.getMonth()] + '-' + d1.getFullYear())).split('-');
+        //     let stopDateSplit1 = ((month[d2.getMonth()] + '-' + d2.getFullYear())).split('-');
+
+        //     let forecastStopDate1 = new Date((month[d1.getMonth()] + '-' + d1.getFullYear()));
+        //     forecastStopDate1.setMonth(forecastStopDate1.getMonth() - 1);
+        //     console.log("Test-----------------111", startDateSplit);
+
+        //     let forecastStartDateNew = selectedForecastProgram.forecastStartDate;
+        //     let forecastStopDateNew = selectedForecastProgram.forecastStopDate;
+
+        //     let beforeEndDateDisplay = new Date(selectedForecastProgram.forecastStartDate);
+        //     beforeEndDateDisplay.setMonth(beforeEndDateDisplay.getMonth() - 1);
+
+        //     this.setState({
+        //         forecastPeriod: months[new Date(forecastStartDateNew).getMonth()] + ' ' + new Date(forecastStartDateNew).getFullYear() + ' ~ ' + months[new Date(forecastStopDateNew).getMonth()] + ' ' + new Date(forecastStopDateNew).getFullYear(),
+        //         rangeValue: { from: { year: new Date(forecastStartDateNew).getFullYear(), month: new Date(forecastStartDateNew).getMonth() + 1 }, to: { year: new Date(forecastStopDateNew).getFullYear(), month: new Date(forecastStopDateNew).getMonth() + 1 } },
+        //         startDateDisplay: months[new Date(forecastStartDateNew).getMonth()] + ' ' + new Date(forecastStartDateNew).getFullYear(),
+        //         endDateDisplay: months[new Date(forecastStopDateNew).getMonth()] + ' ' + new Date(forecastStopDateNew).getFullYear(),
+        //         beforeEndDateDisplay: months[new Date(beforeEndDateDisplay).getMonth()] + ' ' + new Date(beforeEndDateDisplay).getFullYear(),
+        //     }, () => {
+
+        //     })
+        // } else {
+        //     var dt = new Date();
+        //     dt.setMonth(dt.getMonth() - REPORT_DATEPICKER_START_MONTH);
+        //     var dt1 = new Date();
+        //     dt1.setMonth(dt1.getMonth() + REPORT_DATEPICKER_END_MONTH);
+        //     this.setState({
+        //         forecastPeriod: '',
+        //         rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: dt1.getFullYear(), month: dt1.getMonth() + 1 } },
+        //         startDateDisplay: '',
+        //         endDateDisplay: '',
+        //         beforeEndDateDisplay: '',
+        //     }, () => {
+        //         // this.filterData();
+        //     })
+        // }
 
 
         this.setState({
             versionId: ((event == null || event == '' || event == undefined) ? (this.state.versionId) : (event.target.value).trim()),
         }, () => {
             // localStorage.setItem("sesVersionIdReport", '');
+            this.setForecastPeriod();
             this.filterData();
         })
 
