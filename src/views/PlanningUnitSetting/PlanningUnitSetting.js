@@ -1728,14 +1728,14 @@ export default class PlanningUnitSetting extends Component {
                 var index = (instance.jexcel).getValue(`N${parseInt(data[i].y) + 1}`, true);
                 if (index == "" || index == null || index == undefined) {
                     console.log("-----------------onPaste---------------------3");
-                    (instance.jexcel).setValueFromCoords(8, data[i].y, true, true);
+                    // (instance.jexcel).setValueFromCoords(8, data[i].y, true, true);
                     (instance.jexcel).setValueFromCoords(9, data[i].y, true, true);
                     (instance.jexcel).setValueFromCoords(10, data[i].y, 1, true);
                     (instance.jexcel).setValueFromCoords(11, data[i].y, 1, true);
                     (instance.jexcel).setValueFromCoords(12, data[i].y, {}, true);
                     (instance.jexcel).setValueFromCoords(13, data[i].y, 0, true);
                     (instance.jexcel).setValueFromCoords(14, data[i].y, true, true);
-                    (instance.jexcel).setValueFromCoords(15, data[i].y, "", true);
+                    // (instance.jexcel).setValueFromCoords(15, data[i].y, "", true);
                     z = data[i].y;
                 }
             }
