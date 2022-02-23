@@ -100,6 +100,7 @@ class ForecastOutput extends Component {
         this.continueToForecastSummary = this.continueToForecastSummary.bind(this);
         this.toggleEu = this.toggleEu.bind(this);
         this.toggleRv = this.toggleRv.bind(this);
+        this.setForecastPeriod = this.setForecastPeriod.bind(this);
     }
 
     backToCompareAndSelect() {
@@ -375,7 +376,7 @@ class ForecastOutput extends Component {
         // headers.push(i18n.t('static.importFromQATSupplyPlan.supplyPlanPlanningUnit'));
 
         // headers.push('Display');
-        (this.state.viewById == 1 ? headers.push(i18n.t('static.product.product')) : headers.push(i18n.t('static.forecastingunit.forecastingunit')));
+        (this.state.viewById == 1 ? headers.push((i18n.t('static.product.product')).replaceAll(' ', '%20')) : headers.push((i18n.t('static.forecastingunit.forecastingunit')).replaceAll(' ', '%20')));
         headers.push(i18n.t('static.consumption.forcast'));
         {
             this.state.xaxis == 2 && this.state.monthArrayList.map(item => (
@@ -678,6 +679,7 @@ class ForecastOutput extends Component {
         let viewById = document.getElementById("viewById").value;
         let yaxisEquUnitId = document.getElementById("yaxisEquUnit").value;
         let xaxisId = document.getElementById("xaxis").value;
+        console.log("versionId----------->filterData", versionId);
 
         if (versionId != 0 && programId > 0 && (viewById == 1 ? planningUnitIds.length > 0 : forecastingUnitIds.length > 0)) {
             if (versionId.includes('Local')) {
@@ -821,7 +823,7 @@ class ForecastOutput extends Component {
                                                                     consumptionQty: parseInt(m.calculatedValue)
                                                                 }
                                                             });
-                                                            let jsonTemp = { objUnit: planningUniObj.planningUnit, scenario: { id: 1, label: treeList[j].label.label_en + filteredScenario[0].label.label_en }, display: true, color: "#ba0c2f", consumptionList: consumptionList }
+                                                            let jsonTemp = { objUnit: planningUniObj.planningUnit, scenario: { id: 1, label: '(' + treeList[j].label.label_en + ' - ' + filteredScenario[0].label.label_en + ')' }, display: true, color: "#ba0c2f", consumptionList: consumptionList }
                                                             console.log("Test------------>8.1", jsonTemp);
                                                             consumptionData.push(jsonTemp);
                                                             match = 0;
@@ -834,7 +836,7 @@ class ForecastOutput extends Component {
                                                     }
 
                                                     if (match == 1) {
-                                                        let jsonTemp = { objUnit: planningUniObj.planningUnit, scenario: { id: 1, label: treeList[j].label.label_en + filteredScenario[0].label.label_en }, display: true, color: "#ba0c2f", consumptionList: [] }
+                                                        let jsonTemp = { objUnit: planningUniObj.planningUnit, scenario: { id: 1, label: '(' + treeList[j].label.label_en + ' - ' + filteredScenario[0].label.label_en + ')' }, display: true, color: "#ba0c2f", consumptionList: [] }
                                                         consumptionData.push(jsonTemp);
                                                     }
 
@@ -921,7 +923,7 @@ class ForecastOutput extends Component {
                                                                     }
                                                                 });
                                                                 // let jsonTemp = { objUnit: forecastingUniObj[l].planningUnit.forecastingUnit, scenario: { id: 1, label: treeList[j].label.label_en + filteredScenario[0].label.label_en }, display: true, color: "#ba0c2f", consumptionList: consumptionList }
-                                                                let jsonTemp = { objUnit: { id: forecastingUniObj[l].planningUnit.id, label: forecastingUniObj[l].planningUnit.forecastingUnit.label }, scenario: { id: 1, label: treeList[j].label.label_en + filteredScenario[0].label.label_en }, display: true, color: "#ba0c2f", consumptionList: consumptionList }
+                                                                let jsonTemp = { objUnit: { id: forecastingUniObj[l].planningUnit.id, label: forecastingUniObj[l].planningUnit.forecastingUnit.label }, scenario: { id: 1, label: '(' + treeList[j].label.label_en + ' - ' + filteredScenario[0].label.label_en + ')' }, display: true, color: "#ba0c2f", consumptionList: consumptionList }
                                                                 consumptionData.push(jsonTemp);
                                                                 match = 0;
                                                                 break;
@@ -934,7 +936,7 @@ class ForecastOutput extends Component {
 
                                                         if (match == 1) {
                                                             // let jsonTemp = { objUnit: forecastingUniObj[l].planningUnit.forecastingUnit, scenario: { id: 1, label: treeList[j].label.label_en + filteredScenario[0].label.label_en }, display: true, color: "#ba0c2f", consumptionList: [] }
-                                                            let jsonTemp = { objUnit: { id: forecastingUniObj[l].planningUnit.id, label: forecastingUniObj[l].planningUnit.forecastingUnit.label }, scenario: { id: 1, label: treeList[j].label.label_en + filteredScenario[0].label.label_en }, display: true, color: "#ba0c2f", consumptionList: [] }
+                                                            let jsonTemp = { objUnit: { id: forecastingUniObj[l].planningUnit.id, label: forecastingUniObj[l].planningUnit.forecastingUnit.label }, scenario: { id: 1, label: '(' + treeList[j].label.label_en + ' - ' + filteredScenario[0].label.label_en + ')' }, display: true, color: "#ba0c2f", consumptionList: [] }
                                                             consumptionData.push(jsonTemp);
                                                         }
 
@@ -951,8 +953,7 @@ class ForecastOutput extends Component {
                                                     let consumptionList = consumptionExtrapolationObj[0].extrapolationDataList.map(m => {
                                                         return {
                                                             consumptionDate: m.month,
-                                                            // consumptionQty: m.amount
-                                                            consumptionQty: parseInt(m.amount)
+                                                            consumptionQty: m.amount
                                                         }
                                                     });
                                                     // let jsonTemp = { objUnit: forecastingUniObj[l].planningUnit.forecastingUnit, scenario: { id: 1, label: "" }, display: true, color: "#ba0c2f", consumptionList: consumptionList }
@@ -1008,6 +1009,8 @@ class ForecastOutput extends Component {
                                 let nextStartDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
                                 let nextEndDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-28';
 
+                                console.log("TestFU------------>900", nextStartDate);
+                                console.log("TestFU------------>901", nextEndDate);
                                 console.log("TestFU------------>92", consumptionData);
 
                                 for (let i = 0; i < consumptionData.length; i++) {
@@ -1441,11 +1444,27 @@ class ForecastOutput extends Component {
                         let programData = this.state.downloadedProgramData.filter(c => c.programId == programId && c.currentVersion.versionId == (versionId.split('(')[0]).trim())[0];
                         console.log("programData---------->", programData);
                         let forecastingUnitListTemp = [];
-                        let planningUnitList = programData.planningUnitList.map(o => o.planningUnit)
+                        var lang = this.state.lang;
+                        // let planningUnitList = programData.planningUnitList.map(o => o.planningUnit)
+
+                        let planningUnitList = programData.planningUnitList.map(o => {
+                            let planningUnitObj1 = o.planningUnit;
+                            let planningUnitObj2 = { selectedForecastMap: o.selectedForecastMap };
+                            return {
+                                ...planningUnitObj1, ...planningUnitObj2
+                            }
+                        });
+
+                        console.log("CheckPU------------------>1", planningUnitList);
+
+                        planningUnitList = planningUnitList.filter(c => Object.keys(c.selectedForecastMap).length !== 0)
+
+                        console.log("CheckPU------------------>3", planningUnitList);
 
                         for (var i = 0; i < planningUnitList.length; i++) {
                             forecastingUnitListTemp.push(planningUnitList[i].forecastingUnit);
                         }
+                        console.log("CheckPU------------------>2", forecastingUnitList);
                         // console.log("PlanningUnitList----------------->1", planningUnitList);
                         // console.log("PlanningUnitList----------------->2", forecastingUnitListTemp);
 
@@ -1464,7 +1483,7 @@ class ForecastOutput extends Component {
                         // const filteredPU = dupPlanningUnitObj.filter(({ id }, index) => !idsPU.includes(id, index + 1))
 
                         let yaxisEquUnitId = document.getElementById("yaxisEquUnit").value;
-                        if (yaxisEquUnitId != -1) {
+                        if (yaxisEquUnitId != -1) {//Yes
                             let filteredProgramEQList = this.state.programEquivalencyUnitList.filter(c => c.equivalencyUnit.equivalencyUnitId == yaxisEquUnitId);
                             let newPlanningUnitList = [];
                             let newForecastingUnitList = [];
@@ -1485,6 +1504,18 @@ class ForecastOutput extends Component {
                             var yaxisEquUnitt = document.getElementById("yaxisEquUnit");
                             var selectedText = yaxisEquUnitt.options[yaxisEquUnitt.selectedIndex].text;
 
+                            newPlanningUnitList.sort(function (a, b) {
+                                a = getLabelText(a.label, lang).toLowerCase();
+                                b = getLabelText(b.label, lang).toLowerCase();
+                                return a < b ? -1 : a > b ? 1 : 0;
+                            });
+
+                            newForecastingUnitList.sort(function (a, b) {
+                                a = getLabelText(a.label, lang).toLowerCase();
+                                b = getLabelText(b.label, lang).toLowerCase();
+                                return a < b ? -1 : a > b ? 1 : 0;
+                            })
+
                             this.setState({
                                 planningUnits: newPlanningUnitList,
                                 forecastingUnits: newForecastingUnitList,
@@ -1499,7 +1530,19 @@ class ForecastOutput extends Component {
                             }, () => {
                                 this.filterData();
                             })
-                        } else {
+                        } else {//NO
+
+                            planningUnitList.sort(function (a, b) {
+                                a = getLabelText(a.label, lang).toLowerCase();
+                                b = getLabelText(b.label, lang).toLowerCase();
+                                return a < b ? -1 : a > b ? 1 : 0;
+                            });
+
+                            forecastingUnitList.sort(function (a, b) {
+                                a = getLabelText(a.label, lang).toLowerCase();
+                                b = getLabelText(b.label, lang).toLowerCase();
+                                return a < b ? -1 : a > b ? 1 : 0;
+                            })
                             this.setState({
                                 planningUnits: planningUnitList,
                                 forecastingUnits: forecastingUnitList,
@@ -1587,61 +1630,159 @@ class ForecastOutput extends Component {
 
     }
 
+    setForecastPeriod() {
+        console.log("selectedForecastProgram------------>001", this.state.programId);
+        console.log("selectedForecastProgram------------>002", this.state.versionId);
+        console.log("selectedForecastProgram------------>002", this.state.programs);
+        let programId = this.state.programId;
+        let versionId = this.state.versionId;
+        if (programId != -1 && versionId.split('(')[0] != -1) {
+
+            if (versionId.includes('Local')) {//Local version
+                versionId = versionId.split('(')[0];
+                versionId = parseInt(versionId);
+                let selectedForecastProgram = this.state.downloadedProgramData.filter(c => c.programId == programId && c.currentVersion.versionId == versionId)[0]
+                let d1 = new Date(selectedForecastProgram.currentVersion.forecastStartDate);
+                let d2 = new Date(selectedForecastProgram.currentVersion.forecastStopDate);
+                var month = [
+                    "Jan",
+                    "Feb",
+                    "Mar",
+                    "Apr",
+                    "May",
+                    "Jun",
+                    "Jul",
+                    "Aug",
+                    "Sep",
+                    "Oct",
+                    "Nov",
+                    "Dec",
+                ]
+
+                let startDateSplit = ((month[d1.getMonth()] + '-' + d1.getFullYear())).split('-');
+                let stopDateSplit = ((month[d2.getMonth()] + '-' + d2.getFullYear())).split('-');
+
+                let forecastStopDate = new Date((month[d1.getMonth()] + '-' + d1.getFullYear()));
+                forecastStopDate.setMonth(forecastStopDate.getMonth() - 1);
+
+                let forecastStartDateNew = selectedForecastProgram.currentVersion.forecastStartDate;
+                let forecastStopDateNew = selectedForecastProgram.currentVersion.forecastStopDate;
+
+                let beforeEndDateDisplay = new Date(selectedForecastProgram.forecastStartDate);
+                beforeEndDateDisplay.setMonth(beforeEndDateDisplay.getMonth() - 1);
+
+                this.setState({
+                    // forecastPeriod: (month[new Date((month[d1.getMonth()] + '-' + d1.getFullYear())).getMonth()]) + ' ' + (startDateSplit[1] - 3) + ' ~ ' + month[forecastStopDate.getMonth()] + ' ' + forecastStopDate.getFullYear(),
+                    rangeValue: { from: { year: new Date(forecastStartDateNew).getFullYear(), month: new Date(forecastStartDateNew).getMonth() + 1 }, to: { year: new Date(forecastStopDateNew).getFullYear(), month: new Date(forecastStopDateNew).getMonth() + 1 } },
+                    forecastPeriod: month[new Date(forecastStartDateNew).getMonth()] + ' ' + new Date(forecastStartDateNew).getFullYear() + ' ~ ' + month[new Date(forecastStopDateNew).getMonth()] + ' ' + new Date(forecastStopDateNew).getFullYear(),
+                }, () => { })
+
+            } else {//server version
+                // let selectedForecastProgram = this.state.programs.filter(c => c.programId == programId && c.currentVersion.versionId == versionId)[0]
+                // let d1 = new Date(selectedForecastProgram.currentVersion.forecastStartDate);
+                // let d2 = new Date(selectedForecastProgram.currentVersion.forecastStopDate);
+                // var month = [
+                //     "Jan",
+                //     "Feb",
+                //     "Mar",
+                //     "Apr",
+                //     "May",
+                //     "Jun",
+                //     "Jul",
+                //     "Aug",
+                //     "Sep",
+                //     "Oct",
+                //     "Nov",
+                //     "Dec",
+                // ]
+
+                // let startDateSplit = ((month[d1.getMonth()] + '-' + d1.getFullYear())).split('-');
+                // let stopDateSplit = ((month[d2.getMonth()] + '-' + d2.getFullYear())).split('-');
+
+                // let forecastStopDate = new Date((month[d1.getMonth()] + '-' + d1.getFullYear()));
+                // forecastStopDate.setMonth(forecastStopDate.getMonth() - 1);
+
+                // let forecastStartDateNew = selectedForecastProgram.currentVersion.forecastStartDate;
+                // let forecastStopDateNew = selectedForecastProgram.currentVersion.forecastStopDate;
+
+                // let beforeEndDateDisplay = new Date(selectedForecastProgram.forecastStartDate);
+                // beforeEndDateDisplay.setMonth(beforeEndDateDisplay.getMonth() - 1);
+
+                // this.setState({
+                //     // forecastPeriod: (month[new Date((month[d1.getMonth()] + '-' + d1.getFullYear())).getMonth()]) + ' ' + (startDateSplit[1] - 3) + ' ~ ' + month[forecastStopDate.getMonth()] + ' ' + forecastStopDate.getFullYear(),
+                //     rangeValue: { from: { year: new Date(forecastStartDateNew).getFullYear(), month: new Date(forecastStartDateNew).getMonth() + 1 }, to: { year: new Date(forecastStopDateNew).getFullYear(), month: new Date(forecastStopDateNew).getMonth() + 1 } },
+                //     forecastPeriod: month[new Date(forecastStartDateNew).getMonth()] + ' ' + new Date(forecastStartDateNew).getFullYear() + ' ~ ' + month[new Date(forecastStopDateNew).getMonth()] + ' ' + new Date(forecastStopDateNew).getFullYear(),
+                // }, () => { })
+
+            }
+        } else {
+            this.setState({
+                forecastPeriod: '',
+            }, () => { })
+        }
+    }
+
 
     setVersionId(event) {
 
 
 
         var versionId = ((event == null || event == '' || event == undefined) ? ((this.state.versionId).toString().split('(')[0]) : (event.target.value.split('(')[0]).trim());
+        console.log("versionId----------->", versionId);
+        console.log("versionId----------->downloadedProgramData", this.state.downloadedProgramData);
         versionId = parseInt(versionId);
         // var version = (versionId.split('(')[0]).trim()
         var programId = this.state.programId;
 
-        if (programId != -1 && versionId != -1) {
-            let selectedForecastProgram = this.state.programs.filter(c => c.programId == programId && c.currentVersion.versionId == versionId)[0]
+        // if (programId != -1 && versionId != -1) {
+        //     let selectedForecastProgram = this.state.programs.filter(c => c.programId == programId && c.currentVersion.versionId == versionId)[0]
+        //     console.log("selectedForecastProgram------------>0", this.state.programs);
+        //     console.log("selectedForecastProgram------------>1", selectedForecastProgram);
+        //     console.log("selectedForecastProgram------------>2", programId);
+        //     console.log("selectedForecastProgram------------>3", versionId);
+        //     let d1 = new Date(selectedForecastProgram.currentVersion.forecastStartDate);
+        //     let d2 = new Date(selectedForecastProgram.currentVersion.forecastStopDate);
+        //     var month = [
+        //         "Jan",
+        //         "Feb",
+        //         "Mar",
+        //         "Apr",
+        //         "May",
+        //         "Jun",
+        //         "Jul",
+        //         "Aug",
+        //         "Sep",
+        //         "Oct",
+        //         "Nov",
+        //         "Dec",
+        //     ]
 
-            let d1 = new Date(selectedForecastProgram.currentVersion.forecastStartDate);
-            let d2 = new Date(selectedForecastProgram.currentVersion.forecastStopDate);
-            var month = [
-                "Jan",
-                "Feb",
-                "Mar",
-                "Apr",
-                "May",
-                "Jun",
-                "Jul",
-                "Aug",
-                "Sep",
-                "Oct",
-                "Nov",
-                "Dec",
-            ]
+        //     let startDateSplit = ((month[d1.getMonth()] + '-' + d1.getFullYear())).split('-');
+        //     let stopDateSplit = ((month[d2.getMonth()] + '-' + d2.getFullYear())).split('-');
 
-            let startDateSplit = ((month[d1.getMonth()] + '-' + d1.getFullYear())).split('-');
-            let stopDateSplit = ((month[d2.getMonth()] + '-' + d2.getFullYear())).split('-');
+        //     let forecastStopDate = new Date((month[d1.getMonth()] + '-' + d1.getFullYear()));
+        //     forecastStopDate.setMonth(forecastStopDate.getMonth() - 1);
 
-            let forecastStopDate = new Date((month[d1.getMonth()] + '-' + d1.getFullYear()));
-            forecastStopDate.setMonth(forecastStopDate.getMonth() - 1);
+        //     let forecastStartDateNew = selectedForecastProgram.currentVersion.forecastStartDate;
+        //     let forecastStopDateNew = selectedForecastProgram.currentVersion.forecastStopDate;
 
-            let forecastStartDateNew = selectedForecastProgram.currentVersion.forecastStartDate;
-            let forecastStopDateNew = selectedForecastProgram.currentVersion.forecastStopDate;
+        //     let beforeEndDateDisplay = new Date(selectedForecastProgram.forecastStartDate);
+        //     beforeEndDateDisplay.setMonth(beforeEndDateDisplay.getMonth() - 1);
 
-            let beforeEndDateDisplay = new Date(selectedForecastProgram.forecastStartDate);
-            beforeEndDateDisplay.setMonth(beforeEndDateDisplay.getMonth() - 1);
+        //     this.setState({
+        //         // forecastPeriod: (month[new Date((month[d1.getMonth()] + '-' + d1.getFullYear())).getMonth()]) + ' ' + (startDateSplit[1] - 3) + ' ~ ' + month[forecastStopDate.getMonth()] + ' ' + forecastStopDate.getFullYear(),
+        //         rangeValue: { from: { year: new Date(forecastStartDateNew).getFullYear(), month: new Date(forecastStartDateNew).getMonth() + 1 }, to: { year: new Date(forecastStopDateNew).getFullYear(), month: new Date(forecastStopDateNew).getMonth() + 1 } },
+        //         forecastPeriod: month[new Date(forecastStartDateNew).getMonth()] + ' ' + new Date(forecastStartDateNew).getFullYear() + ' ~ ' + month[new Date(forecastStopDateNew).getMonth()] + ' ' + new Date(forecastStopDateNew).getFullYear(),
+        //     }, () => {
 
-            this.setState({
-                // forecastPeriod: (month[new Date((month[d1.getMonth()] + '-' + d1.getFullYear())).getMonth()]) + ' ' + (startDateSplit[1] - 3) + ' ~ ' + month[forecastStopDate.getMonth()] + ' ' + forecastStopDate.getFullYear(),
-                forecastPeriod: month[new Date(forecastStartDateNew).getMonth()] + ' ' + new Date(forecastStartDateNew).getFullYear() + ' ~ ' + month[new Date(forecastStopDateNew).getMonth()] + ' ' + new Date(forecastStopDateNew).getFullYear(),
-            }, () => {
+        //     })
+        // } else {
+        //     this.setState({
+        //         forecastPeriod: '',
+        //     }, () => {
 
-            })
-        } else {
-            this.setState({
-                forecastPeriod: '',
-            }, () => {
-
-            })
-        }
+        //     })
+        // }
 
 
         var viewById = document.getElementById("viewById").value;
@@ -1662,6 +1803,7 @@ class ForecastOutput extends Component {
             }, () => {
                 // localStorage.setItem("sesVersionIdReport", this.state.versionId);
                 // (viewById == 1 ? this.getPlanningUnitForecastingUnit() : this.getForecastingUnit());
+                this.setForecastPeriod();
                 this.filterData();
                 this.getEquivalencyUnitData();
                 this.getPlanningUnitForecastingUnit();
@@ -1672,6 +1814,7 @@ class ForecastOutput extends Component {
                 versionId: event.target.value
             }, () => {
                 // (viewById == 1 ? this.getPlanningUnitForecastingUnit() : this.getForecastingUnit());
+                this.setForecastPeriod();
                 this.filterData();
                 this.getEquivalencyUnitData();
                 this.getPlanningUnitForecastingUnit()
@@ -2072,7 +2215,7 @@ class ForecastOutput extends Component {
                     })
                     datasetsArr.push(
                         {
-                            label: item.objUnit.label.label_en + ' - ' + item.scenario.label,
+                            label: item.objUnit.label.label_en + ' ' + item.scenario.label,
                             id: item.objUnit.id,
                             type: 'line',
                             stack: 3,
@@ -2156,14 +2299,14 @@ class ForecastOutput extends Component {
         const { planningUnits } = this.state;
         let planningUnitList = planningUnits.length > 0
             && planningUnits.map((item, i) => {
-                return ({ label: getLabelText(item.label, this.state.lang), value: item.id })
+                return ({ label: getLabelText(item.label, this.state.lang) + ' | ' + item.id, value: item.id })
 
             }, this);
 
         const { forecastingUnits } = this.state;
         let forecastingUnitList = forecastingUnits.length > 0
             && forecastingUnits.map((item, i) => {
-                return ({ label: getLabelText(item.label, this.state.lang), value: item.id })
+                return ({ label: getLabelText(item.label, this.state.lang) + ' | ' + item.id, value: item.id })
 
             }, this);
 

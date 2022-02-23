@@ -5945,3 +5945,7 @@ font-style: italic!important;
   .jexcel > thead.resizable > tr > .arrow-up:not(.AsteriskTheadtrTd)::after {
     content: ""!important;
   }
+
+  .removeDropdownArrow{
+    appearance: none;
+  }

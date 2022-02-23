@@ -299,6 +299,24 @@ class ProductValidation extends Component {
         }
     }
 
+    addCommas(cell1, row) {
+
+        if (cell1 != null && cell1 != "") {
+            cell1 += '';
+            var x = cell1.replaceAll(",", "").split('.');
+            var x1 = x[0];
+            var x2 = x.length > 1 ? '.' + x[1].slice(0, 2) : '';
+            var rgx = /(\d+)(\d{3})/;
+            while (rgx.test(x1)) {
+                x1 = x1.replace(rgx, '$1' + ',' + '$2');
+            }
+            return x1 + x2;
+            // return cell1.toString().replaceAll(",", "").replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+        } else {
+            return "";
+        }
+    }
+
     getData() {
         if (this.state.scenarioId > 0) {
             this.setState({
@@ -465,14 +483,14 @@ class ProductValidation extends Component {
                         } else {
                             sharePu = Math.round((noOfMonthsInUsagePeriod / finalData[i].nodeDataMap.puNode.planningUnit.multiplier));
                         }
-                        usageTextPU = "For each " + selectedText + " we need " + sharePu + " " + planningUnit;
+                        usageTextPU = i18n.t('static.tree.forEach') + " " + selectedText + " " + i18n.t('static.tree.weNeed') + " " + sharePu + " " + planningUnit;
                     } else {
                         console.log("finalData[i].parentNodeNodeDataMap.fuNode.noOfForecastingUnitsPerPerson+++", finalData[i].parentNodeNodeDataMap.fuNode.noOfForecastingUnitsPerPerson);
                         console.log("noOfMonthsInUsagePeriod+++", noOfMonthsInUsagePeriod);
                         console.log("finalData[i].nodeDataMap.puNode.refillMonths+++", finalData[i].nodeDataMap.puNode.refillMonths);
-                        var puPerInterval = (((finalData[i].parentNodeNodeDataMap.fuNode.noOfForecastingUnitsPerPerson / noOfMonthsInUsagePeriod) / 1) / finalData[i].nodeDataMap.puNode.refillMonths);
+                        var puPerInterval = (((finalData[i].parentNodeNodeDataMap.fuNode.noOfForecastingUnitsPerPerson / noOfMonthsInUsagePeriod) / finalData[i].nodeDataMap.puNode.planningUnit.multiplier) / finalData[i].nodeDataMap.puNode.refillMonths);
                         console.log("puPerInterval###", puPerInterval);
-                        usageTextPU = "For each " + selectedText + " we need " + puPerInterval.toFixed(2) + " " + planningUnit + " every " + finalData[i].nodeDataMap.puNode.refillMonths + " months";
+                        usageTextPU = i18n.t('static.tree.forEach') + " " + selectedText + " " + i18n.t('static.tree.weNeed') + " " + this.addCommas(puPerInterval) + " " + planningUnit + " " + i18n.t('static.usageTemplate.every') + " " + finalData[i].nodeDataMap.puNode.refillMonths + " " + i18n.t('static.report.month');
                     }
                     var currency = this.state.currencyList.filter(c => c.id == this.state.currencyId)[0];
                     var cost = 0;

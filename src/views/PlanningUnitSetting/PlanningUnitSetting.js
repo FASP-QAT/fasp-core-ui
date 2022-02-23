@@ -60,6 +60,13 @@ const sortArray = (sourceArray) => {
     return sourceArray.sort(sortByName);
 };
 
+const sortArrayByName = (sourceArray) => {
+
+    // const sortByName = (a, b) => getLabelText(a.label, this.state.lang).localeCompare(getLabelText(b.label, this.state.lang), 'en', { numeric: true });
+    const sortByName1 = (a, b) => a.name.localeCompare(b.name, 'en', { numeric: true });
+    return sourceArray.sort(sortByName1);
+};
+
 export default class PlanningUnitSetting extends Component {
     constructor(props) {
         super(props);
@@ -165,7 +172,8 @@ export default class PlanningUnitSetting extends Component {
 
                 //planning unit
                 var col = ("B").concat(parseInt(y) + 1);
-                var value = this.el.getValueFromCoords(1, y);
+                // var value = this.el.getValueFromCoords(1, y);
+                var value = this.el.getRowData(parseInt(y))[1];
                 console.log("value-----", value);
                 if (value == "") {
                     this.el.setStyle(col, "background-color", "transparent");
@@ -173,8 +181,20 @@ export default class PlanningUnitSetting extends Component {
                     this.el.setComments(col, i18n.t('static.label.fieldRequired'));
                     valid = false;
                 } else {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setComments(col, "");
+                    for (var i = (json.length - 1); i >= 0; i--) {
+                        var map = new Map(Object.entries(json[i]));
+                        var planningUnitValue = map.get("1");
+                        if (planningUnitValue == value && y != i && i > y) {
+                            this.el.setStyle(col, "background-color", "transparent");
+                            this.el.setStyle(col, "background-color", "yellow");
+                            this.el.setComments(col, i18n.t('static.message.planningUnitAlreadyExists'));
+                            i = -1;
+                            valid = false;
+                        } else {
+                            this.el.setStyle(col, "background-color", "transparent");
+                            this.el.setComments(col, "");
+                        }
+                    }
                 }
 
                 var col = ("E").concat(parseInt(y) + 1);
@@ -411,14 +431,34 @@ export default class PlanningUnitSetting extends Component {
 
         //planning unit
         if (x == 1) {
+            var json = this.el.getJson(null, false);
             var col = ("B").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
             } else {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setComments(col, "");
+                console.log("json.length", json.length);
+                var jsonLength = parseInt(json.length) - 1;
+                console.log("jsonLength", jsonLength);
+                for (var i = jsonLength; i >= 0; i--) {
+                    console.log("i=---------->", i, "y----------->", y);
+                    var map = new Map(Object.entries(json[i]));
+                    var planningUnitValue = map.get("1");
+                    console.log("Planning Unit value in change", map.get("1"));
+                    console.log("Value----->", value);
+                    if (planningUnitValue == value && y != i) {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setStyle(col, "background-color", "yellow");
+                        this.el.setComments(col, i18n.t('static.message.planningUnitAlreadyExists'));
+                        this.el.setValueFromCoords(10, y, 1, true);
+                        i = -1;
+                    } else {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setComments(col, "");
+                        this.el.setValueFromCoords(10, y, 1, true);
+                    }
+                }
             }
         }
 
@@ -1688,14 +1728,14 @@ export default class PlanningUnitSetting extends Component {
                 var index = (instance.jexcel).getValue(`N${parseInt(data[i].y) + 1}`, true);
                 if (index == "" || index == null || index == undefined) {
                     console.log("-----------------onPaste---------------------3");
-                    (instance.jexcel).setValueFromCoords(8, data[i].y, true, true);
+                    // (instance.jexcel).setValueFromCoords(8, data[i].y, true, true);
                     (instance.jexcel).setValueFromCoords(9, data[i].y, true, true);
                     (instance.jexcel).setValueFromCoords(10, data[i].y, 1, true);
                     (instance.jexcel).setValueFromCoords(11, data[i].y, 1, true);
                     (instance.jexcel).setValueFromCoords(12, data[i].y, {}, true);
                     (instance.jexcel).setValueFromCoords(13, data[i].y, 0, true);
                     (instance.jexcel).setValueFromCoords(14, data[i].y, true, true);
-                    (instance.jexcel).setValueFromCoords(15, data[i].y, "", true);
+                    // (instance.jexcel).setValueFromCoords(15, data[i].y, "", true);
                     z = data[i].y;
                 }
             }
@@ -1755,8 +1795,15 @@ export default class PlanningUnitSetting extends Component {
             }
 
         }
+        console.log("mylist--------->31", mylist);
+        if (mylist.length > 0) {
+            sortArrayByName(mylist);
+            let mylistObj = mylist.filter(c => c.id == -1)[0];
+            mylist = mylist.filter(c => c.id != -1);
+            mylist.unshift(mylistObj);
+        }
 
-        console.log("mylist--------->32", mylist);
+        console.log("mylist--------->35", mylist);
         return mylist;
 
     }.bind(this)
