@@ -263,22 +263,22 @@ class ForecastSummary extends Component {
         if (viewById == 1) {//National----1
             const headers = [];
             headers.push('');
-            headers.push(i18n.t('static.product.product'));
-            headers.push(i18n.t('static.forecastReport.totalForecastQuantity'));
+            headers.push((i18n.t('static.product.product')).replaceAll(' ', '%20'));
+            headers.push((i18n.t('static.forecastReport.totalForecastQuantity').replaceAll(' ', '%20')));
             if (!this.state.hideColumn) {
-                headers.push(i18n.t('static.report.stock') + i18n.t('static.forecastReport.endOf') + this.state.beforeEndDateDisplay + ')');
-                headers.push(i18n.t('static.forecastReport.existingShipments') + '(' + this.state.startDateDisplay + ' - ' + this.state.endDateDisplay + ')');
-                headers.push(i18n.t('static.report.stock') + i18n.t('static.forecastReport.endOf') + this.state.endDateDisplay + ')');
-                headers.push(i18n.t('static.forecastReport.desiredMonthsOfStock') + i18n.t('static.forecastReport.endOf') + this.state.endDateDisplay + ')');
-                headers.push(i18n.t('static.forecastReport.desiredStock') + i18n.t('static.forecastReport.endOf') + this.state.endDateDisplay + ')');
+                headers.push((i18n.t('static.report.stock')).replaceAll(' ', '%20') + (i18n.t('static.forecastReport.endOf')).replaceAll(' ', '%20') + this.state.beforeEndDateDisplay + ')');
+                headers.push((i18n.t('static.forecastReport.existingShipments')).replaceAll(' ', '%20') + '(' + this.state.startDateDisplay + ' - ' + this.state.endDateDisplay + ')');
+                headers.push((i18n.t('static.report.stock')).replaceAll(' ', '%20') + (i18n.t('static.forecastReport.endOf')).replaceAll(' ', '%20') + this.state.endDateDisplay + ')');
+                headers.push((i18n.t('static.forecastReport.desiredMonthsOfStock')).replaceAll(' ', '%20') + (i18n.t('static.forecastReport.endOf')).replaceAll(' ', '%20') + this.state.endDateDisplay + ')');
+                headers.push((i18n.t('static.forecastReport.desiredStock')).replaceAll(' ', '%20') + (i18n.t('static.forecastReport.endOf')).replaceAll(' ', '%20') + this.state.endDateDisplay + ')');
             }
-            headers.push(i18n.t('static.forecastReport.procurementSurplus'));
+            headers.push((i18n.t('static.forecastReport.procurementSurplus')).replaceAll(' ', '%20'));
             if (!this.state.hideColumn) {
-                headers.push(i18n.t('static.forecastReport.priceType'));
-                headers.push(i18n.t('static.forecastReport.unitPrice') + ' (USD)');
+                headers.push((i18n.t('static.forecastReport.priceType').replaceAll(' ', '%20')));
+                headers.push((i18n.t('static.forecastReport.unitPrice')).replaceAll(' ', '%20') + ' (USD)');
             }
-            headers.push(i18n.t('static.forecastReport.ProcurementsNeeded') + '(USD)');
-            headers.push(i18n.t('static.program.notes'));
+            headers.push((i18n.t('static.forecastReport.ProcurementsNeeded')).replaceAll(' ', '%20') + '(USD)');
+            headers.push((i18n.t('static.program.notes')).replaceAll(' ', '%20'));
 
             var A = [this.addDoubleQuoteToRowContent(headers)]
 
@@ -330,7 +330,7 @@ class ForecastSummary extends Component {
                     '',
                     '',
                     '',
-                    i18n.t('static.forecastReport.productCost'),
+                    (i18n.t('static.forecastReport.productCost')).replaceAll(' ', '%20'),
                     this.state.totalProductCost,
                     ''
                 ]))
@@ -345,7 +345,7 @@ class ForecastSummary extends Component {
                     '',
                     '',
                     '',
-                    i18n.t('static.forecastReport.freight') + '(7%)',
+                    (i18n.t('static.forecastReport.freight')).replaceAll(' ', '%20') + '(7%)',
                     (0.07 * this.state.totalProductCost),
                     ''
                 ]))
@@ -360,7 +360,7 @@ class ForecastSummary extends Component {
                     '',
                     '',
                     '',
-                    i18n.t('static.shipment.totalCost'),
+                    (i18n.t('static.shipment.totalCost')).replaceAll(' ', '%20'),
                     (this.state.totalProductCost + 0.07 * this.state.totalProductCost),
                     ''
                 ]))
@@ -369,7 +369,7 @@ class ForecastSummary extends Component {
                     '',
                     '',
                     '',
-                    i18n.t('static.forecastReport.productCost'),
+                    (i18n.t('static.forecastReport.productCost')).replaceAll(' ', '%20'),
                     this.state.totalProductCost,
                     ''
                 ]))
@@ -385,7 +385,7 @@ class ForecastSummary extends Component {
                     '',
                     '',
                     '',
-                    i18n.t('static.shipment.totalCost'),
+                    (i18n.t('static.shipment.totalCost')).replaceAll(' ', '%20'),
                     (this.state.totalProductCost + 0.07 * this.state.totalProductCost),
                     ''
                 ]))
@@ -419,18 +419,18 @@ class ForecastSummary extends Component {
                 nestedHeaders.push(regRegionList[k].label.label_en);
                 nestedHeaders.push('');
             }
-            nestedHeaders.push(i18n.t('static.forecastReport.allRegions'));
+            nestedHeaders.push((i18n.t('static.forecastReport.allRegions')).replaceAll(' ', '%20'));
             var A = [this.addDoubleQuoteToRowContent(nestedHeaders)]
 
             const headers = [];
-            headers.push(i18n.t('static.product.product'));
+            headers.push((i18n.t('static.product.product')).replaceAll(' ', '%20'));
             for (var k = 0; k < regRegionList.length; k++) {
-                headers.push(i18n.t('static.compareVersion.selectedForecast'));
-                headers.push(i18n.t('static.forecastReport.forecastQuantity'));
-                headers.push(i18n.t('static.program.notes'));
+                headers.push((i18n.t('static.compareVersion.selectedForecast')).replaceAll(' ', '%20'));
+                headers.push((i18n.t('static.forecastReport.forecastQuantity')).replaceAll(' ', '%20'));
+                headers.push((i18n.t('static.program.notes')).replaceAll(' ', '%20'));
             }
 
-            headers.push(i18n.t('static.forecastReport.totalForecastQuantity'));
+            headers.push((i18n.t('static.forecastReport.totalForecastQuantity')).replaceAll(' ', '%20'));
             A.push([this.addDoubleQuoteToRowContent(headers)]);
 
             for (var tc = 0; tc < tcList.length; tc++) {

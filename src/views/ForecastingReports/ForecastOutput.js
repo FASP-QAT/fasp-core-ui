@@ -376,7 +376,7 @@ class ForecastOutput extends Component {
         // headers.push(i18n.t('static.importFromQATSupplyPlan.supplyPlanPlanningUnit'));
 
         // headers.push('Display');
-        (this.state.viewById == 1 ? headers.push(i18n.t('static.product.product')) : headers.push(i18n.t('static.forecastingunit.forecastingunit')));
+        (this.state.viewById == 1 ? headers.push((i18n.t('static.product.product')).replaceAll(' ', '%20')) : headers.push((i18n.t('static.forecastingunit.forecastingunit')).replaceAll(' ', '%20')));
         headers.push(i18n.t('static.consumption.forcast'));
         {
             this.state.xaxis == 2 && this.state.monthArrayList.map(item => (
