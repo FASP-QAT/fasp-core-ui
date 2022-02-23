@@ -303,13 +303,13 @@ class CompareAndSelectScenario extends Component {
             var selectedEquivalencyUnit = this.state.equivalencyUnitList.filter(c => c.equivalencyUnitMappingId == this.state.equivalencyUnitId);
             multiplier = selectedEquivalencyUnit.length > 0 ? selectedEquivalencyUnit[0].convertToEu : 1;
         }
-        var actualCalculationDataType=selectedPlanningUnit.consumptionDataType;
-        var actualMultiplier=1;
-        if(actualCalculationDataType==1){
-            actualMultiplier=selectedPlanningUnit.planningUnit.multiplier;
-        }else if(selectedPlanningUnit.consumptionDataType == 2){
-            actualMultiplier=1;
-        }else if(selectedPlanningUnit.consumptionDataType == 3){
+        var actualCalculationDataType = selectedPlanningUnit.consumptionDataType;
+        var actualMultiplier = 1;
+        if (actualCalculationDataType == 1) {
+            actualMultiplier = selectedPlanningUnit.planningUnit.multiplier;
+        } else if (selectedPlanningUnit.consumptionDataType == 2) {
+            actualMultiplier = 1;
+        } else if (selectedPlanningUnit.consumptionDataType == 3) {
             actualMultiplier = selectedPlanningUnit.otherUnit.multiplier
         }
         var totalActual = 0;
@@ -332,7 +332,7 @@ class CompareAndSelectScenario extends Component {
 
             var actualFilter = consumptionData.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArrayListWithoutFormat[m]).format("YYYY-MM"));
 
-            data[1] = actualFilter.length > 0 ? (Number(actualFilter[0].amount) *Number(actualMultiplier) * Number(multiplier)).toFixed(2) : "";
+            data[1] = actualFilter.length > 0 ? (Number(actualFilter[0].amount) * Number(actualMultiplier) * Number(multiplier)).toFixed(2) : "";
             actualConsumptionListForMonth.push(actualFilter.length > 0 ? (Number(actualFilter[0].amount) * Number(actualMultiplier) * Number(multiplier)) : null);
             var monthArrayForErrorFilter = monthArrayForError.filter(c => moment(c).format("YYYY-MM") == moment(monthArrayListWithoutFormat[m]).format("YYYY-MM"));
             if (monthArrayForErrorFilter.length > 0) {
@@ -1557,7 +1557,7 @@ class CompareAndSelectScenario extends Component {
         var chartOptions = {
             title: {
                 display: true,
-                text: (this.state.viewById == 1 && this.state.planningUnitId > 0 ? getLabelText(this.state.planningUnitList.filter(c => c.planningUnit.id == this.state.planningUnitId)[0].planningUnit.label, this.state.lang) : this.state.viewById == 2 && this.state.forecastingUnitId > 0 ? getLabelText(this.state.forecastingUnitList.filter(c => c.id == this.state.forecastingUnitId)[0].label, this.state.lang) : this.state.equivalencyUnitId > 0 ? getLabelText(this.state.equivalencyUnitList.filter(c => c.equivalencyUnitMappingId == this.state.equivalencyUnitId)[0].equivalencyUnit.label, this.state.lang) : "") + " ( " + this.state.regionName + " )"
+                text: (this.state.viewById == 1 && this.state.planningUnitId > 0 ? getLabelText(this.state.planningUnitList.filter(c => c.planningUnit.id == this.state.planningUnitId)[0].planningUnit.label, this.state.lang) : this.state.viewById == 2 && this.state.forecastingUnitId > 0 && this.state.planningUnitId > 0 ? getLabelText(this.state.forecastingUnitList.filter(c => c.id == this.state.forecastingUnitId)[0].label, this.state.lang) : this.state.equivalencyUnitId > 0 && this.state.planningUnitId > 0 ? getLabelText(this.state.equivalencyUnitList.filter(c => c.equivalencyUnitMappingId == this.state.equivalencyUnitId)[0].equivalencyUnit.label, this.state.lang) : "") + " ( " + this.state.regionName + " )"
             },
             scales: {
                 yAxes: [
@@ -1565,7 +1565,7 @@ class CompareAndSelectScenario extends Component {
                         id: 'A',
                         scaleLabel: {
                             display: true,
-                            labelString: this.state.viewById == 1 && this.state.planningUnitId > 0 ? getLabelText(this.state.planningUnitList.filter(c => c.planningUnit.id == this.state.planningUnitId)[0].planningUnit.unit.label, this.state.lang) : this.state.viewById == 2 && this.state.forecastingUnitId > 0 ? getLabelText(this.state.forecastingUnitList.filter(c => c.id == this.state.forecastingUnitId)[0].unit.label, this.state.lang) : this.state.equivalencyUnitId > 0 ? getLabelText(this.state.equivalencyUnitList.filter(c => c.equivalencyUnitMappingId == this.state.equivalencyUnitId)[0].unit.label, this.state.lang) : "",
+                            labelString: this.state.viewById == 1 && this.state.planningUnitId > 0 ? getLabelText(this.state.planningUnitList.filter(c => c.planningUnit.id == this.state.planningUnitId)[0].planningUnit.unit.label, this.state.lang) : this.state.viewById == 2 && this.state.forecastingUnitId > 0 && this.state.planningUnitId > 0 ? getLabelText(this.state.forecastingUnitList.filter(c => c.id == this.state.forecastingUnitId)[0].unit.label, this.state.lang) : this.state.equivalencyUnitId > 0 && this.state.planningUnitId > 0 ? getLabelText(this.state.equivalencyUnitList.filter(c => c.equivalencyUnitMappingId == this.state.equivalencyUnitId)[0].unit.label, this.state.lang) : "",
                             fontColor: 'black'
                         },
                         stacked: false,
@@ -1789,7 +1789,7 @@ class CompareAndSelectScenario extends Component {
                     <div className="Card-header-reporticon pb-2">
                         <span className="compareAndSelect-larrow"> <i className="cui-arrow-left icons " > </i></span>
                         <span className="compareAndSelect-rarrow"> <i className="cui-arrow-right icons " > </i></span>
-                        <span className="compareAndSelect-larrowText"> {i18n.t('static.common.backTo')} <a href={this.state.datasetId != -1 && this.state.datasetId != "" && this.state.datasetId != undefined ?"/#/dataSet/buildTree/tree/0/" + this.state.datasetId:"/#/dataSet/buildTree"} target="_blank">{i18n.t('static.common.managetree')}</a> {i18n.t('static.tree.or')} <a href="/#/extrapolation/extrapolateData" target="_blank">{i18n.t('static.dashboard.consExtrapolation')}</a></span>
+                        <span className="compareAndSelect-larrowText"> {i18n.t('static.common.backTo')} <a href={this.state.datasetId != -1 && this.state.datasetId != "" && this.state.datasetId != undefined ? "/#/dataSet/buildTree/tree/0/" + this.state.datasetId : "/#/dataSet/buildTree"} target="_blank">{i18n.t('static.common.managetree')}</a> {i18n.t('static.tree.or')} <a href="/#/extrapolation/extrapolateData" target="_blank">{i18n.t('static.dashboard.consExtrapolation')}</a></span>
                         <span className="compareAndSelect-rarrowText"> {i18n.t('static.common.continueTo')} <a href={this.state.datasetId != -1 && this.state.datasetId != "" && this.state.datasetId != undefined ? "/#/forecastReport/forecastOutput/" + this.state.datasetId.toString().split("_")[0] + "/" + (this.state.datasetId.toString().split("_")[1]).toString().substring(1) : "/#/forecastReport/forecastOutput/"} target="_blank">{i18n.t('static.dashboard.monthlyForecast')}</a></span><br />
                         {
                             this.state.showAllData &&
