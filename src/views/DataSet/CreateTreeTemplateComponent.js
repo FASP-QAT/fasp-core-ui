@@ -2184,10 +2184,13 @@ export default class CreateTreeTemplate extends Component {
                 instance.jexcel.setStyle(col, "background-color", "transparent");
                 instance.jexcel.setStyle(col, "background-color", "yellow");
                 instance.jexcel.setComments(col, i18n.t('static.label.fieldRequired'));
+                this.state.modelingEl.setValueFromCoords(5, y, "", true);
+                this.state.modelingEl.setValueFromCoords(6, y, "", true);
             } else {
                 if (value == 2) {
                     this.state.modelingEl.setValueFromCoords(5, y, "", true);
-                } else {
+                }
+                else if (value == 3 || value == 4 || value == 5) {
                     this.state.modelingEl.setValueFromCoords(6, y, "", true);
                 }
                 instance.jexcel.setStyle(col, "background-color", "transparent");

@@ -1768,7 +1768,7 @@ export default class BuildTree extends Component {
                 items: [],
                 selectedScenario: '',
                 programId,
-                // singleValue2: {},
+                singleValue2: { year: new Date(programData.currentVersion.forecastStartDate).getFullYear(), month: new Date(programData.currentVersion.forecastStartDate).getMonth() + 1 },
                 // defYear1: { year: 2021, month: 1 },
                 // defYear2: { year: 2021, month: 12 },
                 forecastStartDate: programData.currentVersion.forecastStartDate,
@@ -1799,7 +1799,8 @@ export default class BuildTree extends Component {
                 selectedScenario: '',
                 programId,
                 forecastPeriod: '',
-                treeData: proList
+                treeData: proList,
+                singleValue2: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 }
             })
         }
         this.getRegionList();
@@ -2749,12 +2750,16 @@ export default class BuildTree extends Component {
                 instance.jexcel.setStyle(col, "background-color", "transparent");
                 instance.jexcel.setStyle(col, "background-color", "yellow");
                 instance.jexcel.setComments(col, i18n.t('static.label.fieldRequired'));
+                this.state.modelingEl.setValueFromCoords(5, y, "", true);
+                this.state.modelingEl.setValueFromCoords(6, y, "", true);
             } else {
                 if (value == 2) {
                     this.state.modelingEl.setValueFromCoords(5, y, "", true);
-                } else {
+                }
+                else if (value == 3 || value == 4 || value == 5) {
                     this.state.modelingEl.setValueFromCoords(6, y, "", true);
                 }
+               
                 instance.jexcel.setStyle(col, "background-color", "transparent");
                 instance.jexcel.setComments(col, "");
             }
@@ -3152,7 +3157,12 @@ export default class BuildTree extends Component {
                         var forecastPeriod = moment(programData.currentVersion.forecastStartDate).format(`MMM-YYYY`) + " ~ " + moment(programData.currentVersion.forecastStopDate).format(`MMM-YYYY`);
                         console.log("forecastPeriod 1---", forecastPeriod);
                         console.log("dataSetObj.programData***>>>", dataEnc);
-                        this.setState({ dataSetObj: dataEnc, minDate, maxDate, forecastStartDate: programData.currentVersion.forecastStartDate, forecastStopDate: programData.currentVersion.forecastStopDate, forecastPeriod }, () => {
+                        this.setState({
+                            dataSetObj: dataEnc, minDate, maxDate,
+                            forecastStartDate: programData.currentVersion.forecastStartDate,
+                            forecastStopDate: programData.currentVersion.forecastStopDate, forecastPeriod,
+                            singleValue2: { year: new Date(programData.currentVersion.forecastStartDate).getFullYear(), month: new Date(programData.currentVersion.forecastStartDate).getMonth() + 1 },
+                        }, () => {
                             this.fetchTracerCategoryList(programData);
                             this.setState({ loading: false })
                         });
@@ -3328,7 +3338,7 @@ export default class BuildTree extends Component {
             if (regionIds != null) {
                 currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.forecastingUnit.id = regionIds.value;
                 currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.forecastingUnit.label.label_en = regionIds.label.split("|")[0];
-                this.setState({ showFUValidation: false },()=>{
+                this.setState({ showFUValidation: false }, () => {
                     this.getForecastingUnitUnitByFUId(regionIds.value);
                 });
             } else {
