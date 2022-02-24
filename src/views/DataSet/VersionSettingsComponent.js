@@ -213,10 +213,12 @@ class VersionSettingsComponent extends Component {
                 var value = this.el.getValue(`O${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
                 var reg = JEXCEL_DECIMAL_NO_REGEX;
                 if (value == "") {
+                    // this.el.setStyle(col, "background-color", "transparent");
+                    // this.el.setStyle(col, "background-color", "yellow");
+                    // this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                    // valid = false;
                     this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                    valid = false;
+                    this.el.setComments(col, "");
                 } else {
                     if (isNaN(parseInt(value)) || !(reg.test(value))) {
                         this.el.setStyle(col, "background-color", "transparent");
@@ -234,10 +236,12 @@ class VersionSettingsComponent extends Component {
                 var value = this.el.getValue(`P${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
                 var reg = JEXCEL_DECIMAL_NO_REGEX;
                 if (value == "") {
+                    // this.el.setStyle(col, "background-color", "transparent");
+                    // this.el.setStyle(col, "background-color", "yellow");
+                    // this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                    // valid = false;
                     this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                    valid = false;
+                    this.el.setComments(col, "");
                 } else {
                     if (isNaN(parseInt(value)) || !(reg.test(value))) {
                         this.el.setStyle(col, "background-color", "transparent");
@@ -255,10 +259,12 @@ class VersionSettingsComponent extends Component {
                 var value = this.el.getValue(`Q${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
                 var reg = JEXCEL_DECIMAL_NO_REGEX;
                 if (value == "") {
+                    // this.el.setStyle(col, "background-color", "transparent");
+                    // this.el.setStyle(col, "background-color", "yellow");
+                    // this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                    // valid = false;
                     this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                    valid = false;
+                    this.el.setComments(col, "");
                 } else {
                     if (isNaN(parseInt(value)) || !(reg.test(value))) {
                         this.el.setStyle(col, "background-color", "transparent");
@@ -430,6 +436,9 @@ class VersionSettingsComponent extends Component {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
                 }
+            } else {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
             }
         }
 
@@ -448,6 +457,9 @@ class VersionSettingsComponent extends Component {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
                 }
+            } else {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
             }
         }
 
@@ -466,6 +478,9 @@ class VersionSettingsComponent extends Component {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
                 }
+            } else {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
             }
         }
 
@@ -1109,10 +1124,10 @@ class VersionSettingsComponent extends Component {
         var tr = asterisk.firstChild;
         tr.children[8].classList.add('AsteriskTheadtrTd');
         tr.children[10].classList.add('AsteriskTheadtrTd');
-        tr.children[16].classList.add('AsteriskTheadtrTd');
-        tr.children[15].classList.add('AsteriskTheadtrTd');
+        // tr.children[16].classList.add('AsteriskTheadtrTd');
+        // tr.children[15].classList.add('AsteriskTheadtrTd');
         tr.children[14].classList.add('AsteriskTheadtrTd');
-        tr.children[17].classList.add('AsteriskTheadtrTd');
+        // tr.children[17].classList.add('AsteriskTheadtrTd');
     }
     oncreateeditor = function (el, cell, x, y) {
         if (x == 4) {
