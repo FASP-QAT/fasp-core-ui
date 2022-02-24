@@ -36,6 +36,7 @@
     "static.message.adjustmentsSaved": "Datos de ajustes guardados",
     "static.ticket.editMasters": "Editar datos maestros",
     "static.role.cancreateroletext": "Seleccionar `Puede crear rol`",
+    "static.dataentry.graphNotes": "Nota: el gráfico y la tabla de resumen solo se actualizan después de enviarlos.",
     "static.program.validselectprogramtext": "Seleccionar el programa",
     "static.message.login.disabled": "Este usuario está deshabilitado",
     "static.quantimed.existingconsupmtionqty": "Consumo estimado QAT",

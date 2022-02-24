@@ -36,6 +36,7 @@
     "static.message.adjustmentsSaved": "Dados de ajustes salvos",
     "static.ticket.editMasters": "Editar dados mestres",
     "static.role.cancreateroletext": "Selecione: Pode criar função",
+    "static.dataentry.graphNotes": "Nota: O gráfico e a tabela de resumo só são atualizados após o envio.",
     "static.program.validselectprogramtext": "Selecione o programa",
     "static.message.login.disabled": "A conta do usuário está desativada",
     "static.quantimed.existingconsupmtionqty": "Consumo previsto atualmente em QAT",

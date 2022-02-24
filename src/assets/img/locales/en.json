@@ -36,6 +36,7 @@
     "static.message.adjustmentsSaved": "Adjustments saved",
     "static.ticket.editMasters": "Edit Masters",
     "static.role.cancreateroletext": "Select Can Create Role",
+    "static.dataentry.graphNotes": "Note: Graph and summary table only update after submitting.",
     "static.program.validselectprogramtext": "Select program",
     "static.message.login.disabled": "User account is disabled",
     "static.quantimed.existingconsupmtionqty": "Current QAT Forecasted Consumption",
