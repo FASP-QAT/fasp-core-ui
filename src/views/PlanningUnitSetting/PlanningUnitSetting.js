@@ -1504,17 +1504,20 @@ export default class PlanningUnitSetting extends Component {
                     title: 'Planning Unit',
                     type: 'autocomplete',
                     source: this.state.allPlanningUnitList,
-                    filter: this.filterPlanningUnitListByTracerCategoryId
+                    filter: this.filterPlanningUnitListByTracerCategoryId,
+                    width:'170',
                     // readOnly: true //1B
                 },
                 {
                     title: 'Consumption Forecast?',
                     type: 'checkbox',
+                    width:'150'
                     // readOnly: true //2C
                 },
                 {
                     title: 'Tree Forecast?',
                     type: 'checkbox',
+                    width:'150'
                     // readOnly: true //3D
                 },
                 {
@@ -1523,6 +1526,7 @@ export default class PlanningUnitSetting extends Component {
                     textEditor: true,
                     decimal: '.',
                     mask: '#,##',
+                    width:'150',
                     disabledMaskOnEdition: true
                     // readOnly: true //4E
                 },
@@ -1532,6 +1536,7 @@ export default class PlanningUnitSetting extends Component {
                     textEditor: true,
                     decimal: '.',
                     mask: '#,##',
+                    width:'150',
                     disabledMaskOnEdition: true
                     // readOnly: true //5F
                 },
@@ -1541,13 +1546,15 @@ export default class PlanningUnitSetting extends Component {
                     textEditor: true,
                     decimal: '.',
                     mask: '#,##',
-                    disabledMaskOnEdition: true
+                    disabledMaskOnEdition: true,
+                    width:'150'
                     // readOnly: true //6G
                 },
                 {
                     title: 'Price Type',
                     type: 'autocomplete',
                     source: this.state.allProcurementAgentList,
+                    width:'180'
                     // filter: this.filterProcurementAgentByPlanningUnit
                     // readOnly: true //7H
                 },
@@ -1557,6 +1564,7 @@ export default class PlanningUnitSetting extends Component {
                     textEditor: true,
                     decimal: '.',
                     mask: '#,##.00',
+                    width:'120',
                     disabledMaskOnEdition: true
                     // readOnly: true //8I
                 },
@@ -2427,7 +2435,7 @@ export default class PlanningUnitSetting extends Component {
                             </div>
                         </div>
 
-                        <div className="" style={{ display: this.state.loading ? "none" : "block" }}>
+                        <div className="UpdatePlanningSettingTable" style={{ display: this.state.loading ? "none" : "block" }}>
                             <div id="tableDiv">
                             </div>
                         </div>

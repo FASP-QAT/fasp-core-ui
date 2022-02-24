@@ -5497,7 +5497,7 @@ border: 1px solid #eee;
      height: 100%;
      top: 0px;
      left: 2px;
-     cursor: col-resize;
+     cursor: pointer;
      font-size: 14px;
      color:#002f6c;
    }
@@ -5533,7 +5533,7 @@ border: 1px solid #eee;
      height: 100%;
      top: 0px;
      left: 2px;
-     cursor: col-resize;
+     cursor: pointer;
      font-size: 14px;
      color:#002f6c;
    }
@@ -5887,8 +5887,8 @@ font-style: italic!important;
      width: 3px;
      height: 100%;
      top: 0px;
-     left: 7px;
-     cursor: col-resize;
+     left: 15px;
+     cursor: pointer;
      font-size: 14px;
      color:#002f6c;
 }
@@ -5899,8 +5899,8 @@ font-style: italic!important;
      width: 3px;
      height: 100%;
      top: 0px;
-     left: 68px;
-     cursor: col-resize;
+     left: 69px;
+     cursor: pointer;
      font-size: 14px;
      color:#BA0C2F;
    }
@@ -5949,3 +5949,16 @@ font-style: italic!important;
   .removeDropdownArrow{
     appearance: none;
   }
+  .UpdatePlanningSettingTable .jexcel > thead.resizable > tr > .InfoTr::after {
+    font-family: 'FontAwesome';
+    content: '\f05a';
+      position: relative;
+       width: 3px;
+       height: 100%;
+       top: 0px;
+       left: 5px;
+       cursor: pointer;
+       font-size: 14px;
+       color:#002f6c;
+     }
+  
