@@ -190,9 +190,9 @@ class ProductValidation extends Component {
             treeList: treeList,
             loading: false
         }, () => {
-            if (treeId != "") {
+            // if (treeId != "") {
                 this.setTreeId(event);
-            }
+            // }
         })
 
     }
@@ -243,9 +243,9 @@ class ProductValidation extends Component {
                 treeListFiltered: treeListFiltered,
                 loading: false
             }, () => {
-                if (scenarioId != "") {
+                // if (scenarioId != "") {
                     this.setScenarioId(event);
-                }
+                // }
             })
         } else {
             this.setState({
@@ -701,9 +701,9 @@ class ProductValidation extends Component {
                 versionList: versionList,
                 loading: false
             }, () => {
-                if (versionId != "") {
+                // if (versionId != "") {
                     this.setVersionId(event)
-                }
+                // }
             })
         } else {
             this.setState({
@@ -858,9 +858,9 @@ class ProductValidation extends Component {
                                 utList:utList,
                                 loading: false
                             }, () => {
-                                if (datasetId != "") {
+                                // if (datasetId != "") {
                                     this.setDatasetId(event);
-                                }
+                                // }
                             })
                         }.bind(this)
                     }.bind(this)
