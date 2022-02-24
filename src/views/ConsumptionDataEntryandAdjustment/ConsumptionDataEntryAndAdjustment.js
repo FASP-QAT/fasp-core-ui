@@ -899,8 +899,9 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     }
     this.setState({
       consumptionUnitShowArr: consumptionUnitShowArr
-    })
-    this.componentDidMount();
+    })}
+
+    componentDidMount(){
     this.getDatasetList();
   }
 
