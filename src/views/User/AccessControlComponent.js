@@ -1283,7 +1283,7 @@ class AccessControlComponent extends Component {
             for (var i = 0; i < selProgram.length; i++) {
                 var paJson = {
                     // name: (selProgram[i].programTypeId == 1 ? i18n.t('static.common.pr') : i18n.t('static.common.fr')) + "" + getLabelText(selProgram[i].label, this.state.lang),
-                    name: getLabelText(selProgram[i].label, this.state.lang) +' - '+ (selProgram[i].programTypeId == 1 ? 'SP' : 'FC'),
+                    name: getLabelText(selProgram[i].label, this.state.lang) +' '+ (selProgram[i].programTypeId == 1 ? '(SP)' : '(FC)'),
                     // name: (getLabelText(selProgram[i].label, this.state.lang)),
                     id: parseInt(selProgram[i].programId),
                     active: selProgram[i].active

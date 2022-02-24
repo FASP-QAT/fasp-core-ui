@@ -152,7 +152,7 @@ export default class PlanningUnitSetting extends Component {
     checkValidation() {
         var valid = true;
         var json = this.el.getJson(null, false);
-        console.log("json.length-------", json.length);
+        console.log("json.length-------", json);
         for (var y = 0; y < json.length; y++) {
             var value = this.el.getValueFromCoords(10, y);
             if (parseInt(value) == 1) {
@@ -333,13 +333,15 @@ export default class PlanningUnitSetting extends Component {
                 var col = ("I").concat(parseInt(y) + 1);
                 var value = this.el.getValue(`I${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
                 var reg = JEXCEL_DECIMAL_CATELOG_PRICE;
+                console.log("Anchal--------->1", value);
                 if (value == "") {
+                    console.log("Anchal--------->2", value);
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.label.fieldRequired'));
                     valid = false;
                 } else {
-                    console.log("Value--------->", value);
+                    console.log("Anchal--------->3", value);
                     // if (isNaN(Number.parseInt(value)) || value < 0 || !(reg.test(value))) {
                     if (isNaN(parseInt(value))) {//string value check
                         this.el.setStyle(col, "background-color", "transparent");
@@ -610,6 +612,7 @@ export default class PlanningUnitSetting extends Component {
         //procurement Agent
         if (x == 7) {
             var col = ("H").concat(parseInt(y) + 1);
+            this.el.setValueFromCoords(10, y, 1, true);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
@@ -624,6 +627,7 @@ export default class PlanningUnitSetting extends Component {
         //unit price
         if (x == 8) {
             var col = ("I").concat(parseInt(y) + 1);
+            this.el.setValueFromCoords(10, y, 1, true);
             // value = this.el.getValue(`I${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             // var reg = DECIMAL_NO_REGEX;
             var reg = JEXCEL_DECIMAL_CATELOG_PRICE;
