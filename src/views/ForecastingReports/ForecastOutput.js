@@ -72,6 +72,7 @@ class ForecastOutput extends Component {
             equivalencyUnitLabel: '',
             calculateEquivalencyUnitTotal: [],
             lang: localStorage.getItem('lang'),
+            allProgramList: [],
             // consumptionDataAll: [
             //     { planningUnit: { id: 1, label: "abacavir-lamivudine 600+300mg/Tablet Tablet (PO), bottle of 30" }, scenario: { id: 3, label: "C. Consumption Low" }, display: true, color: "#ba0c2f", consumptionList: [{ consumptionDate: "2021-01-01", consumptionQty: 36577 }, { consumptionDate: "2021-02-01", consumptionQty: 36805 }, { consumptionDate: "2021-03-01", consumptionQty: 37039 }, { consumptionDate: "2021-04-01", consumptionQty: 37273 }, { consumptionDate: "2021-05-01", consumptionQty: 37507 }, { consumptionDate: "2021-06-01", consumptionQty: 37741 }, { consumptionDate: "2021-07-01", consumptionQty: 37982 }, { consumptionDate: "2021-08-01", consumptionQty: 38223 }, { consumptionDate: "2021-09-01", consumptionQty: 38464 }, { consumptionDate: "2021-10-01", consumptionQty: 38705 }, { consumptionDate: "2021-11-01", consumptionQty: 38953 }, { consumptionDate: "2021-12-01", consumptionQty: 39200 }] },
             //     { planningUnit: { id: 2, label: "dolutegravir-lamivudine-tenofovir 50+300+300mg/Tablet Tablet (PO) - bottle of 30" }, scenario: { id: 1, label: "A. Consumption High" }, color: "#0067b9", display: true, consumptionList: [{ consumptionDate: "2021-01-01", consumptionQty: 29927 }, { consumptionDate: "2021-02-01", consumptionQty: 30113 }, { consumptionDate: "2021-03-01", consumptionQty: 30305 }, { consumptionDate: "2021-04-01", consumptionQty: 30496 }, { consumptionDate: "2021-05-01", consumptionQty: 30688 }, { consumptionDate: "2021-06-01", consumptionQty: 30879 }, { consumptionDate: "2021-07-01", consumptionQty: 31077 }, { consumptionDate: "2021-08-01", consumptionQty: 31274 }, { consumptionDate: "2021-09-01", consumptionQty: 31471 }, { consumptionDate: "2021-10-01", consumptionQty: 31668 }, { consumptionDate: "2021-11-01", consumptionQty: 31870 }, { consumptionDate: "2021-12-01", consumptionQty: 32073 }] },
@@ -404,7 +405,7 @@ class ForecastOutput extends Component {
 
         this.state.xaxis == 2 && this.state.consumptionData.map(ele => {
             let propertyName = this.state.monthArrayList.map(item1 => (
-                ele.consumptionList.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(item1).format("YYYY-MM")).length > 0 ? (ele.consumptionList.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(item1).format("YYYY-MM"))[0].consumptionQty) : ''
+                ele.consumptionList.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(item1).format("YYYY-MM")).length > 0 ? ((ele.consumptionList.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(item1).format("YYYY-MM"))[0].consumptionQty) == 'NAN' || Number.isNaN((ele.consumptionList.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(item1).format("YYYY-MM"))[0].consumptionQty)) ? '' : (ele.consumptionList.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(item1).format("YYYY-MM"))[0].consumptionQty)) : ''
             ));
 
             return (A.push(this.addDoubleQuoteToRowContent([
@@ -586,7 +587,8 @@ class ForecastOutput extends Component {
         let data = []
         this.state.xaxis == 2 && this.state.consumptionData.map(ele => {
             let propertyName = this.state.monthArrayList.map(item1 => (
-                ele.consumptionList.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(item1).format("YYYY-MM")).length > 0 ? (ele.consumptionList.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(item1).format("YYYY-MM"))[0].consumptionQty) : ''
+                // ele.consumptionList.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(item1).format("YYYY-MM")).length > 0 ? (ele.consumptionList.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(item1).format("YYYY-MM"))[0].consumptionQty) : ''
+                ele.consumptionList.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(item1).format("YYYY-MM")).length > 0 ? ((ele.consumptionList.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(item1).format("YYYY-MM"))[0].consumptionQty) == 'NAN' || Number.isNaN((ele.consumptionList.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(item1).format("YYYY-MM"))[0].consumptionQty)) ? '' : (ele.consumptionList.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(item1).format("YYYY-MM"))[0].consumptionQty)) : ''
             ));
             A = [];
             A.push(
@@ -850,11 +852,13 @@ class ForecastOutput extends Component {
                                             // console.log("Test------------>ELSE");
                                             let consumptionExtrapolationObj = consumptionExtrapolation.filter(c => c.consumptionExtrapolationId == consumptionExtrapolationId);
                                             if (consumptionExtrapolationObj.length > 0) {
+                                                console.log("Test------------>ELSE-1", consumptionExtrapolationObj);
                                                 let consumptionList = consumptionExtrapolationObj[0].extrapolationDataList.map(m => {
                                                     return {
                                                         consumptionDate: m.month,
                                                         // consumptionQty: m.amount
-                                                        consumptionQty: parseInt(m.amount)
+                                                        // consumptionQty: parseInt(m.amount)
+                                                        consumptionQty: (m.amount == null ? 0 : parseInt(m.amount))
                                                     }
                                                 });
                                                 let jsonTemp = { objUnit: planningUniObj.planningUnit, scenario: { id: 1, label: "" }, display: true, color: "#ba0c2f", consumptionList: consumptionList }
@@ -1200,8 +1204,13 @@ class ForecastOutput extends Component {
             // AuthenticationService.setupAxiosInterceptors();
             ProgramService.getDataSetListAll()
                 .then(response => {
+                    let datasetList = response.data;
+                    console.log("datasetList-------------->1", datasetList);
+                    datasetList = datasetList.filter(c => c.active == true);
+                    console.log("datasetList-------------->2", datasetList);
                     this.setState({
-                        programs: response.data
+                        programs: datasetList,
+                        allProgramList: response.data
                     }, () => { this.consolidatedProgramList() })
                 }).catch(
                     error => {
@@ -1636,10 +1645,14 @@ class ForecastOutput extends Component {
         console.log("selectedForecastProgram------------>002", this.state.programs);
         let programId = this.state.programId;
         let versionId = this.state.versionId;
-        if (programId != -1 && versionId.split('(')[0] != -1) {
+        // versionId = (versionId.toString().includes('(') ? versionId.split('(')[0] : versionId);
 
-            if (versionId.includes('Local')) {//Local version
-                versionId = versionId.split('(')[0];
+        console.log("setForecastPeriod---------->", versionId);
+        if (programId != -1 && (versionId.toString().includes('(') ? versionId.split('(')[0] : versionId) != -1) {
+            // if (programId != -1 && versionIdsplit('(')[0] != -1) {
+
+            if (versionId.toString().includes('Local')) {//Local version
+                // versionId = versionId.split('(')[0];
                 versionId = parseInt(versionId);
                 let selectedForecastProgram = this.state.downloadedProgramData.filter(c => c.programId == programId && c.currentVersion.versionId == versionId)[0]
                 let d1 = new Date(selectedForecastProgram.currentVersion.forecastStartDate);
@@ -1856,17 +1869,24 @@ class ForecastOutput extends Component {
         if (programId != 0) {
 
             const program = this.state.programs.filter(c => c.programId == programId)
-            console.log(program)
+            console.log("program-------------->", program);
             if (program.length == 1) {
                 if (isSiteOnline()) {
                     this.setState({
                         versions: [],
                     }, () => {
-                        this.setState({
-                            versions: program[0].versionList.filter(function (x, i, a) {
-                                return a.indexOf(x) === i;
-                            })
-                        }, () => { this.consolidatedVersionList(programId) });
+                        let inactiveProgram = this.state.allProgramList.filter(c => c.active == false);
+                        inactiveProgram = inactiveProgram.filter(c => c.programId == programId);
+                        if (inactiveProgram.length > 0) {//Inactive
+                            this.consolidatedVersionList(programId)
+                        } else {//Active
+                            this.setState({
+                                versions: program[0].versionList.filter(function (x, i, a) {
+                                    return a.indexOf(x) === i;
+                                })
+                            }, () => { this.consolidatedVersionList(programId) });
+                        }
+
                     });
 
 
