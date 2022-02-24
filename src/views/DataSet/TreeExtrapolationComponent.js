@@ -703,6 +703,42 @@ export default class TreeExtrapolationComponent extends React.Component {
         this.interpolate = this.interpolate.bind(this);
         this.extrapolationMethodChange = this.extrapolationMethodChange.bind(this);
         this.checkValidationExtrapolation = this.checkValidationExtrapolation.bind(this);
+        this.buildExtrapolationMom = this.buildExtrapolationMom.bind(this);
+    }
+    buildExtrapolationMom() {
+        var extrapolationDataList = [];
+        var momList = [];
+        var tableJson = this.state.dataExtrapolation.getJson(null, false);
+        for (var i = 0; i < tableJson.length; i++) {
+            var map1 = new Map(Object.entries(tableJson[i]));
+            var json = {
+                month: map1.get("0"),
+                amount: map1.get("1"),
+                reportingRate: map1.get("2")
+            };
+            extrapolationDataList.push(json)
+            var json2 = {
+                calculatedValue: map1.get("11"),
+                difference: 0,
+                endValue: map1.get("11"),
+                endValueWMC: map1.get("11"),
+                manualChange: map1.get("10"),
+                month: map1.get("0"),
+                seasonalityPerc: 0,
+                startValue: map1.get("1")
+            };
+            momList.push(json2);
+        }
+        this.setState({
+            nodeDataExtrapolation: {
+                extrapolationDataList
+            }
+        }, () => {
+            const { currentItemConfig } = this.props.items;
+            currentItemConfig.context.payload.nodeDataMap[this.props.items.selectedScenario][0].nodeDataExtrapolation = this.state.nodeDataExtrapolation;
+            currentItemConfig.context.payload.nodeDataMap[this.props.items.selectedScenario][0].nodeDataMomList = momList;
+            this.props.updateState("currentItemConfig", currentItemConfig);
+        });
     }
 
     touchAllExtrapolation(setTouched, errors) {
@@ -2054,6 +2090,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                         validate={validateExtrapolation(validationSchemaExtrapolation)}
                         onSubmit={(values, { setSubmitting, setErrors }) => {
                             if (this.checkValidationExtrapolation()) {
+                                this.buildExtrapolationMom();
                                 console.log("tree extrapolation on submit called")
                             } else {
                                 console.log("tree extrapolation on submit not called")
