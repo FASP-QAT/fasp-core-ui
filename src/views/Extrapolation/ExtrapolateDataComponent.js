@@ -351,7 +351,7 @@ export default class ExtrapolateDataComponent extends React.Component {
             }.bind(this),
             onload: this.loaded,
             pagination: false,
-            search: true,
+            search: false,
             columnSorting: true,
             tableOverflow: true,
             wordWrap: true,
@@ -364,7 +364,7 @@ export default class ExtrapolateDataComponent extends React.Component {
             allowExport: false,
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             //position: 'top',
-            filters: true,
+            filters: false,
             license: JEXCEL_PRO_KEY,
             contextMenu: function (obj, x, y, e) {
                 return [];
@@ -519,7 +519,8 @@ export default class ExtrapolateDataComponent extends React.Component {
     }
 
     loaded = function (instance, cell, x, y, value) {
-        jExcelLoadedFunctionWithoutPagination(instance);
+        // jExcelLoadedFunctionWithoutPagination(instance);
+        jExcelLoadedFunctionOnlyHideRow(instance);
         var asterisk = document.getElementsByClassName("resizable")[0];
         var tr = asterisk.firstChild;
 
@@ -1053,7 +1054,7 @@ export default class ExtrapolateDataComponent extends React.Component {
         csvRow.push('"' + (i18n.t('static.extrapolation.dateRangeForHistoricData') + ' : ' + this.makeText(this.state.rangeValue1.from) + ' ~ ' + this.makeText(this.state.rangeValue1.to)).replaceAll(' ', '%20') + '"')
         csvRow.push('')
         csvRow.push('')
-        csvRow.push('"' + (i18n.t('static.extrapolation.selectedExtraploationMethods')) + '"')
+        csvRow.push('"' + (i18n.t('static.extrapolation.selectedExtraploationMethods')).replaceAll(' ', '%20') + '"')
         csvRow.push('')
         if (this.state.movingAvgId) {
             csvRow.push('"' + (i18n.t('static.extrapolation.movingAverages')).replaceAll(' ', '%20') + '"')
@@ -1652,7 +1653,7 @@ export default class ExtrapolateDataComponent extends React.Component {
         let planningUnits = planningUnitList.length > 0 && planningUnitList.map((item, i) => {
             return (
                 <option key={i} value={item.planningUnit.id}>
-                    {item.planningUnit.id +" "+getLabelText(item.planningUnit.label, this.state.lang)}
+                    {getLabelText(item.planningUnit.label, this.state.lang)+" | "+item.planningUnit.id}
                 </option>
             )
         }, this);
