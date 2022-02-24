@@ -514,8 +514,8 @@ export function exportPDF(props) {
         y = y + 10;
     }
     props.state.missingMonthList.map((item, i) => {
-        doc.setFont('helvetica', 'bold')
-        planningText = doc.splitTextToSize(getLabelText(item.planningUnitLabel, props.state.lang) + " - " + getLabelText(item.regionLabel, props.state.lang) + " : ", doc.internal.pageSize.width * 3 / 4);
+        // doc.setFont('helvetica', 'bold')
+        planningText = doc.splitTextToSize(getLabelText(item.planningUnitLabel, props.state.lang) + " - " + getLabelText(item.regionLabel, props.state.lang) + ": ", doc.internal.pageSize.width * 3 / 4);
         // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
         y = y + 10;
         for (var i = 0; i < planningText.length; i++) {
@@ -556,8 +556,8 @@ export function exportPDF(props) {
         y = y + 10;
     }
     props.state.consumptionListlessTwelve.map((item, i) => {
-        doc.setFont('helvetica', 'bold')
-        planningText = doc.splitTextToSize(getLabelText(item.planningUnitLabel, props.state.lang) + " - " + getLabelText(item.regionLabel, props.state.lang) + " : ", doc.internal.pageSize.width * 3 / 4);
+        // doc.setFont('helvetica', 'bold')
+        planningText = doc.splitTextToSize(getLabelText(item.planningUnitLabel, props.state.lang) + " - " + getLabelText(item.regionLabel, props.state.lang) + ": ", doc.internal.pageSize.width * 3 / 4);
         // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
         y = y + 10;
         for (var i = 0; i < planningText.length; i++) {
@@ -904,8 +904,8 @@ export function exportPDF(props) {
             getLabelText(item6.tree, props.state.lang),
             getLabelText(item6.node, props.state.lang),
             getLabelText(item6.scenario, props.state.lang),
-            ((item6.notes != "" && item6.notes != null) ? i18n.t('static.commitTree.main') + " : " + item6.notes : "" + "" +
-                ((item6.madelingNotes != "" && item6.madelingNotes != null) ? i18n.t('static.commitTree.modeling') + " : " + item6.madelingNotes : ""))
+            ((item6.notes != "" && item6.notes != null) ? i18n.t('static.commitTree.main') + ": " + item6.notes : "" + "" +
+                ((item6.madelingNotes != "" && item6.madelingNotes != null) ? i18n.t('static.commitTree.modeling') + ": " + item6.madelingNotes : ""))
         ])
     });
     var content3 = {

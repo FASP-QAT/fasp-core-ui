@@ -1646,6 +1646,8 @@ class CompareAndSelectScenario extends Component {
                         return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
                     }
                 },
+                intersect: false,
+
                 // options: {
                 //     interaction: {
                 //         mode: 'nearest'
