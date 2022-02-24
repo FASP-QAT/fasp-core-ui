@@ -117,6 +117,7 @@ export default class PlanningUnitSetting extends Component {
         this.cancelClicked = this.cancelClicked.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.disablePUNode = this.disablePUNode.bind(this);
+        this.disablePUConsumptionData = this.disablePUConsumptionData.bind(this);
         this.onPaste = this.onPaste.bind(this);
     }
 
@@ -1446,6 +1447,8 @@ export default class PlanningUnitSetting extends Component {
             data[13] = indexVar;
             data[14] = outPutList[j].treeForecast;
             data[15] = outPutList[j].consumptionNotes;
+            // data[16] = outPutList[j].active;
+            // data[17] = outPutList[j].active;
 
 
             outPutListArray[count] = data;
@@ -1470,6 +1473,8 @@ export default class PlanningUnitSetting extends Component {
             data[13] = 0;
             data[14] = true;
             data[15] = "";
+            // data[16] = true;
+            // data[17] = true;
             outPutListArray[0] = data;
         }
         // console.log("outPutListArray---->", outPutListArray);
@@ -1584,8 +1589,18 @@ export default class PlanningUnitSetting extends Component {
                 {
                     title: i18n.t('static.program.notes'),
                     type: 'text',
-                    // width: 400
+                    // width: 400 //15P
                 },
+                // {
+                //     title: 'Active',
+                //     type: 'checkbox',
+                //     // readOnly: true //16Q
+                // },
+                // {
+                //     title: 'active',
+                //     type: 'hidden',
+                //     // readOnly: true //17R
+                // },
             ],
             updateTable: function (el, cell, x, y, source, value, id) {
                 var elInstance = el.jexcel;
@@ -1851,6 +1866,7 @@ export default class PlanningUnitSetting extends Component {
             let originalPlanningUnitList = programData.planningUnitList;
 
             let listOfDisablePuNode = [];
+            let listOfDisablePuNodeActiveInactive = [];
 
 
             for (var i = 0; i < tableJson.length; i++) {
@@ -1907,7 +1923,8 @@ export default class PlanningUnitSetting extends Component {
                         "otherUnit": null,
                         "selectedForecastMap": map1.get("12"),
                         "createdBy": null,
-                        "createdDate": null
+                        "createdDate": null,
+                        // "active": map1.get("16"),
                     }
                     planningUnitList.push(tempJson);
                 } else {
@@ -1955,7 +1972,8 @@ export default class PlanningUnitSetting extends Component {
                         "otherUnit": planningUnitobj1.otherUnit,
                         "selectedForecastMap": map1.get("12"),
                         "createdBy": planningUnitobj1.createdBy,
-                        "createdDate": planningUnitobj1.createdDate
+                        "createdDate": planningUnitobj1.createdDate,
+                        // "active": map1.get("16"),
                     }
                     planningUnitList.push(tempJson);
 
@@ -2000,6 +2018,10 @@ export default class PlanningUnitSetting extends Component {
                 if (map1.get("3") == false && map1.get("14") == true) {
                     listOfDisablePuNode.push(parseInt(map1.get("1")));
                 }
+
+                // if (map1.get("16") == false && map1.get("17") == true) {
+                //     listOfDisablePuNode.push(parseInt(map1.get("1")));
+                // }
 
 
 
@@ -2056,6 +2078,7 @@ export default class PlanningUnitSetting extends Component {
                         listOfDisablePuNode = [...new Set(listOfDisablePuNode)];
                         if (listOfDisablePuNode.length > 0) {
                             this.disablePUNode(listOfDisablePuNode);
+                            // this.disablePUConsumptionData(listOfDisablePuNode);
                         }
 
 
@@ -2083,6 +2106,74 @@ export default class PlanningUnitSetting extends Component {
 
 
 
+        }
+    }
+
+    disablePUConsumptionData(listOfDisablePuNode) {
+        console.log("Test---------------->12", listOfDisablePuNode);
+
+        // var program = (this.state.datasetList1.filter(x => x.programId == this.state.forecastProgramId && x.version == this.state.forecastProgramVersionId)[0]);
+        let datasetList1 = this.state.datasetList1;
+        for (var i = 0; i < datasetList1.length; i++) {
+            var programs = [];
+            var program = datasetList1[i];
+
+            var databytes = CryptoJS.AES.decrypt(program.programData, SECRET_KEY);
+            var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
+
+            let actualConsumptionList = programData.actualConsumptionList;
+
+            for (var j = 0; j < listOfDisablePuNode.length; j++) {
+                for (var k = 0; k < actualConsumptionList.length; k++) {
+                    if (parseInt(listOfDisablePuNode[j]) == actualConsumptionList[k].planningUnit.id) {
+                        actualConsumptionList[k].amount = 0;
+                    }
+                }
+            }
+            console.log("Test---------------->7", actualConsumptionList);
+
+            programData.actualConsumptionList = actualConsumptionList;
+
+            programData = (CryptoJS.AES.encrypt(JSON.stringify(programData), SECRET_KEY)).toString();
+            program.programData = programData;
+
+            programs.push(program);
+
+            console.log("programs to update---", programs);
+
+            var db1;
+            getDatabase();
+            var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+            openRequest.onerror = function (event) {
+                this.setState({
+                    message: i18n.t('static.program.errortext'),
+                    color: 'red'
+                })
+                this.hideFirstComponent()
+            }.bind(this);
+            openRequest.onsuccess = function (e) {
+                db1 = e.target.result;
+                var transaction = db1.transaction(['datasetData'], 'readwrite');
+                var programTransaction = transaction.objectStore('datasetData');
+                programs.forEach(program => {
+                    var programRequest = programTransaction.put(program);
+                    console.log("---hurrey---");
+                })
+                transaction.oncomplete = function (event) {
+                    console.log("Data update success");
+                    // alert("success");
+                }.bind(this);
+                transaction.onerror = function (event) {
+                    this.setState({
+                        loading: false,
+                        // message: 'Error occured.',
+                        color: "red",
+                    }, () => {
+                        this.hideSecondComponent();
+                    });
+                    console.log("Data update errr");
+                }.bind(this);
+            }.bind(this);
         }
     }
 
@@ -2214,6 +2305,8 @@ export default class PlanningUnitSetting extends Component {
         data[13] = 0;
         data[14] = true;
         data[15] = "";
+        // data[16] = true;
+        // data[17] = true;
 
         this.el.insertRow(
             data, 0, 1

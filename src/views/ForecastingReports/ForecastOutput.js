@@ -1946,7 +1946,7 @@ class ForecastOutput extends Component {
                         this.filterData();
                         this.setVersionId();
                     })
-                }else if (localStorage.getItem("sesForecastVersionIdReport") != '' && localStorage.getItem("sesForecastVersionIdReport") != undefined) {
+                } else if (localStorage.getItem("sesForecastVersionIdReport") != '' && localStorage.getItem("sesForecastVersionIdReport") != undefined) {
                     let versionVar = versionList.filter(c => c.versionId == localStorage.getItem("sesForecastVersionIdReport"));
                     this.setState({
                         versions: versionList,
@@ -2182,6 +2182,7 @@ class ForecastOutput extends Component {
                 //     }.bind(this)
                 // },
                 enabled: false,
+                intersect: false,
                 custom: CustomTooltips
             },
             maintainAspectRatio: false
