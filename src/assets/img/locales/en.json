@@ -1745,7 +1745,7 @@
     "static.message.user.notExist": "User does not exist",
     "static.label.validData": "Enter valid data",
     "static.common.realmtext": "Select Realm",
-    "static.commitTree.noForecastSelected": "No Forecast selected",
+    "static.commitTree.noForecastSelected": "No Forecast Selected",
     "static.supplyPlan.addOrListBatchInfo": "Show Batch Information",
     "static.manualTagging.erpShipmentLineNo": "ERP Shipment Line #",
     "static.tree.+AddTree": "+ Add Tree",

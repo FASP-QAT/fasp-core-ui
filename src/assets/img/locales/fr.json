@@ -1744,7 +1744,7 @@
     "static.message.user.notExist": "L`utilisateur n`existe pas",
     "static.label.validData": "Entrez des données valides",
     "static.common.realmtext": "Sélectionner le Domaine",
-    "static.commitTree.noForecastSelected": "Branches manquant Unité de planification",
+    "static.commitTree.noForecastSelected": "Aucune prévision sélectionnée",
     "static.supplyPlan.addOrListBatchInfo": "Ajouter / lister un lot",
     "static.manualTagging.erpShipmentLineNo": "Numéro de ligne d`expédition PGI",
     "static.tree.+AddTree": "+ Ajouter un arbre",

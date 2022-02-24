@@ -1744,7 +1744,7 @@
     "static.message.user.notExist": "Este usuário não existe",
     "static.label.validData": "Insira dados válidos",
     "static.common.realmtext": "static.commitVersion.acceptLatestVersion",
-    "static.commitTree.noForecastSelected": "Filiais sem Unidade de Planejamento",
+    "static.commitTree.noForecastSelected": "Nenhuma previsão selecionada",
     "static.supplyPlan.addOrListBatchInfo": "Mostrar informações do lote",
     "static.manualTagging.erpShipmentLineNo": "Nº de linha de embarque do ERP",
     "static.tree.+AddTree": "+ Adicionar Árvore",

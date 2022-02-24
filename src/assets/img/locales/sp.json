@@ -1744,7 +1744,7 @@
     "static.message.user.notExist": "El usuario no existe",
     "static.label.validData": "Ingrese datos válidos",
     "static.common.realmtext": "Seleccionar ámbito",
-    "static.commitTree.noForecastSelected": "Sucursales faltan Unidad de Planificación",
+    "static.commitTree.noForecastSelected": "Ningún pronóstico seleccionado",
     "static.supplyPlan.addOrListBatchInfo": "Agregar / ver lote",
     "static.manualTagging.erpShipmentLineNo": "Línea de pedido ERP #",
     "static.tree.+AddTree": "+ Agregar árbol",
