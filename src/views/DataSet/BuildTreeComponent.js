@@ -7306,11 +7306,6 @@ export default class BuildTree extends Component {
         console.log("items>>>", items);
         console.log("get payload 111");
         for (let i = 0; i < items.length; i++) {
-            console.log("get payload 12");
-            // console.log("this.state.modelinDataForScenario---", this.state.modelinDataForScenario);
-            console.log("items[i]---", items[i]);
-            console.log("items[i].payload.nodeDataMap[this.state.selectedScenario][0].nodeDataId---", items[i].payload.nodeDataMap[this.state.selectedScenario][0].nodeDataId);
-            console.log("items[i].payload.nodeDataMap[this.state.selectedScenario][0].modelling---", items[i].payload.nodeDataMap[this.state.selectedScenario][0]);
             if (items[i].payload.nodeDataMap[this.state.selectedScenario][0].nodeDataMomList != null) {
                 var nodeDataModelingMap = items[i].payload.nodeDataMap[this.state.selectedScenario][0].nodeDataMomList.filter(x => moment(x.month).format('YYYY-MM') == moment(date).format('YYYY-MM'));
                 console.log("nodeDataModelingMap>>>", nodeDataModelingMap);
