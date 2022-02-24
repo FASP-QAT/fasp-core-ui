@@ -106,6 +106,7 @@ class ForecastSummary extends Component {
             dataArray: [],
             lang: localStorage.getItem('lang'),
             downloadedProgramData: [],
+            allProgramList: [],
 
         };
         this.getPrograms = this.getPrograms.bind(this);
@@ -1395,8 +1396,13 @@ class ForecastSummary extends Component {
             // AuthenticationService.setupAxiosInterceptors();
             ProgramService.getDataSetListAll()
                 .then(response => {
+                    let datasetList = response.data;
+                    console.log("datasetList-------------->1", datasetList);
+                    datasetList = datasetList.filter(c => c.active == true);
+                    console.log("datasetList-------------->2", datasetList);
                     this.setState({
-                        programs: response.data
+                        programs: datasetList,
+                        allProgramList: response.data
                     }, () => { this.consolidatedProgramList() })
                 }).catch(
                     error => {
@@ -1590,10 +1596,12 @@ class ForecastSummary extends Component {
     setForecastPeriod() {
         let programId = this.state.programId;
         let versionId = this.state.versionId;
-        if (programId != -1 && versionId.split('(')[0] != -1) {
-
-            if (versionId.includes('Local')) {//Local version
-                versionId = versionId.split('(')[0];
+        // versionId = (versionId.toString().includes('(') ? versionId.split('(')[0] : versionId);
+        if (programId != -1 && (versionId.toString().includes('(') ? versionId.split('(')[0] : versionId) != -1) {
+        // if (programId != -1 && versionIdsplit('(')[0] != -1) {
+            if (versionId.toString().includes('Local')) {//Local version
+                
+                // versionId = versionId.split('(')[0];
                 versionId = parseInt(versionId);
                 let selectedForecastProgram = this.state.downloadedProgramData.filter(c => c.programId == programId && c.currentVersion.versionId == versionId)[0];
                 console.log("Test-----------------111", selectedForecastProgram);
@@ -1864,11 +1872,19 @@ class ForecastSummary extends Component {
                     this.setState({
                         versions: [],
                     }, () => {
-                        this.setState({
-                            versions: program[0].versionList.filter(function (x, i, a) {
-                                return a.indexOf(x) === i;
-                            })
-                        }, () => { this.consolidatedVersionList(programId) });
+                        let inactiveProgram = this.state.allProgramList.filter(c => c.active == false);
+                        inactiveProgram = inactiveProgram.filter(c => c.programId == programId);
+
+                        if (inactiveProgram.length > 0) {//Inactive
+                            this.consolidatedVersionList(programId)
+                        } else {
+                            this.setState({
+                                versions: program[0].versionList.filter(function (x, i, a) {
+                                    return a.indexOf(x) === i;
+                                })
+                            }, () => { this.consolidatedVersionList(programId) });
+                        }
+
                     });
 
 
