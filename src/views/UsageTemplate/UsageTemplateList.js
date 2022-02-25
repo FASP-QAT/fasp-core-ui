@@ -34,6 +34,7 @@ import UnitService from '../../api/UnitService.js';
 import ProgramService from '../../api/ProgramService';
 import CryptoJS from 'crypto-js';
 import { SECRET_KEY, JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, JEXCEL_DATE_FORMAT_SM, INTEGER_NO_REGEX } from "../../Constants";
+import { number } from "mathjs";
 
 let initialValues = {
     number1: "",
@@ -879,25 +880,27 @@ class usageTemplate extends Component {
                 },
                 {
                     title: i18n.t('static.usageTemplate.people'),
-                    type: 'text',
+                    type: 'hidden',
                     readOnly: true,
                     textEditor: true, //7 H
                 },
                 {
-                    title: i18n.t('static.usageTemplate.people'),
+                    // title: i18n.t('static.usageTemplate.people'),
+                    title: '# Person(s)',
                     type: 'numeric',
                     // readOnly: true
                     textEditor: true, //8 I
                 },
                 {
-                    title: i18n.t('static.usageTemplate.people'),
+                    // title: i18n.t('static.usageTemplate.people'),
+                    title: 'Person(s) Unit',
                     type: 'text',
                     readOnly: true,
                     textEditor: true, //9 J
                 },
                 {
                     title: i18n.t('static.usageTemplate.fuPerPersonPerTime'),
-                    type: 'text',
+                    type: 'hidden',
                     readOnly: true,
                     textEditor: true, //10 K
                 },
@@ -909,13 +912,13 @@ class usageTemplate extends Component {
                 },
                 {
                     title: i18n.t('static.usageTemplate.fuPerPersonPerTime'),
-                    type: 'autocomplete',
+                    type: 'hidden',
                     readOnly: true,
                     source: this.state.unitList, //12 M
                 },
                 {
                     title: i18n.t('static.usageTemplate.fuPerPersonPerTime'),
-                    type: 'text',//hidden black
+                    type: 'hidden',//hidden black
                     readOnly: true,
                     textEditor: true, //13 N
                 },
@@ -926,7 +929,8 @@ class usageTemplate extends Component {
                     // readOnly: true //14 O
                 },
                 {
-                    title: i18n.t('static.usageTemplate.usageFrequency'),
+                    // title: i18n.t('static.usageTemplate.usageFrequency'),
+                    title: '# of times/Frequency',
                     type: 'numeric',
                     // readOnly: true
                     textEditor: true,
@@ -934,25 +938,26 @@ class usageTemplate extends Component {
                 },
                 {
                     title: i18n.t('static.usageTemplate.usageFrequency'),
-                    type: 'text',
+                    type: 'hidden',
                     readOnly: true,
                     textEditor: true, //16 Q
                 },
                 {
-                    title: i18n.t('static.usageTemplate.usageFrequency'),
+                    // title: i18n.t('static.usageTemplate.usageFrequency'),
+                    title: 'Frequency',
                     type: 'autocomplete',
                     source: this.state.usagePeriodList, //17 R
                     filter: this.filterUsagePeriod1
                 },
                 {
                     title: i18n.t('static.usageTemplate.fuPerPersonPerMonth'),
-                    type: 'text',//hidden black
+                    type: 'hidden',//hidden black
                     readOnly: true,
                     textEditor: true, //18 S
                 },
                 {
                     title: ' ',//empty for
-                    type: 'text',
+                    type: 'hidden',
                     readOnly: true,
                     textEditor: true, //19 T
                 },
@@ -963,7 +968,8 @@ class usageTemplate extends Component {
                     textEditor: true, //20 U
                 },
                 {
-                    title: i18n.t('static.usagePeriod.usagePeriod'),
+                    // title: i18n.t('static.usagePeriod.usagePeriod'),
+                    title: 'Period Unit',
                     type: 'autocomplete',
                     source: this.state.usagePeriodList, //21 V
                     filter: this.filterUsagePeriod2
@@ -995,7 +1001,7 @@ class usageTemplate extends Component {
                 },
                 {
                     title: i18n.t('static.program.notes'),
-                    type: 'text',
+                    type: 'hidden',
                     // width: 400 //27 AB
                 },
 
@@ -1212,15 +1218,22 @@ class usageTemplate extends Component {
                                         //it's a number
                                         console.log("number---------------------->1");
                                         let tempList = this.state.usagePeriodListLong;
-                                        let selectedPickerConvertTOMonth = tempList.filter(c => c.usagePeriodId == value)[0].convertToMonth;
 
-                                        for (var i = 0; i < tempList.length; i++) {
-                                            console.log("number---------------------->1.1");
-                                            if (parseFloat(tempList[i].convertToMonth) <= parseFloat(selectedPickerConvertTOMonth)) {
-                                                tempUsagePeriodList.push(tempList[i]);
+                                        if (value == 0) {
+                                            tempUsagePeriodList = tempList;
+                                        } else {
+                                            let selectedPickerConvertTOMonth = tempList.filter(c => c.usagePeriodId == value)[0].convertToMonth;
+
+                                            for (var i = 0; i < tempList.length; i++) {
+                                                console.log("number---------------------->1.1");
+                                                if (parseFloat(tempList[i].convertToMonth) <= parseFloat(selectedPickerConvertTOMonth)) {
+                                                    tempUsagePeriodList.push(tempList[i]);
+                                                }
                                             }
+                                            console.log("number---------------------->2", tempUsagePeriodList);
                                         }
-                                        console.log("number---------------------->2", tempUsagePeriodList);
+
+
                                     }
 
                                     console.log("number---------------------->3");
@@ -1905,7 +1918,7 @@ class usageTemplate extends Component {
         }
 
         if (x == 4 || x == 8 || x == 11 || x == 15 || x == 16 || x == 17 || x == 20 || x == 21) {
-            let string = 'Every ' + this.el.getValue(`I${parseInt(y) + 1}`, true) + ' Patient - requires ' + this.el.getValue(`L${parseInt(y) + 1}`, true) + " " + this.el.getValue(`M${parseInt(y) + 1}`, true);
+            let string = 'Every ' + this.el.getValue(`I${parseInt(y) + 1}`, true) + ' patient - requires ' + this.el.getValue(`L${parseInt(y) + 1}`, true) + " " + this.el.getValue(`M${parseInt(y) + 1}`, true);
 
             if (!this.el.getValueFromCoords(14, y)) {//one time usage false
                 string += " " + this.el.getValue(`P${parseInt(y) + 1}`, true) + " " + this.el.getValue(`Q${parseInt(y) + 1}`, true) + " " + this.el.getValue(`R${parseInt(y) + 1}`, true);
@@ -2988,6 +3001,8 @@ class usageTemplate extends Component {
                 let picker2ConvertTOMonth = tempList.filter(c => c.usagePeriodId == this.state.picker2)[0].convertToMonth;
                 let number1 = event.target.value;
                 number2 = (parseFloat(picker1ConvertTOMonth) / parseFloat(picker2ConvertTOMonth) / parseFloat(number1)).toFixed(2)
+
+                number2 = (number2.toString().includes('.00') ? parseInt(number2) : number2);
             }
 
 
@@ -3006,6 +3021,8 @@ class usageTemplate extends Component {
                 let picker2ConvertTOMonth = tempList.filter(c => c.usagePeriodId == this.state.picker2)[0].convertToMonth;
                 let number1 = this.state.number1;
                 number2 = (parseFloat(picker1ConvertTOMonth) / parseFloat(picker2ConvertTOMonth) / parseFloat(number1)).toFixed(2)
+
+                number2 = (number2.toString().includes('.00') ? parseInt(number2) : number2);
             }
 
 
@@ -3031,6 +3048,8 @@ class usageTemplate extends Component {
                 let picker2ConvertTOMonth = tempList.filter(c => c.usagePeriodId == event.target.value)[0].convertToMonth;
                 let number1 = this.state.number1;
                 number2 = (parseFloat(picker1ConvertTOMonth) / parseFloat(picker2ConvertTOMonth) / parseFloat(number1)).toFixed(2)
+
+                number2 = (number2.toString().includes('.00') ? parseInt(number2) : number2);
             }
 
             this.setState({
