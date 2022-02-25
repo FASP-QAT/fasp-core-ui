@@ -2176,7 +2176,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                         <div className="row">
                                             <FormGroup className="col-md-12 " style={{ display: "block" }}>
                                                 <div className="check inline pl-lg-3 pt-lg-2">
-                                                    <div className="pl-lg-0 pb-lg-2">
+                                                    <div className="row pl-lg-1 pb-lg-2">
                                                         <div>
                                                             <Popover placement="top" isOpen={this.state.popoverOpenMa} target="Popover1" trigger="hover" toggle={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)}>
                                                                 <PopoverBody>Need to add Info.</PopoverBody>
@@ -2200,6 +2200,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                             </Label>
                                                         </div>
                                                         {/* {this.state.movingAvgId && */}
+                                                        <div className="row col-md-12 pt-lg-2">
                                                         <div className="col-md-2 pl-lg-0 pt-lg-0" style={{ display: this.state.movingAvgId ? '' : 'none' }}>
                                                             <Label htmlFor="appendedInputButton"># of Months</Label>
                                                             <Input
@@ -2215,6 +2216,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                                 onChange={(e) => { handleChange(e); this.setMonthsForMovingAverage(e) }}
                                                             />
                                                             <FormFeedback>{errors.noOfMonthsId}</FormFeedback>
+                                                        </div>
                                                         </div>
                                                         {/* } */}
                                                     </div>
@@ -2287,8 +2289,8 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                                 <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenTes', !this.state.popoverOpenTes)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
                                                             </Label>
                                                         </div>
-                                                        <div className="row col-md-12 pt-lg-2" style={{ display: this.state.smoothingId ? '' : 'none' }}>
-                                                            <div className="pt-lg-0" style={{ display: 'contents' }}>
+                                                        <div className="row col-md-12 pt-lg-2 pl-lg-0" style={{ display: this.state.smoothingId ? '' : 'none' }}>
+                                                            <div className="pt-lg-0 pl-lg-0" style={{ display: 'contents' }}>
                                                                 <div className="tab-ml-1 mt-md-2 mb-md-0 ExtraCheckboxFieldWidth">
                                                                     <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.confidenceLevel')}</Label>
                                                                     <Input
@@ -2431,6 +2433,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                             </Label>
                                                         </div>
                                                         {this.state.arimaId &&
+                                                        <div className="row col-md-12 pt-lg-2 pl-lg-0">
                                                             <div className="pt-lg-0" style={{ display: 'contents' }}>
                                                                 <div className="tab-ml-1 mt-md-2 mb-md-0 ExtraCheckboxFieldWidth">
                                                                     <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.p')}</Label>
@@ -2480,6 +2483,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                                     />
                                                                     <FormFeedback>{errors.qId}</FormFeedback>
                                                                 </div>
+                                                            </div>
                                                             </div>
                                                         }
                                                     </div>
