@@ -1598,9 +1598,9 @@ class ForecastSummary extends Component {
         let versionId = this.state.versionId;
         // versionId = (versionId.toString().includes('(') ? versionId.split('(')[0] : versionId);
         if (programId != -1 && (versionId.toString().includes('(') ? versionId.split('(')[0] : versionId) != -1) {
-        // if (programId != -1 && versionIdsplit('(')[0] != -1) {
+            // if (programId != -1 && versionIdsplit('(')[0] != -1) {
             if (versionId.toString().includes('Local')) {//Local version
-                
+
                 // versionId = versionId.split('(')[0];
                 versionId = parseInt(versionId);
                 let selectedForecastProgram = this.state.downloadedProgramData.filter(c => c.programId == programId && c.currentVersion.versionId == versionId)[0];
@@ -1843,6 +1843,8 @@ class ForecastSummary extends Component {
             versionId: ((event == null || event == '' || event == undefined) ? (this.state.versionId) : (event.target.value).trim()),
         }, () => {
             // localStorage.setItem("sesVersionIdReport", '');
+            localStorage.setItem("sesForecastProgramIdReport", parseInt(document.getElementById("programId").value));
+            localStorage.setItem("sesForecastVersionIdReport", document.getElementById("versionId").value);
             this.setForecastPeriod();
             this.filterData();
         })

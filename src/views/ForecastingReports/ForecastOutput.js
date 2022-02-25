@@ -1816,6 +1816,8 @@ class ForecastOutput extends Component {
             }, () => {
                 // localStorage.setItem("sesVersionIdReport", this.state.versionId);
                 // (viewById == 1 ? this.getPlanningUnitForecastingUnit() : this.getForecastingUnit());
+                localStorage.setItem("sesForecastProgramIdReport", parseInt(document.getElementById("programId").value));
+                localStorage.setItem("sesForecastVersionIdReport", document.getElementById("versionId").value);
                 this.setForecastPeriod();
                 this.filterData();
                 this.getEquivalencyUnitData();
