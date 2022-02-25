@@ -678,11 +678,11 @@ export default class TreeExtrapolationComponent extends React.Component {
             minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
             maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
             rangeValue: { from: { year: new Date(startDate).getFullYear(), month: new Date(startDate).getMonth() + 1 }, to: { year: new Date(endDate).getFullYear(), month: new Date(endDate).getMonth() + 1 } },
-            movingAvgId: true,
-            semiAvgId: true,
-            linearRegressionId: true,
-            smoothingId: true,
-            arimaId: true,
+            movingAvgId: false,
+            semiAvgId: false,
+            linearRegressionId: false,
+            smoothingId: false,
+            arimaId: false,
             popoverChooseMethod: false,
             popoverOpenMa: false,
             popoverOpenSa: false,
@@ -1097,48 +1097,71 @@ export default class TreeExtrapolationComponent extends React.Component {
                     extrapolationMethodList: myResult.filter(x => x.active == true)
                 }, () => {
                     if (this.props.items.currentScenario.nodeDataExtrapolationOptionList == null) {
-                        var nodeDataExtrapolationOptionList = [];
-                        for (let i = 0; i < this.state.extrapolationMethodList.length; i++) {
-                            var e = this.state.extrapolationMethodList[i];
-                            var json;
-                            if (e.id == 7) { // moving avg
-                                json = {
-                                    extrapolationMethod: e.id,
-                                    jsonProperties: {
-                                        months: this.state.monthsForMovingAverage
-                                    }
-                                }
-                            } else if (e.id == 5 || e.id == 6) { // semi avg
-                                json = {
-                                    extrapolationMethod: e.id,
-                                    jsonProperties: {
-                                    }
-                                }
-                            }
-                            else if (e.id == 2) { // TES
-                                json = {
-                                    extrapolationMethod: e.id,
-                                    jsonProperties: {
-                                        confidenceLevel: this.state.confidenceLevelId,
-                                        seasonality: this.state.noOfMonthsForASeason,
-                                        alpha: this.state.alpha,
-                                        beta: this.state.beta,
-                                        gamma: this.state.gamma
-                                    }
-                                }
-                            }
-                            nodeDataExtrapolationOptionList.push(json);
-                        }
-                        this.setState({ nodeDataExtrapolationOptionList, filteredExtrapolationMethodList: JSON.parse(JSON.stringify(this.state.extrapolationMethodList)) })
+                        // var nodeDataExtrapolationOptionList = [];
+                        // for (let i = 0; i < this.state.extrapolationMethodList.length; i++) {
+                        //     var e = this.state.extrapolationMethodList[i];
+                        //     var json;
+                        //     if (e.id == 7) { // moving avg
+                        //         json = {
+                        //             extrapolationMethod: e.id,
+                        //             jsonProperties: {
+                        //                 months: this.state.monthsForMovingAverage
+                        //             }
+                        //         }
+                        //     } else if (e.id == 5 || e.id == 6) { // semi avg
+                        //         json = {
+                        //             extrapolationMethod: e.id,
+                        //             jsonProperties: {
+                        //             }
+                        //         }
+                        //     }
+                        //     else if (e.id == 2) { // TES
+                        //         json = {
+                        //             extrapolationMethod: e.id,
+                        //             jsonProperties: {
+                        //                 confidenceLevel: this.state.confidenceLevelId,
+                        //                 seasonality: this.state.noOfMonthsForASeason,
+                        //                 alpha: this.state.alpha,
+                        //                 beta: this.state.beta,
+                        //                 gamma: this.state.gamma
+                        //             }
+                        //         }
+                        //     }
+                        //     nodeDataExtrapolationOptionList.push(json);
+                        // }
+                        // this.setState({ nodeDataExtrapolationOptionList, filteredExtrapolationMethodList: JSON.parse(JSON.stringify(this.state.extrapolationMethodList)) })
                     } else {
                         var filteredExtrapolationMethodList = [];
                         var nodeDataExtrapolationOptionList = this.props.items.currentScenario.nodeDataExtrapolationOptionList;
                         console.log("nodeDataExtrapolationOptionList----", nodeDataExtrapolationOptionList)
                         console.log("nodeDataExtrapolationOptionList length----", nodeDataExtrapolationOptionList.length)
+                        var movingAvgId = false;
+                        var semiAvgId = false;
+                        var linearRegressionId = false;
+                        var smoothingId = false;
+                        var arimaId = false;
+                        var monthsForMovingAverage = this.state.monthsForMovingAverage;
+
                         for (let i = 0; i < nodeDataExtrapolationOptionList.length; i++) {
+                            var id = nodeDataExtrapolationOptionList[i].extrapolationMethod.id;
                             filteredExtrapolationMethodList.push(nodeDataExtrapolationOptionList[i].extrapolationMethod);
+                            if (id == 7) {
+                                movingAvgId = true;
+                                // monthsForMovingAverage = nodeDataExtrapolationOptionList[i].jsonProperties.monthsForMovingAverage;
+                            } else if (id == 6) {
+                                semiAvgId = true;
+                            } else if (id == 5) {
+                                linearRegressionId = true;
+                            }
+                            else if (id == 4) {
+                                arimaId = true;
+                            }
+                            else if (id == 2) {
+                                smoothingId = true;
+                            }
+
                         }
-                        this.setState({ filteredExtrapolationMethodList, forecastNestedHeader: filteredExtrapolationMethodList.length })
+                        this.setState({ movingAvgId, semiAvgId, linearRegressionId, smoothingId, arimaId, filteredExtrapolationMethodList, forecastNestedHeader: filteredExtrapolationMethodList.length, nodeDataExtrapolationOptionList, movingAvgId })
 
                     }
                 })
@@ -1265,31 +1288,31 @@ export default class TreeExtrapolationComponent extends React.Component {
                 },
                 {
                     title: 'Moving Averages',
-                    type: 'number',
+                    type: this.state.movingAvgId ? 'number' : 'hidden',
                     mask: '#,##.00',
                     readOnly: true
                 },
                 {
                     title: 'Semi-Averages',
-                    type: 'number',
+                    type: this.state.semiAvgId ? 'number' : 'hidden',
                     mask: '#,##.00',
                     readOnly: true
                 },
                 {
                     title: 'Linear Regression',
-                    type: 'number',
+                    type: this.state.linearRegressionId ? 'number' : 'hidden',
                     mask: '#,##.00',
                     readOnly: true
                 },
                 {
                     title: 'TES',
-                    type: 'number',
+                    type: this.state.smoothingId ? 'number' : 'hidden',
                     mask: '#,##.00',
                     readOnly: true
                 },
                 {
                     title: 'ARIMA',
-                    type: 'number',
+                    type: this.state.arimaId ? 'number' : 'hidden',
                     mask: '#,##.00',
                     readOnly: true
                 },
@@ -1770,7 +1793,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                 yAxes: [{
                     scaleLabel: {
                         display: true,
-                        labelString: getLabelText(this.props.items.currentItemConfig.context.payload.nodeUnit.label, this.state.lang),
+                        labelString: this.props.items.currentItemConfig.context.payload.nodeUnit.label != null && this.props.items.currentItemConfig.context.payload.nodeUnit.label != "" ? getLabelText(this.props.items.currentItemConfig.context.payload.nodeUnit.label, this.state.lang) : "",
                         fontColor: 'black'
                     },
                     ticks: {

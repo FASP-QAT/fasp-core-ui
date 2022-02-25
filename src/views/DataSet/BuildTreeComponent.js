@@ -7176,7 +7176,9 @@ export default class BuildTree extends Component {
                 </TabPane>
                 <TabPane tabId="3">
                     {/* <ConsumptionInSupplyPlanComponent ref="consumptionChild" items={this.state} toggleLarge={this.toggleLarge} updateState={this.updateState} formSubmit={this.formSubmit} hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} consumptionPage="consumptionDataEntry" useLocalData={1} /> */}
-                    <TreeExtrapolationComponent ref="extrapolationChild" items={this.state} />
+                    {this.state.currentItemConfig.context.payload.extrapolation &&
+                        <TreeExtrapolationComponent ref="extrapolationChild" items={this.state} />
+                    }
                 </TabPane>
 
             </>
@@ -8539,6 +8541,7 @@ export default class BuildTree extends Component {
                                         {i18n.t('static.tree.Modeling/Transfer')}
                                     </NavLink>
                                 </NavItem>
+
                                 <NavItem style={{ display: this.state.currentItemConfig.context.payload.extrapolation ? 'block' : 'none' }}>
                                     <NavLink
                                         active={this.state.activeTab1[0] === '3'}
