@@ -13,7 +13,7 @@ import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 import { Formik } from 'formik';
 import * as Yup from 'yup'
 import '../../views/Forms/ValidationForms/ValidationForms.css'
-import { Row, Col, Card, CardFooter, Button, CardBody, Form, Modal, ModalBody, PopoverBody, Popover, ModalFooter, ModalHeader, FormGroup, Label, FormFeedback, Input, InputGroupAddon, Collapse, InputGroupText, Dropdown, DropdownItem, DropdownMenu, DropdownToggle, InputGroup } from 'reactstrap';
+import { Row, Col, Card, CardFooter, Button, CardBody, Form, Modal, ModalBody, PopoverBody, Popover, ModalFooter, ModalHeader, FormGroup, Label, FormFeedback, Input, InputGroupAddon, Collapse, InputGroupText,Dropdown, DropdownItem, DropdownMenu, DropdownToggle, InputGroup } from 'reactstrap';
 import Provider from '../../Samples/Provider'
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import { Nav, NavItem, NavLink, TabContent, TabPane } from 'reactstrap';
@@ -2746,30 +2746,20 @@ export default class BuildTree extends Component {
         // instance.jexcel
         if (x == 2) {
             var col = ("C").concat(parseInt(y) + 1);
-            var colPer = ("F").concat(parseInt(y) + 1);
-            var colNum = ("G").concat(parseInt(y) + 1);
             if (value == "") {
                 instance.jexcel.setStyle(col, "background-color", "transparent");
                 instance.jexcel.setStyle(col, "background-color", "yellow");
                 instance.jexcel.setComments(col, i18n.t('static.label.fieldRequired'));
                 this.state.modelingEl.setValueFromCoords(5, y, "", true);
                 this.state.modelingEl.setValueFromCoords(6, y, "", true);
-                instance.jexcel.setStyle(colPer, "background-color", "transparent");
-                instance.jexcel.setComments(colPer, "");
-                instance.jexcel.setStyle(colNum, "background-color", "transparent");
-                instance.jexcel.setComments(colNum, "");
             } else {
                 if (value == 2) {
                     this.state.modelingEl.setValueFromCoords(5, y, "", true);
-                    instance.jexcel.setStyle(colPer, "background-color", "transparent");
-                    instance.jexcel.setComments(colPer, "");
                 }
                 else if (value == 3 || value == 4 || value == 5) {
                     this.state.modelingEl.setValueFromCoords(6, y, "", true);
-                    instance.jexcel.setStyle(colNum, "background-color", "transparent");
-                    instance.jexcel.setComments(colNum, "");
                 }
-
+               
                 instance.jexcel.setStyle(col, "background-color", "transparent");
                 instance.jexcel.setComments(col, "");
             }
@@ -6762,7 +6752,7 @@ export default class BuildTree extends Component {
 
                         <div className="col-md-12">
                             {this.state.showModelingJexcelNumber &&
-                                <> <div className="calculatorimg calculatorTable">
+                                <> <div className="calculatorimg">
                                     <div id="modelingJexcel" className={"RowClickable ScalingTable"} style={{ display: this.state.modelingJexcelLoader ? "none" : "block" }}>
                                     </div>
                                     <div style={{ display: this.state.modelingJexcelLoader ? "block" : "none" }}>
@@ -7316,6 +7306,11 @@ export default class BuildTree extends Component {
         console.log("items>>>", items);
         console.log("get payload 111");
         for (let i = 0; i < items.length; i++) {
+            console.log("get payload 12");
+            // console.log("this.state.modelinDataForScenario---", this.state.modelinDataForScenario);
+            console.log("items[i]---", items[i]);
+            console.log("items[i].payload.nodeDataMap[this.state.selectedScenario][0].nodeDataId---", items[i].payload.nodeDataMap[this.state.selectedScenario][0].nodeDataId);
+            console.log("items[i].payload.nodeDataMap[this.state.selectedScenario][0].modelling---", items[i].payload.nodeDataMap[this.state.selectedScenario][0]);
             if (items[i].payload.nodeDataMap[this.state.selectedScenario][0].nodeDataMomList != null) {
                 var nodeDataModelingMap = items[i].payload.nodeDataMap[this.state.selectedScenario][0].nodeDataMomList.filter(x => moment(x.month).format('YYYY-MM') == moment(date).format('YYYY-MM'));
                 console.log("nodeDataModelingMap>>>", nodeDataModelingMap);
@@ -7406,8 +7401,6 @@ export default class BuildTree extends Component {
                             "ContactTitle TitleColor"}>
                             <div title={itemConfig.payload.label.label_en} style={{ fontSize: '13px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', width: '157px', float: 'left', fontWeight: 'bold' }}>
                                 {itemConfig.payload.label.label_en}</div>
-
-                            {itemConfig.payload.extrapolation == true && <i class="fa fa-line-chart" style={{ fontSize: '11px', color: (itemConfig.payload.nodeType.id == 4 || itemConfig.payload.nodeType.id == 5 ? '#fff' : '#002f6c') }}></i>}
                             {this.getPayloadData(itemConfig, 4) == true && <i class="fa fa-exchange fa-rotate-90" style={{ fontSize: '11px', color: (itemConfig.payload.nodeType.id == 4 || itemConfig.payload.nodeType.id == 5 ? '#fff' : '#002f6c') }}></i>}
                             <b style={{ color: '#212721', float: 'right' }}>
                                 {itemConfig.payload.nodeType.id == 2 ?
@@ -7951,15 +7944,15 @@ export default class BuildTree extends Component {
                                                             <InputGroupAddon addonType="append" onClick={this.toggleDropdown}>
                                                                 {/* <InputGroupText><i class="fa fa-plus icons" aria-hidden="true" data-toggle="tooltip" data-html="true" data-placement="bottom" onClick={this.openScenarioModal} title=""></i></InputGroupText> */}
                                                                 <InputGroupText><i class="fa fa-caret-down icons" data-bind="label" id="searchLabel" title=""></i></InputGroupText>
-
+                                                                
                                                             </InputGroupAddon>
                                                         </InputGroup>
-                                                        <div class="list-group DropdownScenario" style={{ display: this.state.showDiv1 ? 'block' : 'none' }}>
+                                                       <div class="list-group DropdownScenario" style={{ display: this.state.showDiv1 ? 'block' : 'none' }}>
                                                             <p class="list-group-item list-group-item-action" onClick={() => { this.openScenarioModal(1) }}>Add Scenario</p>
                                                             <p class="list-group-item list-group-item-action" onClick={() => { this.openScenarioModal(2) }}>Edit Scenario</p>
                                                             <p class="list-group-item list-group-item-action" onClick={() => { this.openScenarioModal(3) }}>Delete Scenario</p>
 
-                                                        </div>
+                                                        </div> 
                                                         {/* <FormFeedback>{errors.languageId}</FormFeedback> */}
                                                     </FormGroup>
                                                     <FormGroup className="col-md-3 pl-lg-0">

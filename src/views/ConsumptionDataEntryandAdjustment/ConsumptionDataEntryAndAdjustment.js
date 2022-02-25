@@ -1785,7 +1785,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                 {this.state.showSmallTable &&
                   <>
                     <div className="table-scroll">
-                      <div className="table-wrap table-responsive">
+                      <div className="table-wrap">
                         <Table className="table-bordered text-center mt-2 overflowhide main-table " bordered size="sm" options={this.options}>
                           <thead>
                             <tr>
