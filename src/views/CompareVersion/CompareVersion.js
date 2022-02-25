@@ -612,7 +612,7 @@ class CompareVersion extends Component {
                                                         id="forecastPeriod"
                                                         bsSize="sm"
                                                         readonly={true}
-                                                        className="greyColor"
+                                                        className="disabledColor"
                                                         value={moment(this.state.datasetData.currentVersion.forecastStartDate).format(DATE_FORMAT_CAP_WITHOUT_DATE) + " - " + moment(this.state.datasetData.currentVersion.forecastStopDate).format(DATE_FORMAT_CAP_WITHOUT_DATE)}
 
                                                     >
@@ -632,7 +632,7 @@ class CompareVersion extends Component {
                                                         bsSize="sm"
                                                         readonly={true}
                                                         value={this.state.datasetData.currentVersion.notes}
-                                                        className="greyColor"
+                                                        className="disabledColor"
                                                     >
                                                     </Input>
 
@@ -672,7 +672,7 @@ class CompareVersion extends Component {
                                                         bsSize="sm"
                                                         readonly={true}
                                                         value={moment(this.state.datasetData1.currentVersion.forecastStartDate).format(DATE_FORMAT_CAP_WITHOUT_DATE) + " - " + moment(this.state.datasetData1.currentVersion.forecastStopDate).format(DATE_FORMAT_CAP_WITHOUT_DATE)}
-                                                        className="greyColor"
+                                                        className="disabledColor"
                                                     >
                                                     </Input>
 
@@ -690,7 +690,7 @@ class CompareVersion extends Component {
                                                         bsSize="sm"
                                                         readonly={true}
                                                         value={this.state.datasetData1.currentVersion.notes}
-                                                        className="greyColor"
+                                                        className="disabledColor"
                                                     >
                                                     </Input>
 

@@ -1843,7 +1843,7 @@ class CompareAndSelectScenario extends Component {
                                                         value={this.state.rangeValue}
                                                         lang={pickerLang}
                                                         readOnly
-                                                        className="greyColor"
+                                                        className="disabledColor"
 
                                                     //theme="light"
                                                     // onChange={this.handleRangeChange}
