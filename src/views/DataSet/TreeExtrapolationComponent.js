@@ -2159,7 +2159,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                         // theme="light"
                                                         // onChange={this.handleRangeChange}
                                                         // onDismiss={this.handleRangeDissmis}
-                                                        className="greyColor"
+                                                        className="disabledColor"
                                                     >
                                                         <MonthBox value={this.props.items.forecastPeriod} />
                                                     </Picker>

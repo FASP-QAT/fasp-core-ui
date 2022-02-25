@@ -2028,7 +2028,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                 // theme="light"
                                                 // onChange={this.handleRangeChange}
                                                 // onDismiss={this.handleRangeDissmis}
-                                                className="greyColor"
+                                                className="disabledColor"
                                             >
                                                 <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} />
                                             </Picker>
