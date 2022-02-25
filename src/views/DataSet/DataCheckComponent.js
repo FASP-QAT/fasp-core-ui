@@ -59,7 +59,7 @@ export function dataCheck(props, datasetJson) {
                     scenarioId: scenarioList[ndm].id,
                     node: payload.label,
                     notes: nodeNotes,
-                    madelingNotes: madelingNotes.slice(0, -1),
+                    madelingNotes: madelingNotes.slice(0, -2),
                     scenarioNotes: scenarioList[ndm].notes
                 });
             }
@@ -261,7 +261,6 @@ export function dataCheck(props, datasetJson) {
     props.updateState("consumptionListlessTwelve", consumptionListlessTwelve)
     props.updateState("notSelectedPlanningUnitList", notSelectedPlanningUnitList)
     props.updateState("treeNodeList", treeNodeList)
-    props.updateState("treeScenarioList", treeScenarioList)
     props.updateState("missingBranchesList", missingBranchesList)
     props.updateState("treeScenarioNotes", treeScenarioNotes)
     props.updateState("datasetPlanningUnit", datasetPlanningUnit)
@@ -270,14 +269,16 @@ export function dataCheck(props, datasetJson) {
     props.updateState("startDate", startDate)
     props.updateState("stopDate", stopDate)
     props.updateState("progressPer", 25)
+    props.updateState("treeScenarioList", treeScenarioList)
     props.updateState("loading", false)
 }
 
-export function buildJxl(props) {
+export function buildJxl1(props) {
     props.updateState("loading", true)
     var treeScenarioList = props.state.treeScenarioList;
     console.log("TreeScenarioList@@@", treeScenarioList)
     var treeScenarioListFilter = treeScenarioList;
+    var treeScenarioListNotHaving100PerChild = [];
     for (var tsl = 0; tsl < treeScenarioListFilter.length; tsl++) {
         var nodeWithPercentageChildren = props.state.nodeWithPercentageChildren.filter(c => c.treeId == treeScenarioListFilter[tsl].treeId && c.scenarioId == treeScenarioListFilter[tsl].scenarioId);
         if (nodeWithPercentageChildren.length > 0) {
@@ -299,9 +300,71 @@ export function buildJxl(props) {
                 }
                 childrenArray.push(data);
             }
+            try {
+                props.el = jexcel(document.getElementById("tableDiv" + tsl), '');
+                props.el.destroy();
+            } catch (err) {
 
-            props.el = jexcel(document.getElementById("tableDiv" + tsl), '');
-            props.el.destroy();
+            }
+
+            var columnsArray = [];
+            columnsArray.push({
+                title: i18n.t('static.inventoryDate.inventoryReport'),
+                type: 'calendar', options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker' }, width: 100,
+                // readOnly: true
+            });
+            for (var nwp = 0; nwp < nodeWithPercentageChildren.length; nwp++) {
+                columnsArray.push({
+                    title: getLabelText(nodeWithPercentageChildren[nwp].label, props.state.lang),
+                    type: nodeWithPercentageChildrenWithHundredCent[nwp] == 1 ? 'numeric' : 'hidden',
+                    mask: '#,##.00%', decimal: '.'
+                    // readOnly: true
+                });
+            }
+            if (columnsArray.filter(c => c.type != 'hidden').length > 1) {
+                // var languageEl = jexcel(document.getElementById("tableDiv" + tsl), options);
+                // props.el = languageEl;
+                treeScenarioListNotHaving100PerChild.push({ treeId: treeScenarioListFilter[tsl].treeId, scenarioId: treeScenarioListFilter[tsl].scenarioId });
+            }
+        }
+    }
+    props.updateState("loading", false);
+    props.updateState("treeScenarioListNotHaving100PerChild", treeScenarioListNotHaving100PerChild);
+}
+
+export function buildJxl(props) {
+    props.updateState("loading", true)
+    var treeScenarioList = props.state.treeScenarioList;
+    console.log("TreeScenarioList@@@", treeScenarioList)
+    var treeScenarioListFilter = treeScenarioList;
+    var treeScenarioListNotHaving100PerChild = [];
+    for (var tsl = 0; tsl < treeScenarioListFilter.length; tsl++) {
+        var nodeWithPercentageChildren = props.state.nodeWithPercentageChildren.filter(c => c.treeId == treeScenarioListFilter[tsl].treeId && c.scenarioId == treeScenarioListFilter[tsl].scenarioId);
+        if (nodeWithPercentageChildren.length > 0) {
+            let childrenList = props.state.childrenWithoutHundred;
+            let childrenArray = [];
+            var data = [];
+            let startDate = props.state.startDate;
+            let stopDate = props.state.stopDate;
+            var curDate = startDate;
+            var nodeWithPercentageChildrenWithHundredCent = [];
+            for (var i = 0; curDate < stopDate; i++) {
+                curDate = moment(startDate).add(i, 'months').format("YYYY-MM-DD");
+                data = [];
+                data[0] = curDate;
+                for (var nwp = 0; nwp < nodeWithPercentageChildren.length; nwp++) {
+                    var child = childrenList.filter(c => c.id == nodeWithPercentageChildren[nwp].id && c.month == curDate);
+                    data[nwp + 1] = child.length > 0 ? (child[0].percentage).toFixed(2) : '';
+                    nodeWithPercentageChildrenWithHundredCent[nwp] = nodeWithPercentageChildrenWithHundredCent[nwp] != 1 ? (child.length > 0 && (child[0].percentage).toFixed(2) != 100) ? 1 : 0 : 1;
+                }
+                childrenArray.push(data);
+            }
+            try {
+                props.el = jexcel(document.getElementById("tableDiv" + tsl), '');
+                props.el.destroy();
+            } catch (err) {
+
+            }
 
             var columnsArray = [];
             columnsArray.push({
@@ -363,12 +426,16 @@ export function buildJxl(props) {
                     return [];
                 }.bind(this),
             };
-            var languageEl = jexcel(document.getElementById("tableDiv" + tsl), options);
-            props.el = languageEl;
+            if (columnsArray.filter(c => c.type != 'hidden').length > 1) {
+                var languageEl = jexcel(document.getElementById("tableDiv" + tsl), options);
+                props.el = languageEl;
+                // treeScenarioListNotHaving100PerChild.push({ treeId: treeScenarioListFilter[tsl].treeId, scenarioId: treeScenarioListFilter[tsl].scenarioId });
+            }
         }
     }
     props.updateState("loading", false);
     props.updateState("treeScenarioListFilter", treeScenarioListFilter);
+    // props.updateState("treeScenarioListNotHaving100PerChild", treeScenarioListNotHaving100PerChild);
 }
 
 export function exportPDF(props) {
@@ -469,9 +536,26 @@ export function exportPDF(props) {
     }
 
     doc.setFont('helvetica', 'normal')
-    props.state.noForecastSelectedList.map((item, i) => {
-        item.regionList.map(item1 => {
-            planningText = doc.splitTextToSize(getLabelText(item.planningUnit.planningUnit.label, props.state.lang) + " - " + item1.label, doc.internal.pageSize.width * 3 / 4);
+    {
+        if (props.state.noForecastSelectedList.filter(c => c.regionList.length > 0).length > 0) {
+            props.state.noForecastSelectedList.map((item, i) => {
+                item.regionList.map(item1 => {
+                    planningText = doc.splitTextToSize(getLabelText(item.planningUnit.planningUnit.label, props.state.lang) + " - " + item1.label, doc.internal.pageSize.width * 3 / 4);
+                    // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+                    y = y + 3;
+                    for (var i = 0; i < planningText.length; i++) {
+                        if (y > doc.internal.pageSize.height - 100) {
+                            doc.addPage();
+                            y = 80;
+
+                        }
+                        doc.text(doc.internal.pageSize.width / 15, y, planningText[i]);
+                        y = y + 10;
+                    }
+                })
+            })
+        } else {
+            planningText = doc.splitTextToSize(i18n.t('static.forecastValidation.noMissingSelectedForecastFound'), doc.internal.pageSize.width * 3 / 4);
             // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
             y = y + 3;
             for (var i = 0; i < planningText.length; i++) {
@@ -483,8 +567,8 @@ export function exportPDF(props) {
                 doc.text(doc.internal.pageSize.width / 15, y, planningText[i]);
                 y = y + 10;
             }
-        })
-    })
+        }
+    }
 
     doc.setFont('helvetica', 'bold')
     planningText = doc.splitTextToSize("2. " + i18n.t('static.commitTree.consumptionForecast'), doc.internal.pageSize.width * 3 / 4);
@@ -513,34 +597,51 @@ export function exportPDF(props) {
         doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
         y = y + 10;
     }
-    props.state.missingMonthList.map((item, i) => {
-        // doc.setFont('helvetica', 'bold')
-        planningText = doc.splitTextToSize(getLabelText(item.planningUnitLabel, props.state.lang) + " - " + getLabelText(item.regionLabel, props.state.lang) + ": ", doc.internal.pageSize.width * 3 / 4);
-        // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
-        y = y + 10;
-        for (var i = 0; i < planningText.length; i++) {
-            if (y > doc.internal.pageSize.height - 100) {
-                doc.addPage();
-                y = 80;
+    {
+        if (props.state.missingMonthList.length > 0) {
+            props.state.missingMonthList.map((item, i) => {
+                // doc.setFont('helvetica', 'bold')
+                planningText = doc.splitTextToSize(getLabelText(item.planningUnitLabel, props.state.lang) + " - " + getLabelText(item.regionLabel, props.state.lang) + ": ", doc.internal.pageSize.width * 3 / 4);
+                // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+                y = y + 10;
+                for (var i = 0; i < planningText.length; i++) {
+                    if (y > doc.internal.pageSize.height - 100) {
+                        doc.addPage();
+                        y = 80;
 
-            }
-            doc.text(doc.internal.pageSize.width / 15, y, planningText[i]);
-            y = y + 10;
-        }
-        doc.setFont('helvetica', 'normal')
-        planningText = doc.splitTextToSize("" + item.monthsArray, doc.internal.pageSize.width * 3 / 4);
-        // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
-        y = y + 3;
-        for (var i = 0; i < planningText.length; i++) {
-            if (y > doc.internal.pageSize.height - 100) {
-                doc.addPage();
-                y = 80;
+                    }
+                    doc.text(doc.internal.pageSize.width / 15, y, planningText[i]);
+                    y = y + 10;
+                }
+                doc.setFont('helvetica', 'normal')
+                planningText = doc.splitTextToSize("" + item.monthsArray, doc.internal.pageSize.width * 3 / 4);
+                // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+                y = y + 3;
+                for (var i = 0; i < planningText.length; i++) {
+                    if (y > doc.internal.pageSize.height - 100) {
+                        doc.addPage();
+                        y = 80;
 
+                    }
+                    doc.text(doc.internal.pageSize.width / 15, y, planningText[i]);
+                    y = y + 10;
+                }
+            })
+        } else {
+            planningText = doc.splitTextToSize(i18n.t('static.forecastValidation.noMissingGaps'), doc.internal.pageSize.width * 3 / 4);
+            // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+            y = y + 3;
+            for (var i = 0; i < planningText.length; i++) {
+                if (y > doc.internal.pageSize.height - 100) {
+                    doc.addPage();
+                    y = 80;
+
+                }
+                doc.text(doc.internal.pageSize.width / 15, y, planningText[i]);
+                y = y + 10;
             }
-            doc.text(doc.internal.pageSize.width / 15, y, planningText[i]);
-            y = y + 10;
         }
-    })
+    }
 
     doc.setFont('helvetica', 'normal')
     planningText = doc.splitTextToSize("b. " + i18n.t('static.commitTree.puThatDoNotHaveAtleast24MonthsOfActualConsumptionValues'), doc.internal.pageSize.width * 3 / 4);
@@ -555,34 +656,51 @@ export function exportPDF(props) {
         doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
         y = y + 10;
     }
-    props.state.consumptionListlessTwelve.map((item, i) => {
-        // doc.setFont('helvetica', 'bold')
-        planningText = doc.splitTextToSize(getLabelText(item.planningUnitLabel, props.state.lang) + " - " + getLabelText(item.regionLabel, props.state.lang) + ": ", doc.internal.pageSize.width * 3 / 4);
-        // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
-        y = y + 10;
-        for (var i = 0; i < planningText.length; i++) {
-            if (y > doc.internal.pageSize.height - 100) {
-                doc.addPage();
-                y = 80;
+    {
+        if (props.state.consumptionListlessTwelve.length > 0) {
+            props.state.consumptionListlessTwelve.map((item, i) => {
+                // doc.setFont('helvetica', 'bold')
+                planningText = doc.splitTextToSize(getLabelText(item.planningUnitLabel, props.state.lang) + " - " + getLabelText(item.regionLabel, props.state.lang) + ": ", doc.internal.pageSize.width * 3 / 4);
+                // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+                y = y + 10;
+                for (var i = 0; i < planningText.length; i++) {
+                    if (y > doc.internal.pageSize.height - 100) {
+                        doc.addPage();
+                        y = 80;
 
-            }
-            doc.text(doc.internal.pageSize.width / 15, y, planningText[i]);
-            y = y + 10;
-        }
-        doc.setFont('helvetica', 'normal')
-        planningText = doc.splitTextToSize("" + item.noOfMonths + " month(s)", doc.internal.pageSize.width * 3 / 4);
-        // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
-        y = y + 3;
-        for (var i = 0; i < planningText.length; i++) {
-            if (y > doc.internal.pageSize.height - 100) {
-                doc.addPage();
-                y = 80;
+                    }
+                    doc.text(doc.internal.pageSize.width / 15, y, planningText[i]);
+                    y = y + 10;
+                }
+                doc.setFont('helvetica', 'normal')
+                planningText = doc.splitTextToSize("" + item.noOfMonths + " month(s)", doc.internal.pageSize.width * 3 / 4);
+                // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+                y = y + 3;
+                for (var i = 0; i < planningText.length; i++) {
+                    if (y > doc.internal.pageSize.height - 100) {
+                        doc.addPage();
+                        y = 80;
 
+                    }
+                    doc.text(doc.internal.pageSize.width / 15, y, planningText[i]);
+                    y = y + 10;
+                }
+            })
+        } else {
+            planningText = doc.splitTextToSize(i18n.t('static.forecastValidation.noMonthsHaveLessData'), doc.internal.pageSize.width * 3 / 4);
+            // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+            y = y + 3;
+            for (var i = 0; i < planningText.length; i++) {
+                if (y > doc.internal.pageSize.height - 100) {
+                    doc.addPage();
+                    y = 80;
+
+                }
+                doc.text(doc.internal.pageSize.width / 15, y, planningText[i]);
+                y = y + 10;
             }
-            doc.text(doc.internal.pageSize.width / 15, y, planningText[i]);
-            y = y + 10;
         }
-    })
+    }
 
     doc.setFont('helvetica', 'bold')
     planningText = doc.splitTextToSize("3. " + i18n.t('static.commitTree.treeForecast'), doc.internal.pageSize.width * 3 / 4);
@@ -612,20 +730,37 @@ export function exportPDF(props) {
         y = y + 10;
     }
     doc.setFont('helvetica', 'normal')
-    props.state.notSelectedPlanningUnitList.map((item, i) => {
-        planningText = doc.splitTextToSize(getLabelText(item.planningUnit.label, props.state.lang) + " - " + item.regionsArray, doc.internal.pageSize.width * 3 / 4);
-        // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
-        y = y + 3;
-        for (var i = 0; i < planningText.length; i++) {
-            if (y > doc.internal.pageSize.height - 100) {
-                doc.addPage();
-                y = 80;
+    {
+        if (props.state.notSelectedPlanningUnitList.length > 0) {
+            props.state.notSelectedPlanningUnitList.map((item, i) => {
+                planningText = doc.splitTextToSize(getLabelText(item.planningUnit.label, props.state.lang) + " - " + item.regionsArray, doc.internal.pageSize.width * 3 / 4);
+                // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+                y = y + 3;
+                for (var i = 0; i < planningText.length; i++) {
+                    if (y > doc.internal.pageSize.height - 100) {
+                        doc.addPage();
+                        y = 80;
 
+                    }
+                    doc.text(doc.internal.pageSize.width / 15, y, planningText[i]);
+                    y = y + 10;
+                }
+            })
+        } else {
+            planningText = doc.splitTextToSize(i18n.t('static.forecastValidation.noMissingPlanningUnitsFound'), doc.internal.pageSize.width * 3 / 4);
+            // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+            y = y + 3;
+            for (var i = 0; i < planningText.length; i++) {
+                if (y > doc.internal.pageSize.height - 100) {
+                    doc.addPage();
+                    y = 80;
+
+                }
+                doc.text(doc.internal.pageSize.width / 15, y, planningText[i]);
+                y = y + 10;
             }
-            doc.text(doc.internal.pageSize.width / 15, y, planningText[i]);
-            y = y + 10;
         }
-    })
+    }
 
     doc.setFont('helvetica', 'normal')
     planningText = doc.splitTextToSize("b. " + i18n.t('static.commitTree.branchesMissingPlanningUnit'), doc.internal.pageSize.width * 3 / 4);
@@ -641,43 +776,63 @@ export function exportPDF(props) {
         y = y + 10;
     }
 
-    props.state.missingBranchesList.map((item, i) => {
-        doc.setFont('helvetica', 'normal')
-        planningText = doc.splitTextToSize(getLabelText(item.treeLabel, props.state.lang), doc.internal.pageSize.width * 3 / 4);
-        // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
-        y = y + 10;
-        for (var i = 0; i < planningText.length; i++) {
-            if (y > doc.internal.pageSize.height - 100) {
-                doc.addPage();
-                y = 80;
+    {
+        console.log("props.state.missingBranchesList@@@", props.state.missingBranchesList)
+        if (props.state.missingBranchesList.length > 0) {
+            props.state.missingBranchesList.map((item, i) => {
+                console.log("In map 2nd time")
+                doc.setFont('helvetica', 'normal')
+                planningText = doc.splitTextToSize(getLabelText(item.treeLabel, props.state.lang), doc.internal.pageSize.width * 3 / 4);
+                // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+                y = y + 10;
+                for (var i = 0; i < planningText.length; i++) {
+                    if (y > doc.internal.pageSize.height - 100) {
+                        doc.addPage();
+                        y = 80;
 
-            }
-            doc.text(doc.internal.pageSize.width / 15, y, planningText[i]);
-            y = y + 10;
-        }
-        item.flatList.length > 0 && item.flatList.map((item1, j) => {
-            doc.setFont('helvetica', 'normal')
-            if (item1.payload.nodeType.id == 4) {
-                doc.setTextColor("red")
-            } else {
-                doc.setTextColor("black")
-            }
+                    }
+                    doc.text(doc.internal.pageSize.width / 15, y, planningText[i]);
+                    y = y + 10;
+                }
+                console.log("item.flatList%%%", item.flatList)
+                item.flatList.length > 0 && item.flatList.map((item1, j) => {
+                    doc.setFont('helvetica', 'normal')
+                    if (item1.payload.nodeType.id == 4) {
+                        doc.setTextColor("red")
+                    } else {
+                        doc.setTextColor("black")
+                    }
 
-            planningText = doc.splitTextToSize(getLabelText(item1.payload.label, props.state.lang), doc.internal.pageSize.width * 3 / 4);
+                    planningText = doc.splitTextToSize(getLabelText(item1.payload.label, props.state.lang), doc.internal.pageSize.width * 3 / 4);
+                    // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+                    y = y + 10;
+                    for (var i = 0; i < planningText.length; i++) {
+                        if (y > doc.internal.pageSize.height - 100) {
+                            doc.addPage();
+                            y = 80;
+
+                        }
+                        doc.text(doc.internal.pageSize.width / 10, y, planningText[i]);
+                        y = y + 10;
+                    }
+                })
+
+            })
+        } else {
+            planningText = doc.splitTextToSize(i18n.t('static.forecastValidation.noBranchesMissingPU'), doc.internal.pageSize.width * 3 / 4);
             // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
-            y = y + 10;
+            y = y + 3;
             for (var i = 0; i < planningText.length; i++) {
                 if (y > doc.internal.pageSize.height - 100) {
                     doc.addPage();
                     y = 80;
 
                 }
-                doc.text(doc.internal.pageSize.width / 10, y, planningText[i]);
+                doc.text(doc.internal.pageSize.width / 15, y, planningText[i]);
                 y = y + 10;
             }
-        })
-
-    })
+        }
+    }
 
     doc.setFont('helvetica', 'normal')
     planningText = doc.splitTextToSize("c. " + i18n.t('static.commitTree.NodesWithChildrenThatDoNotAddUpTo100Prcnt'), doc.internal.pageSize.width * 3 / 4);
@@ -692,69 +847,88 @@ export function exportPDF(props) {
         doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
         y = y + 10;
     }
-    var height = doc.internal.pageSize.height - 50;
-    var h1 = 50;
-    //   var aspectwidth1 = (width - h1);
-    var startY = y + 10
-    var pages = Math.ceil(startY / height)
-    for (var j = 1; j < pages; j++) {
-        doc.addPage()
-    }
-    y = startY - ((height - h1) * (pages - 1))
-    props.state.treeScenarioList.map((item1, count) => {
-        var nodeWithPercentageChildren = props.state.nodeWithPercentageChildren.filter(c => c.treeId == item1.treeId && c.scenarioId == item1.scenarioId);
-        if (nodeWithPercentageChildren.length > 0) {
-            doc.setFont('helvetica', 'normal')
-            planningText = doc.splitTextToSize(getLabelText(item1.treeLabel, props.state.lang) + " / " + getLabelText(item1.scenarioLabel, props.state.lang), doc.internal.pageSize.width * 3 / 4);
+    {
+        if (props.state.treeScenarioList.length > 0 && props.state.treeScenarioListNotHaving100PerChild.length > 0) {
+            props.state.treeScenarioList.map((item1, count) => {
+                var height = doc.internal.pageSize.height - 50;
+                var h1 = 50;
+                //   var aspectwidth1 = (width - h1);
+                var startY = y
+                var pages = Math.ceil(startY / height)
+                for (var j = 1; j < pages; j++) {
+                    doc.addPage()
+                }
+                y = startY - ((height - h1) * (pages - 1))
+                if (props.state.treeScenarioListNotHaving100PerChild.filter(c => c.treeId == item1.treeId && c.scenarioId == item1.scenarioId).length > 0) {
+                    var nodeWithPercentageChildren = props.state.nodeWithPercentageChildren.filter(c => c.treeId == item1.treeId && c.scenarioId == item1.scenarioId);
+                    if (nodeWithPercentageChildren.length > 0) {
+                        doc.setFont('helvetica', 'normal')
+                        planningText = doc.splitTextToSize(getLabelText(item1.treeLabel, props.state.lang) + " / " + getLabelText(item1.scenarioLabel, props.state.lang), doc.internal.pageSize.width * 3 / 4);
+                        // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+                        y = y + 10;
+                        for (var i = 0; i < planningText.length; i++) {
+                            if (y > doc.internal.pageSize.height - 100) {
+                                doc.addPage();
+                                y = 80;
+
+                            }
+                            doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
+                            y = y + 10;
+                        }
+
+
+                        var columnsArray = [];
+                        item1.columnArray.filter(c => c.type != 'hidden').map(item4 => {
+                            columnsArray.push(item4.title)
+                        })
+                        var dataArr = [];
+                        item1.dataArray.map(item3 => {
+                            var dataArr1 = []
+                            item1.columnArray.map((item2, count) => {
+                                if (item2.type != 'hidden') {
+                                    if (item2.type == 'calendar') {
+                                        dataArr1.push(moment(item3[count]).format(DATE_FORMAT_CAP_WITHOUT_DATE))
+                                    } else {
+                                        dataArr1.push(item3[count] + "%")
+                                    }
+                                }
+                            })
+                            dataArr.push(dataArr1);
+                        })
+
+                        var data = dataArr;
+                        var content = {
+                            margin: { top: 80, bottom: 50 },
+                            startY: y,
+                            head: [columnsArray],
+                            body: data,
+                            styles: { lineWidth: 1, fontSize: 8, halign: 'center' }
+
+                        };
+                        doc.autoTable(content);
+                        y = doc.lastAutoTable.finalY + 20
+                        if (y + 100 > height) {
+                            doc.addPage();
+                            y = 80
+                        }
+                    }
+                }
+            })
+        } else {
+            planningText = doc.splitTextToSize(i18n.t('static.forecastValidation.noNodesHaveChildrenLessThanPerc'), doc.internal.pageSize.width * 3 / 4);
             // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
-            y = y + 10;
+            y = y + 3;
             for (var i = 0; i < planningText.length; i++) {
                 if (y > doc.internal.pageSize.height - 100) {
                     doc.addPage();
                     y = 80;
 
                 }
-                doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
+                doc.text(doc.internal.pageSize.width / 15, y, planningText[i]);
                 y = y + 10;
             }
-
-
-            var columnsArray = [];
-            item1.columnArray.filter(c => c.type != 'hidden').map(item4 => {
-                columnsArray.push(item4.title)
-            })
-            var dataArr = [];
-            item1.dataArray.map(item3 => {
-                var dataArr1 = []
-                item1.columnArray.map((item2, count) => {
-                    if (item2.type != 'hidden') {
-                        if (item2.type == 'calendar') {
-                            dataArr1.push(moment(item3[count]).format(DATE_FORMAT_CAP_WITHOUT_DATE))
-                        } else {
-                            dataArr1.push(item3[count] + "%")
-                        }
-                    }
-                })
-                dataArr.push(dataArr1);
-            })
-
-            var data = dataArr;
-            var content = {
-                margin: { top: 80, bottom: 50 },
-                startY: y,
-                head: [columnsArray],
-                body: data,
-                styles: { lineWidth: 1, fontSize: 8, halign: 'center' }
-
-            };
-            doc.autoTable(content);
-            y = doc.lastAutoTable.finalY + 20
-            if (y + 100 > height) {
-                doc.addPage();
-                y = 80
-            }
         }
-    })
+    }
 
     doc.setFont('helvetica', 'bold')
     planningText = doc.splitTextToSize("4. " + i18n.t('static.program.notes'), doc.internal.pageSize.width * 3 / 4);
@@ -809,13 +983,29 @@ export function exportPDF(props) {
         styles: { lineWidth: 1, fontSize: 8, halign: 'center' }
 
     };
-    doc.autoTable(content1);
-    // doc.addPage()
-    y = doc.lastAutoTable.finalY + 20
-    if (y + 100 > height) {
-        doc.addPage();
-        y = 80
+
+    if (props.state.datasetPlanningUnit.length > 0 && props.state.datasetPlanningUnit.filter(c => c.consuptionForecast.toString() == "true").length > 0) {
+        doc.autoTable(content1);// doc.addPage()
+        y = doc.lastAutoTable.finalY + 20
+        if (y + 100 > height) {
+            doc.addPage();
+            y = 80
+        }
+    } else {
+        planningText = doc.splitTextToSize(i18n.t('static.forecastValidation.noConsumptionNotesFound'), doc.internal.pageSize.width * 3 / 4);
+        // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+        y = y + 3;
+        for (var i = 0; i < planningText.length; i++) {
+            if (y > doc.internal.pageSize.height - 100) {
+                doc.addPage();
+                y = 80;
+
+            }
+            doc.text(doc.internal.pageSize.width / 15, y, planningText[i]);
+            y = y + 10;
+        }
     }
+
 
     doc.setFont('helvetica', 'normal')
     // y = 80;
@@ -863,13 +1053,28 @@ export function exportPDF(props) {
         styles: { lineWidth: 1, fontSize: 8, halign: 'center' }
 
     };
-    doc.autoTable(content2);
-    // y = 80;
-    // doc.addPage()
-    y = doc.lastAutoTable.finalY + 20
-    if (y + 100 > height) {
-        doc.addPage();
-        y = 80
+    if (props.state.treeScenarioNotes.length > 0) {
+        doc.autoTable(content2);
+        // y = 80;
+        // doc.addPage()
+        y = doc.lastAutoTable.finalY + 20
+        if (y + 100 > height) {
+            doc.addPage();
+            y = 80
+        }
+    } else {
+        planningText = doc.splitTextToSize(i18n.t('static.forecastValidation.noTreeScenarioNotesFound'), doc.internal.pageSize.width * 3 / 4);
+        // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+        y = y + 3;
+        for (var i = 0; i < planningText.length; i++) {
+            if (y > doc.internal.pageSize.height - 100) {
+                doc.addPage();
+                y = 80;
+
+            }
+            doc.text(doc.internal.pageSize.width / 15, y, planningText[i]);
+            y = y + 10;
+        }
     }
     doc.setFont('helvetica', 'normal')
     planningText = doc.splitTextToSize("c. " + i18n.t('static.commitTree.treeNodes'), doc.internal.pageSize.width * 3 / 4);
@@ -916,7 +1121,22 @@ export function exportPDF(props) {
         styles: { lineWidth: 1, fontSize: 8, halign: 'center' }
 
     };
-    doc.autoTable(content3);
+    if (props.state.treeNodeList.length > 0 && props.state.treeNodeList.filter(c => (c.notes != null && c.notes != "") || (c.madelingNotes != null && c.madelingNotes != "")).length > 0) {
+        doc.autoTable(content3);
+    } else {
+        planningText = doc.splitTextToSize(i18n.t('static.forecastValidation.noTreeNodesNotesFound'), doc.internal.pageSize.width * 3 / 4);
+        // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+        y = y + 3;
+        for (var i = 0; i < planningText.length; i++) {
+            if (y > doc.internal.pageSize.height - 100) {
+                doc.addPage();
+                y = 80;
+
+            }
+            doc.text(doc.internal.pageSize.width / 15, y, planningText[i]);
+            y = y + 10;
+        }
+    }
 
 
     addHeaders(doc)
