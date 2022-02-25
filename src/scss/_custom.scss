@@ -1004,7 +1004,7 @@ content: '\f1ec';
   //  color: #BA0C2F; 
    top: 0px;
    left: 2px;
-   cursor: col-resize;
+   cursor: pointer;
    font-size: 14px;
  }
 
@@ -6016,4 +6016,23 @@ font-style: italic!important;
 .extrapolateTable .jexcel colgroup{
   width: 100%!important;
   max-width: 100%!important;
+}
+.DataEntryTable .table thead tr th{
+  position: sticky;
+    top: -1px;
+    padding: 6px 20px 5px 20px !important;
+    background: #fff;
+}
+.DataEntryTable .clone {
+  top: 0;
+  left: 40px;
+}
+.datdEntryRow .regionBold{
+  font-weight: bold;
+    background: #6c6463!important;
+    color: #fff!important;
+    border: none!important;
+}
+.datdEntryRow .jexcel > tbody > tr > td.regionBold {
+  color: #fff !important;
 }
