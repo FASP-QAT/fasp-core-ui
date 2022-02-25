@@ -163,6 +163,7 @@ export default class ExtrapolateDataComponent extends React.Component {
             programRequest.onsuccess = function (e) {
                 var forecastProgramList = [];
                 var myResult = programRequest.result;
+                console.log("result*******",myResult)
                 for (var i = 0; i < myResult.length; i++) {
                     var datasetDataBytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
                     var datasetData = datasetDataBytes.toString(CryptoJS.enc.Utf8);
@@ -2516,7 +2517,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                         </Table>
                                     </div>
                                 </div>}
-                            {this.state.showData && <div id="tableDiv" className="extrapolateTable"></div>}
+                            {this.state.showData && <div id="tableDiv" className="extrapolateTable pt-lg-5"></div>}
                         </div>
                         <div style={{ display: this.state.loading ? "block" : "none" }}>
                             <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
