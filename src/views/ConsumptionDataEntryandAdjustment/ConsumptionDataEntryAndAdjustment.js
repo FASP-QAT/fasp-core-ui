@@ -1783,9 +1783,10 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
               </Form>
               <div style={{ display: this.state.loading ? "none" : "block" }}>
                 {this.state.showSmallTable &&
-                  <>
+                  <div className="row">
+                    <div className="col-md-12">
                     <div className="table-scroll">
-                      <div className="table-wrap">
+                      <div className="table-wrap DataEntryTable table-responsive">
                         <Table className="table-bordered text-center mt-2 overflowhide main-table " bordered size="sm" options={this.options}>
                           <thead>
                             <tr>
@@ -1918,7 +1919,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                     <br></br>
                     <br></br>
                     <div className="row">
-                      <div className="col-md-12 pl-2 pr-2">
+                      <div className="col-md-12 pl-2 pr-2 datdEntryRow">
                         <div id="tableDiv" className="leftAlignTable">
                         </div>
                       </div>
@@ -1936,7 +1937,8 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                         <b>{i18n.t('static.dataentry.graphNotes')}</b>
                       </div>
                     }
-                  </>
+                  </div>
+                  </div>
 
                 }
               </div>

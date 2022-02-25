@@ -6009,3 +6009,22 @@ font-style: italic!important;
   text-shadow: 0 0 5px #fff;
   display: none;
 }
+.DataEntryTable .table thead tr th{
+  position: sticky;
+    top: -1px;
+    padding: 6px 20px 5px 20px !important;
+    background: #fff;
+}
+.DataEntryTable .clone {
+  top: 0;
+  left: 40px;
+}
+.datdEntryRow .regionBold{
+  font-weight: bold;
+    background: #6c6463!important;
+    color: #fff!important;
+    border: none!important;
+}
+.datdEntryRow .jexcel > tbody > tr > td.regionBold {
+  color: #fff !important;
+}
