@@ -7176,7 +7176,9 @@ export default class BuildTree extends Component {
                 </TabPane>
                 <TabPane tabId="3">
                     {/* <ConsumptionInSupplyPlanComponent ref="consumptionChild" items={this.state} toggleLarge={this.toggleLarge} updateState={this.updateState} formSubmit={this.formSubmit} hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} consumptionPage="consumptionDataEntry" useLocalData={1} /> */}
-                    <TreeExtrapolationComponent ref="extrapolationChild" items={this.state} />
+                    {this.state.currentItemConfig.context.payload.extrapolation &&
+                        <TreeExtrapolationComponent ref="extrapolationChild" items={this.state} />
+                    }
                 </TabPane>
 
             </>
@@ -7869,14 +7871,24 @@ export default class BuildTree extends Component {
                                             <span style={{ cursor: 'pointer' }} onClick={this.cancelClicked}><i className="fa fa-long-arrow-left" style={{ color: '#20a8d8', fontSize: '13px' }}></i> <small className="supplyplanformulas">{'Return To List'}</small></span>
                                         </a>
                                     </div>
-                                    <div className="col-md-6">
+                                    {/* <div className="col-md-6">
                                         <span className="pr-lg-0 pt-lg-0 float-right">
+                                            <h5 style={{ color: '#BA0C2F' }}>{i18n.t('static.tree.pleaseSaveAndDoARecalculateAfterDragAndDrop.')}</h5>
+                                        </span>
+                                    </div> */}
+
+                                </div>
+                            </div>
+                            <div className="row">
+                                <div className="col-md-12 pl-lg-3">
+                                <div className="col-md-12">
+                                        <span className="pr-lg-0 pt-lg-0 float-left">
                                             <h5 style={{ color: '#BA0C2F' }}>{i18n.t('static.tree.pleaseSaveAndDoARecalculateAfterDragAndDrop.')}</h5>
                                         </span>
                                     </div>
 
-                                </div>
-                            </div>
+                                    </div>
+                                    </div>
                         </div>
                         <CardBody className="pt-lg-1 pl-lg-0 pr-lg-0">
                             <div className="container-fluid pl-lg-3 pr-lg-3">
@@ -8539,6 +8551,7 @@ export default class BuildTree extends Component {
                                         {i18n.t('static.tree.Modeling/Transfer')}
                                     </NavLink>
                                 </NavItem>
+
                                 <NavItem style={{ display: this.state.currentItemConfig.context.payload.extrapolation ? 'block' : 'none' }}>
                                     <NavLink
                                         active={this.state.activeTab1[0] === '3'}
