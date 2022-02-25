@@ -731,8 +731,8 @@ export function exportPDF(props) {
     }
     doc.setFont('helvetica', 'normal')
     {
-        if (props.state.notSelectedPlanningUnitList.length > 0) {
-            props.state.notSelectedPlanningUnitList.map((item, i) => {
+        if (props.state.notSelectedPlanningUnitList.length > 0 && props.state.notSelectedPlanningUnitList.filter(c => c.regionsArray.length > 0).length > 0) {
+            props.state.notSelectedPlanningUnitList.filter(c => c.regionsArray.length > 0).map((item, i) => {
                 planningText = doc.splitTextToSize(getLabelText(item.planningUnit.label, props.state.lang) + " - " + item.regionsArray, doc.internal.pageSize.width * 3 / 4);
                 // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
                 y = y + 3;

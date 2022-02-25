@@ -1234,7 +1234,7 @@ class VersionSettingsComponent extends Component {
 
         // Tree Forecast : planing unit missing on tree
         const { notSelectedPlanningUnitList } = this.state;
-        let pu = notSelectedPlanningUnitList.length > 0 ? notSelectedPlanningUnitList.map((item, i) => {
+        let pu = (notSelectedPlanningUnitList.length > 0 && notSelectedPlanningUnitList.filter(c => c.regionsArray.length > 0).length > 0) ? notSelectedPlanningUnitList.filter(c => c.regionsArray.length > 0).map((item, i) => {
             return (
                 <li key={i}>
                     <div>{getLabelText(item.planningUnit.label, this.state.lang) + " - " + item.regionsArray}</div>
