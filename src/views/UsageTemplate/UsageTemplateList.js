@@ -1286,7 +1286,7 @@ class usageTemplate extends Component {
         var programList = this.state.typeList;
         var value = (instance.jexcel.getJson(null, false)[r])[1];
         value = Number(value);
-        if (value != -1) {
+        if (value != -1 && value != 0) {
             let programObj = this.state.typeList.filter(c => c.id == parseInt(value))[0];
             let programHealthAreaList = programObj.healthAreaList;
             let tempMyList = [];
