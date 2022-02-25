@@ -2114,7 +2114,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                 <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='userForm' autocomplete="off">
                                     {/* formik validation starts here */}
                                     <div className="row pt-lg-0" style={{ float: 'right', marginTop: '-42px' }}>
-                                        <div className="col-md-12">
+                                        <div className="row pl-lg-0 pr-lg-0">
                                             {/* <SupplyPlanFormulas ref="formulaeChild" /> */}
                                             <a className="">
                                                 <span style={{ cursor: 'pointer', color: '20a8d8' }} ><small className="supplyplanformulas">{i18n.t('Show Guidance')}</small></span>
@@ -2176,7 +2176,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                         <div className="row">
                                             <FormGroup className="col-md-12 " style={{ display: "block" }}>
                                                 <div className="check inline pl-lg-3 pt-lg-2">
-                                                    <div className="row pl-lg-1 pb-lg-2">
+                                                    <div className="pl-lg-0 pb-lg-2">
                                                         <div>
                                                             <Popover placement="top" isOpen={this.state.popoverOpenMa} target="Popover1" trigger="hover" toggle={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)}>
                                                                 <PopoverBody>Need to add Info.</PopoverBody>
@@ -2200,7 +2200,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                             </Label>
                                                         </div>
                                                         {/* {this.state.movingAvgId && */}
-                                                        <div className="col-md-3 pt-lg-0" style={{ display: this.state.movingAvgId ? '' : 'none' }}>
+                                                        <div className="col-md-2 pl-lg-0 pt-lg-0" style={{ display: this.state.movingAvgId ? '' : 'none' }}>
                                                             <Label htmlFor="appendedInputButton"># of Months</Label>
                                                             <Input
                                                                 className="controls"
@@ -2487,19 +2487,19 @@ export default class TreeExtrapolationComponent extends React.Component {
                                             </FormGroup>
                                         </div>
 
-                                        <div className="col-md-12 text-left pt-lg-3 pl-lg-0">
-                                            <Button className="mr-1 btn btn-info btn-md " onClick={this.toggledata}>
+                                        <div className="col-md-12 row text-left pt-lg-3 pl-lg-0">
+                                            {/* <Button className="mr-1 btn btn-info btn-md " onClick={this.toggledata}>
                                                 {this.state.show ? i18n.t('static.common.hideData') : i18n.t('static.common.showData')}
-                                            </Button>
+                                            </Button> */}
                                             <Button type="button" color="success" className="mr-1" size="md" onClick={this.interpolate}>Interpolate</Button>
                                         </div>
                                     </div>
                                     {/* </Form> */}
-                                    <div className="col-md-12 pl-lg-0 pr-lg-0 pt-lg-3">
+                                    <div className="row pl-lg-0 pr-lg-0 pt-lg-3">
                                         <div className="col-md-6">
                                             {/* <Button type="button" size="md" color="info" className="float-left mr-1" onClick={this.resetTree}>{'Show/hide data'}</Button> */}
                                         </div>
-                                        <div className="col-md-4 float-right" style={{ marginTop: '-42px' }}>
+                                        <div className="col-md-6 float-right" style={{ marginTop: '-42px' }}>
                                             <FormGroup className="float-right" >
                                                 <div className="check inline pl-lg-1 pt-lg-0">
                                                     <div>
@@ -2522,9 +2522,12 @@ export default class TreeExtrapolationComponent extends React.Component {
                                             </FormGroup>
                                         </div>
                                     </div>
-                                    <div id="tableDiv" className="extrapolateTable consumptionDataEntryTable"></div>
+                                    <div className="row pl-lg-0 pr-lg-0 extrapolateTable consumptionDataEntryTable">
+                                    <div id="tableDiv" className=""></div>
+                                    </div>
                                     {/* Graph */}
-                                    <div className="col-md-12 pt-lg-4">
+                                    <div className="row">
+                                    <div className="col-md-12 pt-lg-4 pl-lg-0 pr-lg-0">
                                         <div className="chart-wrapper chart-graph-report pl-0 ml-0" style={{ marginLeft: '50px' }}>
                                             <Line id="cool-canvas" data={line} options={options} />
                                             <div>
@@ -2532,6 +2535,8 @@ export default class TreeExtrapolationComponent extends React.Component {
                                             </div>
                                         </div>
                                     </div>
+                                    </div>
+                                    <div className="row pl-lg-0 pr-lg-0">
                                     <div className="table-scroll">
                                         <div className="table-wrap table-responsive">
                                             <Table className="table-bordered text-center mt-2 overflowhide main-table " bordered size="sm" >
@@ -2650,13 +2655,14 @@ export default class TreeExtrapolationComponent extends React.Component {
                                             </Table>
                                         </div>
                                     </div>
-                                    <div className="col-md-12 pl-lg-0 pt-lg-3 pb-lg-3">
+                                    </div>
+                                    <div className="col-md-12 row pl-lg-0  pr-lg-0 pt-lg-3 pb-lg-3">
                                         <ul className="legendcommitversion pl-lg-0">
                                             <li><span className="lowestErrorGreenLegend legendcolor"></span> <span className="legendcommitversionText">Lowest Error</span></li>
 
                                         </ul>
                                     </div>
-                                    <div className="col-md-12 pl-lg-0">
+                                    <div className="col-md-12 row pl-lg-0 pr-lg-0">
                                         <Row>
                                             <FormGroup className="col-md-3">
                                                 <Label htmlFor="currencyId">Choose Method<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.togglepopoverChooseMethod('popoverChooseMethod', !this.state.popoverChooseMethod)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
