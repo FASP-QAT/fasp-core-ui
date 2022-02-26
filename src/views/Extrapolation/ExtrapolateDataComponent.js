@@ -233,7 +233,6 @@ export default class ExtrapolateDataComponent extends React.Component {
         this.setState({ rangeValue: value })
     }
     handleRangeDissmis1(value) {
-        console.log("Value+++", value)
         this.setState({ rangeValue1: value }, () => {
             this.setExtrapolatedParameters(0)
         })
@@ -341,7 +340,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                 if (y != null) {
                     var elInstance = el.jexcel;
                     var rowData = elInstance.getRowData(y);
-                    if (moment(rowData[0]).format("YYYY-MM") >= moment(this.state.datasetJson.currentVersion.startDate).format("YYYY-MM") && moment(rowData[0]).format("YYYY-MM") <= moment(this.state.datasetJson.currentVersion.stopDate).format("YYYY-MM")) {
+                    if (moment(rowData[0]).format("YYYY-MM") >= moment(this.state.datasetJson.currentVersion.forecastStartDate).format("YYYY-MM") && moment(rowData[0]).format("YYYY-MM") <= moment(this.state.datasetJson.currentVersion.forecastStopDate).format("YYYY-MM")) {
                         var cell = elInstance.getCell(("A").concat(parseInt(y) + 1))
                         cell.classList.add('jexcelBoldPurpleCell');
                     } else {
@@ -490,8 +489,6 @@ export default class ExtrapolateDataComponent extends React.Component {
         var inputDataSemiAverage = [];
         var inputDataLinearRegression = [];
         var inputDataTes = [];
-        console.log("this.state.regionId", this.state.regionId)
-        console.log("this.state.planningUnitId", this.state.planningUnitId)
         for (var j = 0; moment(curDate).format("YYYY-MM") < moment(stopDate).format("YYYY-MM"); j++) {
             curDate = moment(startDate).startOf('month').add(j, 'months').format("YYYY-MM-DD");
             var consumptionData = actualConsumptionList.filter(c => moment(c.month).format("YYYY-MM") == moment(curDate).format("YYYY-MM") && c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId)
@@ -1443,8 +1440,8 @@ export default class ExtrapolateDataComponent extends React.Component {
 
     getDateDifference() {
         var rangeValue = this.state.rangeValue1;
-        let startDate = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
-        let endDate = rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
+        let startDate = moment(rangeValue.from.year + '-' + rangeValue.from.month + '-01').format("YYYY-MM");
+        let endDate = moment(rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate()).format("YYYY-MM");
         console.log("startDate-->", startDate);
         console.log("endDate-->", endDate);
         // var monthsDiff = moment(endDate).diff(startDate, 'months', true);
