@@ -682,6 +682,7 @@ export default class BuildTree extends Component {
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.getMaxNodeDataId = this.getMaxNodeDataId.bind(this);
         this.exportPDF = this.exportPDF.bind(this);
+        this.updateExtrapolationData = this.updateExtrapolationData.bind(this);
     }
     getMaxNodeDataId() {
         var maxNodeDataId = 0;
@@ -889,6 +890,11 @@ export default class BuildTree extends Component {
         this.setState({
             showDiv1: !this.state.showDiv1
         })
+    }
+    updateExtrapolationData(parameterName, value) {
+        this.setState({
+            [parameterName]: value
+        });
     }
     updateState(parameterName, value) {
         console.log("parameterName---", parameterName);
@@ -7177,7 +7183,7 @@ export default class BuildTree extends Component {
                 <TabPane tabId="3">
                     {/* <ConsumptionInSupplyPlanComponent ref="consumptionChild" items={this.state} toggleLarge={this.toggleLarge} updateState={this.updateState} formSubmit={this.formSubmit} hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} consumptionPage="consumptionDataEntry" useLocalData={1} /> */}
                     {this.state.currentItemConfig.context.payload.extrapolation &&
-                        <TreeExtrapolationComponent ref="extrapolationChild" items={this.state} />
+                        <TreeExtrapolationComponent ref="extrapolationChild" items={this.state} updateState={this.updateState}/>
                     }
                 </TabPane>
 
@@ -7881,14 +7887,14 @@ export default class BuildTree extends Component {
                             </div>
                             <div className="row">
                                 <div className="col-md-12 pl-lg-3">
-                                <div className="col-md-12">
+                                    <div className="col-md-12">
                                         <span className="pr-lg-0 pt-lg-0 float-left">
                                             <h5 style={{ color: '#BA0C2F' }}>{i18n.t('static.tree.pleaseSaveAndDoARecalculateAfterDragAndDrop.')}</h5>
                                         </span>
                                     </div>
 
-                                    </div>
-                                    </div>
+                                </div>
+                            </div>
                         </div>
                         <CardBody className="pt-lg-1 pl-lg-0 pr-lg-0">
                             <div className="container-fluid pl-lg-3 pr-lg-3">
