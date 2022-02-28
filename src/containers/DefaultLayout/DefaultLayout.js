@@ -1683,7 +1683,7 @@ class DefaultLayout extends Component {
                           {
                             name: i18n.t('static.dataset.manageProgramInfo'),
                             url: '/dataSet/listDataSet',
-                            icon: 'fa fa-file-text-o',
+                            icon: 'fa fa-cog',
                             attributes: {
                               hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_DATASET') && this.state.activeTab == 1 ? false : true),
                               onClick: e => {
