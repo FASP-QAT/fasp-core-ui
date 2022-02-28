@@ -16,7 +16,7 @@ import CryptoJS from 'crypto-js';
 import moment from 'moment';
 import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
-import { buildJxl, dataCheck } from "./DataCheckComponent";
+import { buildJxl, buildJxl1, dataCheck } from "./DataCheckComponent";
 import { exportPDF, noForecastSelectedClicked, missingMonthsClicked, missingBranchesClicked, nodeWithPercentageChildrenClicked } from '../DataSet/DataCheckComponent.js';
 import pdfIcon from '../../assets/img/pdf.png';
 
@@ -77,6 +77,7 @@ class VersionSettingsComponent extends Component {
             noForecastSelectedList: [],
             datasetPlanningUnit: [],
             notSelectedPlanningUnitList: [],
+            treeScenarioListNotHaving100PerChild: []
         }
         this.hideFirstComponent = this.hideFirstComponent.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
@@ -98,6 +99,9 @@ class VersionSettingsComponent extends Component {
             [parameterName]: value
         }, () => {
             if (parameterName == "treeScenarioList") {
+                buildJxl1(this)
+            }
+            if (parameterName == "treeScenarioListNotHaving100PerChild") {
                 buildJxl(this)
             }
         })
@@ -213,10 +217,12 @@ class VersionSettingsComponent extends Component {
                 var value = this.el.getValue(`O${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
                 var reg = JEXCEL_DECIMAL_NO_REGEX;
                 if (value == "") {
+                    // this.el.setStyle(col, "background-color", "transparent");
+                    // this.el.setStyle(col, "background-color", "yellow");
+                    // this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                    // valid = false;
                     this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                    valid = false;
+                    this.el.setComments(col, "");
                 } else {
                     if (isNaN(parseInt(value)) || !(reg.test(value))) {
                         this.el.setStyle(col, "background-color", "transparent");
@@ -234,10 +240,12 @@ class VersionSettingsComponent extends Component {
                 var value = this.el.getValue(`P${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
                 var reg = JEXCEL_DECIMAL_NO_REGEX;
                 if (value == "") {
+                    // this.el.setStyle(col, "background-color", "transparent");
+                    // this.el.setStyle(col, "background-color", "yellow");
+                    // this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                    // valid = false;
                     this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                    valid = false;
+                    this.el.setComments(col, "");
                 } else {
                     if (isNaN(parseInt(value)) || !(reg.test(value))) {
                         this.el.setStyle(col, "background-color", "transparent");
@@ -255,10 +263,12 @@ class VersionSettingsComponent extends Component {
                 var value = this.el.getValue(`Q${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
                 var reg = JEXCEL_DECIMAL_NO_REGEX;
                 if (value == "") {
+                    // this.el.setStyle(col, "background-color", "transparent");
+                    // this.el.setStyle(col, "background-color", "yellow");
+                    // this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                    // valid = false;
                     this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                    valid = false;
+                    this.el.setComments(col, "");
                 } else {
                     if (isNaN(parseInt(value)) || !(reg.test(value))) {
                         this.el.setStyle(col, "background-color", "transparent");
@@ -430,6 +440,9 @@ class VersionSettingsComponent extends Component {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
                 }
+            } else {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
             }
         }
 
@@ -448,6 +461,9 @@ class VersionSettingsComponent extends Component {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
                 }
+            } else {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
             }
         }
 
@@ -466,6 +482,9 @@ class VersionSettingsComponent extends Component {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
                 }
+            } else {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
             }
         }
 
@@ -1109,10 +1128,10 @@ class VersionSettingsComponent extends Component {
         var tr = asterisk.firstChild;
         tr.children[8].classList.add('AsteriskTheadtrTd');
         tr.children[10].classList.add('AsteriskTheadtrTd');
-        tr.children[16].classList.add('AsteriskTheadtrTd');
-        tr.children[15].classList.add('AsteriskTheadtrTd');
+        // tr.children[16].classList.add('AsteriskTheadtrTd');
+        // tr.children[15].classList.add('AsteriskTheadtrTd');
         tr.children[14].classList.add('AsteriskTheadtrTd');
-        tr.children[17].classList.add('AsteriskTheadtrTd');
+        // tr.children[17].classList.add('AsteriskTheadtrTd');
     }
     oncreateeditor = function (el, cell, x, y) {
         if (x == 4) {
@@ -1180,7 +1199,7 @@ class VersionSettingsComponent extends Component {
         }
         //No forecast selected
         const { noForecastSelectedList } = this.state;
-        let noForecastSelected = noForecastSelectedList.length > 0 &&
+        let noForecastSelected = noForecastSelectedList.filter(c => c.regionList.length > 0).length > 0 ?
             noForecastSelectedList.map((item, i) => {
                 return (
                     item.regionList.map(item1 => {
@@ -1191,37 +1210,37 @@ class VersionSettingsComponent extends Component {
                         )
                     }, this)
                 )
-            }, this);
+            }, this) : <span>{i18n.t('static.forecastValidation.noMissingSelectedForecastFound')}</span>;
 
         //Consumption : missing months
         const { missingMonthList } = this.state;
-        let missingMonths = missingMonthList.length > 0 && missingMonthList.map((item, i) => {
+        let missingMonths = missingMonthList.length > 0 ? missingMonthList.map((item, i) => {
             return (
                 <li key={i}>
-                    <div><span><div className="hoverDiv" onClick={() => missingMonthsClicked(item.planningUnitId, this)}><b>{getLabelText(item.planningUnitLabel, this.state.lang) + " - " + getLabelText(item.regionLabel, this.state.lang) + " : "}</b></div>{"" + item.monthsArray}</span></div>
+                    <div><span><div className="hoverDiv" onClick={() => missingMonthsClicked(item.planningUnitId, this)}>{getLabelText(item.planningUnitLabel, this.state.lang) + " - " + getLabelText(item.regionLabel, this.state.lang) + ": "}</div>{"" + item.monthsArray}</span></div>
                 </li>
             )
-        }, this);
+        }, this) : <span>{i18n.t('static.forecastValidation.noMissingGaps')}</span>;
 
         //Consumption : planning unit less 12 month
         const { consumptionListlessTwelve } = this.state;
-        let consumption = consumptionListlessTwelve.length > 0 && consumptionListlessTwelve.map((item, i) => {
+        let consumption = consumptionListlessTwelve.length > 0 ? consumptionListlessTwelve.map((item, i) => {
             return (
                 <li key={i}>
-                    <div><span><div className="hoverDiv" onClick={() => missingMonthsClicked(item.planningUnitId, this)}><b>{getLabelText(item.planningUnitLabel, this.state.lang) + " - " + getLabelText(item.regionLabel, this.state.lang) + " : "}</b></div></span><span>{item.noOfMonths + " month(s)"}</span></div>
+                    <div><span><div className="hoverDiv" onClick={() => missingMonthsClicked(item.planningUnitId, this)}>{getLabelText(item.planningUnitLabel, this.state.lang) + " - " + getLabelText(item.regionLabel, this.state.lang) + ": "}</div></span><span>{item.noOfMonths + " month(s)"}</span></div>
                 </li>
             )
-        }, this);
+        }, this) : <span>{i18n.t('static.forecastValidation.noMonthsHaveLessData')}</span>;
 
         // Tree Forecast : planing unit missing on tree
         const { notSelectedPlanningUnitList } = this.state;
-        let pu = notSelectedPlanningUnitList.length > 0 && notSelectedPlanningUnitList.map((item, i) => {
+        let pu = (notSelectedPlanningUnitList.length > 0 && notSelectedPlanningUnitList.filter(c => c.regionsArray.length > 0).length > 0) ? notSelectedPlanningUnitList.filter(c => c.regionsArray.length > 0).map((item, i) => {
             return (
                 <li key={i}>
                     <div>{getLabelText(item.planningUnit.label, this.state.lang) + " - " + item.regionsArray}</div>
                 </li>
             )
-        }, this);
+        }, this) : <span>{i18n.t('static.forecastValidation.noMissingPlanningUnitsFound')}</span>;
 
         // Tree Forecast : branches missing PU
         const { missingBranchesList } = this.state;
@@ -1242,32 +1261,34 @@ class VersionSettingsComponent extends Component {
                     </li>
                 </ul>
             )
-        }, this) : <ul></ul>;
+        }, this) : <ul><span>{i18n.t('static.forecastValidation.noBranchesMissingPU')}</span></ul>;
 
         //Nodes less than 100%
-        let jxlTable = this.state.treeScenarioList.length > 0 ? this.state.treeScenarioList.map((item1, count) => {
-            var nodeWithPercentageChildren = this.state.nodeWithPercentageChildren.filter(c => c.treeId == item1.treeId && c.scenarioId == item1.scenarioId);
-            if (nodeWithPercentageChildren.length > 0) {
-                return (<><span className="hoverDiv" onClick={() => nodeWithPercentageChildrenClicked(item1.treeId, item1.scenarioId, this)}><span>{getLabelText(item1.treeLabel, this.state.lang) + " / " + getLabelText(item1.scenarioLabel, this.state.lang)}</span></span><div className="table-responsive">
-                    <div id={"tableDiv" + count} className="jexcelremoveReadonlybackground consumptionDataEntryTable" name='jxlTableData' />
-                </div><br /></>)
+        let jxlTable = this.state.treeScenarioList.length > 0 && this.state.treeScenarioListNotHaving100PerChild.length > 0 ? this.state.treeScenarioList.map((item1, count) => {
+            if (this.state.treeScenarioListNotHaving100PerChild.filter(c => c.treeId == item1.treeId && c.scenarioId == item1.scenarioId).length > 0) {
+                var nodeWithPercentageChildren = this.state.nodeWithPercentageChildren.filter(c => c.treeId == item1.treeId && c.scenarioId == item1.scenarioId);
+                if (nodeWithPercentageChildren.length > 0) {
+                    return (<><span className="hoverDiv" onClick={() => nodeWithPercentageChildrenClicked(item1.treeId, item1.scenarioId, this)}><span>{getLabelText(item1.treeLabel, this.state.lang) + " / " + getLabelText(item1.scenarioLabel, this.state.lang)}</span></span><div className="table-responsive">
+                        <div id={"tableDiv" + count} className="jexcelremoveReadonlybackground consumptionDataEntryTable" name='jxlTableData' />
+                    </div><br /></>)
+                }
             }
-        }, this) : <br />
+        }, this) : <ul><span>{i18n.t('static.forecastValidation.noNodesHaveChildrenLessThanPerc')}</span><br /></ul>
 
         //Consumption Notes
         const { datasetPlanningUnit } = this.state;
-        let consumtionNotes = datasetPlanningUnit.length > 0 && datasetPlanningUnit.filter(c => c.consuptionForecast.toString() == "true").map((item, i) => {
+        let consumtionNotes = (datasetPlanningUnit.length > 0 && datasetPlanningUnit.filter(c => c.consuptionForecast.toString() == "true").length > 0) ? datasetPlanningUnit.filter(c => c.consuptionForecast.toString() == "true").map((item, i) => {
             return (
                 <tr key={i} className="hoverTd" onClick={() => missingMonthsClicked(item.planningUnit.id, this)}>
                     <td>{getLabelText(item.planningUnit.label, this.state.lang)}</td>
                     <td>{item.consumptionNotes}</td>
                 </tr>
             )
-        }, this);
+        }, this) : <span>&emsp;&emsp;&emsp;&ensp;{i18n.t('static.forecastValidation.noConsumptionNotesFound')}</span>;
 
         //Tree scenario Notes
         const { treeScenarioNotes } = this.state;
-        let scenarioNotes = treeScenarioNotes.length > 0 && treeScenarioNotes.map((item, i) => {
+        let scenarioNotes = treeScenarioNotes.length > 0 ? treeScenarioNotes.map((item, i) => {
             return (
                 <tr key={i} className="hoverTd" onClick={() => nodeWithPercentageChildrenClicked(item.treeId, item.scenarioId, this)}>
                     <td>{getLabelText(item.tree, this.state.lang)}</td>
@@ -1276,21 +1297,21 @@ class VersionSettingsComponent extends Component {
                     <td>{item.scenarioNotes}</td>
                 </tr>
             )
-        }, this);
+        }, this) : <span>&emsp;&emsp;&emsp;&ensp;{i18n.t('static.forecastValidation.noTreeScenarioNotesFound')}</span>;
 
         //Tree Nodes Notes
         const { treeNodeList } = this.state;
-        let treeNodes = treeNodeList.length > 0 && treeNodeList.filter(c => (c.notes != null && c.notes != "") || (c.madelingNotes != null && c.madelingNotes != "")).map((item, i) => {
+        let treeNodes = treeNodeList.length > 0 && treeNodeList.filter(c => (c.notes != null && c.notes != "") || (c.madelingNotes != null && c.madelingNotes != "")).length > 0 ? treeNodeList.filter(c => (c.notes != null && c.notes != "") || (c.madelingNotes != null && c.madelingNotes != "")).map((item, i) => {
             return (
                 <tr key={i} className="hoverTd" onClick={() => nodeWithPercentageChildrenClicked(item.treeId, item.scenarioId, this)}>
                     <td>{getLabelText(item.tree, this.state.lang)}</td>
                     <td>{getLabelText(item.node, this.state.lang)}</td>
                     <td>{getLabelText(item.scenario, this.state.lang)}</td>
-                    <td>{(item.notes != "" && item.notes != null) ? i18n.t('static.commitTree.main') + " : " + item.notes : ""}<br />
-                        {(item.madelingNotes != "" && item.madelingNotes != null) ? i18n.t('static.commitTree.modeling') + " : " + item.madelingNotes : ""}</td>
+                    <td>{(item.notes != "" && item.notes != null) ? i18n.t('static.commitTree.main') + ": " + item.notes : ""}<br />
+                        {(item.madelingNotes != "" && item.madelingNotes != null) ? i18n.t('static.commitTree.modeling') + ": " + item.madelingNotes : ""}</td>
                 </tr>
             )
-        }, this);
+        }, this) : <span>&emsp;&emsp;&emsp;&ensp;{i18n.t('static.forecastValidation.noTreeNodesNotesFound')}</span>;
 
 
         return (
@@ -1424,7 +1445,7 @@ class VersionSettingsComponent extends Component {
 
                             <span>a. {i18n.t('static.forecastMethod.historicalData')}:</span>
                             <div className="">
-                                <div className="table-wrap table-responsive fixTableHead">
+                                {(datasetPlanningUnit.length > 0 && datasetPlanningUnit.filter(c => c.consuptionForecast.toString() == "true").length > 0) ? <div className="table-wrap table-responsive fixTableHead">
                                     <Table className="table-bordered text-center mt-2 overflowhide main-table table-striped1" bordered size="sm" >
                                         <thead>
                                             <tr>
@@ -1434,11 +1455,11 @@ class VersionSettingsComponent extends Component {
                                         </thead>
                                         <tbody>{consumtionNotes}</tbody>
                                     </Table>
-                                </div>
+                                </div> : <span>{consumtionNotes}</span>}
                             </div><br />
                             <span>b. {i18n.t('static.commitTree.treeScenarios')}:</span>
                             <div className="table-scroll">
-                                <div className="table-wrap table-responsive fixTableHead">
+                                {treeScenarioNotes.length > 0 ? <div className="table-wrap table-responsive fixTableHead">
                                     <Table className="table-bordered text-center mt-2 overflowhide main-table table-striped1" bordered size="sm" >
                                         <thead>
                                             <tr>
@@ -1450,12 +1471,12 @@ class VersionSettingsComponent extends Component {
                                         </thead>
                                         <tbody>{scenarioNotes}</tbody>
                                     </Table>
-                                </div>
+                                </div> : <span>{scenarioNotes}</span>}
                             </div><br />
                             <span>c. {i18n.t('static.commitTree.treeNodes')}:</span>
                             {/* <div className="table-scroll"> */}
                             <div className="">
-                                <div className="table-wrap table-responsive fixTableHead">
+                                {treeNodeList.length > 0 && treeNodeList.filter(c => (c.notes != null && c.notes != "") || (c.madelingNotes != null && c.madelingNotes != "")).length > 0 ? <div className="table-wrap table-responsive fixTableHead">
                                     <Table className="table-bordered text-center mt-2 overflowhide main-table table-striped1" bordered size="sm" >
                                         <thead>
                                             <tr>
@@ -1467,7 +1488,7 @@ class VersionSettingsComponent extends Component {
                                         </thead>
                                         <tbody>{treeNodes}</tbody>
                                     </Table>
-                                </div>
+                                </div> : <span>{treeNodes}</span>}
                             </div>
                             <div className="col-md-12 pb-lg-5 pt-lg-3">
                                 <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={() => { this.openModalPopup() }}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>

@@ -34,6 +34,7 @@ import UnitService from '../../api/UnitService.js';
 import ProgramService from '../../api/ProgramService';
 import CryptoJS from 'crypto-js';
 import { SECRET_KEY, JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, JEXCEL_DATE_FORMAT_SM, INTEGER_NO_REGEX } from "../../Constants";
+import { number } from "mathjs";
 
 let initialValues = {
     number1: "",
@@ -112,7 +113,8 @@ class usageTemplate extends Component {
             textMessage: 'time(s) per',
             usagePeriodListLong: [],
             usagePeriodDisplayList: [],
-            roleArray: []
+            roleArray: [],
+            dimensionList: [],
         }
         // this.setTextAndValue = this.setTextAndValue.bind(this);
         // this.disableRow = this.disableRow.bind(this);
@@ -143,6 +145,7 @@ class usageTemplate extends Component {
         this.getForcastingUnitById = this.getForcastingUnitById.bind(this);
         this.modelOpenClose = this.modelOpenClose.bind(this);
         this.dataChange = this.dataChange.bind(this);
+        this.getDimensionList = this.getDimensionList.bind(this);
     }
 
     touchAll(setTouched, errors) {
@@ -377,6 +380,87 @@ class usageTemplate extends Component {
                     },
                         () => {
                             console.log("TracerCategory------->", this.state.tracerCategoryList)
+                            this.getDimensionList();
+                        })
+                } else {
+                    this.setState({
+                        message: response.data.messageCode, loading: false
+                    },
+                        () => {
+                            this.hideSecondComponent();
+                        })
+                }
+
+            }).catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                                break;
+                        }
+                    }
+                }
+            );
+    }
+
+    getDimensionList() {
+        UnitService.getUnitListByDimensionId(5)
+            .then(response => {
+                if (response.status == 200) {
+                    console.log("getUnitListByDimensionId------->123", response.data);
+                    var listArray = response.data;
+                    listArray.sort((a, b) => {
+                        var itemLabelA = (a.unitCode).toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = (b.unitCode).toUpperCase(); // ignore upper and lowercase                   
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
+
+                    let tempList = [];
+                    if (listArray.length > 0) {
+                        for (var i = 0; i < listArray.length; i++) {
+                            var paJson = {
+                                name: getLabelText(listArray[i].unitCode, this.state.lang),
+                                id: parseInt(listArray[i].unitId),
+                                active: listArray[i].active,
+                            }
+                            tempList[i] = paJson
+                        }
+                    }
+
+                    this.setState({
+                        dimensionList: tempList,
+                    },
+                        () => {
                             this.getForecastingUnit();
                         })
                 } else {
@@ -717,6 +801,7 @@ class usageTemplate extends Component {
                 data[7] = "Every"
                 data[8] = papuList[j].noOfPatients
                 data[9] = "patient"
+                // data[9] = 91
 
                 data[10] = "requires"
                 data[11] = papuList[j].noOfForecastingUnits
@@ -751,6 +836,8 @@ class usageTemplate extends Component {
 
                 //(papuList[j].oneTimeUsage == false ? '' : `=ROUND(N${parseInt(j) + 1},2)`)//hidden
 
+                // let unitName = this.state.dimensionList.filter(c => c.unitId == papuList[j].unitId)[0].unitCode;
+                // let string = "Every " + papuList[j].noOfPatients + " "+ unitName +" - requires " + papuList[j].noOfForecastingUnits + " " + papuList[j].unit.label.label_en;
 
                 let string = "Every " + papuList[j].noOfPatients + " patient - requires " + papuList[j].noOfForecastingUnits + " " + papuList[j].unit.label.label_en;
                 if (!papuList[j].oneTimeUsage) { //one time usage false
@@ -795,6 +882,7 @@ class usageTemplate extends Component {
             data[7] = "Every";
             data[8] = 1;
             data[9] = "patient"
+            // data[9] = 91
 
             data[10] = "requires";
             data[11] = 0;
@@ -879,25 +967,32 @@ class usageTemplate extends Component {
                 },
                 {
                     title: i18n.t('static.usageTemplate.people'),
-                    type: 'text',
+                    type: 'hidden',
                     readOnly: true,
                     textEditor: true, //7 H
                 },
                 {
-                    title: i18n.t('static.usageTemplate.people'),
+                    // title: i18n.t('static.usageTemplate.people'),
+                    title: '# Person(s)',
                     type: 'numeric',
                     // readOnly: true
                     textEditor: true, //8 I
                 },
                 {
-                    title: i18n.t('static.usageTemplate.people'),
+                    // title: i18n.t('static.usageTemplate.people'),
+                    title: 'Person(s) Unit',
                     type: 'text',
                     readOnly: true,
                     textEditor: true, //9 J
                 },
+                // {
+                //     title: 'Person(s) Unit',
+                //     type: 'autocomplete',
+                //     source: this.state.dimensionList, //9 J
+                // },
                 {
                     title: i18n.t('static.usageTemplate.fuPerPersonPerTime'),
-                    type: 'text',
+                    type: 'hidden',
                     readOnly: true,
                     textEditor: true, //10 K
                 },
@@ -909,13 +1004,13 @@ class usageTemplate extends Component {
                 },
                 {
                     title: i18n.t('static.usageTemplate.fuPerPersonPerTime'),
-                    type: 'autocomplete',
+                    type: 'hidden',
                     readOnly: true,
                     source: this.state.unitList, //12 M
                 },
                 {
                     title: i18n.t('static.usageTemplate.fuPerPersonPerTime'),
-                    type: 'text',//hidden black
+                    type: 'hidden',//hidden black
                     readOnly: true,
                     textEditor: true, //13 N
                 },
@@ -926,7 +1021,8 @@ class usageTemplate extends Component {
                     // readOnly: true //14 O
                 },
                 {
-                    title: i18n.t('static.usageTemplate.usageFrequency'),
+                    // title: i18n.t('static.usageTemplate.usageFrequency'),
+                    title: '# of times/Frequency',
                     type: 'numeric',
                     // readOnly: true
                     textEditor: true,
@@ -934,25 +1030,26 @@ class usageTemplate extends Component {
                 },
                 {
                     title: i18n.t('static.usageTemplate.usageFrequency'),
-                    type: 'text',
+                    type: 'hidden',
                     readOnly: true,
                     textEditor: true, //16 Q
                 },
                 {
-                    title: i18n.t('static.usageTemplate.usageFrequency'),
+                    // title: i18n.t('static.usageTemplate.usageFrequency'),
+                    title: 'Frequency',
                     type: 'autocomplete',
                     source: this.state.usagePeriodList, //17 R
                     filter: this.filterUsagePeriod1
                 },
                 {
                     title: i18n.t('static.usageTemplate.fuPerPersonPerMonth'),
-                    type: 'text',//hidden black
+                    type: 'hidden',//hidden black
                     readOnly: true,
                     textEditor: true, //18 S
                 },
                 {
                     title: ' ',//empty for
-                    type: 'text',
+                    type: 'hidden',
                     readOnly: true,
                     textEditor: true, //19 T
                 },
@@ -963,7 +1060,8 @@ class usageTemplate extends Component {
                     textEditor: true, //20 U
                 },
                 {
-                    title: i18n.t('static.usagePeriod.usagePeriod'),
+                    // title: i18n.t('static.usagePeriod.usagePeriod'),
+                    title: 'Period Unit',
                     type: 'autocomplete',
                     source: this.state.usagePeriodList, //21 V
                     filter: this.filterUsagePeriod2
@@ -995,7 +1093,7 @@ class usageTemplate extends Component {
                 },
                 {
                     title: i18n.t('static.program.notes'),
-                    type: 'text',
+                    type: 'hidden',
                     // width: 400 //27 AB
                 },
 
@@ -1212,15 +1310,22 @@ class usageTemplate extends Component {
                                         //it's a number
                                         console.log("number---------------------->1");
                                         let tempList = this.state.usagePeriodListLong;
-                                        let selectedPickerConvertTOMonth = tempList.filter(c => c.usagePeriodId == value)[0].convertToMonth;
 
-                                        for (var i = 0; i < tempList.length; i++) {
-                                            console.log("number---------------------->1.1");
-                                            if (parseFloat(tempList[i].convertToMonth) <= parseFloat(selectedPickerConvertTOMonth)) {
-                                                tempUsagePeriodList.push(tempList[i]);
+                                        if (value == 0) {
+                                            tempUsagePeriodList = tempList;
+                                        } else {
+                                            let selectedPickerConvertTOMonth = tempList.filter(c => c.usagePeriodId == value)[0].convertToMonth;
+
+                                            for (var i = 0; i < tempList.length; i++) {
+                                                console.log("number---------------------->1.1");
+                                                if (parseFloat(tempList[i].convertToMonth) <= parseFloat(selectedPickerConvertTOMonth)) {
+                                                    tempUsagePeriodList.push(tempList[i]);
+                                                }
                                             }
+                                            console.log("number---------------------->2", tempUsagePeriodList);
                                         }
-                                        console.log("number---------------------->2", tempUsagePeriodList);
+
+
                                     }
 
                                     console.log("number---------------------->3");
@@ -1286,7 +1391,7 @@ class usageTemplate extends Component {
         var programList = this.state.typeList;
         var value = (instance.jexcel.getJson(null, false)[r])[1];
         value = Number(value);
-        if (value != -1) {
+        if (value != -1 && value != 0) {
             let programObj = this.state.typeList.filter(c => c.id == parseInt(value))[0];
             let programHealthAreaList = programObj.healthAreaList;
             let tempMyList = [];
@@ -1905,7 +2010,15 @@ class usageTemplate extends Component {
         }
 
         if (x == 4 || x == 8 || x == 11 || x == 15 || x == 16 || x == 17 || x == 20 || x == 21) {
-            let string = 'Every ' + this.el.getValue(`I${parseInt(y) + 1}`, true) + ' Patient - requires ' + this.el.getValue(`L${parseInt(y) + 1}`, true) + " " + this.el.getValue(`M${parseInt(y) + 1}`, true);
+
+            // unitIdValue = this.el.getValueFromCoords(9, y);
+            // let unitName = '';
+            // if (unitIdValue != 0) {
+            //     unitName = this.state.dimensionList.filter(c => c.unitId == unitIdValue)[0].unitCode;
+            // }
+            // let string = 'Every ' + this.el.getValue(`I${parseInt(y) + 1}`, true) + ' ' + unitName + ' - requires ' + this.el.getValue(`L${parseInt(y) + 1}`, true) + " " + this.el.getValue(`M${parseInt(y) + 1}`, true);
+
+            let string = 'Every ' + this.el.getValue(`I${parseInt(y) + 1}`, true) + ' patient - requires ' + this.el.getValue(`L${parseInt(y) + 1}`, true) + " " + this.el.getValue(`M${parseInt(y) + 1}`, true);
 
             if (!this.el.getValueFromCoords(14, y)) {//one time usage false
                 string += " " + this.el.getValue(`P${parseInt(y) + 1}`, true) + " " + this.el.getValue(`Q${parseInt(y) + 1}`, true) + " " + this.el.getValue(`R${parseInt(y) + 1}`, true);
@@ -1920,7 +2033,7 @@ class usageTemplate extends Component {
             this.el.setValueFromCoords(23, y, string, true);
         }
 
-
+        //-----------------------------------------------------------
         //Active
         // if (x != 24) {
         //     this.el.setValueFromCoords(24, y, 1, true);
@@ -2988,6 +3101,8 @@ class usageTemplate extends Component {
                 let picker2ConvertTOMonth = tempList.filter(c => c.usagePeriodId == this.state.picker2)[0].convertToMonth;
                 let number1 = event.target.value;
                 number2 = (parseFloat(picker1ConvertTOMonth) / parseFloat(picker2ConvertTOMonth) / parseFloat(number1)).toFixed(2)
+
+                number2 = (number2.toString().includes('.00') ? parseInt(number2) : number2);
             }
 
 
@@ -3006,6 +3121,8 @@ class usageTemplate extends Component {
                 let picker2ConvertTOMonth = tempList.filter(c => c.usagePeriodId == this.state.picker2)[0].convertToMonth;
                 let number1 = this.state.number1;
                 number2 = (parseFloat(picker1ConvertTOMonth) / parseFloat(picker2ConvertTOMonth) / parseFloat(number1)).toFixed(2)
+
+                number2 = (number2.toString().includes('.00') ? parseInt(number2) : number2);
             }
 
 
@@ -3031,6 +3148,8 @@ class usageTemplate extends Component {
                 let picker2ConvertTOMonth = tempList.filter(c => c.usagePeriodId == event.target.value)[0].convertToMonth;
                 let number1 = this.state.number1;
                 number2 = (parseFloat(picker1ConvertTOMonth) / parseFloat(picker2ConvertTOMonth) / parseFloat(number1)).toFixed(2)
+
+                number2 = (number2.toString().includes('.00') ? parseInt(number2) : number2);
             }
 
             this.setState({

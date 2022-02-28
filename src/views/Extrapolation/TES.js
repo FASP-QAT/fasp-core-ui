@@ -72,6 +72,7 @@ export function calculateTES(inputData, alphaParam, betaParam, gammaParam, confi
     console.log("CI = " + CI)
     console.log("Data%%%",data)
     calculateError(data, "tesError", props);
+    // console.log("tesData----",tesData);
     props.updateState("tesData", data);
     props.updateState("CI", CI);
     // let errors = getErrors(data)

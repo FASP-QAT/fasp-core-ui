@@ -1427,7 +1427,7 @@ class ApplicationDashboard extends Component {
 
 
           {
-            this.state.datasetList.length > 0 &&
+            this.state.datasetList.length > 0 && activeTab1 == 1 &&
             this.state.datasetList.map((item) => (
               <Col xs="12" sm="6" lg="3">
                 <Card className=" CardHeight">
@@ -1437,16 +1437,18 @@ class ApplicationDashboard extends Component {
                     <div style={{ display: item.loading ? "none" : "block" }}>
                       <div class="h1 text-muted text-left mb-2">
                         <i class="fa fa-list-alt icon-color"></i>
-                        {/* <ButtonGroup className="float-right BtnZindex">
+                        <ButtonGroup className="float-right BtnZindex">
                           <Dropdown id={item.id} isOpen={this.state[item.id]} toggle={() => { this.setState({ [item.id]: !this.state[item.id] }); }}>
                             <DropdownToggle caret className="p-0" color="transparent">
                             </DropdownToggle>
                             <DropdownMenu right>
-                              <DropdownItem onClick={() => this.getProblemListAfterCalculation(item.id)}>{i18n.t('static.qpl.calculate')}</DropdownItem>
-                              <DropdownItem onClick={() => this.redirectToCrud(/report/problemList/1/ + item.id + "/false")}>{i18n.t('static.dashboard.qatProblemList')}</DropdownItem>
+                              <DropdownItem onClick={() => this.redirectToCrud("/dataset/versionSettings")}>{'Version Settings'}</DropdownItem>
+                              <DropdownItem onClick={() => this.redirectToCrud("/dataset/listTree")}>{'Tree'}</DropdownItem>
+                              <DropdownItem onClick={() => this.redirectToCrud("/dataentry/consumptionDataEntryAndAdjustment")}>{'Consumption'}</DropdownItem>
+                              {/*<DropdownItem onClick={() => this.redirectToCrud(/report/problemList / 1 / + item.id + "/false")}>{i18n.t('static.dashboard.qatProblemList')}</DropdownItem> */}
                             </DropdownMenu>
                           </Dropdown>
-                        </ButtonGroup> */}
+                        </ButtonGroup>
                         {/* <i class="fa fa-list-alt icon-color"></i> &nbsp;
                         <a href="javascript:void();" title="Recalculate" onClick={() => this.getProblemListAfterCalculation(item.id)}><i className="fa fa-refresh"></i></a> */}
                       </div>
@@ -1455,7 +1457,7 @@ class ApplicationDashboard extends Component {
                       {/* <div className="TextTittle ">{i18n.t("static.problemReport.open")}:{item.openCount}</div> */}
                       {/* <div className="TextTittle">{i18n.t("static.problemReport.addressed")}: {item.addressedCount}</div> */}
                     </div>
-                    {/* <div style={{ display: item.loading ? "block" : "none" }}>
+                    <div style={{ display: item.loading ? "block" : "none" }}>
                       <div className="d-flex align-items-center justify-content-center" style={{ height: "70px" }} >
                         <div class="align-items-center">
                           <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
@@ -1463,7 +1465,7 @@ class ApplicationDashboard extends Component {
                           </div>
                         </div>
                       </div>
-                    </div> */}
+                    </div>
                   </CardBody>
                 </Card>
               </Col>

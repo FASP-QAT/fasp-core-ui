@@ -52,6 +52,9 @@ import PDFDocument from 'pdfkit-nodejs-webpack';
 import blobStream from 'blob-stream';
 import OrgDiagramPdfkit from '../TreePDF/OrgDiagramPdfkit';
 import Size from '../../../node_modules/basicprimitives/src/graphics/structs/Size';
+import classNames from 'classnames';
+import Select from 'react-select';
+import 'react-select/dist/react-select.min.css';
 
 
 const entityname = 'Tree Template';
@@ -128,6 +131,18 @@ const validationSchemaNodeData = function (values) {
         //                 return true;
         //             }
         //         }),
+        needFUValidation: Yup.boolean(),
+        forecastingUnitId: Yup.string()
+            .when("needFUValidation", {
+                is: val => {
+                    return document.getElementById("needFUValidation").value === "true";
+
+                },
+                then: Yup.string()
+                    .required('Please select forecasting unit')
+                    .typeError('Please select forecasting unit'),
+                otherwise: Yup.string().notRequired()
+            }),
         usageTypeIdFU: Yup.string()
             .test('usageTypeIdFU', i18n.t('static.validation.fieldRequired'),
                 function (value) {
@@ -341,6 +356,9 @@ export default class CreateTreeTemplate extends Component {
         this.pickAMonth2 = React.createRef()
         this.pickAMonth1 = React.createRef()
         this.state = {
+            showFUValidation: true,
+            fuValues: [],
+            fuLabels: [],
             showModelingValidation: true,
             hidePlanningUnit: false,
             maxNodeDataId: '',
@@ -578,6 +596,31 @@ export default class CreateTreeTemplate extends Component {
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.getMaxNodeDataId = this.getMaxNodeDataId.bind(this);
         this.exportPDF = this.exportPDF.bind(this);
+    }
+
+    handleFUChange = (regionIds) => {
+        console.log("regionIds---", regionIds);
+        const { currentItemConfig } = this.state;
+
+        this.setState({
+            fuValues: regionIds != null ? regionIds : "",
+            // fuLabels: regionIds != null ? regionIds.label : ""
+        }, () => {
+            if (regionIds != null) {
+                currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.forecastingUnit.id = regionIds.value;
+                currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.forecastingUnit.label.label_en = regionIds.label.split("|")[0];
+                this.setState({ showFUValidation: false }, () => {
+                    this.getForecastingUnitUnitByFUId(regionIds.value);
+                });
+            } else {
+                currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.forecastingUnit.id = "";
+                currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.forecastingUnit.label.label_en = "";
+                this.setState({ showFUValidation: true });
+            }
+            console.log("regionValues---", this.state.fuValues);
+            console.log("regionLabels---", this.state.fuLabels);
+            this.setState({ currentItemConfig });
+        })
     }
 
     exportPDF = () => {
@@ -895,7 +938,11 @@ export default class CreateTreeTemplate extends Component {
         currentItemConfig.context = JSON.parse(JSON.stringify(orgCurrentItemConfig));
         console.log("============1============", orgCurrentItemConfig);
         this.setState({
-            currentItemConfig
+            currentItemConfig,
+            usageTemplateId: "",
+            usageText: "",
+            fuValues: { value: orgCurrentItemConfig.payload.nodeDataMap[0][0].fuNode.forecastingUnit.id, label: getLabelText(orgCurrentItemConfig.payload.nodeDataMap[0][0].fuNode.forecastingUnit.label, this.state.lang) + " | " + orgCurrentItemConfig.payload.nodeDataMap[0][0].fuNode.forecastingUnit.id },
+            // fuLabels: []
         }, () => {
             console.log("currentItemConfig after---", this.state.orgCurrentItemConfig)
         });
@@ -2137,10 +2184,13 @@ export default class CreateTreeTemplate extends Component {
                 instance.jexcel.setStyle(col, "background-color", "transparent");
                 instance.jexcel.setStyle(col, "background-color", "yellow");
                 instance.jexcel.setComments(col, i18n.t('static.label.fieldRequired'));
+                this.state.modelingEl.setValueFromCoords(5, y, "", true);
+                this.state.modelingEl.setValueFromCoords(6, y, "", true);
             } else {
                 if (value == 2) {
                     this.state.modelingEl.setValueFromCoords(5, y, "", true);
-                } else {
+                }
+                else if (value == 3 || value == 4 || value == 5) {
                     this.state.modelingEl.setValueFromCoords(6, y, "", true);
                 }
                 instance.jexcel.setStyle(col, "background-color", "transparent");
@@ -2952,19 +3002,26 @@ export default class CreateTreeTemplate extends Component {
         ForecastingUnitService.getForcastingUnitListByTracerCategoryId(tracerCategoryId).then(response => {
             console.log("fu list---", response.data)
 
-            var autocompleteData = [];
-            for (var i = 0; i < response.data.length; i++) {
-                // autocompleteData[i] = { value: response.data[i].forecastingUnitId, label: response.data[i].label.label_en + " [" + response.data[i].forecastingUnitId + "]" }
-                autocompleteData[i] = { value: response.data[i].forecastingUnitId, label: response.data[i].forecastingUnitId + "|" + getLabelText(response.data[i].label, this.state.lang) }
-            }
+
+            let forecastingUnitMultiList = response.data.length > 0
+                && response.data.map((item, i) => {
+                    return ({ value: item.forecastingUnitId, label: getLabelText(item.label, this.state.lang) + " | " + item.forecastingUnitId })
+
+                }, this);
+            // var autocompleteData = [];
+
+            // for (var i = 0; i < response.data.length; i++) {
+            //     // autocompleteData[i] = { value: response.data[i].forecastingUnitId, label: response.data[i].label.label_en + " [" + response.data[i].forecastingUnitId + "]" }
+            //     // autocompleteData[i] = { value: response.data[i].forecastingUnitId, label: response.data[i].forecastingUnitId + "|" + getLabelText(response.data[i].label, this.state.lang) }
+            // }
             this.setState({
-                autocompleteData,
+                forecastingUnitMultiList,
                 forecastingUnitList: response.data
             }, () => {
                 if (response.data.length == 1) {
                     const currentItemConfig = this.state.currentItemConfig;
                     (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.id = response.data[0].forecastingUnitId;
-                    (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.label.label_en = response.data[0].forecastingUnitId + "|" + getLabelText(response.data[0].label, this.state.lang);
+                    (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.label.label_en = getLabelText(response.data[0].label, this.state.lang) + " | " + response.data[0].forecastingUnitId;
                     this.setState({
                         currentItemConfig: currentItemConfig
                     }, () => {
@@ -3100,7 +3157,8 @@ export default class CreateTreeTemplate extends Component {
             nodeTypeId: true,
             nodeTitle: true,
             nodeUnitId: true,
-            percentageOfParent: true
+            percentageOfParent: true,
+            forecastingUnitId: true
             // nodeValue: true
         }
         )
@@ -4324,6 +4382,10 @@ export default class CreateTreeTemplate extends Component {
 
                 if (data.context.payload.nodeType.id == 4) {
                     this.getForecastingUnitListByTracerCategoryId((data.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.tracerCategory.id);
+                    this.setState({
+                        fuValues: { value: (data.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.id, label: getLabelText((data.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.label, this.state.lang) + " | " + (data.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.id }
+                        // fuLabels: getLabelText(this.state.currentScenario.fuNode.forecastingUnit.label, this.state.lang) + " | " + this.state.currentScenario.fuNode.forecastingUnit.id
+                    });
                     // this.getNoOfMonthsInUsagePeriod();
                     this.getNodeUnitOfPrent();
                     this.getNoOfFUPatient();
@@ -4670,7 +4732,8 @@ export default class CreateTreeTemplate extends Component {
                             nodeTypeId: this.state.currentItemConfig.context.payload.nodeType.id,
                             nodeUnitId: this.state.currentItemConfig.context.payload.nodeUnit.id,
                             nodeValue: this.state.currentItemConfig.context.payload.nodeType.id != 1 && this.state.currentItemConfig.context.payload.nodeType.id != 2 ? this.state.currentItemConfig.context.payload.nodeDataMap[0][0].calculatedDataValue : this.state.currentItemConfig.context.payload.nodeDataMap[0][0].dataValue,
-                            percentageOfParent: (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].dataValue
+                            percentageOfParent: (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].dataValue,
+                            forecastingUnitId: this.state.fuValues,
                         }}
                         validate={validateNodeData(validationSchemaNodeData)}
                         onSubmit={(values, { setSubmitting, setErrors }) => {
@@ -4703,6 +4766,8 @@ export default class CreateTreeTemplate extends Component {
                                 isValid,
                                 setTouched,
                                 handleReset,
+                                setFieldValue,
+                                setFieldTouched
                             }) => (
                                 <Form className="needs-validation" onSubmit={handleSubmit} onReset={handleReset} noValidate name='nodeDataForm' autocomplete="off">
                                     <div className="row">
@@ -5170,9 +5235,47 @@ export default class CreateTreeTemplate extends Component {
                                                 </Input>
                                                 {/* <FormFeedback className="red">{errors.usageTemplateId}</FormFeedback> */}
                                             </FormGroup>
+                                            <Input
+                                                type="hidden"
+                                                name="showFUValidation"
+                                                id="showFUValidation"
+                                                value={this.state.showFUValidation}
+                                            />
+                                            <Input
+                                                type="hidden"
+                                                name="needFUValidation"
+                                                id="needFUValidation"
+                                                value={(this.state.currentItemConfig.context.payload.nodeType.id != 4 ? false : true)}
+                                            />
                                             <FormGroup className="col-md-12" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 4 ? 'block' : 'none' }}>
                                                 <Label htmlFor="currencyId">{i18n.t('static.product.unit1')}<span class="red Reqasterisk">*</span></Label>
-                                                <div className="controls fuNodeAutocomplete"
+                                                <div className="controls ">
+                                                    {/* <InMultiputGroup> */}
+                                                    <Select
+                                                        // className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
+                                                        //     { 'is-valid': !errors.forecastingUnitId },
+                                                        //     { 'is-invalid': (touched.forecastingUnitId && !!errors.forecastingUnitId) }
+                                                        // )}
+                                                        className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
+                                                            { 'is-valid': !errors.forecastingUnitId && this.state.fuValues != '' },
+                                                            { 'is-invalid': (touched.forecastingUnitId && !!errors.forecastingUnitId && (this.state.currentItemConfig.context.payload.nodeType.id != 4 ? false : true) || !!errors.forecastingUnitId) }
+                                                        )}
+                                                        id="forecastingUnitId"
+                                                        name="forecastingUnitId"
+                                                        bsSize="sm"
+                                                        onChange={(e) => {
+                                                            handleChange(e);
+                                                            setFieldValue("forecastingUnitId", e);
+                                                            this.handleFUChange(e);
+                                                        }}
+                                                        onBlur={() => setFieldTouched("forecastingUnitId", true)}
+                                                        // multi
+                                                        options={this.state.forecastingUnitMultiList}
+                                                        value={this.state.fuValues}
+                                                    />
+                                                    <FormFeedback>{errors.forecastingUnitId}</FormFeedback>
+                                                </div><br />
+                                                {/* <div className="controls fuNodeAutocomplete"
                                                 >
                                                     <Autocomplete
                                                         id="forecastingUnitId"
@@ -5200,7 +5303,7 @@ export default class CreateTreeTemplate extends Component {
                                                             }} />}
                                                     />
 
-                                                </div>
+                                                </div> */}
                                             </FormGroup>
 
                                             <FormGroup className="col-md-6" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 4 ? 'block' : 'none' }}>
@@ -5602,7 +5705,7 @@ export default class CreateTreeTemplate extends Component {
 
                         <div className="col-md-12">
                             {this.state.showModelingJexcelNumber &&
-                                <> <div className="calculatorimg">
+                                <> <div className="calculatorimg calculatorTable">
                                     <div id="modelingJexcel" className={"RowClickable ScalingTable"} style={{ display: this.state.modelingJexcelLoader ? "none" : "block" }}>
                                     </div>
                                     <div style={{ display: this.state.modelingJexcelLoader ? "block" : "none" }}>
@@ -6120,7 +6223,7 @@ export default class CreateTreeTemplate extends Component {
         console.log("Items+++", items);
         var dataArray = [];
         dataArray.push(new Paragraph({
-            children: [new TextRun({ "text": "Tree Validation", bold: true,size:30 })],
+            children: [new TextRun({ "text": "Tree Validation", bold: true, size: 30 })],
             spacing: {
                 after: 150,
             },
@@ -6128,25 +6231,25 @@ export default class CreateTreeTemplate extends Component {
         dataArray.push(new Paragraph({
         }));
         dataArray.push(new Paragraph({
-            children: [new TextRun({ "text": i18n.t('static.forecastMethod.forecastMethod') +" : ", bold: true }), new TextRun({ "text": document.getElementById("forecastMethodId").selectedOptions[0].text })],
+            children: [new TextRun({ "text": i18n.t('static.forecastMethod.forecastMethod') + " : ", bold: true }), new TextRun({ "text": document.getElementById("forecastMethodId").selectedOptions[0].text })],
             spacing: {
                 after: 150,
             },
         }));
         dataArray.push(new Paragraph({
-            children: [new TextRun({ "text": "Template Name" +" : ", bold: true }), new TextRun({ "text": document.getElementById("treeName").value })],
+            children: [new TextRun({ "text": "Template Name" + " : ", bold: true }), new TextRun({ "text": document.getElementById("treeName").value })],
             spacing: {
                 after: 150,
             },
         }));
         dataArray.push(new Paragraph({
-            children: [new TextRun({ "text": i18n.t('static.program.monthsInPast') +" : ", bold: true }), new TextRun({ "text": document.getElementById("monthsInPast").value })],
+            children: [new TextRun({ "text": i18n.t('static.program.monthsInPast') + " : ", bold: true }), new TextRun({ "text": document.getElementById("monthsInPast").value })],
             spacing: {
                 after: 150,
             },
         }));
         dataArray.push(new Paragraph({
-            children: [new TextRun({ "text": i18n.t('static.program.monthsInFuture') +" : ", bold: true }), new TextRun({ "text": document.getElementById("monthsInFuture").value })],
+            children: [new TextRun({ "text": i18n.t('static.program.monthsInFuture') + " : ", bold: true }), new TextRun({ "text": document.getElementById("monthsInFuture").value })],
             spacing: {
                 after: 150,
             },
@@ -6415,6 +6518,8 @@ export default class CreateTreeTemplate extends Component {
                                 event.stopPropagation();
                                 console.log("add node----", itemConfig);
                                 this.setState({
+                                    fuValues: [],
+                                    fuLabels: [],
                                     scalingList: [],
                                     usageTemplateId: '',
                                     usageText: "",

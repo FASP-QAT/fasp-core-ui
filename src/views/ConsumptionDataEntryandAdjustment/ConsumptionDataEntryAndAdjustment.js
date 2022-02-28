@@ -56,6 +56,8 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     }
     this.loaded = this.loaded.bind(this);
     this.buildDataJexcel = this.buildDataJexcel.bind(this);
+    this.cancelClicked = this.cancelClicked.bind(this);        
+  //  this.consumptionDataChanged = this.consumptionDataChanged.bind(this);
     this.filterList = this.filterList.bind(this)
   }
 
@@ -64,6 +66,23 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     return this.state.mixedList.filter(c => c.type == value);
   }
 
+  cancelClicked() {
+    var cont = false;
+    if (this.state.consumptionChanged) {
+        var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
+        if (cf == true) {
+            cont = true;
+        } else {
+
+        }
+    } else {
+        cont = true;
+    }
+    if (cont == true) {
+        let id = AuthenticationService.displayDashboardBasedOnRole();
+        this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.message.cancelled', { entityname }))
+    }
+}
   buildDataJexcel(consumptionUnitId) {
 
     var cont = false;
@@ -239,10 +258,12 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           },
           onload: this.loaded,
           onchange: function (instance, cell, x, y, value) {
+           // this.consumptionDataChanged()
             this.setState({
               consumptionChanged: true
             })
           }.bind(this),
+          
           pagination: false,
           search: false,
           columnSorting: false,
@@ -476,7 +497,10 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       })
     }
   }
-
+  // consumptionDataChanged = function (instance, cell, x, y, value) {
+  //   var elInstance = this.state.consumptionEl;
+  //   var rowData = elInstance.getRowData(y);
+  // }
 
   interpolationMissingActualConsumption() {
     var notes = "";
@@ -875,8 +899,9 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     }
     this.setState({
       consumptionUnitShowArr: consumptionUnitShowArr
-    })
-    this.componentDidMount();
+    })}
+
+    componentDidMount(){
     this.getDatasetList();
   }
 
@@ -1681,7 +1706,8 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     return (
       <div className="animated fadeIn">
         <Prompt
-          when={this.state.consumptionChangedFlag == 1 || this.state.consumptionBatchInfoChangedFlag == 1}
+         // when={this.state.consumptionChangedFlag == 1 || this.state.consumptionBatchInfoChangedFlag == 1}
+          when={this.state.consumptionChanged == 1}
           message={i18n.t("static.dataentry.confirmmsg")}
         />
         <AuthenticationServiceComponent history={this.props.history} />
@@ -1705,10 +1731,11 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           </div>
           <div className="Card-header-addicon pb-0">
             <div className="card-header-actions">
-              <img style={{ height: '23px', width: '23px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
+              {/* <img style={{ height: '23px', width: '23px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} /> */}
               <a className="card-header-action">
                 <span style={{ cursor: 'pointer' }} onClick={() => { this.toggleShowGuidance() }}><small className="supplyplanformulas">{i18n.t('static.common.showGuidance')}</small></span>
               </a>
+              <img style={{ height: '23px', width: '23px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
               {/* <span className="card-header-action">
                 {this.state.datasetId != "" && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} ><i className="fa fa-plus-square" style={{ fontSize: '20px' }} onClick={() => this.buildDataJexcel(0)}></i></a>}</span> */}
 
@@ -1756,9 +1783,10 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
               </Form>
               <div style={{ display: this.state.loading ? "none" : "block" }}>
                 {this.state.showSmallTable &&
-                  <>
+                  <div className="row">
+                    <div className="col-md-12">
                     <div className="table-scroll">
-                      <div className="table-wrap table-responsive">
+                      <div className="table-wrap DataEntryTable table-responsive">
                         <Table className="table-bordered text-center mt-2 overflowhide main-table " bordered size="sm" options={this.options}>
                           <thead>
                             <tr>
@@ -1891,7 +1919,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                     <br></br>
                     <br></br>
                     <div className="row">
-                      <div className="col-md-12 pl-2 pr-2">
+                      <div className="col-md-12 pl-2 pr-2 datdEntryRow">
                         <div id="tableDiv" className="leftAlignTable">
                         </div>
                       </div>
@@ -1909,7 +1937,8 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                         <b>{i18n.t('static.dataentry.graphNotes')}</b>
                       </div>
                     }
-                  </>
+                  </div>
+                  </div>
 
                 }
               </div>
@@ -1937,8 +1966,8 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         </Card>
         <Modal isOpen={this.state.showGuidance}
           className={'modal-lg ' + this.props.className} >
-          <ModalHeader toggle={() => this.toggleShowGuidance()} className="modalHeaderSupplyPlan">
-            <strong>Show Guidance</strong>
+          <ModalHeader toggle={() => this.toggleShowGuidance()} className="ModalHead modal-info-Headher">
+            <strong className="TextWhite">Show Guidance</strong>
           </ModalHeader>
           <div>
             <ModalBody>
@@ -1953,9 +1982,9 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         </Modal>
         <Modal isOpen={this.state.toggleDataCheck}
           className={'modal-lg ' + this.props.className} >
-          <ModalHeader toggle={() => this.openDataCheckModel()} className="modalHeaderSupplyPlan">
+          <ModalHeader toggle={() => this.openDataCheckModel()} className="ModalHead modal-info-Headher">
             <div>
-              <img className=" pull-right iconClass cursor ml-lg-2" style={{ height: '22px', width: '22px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.exportPDFDataCheck()} />
+              <img className=" pull-right iconClass cursor ml-lg-2" style={{ height: '22px', width: '22px', cursor: 'pointer',marginTop:'-4px' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.exportPDFDataCheck()} />
               <strong>{i18n.t('static.common.dataCheck')}</strong>
             </div>
           </ModalHeader>

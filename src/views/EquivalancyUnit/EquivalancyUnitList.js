@@ -636,9 +636,11 @@ class EquivalancyUnit extends Component {
 
                 {
                     title: i18n.t('static.equivalencyUnit.conversionToEU'),
-                    type: 'text',
-                    // readOnly: true
+                    type: 'numeric',
                     textEditor: true,
+                    decimal: '.',
+                    mask: '#,##',
+                    disabledMaskOnEdition: true
                 },
                 {
                     title: i18n.t('static.common.notes'),
@@ -2092,7 +2094,7 @@ class EquivalancyUnit extends Component {
                                 case 406:
                                     this.setState({
                                         // message: error.response.data.messageCode,
-                                        message: 'Fail to add',
+                                        message: 'Duplicate equivalency unit, forecasting unit, program combination not allow',
                                         color: "#BA0C2F", loading: false
                                     },
                                         () => {
@@ -2267,31 +2269,60 @@ class EquivalancyUnit extends Component {
         if (x == 6) {
             var col = ("G").concat(parseInt(y) + 1);
             value = elInstance.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-            // var reg = DECIMAL_NO_REGEX;
+            if (value == '' || value == null) {
+                value = elInstance.getValueFromCoords(6, y);
+            }
             var reg = /^\d{1,14}(\.\d{1,4})?$/;
-            if (value == "") {
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setStyle(col, "background-color", "yellow");
-                elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
-            } else {
-                // if (isNaN(Number.parseInt(value)) || value < 0 || !(reg.test(value))) {
-                if (!(reg.test(value))) {
+            if (value != "") {
+                if (isNaN(parseInt(value))) {//string value check
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setStyle(col, "background-color", "yellow");
+                    elInstance.setComments(col, 'String value not allowed')
+                }
+                // else if (!Number.isInteger(Number(value))) {//decimal value check
+                //     elInstance.setStyle(col, "background-color", "transparent");
+                //     elInstance.setStyle(col, "background-color", "yellow");
+                //     elInstance.setComments(col, 'Decimal value not allowed')
+                // } 
+                else if (!(reg.test(value))) {
                     elInstance.setStyle(col, "background-color", "transparent");
                     elInstance.setStyle(col, "background-color", "yellow");
                     elInstance.setComments(col, i18n.t('static.usagePeriod.conversionTOFUTest'));
                 } else {
-                    if (isNaN(Number.parseInt(value)) || value <= 0) {
-                        elInstance.setStyle(col, "background-color", "transparent");
-                        elInstance.setStyle(col, "background-color", "yellow");
-                        elInstance.setComments(col, i18n.t('static.program.validvaluetext'));
-                    } else {
-                        elInstance.setStyle(col, "background-color", "transparent");
-                        elInstance.setComments(col, "");
-                    }
-
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setComments(col, "");
                 }
+            } else {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setStyle(col, "background-color", "yellow");
+                elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
 
             }
+            //// var reg = DECIMAL_NO_REGEX;
+            // var reg = /^\d{1,14}(\.\d{1,4})?$/;
+            // if (value == "") {
+            //     elInstance.setStyle(col, "background-color", "transparent");
+            //     elInstance.setStyle(col, "background-color", "yellow");
+            //     elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
+            // } else {
+            //     // if (isNaN(Number.parseInt(value)) || value < 0 || !(reg.test(value))) {
+            //     if (!(reg.test(value))) {
+            //         elInstance.setStyle(col, "background-color", "transparent");
+            //         elInstance.setStyle(col, "background-color", "yellow");
+            //         elInstance.setComments(col, i18n.t('static.usagePeriod.conversionTOFUTest'));
+            //     } else {
+            //         if (isNaN(Number.parseInt(value)) || value <= 0) {
+            //             elInstance.setStyle(col, "background-color", "transparent");
+            //             elInstance.setStyle(col, "background-color", "yellow");
+            //             elInstance.setComments(col, i18n.t('static.program.validvaluetext'));
+            //         } else {
+            //             elInstance.setStyle(col, "background-color", "transparent");
+            //             elInstance.setComments(col, "");
+            //         }
+
+            //     }
+
+            // }
         }
 
         //Type
@@ -2485,8 +2516,60 @@ class EquivalancyUnit extends Component {
 
 
                 //conversion to FU decimal 14,4
+                // var col = ("G").concat(parseInt(y) + 1);
+                // var value = elInstance.getValueFromCoords(6, y);
+                // var reg = /^\d{1,14}(\.\d{1,4})?$/;
+                // if (value == "") {
+                //     elInstance.setStyle(col, "background-color", "transparent");
+                //     elInstance.setStyle(col, "background-color", "yellow");
+                //     elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
+                //     valid = false;
+                //     this.setState({
+                //         message: i18n.t('static.supplyPlan.validationFailed'),
+                //         color: 'red'
+                //     },
+                //         () => {
+                //             this.hideSecondComponent();
+                //         })
+                // } else {
+                //     if (!(reg.test(value))) {
+                //         elInstance.setStyle(col, "background-color", "transparent");
+                //         elInstance.setStyle(col, "background-color", "yellow");
+                //         elInstance.setComments(col, i18n.t('static.usagePeriod.conversionTOFUTest'));
+                //         valid = false;
+                //         this.setState({
+                //             message: i18n.t('static.supplyPlan.validationFailed'),
+                //             color: 'red'
+                //         },
+                //             () => {
+                //                 this.hideSecondComponent();
+                //             })
+                //     } else {
+                //         if (isNaN(Number.parseInt(value)) || value <= 0) {
+                //             elInstance.setStyle(col, "background-color", "transparent");
+                //             elInstance.setStyle(col, "background-color", "yellow");
+                //             elInstance.setComments(col, i18n.t('static.program.validvaluetext'));
+                //             valid = false;
+                //             this.setState({
+                //                 message: i18n.t('static.supplyPlan.validationFailed'),
+                //                 color: 'red'
+                //             },
+                //                 () => {
+                //                     this.hideSecondComponent();
+                //                 })
+                //         } else {
+                //             elInstance.setStyle(col, "background-color", "transparent");
+                //             elInstance.setComments(col, "");
+                //         }
+                //     }
+                // }
+
                 var col = ("G").concat(parseInt(y) + 1);
-                var value = elInstance.getValueFromCoords(6, y);
+                var value = elInstance.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+                if (value == '' || value == null) {
+                    value = elInstance.getValueFromCoords(6, y);
+                }
+                // var value = elInstance.getValueFromCoords(5, y);
                 var reg = /^\d{1,14}(\.\d{1,4})?$/;
                 if (value == "") {
                     elInstance.setStyle(col, "background-color", "transparent");
@@ -2501,7 +2584,26 @@ class EquivalancyUnit extends Component {
                             this.hideSecondComponent();
                         })
                 } else {
-                    if (!(reg.test(value))) {
+                    if (isNaN(parseInt(value))) {//string value check
+                        elInstance.setStyle(col, "background-color", "transparent");
+                        elInstance.setStyle(col, "background-color", "yellow");
+                        elInstance.setComments(col, 'String value not allowed');
+                        valid = false;
+                        this.setState({
+                            message: i18n.t('static.supplyPlan.validationFailed'),
+                            color: 'red'
+                        },
+                            () => {
+                                this.hideSecondComponent();
+                            })
+                    }
+                    // else if (!Number.isInteger(Number(value))) {//decimal value check
+                    //     this.el.setStyle(col, "background-color", "transparent");
+                    //     this.el.setStyle(col, "background-color", "yellow");
+                    //     this.el.setComments(col, 'Decimal value not allowed');
+                    //     valid = false;
+                    // }
+                    else if (!(reg.test(value))) {
                         elInstance.setStyle(col, "background-color", "transparent");
                         elInstance.setStyle(col, "background-color", "yellow");
                         elInstance.setComments(col, i18n.t('static.usagePeriod.conversionTOFUTest'));
@@ -2514,22 +2616,8 @@ class EquivalancyUnit extends Component {
                                 this.hideSecondComponent();
                             })
                     } else {
-                        if (isNaN(Number.parseInt(value)) || value <= 0) {
-                            elInstance.setStyle(col, "background-color", "transparent");
-                            elInstance.setStyle(col, "background-color", "yellow");
-                            elInstance.setComments(col, i18n.t('static.program.validvaluetext'));
-                            valid = false;
-                            this.setState({
-                                message: i18n.t('static.supplyPlan.validationFailed'),
-                                color: 'red'
-                            },
-                                () => {
-                                    this.hideSecondComponent();
-                                })
-                        } else {
-                            elInstance.setStyle(col, "background-color", "transparent");
-                            elInstance.setComments(col, "");
-                        }
+                        elInstance.setStyle(col, "background-color", "transparent");
+                        elInstance.setComments(col, "");
                     }
                 }
 

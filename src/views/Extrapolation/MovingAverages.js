@@ -2,7 +2,7 @@ import { calculateError } from '../Extrapolation/ErrorCalculations.js';
 export function calculateMovingAvg(inputData, noOfMonths, noOfProjectionMonths, props) {
 
     const data = inputData;
-    console.log("InputData@@@",inputData)
+    console.log("InputData mv@@@",inputData)
     console.log("noOfMonths@@@",noOfMonths)
     console.log("noOfProjectionMonths@@@",noOfProjectionMonths)
 
