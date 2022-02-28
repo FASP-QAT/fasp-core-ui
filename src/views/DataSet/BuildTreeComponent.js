@@ -7408,12 +7408,12 @@ export default class BuildTree extends Component {
                         <div className={itemConfig.payload.nodeType.id == 5 ||
                             itemConfig.payload.nodeType.id == 4 ? "ContactTitle TitleColorWhite" :
                             "ContactTitle TitleColor"}>
-                            <div title={itemConfig.payload.label.label_en} style={{ fontSize: '13px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', width: '157px', float: 'left', fontWeight: 'bold' }}>
+                            <div title={itemConfig.payload.label.label_en} style={{ fontSize: '13px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', width: '140px', float: 'left', fontWeight: 'bold',}}>
                                 {itemConfig.payload.label.label_en}</div>
-
+                            <div style={{float:'right'}}>
                             {itemConfig.payload.extrapolation == true && <i class="fa fa-line-chart" style={{ fontSize: '11px', color: (itemConfig.payload.nodeType.id == 4 || itemConfig.payload.nodeType.id == 5 ? '#fff' : '#002f6c') }}></i>}
                             {this.getPayloadData(itemConfig, 4) == true && <i class="fa fa-exchange fa-rotate-90" style={{ fontSize: '11px', color: (itemConfig.payload.nodeType.id == 4 || itemConfig.payload.nodeType.id == 5 ? '#fff' : '#002f6c') }}></i>}
-                            <b style={{ color: '#212721', float: 'right' }}>
+                            <b style={{ color: '#212721',float:'right' }}>
                                 {itemConfig.payload.nodeType.id == 2 ?
                                     <i class="fa fa-hashtag" style={{ fontSize: '11px', color: '#002f6c' }}></i> :
                                     (itemConfig.payload.nodeType.id == 3 ?
@@ -7426,7 +7426,7 @@ export default class BuildTree extends Component {
                                                     // <i class="fa fa-plus" style={{ fontSize: '11px', color: '#002f6c' }} ></i> : ""))))}</b>
                                                     <i><img src={AggregationNode} className="AggregationNodeSize" /></i> : ""))))}</b>
 
-
+                                                    </div>
                         </div>
                     </div>
                     <div className="ContactPhone ContactPhoneValue">
