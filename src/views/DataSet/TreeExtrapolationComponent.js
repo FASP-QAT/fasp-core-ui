@@ -1252,6 +1252,7 @@ export default class TreeExtrapolationComponent extends React.Component {
             {
                 title: 'Forecast',
                 colspan: this.state.forecastNestedHeader
+                // colspan:'5'
             },
         );
         nestedHeaders.push(
@@ -2217,7 +2218,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                             />
                                                             <Label
                                                                 className="form-check-label"
-                                                                check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                                check htmlFor="inline-radio2" style={{ fontSize: '12px',marginTop:'2px' }}>
                                                                 <b>Moving Averages</b>
                                                                 <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
                                                             </Label>
@@ -2260,7 +2261,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                             />
                                                             <Label
                                                                 className="form-check-label"
-                                                                check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                                check htmlFor="inline-radio2" style={{ fontSize: '12px',marginTop:'2px' }}>
                                                                 <b>Semi-Averages</b>
                                                                 <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenSa', !this.state.popoverOpenSa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
                                                             </Label>
@@ -2283,7 +2284,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                             />
                                                             <Label
                                                                 className="form-check-label"
-                                                                check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                                check htmlFor="inline-radio2" style={{ fontSize: '12px',marginTop:'2px' }}>
                                                                 <b>Linear Regression</b>
                                                                 <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenLr', !this.state.popoverOpenLr)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
                                                             </Label>
@@ -2307,7 +2308,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                             />
                                                             <Label
                                                                 className="form-check-label"
-                                                                check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                                check htmlFor="inline-radio2" style={{ fontSize: '12px',marginTop:'2px' }}>
                                                                 <b>Triple-Exponential Smoothing (Holts-Winters)</b>
                                                                 <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenTes', !this.state.popoverOpenTes)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
                                                             </Label>
@@ -2450,7 +2451,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                             />
                                                             <Label
                                                                 className="form-check-label"
-                                                                check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                                check htmlFor="inline-radio2" style={{ fontSize: '12px',marginTop:'2px' }}>
                                                                 <b>{i18n.t('static.extrapolation.arimaFull')}</b>
                                                                 <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenArima', !this.state.popoverOpenArima)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
                                                             </Label>

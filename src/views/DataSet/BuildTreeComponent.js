@@ -1380,7 +1380,9 @@ export default class BuildTree extends Component {
         console.log("type---------", type);
         var scenarioId = this.state.selectedScenario;
         this.setState({
-            scenarioActionType: type
+            scenarioActionType: type,
+            showDiv1:false
+
         })
         if (type != 3) {
             if (type == 2) {
