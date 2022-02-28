@@ -163,6 +163,7 @@ export default class ExtrapolateDataComponent extends React.Component {
             programRequest.onsuccess = function (e) {
                 var forecastProgramList = [];
                 var myResult = programRequest.result;
+                console.log("result*******",myResult)
                 for (var i = 0; i < myResult.length; i++) {
                     var datasetDataBytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
                     var datasetData = datasetDataBytes.toString(CryptoJS.enc.Utf8);
@@ -232,7 +233,6 @@ export default class ExtrapolateDataComponent extends React.Component {
         this.setState({ rangeValue: value })
     }
     handleRangeDissmis1(value) {
-        console.log("Value+++", value)
         this.setState({ rangeValue1: value }, () => {
             this.setExtrapolatedParameters(0)
         })
@@ -285,51 +285,51 @@ export default class ExtrapolateDataComponent extends React.Component {
             data: dataArray,
             columnDrag: true,
             columns:
-             [
-                {
-                    title: i18n.t('static.inventoryDate.inventoryReport'),
-                    type: 'calendar', options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker' }, width: 100,readOnly:true
-                },
-                {
-                    title: i18n.t('static.extrapolation.adjustedActuals'),
-                    type: 'numeric', mask: '#,##.00', decimal: '.',readOnly:true
-                },
-                {
-                    title: i18n.t('static.extrapolation.movingAverages'),
-                    type: this.state.movingAvgId ? 'numeric' : 'hidden',
-                    mask: '#,##.00', decimal: '.',readOnly:true
-                },
-                {
-                    title: i18n.t('static.extrapolation.semiAverages'),
-                    type: this.state.semiAvgId ? 'numeric' : 'hidden',
-                    mask: '#,##.00', decimal: '.',readOnly:true
-                },
-                {
-                    title: i18n.t('static.extrapolation.linearRegression'),
-                    type: this.state.linearRegressionId ? 'numeric' : 'hidden',
-                    mask: '#,##.00', decimal: '.',readOnly:true
-                },
-                {
-                    title: i18n.t('static.extrapolation.tesLower'),
-                    type: this.state.smoothingId ? 'numeric' : 'hidden',
-                    mask: '#,##.00', decimal: '.',readOnly:true
-                },
-                {
-                    title: i18n.t('static.extrapolation.tes'),
-                    type: this.state.smoothingId ? 'numeric' : 'hidden',
-                    mask: '#,##.00', decimal: '.',readOnly:true
-                },
-                {
-                    title: i18n.t('static.extrapolation.tesUpper'),
-                    type: this.state.smoothingId ? 'numeric' : 'hidden',
-                    mask: '#,##.00', decimal: '.',readOnly:true
-                },
-                // {
-                //     title: i18n.t('static.extrapolation.arima'),
-                //     type: this.state.arimaId ? 'numeric' : 'hidden',
-                //     mask: '#,##.00', decimal: '.',readOnly:true
-                // }
-            ],
+                [
+                    {
+                        title: i18n.t('static.inventoryDate.inventoryReport'),
+                        type: 'calendar', options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker' }, width: 100, readOnly: true
+                    },
+                    {
+                        title: i18n.t('static.extrapolation.adjustedActuals'),
+                        type: 'numeric', mask: '#,##.00', decimal: '.', readOnly: true
+                    },
+                    {
+                        title: i18n.t('static.extrapolation.movingAverages'),
+                        type: this.state.movingAvgId ? 'numeric' : 'hidden',
+                        mask: '#,##.00', decimal: '.', readOnly: true
+                    },
+                    {
+                        title: i18n.t('static.extrapolation.semiAverages'),
+                        type: this.state.semiAvgId ? 'numeric' : 'hidden',
+                        mask: '#,##.00', decimal: '.', readOnly: true
+                    },
+                    {
+                        title: i18n.t('static.extrapolation.linearRegression'),
+                        type: this.state.linearRegressionId ? 'numeric' : 'hidden',
+                        mask: '#,##.00', decimal: '.', readOnly: true
+                    },
+                    {
+                        title: i18n.t('static.extrapolation.tesLower'),
+                        type: this.state.smoothingId ? 'numeric' : 'hidden',
+                        mask: '#,##.00', decimal: '.', readOnly: true
+                    },
+                    {
+                        title: i18n.t('static.extrapolation.tes'),
+                        type: this.state.smoothingId ? 'numeric' : 'hidden',
+                        mask: '#,##.00', decimal: '.', readOnly: true
+                    },
+                    {
+                        title: i18n.t('static.extrapolation.tesUpper'),
+                        type: this.state.smoothingId ? 'numeric' : 'hidden',
+                        mask: '#,##.00', decimal: '.', readOnly: true
+                    },
+                    // {
+                    //     title: i18n.t('static.extrapolation.arima'),
+                    //     type: this.state.arimaId ? 'numeric' : 'hidden',
+                    //     mask: '#,##.00', decimal: '.',readOnly:true
+                    // }
+                ],
             text: {
                 // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
                 showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
@@ -340,7 +340,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                 if (y != null) {
                     var elInstance = el.jexcel;
                     var rowData = elInstance.getRowData(y);
-                    if (moment(rowData[0]).format("YYYY-MM") >= moment(this.state.datasetJson.currentVersion.startDate).format("YYYY-MM") && moment(rowData[0]).format("YYYY-MM") <= moment(this.state.datasetJson.currentVersion.stopDate).format("YYYY-MM")) {
+                    if (moment(rowData[0]).format("YYYY-MM") >= moment(this.state.datasetJson.currentVersion.forecastStartDate).format("YYYY-MM") && moment(rowData[0]).format("YYYY-MM") <= moment(this.state.datasetJson.currentVersion.forecastStopDate).format("YYYY-MM")) {
                         var cell = elInstance.getCell(("A").concat(parseInt(y) + 1))
                         cell.classList.add('jexcelBoldPurpleCell');
                     } else {
@@ -351,7 +351,7 @@ export default class ExtrapolateDataComponent extends React.Component {
             }.bind(this),
             onload: this.loaded,
             pagination: false,
-            search: true,
+            search: false,
             columnSorting: true,
             tableOverflow: true,
             wordWrap: true,
@@ -363,8 +363,8 @@ export default class ExtrapolateDataComponent extends React.Component {
             copyCompatibility: true,
             allowExport: false,
             paginationOptions: JEXCEL_PAGINATION_OPTION,
-            position: 'top',
-            filters: true,
+            //position: 'top',
+            filters: false,
             license: JEXCEL_PRO_KEY,
             contextMenu: function (obj, x, y, e) {
                 return [];
@@ -489,8 +489,6 @@ export default class ExtrapolateDataComponent extends React.Component {
         var inputDataSemiAverage = [];
         var inputDataLinearRegression = [];
         var inputDataTes = [];
-        console.log("this.state.regionId", this.state.regionId)
-        console.log("this.state.planningUnitId", this.state.planningUnitId)
         for (var j = 0; moment(curDate).format("YYYY-MM") < moment(stopDate).format("YYYY-MM"); j++) {
             curDate = moment(startDate).startOf('month').add(j, 'months').format("YYYY-MM-DD");
             var consumptionData = actualConsumptionList.filter(c => moment(c.month).format("YYYY-MM") == moment(curDate).format("YYYY-MM") && c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId)
@@ -519,7 +517,8 @@ export default class ExtrapolateDataComponent extends React.Component {
     }
 
     loaded = function (instance, cell, x, y, value) {
-        jExcelLoadedFunctionWithoutPagination(instance);
+        // jExcelLoadedFunctionWithoutPagination(instance);
+        jExcelLoadedFunctionOnlyHideRow(instance);
         var asterisk = document.getElementsByClassName("resizable")[0];
         var tr = asterisk.firstChild;
 
@@ -1053,26 +1052,26 @@ export default class ExtrapolateDataComponent extends React.Component {
         csvRow.push('"' + (i18n.t('static.extrapolation.dateRangeForHistoricData') + ' : ' + this.makeText(this.state.rangeValue1.from) + ' ~ ' + this.makeText(this.state.rangeValue1.to)).replaceAll(' ', '%20') + '"')
         csvRow.push('')
         csvRow.push('')
-        csvRow.push('"' + (i18n.t('static.extrapolation.selectedExtraploationMethods')) + '"')
+        csvRow.push('"' + (i18n.t('static.extrapolation.selectedExtraploationMethods')).replaceAll(' ', '%20') + '"')
         csvRow.push('')
         if (this.state.movingAvgId) {
-            csvRow.push('"' + (i18n.t('static.extrapolation.movingAverages')) + '"')
+            csvRow.push('"' + (i18n.t('static.extrapolation.movingAverages')).replaceAll(' ', '%20') + '"')
             csvRow.push('')
         }
         if (this.state.semiAvgId) {
-            csvRow.push('"' + (i18n.t('static.extrapolation.semiAverages')) + '"')
+            csvRow.push('"' + (i18n.t('static.extrapolation.semiAverages')).replaceAll(' ', '%20') + '"')
             csvRow.push('')
         }
         if (this.state.linearRegressionId) {
-            csvRow.push('"' + (i18n.t('static.extrapolation.linearRegression')) + '"')
+            csvRow.push('"' + (i18n.t('static.extrapolation.linearRegression').replaceAll(' ', '%20')) + '"')
             csvRow.push('')
         }
         if (this.state.smoothingId) {
-            csvRow.push('"' + (i18n.t('static.extrapolation.tes')) + '"')
+            csvRow.push('"' + (i18n.t('static.extrapolation.tes')).replaceAll(' ', '%20') + '"')
             csvRow.push('')
         }
         if (this.state.arimaId) {
-            csvRow.push('"' + (i18n.t('static.extrapolation.arima')) + '"')
+            csvRow.push('"' + (i18n.t('static.extrapolation.arima')).replaceAll(' ', '%20') + '"')
             csvRow.push('')
         }
         csvRow.push('')
@@ -1097,41 +1096,137 @@ export default class ExtrapolateDataComponent extends React.Component {
         let headers = [];
         columns.map((item, idx) => { headers[idx] = (item).replaceAll(' ', '%20') });
         var A = [this.addDoubleQuoteToRowContent(headers)];
-        A.push(this.addDoubleQuoteToRowContent([
-            i18n.t('static.extrapolation.rmse'),
-            this.state.movingAvgId ? Number(this.state.movingAvgError.rmse).toFixed(3) : "",
-            this.state.semiAvgId ? Number(this.state.semiAvgError.rmse).toFixed(3) : "",
-            this.state.linearRegressionId ? Number(this.state.linearRegressionError.rmse).toFixed(3) : "",
-            this.state.smoothingId ? Number(this.state.tesError.rmse).toFixed(3) : "",
-            this.state.arimaId ? "" : ""]))
-        A.push(this.addDoubleQuoteToRowContent([
-            i18n.t('static.extrapolation.mape'),
-            this.state.movingAvgId ? Number(this.state.movingAvgError.mape).toFixed(3) : "",
-            this.state.semiAvgId ? Number(this.state.semiAvgError.mape).toFixed(3) : "",
-            this.state.linearRegressionId ? Number(this.state.linearRegressionError.mape).toFixed(3) : "",
-            this.state.smoothingId ? Number(this.state.tesError.mape).toFixed(3) : "",
-            this.state.arimaId ? "" : ""]))
-        A.push(this.addDoubleQuoteToRowContent([
-            i18n.t('static.extrapolation.mse'),
-            this.state.movingAvgId ? Number(this.state.movingAvgError.mse).toFixed(3) : "",
-            this.state.semiAvgId ? Number(this.state.semiAvgError.mse).toFixed(3) : "",
-            this.state.linearRegressionId ? Number(this.state.linearRegressionError.mse).toFixed(3) : "",
-            this.state.smoothingId ? Number(this.state.tesError.mse).toFixed(3) : "",
-            this.state.arimaId ? "" : ""]))
-        A.push(this.addDoubleQuoteToRowContent([
-            i18n.t('static.extrapolation.wape'),
-            this.state.movingAvgId ? Number(this.state.movingAvgError.wape).toFixed(3) : "",
-            this.state.semiAvgId ? Number(this.state.semiAvgError.wape).toFixed(3) : "",
-            this.state.linearRegressionId ? Number(this.state.linearRegressionError.wape).toFixed(3) : "",
-            this.state.smoothingId ? Number(this.state.tesError.wape).toFixed(3) : "",
-            this.state.arimaId ? "" : ""]))
-        A.push(this.addDoubleQuoteToRowContent([
-            i18n.t('static.extrapolation.rSquare'),
-            this.state.movingAvgId ? Number(this.state.movingAvgError.rSqd).toFixed(3) : "",
-            this.state.semiAvgId ? Number(this.state.semiAvgError.rSqd).toFixed(3) : "",
-            this.state.linearRegressionId ? Number(this.state.linearRegressionError.rSqd).toFixed(3) : "",
-            this.state.smoothingId ? Number(this.state.tesError.rSqd).toFixed(3) : "",
-            this.state.arimaId ? "" : ""]))
+        var B = [];
+        B.push(i18n.t('static.extrapolation.rmse'))
+        if (this.state.movingAvgId) {
+            B.push(Number(this.state.movingAvgError.rmse).toFixed(3))
+        }
+        if (this.state.semiAvgId) {
+            B.push(Number(this.state.semiAvgError.rmse).toFixed(3))
+        }
+        if (this.state.linearRegressionId) {
+            B.push(Number(this.state.linearRegressionError.rmse).toFixed(3))
+        }
+        if (this.state.smoothingId) {
+            B.push(Number(this.state.tesError.rmse).toFixed(3))
+        }
+        if (this.state.arimaId) {
+            B.push("")
+        }
+        A.push(this.addDoubleQuoteToRowContent(B));
+        B = [];
+        B.push(i18n.t('static.extrapolation.mape'))
+        if (this.state.movingAvgId) {
+            B.push(Number(this.state.movingAvgError.mape).toFixed(3))
+        }
+        if (this.state.semiAvgId) {
+            B.push(Number(this.state.semiAvgError.mape).toFixed(3))
+        }
+        if (this.state.linearRegressionId) {
+            B.push(Number(this.state.linearRegressionError.mape).toFixed(3))
+        }
+        if (this.state.smoothingId) {
+            B.push(Number(this.state.tesError.mape).toFixed(3))
+        }
+        if (this.state.arimaId) {
+            B.push("")
+        }
+        A.push(this.addDoubleQuoteToRowContent(B));
+
+        B = [];
+        B.push(i18n.t('static.extrapolation.mse'))
+        if (this.state.movingAvgId) {
+            B.push(Number(this.state.movingAvgError.mse).toFixed(3))
+        }
+        if (this.state.semiAvgId) {
+            B.push(Number(this.state.semiAvgError.mse).toFixed(3))
+        }
+        if (this.state.linearRegressionId) {
+            B.push(Number(this.state.linearRegressionError.mse).toFixed(3))
+        }
+        if (this.state.smoothingId) {
+            B.push(Number(this.state.tesError.mse).toFixed(3))
+        }
+        if (this.state.arimaId) {
+            B.push("")
+        }
+        A.push(this.addDoubleQuoteToRowContent(B));
+
+
+        B = [];
+        B.push(i18n.t('static.extrapolation.wape'))
+        if (this.state.movingAvgId) {
+            B.push(Number(this.state.movingAvgError.wape).toFixed(3))
+        }
+        if (this.state.semiAvgId) {
+            B.push(Number(this.state.semiAvgError.wape).toFixed(3))
+        }
+        if (this.state.linearRegressionId) {
+            B.push(Number(this.state.linearRegressionError.wape).toFixed(3))
+        }
+        if (this.state.smoothingId) {
+            B.push(Number(this.state.tesError.wape).toFixed(3))
+        }
+        if (this.state.arimaId) {
+            B.push("")
+        }
+        A.push(this.addDoubleQuoteToRowContent(B));
+
+        B = [];
+        B.push(i18n.t('static.extrapolation.rSquare'))
+        if (this.state.movingAvgId) {
+            B.push(Number(this.state.movingAvgError.rSqd).toFixed(3))
+        }
+        if (this.state.semiAvgId) {
+            B.push(Number(this.state.semiAvgError.rSqd).toFixed(3))
+        }
+        if (this.state.linearRegressionId) {
+            B.push(Number(this.state.linearRegressionError.rSqd).toFixed(3))
+        }
+        if (this.state.smoothingId) {
+            B.push(Number(this.state.tesError.rSqd).toFixed(3))
+        }
+        if (this.state.arimaId) {
+            B.push("")
+        }
+        A.push(this.addDoubleQuoteToRowContent(B));
+
+
+        // A.push(this.addDoubleQuoteToRowContent([
+        //     i18n.t('static.extrapolation.rmse'),
+        //     this.state.movingAvgId ? Number(this.state.movingAvgError.rmse).toFixed(3) : "",
+        //     this.state.semiAvgId ? Number(this.state.semiAvgError.rmse).toFixed(3) : "",
+        //     this.state.linearRegressionId ? Number(this.state.linearRegressionError.rmse).toFixed(3) : "",
+        //     this.state.smoothingId ? Number(this.state.tesError.rmse).toFixed(3) : "",
+        //     this.state.arimaId ? "" : ""]))
+        // A.push(this.addDoubleQuoteToRowContent([
+        //     i18n.t('static.extrapolation.mape'),
+        //     this.state.movingAvgId ? Number(this.state.movingAvgError.mape).toFixed(3) : "",
+        //     this.state.semiAvgId ? Number(this.state.semiAvgError.mape).toFixed(3) : "",
+        //     this.state.linearRegressionId ? Number(this.state.linearRegressionError.mape).toFixed(3) : "",
+        //     this.state.smoothingId ? Number(this.state.tesError.mape).toFixed(3) : "",
+        //     this.state.arimaId ? "" : ""]))
+        // A.push(this.addDoubleQuoteToRowContent([
+        //     i18n.t('static.extrapolation.mse'),
+        //     this.state.movingAvgId ? Number(this.state.movingAvgError.mse).toFixed(3) : "",
+        //     this.state.semiAvgId ? Number(this.state.semiAvgError.mse).toFixed(3) : "",
+        //     this.state.linearRegressionId ? Number(this.state.linearRegressionError.mse).toFixed(3) : "",
+        //     this.state.smoothingId ? Number(this.state.tesError.mse).toFixed(3) : "",
+        //     this.state.arimaId ? "" : ""]))
+        // A.push(this.addDoubleQuoteToRowContent([
+        //     i18n.t('static.extrapolation.wape'),
+        //     this.state.movingAvgId ? Number(this.state.movingAvgError.wape).toFixed(3) : "",
+        //     this.state.semiAvgId ? Number(this.state.semiAvgError.wape).toFixed(3) : "",
+        //     this.state.linearRegressionId ? Number(this.state.linearRegressionError.wape).toFixed(3) : "",
+        //     this.state.smoothingId ? Number(this.state.tesError.wape).toFixed(3) : "",
+        //     this.state.arimaId ? "" : ""]))
+        // A.push(this.addDoubleQuoteToRowContent([
+        //     i18n.t('static.extrapolation.rSquare'),
+        //     this.state.movingAvgId ? Number(this.state.movingAvgError.rSqd).toFixed(3) : "",
+        //     this.state.semiAvgId ? Number(this.state.semiAvgError.rSqd).toFixed(3) : "",
+        //     this.state.linearRegressionId ? Number(this.state.linearRegressionError.rSqd).toFixed(3) : "",
+        //     this.state.smoothingId ? Number(this.state.tesError.rSqd).toFixed(3) : "",
+        //     this.state.arimaId ? "" : ""]))
 
         for (var i = 0; i < A.length; i++) {
             csvRow.push(A[i].join(","))
@@ -1175,14 +1270,33 @@ export default class ExtrapolateDataComponent extends React.Component {
             var tesDataFilter = this.state.tesData.filter(c => moment(startMonth).add(c.month - 1, 'months').format("YYYY-MM") == moment(monthArray[j]).format("YYYY-MM"))
             B.push(
                 moment(monthArray[j]).format(DATE_FORMAT_CAP_WITHOUT_DATE).toString().replaceAll(',', ' ').replaceAll(' ', '%20'),
-                consumptionData.length > 0 ? consumptionData[0].amount : "",
-                this.state.movingAvgId && movingAvgDataFilter.length > 0 && movingAvgDataFilter[0].forecast != null ? movingAvgDataFilter[0].forecast.toFixed(2) : '',
-                this.state.semiAvgId && semiAvgDataFilter.length > 0 && semiAvgDataFilter[0].forecast != null ? semiAvgDataFilter[0].forecast.toFixed(2) : '',
-                this.state.linearRegressionId && linearRegressionDataFilter.length > 0 && linearRegressionDataFilter[0].forecast != null ? linearRegressionDataFilter[0].forecast.toFixed(2) : '',
-                this.state.smoothingId && tesDataFilter.length > 0 && tesDataFilter[0].forecast != null ? (Number(tesDataFilter[0].forecast) - CI).toFixed(2) : '',
-                this.state.smoothingId && tesDataFilter.length > 0 && tesDataFilter[0].forecast != null ? Number(tesDataFilter[0].forecast).toFixed(2) : '',
-                this.state.smoothingId && tesDataFilter.length > 0 && tesDataFilter[0].forecast != null ? (Number(tesDataFilter[0].forecast) + CI).toFixed(2) : '',
-                this.state.arimaId ? "" : "")
+                consumptionData.length > 0 ? consumptionData[0].amount : "")
+            if (this.state.movingAvgId && movingAvgDataFilter.length > 0 && movingAvgDataFilter[0].forecast != null) {
+                B.push(movingAvgDataFilter[0].forecast.toFixed(2))
+            } if (this.state.semiAvgId && semiAvgDataFilter.length > 0 && semiAvgDataFilter[0].forecast != null) {
+                B.push(semiAvgDataFilter[0].forecast.toFixed(2))
+            } if (this.state.linearRegressionId && linearRegressionDataFilter.length > 0 && linearRegressionDataFilter[0].forecast != null) {
+                B.push(linearRegressionDataFilter[0].forecast.toFixed(2))
+            }
+            if (this.state.smoothingId && tesDataFilter.length > 0 && tesDataFilter[0].forecast != null) {
+                B.push((Number(tesDataFilter[0].forecast) - CI).toFixed(2),
+                    Number(tesDataFilter[0].forecast).toFixed(2),
+                    (Number(tesDataFilter[0].forecast) + CI).toFixed(2))
+            } if (this.state.arimaId) {
+                B.push("")
+            }
+
+            // B.push(
+            //     moment(monthArray[j]).format(DATE_FORMAT_CAP_WITHOUT_DATE).toString().replaceAll(',', ' ').replaceAll(' ', '%20'),
+            //     consumptionData.length > 0 ? consumptionData[0].amount : "",
+            //     this.state.movingAvgId && movingAvgDataFilter.length > 0 && movingAvgDataFilter[0].forecast != null ? movingAvgDataFilter[0].forecast.toFixed(2) : '',
+            //     this.state.semiAvgId && semiAvgDataFilter.length > 0 && semiAvgDataFilter[0].forecast != null ? semiAvgDataFilter[0].forecast.toFixed(2) : '',
+            //     this.state.linearRegressionId && linearRegressionDataFilter.length > 0 && linearRegressionDataFilter[0].forecast != null ? linearRegressionDataFilter[0].forecast.toFixed(2) : '',
+            //     this.state.smoothingId && tesDataFilter.length > 0 && tesDataFilter[0].forecast != null ? (Number(tesDataFilter[0].forecast) - CI).toFixed(2) : '',
+            //     this.state.smoothingId && tesDataFilter.length > 0 && tesDataFilter[0].forecast != null ? Number(tesDataFilter[0].forecast).toFixed(2) : '',
+            //     this.state.smoothingId && tesDataFilter.length > 0 && tesDataFilter[0].forecast != null ? (Number(tesDataFilter[0].forecast) + CI).toFixed(2) : '',
+            //     this.state.arimaId ? "" : "")
+
             C.push(this.addDoubleQuoteToRowContent(B));
         }
         for (var i = 0; i < C.length; i++) {
@@ -1326,8 +1440,8 @@ export default class ExtrapolateDataComponent extends React.Component {
 
     getDateDifference() {
         var rangeValue = this.state.rangeValue1;
-        let startDate = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
-        let endDate = rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
+        let startDate = moment(rangeValue.from.year + '-' + rangeValue.from.month + '-01').format("YYYY-MM");
+        let endDate = moment(rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate()).format("YYYY-MM");
         console.log("startDate-->", startDate);
         console.log("endDate-->", endDate);
         // var monthsDiff = moment(endDate).diff(startDate, 'months', true);
@@ -1537,7 +1651,7 @@ export default class ExtrapolateDataComponent extends React.Component {
         let planningUnits = planningUnitList.length > 0 && planningUnitList.map((item, i) => {
             return (
                 <option key={i} value={item.planningUnit.id}>
-                    {getLabelText(item.planningUnit.label, this.state.lang)}
+                    {getLabelText(item.planningUnit.label, this.state.lang)+" | "+item.planningUnit.id}
                 </option>
             )
         }, this);
@@ -1709,7 +1823,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                     lineTension: 0,
                     label: i18n.t('static.extrapolation.movingAverages'),
                     backgroundColor: 'transparent',
-                    borderColor: '#A7C6ED',
+                    borderColor: '#002f6c',
                     ticks: {
                         fontSize: 2,
                         fontColor: 'transparent',
@@ -1728,7 +1842,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                 lineTension: 0,
                 label: i18n.t('static.extrapolation.semiAverages'),
                 backgroundColor: 'transparent',
-                borderColor: '#49A4A1',
+                borderColor: '#118B70',
                 ticks: {
                     fontSize: 2,
                     fontColor: 'transparent',
@@ -1748,7 +1862,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                     lineTension: 0,
                     label: i18n.t('static.extrapolation.linearRegression'),
                     backgroundColor: 'transparent',
-                    borderColor: '#118B70',
+                    borderColor: '#A7C6ED',
                     ticks: {
                         fontSize: 2,
                         fontColor: 'transparent',
@@ -1767,7 +1881,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                 lineTension: 0,
                 label: i18n.t('static.extrapolation.tesLower'),
                 backgroundColor: 'transparent',
-                borderColor: '#002FC6',
+                borderColor: '#BA0C2F',
                 borderStyle: 'dotted',
                 borderDash: [10, 10],
                 ticks: {
@@ -1788,7 +1902,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                 lineTension: 0,
                 label: i18n.t('static.extrapolation.tes'),
                 backgroundColor: 'transparent',
-                borderColor: '#651D32',
+                borderColor: '#BA0C2F',
                 ticks: {
                     fontSize: 2,
                     fontColor: 'transparent',
@@ -1807,7 +1921,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                 lineTension: 0,
                 label: i18n.t('static.extrapolation.tesUpper'),
                 backgroundColor: 'transparent',
-                borderColor: '#6c6463',
+                borderColor: '#BA0C2F',
                 borderStyle: 'dotted',
                 borderDash: [10, 10],
                 ticks: {
@@ -1828,7 +1942,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                 lineTension: 0,
                 label: i18n.t('static.extrapolation.arima'),
                 backgroundColor: 'transparent',
-                borderColor: '#BA0C2F',
+                borderColor: '#F48521',
                 ticks: {
                     fontSize: 2,
                     fontColor: 'transparent',
@@ -1911,7 +2025,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                 // theme="light"
                                                 // onChange={this.handleRangeChange}
                                                 // onDismiss={this.handleRangeDissmis}
-                                                className="greyColor"
+                                                className="disabledColor"
                                             >
                                                 <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} />
                                             </Picker>
@@ -2032,7 +2146,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.noOfMonths')}</Label>
                                                 <Input
                                                     className="controls"
-                                                    type="text"
+                                                    type="number"
                                                     id="noOfMonthsId"
                                                     bsSize="sm"
                                                     name="noOfMonthsId"
@@ -2156,7 +2270,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                     <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.alpha')}</Label>
                                                     <Input
                                                         className="controls"
-                                                        type="text"
+                                                        type="number"
                                                         id="alphaId"
                                                         name="alphaId"
                                                         bsSize="sm"
@@ -2168,7 +2282,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                     <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.beta')}</Label>
                                                     <Input
                                                         className="controls"
-                                                        type="text"
+                                                        type="number"
                                                         id="betaId"
                                                         bsSize="sm"
                                                         name="betaId"
@@ -2180,7 +2294,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                     <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.gamma')}</Label>
                                                     <Input
                                                         className="controls"
-                                                        type="text"
+                                                        type="number"
                                                         id="gammaId"
                                                         bsSize="sm"
                                                         name="gammaId"
@@ -2226,7 +2340,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                     <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.p')}</Label>
                                                     <Input
                                                         className="controls"
-                                                        type="text"
+                                                        type="number"
                                                         id="pId"
                                                         name="pId"
                                                         bsSize="sm"
@@ -2236,7 +2350,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                     <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.d')}</Label>
                                                     <Input
                                                         className="controls"
-                                                        type="text"
+                                                        type="number"
                                                         id="dId"
                                                         name="dId"
                                                         bsSize="sm"
@@ -2246,7 +2360,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                     <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.q')}</Label>
                                                     <Input
                                                         className="controls"
-                                                        type="text"
+                                                        type="number"
                                                         id="qId"
                                                         name="qId"
                                                         bsSize="sm"
@@ -2400,7 +2514,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                         </Table>
                                     </div>
                                 </div>}
-                            {this.state.showData && <div id="tableDiv" className="extrapolateTable"></div>}
+                            {this.state.showData && <div id="tableDiv" className="extrapolateTable pt-lg-5"></div>}
                         </div>
                         <div style={{ display: this.state.loading ? "block" : "none" }}>
                             <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
@@ -2425,8 +2539,8 @@ export default class ExtrapolateDataComponent extends React.Component {
                 </Card>
                 <Modal isOpen={this.state.showGuidance}
                     className={'modal-lg ' + this.props.className} >
-                    <ModalHeader toggle={() => this.toggleShowGuidance()} className="modalHeaderSupplyPlan">
-                        <strong>Show Guidance</strong>
+                    <ModalHeader toggle={() => this.toggleShowGuidance()} className="ModalHead modal-info-Headher">
+                        <strong className="TextWhite">Show Guidance</strong>
                     </ModalHeader>
                     <div>
                         <ModalBody>
@@ -2442,9 +2556,9 @@ export default class ExtrapolateDataComponent extends React.Component {
 
                 <Modal isOpen={this.state.toggleDataCheck}
                     className={'modal-lg ' + this.props.className} >
-                    <ModalHeader toggle={() => this.openDataCheckModel()} className="modalHeaderSupplyPlan">
+                    <ModalHeader toggle={() => this.openDataCheckModel()} className="ModalHead modal-info-Headher">
                         <div>
-                            <img className=" pull-right iconClass cursor ml-lg-2" style={{ height: '22px', width: '22px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.exportPDFDataCheck()} />
+                            <img className=" pull-right iconClass cursor ml-lg-2" style={{ height: '22px', width: '22px', cursor: 'pointer',marginTop:'-4px' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.exportPDFDataCheck()} />
                             <strong>{i18n.t('static.common.dataCheck')}</strong>
                         </div>
                     </ModalHeader>

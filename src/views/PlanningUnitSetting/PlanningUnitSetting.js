@@ -60,6 +60,13 @@ const sortArray = (sourceArray) => {
     return sourceArray.sort(sortByName);
 };
 
+const sortArrayByName = (sourceArray) => {
+
+    // const sortByName = (a, b) => getLabelText(a.label, this.state.lang).localeCompare(getLabelText(b.label, this.state.lang), 'en', { numeric: true });
+    const sortByName1 = (a, b) => a.name.localeCompare(b.name, 'en', { numeric: true });
+    return sourceArray.sort(sortByName1);
+};
+
 export default class PlanningUnitSetting extends Component {
     constructor(props) {
         super(props);
@@ -110,6 +117,7 @@ export default class PlanningUnitSetting extends Component {
         this.cancelClicked = this.cancelClicked.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.disablePUNode = this.disablePUNode.bind(this);
+        this.disablePUConsumptionData = this.disablePUConsumptionData.bind(this);
         this.onPaste = this.onPaste.bind(this);
     }
 
@@ -144,7 +152,7 @@ export default class PlanningUnitSetting extends Component {
     checkValidation() {
         var valid = true;
         var json = this.el.getJson(null, false);
-        console.log("json.length-------", json.length);
+        console.log("json.length-------", json);
         for (var y = 0; y < json.length; y++) {
             var value = this.el.getValueFromCoords(10, y);
             if (parseInt(value) == 1) {
@@ -165,7 +173,8 @@ export default class PlanningUnitSetting extends Component {
 
                 //planning unit
                 var col = ("B").concat(parseInt(y) + 1);
-                var value = this.el.getValueFromCoords(1, y);
+                // var value = this.el.getValueFromCoords(1, y);
+                var value = this.el.getRowData(parseInt(y))[1];
                 console.log("value-----", value);
                 if (value == "") {
                     this.el.setStyle(col, "background-color", "transparent");
@@ -173,8 +182,20 @@ export default class PlanningUnitSetting extends Component {
                     this.el.setComments(col, i18n.t('static.label.fieldRequired'));
                     valid = false;
                 } else {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setComments(col, "");
+                    for (var i = (json.length - 1); i >= 0; i--) {
+                        var map = new Map(Object.entries(json[i]));
+                        var planningUnitValue = map.get("1");
+                        if (planningUnitValue == value && y != i && i > y) {
+                            this.el.setStyle(col, "background-color", "transparent");
+                            this.el.setStyle(col, "background-color", "yellow");
+                            this.el.setComments(col, i18n.t('static.message.planningUnitAlreadyExists'));
+                            i = -1;
+                            valid = false;
+                        } else {
+                            this.el.setStyle(col, "background-color", "transparent");
+                            this.el.setComments(col, "");
+                        }
+                    }
                 }
 
                 var col = ("E").concat(parseInt(y) + 1);
@@ -312,13 +333,15 @@ export default class PlanningUnitSetting extends Component {
                 var col = ("I").concat(parseInt(y) + 1);
                 var value = this.el.getValue(`I${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
                 var reg = JEXCEL_DECIMAL_CATELOG_PRICE;
+                console.log("Anchal--------->1", value);
                 if (value == "") {
+                    console.log("Anchal--------->2", value);
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.label.fieldRequired'));
                     valid = false;
                 } else {
-                    console.log("Value--------->", value);
+                    console.log("Anchal--------->3", value);
                     // if (isNaN(Number.parseInt(value)) || value < 0 || !(reg.test(value))) {
                     if (isNaN(parseInt(value))) {//string value check
                         this.el.setStyle(col, "background-color", "transparent");
@@ -411,14 +434,34 @@ export default class PlanningUnitSetting extends Component {
 
         //planning unit
         if (x == 1) {
+            var json = this.el.getJson(null, false);
             var col = ("B").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
             } else {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setComments(col, "");
+                console.log("json.length", json.length);
+                var jsonLength = parseInt(json.length) - 1;
+                console.log("jsonLength", jsonLength);
+                for (var i = jsonLength; i >= 0; i--) {
+                    console.log("i=---------->", i, "y----------->", y);
+                    var map = new Map(Object.entries(json[i]));
+                    var planningUnitValue = map.get("1");
+                    console.log("Planning Unit value in change", map.get("1"));
+                    console.log("Value----->", value);
+                    if (planningUnitValue == value && y != i) {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setStyle(col, "background-color", "yellow");
+                        this.el.setComments(col, i18n.t('static.message.planningUnitAlreadyExists'));
+                        this.el.setValueFromCoords(10, y, 1, true);
+                        i = -1;
+                    } else {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setComments(col, "");
+                        this.el.setValueFromCoords(10, y, 1, true);
+                    }
+                }
             }
         }
 
@@ -569,6 +612,7 @@ export default class PlanningUnitSetting extends Component {
         //procurement Agent
         if (x == 7) {
             var col = ("H").concat(parseInt(y) + 1);
+            this.el.setValueFromCoords(10, y, 1, true);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
@@ -583,6 +627,7 @@ export default class PlanningUnitSetting extends Component {
         //unit price
         if (x == 8) {
             var col = ("I").concat(parseInt(y) + 1);
+            this.el.setValueFromCoords(10, y, 1, true);
             // value = this.el.getValue(`I${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             // var reg = DECIMAL_NO_REGEX;
             var reg = JEXCEL_DECIMAL_CATELOG_PRICE;
@@ -1406,6 +1451,8 @@ export default class PlanningUnitSetting extends Component {
             data[13] = indexVar;
             data[14] = outPutList[j].treeForecast;
             data[15] = outPutList[j].consumptionNotes;
+            // data[16] = outPutList[j].active;
+            // data[17] = outPutList[j].active;
 
 
             outPutListArray[count] = data;
@@ -1430,6 +1477,8 @@ export default class PlanningUnitSetting extends Component {
             data[13] = 0;
             data[14] = true;
             data[15] = "";
+            // data[16] = true;
+            // data[17] = true;
             outPutListArray[0] = data;
         }
         // console.log("outPutListArray---->", outPutListArray);
@@ -1455,17 +1504,20 @@ export default class PlanningUnitSetting extends Component {
                     title: 'Planning Unit',
                     type: 'autocomplete',
                     source: this.state.allPlanningUnitList,
-                    filter: this.filterPlanningUnitListByTracerCategoryId
+                    filter: this.filterPlanningUnitListByTracerCategoryId,
+                    width:'170',
                     // readOnly: true //1B
                 },
                 {
                     title: 'Consumption Forecast?',
                     type: 'checkbox',
+                    width:'150'
                     // readOnly: true //2C
                 },
                 {
                     title: 'Tree Forecast?',
                     type: 'checkbox',
+                    width:'150'
                     // readOnly: true //3D
                 },
                 {
@@ -1474,6 +1526,7 @@ export default class PlanningUnitSetting extends Component {
                     textEditor: true,
                     decimal: '.',
                     mask: '#,##',
+                    width:'150',
                     disabledMaskOnEdition: true
                     // readOnly: true //4E
                 },
@@ -1483,6 +1536,7 @@ export default class PlanningUnitSetting extends Component {
                     textEditor: true,
                     decimal: '.',
                     mask: '#,##',
+                    width:'150',
                     disabledMaskOnEdition: true
                     // readOnly: true //5F
                 },
@@ -1492,13 +1546,15 @@ export default class PlanningUnitSetting extends Component {
                     textEditor: true,
                     decimal: '.',
                     mask: '#,##',
-                    disabledMaskOnEdition: true
+                    disabledMaskOnEdition: true,
+                    width:'150'
                     // readOnly: true //6G
                 },
                 {
                     title: 'Price Type',
                     type: 'autocomplete',
                     source: this.state.allProcurementAgentList,
+                    width:'180'
                     // filter: this.filterProcurementAgentByPlanningUnit
                     // readOnly: true //7H
                 },
@@ -1508,6 +1564,7 @@ export default class PlanningUnitSetting extends Component {
                     textEditor: true,
                     decimal: '.',
                     mask: '#,##.00',
+                    width:'120',
                     disabledMaskOnEdition: true
                     // readOnly: true //8I
                 },
@@ -1544,8 +1601,18 @@ export default class PlanningUnitSetting extends Component {
                 {
                     title: i18n.t('static.program.notes'),
                     type: 'text',
-                    // width: 400
+                    // width: 400 //15P
                 },
+                // {
+                //     title: 'Active',
+                //     type: 'checkbox',
+                //     // readOnly: true //16Q
+                // },
+                // {
+                //     title: 'active',
+                //     type: 'hidden',
+                //     // readOnly: true //17R
+                // },
             ],
             updateTable: function (el, cell, x, y, source, value, id) {
                 var elInstance = el.jexcel;
@@ -1688,14 +1755,14 @@ export default class PlanningUnitSetting extends Component {
                 var index = (instance.jexcel).getValue(`N${parseInt(data[i].y) + 1}`, true);
                 if (index == "" || index == null || index == undefined) {
                     console.log("-----------------onPaste---------------------3");
-                    (instance.jexcel).setValueFromCoords(8, data[i].y, true, true);
+                    // (instance.jexcel).setValueFromCoords(8, data[i].y, true, true);
                     (instance.jexcel).setValueFromCoords(9, data[i].y, true, true);
                     (instance.jexcel).setValueFromCoords(10, data[i].y, 1, true);
                     (instance.jexcel).setValueFromCoords(11, data[i].y, 1, true);
                     (instance.jexcel).setValueFromCoords(12, data[i].y, {}, true);
                     (instance.jexcel).setValueFromCoords(13, data[i].y, 0, true);
                     (instance.jexcel).setValueFromCoords(14, data[i].y, true, true);
-                    (instance.jexcel).setValueFromCoords(15, data[i].y, "", true);
+                    // (instance.jexcel).setValueFromCoords(15, data[i].y, "", true);
                     z = data[i].y;
                 }
             }
@@ -1755,8 +1822,15 @@ export default class PlanningUnitSetting extends Component {
             }
 
         }
+        console.log("mylist--------->31", mylist);
+        if (mylist.length > 0) {
+            sortArrayByName(mylist);
+            let mylistObj = mylist.filter(c => c.id == -1)[0];
+            mylist = mylist.filter(c => c.id != -1);
+            mylist.unshift(mylistObj);
+        }
 
-        console.log("mylist--------->32", mylist);
+        console.log("mylist--------->35", mylist);
         return mylist;
 
     }.bind(this)
@@ -1804,6 +1878,7 @@ export default class PlanningUnitSetting extends Component {
             let originalPlanningUnitList = programData.planningUnitList;
 
             let listOfDisablePuNode = [];
+            let listOfDisablePuNodeActiveInactive = [];
 
 
             for (var i = 0; i < tableJson.length; i++) {
@@ -1860,7 +1935,8 @@ export default class PlanningUnitSetting extends Component {
                         "otherUnit": null,
                         "selectedForecastMap": map1.get("12"),
                         "createdBy": null,
-                        "createdDate": null
+                        "createdDate": null,
+                        // "active": map1.get("16"),
                     }
                     planningUnitList.push(tempJson);
                 } else {
@@ -1908,7 +1984,8 @@ export default class PlanningUnitSetting extends Component {
                         "otherUnit": planningUnitobj1.otherUnit,
                         "selectedForecastMap": map1.get("12"),
                         "createdBy": planningUnitobj1.createdBy,
-                        "createdDate": planningUnitobj1.createdDate
+                        "createdDate": planningUnitobj1.createdDate,
+                        // "active": map1.get("16"),
                     }
                     planningUnitList.push(tempJson);
 
@@ -1953,6 +2030,10 @@ export default class PlanningUnitSetting extends Component {
                 if (map1.get("3") == false && map1.get("14") == true) {
                     listOfDisablePuNode.push(parseInt(map1.get("1")));
                 }
+
+                // if (map1.get("16") == false && map1.get("17") == true) {
+                //     listOfDisablePuNode.push(parseInt(map1.get("1")));
+                // }
 
 
 
@@ -2009,6 +2090,7 @@ export default class PlanningUnitSetting extends Component {
                         listOfDisablePuNode = [...new Set(listOfDisablePuNode)];
                         if (listOfDisablePuNode.length > 0) {
                             this.disablePUNode(listOfDisablePuNode);
+                            // this.disablePUConsumptionData(listOfDisablePuNode);
                         }
 
 
@@ -2036,6 +2118,74 @@ export default class PlanningUnitSetting extends Component {
 
 
 
+        }
+    }
+
+    disablePUConsumptionData(listOfDisablePuNode) {
+        console.log("Test---------------->12", listOfDisablePuNode);
+
+        // var program = (this.state.datasetList1.filter(x => x.programId == this.state.forecastProgramId && x.version == this.state.forecastProgramVersionId)[0]);
+        let datasetList1 = this.state.datasetList1;
+        for (var i = 0; i < datasetList1.length; i++) {
+            var programs = [];
+            var program = datasetList1[i];
+
+            var databytes = CryptoJS.AES.decrypt(program.programData, SECRET_KEY);
+            var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
+
+            let actualConsumptionList = programData.actualConsumptionList;
+
+            for (var j = 0; j < listOfDisablePuNode.length; j++) {
+                for (var k = 0; k < actualConsumptionList.length; k++) {
+                    if (parseInt(listOfDisablePuNode[j]) == actualConsumptionList[k].planningUnit.id) {
+                        actualConsumptionList[k].amount = 0;
+                    }
+                }
+            }
+            console.log("Test---------------->7", actualConsumptionList);
+
+            programData.actualConsumptionList = actualConsumptionList;
+
+            programData = (CryptoJS.AES.encrypt(JSON.stringify(programData), SECRET_KEY)).toString();
+            program.programData = programData;
+
+            programs.push(program);
+
+            console.log("programs to update---", programs);
+
+            var db1;
+            getDatabase();
+            var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+            openRequest.onerror = function (event) {
+                this.setState({
+                    message: i18n.t('static.program.errortext'),
+                    color: 'red'
+                })
+                this.hideFirstComponent()
+            }.bind(this);
+            openRequest.onsuccess = function (e) {
+                db1 = e.target.result;
+                var transaction = db1.transaction(['datasetData'], 'readwrite');
+                var programTransaction = transaction.objectStore('datasetData');
+                programs.forEach(program => {
+                    var programRequest = programTransaction.put(program);
+                    console.log("---hurrey---");
+                })
+                transaction.oncomplete = function (event) {
+                    console.log("Data update success");
+                    // alert("success");
+                }.bind(this);
+                transaction.onerror = function (event) {
+                    this.setState({
+                        loading: false,
+                        // message: 'Error occured.',
+                        color: "red",
+                    }, () => {
+                        this.hideSecondComponent();
+                    });
+                    console.log("Data update errr");
+                }.bind(this);
+            }.bind(this);
         }
     }
 
@@ -2167,6 +2317,8 @@ export default class PlanningUnitSetting extends Component {
         data[13] = 0;
         data[14] = true;
         data[15] = "";
+        // data[16] = true;
+        // data[17] = true;
 
         this.el.insertRow(
             data, 0, 1
@@ -2283,7 +2435,7 @@ export default class PlanningUnitSetting extends Component {
                             </div>
                         </div>
 
-                        <div className="" style={{ display: this.state.loading ? "none" : "block" }}>
+                        <div className="UpdatePlanningSettingTable" style={{ display: this.state.loading ? "none" : "block" }}>
                             <div id="tableDiv">
                             </div>
                         </div>

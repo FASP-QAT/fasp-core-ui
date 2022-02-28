@@ -1004,7 +1004,7 @@ content: '\f1ec';
   //  color: #BA0C2F; 
    top: 0px;
    left: 2px;
-   cursor: col-resize;
+   cursor: pointer;
    font-size: 14px;
  }
 
@@ -5484,6 +5484,10 @@ border: 1px solid #eee;
   background-color:#CFCDC9; 
 }
 
+.disabledColor{
+  background-color:#e5edf5
+}
+
 .extrapolateTable .jexcel_content .draggable tr td:nth-child(4) {
 	// color: rgb(170, 85, 161);
   color: #212721;
@@ -5497,7 +5501,7 @@ border: 1px solid #eee;
      height: 100%;
      top: 0px;
      left: 2px;
-     cursor: col-resize;
+     cursor: pointer;
      font-size: 14px;
      color:#002f6c;
    }
@@ -5533,7 +5537,7 @@ border: 1px solid #eee;
      height: 100%;
      top: 0px;
      left: 2px;
-     cursor: col-resize;
+     cursor: pointer;
      font-size: 14px;
      color:#002f6c;
    }
@@ -5887,8 +5891,8 @@ font-style: italic!important;
      width: 3px;
      height: 100%;
      top: 0px;
-     left: 7px;
-     cursor: col-resize;
+     left: 15px;
+     cursor: pointer;
      font-size: 14px;
      color:#002f6c;
 }
@@ -5899,8 +5903,8 @@ font-style: italic!important;
      width: 3px;
      height: 100%;
      top: 0px;
-     left: 68px;
-     cursor: col-resize;
+     left: 69px;
+     cursor: pointer;
      font-size: 14px;
      color:#BA0C2F;
    }
@@ -5945,3 +5949,90 @@ font-style: italic!important;
   .jexcel > thead.resizable > tr > .arrow-up:not(.AsteriskTheadtrTd)::after {
     content: ""!important;
   }
+
+  .removeDropdownArrow{
+    appearance: none;
+  }
+  .UpdatePlanningSettingTable .jexcel > thead.resizable > tr > .InfoTr::after {
+    font-family: 'FontAwesome';
+    content: '\f05a';
+      position: relative;
+       width: 3px;
+       height: 100%;
+       top: 0px;
+       left: 5px;
+       cursor: pointer;
+       font-size: 14px;
+       color:#002f6c;
+     }
+  
+  .calculatorTable .jexcel_floating_editor {
+    position: absolute;
+    z-index: 0!important;
+    user-select: none;
+    -webkit-font-smoothing: antialiased;
+    font-size: .875rem;
+    letter-spacing: .2px;
+    /* -webkit-box-shadow: 0 8px 10px 1px rgb(0 0 0 / 14%), 0 3px 14px 2px rgb(0 0 0 / 12%), 0 5px 5px -3px rgb(0 0 0 / 20%); */
+    box-shadow:none!important;
+    padding: 6px;
+    background-color: transparent;
+    min-width: 17px;
+    min-height: 17px!important;
+    text-align: left;
+    box-sizing: border-box;
+    overflow: hidden;
+    margin-top: auto!important;
+    left: 38px!important;
+    margin-bottom: auto!important;
+}
+.calculatorTable .jupload {
+  border: none;
+  cursor: pointer;
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  min-height: 0px;
+}
+.calculatorTable .jexcel .jexcel_editor .jupload img {
+  width: 17px;
+  height: auto;
+}
+.calculatorTable .jexcel .jexcel_editor .jclose:after {
+  position: absolute;
+  top: 0;
+  right: 0;
+  margin: 10px;
+  content: 'close';
+  font-family: 'Material icons';
+  font-size: 24px;
+  width: 24px;
+  height: 24px;
+  line-height: 24px;
+  cursor: pointer;
+  text-shadow: 0 0 5px #fff;
+  display: none;
+}
+.extrapolateTable .jexcel colgroup{
+  width: 100%!important;
+  max-width: 100%!important;
+}
+.DataEntryTable .table thead tr th{
+  position: sticky;
+    top: -1px;
+    padding: 6px 20px 5px 20px !important;
+    background: #fff;
+}
+.DataEntryTable .clone {
+  top: 0;
+  left: 40px;
+}
+.datdEntryRow .regionBold{
+  font-weight: bold;
+    background: #6c6463!important;
+    color: #fff!important;
+    border: none!important;
+}
+.datdEntryRow .jexcel > tbody > tr > td.regionBold {
+  color: #fff !important;
+}

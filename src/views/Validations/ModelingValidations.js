@@ -224,7 +224,6 @@ class ModelingValidation extends Component {
                 }
             }).catch(
                 error => {
-                    console.log("In catch error", error);
                     this.el = jexcel(document.getElementById("tableDiv"), '');
                     this.el.destroy();
                     this.setState({
@@ -292,9 +291,11 @@ class ModelingValidation extends Component {
             rangeValue: rangeValue,
             loading: false
         }, () => {
-            if (treeId != "") {
+            // if (treeId != "") {
                 this.setTreeId(event);
-            }
+            // }else{
+
+            // }
         })
 
     }
@@ -335,7 +336,6 @@ class ModelingValidation extends Component {
         var treeList = this.state.treeList;
         if (this.state.treeId > 0) {
             var treeListFiltered = treeList.filter(c => c.treeId == this.state.treeId)[0];
-            console.log("treeListFiltered@@@", treeListFiltered);
             var levelList = [...new Set(treeListFiltered.tree.flatList.map(ele => (ele.level)))]
             var scenarioList = treeListFiltered.scenarioList;
             var scenarioId = "";
@@ -372,12 +372,12 @@ class ModelingValidation extends Component {
                 treeListFiltered: treeListFiltered,
                 loading: false
             }, () => {
-                if (scenarioId != "") {
+                // if (scenarioId != "") {
                     this.setScenarioId(event);
-                }
-                if (levelId != "") {
+                // }
+                // if (levelId != "") {
                     this.setLevelId(levelEvent);
-                }
+                // }
 
             })
         } else {
@@ -507,7 +507,7 @@ class ModelingValidation extends Component {
                 for (var k = 0; k < nodeVal.length; k++) {
                     var flatListFiltered = flatList.filter(c => c.id == nodeVal[k].value)[0].payload.nodeDataMap[this.state.scenarioId][0].nodeDataMomList;
                     var calculatedValue = "";
-                    if (flatListFiltered.length > 0) {
+                    if (flatListFiltered!=undefined && flatListFiltered.length > 0) {
                         var cvList = flatListFiltered.filter(c => moment(c.month).format("YYYY-MM-DD") == moment(monthList[j]).format("YYYY-MM-DD"));
                         if (cvList.length > 0) {
                             calculatedValue = cvList[0].calculatedValue
@@ -525,7 +525,7 @@ class ModelingValidation extends Component {
                 for (var k = 0; k < nodeVal.length; k++) {
                     var flatListFiltered = flatList.filter(c => c.id == nodeVal[k].value)[0].payload.nodeDataMap[this.state.scenarioId][0].nodeDataMomList;
                     var calculatedValue = "";
-                    if (flatListFiltered.length > 0) {
+                    if (flatListFiltered!=undefined && flatListFiltered.length > 0) {
                         var cvList = flatListFiltered.filter(c => moment(c.month).format("YYYY-MM-DD") == moment(monthList[j]).format("YYYY-MM-DD"));
                         if (cvList.length > 0) {
                             calculatedValue = cvList[0].calculatedValue
@@ -699,9 +699,9 @@ class ModelingValidation extends Component {
                 versionList: versionList,
                 loading: false
             }, () => {
-                if (versionId != "") {
+                // if (versionId != "") {
                     this.setVersionId(event)
-                }
+                // }
             })
         } else {
             this.el = jexcel(document.getElementById("tableDiv"), '');
@@ -830,9 +830,9 @@ class ModelingValidation extends Component {
                         unitList: unitList,
                         loading: false
                     }, () => {
-                        if (datasetId != "") {
+                        // if (datasetId != "") {
                             this.setDatasetId(event);
-                        }
+                        // }
                     })
                 }.bind(this)
             }.bind(this)
@@ -952,7 +952,6 @@ class ModelingValidation extends Component {
             }
             doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
             y = y + 10;
-            console.log(y)
         }
 
         planningText = doc.splitTextToSize(i18n.t('static.common.treeName') + ' : ' + document.getElementById("treeId").selectedOptions[0].text, doc.internal.pageSize.width * 3 / 4);
@@ -966,7 +965,6 @@ class ModelingValidation extends Component {
             }
             doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
             y = y + 10;
-            console.log(y)
         }
 
         planningText = doc.splitTextToSize(i18n.t('static.whatIf.scenario') + ' : ' + document.getElementById("scenarioId").selectedOptions[0].text, doc.internal.pageSize.width * 3 / 4);
@@ -980,7 +978,6 @@ class ModelingValidation extends Component {
             }
             doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
             y = y + 10;
-            console.log(y)
         }
 
         planningText = doc.splitTextToSize(i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to), doc.internal.pageSize.width * 3 / 4);
@@ -994,7 +991,6 @@ class ModelingValidation extends Component {
             }
             doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
             y = y + 10;
-            console.log(y)
         }
 
         planningText = doc.splitTextToSize(i18n.t('static.common.level') + ' : ' + document.getElementById("levelId").selectedOptions[0].text, doc.internal.pageSize.width * 3 / 4);
@@ -1008,7 +1004,6 @@ class ModelingValidation extends Component {
             }
             doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
             y = y + 10;
-            console.log(y)
         }
 
         planningText = doc.splitTextToSize(i18n.t('static.modelingValidation.levelUnit') + ' : ' + document.getElementById("levelUnit").value, doc.internal.pageSize.width * 3 / 4);
@@ -1022,7 +1017,6 @@ class ModelingValidation extends Component {
             }
             doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
             y = y + 10;
-            console.log(y)
         }
 
         planningText = doc.splitTextToSize(i18n.t('static.common.node') + ' : ' + this.state.nodeLabelArr.join('; '), doc.internal.pageSize.width * 3 / 4);
@@ -1036,7 +1030,6 @@ class ModelingValidation extends Component {
             }
             doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
             y = y + 10;
-            console.log(y)
         }
 
         y = y + 10;
@@ -1059,7 +1052,6 @@ class ModelingValidation extends Component {
         var h1 = 50;
         var aspectwidth1 = (width - h1);
         let startY = y + 10
-        //   console.log('startY', startY)
         let pages = Math.ceil(startY / height)
         for (var j = 1; j < pages; j++) {
             doc.addPage()
@@ -1075,12 +1067,10 @@ class ModelingValidation extends Component {
         this.state.columns.filter(c => c.type != 'hidden').map((item, idx) => { columns.push(item.title) });
         var dataArr = [];
         var dataArr1 = [];
-        console.log("this.state.dataEl.getJson(null, false)+++", this.state.dataEl.getJson(null, false))
         this.state.dataEl.getJson(null, false).map(ele => {
             dataArr = [];
             this.state.columns.map((item, idx) => {
                 if (item.type != 'hidden') {
-                    console.log("ele[idx]+++", ele[idx])
                     if (item.type == 'numeric') {
                         if (item.mask != undefined && item.mask.toString().includes("%")) {
                             dataArr.push(this.formatter(ele[idx]) + " %");
@@ -1318,17 +1308,12 @@ class ModelingValidation extends Component {
             var index = aggregatedData.findIndex(c => c.label == datasetListForGraph[i].label);
             if (index == -1) {
                 var filter = datasetListForGraph.filter(c => c.label == datasetListForGraph[i].label);
-                console.log("Filter@@@",filter);
                 var dataArr = filter[0].data;
-                console.log("DataArra@@@",dataArr);
                 for (var f = 1; f < filter.length; f++) {
-                    console.log("Filter[fdata@@@",filter[f].data);
                     filter[f].data.map(function (num, idx) {
-                        console.log("add@@@",num + dataArr[idx]);
                         dataArr[idx] = (Number(num) + Number(dataArr[idx])).toFixed(2);
                     })
                 }
-                console.log("FinalArra@@@",dataArr)
                 aggregatedData.push({
                     label: filter[0].label,
                     data: dataArr,

@@ -7,9 +7,11 @@ import { Row, Col, Card, CardFooter, Button, Table, CardBody, Form, Modal, Modal
 import getLabelText from '../../CommonComponent/getLabelText';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow, jExcelLoadedFunctionWithoutPagination } from '../../CommonComponent/JExcelCommonFunctions.js';
-import { DATE_FORMAT_CAP_WITHOUT_DATE, SECRET_KEY, JEXCEL_INTEGER_REGEX_FOR_DATA_ENTRY, INDEXED_DB_VERSION, INDEXED_DB_NAME, DATE_FORMAT_CAP, ACTUAL_CONSUMPTION_DATA_SOURCE_TYPE, FORECASTED_CONSUMPTION_DATA_SOURCE_TYPE, JEXCEL_DATE_FORMAT_WITHOUT_DATE, ACTUAL_CONSUMPTION_TYPE, FORCASTED_CONSUMPTION_TYPE, JEXCEL_PAGINATION_OPTION, ACTUAL_CONSUMPTION_MONTHS_IN_PAST, FORECASTED_CONSUMPTION_MONTHS_IN_PAST, JEXCEL_PRO_KEY, JEXCEL_MONTH_PICKER_FORMAT, ACTUAL_CONSUMPTION_MODIFIED, FORECASTED_CONSUMPTION_MODIFIED } from "../../Constants";
+import { INDEXED_DB_VERSION, INDEXED_DB_NAME, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, JEXCEL_MONTH_PICKER_FORMAT, JEXCEL_DECIMAL_MONTHLY_CHANGE, JEXCEL_DECIMAL_NO_REGEX_LONG } from "../../Constants";
 import moment from "moment";
-import CryptoJS from 'crypto-js'
+import { Formik } from 'formik';
+import * as Yup from 'yup'
+import '../../views/Forms/ValidationForms/ValidationForms.css'
 import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
 import { Bar, Line, Pie } from 'react-chartjs-2';
@@ -17,9 +19,153 @@ import { calculateMovingAvg } from '../Extrapolation/MovingAverages';
 import { calculateSemiAverages } from '../Extrapolation/SemiAverages';
 import { calculateLinearRegression } from '../Extrapolation/LinearRegression';
 import { calculateTES } from '../Extrapolation/TES';
+import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
 const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
     from: 'From', to: 'To',
+}
+
+const validationSchemaExtrapolation = function (values) {
+    return Yup.object().shape({
+        extrapolationMethodId: Yup.string()
+            .required(i18n.t('static.validation.selectForecastMethod')),
+        noOfMonthsId:
+            Yup.string().test('noOfMonthsId', 'Please enter no. of months.',
+                function (value) {
+                    console.log("*****", document.getElementById("movingAvgId").value);
+                    var testNumber = (/^\d{0,10}?$/).test((document.getElementById("noOfMonthsId").value).replaceAll(",", ""));
+                    // console.log("*****", testNumber);
+                    if ((document.getElementById("movingAvgId").value) == "true" && (document.getElementById("noOfMonthsId").value == "" || testNumber == false)) {
+                        return false;
+                    } else {
+                        return true;
+                    }
+                }),
+        confidenceLevelId:
+            Yup.string().test('confidenceLevelId', 'Please enter confidence level.',
+                function (value) {
+                    console.log("*****", document.getElementById("smoothingId").value);
+                    var testNumber = document.getElementById("confidenceLevelId").value != "" ? (/^\d{0,3}(\.\d{1,2})?$/).test(document.getElementById("confidenceLevelId").value) : false;
+                    // console.log("*****", testNumber);
+                    if ((document.getElementById("smoothingId").value) == "true" && (document.getElementById("confidenceLevelId").value == "" || testNumber == false)) {
+                        return false;
+                    } else {
+                        return true;
+                    }
+                }),
+        seasonalityId:
+            Yup.string().test('seasonalityId', 'Please enter seasonality.',
+                function (value) {
+                    console.log("*****", document.getElementById("smoothingId").value);
+                    var testNumber = document.getElementById("seasonalityId").value != "" ? (/^\d{0,3}(\.\d{1,2})?$/).test(document.getElementById("seasonalityId").value) : false;
+                    // console.log("*****", testNumber);
+                    if ((document.getElementById("smoothingId").value) == "true" && (document.getElementById("seasonalityId").value == "" || testNumber == false)) {
+                        return false;
+                    } else {
+                        return true;
+                    }
+                }),
+        gammaId:
+            Yup.string().test('gammaId', 'Please enter gamma value.',
+                function (value) {
+                    console.log("*****", document.getElementById("smoothingId").value);
+                    var testNumber = document.getElementById("gammaId").value != "" ? (/^\d{0,3}(\.\d{1,2})?$/).test(document.getElementById("gammaId").value) : false;
+                    // console.log("*****", testNumber);
+                    if ((document.getElementById("smoothingId").value) == "true" && (document.getElementById("gammaId").value == "" || testNumber == false)) {
+                        return false;
+                    } else {
+                        return true;
+                    }
+                }),
+        betaId:
+            Yup.string().test('betaId', 'Please enter beta value.',
+                function (value) {
+                    console.log("*****", document.getElementById("smoothingId").value);
+                    var testNumber = document.getElementById("betaId").value != "" ? (/^\d{0,3}(\.\d{1,2})?$/).test(document.getElementById("betaId").value) : false;
+                    // console.log("*****", testNumber);
+                    if ((document.getElementById("smoothingId").value) == "true" && (document.getElementById("betaId").value == "" || testNumber == false)) {
+                        return false;
+                    } else {
+                        return true;
+                    }
+                }),
+        alphaId:
+            Yup.string().test('alphaId', 'Please enter alpha value.',
+                function (value) {
+                    console.log("*****", document.getElementById("smoothingId").value);
+                    var testNumber = document.getElementById("alphaId").value != "" ? (/^\d{0,3}(\.\d{1,2})?$/).test(document.getElementById("alphaId").value) : false;
+                    // console.log("*****", testNumber);
+                    if ((document.getElementById("smoothingId").value) == "true" && (document.getElementById("alphaId").value == "" || testNumber == false)) {
+                        return false;
+                    } else {
+                        return true;
+                    }
+                }),
+        pId:
+            Yup.string().test('pId', 'Please enter p value.',
+                function (value) {
+                    console.log("*****", document.getElementById("arimaId").value);
+                    var testNumber = document.getElementById("pId").value != "" ? (/^\d{0,3}(\.\d{1,2})?$/).test(document.getElementById("pId").value) : false;
+                    // console.log("*****", testNumber);
+                    if ((document.getElementById("arimaId").value) == "true" && (document.getElementById("pId").value == "" || testNumber == false)) {
+                        return false;
+                    } else {
+                        return true;
+                    }
+                }),
+        dId:
+            Yup.string().test('dId', 'Please enter d value.',
+                function (value) {
+                    console.log("*****", document.getElementById("arimaId").value);
+                    var testNumber = document.getElementById("dId").value != "" ? (/^\d{0,3}(\.\d{1,2})?$/).test(document.getElementById("dId").value) : false;
+                    // console.log("*****", testNumber);
+                    if ((document.getElementById("arimaId").value) == "true" && (document.getElementById("dId").value == "" || testNumber == false)) {
+                        return false;
+                    } else {
+                        return true;
+                    }
+                }),
+        qId:
+            Yup.string().test('qId', 'Please enter q value.',
+                function (value) {
+                    console.log("*****", document.getElementById("arimaId").value);
+                    var testNumber = document.getElementById("qId").value != "" ? (/^\d{0,3}(\.\d{1,2})?$/).test(document.getElementById("qId").value) : false;
+                    // console.log("*****", testNumber);
+                    if ((document.getElementById("arimaId").value) == "true" && (document.getElementById("qId").value == "" || testNumber == false)) {
+                        return false;
+                    } else {
+                        return true;
+                    }
+                }),
+        // treeName: Yup.string()
+        //     .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
+        //     .required(i18n.t('static.validation.selectTreeName')),
+        // regionId: Yup.string()
+        //     .required(i18n.t('static.common.regiontext')),
+
+    })
+}
+
+const validateExtrapolation = (getValidationSchema) => {
+    return (values) => {
+        const validationSchemaExtrapolation = getValidationSchema(values)
+        try {
+            validationSchemaExtrapolation.validateSync(values, { abortEarly: false })
+            return {}
+        } catch (error) {
+            return getErrorsFromValidationErrorExtrapolation(error)
+        }
+    }
+}
+
+const getErrorsFromValidationErrorExtrapolation = (validationError) => {
+    const FIRST_ERROR = 0
+    return validationError.inner.reduce((errors, error) => {
+        return {
+            ...errors,
+            [error.path]: error.errors[FIRST_ERROR],
+        }
+    }, {})
 }
 export default class TreeExtrapolationComponent extends React.Component {
     constructor(props) {
@@ -29,6 +175,9 @@ export default class TreeExtrapolationComponent extends React.Component {
         var startDate = moment("2021-05-01").format("YYYY-MM-DD");
         var endDate = moment("2022-02-01").format("YYYY-MM-DD")
         this.state = {
+            forecastNestedHeader: '5',
+            filteredExtrapolationMethodList: [],
+            minMonth: '',
             monthsForMovingAverage: 5,
             confidenceLevelId: 0.95,
             noOfMonthsForASeason: 4,
@@ -36,8 +185,13 @@ export default class TreeExtrapolationComponent extends React.Component {
             alpha: 0.2,
             beta: 0.2,
             gamma: 0.2,
+            p: 95,
+            d: 12,
+            q: 12,
             nodeDataExtrapolationOptionList: [],
             nodeDataExtrapolation: {
+                extrapolationMethod: {},
+                notes: '',
                 // reportingRate
                 // month
                 // amount
@@ -46,6 +200,7 @@ export default class TreeExtrapolationComponent extends React.Component {
             monthArray: [],
             extrapolationMethodList: [],
             show: false,
+            jexcelDataArr: [],
             jexcelData: [
                 {
                     month: '2020-05-01',
@@ -523,22 +678,195 @@ export default class TreeExtrapolationComponent extends React.Component {
             minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
             maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
             rangeValue: { from: { year: new Date(startDate).getFullYear(), month: new Date(startDate).getMonth() + 1 }, to: { year: new Date(endDate).getFullYear(), month: new Date(endDate).getMonth() + 1 } },
-            movingAvgId: true,
-            semiAvgId: true,
-            linearRegressionId: true,
-            smoothingId: true,
-            arimaId: true,
+            movingAvgId: false,
+            semiAvgId: false,
+            linearRegressionId: false,
+            smoothingId: false,
+            arimaId: false,
             popoverChooseMethod: false,
             popoverOpenMa: false,
             popoverOpenSa: false,
             popoverOpenLr: false,
             popoverOpenTes: false,
-            popoverOpenArima: false
+            popoverOpenArima: false,
+            semiAvgData: [],
+            linearRegressionData: [],
+            tesData: [],
+            movingAvgError: { "rmse": "", "mape": "", "mse": "", "wape": "", "rSqd": "" },
+            semiAvgError: { "rmse": "", "mape": "", "mse": "", "wape": "", "rSqd": "" },
+            linearRegressionError: { "rmse": "", "mape": "", "mse": "", "wape": "", "rSqd": "" },
+            tesError: { "rmse": "", "mape": "", "mse": "", "wape": "", "rSqd": "" },
         }
         this.buildJexcel = this.buildJexcel.bind(this);
         this.getExtrapolationMethodList = this.getExtrapolationMethodList.bind(this);
         this.manualChangeExtrapolation = this.manualChangeExtrapolation.bind(this);
         this.interpolate = this.interpolate.bind(this);
+        this.extrapolationMethodChange = this.extrapolationMethodChange.bind(this);
+        this.checkValidationExtrapolation = this.checkValidationExtrapolation.bind(this);
+        this.buildExtrapolationMom = this.buildExtrapolationMom.bind(this);
+    }
+    buildExtrapolationMom() {
+        var extrapolationDataList = [];
+        var momList = [];
+        var tableJson = this.state.dataExtrapolation.getJson(null, false);
+        for (var i = 0; i < tableJson.length; i++) {
+            var map1 = new Map(Object.entries(tableJson[i]));
+            var json = {
+                month: map1.get("0"),
+                amount: map1.get("1"),
+                reportingRate: map1.get("2")
+            };
+            extrapolationDataList.push(json)
+            var json2 = {
+                calculatedValue: map1.get("11"),
+                difference: 0,
+                endValue: map1.get("11"),
+                endValueWMC: map1.get("11"),
+                manualChange: map1.get("10"),
+                month: map1.get("0"),
+                seasonalityPerc: 0,
+                startValue: map1.get("1")
+            };
+            momList.push(json2);
+        }
+        this.setState({
+            nodeDataExtrapolation: {
+                extrapolationDataList
+            }
+        }, () => {
+            const { currentItemConfig } = this.props.items;
+            currentItemConfig.context.payload.nodeDataMap[this.props.items.selectedScenario][0].nodeDataExtrapolation = this.state.nodeDataExtrapolation;
+            currentItemConfig.context.payload.nodeDataMap[this.props.items.selectedScenario][0].nodeDataMomList = momList;
+            this.props.updateState("currentItemConfig", currentItemConfig);
+        });
+    }
+
+    touchAllExtrapolation(setTouched, errors) {
+        setTouched({
+            extrapolationMethodId: true,
+            noOfMonthsId: true,
+            confidenceLevelId: true,
+            seasonalityId: true,
+            gammaId: true,
+            betaId: true,
+            alphaId: true,
+            pId: true,
+            dId: true,
+            qId: true
+        }
+        )
+        this.validateFormExtrapolation(errors)
+    }
+
+    validateFormExtrapolation(errors) {
+        this.findFirstErrorExtrapolation('userForm', (fieldName) => {
+            return Boolean(errors[fieldName])
+        })
+    }
+    findFirstErrorExtrapolation(formName, hasError) {
+        const form = document.forms[formName]
+        for (let i = 0; i < form.length; i++) {
+            if (hasError(form[i].name)) {
+                form[i].focus()
+                break
+            }
+        }
+    }
+
+    checkValidationExtrapolation() {
+        var valid = true;
+        var json = this.state.dataExtrapolation.getJson(null, false);
+        for (var y = 0; y < json.length; y++) {
+            var value = this.state.dataExtrapolation.getValueFromCoords(1, y);
+            if (value != null && value != "") {
+                //Population
+                var col = ("B").concat(parseInt(y) + 1);
+                var reg = JEXCEL_DECIMAL_NO_REGEX_LONG;
+                var value = this.el.getValueFromCoords(1, y);
+                if (value != "" && !(reg.test(value.toString().replaceAll(",", "")))) {
+                    this.state.dataExtrapolation.setStyle(col, "background-color", "transparent");
+                    this.state.dataExtrapolation.setStyle(col, "background-color", "yellow");
+                    this.state.dataExtrapolation.setComments(col, i18n.t('static.message.invalidnumber'));
+                    valid = false;
+                }
+                else {
+                    this.state.dataExtrapolation.setStyle(col, "background-color", "transparent");
+                    this.state.dataExtrapolation.setComments(col, "");
+                    var reportingRate = this.state.dataExtrapolation.getValue(`C${parseInt(y) + 1}`, true).toString().replaceAll(",", "").split("%")[0];
+                    var col1 = ("C").concat(parseInt(y) + 1);
+                    if (reportingRate == "") {
+                        this.state.dataExtrapolation.setStyle(col1, "background-color", "transparent");
+                        this.state.dataExtrapolation.setStyle(col1, "background-color", "yellow");
+                        this.state.dataExtrapolation.setComments(col1, i18n.t('static.label.fieldRequired'));
+                        valid = false;
+                    } else if (reportingRate > 100) {
+                        this.state.dataExtrapolation.setStyle(col1, "background-color", "transparent");
+                        this.state.dataExtrapolation.setStyle(col1, "background-color", "yellow");
+                        this.state.dataExtrapolation.setComments(col1, i18n.t('static.message.invalidnumber'));
+                        valid = false;
+                    }
+                    else if (!(reg.test(reportingRate))) {
+                        this.state.dataExtrapolation.setStyle(col1, "background-color", "transparent");
+                        this.state.dataExtrapolation.setStyle(col1, "background-color", "yellow");
+                        this.state.dataExtrapolation.setComments(col1, i18n.t('static.message.invalidnumber'));
+                        valid = false;
+                    }
+                }
+                // Reporting rate
+                var col = ("C").concat(parseInt(y) + 1);
+                var value = this.el.getValueFromCoords(2, y);
+                var reg = JEXCEL_DECIMAL_NO_REGEX_LONG;
+                console.log("reporting rate value---", value)
+                var actualValue = this.state.dataExtrapolation.getValue(`B${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+                // value.split("%")[0];
+                value = value.toString().replaceAll(",", "").split("%")[0];
+                if (actualValue != "" && value == "") {
+                    this.state.dataExtrapolation.setStyle(col, "background-color", "transparent");
+                    this.state.dataExtrapolation.setStyle(col, "background-color", "yellow");
+                    this.state.dataExtrapolation.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                } else if (value > 100) {
+                    this.state.dataExtrapolation.setStyle(col, "background-color", "transparent");
+                    this.state.dataExtrapolation.setStyle(col, "background-color", "yellow");
+                    this.state.dataExtrapolation.setComments(col, i18n.t('static.message.invalidnumber'));
+                    valid = false;
+                }
+                else if (!(reg.test(value))) {
+                    this.state.dataExtrapolation.setStyle(col, "background-color", "transparent");
+                    this.state.dataExtrapolation.setStyle(col, "background-color", "yellow");
+                    this.state.dataExtrapolation.setComments(col, i18n.t('static.message.invalidnumber'));
+                    valid = false;
+                }
+                else {
+                    this.state.dataExtrapolation.setStyle(col, "background-color", "transparent");
+                    this.state.dataExtrapolation.setComments(col, "");
+                }
+                // Manual Change
+                var col = ("K").concat(parseInt(y) + 1);
+                var value = this.el.getValueFromCoords(10, y);
+                var reg = JEXCEL_DECIMAL_MONTHLY_CHANGE;
+                value = value.toString().replaceAll(",", "");
+                if (value != "" && !(reg.test(value))) {
+                    this.state.dataExtrapolation.setStyle(col, "background-color", "transparent");
+                    this.state.dataExtrapolation.setStyle(col, "background-color", "yellow");
+                    this.state.dataExtrapolation.setComments(col, i18n.t('static.message.invalidnumber'));
+                    valid = false;
+                }
+                else {
+                    this.state.dataExtrapolation.setStyle(col, "background-color", "transparent");
+                    this.state.dataExtrapolation.setComments(col, "");
+                }
+            }
+        }
+        return valid;
+    }
+
+
+    extrapolationMethodChange(e) {
+        console.log("extrapolation method id---", e.target.value);
+        this.state.nodeDataExtrapolation.extrapolationMethod.id = e.target.value;
+        this.state.dataExtrapolation.setValueFromCoords(13, 0, e.target.value, true);
+        // this.buildJexcel();
     }
 
     setMonthsForMovingAverage(e) {
@@ -633,6 +961,7 @@ export default class TreeExtrapolationComponent extends React.Component {
             }
             jexcelDataArr.push(json);
         }
+        this.setState({ jexcelDataArr })
         for (var j = 0; j < monthArray.length; j++) {
             var dataArr = jexcelDataArr.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArray[j]).format("YYYY-MM"))[0];
             console.log(moment(monthArray[j]).format("YYYY-MM") + " " + "dataArr---", dataArr);
@@ -678,11 +1007,21 @@ export default class TreeExtrapolationComponent extends React.Component {
         }
         console.log("interpolatedData---", interpolatedData);
         this.state.nodeDataExtrapolation.extrapolationDataList = jexcelDataArr;
+        var valList = jexcelDataArr.filter(c => c.amount > 0)
+            .sort(function (a, b) {
+                return new Date(a.month) - new Date(b.month);
+            });
+        this.setState({
+            minMonth: valList[0].month
+        });
         for (let i = 0; i < jexcelDataArr.length; i++) {
-            inputDataMovingAvg.push({ "month": inputDataMovingAvg.length + 1, "actual": jexcelDataArr[i].amount > 0 ? Number(jexcelDataArr[i].amount) : null, "forecast": null })
-            inputDataSemiAverage.push({ "month": inputDataSemiAverage.length + 1, "actual": jexcelDataArr[i].amount > 0 ? Number(jexcelDataArr[i].amount) : null, "forecast": null })
-            inputDataLinearRegression.push({ "month": inputDataLinearRegression.length + 1, "actual": jexcelDataArr[i].amount > 0 ? Number(jexcelDataArr[i].amount) : null, "forecast": null })
-            inputDataTes.push({ "month": inputDataTes.length + 1, "actual": jexcelDataArr[i].amount > 0 ? Number(jexcelDataArr[i].amount) : null, "forecast": null })
+            if (moment(valList[0].month).format("YYYY-MM") <= moment(jexcelDataArr[i].month).format("YYYY-MM")) {
+                inputDataMovingAvg.push({ "month": inputDataMovingAvg.length + 1, "actual": jexcelDataArr[i].amount > 0 ? Number(jexcelDataArr[i].amount) : null, "forecast": null })
+                inputDataSemiAverage.push({ "month": inputDataSemiAverage.length + 1, "actual": jexcelDataArr[i].amount > 0 ? Number(jexcelDataArr[i].amount) : null, "forecast": null })
+                inputDataLinearRegression.push({ "month": inputDataLinearRegression.length + 1, "actual": jexcelDataArr[i].amount > 0 ? Number(jexcelDataArr[i].amount) : null, "forecast": null })
+                inputDataTes.push({ "month": inputDataTes.length + 1, "actual": jexcelDataArr[i].amount > 0 ? Number(jexcelDataArr[i].amount) : null, "forecast": null })
+                console.log("inputDataTes----", inputDataTes)
+            }
         }
         var data = jexcelDataArr.filter(c => c.amount > 0)
             .sort(function (a, b) {
@@ -691,16 +1030,30 @@ export default class TreeExtrapolationComponent extends React.Component {
         var lastMonth = data[data.length - 1].month;
         var noOfMonthsForProjection = moment(new Date(this.props.items.forecastStopDate)).diff(new Date(lastMonth), 'months', true)
         console.log("noOfMonthsForProjection", noOfMonthsForProjection);
-        calculateMovingAvg(inputDataMovingAvg, this.state.monthsForMovingAverage, noOfMonthsForProjection, this);
+        calculateMovingAvg(inputDataMovingAvg, this.state.monthsForMovingAverage, Math.trunc(noOfMonthsForProjection), this);
+        calculateSemiAverages(inputDataSemiAverage, noOfMonthsForProjection, this);
+        calculateLinearRegression(inputDataLinearRegression, noOfMonthsForProjection, this);
+        if (inputDataTes.length >= (this.state.noOfMonthsForASeason * 2)) {
+            console.log("tes inside if")
+            calculateTES(inputDataTes, this.state.alpha, this.state.beta, this.state.gamma, this.state.confidenceLevelId, this.state.noOfMonthsForASeason, noOfMonthsForProjection, this);
+        } else {
+            console.log("tes inside else")
+            this.setState({
+                tesData: [],
+                CI: 0,
+                tesError: { "rmse": "", "mape": "", "mse": "", "wape": "", "rSqd": "" }
+            })
+        }
         // this.buildJexcel();
 
     }
 
     updateState(parameterName, value) {
+        console.log("#######" + parameterName + "---", value)
         this.setState({
             [parameterName]: value
         }, () => {
-            console.log("value for avg---", value)
+            console.log("%%%" + parameterName + "---", value)
             this.buildJexcel();
         })
     }
@@ -743,40 +1096,73 @@ export default class TreeExtrapolationComponent extends React.Component {
                 this.setState({
                     extrapolationMethodList: myResult.filter(x => x.active == true)
                 }, () => {
-                    if (this.props.items.currentScenario.nodeDataExtrapolationOptionList == "") {
-                        var nodeDataExtrapolationOptionList = [];
-                        for (let i = 0; i < this.state.extrapolationMethodList.length; i++) {
-                            var e = this.state.extrapolationMethodList[i];
-                            var json;
-                            if (e.id == 7) { // moving avg
-                                json = {
-                                    extrapolationMethod: e.id,
-                                    jsonProperties: {
-                                        months: this.state.monthsForMovingAverage
-                                    }
-                                }
-                            } else if (e.id == 5 || e.id == 6) { // semi avg
-                                json = {
-                                    extrapolationMethod: e.id,
-                                    jsonProperties: {
-                                    }
-                                }
+                    if (this.props.items.currentScenario.nodeDataExtrapolationOptionList == null) {
+                        // var nodeDataExtrapolationOptionList = [];
+                        // for (let i = 0; i < this.state.extrapolationMethodList.length; i++) {
+                        //     var e = this.state.extrapolationMethodList[i];
+                        //     var json;
+                        //     if (e.id == 7) { // moving avg
+                        //         json = {
+                        //             extrapolationMethod: e.id,
+                        //             jsonProperties: {
+                        //                 months: this.state.monthsForMovingAverage
+                        //             }
+                        //         }
+                        //     } else if (e.id == 5 || e.id == 6) { // semi avg
+                        //         json = {
+                        //             extrapolationMethod: e.id,
+                        //             jsonProperties: {
+                        //             }
+                        //         }
+                        //     }
+                        //     else if (e.id == 2) { // TES
+                        //         json = {
+                        //             extrapolationMethod: e.id,
+                        //             jsonProperties: {
+                        //                 confidenceLevel: this.state.confidenceLevelId,
+                        //                 seasonality: this.state.noOfMonthsForASeason,
+                        //                 alpha: this.state.alpha,
+                        //                 beta: this.state.beta,
+                        //                 gamma: this.state.gamma
+                        //             }
+                        //         }
+                        //     }
+                        //     nodeDataExtrapolationOptionList.push(json);
+                        // }
+                        // this.setState({ nodeDataExtrapolationOptionList, filteredExtrapolationMethodList: JSON.parse(JSON.stringify(this.state.extrapolationMethodList)) })
+                    } else {
+                        var filteredExtrapolationMethodList = [];
+                        var nodeDataExtrapolationOptionList = this.props.items.currentScenario.nodeDataExtrapolationOptionList;
+                        console.log("nodeDataExtrapolationOptionList----", nodeDataExtrapolationOptionList)
+                        console.log("nodeDataExtrapolationOptionList length----", nodeDataExtrapolationOptionList.length)
+                        var movingAvgId = false;
+                        var semiAvgId = false;
+                        var linearRegressionId = false;
+                        var smoothingId = false;
+                        var arimaId = false;
+                        var monthsForMovingAverage = this.state.monthsForMovingAverage;
+
+                        for (let i = 0; i < nodeDataExtrapolationOptionList.length; i++) {
+                            var id = nodeDataExtrapolationOptionList[i].extrapolationMethod.id;
+                            filteredExtrapolationMethodList.push(nodeDataExtrapolationOptionList[i].extrapolationMethod);
+                            if (id == 7) {
+                                movingAvgId = true;
+                                // monthsForMovingAverage = nodeDataExtrapolationOptionList[i].jsonProperties.monthsForMovingAverage;
+                            } else if (id == 6) {
+                                semiAvgId = true;
+                            } else if (id == 5) {
+                                linearRegressionId = true;
                             }
-                            else if (e.id == 2) { // TES
-                                json = {
-                                    extrapolationMethod: e.id,
-                                    jsonProperties: {
-                                        confidenceLevel: this.state.confidenceLevelId,
-                                        seasonality: this.state.noOfMonthsForASeason,
-                                        alpha: this.state.alpha,
-                                        beta: this.state.beta,
-                                        gamma: this.state.gamma
-                                    }
-                                }
+                            else if (id == 4) {
+                                arimaId = true;
                             }
-                            nodeDataExtrapolationOptionList.push(json);
+                            else if (id == 2) {
+                                smoothingId = true;
+                            }
+
                         }
-                        this.setState({ nodeDataExtrapolationOptionList })
+                        this.setState({ movingAvgId, semiAvgId, linearRegressionId, smoothingId, arimaId, filteredExtrapolationMethodList, forecastNestedHeader: filteredExtrapolationMethodList.length, nodeDataExtrapolationOptionList, movingAvgId })
+
                     }
                 })
             }.bind(this);
@@ -811,6 +1197,7 @@ export default class TreeExtrapolationComponent extends React.Component {
         // monthArray.push('2025-01-01');
         console.log("monthArray---", monthArray);
         let count = 0;
+        let count1 = '';
         for (var j = 0; j < monthArray.length; j++) {
             var cellData = this.state.nodeDataExtrapolation.extrapolationDataList.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArray[j]).format("YYYY-MM"))[0];
             data = [];
@@ -818,16 +1205,22 @@ export default class TreeExtrapolationComponent extends React.Component {
             data[1] = cellData != null && cellData != "" ? cellData.amount : (moment(monthArray[j]).isSame(this.props.items.currentItemConfig.context.payload.nodeDataMap[this.props.items.selectedScenario][0].month) ? this.props.items.currentItemConfig.context.payload.nodeDataMap[this.props.items.selectedScenario][0].calculatedDataValue : "");
             data[2] = cellData != null && cellData != "" ? cellData.reportingRate : 100
             data[3] = `=ROUND((B${parseInt(j) + 1}*C${parseInt(j) + 1})/100,2)`
-            data[4] = ""
-            data[5] = ""
-            data[6] = ""
-            data[7] = ""
+            // data[4] = this.state.movingAvgData[j+1].actual
+            count1 = moment(this.state.minMonth).format("YYYY-MM") == moment(monthArray[j]).format("YYYY-MM") ? 0 : moment(this.state.minMonth).format("YYYY-MM") < moment(monthArray[j]).format("YYYY-MM") ? count1 : '';
+            data[4] = this.state.movingAvgData.length > 0 && count1 != '' ? this.state.movingAvgData[count1].forecast : ''
+            data[5] = this.state.semiAvgData.length > 0 && count1 != '' ? this.state.semiAvgData[count1].forecast : ''
+            data[6] = this.state.linearRegressionData.length > 0 && count1 != '' ? this.state.linearRegressionData[count1].forecast : ''
+            data[7] = this.state.tesData.length > 0 && count1 != '' ? this.state.tesData[count1].forecast : ''
             data[8] = ""
+            if (count1 >= 0) {
+                count1++;
+            }
             // data[9] = `=IF(ISBLANK(B${parseInt(j) + 1}),10,ROUND(B${parseInt(j) + 1},2))`
-            data[9] = `=IF(B${parseInt(j) + 1} != "",ROUND(B${parseInt(j) + 1},2),'')` // J
+            data[9] = `=IF(B${parseInt(j) + 1} != "",ROUND(B${parseInt(j) + 1},2),IF(N1 == 2,H${parseInt(j) + 1},IF(N1 == 7,E${parseInt(j) + 1},IF(N1==5,G${parseInt(j) + 1},IF(N1 == 6,F${parseInt(j) + 1},'')))))` // J
             data[10] = "" // K
             data[11] = `=IF(M1 == true,ROUND(J${parseInt(j)} + K${parseInt(j)},2),ROUND(J${parseInt(j) + 1} + K${parseInt(j) + 1},2))`
             data[12] = this.props.items.currentItemConfig.context.payload.nodeDataMap[this.props.items.selectedScenario][0].manualChangesEffectFuture
+            data[13] = this.state.nodeDataExtrapolation.extrapolationMethod.id
             // data[0] = list[j].month
             // data[1] = list[j].node
             // data[2] = list[j].reportingRate
@@ -858,7 +1251,7 @@ export default class TreeExtrapolationComponent extends React.Component {
         nestedHeaders.push(
             {
                 title: 'Forecast',
-                colspan: '5'
+                colspan: this.state.forecastNestedHeader
             },
         );
         nestedHeaders.push(
@@ -895,27 +1288,32 @@ export default class TreeExtrapolationComponent extends React.Component {
                 },
                 {
                     title: 'Moving Averages',
-                    type: 'number',
+                    type: this.state.movingAvgId ? 'number' : 'hidden',
+                    mask: '#,##.00',
                     readOnly: true
                 },
                 {
                     title: 'Semi-Averages',
-                    type: 'number',
+                    type: this.state.semiAvgId ? 'number' : 'hidden',
+                    mask: '#,##.00',
                     readOnly: true
                 },
                 {
                     title: 'Linear Regression',
-                    type: 'number',
+                    type: this.state.linearRegressionId ? 'number' : 'hidden',
+                    mask: '#,##.00',
                     readOnly: true
                 },
                 {
                     title: 'TES',
-                    type: 'number',
+                    type: this.state.smoothingId ? 'number' : 'hidden',
+                    mask: '#,##.00',
                     readOnly: true
                 },
                 {
                     title: 'ARIMA',
-                    type: 'number',
+                    type: this.state.arimaId ? 'number' : 'hidden',
+                    mask: '#,##.00',
                     readOnly: true
                 },
 
@@ -939,6 +1337,10 @@ export default class TreeExtrapolationComponent extends React.Component {
                 {
                     title: 'manualChangeAffectsFutureMonth',
                     type: 'hidden'
+                },
+                {
+                    title: 'extrapolationMethodId',
+                    type: 'hidden'
                 }
             ],
 
@@ -959,6 +1361,7 @@ export default class TreeExtrapolationComponent extends React.Component {
             allowDeleteRow: false,
             onselection: this.selected,
             oneditionend: this.onedit,
+            onchange: this.extrapolationChanged,
             updateTable: function (el, cell, x, y, source, value, id) {
                 var elInstance = el.jexcel;
                 if (y != null) {
@@ -995,8 +1398,89 @@ export default class TreeExtrapolationComponent extends React.Component {
         };
         var dataExtrapolation = jexcel(document.getElementById("tableDiv"), options);
         this.el = dataExtrapolation;
+        var rmseArr = [];
+        var mapeArr = [];
+        var mseArr = [];
+        var rSqdArr = [];
+        var wapeArr = [];
+
+        if (this.state.movingAvgId) {
+            rmseArr.push(this.state.movingAvgError.rmse)
+        }
+        if (this.state.semiAvgId) {
+            rmseArr.push(this.state.semiAvgError.rmse)
+        }
+        if (this.state.linearRegressionId) {
+            rmseArr.push(this.state.linearRegressionError.rmse)
+        }
+        if (this.state.smoothingId) {
+            rmseArr.push(this.state.tesError.rmse)
+        }
+
+        if (this.state.movingAvgId) {
+            mapeArr.push(this.state.movingAvgError.mape)
+        }
+        if (this.state.semiAvgId) {
+            mapeArr.push(this.state.semiAvgError.mape)
+        }
+        if (this.state.linearRegressionId) {
+            mapeArr.push(this.state.linearRegressionError.mape)
+        }
+        if (this.state.smoothingId) {
+            mapeArr.push(this.state.tesError.mape)
+        }
+
+        if (this.state.movingAvgId) {
+            mseArr.push(this.state.movingAvgError.mse)
+        }
+        if (this.state.semiAvgId) {
+            mseArr.push(this.state.semiAvgError.mse)
+        }
+        if (this.state.linearRegressionId) {
+            mseArr.push(this.state.linearRegressionError.mse)
+        }
+        if (this.state.smoothingId) {
+            mseArr.push(this.state.tesError.mse)
+        }
+
+        if (this.state.movingAvgId) {
+            rSqdArr.push(this.state.movingAvgError.rSqd)
+        }
+        if (this.state.semiAvgId) {
+            rSqdArr.push(this.state.semiAvgError.rSqd)
+        }
+        if (this.state.linearRegressionId) {
+            rSqdArr.push(this.state.linearRegressionError.rSqd)
+        }
+        if (this.state.smoothingId) {
+            rSqdArr.push(this.state.tesError.rSqd)
+        }
+
+        if (this.state.movingAvgId) {
+            wapeArr.push(this.state.movingAvgError.wape)
+        }
+        if (this.state.semiAvgId) {
+            wapeArr.push(this.state.semiAvgError.wape)
+        }
+        if (this.state.linearRegressionId) {
+            wapeArr.push(this.state.linearRegressionError.wape)
+        }
+        if (this.state.smoothingId) {
+            wapeArr.push(this.state.tesError.wape)
+        }
+
+        var minRmse = Math.min(...rmseArr.filter(c => c != ""));
+        var minMape = Math.min(...mapeArr.filter(c => c != ""));
+        var minMse = Math.min(...mseArr.filter(c => c != ""));
+        var minRsqd = Math.min(...rSqdArr.filter(c => c != ""));
+        var minWape = Math.min(...wapeArr.filter(c => c != ""));
         this.setState({
-            dataExtrapolation
+            dataExtrapolation,
+            minRmse: minRmse,
+            minMape: minMape,
+            minMse: minMse,
+            minRsqd: minRsqd,
+            minWape: minWape
             // dataEl: dataEl, loading: false,
             // inputDataFilter: inputData,
             // inputDataAverageFilter: inputDataAverage,
@@ -1021,73 +1505,252 @@ export default class TreeExtrapolationComponent extends React.Component {
 
     }
 
+    extrapolationChanged = function (instance, cell, x, y, value) {
+        // Population
+        if (x == 1) {
+            var col = ("B").concat(parseInt(y) + 1);
+            var reg = JEXCEL_DECIMAL_NO_REGEX_LONG;
+            console.log("population value---", value)
+            if (value != "" && !(reg.test(value.toString().replaceAll(",", "")))) {
+                instance.jexcel.setStyle(col, "background-color", "transparent");
+                instance.jexcel.setStyle(col, "background-color", "yellow");
+                instance.jexcel.setComments(col, i18n.t('static.message.invalidnumber'));
+            }
+            else {
+                instance.jexcel.setStyle(col, "background-color", "transparent");
+                instance.jexcel.setComments(col, "");
+                var reportingRate = instance.jexcel.getValue(`C${parseInt(y) + 1}`, true).toString().replaceAll(",", "").split("%")[0];
+                var col1 = ("C").concat(parseInt(y) + 1);
+                if (reportingRate == "") {
+                    instance.jexcel.setStyle(col1, "background-color", "transparent");
+                    instance.jexcel.setStyle(col1, "background-color", "yellow");
+                    instance.jexcel.setComments(col1, i18n.t('static.label.fieldRequired'));
+                } else if (reportingRate > 100) {
+                    instance.jexcel.setStyle(col1, "background-color", "transparent");
+                    instance.jexcel.setStyle(col1, "background-color", "yellow");
+                    instance.jexcel.setComments(col1, i18n.t('static.message.invalidnumber'));
+                }
+                else if (!(reg.test(reportingRate))) {
+                    instance.jexcel.setStyle(col1, "background-color", "transparent");
+                    instance.jexcel.setStyle(col1, "background-color", "yellow");
+                    instance.jexcel.setComments(col1, i18n.t('static.message.invalidnumber'));
+                }
+                var manualChange = instance.jexcel.getValue(`K${parseInt(y) + 1}`, true).toString().replaceAll(",", "").split("%")[0];
+                var col2 = ("K").concat(parseInt(y) + 1);
+                if (manualChange != "" && !(reg.test(manualChange))) {
+                    instance.jexcel.setStyle(col2, "background-color", "transparent");
+                    instance.jexcel.setStyle(col2, "background-color", "yellow");
+                    instance.jexcel.setComments(col2, i18n.t('static.message.invalidnumber'));
+                }
+                else {
+                    instance.jexcel.setStyle(col2, "background-color", "transparent");
+                    instance.jexcel.setComments(col2, "");
+                }
+
+            }
+        }
+        // Reporting Rate
+        if (x == 2) {
+            var col = ("C").concat(parseInt(y) + 1);
+            var reg = JEXCEL_DECIMAL_NO_REGEX_LONG;
+            console.log("reporting rate value---", value)
+            var actualValue = instance.jexcel.getValue(`B${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+            // value.split("%")[0];
+            value = value.toString().replaceAll(",", "").split("%")[0];
+            if (actualValue != "" && value == "") {
+                instance.jexcel.setStyle(col, "background-color", "transparent");
+                instance.jexcel.setStyle(col, "background-color", "yellow");
+                instance.jexcel.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else if (value > 100) {
+                instance.jexcel.setStyle(col, "background-color", "transparent");
+                instance.jexcel.setStyle(col, "background-color", "yellow");
+                instance.jexcel.setComments(col, i18n.t('static.message.invalidnumber'));
+            }
+            else if (!(reg.test(value))) {
+                instance.jexcel.setStyle(col, "background-color", "transparent");
+                instance.jexcel.setStyle(col, "background-color", "yellow");
+                instance.jexcel.setComments(col, i18n.t('static.message.invalidnumber'));
+            }
+            else {
+                instance.jexcel.setStyle(col, "background-color", "transparent");
+                instance.jexcel.setComments(col, "");
+            }
+        }
+        // Manual change
+        if (x == 10) {
+            var col = ("K").concat(parseInt(y) + 1);
+            var reg = JEXCEL_DECIMAL_MONTHLY_CHANGE;
+            value = value.toString().replaceAll(",", "");
+            var actualValue = instance.jexcel.getValue(`B${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+            if (actualValue != "" && value != "" && !(reg.test(value))) {
+                instance.jexcel.setStyle(col, "background-color", "transparent");
+                instance.jexcel.setStyle(col, "background-color", "yellow");
+                instance.jexcel.setComments(col, i18n.t('static.message.invalidnumber'));
+            }
+            else {
+                instance.jexcel.setStyle(col, "background-color", "transparent");
+                instance.jexcel.setComments(col, "");
+            }
+        }
+    }.bind(this);
+
     setMovingAvgId(e) {
+        var json;
+        var json1;
+        var filteredExtrapolationMethodList = this.state.filteredExtrapolationMethodList;
         var movingAvgId = e.target.checked;
         this.setState({
             movingAvgId: movingAvgId
         }, () => {
             if (this.state.dataExtrapolation != "") {
                 if (movingAvgId) {
+                    json = {
+                        extrapolationMethod: { id: 7 },
+                        jsonProperties: {
+                            months: this.state.monthsForMovingAverage
+                        }
+                    }
+                    json1 = this.state.extrapolationMethodList.filter(c => c.id == 7)[0];
+                    this.state.nodeDataExtrapolationOptionList.push(json);
+                    filteredExtrapolationMethodList.push(json1);
                     this.state.dataExtrapolation.showColumn(4);
                 } else {
+                    const index = this.state.nodeDataExtrapolationOptionList.findIndex(c => c.extrapolationMethod.id == 7);
+                    const index1 = filteredExtrapolationMethodList.findIndex(c => c.id == 7);
+                    filteredExtrapolationMethodList.splice(index1, 1);
+                    this.state.nodeDataExtrapolationOptionList.splice(index, 1);
                     this.state.dataExtrapolation.hideColumn(4);
                 }
+                this.setState({ filteredExtrapolationMethodList, forecastNestedHeader: filteredExtrapolationMethodList.length })
             }
         })
     }
     setSemiAvgId(e) {
+        var json;
+        var json1;
+        var filteredExtrapolationMethodList = this.state.filteredExtrapolationMethodList;
+        console.log("filteredExtrapolationMethodList--->>>>", this.state.extrapolationMethodList)
         var semiAvgId = e.target.checked;
         this.setState({
             semiAvgId: semiAvgId
         }, () => {
             if (this.state.dataExtrapolation != "") {
                 if (semiAvgId) {
+                    json = {
+                        extrapolationMethod: { id: 6 },
+                        jsonProperties: {
+                        }
+                    }
+                    json1 = this.state.extrapolationMethodList.filter(c => c.id == 6)[0];
+                    console.log("json1---", json1)
+                    this.state.nodeDataExtrapolationOptionList.push(json);
+                    filteredExtrapolationMethodList.push(json1);
                     this.state.dataExtrapolation.showColumn(5);
                 } else {
+                    const index = this.state.nodeDataExtrapolationOptionList.findIndex(c => c.extrapolationMethod.id == 6);
+                    const index1 = filteredExtrapolationMethodList.findIndex(c => c.id == 6);
+                    filteredExtrapolationMethodList.splice(index1, 1);
+                    this.state.nodeDataExtrapolationOptionList.splice(index, 1);
                     this.state.dataExtrapolation.hideColumn(5);
                 }
+                this.setState({ filteredExtrapolationMethodList, forecastNestedHeader: filteredExtrapolationMethodList.length }, () => {
+                    console.log("filteredExtrapolationMethodList new ---", this.state.filteredExtrapolationMethodList)
+                })
             }
         })
     }
     setLinearRegressionId(e) {
+        var json;
+        var json1;
+        var filteredExtrapolationMethodList = this.state.filteredExtrapolationMethodList;
         var linearRegressionId = e.target.checked;
         this.setState({
             linearRegressionId: linearRegressionId
         }, () => {
             if (this.state.dataExtrapolation != "") {
                 if (linearRegressionId) {
+                    json = {
+                        extrapolationMethod: { id: 5 },
+                        jsonProperties: {
+                        }
+                    }
+                    json1 = this.state.extrapolationMethodList.filter(c => c.id == 5)[0];
+                    this.state.nodeDataExtrapolationOptionList.push(json);
+                    filteredExtrapolationMethodList.push(json1);
                     this.state.dataExtrapolation.showColumn(6);
                 } else {
+                    const index = this.state.nodeDataExtrapolationOptionList.findIndex(c => c.extrapolationMethod.id == 5);
+                    const index1 = filteredExtrapolationMethodList.findIndex(c => c.id == 5);
+                    filteredExtrapolationMethodList.splice(index1, 1);
+                    this.state.nodeDataExtrapolationOptionList.splice(index, 1);
                     this.state.dataExtrapolation.hideColumn(6);
                 }
+                this.setState({ filteredExtrapolationMethodList, forecastNestedHeader: filteredExtrapolationMethodList.length })
             }
         })
     }
     setSmoothingId(e) {
+        var json;
+        var json1;
+        var filteredExtrapolationMethodList = this.state.filteredExtrapolationMethodList;
         var smoothingId = e.target.checked;
         this.setState({
             smoothingId: smoothingId
         }, () => {
             if (this.state.dataExtrapolation != "") {
                 if (smoothingId) {
+                    json = {
+                        extrapolationMethod: { id: 2 },
+                        jsonProperties: {
+                            confidenceLevel: this.state.confidenceLevelId,
+                            seasonality: this.state.noOfMonthsForASeason,
+                            alpha: this.state.alpha,
+                            beta: this.state.beta,
+                            gamma: this.state.gamma
+                        }
+                    }
+                    json1 = this.state.extrapolationMethodList.filter(c => c.id == 2)[0];
+                    this.state.nodeDataExtrapolationOptionList.push(json);
+                    filteredExtrapolationMethodList.push(json1);
                     this.state.dataExtrapolation.showColumn(7);
                 } else {
+                    const index = this.state.nodeDataExtrapolationOptionList.findIndex(c => c.extrapolationMethod.id == 2);
+                    const index1 = filteredExtrapolationMethodList.findIndex(c => c.id == 2);
+                    filteredExtrapolationMethodList.splice(index1, 1);
+                    this.state.nodeDataExtrapolationOptionList.splice(index, 1);
                     this.state.dataExtrapolation.hideColumn(7);
                 }
+                this.setState({ filteredExtrapolationMethodList, forecastNestedHeader: filteredExtrapolationMethodList.length })
             }
         })
     }
     setArimaId(e) {
+        var json;
+        var json1;
+        var filteredExtrapolationMethodList = this.state.filteredExtrapolationMethodList;
         var arimaId = e.target.checked;
         this.setState({
             arimaId: arimaId
         }, () => {
             if (this.state.dataExtrapolation != "") {
                 if (arimaId) {
+                    json = {
+                        extrapolationMethod: { id: 4 },
+                        jsonProperties: {
+                        }
+                    }
+                    json1 = this.state.extrapolationMethodList.filter(c => c.id == 4)[0];
+                    this.state.nodeDataExtrapolationOptionList.push(json);
+                    filteredExtrapolationMethodList.push(json1);
                     this.state.dataExtrapolation.showColumn(8);
                 } else {
+                    const index = this.state.nodeDataExtrapolationOptionList.findIndex(c => c.extrapolationMethod.id == 4);
+                    const index1 = filteredExtrapolationMethodList.findIndex(c => c.id == 4);
+                    filteredExtrapolationMethodList.splice(index1, 1);
+                    this.state.nodeDataExtrapolationOptionList.splice(index, 1);
                     this.state.dataExtrapolation.hideColumn(8);
                 }
+                this.setState({ filteredExtrapolationMethodList, forecastNestedHeader: filteredExtrapolationMethodList.length })
             }
         })
     }
@@ -1103,9 +1766,9 @@ export default class TreeExtrapolationComponent extends React.Component {
     toggledata = () => this.setState((currentState) => ({ show: !currentState.show }));
 
     render() {
-        const { extrapolationMethodList } = this.state;
-        let extrapolationMethods = extrapolationMethodList.length > 0
-            && extrapolationMethodList.map((item, i) => {
+        const { filteredExtrapolationMethodList } = this.state;
+        let extrapolationMethods = filteredExtrapolationMethodList.length > 0
+            && filteredExtrapolationMethodList.map((item, i) => {
                 return (
                     <option key={i} value={item.id}>
                         {getLabelText(item.label, this.state.lang)}
@@ -1130,7 +1793,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                 yAxes: [{
                     scaleLabel: {
                         display: true,
-                        labelString: 'People',
+                        labelString: this.props.items.currentItemConfig.context.payload.nodeUnit.label != null && this.props.items.currentItemConfig.context.payload.nodeUnit.label != "" ? getLabelText(this.props.items.currentItemConfig.context.payload.nodeUnit.label, this.state.lang) : "",
                         fontColor: 'black'
                     },
                     ticks: {
@@ -1156,19 +1819,20 @@ export default class TreeExtrapolationComponent extends React.Component {
                         gridLines: {
                             color: "rgba(0, 0, 0, 0)",
                         },
-                        scaleLabel: {
-                            display: true,
-                            labelString: 'Month',
-                            fontColor: 'black'
-                        },
+                        // scaleLabel: {
+                        //     display: true,
+                        //     labelString: 'Month',
+                        //     fontColor: 'black'
+                        // },
                         ticks: {
                             fontColor: 'black',
+                            autoSkip: false,
                             callback: function (label) {
                                 console.log("month label---", label);
                                 var xAxis1 = label
                                 xAxis1 += '';
                                 console.log("month graph---", xAxis1.split('-')[0])
-                                var month = moment(label).format(DATE_FORMAT_CAP_WITHOUT_DATE);
+                                var month = xAxis1.split('-')[0];
                                 return month;
                             }
                         }
@@ -1184,16 +1848,41 @@ export default class TreeExtrapolationComponent extends React.Component {
                                 xAxis2 += '';
                                 var month = xAxis2.split('-')[0];
                                 var year = xAxis2.split('-')[1];
-                                if (month === "Feb") {
+                                if (month === "Jul") {
                                     return year;
                                 } else {
                                     return "";
                                 }
-                            }
+                            },
+                            maxRotation: 0,
+                            minRotation: 0,
+                            autoSkip: false
                         }
                     }]
             },
+            tooltips: {
+                enabled: false,
+                custom: CustomTooltips,
+                callbacks: {
+                    label: function (tooltipItem, data) {
 
+                        let label = data.labels[tooltipItem.index];
+                        let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
+
+                        var cell1 = value
+                        cell1 += '';
+                        var x = cell1.split('.');
+                        var x1 = x[0];
+                        var x2 = x.length > 1 ? '.' + x[1] : '';
+                        var rgx = /(\d+)(\d{3})/;
+                        while (rgx.test(x1)) {
+                            x1 = x1.replace(rgx, '$1' + ',' + '$2');
+                        }
+                        return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
+                    }
+                }
+
+            },
             // tooltips: {
             // enabled: false,
             // custom: CustomTooltips,
@@ -1230,32 +1919,38 @@ export default class TreeExtrapolationComponent extends React.Component {
         }
 
 
-        let line = "";
-        line = {
-            labels: this.state.jexcelData.map((item, index) => (item.month)),
-            datasets: [
+        let datasets = [];
+        datasets.push({
+            type: "line",
+            pointRadius: 0,
+            lineTension: 0,
+            label: i18n.t('static.extrapolation.adjustedActuals'),
+            backgroundColor: 'transparent',
+            borderColor: '#CFCDC9',
+            ticks: {
+                fontSize: 2,
+                fontColor: 'transparent',
+            },
+            showInLegend: true,
+            pointStyle: 'line',
+            pointBorderWidth: 5,
+            yValueFormatString: "###,###,###,###",
+            data: this.state.jexcelDataArr.map((item, index) => (item.amount > 0 ? item.amount : null))
+        })
+
+        let stopDate = moment(this.props.items.forecastStopDate).format("YYYY-MM-DD");
+        let startDate = moment(this.props.items.forecastStartDate).format("YYYY-MM-DD");
+
+        console.log("Stop Date&&&", stopDate);
+        console.log("Stop Date&&&", this.state.movingAvgData);
+
+        if (this.state.movingAvgId) {
+            datasets.push(
                 {
                     type: "line",
                     pointRadius: 0,
                     lineTension: 0,
-                    label: 'Adjusted Actuals',
-                    backgroundColor: 'transparent',
-                    borderColor: '#CFCDC9',
-                    ticks: {
-                        fontSize: 2,
-                        fontColor: 'transparent',
-                    },
-                    showInLegend: true,
-                    pointStyle: 'line',
-                    pointBorderWidth: 5,
-                    yValueFormatString: "###,###,###,###",
-                    data: this.state.jexcelData.map((item, index) => (item.adjustedActuals > 0 ? item.adjustedActuals : null))
-                },
-                {
-                    type: "line",
-                    pointRadius: 0,
-                    lineTension: 0,
-                    label: 'Moving Averages',
+                    label: i18n.t('static.extrapolation.movingAverages'),
                     backgroundColor: 'transparent',
                     borderColor: '#A7C6ED',
                     ticks: {
@@ -1266,30 +1961,35 @@ export default class TreeExtrapolationComponent extends React.Component {
                     pointStyle: 'line',
                     pointBorderWidth: 5,
                     yValueFormatString: "###,###,###,###",
-                    data: this.state.jexcelData.map((item, index) => (item.ma > 0 ? item.ma : null))
+                    data: this.state.movingAvgData.map((item, index) => (item.forecast > 0 && moment(this.state.minMonth).format("YYYY-MM") <= moment(this.props.items.forecastStopDate).format("YYYY-MM") ? item.forecast.toFixed(2) : null))
+                })
+        }
+        if (this.state.semiAvgId) {
+            datasets.push({
+                type: "line",
+                pointRadius: 0,
+                lineTension: 0,
+                label: i18n.t('static.extrapolation.semiAverages'),
+                backgroundColor: 'transparent',
+                borderColor: '#49A4A1',
+                ticks: {
+                    fontSize: 2,
+                    fontColor: 'transparent',
                 },
+                showInLegend: true,
+                pointStyle: 'line',
+                pointBorderWidth: 5,
+                yValueFormatString: "###,###,###,###",
+                data: this.state.semiAvgData.map((item, index) => (item.forecast > 0 && moment(this.state.minMonth).format("YYYY-MM") <= moment(this.props.items.forecastStopDate).format("YYYY-MM") ? item.forecast.toFixed(2) : null))
+            })
+        }
+        if (this.state.linearRegressionId) {
+            datasets.push(
                 {
                     type: "line",
                     pointRadius: 0,
                     lineTension: 0,
-                    label: 'Semi-Averages',
-                    backgroundColor: 'transparent',
-                    borderColor: '#49A4A1',
-                    ticks: {
-                        fontSize: 2,
-                        fontColor: 'transparent',
-                    },
-                    showInLegend: true,
-                    pointStyle: 'line',
-                    pointBorderWidth: 5,
-                    yValueFormatString: "###,###,###,###",
-                    data: this.state.jexcelData.map((item, index) => (item.sa > 0 ? item.sa : null))
-                },
-                {
-                    type: "line",
-                    pointRadius: 0,
-                    lineTension: 0,
-                    label: 'Linear Regression',
+                    label: i18n.t('static.extrapolation.linearRegression'),
                     backgroundColor: 'transparent',
                     borderColor: '#118B70',
                     ticks: {
@@ -1300,282 +2000,362 @@ export default class TreeExtrapolationComponent extends React.Component {
                     pointStyle: 'line',
                     pointBorderWidth: 5,
                     yValueFormatString: "###,###,###,###",
-                    data: this.state.jexcelData.map((item, index) => (item.lr > 0 ? item.lr : null))
+                    data: this.state.linearRegressionData.map((item, index) => (item.forecast > 0 && moment(this.state.minMonth).format("YYYY-MM") <= moment(this.props.items.forecastStopDate).format("YYYY-MM") ? item.forecast.toFixed(2) : null))
+                })
+        }
+        if (this.state.smoothingId) {
+            datasets.push({
+                type: "line",
+                pointRadius: 0,
+                lineTension: 0,
+                label: i18n.t('static.extrapolation.tesLower'),
+                backgroundColor: 'transparent',
+                borderColor: '#002FC6',
+                borderStyle: 'dotted',
+                borderDash: [10, 10],
+                ticks: {
+                    fontSize: 2,
+                    fontColor: 'transparent',
                 },
-                {
-                    type: "line",
-                    pointRadius: 0,
-                    lineTension: 0,
-                    label: 'TES (Lower Confidence Bound)',
-                    backgroundColor: 'transparent',
-                    borderColor: '#002FC6',
-                    ticks: {
-                        fontSize: 2,
-                        fontColor: 'transparent',
-                    },
-                    showInLegend: true,
-                    pointStyle: 'line',
-                    pointBorderWidth: 5,
-                    yValueFormatString: "###,###,###,###",
-                    data: this.state.jexcelData.map((item, index) => (item.tesM > 0 ? item.tesM : null))
+                showInLegend: true,
+                pointStyle: 'line',
+                pointBorderWidth: 5,
+                yValueFormatString: "###,###,###,###",
+                data: this.state.tesData.map((item, index) => (item.forecast > 0 && moment(this.state.minMonth).format("YYYY-MM") <= moment(this.props.items.forecastStopDate).format("YYYY-MM") ? (item.forecast - this.state.CI).toFixed(2) : null))
+            })
+        }
+        if (this.state.smoothingId) {
+            datasets.push({
+                type: "line",
+                pointRadius: 0,
+                lineTension: 0,
+                label: i18n.t('static.extrapolation.tes'),
+                backgroundColor: 'transparent',
+                borderColor: '#651D32',
+                ticks: {
+                    fontSize: 2,
+                    fontColor: 'transparent',
                 },
-                {
-                    type: "line",
-                    pointRadius: 0,
-                    lineTension: 0,
-                    label: 'TES (Medium)',
-                    backgroundColor: 'transparent',
-                    borderColor: '#651D32',
-                    ticks: {
-                        fontSize: 2,
-                        fontColor: 'transparent',
-                    },
-                    showInLegend: true,
-                    pointStyle: 'line',
-                    pointBorderWidth: 5,
-                    yValueFormatString: "###,###,###,###",
-                    data: this.state.jexcelData.map((item, index) => (item.tesM > 0 ? item.tesM : null))
+                showInLegend: true,
+                pointStyle: 'line',
+                pointBorderWidth: 5,
+                yValueFormatString: "###,###,###,###",
+                data: this.state.tesData.map((item, index) => (item.forecast > 0 && moment(this.state.minMonth).format("YYYY-MM") <= moment(this.props.items.forecastStopDate).format("YYYY-MM") ? item.forecast.toFixed(2) : null))
+            })
+        }
+        if (this.state.smoothingId) {
+            datasets.push({
+                type: "line",
+                pointRadius: 0,
+                lineTension: 0,
+                label: i18n.t('static.extrapolation.tesUpper'),
+                backgroundColor: 'transparent',
+                borderColor: '#6c6463',
+                borderStyle: 'dotted',
+                borderDash: [10, 10],
+                ticks: {
+                    fontSize: 2,
+                    fontColor: 'transparent',
                 },
-                {
-                    type: "line",
-                    pointRadius: 0,
-                    lineTension: 0,
-                    label: 'TES (Upper Confidence Bound)',
-                    backgroundColor: 'transparent',
-                    borderColor: '#6c6463',
-                    ticks: {
-                        fontSize: 2,
-                        fontColor: 'transparent',
-                    },
-                    showInLegend: true,
-                    pointStyle: 'line',
-                    pointBorderWidth: 5,
-                    yValueFormatString: "###,###,###,###",
-                    data: this.state.jexcelData.map((item, index) => (item.tesM > 0 ? item.tesM : null))
+                showInLegend: true,
+                pointStyle: 'line',
+                pointBorderWidth: 5,
+                yValueFormatString: "###,###,###,###",
+                data: this.state.tesData.map((item, index) => (item.forecast > 0 && moment(this.state.minMonth).format("YYYY-MM") <= moment(this.props.items.forecastStopDate).format("YYYY-MM") ? (item.forecast + this.state.CI).toFixed(2) : null))
+            })
+        }
+        if (this.state.arimaId) {
+            datasets.push({
+                type: "line",
+                pointRadius: 0,
+                lineTension: 0,
+                label: i18n.t('static.extrapolation.arima'),
+                backgroundColor: 'transparent',
+                borderColor: '#BA0C2F',
+                ticks: {
+                    fontSize: 2,
+                    fontColor: 'transparent',
                 },
-                {
-                    type: "line",
-                    pointRadius: 0,
-                    lineTension: 0,
-                    label: 'ARIMA',
-                    backgroundColor: 'transparent',
-                    borderColor: '#BA0C2F',
-                    ticks: {
-                        fontSize: 2,
-                        fontColor: 'transparent',
-                    },
-                    showInLegend: true,
-                    pointStyle: 'line',
-                    pointBorderWidth: 5,
-                    yValueFormatString: "###,###,###,###",
-                    data: this.state.jexcelData.map((item, index) => (item.arima > 0 ? item.arima : null))
-                }
-            ]
+                showInLegend: true,
+                pointStyle: 'line',
+                pointBorderWidth: 5,
+                yValueFormatString: "###,###,###,###",
+                data: this.state.dataList.map((item, index) => (item.arimaForecast > 0 ? item.arimaForecast : null))
+            })
+        }
+        let line = {};
+        if (true) {
+            line = {
+                labels: this.state.monthArray.map(c => moment(c).format("MMM-YYYY")),
+                datasets: datasets
+            }
         }
         return (
             <div className="animated fadeIn">
                 <CardBody className="pb-lg-2 pt-lg-0">
-                    <div className="row pt-lg-0" style={{ float: 'right', marginTop: '-42px' }}>
-                        <div className="col-md-12">
-                            {/* <SupplyPlanFormulas ref="formulaeChild" /> */}
-                            <a className="">
-                                <span style={{ cursor: 'pointer', color: '20a8d8' }} ><small className="supplyplanformulas">{i18n.t('Show Guidance')}</small></span>
+                    <Formik
+                        enableReinitialize={true}
+                        initialValues={{
+                            extrapolationMethodId: this.state.nodeDataExtrapolation.extrapolationMethod.id,
+                            noOfMonthsId: this.state.monthsForMovingAverage,
+                            confidenceLevelId: this.state.confidenceLevelId,
+                            seasonalityId: this.state.noOfMonthsForASeason,
+                            gammaId: this.state.gamma,
+                            betaId: this.state.beta,
+                            alphaId: this.state.alpha,
+                            pId: this.state.p,
+                            dId: this.state.d,
+                            qId: this.state.q
+                            // treeName: this.state.curTreeObj.label.label_en,
+                            // regionArray: this.state.regionList,
+                            // regionId: this.state.regionValues,
+                        }}
+                        validate={validateExtrapolation(validationSchemaExtrapolation)}
+                        onSubmit={(values, { setSubmitting, setErrors }) => {
+                            if (this.checkValidationExtrapolation()) {
+                                this.buildExtrapolationMom();
+                                console.log("tree extrapolation on submit called")
+                            } else {
+                                console.log("tree extrapolation on submit not called")
+                            }
+                        }}
+                        render={
+                            ({
+                                values,
+                                errors,
+                                touched,
+                                handleChange,
+                                handleBlur,
+                                handleSubmit,
+                                isSubmitting,
+                                isValid,
+                                setTouched,
+                                handleReset,
+                                setFieldValue,
+                                setFieldTouched
+                            }) => (
+                                <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='userForm' autocomplete="off">
+                                    {/* formik validation starts here */}
+                                    <div className="row pt-lg-0" style={{ float: 'right', marginTop: '-42px' }}>
+                                        <div className="row pl-lg-0 pr-lg-0">
+                                            {/* <SupplyPlanFormulas ref="formulaeChild" /> */}
+                                            <a className="">
+                                                <span style={{ cursor: 'pointer', color: '20a8d8' }} ><small className="supplyplanformulas">{i18n.t('Show Guidance')}</small></span>
 
-                            </a>
-                        </div>
-                    </div>
-                    <Form name='simpleForm'>
-                        <div className=" pl-0">
-                            <div className="row">
-                                <FormGroup className="col-md-3 pl-lg-0">
-                                    <Label htmlFor="appendedInputButton">Start Month for Historical Data<span className="stock-box-icon fa fa-sort-desc ml-1"></span></Label>
-                                    <div className="controls edit readonly">
-                                        <Picker
-
-                                            id="month"
-                                            name="month"
-                                            ref={this.pickAMonth1}
-                                            years={{ min: this.props.items.minDate, max: this.props.items.maxDate }}
-                                            value={{
-                                                year: new Date(this.props.items.currentScenario.month).getFullYear(), month: ("0" + (new Date(this.props.items.currentScenario.month).getMonth() + 1)).slice(-2)
-                                            }}
-                                            lang={pickerLang.months}
-                                        // theme="dark"
-                                        // onChange={this.handleAMonthChange1}
-                                        // onDismiss={this.handleAMonthDissmis1}
-                                        >
-                                            <MonthBox value={this.makeText({ year: new Date(this.props.items.currentScenario.month).getFullYear(), month: ("0" + (new Date(this.props.items.currentScenario.month).getMonth() + 1)).slice(-2) })}
-                                            />
-                                        </Picker>
+                                            </a>
+                                        </div>
                                     </div>
-                                </FormGroup>
-                                <FormGroup className="col-md-3">
-                                    <Label htmlFor="appendedInputButton">Forecast Period<span className="stock-box-icon fa fa-sort-desc ml-1"></span></Label>
-                                    <div className="controls edit">
+                                    {/* <Form name='simpleForm'> */}
+                                    <div className=" pl-0">
+                                        <div className="row">
+                                            <FormGroup className="col-md-3 pl-lg-0">
+                                                <Label htmlFor="appendedInputButton">Start Month for Historical Data<span className="stock-box-icon fa fa-sort-desc ml-1"></span></Label>
+                                                <div className="controls edit readonly">
+                                                    <Picker
 
-                                        <Picker
-                                            years={{ min: this.state.minDate, max: this.state.maxDate }}
-                                            ref={this.pickRange}
-                                            value={rangeValue}
-                                            lang={pickerLang}
-                                            // theme="light"
-                                            // onChange={this.handleRangeChange}
-                                            // onDismiss={this.handleRangeDissmis}
-                                            className="greyColor"
-                                        >
-                                            <MonthBox value={this.props.items.forecastPeriod} />
-                                        </Picker>
-                                    </div>
-                                </FormGroup>
-                                {/* <FormGroup className="col-md-3">
+                                                        id="month"
+                                                        name="month"
+                                                        ref={this.pickAMonth1}
+                                                        years={{ min: this.props.items.minDate, max: this.props.items.maxDate }}
+                                                        value={{
+                                                            year: new Date(this.props.items.currentScenario.month).getFullYear(), month: ("0" + (new Date(this.props.items.currentScenario.month).getMonth() + 1)).slice(-2)
+                                                        }}
+                                                        lang={pickerLang.months}
+                                                    // theme="dark"
+                                                    // onChange={this.handleAMonthChange1}
+                                                    // onDismiss={this.handleAMonthDissmis1}
+                                                    >
+                                                        <MonthBox value={this.makeText({ year: new Date(this.props.items.currentScenario.month).getFullYear(), month: ("0" + (new Date(this.props.items.currentScenario.month).getMonth() + 1)).slice(-2) })}
+                                                        />
+                                                    </Picker>
+                                                </div>
+                                            </FormGroup>
+                                            <FormGroup className="col-md-3">
+                                                <Label htmlFor="appendedInputButton">Forecast Period<span className="stock-box-icon fa fa-sort-desc ml-1"></span></Label>
+                                                <div className="controls edit">
+
+                                                    <Picker
+                                                        years={{ min: this.state.minDate, max: this.state.maxDate }}
+                                                        ref={this.pickRange}
+                                                        value={rangeValue}
+                                                        lang={pickerLang}
+                                                        // theme="light"
+                                                        // onChange={this.handleRangeChange}
+                                                        // onDismiss={this.handleRangeDissmis}
+                                                        className="disabledColor"
+                                                    >
+                                                        <MonthBox value={this.props.items.forecastPeriod} />
+                                                    </Picker>
+                                                </div>
+                                            </FormGroup>
+                                            {/* <FormGroup className="col-md-3">
  
  <div>
  Show Guidance
  </div>
  </FormGroup> */}
-                            </div>
-                            <div className="row">
-                                <FormGroup className="col-md-12 " style={{ display: this.state.show ? "block" : "none" }}>
-                                    <div className="check inline pl-lg-3 pt-lg-2">
-                                        <div className="row pl-lg-1 pb-lg-2">
-                                            <div>
-                                                <Popover placement="top" isOpen={this.state.popoverOpenMa} target="Popover1" trigger="hover" toggle={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)}>
-                                                    <PopoverBody>Need to add Info.</PopoverBody>
-                                                </Popover>
-                                            </div>
-                                            <div>
-                                                <Input
-                                                    className="form-check-input"
-                                                    type="checkbox"
-                                                    id="movingAvgId"
-                                                    name="movingAvgId"
-                                                    checked={this.state.movingAvgId}
-                                                    onClick={(e) => { this.setMovingAvgId(e); }}
-                                                />
-                                                <Label
-                                                    className="form-check-label"
-                                                    check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                                                    <b>Moving Averages</b>
-                                                    <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
-                                                </Label>
-                                            </div>
-                                            {/* {this.state.movingAvgId && */}
-                                            <div className="col-md-3 pt-lg-0" style={{ display: this.state.movingAvgId ? '' : 'none' }}>
-                                                <Label htmlFor="appendedInputButton"># of Months</Label>
-                                                <Input
-                                                    className="controls"
-                                                    type="text"
-                                                    bsSize="sm"
-                                                    id="noOfMonthsId"
-                                                    name="noOfMonthsId"
-                                                    value={this.state.monthsForMovingAverage}
-                                                    onChange={(e) => { this.setMonthsForMovingAverage(e); }}
-                                                />
-                                            </div>
-                                            {/* } */}
                                         </div>
-                                        <div className="row pl-lg-1 pb-lg-2">
-                                            <div>
-                                                <Popover placement="top" isOpen={this.state.popoverOpenSa} target="Popover1" trigger="hover" toggle={() => this.toggle('popoverOpenMa', !this.state.popoverOpenSa)}>
-                                                    <PopoverBody>Need to add Info.</PopoverBody>
-                                                </Popover>
-                                            </div>
-                                            <div className="pt-lg-2">
-                                                <Input
-                                                    className="form-check-input"
-                                                    type="checkbox"
-                                                    id="semiAvgId"
-                                                    name="semiAvgId"
-                                                    checked={this.state.semiAvgId}
-                                                    onClick={(e) => { this.setSemiAvgId(e); }}
-                                                />
-                                                <Label
-                                                    className="form-check-label"
-                                                    check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                                                    <b>Semi-Averages</b>
-                                                    <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenSa', !this.state.popoverOpenSa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
-                                                </Label>
-                                            </div>
-                                        </div>
-                                        <div className="row pl-lg-1 pb-lg-2">
-                                            <div>
-                                                <Popover placement="top" isOpen={this.state.popoverOpenLr} target="Popover1" trigger="hover" toggle={() => this.toggle('popoverOpenLr', !this.state.popoverOpenLr)}>
-                                                    <PopoverBody>Need to add Info.</PopoverBody>
-                                                </Popover>
-                                            </div>
-                                            <div className="pt-lg-2">
-                                                <Input
-                                                    className="form-check-input"
-                                                    type="checkbox"
-                                                    id="linearRegressionId"
-                                                    name="linearRegressionId"
-                                                    checked={this.state.linearRegressionId}
-                                                    onClick={(e) => { this.setLinearRegressionId(e); }}
-                                                />
-                                                <Label
-                                                    className="form-check-label"
-                                                    check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                                                    <b>Linear Regression</b>
-                                                    <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenLr', !this.state.popoverOpenLr)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
-                                                </Label>
-                                            </div>
-                                        </div>
-                                        <div className="row pl-lg-1 pb-lg-2">
-                                            <div>
-                                                <Popover placement="top" isOpen={this.state.popoverOpenTes} target="Popover1" trigger="hover" toggle={() => this.toggle('popoverOpenMa', !this.state.popoverOpenTes)}>
-                                                    <PopoverBody>Need to add Info.</PopoverBody>
-                                                </Popover>
-                                            </div>
-                                            <div className="pt-lg-2">
-                                                <Input
-                                                    className="form-check-input"
-                                                    type="checkbox"
-                                                    id="smoothingId"
-                                                    name="smoothingId"
-                                                    checked={this.state.smoothingId}
-                                                    onClick={(e) => { this.setSmoothingId(e); }}
-                                                />
-                                                <Label
-                                                    className="form-check-label"
-                                                    check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                                                    <b>Triple-Exponential Smoothing (Holts-Winters)</b>
-                                                    <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenTes', !this.state.popoverOpenTes)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
-                                                </Label>
-                                            </div>
-                                            <div className="row col-md-12 pt-lg-2" style={{ display: this.state.smoothingId ? '' : 'none' }}>
-                                                <div className="pt-lg-0" style={{ display: 'contents' }}>
-                                                    <div className="tab-ml-1 mt-md-2 mb-md-0 ExtraCheckboxFieldWidth">
-                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.confidenceLevel')}</Label>
-                                                        <Input
-                                                            className="controls"
-                                                            type="select"
-                                                            bsSize="sm"
-                                                            id="confidenceLevelId"
-                                                            name="confidenceLevelId"
-                                                            value={this.state.confidenceLevelId}
-                                                            onChange={(e) => { this.setConfidenceLevelId(e); }}
-                                                        >
-                                                            <option value="0.85">85%</option>
-                                                            <option value="0.90">90%</option>
-                                                            <option value="0.95">95%</option>
-                                                            <option value="0.99">99%</option>
-                                                            <option value="0.995">99.5%</option>
-                                                            <option value="0.999">99.9%</option>
-                                                        </Input>
+                                        {/* formik validation starts here */}
+                                        <div className="row">
+                                            <FormGroup className="col-md-12 " style={{ display: "block" }}>
+                                                <div className="check inline pl-lg-3 pt-lg-2">
+                                                    <div className="row pl-lg-1 pb-lg-2">
+                                                        <div>
+                                                            <Popover placement="top" isOpen={this.state.popoverOpenMa} target="Popover1" trigger="hover" toggle={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)}>
+                                                                <PopoverBody>Need to add Info.</PopoverBody>
+                                                            </Popover>
+                                                        </div>
+                                                        <div>
+                                                            <Input
+                                                                className="form-check-input"
+                                                                type="checkbox"
+                                                                id="movingAvgId"
+                                                                name="movingAvgId"
+                                                                checked={this.state.movingAvgId}
+                                                                value={this.state.movingAvgId}
+                                                                onClick={(e) => { this.setMovingAvgId(e); }}
+                                                            />
+                                                            <Label
+                                                                className="form-check-label"
+                                                                check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                                <b>Moving Averages</b>
+                                                                <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
+                                                            </Label>
+                                                        </div>
+                                                        {/* {this.state.movingAvgId && */}
+                                                        <div className="row col-md-12 pt-lg-2">
+                                                        <div className="col-md-2 pl-lg-0 pt-lg-0" style={{ display: this.state.movingAvgId ? '' : 'none' }}>
+                                                            <Label htmlFor="appendedInputButton"># of Months</Label>
+                                                            <Input
+                                                                className="controls"
+                                                                type="text"
+                                                                bsSize="sm"
+                                                                id="noOfMonthsId"
+                                                                name="noOfMonthsId"
+                                                                value={this.state.monthsForMovingAverage}
+                                                                valid={!errors.noOfMonthsId && this.state.monthsForMovingAverage != null ? this.state.monthsForMovingAverage : '' != ''}
+                                                                invalid={touched.noOfMonthsId && !!errors.noOfMonthsId}
+                                                                onBlur={handleBlur}
+                                                                onChange={(e) => { handleChange(e); this.setMonthsForMovingAverage(e) }}
+                                                            />
+                                                            <FormFeedback>{errors.noOfMonthsId}</FormFeedback>
+                                                        </div>
+                                                        </div>
+                                                        {/* } */}
                                                     </div>
-                                                    <div className="tab-ml-1 mt-md-2 mb-md-0 ExtraCheckboxFieldWidth">
-                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.seasonality')}</Label>
-                                                        <Input
-                                                            className="controls"
-                                                            type="text"
-                                                            bsSize="sm"
-                                                            id="seasonalityId"
-                                                            name="seasonalityId"
-                                                            value={this.state.noOfMonthsForASeason}
-                                                            onChange={(e) => { this.setSeasonals(e); }}
-                                                        />
+                                                    <div className="row pl-lg-1 pb-lg-2">
+                                                        <div>
+                                                            <Popover placement="top" isOpen={this.state.popoverOpenSa} target="Popover1" trigger="hover" toggle={() => this.toggle('popoverOpenMa', !this.state.popoverOpenSa)}>
+                                                                <PopoverBody>Need to add Info.</PopoverBody>
+                                                            </Popover>
+                                                        </div>
+                                                        <div className="pt-lg-2">
+                                                            <Input
+                                                                className="form-check-input"
+                                                                type="checkbox"
+                                                                id="semiAvgId"
+                                                                name="semiAvgId"
+                                                                checked={this.state.semiAvgId}
+                                                                onClick={(e) => { this.setSemiAvgId(e); }}
+                                                            />
+                                                            <Label
+                                                                className="form-check-label"
+                                                                check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                                <b>Semi-Averages</b>
+                                                                <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenSa', !this.state.popoverOpenSa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
+                                                            </Label>
+                                                        </div>
                                                     </div>
-                                                    {/* <div className="col-md-3">
+                                                    <div className="row pl-lg-1 pb-lg-2">
+                                                        <div>
+                                                            <Popover placement="top" isOpen={this.state.popoverOpenLr} target="Popover1" trigger="hover" toggle={() => this.toggle('popoverOpenLr', !this.state.popoverOpenLr)}>
+                                                                <PopoverBody>Need to add Info.</PopoverBody>
+                                                            </Popover>
+                                                        </div>
+                                                        <div className="pt-lg-2">
+                                                            <Input
+                                                                className="form-check-input"
+                                                                type="checkbox"
+                                                                id="linearRegressionId"
+                                                                name="linearRegressionId"
+                                                                checked={this.state.linearRegressionId}
+                                                                onClick={(e) => { this.setLinearRegressionId(e); }}
+                                                            />
+                                                            <Label
+                                                                className="form-check-label"
+                                                                check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                                <b>Linear Regression</b>
+                                                                <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenLr', !this.state.popoverOpenLr)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
+                                                            </Label>
+                                                        </div>
+                                                    </div>
+                                                    <div className="row pl-lg-1 pb-lg-2">
+                                                        <div>
+                                                            <Popover placement="top" isOpen={this.state.popoverOpenTes} target="Popover1" trigger="hover" toggle={() => this.toggle('popoverOpenMa', !this.state.popoverOpenTes)}>
+                                                                <PopoverBody>Need to add Info.</PopoverBody>
+                                                            </Popover>
+                                                        </div>
+                                                        <div className="pt-lg-2">
+                                                            <Input
+                                                                className="form-check-input"
+                                                                type="checkbox"
+                                                                id="smoothingId"
+                                                                name="smoothingId"
+                                                                checked={this.state.smoothingId}
+                                                                value={this.state.smoothingId}
+                                                                onClick={(e) => { this.setSmoothingId(e); }}
+                                                            />
+                                                            <Label
+                                                                className="form-check-label"
+                                                                check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                                <b>Triple-Exponential Smoothing (Holts-Winters)</b>
+                                                                <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenTes', !this.state.popoverOpenTes)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
+                                                            </Label>
+                                                        </div>
+                                                        <div className="row col-md-12 pt-lg-2 pl-lg-0" style={{ display: this.state.smoothingId ? '' : 'none' }}>
+                                                            <div className="pt-lg-0 pl-lg-0" style={{ display: 'contents' }}>
+                                                                <div className="tab-ml-1 mt-md-2 mb-md-0 ExtraCheckboxFieldWidth">
+                                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.confidenceLevel')}</Label>
+                                                                    <Input
+                                                                        className="controls"
+                                                                        type="select"
+                                                                        bsSize="sm"
+                                                                        id="confidenceLevelId"
+                                                                        name="confidenceLevelId"
+                                                                        value={this.state.confidenceLevelId}
+                                                                        valid={!errors.confidenceLevelId && this.state.confidenceLevelId != null ? this.state.confidenceLevelId : '' != ''}
+                                                                        invalid={touched.confidenceLevelId && !!errors.confidenceLevelId}
+                                                                        onBlur={handleBlur}
+                                                                        onChange={(e) => { handleChange(e); this.setConfidenceLevelId(e) }}
+
+                                                                    >
+                                                                        <option value="">Please select confidence level</option>
+                                                                        <option value="0.85">85%</option>
+                                                                        <option value="0.90">90%</option>
+                                                                        <option value="0.95">95%</option>
+                                                                        <option value="0.99">99%</option>
+                                                                        <option value="0.995">99.5%</option>
+                                                                        <option value="0.999">99.9%</option>
+                                                                    </Input>
+                                                                    <FormFeedback>{errors.confidenceLevelId}</FormFeedback>
+                                                                </div>
+                                                                <div className="tab-ml-1 mt-md-2 mb-md-0 ExtraCheckboxFieldWidth">
+                                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.seasonality')}</Label>
+                                                                    <Input
+                                                                        className="controls"
+                                                                        type="text"
+                                                                        bsSize="sm"
+                                                                        id="seasonalityId"
+                                                                        name="seasonalityId"
+                                                                        value={this.state.noOfMonthsForASeason}
+                                                                        valid={!errors.seasonalityId && this.state.noOfMonthsForASeason != null ? this.state.noOfMonthsForASeason : '' != ''}
+                                                                        invalid={touched.seasonalityId && !!errors.seasonalityId}
+                                                                        onBlur={handleBlur}
+                                                                        onChange={(e) => { handleChange(e); this.setSeasonals(e) }}
+                                                                    />
+                                                                    <FormFeedback>{errors.seasonalityId}</FormFeedback>
+                                                                </div>
+                                                                {/* <div className="col-md-3">
  <Input
  className="form-check-input"
  type="checkbox"
@@ -1591,281 +2371,376 @@ export default class TreeExtrapolationComponent extends React.Component {
  </Label>
  </div> */}
 
-                                                    <div className="tab-ml-1 mt-md-2 mb-md-0 ExtraCheckboxFieldWidth">
-                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.alpha')}</Label>
-                                                        <Input
-                                                            className="controls"
-                                                            type="text"
-                                                            id="alphaId"
-                                                            bsSize="sm"
-                                                            name="alphaId"
-                                                            value={this.state.alpha}
-                                                            onChange={(e) => { this.setAlpha(e); }}
-                                                        />
+                                                                <div className="tab-ml-1 mt-md-2 mb-md-0 ExtraCheckboxFieldWidth">
+                                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.alpha')}</Label>
+                                                                    <Input
+                                                                        className="controls"
+                                                                        type="text"
+                                                                        id="alphaId"
+                                                                        bsSize="sm"
+                                                                        name="alphaId"
+                                                                        value={this.state.alpha}
+                                                                        valid={!errors.alphaId && this.state.alpha != null ? this.state.alpha : '' != ''}
+                                                                        invalid={touched.alphaId && !!errors.alphaId}
+                                                                        onBlur={handleBlur}
+                                                                        onChange={(e) => { handleChange(e); this.setAlpha(e) }}
+                                                                    />
+                                                                    <FormFeedback>{errors.alphaId}</FormFeedback>
+                                                                </div>
+                                                                <div className="tab-ml-1 mt-md-2 mb-md-0 ExtraCheckboxFieldWidth">
+                                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.beta')}</Label>
+                                                                    <Input
+                                                                        className="controls"
+                                                                        type="text"
+                                                                        id="betaId"
+                                                                        bsSize="sm"
+                                                                        name="betaId"
+                                                                        value={this.state.beta}
+                                                                        valid={!errors.betaId && this.state.beta != null ? this.state.beta : '' != ''}
+                                                                        invalid={touched.betaId && !!errors.betaId}
+                                                                        onBlur={handleBlur}
+                                                                        onChange={(e) => { handleChange(e); this.setBeta(e) }}
+                                                                    />
+                                                                    <FormFeedback>{errors.betaId}</FormFeedback>
+                                                                </div>
+                                                                <div className="tab-ml-1 mt-md-2 mb-md-0 ExtraCheckboxFieldWidth">
+                                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.gamma')}</Label>
+                                                                    <Input
+                                                                        className="controls"
+                                                                        type="text"
+                                                                        bsSize="sm"
+                                                                        id="gammaId"
+                                                                        name="gammaId"
+                                                                        value={this.state.gamma}
+                                                                        valid={!errors.gammaId && this.state.gamma != null ? this.state.gamma : '' != ''}
+                                                                        invalid={touched.gammaId && !!errors.gammaId}
+                                                                        onBlur={handleBlur}
+                                                                        onChange={(e) => { handleChange(e); this.setGamma(e) }}
+                                                                    />
+                                                                    <FormFeedback>{errors.gammaId}</FormFeedback>
+                                                                </div>
+                                                                <div className="tab-ml-1 mt-md-2 mb-md-0 ExtraCheckboxFieldWidth">
+                                                                    <Label htmlFor="appendedInputButton">Phi</Label>
+                                                                    <Input
+                                                                        className="controls"
+                                                                        type="text"
+                                                                        id="phiId"
+                                                                        bsSize="sm"
+                                                                        name="phiId"
+                                                                    />
+                                                                </div>
+                                                            </div>
+                                                        </div>
                                                     </div>
-                                                    <div className="tab-ml-1 mt-md-2 mb-md-0 ExtraCheckboxFieldWidth">
-                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.beta')}</Label>
-                                                        <Input
-                                                            className="controls"
-                                                            type="text"
-                                                            id="betaId"
-                                                            bsSize="sm"
-                                                            name="betaId"
-                                                            value={this.state.beta}
-                                                            onChange={(e) => { this.setBeta(e); }}
-                                                        />
-                                                    </div>
-                                                    <div className="tab-ml-1 mt-md-2 mb-md-0 ExtraCheckboxFieldWidth">
-                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.gamma')}</Label>
-                                                        <Input
-                                                            className="controls"
-                                                            type="text"
-                                                            bsSize="sm"
-                                                            id="gammaId"
-                                                            name="gammaId"
-                                                            value={this.state.gamma}
-                                                            onChange={(e) => { this.setGamma(e); }}
-                                                        />
-                                                    </div>
-                                                    <div className="tab-ml-1 mt-md-2 mb-md-0 ExtraCheckboxFieldWidth">
-                                                        <Label htmlFor="appendedInputButton">Phi</Label>
-                                                        <Input
-                                                            className="controls"
-                                                            type="text"
-                                                            id="phiId"
-                                                            bsSize="sm"
-                                                            name="phiId"
-                                                        />
+                                                    <div className="row pl-lg-1 pb-lg-2">
+                                                        <div>
+                                                            <Popover placement="top" isOpen={this.state.popoverOpenArima} target="Popover1" trigger="hover" toggle={() => this.toggle('popoverOpenArima', !this.state.popoverOpenArima)}>
+                                                                <PopoverBody>Need to add Info.</PopoverBody>
+                                                            </Popover>
+                                                        </div>
+                                                        <div className="pt-lg-2">
+                                                            <Input
+                                                                className="form-check-input"
+                                                                type="checkbox"
+                                                                id="arimaId"
+                                                                name="arimaId"
+                                                                checked={this.state.arimaId}
+                                                                value={this.state.arimaId}
+                                                                onClick={(e) => { this.setArimaId(e); }}
+                                                            />
+                                                            <Label
+                                                                className="form-check-label"
+                                                                check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                                <b>{i18n.t('static.extrapolation.arimaFull')}</b>
+                                                                <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenArima', !this.state.popoverOpenArima)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
+                                                            </Label>
+                                                        </div>
+                                                        {this.state.arimaId &&
+                                                        <div className="row col-md-12 pt-lg-2 pl-lg-0">
+                                                            <div className="pt-lg-0" style={{ display: 'contents' }}>
+                                                                <div className="tab-ml-1 mt-md-2 mb-md-0 ExtraCheckboxFieldWidth">
+                                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.p')}</Label>
+                                                                    <Input
+                                                                        className="controls"
+                                                                        type="text"
+                                                                        id="pId"
+                                                                        bsSize="sm"
+                                                                        name="pId"
+                                                                        value={this.state.p}
+                                                                        valid={!errors.pId && this.state.p != null ? this.state.p : '' != ''}
+                                                                        invalid={touched.pId && !!errors.pId}
+                                                                        onBlur={handleBlur}
+                                                                        onChange={(e) => { handleChange(e); }}
+                                                                    />
+                                                                    <FormFeedback>{errors.pId}</FormFeedback>
+                                                                </div>
+                                                                <div className="tab-ml-1 mt-md-2 mb-md-0 ExtraCheckboxFieldWidth">
+                                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.d')}</Label>
+                                                                    <Input
+                                                                        className="controls"
+                                                                        type="text"
+                                                                        id="dId"
+                                                                        bsSize="sm"
+                                                                        name="dId"
+                                                                        value={this.state.d}
+                                                                        valid={!errors.dId && this.state.d != null ? this.state.d : '' != ''}
+                                                                        invalid={touched.dId && !!errors.dId}
+                                                                        onBlur={handleBlur}
+                                                                        onChange={(e) => { handleChange(e); }}
+                                                                    />
+                                                                    <FormFeedback>{errors.dId}</FormFeedback>
+                                                                </div>
+                                                                <div className="tab-ml-1 mt-md-2 mb-md-0 ExtraCheckboxFieldWidth">
+                                                                    <Label htmlFor="appendedInputButton">q</Label>
+                                                                    <Input
+                                                                        className="controls"
+                                                                        type="text"
+                                                                        id="qId"
+                                                                        bsSize="sm"
+                                                                        name="qId"
+                                                                        value={this.state.q}
+                                                                        valid={!errors.qId && this.state.q != null ? this.state.q : '' != ''}
+                                                                        invalid={touched.qId && !!errors.qId}
+                                                                        onBlur={handleBlur}
+                                                                        onChange={(e) => { handleChange(e); }}
+                                                                    />
+                                                                    <FormFeedback>{errors.qId}</FormFeedback>
+                                                                </div>
+                                                            </div>
+                                                            </div>
+                                                        }
                                                     </div>
                                                 </div>
+                                            </FormGroup>
+                                        </div>
+
+                                        <div className="col-md-12 row text-left pt-lg-3 pl-lg-0">
+                                            {/* <Button className="mr-1 btn btn-info btn-md " onClick={this.toggledata}>
+                                                {this.state.show ? i18n.t('static.common.hideData') : i18n.t('static.common.showData')}
+                                            </Button> */}
+                                            <Button type="button" color="success" className="mr-1" size="md" onClick={this.interpolate}>Interpolate</Button>
+                                        </div>
+                                    </div>
+                                    {/* </Form> */}
+                                    <div className="row pl-lg-0 pr-lg-0 pt-lg-3">
+                                        <div className="col-md-6">
+                                            {/* <Button type="button" size="md" color="info" className="float-left mr-1" onClick={this.resetTree}>{'Show/hide data'}</Button> */}
+                                        </div>
+                                        <div className="col-md-6 float-right" style={{ marginTop: '-42px' }}>
+                                            <FormGroup className="float-right" >
+                                                <div className="check inline pl-lg-1 pt-lg-0">
+                                                    <div>
+                                                        <Input
+                                                            className="form-check-input checkboxMargin"
+                                                            type="checkbox"
+                                                            id="manualChangeExtrapolation"
+                                                            name="manualChangeExtrapolation"
+                                                            // checked={true}
+                                                            checked={this.props.items.currentItemConfig.context.payload.nodeDataMap[this.props.items.selectedScenario][0].manualChangesEffectFuture}
+                                                            onClick={(e) => { this.manualChangeExtrapolation(e); }}
+                                                        />
+                                                        <Label
+                                                            className="form-check-label"
+                                                            check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                            <b>{'Manual change affects future months (cumulative)'}</b>
+                                                        </Label>
+                                                    </div>
+                                                </div>
+                                            </FormGroup>
+                                        </div>
+                                    </div>
+                                    <div className="row pl-lg-0 pr-lg-0 extrapolateTable consumptionDataEntryTable">
+                                    <div id="tableDiv" className=""></div>
+                                    </div>
+                                    {/* Graph */}
+                                    <div className="row">
+                                    <div className="col-md-12 pt-lg-4 pl-lg-0 pr-lg-0">
+                                        <div className="chart-wrapper chart-graph-report pl-0 ml-0" style={{ marginLeft: '50px' }}>
+                                            <Line id="cool-canvas" data={line} options={options} />
+                                            <div>
+
                                             </div>
                                         </div>
-                                        <div className="row pl-lg-1 pb-lg-2">
+                                    </div>
+                                    </div>
+                                    <div className="row pl-lg-0 pr-lg-0">
+                                    <div className="table-scroll">
+                                        <div className="table-wrap table-responsive">
+                                            <Table className="table-bordered text-center mt-2 overflowhide main-table " bordered size="sm" >
+                                                <thead>
+                                                    <tr>
+                                                        <td width="230px"><b>{i18n.t('static.common.errors')}</b></td>
+                                                        {this.state.movingAvgId &&
+                                                            <td width="110px"><b>{i18n.t('static.extrapolation.movingAverages')}</b></td>
+                                                        }
+                                                        {this.state.semiAvgId &&
+                                                            <td width="110px"><b>{i18n.t('static.extrapolation.semiAverages')}</b></td>
+                                                        }
+                                                        {this.state.linearRegressionId &&
+                                                            <td width="110px"><b>{i18n.t('static.extrapolation.linearRegression')}</b></td>
+                                                        }
+                                                        {this.state.smoothingId &&
+                                                            <td width="110px"><b>{i18n.t('static.extrapolation.tes')}</b></td>
+                                                        }
+                                                        {this.state.arimaId &&
+                                                            <td width="110px"><b>{i18n.t('static.extrapolation.arima')}</b></td>
+                                                        }
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td>{i18n.t('static.extrapolation.rmse')}</td>
+                                                        {this.state.movingAvgId &&
+                                                            <td style={{ textAlign: "right", "fontWeight": this.state.minRmse == this.state.movingAvgError.rmse ? "bold" : "normal" }} bgcolor={this.state.minRmse == this.state.movingAvgError.rmse ? "#86cd99" : "#FFFFFF"}>{this.state.movingAvgError.rmse != "" ? this.state.movingAvgError.rmse.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
+                                                        }
+                                                        {this.state.semiAvgId &&
+                                                            <td style={{ textAlign: "right", "fontWeight": this.state.minRmse == this.state.semiAvgError.rmse ? "bold" : "normal" }} bgcolor={this.state.minRmse == this.state.semiAvgError.rmse ? "#86cd99" : "#FFFFFF"}>{this.state.semiAvgError.rmse != "" ? this.state.semiAvgError.rmse.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
+                                                        }
+                                                        {this.state.linearRegressionId &&
+                                                            <td style={{ textAlign: "right", "fontWeight": this.state.minRmse == this.state.linearRegressionError.rmse ? "bold" : "normal" }} bgcolor={this.state.minRmse == this.state.linearRegressionError.rmse ? "#86cd99" : "#FFFFFF"}>{this.state.linearRegressionError.rmse != "" ? this.state.linearRegressionError.rmse.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
+                                                        }
+                                                        {this.state.smoothingId &&
+                                                            <td style={{ textAlign: "right", "fontWeight": this.state.minRmse == this.state.tesError.rmse ? "bold" : "normal" }} bgcolor={this.state.minRmse == this.state.tesError.rmse ? "#86cd99" : "#FFFFFF"}>{this.state.tesError.rmse != "" ? this.state.tesError.rmse.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
+                                                        }
+                                                        {this.state.arimaId &&
+                                                            <td></td>
+                                                        }
+                                                    </tr>
+                                                    <tr>
+                                                        <td>{i18n.t('static.extrapolation.mape')}</td>
+                                                        {this.state.movingAvgId &&
+                                                            <td style={{ textAlign: "right", "fontWeight": this.state.minMape == this.state.movingAvgError.mape ? "bold" : "normal" }} bgcolor={this.state.minMape == this.state.movingAvgError.mape ? "#86cd99" : "#FFFFFF"}>{this.state.movingAvgError.mape != "" ? this.state.movingAvgError.mape.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
+                                                        }
+                                                        {this.state.semiAvgId &&
+                                                            <td style={{ textAlign: "right", "fontWeight": this.state.minMape == this.state.semiAvgError.mape ? "bold" : "normal" }} bgcolor={this.state.minMape == this.state.semiAvgError.mape ? "#86cd99" : "#FFFFFF"}>{this.state.semiAvgError.mape != "" ? this.state.semiAvgError.mape.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
+                                                        }
+                                                        {this.state.linearRegressionId &&
+                                                            <td style={{ textAlign: "right", "fontWeight": this.state.minMape == this.state.linearRegressionError.mape ? "bold" : "normal" }} bgcolor={this.state.minMape == this.state.linearRegressionError.mape ? "#86cd99" : "#FFFFFF"}>{this.state.linearRegressionError.mape != "" ? this.state.linearRegressionError.mape.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
+                                                        }
+                                                        {this.state.smoothingId &&
+                                                            <td style={{ textAlign: "right", "fontWeight": this.state.minMape == this.state.tesError.mape ? "bold" : "normal" }} bgcolor={this.state.minMape == this.state.tesError.mape ? "#86cd99" : "#FFFFFF"}>{this.state.tesError.mape != "" ? this.state.tesError.mape.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
+                                                        }
+                                                        {this.state.arimaId &&
+                                                            <td></td>
+                                                        }
+                                                    </tr>
+                                                    <tr>
+                                                        <td>{i18n.t('static.extrapolation.mse')}</td>
+                                                        {this.state.movingAvgId &&
+                                                            <td style={{ textAlign: "right", "fontWeight": this.state.minMse == this.state.movingAvgError.mse ? "bold" : "normal" }} bgcolor={this.state.minMse == this.state.movingAvgError.mse ? "#86cd99" : "#FFFFFF"}>{this.state.movingAvgError.mse != "" ? this.state.movingAvgError.mse.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
+                                                        }
+                                                        {this.state.semiAvgId &&
+                                                            <td style={{ textAlign: "right", "fontWeight": this.state.minMse == this.state.semiAvgError.mse ? "bold" : "normal" }} bgcolor={this.state.minMse == this.state.semiAvgError.mse ? "#86cd99" : "#FFFFFF"}>{this.state.semiAvgError.mse != "" ? this.state.semiAvgError.mse.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
+                                                        }
+                                                        {this.state.linearRegressionId &&
+                                                            <td style={{ textAlign: "right", "fontWeight": this.state.minMse == this.state.linearRegressionError.mse ? "bold" : "normal" }} bgcolor={this.state.minMse == this.state.linearRegressionError.mse ? "#86cd99" : "#FFFFFF"}>{this.state.linearRegressionError.mse != "" ? this.state.linearRegressionError.mse.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
+                                                        }
+                                                        {this.state.smoothingId &&
+                                                            <td style={{ textAlign: "right", "fontWeight": this.state.minMse == this.state.tesError.mse ? "bold" : "normal" }} bgcolor={this.state.minMse == this.state.tesError.mse ? "#86cd99" : "#FFFFFF"}>{this.state.tesError.mse != "" ? this.state.tesError.mse.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
+                                                        }
+                                                        {this.state.arimaId &&
+                                                            <td></td>
+                                                        }
+                                                    </tr>
+                                                    <tr>
+                                                        <td>{i18n.t('static.extrapolation.wape')}</td>
+                                                        {this.state.movingAvgId &&
+                                                            <td style={{ textAlign: "right", "fontWeight": this.state.minWape == this.state.movingAvgError.wape ? "bold" : "normal" }} bgcolor={this.state.minWape == this.state.movingAvgError.wape ? "#86cd99" : "#FFFFFF"}>{this.state.movingAvgError.wape != "" ? this.state.movingAvgError.wape.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
+                                                        }
+                                                        {this.state.semiAvgId &&
+                                                            <td style={{ textAlign: "right", "fontWeight": this.state.minWape == this.state.semiAvgError.wape ? "bold" : "normal" }} bgcolor={this.state.minWape == this.state.semiAvgError.wape ? "#86cd99" : "#FFFFFF"}>{this.state.semiAvgError.wape != "" ? this.state.semiAvgError.wape.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
+                                                        }
+                                                        {this.state.linearRegressionId &&
+                                                            <td style={{ textAlign: "right", "fontWeight": this.state.minWape == this.state.linearRegressionError.wape ? "bold" : "normal" }} bgcolor={this.state.minWape == this.state.linearRegressionError.wape ? "#86cd99" : "#FFFFFF"}>{this.state.linearRegressionError.wape != "" ? this.state.linearRegressionError.wape.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
+                                                        }
+                                                        {this.state.smoothingId &&
+                                                            <td style={{ textAlign: "right", "fontWeight": this.state.minWape == this.state.tesError.wape ? "bold" : "normal" }} bgcolor={this.state.minWape == this.state.tesError.wape ? "#86cd99" : "#FFFFFF"}>{this.state.tesError.wape != "" ? this.state.tesError.wape.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
+                                                        }
+                                                        {this.state.arimaId &&
+                                                            <td></td>
+                                                        }
+                                                    </tr>
+                                                    <tr>
+                                                        <td>{i18n.t('static.extrapolation.rSquare')}</td>
+                                                        {this.state.movingAvgId &&
+                                                            <td style={{ textAlign: "right", "fontWeight": this.state.minRsqd == this.state.movingAvgError.rSqd ? "bold" : "normal" }} bgcolor={this.state.minRsqd == this.state.movingAvgError.rSqd ? "#86cd99" : "#FFFFFF"}>{this.state.movingAvgError.rSqd != "" ? this.state.movingAvgError.rSqd.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
+                                                        }
+                                                        {this.state.semiAvgId &&
+                                                            <td style={{ textAlign: "right", "fontWeight": this.state.minRsqd == this.state.semiAvgError.rSqd ? "bold" : "normal" }} bgcolor={this.state.minRsqd == this.state.semiAvgError.rSqd ? "#86cd99" : "#FFFFFF"}>{this.state.semiAvgError.rSqd != "" ? this.state.semiAvgError.rSqd.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
+                                                        }
+                                                        {this.state.linearRegressionId &&
+                                                            <td style={{ textAlign: "right", "fontWeight": this.state.minRsqd == this.state.linearRegressionError.rSqd ? "bold" : "normal" }} bgcolor={this.state.minRsqd == this.state.linearRegressionError.rSqd ? "#86cd99" : "#FFFFFF"}>{this.state.linearRegressionError.rSqd != "" ? this.state.linearRegressionError.rSqd.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
+                                                        }
+                                                        {this.state.smoothingId &&
+                                                            <td style={{ textAlign: "right", "fontWeight": this.state.minRsqd == this.state.tesError.rSqd ? "bold" : "normal" }} bgcolor={this.state.minRsqd == this.state.tesError.rSqd ? "#86cd99" : "#FFFFFF"}>{this.state.tesError.rSqd != "" ? this.state.tesError.rSqd.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
+                                                        }
+                                                        {this.state.arimaId &&
+                                                            <td></td>
+                                                        }
+                                                    </tr>
+                                                </tbody>
+                                            </Table>
+                                        </div>
+                                    </div>
+                                    </div>
+                                    <div className="col-md-12 row pl-lg-0  pr-lg-0 pt-lg-3 pb-lg-3">
+                                        <ul className="legendcommitversion pl-lg-0">
+                                            <li><span className="lowestErrorGreenLegend legendcolor"></span> <span className="legendcommitversionText">Lowest Error</span></li>
+
+                                        </ul>
+                                    </div>
+                                    <div className="col-md-12 row pl-lg-0 pr-lg-0">
+                                        <Row>
+                                            <FormGroup className="col-md-3">
+                                                <Label htmlFor="currencyId">Choose Method<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.togglepopoverChooseMethod('popoverChooseMethod', !this.state.popoverChooseMethod)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
+                                                {/* <InputGroup> */}
+                                                <Input
+                                                    type="select"
+                                                    name="extrapolationMethodId"
+                                                    id="extrapolationMethodId"
+                                                    bsSize="sm"
+                                                    valid={!errors.extrapolationMethodId && this.state.nodeDataExtrapolation.extrapolationMethod.id != null ? this.state.nodeDataExtrapolation.extrapolationMethod.id : '' != ''}
+                                                    invalid={touched.extrapolationMethodId && !!errors.extrapolationMethodId}
+                                                    onBlur={handleBlur}
+                                                    onChange={(e) => { handleChange(e); this.extrapolationMethodChange(e) }}
+                                                    required
+                                                    value={this.state.nodeDataExtrapolation.extrapolationMethod.id}
+                                                >
+                                                    <option value="">{"Select extrapolation method"}</option>
+                                                    {extrapolationMethods}
+                                                </Input>
+
+                                                {/* </InputGroup> */}
+                                                <FormFeedback>{errors.extrapolationMethodId}</FormFeedback>
+                                            </FormGroup>
                                             <div>
-                                                <Popover placement="top" isOpen={this.state.popoverOpenArima} target="Popover1" trigger="hover" toggle={() => this.toggle('popoverOpenArima', !this.state.popoverOpenArima)}>
+                                                <Popover placement="top" isOpen={this.state.popoverChooseMethod} target="Popover1" trigger="hover" toggleChooseMethod={() => this.toggleChooseMethod('popoverChooseMethod', !this.state.popoverChooseMethod)}>
                                                     <PopoverBody>Need to add Info.</PopoverBody>
                                                 </Popover>
                                             </div>
-                                            <div className="pt-lg-2">
-                                                <Input
-                                                    className="form-check-input"
-                                                    type="checkbox"
-                                                    id="arimaId"
-                                                    name="arimaId"
-                                                    checked={this.state.arimaId}
-                                                    onClick={(e) => { this.setArimaId(e); }}
-                                                />
-                                                <Label
-                                                    className="form-check-label"
-                                                    check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                                                    <b>{i18n.t('static.extrapolation.arimaFull')}</b>
-                                                    <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenArima', !this.state.popoverOpenArima)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
-                                                </Label>
-                                            </div>
-                                            {this.state.arimaId &&
-                                                <div className="pt-lg-0" style={{ display: 'contents' }}>
-                                                    <div className="tab-ml-1 mt-md-2 mb-md-0 ExtraCheckboxFieldWidth">
-                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.p')}</Label>
-                                                        <Input
-                                                            className="controls"
-                                                            type="text"
-                                                            id="pId"
-                                                            bsSize="sm"
-                                                            name="pId"
-                                                        />
-                                                    </div>
-                                                    <div className="tab-ml-1 mt-md-2 mb-md-0 ExtraCheckboxFieldWidth">
-                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.d')}</Label>
-                                                        <Input
-                                                            className="controls"
-                                                            type="text"
-                                                            id="dId"
-                                                            bsSize="sm"
-                                                            name="dId"
-                                                        />
-                                                    </div>
-                                                    <div className="tab-ml-1 mt-md-2 mb-md-0 ExtraCheckboxFieldWidth">
-                                                        <Label htmlFor="appendedInputButton">q</Label>
-                                                        <Input
-                                                            className="controls"
-                                                            type="text"
-                                                            id="qId"
-                                                            bsSize="sm"
-                                                            name="qId"
-                                                        />
-                                                    </div>
-                                                </div>
-                                            }
-                                        </div>
+                                            <FormGroup className="col-md-5">
+                                                <Label htmlFor="currencyId">Notes</Label>
+                                                <InputGroup>
+                                                    <Input
+                                                        type="textarea"
+                                                        name="notesExtrapolation"
+                                                        id="notesExtrapolation"
+                                                        bsSize="sm"
+                                                        value={this.state.nodeDataExtrapolation.notes}
+                                                    // onChange={(e) => { this.setStartAndStopDateOfProgram(e.target.value) }}
+                                                    ></Input>
+
+                                                </InputGroup>
+
+                                            </FormGroup>
+                                            <FormGroup className="pl-lg-3 ExtrapolateSaveBtn">
+                                                <Button type="submit" color="success" onClick={() => this.touchAllExtrapolation(setTouched, errors)} className="mr-1 float-right" size="md"><i className="fa fa-check"></i>{i18n.t('static.pipeline.save')}</Button>
+                                            </FormGroup>
+                                        </Row>
                                     </div>
-                                </FormGroup>
-                            </div>
-                            <div className="col-md-12 text-left pt-lg-3 pl-lg-0">
-                                <Button className="mr-1 btn btn-info btn-md " onClick={this.toggledata}>
-                                    {this.state.show ? i18n.t('static.common.hideData') : i18n.t('static.common.showData')}
-                                </Button>
-                                <Button type="button" color="success" className="mr-1" size="md" onClick={this.interpolate}>Interpolate</Button>
-                            </div>
-                        </div>
-                    </Form>
-                    <div className="col-md-12 pl-lg-0 pr-lg-0 pt-lg-3">
-                        <div className="col-md-6">
-                            {/* <Button type="button" size="md" color="info" className="float-left mr-1" onClick={this.resetTree}>{'Show/hide data'}</Button> */}
-                        </div>
-                        <div className="col-md-4 float-right" style={{ marginTop: '-42px' }}>
-                            <FormGroup className="float-right" >
-                                <div className="check inline pl-lg-1 pt-lg-0">
-                                    <div>
-                                        <Input
-                                            className="form-check-input checkboxMargin"
-                                            type="checkbox"
-                                            id="manualChangeExtrapolation"
-                                            name="manualChangeExtrapolation"
-                                            // checked={true}
-                                            checked={this.props.items.currentItemConfig.context.payload.nodeDataMap[this.props.items.selectedScenario][0].manualChangesEffectFuture}
-                                            onClick={(e) => { this.manualChangeExtrapolation(e); }}
-                                        />
-                                        <Label
-                                            className="form-check-label"
-                                            check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                                            <b>{'Manual change affects future months (cumulative)'}</b>
-                                        </Label>
-                                    </div>
-                                </div>
-                            </FormGroup>
-                        </div>
-                    </div>
-                    <div id="tableDiv" className="extrapolateTable consumptionDataEntryTable"></div>
-                    {/* Graph */}
-                    <div className="col-md-12 pt-lg-4">
-                        <div className="chart-wrapper chart-graph-report pl-0 ml-0" style={{ marginLeft: '50px' }}>
-                            <Line id="cool-canvas" data={line} options={options} />
-                            <div>
-
-                            </div>
-                        </div>
-                    </div>
-                    <div className="table-scroll">
-                        <div className="table-wrap table-responsive">
-                            <Table className="table-bordered text-center mt-2 overflowhide main-table " bordered size="sm" >
-                                <thead>
-                                    <tr>
-                                        <td width="60px" className="text-left" title="Errors"><b>Errors</b> <i className="fa fa-info-circle icons" style={{ cursor: 'pointer', color: '#002f6c' }}></i></td>
-                                        {this.state.movingAvgId &&
-                                            <td width="110px"><b>Moving Averages</b></td>
-                                        }
-                                        <td width="110px"><b>Semi Averages</b></td>
-                                        <td width="110px"><b>Linear Regression</b></td>
-                                        <td width="110px"><b>TES</b></td>
-                                        <td width="110px"><b>ARIMA</b></td>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td className="text-left">RMSE</td>
-                                        {this.state.movingAvgId &&
-                                            <td>199.896015</td>
-                                        }
-                                        <td>180.873394</td>
-                                        <td className="ErrortdBg">176.258641</td>
-                                        <td></td>
-                                        <td></td>
-                                    </tr>
-                                    <tr>
-                                        <td className="text-left">MAPE</td>
-                                        {this.state.movingAvgId &&
-                                            <td>0.506926</td>
-                                        }
-                                        <td>0.531222</td>
-                                        <td className="ErrortdBg">0.506034</td>
-                                        <td></td>
-                                        <td></td>
-                                    </tr>
-                                    <tr>
-                                        <td className="text-left">MSE</td>
-                                        {this.state.movingAvgId &&
-                                            <td>39958.416892</td>
-                                        }
-                                        <td>32715.184570</td>
-                                        <td className="ErrortdBg">31067.108640</td>
-                                        <td></td>
-                                        <td></td>
-                                    </tr>
-                                    <tr>
-                                        <td className="text-left">WAPE</td>
-                                        {this.state.movingAvgId &&
-                                            <td></td>
-                                        }
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                    </tr>
-                                    <tr>
-                                        <td className="text-left">R^2</td>
-                                        {this.state.movingAvgId &&
-                                            <td></td>
-                                        }
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                    </tr>
-                                </tbody>
-                            </Table>
-                        </div>
-                    </div>
-                    <div className="col-md-12 pl-lg-0 pt-lg-3 pb-lg-3">
-                        <ul className="legendcommitversion pl-lg-0">
-                            <li><span className="lowestErrorGreenLegend legendcolor"></span> <span className="legendcommitversionText">Lowest Error</span></li>
-
-                        </ul>
-                    </div>
-                    <div className="col-md-12 pl-lg-0">
-                        <Row>
-                            <FormGroup className="col-md-3">
-                                <Label htmlFor="currencyId">Choose Method<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.togglepopoverChooseMethod('popoverChooseMethod', !this.state.popoverChooseMethod)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
-                                <InputGroup>
-                                    <Input
-                                        type="select"
-                                        name="extrapolationMethodId"
-                                        id="extrapolationMethodId"
-                                        bsSize="sm"
-                                    // value={this.state.programId}
-                                    // onChange={(e) => { this.setStartAndStopDateOfProgram(e.target.value) }}
-                                    >
-                                        <option value="">{"Select extrapolation method"}</option>
-                                        {extrapolationMethods}
-                                    </Input>
-
-                                </InputGroup>
-
-                            </FormGroup>
-                            <div>
-                                <Popover placement="top" isOpen={this.state.popoverChooseMethod} target="Popover1" trigger="hover" toggleChooseMethod={() => this.toggleChooseMethod('popoverChooseMethod', !this.state.popoverChooseMethod)}>
-                                    <PopoverBody>Need to add Info.</PopoverBody>
-                                </Popover>
-                            </div>
-                            <FormGroup className="col-md-5">
-                                <Label htmlFor="currencyId">Notes</Label>
-                                <InputGroup>
-                                    <Input
-                                        type="textarea"
-                                        name="notesExtrapolation"
-                                        id="notesExtrapolation"
-                                        bsSize="sm"
-                                    // value={this.state.programId}
-                                    // onChange={(e) => { this.setStartAndStopDateOfProgram(e.target.value) }}
-                                    ></Input>
-
-                                </InputGroup>
-
-                            </FormGroup>
-                            <FormGroup className="pl-lg-3 ExtrapolateSaveBtn">
-                                <Button type="submit" color="success" className="mr-1 float-right" size="md"><i className="fa fa-check"></i>{i18n.t('static.pipeline.save')}</Button>
-                            </FormGroup>
-                        </Row>
-                    </div>
+                                </Form>
+                            )} />
+                    {/* formik validation ends here */}
                 </CardBody>
             </div>
         )
