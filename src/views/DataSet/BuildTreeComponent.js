@@ -1387,7 +1387,7 @@ export default class BuildTree extends Component {
         var scenarioId = this.state.selectedScenario;
         this.setState({
             scenarioActionType: type,
-            showDiv1: false
+            showDiv1:false
 
         })
         if (type != 3) {
@@ -5822,7 +5822,7 @@ export default class BuildTree extends Component {
                                                 <PopoverBody>{i18n.t('static.tree.lagMessage')}</PopoverBody>
                                             </Popover>
                                         </div>
-                                        <FormGroup className={"col-md-6"}>
+                                        <FormGroup className={this.state.currentItemConfig.context.payload.nodeType.id == 2 ? "col-md-5" : "col-md-6"}>
                                             <Label htmlFor="currencyId">{i18n.t('static.tree.nodeType')}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={this.toggle} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                             <Input
                                                 type="select"
@@ -5847,6 +5847,25 @@ export default class BuildTree extends Component {
                                                     }, this)}
                                             </Input>
                                             <FormFeedback className="red">{errors.nodeTypeId}</FormFeedback>
+                                        </FormGroup>
+                                        <FormGroup className={this.state.currentItemConfig.context.payload.nodeType.id == 2 ? "col-md-1" : "col-md-1"} style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 2 ? "block" : "none" }}>
+                                            <Label htmlFor="currencyId" style={{ visibility: 'hidden' }}></Label>
+                                            <div style={{ marginTop: '13px' }}>
+                                                <Input
+                                                    className="form-check-input checkboxMargin"
+                                                    type="checkbox"
+                                                    id="extrapolate"
+                                                    name="extrapolate"
+                                                    // checked={true}
+                                                    checked={this.state.currentItemConfig.context.payload.extrapolation}
+                                                    onClick={(e) => { this.extrapolate(e); }}
+                                                />
+                                                <Label
+                                                    className="form-check-label"
+                                                    check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                    <b>{'Extrapolate'}</b>
+                                                </Label>
+                                            </div>
                                         </FormGroup>
 
                                         {/* {this.state.aggregationNode && */}
@@ -7167,7 +7186,7 @@ export default class BuildTree extends Component {
                 <TabPane tabId="3">
                     {/* <ConsumptionInSupplyPlanComponent ref="consumptionChild" items={this.state} toggleLarge={this.toggleLarge} updateState={this.updateState} formSubmit={this.formSubmit} hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} consumptionPage="consumptionDataEntry" useLocalData={1} /> */}
                     {this.state.currentItemConfig.context.payload.extrapolation &&
-                        <TreeExtrapolationComponent ref="extrapolationChild" items={this.state} updateState={this.updateState} />
+                        <TreeExtrapolationComponent ref="extrapolationChild" items={this.state} updateState={this.updateState}/>
                     }
                 </TabPane>
 
@@ -7396,25 +7415,25 @@ export default class BuildTree extends Component {
                         <div className={itemConfig.payload.nodeType.id == 5 ||
                             itemConfig.payload.nodeType.id == 4 ? "ContactTitle TitleColorWhite" :
                             "ContactTitle TitleColor"}>
-                            <div title={itemConfig.payload.label.label_en} style={{ fontSize: '13px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', width: '140px', float: 'left', fontWeight: 'bold', }}>
+                            <div title={itemConfig.payload.label.label_en} style={{ fontSize: '13px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', width: '140px', float: 'left', fontWeight: 'bold',}}>
                                 {itemConfig.payload.label.label_en}</div>
-                            <div style={{ float: 'right' }}>
-                                {itemConfig.payload.extrapolation == true && <i class="fa fa-line-chart" style={{ fontSize: '11px', color: (itemConfig.payload.nodeType.id == 4 || itemConfig.payload.nodeType.id == 5 ? '#fff' : '#002f6c') }}></i>}
-                                {this.getPayloadData(itemConfig, 4) == true && <i class="fa fa-exchange fa-rotate-90" style={{ fontSize: '11px', color: (itemConfig.payload.nodeType.id == 4 || itemConfig.payload.nodeType.id == 5 ? '#fff' : '#002f6c') }}></i>}
-                                <b style={{ color: '#212721', float: 'right' }}>
-                                    {itemConfig.payload.nodeType.id == 2 ?
-                                        <i class="fa fa-hashtag" style={{ fontSize: '11px', color: '#002f6c' }}></i> :
-                                        (itemConfig.payload.nodeType.id == 3 ?
-                                            <i class="fa fa-percent " style={{ fontSize: '11px', color: '#002f6c' }} ></i> :
-                                            (itemConfig.payload.nodeType.id == 4 ?
-                                                <i class="fa fa-cube" style={{ fontSize: '11px', color: '#fff' }} ></i> :
-                                                (itemConfig.payload.nodeType.id == 5 ?
-                                                    <i class="fa fa-cubes" style={{ fontSize: '11px', color: '#fff' }} ></i> :
-                                                    (itemConfig.payload.nodeType.id == 1 ?
-                                                        // <i class="fa fa-plus" style={{ fontSize: '11px', color: '#002f6c' }} ></i> : ""))))}</b>
-                                                        <i><img src={AggregationNode} className="AggregationNodeSize" /></i> : ""))))}</b>
+                            <div style={{float:'right'}}>
+                            {itemConfig.payload.extrapolation == true && <i class="fa fa-line-chart" style={{ fontSize: '11px', color: (itemConfig.payload.nodeType.id == 4 || itemConfig.payload.nodeType.id == 5 ? '#fff' : '#002f6c') }}></i>}
+                            {this.getPayloadData(itemConfig, 4) == true && <i class="fa fa-exchange fa-rotate-90" style={{ fontSize: '11px', color: (itemConfig.payload.nodeType.id == 4 || itemConfig.payload.nodeType.id == 5 ? '#fff' : '#002f6c') }}></i>}
+                            <b style={{ color: '#212721',float:'right' }}>
+                                {itemConfig.payload.nodeType.id == 2 ?
+                                    <i class="fa fa-hashtag" style={{ fontSize: '11px', color: '#002f6c' }}></i> :
+                                    (itemConfig.payload.nodeType.id == 3 ?
+                                        <i class="fa fa-percent " style={{ fontSize: '11px', color: '#002f6c' }} ></i> :
+                                        (itemConfig.payload.nodeType.id == 4 ?
+                                            <i class="fa fa-cube" style={{ fontSize: '11px', color: '#fff' }} ></i> :
+                                            (itemConfig.payload.nodeType.id == 5 ?
+                                                <i class="fa fa-cubes" style={{ fontSize: '11px', color: '#fff' }} ></i> :
+                                                (itemConfig.payload.nodeType.id == 1 ?
+                                                    // <i class="fa fa-plus" style={{ fontSize: '11px', color: '#002f6c' }} ></i> : ""))))}</b>
+                                                    <i><img src={AggregationNode} className="AggregationNodeSize" /></i> : ""))))}</b>
 
-                            </div>
+                                                    </div>
                         </div>
                     </div>
                     <div className="ContactPhone ContactPhoneValue">
@@ -8552,26 +8571,8 @@ export default class BuildTree extends Component {
                                     </NavLink>
                                 </NavItem>
 
-                                <div style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 2 ? "block" : "none" }}>
-                                    <div style={{ marginLeft: '70px', marginTop: '8px' }}>
-                                        <Input
-                                            className="form-check-input checkboxMargin"
-                                            type="checkbox"
-                                            id="extrapolate"
-                                            name="extrapolate"
-                                            // checked={true}
-                                            checked={this.state.currentItemConfig.context.payload.extrapolation}
-                                            onClick={(e) => { this.extrapolate(e); }}
-                                        />
-                                        <Label
-                                            className="form-check-label"
-                                            check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                                            <b>{'Extrapolate'}</b>
-                                        </Label>
-                                    </div>
-                                </div>
-                            </Nav>
 
+                            </Nav>
                             <TabContent activeTab={this.state.activeTab1[0]}>
                                 {this.tabPane1()}
                             </TabContent>
