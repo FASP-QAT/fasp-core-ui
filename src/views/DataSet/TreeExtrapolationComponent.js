@@ -20,6 +20,8 @@ import { calculateSemiAverages } from '../Extrapolation/SemiAverages';
 import { calculateLinearRegression } from '../Extrapolation/LinearRegression';
 import { calculateTES } from '../Extrapolation/TES';
 import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
+import { JEXCEL_INTEGER_REGEX } from '../../Constants.js'
+
 const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
     from: 'From', to: 'To',
@@ -32,7 +34,7 @@ const validationSchemaExtrapolation = function (values) {
                 function (value) {
                     console.log("***1**", document.getElementById("movingAvgId").value);
                     console.log("***noOfMonthsId**", document.getElementById("noOfMonthsId").value);
-                    var testNumber = (/^\d{0,10}?$/).test((document.getElementById("noOfMonthsId").value).replaceAll(",", ""));
+                    var testNumber = JEXCEL_INTEGER_REGEX.test((document.getElementById("noOfMonthsId").value).replaceAll(",", ""));
                     if ((document.getElementById("movingAvgId").value) == "true" && (document.getElementById("noOfMonthsId").value == "" || testNumber == false)) {
                         return false;
                     } else {
@@ -43,19 +45,19 @@ const validationSchemaExtrapolation = function (values) {
             Yup.string().test('confidenceLevelId', 'Please enter confidence level.',
                 function (value) {
                     console.log("***2**", document.getElementById("smoothingId").value);
-                    var testNumber = document.getElementById("confidenceLevelId").value != "" ? (/^\d{0,3}(\.\d{1,2})?$/).test(document.getElementById("confidenceLevelId").value) : false;
+                    // var testNumber = document.getElementById("confidenceLevelId").value != "" ? (/^\d{0,3}(\.\d{1,2})?$/).test(document.getElementById("confidenceLevelId").value) : false;
                     // console.log("*****", testNumber);
-                    if ((document.getElementById("smoothingId").value) == "true" && (document.getElementById("confidenceLevelId").value == "" || testNumber == false)) {
+                    if ((document.getElementById("smoothingId").value) == "true" && document.getElementById("confidenceLevelId").value == "") {
                         return false;
                     } else {
                         return true;
                     }
                 }),
         seasonalityId:
-            Yup.string().test('seasonalityId', 'Please enter seasonality.',
+            Yup.string().test('seasonalityId', 'Please enter correct seasonality.',
                 function (value) {
                     console.log("***3**", document.getElementById("smoothingId").value);
-                    var testNumber = document.getElementById("seasonalityId").value != "" ? (/^\d{0,3}(\.\d{1,2})?$/).test(document.getElementById("seasonalityId").value) : false;
+                    var testNumber = document.getElementById("seasonalityId").value != "" ? JEXCEL_INTEGER_REGEX.test(document.getElementById("seasonalityId").value) : false;
                     // console.log("*****", testNumber);
                     if ((document.getElementById("smoothingId").value) == "true" && (document.getElementById("seasonalityId").value == "" || testNumber == false)) {
                         return false;
@@ -725,33 +727,50 @@ export default class TreeExtrapolationComponent extends React.Component {
         // this.updateState = this.updateState.bind(this);
     }
 
-    checkActualValuesGap() {
-        var jexcelDataArr = [];
-        var tableJson = this.state.dataExtrapolation.getJson(null, false);
-        for (var i = 0; i < tableJson.length; i++) {
-            var map1 = new Map(Object.entries(tableJson[i]));
-            var json = {
-                month: map1.get("0"),
-                amount: map1.get("1") != "" ? map1.get("1").toString().replaceAll(",", "") : map1.get("1"),
-                reportingRate: map1.get("2")
-            }
-            jexcelDataArr.push(json);
-        }
-
-        var dataList = jexcelDataArr.filter(c => c.amount > 0)
-            .sort(function (a, b) {
-                return new Date(a.month) - new Date(b.month);
-            });
-        // console.log(moment(monthArray[j]).format("YYYY-MM") + " " + "startValList---", startValList);
-        // var endValList = jexcelDataArr.filter(c => moment(c.month).format("YYYY-MM") > moment(monthArray[j]).format("YYYY-MM") && c.amount > 0)
-        //     .sort(function (a, b) {
-        //         return new Date(a.month) - new Date(b.month);
-        //     });
-        var result = jexcelDataArr.filter(c => moment(c.month).format("YYYY-MM") >= moment(dataList[0]).format("YYYY-MM") && moment(c.month).format("YYYY-MM") <= moment(dataList[dataList.length - 1]).format("YYYY-MM") && c.amount == 0)
-        if (result.length > 0)
-            return false
-        else
-            return true;
+    checkActualValuesGap(type) {
+        this.setState({ extrapolationLoader: true }, () => {
+            setTimeout(() => {
+                var jexcelDataArr = [];
+                var tableJson = this.state.dataExtrapolation.getJson(null, false);
+                for (var i = 0; i < tableJson.length; i++) {
+                    var map1 = new Map(Object.entries(tableJson[i]));
+                    var json = {
+                        month: map1.get("0"),
+                        amount: map1.get("1") != "" ? map1.get("1").toString().replaceAll(",", "") : map1.get("1"),
+                        reportingRate: map1.get("2")
+                    }
+                    jexcelDataArr.push(json);
+                }
+                console.log("jexcel data 2---", jexcelDataArr);
+                var dataList = jexcelDataArr.filter(c => c.amount > 0)
+                    .sort(function (a, b) {
+                        return new Date(a.month) - new Date(b.month);
+                    });
+                console.log("gap2---", dataList)
+                // console.log(moment(monthArray[j]).format("YYYY-MM") + " " + "startValList---", startValList);
+                // var endValList = jexcelDataArr.filter(c => moment(c.month).format("YYYY-MM") > moment(monthArray[j]).format("YYYY-MM") && c.amount > 0)
+                //     .sort(function (a, b) {
+                //         return new Date(a.month) - new Date(b.month);
+                //     });
+                var result = jexcelDataArr.filter(c => moment(c.month).format("YYYY-MM") > moment(dataList[0].month).format("YYYY-MM") && moment(c.month).format("YYYY-MM") < moment(dataList[dataList.length - 1].month).format("YYYY-MM") && (c.amount == 0 || c.amount == ''))
+                console.log("dataList[0]---", dataList[0]);
+                console.log("dataList[dataList.length - 1]---", dataList[dataList.length - 1]);
+                console.log("gap3---", moment('2021-02-01').isBetween(dataList[0], dataList[dataList.length - 1]))
+                console.log("gap4---", jexcelDataArr.filter(c => c.amount == '' && moment(c.month).isBetween(dataList[0], dataList[dataList.length - 1], null)))
+                if (result.length > 0) {
+                    this.setState({ extrapolationLoader: false }, () => {
+                        alert("Please fill in the blank actual values or interpolate.")
+                    });
+                }
+                else {
+                    if (type) {
+                        this.calculateExtrapolatedData(false);
+                    } else {
+                        this.buildExtrapolationMom();
+                    }
+                }
+            }, 0);
+        });
     }
     changeNotes(notes) {
         const { nodeDataExtrapolation } = this.state;
@@ -761,6 +780,7 @@ export default class TreeExtrapolationComponent extends React.Component {
         })
     }
     buildExtrapolationMom() {
+
         var extrapolationDataList = [];
         var momList = [];
         var tableJson = this.state.dataExtrapolation.getJson(null, false);
@@ -849,7 +869,8 @@ export default class TreeExtrapolationComponent extends React.Component {
 
         this.setState({
             nodeDataExtrapolation,
-            nodeDataExtrapolationOptionList
+            nodeDataExtrapolationOptionList,
+            extrapolationLoader: false
         }, () => {
             const { currentItemConfig } = this.props.items;
             currentItemConfig.context.payload.nodeDataMap[this.props.items.selectedScenario][0].nodeDataExtrapolation = this.state.nodeDataExtrapolation;
@@ -858,7 +879,6 @@ export default class TreeExtrapolationComponent extends React.Component {
             console.log("extrapolation data----", currentItemConfig);
             this.props.updateState("currentItemConfig", currentItemConfig);
         });
-
     }
 
     touchAllExtrapolation(setTouched, errors) {
@@ -1084,69 +1104,71 @@ export default class TreeExtrapolationComponent extends React.Component {
                 jexcelDataArr.push(json);
             }
         } else {
-            if (this.checkActualValuesGap()) {
-                var tableJson = this.state.dataExtrapolation.getJson(null, false);
-                for (var i = 0; i < tableJson.length; i++) {
-                    var map1 = new Map(Object.entries(tableJson[i]));
-                    console.log("10 map---" + map1.get("10"));
-                    var result = jexcelDataArr.filter(x => x.amount > 0);
-                    resultCount = (map1.get("1") != "" && map1.get("1") != 0) || result.length > 0 ? resultCount + 1 : resultCount;
-                    var json = {
-                        month: map1.get("0"),
-                        amount: map1.get("1") != "" ? map1.get("1").toString().replaceAll(",", "") : map1.get("1"),
-                        reportingRate: map1.get("2"),
-                        monthNo: resultCount
-                    }
-                    jexcelDataArr.push(json);
+            var tableJson = this.state.dataExtrapolation.getJson(null, false);
+            for (var i = 0; i < tableJson.length; i++) {
+                var map1 = new Map(Object.entries(tableJson[i]));
+                console.log("10 map---" + map1.get("10"));
+                var result = jexcelDataArr.filter(x => x.amount > 0);
+                resultCount = (map1.get("1") != "" && map1.get("1") != 0) || result.length > 0 ? resultCount + 1 : resultCount;
+                var json = {
+                    month: map1.get("0"),
+                    amount: map1.get("1") != "" ? map1.get("1").toString().replaceAll(",", "") : map1.get("1"),
+                    reportingRate: map1.get("2"),
+                    monthNo: resultCount
                 }
-            } else {
-                alert("There are some missing values in the data.Please fill in the data or interpolate.")
+                jexcelDataArr.push(json);
             }
-        }
-        this.setState({ jexcelDataArr }, () => {
-            console.log("tableJson length---", jexcelDataArr.length);
-            if (jexcelDataArr.length > 0) {
-                console.log("jexcelDataArr with month no---->", jexcelDataArr)
 
-                var valList = jexcelDataArr.filter(c => c.amount > 0)
-                    .sort(function (a, b) {
-                        return new Date(a.month) - new Date(b.month);
-                    });
-                this.setState({
-                    minMonth: valList[0].month
-                });
-                for (let i = 0; i < jexcelDataArr.length; i++) {
-                    if (moment(valList[0].month).format("YYYY-MM") <= moment(jexcelDataArr[i].month).format("YYYY-MM")) {
-                        inputDataMovingAvg.push({ "month": inputDataMovingAvg.length + 1, "actual": jexcelDataArr[i].amount > 0 ? Number(jexcelDataArr[i].amount) : null, "forecast": null })
-                        inputDataSemiAverage.push({ "month": inputDataSemiAverage.length + 1, "actual": jexcelDataArr[i].amount > 0 ? Number(jexcelDataArr[i].amount) : null, "forecast": null })
-                        inputDataLinearRegression.push({ "month": inputDataLinearRegression.length + 1, "actual": jexcelDataArr[i].amount > 0 ? Number(jexcelDataArr[i].amount) : null, "forecast": null })
-                        inputDataTes.push({ "month": inputDataTes.length + 1, "actual": jexcelDataArr[i].amount > 0 ? Number(jexcelDataArr[i].amount) : null, "forecast": null })
-                        console.log("inputDataTes----", inputDataTes)
-                    }
-                }
-                console.log("inputDataMovingAvg--->>>", inputDataMovingAvg)
-                var data = jexcelDataArr.filter(c => c.amount > 0)
-                    .sort(function (a, b) {
-                        return new Date(a.month) - new Date(b.month);
-                    });
-                var lastMonth = data[data.length - 1].month;
-                var noOfMonthsForProjection = moment(new Date(this.props.items.forecastStopDate)).diff(new Date(lastMonth), 'months', true)
-                console.log("noOfMonthsForProjection", noOfMonthsForProjection);
-                calculateMovingAvg(inputDataMovingAvg, this.state.monthsForMovingAverage, Math.trunc(noOfMonthsForProjection), this);
-                calculateSemiAverages(inputDataSemiAverage, noOfMonthsForProjection, this);
-                calculateLinearRegression(inputDataLinearRegression, noOfMonthsForProjection, this);
-                if (inputDataTes.length >= (this.state.noOfMonthsForASeason * 2)) {
-                    console.log("tes inside if")
-                    calculateTES(inputDataTes, this.state.alpha, this.state.beta, this.state.gamma, this.state.confidenceLevelId, this.state.noOfMonthsForASeason, noOfMonthsForProjection, this);
-                } else {
-                    console.log("tes inside else")
+        }
+        console.log("jexcel data 1---", jexcelDataArr);
+        this.setState({ jexcelDataArr }, () => {
+            setTimeout(() => {
+                console.log("tableJson for extrapolation---", this.state.jexcelDataArr);
+                if (jexcelDataArr.length > 0) {
+                    console.log("jexcelDataArr with month no---->", jexcelDataArr)
+
+                    var valList = jexcelDataArr.filter(c => c.amount > 0)
+                        .sort(function (a, b) {
+                            return new Date(a.month) - new Date(b.month);
+                        });
                     this.setState({
-                        tesData: [],
-                        CI: 0,
-                        tesError: { "rmse": "", "mape": "", "mse": "", "wape": "", "rSqd": "" }
-                    })
+                        minMonth: valList[0].month
+                    });
+                    for (let i = 0; i < jexcelDataArr.length; i++) {
+                        if (moment(valList[0].month).format("YYYY-MM") <= moment(jexcelDataArr[i].month).format("YYYY-MM")) {
+                            inputDataMovingAvg.push({ "month": inputDataMovingAvg.length + 1, "actual": jexcelDataArr[i].amount > 0 ? Number(jexcelDataArr[i].amount) : null, "forecast": null })
+                            inputDataSemiAverage.push({ "month": inputDataSemiAverage.length + 1, "actual": jexcelDataArr[i].amount > 0 ? Number(jexcelDataArr[i].amount) : null, "forecast": null })
+                            inputDataLinearRegression.push({ "month": inputDataLinearRegression.length + 1, "actual": jexcelDataArr[i].amount > 0 ? Number(jexcelDataArr[i].amount) : null, "forecast": null })
+                            inputDataTes.push({ "month": inputDataTes.length + 1, "actual": jexcelDataArr[i].amount > 0 ? Number(jexcelDataArr[i].amount) : null, "forecast": null })
+                            console.log("inputDataTes----", inputDataTes)
+                        }
+                    }
+                    console.log("inputDataMovingAvg--->>>", inputDataMovingAvg)
+                    var data = jexcelDataArr.filter(c => c.amount > 0)
+                        .sort(function (a, b) {
+                            return new Date(a.month) - new Date(b.month);
+                        });
+                    var lastMonth = data[data.length - 1].month;
+                    var noOfMonthsForProjection = moment(new Date(this.props.items.forecastStopDate)).diff(new Date(lastMonth), 'months', true)
+                    console.log("noOfMonthsForProjection", noOfMonthsForProjection);
+                    calculateMovingAvg(inputDataMovingAvg, this.state.monthsForMovingAverage, Math.trunc(noOfMonthsForProjection), this);
+                    calculateSemiAverages(inputDataSemiAverage, noOfMonthsForProjection, this);
+                    calculateLinearRegression(inputDataLinearRegression, noOfMonthsForProjection, this);
+                    if (inputDataTes.length >= (this.state.noOfMonthsForASeason * 2)) {
+                        console.log("tes inside if")
+                        calculateTES(JSON.parse(JSON.stringify(inputDataTes)), this.state.alpha, this.state.beta, this.state.gamma, this.state.confidenceLevelId, this.state.noOfMonthsForASeason, Math.trunc(noOfMonthsForProjection), this);
+                    } else {
+                        console.log("tes inside else")
+                        this.setState({
+                            tesData: [],
+                            CI: 0,
+                            tesError: { "rmse": "", "mape": "", "mse": "", "wape": "", "rSqd": "" }
+                        })
+                    }
+                } else {
+                    this.setState({ extrapolationLoader: false });
                 }
-            }
+            }, 0);
         });
         // this.buildJexcel();
 
@@ -1222,14 +1244,16 @@ export default class TreeExtrapolationComponent extends React.Component {
             // }
         }
         console.log("interpolatedData---", interpolatedData);
-        this.state.nodeDataExtrapolation.extrapolationDataList = jexcelDataArr;
+        const { nodeDataExtrapolation } = this.state;
+        nodeDataExtrapolation.extrapolationDataList = jexcelDataArr;
         var valList = jexcelDataArr.filter(c => c.amount > 0)
             .sort(function (a, b) {
                 return new Date(a.month) - new Date(b.month);
             });
         this.setState({
-            minMonth: valList[0].month
-        });
+            minMonth: valList[0].month,
+            nodeDataExtrapolation
+        }, () => { this.buildJexcel() });
         // for (let i = 0; i < jexcelDataArr.length; i++) {
         //     if (moment(valList[0].month).format("YYYY-MM") <= moment(jexcelDataArr[i].month).format("YYYY-MM")) {
         //         inputDataMovingAvg.push({ "month": inputDataMovingAvg.length + 1, "actual": jexcelDataArr[i].amount > 0 ? Number(jexcelDataArr[i].amount) : null, "forecast": null })
@@ -1806,6 +1830,7 @@ export default class TreeExtrapolationComponent extends React.Component {
         tr.children[7].classList.add('InfoTr');
         tr.children[8].classList.add('InfoTr');
         tr.children[9].classList.add('InfoTr');
+        tr.children[3].title = 'Placeholder'
 
 
     }
@@ -2450,7 +2475,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                             validate={validateExtrapolation(validationSchemaExtrapolation)}
                             onSubmit={(values, { setSubmitting, setErrors }) => {
                                 if (this.checkValidationExtrapolation()) {
-                                    this.buildExtrapolationMom();
+                                    this.checkActualValuesGap(false);
                                     console.log("tree extrapolation on submit called")
                                 } else {
                                     console.log("tree extrapolation on submit not called")
@@ -2554,7 +2579,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                                 />
                                                                 <Label
                                                                     className="form-check-label"
-                                                                    check htmlFor="inline-radio2" style={{ fontSize: '12px',marginTop:'2px' }}>
+                                                                    check htmlFor="inline-radio2" style={{ fontSize: '12px', marginTop: '2px' }}>
                                                                     <b>Moving Averages</b>
                                                                     <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
                                                                 </Label>
@@ -2597,7 +2622,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                                 />
                                                                 <Label
                                                                     className="form-check-label"
-                                                                    check htmlFor="inline-radio2" style={{ fontSize: '12px', marginTop:'2px' }}>
+                                                                    check htmlFor="inline-radio2" style={{ fontSize: '12px', marginTop: '2px' }}>
                                                                     <b>Semi-Averages</b>
                                                                     <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenSa', !this.state.popoverOpenSa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
                                                                 </Label>
@@ -2620,7 +2645,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                                 />
                                                                 <Label
                                                                     className="form-check-label"
-                                                                    check htmlFor="inline-radio2" style={{ fontSize: '12px',marginTop:'2px' }}>
+                                                                    check htmlFor="inline-radio2" style={{ fontSize: '12px', marginTop: '2px' }}>
                                                                     <b>Linear Regression</b>
                                                                     <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenLr', !this.state.popoverOpenLr)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
                                                                 </Label>
@@ -2644,7 +2669,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                                 />
                                                                 <Label
                                                                     className="form-check-label"
-                                                                    check htmlFor="inline-radio2" style={{ fontSize: '12px', marginTop:'2px' }}>
+                                                                    check htmlFor="inline-radio2" style={{ fontSize: '12px', marginTop: '2px' }}>
                                                                     <b>Triple-Exponential Smoothing (Holts-Winters)</b>
                                                                     <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenTes', !this.state.popoverOpenTes)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
                                                                 </Label>
@@ -2778,7 +2803,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                                 />
                                                                 <Label
                                                                     className="form-check-label"
-                                                                    check htmlFor="inline-radio2" style={{ fontSize: '12px', marginTop:'2px' }}>
+                                                                    check htmlFor="inline-radio2" style={{ fontSize: '12px', marginTop: '2px' }}>
                                                                     <b>{i18n.t('static.extrapolation.arimaFull')}</b>
                                                                     <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenArima', !this.state.popoverOpenArima)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
                                                                 </Label>
@@ -2892,22 +2917,22 @@ export default class TreeExtrapolationComponent extends React.Component {
                                             </div>
                                         </div>
                                         <div className="row pl-lg-0 pr-lg-0">
-                                       
+
                                             <div className="table-scroll">
                                                 <div className="table-wrap table-responsive">
                                                     <Table className="table-bordered text-center mt-2 overflowhide main-table " bordered size="sm" >
                                                         <thead>
                                                             <tr>
-                                                           
-                                                                <td width="60px" className="text-left" title={i18n.t('static.common.errors')}><b>{i18n.t('static.common.errors')}</b> <i class="fa fa-info-circle icons pl-lg-2" id="Popover1"  aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></td>
+
+                                                                <td width="60px" className="text-left" title={i18n.t('static.common.errors')}><b>{i18n.t('static.common.errors')}</b> <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></td>
                                                                 {this.state.movingAvgId &&
-                                                                    <td width="110px" title={i18n.t('static.extrapolation.movingAverages')}><b>{i18n.t('static.extrapolation.movingAverages')}</b> <i class="fa fa-info-circle icons pl-lg-2" id="Popover1"  aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></td>
+                                                                    <td width="110px" title={i18n.t('static.extrapolation.movingAverages')}><b>{i18n.t('static.extrapolation.movingAverages')}</b> <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></td>
                                                                 }
                                                                 {this.state.semiAvgId &&
-                                                                    <td width="110px" title={i18n.t('static.extrapolation.semiAverages')}><b>{i18n.t('static.extrapolation.semiAverages')}</b> <i class="fa fa-info-circle icons pl-lg-2" id="Popover1"  aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></td>
+                                                                    <td width="110px" title={i18n.t('static.extrapolation.semiAverages')}><b>{i18n.t('static.extrapolation.semiAverages')}</b> <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></td>
                                                                 }
                                                                 {this.state.linearRegressionId &&
-                                                                    <td width="110px" title={i18n.t('static.extrapolation.linearRegression')}><b>{i18n.t('static.extrapolation.linearRegression')}</b> <i class="fa fa-info-circle icons pl-lg-2" id="Popover1"  aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></td>
+                                                                    <td width="110px" title={i18n.t('static.extrapolation.linearRegression')}><b>{i18n.t('static.extrapolation.linearRegression')}</b> <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></td>
                                                                 }
                                                                 {this.state.smoothingId &&
                                                                     <td width="110px"><b>{i18n.t('static.extrapolation.tes')}</b></td>
@@ -2921,16 +2946,16 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                             <tr>
                                                                 <td className="text-left">{i18n.t('static.extrapolation.rmse')}</td>
                                                                 {this.state.movingAvgId &&
-                                                                    <td style={{ textAlign: "right", "fontWeight": this.state.minRmse == this.state.movingAvgError.rmse ? "bold" : "normal" }} bgcolor={this.state.minRmse == this.state.movingAvgError.rmse ? "#86cd99" : "#FFFFFF"}>{this.state.movingAvgError.rmse != "" ? this.state.movingAvgError.rmse.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
+                                                                    <td style={{ textAlign: "right", "fontWeight": this.state.minRmse == this.state.movingAvgError.rmse ? "bold" : "normal" }} bgcolor={this.state.minRmse == this.state.movingAvgError.rmse ? "#86cd99" : "#FFFFFF"}>{this.state.movingAvgError.rmse != "" ? this.state.movingAvgError.rmse.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
                                                                 }
                                                                 {this.state.semiAvgId &&
-                                                                    <td style={{ textAlign: "right", "fontWeight": this.state.minRmse == this.state.semiAvgError.rmse ? "bold" : "normal" }} bgcolor={this.state.minRmse == this.state.semiAvgError.rmse ? "#86cd99" : "#FFFFFF"}>{this.state.semiAvgError.rmse != "" ? this.state.semiAvgError.rmse.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
+                                                                    <td style={{ textAlign: "right", "fontWeight": this.state.minRmse == this.state.semiAvgError.rmse ? "bold" : "normal" }} bgcolor={this.state.minRmse == this.state.semiAvgError.rmse ? "#86cd99" : "#FFFFFF"}>{this.state.semiAvgError.rmse != "" ? this.state.semiAvgError.rmse.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
                                                                 }
                                                                 {this.state.linearRegressionId &&
-                                                                    <td style={{ textAlign: "right", "fontWeight": this.state.minRmse == this.state.linearRegressionError.rmse ? "bold" : "normal" }} bgcolor={this.state.minRmse == this.state.linearRegressionError.rmse ? "#86cd99" : "#FFFFFF"}>{this.state.linearRegressionError.rmse != "" ? this.state.linearRegressionError.rmse.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
+                                                                    <td style={{ textAlign: "right", "fontWeight": this.state.minRmse == this.state.linearRegressionError.rmse ? "bold" : "normal" }} bgcolor={this.state.minRmse == this.state.linearRegressionError.rmse ? "#86cd99" : "#FFFFFF"}>{this.state.linearRegressionError.rmse != "" ? this.state.linearRegressionError.rmse.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
                                                                 }
                                                                 {this.state.smoothingId &&
-                                                                    <td style={{ textAlign: "right", "fontWeight": this.state.minRmse == this.state.tesError.rmse ? "bold" : "normal" }} bgcolor={this.state.minRmse == this.state.tesError.rmse ? "#86cd99" : "#FFFFFF"}>{this.state.tesError.rmse != "" ? this.state.tesError.rmse.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
+                                                                    <td style={{ textAlign: "right", "fontWeight": this.state.minRmse == this.state.tesError.rmse ? "bold" : "normal" }} bgcolor={this.state.minRmse == this.state.tesError.rmse ? "#86cd99" : "#FFFFFF"}>{this.state.tesError.rmse != "" ? this.state.tesError.rmse.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
                                                                 }
                                                                 {this.state.arimaId &&
                                                                     <td></td>
@@ -2939,16 +2964,16 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                             <tr>
                                                                 <td className="text-left">{i18n.t('static.extrapolation.mape')}</td>
                                                                 {this.state.movingAvgId &&
-                                                                    <td style={{ textAlign: "right", "fontWeight": this.state.minMape == this.state.movingAvgError.mape ? "bold" : "normal" }} bgcolor={this.state.minMape == this.state.movingAvgError.mape ? "#86cd99" : "#FFFFFF"}>{this.state.movingAvgError.mape != "" ? this.state.movingAvgError.mape.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
+                                                                    <td style={{ textAlign: "right", "fontWeight": this.state.minMape == this.state.movingAvgError.mape ? "bold" : "normal" }} bgcolor={this.state.minMape == this.state.movingAvgError.mape ? "#86cd99" : "#FFFFFF"}>{this.state.movingAvgError.mape != "" ? this.state.movingAvgError.mape.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
                                                                 }
                                                                 {this.state.semiAvgId &&
-                                                                    <td style={{ textAlign: "right", "fontWeight": this.state.minMape == this.state.semiAvgError.mape ? "bold" : "normal" }} bgcolor={this.state.minMape == this.state.semiAvgError.mape ? "#86cd99" : "#FFFFFF"}>{this.state.semiAvgError.mape != "" ? this.state.semiAvgError.mape.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
+                                                                    <td style={{ textAlign: "right", "fontWeight": this.state.minMape == this.state.semiAvgError.mape ? "bold" : "normal" }} bgcolor={this.state.minMape == this.state.semiAvgError.mape ? "#86cd99" : "#FFFFFF"}>{this.state.semiAvgError.mape != "" ? this.state.semiAvgError.mape.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
                                                                 }
                                                                 {this.state.linearRegressionId &&
-                                                                    <td style={{ textAlign: "right", "fontWeight": this.state.minMape == this.state.linearRegressionError.mape ? "bold" : "normal" }} bgcolor={this.state.minMape == this.state.linearRegressionError.mape ? "#86cd99" : "#FFFFFF"}>{this.state.linearRegressionError.mape != "" ? this.state.linearRegressionError.mape.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
+                                                                    <td style={{ textAlign: "right", "fontWeight": this.state.minMape == this.state.linearRegressionError.mape ? "bold" : "normal" }} bgcolor={this.state.minMape == this.state.linearRegressionError.mape ? "#86cd99" : "#FFFFFF"}>{this.state.linearRegressionError.mape != "" ? this.state.linearRegressionError.mape.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
                                                                 }
                                                                 {this.state.smoothingId &&
-                                                                    <td style={{ textAlign: "right", "fontWeight": this.state.minMape == this.state.tesError.mape ? "bold" : "normal" }} bgcolor={this.state.minMape == this.state.tesError.mape ? "#86cd99" : "#FFFFFF"}>{this.state.tesError.mape != "" ? this.state.tesError.mape.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
+                                                                    <td style={{ textAlign: "right", "fontWeight": this.state.minMape == this.state.tesError.mape ? "bold" : "normal" }} bgcolor={this.state.minMape == this.state.tesError.mape ? "#86cd99" : "#FFFFFF"}>{this.state.tesError.mape != "" ? this.state.tesError.mape.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
                                                                 }
                                                                 {this.state.arimaId &&
                                                                     <td></td>
@@ -2957,16 +2982,16 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                             <tr>
                                                                 <td className="text-left">{i18n.t('static.extrapolation.mse')}</td>
                                                                 {this.state.movingAvgId &&
-                                                                    <td style={{ textAlign: "right", "fontWeight": this.state.minMse == this.state.movingAvgError.mse ? "bold" : "normal" }} bgcolor={this.state.minMse == this.state.movingAvgError.mse ? "#86cd99" : "#FFFFFF"}>{this.state.movingAvgError.mse != "" ? this.state.movingAvgError.mse.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
+                                                                    <td style={{ textAlign: "right", "fontWeight": this.state.minMse == this.state.movingAvgError.mse ? "bold" : "normal" }} bgcolor={this.state.minMse == this.state.movingAvgError.mse ? "#86cd99" : "#FFFFFF"}>{this.state.movingAvgError.mse != "" ? this.state.movingAvgError.mse.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
                                                                 }
                                                                 {this.state.semiAvgId &&
-                                                                    <td style={{ textAlign: "right", "fontWeight": this.state.minMse == this.state.semiAvgError.mse ? "bold" : "normal" }} bgcolor={this.state.minMse == this.state.semiAvgError.mse ? "#86cd99" : "#FFFFFF"}>{this.state.semiAvgError.mse != "" ? this.state.semiAvgError.mse.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
+                                                                    <td style={{ textAlign: "right", "fontWeight": this.state.minMse == this.state.semiAvgError.mse ? "bold" : "normal" }} bgcolor={this.state.minMse == this.state.semiAvgError.mse ? "#86cd99" : "#FFFFFF"}>{this.state.semiAvgError.mse != "" ? this.state.semiAvgError.mse.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
                                                                 }
                                                                 {this.state.linearRegressionId &&
-                                                                    <td style={{ textAlign: "right", "fontWeight": this.state.minMse == this.state.linearRegressionError.mse ? "bold" : "normal" }} bgcolor={this.state.minMse == this.state.linearRegressionError.mse ? "#86cd99" : "#FFFFFF"}>{this.state.linearRegressionError.mse != "" ? this.state.linearRegressionError.mse.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
+                                                                    <td style={{ textAlign: "right", "fontWeight": this.state.minMse == this.state.linearRegressionError.mse ? "bold" : "normal" }} bgcolor={this.state.minMse == this.state.linearRegressionError.mse ? "#86cd99" : "#FFFFFF"}>{this.state.linearRegressionError.mse != "" ? this.state.linearRegressionError.mse.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
                                                                 }
                                                                 {this.state.smoothingId &&
-                                                                    <td style={{ textAlign: "right", "fontWeight": this.state.minMse == this.state.tesError.mse ? "bold" : "normal" }} bgcolor={this.state.minMse == this.state.tesError.mse ? "#86cd99" : "#FFFFFF"}>{this.state.tesError.mse != "" ? this.state.tesError.mse.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
+                                                                    <td style={{ textAlign: "right", "fontWeight": this.state.minMse == this.state.tesError.mse ? "bold" : "normal" }} bgcolor={this.state.minMse == this.state.tesError.mse ? "#86cd99" : "#FFFFFF"}>{this.state.tesError.mse != "" ? this.state.tesError.mse.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
                                                                 }
                                                                 {this.state.arimaId &&
                                                                     <td></td>
@@ -2975,16 +3000,16 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                             <tr>
                                                                 <td className="text-left">{i18n.t('static.extrapolation.wape')}</td>
                                                                 {this.state.movingAvgId &&
-                                                                    <td style={{ textAlign: "right", "fontWeight": this.state.minWape == this.state.movingAvgError.wape ? "bold" : "normal" }} bgcolor={this.state.minWape == this.state.movingAvgError.wape ? "#86cd99" : "#FFFFFF"}>{this.state.movingAvgError.wape != "" ? this.state.movingAvgError.wape.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
+                                                                    <td style={{ textAlign: "right", "fontWeight": this.state.minWape == this.state.movingAvgError.wape ? "bold" : "normal" }} bgcolor={this.state.minWape == this.state.movingAvgError.wape ? "#86cd99" : "#FFFFFF"}>{this.state.movingAvgError.wape != "" ? this.state.movingAvgError.wape.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
                                                                 }
                                                                 {this.state.semiAvgId &&
-                                                                    <td style={{ textAlign: "right", "fontWeight": this.state.minWape == this.state.semiAvgError.wape ? "bold" : "normal" }} bgcolor={this.state.minWape == this.state.semiAvgError.wape ? "#86cd99" : "#FFFFFF"}>{this.state.semiAvgError.wape != "" ? this.state.semiAvgError.wape.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
+                                                                    <td style={{ textAlign: "right", "fontWeight": this.state.minWape == this.state.semiAvgError.wape ? "bold" : "normal" }} bgcolor={this.state.minWape == this.state.semiAvgError.wape ? "#86cd99" : "#FFFFFF"}>{this.state.semiAvgError.wape != "" ? this.state.semiAvgError.wape.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
                                                                 }
                                                                 {this.state.linearRegressionId &&
-                                                                    <td style={{ textAlign: "right", "fontWeight": this.state.minWape == this.state.linearRegressionError.wape ? "bold" : "normal" }} bgcolor={this.state.minWape == this.state.linearRegressionError.wape ? "#86cd99" : "#FFFFFF"}>{this.state.linearRegressionError.wape != "" ? this.state.linearRegressionError.wape.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
+                                                                    <td style={{ textAlign: "right", "fontWeight": this.state.minWape == this.state.linearRegressionError.wape ? "bold" : "normal" }} bgcolor={this.state.minWape == this.state.linearRegressionError.wape ? "#86cd99" : "#FFFFFF"}>{this.state.linearRegressionError.wape != "" ? this.state.linearRegressionError.wape.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
                                                                 }
                                                                 {this.state.smoothingId &&
-                                                                    <td style={{ textAlign: "right", "fontWeight": this.state.minWape == this.state.tesError.wape ? "bold" : "normal" }} bgcolor={this.state.minWape == this.state.tesError.wape ? "#86cd99" : "#FFFFFF"}>{this.state.tesError.wape != "" ? this.state.tesError.wape.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
+                                                                    <td style={{ textAlign: "right", "fontWeight": this.state.minWape == this.state.tesError.wape ? "bold" : "normal" }} bgcolor={this.state.minWape == this.state.tesError.wape ? "#86cd99" : "#FFFFFF"}>{this.state.tesError.wape != "" ? this.state.tesError.wape.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
                                                                 }
                                                                 {this.state.arimaId &&
                                                                     <td></td>
@@ -2993,16 +3018,16 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                             <tr>
                                                                 <td className="text-left">{i18n.t('static.extrapolation.rSquare')}</td>
                                                                 {this.state.movingAvgId &&
-                                                                    <td style={{ textAlign: "right", "fontWeight": this.state.minRsqd == this.state.movingAvgError.rSqd ? "bold" : "normal" }} bgcolor={this.state.minRsqd == this.state.movingAvgError.rSqd ? "#86cd99" : "#FFFFFF"}>{this.state.movingAvgError.rSqd != "" ? this.state.movingAvgError.rSqd.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
+                                                                    <td style={{ textAlign: "right", "fontWeight": this.state.minRsqd == this.state.movingAvgError.rSqd ? "bold" : "normal" }} bgcolor={this.state.minRsqd == this.state.movingAvgError.rSqd ? "#86cd99" : "#FFFFFF"}>{this.state.movingAvgError.rSqd != "" ? this.state.movingAvgError.rSqd.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
                                                                 }
                                                                 {this.state.semiAvgId &&
-                                                                    <td style={{ textAlign: "right", "fontWeight": this.state.minRsqd == this.state.semiAvgError.rSqd ? "bold" : "normal" }} bgcolor={this.state.minRsqd == this.state.semiAvgError.rSqd ? "#86cd99" : "#FFFFFF"}>{this.state.semiAvgError.rSqd != "" ? this.state.semiAvgError.rSqd.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
+                                                                    <td style={{ textAlign: "right", "fontWeight": this.state.minRsqd == this.state.semiAvgError.rSqd ? "bold" : "normal" }} bgcolor={this.state.minRsqd == this.state.semiAvgError.rSqd ? "#86cd99" : "#FFFFFF"}>{this.state.semiAvgError.rSqd != "" ? this.state.semiAvgError.rSqd.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
                                                                 }
                                                                 {this.state.linearRegressionId &&
-                                                                    <td style={{ textAlign: "right", "fontWeight": this.state.minRsqd == this.state.linearRegressionError.rSqd ? "bold" : "normal" }} bgcolor={this.state.minRsqd == this.state.linearRegressionError.rSqd ? "#86cd99" : "#FFFFFF"}>{this.state.linearRegressionError.rSqd != "" ? this.state.linearRegressionError.rSqd.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
+                                                                    <td style={{ textAlign: "right", "fontWeight": this.state.minRsqd == this.state.linearRegressionError.rSqd ? "bold" : "normal" }} bgcolor={this.state.minRsqd == this.state.linearRegressionError.rSqd ? "#86cd99" : "#FFFFFF"}>{this.state.linearRegressionError.rSqd != "" ? this.state.linearRegressionError.rSqd.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
                                                                 }
                                                                 {this.state.smoothingId &&
-                                                                    <td style={{ textAlign: "right", "fontWeight": this.state.minRsqd == this.state.tesError.rSqd ? "bold" : "normal" }} bgcolor={this.state.minRsqd == this.state.tesError.rSqd ? "#86cd99" : "#FFFFFF"}>{this.state.tesError.rSqd != "" ? this.state.tesError.rSqd.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
+                                                                    <td style={{ textAlign: "right", "fontWeight": this.state.minRsqd == this.state.tesError.rSqd ? "bold" : "normal" }} bgcolor={this.state.minRsqd == this.state.tesError.rSqd ? "#86cd99" : "#FFFFFF"}>{this.state.tesError.rSqd != "" ? this.state.tesError.rSqd.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
                                                                 }
                                                                 {this.state.arimaId &&
                                                                     <td></td>
@@ -3064,8 +3089,8 @@ export default class TreeExtrapolationComponent extends React.Component {
 
                                                 </FormGroup>
                                                 <FormGroup className="pl-lg-3 ExtrapolateSaveBtn">
-                                                    <Button type="button" id="dataCheck" size="md" color="info" className="float-right mr-1" onClick={() => this.calculateExtrapolatedData(false)}><i className="fa fa-check"></i>Extrapolate</Button>
                                                     <Button type="submit" color="success" onClick={() => this.touchAllExtrapolation(setTouched, errors)} className="mr-1 float-right" size="md"><i className="fa fa-check"></i>{i18n.t('static.pipeline.save')}</Button>
+                                                    <Button type="button" id="dataCheck" size="md" color="info" className="float-right mr-1" onClick={() => this.checkActualValuesGap(true)}><i className="fa fa-check"></i>Extrapolate</Button>
                                                 </FormGroup>
                                             </Row>
                                         </div>

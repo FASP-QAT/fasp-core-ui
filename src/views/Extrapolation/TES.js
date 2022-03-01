@@ -1,19 +1,386 @@
 import { std, sqrt, mean, abs } from 'mathjs';
 import { calculateError } from '../Extrapolation/ErrorCalculations.js';
 export function calculateTES(inputData, alphaParam, betaParam, gammaParam, confidenceLevel, seasonality, noOfProjectionMonths, props) {
-    console.log("InputData@@@",inputData)
+    console.log("InputData@@@", inputData)
     const alpha = alphaParam
     const beta = betaParam
     const gamma = gammaParam
     const noOfMonthsForASeason = seasonality
     const confidence = confidenceLevel;
-    console.log("alpha%%%",alpha)
-    console.log("beta%%%",beta)
-    console.log("gamma%%%",gamma)
-    console.log("noOfMonthsForASeason%%%",noOfMonthsForASeason)
-    console.log("confidence%%%",confidenceLevel);
+    console.log("alpha%%%", alpha)
+    console.log("beta%%%", beta)
+    console.log("gamma%%%", gamma)
+    console.log("noOfMonthsForASeason%%%", noOfMonthsForASeason)
+    console.log("noOfProjectionMonths%%%", noOfProjectionMonths)
+    console.log("confidence%%%", confidenceLevel);
 
-
+    inputData = [
+        {
+            "month": 1,
+            "actual": 1807.37,
+            "forecast": null
+        },
+        {
+            "month": 2,
+            "actual": 2355.32,
+            "forecast": null
+        },
+        {
+            "month": 3,
+            "actual": 2591.83,
+            "forecast": null
+        },
+        {
+            "month": 4,
+            "actual": 2236.39,
+            "forecast": null
+        },
+        {
+            "month": 5,
+            "actual": 1549.14,
+            "forecast": null
+        },
+        {
+            "month": 6,
+            "actual": 2105.79,
+            "forecast": null
+        },
+        {
+            "month": 7,
+            "actual": 2041.32,
+            "forecast": null
+        },
+        {
+            "month": 8,
+            "actual": 2021.01,
+            "forecast": null
+        },
+        {
+            "month": 9,
+            "actual": 1870.46,
+            "forecast": null
+        },
+        {
+            "month": 10,
+            "actual": 2390.56,
+            "forecast": null
+        },
+        {
+            "month": 11,
+            "actual": 2198.03,
+            "forecast": null
+        },
+        {
+            "month": 12,
+            "actual": 2046.83,
+            "forecast": null
+        },
+        {
+            "month": 13,
+            "actual": 1934.19,
+            "forecast": null
+        },
+        {
+            "month": 14,
+            "actual": 2406.41,
+            "forecast": null
+        },
+        {
+            "month": 15,
+            "actual": 2249.06,
+            "forecast": null
+        },
+        {
+            "month": 16,
+            "actual": 2211.56,
+            "forecast": null
+        },
+        {
+            "month": 17,
+            "actual": 2237.05,
+            "forecast": null
+        },
+        {
+            "month": 18,
+            "actual": 2856.43,
+            "forecast": null
+        },
+        {
+            "month": 19,
+            "actual": 2799.57,
+            "forecast": null
+        },
+        {
+            "month": 20,
+            "actual": 2645.33,
+            "forecast": null
+        },
+        {
+            "month": 21,
+            "actual": 2563.59,
+            "forecast": null
+        },
+        {
+            "month": 22,
+            "actual": 3146.52,
+            "forecast": null
+        },
+        {
+            "month": 23,
+            "actual": 3196.68,
+            "forecast": null
+        },
+        {
+            "month": 24,
+            "actual": 2930.48,
+            "forecast": null
+        },
+        {
+            "month": 25,
+            "actual": null,
+            "forecast": null
+        },
+        {
+            "month": 26,
+            "actual": null,
+            "forecast": null
+        },
+        {
+            "month": 27,
+            "actual": null,
+            "forecast": null
+        },
+        {
+            "month": 28,
+            "actual": null,
+            "forecast": null
+        },
+        {
+            "month": 29,
+            "actual": null,
+            "forecast": null
+        },
+        {
+            "month": 30,
+            "actual": null,
+            "forecast": null
+        },
+        {
+            "month": 31,
+            "actual": null,
+            "forecast": null
+        },
+        {
+            "month": 32,
+            "actual": null,
+            "forecast": null
+        },
+        {
+            "month": 33,
+            "actual": null,
+            "forecast": null
+        },
+        {
+            "month": 34,
+            "actual": null,
+            "forecast": null
+        },
+        {
+            "month": 35,
+            "actual": null,
+            "forecast": null
+        },
+        {
+            "month": 36,
+            "actual": null,
+            "forecast": null
+        },
+        {
+            "month": 37,
+            "actual": null,
+            "forecast": null
+        },
+        {
+            "month": 38,
+            "actual": null,
+            "forecast": null
+        },
+        {
+            "month": 39,
+            "actual": null,
+            "forecast": null
+        },
+        {
+            "month": 40,
+            "actual": null,
+            "forecast": null
+        },
+        {
+            "month": 41,
+            "actual": null,
+            "forecast": null
+        },
+        {
+            "month": 42,
+            "actual": null,
+            "forecast": null
+        },
+        {
+            "month": 43,
+            "actual": null,
+            "forecast": null
+        },
+        {
+            "month": 44,
+            "actual": null,
+            "forecast": null
+        },
+        {
+            "month": 45,
+            "actual": null,
+            "forecast": null
+        },
+        {
+            "month": 46,
+            "actual": null,
+            "forecast": null
+        },
+        {
+            "month": 47,
+            "actual": null,
+            "forecast": null
+        },
+        {
+            "month": 48,
+            "actual": null,
+            "forecast": null
+        },
+        {
+            "month": 49,
+            "actual": null,
+            "forecast": null
+        },
+        {
+            "month": 50,
+            "actual": null,
+            "forecast": null
+        },
+        {
+            "month": 51,
+            "actual": null,
+            "forecast": null
+        },
+        {
+            "month": 52,
+            "actual": null,
+            "forecast": null
+        },
+        {
+            "month": 53,
+            "actual": null,
+            "forecast": null
+        },
+        {
+            "month": 54,
+            "actual": null,
+            "forecast": null
+        },
+        {
+            "month": 55,
+            "actual": null,
+            "forecast": null
+        },
+        {
+            "month": 56,
+            "actual": null,
+            "forecast": null
+        },
+        {
+            "month": 57,
+            "actual": null,
+            "forecast": null
+        },
+        {
+            "month": 58,
+            "actual": null,
+            "forecast": null
+        },
+        {
+            "month": 59,
+            "actual": null,
+            "forecast": null
+        },
+        {
+            "month": 60,
+            "actual": null,
+            "forecast": null
+        },
+        {
+            "month": 61,
+            "actual": null,
+            "forecast": null
+        },
+        {
+            "month": 62,
+            "actual": null,
+            "forecast": null
+        },
+        {
+            "month": 63,
+            "actual": null,
+            "forecast": null
+        },
+        {
+            "month": 64,
+            "actual": null,
+            "forecast": null
+        },
+        {
+            "month": 65,
+            "actual": null,
+            "forecast": null
+        },
+        {
+            "month": 66,
+            "actual": null,
+            "forecast": null
+        },
+        {
+            "month": 67,
+            "actual": null,
+            "forecast": null
+        },
+        {
+            "month": 68,
+            "actual": null,
+            "forecast": null
+        },
+        {
+            "month": 69,
+            "actual": null,
+            "forecast": null
+        },
+        {
+            "month": 70,
+            "actual": null,
+            "forecast": null
+        },
+        {
+            "month": 71,
+            "actual": null,
+            "forecast": null
+        },
+        {
+            "month": 72,
+            "actual": null,
+            "forecast": null
+        },
+        {
+            "month": 73,
+            "actual": null,
+            "forecast": null
+        }
+    ]
     const tTable = [
         { "df": 1, "zValue": [1.963, 3.078, 6.314, 31.82, 63.66, 318.31] },
         { "df": 2, "zValue": [1.386, 1.886, 2.92, 6.965, 9.925, 22.327] },
@@ -52,7 +419,7 @@ export function calculateTES(inputData, alphaParam, betaParam, gammaParam, confi
         { "df": 1000, "zValue": [1.037, 1.282, 1.646, 2.33, 2.581, 3.098] }
     ]
 
-    const data =inputData
+    const data = JSON.parse(JSON.stringify(inputData))
     const result = tes(data, noOfMonthsForASeason, alpha, beta, gamma, noOfProjectionMonths)
     const actualLength = data.length;
 
@@ -63,16 +430,17 @@ export function calculateTES(inputData, alphaParam, betaParam, gammaParam, confi
             data[x].forecast = result[x]
         }
     }
-    const zValue = getZValue(result.length, confidence,tTable)
-    console.log("Result%%%",result)
+    const zValue = getZValue(result.length, confidence, tTable)
+    console.log("Result%%%", result)
     console.log("Z value = " + zValue)
     const stdDev = std(result)
     console.log("Std dev = " + stdDev)
     const CI = zValue * stdDev / sqrt(result.length)
     console.log("CI = " + CI)
-    console.log("Data%%%",data)
+    console.log("Data%%%", data)
     calculateError(data, "tesError", props);
-    // console.log("tesData----",tesData);
+    console.log("tesData input----",inputData);
+    console.log("tesData output----",data);
     props.updateState("tesData", data);
     props.updateState("CI", CI);
     // let errors = getErrors(data)
@@ -83,7 +451,7 @@ export function calculateTES(inputData, alphaParam, betaParam, gammaParam, confi
     // console.log("rSqd=" + errors.rSqd)
 }
 
-function getZValue(df, confidence,tTable) {
+function getZValue(df, confidence, tTable) {
     let final_t_table = null;
     for (let x = 0; x < tTable.length; x++) {
         if (df < tTable[x].df) {
@@ -91,7 +459,7 @@ function getZValue(df, confidence,tTable) {
         }
         final_t_table = tTable[x]
     }
-    console.log("confidence###",confidence)
+    console.log("confidence###", confidence)
     switch (Number(confidence)) {
         case 0.85:
             console.log("###in 1")
@@ -172,6 +540,6 @@ function tes(data, slen, alpha, beta, gamma, n_preds) {
         last_trend = trend;
     }
     console.log("%%%tes end")
-    console.log("%%%tes end result",result)
+    console.log("%%%tes end result", result)
     return result;
 }
