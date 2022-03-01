@@ -2554,7 +2554,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                                 />
                                                                 <Label
                                                                     className="form-check-label"
-                                                                    check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                                    check htmlFor="inline-radio2" style={{ fontSize: '12px',marginTop:'2px' }}>
                                                                     <b>Moving Averages</b>
                                                                     <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
                                                                 </Label>
@@ -2597,7 +2597,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                                 />
                                                                 <Label
                                                                     className="form-check-label"
-                                                                    check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                                    check htmlFor="inline-radio2" style={{ fontSize: '12px', marginTop:'2px' }}>
                                                                     <b>Semi-Averages</b>
                                                                     <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenSa', !this.state.popoverOpenSa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
                                                                 </Label>
@@ -2620,7 +2620,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                                 />
                                                                 <Label
                                                                     className="form-check-label"
-                                                                    check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                                    check htmlFor="inline-radio2" style={{ fontSize: '12px',marginTop:'2px' }}>
                                                                     <b>Linear Regression</b>
                                                                     <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenLr', !this.state.popoverOpenLr)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
                                                                 </Label>
@@ -2644,7 +2644,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                                 />
                                                                 <Label
                                                                     className="form-check-label"
-                                                                    check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                                    check htmlFor="inline-radio2" style={{ fontSize: '12px', marginTop:'2px' }}>
                                                                     <b>Triple-Exponential Smoothing (Holts-Winters)</b>
                                                                     <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenTes', !this.state.popoverOpenTes)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
                                                                 </Label>
@@ -2778,7 +2778,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                                 />
                                                                 <Label
                                                                     className="form-check-label"
-                                                                    check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                                    check htmlFor="inline-radio2" style={{ fontSize: '12px', marginTop:'2px' }}>
                                                                     <b>{i18n.t('static.extrapolation.arimaFull')}</b>
                                                                     <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenArima', !this.state.popoverOpenArima)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
                                                                 </Label>
@@ -2892,20 +2892,22 @@ export default class TreeExtrapolationComponent extends React.Component {
                                             </div>
                                         </div>
                                         <div className="row pl-lg-0 pr-lg-0">
+                                       
                                             <div className="table-scroll">
                                                 <div className="table-wrap table-responsive">
                                                     <Table className="table-bordered text-center mt-2 overflowhide main-table " bordered size="sm" >
                                                         <thead>
                                                             <tr>
-                                                                <td width="230px"><b>{i18n.t('static.common.errors')}</b></td>
+                                                           
+                                                                <td width="60px" className="text-left" title={i18n.t('static.common.errors')}><b>{i18n.t('static.common.errors')}</b> <i class="fa fa-info-circle icons pl-lg-2" id="Popover1"  aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></td>
                                                                 {this.state.movingAvgId &&
-                                                                    <td width="110px"><b>{i18n.t('static.extrapolation.movingAverages')}</b></td>
+                                                                    <td width="110px" title={i18n.t('static.extrapolation.movingAverages')}><b>{i18n.t('static.extrapolation.movingAverages')}</b> <i class="fa fa-info-circle icons pl-lg-2" id="Popover1"  aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></td>
                                                                 }
                                                                 {this.state.semiAvgId &&
-                                                                    <td width="110px"><b>{i18n.t('static.extrapolation.semiAverages')}</b></td>
+                                                                    <td width="110px" title={i18n.t('static.extrapolation.semiAverages')}><b>{i18n.t('static.extrapolation.semiAverages')}</b> <i class="fa fa-info-circle icons pl-lg-2" id="Popover1"  aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></td>
                                                                 }
                                                                 {this.state.linearRegressionId &&
-                                                                    <td width="110px"><b>{i18n.t('static.extrapolation.linearRegression')}</b></td>
+                                                                    <td width="110px" title={i18n.t('static.extrapolation.linearRegression')}><b>{i18n.t('static.extrapolation.linearRegression')}</b> <i class="fa fa-info-circle icons pl-lg-2" id="Popover1"  aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></td>
                                                                 }
                                                                 {this.state.smoothingId &&
                                                                     <td width="110px"><b>{i18n.t('static.extrapolation.tes')}</b></td>
@@ -2917,7 +2919,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                         </thead>
                                                         <tbody>
                                                             <tr>
-                                                                <td>{i18n.t('static.extrapolation.rmse')}</td>
+                                                                <td className="text-left">{i18n.t('static.extrapolation.rmse')}</td>
                                                                 {this.state.movingAvgId &&
                                                                     <td style={{ textAlign: "right", "fontWeight": this.state.minRmse == this.state.movingAvgError.rmse ? "bold" : "normal" }} bgcolor={this.state.minRmse == this.state.movingAvgError.rmse ? "#86cd99" : "#FFFFFF"}>{this.state.movingAvgError.rmse != "" ? this.state.movingAvgError.rmse.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
                                                                 }
@@ -2935,7 +2937,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                                 }
                                                             </tr>
                                                             <tr>
-                                                                <td>{i18n.t('static.extrapolation.mape')}</td>
+                                                                <td className="text-left">{i18n.t('static.extrapolation.mape')}</td>
                                                                 {this.state.movingAvgId &&
                                                                     <td style={{ textAlign: "right", "fontWeight": this.state.minMape == this.state.movingAvgError.mape ? "bold" : "normal" }} bgcolor={this.state.minMape == this.state.movingAvgError.mape ? "#86cd99" : "#FFFFFF"}>{this.state.movingAvgError.mape != "" ? this.state.movingAvgError.mape.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
                                                                 }
@@ -2953,7 +2955,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                                 }
                                                             </tr>
                                                             <tr>
-                                                                <td>{i18n.t('static.extrapolation.mse')}</td>
+                                                                <td className="text-left">{i18n.t('static.extrapolation.mse')}</td>
                                                                 {this.state.movingAvgId &&
                                                                     <td style={{ textAlign: "right", "fontWeight": this.state.minMse == this.state.movingAvgError.mse ? "bold" : "normal" }} bgcolor={this.state.minMse == this.state.movingAvgError.mse ? "#86cd99" : "#FFFFFF"}>{this.state.movingAvgError.mse != "" ? this.state.movingAvgError.mse.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
                                                                 }
@@ -2971,7 +2973,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                                 }
                                                             </tr>
                                                             <tr>
-                                                                <td>{i18n.t('static.extrapolation.wape')}</td>
+                                                                <td className="text-left">{i18n.t('static.extrapolation.wape')}</td>
                                                                 {this.state.movingAvgId &&
                                                                     <td style={{ textAlign: "right", "fontWeight": this.state.minWape == this.state.movingAvgError.wape ? "bold" : "normal" }} bgcolor={this.state.minWape == this.state.movingAvgError.wape ? "#86cd99" : "#FFFFFF"}>{this.state.movingAvgError.wape != "" ? this.state.movingAvgError.wape.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
                                                                 }
@@ -2989,7 +2991,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                                 }
                                                             </tr>
                                                             <tr>
-                                                                <td>{i18n.t('static.extrapolation.rSquare')}</td>
+                                                                <td className="text-left">{i18n.t('static.extrapolation.rSquare')}</td>
                                                                 {this.state.movingAvgId &&
                                                                     <td style={{ textAlign: "right", "fontWeight": this.state.minRsqd == this.state.movingAvgError.rSqd ? "bold" : "normal" }} bgcolor={this.state.minRsqd == this.state.movingAvgError.rSqd ? "#86cd99" : "#FFFFFF"}>{this.state.movingAvgError.rSqd != "" ? this.state.movingAvgError.rSqd.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
                                                                 }
@@ -3017,9 +3019,9 @@ export default class TreeExtrapolationComponent extends React.Component {
 
                                             </ul>
                                         </div>
-                                        <div className="col-md-12 row pl-lg-0 pr-lg-0">
+                                        <div className="col-md-12 pl-lg-0 pr-lg-0">
                                             <Row>
-                                                <FormGroup className="col-md-3">
+                                                <FormGroup className="col-md-3 pl-lg-0">
                                                     <Label htmlFor="currencyId">Choose Method<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.togglepopoverChooseMethod('popoverChooseMethod', !this.state.popoverChooseMethod)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                                     {/* <InputGroup> */}
                                                     <Input
