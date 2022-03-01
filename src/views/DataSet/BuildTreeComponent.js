@@ -4738,7 +4738,8 @@ export default class BuildTree extends Component {
             showCalculatorFields: false
         });
         if (tab == 3) {
-            this.refs.extrapolationChild.buildJexcel();
+            // this.refs.extrapolationChild.buildJexcel();
+            this.refs.extrapolationChild.getExtrapolationMethodList();
         }
         if (tab == 2) {
             console.log("***>>>", this.state.currentItemConfig);
