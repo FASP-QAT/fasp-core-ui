@@ -1635,6 +1635,46 @@ export default class TreeExtrapolationComponent extends React.Component {
                         cell.classList.remove('bold');
                         // elInstance.showIndex(6);
                     }
+                    var cell;
+                    if (this.state.nodeDataExtrapolation.extrapolationMethod.id == 7) {
+                        elInstance.getCell(("E").concat(parseInt(y) + 1)).classList.add('highlightExtrapolationMethod');
+                        elInstance.getCell(("F").concat(parseInt(y) + 1)).classList.remove('highlightExtrapolationMethod');
+                        elInstance.getCell(("G").concat(parseInt(y) + 1)).classList.remove('highlightExtrapolationMethod');
+                        elInstance.getCell(("I").concat(parseInt(y) + 1)).classList.remove('highlightExtrapolationMethod');
+                        elInstance.getCell(("H").concat(parseInt(y) + 1)).classList.remove('highlightExtrapolationMethod');
+                    } else if (this.state.nodeDataExtrapolation.extrapolationMethod.id == 6) {
+                        elInstance.getCell(("F").concat(parseInt(y) + 1)).classList.add('highlightExtrapolationMethod');
+                        elInstance.getCell(("E").concat(parseInt(y) + 1)).classList.remove('highlightExtrapolationMethod');
+                        elInstance.getCell(("G").concat(parseInt(y) + 1)).classList.remove('highlightExtrapolationMethod');
+                        elInstance.getCell(("I").concat(parseInt(y) + 1)).classList.remove('highlightExtrapolationMethod');
+                        elInstance.getCell(("H").concat(parseInt(y) + 1)).classList.remove('highlightExtrapolationMethod');
+                    } else if (this.state.nodeDataExtrapolation.extrapolationMethod.id == 5) {
+                        elInstance.getCell(("G").concat(parseInt(y) + 1)).classList.add('highlightExtrapolationMethod');
+                        elInstance.getCell(("E").concat(parseInt(y) + 1)).classList.remove('highlightExtrapolationMethod');
+                        elInstance.getCell(("F").concat(parseInt(y) + 1)).classList.remove('highlightExtrapolationMethod');
+                        elInstance.getCell(("I").concat(parseInt(y) + 1)).classList.remove('highlightExtrapolationMethod');
+                        elInstance.getCell(("H").concat(parseInt(y) + 1)).classList.remove('highlightExtrapolationMethod');
+                    }
+                    else if (this.state.nodeDataExtrapolation.extrapolationMethod.id == 4) {
+                        elInstance.getCell(("I").concat(parseInt(y) + 1)).classList.add('highlightExtrapolationMethod');
+                        elInstance.getCell(("E").concat(parseInt(y) + 1)).classList.remove('highlightExtrapolationMethod');
+                        elInstance.getCell(("F").concat(parseInt(y) + 1)).classList.remove('highlightExtrapolationMethod');
+                        elInstance.getCell(("G").concat(parseInt(y) + 1)).classList.remove('highlightExtrapolationMethod');
+                        elInstance.getCell(("H").concat(parseInt(y) + 1)).classList.remove('highlightExtrapolationMethod');
+                    }
+                    else if (this.state.nodeDataExtrapolation.extrapolationMethod.id == 2) {
+                        elInstance.getCell(("H").concat(parseInt(y) + 1)).classList.add('highlightExtrapolationMethod');
+                        elInstance.getCell(("E").concat(parseInt(y) + 1)).classList.remove('highlightExtrapolationMethod');
+                        elInstance.getCell(("F").concat(parseInt(y) + 1)).classList.remove('highlightExtrapolationMethod');
+                        elInstance.getCell(("G").concat(parseInt(y) + 1)).classList.remove('highlightExtrapolationMethod');
+                        elInstance.getCell(("I").concat(parseInt(y) + 1)).classList.remove('highlightExtrapolationMethod');
+                    } else {
+                        elInstance.getCell(("E").concat(parseInt(y) + 1)).classList.remove('highlightExtrapolationMethod');
+                        elInstance.getCell(("F").concat(parseInt(y) + 1)).classList.remove('highlightExtrapolationMethod');
+                        elInstance.getCell(("G").concat(parseInt(y) + 1)).classList.remove('highlightExtrapolationMethod');
+                        elInstance.getCell(("I").concat(parseInt(y) + 1)).classList.remove('highlightExtrapolationMethod');
+                        elInstance.getCell(("H").concat(parseInt(y) + 1)).classList.remove('highlightExtrapolationMethod');
+                    }
                     // } 
                     // if (rowData[3] != "" && moment(this.state.minMonth).diff(moment(rowData[3]), 'months') == 0) {
                     //     var cell = elInstance.getCell(("D").concat(parseInt(y) + 1))
@@ -1878,13 +1918,18 @@ export default class TreeExtrapolationComponent extends React.Component {
                     json1 = this.state.extrapolationMethodList.filter(c => c.id == 7)[0];
                     // this.state.nodeDataExtrapolationOptionList.push(json);
                     filteredExtrapolationMethodList.push(json1);
-                    this.state.dataExtrapolation.showColumn(4);
+                    if (this.state.dataExtrapolation != null) {
+                        console.log("spreadsheet.getHeaders()---", this.state.dataExtrapolation.getHeader(4));
+                        this.state.dataExtrapolation.showColumn(4);
+                    }
                 } else {
                     // const index = this.state.nodeDataExtrapolationOptionList.findIndex(c => c.extrapolationMethod.id == 7);
                     const index1 = filteredExtrapolationMethodList.findIndex(c => c.id == 7);
                     filteredExtrapolationMethodList.splice(index1, 1);
                     // this.state.nodeDataExtrapolationOptionList.splice(index, 1);
-                    this.state.dataExtrapolation.hideColumn(4);
+                    if (this.state.dataExtrapolation != null) {
+                        this.state.dataExtrapolation.hideColumn(4);
+                    }
                 }
                 this.setState({ filteredExtrapolationMethodList, forecastNestedHeader: filteredExtrapolationMethodList.length }, () => { this.buildJexcel() })
             }
@@ -1910,13 +1955,17 @@ export default class TreeExtrapolationComponent extends React.Component {
                     console.log("json1---", json1)
                     // this.state.nodeDataExtrapolationOptionList.push(json);
                     filteredExtrapolationMethodList.push(json1);
-                    this.state.dataExtrapolation.showColumn(5);
+                    if (this.state.dataExtrapolation != null) {
+                        this.state.dataExtrapolation.showColumn(5);
+                    }
                 } else {
                     // const index = this.state.nodeDataExtrapolationOptionList.findIndex(c => c.extrapolationMethod.id == 6);
                     const index1 = filteredExtrapolationMethodList.findIndex(c => c.id == 6);
                     filteredExtrapolationMethodList.splice(index1, 1);
                     // this.state.nodeDataExtrapolationOptionList.splice(index, 1);
-                    this.state.dataExtrapolation.hideColumn(5);
+                    if (this.state.dataExtrapolation != null) {
+                        this.state.dataExtrapolation.hideColumn(5);
+                    }
                 }
                 this.setState({ filteredExtrapolationMethodList, forecastNestedHeader: filteredExtrapolationMethodList.length }, () => {
                     console.log("filteredExtrapolationMethodList new ---", this.state.filteredExtrapolationMethodList)
@@ -1943,13 +1992,17 @@ export default class TreeExtrapolationComponent extends React.Component {
                     json1 = this.state.extrapolationMethodList.filter(c => c.id == 5)[0];
                     // this.state.nodeDataExtrapolationOptionList.push(json);
                     filteredExtrapolationMethodList.push(json1);
-                    this.state.dataExtrapolation.showColumn(6);
+                    if (this.state.dataExtrapolation != null) {
+                        this.state.dataExtrapolation.showColumn(6);
+                    }
                 } else {
                     // const index = this.state.nodeDataExtrapolationOptionList.findIndex(c => c.extrapolationMethod.id == 5);
                     const index1 = filteredExtrapolationMethodList.findIndex(c => c.id == 5);
                     filteredExtrapolationMethodList.splice(index1, 1);
                     // this.state.nodeDataExtrapolationOptionList.splice(index, 1);
-                    this.state.dataExtrapolation.hideColumn(6);
+                    if (this.state.dataExtrapolation != null) {
+                        this.state.dataExtrapolation.hideColumn(6);
+                    }
                 }
                 this.setState({ filteredExtrapolationMethodList, forecastNestedHeader: filteredExtrapolationMethodList.length }, () => { this.buildJexcel() })
             }
@@ -1978,13 +2031,17 @@ export default class TreeExtrapolationComponent extends React.Component {
                     json1 = this.state.extrapolationMethodList.filter(c => c.id == 2)[0];
                     // this.state.nodeDataExtrapolationOptionList.push(json);
                     filteredExtrapolationMethodList.push(json1);
-                    this.state.dataExtrapolation.showColumn(7);
+                    if (this.state.dataExtrapolation != null) {
+                        this.state.dataExtrapolation.showColumn(7);
+                    }
                 } else {
                     // const index = this.state.nodeDataExtrapolationOptionList.findIndex(c => c.extrapolationMethod.id == 2);
                     const index1 = filteredExtrapolationMethodList.findIndex(c => c.id == 2);
                     filteredExtrapolationMethodList.splice(index1, 1);
                     // this.state.nodeDataExtrapolationOptionList.splice(index, 1);
-                    this.state.dataExtrapolation.hideColumn(7);
+                    if (this.state.dataExtrapolation != null) {
+                        this.state.dataExtrapolation.hideColumn(7);
+                    }
                 }
                 this.setState({ filteredExtrapolationMethodList, forecastNestedHeader: filteredExtrapolationMethodList.length }, () => { this.buildJexcel() })
             }
@@ -2011,13 +2068,17 @@ export default class TreeExtrapolationComponent extends React.Component {
                     json1 = this.state.extrapolationMethodList.filter(c => c.id == 4)[0];
                     // this.state.nodeDataExtrapolationOptionList.push(json);
                     filteredExtrapolationMethodList.push(json1);
-                    this.state.dataExtrapolation.showColumn(8);
+                    if (this.state.dataExtrapolation != null) {
+                        this.state.dataExtrapolation.showColumn(8);
+                    }
                 } else {
                     // const index = this.state.nodeDataExtrapolationOptionList.findIndex(c => c.extrapolationMethod.id == 4);
                     const index1 = filteredExtrapolationMethodList.findIndex(c => c.id == 4);
                     filteredExtrapolationMethodList.splice(index1, 1);
                     // this.state.nodeDataExtrapolationOptionList.splice(index, 1);
-                    this.state.dataExtrapolation.hideColumn(8);
+                    if (this.state.dataExtrapolation != null) {
+                        this.state.dataExtrapolation.hideColumn(8);
+                    }
                 }
                 this.setState({ filteredExtrapolationMethodList, forecastNestedHeader: filteredExtrapolationMethodList.length }, () => { this.buildJexcel() })
             }
