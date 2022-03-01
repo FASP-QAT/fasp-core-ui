@@ -1119,7 +1119,7 @@ export default class TreeExtrapolationComponent extends React.Component {
             var map1 = new Map(Object.entries(tableJson[i]));
             console.log("10 map---" + map1.get("10"));
             var result = jexcelDataArr.filter(x => x.amount > 0);
-            resultCount = (extrapolationDataList[i].amount != "" && extrapolationDataList[i].amount != 0) || result.length > 0 ? resultCount + 1 : resultCount;
+            resultCount = (map1.get("1") != "" && map1.get("1") != 0) || result.length > 0 ? resultCount + 1 : resultCount;
             var json = {
                 month: map1.get("0"),
                 amount: map1.get("1") != "" ? map1.get("1").toString().replaceAll(",", "") : map1.get("1"),
@@ -1836,7 +1836,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                     // this.state.nodeDataExtrapolationOptionList.splice(index, 1);
                     this.state.dataExtrapolation.hideColumn(4);
                 }
-                this.setState({ filteredExtrapolationMethodList, forecastNestedHeader: filteredExtrapolationMethodList.length })
+                this.setState({ filteredExtrapolationMethodList, forecastNestedHeader: filteredExtrapolationMethodList.length },()=>{this.buildJexcel()})
             }
         })
     }
