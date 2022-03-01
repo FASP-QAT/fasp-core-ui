@@ -1114,13 +1114,17 @@ export default class TreeExtrapolationComponent extends React.Component {
         var tableJson = this.state.dataExtrapolation.getJson(null, false);
         console.log("tableJson length---", tableJson.length);
         console.log("tableJson---", tableJson);
+        var resultCount = 0;
         for (var i = 0; i < tableJson.length; i++) {
             var map1 = new Map(Object.entries(tableJson[i]));
             console.log("10 map---" + map1.get("10"));
+            var result = jexcelDataArr.filter(x => x.amount > 0);
+            resultCount = (extrapolationDataList[i].amount != "" && extrapolationDataList[i].amount != 0) || result.length > 0 ? resultCount + 1 : resultCount;
             var json = {
                 month: map1.get("0"),
                 amount: map1.get("1") != "" ? map1.get("1").toString().replaceAll(",", "") : map1.get("1"),
-                reportingRate: map1.get("2")
+                reportingRate: map1.get("2"),
+                monthNo: resultCount
             }
             jexcelDataArr.push(json);
         }
@@ -1457,6 +1461,7 @@ export default class TreeExtrapolationComponent extends React.Component {
             {
                 title: 'Forecast',
                 colspan: this.state.forecastNestedHeader
+                // colspan:'5'
             },
         );
         nestedHeaders.push(
