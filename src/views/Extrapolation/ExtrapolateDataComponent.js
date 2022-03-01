@@ -2651,8 +2651,9 @@ export default class ExtrapolateDataComponent extends React.Component {
 
                 //Consumption : missing months
                 for (var i = 0; moment(curDate).format("YYYY-MM") < moment(stopDate).format("YYYY-MM"); i++) {
-                    curDate = moment(startDate).add(i, 'months').format("YYYY-MM-DD");
                     var consumptionListFilteredForMonth = consumptionList.filter(c => c.planningUnit.id == puId && c.region.id == regionId);
+                    let actualMin = moment.min(consumptionListFilteredForMonth.map(d => moment(d.month)));
+                    curDate = moment(actualMin).add(i, 'months').format("YYYY-MM-DD");
                     var consumptionListForCurrentMonth = consumptionListFilteredForMonth.filter(c => moment(c.month).format("YYYY-MM") == moment(curDate).format("YYYY-MM"));
                     var checkIfPrevMonthConsumptionAva = consumptionListFilteredForMonth.filter(c => moment(c.month).format("YYYY-MM") < moment(curDate).format("YYYY-MM"));
                     var checkIfNextMonthConsumptionAva = consumptionListFilteredForMonth.filter(c => moment(c.month).format("YYYY-MM") > moment(curDate).format("YYYY-MM"));
