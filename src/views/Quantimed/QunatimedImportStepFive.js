@@ -280,8 +280,8 @@ export default class QunatimedImportStepFive extends Component {
                                                             id: this.props.items.program.regionId
                                                         },
                                                         consumptionDate: moment(qunatimedDataFiltered[i].dtmPeriod).startOf('month').format("YYYY-MM-DD"),
-                                                        consumptionRcpuQty: qunatimedDataFiltered[i].ingConsumption.toString().replaceAll("\,", ""),
-                                                        consumptionQty: qunatimedDataFiltered[i].ingConsumption.toString().replaceAll("\,", ""),
+                                                        consumptionRcpuQty: qunatimedDataFiltered[i].updateConsumptionQuantity.toString().replaceAll("\,", ""),
+                                                        consumptionQty: qunatimedDataFiltered[i].updateConsumptionQuantity.toString().replaceAll("\,", ""),
                                                         dayOfStockOut: "",
                                                         active: true,
                                                         realmCountryPlanningUnit: {
