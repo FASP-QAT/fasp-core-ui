@@ -1704,7 +1704,7 @@ class CompareAndSelectScenario extends Component {
                             fontColor: 'transparent',
                         },
                         lineTension: 0.1,
-                        borderWidth: idx == 0 ? 5 : 3,
+                        borderWidth: (this.state.selectedTreeScenarioId == item.id) ? 5 : 3,
                         pointStyle: 'line',
                         pointRadius: 0,
                         showInLegend: true,
