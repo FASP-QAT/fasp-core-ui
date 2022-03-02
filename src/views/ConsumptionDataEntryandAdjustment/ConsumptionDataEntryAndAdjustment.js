@@ -1783,9 +1783,10 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
               </Form>
               <div style={{ display: this.state.loading ? "none" : "block" }}>
                 {this.state.showSmallTable &&
-                  <>
+                  <div className="row">
+                    <div className="col-md-12">
                     <div className="table-scroll">
-                      <div className="table-wrap table-responsive">
+                      <div className="table-wrap DataEntryTable table-responsive">
                         <Table className="table-bordered text-center mt-2 overflowhide main-table " bordered size="sm" options={this.options}>
                           <thead>
                             <tr>
@@ -1918,7 +1919,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                     <br></br>
                     <br></br>
                     <div className="row">
-                      <div className="col-md-12 pl-2 pr-2">
+                      <div className="col-md-12 pl-2 pr-2 datdEntryRow">
                         <div id="tableDiv" className="leftAlignTable">
                         </div>
                       </div>
@@ -1936,7 +1937,8 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                         <b>{i18n.t('static.dataentry.graphNotes')}</b>
                       </div>
                     }
-                  </>
+                  </div>
+                  </div>
 
                 }
               </div>
@@ -2042,10 +2044,14 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
 
         //Consumption : missing months
         for (var i = 0; moment(curDate).format("YYYY-MM") < moment(stopDate).format("YYYY-MM"); i++) {
-          curDate = moment(startDate).add(i, 'months').format("YYYY-MM-DD");
-          var consumptionListFilteredForMonth = consumptionList.filter(c => c.planningUnit.id == puId && c.region.id == regionId && c.month == curDate);
-          if (consumptionListFilteredForMonth.length == 0) {
-            monthsArray.push(" " + moment(curDate).format(DATE_FORMAT_CAP_WITHOUT_DATE));
+          var consumptionListFilteredForMonth = consumptionList.filter(c => c.planningUnit.id == puId && c.region.id == regionId);
+          let actualMin = moment.min(consumptionListFilteredForMonth.map(d => moment(d.month)));
+          curDate = moment(actualMin).add(i, 'months').format("YYYY-MM-DD");
+          var consumptionListForCurrentMonth = consumptionListFilteredForMonth.filter(c => moment(c.month).format("YYYY-MM") == moment(curDate).format("YYYY-MM"));
+          var checkIfPrevMonthConsumptionAva = consumptionListFilteredForMonth.filter(c => moment(c.month).format("YYYY-MM") < moment(curDate).format("YYYY-MM"));
+          var checkIfNextMonthConsumptionAva = consumptionListFilteredForMonth.filter(c => moment(c.month).format("YYYY-MM") > moment(curDate).format("YYYY-MM"));
+          if (consumptionListForCurrentMonth.length == 0 && checkIfPrevMonthConsumptionAva.length > 0 && checkIfNextMonthConsumptionAva.length > 0) {
+            monthsArray.push(moment(curDate).format(DATE_FORMAT_CAP_WITHOUT_DATE));
           }
         }
 

@@ -531,14 +531,19 @@ class ForecastOutput extends Component {
                     doc.text(i18n.t('static.common.display') + ' : ' + document.getElementById("viewById").selectedOptions[0].text, doc.internal.pageSize.width / 8, 210, {
                         align: 'left'
                     })
+                    let startY1 = 0;
                     if (document.getElementById("viewById").value == 1) {
                         var planningText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
                         doc.text(doc.internal.pageSize.width / 8, 230, planningText)
+                        startY1 = 230 + (doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4).length * 10)
                     } else {
                         var planningText = doc.splitTextToSize((i18n.t('static.product.unit1') + ' : ' + this.state.forecastingUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
                         doc.text(doc.internal.pageSize.width / 8, 230, planningText)
+                        startY1 = 250 + (doc.splitTextToSize((i18n.t('static.product.unit1') + ' : ' + this.state.forecastingUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4).length * 10)
                     }
-                    doc.text(i18n.t('static.forecastReport.xAxisAggregateByYear') + ' : ' + document.getElementById("xaxis").selectedOptions[0].text, doc.internal.pageSize.width / 8, 250, {
+
+
+                    doc.text(i18n.t('static.forecastReport.xAxisAggregateByYear') + ' : ' + document.getElementById("xaxis").selectedOptions[0].text, doc.internal.pageSize.width / 8, startY1, {
                         align: 'left'
                     })
 
@@ -567,6 +572,7 @@ class ForecastOutput extends Component {
 
         doc.addImage(canvasImg, 'png', 50, 280, 750, 260, 'CANVAS');
 
+        //table start
         const headers = [];
 
         (this.state.viewById == 1 ? headers.push(i18n.t('static.product.product')) : headers.push(i18n.t('static.forecastingunit.forecastingunit')));
@@ -588,7 +594,7 @@ class ForecastOutput extends Component {
         this.state.xaxis == 2 && this.state.consumptionData.map(ele => {
             let propertyName = this.state.monthArrayList.map(item1 => (
                 // ele.consumptionList.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(item1).format("YYYY-MM")).length > 0 ? (ele.consumptionList.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(item1).format("YYYY-MM"))[0].consumptionQty) : ''
-                ele.consumptionList.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(item1).format("YYYY-MM")).length > 0 ? ((ele.consumptionList.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(item1).format("YYYY-MM"))[0].consumptionQty) == 'NAN' || Number.isNaN((ele.consumptionList.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(item1).format("YYYY-MM"))[0].consumptionQty)) ? '' : (ele.consumptionList.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(item1).format("YYYY-MM"))[0].consumptionQty)) : ''
+                ele.consumptionList.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(item1).format("YYYY-MM")).length > 0 ? ((ele.consumptionList.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(item1).format("YYYY-MM"))[0].consumptionQty) == 'NAN' || Number.isNaN((ele.consumptionList.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(item1).format("YYYY-MM"))[0].consumptionQty)) ? '' : (ele.consumptionList.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(item1).format("YYYY-MM"))[0].consumptionQty).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")) : ''
             ));
             A = [];
             A.push(
@@ -652,16 +658,24 @@ class ForecastOutput extends Component {
 
         }
 
-        // let data = [A];
-
         let content = {
             margin: { top: 80, bottom: 50 },
             startY: height,
             head: header,
             body: data,
-            styles: { lineWidth: 1, fontSize: 8, halign: 'center' }
+            styles: { lineWidth: 1, fontSize: 8, halign: 'center' },
+            // rowPageBreak: 'auto',
+            // tableWidth: 'auto',
+            horizontalPageBreak: true,
+            horizontalPageBreakRepeat: 0,
+            columnStyles: [
+                { halign: "left" },
+                { halign: "left" },
+            ]
 
         };
+
+
 
         doc.autoTable(content);
         addHeaders(doc)
@@ -861,7 +875,7 @@ class ForecastOutput extends Component {
                                                         consumptionQty: (m.amount == null ? 0 : parseInt(m.amount))
                                                     }
                                                 });
-                                                let jsonTemp = { objUnit: planningUniObj.planningUnit, scenario: { id: 1, label: "" }, display: true, color: "#ba0c2f", consumptionList: consumptionList }
+                                                let jsonTemp = { objUnit: planningUniObj.planningUnit, scenario: { id: consumptionExtrapolationObj[0].extrapolationMethod.id, label: '(' + consumptionExtrapolationObj[0].extrapolationMethod.label.label_en + ')' }, display: true, color: "#ba0c2f", consumptionList: consumptionList }
                                                 consumptionData.push(jsonTemp);
 
                                             } else {
@@ -961,7 +975,7 @@ class ForecastOutput extends Component {
                                                         }
                                                     });
                                                     // let jsonTemp = { objUnit: forecastingUniObj[l].planningUnit.forecastingUnit, scenario: { id: 1, label: "" }, display: true, color: "#ba0c2f", consumptionList: consumptionList }
-                                                    let jsonTemp = { objUnit: { id: forecastingUniObj[l].planningUnit.id, label: forecastingUniObj[l].planningUnit.forecastingUnit.label }, scenario: { id: 1, label: "" }, display: true, color: "#ba0c2f", consumptionList: consumptionList }
+                                                    let jsonTemp = { objUnit: { id: forecastingUniObj[l].planningUnit.id, label: forecastingUniObj[l].planningUnit.forecastingUnit.label }, scenario: { id: consumptionExtrapolationObj[0].extrapolationMethod.id, label: '(' + consumptionExtrapolationObj[0].extrapolationMethod.label.label_en + ')' }, display: true, color: "#ba0c2f", consumptionList: consumptionList }
                                                     consumptionData.push(jsonTemp);
 
                                                 } else {
@@ -2712,7 +2726,7 @@ class ForecastOutput extends Component {
                                                 <div className="table-scroll1">
                                                     <div className="table-wrap table-responsive">
                                                         {this.state.consumptionData.length > 0 &&
-                                                            <Table className="table-bordered table-bordered1 text-center mt-2 overflowhide main-table " bordered size="sm" options={this.options}>
+                                                            <Table className="table-bordered table-bordered1 text-center mt-2 overflowhide main-table " bordered size="sm" options={this.options} id="forecastOutputId">
                                                                 <thead>
                                                                     <tr>
                                                                         <th className='Firstcolum'>{i18n.t('static.forecastReport.display')}</th>

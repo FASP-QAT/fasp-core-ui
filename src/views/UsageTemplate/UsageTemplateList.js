@@ -113,7 +113,8 @@ class usageTemplate extends Component {
             textMessage: 'time(s) per',
             usagePeriodListLong: [],
             usagePeriodDisplayList: [],
-            roleArray: []
+            roleArray: [],
+            dimensionList: [],
         }
         // this.setTextAndValue = this.setTextAndValue.bind(this);
         // this.disableRow = this.disableRow.bind(this);
@@ -144,6 +145,7 @@ class usageTemplate extends Component {
         this.getForcastingUnitById = this.getForcastingUnitById.bind(this);
         this.modelOpenClose = this.modelOpenClose.bind(this);
         this.dataChange = this.dataChange.bind(this);
+        this.getDimensionList = this.getDimensionList.bind(this);
     }
 
     touchAll(setTouched, errors) {
@@ -378,6 +380,87 @@ class usageTemplate extends Component {
                     },
                         () => {
                             console.log("TracerCategory------->", this.state.tracerCategoryList)
+                            this.getDimensionList();
+                        })
+                } else {
+                    this.setState({
+                        message: response.data.messageCode, loading: false
+                    },
+                        () => {
+                            this.hideSecondComponent();
+                        })
+                }
+
+            }).catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                                break;
+                        }
+                    }
+                }
+            );
+    }
+
+    getDimensionList() {
+        UnitService.getUnitListByDimensionId(5)
+            .then(response => {
+                if (response.status == 200) {
+                    console.log("getUnitListByDimensionId------->123", response.data);
+                    var listArray = response.data;
+                    listArray.sort((a, b) => {
+                        var itemLabelA = (a.unitCode).toUpperCase(); // ignore upper and lowercase
+                        var itemLabelB = (b.unitCode).toUpperCase(); // ignore upper and lowercase                   
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
+
+                    let tempList = [];
+                    if (listArray.length > 0) {
+                        for (var i = 0; i < listArray.length; i++) {
+                            var paJson = {
+                                name: getLabelText(listArray[i].unitCode, this.state.lang),
+                                id: parseInt(listArray[i].unitId),
+                                active: listArray[i].active,
+                            }
+                            tempList[i] = paJson
+                        }
+                    }
+
+                    this.setState({
+                        dimensionList: tempList,
+                    },
+                        () => {
                             this.getForecastingUnit();
                         })
                 } else {
@@ -718,6 +801,7 @@ class usageTemplate extends Component {
                 data[7] = "Every"
                 data[8] = papuList[j].noOfPatients
                 data[9] = "patient"
+                // data[9] = 91
 
                 data[10] = "requires"
                 data[11] = papuList[j].noOfForecastingUnits
@@ -752,6 +836,8 @@ class usageTemplate extends Component {
 
                 //(papuList[j].oneTimeUsage == false ? '' : `=ROUND(N${parseInt(j) + 1},2)`)//hidden
 
+                // let unitName = this.state.dimensionList.filter(c => c.unitId == papuList[j].unitId)[0].unitCode;
+                // let string = "Every " + papuList[j].noOfPatients + " "+ unitName +" - requires " + papuList[j].noOfForecastingUnits + " " + papuList[j].unit.label.label_en;
 
                 let string = "Every " + papuList[j].noOfPatients + " patient - requires " + papuList[j].noOfForecastingUnits + " " + papuList[j].unit.label.label_en;
                 if (!papuList[j].oneTimeUsage) { //one time usage false
@@ -796,6 +882,7 @@ class usageTemplate extends Component {
             data[7] = "Every";
             data[8] = 1;
             data[9] = "patient"
+            // data[9] = 91
 
             data[10] = "requires";
             data[11] = 0;
@@ -898,6 +985,11 @@ class usageTemplate extends Component {
                     readOnly: true,
                     textEditor: true, //9 J
                 },
+                // {
+                //     title: 'Person(s) Unit',
+                //     type: 'autocomplete',
+                //     source: this.state.dimensionList, //9 J
+                // },
                 {
                     title: i18n.t('static.usageTemplate.fuPerPersonPerTime'),
                     type: 'hidden',
@@ -1918,6 +2010,14 @@ class usageTemplate extends Component {
         }
 
         if (x == 4 || x == 8 || x == 11 || x == 15 || x == 16 || x == 17 || x == 20 || x == 21) {
+
+            // unitIdValue = this.el.getValueFromCoords(9, y);
+            // let unitName = '';
+            // if (unitIdValue != 0) {
+            //     unitName = this.state.dimensionList.filter(c => c.unitId == unitIdValue)[0].unitCode;
+            // }
+            // let string = 'Every ' + this.el.getValue(`I${parseInt(y) + 1}`, true) + ' ' + unitName + ' - requires ' + this.el.getValue(`L${parseInt(y) + 1}`, true) + " " + this.el.getValue(`M${parseInt(y) + 1}`, true);
+
             let string = 'Every ' + this.el.getValue(`I${parseInt(y) + 1}`, true) + ' patient - requires ' + this.el.getValue(`L${parseInt(y) + 1}`, true) + " " + this.el.getValue(`M${parseInt(y) + 1}`, true);
 
             if (!this.el.getValueFromCoords(14, y)) {//one time usage false
@@ -1933,7 +2033,7 @@ class usageTemplate extends Component {
             this.el.setValueFromCoords(23, y, string, true);
         }
 
-
+        //-----------------------------------------------------------
         //Active
         // if (x != 24) {
         //     this.el.setValueFromCoords(24, y, 1, true);

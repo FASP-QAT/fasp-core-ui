@@ -106,8 +106,53 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
 
 
         }
+        console.log("Transfer To Node list###@@@", transferToNodeList);
+        console.log("FlatList###@@@", flatList)
+        var maxLevel = Math.max.apply(Math, flatList.map(function (o) { return o.level; }))
+        var sortedFlatList = [];
+        var sortedFlatListId = [];
+        var sortedFlatListNodeDataId = [];
+        for (var ml = 0; ml <= maxLevel; ml++) {
+            console.log("Level###@@@", ml);
+            var flatListForLevel = flatList.filter(c => c.level == ml && c.payload.nodeType.id != 1);
+            for (var fll = 0; fll < flatListForLevel.length; fll++) {
+                for (var ndm = 0; ndm < scenarioList.length; ndm++) {
+                    console.log("fll###@@@", fll);
+                    // Vo wali list lekar aao jiske calculations nhi hue hai
+                    var filterFlatListWhoseCalculationsAreRemaining = flatListForLevel.filter(c => !sortedFlatListId.includes(c.id));
+                    console.log("filterFlatListWhoseCalculationsAreRemaining###@@@", filterFlatListWhoseCalculationsAreRemaining)
+                    var leaveLoop = false;
+                    for (var v = 0; (v < filterFlatListWhoseCalculationsAreRemaining.length && !leaveLoop); v++) {
+                        var listOfTransferTo = transferToNodeList.filter(c => (filterFlatListWhoseCalculationsAreRemaining[v].payload.nodeDataMap[scenarioList[ndm].id])[0].nodeDataId == c.nodeDataId);
+                        console.log("Kya usme kuch transfer ho raha hai v###@@@", v)
+                        console.log("ListOf transfer to###@@@", listOfTransferTo);
+                        if (listOfTransferTo.length == 0) {
+                            console.log("In if ###@@@");
+                            sortedFlatList.push(filterFlatListWhoseCalculationsAreRemaining[v]);
+                            sortedFlatListId.push(filterFlatListWhoseCalculationsAreRemaining[v].id);
+                            sortedFlatListNodeDataId.push((filterFlatListWhoseCalculationsAreRemaining[v].payload.nodeDataMap[scenarioList[ndm].id])[0].nodeDataId);
+                            leaveLoop = true;
+                        } else {
+                            console.log("###@@@in else")
+                            var checkIfAllFromCalculationsAreDone = listOfTransferTo.filter(c => sortedFlatListId.includes(c.transferFromNodeDataId));
+                            console.log("Check if all the calculations are done###@@@", checkIfAllFromCalculationsAreDone)
+                            if (listOfTransferTo.length == checkIfAllFromCalculationsAreDone.length) {
+                                sortedFlatList.push(filterFlatListWhoseCalculationsAreRemaining[v]);
+                                sortedFlatListId.push(filterFlatListWhoseCalculationsAreRemaining[v].id);
+                                sortedFlatListNodeDataId.push((filterFlatListWhoseCalculationsAreRemaining[v].payload.nodeDataMap[scenarioList[ndm].id])[0].nodeDataId);
+                                leaveLoop = true;
+                            }
+                        }
+                        // var flatListWhichIsNotDepended = filterFlatListWhoseCalculationsAreRemaining
+                    }
+
+                }
+            }
+        }
+        console.log("sortedFlatList###", sortedFlatList);
+        flatList = sortedFlatList.concat(flatList.filter(c => c.payload.nodeType.id == 1)).concat(flatList.filter(c => c.payload.nodeType.id != 1 && !sortedFlatListId.includes(c.id)));
+        console.log("FlatList", flatList);
         for (var fl = 0; fl < flatList.length; fl++) {
-            console.log("FlatList", flatList);
             console.log("FlatList$$$", flatList[fl]);
             var payload = flatList[fl].payload;
             if (payload.nodeType.id != 1) {
@@ -256,7 +301,7 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                         var seasonalityPercTotal = 0;
                         var manualChangeTotal = 0;
                         var nodeDataOverrideListFiltered = nodeDataOverrideList.length != null ? nodeDataOverrideList.filter(c => moment(c.month).format("YYYY-MM-DD") == moment(curDate).format("YYYY-MM-DD")) : [];
-                        console.log("nodeDataOverrideListFiltered---",nodeDataOverrideListFiltered)
+                        console.log("nodeDataOverrideListFiltered---", nodeDataOverrideListFiltered)
                         if (nodeDataOverrideListFiltered.length > 0) {
                             var seasonalityNumber = (Number(endValue) * Number(nodeDataOverrideListFiltered[0].seasonalityPerc)) / 100;
                             seasonalityPercTotal += Number(nodeDataOverrideListFiltered[0].seasonalityPerc);

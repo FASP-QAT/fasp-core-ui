@@ -2754,28 +2754,21 @@ export default class BuildTree extends Component {
         // instance.jexcel
         if (x == 2) {
             var col = ("C").concat(parseInt(y) + 1);
-            var colPer = ("F").concat(parseInt(y) + 1);
-            var colNum = ("G").concat(parseInt(y) + 1);
             if (value == "") {
                 instance.jexcel.setStyle(col, "background-color", "transparent");
                 instance.jexcel.setStyle(col, "background-color", "yellow");
                 instance.jexcel.setComments(col, i18n.t('static.label.fieldRequired'));
                 this.state.modelingEl.setValueFromCoords(5, y, "", true);
                 this.state.modelingEl.setValueFromCoords(6, y, "", true);
-                instance.jexcel.setStyle(colPer, "background-color", "transparent");
-                instance.jexcel.setComments(colPer, "");
-                instance.jexcel.setStyle(colNum, "background-color", "transparent");
-                instance.jexcel.setComments(colNum, "");
+                this.state.modelingEl.setValueFromCoords(8, y, '', true);
             } else {
                 if (value == 2) {
                     this.state.modelingEl.setValueFromCoords(5, y, "", true);
-                    instance.jexcel.setStyle(colPer, "background-color", "transparent");
-                    instance.jexcel.setComments(colPer, "");
+                    this.state.modelingEl.setValueFromCoords(8, y, '', true);
                 }
                 else if (value == 3 || value == 4 || value == 5) {
                     this.state.modelingEl.setValueFromCoords(6, y, "", true);
-                    instance.jexcel.setStyle(colNum, "background-color", "transparent");
-                    instance.jexcel.setComments(colNum, "");
+                    this.state.modelingEl.setValueFromCoords(8, y, '', true);
                 }
 
                 instance.jexcel.setStyle(col, "background-color", "transparent");
@@ -7309,6 +7302,11 @@ export default class BuildTree extends Component {
         console.log("items>>>", items);
         console.log("get payload 111");
         for (let i = 0; i < items.length; i++) {
+            console.log("get payload 12");
+            // console.log("this.state.modelinDataForScenario---", this.state.modelinDataForScenario);
+            console.log("items[i]---", items[i]);
+            console.log("items[i].payload.nodeDataMap[this.state.selectedScenario][0].nodeDataId---", items[i].payload.nodeDataMap[this.state.selectedScenario][0].nodeDataId);
+            console.log("items[i].payload.nodeDataMap[this.state.selectedScenario][0].modelling---", items[i].payload.nodeDataMap[this.state.selectedScenario][0]);
             if (items[i].payload.nodeDataMap[this.state.selectedScenario][0].nodeDataMomList != null) {
                 var nodeDataModelingMap = items[i].payload.nodeDataMap[this.state.selectedScenario][0].nodeDataMomList.filter(x => moment(x.month).format('YYYY-MM') == moment(date).format('YYYY-MM'));
                 console.log("nodeDataModelingMap>>>", nodeDataModelingMap);
@@ -8554,7 +8552,7 @@ export default class BuildTree extends Component {
                                 </NavItem>
 
                                 <div style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 2 ? "block" : "none" }}>
-                                    <div style={{ marginLeft: '34px',marginTop: '8px' }}>
+                                    <div style={{ marginLeft: '34px', marginTop: '8px' }}>
                                         <Input
                                             className="form-check-input checkboxMargin"
                                             type="checkbox"

@@ -170,7 +170,7 @@ class DefaultHeader extends Component {
                     "../../../../src/ShowGuidanceHtmlFile/ShowGuidancePr.html"
               } target="_blank">
                 {/* <i class="nav-icon fa fa-compass ShowGuidanceIcon" title={'Show Guidance'}></i> */}
-                <img src={ShowGuidanceImg} className="HelpIcon" title={i18n.t('static.user.usermanual')} style={{ width: '25px', height: '25px' }} />
+                <img src={ShowGuidanceImg} className="HelpIcon" title={'Show Guidance'} style={{ width: '25px', height: '25px' }} />
               </a>
             </span>
           </NavItem>
