@@ -991,11 +991,13 @@ class ForecastSummary extends Component {
                                     } else {//consumptionExtrapolationId
 
                                         let consumptionExtrapolationObj = consumptionExtrapolation.filter(c => c.consumptionExtrapolationId == consumptionExtrapolationId);
+                                        console.log("consumptionExtrapolationObj----------->", consumptionExtrapolationObj);
                                         if (consumptionExtrapolationObj.length > 0) {
                                             let consumptionList = consumptionExtrapolationObj[0].extrapolationDataList.map(m => {
                                                 return {
                                                     consumptionDate: m.month,
-                                                    consumptionQty: (m.amount).toFixed(2)
+                                                    // consumptionQty: (m.amount).toFixed(2)
+                                                    consumptionQty: (m.amount == null ? 0 : Number(m.amount).toFixed(2))
                                                 }
                                             });
                                             let jsonTemp = { objUnit: planningUnitList[j].planningUnit, scenario: { id: 1, label: "" }, display: true, color: "#ba0c2f", consumptionList: consumptionList }
