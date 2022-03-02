@@ -30,11 +30,12 @@ const pickerLang = {
 const validationSchemaExtrapolation = function (values) {
     return Yup.object().shape({
         noOfMonthsId:
-            Yup.string().test('noOfMonthsId', 'Please enter no. of months.',
+            Yup.string().test('noOfMonthsId', 'Please enter positive number.',
                 function (value) {
                     console.log("***1**", document.getElementById("movingAvgId").value);
                     console.log("***noOfMonthsId**", document.getElementById("noOfMonthsId").value);
                     var testNumber = JEXCEL_INTEGER_REGEX.test((document.getElementById("noOfMonthsId").value).replaceAll(",", ""));
+                    console.log("***testNumber***", testNumber)
                     if ((document.getElementById("movingAvgId").value) == "true" && (document.getElementById("noOfMonthsId").value == "" || testNumber == false)) {
                         return false;
                     } else {
@@ -42,7 +43,7 @@ const validationSchemaExtrapolation = function (values) {
                     }
                 }),
         confidenceLevelId:
-            Yup.string().test('confidenceLevelId', 'Please enter confidence level.',
+            Yup.string().test('confidenceLevelId', 'Please select confidence level.',
                 function (value) {
                     console.log("***2**", document.getElementById("smoothingId").value);
                     // var testNumber = document.getElementById("confidenceLevelId").value != "" ? (/^\d{0,3}(\.\d{1,2})?$/).test(document.getElementById("confidenceLevelId").value) : false;
@@ -54,7 +55,7 @@ const validationSchemaExtrapolation = function (values) {
                     }
                 }),
         seasonalityId:
-            Yup.string().test('seasonalityId', 'Please enter correct seasonality.',
+            Yup.string().test('seasonalityId', 'Please enter positive number.',
                 function (value) {
                     console.log("***3**", document.getElementById("smoothingId").value);
                     var testNumber = document.getElementById("seasonalityId").value != "" ? JEXCEL_INTEGER_REGEX.test(document.getElementById("seasonalityId").value) : false;
@@ -66,7 +67,7 @@ const validationSchemaExtrapolation = function (values) {
                     }
                 }),
         gammaId:
-            Yup.string().test('gammaId', 'Please enter gamma value.',
+            Yup.string().test('gammaId', 'Please enter correct gamma value.',
                 function (value) {
                     console.log("***4**", document.getElementById("smoothingId").value);
                     var testNumber = document.getElementById("gammaId").value != "" ? (/^\d{0,3}(\.\d{1,2})?$/).test(document.getElementById("gammaId").value) : false;
@@ -78,7 +79,7 @@ const validationSchemaExtrapolation = function (values) {
                     }
                 }),
         betaId:
-            Yup.string().test('betaId', 'Please enter beta value.',
+            Yup.string().test('betaId', 'Please enter correct beta value.',
                 function (value) {
                     console.log("***5**", document.getElementById("smoothingId").value);
                     var testNumber = document.getElementById("betaId").value != "" ? (/^\d{0,3}(\.\d{1,2})?$/).test(document.getElementById("betaId").value) : false;
@@ -90,7 +91,7 @@ const validationSchemaExtrapolation = function (values) {
                     }
                 }),
         alphaId:
-            Yup.string().test('alphaId', 'Please enter alpha value.',
+            Yup.string().test('alphaId', 'Please enter correct alpha value.',
                 function (value) {
                     console.log("***6**", document.getElementById("smoothingId").value);
                     var testNumber = document.getElementById("alphaId").value != "" ? (/^\d{0,3}(\.\d{1,2})?$/).test(document.getElementById("alphaId").value) : false;
@@ -102,7 +103,7 @@ const validationSchemaExtrapolation = function (values) {
                     }
                 }),
         pId:
-            Yup.string().test('pId', 'Please enter p value.',
+            Yup.string().test('pId', 'Please select p value.',
                 function (value) {
                     console.log("***7**", document.getElementById("arimaId").value);
                     // var testNumber = document.getElementById("pId").value != "" ? (/^\d{0,3}(\.\d{1,2})?$/).test(document.getElementById("pId").value) : false;
@@ -114,10 +115,11 @@ const validationSchemaExtrapolation = function (values) {
                     }
                 }),
         dId:
-            Yup.string().test('dId', 'Please enter d value.',
+            Yup.string().test('dId', 'Please enter correct d value.',
                 function (value) {
                     console.log("***8**", document.getElementById("arimaId").value);
                     // var testNumber = document.getElementById("dId").value != "" ? (/^\d{0,3}(\.\d{1,2})?$/).test(document.getElementById("dId").value) : false;
+                    // var testNumber = JEXCEL_INTEGER_REGEX.test((document.getElementById("dId").value).replaceAll(",", ""));
                     // console.log("*****", testNumber);
                     if ((document.getElementById("arimaId").value) == "true" && (document.getElementById("dId").value == "")) {
                         return false;
@@ -126,10 +128,11 @@ const validationSchemaExtrapolation = function (values) {
                     }
                 }),
         qId:
-            Yup.string().test('qId', 'Please enter q value.',
+            Yup.string().test('qId', 'Please enter correct q value.',
                 function (value) {
                     console.log("***9**", document.getElementById("arimaId").value);
                     // var testNumber = document.getElementById("qId").value != "" ? (/^\d{0,3}(\.\d{1,2})?$/).test(document.getElementById("qId").value) : false;
+                    // var testNumber = JEXCEL_INTEGER_REGEX.test((document.getElementById("qId").value).replaceAll(",", ""));
                     // console.log("*****", testNumber);
                     if ((document.getElementById("arimaId").value) == "true" && (document.getElementById("qId").value == "")) {
                         return false;
@@ -192,12 +195,12 @@ export default class TreeExtrapolationComponent extends React.Component {
             minMonth: '',
             monthsForMovingAverage: 5,
             confidenceLevelId: 0.95,
-            noOfMonthsForASeason: 4,
+            noOfMonthsForASeason: 12,
             movingAvgData: [],
             alpha: 0.2,
             beta: 0.2,
             gamma: 0.2,
-            p: 95,
+            p: 0.95,
             d: 12,
             q: 12,
             nodeDataExtrapolationOptionList: [],
@@ -737,7 +740,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                     var json = {
                         month: map1.get("0"),
                         amount: map1.get("1") != "" ? map1.get("1").toString().replaceAll(",", "") : map1.get("1"),
-                        reportingRate: map1.get("2")
+                        reportingRate: map1.get("2") != "" ? map1.get("2").toString().replaceAll("%", "") : map1.get("2")
                     }
                     jexcelDataArr.push(json);
                 }
@@ -791,7 +794,7 @@ export default class TreeExtrapolationComponent extends React.Component {
             var json = {
                 month: map1.get("0"),
                 amount: map1.get("1"),
-                reportingRate: map1.get("2")
+                reportingRate:  map1.get("2") != "" ? map1.get("2").toString().replaceAll("%", "") : map1.get("2")
             };
             extrapolationDataList.push(json)
             var json2 = {
@@ -1115,7 +1118,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                 var json = {
                     month: map1.get("0"),
                     amount: map1.get("1") != "" ? map1.get("1").toString().replaceAll(",", "") : map1.get("1"),
-                    reportingRate: map1.get("2"),
+                    reportingRate:  map1.get("2") != "" ? map1.get("2").toString().replaceAll("%", "") : map1.get("2"),
                     monthNo: resultCount
                 }
                 jexcelDataArr.push(json);
@@ -1200,7 +1203,7 @@ export default class TreeExtrapolationComponent extends React.Component {
             var json = {
                 month: map1.get("0"),
                 amount: map1.get("1") != "" ? map1.get("1").toString().replaceAll(",", "") : map1.get("1"),
-                reportingRate: map1.get("2"),
+                reportingRate:  map1.get("2") != "" ? map1.get("2").toString().replaceAll("%", "") : map1.get("2"),
                 monthNo: resultCount
             }
             jexcelDataArr.push(json);
@@ -1347,7 +1350,9 @@ export default class TreeExtrapolationComponent extends React.Component {
                         changed: 1
                     }, () => {
                         if (this.props.items.currentScenario.nodeDataExtrapolationOptionList == null) {
-                            this.setState({ extrapolationLoader: false })
+                            this.setState({ extrapolationLoader: false, forecastNestedHeader: 0 }, () => {
+                                this.buildJexcel();
+                            })
                             // var nodeDataExtrapolationOptionList = [];
                             // for (let i = 0; i < this.state.extrapolationMethodList.length; i++) {
                             //     var e = this.state.extrapolationMethodList[i];
@@ -2735,6 +2740,7 @@ export default class TreeExtrapolationComponent extends React.Component {
 
                                                                         >
                                                                             <option value="">Please select confidence level</option>
+                                                                            <option value="0.80">80%</option>
                                                                             <option value="0.85">85%</option>
                                                                             <option value="0.90">90%</option>
                                                                             <option value="0.95">95%</option>
@@ -2858,7 +2864,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                                             <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.p')}</Label>
                                                                             <Input
                                                                                 className="controls"
-                                                                                type="text"
+                                                                                type="select"
                                                                                 id="pId"
                                                                                 bsSize="sm"
                                                                                 name="pId"
@@ -2867,7 +2873,16 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                                                 invalid={touched.pId && !!errors.pId}
                                                                                 onBlur={handleBlur}
                                                                                 onChange={(e) => { handleChange(e); }}
-                                                                            />
+                                                                            >
+                                                                                <option value="">Please select confidence level</option>
+                                                                                <option value="0.80">80%</option>
+                                                                                <option value="0.85">85%</option>
+                                                                                <option value="0.90">90%</option>
+                                                                                <option value="0.95">95%</option>
+                                                                                <option value="0.99">99%</option>
+                                                                                <option value="0.995">99.5%</option>
+                                                                                <option value="0.999">99.9%</option>
+                                                                            </Input>
                                                                             <FormFeedback>{errors.pId}</FormFeedback>
                                                                         </div>
                                                                         <div className="tab-ml-1 mt-md-2 mb-md-0 ExtraCheckboxFieldWidth">
