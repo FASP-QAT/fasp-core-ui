@@ -2555,7 +2555,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                             <div className="row">
                                                 <FormGroup className="col-md-3 pl-lg-0">
                                                     <Label htmlFor="appendedInputButton">Start Month for Historical Data<span className="stock-box-icon fa fa-sort-desc ml-1"></span></Label>
-                                                    <div className="controls edit readonly">
+                                                    <div className="controls edit disabledColor">
                                                         <Picker
 
                                                             id="month"
@@ -2978,10 +2978,10 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                                     <td width="110px" title={i18n.t('static.extrapolation.linearRegression')}><b>{i18n.t('static.extrapolation.linearRegression')}</b> <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></td>
                                                                 }
                                                                 {this.state.smoothingId &&
-                                                                    <td width="110px"><b>{i18n.t('static.extrapolation.tes')}</b></td>
+                                                                    <td width="110px" title={i18n.t('static.extrapolation.tes')}><b>{i18n.t('static.extrapolation.tes')}</b> <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></td>
                                                                 }
                                                                 {this.state.arimaId &&
-                                                                    <td width="110px"><b>{i18n.t('static.extrapolation.arima')}</b></td>
+                                                                    <td width="110px" title={i18n.t('static.extrapolation.arima')}><b>{i18n.t('static.extrapolation.arima')}</b> <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></td>
                                                                 }
                                                             </tr>
                                                         </thead>
