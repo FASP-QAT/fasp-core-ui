@@ -1041,7 +1041,7 @@ class ProductValidation extends Component {
         columns.push(i18n.t('static.supplyPlan.pricePerPlanningUnit'));
         columns.push(i18n.t('static.productValidation.cost'));
         const headers = [columns]
-        const data = this.state.dataEl.getJson(null, false).map(ele => [ele[0], ele[1], ele[2], ele[3], ele[4], ele[5], this.formatter(ele[6]), this.formatter(ele[7]), ele[9] != 1 ? this.formatter((Number(ele[6] * ele[7])).toFixed(2)) : this.formatter(Number(ele[8]))]);
+        const data = this.state.dataEl.getJson(null, false).map(ele => [ele[0], ele[1], ele[2], ele[3], ele[4], ele[5], this.formatter(ele[6]), this.formatter(ele[7]), this.formatter(Number(ele[8]).toFixed(2))]);
         // doc.addPage()
         let content = {
             margin: { top: 80, bottom: 50 },
