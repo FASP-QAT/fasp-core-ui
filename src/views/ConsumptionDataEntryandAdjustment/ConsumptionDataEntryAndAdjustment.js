@@ -787,8 +787,9 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     this.setState({
       loading: true
     })
-    var validation = this.checkValidationConsumption();
-    if (validation == true) {
+   // var validation = this.checkValidationConsumption();
+   var validation =true; 
+   if (validation == true) {
       var db1;
       var storeOS;
       getDatabase();
@@ -1712,7 +1713,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           gridLines: {
             drawBorder: true, lineWidth: 0
           },
-          // stacked: true
+          stacked: true
         }]
       },
       tooltips: {
@@ -1785,7 +1786,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
             label: getLabelText(item.label, this.state.lang),
             data: this.state.planningUnitTotalListRegion.filter(c => c.planningUnitId == this.state.selectedConsumptionUnitObject.planningUnit.id && c.region.regionId == item.regionId).map(item => (item.qty > 0 ? item.qty : null)),
             // type: 'line'
-            stack: 2 + count,
+            stack: 1,
             // backgroundColor: 'transparent',
             backgroundColor: colourArray[colourCount],
             borderStyle: 'dotted',
