@@ -1815,9 +1815,68 @@ export default class BuildTree extends Component {
     }
     extrapolate(e) {
         const { currentItemConfig } = this.state;
+        // const newArray = this.state.activeTab1.slice()
         currentItemConfig.context.payload.extrapolation = e.target.checked == true ? true : false;
+        console.log("this.state.activeTab1---", this.state.activeTab1);
+
         this.setState({
-            currentItemConfig
+            currentItemConfig,
+            activeTab1: e.target.checked == true ? new Array(2).fill('3') : new Array(2).fill('2')
+        }, () => {
+            if (this.state.activeTab1[0] == '3') {
+                if (this.state.modelingEl != "") {
+                    this.state.modelingEl.destroy();
+                    if (this.state.momEl != "") {
+                        this.state.momEl.destroy();
+                    }
+                    else if (this.state.momElPer != "") {
+                        this.state.momElPer.destroy();
+                    }
+                }
+
+                this.refs.extrapolationChild.getExtrapolationMethodList();
+            } else {
+                console.log("***>>>", this.state.currentItemConfig);
+                if (this.state.currentItemConfig.context.payload.nodeType.id != 1) {
+                    var minMonth = this.state.forecastStartDate;
+                    var maxMonth = this.state.forecastStopDate;
+                    console.log("minMonth---", minMonth);
+                    console.log("maxMonth---", maxMonth);
+                    var modelingTypeList = this.state.modelingTypeList;
+                    var arr = [];
+                    if (this.state.currentItemConfig.context.payload.nodeType.id == 2) {
+                        arr = modelingTypeList.filter(x => x.modelingTypeId != 1 && x.modelingTypeId != 5);
+                    } else {
+                        arr = modelingTypeList.filter(x => x.modelingTypeId == 5);
+                    }
+                    console.log("arr---", arr);
+                    var modelingTypeListNew = [];
+                    for (var i = 0; i < arr.length; i++) {
+                        console.log("arr[i]---", arr[i]);
+                        modelingTypeListNew[i] = { id: arr[i].modelingTypeId, name: getLabelText(arr[i].label, this.state.lang) }
+                    }
+                    this.setState({
+                        showModelingJexcelNumber: true,
+                        minMonth, maxMonth, filteredModelingType: modelingTypeListNew
+                    }, () => {
+                        this.buildModelingJexcel();
+                    })
+
+                }
+                else {
+                    this.setState({
+                        showModelingJexcelNumber: true
+                    }, () => {
+                        this.buildModelingJexcel();
+                    })
+                }
+                //  else if (this.state.currentItemConfig.context.payload.nodeType.id == 3) {
+                //     this.setState({ showModelingJexcelPercent: true }, () => {
+                //         this.buildModelingJexcelPercent()
+                //     })
+                // }
+            }
+
         });
     }
     momCheckbox(e) {
@@ -4731,55 +4790,67 @@ export default class BuildTree extends Component {
         this.setState({
             activeTab1: newArray,
             showCalculatorFields: false
+        }, () => {
+            if (tab == 3) {
+                // this.refs.extrapolationChild.buildJexcel();
+                if (this.state.modelingEl != "") {
+                    this.state.modelingEl.destroy();
+                    if (this.state.momEl != "") {
+                        this.state.momEl.destroy();
+                    }
+                    else if (this.state.momElPer != "") {
+                        this.state.momElPer.destroy();
+                    }
+                }
+
+
+                this.refs.extrapolationChild.getExtrapolationMethodList();
+            }
+            if (tab == 2) {
+                console.log("***>>>", this.state.currentItemConfig);
+                if (this.state.currentItemConfig.context.payload.nodeType.id != 1) {
+                    var curDate = (moment(Date.now()).utcOffset('-0500').format('YYYY-MM-DD'));
+                    var month = this.state.currentScenario.month;
+
+                    var minMonth = this.state.forecastStartDate;
+                    var maxMonth = this.state.forecastStopDate;
+                    console.log("minMonth---", minMonth);
+                    console.log("maxMonth---", maxMonth);
+                    var modelingTypeList = this.state.modelingTypeList;
+                    var arr = [];
+                    if (this.state.currentItemConfig.context.payload.nodeType.id == 2) {
+                        arr = modelingTypeList.filter(x => x.modelingTypeId != 1 && x.modelingTypeId != 5);
+                    } else {
+                        arr = modelingTypeList.filter(x => x.modelingTypeId == 5);
+                    }
+                    console.log("arr---", arr);
+                    var modelingTypeListNew = [];
+                    for (var i = 0; i < arr.length; i++) {
+                        console.log("arr[i]---", arr[i]);
+                        modelingTypeListNew[i] = { id: arr[i].modelingTypeId, name: getLabelText(arr[i].label, this.state.lang) }
+                    }
+                    this.setState({
+                        showModelingJexcelNumber: true,
+                        minMonth, maxMonth, filteredModelingType: modelingTypeListNew
+                    }, () => {
+                        this.buildModelingJexcel();
+                    })
+
+                }
+                else {
+                    this.setState({
+                        showModelingJexcelNumber: true
+                    }, () => {
+                        this.buildModelingJexcel();
+                    })
+                }
+                //  else if (this.state.currentItemConfig.context.payload.nodeType.id == 3) {
+                //     this.setState({ showModelingJexcelPercent: true }, () => {
+                //         this.buildModelingJexcelPercent()
+                //     })
+                // }
+            }
         });
-        if (tab == 3) {
-            // this.refs.extrapolationChild.buildJexcel();
-            this.refs.extrapolationChild.getExtrapolationMethodList();
-        }
-        if (tab == 2) {
-            console.log("***>>>", this.state.currentItemConfig);
-            if (this.state.currentItemConfig.context.payload.nodeType.id != 1) {
-                var curDate = (moment(Date.now()).utcOffset('-0500').format('YYYY-MM-DD'));
-                var month = this.state.currentScenario.month;
-
-                var minMonth = this.state.forecastStartDate;
-                var maxMonth = this.state.forecastStopDate;
-                console.log("minMonth---", minMonth);
-                console.log("maxMonth---", maxMonth);
-                var modelingTypeList = this.state.modelingTypeList;
-                var arr = [];
-                if (this.state.currentItemConfig.context.payload.nodeType.id == 2) {
-                    arr = modelingTypeList.filter(x => x.modelingTypeId != 1 && x.modelingTypeId != 5);
-                } else {
-                    arr = modelingTypeList.filter(x => x.modelingTypeId == 5);
-                }
-                console.log("arr---", arr);
-                var modelingTypeListNew = [];
-                for (var i = 0; i < arr.length; i++) {
-                    console.log("arr[i]---", arr[i]);
-                    modelingTypeListNew[i] = { id: arr[i].modelingTypeId, name: getLabelText(arr[i].label, this.state.lang) }
-                }
-                this.setState({
-                    showModelingJexcelNumber: true,
-                    minMonth, maxMonth, filteredModelingType: modelingTypeListNew
-                }, () => {
-                    this.buildModelingJexcel();
-                })
-
-            }
-            else {
-                this.setState({
-                    showModelingJexcelNumber: true
-                }, () => {
-                    this.buildModelingJexcel();
-                })
-            }
-            //  else if (this.state.currentItemConfig.context.payload.nodeType.id == 3) {
-            //     this.setState({ showModelingJexcelPercent: true }, () => {
-            //         this.buildModelingJexcelPercent()
-            //     })
-            // }
-        }
     }
 
     resetTree() {
@@ -5841,7 +5912,24 @@ export default class BuildTree extends Component {
                                             </Input>
                                             <FormFeedback className="red">{errors.nodeTypeId}</FormFeedback>
                                         </FormGroup>
-
+                                        {/* <FormGroup style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 2 ? "block" : "none" }}>
+                                            <div style={{ marginLeft: '34px', marginTop: '8px' }}>
+                                                <Input
+                                                    className="form-check-input checkboxMargin"
+                                                    type="checkbox"
+                                                    id="extrapolate"
+                                                    name="extrapolate"
+                                                    // checked={true}
+                                                    checked={this.state.currentItemConfig.context.payload.extrapolation}
+                                                    onClick={(e) => { this.extrapolate(e); }}
+                                                />
+                                                <Label
+                                                    className="form-check-label"
+                                                    check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                    <b>{'Extrapolate'}</b>
+                                                </Label>
+                                            </div>
+                                        </FormGroup> */}
 
                                         {/* {this.state.aggregationNode && */}
 
@@ -7160,9 +7248,9 @@ export default class BuildTree extends Component {
                 </TabPane>
                 <TabPane tabId="3">
                     {/* <ConsumptionInSupplyPlanComponent ref="consumptionChild" items={this.state} toggleLarge={this.toggleLarge} updateState={this.updateState} formSubmit={this.formSubmit} hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} consumptionPage="consumptionDataEntry" useLocalData={1} /> */}
-                    {this.state.currentItemConfig.context.payload.extrapolation &&
-                        <TreeExtrapolationComponent ref="extrapolationChild" items={this.state} updateState={this.updateState} />
-                    }
+                    {/* {this.state.currentItemConfig.context.payload.extrapolation && */}
+                    <TreeExtrapolationComponent ref="extrapolationChild" items={this.state} updateState={this.updateState} />
+                    {/* } */}
                 </TabPane>
 
             </>
@@ -8533,6 +8621,8 @@ export default class BuildTree extends Component {
                                     </NavLink>
                                 </NavItem>
                                 <NavItem style={{ display: !this.state.currentItemConfig.context.payload.extrapolation || this.state.currentItemConfig.context.payload.nodeType.id != 2 ? 'block' : 'none' }}>
+                                    {/* {this.state.currentItemConfig.context.payload.extrapolation == false || this.state.currentItemConfig.context.payload.nodeType.id != 2 && */}
+                                    {/* <NavItem> */}
                                     <NavLink
                                         active={this.state.activeTab1[0] === '2'}
                                         onClick={() => { this.toggleModal(0, '2'); }}
@@ -8540,6 +8630,7 @@ export default class BuildTree extends Component {
                                         {i18n.t('static.tree.Modeling/Transfer')}
                                     </NavLink>
                                 </NavItem>
+                                {/* } */}
 
                                 <NavItem style={{ display: this.state.currentItemConfig.context.payload.extrapolation && this.state.currentItemConfig.context.payload.nodeType.id == 2 ? 'block' : 'none' }}>
                                     <NavLink

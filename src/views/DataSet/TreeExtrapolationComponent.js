@@ -794,7 +794,7 @@ export default class TreeExtrapolationComponent extends React.Component {
             var json = {
                 month: map1.get("0"),
                 amount: map1.get("1"),
-                reportingRate:  map1.get("2") != "" ? map1.get("2").toString().replaceAll("%", "") : map1.get("2")
+                reportingRate: map1.get("2") != "" ? map1.get("2").toString().replaceAll("%", "") : map1.get("2")
             };
             extrapolationDataList.push(json)
             var json2 = {
@@ -1118,7 +1118,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                 var json = {
                     month: map1.get("0"),
                     amount: map1.get("1") != "" ? map1.get("1").toString().replaceAll(",", "") : map1.get("1"),
-                    reportingRate:  map1.get("2") != "" ? map1.get("2").toString().replaceAll("%", "") : map1.get("2"),
+                    reportingRate: map1.get("2") != "" ? map1.get("2").toString().replaceAll("%", "") : map1.get("2"),
                     monthNo: resultCount
                 }
                 jexcelDataArr.push(json);
@@ -1203,7 +1203,7 @@ export default class TreeExtrapolationComponent extends React.Component {
             var json = {
                 month: map1.get("0"),
                 amount: map1.get("1") != "" ? map1.get("1").toString().replaceAll(",", "") : map1.get("1"),
-                reportingRate:  map1.get("2") != "" ? map1.get("2").toString().replaceAll("%", "") : map1.get("2"),
+                reportingRate: map1.get("2") != "" ? map1.get("2").toString().replaceAll("%", "") : map1.get("2"),
                 monthNo: resultCount
             }
             jexcelDataArr.push(json);
@@ -1318,10 +1318,11 @@ export default class TreeExtrapolationComponent extends React.Component {
         if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
         return '?'
     }
-    // componentDidMount() {
+    componentDidMount() {
     //     this.getExtrapolationMethodList();
-    // }
+    }
     getExtrapolationMethodList() {
+        console.log("### inside did mount")
         this.setState({
             extrapolationLoader: true
         }, () => {
@@ -1350,7 +1351,9 @@ export default class TreeExtrapolationComponent extends React.Component {
                         changed: 1
                     }, () => {
                         if (this.props.items.currentScenario.nodeDataExtrapolationOptionList == null) {
+                            console.log("### inside did mount if")
                             this.setState({ extrapolationLoader: false, forecastNestedHeader: 0 }, () => {
+                                console.log("### inside did mount if state update")
                                 this.buildJexcel();
                             })
                             // var nodeDataExtrapolationOptionList = [];
@@ -1530,6 +1533,7 @@ export default class TreeExtrapolationComponent extends React.Component {
             dataArray[count] = data;
             count++;
         }
+        console.log("### inside jexcel")
 
         this.el = jexcel(document.getElementById("tableDiv"), '');
         this.el.destroy();
@@ -1731,6 +1735,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                 return [];
             }.bind(this),
         };
+        
         var dataExtrapolation = jexcel(document.getElementById("tableDiv"), options);
         this.el = dataExtrapolation;
         var rmseArr = [];
@@ -1809,7 +1814,7 @@ export default class TreeExtrapolationComponent extends React.Component {
         var minMse = Math.min(...mseArr.filter(c => c != ""));
         var minRsqd = Math.min(...rSqdArr.filter(c => c != ""));
         var minWape = Math.min(...wapeArr.filter(c => c != ""));
-
+        console.log("### inside jexcel going to update state")
         this.setState({
             dataExtrapolation,
             minRmse: minRmse,
@@ -1831,18 +1836,20 @@ export default class TreeExtrapolationComponent extends React.Component {
     loadedExtrapolation = function (instance, cell, x, y, value) {
         //  jExcelLoadedFunctionWithoutPagination(instance);
         jExcelLoadedFunctionOnlyHideRow(instance);
-        var asterisk = document.getElementsByClassName("resizable")[0];
-        var tr = asterisk.firstChild.nextSibling;
-        console.log("asterisk", asterisk.firstChild.nextSibling)
+        console.log("my instance---",instance)
+        // if (this.state.dataExtrapolation != "") {
+            var asterisk = document.getElementsByClassName("resizable")[0];
+            var tr = asterisk.firstChild.nextSibling;
+            console.log("asterisk", asterisk.firstChild.nextSibling)
 
-        tr.children[3].classList.add('InfoTr');
-        tr.children[5].classList.add('InfoTr');
-        tr.children[6].classList.add('InfoTr');
-        tr.children[7].classList.add('InfoTr');
-        tr.children[8].classList.add('InfoTr');
-        tr.children[9].classList.add('InfoTr');
-        tr.children[3].title = 'Placeholder'
-
+            tr.children[3].classList.add('InfoTr');
+            tr.children[5].classList.add('InfoTr');
+            tr.children[6].classList.add('InfoTr');
+            tr.children[7].classList.add('InfoTr');
+            tr.children[8].classList.add('InfoTr');
+            tr.children[9].classList.add('InfoTr');
+            tr.children[3].title = 'Placeholder'
+        // }
 
     }
 
