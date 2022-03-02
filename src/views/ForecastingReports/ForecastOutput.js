@@ -669,9 +669,9 @@ class ForecastOutput extends Component {
             horizontalPageBreak: true,
             horizontalPageBreakRepeat: 0,
             columnStyles: [
-                {halign: "left" },
-                {halign: "left" },
-              ]
+                { halign: "left" },
+                { halign: "left" },
+            ]
 
         };
 
@@ -875,7 +875,7 @@ class ForecastOutput extends Component {
                                                         consumptionQty: (m.amount == null ? 0 : parseInt(m.amount))
                                                     }
                                                 });
-                                                let jsonTemp = { objUnit: planningUniObj.planningUnit, scenario: { id: 1, label: "" }, display: true, color: "#ba0c2f", consumptionList: consumptionList }
+                                                let jsonTemp = { objUnit: planningUniObj.planningUnit, scenario: { id: consumptionExtrapolationObj[0].extrapolationMethod.id, label: '(' + consumptionExtrapolationObj[0].extrapolationMethod.label.label_en + ')' }, display: true, color: "#ba0c2f", consumptionList: consumptionList }
                                                 consumptionData.push(jsonTemp);
 
                                             } else {
@@ -975,7 +975,7 @@ class ForecastOutput extends Component {
                                                         }
                                                     });
                                                     // let jsonTemp = { objUnit: forecastingUniObj[l].planningUnit.forecastingUnit, scenario: { id: 1, label: "" }, display: true, color: "#ba0c2f", consumptionList: consumptionList }
-                                                    let jsonTemp = { objUnit: { id: forecastingUniObj[l].planningUnit.id, label: forecastingUniObj[l].planningUnit.forecastingUnit.label }, scenario: { id: 1, label: "" }, display: true, color: "#ba0c2f", consumptionList: consumptionList }
+                                                    let jsonTemp = { objUnit: { id: forecastingUniObj[l].planningUnit.id, label: forecastingUniObj[l].planningUnit.forecastingUnit.label }, scenario: { id: consumptionExtrapolationObj[0].extrapolationMethod.id, label: '(' + consumptionExtrapolationObj[0].extrapolationMethod.label.label_en + ')' }, display: true, color: "#ba0c2f", consumptionList: consumptionList }
                                                     consumptionData.push(jsonTemp);
 
                                                 } else {

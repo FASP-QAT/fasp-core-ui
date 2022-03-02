@@ -1565,7 +1565,7 @@ class CompareAndSelectScenario extends Component {
                         id: 'A',
                         scaleLabel: {
                             display: true,
-                            labelString: this.state.viewById == 1 && this.state.planningUnitId > 0 ? getLabelText(this.state.planningUnitList.filter(c => c.planningUnit.id == this.state.planningUnitId)[0].planningUnit.unit.label, this.state.lang) : this.state.viewById == 2 && this.state.forecastingUnitId > 0 && this.state.planningUnitId > 0 ? getLabelText(this.state.forecastingUnitList.filter(c => c.id == this.state.forecastingUnitId)[0].unit.label, this.state.lang) : this.state.equivalencyUnitId > 0 && this.state.planningUnitId > 0 ? getLabelText(this.state.equivalencyUnitList.filter(c => c.equivalencyUnitMappingId == this.state.equivalencyUnitId)[0].unit.label, this.state.lang) : "",
+                            labelString: this.state.viewById == 1 && this.state.planningUnitId > 0 ? getLabelText(this.state.planningUnitList.filter(c => c.planningUnit.id == this.state.planningUnitId)[0].planningUnit.unit.label, this.state.lang) : this.state.viewById == 2 && this.state.forecastingUnitId > 0 && this.state.planningUnitId > 0 ? getLabelText(this.state.forecastingUnitList.filter(c => c.id == this.state.forecastingUnitId)[0].unit.label, this.state.lang) : this.state.equivalencyUnitId > 0 && this.state.planningUnitId > 0 ? getLabelText(this.state.equivalencyUnitList.filter(c => c.equivalencyUnitMappingId == this.state.equivalencyUnitId)[0].equivalencyUnit.label, this.state.lang) : "",
                             fontColor: 'black'
                         },
                         stacked: false,
@@ -1704,7 +1704,7 @@ class CompareAndSelectScenario extends Component {
                             fontColor: 'transparent',
                         },
                         lineTension: 0.1,
-                        borderWidth: idx == 0 ? 5 : 3,
+                        borderWidth: (this.state.selectedTreeScenarioId == item.id) ? 5 : 3,
                         pointStyle: 'line',
                         pointRadius: 0,
                         showInLegend: true,

@@ -116,8 +116,19 @@ class CompareVersion extends Component {
             var selectedDataset = datasetList.filter(c => c.id == this.state.datasetId)[0];
             var versionList = [];
             var vList = selectedDataset.versionList;
-            for (var v = 0; v < vList.length; v++) {
-                versionList.push(vList[v].versionId)
+            var onlineVersionList = vList.filter(c => !c.versionId.toString().includes("Local")).sort(function (a, b) {
+                a = a.versionId;
+                b = b.versionId;
+                return a > b ? -1 : a < b ? 1 : 0;
+            });
+            var offlineVersionList = vList.filter(c => c.versionId.toString().includes("Local")).sort(function (a, b) {
+                a = a.versionId.split(" ")[0];
+                b = b.versionId.split(" ")[0];
+                return a > b ? -1 : a < b ? 1 : 0;
+            });
+            var newVList = offlineVersionList.concat(onlineVersionList)
+            for (var v = 0; v < newVList.length; v++) {
+                versionList.push(newVList[v].versionId)
             }
             var versionId = "";
             var event = {
@@ -189,8 +200,19 @@ class CompareVersion extends Component {
             var selectedDataset = datasetList.filter(c => c.id == this.state.datasetId)[0];
             var versionList = [];
             var vList = selectedDataset.versionList;
-            for (var v = 0; v < vList.length; v++) {
-                versionList.push(vList[v].versionId)
+            var onlineVersionList = vList.filter(c => !c.versionId.toString().includes("Local")).sort(function (a, b) {
+                a = a.versionId;
+                b = b.versionId;
+                return a > b ? -1 : a < b ? 1 : 0;
+            });
+            var offlineVersionList = vList.filter(c => c.versionId.toString().includes("Local")).sort(function (a, b) {
+                a = a.versionId.split(" ")[0];
+                b = b.versionId.split(" ")[0];
+                return a > b ? -1 : a < b ? 1 : 0;
+            });
+            var newVList = offlineVersionList.concat(onlineVersionList)
+            for (var v = 0; v < newVList.length; v++) {
+                versionList.push(newVList[v].versionId)
             }
             versionList=versionList.filter(c=>c!=this.state.versionId);
 
