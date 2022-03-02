@@ -835,7 +835,7 @@ export default class BuildTree extends Component {
             currentItemConfig,
             currentScenario: (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0],
             usageTemplateId: "",
-            fuValues: { value: orgCurrentItemConfig.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.forecastingUnit.id, label: getLabelText(orgCurrentItemConfig.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.forecastingUnit.label, this.state.lang) + " | " + orgCurrentItemConfig.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.forecastingUnit.id },
+            fuValues: this.state.addNodeFlag ? [] : { value: orgCurrentItemConfig.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.forecastingUnit.id, label: getLabelText(orgCurrentItemConfig.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.forecastingUnit.label, this.state.lang) + " | " + orgCurrentItemConfig.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.forecastingUnit.id },
             usageText: ""
         }, () => {
             console.log("currentItemConfig after---", this.state.orgCurrentItemConfig)
