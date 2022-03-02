@@ -641,6 +641,7 @@ class ForecastSummary extends Component {
                         regionArray.push((filterForecastSelected != undefined ? (filterForecastSelected.totalForecast == null ? "" : filterForecastSelected.totalForecast) : ""));
                         regionArray.push((filterForecastSelected != undefined ? (filterForecastSelected.notes == null ? "" : ((filterForecastSelected.notes))) : ""));
                     }
+                    tempData1 = [];
                     tempData1.push(puListFiltered[j].planningUnit.label.label_en);
                     tempData1 = tempData1.concat(regionArray);
                     tempData1.push(total);
@@ -648,6 +649,8 @@ class ForecastSummary extends Component {
 
                 }
             }
+
+            console.log("data------------------>12345 ", data);
 
             var startY = 230;
             let content = {
