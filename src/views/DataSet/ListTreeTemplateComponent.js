@@ -49,7 +49,8 @@ export default class ListTreeTemplate extends Component {
         console.log("treeTemplateList---->", treeTemplateList);
         let treeTemplateArray = [];
         let count = 0;
-
+        var selStatus = document.getElementById("active").value;
+        var tempSelStatus = selStatus != "" ? (selStatus == "true" ? true : false) : "";
         for (var j = 0; j < treeTemplateList.length; j++) {
             data = [];
             data[0] = treeTemplateList[j].treeTemplateId;
@@ -58,8 +59,16 @@ export default class ListTreeTemplate extends Component {
             data[3] = treeTemplateList[j].monthsInPast;
             data[4] = treeTemplateList[j].monthsInFuture;
             data[5] = treeTemplateList[j].active;
-            treeTemplateArray[count] = data;
-            count++;
+            if (selStatus != "") {
+                if (tempSelStatus == treeTemplateList[j].active) {
+                    treeTemplateArray[count] = data;
+                    count++;
+                }
+            } else {
+                treeTemplateArray[count] = data;
+                count++;
+            }
+
         }
         this.el = jexcel(document.getElementById("tableDiv"), '');
         this.el.destroy();
@@ -186,8 +195,13 @@ export default class ListTreeTemplate extends Component {
         this.hideFirstComponent();
         DatasetService.getTreeTemplateList().then(response => {
             console.log("tree template list---", response.data)
+            var treeTemplateList = response.data.sort((a, b) => {
+                var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                return itemLabelA > itemLabelB ? 1 : -1;
+            });
             this.setState({
-                treeTemplateList: response.data,
+                treeTemplateList,
                 loading: false
             }, () => { this.buildJexcel() })
         })
@@ -288,6 +302,29 @@ export default class ListTreeTemplate extends Component {
                     </div>
                     <CardBody className="pb-lg-0 pt-lg-0">
                         {/* <div id="loader" className="center"></div> */}
+                        <Col md="3 pl-0">
+                            <div className="d-md-flex Selectdiv2">
+                                <FormGroup className="tab-ml-1 mt-md-2 mb-md-0 ">
+                                    <Label htmlFor="appendedInputButton">{i18n.t('static.common.status')}</Label>
+                                    <div className="controls SelectGo">
+                                        <InputGroup>
+                                            <Input
+                                                type="select"
+                                                name="active"
+                                                id="active"
+                                                bsSize="sm"
+                                                onChange={this.buildJexcel}
+                                            >
+                                                <option value="">{i18n.t('static.common.all')}</option>
+                                                <option value="true" selected>{i18n.t('static.common.active')}</option>
+                                                <option value="false">{i18n.t('static.common.disabled')}</option>
+
+                                            </Input>
+                                        </InputGroup>
+                                    </div>
+                                </FormGroup>
+                            </div>
+                        </Col>
                         <div className="TreeTemplateTable">
                             <div id="tableDiv" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE_TEMPLATE') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
                             </div>
