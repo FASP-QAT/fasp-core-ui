@@ -548,7 +548,7 @@ class CompareAndSelectScenario extends Component {
             var planningUnitId = e.target.value;
             console.log("Forecasting Unit^^^", name[0].planningUnit.forecastingUnit.id);
             console.log("this.state.equivalencyUnitList^^^", this.state.equivalencyUnitList);
-            var equivalencyUnit = this.state.equivalencyUnitList.filter(c => c.forecastingUnit.id == name[0].planningUnit.forecastingUnit.id && c.equivalencyUnit.active && c.active);
+            var equivalencyUnit = this.state.equivalencyUnitList.filter(c => c.forecastingUnit.id == name[0].planningUnit.forecastingUnit.id && c.equivalencyUnit.active);
             console.log("Equivalency Unit^^^", equivalencyUnit)
             var viewById = this.state.viewById;
             this.setState({
