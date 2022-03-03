@@ -6089,3 +6089,9 @@ pointer-events: none;
   max-height: 100vh!important;
   // overflow: scroll !important;
 }
+.VersionSettingMode{
+  height: 360px !important;
+  // max-height: calc(100vh - 340px) !important;
+  overflow-y: scroll;
+  overflow-x: hidden;
+}
