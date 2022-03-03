@@ -103,12 +103,12 @@ const validationSchemaExtrapolation = function (values) {
                     }
                 }),
         pId:
-            Yup.string().test('pId', 'Please select p value.',
+            Yup.string().test('pId', 'Please enter correct p value.',
                 function (value) {
                     console.log("***7**", document.getElementById("arimaId").value);
-                    // var testNumber = document.getElementById("pId").value != "" ? (/^\d{0,3}(\.\d{1,2})?$/).test(document.getElementById("pId").value) : false;
+                    var testNumber = document.getElementById("pId").value != "" ? (/^\d{0,3}(\.\d{1,2})?$/).test(document.getElementById("pId").value) : false;
                     // console.log("*****", testNumber);
-                    if ((document.getElementById("arimaId").value) == "true" && (document.getElementById("pId").value == "")) {
+                    if ((document.getElementById("arimaId").value) == "true" && (document.getElementById("pId").value == "" || testNumber == false)) {
                         return false;
                     } else {
                         return true;
@@ -118,10 +118,10 @@ const validationSchemaExtrapolation = function (values) {
             Yup.string().test('dId', 'Please enter correct d value.',
                 function (value) {
                     console.log("***8**", document.getElementById("arimaId").value);
-                    // var testNumber = document.getElementById("dId").value != "" ? (/^\d{0,3}(\.\d{1,2})?$/).test(document.getElementById("dId").value) : false;
+                    var testNumber = document.getElementById("dId").value != "" ? (/^\d{0,3}(\.\d{1,2})?$/).test(document.getElementById("dId").value) : false;
                     // var testNumber = JEXCEL_INTEGER_REGEX.test((document.getElementById("dId").value).replaceAll(",", ""));
                     // console.log("*****", testNumber);
-                    if ((document.getElementById("arimaId").value) == "true" && (document.getElementById("dId").value == "")) {
+                    if ((document.getElementById("arimaId").value) == "true" && (document.getElementById("dId").value == "" || testNumber == false)) {
                         return false;
                     } else {
                         return true;
@@ -130,16 +130,27 @@ const validationSchemaExtrapolation = function (values) {
         qId:
             Yup.string().test('qId', 'Please enter correct q value.',
                 function (value) {
-                    console.log("***9**", document.getElementById("arimaId").value);
-                    // var testNumber = document.getElementById("qId").value != "" ? (/^\d{0,3}(\.\d{1,2})?$/).test(document.getElementById("qId").value) : false;
-                    // var testNumber = JEXCEL_INTEGER_REGEX.test((document.getElementById("qId").value).replaceAll(",", ""));
-                    // console.log("*****", testNumber);
-                    if ((document.getElementById("arimaId").value) == "true" && (document.getElementById("qId").value == "")) {
+                    console.log("***4 arima**", document.getElementById("arimaId").value);
+                    var testNumber = document.getElementById("qId").value != "" ? (/^\d{0,3}(\.\d{1,2})?$/).test(document.getElementById("qId").value) : false;
+                    console.log("*****", testNumber);
+                    if ((document.getElementById("arimaId").value) == "true" && (document.getElementById("qId").value == "" || testNumber == false)) {
                         return false;
                     } else {
                         return true;
                     }
                 }),
+        // Yup.string().test('qId', 'Please enter correct q value.',
+        //     function (value) {
+        //         console.log("***9**", document.getElementById("arimaId").value);
+        //         // var testNumber = document.getElementById("qId").value != "" ? (/^\d{0,3}(\.\d{1,2})?$/).test(document.getElementById("qId").value) : false;
+        //         var testNumber = JEXCEL_INTEGER_REGEX.test((document.getElementById("qId").value).replaceAll(",", ""));
+        //         // console.log("*****", testNumber);
+        //         if ((document.getElementById("arimaId").value) == "true" && (document.getElementById("qId").value == "" || testNumber == false)) {
+        //             return false;
+        //         } else {
+        //             return true;
+        //         }
+        //     }),
         // extrapolationMethodId:
         //     Yup.string().test('extrapolationMethodId', 'Please enter q value.',
         //         function (value) {
@@ -155,7 +166,7 @@ const validationSchemaExtrapolation = function (values) {
         //             }
         //         }),
         extrapolationMethodId: Yup.string()
-            .required(i18n.t('static.common.regiontext')),
+            .required('Please select extrapolation method.'),
 
     })
 }
@@ -200,7 +211,7 @@ export default class TreeExtrapolationComponent extends React.Component {
             alpha: 0.2,
             beta: 0.2,
             gamma: 0.2,
-            p: 0.95,
+            p: 95,
             d: 12,
             q: 12,
             nodeDataExtrapolationOptionList: [],
@@ -1086,6 +1097,30 @@ export default class TreeExtrapolationComponent extends React.Component {
         })
     }
 
+    setPId(e) {
+        this.setState({
+            p: e.target.value
+        }, () => {
+            // this.buildJxl()
+        })
+    }
+    setDId(e) {
+        this.setState({
+            d: e.target.value
+        }, () => {
+            // this.buildJxl()
+        })
+    }
+
+    setQId(e) {
+        this.setState({
+            q: e.target.value
+        }, () => {
+            // this.buildJxl()
+        })
+    }
+
+
     calculateExtrapolatedData(dataAvailabel) {
         var monthArray = this.state.monthArray;
         var jexcelDataArr = [];
@@ -1319,7 +1354,7 @@ export default class TreeExtrapolationComponent extends React.Component {
         return '?'
     }
     componentDidMount() {
-    //     this.getExtrapolationMethodList();
+        //     this.getExtrapolationMethodList();
     }
     getExtrapolationMethodList() {
         console.log("### inside did mount")
@@ -1537,29 +1572,44 @@ export default class TreeExtrapolationComponent extends React.Component {
 
         this.el = jexcel(document.getElementById("tableDiv"), '');
         this.el.destroy();
-
+        console.log("this.state.forecastNestedHeader---", this.state.forecastNestedHeader)
         let nestedHeaders = [];
-        nestedHeaders.push(
-            {
-                title: '',
-                colspan: '4'
-            },
+        if (this.state.forecastNestedHeader > 0) {
+            nestedHeaders.push(
+                {
+                    title: '',
+                    colspan: '4'
+                },
 
-        );
-        nestedHeaders.push(
-            {
-                title: 'Forecast',
-                colspan: this.state.forecastNestedHeader
-                // colspan:'5'
-            },
-        );
-        nestedHeaders.push(
-            {
-                title: '',
-                colspan: '3'
-            },
-        );
+            );
+            nestedHeaders.push(
+                {
+                    title: 'Forecast',
+                    colspan: this.state.forecastNestedHeader
+                    // colspan:'5'
+                },
+            );
+            nestedHeaders.push(
+                {
+                    title: '',
+                    colspan: '3'
+                },
+            );
+        } else {
+            nestedHeaders.push(
+                {
+                    title: '',
+                    colspan: '4'
+                },
 
+            );
+            nestedHeaders.push(
+                {
+                    title: '',
+                    colspan: '3'
+                },
+            );
+        }
         var options = {
             data: dataArray,
             columnDrag: true,
@@ -1735,7 +1785,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                 return [];
             }.bind(this),
         };
-        
+
         var dataExtrapolation = jexcel(document.getElementById("tableDiv"), options);
         this.el = dataExtrapolation;
         var rmseArr = [];
@@ -1836,19 +1886,19 @@ export default class TreeExtrapolationComponent extends React.Component {
     loadedExtrapolation = function (instance, cell, x, y, value) {
         //  jExcelLoadedFunctionWithoutPagination(instance);
         jExcelLoadedFunctionOnlyHideRow(instance);
-        console.log("my instance---",instance)
+        console.log("my instance---", instance)
         // if (this.state.dataExtrapolation != "") {
-            var asterisk = document.getElementsByClassName("resizable")[0];
-            var tr = asterisk.firstChild.nextSibling;
-            console.log("asterisk", asterisk.firstChild.nextSibling)
+        var asterisk = document.getElementsByClassName("resizable")[0];
+        var tr = asterisk.firstChild.nextSibling;
+        console.log("asterisk", asterisk.firstChild.nextSibling)
 
-            tr.children[3].classList.add('InfoTr');
-            tr.children[5].classList.add('InfoTr');
-            tr.children[6].classList.add('InfoTr');
-            tr.children[7].classList.add('InfoTr');
-            tr.children[8].classList.add('InfoTr');
-            tr.children[9].classList.add('InfoTr');
-            tr.children[3].title = 'Placeholder'
+        tr.children[3].classList.add('InfoTr');
+        tr.children[5].classList.add('InfoTr');
+        tr.children[6].classList.add('InfoTr');
+        tr.children[7].classList.add('InfoTr');
+        tr.children[8].classList.add('InfoTr');
+        tr.children[9].classList.add('InfoTr');
+        tr.children[3].title = 'Placeholder'
         // }
 
     }
@@ -2864,69 +2914,61 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                                     <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenArima', !this.state.popoverOpenArima)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
                                                                 </Label>
                                                             </div>
-                                                            {this.state.arimaId &&
-                                                                <div className="row col-md-12 pt-lg-2 pl-lg-0">
-                                                                    <div className="pt-lg-0" style={{ display: 'contents' }}>
-                                                                        <div className="tab-ml-1 mt-md-2 mb-md-0 ExtraCheckboxFieldWidth">
-                                                                            <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.p')}</Label>
-                                                                            <Input
-                                                                                className="controls"
-                                                                                type="select"
-                                                                                id="pId"
-                                                                                bsSize="sm"
-                                                                                name="pId"
-                                                                                value={this.state.p}
-                                                                                valid={!errors.pId && this.state.p != null ? this.state.p : '' != ''}
-                                                                                invalid={touched.pId && !!errors.pId}
-                                                                                onBlur={handleBlur}
-                                                                                onChange={(e) => { handleChange(e); }}
-                                                                            >
-                                                                                <option value="">Please select confidence level</option>
-                                                                                <option value="0.80">80%</option>
-                                                                                <option value="0.85">85%</option>
-                                                                                <option value="0.90">90%</option>
-                                                                                <option value="0.95">95%</option>
-                                                                                <option value="0.99">99%</option>
-                                                                                <option value="0.995">99.5%</option>
-                                                                                <option value="0.999">99.9%</option>
-                                                                            </Input>
-                                                                            <FormFeedback>{errors.pId}</FormFeedback>
-                                                                        </div>
-                                                                        <div className="tab-ml-1 mt-md-2 mb-md-0 ExtraCheckboxFieldWidth">
-                                                                            <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.d')}</Label>
-                                                                            <Input
-                                                                                className="controls"
-                                                                                type="text"
-                                                                                id="dId"
-                                                                                bsSize="sm"
-                                                                                name="dId"
-                                                                                value={this.state.d}
-                                                                                valid={!errors.dId && this.state.d != null ? this.state.d : '' != ''}
-                                                                                invalid={touched.dId && !!errors.dId}
-                                                                                onBlur={handleBlur}
-                                                                                onChange={(e) => { handleChange(e); }}
-                                                                            />
-                                                                            <FormFeedback>{errors.dId}</FormFeedback>
-                                                                        </div>
-                                                                        <div className="tab-ml-1 mt-md-2 mb-md-0 ExtraCheckboxFieldWidth">
-                                                                            <Label htmlFor="appendedInputButton">q</Label>
-                                                                            <Input
-                                                                                className="controls"
-                                                                                type="text"
-                                                                                id="qId"
-                                                                                bsSize="sm"
-                                                                                name="qId"
-                                                                                value={this.state.q}
-                                                                                valid={!errors.qId && this.state.q != null ? this.state.q : '' != ''}
-                                                                                invalid={touched.qId && !!errors.qId}
-                                                                                onBlur={handleBlur}
-                                                                                onChange={(e) => { handleChange(e); }}
-                                                                            />
-                                                                            <FormFeedback>{errors.qId}</FormFeedback>
-                                                                        </div>
+                                                            {/* {this.state.arimaId && */}
+                                                            <div className="row col-md-12 pt-lg-2 pl-lg-0" style={{ display: this.state.arimaId ? '' : 'none' }}>
+                                                                {/* <div className="row col-md-12 pt-lg-2 pl-lg-0"> */}
+                                                                <div className="pt-lg-0" style={{ display: 'contents' }}>
+                                                                    <div className="tab-ml-1 mt-md-2 mb-md-0 ExtraCheckboxFieldWidth">
+                                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.p')}</Label>
+                                                                        <Input
+                                                                            className="controls"
+                                                                            type="text"
+                                                                            id="pId"
+                                                                            bsSize="sm"
+                                                                            name="pId"
+                                                                            value={this.state.p}
+                                                                            valid={!errors.pId && this.state.p != null ? this.state.p : '' != ''}
+                                                                            invalid={touched.pId && !!errors.pId}
+                                                                            onBlur={handleBlur}
+                                                                            onChange={(e) => { handleChange(e); this.setPId(e) }}
+                                                                        />
+                                                                        <FormFeedback>{errors.pId}</FormFeedback>
+                                                                    </div>
+                                                                    <div className="tab-ml-1 mt-md-2 mb-md-0 ExtraCheckboxFieldWidth">
+                                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.d')}</Label>
+                                                                        <Input
+                                                                            className="controls"
+                                                                            type="text"
+                                                                            id="dId"
+                                                                            bsSize="sm"
+                                                                            name="dId"
+                                                                            value={this.state.d}
+                                                                            valid={!errors.dId && this.state.d != null ? this.state.d : '' != ''}
+                                                                            invalid={touched.dId && !!errors.dId}
+                                                                            onBlur={handleBlur}
+                                                                            onChange={(e) => { handleChange(e); this.setDId(e) }}
+                                                                        />
+                                                                        <FormFeedback>{errors.dId}</FormFeedback>
+                                                                    </div>
+                                                                    <div className="tab-ml-1 mt-md-2 mb-md-0 ExtraCheckboxFieldWidth">
+                                                                        <Label htmlFor="appendedInputButton">q</Label>
+                                                                        <Input
+                                                                            className="controls"
+                                                                            type="text"
+                                                                            id="qId"
+                                                                            bsSize="sm"
+                                                                            name="qId"
+                                                                            value={this.state.q}
+                                                                            valid={!errors.qId && this.state.q != null ? this.state.q : '' != ''}
+                                                                            invalid={touched.qId && !!errors.qId}
+                                                                            onBlur={handleBlur}
+                                                                            onChange={(e) => { handleChange(e); this.setQId(e) }}
+                                                                        />
+                                                                        <FormFeedback>{errors.qId}</FormFeedback>
                                                                     </div>
                                                                 </div>
-                                                            }
+                                                            </div>
+                                                            {/* } */}
                                                         </div>
                                                     </div>
                                                 </FormGroup>
