@@ -2295,6 +2295,14 @@ export default class TreeExtrapolationComponent extends React.Component {
                                 var month = xAxis1.split('-')[0];
                                 return month;
                             }
+                            // ,
+                            // changeItemColor: function (item) {
+                            //     console.log("graph item---",item);
+                            //     // item.scaleLabel.fontColor = color;
+                            //     // item.ticks.fontColor = color;
+                            //     // item.ticks.minor.fontColor = color;
+                            //     // item.ticks.major.fontColor = color;
+                            // }
                         }
                     },
                     {

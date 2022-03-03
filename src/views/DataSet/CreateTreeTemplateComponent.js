@@ -411,6 +411,7 @@ export default class CreateTreeTemplate extends Component {
             numberNode: false,
             scalingTotal: '',
             singleValue2: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 },
+            minDateValue: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
             minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
             maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
             treeTemplate: {
@@ -937,8 +938,8 @@ export default class CreateTreeTemplate extends Component {
         const { orgCurrentItemConfig, currentItemConfig } = this.state;
         currentItemConfig.context = JSON.parse(JSON.stringify(orgCurrentItemConfig));
         console.log("============1============", orgCurrentItemConfig);
-        console.log("this.state.addNodeFlag reset 1---",this.state.addNodeFlag);
-        console.log("this.state.addNodeFlag reset 2---",this.state.addNodeFlag ? [] : { value: orgCurrentItemConfig.payload.nodeDataMap[0][0].fuNode.forecastingUnit.id, label: getLabelText(orgCurrentItemConfig.payload.nodeDataMap[0][0].fuNode.forecastingUnit.label, this.state.lang) + " | " + orgCurrentItemConfig.payload.nodeDataMap[0][0].fuNode.forecastingUnit.id });
+        console.log("this.state.addNodeFlag reset 1---", this.state.addNodeFlag);
+        console.log("this.state.addNodeFlag reset 2---", this.state.addNodeFlag ? [] : { value: orgCurrentItemConfig.payload.nodeDataMap[0][0].fuNode.forecastingUnit.id, label: getLabelText(orgCurrentItemConfig.payload.nodeDataMap[0][0].fuNode.forecastingUnit.label, this.state.lang) + " | " + orgCurrentItemConfig.payload.nodeDataMap[0][0].fuNode.forecastingUnit.id });
         this.setState({
             currentItemConfig,
             usageTemplateId: "",
@@ -4384,7 +4385,11 @@ export default class CreateTreeTemplate extends Component {
             }, () => {
                 console.log("highlighted item---", this.state.currentItemConfig.context)
                 this.getNodeTypeFollowUpList(data.context.level == 0 ? 0 : data.parentItem.payload.nodeType.id);
-
+                if (data.context.level != 0) {
+                    this.setState({
+                        parentValue: data.parentItem.payload.nodeDataMap[0][0].calculatedDataValue
+                    });
+                }
                 if (data.context.payload.nodeType.id == 4) {
                     this.getForecastingUnitListByTracerCategoryId((data.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.tracerCategory.id);
                     this.setState({
@@ -4874,7 +4879,7 @@ export default class CreateTreeTemplate extends Component {
                                                     id="month"
                                                     name="month"
                                                     ref={this.pickAMonth1}
-                                                    years={{ min: this.state.minDate, max: this.state.maxDate }}
+                                                    years={{ min: this.state.minDateValue, max: this.state.maxDate }}
                                                     value={{ year: new Date((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].month).getFullYear(), month: ("0" + (new Date((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].month).getMonth() + 1)).slice(-2) }}
                                                     lang={pickerLang.months}
                                                     // theme="dark"
@@ -4905,14 +4910,14 @@ export default class CreateTreeTemplate extends Component {
                                             <FormFeedback className="red">{errors.percentageOfParent}</FormFeedback>
                                         </FormGroup>
                                         <FormGroup className="col-md-6" style={{ display: this.state.numberNode ? 'block' : 'none' }}>
-                                            <Label htmlFor="currencyId">Parent Value</Label>
+                                            <Label htmlFor="currencyId">{i18n.t('static.tree.parentValue')} {i18n.t('static.common.for')} {moment(this.state.currentItemConfig.parentItem.payload.nodeDataMap[0][0].month).format(`MMM-YYYY`)}</Label>
                                             <Input type="text"
                                                 id="parentValue"
                                                 name="parentValue"
                                                 bsSize="sm"
                                                 readOnly={true}
                                                 onChange={(e) => { this.dataChange(e) }}
-                                                value={this.state.addNodeFlag != "true" ? addCommas(this.state.currentItemConfig.parentItem != null ? (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].calculatedDataValue : '') : addCommas(this.state.parentValue)}
+                                                value={addCommas(this.state.parentValue)}
                                             ></Input>
                                         </FormGroup>
                                         {/* </> */}
@@ -5048,7 +5053,7 @@ export default class CreateTreeTemplate extends Component {
                                                         && this.state.planningUnitList.map((item, i) => {
                                                             return (
                                                                 <option key={i} value={item.planningUnitId}>
-                                                                    {getLabelText(item.label, this.state.lang)}
+                                                                    {getLabelText(item.label, this.state.lang) + " | " + item.planningUnitId}
                                                                 </option>
                                                             )
                                                         }, this)}
@@ -6658,6 +6663,7 @@ export default class CreateTreeTemplate extends Component {
                                     console.log("item config---", itemConfig);
                                     this.setState({
                                         orgCurrentItemConfig: JSON.parse(JSON.stringify(this.state.currentItemConfig.context)),
+                                        parentValue: itemConfig.payload.nodeDataMap[0][0].calculatedDataValue
                                     });
 
                                     this.getNodeTypeFollowUpList(itemConfig.payload.nodeType.id);

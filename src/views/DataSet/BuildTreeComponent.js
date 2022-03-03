@@ -480,6 +480,7 @@ export default class BuildTree extends Component {
             level0: true,
             numberNode: false,
             singleValue2: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 },
+            minDateValue: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
             minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
             maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
             treeTemplate: {
@@ -5971,7 +5972,7 @@ export default class BuildTree extends Component {
                                                     id="month"
                                                     name="month"
                                                     ref={this.pickAMonth1}
-                                                    years={{ min: this.state.minDate, max: this.state.maxDate }}
+                                                    years={{ min: this.state.minDateValue, max: this.state.maxDate }}
                                                     value={{
                                                         year: new Date(this.state.currentScenario.month).getFullYear(), month: ("0" + (new Date(this.state.currentScenario.month).getMonth() + 1)).slice(-2)
                                                     }}
@@ -6008,7 +6009,7 @@ export default class BuildTree extends Component {
                                             <FormFeedback className="red">{errors.percentageOfParent}</FormFeedback>
                                         </FormGroup>
                                         <FormGroup className="col-md-6" style={{ display: this.state.numberNode ? 'block' : 'none' }}>
-                                            <Label htmlFor="currencyId">{i18n.t('static.tree.parentValue')}</Label>
+                                            <Label htmlFor="currencyId">{i18n.t('static.tree.parentValue')} {i18n.t('static.common.for')} {moment(this.state.parentScenario.month).format(`MMM-YYYY`)}</Label>
                                             <Input type="text"
                                                 id="parentValue"
                                                 name="parentValue"
@@ -6158,7 +6159,7 @@ export default class BuildTree extends Component {
                                                         && this.state.planningUnitList.map((item, i) => {
                                                             return (
                                                                 <option key={i} value={item.id}>
-                                                                    {getLabelText(item.label, this.state.lang)}
+                                                                    {getLabelText(item.label, this.state.lang) + " | " + item.id}
                                                                 </option>
                                                             )
                                                         }, this)}
@@ -7752,6 +7753,7 @@ export default class BuildTree extends Component {
                                 nodeDataMap[this.state.selectedScenario] = tempArray;
                                 // tempArray.push(nodeDataMap);
                                 this.setState({
+                                    parentValue:"",
                                     fuValues: [],
                                     fuLabels: [],
                                     // showFUValidation : true,
@@ -7849,6 +7851,7 @@ export default class BuildTree extends Component {
                                     console.log("add click number node flag---", this.state.numberNode);
                                     this.setState({
                                         orgCurrentItemConfig: JSON.parse(JSON.stringify(this.state.currentItemConfig.context)),
+                                        parentValue: itemConfig.payload.nodeDataMap[this.state.selectedScenario][0].calculatedDataValue
                                     });
 
                                     this.getNodeTypeFollowUpList(itemConfig.payload.nodeType.id);
