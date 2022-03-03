@@ -376,6 +376,11 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                             }
                             calculatedValue = totalValue;
                         }
+                        if (payload.nodeType.id == 5) {
+                            var pu = (datasetJson.planningUnitList).filter(c => c.planningUnit.id == nodeDataMapForScenario.puNode.planningUnit.id)[0];
+                            var fuPerPu = pu.planningUnit.multiplier;
+                            calculatedValue = calculatedValue / fuPerPu;
+                        }
                         var calculatedMmdValue = calculatedValue;
                         console.log("flatList[fl]$$$###", flatList[fl])
                         var childNode = (flatListUnsorted.filter(c => c.parent == flatList[fl].id))[0];
