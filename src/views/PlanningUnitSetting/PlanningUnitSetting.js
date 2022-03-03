@@ -1505,19 +1505,19 @@ export default class PlanningUnitSetting extends Component {
                     type: 'autocomplete',
                     source: this.state.allPlanningUnitList,
                     filter: this.filterPlanningUnitListByTracerCategoryId,
-                    width:'170',
+                    width: '170',
                     // readOnly: true //1B
                 },
                 {
                     title: 'Consumption Forecast?',
                     type: 'checkbox',
-                    width:'150'
+                    width: '150'
                     // readOnly: true //2C
                 },
                 {
                     title: 'Tree Forecast?',
                     type: 'checkbox',
-                    width:'150'
+                    width: '150'
                     // readOnly: true //3D
                 },
                 {
@@ -1526,7 +1526,7 @@ export default class PlanningUnitSetting extends Component {
                     textEditor: true,
                     decimal: '.',
                     mask: '#,##',
-                    width:'150',
+                    width: '150',
                     disabledMaskOnEdition: true
                     // readOnly: true //4E
                 },
@@ -1536,7 +1536,7 @@ export default class PlanningUnitSetting extends Component {
                     textEditor: true,
                     decimal: '.',
                     mask: '#,##',
-                    width:'150',
+                    width: '150',
                     disabledMaskOnEdition: true
                     // readOnly: true //5F
                 },
@@ -1547,14 +1547,14 @@ export default class PlanningUnitSetting extends Component {
                     decimal: '.',
                     mask: '#,##',
                     disabledMaskOnEdition: true,
-                    width:'150'
+                    width: '150'
                     // readOnly: true //6G
                 },
                 {
                     title: 'Price Type',
                     type: 'autocomplete',
                     source: this.state.allProcurementAgentList,
-                    width:'180'
+                    width: '180'
                     // filter: this.filterProcurementAgentByPlanningUnit
                     // readOnly: true //7H
                 },
@@ -1564,7 +1564,7 @@ export default class PlanningUnitSetting extends Component {
                     textEditor: true,
                     decimal: '.',
                     mask: '#,##.00',
-                    width:'120',
+                    width: '120',
                     disabledMaskOnEdition: true
                     // readOnly: true //8I
                 },
@@ -1674,6 +1674,16 @@ export default class PlanningUnitSetting extends Component {
                 if (y == null) {
                     // alert("Hi");
                 } else {
+
+                    // Insert new row before
+                    if (obj.options.allowInsertRow == true) {
+                        items.push({
+                            title: i18n.t('static.common.addRow'),
+                            onclick: function () {
+                                this.addRow();
+                            }.bind(this)
+                        });
+                    }
                     // alert("Hi1");
                     // Delete a row
                     if (obj.options.allowDeleteRow == true) {

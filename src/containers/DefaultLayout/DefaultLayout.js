@@ -890,10 +890,30 @@ class DefaultLayout extends Component {
     e.preventDefault();
     this.props.history.push(`/program/downloadProgram/`)
   }
+  goToLoadProgramFC(e) {
+    e.preventDefault();
+    this.props.history.push(`/dataset/loadDeleteDataSet`)
+  }
   goToCommitProgram(e) {
     e.preventDefault();
     if (isSiteOnline()) {
       this.props.history.push(`/program/syncPage/`)
+    } else {
+      confirmAlert({
+        message: i18n.t('static.commit.offline'),
+        buttons: [
+          {
+            label: i18n.t('static.common.close')
+          }
+        ]
+      });
+    }
+
+  }
+  goToCommitProgramFC(e) {
+    e.preventDefault();
+    if (isSiteOnline()) {
+      this.props.history.push(`/dataset/commitTree`)
     } else {
       confirmAlert({
         message: i18n.t('static.commit.offline'),
@@ -1160,7 +1180,7 @@ class DefaultLayout extends Component {
 
         <AppHeader fixed >
           <Suspense fallback={this.loading()}>
-            <DefaultHeader onLogout={e => this.signOut(e)} onChangePassword={e => this.changePassword(e)} onChangeDashboard={e => this.showDashboard(e)} shipmentLinkingAlerts={e => this.showShipmentLinkingAlerts(e)} latestProgram={e => this.goToLoadProgram(e)} title={this.state.name} notificationCount={this.state.notificationCount} changeIcon={this.state.changeIcon} commitProgram={e => this.goToCommitProgram(e)} activeModule={this.state.activeTab == 1 ? 1 : 2} />
+            <DefaultHeader onLogout={e => this.signOut(e)} onChangePassword={e => this.changePassword(e)} onChangeDashboard={e => this.showDashboard(e)} shipmentLinkingAlerts={e => this.showShipmentLinkingAlerts(e)} latestProgram={e => this.goToLoadProgram(e)} latestProgramFC={e => this.goToLoadProgramFC(e)} title={this.state.name} notificationCount={this.state.notificationCount} changeIcon={this.state.changeIcon} commitProgram={e => this.goToCommitProgram(e)} commitProgramFC={e => this.goToCommitProgramFC(e)} activeModule={this.state.activeTab == 1 ? 1 : 2} />
           </Suspense>
         </AppHeader>
         <div className="app-body">
@@ -1744,7 +1764,7 @@ class DefaultLayout extends Component {
                           {
                             name: i18n.t('static.common.loadDeleteDataSet'),
                             url: '/dataset/loadDeleteDataSet',
-                            icon: 'fa fa-cloud-download',
+                            icon: 'cui-cloud-download FontBoldIcon',
                             attributes: {
                               hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true),
                               onClick: e => {
@@ -1755,7 +1775,7 @@ class DefaultLayout extends Component {
                           {
                             name: i18n.t('static.commitProgram.commitProgram'),
                             url: '/dataset/commitTree',
-                            icon: 'fa fa-cloud-upload',
+                            icon: 'cui-cloud-upload FontBoldIcon',
                             attributes: {
                               hidden: (this.state.businessFunctions.includes('ROLE_BF_COMMIT_DATASET') && this.state.activeTab == 1 ? false : true),
                               onClick: e => {
@@ -2118,7 +2138,7 @@ class DefaultLayout extends Component {
                           {
                             name: i18n.t('static.dashboard.downloadprogram'),
                             url: '/program/downloadProgram',
-                            icon: 'fa fa-cloud-download',
+                            icon: 'cui-cloud-download FontBoldIcon',
                             attributes: {
                               hidden: ((this.state.businessFunctions.includes('ROLE_BF_DOWNLOAD_PROGARM') && this.state.activeTab == 2) ? false : true),
                               onClick: e => {
@@ -2174,7 +2194,7 @@ class DefaultLayout extends Component {
                           {
                             name: i18n.t('static.dashboard.commitVersion'),
                             url: '/program/syncPage',
-                            icon: 'fa fa-cloud-upload',
+                            icon: 'cui-cloud-upload FontBoldIcon',
                             attributes: {
                               hidden: ((this.state.businessFunctions.includes('ROLE_BF_COMMIT_VERSION') && this.state.activeTab == 2) ? false : true),
                               onClick: e => {
