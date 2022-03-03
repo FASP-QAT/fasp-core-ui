@@ -292,7 +292,7 @@ class ModelingValidation extends Component {
             loading: false
         }, () => {
             // if (treeId != "") {
-                this.setTreeId(event);
+            this.setTreeId(event);
             // }else{
 
             // }
@@ -373,10 +373,10 @@ class ModelingValidation extends Component {
                 loading: false
             }, () => {
                 // if (scenarioId != "") {
-                    this.setScenarioId(event);
+                this.setScenarioId(event);
                 // }
                 // if (levelId != "") {
-                    this.setLevelId(levelEvent);
+                this.setLevelId(levelEvent);
                 // }
 
             })
@@ -506,11 +506,12 @@ class ModelingValidation extends Component {
                 var totalPer = 0;
                 for (var k = 0; k < nodeVal.length; k++) {
                     var flatListFiltered = flatList.filter(c => c.id == nodeVal[k].value)[0].payload.nodeDataMap[this.state.scenarioId][0].nodeDataMomList;
+                    var checkIfPuNode = flatList.filter(c => c.id == nodeVal[k].value)[0].payload.nodeType.id;
                     var calculatedValue = "";
-                    if (flatListFiltered!=undefined && flatListFiltered.length > 0) {
+                    if (flatListFiltered != undefined && flatListFiltered.length > 0) {
                         var cvList = flatListFiltered.filter(c => moment(c.month).format("YYYY-MM-DD") == moment(monthList[j]).format("YYYY-MM-DD"));
                         if (cvList.length > 0) {
-                            calculatedValue = cvList[0].calculatedValue
+                            calculatedValue = checkIfPuNode == 5 ? cvList[0].calculatedMmdValue : cvList[0].calculatedValue
                         } else {
                             calculatedValue = "";
                         }
@@ -524,11 +525,12 @@ class ModelingValidation extends Component {
 
                 for (var k = 0; k < nodeVal.length; k++) {
                     var flatListFiltered = flatList.filter(c => c.id == nodeVal[k].value)[0].payload.nodeDataMap[this.state.scenarioId][0].nodeDataMomList;
+                    var checkIfPuNode = flatList.filter(c => c.id == nodeVal[k].value)[0].payload.nodeType.id;
                     var calculatedValue = "";
-                    if (flatListFiltered!=undefined && flatListFiltered.length > 0) {
+                    if (flatListFiltered != undefined && flatListFiltered.length > 0) {
                         var cvList = flatListFiltered.filter(c => moment(c.month).format("YYYY-MM-DD") == moment(monthList[j]).format("YYYY-MM-DD"));
                         if (cvList.length > 0) {
-                            calculatedValue = cvList[0].calculatedValue
+                            calculatedValue = checkIfPuNode == 5 ? cvList[0].calculatedMmdValue : cvList[0].calculatedValue
                         } else {
                             calculatedValue = "";
                         }
@@ -700,7 +702,7 @@ class ModelingValidation extends Component {
                 loading: false
             }, () => {
                 // if (versionId != "") {
-                    this.setVersionId(event)
+                this.setVersionId(event)
                 // }
             })
         } else {
@@ -831,7 +833,7 @@ class ModelingValidation extends Component {
                         loading: false
                     }, () => {
                         // if (datasetId != "") {
-                            this.setDatasetId(event);
+                        this.setDatasetId(event);
                         // }
                     })
                 }.bind(this)

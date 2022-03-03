@@ -151,7 +151,7 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
         }
         // console.log("sortedFlatList###", sortedFlatList);
         flatList = sortedFlatList.concat(flatList.filter(c => c.payload.nodeType.id == 1)).concat(flatList.filter(c => c.payload.nodeType.id != 1 && !sortedFlatListId.includes(c.id)));
-        // console.log("FlatList", flatList);
+        console.log("FlatList$$$###", flatList);
         for (var fl = 0; fl < flatList.length; fl++) {
             // console.log("FlatList$$$", flatList[fl]);
             var payload = flatList[fl].payload;
@@ -377,12 +377,14 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                             calculatedValue = totalValue;
                         }
                         var calculatedMmdValue = calculatedValue;
-
+                        console.log("flatList[fl]$$$###", flatList[fl])
                         var childNode = (flatListUnsorted.filter(c => c.parent == flatList[fl].id))[0];
+                        console.log("ChildNode$$$###", childNode);
                         var grandChildNode = childNode != undefined ? (flatListUnsorted.filter(c => c.parent == childNode.id))[0] : "";
                         // console.log("ChildNode$$$%%%", childNode);
                         // console.log("grandChildNode$$$%%%", grandChildNode);
                         if (childNode != undefined && grandChildNode != undefined && childNode.payload.nodeType.id == 4 && grandChildNode.payload.nodeType.id == 5) {
+                            console.log("In ifCondition$$$###")
                             // console.log("in if$$$%%%");
 
                             // var daysPerMonth = 365 / 12;
@@ -394,7 +396,7 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                             // var grandParentNodeData = (grandParentFiltered.payload.nodeDataMap[scenarioList[ndm].id]);
                             // console.log("grandParentNodeData$$$%%%", grandParentNodeData)
                             // if (grandParentNodeData != undefined) {
-                            patients = nodeDataMapForScenario.calculatedDataValue;
+                            patients = nodeDataMapForScenario.calculatedDataValue != null ? nodeDataMapForScenario.calculatedDataValue : nodeDataMapForScenario.dataValue;
                             // } else {
                             // patients = 0;
                             // }
@@ -442,29 +444,43 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                             }
                             // console.log("noOfPus$$$%%%", noOfPus);
                             calculatedMmdValue = noOfPus;
-                            console.log("CalculatedMmdValueForPaitent$$$$###",calculatedMmdValue)
+                            console.log("CalculatedMmdValueForPaitent$$$$###", calculatedMmdValue)
                         }
 
-                        if (payload.nodeType.id == 4) {
+                        if (payload.nodeType.id == 4 && nodeDataMapForScenario.fuNode.usageType.id == 2) {
                             var parent = (flatList[fl].parent);
                             var parentFiltered = (flatListUnsorted.filter(c => c.id == parent))[0];
                             var childNode = (flatListUnsorted.filter(c => c.parent == flatList[fl].id))[0];
                             var noOfBottlesInOneVisit = 6;
                             var pu = (datasetJson.planningUnitList.filter(c => c.planningUnit.id == (childNode.payload.nodeDataMap[scenarioList[ndm].id])[0].puNode.planningUnit.id))[0];
                             var fuPerPu = pu.planningUnit.multiplier;
-                            calculatedMmdValue = Math.round((parentFiltered.payload.nodeDataMap[scenarioList[ndm].id])[0].nodeDataMomList.filter(c => moment(c.month).format("YYYY-MM-DD") == moment(curDate).format("YYYY-MM-DD"))[0].calculatedMmdValue * noOfBottlesInOneVisit) * fuPerPu;
-                            console.log("CalculatedMmdValueForFU$$$$###",calculatedMmdValue)
+                            var lag = nodeDataMapForScenario.fuNode.lagInMonths;
+                            if (i >= lag) {
+                                calculatedMmdValue = Math.round(((parentFiltered.payload.nodeDataMap[scenarioList[ndm].id])[0].nodeDataMomList.filter(c => moment(c.month).format("YYYY-MM-DD") == moment(curDate).subtract(lag, 'months').format("YYYY-MM-DD"))[0].calculatedMmdValue * nodeDataMapForScenario.dataValue / 100) * noOfBottlesInOneVisit) * fuPerPu;
+                            } else {
+                                calculatedMmdValue = 0;
+                            }
+                            console.log("CalculatedMmdValueForFU$$$$###", calculatedMmdValue)
                             // console.log("calculatedMmdValue$$$%%%", calculatedMmdValue);
                         }
                         if (payload.nodeType.id == 5) {
                             var parent = (flatList[fl].parent);
                             var parentFiltered = (flatListUnsorted.filter(c => c.id == parent))[0];
-                            var grandParent = parentFiltered.parent;
-                            var grandParentFiltered = (flatListUnsorted.filter(c => c.id == grandParent))[0];
-                            // var childNode = (flatListUnsorted.filter(c => c.parent == flatList[fl].id))[0];
-                            var noOfBottlesInOneVisit = 6;
-                            calculatedMmdValue = Math.round((grandParentFiltered.payload.nodeDataMap[scenarioList[ndm].id])[0].nodeDataMomList.filter(c => moment(c.month).format("YYYY-MM-DD") == moment(curDate).format("YYYY-MM-DD"))[0].calculatedMmdValue * noOfBottlesInOneVisit);
-                            console.log("CalculatedMmdValueForPU$$$$###",calculatedMmdValue)
+                            if ((parentFiltered.payload.nodeDataMap[scenarioList[ndm].id])[0].fuNode.usageType.id == 2) {
+                                calculatedMmdValue = Math.round(((parentFiltered.payload.nodeDataMap[scenarioList[ndm].id])[0].nodeDataMomList.filter(c => moment(c.month).format("YYYY-MM-DD") == moment(curDate).subtract(0, 'months').format("YYYY-MM-DD"))[0].calculatedMmdValue * nodeDataMapForScenario.dataValue / 100) / fuPerPu);
+                            }
+                            // var grandParent = parentFiltered.parent;
+                            // var grandParentFiltered = (flatListUnsorted.filter(c => c.id == grandParent))[0];
+                            // // var childNode = (flatListUnsorted.filter(c => c.parent == flatList[fl].id))[0];
+                            // var noOfBottlesInOneVisit = 6;
+                            // var lag = (parentFiltered.payload.nodeDataMap[scenarioList[ndm].id])[0].fuNode.lagInMonths;
+                            // console.log("I++++", i);
+                            // if (i >= lag) {
+                            //     calculatedMmdValue = Math.round((grandParentFiltered.payload.nodeDataMap[scenarioList[ndm].id])[0].nodeDataMomList.filter(c => moment(c.month).format("YYYY-MM-DD") == moment(curDate).subtract(lag, 'months').format("YYYY-MM-DD"))[0].calculatedMmdValue * noOfBottlesInOneVisit);
+                            // } else {
+                            //     calculatedMmdValue = 0;
+                            // }
+                            console.log("CalculatedMmdValueForPU$$$$###", calculatedMmdValue)
                             // console.log("calculatedMMDValuePU$$$%%%", calculatedMmdValue);
                         }
 
