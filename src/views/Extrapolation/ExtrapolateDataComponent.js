@@ -1,9 +1,11 @@
 import React from "react";
 import ReactDOM from 'react-dom';
+import * as Yup from 'yup';
+import '../../views/Forms/ValidationForms/ValidationForms.css'
 import {
     Card, CardBody,
     Label, Input, FormGroup,
-    CardFooter, Button, Col, Form, InputGroup, Modal, ModalHeader, ModalFooter, ModalBody, Row, Table, PopoverBody, Popover
+    CardFooter, Button, Col, Form, InputGroup, Modal,FormFeedback, ModalHeader, ModalFooter, ModalBody, Row, Table, PopoverBody, Popover
 } from 'reactstrap';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_PAGINATION_OPTION, SECRET_KEY, DATE_FORMAT_CAP_WITHOUT_DATE, JEXCEL_MONTH_PICKER_FORMAT } from "../../Constants";
@@ -28,12 +30,152 @@ import { Prompt } from "react-router";
 import pdfIcon from '../../assets/img/pdf.png';
 import jsPDF from 'jspdf';
 import { LOGO } from "../../CommonComponent/Logo";
+import { Formik } from "formik";
 
 const entityname = i18n.t('static.dashboard.extrapolation');
 const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
     from: 'From', to: 'To',
 }
+const validationSchemaExtrapolation = function (values) {
+    return Yup.object().shape({
+        noOfMonthsId:
+            Yup.string().test('noOfMonthsId', 'Please enter no. of months.',
+                function (value) {
+                    console.log("***** noOfMonthsId", document.getElementById("movingAvgId").value);
+                    ///^[0-9\b]+$/
+                    console.log("&&&&&&&&&&&&&&&",(document.getElementById("noOfMonthsId").value).replaceAll(",", ""))
+                    var testNumber = (/^[\d]*$/).test((document.getElementById("noOfMonthsId").value).replaceAll(",", ""));
+                    console.log("*****&&&&", testNumber);
+                    if ((document.getElementById("movingAvgId").value) == "on" && (document.getElementById("noOfMonthsId").value == "" || testNumber == false)) {
+                    console.log("RRRRRR-if");
+                        return false;
+                    } else {
+                        console.log("RRRRRR-else");
+                        return true;
+                    }
+                }),
+        confidenceLevelId:
+            Yup.string().test('confidenceLevelId', 'Please enter confidence level.',
+                function (value) {
+                    console.log("*****", document.getElementById("smoothingId").value);
+                    var testNumber = document.getElementById("confidenceLevelId").value != "" ? (/^\d{0,3}(\.\d{1,2})?$/).test(document.getElementById("confidenceLevelId").value) : false;
+                    // console.log("*****", testNumber);
+                    if ((document.getElementById("smoothingId").value) == "true" && (document.getElementById("confidenceLevelId").value == "" || testNumber == false)) {
+                        return false;
+                    } else {
+                        return true;
+                    }
+                }),
+        seasonalityId:
+            Yup.string().test('seasonalityId', 'Please enter seasonality.',
+                function (value) {
+                    console.log("*****", document.getElementById("smoothingId").value);
+                    var testNumber = document.getElementById("seasonalityId").value != "" ? (/^\d{0,3}(\.\d{1,2})?$/).test(document.getElementById("seasonalityId").value) : false;
+                    // console.log("*****", testNumber);
+                    if ((document.getElementById("smoothingId").value) == "true" && (document.getElementById("seasonalityId").value == "" || testNumber == false)) {
+                        return false;
+                    } else {
+                        return true;
+                    }
+                }),
+        gammaId:
+            Yup.string().test('gammaId', 'Please enter gamma value.',
+                function (value) {
+                    console.log("*****", document.getElementById("smoothingId").value);
+                    var testNumber = document.getElementById("gammaId").value != "" ? (/^\d{0,3}(\.\d{1,2})?$/).test(document.getElementById("gammaId").value) : false;
+                    // console.log("*****", testNumber);
+                    if ((document.getElementById("smoothingId").value) == "true" && (document.getElementById("gammaId").value == "" || testNumber == false)) {
+                        return false;
+                    } else {
+                        return true;
+                    }
+                }),
+        betaId:
+            Yup.string().test('betaId', 'Please enter beta value.',
+                function (value) {
+                    console.log("*****", document.getElementById("smoothingId").value);
+                    var testNumber = document.getElementById("betaId").value != "" ? (/^\d{0,3}(\.\d{1,2})?$/).test(document.getElementById("betaId").value) : false;
+                    // console.log("*****", testNumber);
+                    if ((document.getElementById("smoothingId").value) == "true" && (document.getElementById("betaId").value == "" || testNumber == false)) {
+                        return false;
+                    } else {
+                        return true;
+                    }
+                }),
+        alphaId:
+            Yup.string().test('alphaId', 'Please enter alpha value.',
+                function (value) {
+                    console.log("*****", document.getElementById("smoothingId").value);
+                    var testNumber = document.getElementById("alphaId").value != "" ? (/^\d{0,3}(\.\d{1,2})?$/).test(document.getElementById("alphaId").value) : false;
+                    // console.log("*****", testNumber);
+                    if ((document.getElementById("smoothingId").value) == "true" && (document.getElementById("alphaId").value == "" || testNumber == false)) {
+                        return false;
+                    } else {
+                        return true;
+                    }
+                }),
+        pId:
+            Yup.string().test('pId', 'Please enter p value.',
+                function (value) {
+                    console.log("*****", document.getElementById("arimaId").value);
+                    var testNumber = document.getElementById("pId").value != "" ? (/^\d{0,3}(\.\d{1,2})?$/).test(document.getElementById("pId").value) : false;
+                    // console.log("*****", testNumber);
+                    if ((document.getElementById("arimaId").value) == "true" && (document.getElementById("pId").value == "" || testNumber == false)) {
+                        return false;
+                    } else {
+                        return true;
+                    }
+                }),
+        dId:
+            Yup.string().test('dId', 'Please enter d value.',
+                function (value) {
+                    console.log("*****", document.getElementById("arimaId").value);
+                    var testNumber = document.getElementById("dId").value != "" ? (/^\d{0,3}(\.\d{1,2})?$/).test(document.getElementById("dId").value) : false;
+                    // console.log("*****", testNumber);
+                    if ((document.getElementById("arimaId").value) == "true" && (document.getElementById("dId").value == "" || testNumber == false)) {
+                        return false;
+                    } else {
+                        return true;
+                    }
+                }),
+        qId:
+            Yup.string().test('qId', 'Please enter q value.',
+                function (value) {
+                    console.log("*****", document.getElementById("arimaId").value);
+                    var testNumber = document.getElementById("qId").value != "" ? (/^\d{0,3}(\.\d{1,2})?$/).test(document.getElementById("qId").value) : false;
+                    // console.log("*****", testNumber);
+                    if ((document.getElementById("arimaId").value) == "true" && (document.getElementById("qId").value == "" || testNumber == false)) {
+                        return false;
+                    } else {
+                        return true;
+                    }
+                })
+    })
+}
+
+const validateExtrapolation = (getValidationSchema) => {
+    return (values) => {
+        const validationSchemaExtrapolation = getValidationSchema(values)
+        try {
+            validationSchemaExtrapolation.validateSync(values, { abortEarly: false })
+            return {}
+        } catch (error) {
+            return getErrorsFromValidationErrorExtrapolation(error)
+        }
+    }
+}
+
+const getErrorsFromValidationErrorExtrapolation = (validationError) => {
+    const FIRST_ERROR = 0
+    return validationError.inner.reduce((errors, error) => {
+        return {
+            ...errors,
+            [error.path]: error.errors[FIRST_ERROR],
+        }
+    }, {})
+}
+
 export default class ExtrapolateDataComponent extends React.Component {
     constructor(props) {
         super(props);
@@ -163,7 +305,7 @@ export default class ExtrapolateDataComponent extends React.Component {
             programRequest.onsuccess = function (e) {
                 var forecastProgramList = [];
                 var myResult = programRequest.result;
-                console.log("result*******",myResult)
+                console.log("result*******", myResult)
                 for (var i = 0; i < myResult.length; i++) {
                     var datasetDataBytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
                     var datasetData = datasetDataBytes.toString(CryptoJS.enc.Utf8);
@@ -244,6 +386,37 @@ export default class ExtrapolateDataComponent extends React.Component {
         }, () => {
             this.buildActualJxl();
         })
+    }
+
+    touchAllExtrapolation(setTouched, errors) {
+        setTouched({
+            noOfMonthsId: true,
+            confidenceLevelId: true,
+            seasonalityId: true,
+            gammaId: true,
+            betaId: true,
+            alphaId: true,
+            pId: true,
+            dId: true,
+            qId: true
+        }
+        )
+        this.validateFormExtrapolation(errors)
+    }
+
+    validateFormExtrapolation(errors) {
+        this.findFirstErrorExtrapolation('userForm', (fieldName) => {
+            return Boolean(errors[fieldName])
+        })
+    }
+    findFirstErrorExtrapolation(formName, hasError) {
+        const form = document.forms[formName]
+        for (let i = 0; i < form.length; i++) {
+            if (hasError(form[i].name)) {
+                form[i].focus()
+                break
+            }
+        }
     }
 
     buildActualJxl() {
@@ -1812,9 +1985,6 @@ export default class ExtrapolateDataComponent extends React.Component {
         let startDate = this.state.rangeValue1.from.year + '-' + (this.state.rangeValue1.from.month) + '-01'
         startDate = moment(startDate).format("YYYY-MM-DD");
 
-        console.log("Stop Date&&&", stopDate);
-        console.log("Stop Date&&&", this.state.movingAvgData);
-
         if (this.state.movingAvgId) {
             datasets.push(
                 {
@@ -1970,6 +2140,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                     message={i18n.t("static.dataentry.confirmmsg")}
                 />
                 <Card>
+
                     <div className="card-header-actions">
                         <div className="Card-header-reporticon">
                             <span className="compareAndSelect-larrow"> <i className="cui-arrow-left icons " > </i></span>
@@ -2114,7 +2285,41 @@ export default class ExtrapolateDataComponent extends React.Component {
                                     </div>
 
                                 </div>
-
+                                <Formik
+                        enableReinitialize={true}
+                        initialValues={{
+                            noOfMonthsId: this.state.monthsForMovingAverage,
+                            confidenceLevelId: this.state.confidenceLevelId,
+                            seasonalityId: this.state.noOfMonthsForASeason,
+                            gammaId: this.state.gamma,
+                            betaId: this.state.beta,
+                            alphaId: this.state.alpha,
+                            pId: this.state.p,
+                            dId: this.state.d,
+                            qId: this.state.q
+                            // treeName: this.state.curTreeObj.label.label_en,
+                            // regionArray: this.state.regionList,
+                            // regionId: this.state.regionValues,
+                        }}
+                        validate={validateExtrapolation(validationSchemaExtrapolation)}
+                        onSubmit={(values, { setSubmitting, setErrors }) => {}}
+                        render={
+                            ({
+                                values,
+                                errors,
+                                touched,
+                                handleChange,
+                                handleBlur,
+                                handleSubmit,
+                                isSubmitting,
+                                isValid,
+                                setTouched,
+                                handleReset,
+                                setFieldValue,
+                                setFieldTouched
+                            }) => (
+                                <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='userForm' autocomplete="off">
+                                   
                                 <div className="col-md-12 pl-lg-0">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.selectExtrapolationMethod')}</Label>
                                 </div>
@@ -2151,8 +2356,12 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                     bsSize="sm"
                                                     name="noOfMonthsId"
                                                     value={this.state.monthsForMovingAverage}
-                                                    onChange={(e) => { this.setMonthsForMovingAverage(e); }}
+                                                    valid={!errors.noOfMonthsId && this.state.monthsForMovingAverage != null ? this.state.monthsForMovingAverage : '' != ''}
+                                                    invalid={touched.noOfMonthsId && !!errors.noOfMonthsId}
+                                                    onBlur={handleBlur}
+                                                    onChange={(e) => { handleChange(e); this.setMonthsForMovingAverage(e) }}
                                                 />
+                                                <FormFeedback>{errors.noOfMonthsId}</FormFeedback>
                                             </div>
 
                                             <div>
@@ -2371,6 +2580,8 @@ export default class ExtrapolateDataComponent extends React.Component {
                                         </div>
                                     </FormGroup>
                                 </div>
+                                </Form>
+                                )} />
                             </div>
                             {/* <div className="col-md-12">
                                 <Button type="button" size="md" color="warning" className="float-right mr-1" onClick={this.reset}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
@@ -2558,7 +2769,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                     className={'modal-lg ' + this.props.className} >
                     <ModalHeader toggle={() => this.openDataCheckModel()} className="ModalHead modal-info-Headher">
                         <div>
-                            <img className=" pull-right iconClass cursor ml-lg-2" style={{ height: '22px', width: '22px', cursor: 'pointer',marginTop:'-4px' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.exportPDFDataCheck()} />
+                            <img className=" pull-right iconClass cursor ml-lg-2" style={{ height: '22px', width: '22px', cursor: 'pointer', marginTop: '-4px' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.exportPDFDataCheck()} />
                             <strong>{i18n.t('static.common.dataCheck')}</strong>
                         </div>
                     </ModalHeader>

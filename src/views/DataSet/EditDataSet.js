@@ -178,7 +178,8 @@ export default class EditProgram extends Component {
             loading: true,
             healthAreaCode: '',
             organisationCode: '',
-            realmCountryCode: ''
+            realmCountryCode: '',
+            isChanged: false,
 
         }
 
@@ -565,7 +566,7 @@ export default class EditProgram extends Component {
             regionIdArray[i] = regionId[i].value;
         }
         program.regionArray = regionIdArray;
-        this.setState({ program: program });
+        this.setState({ program: program, isChanged: true });
     }
     updateFieldDataHealthArea(value) {
         let { program } = this.state;
@@ -576,7 +577,7 @@ export default class EditProgram extends Component {
             healthAreaIdArray[i] = healthAreaId[i].value;
         }
         program.healthAreaArray = healthAreaIdArray;
-        this.setState({ program: program });
+        this.setState({ program: program, isChanged: true });
     }
     dataChange(event) {
         let { program } = this.state;
@@ -604,7 +605,7 @@ export default class EditProgram extends Component {
             program.programNotes = event.target.value;
         }
 
-        this.setState({ program }, () => { console.log(this.state) })
+        this.setState({ program, isChanged: true }, () => { console.log(this.state) })
 
     }
     touchAll(setTouched, errors) {
@@ -991,7 +992,7 @@ export default class EditProgram extends Component {
                                             <CardFooter>
                                                 <FormGroup>
                                                     <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i>{i18n.t('static.common.cancel')}</Button>
-                                                    <Button type="button" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                                                    {this.state.isChanged == true && <Button type="button" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>}
                                                     <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
                                                     &nbsp;
                                                 </FormGroup>
@@ -1042,7 +1043,8 @@ export default class EditProgram extends Component {
                 uniqueCode: uniqueCode,
                 healthAreaCode: healthAreaCode,
                 organisationCode: organisationCode,
-                realmCountryCode: realmCountryCode
+                realmCountryCode: realmCountryCode,
+                isChanged: false
             })
             initialValues = {
                 programName: getLabelText(this.state.program.label, lang),

@@ -107,6 +107,7 @@ class ForecastSummary extends Component {
             lang: localStorage.getItem('lang'),
             downloadedProgramData: [],
             allProgramList: [],
+            regRegionList: [],
 
         };
         this.getPrograms = this.getPrograms.bind(this);
@@ -1146,13 +1147,17 @@ class ForecastSummary extends Component {
                                         // data[2] = "";
                                         data[2] = puList.filter(c => c.planningUnit.forecastingUnit.tracerCategory.id == tcList[tc])[0].planningUnit.forecastingUnit.tracerCategory.label.label_en;
                                         for (var k = 0; k < this.state.regRegionList.length; k++) {
-                                            data[k + 3] = "";
-                                            data[k + 4] = "";
-                                            data[k + 5] = "";
+                                            // data[k + 3] = "";
+                                            // data[k + 4] = "";
+                                            // data[k + 5] = "";
+                                            data[(k + 1) * 3] = "";
+                                            data[((k + 1) * 3) + 1] = "";
+                                            data[((k + 1) * 3) + 2] = "";
                                         }
                                         data[(regRegionList.length * 3) + 3] = 1
                                         data[(regRegionList.length * 3) + 4] = ""
 
+                                        console.log("data------------------->3211", data);
                                         dataArray.push(data);
                                         var puListFiltered = puList.filter(c => c.planningUnit.forecastingUnit.tracerCategory.id == tcList[tc]);
                                         for (var j = 0; j < puListFiltered.length; j++) {
@@ -1275,12 +1280,21 @@ class ForecastSummary extends Component {
                                             var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF']
                                             for (var y = 0; y < json.length; y++) {
                                                 var rowData = elInstance.getRowData(y);
-                                                if (rowData[12] == 1) {
+                                                console.log("RowData--------->1", rowData);
+                                                let rowDataSecondLast = rowData[rowData.length - 2];
+                                                // console.log("RowData--------->2", rowDataSecondLast);
+                                                if (rowDataSecondLast == 1) {
                                                     for (var r = 0; r < rowData.length; r++) {
                                                         var cell = elInstance.getCell((colArr[r]).concat(parseInt(y) + 1))
                                                         cell.classList.add('readonly');
                                                     }
                                                 }
+                                                // if (rowData[12] == 1) {
+                                                //     for (var r = 0; r < rowData.length; r++) {
+                                                //         var cell = elInstance.getCell((colArr[r]).concat(parseInt(y) + 1))
+                                                //         cell.classList.add('readonly');
+                                                //     }
+                                                // }
                                             }
                                         },
                                         license: JEXCEL_PRO_KEY,

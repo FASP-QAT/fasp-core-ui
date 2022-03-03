@@ -30,11 +30,12 @@ const pickerLang = {
 const validationSchemaExtrapolation = function (values) {
     return Yup.object().shape({
         noOfMonthsId:
-            Yup.string().test('noOfMonthsId', 'Please enter no. of months.',
+            Yup.string().test('noOfMonthsId', 'Please enter positive number.',
                 function (value) {
                     console.log("***1**", document.getElementById("movingAvgId").value);
                     console.log("***noOfMonthsId**", document.getElementById("noOfMonthsId").value);
                     var testNumber = JEXCEL_INTEGER_REGEX.test((document.getElementById("noOfMonthsId").value).replaceAll(",", ""));
+                    console.log("***testNumber***", testNumber)
                     if ((document.getElementById("movingAvgId").value) == "true" && (document.getElementById("noOfMonthsId").value == "" || testNumber == false)) {
                         return false;
                     } else {
@@ -42,7 +43,7 @@ const validationSchemaExtrapolation = function (values) {
                     }
                 }),
         confidenceLevelId:
-            Yup.string().test('confidenceLevelId', 'Please enter confidence level.',
+            Yup.string().test('confidenceLevelId', 'Please select confidence level.',
                 function (value) {
                     console.log("***2**", document.getElementById("smoothingId").value);
                     // var testNumber = document.getElementById("confidenceLevelId").value != "" ? (/^\d{0,3}(\.\d{1,2})?$/).test(document.getElementById("confidenceLevelId").value) : false;
@@ -54,7 +55,7 @@ const validationSchemaExtrapolation = function (values) {
                     }
                 }),
         seasonalityId:
-            Yup.string().test('seasonalityId', 'Please enter correct seasonality.',
+            Yup.string().test('seasonalityId', 'Please enter positive number.',
                 function (value) {
                     console.log("***3**", document.getElementById("smoothingId").value);
                     var testNumber = document.getElementById("seasonalityId").value != "" ? JEXCEL_INTEGER_REGEX.test(document.getElementById("seasonalityId").value) : false;
@@ -66,7 +67,7 @@ const validationSchemaExtrapolation = function (values) {
                     }
                 }),
         gammaId:
-            Yup.string().test('gammaId', 'Please enter gamma value.',
+            Yup.string().test('gammaId', 'Please enter correct gamma value.',
                 function (value) {
                     console.log("***4**", document.getElementById("smoothingId").value);
                     var testNumber = document.getElementById("gammaId").value != "" ? (/^\d{0,3}(\.\d{1,2})?$/).test(document.getElementById("gammaId").value) : false;
@@ -78,7 +79,7 @@ const validationSchemaExtrapolation = function (values) {
                     }
                 }),
         betaId:
-            Yup.string().test('betaId', 'Please enter beta value.',
+            Yup.string().test('betaId', 'Please enter correct beta value.',
                 function (value) {
                     console.log("***5**", document.getElementById("smoothingId").value);
                     var testNumber = document.getElementById("betaId").value != "" ? (/^\d{0,3}(\.\d{1,2})?$/).test(document.getElementById("betaId").value) : false;
@@ -90,7 +91,7 @@ const validationSchemaExtrapolation = function (values) {
                     }
                 }),
         alphaId:
-            Yup.string().test('alphaId', 'Please enter alpha value.',
+            Yup.string().test('alphaId', 'Please enter correct alpha value.',
                 function (value) {
                     console.log("***6**", document.getElementById("smoothingId").value);
                     var testNumber = document.getElementById("alphaId").value != "" ? (/^\d{0,3}(\.\d{1,2})?$/).test(document.getElementById("alphaId").value) : false;
@@ -102,41 +103,54 @@ const validationSchemaExtrapolation = function (values) {
                     }
                 }),
         pId:
-            Yup.string().test('pId', 'Please enter p value.',
+            Yup.string().test('pId', 'Please enter correct p value.',
                 function (value) {
                     console.log("***7**", document.getElementById("arimaId").value);
-                    // var testNumber = document.getElementById("pId").value != "" ? (/^\d{0,3}(\.\d{1,2})?$/).test(document.getElementById("pId").value) : false;
+                    var testNumber = document.getElementById("pId").value != "" ? (/^\d{0,3}(\.\d{1,2})?$/).test(document.getElementById("pId").value) : false;
                     // console.log("*****", testNumber);
-                    if ((document.getElementById("arimaId").value) == "true" && (document.getElementById("pId").value == "")) {
+                    if ((document.getElementById("arimaId").value) == "true" && (document.getElementById("pId").value == "" || testNumber == false)) {
                         return false;
                     } else {
                         return true;
                     }
                 }),
         dId:
-            Yup.string().test('dId', 'Please enter d value.',
+            Yup.string().test('dId', 'Please enter correct d value.',
                 function (value) {
                     console.log("***8**", document.getElementById("arimaId").value);
-                    // var testNumber = document.getElementById("dId").value != "" ? (/^\d{0,3}(\.\d{1,2})?$/).test(document.getElementById("dId").value) : false;
+                    var testNumber = document.getElementById("dId").value != "" ? (/^\d{0,3}(\.\d{1,2})?$/).test(document.getElementById("dId").value) : false;
+                    // var testNumber = JEXCEL_INTEGER_REGEX.test((document.getElementById("dId").value).replaceAll(",", ""));
                     // console.log("*****", testNumber);
-                    if ((document.getElementById("arimaId").value) == "true" && (document.getElementById("dId").value == "")) {
+                    if ((document.getElementById("arimaId").value) == "true" && (document.getElementById("dId").value == "" || testNumber == false)) {
                         return false;
                     } else {
                         return true;
                     }
                 }),
         qId:
-            Yup.string().test('qId', 'Please enter q value.',
+            Yup.string().test('qId', 'Please enter correct q value.',
                 function (value) {
-                    console.log("***9**", document.getElementById("arimaId").value);
-                    // var testNumber = document.getElementById("qId").value != "" ? (/^\d{0,3}(\.\d{1,2})?$/).test(document.getElementById("qId").value) : false;
-                    // console.log("*****", testNumber);
-                    if ((document.getElementById("arimaId").value) == "true" && (document.getElementById("qId").value == "")) {
+                    console.log("***4 arima**", document.getElementById("arimaId").value);
+                    var testNumber = document.getElementById("qId").value != "" ? (/^\d{0,3}(\.\d{1,2})?$/).test(document.getElementById("qId").value) : false;
+                    console.log("*****", testNumber);
+                    if ((document.getElementById("arimaId").value) == "true" && (document.getElementById("qId").value == "" || testNumber == false)) {
                         return false;
                     } else {
                         return true;
                     }
                 }),
+        // Yup.string().test('qId', 'Please enter correct q value.',
+        //     function (value) {
+        //         console.log("***9**", document.getElementById("arimaId").value);
+        //         // var testNumber = document.getElementById("qId").value != "" ? (/^\d{0,3}(\.\d{1,2})?$/).test(document.getElementById("qId").value) : false;
+        //         var testNumber = JEXCEL_INTEGER_REGEX.test((document.getElementById("qId").value).replaceAll(",", ""));
+        //         // console.log("*****", testNumber);
+        //         if ((document.getElementById("arimaId").value) == "true" && (document.getElementById("qId").value == "" || testNumber == false)) {
+        //             return false;
+        //         } else {
+        //             return true;
+        //         }
+        //     }),
         // extrapolationMethodId:
         //     Yup.string().test('extrapolationMethodId', 'Please enter q value.',
         //         function (value) {
@@ -152,7 +166,7 @@ const validationSchemaExtrapolation = function (values) {
         //             }
         //         }),
         extrapolationMethodId: Yup.string()
-            .required(i18n.t('static.common.regiontext')),
+            .required('Please select extrapolation method.'),
 
     })
 }
@@ -192,7 +206,7 @@ export default class TreeExtrapolationComponent extends React.Component {
             minMonth: '',
             monthsForMovingAverage: 5,
             confidenceLevelId: 0.95,
-            noOfMonthsForASeason: 4,
+            noOfMonthsForASeason: 12,
             movingAvgData: [],
             alpha: 0.2,
             beta: 0.2,
@@ -737,7 +751,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                     var json = {
                         month: map1.get("0"),
                         amount: map1.get("1") != "" ? map1.get("1").toString().replaceAll(",", "") : map1.get("1"),
-                        reportingRate: map1.get("2")
+                        reportingRate: map1.get("2") != "" ? map1.get("2").toString().replaceAll("%", "") : map1.get("2")
                     }
                     jexcelDataArr.push(json);
                 }
@@ -759,7 +773,9 @@ export default class TreeExtrapolationComponent extends React.Component {
                 console.log("gap4---", jexcelDataArr.filter(c => c.amount == '' && moment(c.month).isBetween(dataList[0], dataList[dataList.length - 1], null)))
                 if (result.length > 0) {
                     this.setState({ extrapolationLoader: false }, () => {
-                        alert("Please fill in the blank actual values or interpolate.")
+                        setTimeout(() => {
+                            alert("Please fill in the blank actual values or interpolate.")
+                        }, 0);
                     });
                 }
                 else {
@@ -789,7 +805,7 @@ export default class TreeExtrapolationComponent extends React.Component {
             var json = {
                 month: map1.get("0"),
                 amount: map1.get("1"),
-                reportingRate: map1.get("2")
+                reportingRate: map1.get("2") != "" ? map1.get("2").toString().replaceAll("%", "") : map1.get("2")
             };
             extrapolationDataList.push(json)
             var json2 = {
@@ -1081,6 +1097,30 @@ export default class TreeExtrapolationComponent extends React.Component {
         })
     }
 
+    setPId(e) {
+        this.setState({
+            p: e.target.value
+        }, () => {
+            // this.buildJxl()
+        })
+    }
+    setDId(e) {
+        this.setState({
+            d: e.target.value
+        }, () => {
+            // this.buildJxl()
+        })
+    }
+
+    setQId(e) {
+        this.setState({
+            q: e.target.value
+        }, () => {
+            // this.buildJxl()
+        })
+    }
+
+
     calculateExtrapolatedData(dataAvailabel) {
         var monthArray = this.state.monthArray;
         var jexcelDataArr = [];
@@ -1113,15 +1153,19 @@ export default class TreeExtrapolationComponent extends React.Component {
                 var json = {
                     month: map1.get("0"),
                     amount: map1.get("1") != "" ? map1.get("1").toString().replaceAll(",", "") : map1.get("1"),
-                    reportingRate: map1.get("2"),
+                    reportingRate: map1.get("2") != "" ? map1.get("2").toString().replaceAll("%", "") : map1.get("2"),
                     monthNo: resultCount
                 }
                 jexcelDataArr.push(json);
             }
 
+
         }
+        const { nodeDataExtrapolation } = this.state;
+        nodeDataExtrapolation.extrapolationDataList = jexcelDataArr;
         console.log("jexcel data 1---", jexcelDataArr);
-        this.setState({ jexcelDataArr }, () => {
+
+        this.setState({ jexcelDataArr, nodeDataExtrapolation }, () => {
             setTimeout(() => {
                 console.log("tableJson for extrapolation---", this.state.jexcelDataArr);
                 if (jexcelDataArr.length > 0) {
@@ -1194,7 +1238,7 @@ export default class TreeExtrapolationComponent extends React.Component {
             var json = {
                 month: map1.get("0"),
                 amount: map1.get("1") != "" ? map1.get("1").toString().replaceAll(",", "") : map1.get("1"),
-                reportingRate: map1.get("2"),
+                reportingRate: map1.get("2") != "" ? map1.get("2").toString().replaceAll("%", "") : map1.get("2"),
                 monthNo: resultCount
             }
             jexcelDataArr.push(json);
@@ -1231,7 +1275,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                     const index = jexcelDataArr.findIndex(c => c.month == monthArray[j]);
                     var json = {
                         month: monthArray[j],
-                        amount: missingActualData,
+                        amount: missingActualData % 1 != 0 ? missingActualData.toFixed(2) : missingActualData,
                         reportingRate: dataArr.reportingRate
                     }
                     jexcelDataArr.splice(index, 1, json);
@@ -1309,10 +1353,11 @@ export default class TreeExtrapolationComponent extends React.Component {
         if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
         return '?'
     }
-    // componentDidMount() {
-    //     this.getExtrapolationMethodList();
-    // }
+    componentDidMount() {
+        //     this.getExtrapolationMethodList();
+    }
     getExtrapolationMethodList() {
+        console.log("### inside did mount")
         this.setState({
             extrapolationLoader: true
         }, () => {
@@ -1341,7 +1386,11 @@ export default class TreeExtrapolationComponent extends React.Component {
                         changed: 1
                     }, () => {
                         if (this.props.items.currentScenario.nodeDataExtrapolationOptionList == null) {
-                            this.setState({ extrapolationLoader: false })
+                            console.log("### inside did mount if")
+                            this.setState({ extrapolationLoader: false, forecastNestedHeader: 0 }, () => {
+                                console.log("### inside did mount if state update")
+                                this.buildJexcel();
+                            })
                             // var nodeDataExtrapolationOptionList = [];
                             // for (let i = 0; i < this.state.extrapolationMethodList.length; i++) {
                             //     var e = this.state.extrapolationMethodList[i];
@@ -1489,11 +1538,11 @@ export default class TreeExtrapolationComponent extends React.Component {
             data[3] = `=ROUND((B${parseInt(j) + 1}*C${parseInt(j) + 1})/100,2)`
             // data[4] = this.state.movingAvgData[j+1].actual
             count1 = moment(this.state.minMonth).format("YYYY-MM") == moment(monthArray[j]).format("YYYY-MM") ? 0 : moment(this.state.minMonth).format("YYYY-MM") < moment(monthArray[j]).format("YYYY-MM") ? count1 : '';
-            console.log("this.state.movingAvgData-----", this.state.movingAvgData);
-            data[4] = this.state.movingAvgData.length > 0 && count1 != '' ? this.state.movingAvgData[count1].forecast : ''
-            data[5] = this.state.semiAvgData.length > 0 && count1 != '' ? this.state.semiAvgData[count1].forecast : ''
-            data[6] = this.state.linearRegressionData.length > 0 && count1 != '' ? this.state.linearRegressionData[count1].forecast : ''
-            data[7] = this.state.tesData.length > 0 && count1 != '' ? this.state.tesData[count1].forecast : ''
+            console.log("month-", monthArray[j] + " count value-", count1 + " tes data-", this.state.tesData[count1]);
+            data[4] = this.state.movingAvgData.length > 0 && count1 != '' ? this.state.movingAvgData[count1].forecast.toFixed(2) : ''
+            data[5] = this.state.semiAvgData.length > 0 && this.state.tesData[count1] != null ? this.state.semiAvgData[count1].forecast.toFixed(2) : ''
+            data[6] = this.state.linearRegressionData.length > 0 && this.state.tesData[count1] != null ? this.state.linearRegressionData[count1].forecast.toFixed(2) : ''
+            data[7] = this.state.tesData.length > 0 && this.state.tesData[count1] != null ? this.state.tesData[count1].forecast.toFixed(2) : ''
             data[8] = ""
             if (count1 >= 0) {
                 count1++;
@@ -1519,32 +1568,48 @@ export default class TreeExtrapolationComponent extends React.Component {
             dataArray[count] = data;
             count++;
         }
+        console.log("### inside jexcel")
 
         this.el = jexcel(document.getElementById("tableDiv"), '');
         this.el.destroy();
-
+        console.log("this.state.forecastNestedHeader---", this.state.forecastNestedHeader)
         let nestedHeaders = [];
-        nestedHeaders.push(
-            {
-                title: '',
-                colspan: '4'
-            },
+        if (this.state.forecastNestedHeader > 0) {
+            nestedHeaders.push(
+                {
+                    title: '',
+                    colspan: '4'
+                },
 
-        );
-        nestedHeaders.push(
-            {
-                title: 'Forecast',
-                colspan: this.state.forecastNestedHeader
-                // colspan:'5'
-            },
-        );
-        nestedHeaders.push(
-            {
-                title: '',
-                colspan: '3'
-            },
-        );
+            );
+            nestedHeaders.push(
+                {
+                    title: 'Forecast',
+                    colspan: this.state.forecastNestedHeader
+                    // colspan:'5'
+                },
+            );
+            nestedHeaders.push(
+                {
+                    title: '',
+                    colspan: '3'
+                },
+            );
+        } else {
+            nestedHeaders.push(
+                {
+                    title: '',
+                    colspan: '4'
+                },
 
+            );
+            nestedHeaders.push(
+                {
+                    title: '',
+                    colspan: '3'
+                },
+            );
+        }
         var options = {
             data: dataArray,
             columnDrag: true,
@@ -1720,6 +1785,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                 return [];
             }.bind(this),
         };
+
         var dataExtrapolation = jexcel(document.getElementById("tableDiv"), options);
         this.el = dataExtrapolation;
         var rmseArr = [];
@@ -1798,7 +1864,7 @@ export default class TreeExtrapolationComponent extends React.Component {
         var minMse = Math.min(...mseArr.filter(c => c != ""));
         var minRsqd = Math.min(...rSqdArr.filter(c => c != ""));
         var minWape = Math.min(...wapeArr.filter(c => c != ""));
-
+        console.log("### inside jexcel going to update state")
         this.setState({
             dataExtrapolation,
             minRmse: minRmse,
@@ -1820,6 +1886,8 @@ export default class TreeExtrapolationComponent extends React.Component {
     loadedExtrapolation = function (instance, cell, x, y, value) {
         //  jExcelLoadedFunctionWithoutPagination(instance);
         jExcelLoadedFunctionOnlyHideRow(instance);
+        console.log("my instance---", instance)
+        // if (this.state.dataExtrapolation != "") {
         var asterisk = document.getElementsByClassName("resizable")[0];
         var tr = asterisk.firstChild.nextSibling;
         console.log("asterisk", asterisk.firstChild.nextSibling)
@@ -1831,7 +1899,7 @@ export default class TreeExtrapolationComponent extends React.Component {
         tr.children[8].classList.add('InfoTr');
         tr.children[9].classList.add('InfoTr');
         tr.children[3].title = 'Placeholder'
-
+        // }
 
     }
 
@@ -1934,29 +2002,32 @@ export default class TreeExtrapolationComponent extends React.Component {
         }, () => {
             if (this.state.dataExtrapolation != "") {
                 if (movingAvgId) {
-                    // json = {
-                    //     extrapolationMethod: { id: 7 },
-                    //     jsonProperties: {
-                    //         months: this.state.monthsForMovingAverage
-                    //     }
-                    // }
                     json1 = this.state.extrapolationMethodList.filter(c => c.id == 7)[0];
-                    // this.state.nodeDataExtrapolationOptionList.push(json);
                     filteredExtrapolationMethodList.push(json1);
                     if (this.state.dataExtrapolation != null) {
                         console.log("spreadsheet.getHeaders()---", this.state.dataExtrapolation.getHeader(4));
                         this.state.dataExtrapolation.showColumn(4);
                     }
                 } else {
-                    // const index = this.state.nodeDataExtrapolationOptionList.findIndex(c => c.extrapolationMethod.id == 7);
                     const index1 = filteredExtrapolationMethodList.findIndex(c => c.id == 7);
                     filteredExtrapolationMethodList.splice(index1, 1);
-                    // this.state.nodeDataExtrapolationOptionList.splice(index, 1);
                     if (this.state.dataExtrapolation != null) {
                         this.state.dataExtrapolation.hideColumn(4);
                     }
                 }
-                this.setState({ filteredExtrapolationMethodList, forecastNestedHeader: filteredExtrapolationMethodList.length }, () => { this.buildJexcel() })
+                this.setState({
+                    filteredExtrapolationMethodList,
+                    forecastNestedHeader: filteredExtrapolationMethodList.length
+                }, () => {
+                    if (this.state.nodeDataExtrapolation.extrapolationMethod.id != "") {
+                        if (this.state.filteredExtrapolationMethodList.filter(x => x.id == this.state.nodeDataExtrapolation.extrapolationMethod.id).length == 0) {
+                            const { nodeDataExtrapolation } = this.state;
+                            nodeDataExtrapolation.extrapolationMethod.id = '';
+                            this.setState({ nodeDataExtrapolation });
+                        }
+                    }
+                    this.buildJexcel();
+                })
             }
         })
     }
@@ -1994,6 +2065,13 @@ export default class TreeExtrapolationComponent extends React.Component {
                 }
                 this.setState({ filteredExtrapolationMethodList, forecastNestedHeader: filteredExtrapolationMethodList.length }, () => {
                     console.log("filteredExtrapolationMethodList new ---", this.state.filteredExtrapolationMethodList)
+                    if (this.state.nodeDataExtrapolation.extrapolationMethod.id != "") {
+                        if (this.state.filteredExtrapolationMethodList.filter(x => x.id == this.state.nodeDataExtrapolation.extrapolationMethod.id).length == 0) {
+                            const { nodeDataExtrapolation } = this.state;
+                            nodeDataExtrapolation.extrapolationMethod.id = '';
+                            this.setState({ nodeDataExtrapolation });
+                        }
+                    }
                     this.buildJexcel();
                 })
             }
@@ -2029,7 +2107,16 @@ export default class TreeExtrapolationComponent extends React.Component {
                         this.state.dataExtrapolation.hideColumn(6);
                     }
                 }
-                this.setState({ filteredExtrapolationMethodList, forecastNestedHeader: filteredExtrapolationMethodList.length }, () => { this.buildJexcel() })
+                this.setState({ filteredExtrapolationMethodList, forecastNestedHeader: filteredExtrapolationMethodList.length }, () => {
+                    if (this.state.nodeDataExtrapolation.extrapolationMethod.id != "") {
+                        if (this.state.filteredExtrapolationMethodList.filter(x => x.id == this.state.nodeDataExtrapolation.extrapolationMethod.id).length == 0) {
+                            const { nodeDataExtrapolation } = this.state;
+                            nodeDataExtrapolation.extrapolationMethod.id = '';
+                            this.setState({ nodeDataExtrapolation });
+                        }
+                    }
+                    this.buildJexcel()
+                })
             }
         })
     }
@@ -2068,7 +2155,16 @@ export default class TreeExtrapolationComponent extends React.Component {
                         this.state.dataExtrapolation.hideColumn(7);
                     }
                 }
-                this.setState({ filteredExtrapolationMethodList, forecastNestedHeader: filteredExtrapolationMethodList.length }, () => { this.buildJexcel() })
+                this.setState({ filteredExtrapolationMethodList, forecastNestedHeader: filteredExtrapolationMethodList.length }, () => {
+                    if (this.state.nodeDataExtrapolation.extrapolationMethod.id != "") {
+                        if (this.state.filteredExtrapolationMethodList.filter(x => x.id == this.state.nodeDataExtrapolation.extrapolationMethod.id).length == 0) {
+                            const { nodeDataExtrapolation } = this.state;
+                            nodeDataExtrapolation.extrapolationMethod.id = '';
+                            this.setState({ nodeDataExtrapolation });
+                        }
+                    }
+                    this.buildJexcel()
+                })
             }
         })
     }
@@ -2105,7 +2201,16 @@ export default class TreeExtrapolationComponent extends React.Component {
                         this.state.dataExtrapolation.hideColumn(8);
                     }
                 }
-                this.setState({ filteredExtrapolationMethodList, forecastNestedHeader: filteredExtrapolationMethodList.length }, () => { this.buildJexcel() })
+                this.setState({ filteredExtrapolationMethodList, forecastNestedHeader: filteredExtrapolationMethodList.length }, () => {
+                    if (this.state.nodeDataExtrapolation.extrapolationMethod.id != "") {
+                        if (this.state.filteredExtrapolationMethodList.filter(x => x.id == this.state.nodeDataExtrapolation.extrapolationMethod.id).length == 0) {
+                            const { nodeDataExtrapolation } = this.state;
+                            nodeDataExtrapolation.extrapolationMethod.id = '';
+                            this.setState({ nodeDataExtrapolation });
+                        }
+                    }
+                    this.buildJexcel()
+                })
             }
         })
     }
@@ -2512,7 +2617,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                             <div className="row">
                                                 <FormGroup className="col-md-3 pl-lg-0">
                                                     <Label htmlFor="appendedInputButton">Start Month for Historical Data<span className="stock-box-icon fa fa-sort-desc ml-1"></span></Label>
-                                                    <div className="controls edit readonly">
+                                                    <div className="controls edit disabledColor">
                                                         <Picker
 
                                                             id="month"
@@ -2692,6 +2797,7 @@ export default class TreeExtrapolationComponent extends React.Component {
 
                                                                         >
                                                                             <option value="">Please select confidence level</option>
+                                                                            <option value="0.80">80%</option>
                                                                             <option value="0.85">85%</option>
                                                                             <option value="0.90">90%</option>
                                                                             <option value="0.95">95%</option>
@@ -2808,60 +2914,61 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                                     <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenArima', !this.state.popoverOpenArima)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
                                                                 </Label>
                                                             </div>
-                                                            {this.state.arimaId &&
-                                                                <div className="row col-md-12 pt-lg-2 pl-lg-0">
-                                                                    <div className="pt-lg-0" style={{ display: 'contents' }}>
-                                                                        <div className="tab-ml-1 mt-md-2 mb-md-0 ExtraCheckboxFieldWidth">
-                                                                            <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.p')}</Label>
-                                                                            <Input
-                                                                                className="controls"
-                                                                                type="text"
-                                                                                id="pId"
-                                                                                bsSize="sm"
-                                                                                name="pId"
-                                                                                value={this.state.p}
-                                                                                valid={!errors.pId && this.state.p != null ? this.state.p : '' != ''}
-                                                                                invalid={touched.pId && !!errors.pId}
-                                                                                onBlur={handleBlur}
-                                                                                onChange={(e) => { handleChange(e); }}
-                                                                            />
-                                                                            <FormFeedback>{errors.pId}</FormFeedback>
-                                                                        </div>
-                                                                        <div className="tab-ml-1 mt-md-2 mb-md-0 ExtraCheckboxFieldWidth">
-                                                                            <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.d')}</Label>
-                                                                            <Input
-                                                                                className="controls"
-                                                                                type="text"
-                                                                                id="dId"
-                                                                                bsSize="sm"
-                                                                                name="dId"
-                                                                                value={this.state.d}
-                                                                                valid={!errors.dId && this.state.d != null ? this.state.d : '' != ''}
-                                                                                invalid={touched.dId && !!errors.dId}
-                                                                                onBlur={handleBlur}
-                                                                                onChange={(e) => { handleChange(e); }}
-                                                                            />
-                                                                            <FormFeedback>{errors.dId}</FormFeedback>
-                                                                        </div>
-                                                                        <div className="tab-ml-1 mt-md-2 mb-md-0 ExtraCheckboxFieldWidth">
-                                                                            <Label htmlFor="appendedInputButton">q</Label>
-                                                                            <Input
-                                                                                className="controls"
-                                                                                type="text"
-                                                                                id="qId"
-                                                                                bsSize="sm"
-                                                                                name="qId"
-                                                                                value={this.state.q}
-                                                                                valid={!errors.qId && this.state.q != null ? this.state.q : '' != ''}
-                                                                                invalid={touched.qId && !!errors.qId}
-                                                                                onBlur={handleBlur}
-                                                                                onChange={(e) => { handleChange(e); }}
-                                                                            />
-                                                                            <FormFeedback>{errors.qId}</FormFeedback>
-                                                                        </div>
+                                                            {/* {this.state.arimaId && */}
+                                                            <div className="row col-md-12 pt-lg-2 pl-lg-0" style={{ display: this.state.arimaId ? '' : 'none' }}>
+                                                                {/* <div className="row col-md-12 pt-lg-2 pl-lg-0"> */}
+                                                                <div className="pt-lg-0" style={{ display: 'contents' }}>
+                                                                    <div className="tab-ml-1 mt-md-2 mb-md-0 ExtraCheckboxFieldWidth">
+                                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.p')}</Label>
+                                                                        <Input
+                                                                            className="controls"
+                                                                            type="text"
+                                                                            id="pId"
+                                                                            bsSize="sm"
+                                                                            name="pId"
+                                                                            value={this.state.p}
+                                                                            valid={!errors.pId && this.state.p != null ? this.state.p : '' != ''}
+                                                                            invalid={touched.pId && !!errors.pId}
+                                                                            onBlur={handleBlur}
+                                                                            onChange={(e) => { handleChange(e); this.setPId(e) }}
+                                                                        />
+                                                                        <FormFeedback>{errors.pId}</FormFeedback>
+                                                                    </div>
+                                                                    <div className="tab-ml-1 mt-md-2 mb-md-0 ExtraCheckboxFieldWidth">
+                                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.d')}</Label>
+                                                                        <Input
+                                                                            className="controls"
+                                                                            type="text"
+                                                                            id="dId"
+                                                                            bsSize="sm"
+                                                                            name="dId"
+                                                                            value={this.state.d}
+                                                                            valid={!errors.dId && this.state.d != null ? this.state.d : '' != ''}
+                                                                            invalid={touched.dId && !!errors.dId}
+                                                                            onBlur={handleBlur}
+                                                                            onChange={(e) => { handleChange(e); this.setDId(e) }}
+                                                                        />
+                                                                        <FormFeedback>{errors.dId}</FormFeedback>
+                                                                    </div>
+                                                                    <div className="tab-ml-1 mt-md-2 mb-md-0 ExtraCheckboxFieldWidth">
+                                                                        <Label htmlFor="appendedInputButton">q</Label>
+                                                                        <Input
+                                                                            className="controls"
+                                                                            type="text"
+                                                                            id="qId"
+                                                                            bsSize="sm"
+                                                                            name="qId"
+                                                                            value={this.state.q}
+                                                                            valid={!errors.qId && this.state.q != null ? this.state.q : '' != ''}
+                                                                            invalid={touched.qId && !!errors.qId}
+                                                                            onBlur={handleBlur}
+                                                                            onChange={(e) => { handleChange(e); this.setQId(e) }}
+                                                                        />
+                                                                        <FormFeedback>{errors.qId}</FormFeedback>
                                                                     </div>
                                                                 </div>
-                                                            }
+                                                            </div>
+                                                            {/* } */}
                                                         </div>
                                                     </div>
                                                 </FormGroup>
@@ -2935,10 +3042,10 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                                     <td width="110px" title={i18n.t('static.extrapolation.linearRegression')}><b>{i18n.t('static.extrapolation.linearRegression')}</b> <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></td>
                                                                 }
                                                                 {this.state.smoothingId &&
-                                                                    <td width="110px"><b>{i18n.t('static.extrapolation.tes')}</b></td>
+                                                                    <td width="110px" title={i18n.t('static.extrapolation.tes')}><b>{i18n.t('static.extrapolation.tes')}</b> <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></td>
                                                                 }
                                                                 {this.state.arimaId &&
-                                                                    <td width="110px"><b>{i18n.t('static.extrapolation.arima')}</b></td>
+                                                                    <td width="110px" title={i18n.t('static.extrapolation.arima')}><b>{i18n.t('static.extrapolation.arima')}</b> <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></td>
                                                                 }
                                                             </tr>
                                                         </thead>

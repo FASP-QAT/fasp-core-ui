@@ -155,8 +155,7 @@ export function dataCheck(props, datasetJson) {
                             var payloadChild = nodeChildrenList[ncl].payload;
                             var nodeDataMapChild = payloadChild.nodeDataMap;
                             var nodeDataMapForScenario = (nodeDataMapChild[scenarioList[ndm].id])[0];
-
-                            var nodeModellingList = nodeDataMapForScenario.nodeDataMomList.filter(c => c.month == curDate);
+                            var nodeModellingList = nodeDataMapForScenario.nodeDataMomList!=undefined?nodeDataMapForScenario.nodeDataMomList.filter(c => c.month == curDate):[];
                             var nodeModellingListFiltered = nodeModellingList;
                             if (nodeModellingListFiltered.length > 0) {
                                 totalPercentage += nodeModellingListFiltered[0].endValue;
@@ -245,6 +244,7 @@ export function dataCheck(props, datasetJson) {
         }
         //No Forecast selected
         var selectedForecast = datasetPlanningUnit[dpu].selectedForecastMap;
+        console.log("selectedForecast$$$$%%%%",selectedForecast);
         var regionArray = [];
         for (var drl = 0; drl < datasetRegionList.length; drl++) {
             if (selectedForecast[datasetRegionList[drl].regionId] == undefined || (selectedForecast[datasetRegionList[drl].regionId].scenarioId == null && selectedForecast[datasetRegionList[drl].regionId].consumptionExtrapolationId == null)) {
