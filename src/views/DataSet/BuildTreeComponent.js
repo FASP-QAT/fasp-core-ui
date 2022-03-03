@@ -8314,7 +8314,7 @@ export default class BuildTree extends Component {
                                         <div style={{ display: !this.state.loading ? "block" : "none" }} class="sample">
                                             {/* <h5 style={{ color: '#BA0C2F' }}>Please save and do a recalculate after drag and drop.</h5> */}
                                             <Provider>
-                                                <div className="placeholder" style={{ clear: 'both', height: '100vh', border: '1px solid #a7c6ed' }} >
+                                                <div className="placeholder TreeTemplateHeight" style={{ clear: 'both', marginTop:'25px', border: '1px solid #a7c6ed' }} >
                                                     {/* <OrgDiagram centerOnCursor={true} config={config} onHighlightChanged={this.onHighlightChanged} /> */}
                                                     <OrgDiagram centerOnCursor={true} config={config} onCursorChanged={this.onCursoChanged} />
                                                 </div>
