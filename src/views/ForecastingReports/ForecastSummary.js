@@ -1379,7 +1379,7 @@ class ForecastSummary extends Component {
                     });
                 }
                 // elInstance.setValueFromCoords((Number(x) + 1), y, totalForecast.toFixed(2), true);
-                elInstance.setValueFromCoords((Number(x) + 1), y, parseInt(totalForecast), true);
+                elInstance.setValueFromCoords((Number(x) + 1), y, Math.round(totalForecast), true);
             }
         }
     }

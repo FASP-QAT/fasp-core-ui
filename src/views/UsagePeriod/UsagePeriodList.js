@@ -20,6 +20,7 @@ import RegionService from "../../api/RegionService";
 import StatusUpdateButtonFeature from "../../CommonComponent/StatusUpdateButtonFeature";
 import UpdateButtonFeature from '../../CommonComponent/UpdateButtonFeature';
 import moment from 'moment';
+import { Prompt } from 'react-router';
 import UsagePeriodService from "../../api/UsagePeriodService";
 import { JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, JEXCEL_DATE_FORMAT_SM } from "../../Constants";
 
@@ -33,7 +34,8 @@ class UsagePeriod extends Component {
             usagePeriodList: [],
             message: '',
             selSource: [],
-            loading: true
+            loading: true,
+            isChanged: false
         }
         // this.setTextAndValue = this.setTextAndValue.bind(this);
         // this.disableRow = this.disableRow.bind(this);
@@ -408,6 +410,19 @@ class UsagePeriod extends Component {
         this.getUsagePeriodData();
     }
 
+    componentWillUnmount() {
+        clearTimeout(this.timeout);
+        window.onbeforeunload = null;
+    }
+
+    componentDidUpdate = () => {
+        if (this.state.isChanged == true) {
+            window.onbeforeunload = () => true
+        } else {
+            window.onbeforeunload = undefined
+        }
+    }
+
 
 
     oneditionend = function (instance, cell, x, y, value) {
@@ -634,6 +649,10 @@ class UsagePeriod extends Component {
             }
         }
 
+        this.setState({
+            isChanged: true,
+        });
+
         //Active
         if (x != 6) {
             this.el.setValueFromCoords(6, y, 1, true);
@@ -748,6 +767,10 @@ class UsagePeriod extends Component {
     render() {
         return (
             <div className="animated fadeIn">
+                <Prompt
+                    when={this.state.isChanged == true}
+                    message={i18n.t("static.dataentry.confirmmsg")}
+                />
                 <AuthenticationServiceComponent history={this.props.history} />
                 {/* <h5 style={{ color: "red" }}>{i18n.t('static.common.customWarningMessage')}</h5> */}
                 <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>

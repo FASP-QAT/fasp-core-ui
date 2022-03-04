@@ -21,6 +21,7 @@ import StatusUpdateButtonFeature from "../../CommonComponent/StatusUpdateButtonF
 import UpdateButtonFeature from '../../CommonComponent/UpdateButtonFeature';
 import moment from 'moment';
 import ModelingTypeService from "../../api/ModelingTypeService";
+import { Prompt } from 'react-router';
 import { JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, JEXCEL_DATE_FORMAT_SM } from "../../Constants";
 
 const entityname = i18n.t('static.modelingType.modelingType')
@@ -33,7 +34,8 @@ class ScaleUpType extends Component {
             scaleUpTypeList: [],
             message: '',
             selSource: [],
-            loading: true
+            loading: true,
+            isChanged: false
         }
         // this.setTextAndValue = this.setTextAndValue.bind(this);
         // this.disableRow = this.disableRow.bind(this);
@@ -418,6 +420,19 @@ class ScaleUpType extends Component {
         //     })
     }
 
+    componentWillUnmount() {
+        clearTimeout(this.timeout);
+        window.onbeforeunload = null;
+    }
+
+    componentDidUpdate = () => {
+        if (this.state.isChanged == true) {
+            window.onbeforeunload = () => true
+        } else {
+            window.onbeforeunload = undefined
+        }
+    }
+
     componentDidMount() {
         this.getModelingTypeData();
     }
@@ -605,6 +620,10 @@ class ScaleUpType extends Component {
             }
         }
 
+        this.setState({
+            isChanged: true,
+        });
+
         //Active
         if (x != 5) {
             this.el.setValueFromCoords(5, y, 1, true);
@@ -668,6 +687,10 @@ class ScaleUpType extends Component {
     render() {
         return (
             <div className="animated fadeIn">
+                <Prompt
+                    when={this.state.isChanged == true}
+                    message={i18n.t("static.dataentry.confirmmsg")}
+                />
                 <AuthenticationServiceComponent history={this.props.history} />
                 {/* <h5 style={{ color: "red" }}>{i18n.t('static.common.customWarningMessage')}</h5> */}
                 <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
