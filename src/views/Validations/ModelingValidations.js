@@ -1199,8 +1199,8 @@ class ModelingValidation extends Component {
                         beginAtZero: true,
                         fontColor: 'black',
                         callback: function (value) {
-                            return value.toLocaleString();
-                        }
+                            return this.state.displayBy == 1 ? value.toLocaleString() : value.toLocaleString() + " %";
+                        }.bind(this)
                     },
                     gridLines: {
                         drawBorder: true, lineWidth: 0
@@ -1604,7 +1604,7 @@ class ModelingValidation extends Component {
                                             &&
                                             <div className="col-md-12 p-0">
                                                 <div className="col-md-12">
-                                                    <div className="chart-wrapper chart-graph-report pl-5 ml-3" style={{ marginLeft: '50px' }}>
+                                                    <div className="chart-wrapper chart-graph-report">
                                                         <Bar id="cool-canvas" data={bar} options={chartOptions} />
                                                         <div>
 

@@ -6309,17 +6309,19 @@ export default class CreateTreeTemplate extends Component {
                         row = row.concat(total).concat("% ")
                         row1 = row1.concat(" Subtotal")
                     }
-                    dataArray.push(new Paragraph({
-                        children: [new TextRun({ "text": row3 }), new TextRun({ "text": row, bold: true }), new TextRun({ "text": row4 }), new TextRun({ "text": row1 })],
-                        spacing: {
-                            after: 150,
-                        },
-                        shading: {
-                            type: ShadingType.CLEAR,
-                            fill: "cfcdc9"
-                        },
-                        style: row != "NA " ? total != 100 ? "aside" : "" : ""
-                    }))
+                    if (items[i].payload.nodeType.id != 1 && items[i].payload.nodeType.id != 2) {
+                        dataArray.push(new Paragraph({
+                            children: [new TextRun({ "text": row3 }), new TextRun({ "text": row, bold: true }), new TextRun({ "text": row4 }), new TextRun({ "text": row1 })],
+                            spacing: {
+                                after: 150,
+                            },
+                            shading: {
+                                type: ShadingType.CLEAR,
+                                fill: "cfcdc9"
+                            },
+                            style: row != "NA " ? total != 100 ? "aside" : "" : ""
+                        }))
+                    }
                 }
             }
         }
@@ -7161,7 +7163,7 @@ export default class CreateTreeTemplate extends Component {
                                                     </CardBody>
                                                     <div style={{ display: !this.state.loading ? "block" : "none" }} class="sample">
                                                         <Provider>
-                                                            <div className="placeholder TreeTemplateHeight" style={{ clear: 'both', marginTop:'25px', border: '1px solid #a7c6ed' }} >
+                                                            <div className="placeholder TreeTemplateHeight" style={{ clear: 'both', marginTop: '25px', border: '1px solid #a7c6ed' }} >
                                                                 {/* <OrgDiagram centerOnCursor={true} config={config} onHighlightChanged={this.onHighlightChanged} /> */}
                                                                 <OrgDiagram centerOnCursor={true} config={config} onCursorChanged={this.onCursoChanged} />
                                                             </div>

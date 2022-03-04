@@ -169,12 +169,12 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                     var nodeDataModelingListUnFiltered = ((nodeDataMap[scenarioList[ndm].id])[0].nodeDataModelingList);
                     var transferNodeList = transferToNodeList.filter(c => c.nodeDataId == nodeDataMapForScenario.nodeDataId);
                     var nodeDataModelingListWithTransfer = nodeDataModelingListUnFiltered.concat(transferNodeList);
-                    var curDate = startDate;
+                    var curDate = moment(nodeDataMapForScenario.month).startOf('month').format("YYYY-MM-DD");
                     var nodeDataList = [];
                     var calculatedMMdPatients = [];
                     for (var i = 0; curDate < stopDate; i++) {
                         // console.log("curDate---", curDate);
-                        curDate = moment(startDate).add(i, 'months').format("YYYY-MM-DD");
+                        curDate = moment(nodeDataMapForScenario.month).add(i, 'months').format("YYYY-MM-DD");
                         var nodeDataModelingList = (nodeDataModelingListWithTransfer).filter(c => moment(curDate).format("YYYY-MM") >= moment(c.startDate).format("YYYY-MM") && moment(curDate).format("YYYY-MM") <= moment(c.stopDate).format("YYYY-MM"));
                         var nodeDataOverrideList = ((nodeDataMap[scenarioList[ndm].id])[0].nodeDataOverrideList);
                         var startValue = 0;
@@ -568,10 +568,10 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                     var childNodeFlatList = flatListUnsorted.filter(c => c.parent == aggregateNodeList[fl - 1].id);
                     // console.log("agg child&&&", childNodeFlatList);
                     // console.log("scenarioList[ndm].id&&&", scenarioList[ndm].id);
-                    var curDate = startDate;
+                    var curDate = moment(nodeDataMapForScenario.month).startOf('month').format("YYYY-MM-DD");;
                     var nodeDataList = [];
                     for (var i = 0; curDate < stopDate; i++) {
-                        curDate = moment(startDate).add(i, 'months').format("YYYY-MM-DD");
+                        curDate = moment(nodeDataMapForScenario.month).add(i, 'months').format("YYYY-MM-DD");
                         var aggregatedStartValue = 0;
                         var aggregatedEndValue = 0;
                         var aggregatedCalculatedValue = 0;
