@@ -127,7 +127,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
         headers.push(i18n.t('static.inventoryDate.inventoryReport'));
         headers.push(i18n.t('static.importFromQATSupplyPlan.supplyPlanConsumption'));
         headers.push(i18n.t('static.importFromQATSupplyPlan.conversionFactor(SupplyPlantoForecast)'));
-        headers.push(i18n.t('static.importFromQATSupplyPlan.convertedConsumption'));
+        headers.push(i18n.t('static.importFromQATSupplyPlan.convertedActualConsumption(SupplyPlanModule)'));
         headers.push(i18n.t('static.importFromQATSupplyPlan.currentQATConsumption'));
         headers.push(i18n.t('static.quantimed.importData'));
 

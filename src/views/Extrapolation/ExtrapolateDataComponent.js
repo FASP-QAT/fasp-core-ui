@@ -5,7 +5,7 @@ import '../../views/Forms/ValidationForms/ValidationForms.css'
 import {
     Card, CardBody,
     Label, Input, FormGroup,
-    CardFooter, Button, Col, Form, InputGroup, Modal,FormFeedback, ModalHeader, ModalFooter, ModalBody, Row, Table, PopoverBody, Popover
+    CardFooter, Button, Col, Form, InputGroup, Modal, FormFeedback, ModalHeader, ModalFooter, ModalBody, Row, Table, PopoverBody, Popover
 } from 'reactstrap';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_PAGINATION_OPTION, SECRET_KEY, DATE_FORMAT_CAP_WITHOUT_DATE, JEXCEL_MONTH_PICKER_FORMAT } from "../../Constants";
@@ -40,27 +40,19 @@ const pickerLang = {
 const validationSchemaExtrapolation = function (values) {
     return Yup.object().shape({
         noOfMonthsId:
-            Yup.string().test('noOfMonthsId', 'Please enter no. of months.',
+            Yup.string().test('noOfMonthsId', 'Please provide valid input.',
                 function (value) {
-                    console.log("***** noOfMonthsId", document.getElementById("movingAvgId").value);
-                    ///^[0-9\b]+$/
-                    console.log("&&&&&&&&&&&&&&&",(document.getElementById("noOfMonthsId").value).replaceAll(",", ""))
                     var testNumber = (/^[\d]*$/).test((document.getElementById("noOfMonthsId").value).replaceAll(",", ""));
-                    console.log("*****&&&&", testNumber);
                     if ((document.getElementById("movingAvgId").value) == "on" && (document.getElementById("noOfMonthsId").value == "" || testNumber == false)) {
-                    console.log("RRRRRR-if");
                         return false;
                     } else {
-                        console.log("RRRRRR-else");
                         return true;
                     }
                 }),
         confidenceLevelId:
-            Yup.string().test('confidenceLevelId', 'Please enter confidence level.',
+            Yup.string().test('confidenceLevelId', 'Please provide valid input.',
                 function (value) {
-                    console.log("*****", document.getElementById("smoothingId").value);
                     var testNumber = document.getElementById("confidenceLevelId").value != "" ? (/^\d{0,3}(\.\d{1,2})?$/).test(document.getElementById("confidenceLevelId").value) : false;
-                    // console.log("*****", testNumber);
                     if ((document.getElementById("smoothingId").value) == "true" && (document.getElementById("confidenceLevelId").value == "" || testNumber == false)) {
                         return false;
                     } else {
@@ -68,11 +60,9 @@ const validationSchemaExtrapolation = function (values) {
                     }
                 }),
         seasonalityId:
-            Yup.string().test('seasonalityId', 'Please enter seasonality.',
+            Yup.string().test('seasonalityId', 'Please provide valid input.',
                 function (value) {
-                    console.log("*****", document.getElementById("smoothingId").value);
                     var testNumber = document.getElementById("seasonalityId").value != "" ? (/^\d{0,3}(\.\d{1,2})?$/).test(document.getElementById("seasonalityId").value) : false;
-                    // console.log("*****", testNumber);
                     if ((document.getElementById("smoothingId").value) == "true" && (document.getElementById("seasonalityId").value == "" || testNumber == false)) {
                         return false;
                     } else {
@@ -80,11 +70,9 @@ const validationSchemaExtrapolation = function (values) {
                     }
                 }),
         gammaId:
-            Yup.string().test('gammaId', 'Please enter gamma value.',
+            Yup.string().test('gammaId', 'Please provide valid input.',
                 function (value) {
-                    console.log("*****", document.getElementById("smoothingId").value);
                     var testNumber = document.getElementById("gammaId").value != "" ? (/^\d{0,3}(\.\d{1,2})?$/).test(document.getElementById("gammaId").value) : false;
-                    // console.log("*****", testNumber);
                     if ((document.getElementById("smoothingId").value) == "true" && (document.getElementById("gammaId").value == "" || testNumber == false)) {
                         return false;
                     } else {
@@ -92,11 +80,9 @@ const validationSchemaExtrapolation = function (values) {
                     }
                 }),
         betaId:
-            Yup.string().test('betaId', 'Please enter beta value.',
+            Yup.string().test('betaId', 'Please provide valid input.',
                 function (value) {
-                    console.log("*****", document.getElementById("smoothingId").value);
                     var testNumber = document.getElementById("betaId").value != "" ? (/^\d{0,3}(\.\d{1,2})?$/).test(document.getElementById("betaId").value) : false;
-                    // console.log("*****", testNumber);
                     if ((document.getElementById("smoothingId").value) == "true" && (document.getElementById("betaId").value == "" || testNumber == false)) {
                         return false;
                     } else {
@@ -104,11 +90,9 @@ const validationSchemaExtrapolation = function (values) {
                     }
                 }),
         alphaId:
-            Yup.string().test('alphaId', 'Please enter alpha value.',
+            Yup.string().test('alphaId', 'Please provide valid input.',
                 function (value) {
-                    console.log("*****", document.getElementById("smoothingId").value);
                     var testNumber = document.getElementById("alphaId").value != "" ? (/^\d{0,3}(\.\d{1,2})?$/).test(document.getElementById("alphaId").value) : false;
-                    // console.log("*****", testNumber);
                     if ((document.getElementById("smoothingId").value) == "true" && (document.getElementById("alphaId").value == "" || testNumber == false)) {
                         return false;
                     } else {
@@ -116,11 +100,9 @@ const validationSchemaExtrapolation = function (values) {
                     }
                 }),
         pId:
-            Yup.string().test('pId', 'Please enter p value.',
+            Yup.string().test('pId', 'Please provide valid input.',
                 function (value) {
-                    console.log("*****", document.getElementById("arimaId").value);
                     var testNumber = document.getElementById("pId").value != "" ? (/^\d{0,3}(\.\d{1,2})?$/).test(document.getElementById("pId").value) : false;
-                    // console.log("*****", testNumber);
                     if ((document.getElementById("arimaId").value) == "true" && (document.getElementById("pId").value == "" || testNumber == false)) {
                         return false;
                     } else {
@@ -128,11 +110,9 @@ const validationSchemaExtrapolation = function (values) {
                     }
                 }),
         dId:
-            Yup.string().test('dId', 'Please enter d value.',
+            Yup.string().test('dId', 'Please provide valid input.',
                 function (value) {
-                    console.log("*****", document.getElementById("arimaId").value);
                     var testNumber = document.getElementById("dId").value != "" ? (/^\d{0,3}(\.\d{1,2})?$/).test(document.getElementById("dId").value) : false;
-                    // console.log("*****", testNumber);
                     if ((document.getElementById("arimaId").value) == "true" && (document.getElementById("dId").value == "" || testNumber == false)) {
                         return false;
                     } else {
@@ -140,11 +120,9 @@ const validationSchemaExtrapolation = function (values) {
                     }
                 }),
         qId:
-            Yup.string().test('qId', 'Please enter q value.',
+            Yup.string().test('qId', 'Please provide valid input.',
                 function (value) {
-                    console.log("*****", document.getElementById("arimaId").value);
                     var testNumber = document.getElementById("qId").value != "" ? (/^\d{0,3}(\.\d{1,2})?$/).test(document.getElementById("qId").value) : false;
-                    // console.log("*****", testNumber);
                     if ((document.getElementById("arimaId").value) == "true" && (document.getElementById("qId").value == "" || testNumber == false)) {
                         return false;
                     } else {
@@ -326,7 +304,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                     });
 
                     var forecastProgramJson = {
-                        name: datasetJson.programCode,
+                        name: datasetJson.programCode +"~v"+myResult[i].version,
                         id: myResult[i].id,
                         regionList: regionList,
                         planningUnitList: planningUnitList,
@@ -1487,65 +1465,117 @@ export default class ExtrapolateDataComponent extends React.Component {
 
     setAlpha(e) {
         var alpha = e.target.value;
-        this.setState({
-            alpha: alpha,
-            dataChanged: true
-        }, () => {
-            this.buildJxl();
-        })
+        var testNumber = alpha != "" ? (/^\d{0,3}(\.\d{1,2})?$/).test(alpha) : false;
+        if (this.state.smoothingId && testNumber == false) {
+            this.setState({
+                alpha: alpha,
+                loading: false
+            })
+        }
+        else {
+            this.setState({
+                alpha: alpha,
+                dataChanged: true
+            }, () => {
+                this.buildJxl();
+            })
+        }
     }
 
     setBeta(e) {
         var beta = e.target.value;
-        this.setState({
-            beta: beta,
-            dataChanged: true
-        }, () => {
-            this.buildJxl();
-        })
+        var testNumber = beta != "" ? (/^\d{0,3}(\.\d{1,2})?$/).test(beta) : false;
+        if (this.state.smoothingId && testNumber == false) {
+            this.setState({
+                beta: beta,
+                loading: false
+            })
+        }
+        else {
+            this.setState({
+                beta: beta,
+                dataChanged: true
+            }, () => {
+                this.buildJxl();
+            })
+        }
     }
 
     setGamma(e) {
         var gamma = e.target.value;
-        this.setState({
-            gamma: gamma,
-            dataChanged: true
-        }, () => {
-            this.buildJxl();
-        })
+        var testNumber = gamma != "" ? (/^\d{0,3}(\.\d{1,2})?$/).test(gamma) : false;
+        if (this.state.smoothingId && testNumber == false) {
+            this.setState({
+                gamma: gamma,
+                loading: false
+            })
+        }
+        else {
+            this.setState({
+                gamma: gamma,
+                dataChanged: true
+            }, () => {
+                this.buildJxl();
+            })
+        }
     }
 
     setSeasonals(e) {
         var seasonals = e.target.value;
-        this.setState({
-            noOfMonthsForASeason: seasonals,
-            dataChanged: true
-        }, () => {
-            this.buildJxl()
-        })
+        var testNumber = seasonals != "" ? (/^\d{0,3}(\.\d{1,2})?$/).test(seasonals) : false;
+        if (this.state.smoothingId && testNumber == false) {
+            this.setState({
+                noOfMonthsForASeason: seasonals,
+                loading: false
+            })
+        }
+        else {
+            this.setState({
+                noOfMonthsForASeason: seasonals,
+                dataChanged: true
+            }, () => {
+                this.buildJxl()
+            })
+        }
     }
 
     setConfidenceLevelId(e) {
         var confidenceLevelId = e.target.value;
-        this.setState({
-            confidenceLevelId: confidenceLevelId,
-            dataChanged: true
-        }, () => {
-            this.buildJxl()
-        })
+        var testNumber = confidenceLevelId != "" ? (/^\d{0,3}(\.\d{1,2})?$/).test(confidenceLevelId) : false;
+        if (this.state.smoothingId && testNumber == false) {
+            this.setState({
+                confidenceLevelId: confidenceLevelId,
+                loading: false
+            })
+        }
+        else {
+            this.setState({
+                confidenceLevelId: confidenceLevelId,
+                dataChanged: true
+            }, () => {
+                this.buildJxl()
+            })
+        }
     }
 
     setMonthsForMovingAverage(e) {
-        this.setState({
-            loading: true
-        })
         var monthsForMovingAverage = e.target.value;
-        this.setState({
-            monthsForMovingAverage: monthsForMovingAverage,
-            dataChanged: true
-        }, () => {
-            this.buildJxl()
-        })
+        var testNumber = true;
+        testNumber = (/^[\d]*$/).test(monthsForMovingAverage.replaceAll(",", ""));
+        if (this.state.movingAvgId && (monthsForMovingAverage == "" || testNumber == false)) {
+            this.setState({
+                monthsForMovingAverage: monthsForMovingAverage,
+                loading: false
+            })
+        } else {
+            this.setState({
+                loading: true,
+                monthsForMovingAverage: monthsForMovingAverage,
+                dataChanged: true
+            }, () => {
+                this.buildJxl()
+            })
+        }
     }
     setMovingAvgId(e) {
         var movingAvgId = e.target.checked;
@@ -1824,7 +1854,7 @@ export default class ExtrapolateDataComponent extends React.Component {
         let planningUnits = planningUnitList.length > 0 && planningUnitList.map((item, i) => {
             return (
                 <option key={i} value={item.planningUnit.id}>
-                    {getLabelText(item.planningUnit.label, this.state.lang)+" | "+item.planningUnit.id}
+                    {getLabelText(item.planningUnit.label, this.state.lang) + " | " + item.planningUnit.id}
                 </option>
             )
         }, this);
@@ -2286,180 +2316,188 @@ export default class ExtrapolateDataComponent extends React.Component {
 
                                 </div>
                                 <Formik
-                        enableReinitialize={true}
-                        initialValues={{
-                            noOfMonthsId: this.state.monthsForMovingAverage,
-                            confidenceLevelId: this.state.confidenceLevelId,
-                            seasonalityId: this.state.noOfMonthsForASeason,
-                            gammaId: this.state.gamma,
-                            betaId: this.state.beta,
-                            alphaId: this.state.alpha,
-                            pId: this.state.p,
-                            dId: this.state.d,
-                            qId: this.state.q
-                            // treeName: this.state.curTreeObj.label.label_en,
-                            // regionArray: this.state.regionList,
-                            // regionId: this.state.regionValues,
-                        }}
-                        validate={validateExtrapolation(validationSchemaExtrapolation)}
-                        onSubmit={(values, { setSubmitting, setErrors }) => {}}
-                        render={
-                            ({
-                                values,
-                                errors,
-                                touched,
-                                handleChange,
-                                handleBlur,
-                                handleSubmit,
-                                isSubmitting,
-                                isValid,
-                                setTouched,
-                                handleReset,
-                                setFieldValue,
-                                setFieldTouched
-                            }) => (
-                                <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='userForm' autocomplete="off">
-                                   
-                                <div className="col-md-12 pl-lg-0">
-                                    <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.selectExtrapolationMethod')}</Label>
-                                </div>
-                                <div className="col-md-12 pl-lg-1">
-                                    <FormGroup className="">
-                                        <div className="check inline  pl-lg-3 pt-lg-3">
-                                            <div>
-                                                <Popover placement="top" isOpen={this.state.popoverOpenMa} target="Popover1" trigger="hover" toggle={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)}>
-                                                    <PopoverBody>Need to add Info.</PopoverBody>
-                                                </Popover>
-                                            </div>
-                                            <div>
-                                                <Input
-                                                    className="form-check-input"
-                                                    type="checkbox"
-                                                    id="movingAvgId"
-                                                    name="movingAvgId"
-                                                    checked={this.state.movingAvgId}
-                                                    onClick={(e) => { this.setMovingAvgId(e); }}
-                                                />
-                                                <Label
-                                                    className="form-check-label"
-                                                    check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                                                    <b>{i18n.t('static.extrapolation.movingAverages')}</b>
-                                                    <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
-                                                </Label>
-                                            </div>
-                                            <div className="col-md-2 pt-lg-2" style={{ display: this.state.movingAvgId ? '' : 'none' }}>
-                                                <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.noOfMonths')}</Label>
-                                                <Input
-                                                    className="controls"
-                                                    type="number"
-                                                    id="noOfMonthsId"
-                                                    bsSize="sm"
-                                                    name="noOfMonthsId"
-                                                    value={this.state.monthsForMovingAverage}
-                                                    valid={!errors.noOfMonthsId && this.state.monthsForMovingAverage != null ? this.state.monthsForMovingAverage : '' != ''}
-                                                    invalid={touched.noOfMonthsId && !!errors.noOfMonthsId}
-                                                    onBlur={handleBlur}
-                                                    onChange={(e) => { handleChange(e); this.setMonthsForMovingAverage(e) }}
-                                                />
-                                                <FormFeedback>{errors.noOfMonthsId}</FormFeedback>
-                                            </div>
+                                    enableReinitialize={true}
+                                    initialValues={{
+                                        noOfMonthsId: this.state.monthsForMovingAverage,
+                                        confidenceLevelId: this.state.confidenceLevelId,
+                                        seasonalityId: this.state.noOfMonthsForASeason,
+                                        gammaId: this.state.gamma,
+                                        betaId: this.state.beta,
+                                        alphaId: this.state.alpha,
+                                        pId: this.state.p,
+                                        dId: this.state.d,
+                                        qId: this.state.q
+                                        // treeName: this.state.curTreeObj.label.label_en,
+                                        // regionArray: this.state.regionList,
+                                        // regionId: this.state.regionValues,
+                                    }}
+                                    validate={validateExtrapolation(validationSchemaExtrapolation)}
+                                    onSubmit={(values, { setSubmitting, setErrors }) => { }}
+                                    render={
+                                        ({
+                                            values,
+                                            errors,
+                                            touched,
+                                            handleChange,
+                                            handleBlur,
+                                            handleSubmit,
+                                            isSubmitting,
+                                            isValid,
+                                            setTouched,
+                                            handleReset,
+                                            setFieldValue,
+                                            setFieldTouched
+                                        }) => (
+                                            <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='userForm' autocomplete="off">
 
-                                            <div>
-                                                <Popover placement="top" isOpen={this.state.popoverOpenSa} target="Popover1" trigger="hover" toggle={() => this.toggle('popoverOpenMa', !this.state.popoverOpenSa)}>
-                                                    <PopoverBody>Need to add Info.</PopoverBody>
-                                                </Popover>
-                                            </div>
-                                            <div className="pt-lg-2">
-                                                <Input
-                                                    className="form-check-input"
-                                                    type="checkbox"
-                                                    id="semiAvgId"
-                                                    name="semiAvgId"
-                                                    checked={this.state.semiAvgId}
-                                                    onClick={(e) => { this.setSemiAvgId(e); }}
-                                                />
-                                                <Label
-                                                    className="form-check-label"
-                                                    check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                                                    <b>{i18n.t('static.extrapolation.semiAverages')}</b>
-                                                    <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenSa', !this.state.popoverOpenSa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
-                                                </Label>
-                                            </div>
-                                            <div>
-                                                <Popover placement="top" isOpen={this.state.popoverOpenLr} target="Popover1" trigger="hover" toggle={() => this.toggle('popoverOpenLr', !this.state.popoverOpenLr)}>
-                                                    <PopoverBody>Need to add Info.</PopoverBody>
-                                                </Popover>
-                                            </div>
-                                            <div className="pt-lg-2">
-                                                <Input
-                                                    className="form-check-input"
-                                                    type="checkbox"
-                                                    id="linearRegressionId"
-                                                    name="linearRegressionId"
-                                                    checked={this.state.linearRegressionId}
-                                                    onClick={(e) => { this.setLinearRegressionId(e); }}
-                                                />
-                                                <Label
-                                                    className="form-check-label"
-                                                    check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                                                    <b>{i18n.t('static.extrapolation.linearRegression')}</b>
-                                                    <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenLr', !this.state.popoverOpenLr)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
-                                                </Label>
-                                            </div>
-                                            <div>
-                                                <Popover placement="top" isOpen={this.state.popoverOpenTes} target="Popover1" trigger="hover" toggle={() => this.toggle('popoverOpenMa', !this.state.popoverOpenTes)}>
-                                                    <PopoverBody>Need to add Info.</PopoverBody>
-                                                </Popover>
-                                            </div>
-                                            <div className="pt-lg-2">
-                                                <Input
-                                                    className="form-check-input"
-                                                    type="checkbox"
-                                                    id="smoothingId"
-                                                    name="smoothingId"
-                                                    checked={this.state.smoothingId}
-                                                    onClick={(e) => { this.setSmoothingId(e); }}
-                                                />
-                                                <Label
-                                                    className="form-check-label"
-                                                    check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                                                    <b>{i18n.t('static.extrapolation.tripleExponential')}</b>
-                                                    <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenTes', !this.state.popoverOpenTes)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
-                                                </Label>
-                                            </div>
+                                                <div className="col-md-12 pl-lg-0">
+                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.selectExtrapolationMethod')}</Label>
+                                                </div>
+                                                <div className="col-md-12 pl-lg-1">
+                                                    <FormGroup className="">
+                                                        <div className="check inline  pl-lg-3 pt-lg-3">
+                                                            <div>
+                                                                <Popover placement="top" isOpen={this.state.popoverOpenMa} target="Popover1" trigger="hover" toggle={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)}>
+                                                                    <PopoverBody>Need to add Info.</PopoverBody>
+                                                                </Popover>
+                                                            </div>
+                                                            <div>
+                                                                <Input
+                                                                    className="form-check-input"
+                                                                    type="checkbox"
+                                                                    id="movingAvgId"
+                                                                    name="movingAvgId"
+                                                                    checked={this.state.movingAvgId}
+                                                                    onClick={(e) => { this.setMovingAvgId(e); }}
+                                                                />
+                                                                <Label
+                                                                    className="form-check-label"
+                                                                    check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                                    <b>{i18n.t('static.extrapolation.movingAverages')}</b>
+                                                                    <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
+                                                                </Label>
+                                                            </div>
+                                                            <div className="col-md-2 pt-lg-2" style={{ display: this.state.movingAvgId ? '' : 'none' }}>
+                                                                <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.noOfMonths')}</Label>
+                                                                <Input
+                                                                    className="controls"
+                                                                    type="number"
+                                                                    id="noOfMonthsId"
+                                                                    bsSize="sm"
+                                                                    name="noOfMonthsId"
+                                                                    value={this.state.monthsForMovingAverage}
+                                                                    valid={!errors.noOfMonthsId && this.state.monthsForMovingAverage != null ? this.state.monthsForMovingAverage : '' != ''}
+                                                                    invalid={touched.noOfMonthsId && !!errors.noOfMonthsId}
+                                                                    onBlur={handleBlur}
+                                                                    onChange={(e) => { handleChange(e); this.setMonthsForMovingAverage(e) }}
+                                                                />
+                                                                <FormFeedback>{errors.noOfMonthsId}</FormFeedback>
+                                                            </div>
 
-                                            <div className="row col-md-12 pt-lg-2" style={{ display: this.state.smoothingId ? '' : 'none' }}>
-                                                <div className="col-md-2">
-                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.confidenceLevel')}</Label>
-                                                    <Input
-                                                        type="select"
-                                                        id="confidenceLevelId"
-                                                        name="confidenceLevelId"
-                                                        bsSize="sm"
-                                                        value={this.state.confidenceLevelId}
-                                                        onChange={(e) => { this.setConfidenceLevelId(e); }}
-                                                    >
-                                                        <option value="0.85">85%</option>
-                                                        <option value="0.90">90%</option>
-                                                        <option value="0.95">95%</option>
-                                                        <option value="0.99">99%</option>
-                                                        <option value="0.995">99.5%</option>
-                                                        <option value="0.999">99.9%</option>
-                                                    </Input>
-                                                </div>
-                                                <div className="col-md-2">
-                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.seasonality')}</Label>
-                                                    <Input
-                                                        className="controls"
-                                                        type="number"
-                                                        bsSize="sm"
-                                                        id="seasonalityId"
-                                                        name="seasonalityId"
-                                                        value={this.state.noOfMonthsForASeason}
-                                                        onChange={(e) => { this.setSeasonals(e); }}
-                                                    />
-                                                </div>
-                                                {/* <div className="col-md-3">
+                                                            <div>
+                                                                <Popover placement="top" isOpen={this.state.popoverOpenSa} target="Popover1" trigger="hover" toggle={() => this.toggle('popoverOpenMa', !this.state.popoverOpenSa)}>
+                                                                    <PopoverBody>Need to add Info.</PopoverBody>
+                                                                </Popover>
+                                                            </div>
+                                                            <div className="pt-lg-2">
+                                                                <Input
+                                                                    className="form-check-input"
+                                                                    type="checkbox"
+                                                                    id="semiAvgId"
+                                                                    name="semiAvgId"
+                                                                    checked={this.state.semiAvgId}
+                                                                    onClick={(e) => { this.setSemiAvgId(e); }}
+                                                                />
+                                                                <Label
+                                                                    className="form-check-label"
+                                                                    check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                                    <b>{i18n.t('static.extrapolation.semiAverages')}</b>
+                                                                    <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenSa', !this.state.popoverOpenSa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
+                                                                </Label>
+                                                            </div>
+                                                            <div>
+                                                                <Popover placement="top" isOpen={this.state.popoverOpenLr} target="Popover1" trigger="hover" toggle={() => this.toggle('popoverOpenLr', !this.state.popoverOpenLr)}>
+                                                                    <PopoverBody>Need to add Info.</PopoverBody>
+                                                                </Popover>
+                                                            </div>
+                                                            <div className="pt-lg-2">
+                                                                <Input
+                                                                    className="form-check-input"
+                                                                    type="checkbox"
+                                                                    id="linearRegressionId"
+                                                                    name="linearRegressionId"
+                                                                    checked={this.state.linearRegressionId}
+                                                                    onClick={(e) => { this.setLinearRegressionId(e); }}
+                                                                />
+                                                                <Label
+                                                                    className="form-check-label"
+                                                                    check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                                    <b>{i18n.t('static.extrapolation.linearRegression')}</b>
+                                                                    <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenLr', !this.state.popoverOpenLr)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
+                                                                </Label>
+                                                            </div>
+                                                            <div>
+                                                                <Popover placement="top" isOpen={this.state.popoverOpenTes} target="Popover1" trigger="hover" toggle={() => this.toggle('popoverOpenMa', !this.state.popoverOpenTes)}>
+                                                                    <PopoverBody>Need to add Info.</PopoverBody>
+                                                                </Popover>
+                                                            </div>
+                                                            <div className="pt-lg-2">
+                                                                <Input
+                                                                    className="form-check-input"
+                                                                    type="checkbox"
+                                                                    id="smoothingId"
+                                                                    name="smoothingId"
+                                                                    checked={this.state.smoothingId}
+                                                                    onClick={(e) => { this.setSmoothingId(e); }}
+                                                                />
+                                                                <Label
+                                                                    className="form-check-label"
+                                                                    check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                                    <b>{i18n.t('static.extrapolation.tripleExponential')}</b>
+                                                                    <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenTes', !this.state.popoverOpenTes)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
+                                                                </Label>
+                                                            </div>
+
+                                                            <div className="row col-md-12 pt-lg-2" style={{ display: this.state.smoothingId ? '' : 'none' }}>
+                                                                <div className="col-md-2">
+                                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.confidenceLevel')}</Label>
+                                                                    <Input
+                                                                        type="select"
+                                                                        id="confidenceLevelId"
+                                                                        name="confidenceLevelId"
+                                                                        bsSize="sm"
+                                                                        value={this.state.confidenceLevelId}
+                                                                        valid={!errors.confidenceLevelId && this.state.confidenceLevelId != null ? this.state.confidenceLevelId : '' != ''}
+                                                                        invalid={touched.confidenceLevelId && !!errors.confidenceLevelId}
+                                                                        onBlur={handleBlur}
+                                                                        onChange={(e) => { this.setConfidenceLevelId(e); }}
+                                                                    >
+                                                                        <option value="0.85">85%</option>
+                                                                        <option value="0.90">90%</option>
+                                                                        <option value="0.95">95%</option>
+                                                                        <option value="0.99">99%</option>
+                                                                        <option value="0.995">99.5%</option>
+                                                                        <option value="0.999">99.9%</option>
+                                                                    </Input>
+                                                                    <FormFeedback>{errors.confidenceLevelId}</FormFeedback>
+                                                                </div>
+                                                                <div className="col-md-2">
+                                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.seasonality')}</Label>
+                                                                    <Input
+                                                                        className="controls"
+                                                                        type="number"
+                                                                        bsSize="sm"
+                                                                        id="seasonalityId"
+                                                                        name="seasonalityId"
+                                                                        value={this.state.noOfMonthsForASeason}
+                                                                        valid={!errors.seasonalityId && this.state.noOfMonthsForASeason != null ? this.state.noOfMonthsForASeason : '' != ''}
+                                                                        invalid={touched.seasonalityId && !!errors.seasonalityId}
+                                                                        onBlur={handleBlur}
+                                                                        onChange={(e) => { this.setSeasonals(e); }}
+                                                                    />
+                                                                    <FormFeedback>{errors.seasonalityId}</FormFeedback>
+                                                                </div>
+                                                                {/* <div className="col-md-3">
                                                         <Input
                                                             className="form-check-input"
                                                             type="checkbox"
@@ -2475,43 +2513,55 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                         </Label>
                                                     </div> */}
 
-                                                <div className="col-md-2">
-                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.alpha')}</Label>
-                                                    <Input
-                                                        className="controls"
-                                                        type="number"
-                                                        id="alphaId"
-                                                        name="alphaId"
-                                                        bsSize="sm"
-                                                        value={this.state.alpha}
-                                                        onChange={(e) => { this.setAlpha(e); }}
-                                                    />
-                                                </div>
-                                                <div className="col-md-2">
-                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.beta')}</Label>
-                                                    <Input
-                                                        className="controls"
-                                                        type="number"
-                                                        id="betaId"
-                                                        bsSize="sm"
-                                                        name="betaId"
-                                                        value={this.state.beta}
-                                                        onChange={(e) => { this.setBeta(e); }}
-                                                    />
-                                                </div>
-                                                <div className="col-md-2">
-                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.gamma')}</Label>
-                                                    <Input
-                                                        className="controls"
-                                                        type="number"
-                                                        id="gammaId"
-                                                        bsSize="sm"
-                                                        name="gammaId"
-                                                        value={this.state.gamma}
-                                                        onChange={(e) => { this.setGamma(e); }}
-                                                    />
-                                                </div>
-                                                {/* <div className="col-md-2">
+                                                                <div className="col-md-2">
+                                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.alpha')}</Label>
+                                                                    <Input
+                                                                        className="controls"
+                                                                        type="number"
+                                                                        id="alphaId"
+                                                                        name="alphaId"
+                                                                        bsSize="sm"
+                                                                        value={this.state.alpha}
+                                                                        valid={!errors.alphaId && this.state.alpha != null ? this.state.alpha : '' != ''}
+                                                                        invalid={touched.alphaId && !!errors.alphaId}
+                                                                        onBlur={handleBlur}
+                                                                        onChange={(e) => { this.setAlpha(e); }}
+                                                                    />
+                                                                    <FormFeedback>{errors.alphaId}</FormFeedback>
+                                                                </div>
+                                                                <div className="col-md-2">
+                                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.beta')}</Label>
+                                                                    <Input
+                                                                        className="controls"
+                                                                        type="number"
+                                                                        id="betaId"
+                                                                        bsSize="sm"
+                                                                        name="betaId"
+                                                                        value={this.state.beta}
+                                                                        valid={!errors.betaId && this.state.beta != null ? this.state.beta : '' != ''}
+                                                                        invalid={touched.betaId && !!errors.betaId}
+                                                                        onBlur={handleBlur}
+                                                                        onChange={(e) => { this.setBeta(e); }}
+                                                                    />
+                                                                    <FormFeedback>{errors.betaId}</FormFeedback>
+                                                                </div>
+                                                                <div className="col-md-2">
+                                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.gamma')}</Label>
+                                                                    <Input
+                                                                        className="controls"
+                                                                        type="number"
+                                                                        id="gammaId"
+                                                                        bsSize="sm"
+                                                                        name="gammaId"
+                                                                        value={this.state.gamma}
+                                                                        valid={!errors.gammaId && this.state.gamma != null ? this.state.gamma : '' != ''}
+                                                                        invalid={touched.gammaId && !!errors.gammaId}
+                                                                        onBlur={handleBlur}
+                                                                        onChange={(e) => { this.setGamma(e); }}
+                                                                    />
+                                                                    <FormFeedback>{errors.gammaId}</FormFeedback>
+                                                                </div>
+                                                                {/* <div className="col-md-2">
                                                         <Label htmlFor="appendedInputButton">Phi</Label>
                                                         <Input
                                                             className="controls"
@@ -2520,68 +2570,68 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                             name="phiId"
                                                         />
                                                     </div> */}
-                                            </div>
+                                                            </div>
 
-                                            <div>
-                                                <Popover placement="top" isOpen={this.state.popoverOpenArima} target="Popover1" trigger="hover" toggle={() => this.toggle('popoverOpenArima', !this.state.popoverOpenArima)}>
-                                                    <PopoverBody>Need to add Info.</PopoverBody>
-                                                </Popover>
-                                            </div>
-                                            <div className="pt-lg-2">
-                                                <Input
-                                                    className="form-check-input"
-                                                    type="checkbox"
-                                                    id="arimaId"
-                                                    name="arimaId"
-                                                    checked={this.state.arimaId}
-                                                    onClick={(e) => { this.setArimaId(e); }}
-                                                />
-                                                <Label
-                                                    className="form-check-label"
-                                                    check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                                                    <b>{i18n.t('static.extrapolation.arimaFull')}</b>
-                                                    <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenArima', !this.state.popoverOpenArima)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
-                                                </Label>
-                                            </div>
+                                                            <div>
+                                                                <Popover placement="top" isOpen={this.state.popoverOpenArima} target="Popover1" trigger="hover" toggle={() => this.toggle('popoverOpenArima', !this.state.popoverOpenArima)}>
+                                                                    <PopoverBody>Need to add Info.</PopoverBody>
+                                                                </Popover>
+                                                            </div>
+                                                            <div className="pt-lg-2">
+                                                                <Input
+                                                                    className="form-check-input"
+                                                                    type="checkbox"
+                                                                    id="arimaId"
+                                                                    name="arimaId"
+                                                                    checked={this.state.arimaId}
+                                                                    onClick={(e) => { this.setArimaId(e); }}
+                                                                />
+                                                                <Label
+                                                                    className="form-check-label"
+                                                                    check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                                    <b>{i18n.t('static.extrapolation.arimaFull')}</b>
+                                                                    <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenArima', !this.state.popoverOpenArima)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
+                                                                </Label>
+                                                            </div>
 
-                                            <div className="row col-md-12 pt-lg-2" style={{ display: this.state.arimaId ? '' : 'none' }}>
-                                                <div className="col-md-2">
-                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.p')}</Label>
-                                                    <Input
-                                                        className="controls"
-                                                        type="number"
-                                                        id="pId"
-                                                        name="pId"
-                                                        bsSize="sm"
-                                                    />
-                                                </div>
-                                                <div className="col-md-2">
-                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.d')}</Label>
-                                                    <Input
-                                                        className="controls"
-                                                        type="number"
-                                                        id="dId"
-                                                        name="dId"
-                                                        bsSize="sm"
-                                                    />
-                                                </div>
-                                                <div className="col-md-2">
-                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.q')}</Label>
-                                                    <Input
-                                                        className="controls"
-                                                        type="number"
-                                                        id="qId"
-                                                        name="qId"
-                                                        bsSize="sm"
-                                                    />
-                                                </div>
-                                            </div>
+                                                            <div className="row col-md-12 pt-lg-2" style={{ display: this.state.arimaId ? '' : 'none' }}>
+                                                                <div className="col-md-2">
+                                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.p')}</Label>
+                                                                    <Input
+                                                                        className="controls"
+                                                                        type="number"
+                                                                        id="pId"
+                                                                        name="pId"
+                                                                        bsSize="sm"
+                                                                    />
+                                                                </div>
+                                                                <div className="col-md-2">
+                                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.d')}</Label>
+                                                                    <Input
+                                                                        className="controls"
+                                                                        type="number"
+                                                                        id="dId"
+                                                                        name="dId"
+                                                                        bsSize="sm"
+                                                                    />
+                                                                </div>
+                                                                <div className="col-md-2">
+                                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.q')}</Label>
+                                                                    <Input
+                                                                        className="controls"
+                                                                        type="number"
+                                                                        id="qId"
+                                                                        name="qId"
+                                                                        bsSize="sm"
+                                                                    />
+                                                                </div>
+                                                            </div>
 
-                                        </div>
-                                    </FormGroup>
-                                </div>
-                                </Form>
-                                )} />
+                                                        </div>
+                                                    </FormGroup>
+                                                </div>
+                                            </Form>
+                                        )} />
                             </div>
                             {/* <div className="col-md-12">
                                 <Button type="button" size="md" color="warning" className="float-right mr-1" onClick={this.reset}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
