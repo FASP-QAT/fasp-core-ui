@@ -27,6 +27,7 @@ import TracerCategoryService from '../../api/TracerCategoryService';
 import ProcurementAgentService from "../../api/ProcurementAgentService";
 import PlanningUnitService from '../../api/PlanningUnitService';
 import "../../../node_modules/jsuites/dist/jsuites.css";
+import { Prompt } from 'react-router';
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
 import {
     Card,
@@ -97,6 +98,7 @@ export default class PlanningUnitSetting extends Component {
             responsePa: [],
             forecastProgramId: '',
             forecastProgramVersionId: '',
+            isChanged1: false
 
         }
         this.changed = this.changed.bind(this);
@@ -670,6 +672,10 @@ export default class PlanningUnitSetting extends Component {
             }
         }
 
+        this.setState({
+            isChanged1: true,
+        });
+
     }
 
     getPlanningUnitByTracerCategoryId(tracerCategoryId) {
@@ -1087,6 +1093,19 @@ export default class PlanningUnitSetting extends Component {
 
     componentDidMount() {
         this.getDatasetList();
+    }
+
+    componentWillUnmount() {
+        clearTimeout(this.timeout);
+        window.onbeforeunload = null;
+    }
+
+    componentDidUpdate = () => {
+        if (this.state.isChanged1 == true) {
+            window.onbeforeunload = () => true
+        } else {
+            window.onbeforeunload = undefined
+        }
     }
 
     getDatasetList() {
@@ -2364,7 +2383,10 @@ export default class PlanningUnitSetting extends Component {
 
         return (
             <div className="animated fadeIn" >
-
+                <Prompt
+                    when={this.state.isChanged1 == true}
+                    message={i18n.t("static.dataentry.confirmmsg")}
+                />
                 <AuthenticationServiceComponent history={this.props.history} />
                 {/* <h5 className="red">{i18n.t(this.state.message)}</h5> */}
                 <h5 className={this.state.color} id="div2">{i18n.t(this.state.message)}</h5>

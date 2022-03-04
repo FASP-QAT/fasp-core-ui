@@ -33,6 +33,7 @@ import UsagePeriodService from '../../api/UsagePeriodService';
 import UnitService from '../../api/UnitService.js';
 import ProgramService from '../../api/ProgramService';
 import CryptoJS from 'crypto-js';
+import { Prompt } from 'react-router';
 import { SECRET_KEY, JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, JEXCEL_DATE_FORMAT_SM, INTEGER_NO_REGEX } from "../../Constants";
 import { number } from "mathjs";
 
@@ -115,6 +116,7 @@ class usageTemplate extends Component {
             usagePeriodDisplayList: [],
             roleArray: [],
             dimensionList: [],
+            isChanged1: false
         }
         // this.setTextAndValue = this.setTextAndValue.bind(this);
         // this.disableRow = this.disableRow.bind(this);
@@ -1569,6 +1571,19 @@ class usageTemplate extends Component {
 
     }
 
+    componentWillUnmount() {
+        clearTimeout(this.timeout);
+        window.onbeforeunload = null;
+    }
+
+    componentDidUpdate = () => {
+        if (this.state.isChanged1 == true) {
+            window.onbeforeunload = () => true
+        } else {
+            window.onbeforeunload = undefined
+        }
+    }
+
     componentDidMount() {
         let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
         let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
@@ -2391,9 +2406,9 @@ class usageTemplate extends Component {
             }
         }
 
-
-
-
+        this.setState({
+            isChanged1: true,
+        });
 
 
 
@@ -2835,6 +2850,10 @@ class usageTemplate extends Component {
 
         return (
             <div className="animated fadeIn">
+                <Prompt
+                    when={this.state.isChanged1 == true}
+                    message={i18n.t("static.dataentry.confirmmsg")}
+                />
                 <AuthenticationServiceComponent history={this.props.history} />
                 {/* <h5 style={{ color: "red" }}>{i18n.t('static.common.customWarningMessage')}</h5> */}
                 <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>

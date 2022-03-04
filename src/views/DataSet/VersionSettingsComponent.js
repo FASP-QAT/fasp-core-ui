@@ -17,6 +17,7 @@ import moment from 'moment';
 import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
 import { buildJxl, buildJxl1, dataCheck } from "./DataCheckComponent";
+import { Prompt } from 'react-router';
 import { exportPDF, noForecastSelectedClicked, missingMonthsClicked, missingBranchesClicked, nodeWithPercentageChildrenClicked } from '../DataSet/DataCheckComponent.js';
 import pdfIcon from '../../assets/img/pdf.png';
 
@@ -77,7 +78,8 @@ class VersionSettingsComponent extends Component {
             noForecastSelectedList: [],
             datasetPlanningUnit: [],
             notSelectedPlanningUnitList: [],
-            treeScenarioListNotHaving100PerChild: []
+            treeScenarioListNotHaving100PerChild: [],
+            isChanged1: false
         }
         this.hideFirstComponent = this.hideFirstComponent.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
@@ -503,6 +505,10 @@ class VersionSettingsComponent extends Component {
                 }
             }
         }
+
+        this.setState({
+            isChanged1: true,
+        });
 
 
 
@@ -1145,6 +1151,19 @@ class VersionSettingsComponent extends Component {
         this.getDatasetList();
     }
 
+    componentWillUnmount() {
+        clearTimeout(this.timeout);
+        window.onbeforeunload = null;
+    }
+
+    componentDidUpdate = () => {
+        if (this.state.isChanged1 == true) {
+            window.onbeforeunload = () => true
+        } else {
+            window.onbeforeunload = undefined
+        }
+    }
+
     handleChangeProgram(programIds) {
         programIds = programIds.sort(function (a, b) {
             return parseInt(a.value) - parseInt(b.value);
@@ -1316,6 +1335,10 @@ class VersionSettingsComponent extends Component {
 
         return (
             <div className="animated">
+                <Prompt
+                    when={this.state.isChanged1 == true}
+                    message={i18n.t("static.dataentry.confirmmsg")}
+                />
                 <AuthenticationServiceComponent history={this.props.history} />
                 <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5 className={this.state.color} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
