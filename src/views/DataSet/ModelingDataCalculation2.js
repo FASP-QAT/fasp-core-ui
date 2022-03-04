@@ -60,16 +60,16 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
             flatList.push(flatListUnsorted.filter(c => c.sortOrder == sortedArray[i])[0]);
         }
         var transferToNodeList = [];
-        if (nodeId != -1) {
-            var curNode = flatList.filter(c => c.id == nodeId)[0];
-            var currentNodeType = curNode.payload.nodeType.id;
-            var parentNodeType = curNode.parent != null ? flatList.filter(c => c.id == curNode.parent)[0].payload.nodeType.id : 0;
-            if (currentNodeType == 2 && parentNodeType == 1) {
+        // if (nodeId != -1) {
+        //     var curNode = flatList.filter(c => c.id == nodeId)[0];
+        //     var currentNodeType = curNode.payload.nodeType.id;
+        //     var parentNodeType = curNode.parent != null ? flatList.filter(c => c.id == curNode.parent)[0].payload.nodeType.id : 0;
+        //     if (currentNodeType == 2 && parentNodeType == 1) {
 
-            } else {
-                flatList = flatList.filter(c => c.id == nodeId);
-            }
-        }
+        //     } else {
+        //         flatList = flatList.filter(c => c.id == nodeId);
+        //     }
+        // }
         for (var fl = 0; fl < flatList.length; fl++) {
             var payload = flatList[fl].payload;
             if (payload.nodeType.id != 1) {
@@ -80,7 +80,7 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                 }
                 for (var ndm = 0; ndm < scenarioList.length; ndm++) {
                     var nodeDataMapForScenario = (nodeDataMap[scenarioList[ndm].id])[0];
-                    var nodeDataModelingListUnFiltered = ((nodeDataMap[scenarioList[ndm].id])[0].nodeDataModelingList);
+                    var nodeDataModelingListUnFiltered = (nodeDataMapForScenario.nodeDataModelingList);
                     var hasTransferNodeIdList = nodeDataModelingListUnFiltered.filter(c => c.transferNodeDataId != null);
 
                     for (var tnl = 0; tnl < hasTransferNodeIdList.length; tnl++) {
@@ -166,7 +166,7 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                 // console.log("scenarioList---", scenarioList);
                 for (var ndm = 0; ndm < scenarioList.length; ndm++) {
                     var nodeDataMapForScenario = (nodeDataMap[scenarioList[ndm].id])[0];
-                    var nodeDataModelingListUnFiltered = ((nodeDataMap[scenarioList[ndm].id])[0].nodeDataModelingList);
+                    var nodeDataModelingListUnFiltered = (nodeDataMapForScenario.nodeDataModelingList);
                     var transferNodeList = transferToNodeList.filter(c => c.nodeDataId == nodeDataMapForScenario.nodeDataId);
                     var nodeDataModelingListWithTransfer = nodeDataModelingListUnFiltered.concat(transferNodeList);
                     var curDate = moment(nodeDataMapForScenario.month).startOf('month').format("YYYY-MM-DD");
@@ -176,7 +176,7 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                         // console.log("curDate---", curDate);
                         curDate = moment(nodeDataMapForScenario.month).add(i, 'months').format("YYYY-MM-DD");
                         var nodeDataModelingList = (nodeDataModelingListWithTransfer).filter(c => moment(curDate).format("YYYY-MM") >= moment(c.startDate).format("YYYY-MM") && moment(curDate).format("YYYY-MM") <= moment(c.stopDate).format("YYYY-MM"));
-                        var nodeDataOverrideList = ((nodeDataMap[scenarioList[ndm].id])[0].nodeDataOverrideList);
+                        var nodeDataOverrideList = (nodeDataMapForScenario.nodeDataOverrideList);
                         var startValue = 0;
                         // console.log("nodeDataMapForScenario---", nodeDataMapForScenario)
                         if (moment(curDate).format("YYYY-MM-DD") == moment(nodeDataMapForScenario.month).format("YYYY-MM-DD")) {
@@ -189,8 +189,13 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                         } else if (moment(curDate).format("YYYY-MM-DD") < moment(nodeDataMapForScenario.month).format("YYYY-MM-DD")) {
                             startValue = 0;
                         } else if (moment(curDate).format("YYYY-MM-DD") > moment(nodeDataMapForScenario.month).format("YYYY-MM-DD")) {
-                            var nodeDataListPrevMonth = nodeDataList.filter(c => moment(c.month).format("YYYY-MM-DD") == moment(curDate).add(-1, 'months').format("YYYY-MM-DD"))[0];
-                            startValue = nodeDataMapForScenario.manualChangesEffectFuture ? nodeDataListPrevMonth.endValue : nodeDataListPrevMonth.endValueWMC;
+                            var nodeDataListPrevMonthFilter = nodeDataList.filter(c => moment(c.month).format("YYYY-MM-DD") == moment(curDate).add(-1, 'months').format("YYYY-MM-DD"));
+                            if (nodeDataListPrevMonthFilter.length > 0) {
+                                var nodeDataListPrevMonth = nodeDataListPrevMonthFilter[0];
+                                startValue = nodeDataMapForScenario.manualChangesEffectFuture ? nodeDataListPrevMonth.endValue : nodeDataListPrevMonth.endValueWMC;
+                            } else {
+                                startValue = 0;
+                            }
                         }
                         // console.log("startValue---", startValue);
                         var difference = 0;
@@ -268,9 +273,15 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                     var transferFromNodeDataMapForScenario = (transferFromNodeData[0].payload.nodeDataMap[scenarioList[ndm].id])[0];
                                     var transferFromNodeMomList = transferFromNodeDataMapForScenario.nodeDataMomList;
                                     // console.log("TransferFromNodeMomList##+", transferFromNodeMomList);
-                                    var transferStartValue = (transferFromNodeMomList.filter(c => moment(c.month).format("YYYY-MM-DD") == moment(curDate).add(0, 'months').format("YYYY-MM-DD"))[0]).startValue;
-                                    difference += Number((Number(transferStartValue) * Number(nodeDataModeling.dataValue)) / 100);
-                                    differenceWMC += Number((Number(transferStartValue) * Number(nodeDataModeling.dataValue)) / 100);
+                                    var transferStartValueFilter = transferFromNodeMomList.filter(c => moment(c.month).format("YYYY-MM-DD") == moment(curDate).add(0, 'months').format("YYYY-MM-DD"));
+                                    if (transferStartValueFilter.length > 0) {
+                                        var transferStartValue = (transferStartValueFilter[0]).startValue;
+                                        difference += Number((Number(transferStartValue) * Number(nodeDataModeling.dataValue)) / 100);
+                                        differenceWMC += Number((Number(transferStartValue) * Number(nodeDataModeling.dataValue)) / 100);
+                                    } else {
+                                        difference = 0;
+                                        differenceWMC = 0;
+                                    }
                                 } else {
                                     difference += Number((Number(startValue) * Number(nodeDataModeling.dataValue)) / 100);
                                     differenceWMC += Number((Number(startValue) * Number(nodeDataModeling.dataValue)) / 100);
@@ -347,8 +358,13 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                             var singleNodeData = (parentFiltered.payload.nodeDataMap[scenarioList[ndm].id]);
                             // console.log("singleNodeData---", singleNodeData);
                             if (singleNodeData != undefined && singleNodeData.length > 0) {
-                                var parentValue = singleNodeData[0].nodeDataMomList.filter(c => moment(c.month).format("YYYY-MM-DD") == moment(curDate).format("YYYY-MM-DD"))[0].calculatedValue;
-                                calculatedValue = (Number(Number(parentValue) * Number(endValue)) / 100);
+                                var parentValueFilter = singleNodeData[0].nodeDataMomList.filter(c => moment(c.month).format("YYYY-MM-DD") == moment(curDate).format("YYYY-MM-DD"));
+                                if (parentValueFilter.length > 0) {
+                                    var parentValue = parentValueFilter[0].calculatedValue;
+                                    calculatedValue = (Number(Number(parentValue) * Number(endValue)) / 100);
+                                } else {
+                                    calculatedValue = 0;
+                                }
                             } else {
                                 calculatedValue = 0;
                             }
@@ -359,7 +375,13 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                             var noOfForecastingUnitsPerPerson = nodeDataMapForScenario.fuNode.noOfForecastingUnitsPerPerson;
                             if (nodeDataMapForScenario.fuNode.usageType.id == 2 || (nodeDataMapForScenario.fuNode.oneTimeUsage != "true" && nodeDataMapForScenario.fuNode.oneTimeUsage != true)) {
                                 usageFrequency = nodeDataMapForScenario.fuNode.usageFrequency;
-                                convertToMonth = (props.state.usagePeriodList.filter(c => c.usagePeriodId == nodeDataMapForScenario.fuNode.usagePeriod.usagePeriodId))[0].convertToMonth;
+                                var usagePeriodFilter = (props.state.usagePeriodList.filter(c => c.usagePeriodId == nodeDataMapForScenario.fuNode.usagePeriod.usagePeriodId));
+                                if (usagePeriodFilter.length > 0) {
+                                    convertToMonth = usagePeriodFilter[0].convertToMonth;
+                                } else {
+                                    convertToMonth = 0;
+                                }
+
                             }
                             if (nodeDataMapForScenario.fuNode.usageType.id == 2) {
                                 fuPerMonth = ((noOfForecastingUnitsPerPerson / usageFrequency) * convertToMonth);
@@ -378,9 +400,13 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                             calculatedValue = totalValue;
                         }
                         if (payload.nodeType.id == 5) {
-                            var pu = (datasetJson.planningUnitList).filter(c => c.planningUnit.id == nodeDataMapForScenario.puNode.planningUnit.id)[0];
-                            var fuPerPu = pu.planningUnit.multiplier;
-                            calculatedValue = calculatedValue / fuPerPu;
+                            var puFilter = (datasetJson.planningUnitList).filter(c => c.planningUnit.id == nodeDataMapForScenario.puNode.planningUnit.id);
+                            if (puFilter.length > 0) {
+                                var pu = puFilter[0];
+                                var fuPerPu = pu.planningUnit.multiplier;
+                                calculatedValue = calculatedValue / fuPerPu;
+                            }
+
                         }
                         var calculatedMmdValue = calculatedValue;
                         console.log("flatList[fl]$$$###", flatList[fl])
@@ -432,8 +458,13 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                 }
                                 // patients = 5432;
                                 // console.log("nodeDataMapForScenario$$$%%%", nodeDataMapForScenario)
-                                var pu = (datasetJson.planningUnitList).filter(c => c.planningUnit.id == (nodeDataMapForScenario.puNode.planningUnit.id))[0];
-                                var fuPerPu = pu.planningUnit.multiplier;
+                                var puFilter = (datasetJson.planningUnitList).filter(c => c.planningUnit.id == (nodeDataMapForScenario.puNode.planningUnit.id));
+                                var fuPerPu = 1;
+                                if (puFilter.length > 0) {
+                                    var pu = puFilter[0];
+                                    fuPerPu = pu.planningUnit.multiplier;
+                                }
+
                                 var monthsPerVisit = nodeDataMapForScenario.puNode.refillMonths;
                                 var noOfBottlesInOneVisit = 6;
                                 var puPerBaseMonth = Math.floor(patients / monthsPerVisit);
@@ -451,9 +482,16 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                 console.log("cycle$$$%%%", cycle);
                                 var deltaPatients = 0;
                                 if (i == 0) {
-                                    deltaPatients = grandParentNodeData.nodeDataMomList.filter(c => moment(c.month).format("YYYY-MM") == moment(curDate).format("YYYY-MM"))[0].calculatedValue - patients;
+                                    var filter1 = grandParentNodeData.nodeDataMomList.filter(c => moment(c.month).format("YYYY-MM") == moment(curDate).format("YYYY-MM"));
+                                    if (filter1.length > 0) {
+                                        deltaPatients = filter1[0].calculatedValue - patients;
+                                    }
                                 } else {
-                                    deltaPatients = grandParentNodeData.nodeDataMomList.filter(c => moment(c.month).format("YYYY-MM") == moment(curDate).format("YYYY-MM"))[0].calculatedValue - grandParentNodeData.nodeDataMomList.filter(c => moment(c.month).format("YYYY-MM-DD") == moment(curDate).add(-1, 'months').format("YYYY-MM-DD"))[0].calculatedValue;
+                                    var filter1 = grandParentNodeData.nodeDataMomList.filter(c => moment(c.month).format("YYYY-MM") == moment(curDate).format("YYYY-MM"));
+                                    var filter2 = grandParentNodeData.nodeDataMomList.filter(c => moment(c.month).format("YYYY-MM-DD") == moment(curDate).add(-1, 'months').format("YYYY-MM-DD"));
+                                    if (filter1.length > 0 && filter2.length > 0) {
+                                        deltaPatients = filter1[0].calculatedValue - filter2[0].calculatedValue;
+                                    }
                                 }
                                 console.log("deltaPatients$$$%%%", deltaPatients);
                                 var noOfPatientsNew = 0;
@@ -583,14 +621,17 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                             if (childScenario != undefined && childScenario.length > 0) {
                                 // console.log("In if &&&", curDate)
                                 var childNodeMomData = childScenario[0].nodeDataMomList;
-                                var nodeDataListFiltered = (childNodeMomData.filter(c => moment(c.month).format("YYYY-MM") == moment(curDate).format("YYYY-MM"))[0]);
-                                // console.log("nodeDataListFiltered&&&", nodeDataListFiltered)
-                                aggregatedStartValue += Number(nodeDataListFiltered.startValue);
-                                aggregatedEndValue += Number(nodeDataListFiltered.endValue);
-                                aggregatedCalculatedValue += Number(nodeDataListFiltered.calculatedValue);
-                                aggregatedDifference += Number(nodeDataListFiltered.difference);
-                                aggregatedSeasonality += Number(nodeDataListFiltered.seasonalityPerc);
-                                aggregatedManualChange += Number(nodeDataListFiltered.manualChange);
+                                var nodeDataListFilteredFilter = (childNodeMomData.filter(c => moment(c.month).format("YYYY-MM") == moment(curDate).format("YYYY-MM")));
+                                if (nodeDataListFilteredFilter.length > 0) {
+                                    var nodeDataListFiltered = nodeDataListFilteredFilter[0];
+                                    // console.log("nodeDataListFiltered&&&", nodeDataListFiltered)
+                                    aggregatedStartValue += Number(nodeDataListFiltered.startValue);
+                                    aggregatedEndValue += Number(nodeDataListFiltered.endValue);
+                                    aggregatedCalculatedValue += Number(nodeDataListFiltered.calculatedValue);
+                                    aggregatedDifference += Number(nodeDataListFiltered.difference);
+                                    aggregatedSeasonality += Number(nodeDataListFiltered.seasonalityPerc);
+                                    aggregatedManualChange += Number(nodeDataListFiltered.manualChange);
+                                }
                             }
                         }
                         // console.log("agg data---", aggregatedStartValue)
