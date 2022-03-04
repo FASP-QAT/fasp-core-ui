@@ -1025,7 +1025,7 @@ export default class CommitTreeComponent extends React.Component {
                         </div>
                     </ModalHeader>
                     <div>
-                        <ModalBody>
+                        <ModalBody className="VersionSettingMode">
                             <span><b>{this.state.programName}</b></span><br />
                             <span><b>{i18n.t('static.common.forecastPeriod')}: </b> {moment(this.state.forecastStartDate).format('MMM-YYYY')} to {moment(this.state.forecastStopDate).format('MMM-YYYY')} </span><br /><br />
 
@@ -1098,11 +1098,15 @@ export default class CommitTreeComponent extends React.Component {
                                     </Table>
                                 </div> : <span>{treeNodes}</span>}
                             </div>
-                            <div className="col-md-12 pb-lg-5 pt-lg-3">
+                            {/* <div className="col-md-12 pb-lg-5 pt-lg-3">
+                                <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={() => { this.toggleShowValidation() }}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={this.synchronize}><i className="fa fa-check"></i>{i18n.t('static.report.ok')}</Button>
+                            </div> */}
+                        </ModalBody>
+                        <div className="col-md-12 pb-lg-5 pt-lg-3">
                                 <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={() => { this.toggleShowValidation() }}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                 <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={this.synchronize}><i className="fa fa-check"></i>{i18n.t('static.report.ok')}</Button>
                             </div>
-                        </ModalBody>
                     </div>
                 </Modal >
             </div >
