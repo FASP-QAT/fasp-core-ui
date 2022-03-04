@@ -2,7 +2,7 @@ import { calculateError } from '../Extrapolation/ErrorCalculations.js';
 let m = 0;
 let c = 0;
 export function calculateSemiAverages(inputData, noOfProjectionMonths, props) {
-    const data = inputData;
+    const data = JSON.parse(JSON.stringify(inputData));
     console.log("InputData@@@",inputData)
     if (inputData.length % 2 == 1) {
         inputData.pop();

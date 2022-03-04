@@ -5245,7 +5245,13 @@ export default class BuildTree extends Component {
         }, () => {
 
             console.log("on add items-------", this.state.items);
-            this.calculateMOMData(newItem.id, 0);
+            if (!itemConfig.context.payload.extrapolation) {
+                this.calculateMOMData(newItem.id, 0);
+            } else {
+                this.setState({
+                    loading: false
+                })
+            }
             // this.calculateValuesForAggregateNode(this.state.items);
         });
     }
@@ -5502,7 +5508,13 @@ export default class BuildTree extends Component {
         }, () => {
             console.log("updated tree data+++", this.state);
             // this.calculateValuesForAggregateNode(this.state.items);
-            this.calculateMOMData(0, 0);
+            if (!currentItemConfig.context.payload.extrapolation) {
+                this.calculateMOMData(0, 0);
+            } else {
+                this.setState({
+                    loading: false
+                })
+            }
             // console.log("returmed list---", this.state.nodeDataMomList);
             // this.updateTreeData();
         });
@@ -7385,7 +7397,7 @@ export default class BuildTree extends Component {
         // })
 
     }
-   
+
 
     updateTreeData(date) {
         var items = this.state.items;
@@ -7753,7 +7765,7 @@ export default class BuildTree extends Component {
                                 nodeDataMap[this.state.selectedScenario] = tempArray;
                                 // tempArray.push(nodeDataMap);
                                 this.setState({
-                                    parentValue:"",
+                                    parentValue: "",
                                     fuValues: [],
                                     fuLabels: [],
                                     // showFUValidation : true,
@@ -8406,7 +8418,7 @@ export default class BuildTree extends Component {
                                         <div style={{ display: !this.state.loading ? "block" : "none" }} class="sample">
                                             {/* <h5 style={{ color: '#BA0C2F' }}>Please save and do a recalculate after drag and drop.</h5> */}
                                             <Provider>
-                                                <div className="placeholder TreeTemplateHeight" style={{ clear: 'both', marginTop:'25px', border: '1px solid #a7c6ed' }} >
+                                                <div className="placeholder TreeTemplateHeight" style={{ clear: 'both', marginTop: '25px', border: '1px solid #a7c6ed' }} >
                                                     {/* <OrgDiagram centerOnCursor={true} config={config} onHighlightChanged={this.onHighlightChanged} /> */}
                                                     <OrgDiagram centerOnCursor={true} config={config} onCursorChanged={this.onCursoChanged} />
                                                 </div>
