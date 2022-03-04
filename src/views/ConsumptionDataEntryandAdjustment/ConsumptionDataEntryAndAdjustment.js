@@ -796,7 +796,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       loading: true
     })
     console.log("validation---------->before")
-    var validation = this.checkValidationConsumption();
+    //var validation = this.checkValidationConsumption();
     //console.log("validation---------->",validation)
     var validation =true; 
     if (validation == true) {
