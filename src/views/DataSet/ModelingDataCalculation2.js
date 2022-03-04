@@ -644,6 +644,7 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                 difference: aggregatedDifference,
                                 seasonalityPerc: aggregatedSeasonality,
                                 manualChange: aggregatedManualChange,
+                                calculatedMmdValue:aggregatedCalculatedValue
                             }
                         );
                     }
