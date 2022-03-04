@@ -1428,7 +1428,7 @@ class VersionSettingsComponent extends Component {
                     </CardFooter>
                 </Card>
                 <Modal isOpen={this.state.showValidation}
-                    className={ 'modal-fixed-footer', 'modal-lg ' + this.props.className} id='divcontents'>
+                    className={ 'modal-lg ' + this.props.className} id='divcontents'>
                     {/* <ModalHeader toggle={() => this.toggleShowValidation()} className="modalHeaderSupplyPlan">
                         <h3 style={{textAlign:'left'}}><strong>{i18n.t('static.commitTree.forecastValidation')}</strong><i className="fa fa-print pull-right iconClass cursor" onClick={() => this.print()}></i></h3>
                     </ModalHeader> */}
