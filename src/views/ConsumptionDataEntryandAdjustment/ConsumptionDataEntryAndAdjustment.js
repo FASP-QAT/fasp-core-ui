@@ -24,6 +24,8 @@ import { Prompt } from "react-router-dom";
 import pdfIcon from '../../assets/img/pdf.png';
 import jsPDF from 'jspdf';
 import { LOGO } from "../../CommonComponent/Logo";
+import { green } from "@material-ui/core/colors";
+import { red } from "@material-ui/core/colors";
 
 const entityname = i18n.t('static.dashboard.dataEntryAndAdjustment');
 
@@ -52,6 +54,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       showDetailTable: false,
       allPlanningUnitList: [],
       message: "",
+      messageColor: "green",
       consumptionChanged: false
     }
     this.loaded = this.loaded.bind(this);
@@ -72,9 +75,6 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     if (this.state.consumptionChanged) {
       var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
       if (cf == true) {
-        this.setState({
-             consumptionChanged: false
-        })
         cont = true;
       } else {
 
@@ -83,9 +83,13 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       cont = true;
     }
     if (cont == true) {
-      let id = AuthenticationService.displayDashboardBasedOnRole();
-      this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.message.cancelled', { entityname }))
-    }
+      this.setState({
+        consumptionChanged: false
+   },()=>{
+    let id = AuthenticationService.displayDashboardBasedOnRole();
+    this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.message.cancelled', { entityname }))
+   })
+     }
   }
 
   buildDataJexcel(consumptionUnitId) {
@@ -523,6 +527,10 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         elInstance.setStyle(col, "background-color", "transparent");
         elInstance.setStyle(col, "background-color", "yellow");
         elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
+      }else {
+        var col = (colArr[x]).concat(parseInt(y) + 1);
+        elInstance.setStyle(col, "background-color", "transparent");
+        elInstance.setComments(col, "");
       }
     }
     if (possibleReportRateY.includes(y.toString())) {
@@ -535,6 +543,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
       }
       else {
+        var col = (colArr[x]).concat(parseInt(y) + 1);
         elInstance.setStyle(col, "background-color", "transparent");
         elInstance.setComments(col, "");
       }
@@ -548,6 +557,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         elInstance.setStyle(col, "background-color", "yellow");
         elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
       } else {
+        var col = (colArr[x]).concat(parseInt(y) + 1);
         elInstance.setStyle(col, "background-color", "transparent");
         elInstance.setComments(col, "");
       }
@@ -555,8 +565,6 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
   }
 
   checkValidationConsumption() {
-    console.log("validation---------->Calculation sarta")
-    
     var valid = true;
     var elInstance = this.state.dataEl;
     var json = elInstance.getJson(null, false);
@@ -576,21 +584,10 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       actualConsumptionStart += 8;
       reportRateStart += 8;
       stockDayStart += 8;
-      console.log("validation---------->Inside For Loop");
-    }
-console.log("validation---------->possibleActualConsumptionY",possibleActualConsumptionY);
-
-console.log("validation---------->possibleReportRateY",possibleReportRateY);
-
-console.log("validation---------->possibleStockDayY",possibleStockDayY);
-
+     }
     for (var y = 0; y < json.length; y++) {
-      console.log("validation---------->y-",y)
-
       for (var x = 1; x < 37; x++) {
-
         var rowData = elInstance.getRowData(y);
-        console.log("validation---------->rowData--->",rowData);
         if (possibleActualConsumptionY.includes(y.toString())) {
           if (rowData[x] == "") {
           } else if (rowData[x] < 0) {
@@ -599,6 +596,10 @@ console.log("validation---------->possibleStockDayY",possibleStockDayY);
             elInstance.setStyle(col, "background-color", "yellow");
             elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
             valid = false;
+          }else{
+            var col = (colArr[x]).concat(parseInt(y) + 1);
+            elInstance.setStyle(col, "background-color", "transparent");
+            elInstance.setComments(col, "");
           }
         }
         if (possibleReportRateY.includes(y.toString())) {
@@ -612,6 +613,7 @@ console.log("validation---------->possibleStockDayY",possibleStockDayY);
             valid = false;
           }
           else {
+            var col = (colArr[x]).concat(parseInt(y) + 1);
             elInstance.setStyle(col, "background-color", "transparent");
             elInstance.setComments(col, "");
           }
@@ -626,13 +628,13 @@ console.log("validation---------->possibleStockDayY",possibleStockDayY);
             elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
             valid = false;
           } else {
+            var col = (colArr[x]).concat(parseInt(y) + 1);
             elInstance.setStyle(col, "background-color", "transparent");
             elInstance.setComments(col, "");
           }
         }
       }
     }
-    console.log("validation---------->Calculation",valid)
     return valid;
   }
 
@@ -961,6 +963,7 @@ console.log("validation---------->possibleStockDayY",possibleStockDayY);
               showDetailTable: true,
               loading: false,
               message: i18n.t('static.compareAndSelect.dataSaved'),
+              messageColor:"green",
               consumptionChanged: false
             }, () => {
               this.getDatasetData();
@@ -973,7 +976,8 @@ console.log("validation---------->possibleStockDayY",possibleStockDayY);
       console.log("INELSE")
       this.setState({
         loading: false,
-        message: i18n.t('static.supplyPlan.validationFailed')
+        message: i18n.t('static.supplyPlan.validationFailed'),
+        messageColor:"red"
        })
     }
   }
@@ -1051,6 +1055,7 @@ console.log("validation---------->possibleStockDayY",possibleStockDayY);
   }
 
   componentDidMount() {
+   this.hideSecondComponent();
     this.getDatasetList();
   }
 
@@ -1860,7 +1865,7 @@ console.log("validation---------->possibleStockDayY",possibleStockDayY);
           message={i18n.t("static.dataentry.confirmmsg")}
         />
         <AuthenticationServiceComponent history={this.props.history} />
-        <h5 className={"green"} id="div1">{this.state.message}</h5>
+        <h5 className={this.state.messageColor} id="div1">{this.state.message}</h5>
         <h5 className={this.props.match.params.color} id="div2">{i18n.t(this.props.match.params.message, { entityname })}</h5>
         <Card>
           <div className="card-header-actions">

@@ -431,7 +431,9 @@ export default class ExtrapolateDataComponent extends React.Component {
             dataArray.push(data)
         }
         this.el = jexcel(document.getElementById("tableDiv"), '');
+        try{
         this.el.destroy();
+        }catch(error){}
         var options = {
             data: dataArray,
             columnDrag: true,
