@@ -486,18 +486,19 @@ class ModelingValidation extends Component {
             }
             let columns = [];
             columns.push({ title: i18n.t('static.inventoryDate.inventoryReport'), type: 'calendar', options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker' }, width: 100, readOnly: true });
-            var nodeVal = this.state.nodeVal;
+            var nodeVal = [...new Set(this.state.nodeVal.map(ele => (ele.label)))];
             for (var k = 0; k < nodeVal.length; k++) {
-                columns.push({ title: nodeVal[k].label, width: 100, readOnly: true, type: displayBy == 1 ? 'numeric' : 'hidden', mask: displayBy == 1 ? '#,##.00' : '#,##.00 %', decimal: '.' });
+                columns.push({ title: nodeVal[k], width: 100, readOnly: true, type: displayBy == 1 ? 'numeric' : 'hidden', mask: displayBy == 1 ? '#,##.00' : '#,##.00 %', decimal: '.' });
             }
             columns.push({ title: i18n.t('static.supplyPlan.total'), width: 100, readOnly: true, type: displayBy == 1 ? 'numeric' : 'hidden', mask: displayBy == 1 ? '#,##.00' : '#,## %' });
             for (var k = 0; k < nodeVal.length; k++) {
-                columns.push({ title: nodeVal[k].label, width: 100, readOnly: true, type: displayBy == 2 ? 'numeric' : 'hidden', mask: displayBy == 1 ? '#,##.00' : '#,##.00 %', decimal: '.' });
+                columns.push({ title: nodeVal[k], width: 100, readOnly: true, type: displayBy == 2 ? 'numeric' : 'hidden', mask: displayBy == 1 ? '#,##.00' : '#,##.00 %', decimal: '.' });
             }
             columns.push({ title: i18n.t('static.supplyPlan.total'), width: 100, readOnly: true, type: displayBy == 2 ? 'numeric' : 'hidden', mask: displayBy == 1 ? '#,##.00' : '#,## %' });
             var data = [];
             var dataArr = [];
-            var nodeVal = this.state.nodeVal;
+            var nodeVal = [...new Set(this.state.nodeVal.map(ele => (ele.label)))];
+            console.log("flatList###", flatList)
             for (var j = 0; j < monthList.length; j++) {
                 data = [];
                 data[0] = moment(monthList[j]).format("YYYY-MM-DD");
@@ -505,44 +506,40 @@ class ModelingValidation extends Component {
                 var total = 0;
                 var totalPer = 0;
                 for (var k = 0; k < nodeVal.length; k++) {
-                    var flatListFiltered = flatList.filter(c => c.id == nodeVal[k].value)[0].payload.nodeDataMap[this.state.scenarioId][0].nodeDataMomList;
-                    var checkIfPuNode = flatList.filter(c => c.id == nodeVal[k].value)[0].payload.nodeType.id;
-                    var calculatedValue = "";
-                    if (flatListFiltered != undefined && flatListFiltered.length > 0) {
-                        var cvList = flatListFiltered.filter(c => moment(c.month).format("YYYY-MM-DD") == moment(monthList[j]).format("YYYY-MM-DD"));
+                    var flatListFiltered = flatList.filter(c => getLabelText(c.payload.label, this.state.lang) == nodeVal[k]);
+                    var calculatedValueTotal = 0;
+                    for (var fl = 0; fl < flatListFiltered.length; fl++) {
+                        var nodeMomList = flatListFiltered[fl].payload.nodeDataMap[this.state.scenarioId][0].nodeDataMomList;
+                        var checkIfPuNode = flatList.filter(c => c.id == flatListFiltered[fl].id)[0].payload.nodeType.id;
+                        var cvList = nodeMomList.filter(c => moment(c.month).format("YYYY-MM-DD") == moment(monthList[j]).format("YYYY-MM-DD"));
                         if (cvList.length > 0) {
-                            calculatedValue = checkIfPuNode == 5 ? cvList[0].calculatedMmdValue : cvList[0].calculatedValue
+                            calculatedValueTotal += checkIfPuNode == 5 ? cvList[0].calculatedMmdValue : cvList[0].calculatedValue;
                         } else {
-                            calculatedValue = "";
                         }
-                    } else {
-                        calculatedValue = "";
                     }
-                    data[k + 1] = calculatedValue != "" ? Number(calculatedValue).toFixed(2) : "";
-                    total += Number(calculatedValue);
+                    data[k + 1] = calculatedValueTotal != "" ? Number(calculatedValueTotal).toFixed(2) : "";
+                    total += Number(calculatedValueTotal);
                 }
                 data[nodeVal.length + 1] = Number(total).toFixed(2);
 
                 for (var k = 0; k < nodeVal.length; k++) {
-                    var flatListFiltered = flatList.filter(c => c.id == nodeVal[k].value)[0].payload.nodeDataMap[this.state.scenarioId][0].nodeDataMomList;
-                    var checkIfPuNode = flatList.filter(c => c.id == nodeVal[k].value)[0].payload.nodeType.id;
-                    var calculatedValue = "";
-                    if (flatListFiltered != undefined && flatListFiltered.length > 0) {
-                        var cvList = flatListFiltered.filter(c => moment(c.month).format("YYYY-MM-DD") == moment(monthList[j]).format("YYYY-MM-DD"));
+                    var flatListFiltered = flatList.filter(c => getLabelText(c.payload.label, this.state.lang) == nodeVal[k]);
+                    var calculatedValueTotal = 0;
+                    for (var fl = 0; fl < flatListFiltered.length; fl++) {
+                        var nodeMomList = flatListFiltered[fl].payload.nodeDataMap[this.state.scenarioId][0].nodeDataMomList;
+                        var checkIfPuNode = flatList.filter(c => c.id == flatListFiltered[fl].id)[0].payload.nodeType.id;
+                        var cvList = nodeMomList.filter(c => moment(c.month).format("YYYY-MM-DD") == moment(monthList[j]).format("YYYY-MM-DD"));
                         if (cvList.length > 0) {
-                            calculatedValue = checkIfPuNode == 5 ? cvList[0].calculatedMmdValue : cvList[0].calculatedValue
+                            calculatedValueTotal += checkIfPuNode == 5 ? cvList[0].calculatedMmdValue : cvList[0].calculatedValue;
                         } else {
-                            calculatedValue = "";
                         }
-                    } else {
-                        calculatedValue = "";
                     }
                     var val = ""
-                    if (calculatedValue != "") {
-                        val = (Number(calculatedValue) / Number(total)) * 100;
+                    if (calculatedValueTotal != "") {
+                        val = (Number(calculatedValueTotal) / Number(total)) * 100;
                     }
                     data[nodeVal.length + 1 + k + 1] = val != "" ? Number(val).toFixed(2) : 0;
-                    totalPer += calculatedValue != "" ? val : 0;
+                    totalPer += calculatedValueTotal != "" ? val : 0;
                 }
                 data[nodeVal.length + 1 + nodeVal.length + 1] = totalPer != 0 ? Number(totalPer).toFixed(2) : 0;
                 dataArr.push(data);
@@ -623,16 +620,18 @@ class ModelingValidation extends Component {
             var nodeIdArr = [];
             var nodeLabelArr = [];
             for (var fdfl = 0; fdfl < flatDataForLevel.length; fdfl++) {
-                nodeList.push({
-                    value: flatDataForLevel[fdfl].id,
-                    label: getLabelText(flatDataForLevel[fdfl].payload.label, this.state.lang)
-                })
-                nodeVal.push({
-                    value: flatDataForLevel[fdfl].id,
-                    label: getLabelText(flatDataForLevel[fdfl].payload.label, this.state.lang)
-                })
-                nodeIdArr.push(flatDataForLevel[fdfl].id)
-                nodeLabelArr.push(getLabelText(flatDataForLevel[fdfl].payload.label, this.state.lang))
+                if (nodeList.findIndex(c => c.label == getLabelText(flatDataForLevel[fdfl].payload.label, this.state.lang)) == -1) {
+                    nodeList.push({
+                        value: flatDataForLevel[fdfl].id,
+                        label: getLabelText(flatDataForLevel[fdfl].payload.label, this.state.lang)
+                    })
+                    nodeVal.push({
+                        value: flatDataForLevel[fdfl].id,
+                        label: getLabelText(flatDataForLevel[fdfl].payload.label, this.state.lang)
+                    })
+                    nodeIdArr.push(flatDataForLevel[fdfl].id)
+                    nodeLabelArr.push(getLabelText(flatDataForLevel[fdfl].payload.label, this.state.lang))
+                }
             }
             this.setState({
                 levelId: levelId,
@@ -1291,13 +1290,14 @@ class ModelingValidation extends Component {
             var elInstance = this.state.dataEl;
             if (elInstance != undefined && this.state.dataEl != "") {
                 var colourCount = 0;
-                this.state.nodeVal.map((item, count) => {
+                var nodeValSet = [...new Set(this.state.nodeVal.map(ele => (ele.label)))];
+                nodeValSet.map((item, count) => {
                     if (colourCount > 10) {
                         colourCount = 0;
                     }
                     datasetListForGraph.push({
-                        label: item.label,
-                        data: this.state.displayBy == 1 ? elInstance.getColumnData([count + 1]) : elInstance.getColumnData([count + this.state.nodeVal.length + 1 + 1]),
+                        label: item,
+                        data: this.state.displayBy == 1 ? elInstance.getColumnData([count + 1]) : elInstance.getColumnData([count + nodeValSet.length + 1 + 1]),
                         backgroundColor: colourArray[colourCount],
                         stack: 1,
                     })
@@ -1305,30 +1305,30 @@ class ModelingValidation extends Component {
                 })
             }
         }
-        var aggregatedData = [];
-        for (var i = 0; i < datasetListForGraph.length; i++) {
-            var index = aggregatedData.findIndex(c => c.label == datasetListForGraph[i].label);
-            if (index == -1) {
-                var filter = datasetListForGraph.filter(c => c.label == datasetListForGraph[i].label);
-                var dataArr = filter[0].data;
-                for (var f = 1; f < filter.length; f++) {
-                    filter[f].data.map(function (num, idx) {
-                        dataArr[idx] = (Number(num) + Number(dataArr[idx])).toFixed(2);
-                    })
-                }
-                aggregatedData.push({
-                    label: filter[0].label,
-                    data: dataArr,
-                    backgroundColor: filter[0].backgroundColor,
-                    stack: filter[0].stack
-                })
-            }
-        }
+        // var aggregatedData = [];
+        // for (var i = 0; i < datasetListForGraph.length; i++) {
+        //     var index = aggregatedData.findIndex(c => c.label == datasetListForGraph[i].label);
+        //     if (index == -1) {
+        //         var filter = datasetListForGraph.filter(c => c.label == datasetListForGraph[i].label);
+        //         var dataArr = filter[0].data;
+        //         for (var f = 1; f < filter.length; f++) {
+        //             filter[f].data.map(function (num, idx) {
+        //                 dataArr[idx] = (Number(num) + Number(dataArr[idx])).toFixed(2);
+        //             })
+        //         }
+        //         aggregatedData.push({
+        //             label: filter[0].label,
+        //             data: dataArr,
+        //             backgroundColor: filter[0].backgroundColor,
+        //             stack: filter[0].stack
+        //         })
+        //     }
+        // }
         if (this.state.monthList.length > 0 && this.state.dataEl != undefined && this.state.dataEl != "") {
             bar = {
 
                 labels: [...new Set(this.state.monthList.map(ele => moment(ele).format("MMM-YYYY")))],
-                datasets: aggregatedData
+                datasets: datasetListForGraph
 
             };
         }
