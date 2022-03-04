@@ -1106,7 +1106,6 @@ export default class ExtrapolateDataComponent extends React.Component {
                 var consumptionExtrapolationFiltered = consumptionExtrapolationList.filter(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId);
                 var consumptionExtrapolationData = consumptionExtrapolationList.filter(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId && c.extrapolationMethod.id == 6)//Semi Averages
                 var consumptionExtrapolationMovingData = consumptionExtrapolationList.filter(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId && c.extrapolationMethod.id == 7)//Moving averages
-                console.log("consumptionExtrapolationMovingData+++", consumptionExtrapolationMovingData)
                 var consumptionExtrapolationRegression = consumptionExtrapolationList.filter(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId && c.extrapolationMethod.id == 5)//Linear Regression
                 var consumptionExtrapolationTESL = consumptionExtrapolationList.filter(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId && c.extrapolationMethod.id == 1)//TES L            
                 var movingAvgId = consumptionExtrapolationFiltered.length > 0 ? false : true;
@@ -1132,7 +1131,6 @@ export default class ExtrapolateDataComponent extends React.Component {
                 var alpha = this.state.alpha;
                 var beta = this.state.beta;
                 var gamma = this.state.gamma;
-                console.log("consumptionExtrapolationTESL+++", consumptionExtrapolationTESL)
                 if (consumptionExtrapolationTESL.length > 0) {
                     confidenceLevel = consumptionExtrapolationTESL[0].jsonProperties.confidenceLevel;
                     seasonality = consumptionExtrapolationTESL[0].jsonProperties.seasonality;
@@ -1203,28 +1201,28 @@ export default class ExtrapolateDataComponent extends React.Component {
         csvRow.push('"' + (i18n.t('static.extrapolation.dateRangeForHistoricData') + ' : ' + this.makeText(this.state.rangeValue1.from) + ' ~ ' + this.makeText(this.state.rangeValue1.to)).replaceAll(' ', '%20') + '"')
         csvRow.push('')
         csvRow.push('')
-        csvRow.push('"' + (i18n.t('static.extrapolation.selectedExtraploationMethods')).replaceAll(' ', '%20') + '"')
-        csvRow.push('')
-        if (this.state.movingAvgId) {
-            csvRow.push('"' + (i18n.t('static.extrapolation.movingAverages')).replaceAll(' ', '%20') + '"')
-            csvRow.push('')
-        }
-        if (this.state.semiAvgId) {
-            csvRow.push('"' + (i18n.t('static.extrapolation.semiAverages')).replaceAll(' ', '%20') + '"')
-            csvRow.push('')
-        }
-        if (this.state.linearRegressionId) {
-            csvRow.push('"' + (i18n.t('static.extrapolation.linearRegression').replaceAll(' ', '%20')) + '"')
-            csvRow.push('')
-        }
-        if (this.state.smoothingId) {
-            csvRow.push('"' + (i18n.t('static.extrapolation.tes')).replaceAll(' ', '%20') + '"')
-            csvRow.push('')
-        }
-        if (this.state.arimaId) {
-            csvRow.push('"' + (i18n.t('static.extrapolation.arima')).replaceAll(' ', '%20') + '"')
-            csvRow.push('')
-        }
+        // csvRow.push('"' + (i18n.t('static.extrapolation.selectedExtraploationMethods')).replaceAll(' ', '%20') + '"')
+        // csvRow.push('')
+        // if (this.state.movingAvgId) {
+        //     csvRow.push('"' + (i18n.t('static.extrapolation.movingAverages')).replaceAll(' ', '%20') + '"')
+        //     csvRow.push('')
+        // }
+        // if (this.state.semiAvgId) {
+        //     csvRow.push('"' + (i18n.t('static.extrapolation.semiAverages')).replaceAll(' ', '%20') + '"')
+        //     csvRow.push('')
+        // }
+        // if (this.state.linearRegressionId) {
+        //     csvRow.push('"' + (i18n.t('static.extrapolation.linearRegression').replaceAll(' ', '%20')) + '"')
+        //     csvRow.push('')
+        // }
+        // if (this.state.smoothingId) {
+        //     csvRow.push('"' + (i18n.t('static.extrapolation.tes')).replaceAll(' ', '%20') + '"')
+        //     csvRow.push('')
+        // }
+        // if (this.state.arimaId) {
+        //     csvRow.push('"' + (i18n.t('static.extrapolation.arima')).replaceAll(' ', '%20') + '"')
+        //     csvRow.push('')
+        // }
         csvRow.push('')
 
         var columns = [];

@@ -576,11 +576,21 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       actualConsumptionStart += 8;
       reportRateStart += 8;
       stockDayStart += 8;
+      console.log("validation---------->Inside For Loop");
     }
+console.log("validation---------->possibleActualConsumptionY",possibleActualConsumptionY);
+
+console.log("validation---------->possibleReportRateY",possibleReportRateY);
+
+console.log("validation---------->possibleStockDayY",possibleStockDayY);
 
     for (var y = 0; y < json.length; y++) {
+      console.log("validation---------->y-",y)
+
       for (var x = 1; x < 37; x++) {
+
         var rowData = elInstance.getRowData(y);
+        console.log("validation---------->rowData--->",rowData);
         if (possibleActualConsumptionY.includes(y.toString())) {
           if (rowData[x] == "") {
           } else if (rowData[x] < 0) {
@@ -796,10 +806,11 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       loading: true
     })
     console.log("validation---------->before")
-    //var validation = this.checkValidationConsumption();
+    var validation = this.checkValidationConsumption();
     //console.log("validation---------->",validation)
-    var validation =true; 
+    //var validation =true; 
     if (validation == true) {
+      console.log("INIF")
       var db1;
       var storeOS;
       getDatabase();
@@ -959,6 +970,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         }.bind(this)
       }.bind(this)
     } else {
+      console.log("INELSE")
       this.setState({
         loading: false,
         message: i18n.t('static.supplyPlan.validationFailed')
@@ -1960,7 +1972,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                                     var totalRegionPU = 0;
                                     return (<tr style={{ display: this.state.consumptionUnitShowArr.includes(item.planningUnit.id) ? "" : "none" }}>
                                       <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
-                                      <td className="sticky-col first-col clone" align="center">{"   " + getLabelText(r.label, this.state.lang)}</td>
+                                      <td className="sticky-col first-col clone text-left" style={{textIndent:'30px'}}>{"   " + getLabelText(r.label, this.state.lang)}</td>
                                       {this.state.monthArray.map((item1, count) => {
                                         var data = this.state.planningUnitTotalListRegion.filter(c => c.planningUnitId == item.planningUnit.id && moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM") && c.region.regionId == r.regionId)
                                         totalRegion += Number(data[0].qty);
