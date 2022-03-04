@@ -72,6 +72,9 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     if (this.state.consumptionChanged) {
       var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
       if (cf == true) {
+        this.setState({
+             consumptionChanged: false
+        })
         cont = true;
       } else {
 
@@ -84,6 +87,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.message.cancelled', { entityname }))
     }
   }
+
   buildDataJexcel(consumptionUnitId) {
 
     var cont = false;
@@ -187,7 +191,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           data[0] = i18n.t('static.dataentry.reportingRate')
           for (var j = 0; j < monthArray.length; j++) {
             var consumptionData = consumptionList.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArray[j].date).format("YYYY-MM") && c.region.id == regionList[r].regionId);
-            data[j + 1] = consumptionData.length > 0 && consumptionData[0].reportingRate > 0 ? consumptionData[0].reportingRate + "%" : 100 + "%";
+            data[j + 1] = consumptionData.length > 0 && consumptionData[0].reportingRate > 0 ? consumptionData[0].reportingRate : 100;
           }
           data[monthArray.length + 1] = multiplier;
           dataArray.push(data);
@@ -204,7 +208,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           data = [];
           data[0] = i18n.t('static.dataentry.stockedOutPer')
           for (var j = 0; j < monthArray.length; j++) {
-            data[j + 1] = `=ROUND(${colArr[j + 1]}${parseInt(dataArray.length)}/${colArr[j + 1] + "1"}*100,0)` + "%";
+            data[j + 1] = `=ROUND(${colArr[j + 1]}${parseInt(dataArray.length)}/${colArr[j + 1] + "1"}*100,0)`;
           }
           data[monthArray.length + 1] = multiplier;
           dataArray.push(data);
@@ -551,6 +555,8 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
   }
 
   checkValidationConsumption() {
+    console.log("validation---------->Calculation sarta")
+    
     var valid = true;
     var elInstance = this.state.dataEl;
     var json = elInstance.getJson(null, false);
@@ -616,6 +622,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         }
       }
     }
+    console.log("validation---------->Calculation",valid)
     return valid;
   }
 
@@ -778,7 +785,8 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     document.getElementById("consumptionNotes").value = notes;
 
     this.setState({
-      consumptionList: fullConsumptionList
+      consumptionList: fullConsumptionList,
+      consumptionChanged: true
     })
     this.buildDataJexcel(this.state.selectedConsumptionUnitId);
   }
@@ -787,9 +795,11 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     this.setState({
       loading: true
     })
-   // var validation = this.checkValidationConsumption();
-   var validation =true; 
-   if (validation == true) {
+    console.log("validation---------->before")
+    var validation = this.checkValidationConsumption();
+    //console.log("validation---------->",validation)
+    var validation =true; 
+    if (validation == true) {
       var db1;
       var storeOS;
       getDatabase();
@@ -949,11 +959,10 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         }.bind(this)
       }.bind(this)
     } else {
-
-     // this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
-      //this.props.updateState("color", "red");
-      // this.props.updateState("loading", false);
-      // this.props.hideSecondComponent();
+      this.setState({
+        loading: false,
+        message: i18n.t('static.supplyPlan.validationFailed')
+       })
     }
   }
 
@@ -1959,7 +1968,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                                         return (<td onClick={() => { this.buildDataJexcel(item.planningUnit.id) }}><NumberFormat displayType={'text'} thousandSeparator={true} value={this.state.showInPlanningUnit ? data[0].qtyInPU : data[0].qty} /></td>)
                                       })}
                                       <td><NumberFormat displayType={'text'} thousandSeparator={true} value={this.state.showInPlanningUnit ? Math.round(totalRegionPU) : Math.round(totalRegion)} /></td>
-                                      <td>{this.state.showInPlanningUnit ? Math.round((totalRegionPU / totalPU) * 100) : Math.round((totalRegion / total) * 100)}{"%"}</td>
+                                      <td>{this.state.showInPlanningUnit ? Math.round((totalRegionPU / totalPU) * 100) : Math.round((totalRegion / total) * 100)}</td>
                                     </tr>)
                                   })}
                                 </>)
