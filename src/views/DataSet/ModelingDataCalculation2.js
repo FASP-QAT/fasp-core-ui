@@ -171,6 +171,7 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                     var nodeDataModelingListWithTransfer = nodeDataModelingListUnFiltered.concat(transferNodeList);
                     var curDate = startDate;
                     var nodeDataList = [];
+                    var calculatedMMdPatients = [];
                     for (var i = 0; curDate < stopDate; i++) {
                         // console.log("curDate---", curDate);
                         curDate = moment(startDate).add(i, 'months').format("YYYY-MM-DD");
@@ -383,110 +384,126 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                         }
                         var calculatedMmdValue = calculatedValue;
                         console.log("flatList[fl]$$$###", flatList[fl])
-                        var childNode = (flatListUnsorted.filter(c => c.parent == flatList[fl].id))[0];
-                        console.log("ChildNode$$$###", childNode);
-                        var grandChildNode = childNode != undefined ? (flatListUnsorted.filter(c => c.parent == childNode.id))[0] : "";
+                        // var childNode = (flatListUnsorted.filter(c => c.parent == flatList[fl].id))[0];
+                        // console.log("ChildNode$$$###", childNode);
+                        // var grandChildNode = childNode != undefined ? (flatListUnsorted.filter(c => c.parent == childNode.id))[0] : "";
                         // console.log("ChildNode$$$%%%", childNode);
                         // console.log("grandChildNode$$$%%%", grandChildNode);
-                        if (childNode != undefined && grandChildNode != undefined && childNode.payload.nodeType.id == 4 && grandChildNode.payload.nodeType.id == 5) {
-                            console.log("In ifCondition$$$###")
-                            // console.log("in if$$$%%%");
+                        // if (childNode != undefined && grandChildNode != undefined && childNode.payload.nodeType.id == 4 && grandChildNode.payload.nodeType.id == 5) {
+                        console.log("In ifCondition$$$###")
+                        // console.log("in if$$$%%%");
 
-                            // var daysPerMonth = 365 / 12;
-                            // var parent = (flatList[fl].parent);
-                            // var parentFiltered = (flatListUnsorted.filter(c => c.id == parent))[0];
-                            // var grandParent = parentFiltered.parent;
-                            // var grandParentFiltered = (flatListUnsorted.filter(c => c.id == grandParent))[0];
-                            var patients = 0;
-                            // var grandParentNodeData = (grandParentFiltered.payload.nodeDataMap[scenarioList[ndm].id]);
-                            // console.log("grandParentNodeData$$$%%%", grandParentNodeData)
-                            // if (grandParentNodeData != undefined) {
-                            patients = nodeDataMapForScenario.calculatedDataValue != null ? nodeDataMapForScenario.calculatedDataValue : nodeDataMapForScenario.dataValue;
-                            // } else {
-                            // patients = 0;
-                            // }
-                            // patients = 5432;
-                            // console.log("nodeDataMapForScenario$$$%%%", nodeDataMapForScenario)
-                            var pu = (datasetJson.planningUnitList.filter(c => c.planningUnit.id == (grandChildNode.payload.nodeDataMap[scenarioList[ndm].id])[0].puNode.planningUnit.id))[0];
-                            var fuPerPu = pu.planningUnit.multiplier;
-                            var monthsPerVisit = (grandChildNode.payload.nodeDataMap[scenarioList[ndm].id])[0].puNode.refillMonths
-                            var noOfBottlesInOneVisit = 6;
-                            var puPerBaseMonth = Math.floor(patients / monthsPerVisit);
-                            var puPerMonthBalance = patients - puPerBaseMonth * monthsPerVisit + puPerBaseMonth;
-                            // console.log("daysPerMonth$$$%%%", daysPerMonth);
-                            // console.log("patients$$$%%%", patients);
-                            // console.log("fuPerPu$$$%%%", fuPerPu);
-                            // console.log("monthsPerVisit$$$%%%", monthsPerVisit);
-                            // console.log("noOfBottlesInOneVisit$$$%%%", noOfBottlesInOneVisit);
-                            // console.log("puPerBaseMonth$$$%%%", puPerBaseMonth);
-                            // console.log("puPerMonthBalance$$$%%%", puPerMonthBalance);
-                            var monthNo = i;
-                            // console.log("monthNo$$$%%%", monthNo);
-                            var cycle = Math.floor(monthNo / monthsPerVisit);
-                            // console.log("cycle$$$%%%", cycle);
-                            var deltaPatients = 0;
-                            if (i == 0) {
-                                deltaPatients = calculatedValue - patients;
-                            } else {
-                                deltaPatients = calculatedValue - nodeDataList.filter(c => moment(c.month).format("YYYY-MM-DD") == moment(curDate).add(-1, 'months').format("YYYY-MM-DD"))[0].calculatedValue;
-                            }
-                            // console.log("deltaPatients$$$%%%", deltaPatients);
-                            var noOfPatientsNew = 0;
-                            var noOfPus = 0;
-                            if (cycle == 0) {
-                                var mod = monthNo % monthsPerVisit;
-                                // console.log("mod$$$%%%", mod);
-                                if (mod == 0) {
-                                    noOfPatientsNew = puPerMonthBalance + deltaPatients;
-                                } else {
-                                    noOfPatientsNew = puPerBaseMonth + deltaPatients;
-                                }
-                                // console.log("noOfPatientsNew$$$%%%", noOfPatientsNew);
-                                noOfPus = noOfPatientsNew;
-                            } else {
-                                var prevCycleValue = nodeDataList.filter(c => moment(c.month).format("YYYY-MM-DD") == moment(curDate).add(-monthsPerVisit, 'months').format("YYYY-MM-DD"))[0].calculatedMmdValue;
-                                noOfPus = prevCycleValue + deltaPatients;
-                            }
-                            // console.log("noOfPus$$$%%%", noOfPus);
-                            calculatedMmdValue = noOfPus;
-                            console.log("CalculatedMmdValueForPaitent$$$$###", calculatedMmdValue)
-                        }
 
-                        if (payload.nodeType.id == 4 && nodeDataMapForScenario.fuNode.usageType.id == 2) {
-                            var parent = (flatList[fl].parent);
-                            var parentFiltered = (flatListUnsorted.filter(c => c.id == parent))[0];
-                            var childNode = (flatListUnsorted.filter(c => c.parent == flatList[fl].id))[0];
-                            var noOfBottlesInOneVisit = 6;
-                            var pu = (datasetJson.planningUnitList.filter(c => c.planningUnit.id == (childNode.payload.nodeDataMap[scenarioList[ndm].id])[0].puNode.planningUnit.id))[0];
-                            var fuPerPu = pu.planningUnit.multiplier;
-                            var lag = nodeDataMapForScenario.fuNode.lagInMonths;
-                            if (i >= lag) {
-                                calculatedMmdValue = Math.round(((parentFiltered.payload.nodeDataMap[scenarioList[ndm].id])[0].nodeDataMomList.filter(c => moment(c.month).format("YYYY-MM-DD") == moment(curDate).subtract(lag, 'months').format("YYYY-MM-DD"))[0].calculatedMmdValue * nodeDataMapForScenario.dataValue / 100) * noOfBottlesInOneVisit) * fuPerPu;
-                            } else {
-                                calculatedMmdValue = 0;
-                            }
-                            console.log("CalculatedMmdValueForFU$$$$###", calculatedMmdValue)
-                            // console.log("calculatedMmdValue$$$%%%", calculatedMmdValue);
-                        }
+                        // console.log("CalculatedMmdValueForPaitent$$$$###", calculatedMmdValue)
+                        // }
+
+                        // if (payload.nodeType.id == 4 && nodeDataMapForScenario.fuNode.usageType.id == 2) {
+                        //     var parent = (flatList[fl].parent);
+                        //     var parentFiltered = (flatListUnsorted.filter(c => c.id == parent))[0];
+                        //     var childNode = (flatListUnsorted.filter(c => c.parent == flatList[fl].id))[0];
+                        //     var noOfBottlesInOneVisit = 6;
+                        //     var pu = (datasetJson.planningUnitList.filter(c => c.planningUnit.id == (childNode.payload.nodeDataMap[scenarioList[ndm].id])[0].puNode.planningUnit.id))[0];
+                        //     var fuPerPu = pu.planningUnit.multiplier;
+                        //     var lag = nodeDataMapForScenario.fuNode.lagInMonths;
+                        //     if (i >= lag) {
+                        //         calculatedMmdValue = Math.round(((parentFiltered.payload.nodeDataMap[scenarioList[ndm].id])[0].nodeDataMomList.filter(c => moment(c.month).format("YYYY-MM-DD") == moment(curDate).subtract(lag, 'months').format("YYYY-MM-DD"))[0].calculatedMmdValue * nodeDataMapForScenario.dataValue / 100) * noOfBottlesInOneVisit) * fuPerPu;
+                        //     } else {
+                        //         calculatedMmdValue = 0;
+                        //     }
+                        //     console.log("CalculatedMmdValueForFU$$$$###", calculatedMmdValue)
+                        //     // console.log("calculatedMmdValue$$$%%%", calculatedMmdValue);
+                        // }
                         if (payload.nodeType.id == 5) {
                             var parent = (flatList[fl].parent);
                             var parentFiltered = (flatListUnsorted.filter(c => c.id == parent))[0];
-                            if ((parentFiltered.payload.nodeDataMap[scenarioList[ndm].id])[0].fuNode.usageType.id == 2) {
-                                calculatedMmdValue = Math.round(((parentFiltered.payload.nodeDataMap[scenarioList[ndm].id])[0].nodeDataMomList.filter(c => moment(c.month).format("YYYY-MM-DD") == moment(curDate).subtract(0, 'months').format("YYYY-MM-DD"))[0].calculatedMmdValue * nodeDataMapForScenario.dataValue / 100) / fuPerPu);
+                            var parentNodeNodeData = (parentFiltered.payload.nodeDataMap[scenarioList[ndm].id])[0];
+                            if (parentNodeNodeData.fuNode.usageType.id == 2) {
+                                var daysPerMonth = 365 / 12;
+
+                                var grandParent = parentFiltered.parent;
+                                var grandParentFiltered = (flatListUnsorted.filter(c => c.id == grandParent))[0];
+                                var patients = 0;
+                                var grandParentNodeData = (grandParentFiltered.payload.nodeDataMap[scenarioList[ndm].id])[0];
+                                console.log("grandParentNodeData$$$%%%", grandParentNodeData)
+                                if (grandParentNodeData != undefined) {
+                                    patients = grandParentNodeData.calculatedDataValue != null ? grandParentNodeData.calculatedDataValue : grandParentNodeData.dataValue;
+                                } else {
+                                    patients = 0;
+                                }
+                                // patients = 5432;
+                                // console.log("nodeDataMapForScenario$$$%%%", nodeDataMapForScenario)
+                                var pu = (datasetJson.planningUnitList).filter(c => c.planningUnit.id == (nodeDataMapForScenario.puNode.planningUnit.id))[0];
+                                var fuPerPu = pu.planningUnit.multiplier;
+                                var monthsPerVisit = nodeDataMapForScenario.puNode.refillMonths;
+                                var noOfBottlesInOneVisit = 6;
+                                var puPerBaseMonth = Math.floor(patients / monthsPerVisit);
+                                var puPerMonthBalance = patients - puPerBaseMonth * monthsPerVisit + puPerBaseMonth;
+                                console.log("daysPerMonth$$$%%%", daysPerMonth);
+                                console.log("patients$$$%%%", patients);
+                                console.log("fuPerPu$$$%%%", fuPerPu);
+                                console.log("monthsPerVisit$$$%%%", monthsPerVisit);
+                                console.log("noOfBottlesInOneVisit$$$%%%", noOfBottlesInOneVisit);
+                                console.log("puPerBaseMonth$$$%%%", puPerBaseMonth);
+                                console.log("puPerMonthBalance$$$%%%", puPerMonthBalance);
+                                var monthNo = i;
+                                console.log("monthNo$$$%%%", monthNo);
+                                var cycle = Math.floor(monthNo / monthsPerVisit);
+                                console.log("cycle$$$%%%", cycle);
+                                var deltaPatients = 0;
+                                if (i == 0) {
+                                    deltaPatients = grandParentNodeData.nodeDataMomList.filter(c => moment(c.month).format("YYYY-MM") == moment(curDate).format("YYYY-MM"))[0].calculatedValue - patients;
+                                } else {
+                                    deltaPatients = grandParentNodeData.nodeDataMomList.filter(c => moment(c.month).format("YYYY-MM") == moment(curDate).format("YYYY-MM"))[0].calculatedValue - grandParentNodeData.nodeDataMomList.filter(c => moment(c.month).format("YYYY-MM-DD") == moment(curDate).add(-1, 'months').format("YYYY-MM-DD"))[0].calculatedValue;
+                                }
+                                console.log("deltaPatients$$$%%%", deltaPatients);
+                                var noOfPatientsNew = 0;
+                                var noOfPatients = 0;
+                                if (cycle == 0) {
+                                    var mod = monthNo % monthsPerVisit;
+                                    console.log("mod$$$%%%", mod);
+                                    if (mod == 0) {
+                                        noOfPatientsNew = puPerMonthBalance + deltaPatients;
+                                    } else {
+                                        noOfPatientsNew = puPerBaseMonth + deltaPatients;
+                                    }
+                                    console.log("noOfPatientsNew$$$%%%", noOfPatientsNew);
+                                    noOfPatients = noOfPatientsNew;
+                                    calculatedMMdPatients.push({ month: curDate, value: noOfPatients });
+                                } else {
+                                    var prevCycleValue = calculatedMMdPatients.filter(c => moment(c.month).format("YYYY-MM") == moment(curDate).add(-monthsPerVisit, 'months').format("YYYY-MM"))[0].value;
+                                    noOfPatients = prevCycleValue + deltaPatients;
+                                    calculatedMMdPatients.push({ month: curDate, value: noOfPatients });
+                                }
+                                // console.log("noOfPus$$$%%%", noOfPus);
+                                // calculatedMmdValue = noOfPus;
+                                // var parent = (flatList[fl].parent);
+                                // var parentFiltered = (flatListUnsorted.filter(c => c.id == parent))[0];
+
+                                var lag = parentNodeNodeData.fuNode.lagInMonths;
+                                var noOfFus = 0;
+                                if (i >= lag) {
+                                    noOfFus = Math.round((calculatedMMdPatients.filter(c => moment(c.month).format("YYYY-MM-DD") == moment(curDate).subtract(lag, 'months').format("YYYY-MM-DD"))[0].value * parentNodeNodeData.dataValue / 100) * noOfBottlesInOneVisit) * fuPerPu;
+                                } else {
+                                    noOfFus = 0;
+                                }
+
+                                // if (parentNodeNodeData.fuNode.usageType.id == 2) {
+                                calculatedMmdValue = Math.round((noOfFus * nodeDataMapForScenario.dataValue / 100) / fuPerPu);
+                                // }
+                                // var grandParent = parentFiltered.parent;
+                                // var grandParentFiltered = (flatListUnsorted.filter(c => c.id == grandParent))[0];
+                                // // var childNode = (flatListUnsorted.filter(c => c.parent == flatList[fl].id))[0];
+                                // var noOfBottlesInOneVisit = 6;
+                                // var lag = (parentFiltered.payload.nodeDataMap[scenarioList[ndm].id])[0].fuNode.lagInMonths;
+                                // console.log("I++++", i);
+                                // if (i >= lag) {
+                                //     calculatedMmdValue = Math.round((grandParentFiltered.payload.nodeDataMap[scenarioList[ndm].id])[0].nodeDataMomList.filter(c => moment(c.month).format("YYYY-MM-DD") == moment(curDate).subtract(lag, 'months').format("YYYY-MM-DD"))[0].calculatedMmdValue * noOfBottlesInOneVisit);
+                                // } else {
+                                //     calculatedMmdValue = 0;
+                                // }
+                                console.log("CalculatedMmdValueForPU$$$$###", calculatedMmdValue)
+                                // console.log("calculatedMMDValuePU$$$%%%", calculatedMmdValue);
                             }
-                            // var grandParent = parentFiltered.parent;
-                            // var grandParentFiltered = (flatListUnsorted.filter(c => c.id == grandParent))[0];
-                            // // var childNode = (flatListUnsorted.filter(c => c.parent == flatList[fl].id))[0];
-                            // var noOfBottlesInOneVisit = 6;
-                            // var lag = (parentFiltered.payload.nodeDataMap[scenarioList[ndm].id])[0].fuNode.lagInMonths;
-                            // console.log("I++++", i);
-                            // if (i >= lag) {
-                            //     calculatedMmdValue = Math.round((grandParentFiltered.payload.nodeDataMap[scenarioList[ndm].id])[0].nodeDataMomList.filter(c => moment(c.month).format("YYYY-MM-DD") == moment(curDate).subtract(lag, 'months').format("YYYY-MM-DD"))[0].calculatedMmdValue * noOfBottlesInOneVisit);
-                            // } else {
-                            //     calculatedMmdValue = 0;
-                            // }
-                            console.log("CalculatedMmdValueForPU$$$$###", calculatedMmdValue)
-                            // console.log("calculatedMMDValuePU$$$%%%", calculatedMmdValue);
                         }
 
 
