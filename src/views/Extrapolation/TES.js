@@ -53,7 +53,7 @@ export function calculateTES(inputData, alphaParam, betaParam, gammaParam, confi
         { "df": 1000, "zValue": [1.037, 1.282, 1.646, 2.33, 2.581, 3.098] }
     ]
 
-    const data = JSON.parse(JSON.stringify(inputData))
+    const data = inputData
     const result = tes(data, noOfMonthsForASeason, alpha, beta, gamma, noOfProjectionMonths)
     const actualLength = data.length;
 

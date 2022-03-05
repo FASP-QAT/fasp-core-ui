@@ -1479,8 +1479,11 @@ class ForecastOutput extends Component {
                         });
 
                         console.log("CheckPU------------------>1", planningUnitList);
+                        // console.log("CheckPU------------------>1.1", planningUnitList[0].selectedForecastMap[(Object.keys(planningUnitList[0].selectedForecastMap))]);
 
                         planningUnitList = planningUnitList.filter(c => Object.keys(c.selectedForecastMap).length !== 0)
+                        // planningUnitList = planningUnitList.filter(c => (c.selectedForecastMap[(Object.keys(c.selectedForecastMap))].scenarioId != null && c.selectedForecastMap[(Object.keys(c.selectedForecastMap))].consumptionExtrapolationId != 0))
+                        planningUnitList = planningUnitList.filter(c => ((c.selectedForecastMap[(Object.keys(c.selectedForecastMap))].scenarioId != null) ? c : ((c.selectedForecastMap[(Object.keys(c.selectedForecastMap))].consumptionExtrapolationId != 0) ? c : '')));
 
                         console.log("CheckPU------------------>3", planningUnitList);
 

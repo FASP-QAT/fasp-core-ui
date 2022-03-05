@@ -3182,17 +3182,19 @@ export default class BuildTree extends Component {
                         row = row.concat(total).concat("% ")
                         row1 = row1.concat(" Subtotal")
                     }
-                    dataArray.push(new Paragraph({
-                        children: [new TextRun({ "text": row3 }), new TextRun({ "text": row, bold: true }), new TextRun({ "text": row4 }), new TextRun({ "text": row1 })],
-                        spacing: {
-                            after: 150,
-                        },
-                        shading: {
-                            type: ShadingType.CLEAR,
-                            fill: "cfcdc9"
-                        },
-                        style: row != "NA " ? total != 100 ? "aside" : "" : "",
-                    }))
+                    if (items[i].payload.nodeType.id != 1 && items[i].payload.nodeType.id != 2) {
+                        dataArray.push(new Paragraph({
+                            children: [new TextRun({ "text": row3 }), new TextRun({ "text": row, bold: true }), new TextRun({ "text": row4 }), new TextRun({ "text": row1 })],
+                            spacing: {
+                                after: 150,
+                            },
+                            shading: {
+                                type: ShadingType.CLEAR,
+                                fill: "cfcdc9"
+                            },
+                            style: row != "NA " ? total != 100 ? "aside" : "" : "",
+                        }))
+                    }
                 }
             }
         }
@@ -5285,7 +5287,13 @@ export default class BuildTree extends Component {
         }, () => {
 
             console.log("on add items-------", this.state.items);
-            this.calculateMOMData(newItem.id, 0);
+            if (!itemConfig.context.payload.extrapolation) {
+                this.calculateMOMData(newItem.id, 0);
+            } else {
+                this.setState({
+                    loading: false
+                })
+            }
             // this.calculateValuesForAggregateNode(this.state.items);
         });
     }
@@ -5542,7 +5550,13 @@ export default class BuildTree extends Component {
         }, () => {
             console.log("updated tree data+++", this.state);
             // this.calculateValuesForAggregateNode(this.state.items);
-            this.calculateMOMData(0, 0);
+            if (!currentItemConfig.context.payload.extrapolation) {
+                this.calculateMOMData(0, 0);
+            } else {
+                this.setState({
+                    loading: false
+                })
+            }
             // console.log("returmed list---", this.state.nodeDataMomList);
             // this.updateTreeData();
         });
@@ -7448,6 +7462,7 @@ export default class BuildTree extends Component {
 
     }
 
+
     updateTreeData(date) {
         var items = this.state.items;
         console.log("items>>>", items);
@@ -8467,7 +8482,7 @@ export default class BuildTree extends Component {
                                         <div style={{ display: !this.state.loading ? "block" : "none" }} class="sample">
                                             {/* <h5 style={{ color: '#BA0C2F' }}>Please save and do a recalculate after drag and drop.</h5> */}
                                             <Provider>
-                                                <div className="placeholder" style={{ clear: 'both', height: '100vh', border: '1px solid #a7c6ed' }} >
+                                                <div className="placeholder TreeTemplateHeight" style={{ clear: 'both', marginTop: '25px', border: '1px solid #a7c6ed' }} >
                                                     {/* <OrgDiagram centerOnCursor={true} config={config} onHighlightChanged={this.onHighlightChanged} /> */}
                                                     <OrgDiagram centerOnCursor={true} config={config} onCursorChanged={this.onCursoChanged} />
                                                 </div>

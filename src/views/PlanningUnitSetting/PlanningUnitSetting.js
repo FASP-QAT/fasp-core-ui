@@ -27,6 +27,7 @@ import TracerCategoryService from '../../api/TracerCategoryService';
 import ProcurementAgentService from "../../api/ProcurementAgentService";
 import PlanningUnitService from '../../api/PlanningUnitService';
 import "../../../node_modules/jsuites/dist/jsuites.css";
+import { Prompt } from 'react-router';
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
 import {
     Card,
@@ -97,6 +98,7 @@ export default class PlanningUnitSetting extends Component {
             responsePa: [],
             forecastProgramId: '',
             forecastProgramVersionId: '',
+            isChanged1: false
 
         }
         this.changed = this.changed.bind(this);
@@ -670,6 +672,10 @@ export default class PlanningUnitSetting extends Component {
             }
         }
 
+        this.setState({
+            isChanged1: true,
+        });
+
     }
 
     getPlanningUnitByTracerCategoryId(tracerCategoryId) {
@@ -1089,6 +1095,19 @@ export default class PlanningUnitSetting extends Component {
         this.getDatasetList();
     }
 
+    componentWillUnmount() {
+        clearTimeout(this.timeout);
+        window.onbeforeunload = null;
+    }
+
+    componentDidUpdate = () => {
+        if (this.state.isChanged1 == true) {
+            window.onbeforeunload = () => true
+        } else {
+            window.onbeforeunload = undefined
+        }
+    }
+
     getDatasetList() {
         var db1;
         getDatabase();
@@ -1451,8 +1470,8 @@ export default class PlanningUnitSetting extends Component {
             data[13] = indexVar;
             data[14] = outPutList[j].treeForecast;
             data[15] = outPutList[j].consumptionNotes;
-            // data[16] = outPutList[j].active;
-            // data[17] = outPutList[j].active;
+            data[16] = outPutList[j].active;
+            data[17] = outPutList[j].active;
 
 
             outPutListArray[count] = data;
@@ -1477,8 +1496,8 @@ export default class PlanningUnitSetting extends Component {
             data[13] = 0;
             data[14] = true;
             data[15] = "";
-            // data[16] = true;
-            // data[17] = true;
+            data[16] = true;
+            data[17] = true;
             outPutListArray[0] = data;
         }
         // console.log("outPutListArray---->", outPutListArray);
@@ -1490,7 +1509,7 @@ export default class PlanningUnitSetting extends Component {
         var options = {
             data: data,
             columnDrag: true,
-            colWidths: [100, 150, 60, 60, 60, 60, 60, 100, 60, 60, 60, 60, 60, 60, 60, 100],
+            colWidths: [100, 150, 60, 60, 60, 60, 60, 100, 60, 60, 60, 60, 60, 60, 60, 100, 60, 60],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
@@ -1603,16 +1622,16 @@ export default class PlanningUnitSetting extends Component {
                     type: 'text',
                     // width: 400 //15P
                 },
-                // {
-                //     title: 'Active',
-                //     type: 'checkbox',
-                //     // readOnly: true //16Q
-                // },
-                // {
-                //     title: 'active',
-                //     type: 'hidden',
-                //     // readOnly: true //17R
-                // },
+                {
+                    title: 'Active',
+                    type: 'checkbox',
+                    // readOnly: true //16Q
+                },
+                {
+                    title: 'active',
+                    type: 'hidden',
+                    // readOnly: true //17R
+                },
             ],
             updateTable: function (el, cell, x, y, source, value, id) {
                 var elInstance = el.jexcel;
@@ -1946,7 +1965,7 @@ export default class PlanningUnitSetting extends Component {
                         "selectedForecastMap": map1.get("12"),
                         "createdBy": null,
                         "createdDate": null,
-                        // "active": map1.get("16"),
+                        "active": map1.get("16"),
                     }
                     planningUnitList.push(tempJson);
                 } else {
@@ -1995,7 +2014,7 @@ export default class PlanningUnitSetting extends Component {
                         "selectedForecastMap": map1.get("12"),
                         "createdBy": planningUnitobj1.createdBy,
                         "createdDate": planningUnitobj1.createdDate,
-                        // "active": map1.get("16"),
+                        "active": map1.get("16"),
                     }
                     planningUnitList.push(tempJson);
 
@@ -2041,9 +2060,9 @@ export default class PlanningUnitSetting extends Component {
                     listOfDisablePuNode.push(parseInt(map1.get("1")));
                 }
 
-                // if (map1.get("16") == false && map1.get("17") == true) {
-                //     listOfDisablePuNode.push(parseInt(map1.get("1")));
-                // }
+                if (map1.get("16") == false && map1.get("17") == true) {
+                    listOfDisablePuNode.push(parseInt(map1.get("1")));
+                }
 
 
 
@@ -2100,7 +2119,7 @@ export default class PlanningUnitSetting extends Component {
                         listOfDisablePuNode = [...new Set(listOfDisablePuNode)];
                         if (listOfDisablePuNode.length > 0) {
                             this.disablePUNode(listOfDisablePuNode);
-                            // this.disablePUConsumptionData(listOfDisablePuNode);
+                            this.disablePUConsumptionData(listOfDisablePuNode);
                         }
 
 
@@ -2364,7 +2383,10 @@ export default class PlanningUnitSetting extends Component {
 
         return (
             <div className="animated fadeIn" >
-
+                <Prompt
+                    when={this.state.isChanged1 == true}
+                    message={i18n.t("static.dataentry.confirmmsg")}
+                />
                 <AuthenticationServiceComponent history={this.props.history} />
                 {/* <h5 className="red">{i18n.t(this.state.message)}</h5> */}
                 <h5 className={this.state.color} id="div2">{i18n.t(this.state.message)}</h5>

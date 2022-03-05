@@ -24,6 +24,8 @@ import { Prompt } from "react-router-dom";
 import pdfIcon from '../../assets/img/pdf.png';
 import jsPDF from 'jspdf';
 import { LOGO } from "../../CommonComponent/Logo";
+import { green } from "@material-ui/core/colors";
+import { red } from "@material-ui/core/colors";
 
 const entityname = i18n.t('static.dashboard.dataEntryAndAdjustment');
 
@@ -52,6 +54,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       showDetailTable: false,
       allPlanningUnitList: [],
       message: "",
+      messageColor: "green",
       consumptionChanged: false
     }
     this.loaded = this.loaded.bind(this);
@@ -80,10 +83,15 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       cont = true;
     }
     if (cont == true) {
-      let id = AuthenticationService.displayDashboardBasedOnRole();
-      this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.message.cancelled', { entityname }))
-    }
+      this.setState({
+        consumptionChanged: false
+   },()=>{
+    let id = AuthenticationService.displayDashboardBasedOnRole();
+    this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.message.cancelled', { entityname }))
+   })
+     }
   }
+
   buildDataJexcel(consumptionUnitId) {
 
     var cont = false;
@@ -187,7 +195,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           data[0] = i18n.t('static.dataentry.reportingRate')
           for (var j = 0; j < monthArray.length; j++) {
             var consumptionData = consumptionList.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArray[j].date).format("YYYY-MM") && c.region.id == regionList[r].regionId);
-            data[j + 1] = consumptionData.length > 0 && consumptionData[0].reportingRate > 0 ? consumptionData[0].reportingRate + "%" : 100 + "%";
+            data[j + 1] = consumptionData.length > 0 && consumptionData[0].reportingRate > 0 ? consumptionData[0].reportingRate : 100;
           }
           data[monthArray.length + 1] = multiplier;
           dataArray.push(data);
@@ -204,7 +212,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           data = [];
           data[0] = i18n.t('static.dataentry.stockedOutPer')
           for (var j = 0; j < monthArray.length; j++) {
-            data[j + 1] = `=ROUND(${colArr[j + 1]}${parseInt(dataArray.length)}/${colArr[j + 1] + "1"}*100,0)` + "%";
+            data[j + 1] = `=ROUND(${colArr[j + 1]}${parseInt(dataArray.length)}/${colArr[j + 1] + "1"}*100,0)`;
           }
           data[monthArray.length + 1] = multiplier;
           dataArray.push(data);
@@ -519,6 +527,10 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         elInstance.setStyle(col, "background-color", "transparent");
         elInstance.setStyle(col, "background-color", "yellow");
         elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
+      }else {
+        var col = (colArr[x]).concat(parseInt(y) + 1);
+        elInstance.setStyle(col, "background-color", "transparent");
+        elInstance.setComments(col, "");
       }
     }
     if (possibleReportRateY.includes(y.toString())) {
@@ -531,6 +543,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
       }
       else {
+        var col = (colArr[x]).concat(parseInt(y) + 1);
         elInstance.setStyle(col, "background-color", "transparent");
         elInstance.setComments(col, "");
       }
@@ -544,6 +557,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         elInstance.setStyle(col, "background-color", "yellow");
         elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
       } else {
+        var col = (colArr[x]).concat(parseInt(y) + 1);
         elInstance.setStyle(col, "background-color", "transparent");
         elInstance.setComments(col, "");
       }
@@ -570,8 +584,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       actualConsumptionStart += 8;
       reportRateStart += 8;
       stockDayStart += 8;
-    }
-
+     }
     for (var y = 0; y < json.length; y++) {
       for (var x = 1; x < 37; x++) {
         var rowData = elInstance.getRowData(y);
@@ -583,6 +596,10 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
             elInstance.setStyle(col, "background-color", "yellow");
             elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
             valid = false;
+          }else{
+            var col = (colArr[x]).concat(parseInt(y) + 1);
+            elInstance.setStyle(col, "background-color", "transparent");
+            elInstance.setComments(col, "");
           }
         }
         if (possibleReportRateY.includes(y.toString())) {
@@ -596,6 +613,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
             valid = false;
           }
           else {
+            var col = (colArr[x]).concat(parseInt(y) + 1);
             elInstance.setStyle(col, "background-color", "transparent");
             elInstance.setComments(col, "");
           }
@@ -610,6 +628,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
             elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
             valid = false;
           } else {
+            var col = (colArr[x]).concat(parseInt(y) + 1);
             elInstance.setStyle(col, "background-color", "transparent");
             elInstance.setComments(col, "");
           }
@@ -778,7 +797,8 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     document.getElementById("consumptionNotes").value = notes;
 
     this.setState({
-      consumptionList: fullConsumptionList
+      consumptionList: fullConsumptionList,
+      consumptionChanged: true
     })
     this.buildDataJexcel(this.state.selectedConsumptionUnitId);
   }
@@ -787,8 +807,12 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     this.setState({
       loading: true
     })
+    console.log("validation---------->before")
     var validation = this.checkValidationConsumption();
+    //console.log("validation---------->",validation)
+    //var validation =true; 
     if (validation == true) {
+      console.log("INIF")
       var db1;
       var storeOS;
       getDatabase();
@@ -939,6 +963,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
               showDetailTable: true,
               loading: false,
               message: i18n.t('static.compareAndSelect.dataSaved'),
+              messageColor:"green",
               consumptionChanged: false
             }, () => {
               this.getDatasetData();
@@ -948,11 +973,12 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         }.bind(this)
       }.bind(this)
     } else {
-
-     // this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
-      //this.props.updateState("color", "red");
-      // this.props.updateState("loading", false);
-      // this.props.hideSecondComponent();
+      console.log("INELSE")
+      this.setState({
+        loading: false,
+        message: i18n.t('static.supplyPlan.validationFailed'),
+        messageColor:"red"
+       })
     }
   }
 
@@ -1029,6 +1055,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
   }
 
   componentDidMount() {
+   this.hideSecondComponent();
     this.getDatasetList();
   }
 
@@ -1712,7 +1739,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           gridLines: {
             drawBorder: true, lineWidth: 0
           },
-          // stacked: true
+          stacked: true
         }]
       },
       tooltips: {
@@ -1785,7 +1812,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
             label: getLabelText(item.label, this.state.lang),
             data: this.state.planningUnitTotalListRegion.filter(c => c.planningUnitId == this.state.selectedConsumptionUnitObject.planningUnit.id && c.region.regionId == item.regionId).map(item => (item.qty > 0 ? item.qty : null)),
             // type: 'line'
-            stack: 2 + count,
+            stack: 1,
             // backgroundColor: 'transparent',
             backgroundColor: colourArray[colourCount],
             borderStyle: 'dotted',
@@ -1838,7 +1865,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           message={i18n.t("static.dataentry.confirmmsg")}
         />
         <AuthenticationServiceComponent history={this.props.history} />
-        <h5 className={"green"} id="div1">{this.state.message}</h5>
+        <h5 className={this.state.messageColor} id="div1">{this.state.message}</h5>
         <h5 className={this.props.match.params.color} id="div2">{i18n.t(this.props.match.params.message, { entityname })}</h5>
         <Card>
           <div className="card-header-actions">
@@ -1950,7 +1977,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                                     var totalRegionPU = 0;
                                     return (<tr style={{ display: this.state.consumptionUnitShowArr.includes(item.planningUnit.id) ? "" : "none" }}>
                                       <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
-                                      <td className="sticky-col first-col clone" align="center">{"   " + getLabelText(r.label, this.state.lang)}</td>
+                                      <td className="sticky-col first-col clone text-left" style={{textIndent:'30px'}}>{"   " + getLabelText(r.label, this.state.lang)}</td>
                                       {this.state.monthArray.map((item1, count) => {
                                         var data = this.state.planningUnitTotalListRegion.filter(c => c.planningUnitId == item.planningUnit.id && moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM") && c.region.regionId == r.regionId)
                                         totalRegion += Number(data[0].qty);
@@ -1958,7 +1985,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                                         return (<td onClick={() => { this.buildDataJexcel(item.planningUnit.id) }}><NumberFormat displayType={'text'} thousandSeparator={true} value={this.state.showInPlanningUnit ? data[0].qtyInPU : data[0].qty} /></td>)
                                       })}
                                       <td><NumberFormat displayType={'text'} thousandSeparator={true} value={this.state.showInPlanningUnit ? Math.round(totalRegionPU) : Math.round(totalRegion)} /></td>
-                                      <td>{this.state.showInPlanningUnit ? Math.round((totalRegionPU / totalPU) * 100) : Math.round((totalRegion / total) * 100)}{"%"}</td>
+                                      <td>{this.state.showInPlanningUnit ? Math.round((totalRegionPU / totalPU) * 100) : Math.round((totalRegion / total) * 100)}</td>
                                     </tr>)
                                   })}
                                 </>)

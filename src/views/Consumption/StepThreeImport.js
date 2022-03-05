@@ -127,7 +127,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
         headers.push(i18n.t('static.inventoryDate.inventoryReport'));
         headers.push(i18n.t('static.importFromQATSupplyPlan.supplyPlanConsumption'));
         headers.push(i18n.t('static.importFromQATSupplyPlan.conversionFactor(SupplyPlantoForecast)'));
-        headers.push(i18n.t('static.importFromQATSupplyPlan.convertedConsumption'));
+        headers.push(i18n.t('static.importFromQATSupplyPlan.convertedActualConsumption(SupplyPlanModule)'));
         headers.push(i18n.t('static.importFromQATSupplyPlan.currentQATConsumption'));
         headers.push(i18n.t('static.quantimed.importData'));
 
@@ -370,7 +370,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
 
                                 // this.props.history.push(`/importFromQATSupplyPlan/listImportFromQATSupplyPlan/` + 'green/' + i18n.t('static.mt.dataUpdateSuccess'))
                                 // this.props.history.push(`/dataentry/consumptionDataEntryAndAdjustment`)
-                                this.props.history.push(`/dataentry/consumptionDataEntryAndAdjustment/` + 'green/' + i18n.t('static.mt.dataUpdateSuccess'))
+                                this.props.history.push(`/dataentry/consumptionDataEntryAndAdjustment/` + 'green/' + i18n.t('static.message.importSuccess'))
                             }.bind(this);
                             transaction.onerror = function (event) {
                                 this.setState({

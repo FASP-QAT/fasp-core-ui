@@ -17,6 +17,7 @@ import moment from 'moment';
 import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
 import { buildJxl, buildJxl1, dataCheck } from "./DataCheckComponent";
+import { Prompt } from 'react-router';
 import { exportPDF, noForecastSelectedClicked, missingMonthsClicked, missingBranchesClicked, nodeWithPercentageChildrenClicked } from '../DataSet/DataCheckComponent.js';
 import pdfIcon from '../../assets/img/pdf.png';
 
@@ -77,7 +78,8 @@ class VersionSettingsComponent extends Component {
             noForecastSelectedList: [],
             datasetPlanningUnit: [],
             notSelectedPlanningUnitList: [],
-            treeScenarioListNotHaving100PerChild: []
+            treeScenarioListNotHaving100PerChild: [],
+            isChanged1: false
         }
         this.hideFirstComponent = this.hideFirstComponent.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
@@ -503,6 +505,10 @@ class VersionSettingsComponent extends Component {
                 }
             }
         }
+
+        this.setState({
+            isChanged1: true,
+        });
 
 
 
@@ -1145,6 +1151,19 @@ class VersionSettingsComponent extends Component {
         this.getDatasetList();
     }
 
+    componentWillUnmount() {
+        clearTimeout(this.timeout);
+        window.onbeforeunload = null;
+    }
+
+    componentDidUpdate = () => {
+        if (this.state.isChanged1 == true) {
+            window.onbeforeunload = () => true
+        } else {
+            window.onbeforeunload = undefined
+        }
+    }
+
     handleChangeProgram(programIds) {
         programIds = programIds.sort(function (a, b) {
             return parseInt(a.value) - parseInt(b.value);
@@ -1316,6 +1335,10 @@ class VersionSettingsComponent extends Component {
 
         return (
             <div className="animated">
+                <Prompt
+                    when={this.state.isChanged1 == true}
+                    message={i18n.t("static.dataentry.confirmmsg")}
+                />
                 <AuthenticationServiceComponent history={this.props.history} />
                 <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5 className={this.state.color} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
@@ -1417,7 +1440,7 @@ class VersionSettingsComponent extends Component {
                         </div>
                     </ModalHeader>
                     <div>
-                        <ModalBody>
+                        <ModalBody className="VersionSettingMode">
                             <span><b>{this.state.programName}</b></span><br />
                             <span><b>{i18n.t('static.common.forecastPeriod')}: </b> {moment(this.state.forecastStartDate).format('MMM-YYYY')} to {moment(this.state.forecastStopDate).format('MMM-YYYY')} </span><br /><br />
 
@@ -1490,11 +1513,15 @@ class VersionSettingsComponent extends Component {
                                     </Table>
                                 </div> : <span>{treeNodes}</span>}
                             </div>
-                            <div className="col-md-12 pb-lg-5 pt-lg-3">
+                            {/* <div className="col-md-12 pb-lg-5 pt-lg-3">
+                                <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={() => { this.openModalPopup() }}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={this.synchronize}><i className="fa fa-check"></i>{i18n.t('static.report.ok')}</Button>
+                            </div> */}
+                        </ModalBody>
+                        <div className="col-md-12 pb-lg-5 pt-lg-3">
                                 <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={() => { this.openModalPopup() }}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                 <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={this.synchronize}><i className="fa fa-check"></i>{i18n.t('static.report.ok')}</Button>
                             </div>
-                        </ModalBody>
                     </div>
                 </Modal >
             </div>
