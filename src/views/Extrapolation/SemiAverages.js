@@ -2,13 +2,12 @@ import { calculateError } from '../Extrapolation/ErrorCalculations.js';
 let m = 0;
 let c = 0;
 export function calculateSemiAverages(inputData, noOfProjectionMonths, props) {
-    const data = JSON.parse(JSON.stringify(inputData));
+    const data = inputData;
     console.log("InputData@@@",inputData)
     if (inputData.length % 2 == 1) {
         inputData.pop();
         noOfProjectionMonths += 1
     }
-
     const noOfMonthsForProjection = noOfProjectionMonths;
     let actualMonths = data[data.length - 1].month;
     initializeSemiAverage(data, actualMonths);
@@ -23,6 +22,7 @@ export function calculateSemiAverages(inputData, noOfProjectionMonths, props) {
         console.log(y + " = " + data[y - 1].forecast);
     }
     calculateError(data, "semiAvgError", props);
+    console.log("InputData@@@ output tes",data)
     props.updateState("semiAvgData", data);
     // Print the output
 
