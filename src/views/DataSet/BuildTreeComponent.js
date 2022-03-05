@@ -5247,7 +5247,13 @@ export default class BuildTree extends Component {
         }, () => {
 
             console.log("on add items-------", this.state.items);
-            this.calculateMOMData(newItem.id, 0);
+            if (!itemConfig.context.payload.extrapolation) {
+                this.calculateMOMData(newItem.id, 0);
+            } else {
+                this.setState({
+                    loading: false
+                })
+            }
             // this.calculateValuesForAggregateNode(this.state.items);
         });
     }
@@ -5504,7 +5510,13 @@ export default class BuildTree extends Component {
         }, () => {
             console.log("updated tree data+++", this.state);
             // this.calculateValuesForAggregateNode(this.state.items);
-            this.calculateMOMData(0, 0);
+            if (!currentItemConfig.context.payload.extrapolation) {
+                this.calculateMOMData(0, 0);
+            } else {
+                this.setState({
+                    loading: false
+                })
+            }
             // console.log("returmed list---", this.state.nodeDataMomList);
             // this.updateTreeData();
         });
