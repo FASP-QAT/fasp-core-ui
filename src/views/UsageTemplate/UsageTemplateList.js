@@ -33,6 +33,7 @@ import UsagePeriodService from '../../api/UsagePeriodService';
 import UnitService from '../../api/UnitService.js';
 import ProgramService from '../../api/ProgramService';
 import CryptoJS from 'crypto-js';
+import { Prompt } from 'react-router';
 import { SECRET_KEY, JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, JEXCEL_DATE_FORMAT_SM, INTEGER_NO_REGEX } from "../../Constants";
 import { number } from "mathjs";
 
@@ -115,6 +116,7 @@ class usageTemplate extends Component {
             usagePeriodDisplayList: [],
             roleArray: [],
             dimensionList: [],
+            isChanged1: false
         }
         // this.setTextAndValue = this.setTextAndValue.bind(this);
         // this.disableRow = this.disableRow.bind(this);
@@ -449,7 +451,7 @@ class usageTemplate extends Component {
                     if (listArray.length > 0) {
                         for (var i = 0; i < listArray.length; i++) {
                             var paJson = {
-                                name: getLabelText(listArray[i].unitCode, this.state.lang),
+                                name: listArray[i].unitCode,
                                 id: parseInt(listArray[i].unitId),
                                 active: listArray[i].active,
                             }
@@ -461,6 +463,7 @@ class usageTemplate extends Component {
                         dimensionList: tempList,
                     },
                         () => {
+                            console.log("dimensionList----------->", this.state.dimensionList);
                             this.getForecastingUnit();
                         })
                 } else {
@@ -800,12 +803,12 @@ class usageTemplate extends Component {
 
                 data[7] = "Every"
                 data[8] = papuList[j].noOfPatients
-                data[9] = "patient"
-                // data[9] = 91
+                // data[9] = "patient"
+                data[9] = papuList[j].unit.id
 
                 data[10] = "requires"
                 data[11] = papuList[j].noOfForecastingUnits
-                data[12] = papuList[j].unit.id
+                data[12] = papuList[j].forecastingUnit.unit.id
 
                 data[13] = `=ROUND(L${parseInt(j) + 1}/I${parseInt(j) + 1},2)`//hidden
 
@@ -836,10 +839,10 @@ class usageTemplate extends Component {
 
                 //(papuList[j].oneTimeUsage == false ? '' : `=ROUND(N${parseInt(j) + 1},2)`)//hidden
 
-                // let unitName = this.state.dimensionList.filter(c => c.unitId == papuList[j].unitId)[0].unitCode;
-                // let string = "Every " + papuList[j].noOfPatients + " "+ unitName +" - requires " + papuList[j].noOfForecastingUnits + " " + papuList[j].unit.label.label_en;
+                let unitName = (this.state.dimensionList.filter(c => c.id == papuList[j].unit.id)[0]).name;
+                let string = "Every " + papuList[j].noOfPatients + " " + unitName + " - requires " + papuList[j].noOfForecastingUnits + " " + papuList[j].forecastingUnit.unit.label.label_en;
 
-                let string = "Every " + papuList[j].noOfPatients + " patient - requires " + papuList[j].noOfForecastingUnits + " " + papuList[j].unit.label.label_en;
+                // let string = "Every " + papuList[j].noOfPatients + " patient - requires " + papuList[j].noOfForecastingUnits + " " + papuList[j].unit.label.label_en;
                 if (!papuList[j].oneTimeUsage) { //one time usage false
                     string += " " + (papuList[j].usageFrequencyCount == null ? '' : papuList[j].usageFrequencyCount) + " time(s) per " + (papuList[j].usageFrequencyUsagePeriod != null ? papuList[j].usageFrequencyUsagePeriod.label.label_en : '');
 
@@ -881,8 +884,8 @@ class usageTemplate extends Component {
 
             data[7] = "Every";
             data[8] = 1;
-            data[9] = "patient"
-            // data[9] = 91
+            // data[9] = "patient"
+            data[9] = ""
 
             data[10] = "requires";
             data[11] = 0;
@@ -920,6 +923,7 @@ class usageTemplate extends Component {
         var options = {
             data: data,
             columnDrag: true,
+            // freezeColumns: 2,
             colWidths: [100, 100, 100, 100, 150, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 120],
             columns: [
 
@@ -978,18 +982,18 @@ class usageTemplate extends Component {
                     // readOnly: true
                     textEditor: true, //8 I
                 },
-                {
-                    // title: i18n.t('static.usageTemplate.people'),
-                    title: 'Person(s) Unit',
-                    type: 'text',
-                    readOnly: true,
-                    textEditor: true, //9 J
-                },
                 // {
+                //     // title: i18n.t('static.usageTemplate.people'),
                 //     title: 'Person(s) Unit',
-                //     type: 'autocomplete',
-                //     source: this.state.dimensionList, //9 J
+                //     type: 'text',
+                //     readOnly: true,
+                //     textEditor: true, //9 J
                 // },
+                {
+                    title: 'Person(s) Unit',
+                    type: 'autocomplete',
+                    source: this.state.dimensionList, //9 J
+                },
                 {
                     title: i18n.t('static.usageTemplate.fuPerPersonPerTime'),
                     type: 'hidden',
@@ -1244,6 +1248,7 @@ class usageTemplate extends Component {
             pagination: localStorage.getItem("sesRecordCount"),
             filters: true,
             search: true,
+            freezeColumns: 3,
             columnSorting: true,
             tableOverflow: true,
             wordWrap: true,
@@ -1567,6 +1572,19 @@ class usageTemplate extends Component {
 
     }
 
+    componentWillUnmount() {
+        clearTimeout(this.timeout);
+        window.onbeforeunload = null;
+    }
+
+    componentDidUpdate = () => {
+        if (this.state.isChanged1 == true) {
+            window.onbeforeunload = () => true
+        } else {
+            window.onbeforeunload = undefined
+        }
+    }
+
     componentDidMount() {
         let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
         let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
@@ -1611,7 +1629,8 @@ class usageTemplate extends Component {
 
         data[7] = "Every";
         data[8] = 1;
-        data[9] = "patient"
+        // data[9] = "patient"
+        data[9] = ""
 
         data[10] = "requires";
         data[11] = 0;
@@ -1681,6 +1700,7 @@ class usageTemplate extends Component {
                         program: (parseInt(map1.get("1")) == -1 ? null : { id: parseInt(map1.get("1")) }),
                         tracerCategory: { id: parseInt(map1.get("3")) },
                         forecastingUnit: { id: parseInt(map1.get("4")) },
+                        unit: { id: parseInt(map1.get("9")) },
                         // lagInMonths: map1.get("5").toString().replace(/,/g, ""),
                         lagInMonths: this.el.getValue(`F${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
                         usageType: { id: parseInt(map1.get("6")) },
@@ -2009,16 +2029,24 @@ class usageTemplate extends Component {
 
         }
 
-        if (x == 4 || x == 8 || x == 11 || x == 15 || x == 16 || x == 17 || x == 20 || x == 21) {
+        if (x == 4 || x == 8 || x == 11 || x == 15 || x == 16 || x == 17 || x == 20 || x == 21 || x == 9) {
 
-            // unitIdValue = this.el.getValueFromCoords(9, y);
-            // let unitName = '';
-            // if (unitIdValue != 0) {
-            //     unitName = this.state.dimensionList.filter(c => c.unitId == unitIdValue)[0].unitCode;
-            // }
-            // let string = 'Every ' + this.el.getValue(`I${parseInt(y) + 1}`, true) + ' ' + unitName + ' - requires ' + this.el.getValue(`L${parseInt(y) + 1}`, true) + " " + this.el.getValue(`M${parseInt(y) + 1}`, true);
+            let unitIdValue = this.el.getValueFromCoords(9, y);
+            console.log("unitIdValue--------->", unitIdValue);
+            let unitName = '';
+            if (unitIdValue != 0) {
+                unitName = this.state.dimensionList.filter(c => c.id == unitIdValue)[0].name;
+            }
 
-            let string = 'Every ' + this.el.getValue(`I${parseInt(y) + 1}`, true) + ' patient - requires ' + this.el.getValue(`L${parseInt(y) + 1}`, true) + " " + this.el.getValue(`M${parseInt(y) + 1}`, true);
+            let unitName1 = '';
+            let unitId = this.el.getValue(`M${parseInt(y) + 1}`, true);
+            if (unitIdValue != 0) {
+                unitName1 = this.state.unitList.filter(c => c.id == unitId)[0].name;
+            }
+
+            let string = 'Every ' + this.el.getValue(`I${parseInt(y) + 1}`, true) + ' ' + unitName + ' - requires ' + this.el.getValue(`L${parseInt(y) + 1}`, true) + " " + unitName1;
+
+            // let string = 'Every ' + this.el.getValue(`I${parseInt(y) + 1}`, true) + ' patient - requires ' + this.el.getValue(`L${parseInt(y) + 1}`, true) + " " + this.el.getValue(`M${parseInt(y) + 1}`, true);
 
             if (!this.el.getValueFromCoords(14, y)) {//one time usage false
                 string += " " + this.el.getValue(`P${parseInt(y) + 1}`, true) + " " + this.el.getValue(`Q${parseInt(y) + 1}`, true) + " " + this.el.getValue(`R${parseInt(y) + 1}`, true);
@@ -2213,6 +2241,29 @@ class usageTemplate extends Component {
         }
 
 
+        //People Validation
+        if (x == 9) {
+            this.el.setValueFromCoords(24, y, 1, true);
+            console.log("LOG---------->3", value);
+            var budgetRegx = /^\S+(?: \S+)*$/;
+            var col = ("J").concat(parseInt(y) + 1);
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                if (!(budgetRegx.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.spacetext'));
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+            }
+        }
+
+
 
         //#FU
         if (x == 11) {
@@ -2389,9 +2440,9 @@ class usageTemplate extends Component {
             }
         }
 
-
-
-
+        this.setState({
+            isChanged1: true,
+        });
 
 
 
@@ -2536,6 +2587,28 @@ class usageTemplate extends Component {
                         }
                     }
                 }
+
+
+                //People validations
+                var col = ("J").concat(parseInt(y) + 1);
+                var value = this.el.getValueFromCoords(9, y);
+                if (value == "") {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                    this.setState({
+                        message: i18n.t('static.supplyPlan.validationFailed'),
+                        color: 'red'
+                    },
+                        () => {
+                            this.hideSecondComponent();
+                        })
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+
 
 
                 //Type
@@ -2833,6 +2906,10 @@ class usageTemplate extends Component {
 
         return (
             <div className="animated fadeIn">
+                <Prompt
+                    when={this.state.isChanged1 == true}
+                    message={i18n.t("static.dataentry.confirmmsg")}
+                />
                 <AuthenticationServiceComponent history={this.props.history} />
                 {/* <h5 style={{ color: "red" }}>{i18n.t('static.common.customWarningMessage')}</h5> */}
                 <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>

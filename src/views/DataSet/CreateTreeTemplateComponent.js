@@ -411,6 +411,7 @@ export default class CreateTreeTemplate extends Component {
             numberNode: false,
             scalingTotal: '',
             singleValue2: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 },
+            minDateValue: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
             minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
             maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
             treeTemplate: {
@@ -937,11 +938,13 @@ export default class CreateTreeTemplate extends Component {
         const { orgCurrentItemConfig, currentItemConfig } = this.state;
         currentItemConfig.context = JSON.parse(JSON.stringify(orgCurrentItemConfig));
         console.log("============1============", orgCurrentItemConfig);
+        console.log("this.state.addNodeFlag reset 1---", this.state.addNodeFlag);
+        console.log("this.state.addNodeFlag reset 2---", this.state.addNodeFlag ? [] : { value: orgCurrentItemConfig.payload.nodeDataMap[0][0].fuNode.forecastingUnit.id, label: getLabelText(orgCurrentItemConfig.payload.nodeDataMap[0][0].fuNode.forecastingUnit.label, this.state.lang) + " | " + orgCurrentItemConfig.payload.nodeDataMap[0][0].fuNode.forecastingUnit.id });
         this.setState({
             currentItemConfig,
             usageTemplateId: "",
             usageText: "",
-            fuValues: { value: orgCurrentItemConfig.payload.nodeDataMap[0][0].fuNode.forecastingUnit.id, label: getLabelText(orgCurrentItemConfig.payload.nodeDataMap[0][0].fuNode.forecastingUnit.label, this.state.lang) + " | " + orgCurrentItemConfig.payload.nodeDataMap[0][0].fuNode.forecastingUnit.id },
+            fuValues: this.state.addNodeFlag ? [] : { value: orgCurrentItemConfig.payload.nodeDataMap[0][0].fuNode.forecastingUnit.id, label: getLabelText(orgCurrentItemConfig.payload.nodeDataMap[0][0].fuNode.forecastingUnit.label, this.state.lang) + " | " + orgCurrentItemConfig.payload.nodeDataMap[0][0].fuNode.forecastingUnit.id },
             // fuLabels: []
         }, () => {
             console.log("currentItemConfig after---", this.state.orgCurrentItemConfig)
@@ -2186,12 +2189,15 @@ export default class CreateTreeTemplate extends Component {
                 instance.jexcel.setComments(col, i18n.t('static.label.fieldRequired'));
                 this.state.modelingEl.setValueFromCoords(5, y, "", true);
                 this.state.modelingEl.setValueFromCoords(6, y, "", true);
+                this.state.modelingEl.setValueFromCoords(8, y, '', true);
             } else {
                 if (value == 2) {
                     this.state.modelingEl.setValueFromCoords(5, y, "", true);
+                    this.state.modelingEl.setValueFromCoords(8, y, '', true);
                 }
                 else if (value == 3 || value == 4 || value == 5) {
                     this.state.modelingEl.setValueFromCoords(6, y, "", true);
+                    this.state.modelingEl.setValueFromCoords(8, y, '', true);
                 }
                 instance.jexcel.setStyle(col, "background-color", "transparent");
                 instance.jexcel.setComments(col, "");
@@ -4379,7 +4385,11 @@ export default class CreateTreeTemplate extends Component {
             }, () => {
                 console.log("highlighted item---", this.state.currentItemConfig.context)
                 this.getNodeTypeFollowUpList(data.context.level == 0 ? 0 : data.parentItem.payload.nodeType.id);
-
+                if (data.context.level != 0) {
+                    this.setState({
+                        parentValue: data.parentItem.payload.nodeDataMap[0][0].calculatedDataValue
+                    });
+                }
                 if (data.context.payload.nodeType.id == 4) {
                     this.getForecastingUnitListByTracerCategoryId((data.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.tracerCategory.id);
                     this.setState({
@@ -4869,7 +4879,7 @@ export default class CreateTreeTemplate extends Component {
                                                     id="month"
                                                     name="month"
                                                     ref={this.pickAMonth1}
-                                                    years={{ min: this.state.minDate, max: this.state.maxDate }}
+                                                    years={{ min: this.state.minDateValue, max: this.state.maxDate }}
                                                     value={{ year: new Date((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].month).getFullYear(), month: ("0" + (new Date((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].month).getMonth() + 1)).slice(-2) }}
                                                     lang={pickerLang.months}
                                                     // theme="dark"
@@ -4900,14 +4910,14 @@ export default class CreateTreeTemplate extends Component {
                                             <FormFeedback className="red">{errors.percentageOfParent}</FormFeedback>
                                         </FormGroup>
                                         <FormGroup className="col-md-6" style={{ display: this.state.numberNode ? 'block' : 'none' }}>
-                                            <Label htmlFor="currencyId">Parent Value</Label>
+                                            <Label htmlFor="currencyId">{i18n.t('static.tree.parentValue')} {i18n.t('static.common.for')} {moment(this.state.currentItemConfig.parentItem.payload.nodeDataMap[0][0].month).format(`MMM-YYYY`)}</Label>
                                             <Input type="text"
                                                 id="parentValue"
                                                 name="parentValue"
                                                 bsSize="sm"
                                                 readOnly={true}
                                                 onChange={(e) => { this.dataChange(e) }}
-                                                value={this.state.addNodeFlag != "true" ? addCommas(this.state.currentItemConfig.parentItem != null ? (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].calculatedDataValue : '') : addCommas(this.state.parentValue)}
+                                                value={addCommas(this.state.parentValue)}
                                             ></Input>
                                         </FormGroup>
                                         {/* </> */}
@@ -5043,7 +5053,7 @@ export default class CreateTreeTemplate extends Component {
                                                         && this.state.planningUnitList.map((item, i) => {
                                                             return (
                                                                 <option key={i} value={item.planningUnitId}>
-                                                                    {getLabelText(item.label, this.state.lang)}
+                                                                    {getLabelText(item.label, this.state.lang) + " | " + item.planningUnitId}
                                                                 </option>
                                                             )
                                                         }, this)}
@@ -5167,7 +5177,7 @@ export default class CreateTreeTemplate extends Component {
                                                         <Input type="text"
                                                             id="puInterval"
                                                             name="puInterval"
-                                                            readOnly={true}
+                                                            // readOnly={true}
                                                             bsSize="sm"
                                                             value={addCommas((this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.usageType.id == 2 ? ((((this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.noOfForecastingUnitsPerPerson /
                                                                 this.state.noOfMonthsInUsagePeriod) / this.state.conversionFactor) * (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.refillMonths) : ((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.sharePlanningUnit == "true" || (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.sharePlanningUnit == true ? (this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor) : Math.round((this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor))))}>
@@ -6299,17 +6309,19 @@ export default class CreateTreeTemplate extends Component {
                         row = row.concat(total).concat("% ")
                         row1 = row1.concat(" Subtotal")
                     }
-                    dataArray.push(new Paragraph({
-                        children: [new TextRun({ "text": row3 }), new TextRun({ "text": row, bold: true }), new TextRun({ "text": row4 }), new TextRun({ "text": row1 })],
-                        spacing: {
-                            after: 150,
-                        },
-                        shading: {
-                            type: ShadingType.CLEAR,
-                            fill: "cfcdc9"
-                        },
-                        style: row != "NA " ? total != 100 ? "aside" : "" : ""
-                    }))
+                    if (items[i].payload.nodeType.id != 1 && items[i].payload.nodeType.id != 2) {
+                        dataArray.push(new Paragraph({
+                            children: [new TextRun({ "text": row3 }), new TextRun({ "text": row, bold: true }), new TextRun({ "text": row4 }), new TextRun({ "text": row1 })],
+                            spacing: {
+                                after: 150,
+                            },
+                            shading: {
+                                type: ShadingType.CLEAR,
+                                fill: "cfcdc9"
+                            },
+                            style: row != "NA " ? total != 100 ? "aside" : "" : ""
+                        }))
+                    }
                 }
             }
         }
@@ -6653,6 +6665,7 @@ export default class CreateTreeTemplate extends Component {
                                     console.log("item config---", itemConfig);
                                     this.setState({
                                         orgCurrentItemConfig: JSON.parse(JSON.stringify(this.state.currentItemConfig.context)),
+                                        parentValue: itemConfig.payload.nodeDataMap[0][0].calculatedDataValue
                                     });
 
                                     this.getNodeTypeFollowUpList(itemConfig.payload.nodeType.id);
@@ -7150,7 +7163,7 @@ export default class CreateTreeTemplate extends Component {
                                                     </CardBody>
                                                     <div style={{ display: !this.state.loading ? "block" : "none" }} class="sample">
                                                         <Provider>
-                                                            <div className="placeholder" style={{ clear: 'both', height: '100vh', border: '1px solid #a7c6ed' }} >
+                                                            <div className="placeholder TreeTemplateHeight" style={{ clear: 'both', marginTop: '25px', border: '1px solid #a7c6ed' }} >
                                                                 {/* <OrgDiagram centerOnCursor={true} config={config} onHighlightChanged={this.onHighlightChanged} /> */}
                                                                 <OrgDiagram centerOnCursor={true} config={config} onCursorChanged={this.onCursoChanged} />
                                                             </div>

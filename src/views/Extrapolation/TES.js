@@ -1,19 +1,20 @@
 import { std, sqrt, mean, abs } from 'mathjs';
 import { calculateError } from '../Extrapolation/ErrorCalculations.js';
 export function calculateTES(inputData, alphaParam, betaParam, gammaParam, confidenceLevel, seasonality, noOfProjectionMonths, props) {
-    console.log("InputData@@@",inputData)
+    console.log("InputData@@@", inputData)
     const alpha = alphaParam
     const beta = betaParam
     const gamma = gammaParam
     const noOfMonthsForASeason = seasonality
     const confidence = confidenceLevel;
-    console.log("alpha%%%",alpha)
-    console.log("beta%%%",beta)
-    console.log("gamma%%%",gamma)
-    console.log("noOfMonthsForASeason%%%",noOfMonthsForASeason)
-    console.log("confidence%%%",confidenceLevel);
+    console.log("alpha%%%", alpha)
+    console.log("beta%%%", beta)
+    console.log("gamma%%%", gamma)
+    console.log("noOfMonthsForASeason%%%", noOfMonthsForASeason)
+    console.log("noOfProjectionMonths%%%", noOfProjectionMonths)
+    console.log("confidence%%%", confidenceLevel);
 
-
+   
     const tTable = [
         { "df": 1, "zValue": [1.963, 3.078, 6.314, 31.82, 63.66, 318.31] },
         { "df": 2, "zValue": [1.386, 1.886, 2.92, 6.965, 9.925, 22.327] },
@@ -52,7 +53,7 @@ export function calculateTES(inputData, alphaParam, betaParam, gammaParam, confi
         { "df": 1000, "zValue": [1.037, 1.282, 1.646, 2.33, 2.581, 3.098] }
     ]
 
-    const data =inputData
+    const data = inputData
     const result = tes(data, noOfMonthsForASeason, alpha, beta, gamma, noOfProjectionMonths)
     const actualLength = data.length;
 
@@ -63,16 +64,17 @@ export function calculateTES(inputData, alphaParam, betaParam, gammaParam, confi
             data[x].forecast = result[x]
         }
     }
-    const zValue = getZValue(result.length, confidence,tTable)
-    console.log("Result%%%",result)
+    const zValue = getZValue(result.length, confidence, tTable)
+    console.log("Result%%%", result)
     console.log("Z value = " + zValue)
     const stdDev = std(result)
     console.log("Std dev = " + stdDev)
     const CI = zValue * stdDev / sqrt(result.length)
     console.log("CI = " + CI)
-    console.log("Data%%%",data)
+    console.log("Data%%%", data)
     calculateError(data, "tesError", props);
-    // console.log("tesData----",tesData);
+    console.log("tesData input----",inputData);
+    console.log("tesData output----",data);
     props.updateState("tesData", data);
     props.updateState("CI", CI);
     // let errors = getErrors(data)
@@ -83,7 +85,7 @@ export function calculateTES(inputData, alphaParam, betaParam, gammaParam, confi
     // console.log("rSqd=" + errors.rSqd)
 }
 
-function getZValue(df, confidence,tTable) {
+function getZValue(df, confidence, tTable) {
     let final_t_table = null;
     for (let x = 0; x < tTable.length; x++) {
         if (df < tTable[x].df) {
@@ -91,7 +93,7 @@ function getZValue(df, confidence,tTable) {
         }
         final_t_table = tTable[x]
     }
-    console.log("confidence###",confidence)
+    console.log("confidence###", confidence)
     switch (Number(confidence)) {
         case 0.85:
             console.log("###in 1")
@@ -172,6 +174,6 @@ function tes(data, slen, alpha, beta, gamma, n_preds) {
         last_trend = trend;
     }
     console.log("%%%tes end")
-    console.log("%%%tes end result",result)
+    console.log("%%%tes end result", result)
     return result;
 }

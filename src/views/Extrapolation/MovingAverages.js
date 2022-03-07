@@ -11,8 +11,10 @@ export function calculateMovingAvg(inputData, noOfMonths, noOfProjectionMonths, 
     let actualMonths = data[data.length - 1].month;
     for (let x = 1; x <= actualMonths + noOfMonthsForProjection; x++) {
         if (x <= actualMonths) {
+            // var movingAvg = getMovingAverage(x, monthsForMovingAverage, actualMonths, data)
+            // data[x - 1].forecast =  movingAvg>0? movingAvg :0; 
             data[x - 1].forecast = getMovingAverage(x, monthsForMovingAverage, actualMonths, data);
-        } else {
+           } else {
             data[x - 1] = { "month": x, "actual": null, "forecast": getMovingAverage(x, monthsForMovingAverage, actualMonths, data) };
         }
     }

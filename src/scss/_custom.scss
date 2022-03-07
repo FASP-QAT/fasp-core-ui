@@ -5919,7 +5919,7 @@ font-style: italic!important;
   height: 13px;
 }
 .ExtraCheckboxFieldWidth{
-  width: 106px;
+  width: 115px;
 }
 .bold{
   font-weight: bold;
@@ -5982,10 +5982,14 @@ font-style: italic!important;
     text-align: left;
     box-sizing: border-box;
     overflow: hidden;
-    margin-top: auto!important;
+    margin-top: 10px!important;
     left: 38px!important;
-    margin-bottom: auto!important;
+    margin-bottom: 10px!important;
+    // pointer-events: none;
 }
+// .calculatorTable .jexcel .jexcel_editor{
+// pointer-events: none;
+// }
 .calculatorTable .jupload {
   border: none;
   cursor: pointer;
@@ -5993,10 +5997,12 @@ font-style: italic!important;
   width: 100%;
   height: 100%;
   min-height: 0px;
+  // pointer-events: none;
 }
 .calculatorTable .jexcel .jexcel_editor .jupload img {
   width: 17px;
   height: auto;
+  // pointer-events: none;
 }
 .calculatorTable .jexcel .jexcel_editor .jclose:after {
   position: absolute;
@@ -6012,6 +6018,7 @@ font-style: italic!important;
   cursor: pointer;
   text-shadow: 0 0 5px #fff;
   display: none;
+  // pointer-events: none;
 }
 .extrapolateTable .jexcel colgroup{
   width: 100%!important;
@@ -6035,4 +6042,56 @@ font-style: italic!important;
 }
 .datdEntryRow .jexcel > tbody > tr > td.regionBold {
   color: #fff !important;
+}
+.ContactTemplate .ContactTitleBackground .ContactTitle {
+  top: 2px;
+  // left: unset!important;
+  right: 2px;
+  height: 16px;
+}
+.NodeLineChartMarginTop{
+  margin-left: 20px;
+}
+.highlightExtrapolationMethod{
+  background-color: greenyellow !important;
+}
+.FontBoldIcon{
+  font-weight: bold;
+}
+.tooltip {
+  position: relative;
+  display: inline-block;
+  border-bottom: 1px dotted black;
+}
+
+.tooltip .tooltiptext {
+  visibility: hidden;
+  width: 120px;
+  background-color: black;
+  color: #000;
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px 0;
+  
+  /* Position the tooltip */
+  position: absolute;
+  z-index: 1;
+  bottom: 100%;
+  left: 50%;
+  margin-left: -60px;
+}
+
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+}
+
+.TreeTemplateHeight{
+  max-height: 100vh!important;
+  // overflow: scroll !important;
+}
+.VersionSettingMode{
+  height: 360px !important;
+  // max-height: calc(100vh - 340px) !important;
+  overflow-y: scroll;
+  overflow-x: hidden;
 }

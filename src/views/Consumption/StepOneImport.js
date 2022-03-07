@@ -260,14 +260,14 @@ export default class StepOneImportMapPlanningUnits extends Component {
 
     changed = function (instance, cell, x, y, value) {
         this.props.removeMessageText && this.props.removeMessageText();
-        if (x == 6) {
-            let ForecastPlanningUnitId = this.el.getValueFromCoords(6, y);
+        if (x == 7) {
+            let ForecastPlanningUnitId = this.el.getValueFromCoords(7, y);
             if (ForecastPlanningUnitId != -1 && ForecastPlanningUnitId != null && ForecastPlanningUnitId != '') {
                 var selectedPlanningUnitObj = this.state.planningUnitList.filter(c => c.planningUnitId == ForecastPlanningUnitId)[0];
-                this.el.setValueFromCoords(5, y, ForecastPlanningUnitId, true);
-                this.el.setValueFromCoords(7, y, selectedPlanningUnitObj.multiplier, true);
-                this.el.setValueFromCoords(8, y, (this.el.getValueFromCoords(2, y) / selectedPlanningUnitObj.multiplier).toFixed(6), true);
-                this.el.setValueFromCoords(9, y, 0, true);
+                this.el.setValueFromCoords(6, y, ForecastPlanningUnitId, true);
+                this.el.setValueFromCoords(8, y, selectedPlanningUnitObj.multiplier, true);
+                this.el.setValueFromCoords(9, y, (this.el.getValueFromCoords(3, y) / selectedPlanningUnitObj.multiplier).toFixed(6), true);
+                this.el.setValueFromCoords(10, y, 0, true);
 
                 // let match = this.state.forecastPlanignUnitListForNotDuplicate.filter(c => c.supplyPlanPlanningUnitId == this.el.getValueFromCoords(0, y))
                 // if (match.length > 0) {
@@ -291,8 +291,8 @@ export default class StepOneImportMapPlanningUnits extends Component {
 
                 let forecastPlanignUnitListForNotDuplicate = this.state.forecastPlanignUnitListForNotDuplicate;
                 forecastPlanignUnitListForNotDuplicate.push({
-                    supplyPlanPlanningUnitId: this.el.getValueFromCoords(0, y),
-                    forecastPlanningUnitId: this.el.getValueFromCoords(6, y)
+                    supplyPlanPlanningUnitId: this.el.getValueFromCoords(1, y),
+                    forecastPlanningUnitId: this.el.getValueFromCoords(7, y)
                 })
 
                 const ids = forecastPlanignUnitListForNotDuplicate.map(o => o.supplyPlanPlanningUnitId)
@@ -303,7 +303,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
 
 
             } else {
-                let SupplyPlanningUnitId = this.el.getValueFromCoords(0, y);
+                let SupplyPlanningUnitId = this.el.getValueFromCoords(1, y);
                 console.log("MYVALUE----------->1", SupplyPlanningUnitId);
 
                 let forecastPlanignUnitListForNotDuplicate = this.state.forecastPlanignUnitListForNotDuplicate;
@@ -336,14 +336,14 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 // }
 
 
-                this.el.setValueFromCoords(5, y, '', true);
-                this.el.setValueFromCoords(7, y, '', true);
+                this.el.setValueFromCoords(6, y, '', true);
                 this.el.setValueFromCoords(8, y, '', true);
-                this.el.setValueFromCoords(9, y, 0, true);
+                this.el.setValueFromCoords(9, y, '', true);
+                this.el.setValueFromCoords(10, y, 0, true);
             }
 
             var budgetRegx = /^\S+(?: \S+)*$/;
-            var col = ("G").concat(parseInt(y) + 1);
+            var col = ("H").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
@@ -362,10 +362,10 @@ export default class StepOneImportMapPlanningUnits extends Component {
 
 
         //#Multiplier
-        if (x == 8) {
-            let ForecastPlanningUnitId = this.el.getValueFromCoords(6, y);
-            var col = ("I").concat(parseInt(y) + 1);
-            value = this.el.getValue(`I${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+        if (x == 9) {
+            let ForecastPlanningUnitId = this.el.getValueFromCoords(7, y);
+            var col = ("J").concat(parseInt(y) + 1);
+            value = this.el.getValue(`J${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             // var reg = DECIMAL_NO_REGEX;
             var reg = /^\d{1,6}(\.\d{1,6})?$/;
             if (ForecastPlanningUnitId != -1) {
@@ -829,11 +829,12 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 let planningUnitObj = this.state.planningUnitList.filter(c => c.planningUnitId == papuList[j].planningUnit.id)[0];
                 console.log("TracerCategory--------->", getLabelText(papuList[j].planningUnit.label, this.state.lang) + ' | ' + papuList[j].planningUnit.id + ' ------ ' + planningUnitObj.forecastingUnit.tracerCategory.label.label_en);
                 data = [];
-                data[0] = papuList[j].planningUnit.id
-                data[1] = getLabelText(papuList[j].planningUnit.label, this.state.lang) + ' | ' + papuList[j].planningUnit.id
-                data[2] = papuList[j].multiplier
-                data[3] = papuList[j].forecastingUnit.id
-                data[4] = planningUnitObj.forecastingUnit.tracerCategory.id
+                data[0] = getLabelText(planningUnitObj.forecastingUnit.tracerCategory.label, this.state.lang)
+                data[1] = papuList[j].planningUnit.id
+                data[2] = getLabelText(papuList[j].planningUnit.label, this.state.lang) + ' | ' + papuList[j].planningUnit.id
+                data[3] = papuList[j].multiplier
+                data[4] = papuList[j].forecastingUnit.id
+                data[5] = planningUnitObj.forecastingUnit.tracerCategory.id
 
                 // let selectedForecastProgram = this.state.datasetList.filter(c => c.programId == document.getElementById("forecastProgramId").value && c.versionId == this.state.forecastProgramVersionId)[0];
                 // let filteredForecastingUnit = selectedForecastProgram.filteredForecastingUnit;
@@ -845,22 +846,22 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 let match = filteredPlanningUnit.filter(c => c.id == papuList[j].planningUnit.id);
 
                 if (match.length > 0) {
-                    data[5] = papuList[j].planningUnit.id
-                    data[6] = getLabelText(papuList[j].planningUnit.label, this.state.lang) + ' | ' + papuList[j].planningUnit.id
-                    data[7] = papuList[j].multiplier
-                    data[8] = 1
+                    data[6] = papuList[j].planningUnit.id
+                    data[7] = getLabelText(papuList[j].planningUnit.label, this.state.lang) + ' | ' + papuList[j].planningUnit.id
+                    data[8] = papuList[j].multiplier
                     data[9] = 1
+                    data[10] = 1
 
                     forecastPlanignUnitListForNotDuplicate.push({
                         supplyPlanPlanningUnitId: papuList[j].planningUnit.id,
                         forecastPlanningUnitId: papuList[j].planningUnit.id
                     });
                 } else {
-                    data[5] = ''
                     data[6] = ''
                     data[7] = ''
                     data[8] = ''
                     data[9] = ''
+                    data[10] = ''
                 }
 
                 papuDataArr[count] = data;
@@ -895,42 +896,42 @@ export default class StepOneImportMapPlanningUnits extends Component {
         var options = {
             data: data,
             columnDrag: true,
-            colWidths: [50, 100, 100, 100, 100, 50, 100, 50],
+            colWidths: [50, 50, 100, 100, 100, 100, 50, 100, 50],
             columns: [
-
+                {
+                    title: 'Tracer Category',
+                    type: 'text',
+                    readOnly: true//0 A
+                },
                 {
                     title: 'Supply Plan Planning Unit Id',
                     type: 'hidden',
-                    readOnly: true//0 A
+                    readOnly: true//1 B
                 },
                 {
                     title: i18n.t('static.importFromQATSupplyPlan.supplyPlanPlanningUnit'),
                     type: 'text',
-                    readOnly: true,//1 B
+                    readOnly: true,//2 C
                 },
                 {
                     title: 'multiplier',
                     type: 'hidden',
-                    readOnly: true//2 C
+                    readOnly: true//3 D
                 },
                 {
                     title: 'forecastingUnitId',
                     type: 'hidden',
-                    readOnly: true//3 D
+                    readOnly: true//4 E
                 },
                 {
                     title: 'tracerCategoryId',
                     type: 'hidden',
-                    readOnly: true//4 E
+                    readOnly: true//5 F
                 },
-
-
-
-
                 {
                     title: 'Forecast Planning Unit Id',
                     type: 'hidden',
-                    readOnly: true//5 F
+                    readOnly: true//6 G
                 },
                 {
                     title: i18n.t('static.importFromQATSupplyPlan.forecastPlanningUnit'),
@@ -943,24 +944,24 @@ export default class StepOneImportMapPlanningUnits extends Component {
                     //     { id: 3, name: 'Male Condom (Latex) Lubricated, No Logo, 53 mm, 1 Each [4181]' },
 
                     // ]
-                    filter: this.filterPlanningUnitBasedOnTracerCategory//6 G
+                    filter: this.filterPlanningUnitBasedOnTracerCategory//7 H
                 },
                 {
                     title: 'ForecastMultiplier',
                     type: 'hidden',
-                    readOnly: true//7 H
+                    readOnly: true//8 I
                 },
                 {
                     title: i18n.t('static.importFromQATSupplyPlan.conversionFactor'),
                     type: 'numeric',
                     decimal: '.',
                     // readOnly: true,
-                    textEditor: true,//8 I
+                    textEditor: true,//9 J
                 },
                 {
                     title: 'Match',
                     type: 'hidden',
-                    readOnly: true//9 J
+                    readOnly: true//10 K
                 },
 
 
@@ -969,33 +970,33 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 if (y != null) {
                     var elInstance = el.jexcel;
                     //left align
-                    elInstance.setStyle(`B${parseInt(y) + 1}`, 'text-align', 'left');
+                    elInstance.setStyle(`C${parseInt(y) + 1}`, 'text-align', 'left');
                     var rowData = elInstance.getRowData(y);
 
 
-                    var match = rowData[9];
+                    var match = rowData[10];
                     // console.log("addRowId------>", addRowId);
                     if (match == 1) {// grade out
-                        var cell1 = elInstance.getCell(`I${parseInt(y) + 1}`)
+                        var cell1 = elInstance.getCell(`J${parseInt(y) + 1}`)
                         cell1.classList.add('readonly');
                     } else {
-                        var cell1 = elInstance.getCell(`I${parseInt(y) + 1}`)
+                        var cell1 = elInstance.getCell(`J${parseInt(y) + 1}`)
                         cell1.classList.remove('readonly');
                     }
 
-                    var doNotImport = rowData[6];
+                    var doNotImport = rowData[7];
                     if (doNotImport == -1) {// grade out
                         // var cell1 = elInstance.getCell(`B${parseInt(y) + 1}`)
                         // cell1.classList.add('readonly');
                         // var cell1 = elInstance.getCell(`G${parseInt(y) + 1}`)
                         // cell1.classList.add('readonly');
 
-                        elInstance.setStyle(`G${parseInt(y) + 1}`, 'background-color', 'transparent');
-                        elInstance.setStyle(`G${parseInt(y) + 1}`, 'background-color', '#f48282');
+                        elInstance.setStyle(`H${parseInt(y) + 1}`, 'background-color', 'transparent');
+                        elInstance.setStyle(`H${parseInt(y) + 1}`, 'background-color', '#f48282');
                         let textColor = contrast('#f48282');
-                        elInstance.setStyle(`G${parseInt(y) + 1}`, 'color', textColor);
+                        elInstance.setStyle(`H${parseInt(y) + 1}`, 'color', textColor);
 
-                        var cell1 = elInstance.getCell(`I${parseInt(y) + 1}`)
+                        var cell1 = elInstance.getCell(`J${parseInt(y) + 1}`)
                         cell1.classList.add('readonly');
 
                     } else {
@@ -1221,13 +1222,13 @@ export default class StepOneImportMapPlanningUnits extends Component {
         var json = this.el.getJson(null, false);
         console.log("json.length-------", json.length);
         for (var y = 0; y < json.length; y++) {
-            var value = this.el.getValueFromCoords(6, y);
+            var value = this.el.getValueFromCoords(7, y);
             if (value != -1) {
 
                 //ForecastPlanningUnit
                 var budgetRegx = /^\S+(?: \S+)*$/;
-                var col = ("G").concat(parseInt(y) + 1);
-                var value = this.el.getValueFromCoords(6, y);
+                var col = ("H").concat(parseInt(y) + 1);
+                var value = this.el.getValueFromCoords(7, y);
                 console.log("value-----", value);
                 if (value == "") {
                     this.el.setStyle(col, "background-color", "transparent");
@@ -1247,8 +1248,8 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 }
 
                 //multiplier
-                var col = ("I").concat(parseInt(y) + 1);
-                var value = this.el.getValueFromCoords(8, y);
+                var col = ("J").concat(parseInt(y) + 1);
+                var value = this.el.getValueFromCoords(9, y);
                 var reg = /^\d{1,6}(\.\d{1,6})?$/;
                 if (value == "") {
                     this.el.setStyle(col, "background-color", "transparent");
@@ -1290,12 +1291,12 @@ export default class StepOneImportMapPlanningUnits extends Component {
             let changedpapuList = [];
             for (var i = 0; i < tableJson.length; i++) {
                 var map1 = new Map(Object.entries(tableJson[i]));
-
+                console.log("map1---->", map1)
                 let json = {
 
-                    supplyPlanPlanningUnitId: parseInt(map1.get("0")),
-                    forecastPlanningUnitId: parseInt(map1.get("6")),
-                    multiplier: map1.get("8").toString().replace(/,/g, ""),
+                    supplyPlanPlanningUnitId: parseInt(map1.get("1")),
+                    forecastPlanningUnitId: parseInt(map1.get("7")),
+                    multiplier: map1.get("9").toString().replace(/,/g, ""),
 
 
                     // capacityCbm: map1.get("2").replace(",", ""),

@@ -234,8 +234,11 @@ export default class ListTreeComponent extends Component {
         }.bind(this);
     }
 
-    getTreeList(datasetId) {
+    getTreeList() {
         // var proList = [];
+        // var datasetId = document.getElementById('datasetId').value;
+        var datasetId = document.getElementById("datasetId").value;
+        localStorage.setItem("sesDatasetId", datasetId);
         var datasetList = this.state.datasetList;
         console.log("filter tree---", datasetList);
         if (datasetId != 0) {
@@ -283,8 +286,15 @@ export default class ListTreeComponent extends Component {
                 this.setState({
                     datasetList: myResult
                 }, () => {
-                    var datasetId = this.state.datasetId != "" && this.state.datasetId != 0 ? this.state.datasetId : 0;
-                    this.getTreeList(datasetId);
+                    var datasetId = "";
+                    if (this.state.datasetList.length == 1) {
+                        datasetId = this.state.datasetList[0].id;
+                    } else if (localStorage.getItem("sesDatasetId") != "" && this.state.datasetList.filter(c => c.id == localStorage.getItem("sesDatasetId")).length > 0) {
+                        datasetId = localStorage.getItem("sesDatasetId");
+                    }
+                    console.log("datasetId---",datasetId);
+                    this.setState({ datasetId },()=>{this.getTreeList();})
+                    
                 });
 
             }.bind(this);
@@ -316,12 +326,15 @@ export default class ListTreeComponent extends Component {
         console.log(">>>", programList);
         let treeArray = [];
         let count = 0;
+        var selStatus = document.getElementById("active").value;
+        var tempSelStatus = selStatus != "" ? (selStatus == "true" ? true : false) : "";
         for (var j = 0; j < programList.length; j++) {
             console.log("programList[j]---", programList[j]);
             var treeList = programList[j].programData.treeList;
 
             if (treeList.length > 0) {
                 for (var k = 0; k < treeList.length; k++) {
+
                     data = [];
                     data[0] = treeList[k].treeId
                     data[1] = programList[j].programCode + "~v" + programList[j].programData.currentVersion.versionId
@@ -336,11 +349,23 @@ export default class ListTreeComponent extends Component {
                     data[8] = programList[j].id
                     data[9] = programList[j].version
                     data[10] = treeList[k].active
-                    treeArray[count] = data;
-                    count++;
+                    console.log("selStatus---", selStatus)
+                    if (selStatus != "") {
+                        if (tempSelStatus == treeList[k].active) {
+                            // treeArray = treeArray.filter(x => x[10] == tempSelStatus);
+                            treeArray[count] = data;
+                            count++;
+                        }
+                    } else {
+                        treeArray[count] = data;
+                        count++;
+                    }
                 }
             }
         }
+
+
+
         const sortArray = (sourceArray) => {
             const sortByName = (a, b) => a[2].localeCompare(b[2], 'en', { numeric: true });
             return sourceArray.sort(sortByName);
@@ -627,24 +652,46 @@ export default class ListTreeComponent extends Component {
 
                     </div>
                     <CardBody className="pb-lg-0 pt-lg-0">
-                        <Col md="3" className="pl-0">
-                            <FormGroup className="Selectdiv">
-                                <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
-                                <div className="controls SelectGo">
-                                    <InputGroup>
-                                        <Input
-                                            type="select"
-                                            name="datasetId"
-                                            id="datasetId"
-                                            bsSize="sm"
-                                            onChange={(e) => { this.getTreeList(e.target.value) }}
-                                        >
-                                            <option value="0">{i18n.t('static.common.all')}</option>
-                                            {datasets}
-                                        </Input>
-                                    </InputGroup>
-                                </div>
-                            </FormGroup>
+                        <Col md="6 pl-0">
+                            <div className="d-md-flex Selectdiv2">
+                                <FormGroup className="tab-ml-1 mt-md-2 mb-md-0 ">
+                                    <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
+                                    <div className="controls SelectGo">
+                                        <InputGroup>
+                                            <Input
+                                                type="select"
+                                                name="datasetId"
+                                                id="datasetId"
+                                                bsSize="sm"
+                                                onChange={this.getTreeList}
+                                                value={this.state.datasetId}
+                                            >
+                                                <option value="0">{i18n.t('static.common.all')}</option>
+                                                {datasets}
+                                            </Input>
+                                        </InputGroup>
+                                    </div>
+                                </FormGroup>
+                                <FormGroup className="tab-ml-1 mt-md-2 mb-md-0 ">
+                                    <Label htmlFor="appendedInputButton">{i18n.t('static.common.status')}</Label>
+                                    <div className="controls SelectGo">
+                                        <InputGroup>
+                                            <Input
+                                                type="select"
+                                                name="active"
+                                                id="active"
+                                                bsSize="sm"
+                                                onChange={this.getTreeList}
+                                            >
+                                                <option value="">{i18n.t('static.common.all')}</option>
+                                                <option value="true" selected>{i18n.t('static.common.active')}</option>
+                                                <option value="false">{i18n.t('static.common.disabled')}</option>
+
+                                            </Input>
+                                        </InputGroup>
+                                    </div>
+                                </FormGroup>
+                            </div>
                         </Col>
                         {/* <div id="loader" className="center"></div> */}
                         <div className="listtreetable">
