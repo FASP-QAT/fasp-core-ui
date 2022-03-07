@@ -488,13 +488,13 @@ class ModelingValidation extends Component {
             columns.push({ title: i18n.t('static.inventoryDate.inventoryReport'), type: 'calendar', options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker' }, width: 100, readOnly: true });
             var nodeVal = this.state.nodeVal;
             for (var k = 0; k < nodeVal.length; k++) {
-                columns.push({ title: nodeVal[k].label, width: 100, readOnly: true, type: displayBy == 1 ? 'numeric' : 'hidden', mask: displayBy == 1 ? '#,##.00' : '#,##.00 %', decimal: '.' });
+                columns.push({ title: nodeVal[k].label, readOnly: true, type: displayBy == 1 ? 'numeric' : 'hidden', mask: displayBy == 1 ? '#,##.00' : '#,##.00 %', decimal: '.' });
             }
-            columns.push({ title: i18n.t('static.supplyPlan.total'), width: 100, readOnly: true, type: displayBy == 1 ? 'numeric' : 'hidden', mask: displayBy == 1 ? '#,##.00' : '#,## %' });
+            columns.push({ title: i18n.t('static.supplyPlan.total'),readOnly: true, type: displayBy == 1 ? 'numeric' : 'hidden', mask: displayBy == 1 ? '#,##.00' : '#,## %' });
             for (var k = 0; k < nodeVal.length; k++) {
-                columns.push({ title: nodeVal[k].label, width: 100, readOnly: true, type: displayBy == 2 ? 'numeric' : 'hidden', mask: displayBy == 1 ? '#,##.00' : '#,##.00 %', decimal: '.' });
+                columns.push({ title: nodeVal[k].label, readOnly: true, type: displayBy == 2 ? 'numeric' : 'hidden', mask: displayBy == 1 ? '#,##.00' : '#,##.00 %', decimal: '.' });
             }
-            columns.push({ title: i18n.t('static.supplyPlan.total'), width: 100, readOnly: true, type: displayBy == 2 ? 'numeric' : 'hidden', mask: displayBy == 1 ? '#,##.00' : '#,## %' });
+            columns.push({ title: i18n.t('static.supplyPlan.total'), readOnly: true, type: displayBy == 2 ? 'numeric' : 'hidden', mask: displayBy == 1 ? '#,##.00' : '#,## %' });
             var data = [];
             var dataArr = [];
             var nodeVal = this.state.nodeVal;
@@ -553,7 +553,7 @@ class ModelingValidation extends Component {
             var options = {
                 data: dataArr,
                 columnDrag: true,
-                colWidths: [0, 150, 150, 150, 100, 100, 100],
+                // colWidths: [0, 150, 150, 150, 100, 100, 100],
                 colHeaderClasses: ["Reqasterisk"],
                 columns: columns,
                 text: {
@@ -565,8 +565,10 @@ class ModelingValidation extends Component {
                 onload: this.loaded,
                 pagination: false,
                 search: false,
+                defaultColWidth: 100,
                 columnSorting: false,
                 tableOverflow: true,
+                tableWidth: "100%",
                 wordWrap: true,
                 allowInsertColumn: false,
                 allowManualInsertColumn: false,

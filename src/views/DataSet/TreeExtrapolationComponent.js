@@ -1898,7 +1898,12 @@ export default class TreeExtrapolationComponent extends React.Component {
         tr.children[7].classList.add('InfoTr');
         tr.children[8].classList.add('InfoTr');
         tr.children[9].classList.add('InfoTr');
-        tr.children[3].title = 'Placeholder'
+        tr.children[3].title=i18n.t('static.tooltip.ReportingRate');
+        tr.children[5].title=i18n.t('static.tooltip.MovingAverages');
+        tr.children[6].title=i18n.t('static.tooltip.SemiAverages');
+        tr.children[7].title=i18n.t('static.tooltip.LinearRegression');
+        tr.children[8].title=i18n.t('static.tooltip.Tes');
+        tr.children[9].title=i18n.t('static.tooltip.arima');
         // }
 
     }
@@ -2217,7 +2222,7 @@ export default class TreeExtrapolationComponent extends React.Component {
     getDatasetData(e) {
 
     }
-
+    
     toggleChooseMethod() {
         this.setState({
             popoverChooseMethod: !this.state.popoverChooseMethod,
@@ -2677,7 +2682,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                         <div className="row pl-lg-1 pb-lg-2">
                                                             <div>
                                                                 <Popover placement="top" isOpen={this.state.popoverOpenMa} target="Popover1" trigger="hover" toggle={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)}>
-                                                                    <PopoverBody>Need to add Info.</PopoverBody>
+                                                                    <PopoverBody>{i18n.t('static.tooltip.MovingAverages')}</PopoverBody>
                                                                 </Popover>
                                                             </div>
                                                             <div>
@@ -2721,7 +2726,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                         <div className="row pl-lg-1 pb-lg-2">
                                                             <div>
                                                                 <Popover placement="top" isOpen={this.state.popoverOpenSa} target="Popover1" trigger="hover" toggle={() => this.toggle('popoverOpenMa', !this.state.popoverOpenSa)}>
-                                                                    <PopoverBody>Need to add Info.</PopoverBody>
+                                                                <PopoverBody>{i18n.t('static.tooltip.SemiAverages')}</PopoverBody>
                                                                 </Popover>
                                                             </div>
                                                             <div className="pt-lg-2">
@@ -2744,7 +2749,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                         <div className="row pl-lg-1 pb-lg-2">
                                                             <div>
                                                                 <Popover placement="top" isOpen={this.state.popoverOpenLr} target="Popover1" trigger="hover" toggle={() => this.toggle('popoverOpenLr', !this.state.popoverOpenLr)}>
-                                                                    <PopoverBody>Need to add Info.</PopoverBody>
+                                                                <PopoverBody>{i18n.t('static.tooltip.LinearRegression')}</PopoverBody>
                                                                 </Popover>
                                                             </div>
                                                             <div className="pt-lg-2">
@@ -2767,7 +2772,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                         <div className="row pl-lg-1 pb-lg-2">
                                                             <div>
                                                                 <Popover placement="top" isOpen={this.state.popoverOpenTes} target="Popover1" trigger="hover" toggle={() => this.toggle('popoverOpenMa', !this.state.popoverOpenTes)}>
-                                                                    <PopoverBody>Need to add Info.</PopoverBody>
+                                                                    <PopoverBody>{i18n.t('static.tooltip.Tes')}</PopoverBody>
                                                                 </Popover>
                                                             </div>
                                                             <div className="pt-lg-2">
@@ -2788,9 +2793,14 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                                 </Label>
                                                             </div>
                                                             <div className="row col-md-12 pt-lg-2 pl-lg-0" style={{ display: this.state.smoothingId ? '' : 'none' }}>
+                                                            <div>
+                                                                <Popover placement="top" isOpen={this.state.popoverOpenTes} target="Popover1" trigger="hover" toggle={() => this.toggle('popoverOpenMa', !this.state.popoverOpenTes)}>
+                                                                    <PopoverBody>{i18n.t('static.tooltip.confidenceLevel')}</PopoverBody>
+                                                                </Popover>
+                                                            </div>
                                                                 <div className="pt-lg-0 pl-lg-0" style={{ display: 'contents' }}>
                                                                     <div className="tab-ml-1 mt-md-2 mb-md-0 ExtraCheckboxFieldWidth">
-                                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.confidenceLevel')}</Label>
+                                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.confidenceLevel')} <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenTes', !this.state.popoverOpenTes)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                                                         <Input
                                                                             className="controls"
                                                                             type="select"
@@ -2815,8 +2825,11 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                                         </Input>
                                                                         <FormFeedback>{errors.confidenceLevelId}</FormFeedback>
                                                                     </div>
+                                                                    <Popover placement="top" isOpen={this.state.popoverOpenTes} target="Popover1" trigger="hover" toggle={() => this.toggle('popoverOpenMa', !this.state.popoverOpenTes)}>
+                                                                    <PopoverBody>{i18n.t('static.tooltip.seasonality')}</PopoverBody>
+                                                                </Popover>
                                                                     <div className="tab-ml-1 mt-md-2 mb-md-0 ExtraCheckboxFieldWidth">
-                                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.seasonality')}</Label>
+                                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.seasonality')} <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenTes', !this.state.popoverOpenTes)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                                                         <Input
                                                                             className="controls"
                                                                             type="text"
@@ -2846,9 +2859,11 @@ export default class TreeExtrapolationComponent extends React.Component {
  Show Advance
  </Label>
  </div> */}
-
+                                                                     <Popover placement="top" isOpen={this.state.popoverOpenTes} target="Popover1" trigger="hover" toggle={() => this.toggle('popoverOpenMa', !this.state.popoverOpenTes)}>
+                                                                    <PopoverBody>{i18n.t('static.tooltip.alpha')}</PopoverBody>
+                                                                </Popover>
                                                                     <div className="tab-ml-1 mt-md-2 mb-md-0 ExtraCheckboxFieldWidth">
-                                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.alpha')}</Label>
+                                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.alpha')} <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenTes', !this.state.popoverOpenTes)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                                                         <Input
                                                                             className="controls"
                                                                             type="text"
@@ -2863,8 +2878,11 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                                         />
                                                                         <FormFeedback>{errors.alphaId}</FormFeedback>
                                                                     </div>
+                                                                    <Popover placement="top" isOpen={this.state.popoverOpenTes} target="Popover1" trigger="hover" toggle={() => this.toggle('popoverOpenMa', !this.state.popoverOpenTes)}>
+                                                                    <PopoverBody>{i18n.t('static.tooltip.beta')}</PopoverBody>
+                                                                </Popover>
                                                                     <div className="tab-ml-1 mt-md-2 mb-md-0 ExtraCheckboxFieldWidth">
-                                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.beta')}</Label>
+                                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.beta')} <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenTes', !this.state.popoverOpenTes)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                                                         <Input
                                                                             className="controls"
                                                                             type="text"
@@ -2879,8 +2897,11 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                                         />
                                                                         <FormFeedback>{errors.betaId}</FormFeedback>
                                                                     </div>
+                                                                    <Popover placement="top" isOpen={this.state.popoverOpenTes} target="Popover1" trigger="hover" toggle={() => this.toggle('popoverOpenMa', !this.state.popoverOpenTes)}>
+                                                                    <PopoverBody>{i18n.t('static.tooltip.gamma')}</PopoverBody>
+                                                                </Popover>
                                                                     <div className="tab-ml-1 mt-md-2 mb-md-0 ExtraCheckboxFieldWidth">
-                                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.gamma')}</Label>
+                                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.gamma')} <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenTes', !this.state.popoverOpenTes)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                                                         <Input
                                                                             className="controls"
                                                                             type="text"
@@ -2902,7 +2923,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                         <div className="row pl-lg-1 pb-lg-2">
                                                             <div>
                                                                 <Popover placement="top" isOpen={this.state.popoverOpenArima} target="Popover1" trigger="hover" toggle={() => this.toggle('popoverOpenArima', !this.state.popoverOpenArima)}>
-                                                                    <PopoverBody>Need to add Info.</PopoverBody>
+                                                                    <PopoverBody>{i18n.t('static.tooltip.arima')}</PopoverBody>
                                                                 </Popover>
                                                             </div>
                                                             <div className="pt-lg-2">
@@ -2925,9 +2946,12 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                             {/* {this.state.arimaId && */}
                                                             <div className="row col-md-12 pt-lg-2 pl-lg-0" style={{ display: this.state.arimaId ? '' : 'none' }}>
                                                                 {/* <div className="row col-md-12 pt-lg-2 pl-lg-0"> */}
+                                                                <Popover placement="top" isOpen={this.state.popoverOpenTes} target="Popover1" trigger="hover" toggle={() => this.toggle('popoverOpenMa', !this.state.popoverOpenTes)}>
+                                                                    <PopoverBody>{i18n.t('static.tooltip.p')}</PopoverBody>
+                                                                </Popover>
                                                                 <div className="pt-lg-0" style={{ display: 'contents' }}>
                                                                     <div className="tab-ml-1 mt-md-2 mb-md-0 ExtraCheckboxFieldWidth">
-                                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.p')}</Label>
+                                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.p')} <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenTes', !this.state.popoverOpenTes)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                                                         <Input
                                                                             className="controls"
                                                                             type="text"
@@ -2942,6 +2966,9 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                                         />
                                                                         <FormFeedback>{errors.pId}</FormFeedback>
                                                                     </div>
+                                                                    <Popover placement="top" isOpen={this.state.popoverOpenTes} target="Popover1" trigger="hover" toggle={() => this.toggle('popoverOpenMa', !this.state.popoverOpenTes)}>
+                                                                    <PopoverBody>{i18n.t('static.tooltip.d')}</PopoverBody>
+                                                                </Popover>
                                                                     <div className="tab-ml-1 mt-md-2 mb-md-0 ExtraCheckboxFieldWidth">
                                                                         <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.d')}</Label>
                                                                         <Input
@@ -2958,8 +2985,11 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                                         />
                                                                         <FormFeedback>{errors.dId}</FormFeedback>
                                                                     </div>
+                                                                    <Popover placement="top" isOpen={this.state.popoverOpenTes} target="Popover1" trigger="hover" toggle={() => this.toggle('popoverOpenMa', !this.state.popoverOpenTes)}>
+                                                                    <PopoverBody>{i18n.t('static.tooltip.q')}</PopoverBody>
+                                                                </Popover>
                                                                     <div className="tab-ml-1 mt-md-2 mb-md-0 ExtraCheckboxFieldWidth">
-                                                                        <Label htmlFor="appendedInputButton">q</Label>
+                                                                        <Label htmlFor="appendedInputButton">q <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenTes', !this.state.popoverOpenTes)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                                                         <Input
                                                                             className="controls"
                                                                             type="text"
@@ -3033,27 +3063,27 @@ export default class TreeExtrapolationComponent extends React.Component {
                                         </div>
                                         <div className="row pl-lg-0 pr-lg-0">
 
-                                            <div className="table-scroll">
+                                            <div className="">
                                                 <div className="table-wrap table-responsive">
                                                     <Table className="table-bordered text-center mt-2 overflowhide main-table " bordered size="sm" >
                                                         <thead>
                                                             <tr>
 
-                                                                <td width="60px" className="text-left" title={i18n.t('static.common.errors')}><b>{i18n.t('static.common.errors')}</b> <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></td>
+                                                                <td width="150px" className="text-left" title={i18n.t('static.tooltip.errors')}><b>{i18n.t('static.common.errors')}</b> <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></td>
                                                                 {this.state.movingAvgId &&
-                                                                    <td width="110px" title={i18n.t('static.extrapolation.movingAverages')}><b>{i18n.t('static.extrapolation.movingAverages')}</b> <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></td>
+                                                                    <td width="150px" title={i18n.t('static.tooltip.MovingAverages')}><b>{i18n.t('static.extrapolation.movingAverages')}</b> <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></td>
                                                                 }
                                                                 {this.state.semiAvgId &&
-                                                                    <td width="110px" title={i18n.t('static.extrapolation.semiAverages')}><b>{i18n.t('static.extrapolation.semiAverages')}</b> <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></td>
+                                                                    <td width="150px" title={i18n.t('static.tooltip.SemiAverages')}><b>{i18n.t('static.extrapolation.semiAverages')}</b> <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></td>
                                                                 }
                                                                 {this.state.linearRegressionId &&
-                                                                    <td width="110px" title={i18n.t('static.extrapolation.linearRegression')}><b>{i18n.t('static.extrapolation.linearRegression')}</b> <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></td>
+                                                                    <td width="150px" title={i18n.t('static.tooltip.LinearRegression')}><b>{i18n.t('static.extrapolation.linearRegression')}</b> <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></td>
                                                                 }
                                                                 {this.state.smoothingId &&
-                                                                    <td width="110px" title={i18n.t('static.extrapolation.tes')}><b>{i18n.t('static.extrapolation.tes')}</b> <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></td>
+                                                                    <td width="150px" title={i18n.t('static.tooltip.Tes')}><b>{i18n.t('static.extrapolation.tes')}</b> <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></td>
                                                                 }
                                                                 {this.state.arimaId &&
-                                                                    <td width="110px" title={i18n.t('static.extrapolation.arima')}><b>{i18n.t('static.extrapolation.arima')}</b> <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></td>
+                                                                    <td width="150px" title={i18n.t('static.tooltip.arima')}><b>{i18n.t('static.extrapolation.arima')}</b> <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></td>
                                                                 }
                                                             </tr>
                                                         </thead>
@@ -3185,7 +3215,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                 </FormGroup>
                                                 <div>
                                                     <Popover placement="top" isOpen={this.state.popoverChooseMethod} target="Popover1" trigger="hover" toggleChooseMethod={() => this.toggleChooseMethod('popoverChooseMethod', !this.state.popoverChooseMethod)}>
-                                                        <PopoverBody>Need to add Info.</PopoverBody>
+                                                        <PopoverBody>{i18n.t('static.tooltip.ChooseMethod')}</PopoverBody>
                                                     </Popover>
                                                 </div>
                                                 <FormGroup className="col-md-5">
