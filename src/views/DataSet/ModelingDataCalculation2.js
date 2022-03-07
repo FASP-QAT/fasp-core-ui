@@ -155,7 +155,7 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
         for (var fl = 0; fl < flatList.length; fl++) {
             // console.log("FlatList$$$", flatList[fl]);
             var payload = flatList[fl].payload;
-            if (payload.nodeType.id != 1 && payload.extrapolation!=undefined && payload.extrapolation.toString() == "false") {
+            if (payload.nodeType.id != 1 && payload.extrapolation != undefined && payload.extrapolation.toString() == "false") {
                 var nodeDataMap = payload.nodeDataMap;
                 var scenarioList = tree.scenarioList;
                 if (scenarioId != -1) {
@@ -470,7 +470,7 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                         var pu = puFilter[0];
                                         fuPerPu = pu.planningUnit.multiplier;
                                     }
-                                }else{
+                                } else {
                                     fuPerPu = nodeDataMapForScenario.puNode.planningUnit.multiplier;
                                 }
 
