@@ -22,7 +22,7 @@ import moment from 'moment';
 import Picker from 'react-month-picker';
 import SelectSearch from 'react-select-search';
 import MonthBox from '../../CommonComponent/MonthBox.js';
-import { INDEXED_DB_NAME, INDEXED_DB_VERSION, TREE_DIMENSION_ID, SECRET_KEY, JEXCEL_MONTH_PICKER_FORMAT, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, JEXCEL_DECIMAL_NO_REGEX_LONG, DATE_FORMAT_CAP_WITHOUT_DATE, JEXCEL_DECIMAL_MONTHLY_CHANGE } from '../../Constants.js'
+import { ROUNDING_NUMBER, INDEXED_DB_NAME, INDEXED_DB_VERSION, TREE_DIMENSION_ID, SECRET_KEY, JEXCEL_MONTH_PICKER_FORMAT, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, JEXCEL_DECIMAL_NO_REGEX_LONG, DATE_FORMAT_CAP_WITHOUT_DATE, JEXCEL_DECIMAL_MONTHLY_CHANGE } from '../../Constants.js'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import jexcel from 'jexcel-pro';
 import "../../../node_modules/jexcel-pro/dist/jexcel.css";
@@ -684,6 +684,20 @@ export default class BuildTree extends Component {
         this.getMaxNodeDataId = this.getMaxNodeDataId.bind(this);
         this.exportPDF = this.exportPDF.bind(this);
         this.updateExtrapolationData = this.updateExtrapolationData.bind(this);
+        this.round = this.round.bind(this);
+    }
+    round(value) {
+        console.log("Round input value---", value);
+        var result = (value - Math.floor(value)).toFixed(2);
+        console.log("Round result---", result);
+        console.log("Round condition---", `${ROUNDING_NUMBER}`);
+        if (result > `${ROUNDING_NUMBER}`) {
+            console.log("Round ceiling---", Math.ceil(value));
+            return Math.ceil(value);
+        } else {
+            console.log("Round floor---", Math.floor(value));
+            return Math.floor(value);
+        }
     }
     getMaxNodeDataId() {
         var maxNodeDataId = 0;
@@ -7469,7 +7483,7 @@ export default class BuildTree extends Component {
                 console.log("fuPerMonth with round---", Math.round(fuPerMonth));
                 (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].displayCalculatedDataValue = Math.round(totalValue);
                 (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].fuPerMonth = Math.round(fuPerMonth);
-            } 
+            }
             // else if (items[i].payload.nodeType.id == 5) {
             //     var item = items.filter(x => x.id == items[i].parent)[0];
             //     (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].displayCalculatedDataValue = Math.round(((item.payload.nodeDataMap[this.state.selectedScenario])[0].displayCalculatedDataValue * (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].dataValue) / 100);
