@@ -840,12 +840,13 @@ export default class TreeExtrapolationComponent extends React.Component {
                 reportingRate: map1.get("2") != "" ? map1.get("2").toString().replaceAll("%", "") : map1.get("2")
             };
             extrapolationDataList.push(json)
+            // (this.state.dataExtrapolation.getValue(`F${parseInt(i) + 1}`, true)).toString().replaceAll(",", "");
             var json2 = {
-                calculatedValue: map1.get("11"),
+                calculatedValue: (this.state.dataExtrapolation.getValue(`L${parseInt(i) + 1}`, true)).toString().replaceAll(",", ""),
                 difference: 0,
-                endValue: map1.get("11"),
-                endValueWMC: map1.get("11"),
-                manualChange: map1.get("10"),
+                endValue: (this.state.dataExtrapolation.getValue(`L${parseInt(i) + 1}`, true)).toString().replaceAll(",", ""),
+                endValueWMC: (this.state.dataExtrapolation.getValue(`L${parseInt(i) + 1}`, true)).toString().replaceAll(",", ""),
+                manualChange: (this.state.dataExtrapolation.getValue(`K${parseInt(i) + 1}`, true)).toString().replaceAll(",", ""),
                 month: map1.get("0"),
                 seasonalityPerc: 0,
                 startValue: map1.get("1")
@@ -1265,18 +1266,18 @@ export default class TreeExtrapolationComponent extends React.Component {
                     })
                 }
                 if (this.state.smoothingId) {
-                    // if (inputDataTes.length >= (this.state.noOfMonthsForASeason * 2)) {
+                    if (inputDataTes.length >= (this.state.noOfMonthsForASeason * 2)) {
                         console.log("tes inside if")
                         calculateTES(JSON.parse(JSON.stringify(inputDataTes)), this.state.alpha, this.state.beta, this.state.gamma, this.state.confidenceLevelId, this.state.noOfMonthsForASeason, Math.trunc(noOfMonthsForProjection), this);
-                    // } else {
-                    //     console.log("tes inside else")
-                    //     this.setState({
-                    //         extrapolationLoader: false,
-                    //         tesData: [],
-                    //         CI: 0,
-                    //         tesError: { "rmse": "", "mape": "", "mse": "", "wape": "", "rSqd": "" }
-                    //     })
-                    // }
+                    } else {
+                        console.log("tes inside else")
+                        this.setState({
+                            extrapolationLoader: false,
+                            tesData: [],
+                            CI: 0,
+                            tesError: { "rmse": "", "mape": "", "mse": "", "wape": "", "rSqd": "" }
+                        })
+                    }
                 } else {
                     this.setState({
                         tesData: [],

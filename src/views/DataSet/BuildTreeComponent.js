@@ -798,6 +798,7 @@ export default class BuildTree extends Component {
         var items = this.state.items;
         var programData = dataSetObj.programData;
         console.log("program data>>> 1", programData);
+        console.log("program data treeData>>> 1.1", treeData);
         programData.treeList = treeData;
         console.log("program data>>> 2", programData);
         // alert("27---")
@@ -4973,6 +4974,7 @@ export default class BuildTree extends Component {
     }
     dataChange(event) {
         // alert("hi");
+        var flag = false;
         console.log("event---", event);
         let { curTreeObj } = this.state;
         let { currentItemConfig } = this.state;
@@ -5074,6 +5076,7 @@ export default class BuildTree extends Component {
         }
         if (event.target.name === "refillMonths") {
             (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].puNode.refillMonths = event.target.value;
+            flag = true;
             this.getUsageText();
         }
 
@@ -5258,6 +5261,7 @@ export default class BuildTree extends Component {
             this.setState({
                 conversionFactor: pu.multiplier
             }, () => {
+                flag = true;
             });
         }
 
@@ -5268,11 +5272,13 @@ export default class BuildTree extends Component {
             currentScenario: (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0]
         }, () => {
             console.log("after state update---", this.state.currentItemConfig);
+            if(flag){
             if (event.target.name === "planningUnitId") {
                 this.calculatePUPerVisit(false);
             } else if (event.target.name === "refillMonths") {
                 this.calculatePUPerVisit(true);
-            }
+            }else{}
+        }
         });
     }
     onAddButtonClick(itemConfig) {
