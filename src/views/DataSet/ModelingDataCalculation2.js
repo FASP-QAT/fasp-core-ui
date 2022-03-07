@@ -475,7 +475,7 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                 }
 
                                 var monthsPerVisit = nodeDataMapForScenario.puNode.refillMonths;
-                                var noOfBottlesInOneVisit = 6;
+                                var noOfBottlesInOneVisit = nodeDataMapForScenario.puNode.puPerVisit;
                                 var puPerBaseMonth = Math.floor(patients / monthsPerVisit);
                                 var puPerMonthBalance = patients - puPerBaseMonth * monthsPerVisit + puPerBaseMonth;
                                 console.log("daysPerMonth$$$%%%", daysPerMonth);
