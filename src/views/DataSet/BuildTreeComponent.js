@@ -528,6 +528,7 @@ export default class BuildTree extends Component {
                         nodeUnit: {
 
                         },
+                        extrapolation: false,
                         nodeDataMap: [
                             // [
                             //     {
@@ -1226,6 +1227,7 @@ export default class BuildTree extends Component {
                             nodeUnit: {
                                 id: ''
                             },
+                            extrapolation: false,
                             nodeDataMap: nodeDataMap
                         },
                         parentItem: {
@@ -1517,6 +1519,7 @@ export default class BuildTree extends Component {
         var parentStartValue = this.state.parentScenario.calculatedDataValue;
         // console.log("parentStartValue---", parentStartValue)
         var momList = this.state.momListPer;
+        console.log("momList percent node---", momList)
         var momListParent = this.state.momListPerParent;
         console.log("momListParent---", momListParent)
         var dataArray = [];
@@ -1793,6 +1796,7 @@ export default class BuildTree extends Component {
         var getMomDataForCurrentNode = this.state.currentScenario.nodeDataMomList;
         console.log("getMomDataForCurrentNode>>>", getMomDataForCurrentNode);
         if (this.state.currentItemConfig.context.payload.nodeType.id > 2) {
+            console.log("mom list parent---", this.state.parentScenario);
             var getMomDataForCurrentNodeParent = this.state.parentScenario.nodeDataMomList;
             console.log("in if>>>>", getMomDataForCurrentNodeParent);
 
@@ -5272,13 +5276,13 @@ export default class BuildTree extends Component {
             currentScenario: (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0]
         }, () => {
             console.log("after state update---", this.state.currentItemConfig);
-            if(flag){
-            if (event.target.name === "planningUnitId") {
-                this.calculatePUPerVisit(false);
-            } else if (event.target.name === "refillMonths") {
-                this.calculatePUPerVisit(true);
-            }else{}
-        }
+            if (flag) {
+                if (event.target.name === "planningUnitId") {
+                    this.calculatePUPerVisit(false);
+                } else if (event.target.name === "refillMonths") {
+                    this.calculatePUPerVisit(true);
+                } else { }
+            }
         });
     }
     onAddButtonClick(itemConfig) {
@@ -5291,6 +5295,7 @@ export default class BuildTree extends Component {
         newItem.id = nodeId;
         newItem.level = parseInt(itemConfig.context.level + 1);
         newItem.payload.nodeId = nodeId;
+        // newItem.payload.extrapolate = itemConfig.context.payload.extrapolate;
         var parentSortOrder = items.filter(c => c.id == itemConfig.context.parent)[0].sortOrder;
         var childList = items.filter(c => c.parent == itemConfig.context.parent);
         newItem.sortOrder = parentSortOrder.concat(".").concat(("0" + (Number(childList.length) + 1)).slice(-2));
@@ -5838,7 +5843,7 @@ export default class BuildTree extends Component {
 
 
         let bar1 = {}
-        if (this.state.momListPer.length > 0 && this.state.momElPer != '') {
+        if (this.state.momListPer != null && this.state.momListPer.length > 0 && this.state.momElPer != '') {
             var datasetsArr = [];
 
             datasetsArr.push(
@@ -7949,6 +7954,7 @@ export default class BuildTree extends Component {
                                                 nodeUnit: {
                                                     id: ''
                                                 },
+                                                extrapolation: false,
                                                 nodeDataMap: nodeDataMap
                                             }
                                         },
