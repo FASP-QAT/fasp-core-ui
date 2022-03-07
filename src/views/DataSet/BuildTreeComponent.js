@@ -7565,7 +7565,7 @@ export default class BuildTree extends Component {
                 }
                 console.log("fuPerMonth without round---", fuPerMonth);
                 console.log("fuPerMonth with round---", Math.round(fuPerMonth));
-                (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].displayCalculatedDataValue = Math.round(totalValue);
+                // (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].displayCalculatedDataValue = Math.round(totalValue);
                 (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].fuPerMonth = Math.round(fuPerMonth);
             }
             // else if (items[i].payload.nodeType.id == 5) {
