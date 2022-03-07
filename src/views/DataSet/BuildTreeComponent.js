@@ -5866,6 +5866,15 @@ export default class BuildTree extends Component {
                                 setFieldTouched
                             }) => (
                                 <Form className="needs-validation" onSubmit={handleSubmit} onReset={handleReset} noValidate name='nodeDataForm' autocomplete="off">
+                                     <div className="row pt-lg-0" style={{ float: 'right', marginTop: '-42px' }}>
+                                            <div className="row pl-lg-0 pr-lg-3">
+                                                {/* <SupplyPlanFormulas ref="formulaeChild" /> */}
+                                                <a className="">
+                                                    <span style={{ cursor: 'pointer', color: '20a8d8' }} ><small className="supplyplanformulas">{i18n.t('Show Guidance')}</small></span>
+
+                                                </a>
+                                            </div>
+                                        </div>
                                     <div className="row">
                                         <FormGroup className="col-md-6">
                                             <Label htmlFor="currencyId">{i18n.t('static.whatIf.scenario')}</Label>
@@ -6802,7 +6811,15 @@ export default class BuildTree extends Component {
                             )} />
                 </TabPane>
                 <TabPane tabId="2">
+                <div className="row pt-lg-0" style={{ float: 'right', marginTop: '-42px' }}>
+                                            <div className="row pl-lg-0 pr-lg-3">
+                                                {/* <SupplyPlanFormulas ref="formulaeChild" /> */}
+                                                <a className="">
+                                                    <span style={{ cursor: 'pointer', color: '20a8d8' }} ><small className="supplyplanformulas">{i18n.t('Show Guidance')}</small></span>
 
+                                                </a>
+                                            </div>
+                                        </div>
                     {/* <div className="row pl-lg-5 pb-lg-3 pt-lg-0">
                         <div className="offset-md-10 col-md-6 pl-lg-4">
                             <SupplyPlanFormulas ref="formulaeChild" />
@@ -6813,6 +6830,7 @@ export default class BuildTree extends Component {
                         </div>
                     </div> */}
                     <div className="row pl-lg-2 pr-lg-2">
+      
                         {/* 
                         <FormGroup className="col-md-2 pt-lg-1">
                             <Label htmlFor="">Node Title<span class="red Reqasterisk">*</span></Label>
