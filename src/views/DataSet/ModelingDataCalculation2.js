@@ -506,15 +506,16 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                 var noOfPatientsNew = 0;
                                 var noOfPatients = 0;
                                 if (cycle == 0) {
-                                    var mod = monthNo % monthsPerVisit;
-                                    console.log("mod$$$%%%", mod);
-                                    if (mod == 0) {
-                                        noOfPatientsNew = puPerMonthBalance + deltaPatients;
-                                    } else {
-                                        noOfPatientsNew = puPerBaseMonth + deltaPatients;
-                                    }
-                                    console.log("noOfPatientsNew$$$%%%", noOfPatientsNew);
-                                    noOfPatients = noOfPatientsNew;
+                                    // var mod = monthNo % monthsPerVisit;
+                                    // console.log("mod$$$%%%", mod);
+                                    // if (mod == 0) {
+                                    //     noOfPatientsNew = puPerMonthBalance + deltaPatients;
+                                    // } else {
+                                    //     noOfPatientsNew = puPerBaseMonth + deltaPatients;
+                                    // }
+                                    // console.log("noOfPatientsNew$$$%%%", noOfPatientsNew);
+                                    noOfPatients = (patients / monthsPerVisit) + deltaPatients;
+                                    console.log("noOfPatients@@@", noOfPatients);
                                     calculatedMMdPatients.push({ month: curDate, value: noOfPatients });
                                 } else {
                                     var prevCycleValue = calculatedMMdPatients.filter(c => moment(c.month).format("YYYY-MM") == moment(curDate).add(-monthsPerVisit, 'months').format("YYYY-MM"))[0].value;
