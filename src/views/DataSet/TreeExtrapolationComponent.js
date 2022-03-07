@@ -2503,7 +2503,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                     lineTension: 0,
                     label: i18n.t('static.extrapolation.movingAverages'),
                     backgroundColor: 'transparent',
-                    borderColor: '#A7C6ED',
+                    borderColor: '#002f6c',
                     ticks: {
                         fontSize: 2,
                         fontColor: 'transparent',
@@ -2522,7 +2522,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                 lineTension: 0,
                 label: i18n.t('static.extrapolation.semiAverages'),
                 backgroundColor: 'transparent',
-                borderColor: '#49A4A1',
+                borderColor: '#118B70',
                 ticks: {
                     fontSize: 2,
                     fontColor: 'transparent',
@@ -2543,7 +2543,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                     lineTension: 0,
                     label: i18n.t('static.extrapolation.linearRegression'),
                     backgroundColor: 'transparent',
-                    borderColor: '#118B70',
+                    borderColor: '#A7C6ED',
                     ticks: {
                         fontSize: 2,
                         fontColor: 'transparent',
@@ -2563,7 +2563,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                 lineTension: 0,
                 label: i18n.t('static.extrapolation.tesLower'),
                 backgroundColor: 'transparent',
-                borderColor: '#002FC6',
+                borderColor: '#BA0C2F',
                 borderStyle: 'dotted',
                 borderDash: [10, 10],
                 ticks: {
@@ -2585,7 +2585,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                 lineTension: 0,
                 label: i18n.t('static.extrapolation.tes'),
                 backgroundColor: 'transparent',
-                borderColor: '#651D32',
+                borderColor: '#BA0C2F',
                 ticks: {
                     fontSize: 2,
                     fontColor: 'transparent',
@@ -2605,7 +2605,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                 lineTension: 0,
                 label: i18n.t('static.extrapolation.tesUpper'),
                 backgroundColor: 'transparent',
-                borderColor: '#6c6463',
+                borderColor: '#BA0C2F',
                 borderStyle: 'dotted',
                 borderDash: [10, 10],
                 ticks: {
@@ -2627,7 +2627,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                 lineTension: 0,
                 label: i18n.t('static.extrapolation.arima'),
                 backgroundColor: 'transparent',
-                borderColor: '#BA0C2F',
+                borderColor: '#F48521',
                 ticks: {
                     fontSize: 2,
                     fontColor: 'transparent',

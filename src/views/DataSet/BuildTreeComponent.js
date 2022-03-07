@@ -1517,6 +1517,7 @@ export default class BuildTree extends Component {
             data[6] = parseFloat(momList[j].calculatedValue).toFixed(2)
             // data[6] = this.state.manualChange ? momList[j].calculatedValue : ((momListParent[j].manualChange > 0) ? momListParent[j].endValueWithManualChangeWMC : momListParent[j].calculatedValueWMC *  momList[j].endValueWithManualChangeWMC) / 100
             data[7] = this.state.currentScenario.nodeDataId
+            data[8] = parseFloat(momList[j].calculatedMmdValue).toFixed(2)
             // `=ROUND(((E${parseInt(j) + 1}*F${parseInt(j) + 1})/100),0)`
             dataArray[count] = data;
             count++;
@@ -1580,6 +1581,12 @@ export default class BuildTree extends Component {
                     title: 'Node data id',
                     type: 'hidden',
 
+                },
+                {
+                    title: '# of PUs',
+                    type: this.state.currentItemConfig.context.payload.nodeType.id == 5 ? 'numeric' : 'hidden',
+                    mask: '#,##.00', decimal: '.',
+                    readOnly: true
                 }
 
             ],
@@ -6343,7 +6350,7 @@ export default class BuildTree extends Component {
                                                         <Input type="text"
                                                             id="puInterval"
                                                             name="puInterval"
-                                                            readOnly={true}
+                                                            // readOnly={true}
                                                             bsSize="sm"
                                                             value={addCommas(this.state.parentScenario.fuNode.usageType.id == 2 ? (((this.state.parentScenario.fuNode.noOfForecastingUnitsPerPerson /
                                                                 this.state.noOfMonthsInUsagePeriod) / this.state.conversionFactor) * this.state.currentScenario.puNode.refillMonths) : (this.state.currentScenario.puNode.sharePlanningUnit == "true" || this.state.currentScenario.puNode.sharePlanningUnit == true ? (this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor) : Math.round((this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor))))}>
@@ -7479,7 +7486,11 @@ export default class BuildTree extends Component {
                 if (nodeDataModelingMap.length > 0) {
                     console.log("get payload 13");
                     if (nodeDataModelingMap[0].calculatedValue != null && nodeDataModelingMap[0].endValue != null) {
-                        (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].displayCalculatedDataValue = nodeDataModelingMap[0].calculatedValue;
+                        if (items[i].payload.nodeType.id == 5) {
+                            (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].displayCalculatedDataValue = nodeDataModelingMap[0].calculatedMmdValue;
+                        } else {
+                            (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].displayCalculatedDataValue = nodeDataModelingMap[0].calculatedValue;
+                        }
                         (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].displayDataValue = nodeDataModelingMap[0].endValue;
                     } else {
                         console.log("get payload 14");
@@ -7520,10 +7531,11 @@ export default class BuildTree extends Component {
                 console.log("fuPerMonth with round---", Math.round(fuPerMonth));
                 (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].displayCalculatedDataValue = Math.round(totalValue);
                 (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].fuPerMonth = Math.round(fuPerMonth);
-            } else if (items[i].payload.nodeType.id == 5) {
-                var item = items.filter(x => x.id == items[i].parent)[0];
-                (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].displayCalculatedDataValue = Math.round(((item.payload.nodeDataMap[this.state.selectedScenario])[0].displayCalculatedDataValue * (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].dataValue) / 100);
-            }
+            } 
+            // else if (items[i].payload.nodeType.id == 5) {
+            //     var item = items.filter(x => x.id == items[i].parent)[0];
+            //     (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].displayCalculatedDataValue = Math.round(((item.payload.nodeDataMap[this.state.selectedScenario])[0].displayCalculatedDataValue * (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].dataValue) / 100);
+            // }
         }
         this.setState({
             items
