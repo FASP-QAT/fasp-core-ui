@@ -611,7 +611,7 @@ class ModelingValidation extends Component {
         var levelId = e.target.value;
         localStorage.setItem("sesLevelId", levelId);
         var levelUnit = "";
-        if (levelId != "") {
+        if (levelId !== "") {
             var treeListFiltered = this.state.treeListFiltered;
             var flatDataForLevel = treeListFiltered.tree.flatList.filter(c => c.level == levelId);
             var flatData = flatDataForLevel[0];
