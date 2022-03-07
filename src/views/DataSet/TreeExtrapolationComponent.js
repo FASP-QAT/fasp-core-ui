@@ -3136,7 +3136,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                 </FormGroup>
                                             </div>
                                         </div>
-                                        <div className="row pl-lg-0 pr-lg-0 extrapolateTable consumptionDataEntryTable">
+                                        <div className="row pl-lg-0 pr-lg-0 extrapolateTable extrapolateTableFilter consumptionDataEntryTable">
                                             <div id="tableDiv" className=""></div>
                                         </div>
                                         {/* Graph */}

@@ -609,6 +609,7 @@ class ProductValidation extends Component {
                 pagination: false,
                 search: false,
                 columnSorting: false,
+                defaultColWidth: 120,
                 tableOverflow: true,
                 wordWrap: true,
                 allowInsertColumn: false,
