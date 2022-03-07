@@ -1998,7 +1998,7 @@ export default class ExtrapolateDataComponent extends React.Component {
             lineTension: 0,
             label: i18n.t('static.extrapolation.adjustedActuals'),
             backgroundColor: 'transparent',
-            borderColor: '#CFCDC9',
+            borderColor: '#6C6463',
             ticks: {
                 fontSize: 2,
                 fontColor: 'transparent',

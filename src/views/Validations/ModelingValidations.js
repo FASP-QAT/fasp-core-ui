@@ -485,7 +485,7 @@ class ModelingValidation extends Component {
                 monthList.push(curDate)
             }
             let columns = [];
-            columns.push({ title: i18n.t('static.inventoryDate.inventoryReport'), type: 'calendar', options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker' }, width: 100, readOnly: true });
+            columns.push({ title: i18n.t('static.inventoryDate.inventoryReport'), type: 'calendar', options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker' },readOnly: true });
             var nodeVal = [...new Set(this.state.nodeVal.map(ele => (ele.label)))];
             for (var k = 0; k < nodeVal.length; k++) {
                 columns.push({ title: nodeVal[k].label, readOnly: true, type: displayBy == 1 ? 'numeric' : 'hidden', mask: displayBy == 1 ? '#,##.00' : '#,##.00 %', decimal: '.' });
@@ -562,10 +562,10 @@ class ModelingValidation extends Component {
                 onload: this.loaded,
                 pagination: false,
                 search: false,
-                defaultColWidth: 100,
+                defaultColWidth: 120,
                 columnSorting: false,
                 tableOverflow: true,
-                tableWidth: "100%",
+                // tableWidth: "100%",
                 wordWrap: true,
                 allowInsertColumn: false,
                 allowManualInsertColumn: false,
@@ -1287,7 +1287,7 @@ class ModelingValidation extends Component {
 
         let bar = {}
         var datasetListForGraph = [];
-        var colourArray = ["#002F6C", "#BA0C2F", "#65ID32", "#49A4A1", "#A7C6ED", "#212721", "#6C6463", "#EDB944", "#F48521", "#86cd99", "#696969", "#FA8072"]
+        var colourArray = ["#002F6C", "#BA0C2F", "#651D32", "#49A4A1", "#A7C6ED", "#212721", "#6C6463", "#EDB944", "#F48521", "#118B70", "#8C8985", "#CFCDC9"]
         if (this.state.monthList.length > 0 && this.state.dataEl != undefined && this.state.dataEl != "") {
             var elInstance = this.state.dataEl;
             if (elInstance != undefined && this.state.dataEl != "") {
@@ -1630,7 +1630,7 @@ class ModelingValidation extends Component {
 
                                     {/* {this.state.show && */}
                                     <div className="row">
-                                        <div className="col-md-12 pl-0 pr-0">
+                                        <div className="pl-0 pr-0 ModelingValidationTable">
 
                                             {/* // <div className="table-scroll">
                                                     // <div className="table-wrap table-responsive"> */}

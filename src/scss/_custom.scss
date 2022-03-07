@@ -3526,6 +3526,7 @@ border-radius: 2em;
 @media screen and (min-width: 768px){
 .month-picker > .rmp-container .rmp-popup {
     width: 17rem!important;
+    // width: 34.6rem!important;
 }
 }
 
@@ -6095,3 +6096,12 @@ font-style: italic!important;
   overflow-y: scroll;
   overflow-x: hidden;
 }
+.ModelingValidationTable .jexcel {
+
+  table-layout: unset!important; 
+  
+}
+.extrapolateTableFilter .jexcel_filters{
+  top: 458.2188px!important;
+  left: 296.203px;
+  }
