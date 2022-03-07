@@ -756,7 +756,8 @@ export default class TreeExtrapolationComponent extends React.Component {
                 month: map1.get("0"),
                 amount: map1.get("1") != "" ? map1.get("1").toString().replaceAll(",", "") : map1.get("1"),
                 reportingRate: map1.get("2") != "" ? map1.get("2").toString().replaceAll("%", "") : map1.get("2"),
-                monthNo: resultCount
+                monthNo: resultCount,
+                manualChange: map1.get("10")
             }
             jexcelDataArr.push(json);
         }
@@ -1188,7 +1189,8 @@ export default class TreeExtrapolationComponent extends React.Component {
                     month: map1.get("0"),
                     amount: map1.get("1") != "" ? map1.get("1").toString().replaceAll(",", "") : map1.get("1"),
                     reportingRate: map1.get("2") != "" ? map1.get("2").toString().replaceAll("%", "") : map1.get("2"),
-                    monthNo: resultCount
+                    monthNo: resultCount,
+                    manualChange: map1.get("10")
                 }
                 jexcelDataArr.push(json);
             }
@@ -1317,7 +1319,8 @@ export default class TreeExtrapolationComponent extends React.Component {
                         month: map1.get("0"),
                         amount: map1.get("1") != "" ? map1.get("1").toString().replaceAll(",", "") : map1.get("1"),
                         reportingRate: map1.get("2") != "" ? map1.get("2").toString().replaceAll("%", "") : map1.get("2"),
-                        monthNo: resultCount
+                        monthNo: resultCount,
+                        manualChange: map1.get("10")
                     }
                     jexcelDataArr.push(json);
                 }
@@ -1354,7 +1357,8 @@ export default class TreeExtrapolationComponent extends React.Component {
                                 var json = {
                                     month: monthArray[j],
                                     amount: missingActualData % 1 != 0 ? missingActualData.toFixed(2) : missingActualData,
-                                    reportingRate: dataArr.reportingRate
+                                    reportingRate: dataArr.reportingRate,
+                                    manualChange: dataArr.manualChange
                                 }
                                 jexcelDataArr.splice(index, 1, json);
                                 // interpolatedData.push(json);
@@ -1633,7 +1637,7 @@ export default class TreeExtrapolationComponent extends React.Component {
             }
             // data[9] = `=IF(ISBLANK(B${parseInt(j) + 1}),10,ROUND(B${parseInt(j) + 1},2))`
             data[9] = `=IF(D${parseInt(j) + 1} != "",ROUND(D${parseInt(j) + 1},2),IF(N1 == 2,H${parseInt(j) + 1},IF(N1 == 7,E${parseInt(j) + 1},IF(N1==5,G${parseInt(j) + 1},IF(N1 == 6,F${parseInt(j) + 1},'')))))` // J
-            data[10] = "" // K
+            data[10] = cellData != null && cellData != "" ? cellData.manualChange : ""
             data[11] = `=IF(M1 == true,ROUND(J${parseInt(j)} + K${parseInt(j)},2),ROUND(J${parseInt(j) + 1} + K${parseInt(j) + 1},2))`
             data[12] = this.props.items.currentItemConfig.context.payload.nodeDataMap[this.props.items.selectedScenario][0].manualChangesEffectFuture
             data[13] = this.state.nodeDataExtrapolation.extrapolationMethod.id
