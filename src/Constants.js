@@ -139,3 +139,4 @@ export const MAX_PROGRAM_CODE_LENGTH = 50;
 export const TREE_DIMENSION_ID = 5;
 export const REPORT_DATEPICKER_START_MONTH = 6;
 export const REPORT_DATEPICKER_END_MONTH = 12;
+export const ROUNDING_NUMBER = 0.15;
