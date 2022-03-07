@@ -1265,18 +1265,18 @@ export default class TreeExtrapolationComponent extends React.Component {
                     })
                 }
                 if (this.state.smoothingId) {
-                    if (inputDataTes.length >= (this.state.noOfMonthsForASeason * 2)) {
+                    // if (inputDataTes.length >= (this.state.noOfMonthsForASeason * 2)) {
                         console.log("tes inside if")
                         calculateTES(JSON.parse(JSON.stringify(inputDataTes)), this.state.alpha, this.state.beta, this.state.gamma, this.state.confidenceLevelId, this.state.noOfMonthsForASeason, Math.trunc(noOfMonthsForProjection), this);
-                    } else {
-                        console.log("tes inside else")
-                        this.setState({
-                            extrapolationLoader: false,
-                            tesData: [],
-                            CI: 0,
-                            tesError: { "rmse": "", "mape": "", "mse": "", "wape": "", "rSqd": "" }
-                        })
-                    }
+                    // } else {
+                    //     console.log("tes inside else")
+                    //     this.setState({
+                    //         extrapolationLoader: false,
+                    //         tesData: [],
+                    //         CI: 0,
+                    //         tesError: { "rmse": "", "mape": "", "mse": "", "wape": "", "rSqd": "" }
+                    //     })
+                    // }
                 } else {
                     this.setState({
                         tesData: [],
