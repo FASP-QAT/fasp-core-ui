@@ -285,6 +285,18 @@ const validationSchemaNodeData = function (values) {
                         return true;
                     }
                 }),
+        puPerVisit: Yup.string()
+            .test('puPerVisit', 'Please enter # of pu per visit.',
+                function (value) {
+                    // console.log("*****", document.getElementById("nodeValue").value);
+                    // var testNumber = (/^(?!$)\d{0,10}?$/).test((document.getElementById("refillMonths").value).replaceAll(",", ""));
+                    // console.log("*****", testNumber);
+                    if (document.getElementById("nodeTypeId").value == 5 && document.getElementById("puPerVisit").value == "") {
+                        return false;
+                    } else {
+                        return true;
+                    }
+                }),
 
     })
 }
@@ -685,7 +697,29 @@ export default class BuildTree extends Component {
         this.exportPDF = this.exportPDF.bind(this);
         this.updateExtrapolationData = this.updateExtrapolationData.bind(this);
         this.round = this.round.bind(this);
+        this.calculatePUPerVisit = this.calculatePUPerVisit.bind(this);
     }
+    calculatePUPerVisit(isRefillMonth) {
+        var currentScenario = this.state.currentScenario;
+        var parentScenario = this.state.parentScenario;
+        var currentItemConfig = this.state.currentItemConfig;
+        var conversionFactor = this.state.conversionFactor;
+        console.log("PUPERVISIT conversionFactor---", conversionFactor);
+        var refillMonths = isRefillMonth && currentScenario.puNode.refillMonths != "" ? currentScenario.puNode.refillMonths : this.round(parseFloat(conversionFactor / (parentScenario.fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod)).toFixed(2));
+        console.log("PUPERVISIT refillMonths---", refillMonths);
+        console.log("PUPERVISIT noOfForecastingUnitsPerPerson---", parentScenario.fuNode.noOfForecastingUnitsPerPerson);
+        console.log("PUPERVISIT noOfMonthsInUsagePeriod---", this.state.noOfMonthsInUsagePeriod);
+        var puPerVisit = this.round(parseFloat(((parentScenario.fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod) * refillMonths) / conversionFactor).toFixed(2));
+        console.log("PUPERVISIT puPerVisit---", puPerVisit);
+
+        currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.puPerVisit = puPerVisit;
+        if (!isRefillMonth) {
+            currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.refillMonths = refillMonths;
+        }
+        currentScenario = currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0];
+        this.setState({ currentItemConfig, currentScenario });
+    }
+
     round(value) {
         console.log("Round input value---", value);
         var result = (value - Math.floor(value)).toFixed(2);
@@ -696,7 +730,11 @@ export default class BuildTree extends Component {
             return Math.ceil(value);
         } else {
             console.log("Round floor---", Math.floor(value));
-            return Math.floor(value);
+            if (Math.floor(value) == 0) {
+                return Math.ceil(value);
+            } else {
+                return Math.floor(value);
+            }
         }
     }
     getMaxNodeDataId() {
@@ -4359,7 +4397,8 @@ export default class BuildTree extends Component {
             planningUnitId: true,
             refillMonths: true,
             sharePlanningUnit: true,
-            forecastingUnitId: true
+            forecastingUnitId: true,
+            puPerVisit: true
             // usagePeriodId:true
         }
         )
@@ -5037,6 +5076,13 @@ export default class BuildTree extends Component {
             (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].puNode.refillMonths = event.target.value;
             this.getUsageText();
         }
+
+        if (event.target.name === "puPerVisit") {
+            (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].puNode.puPerVisit = event.target.value;
+            this.getUsageText();
+        }
+
+
         // if (event.target.name === "forecastMethodId") {
         //     treeTemplatee.forecastMethod.id = event.target.value;
         // }
@@ -5212,7 +5258,6 @@ export default class BuildTree extends Component {
             this.setState({
                 conversionFactor: pu.multiplier
             }, () => {
-
             });
         }
 
@@ -5223,6 +5268,11 @@ export default class BuildTree extends Component {
             currentScenario: (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0]
         }, () => {
             console.log("after state update---", this.state.currentItemConfig);
+            if (event.target.name === "planningUnitId") {
+                this.calculatePUPerVisit(false);
+            } else if (event.target.name === "refillMonths") {
+                this.calculatePUPerVisit(true);
+            }
         });
     }
     onAddButtonClick(itemConfig) {
@@ -5880,15 +5930,15 @@ export default class BuildTree extends Component {
                                 setFieldTouched
                             }) => (
                                 <Form className="needs-validation" onSubmit={handleSubmit} onReset={handleReset} noValidate name='nodeDataForm' autocomplete="off">
-                                     <div className="row pt-lg-0" style={{ float: 'right', marginTop: '-42px' }}>
-                                            <div className="row pl-lg-0 pr-lg-3">
-                                                {/* <SupplyPlanFormulas ref="formulaeChild" /> */}
-                                                <a className="">
-                                                    <span style={{ cursor: 'pointer', color: '20a8d8' }} ><small className="supplyplanformulas">{i18n.t('Show Guidance')}</small></span>
+                                    <div className="row pt-lg-0" style={{ float: 'right', marginTop: '-42px' }}>
+                                        <div className="row pl-lg-0 pr-lg-3">
+                                            {/* <SupplyPlanFormulas ref="formulaeChild" /> */}
+                                            <a className="">
+                                                <span style={{ cursor: 'pointer', color: '20a8d8' }} ><small className="supplyplanformulas">{i18n.t('Show Guidance')}</small></span>
 
-                                                </a>
-                                            </div>
+                                            </a>
                                         </div>
+                                    </div>
                                     <div className="row">
                                         <FormGroup className="col-md-6">
                                             <Label htmlFor="currencyId">{i18n.t('static.whatIf.scenario')}</Label>
@@ -6234,7 +6284,7 @@ export default class BuildTree extends Component {
                                                             name="noOfPUUsage"
                                                             bsSize="sm"
                                                             readOnly={true}
-                                                            value={addCommas(this.state.parentScenario.fuNode.usageType.id == 2 ? ((this.state.parentScenario.fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod) / this.state.conversionFactor) : (this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor))}>
+                                                            value={addCommas(this.state.parentScenario.fuNode.usageType.id == 2 ? this.round((this.state.parentScenario.fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod) / this.state.conversionFactor) : this.round(this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor))}>
 
                                                         </Input>
                                                     </FormGroup>
@@ -6271,7 +6321,7 @@ export default class BuildTree extends Component {
                                                                     bsSize="sm"
                                                                     readOnly={true}
                                                                     // value={addCommas(this.state.conversionFactor / ((this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod))}>
-                                                                    value={addCommas(this.state.conversionFactor / (this.state.parentScenario.fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod))}>
+                                                                    value={addCommas(this.round(this.state.conversionFactor / (this.state.parentScenario.fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod)))}>
 
                                                                 </Input>
                                                             </FormGroup>
@@ -6331,14 +6381,24 @@ export default class BuildTree extends Component {
                                                     </FormGroup>
                                                     <FormGroup className="col-md-10">
                                                         <Input type="text"
-                                                            id="puInterval"
-                                                            name="puInterval"
-                                                            // readOnly={true}
+                                                            id="puPerVisit"
+                                                            name="puPerVisit"
+                                                            readOnly={this.state.parentScenario.fuNode.usageType.id == 2 ? false : true}
                                                             bsSize="sm"
-                                                            value={addCommas(this.state.parentScenario.fuNode.usageType.id == 2 ? (((this.state.parentScenario.fuNode.noOfForecastingUnitsPerPerson /
-                                                                this.state.noOfMonthsInUsagePeriod) / this.state.conversionFactor) * this.state.currentScenario.puNode.refillMonths) : (this.state.currentScenario.puNode.sharePlanningUnit == "true" || this.state.currentScenario.puNode.sharePlanningUnit == true ? (this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor) : Math.round((this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor))))}>
+                                                            valid={!errors.puPerVisit && this.state.currentItemConfig.context.payload.nodeType.id == 5 ? this.state.currentScenario.puNode.puPerVisit != '' : !errors.puPerVisit}
+                                                            invalid={touched.puPerVisit && !!errors.puPerVisit}
+                                                            onBlur={handleBlur}
+                                                            onChange={(e) => {
+                                                                handleChange(e);
+                                                                this.dataChange(e)
+                                                            }}
+                                                            value={this.state.parentScenario.fuNode.usageType.id == 2 ? addCommas(this.state.currentScenario.puNode.puPerVisit) : (this.state.currentScenario.puNode.sharePlanningUnit == "true" || this.state.currentScenario.puNode.sharePlanningUnit == true ? (this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor) : this.round((this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor)))}
+                                                        // value={addCommas(this.state.parentScenario.fuNode.usageType.id == 2 ? (((this.state.parentScenario.fuNode.noOfForecastingUnitsPerPerson /
+                                                        //     this.state.noOfMonthsInUsagePeriod) / this.state.conversionFactor) * this.state.currentScenario.puNode.refillMonths) : (this.state.currentScenario.puNode.sharePlanningUnit == "true" || this.state.currentScenario.puNode.sharePlanningUnit == true ? (this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor) : Math.round((this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor))))}
+                                                        >
 
                                                         </Input>
+                                                        <FormFeedback className="red">{errors.puPerVisit}</FormFeedback>
                                                     </FormGroup>
 
                                                 </>}
@@ -6825,15 +6885,15 @@ export default class BuildTree extends Component {
                             )} />
                 </TabPane>
                 <TabPane tabId="2">
-                <div className="row pt-lg-0" style={{ float: 'right', marginTop: '-42px' }}>
-                                            <div className="row pl-lg-0 pr-lg-3">
-                                                {/* <SupplyPlanFormulas ref="formulaeChild" /> */}
-                                                <a className="">
-                                                    <span style={{ cursor: 'pointer', color: '20a8d8' }} ><small className="supplyplanformulas">{i18n.t('Show Guidance')}</small></span>
+                    <div className="row pt-lg-0" style={{ float: 'right', marginTop: '-42px' }}>
+                        <div className="row pl-lg-0 pr-lg-3">
+                            {/* <SupplyPlanFormulas ref="formulaeChild" /> */}
+                            <a className="">
+                                <span style={{ cursor: 'pointer', color: '20a8d8' }} ><small className="supplyplanformulas">{i18n.t('Show Guidance')}</small></span>
 
-                                                </a>
-                                            </div>
-                                        </div>
+                            </a>
+                        </div>
+                    </div>
                     {/* <div className="row pl-lg-5 pb-lg-3 pt-lg-0">
                         <div className="offset-md-10 col-md-6 pl-lg-4">
                             <SupplyPlanFormulas ref="formulaeChild" />
@@ -6844,7 +6904,7 @@ export default class BuildTree extends Component {
                         </div>
                     </div> */}
                     <div className="row pl-lg-2 pr-lg-2">
-      
+
                         {/* 
                         <FormGroup className="col-md-2 pt-lg-1">
                             <Label htmlFor="">Node Title<span class="red Reqasterisk">*</span></Label>
