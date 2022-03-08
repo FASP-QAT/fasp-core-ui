@@ -169,6 +169,7 @@ export default class ExtrapolateDataComponent extends React.Component {
             forecastProgramList: [],
             planningUnitId: -1,
             planningUnitList: [],
+            show: false,
             regionId: -1,
             regionList: [],
             monthArray: [],
@@ -304,7 +305,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                     });
 
                     var forecastProgramJson = {
-                        name: datasetJson.programCode +"~v"+myResult[i].version,
+                        name: datasetJson.programCode + "~v" + myResult[i].version,
                         id: myResult[i].id,
                         regionList: regionList,
                         planningUnitList: planningUnitList,
@@ -431,9 +432,9 @@ export default class ExtrapolateDataComponent extends React.Component {
             dataArray.push(data)
         }
         this.el = jexcel(document.getElementById("tableDiv"), '');
-        try{
-        this.el.destroy();
-        }catch(error){}
+        try {
+            this.el.destroy();
+        } catch (error) { }
         var options = {
             data: dataArray,
             columnDrag: true,
@@ -445,43 +446,43 @@ export default class ExtrapolateDataComponent extends React.Component {
                     },
                     {
                         title: i18n.t('static.extrapolation.adjustedActuals'),
-                        type: 'numeric', mask: '#,##.00', decimal: '.', readOnly: true
+                        type: 'numeric', mask: '#,##.00', decimal: '.', readOnly: false
                     },
                     {
                         title: i18n.t('static.extrapolation.movingAverages'),
                         type: this.state.movingAvgId ? 'numeric' : 'hidden',
-                        mask: '#,##.00', decimal: '.', readOnly: true
+                        mask: '#,##.00', decimal: '.', readOnly: false
                     },
                     {
                         title: i18n.t('static.extrapolation.semiAverages'),
                         type: this.state.semiAvgId ? 'numeric' : 'hidden',
-                        mask: '#,##.00', decimal: '.', readOnly: true
+                        mask: '#,##.00', decimal: '.', readOnly: false
                     },
                     {
                         title: i18n.t('static.extrapolation.linearRegression'),
                         type: this.state.linearRegressionId ? 'numeric' : 'hidden',
-                        mask: '#,##.00', decimal: '.', readOnly: true
+                        mask: '#,##.00', decimal: '.', readOnly: false
                     },
                     {
                         title: i18n.t('static.extrapolation.tesLower'),
                         type: this.state.smoothingId ? 'numeric' : 'hidden',
-                        mask: '#,##.00', decimal: '.', readOnly: true
+                        mask: '#,##.00', decimal: '.', readOnly: false
                     },
                     {
                         title: i18n.t('static.extrapolation.tes'),
                         type: this.state.smoothingId ? 'numeric' : 'hidden',
-                        mask: '#,##.00', decimal: '.', readOnly: true
+                        mask: '#,##.00', decimal: '.', readOnly: false
                     },
                     {
                         title: i18n.t('static.extrapolation.tesUpper'),
                         type: this.state.smoothingId ? 'numeric' : 'hidden',
-                        mask: '#,##.00', decimal: '.', readOnly: true
+                        mask: '#,##.00', decimal: '.', readOnly: false
                     },
-                    // {
-                    //     title: i18n.t('static.extrapolation.arima'),
-                    //     type: this.state.arimaId ? 'numeric' : 'hidden',
-                    //     mask: '#,##.00', decimal: '.',readOnly:true
-                    // }
+                    {
+                        title: i18n.t('static.extrapolation.arima'),
+                        type: this.state.arimaId ? 'numeric' : 'hidden',
+                        mask: '#,##.00', decimal: '.',readOnly:false
+                    }
                 ],
             text: {
                 // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
@@ -495,10 +496,24 @@ export default class ExtrapolateDataComponent extends React.Component {
                     var rowData = elInstance.getRowData(y);
                     if (moment(rowData[0]).format("YYYY-MM") >= moment(this.state.datasetJson.currentVersion.forecastStartDate).format("YYYY-MM") && moment(rowData[0]).format("YYYY-MM") <= moment(this.state.datasetJson.currentVersion.forecastStopDate).format("YYYY-MM")) {
                         var cell = elInstance.getCell(("A").concat(parseInt(y) + 1))
+                        cell.classList.add('jexcelBoldCell');
+                    } if (rowData[1]) {
+                        var cell = elInstance.getCell(("B").concat(parseInt(y) + 1))
+                        cell.classList.add('jexcelBoldCell');
+                    }
+                    if (rowData[2] || rowData[3] || rowData[4] || rowData[5] || rowData[6] || rowData[7]) {
+                        var cell = elInstance.getCell(("C").concat(parseInt(y) + 1))
                         cell.classList.add('jexcelBoldPurpleCell');
-                    } else {
-                        var cell = elInstance.getCell(("A").concat(parseInt(y) + 1))
-                        cell.classList.remove('jexcelBoldPurpleCell');
+                        var cell = elInstance.getCell(("D").concat(parseInt(y) + 1))
+                        cell.classList.add('jexcelBoldPurpleCell');
+                        var cell = elInstance.getCell(("E").concat(parseInt(y) + 1))
+                        cell.classList.add('jexcelBoldPurpleCell');
+                        var cell = elInstance.getCell(("F").concat(parseInt(y) + 1))
+                        cell.classList.add('jexcelBoldPurpleCell');
+                        var cell = elInstance.getCell(("G").concat(parseInt(y) + 1))
+                        cell.classList.add('jexcelBoldPurpleCell');
+                        var cell = elInstance.getCell(("H").concat(parseInt(y) + 1))
+                        cell.classList.add('jexcelBoldPurpleCell');
                     }
                 }
             }.bind(this),
@@ -511,8 +526,9 @@ export default class ExtrapolateDataComponent extends React.Component {
             allowInsertColumn: false,
             allowManualInsertColumn: false,
             allowDeleteRow: false,
-            onselection: this.selected,
-            oneditionend: this.onedit,
+            //  onselection: this.selected,
+            // oneditionend: this.onedit,
+            editable: false,
             copyCompatibility: true,
             allowExport: false,
             paginationOptions: JEXCEL_PAGINATION_OPTION,
@@ -1019,6 +1035,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                     putRequest.onsuccess = function (event) {
                         // let id = AuthenticationService.displayDashboardBasedOnRole();
                         // this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/green/' + i18n.t('static.compareAndSelect.dataSaved'));
+                        console.log("IN_SAVE")
                         this.setState({
                             dataEl: "",
                             loading: false,
@@ -1181,6 +1198,7 @@ export default class ExtrapolateDataComponent extends React.Component {
             })
         }
     }
+    toggledata = () => this.setState((currentState) => ({ show: !currentState.show }));
 
     makeText = m => {
         if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
@@ -1341,44 +1359,6 @@ export default class ExtrapolateDataComponent extends React.Component {
             B.push("")
         }
         A.push(this.addDoubleQuoteToRowContent(B));
-
-
-        // A.push(this.addDoubleQuoteToRowContent([
-        //     i18n.t('static.extrapolation.rmse'),
-        //     this.state.movingAvgId ? Number(this.state.movingAvgError.rmse).toFixed(3) : "",
-        //     this.state.semiAvgId ? Number(this.state.semiAvgError.rmse).toFixed(3) : "",
-        //     this.state.linearRegressionId ? Number(this.state.linearRegressionError.rmse).toFixed(3) : "",
-        //     this.state.smoothingId ? Number(this.state.tesError.rmse).toFixed(3) : "",
-        //     this.state.arimaId ? "" : ""]))
-        // A.push(this.addDoubleQuoteToRowContent([
-        //     i18n.t('static.extrapolation.mape'),
-        //     this.state.movingAvgId ? Number(this.state.movingAvgError.mape).toFixed(3) : "",
-        //     this.state.semiAvgId ? Number(this.state.semiAvgError.mape).toFixed(3) : "",
-        //     this.state.linearRegressionId ? Number(this.state.linearRegressionError.mape).toFixed(3) : "",
-        //     this.state.smoothingId ? Number(this.state.tesError.mape).toFixed(3) : "",
-        //     this.state.arimaId ? "" : ""]))
-        // A.push(this.addDoubleQuoteToRowContent([
-        //     i18n.t('static.extrapolation.mse'),
-        //     this.state.movingAvgId ? Number(this.state.movingAvgError.mse).toFixed(3) : "",
-        //     this.state.semiAvgId ? Number(this.state.semiAvgError.mse).toFixed(3) : "",
-        //     this.state.linearRegressionId ? Number(this.state.linearRegressionError.mse).toFixed(3) : "",
-        //     this.state.smoothingId ? Number(this.state.tesError.mse).toFixed(3) : "",
-        //     this.state.arimaId ? "" : ""]))
-        // A.push(this.addDoubleQuoteToRowContent([
-        //     i18n.t('static.extrapolation.wape'),
-        //     this.state.movingAvgId ? Number(this.state.movingAvgError.wape).toFixed(3) : "",
-        //     this.state.semiAvgId ? Number(this.state.semiAvgError.wape).toFixed(3) : "",
-        //     this.state.linearRegressionId ? Number(this.state.linearRegressionError.wape).toFixed(3) : "",
-        //     this.state.smoothingId ? Number(this.state.tesError.wape).toFixed(3) : "",
-        //     this.state.arimaId ? "" : ""]))
-        // A.push(this.addDoubleQuoteToRowContent([
-        //     i18n.t('static.extrapolation.rSquare'),
-        //     this.state.movingAvgId ? Number(this.state.movingAvgError.rSqd).toFixed(3) : "",
-        //     this.state.semiAvgId ? Number(this.state.semiAvgError.rSqd).toFixed(3) : "",
-        //     this.state.linearRegressionId ? Number(this.state.linearRegressionError.rSqd).toFixed(3) : "",
-        //     this.state.smoothingId ? Number(this.state.tesError.rSqd).toFixed(3) : "",
-        //     this.state.arimaId ? "" : ""]))
-
         for (var i = 0; i < A.length; i++) {
             csvRow.push(A[i].join(","))
         }
@@ -2214,7 +2194,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                             </Input>
                                         </div>
                                     </FormGroup>
-                                    <FormGroup className="col-md-3">
+                                    {/* <FormGroup className="col-md-3">
                                         <Label htmlFor="appendedInputButton">{i18n.t('static.common.forecastPeriod')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
                                         <div className="controls edit">
 
@@ -2232,8 +2212,8 @@ export default class ExtrapolateDataComponent extends React.Component {
                                             </Picker>
 
                                         </div>
-                                    </FormGroup>
-                                    <FormGroup className="col-md-3 ">
+                                    </FormGroup> */}
+                                    <FormGroup className="col-md-6 ">
                                         <Label htmlFor="appendedInputButton">{i18n.t('static.dashboard.planningunitheader')}</Label>
                                         <div className="controls ">
                                             <Input
@@ -2243,7 +2223,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                 bsSize="sm"
                                                 value={this.state.planningUnitId}
                                                 onChange={(e) => { this.setPlanningUnitId(e); }}
-                                                className="selectWrapText"
+                                                // className="selectWrapText"
                                             >
                                                 <option value="">{i18n.t('static.common.select')}</option>
                                                 {planningUnits}
@@ -2292,10 +2272,9 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                 " " + i18n.t('static.common.and') + " "}<b>{this.state.regionId > 0 && document.getElementById("regionId").selectedOptions[0].text + (" ")}</b> {this.state.regionId > 0 && i18n.t('static.extrpolate.selectYourExtrapolationParameters')}
                                         </h5>
                                     </FormGroup>
-                                    <FormGroup className="col-md-3">
-                                        <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.dateRangeForHistoricData')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
+                                    <FormGroup className="col-md-4">
+                                        <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.dateRangeForHistoricData')+"    "}<i>(Forecast: {makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)})</i> <span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
                                         <div className="controls edit">
-
                                             <Picker
                                                 years={{ min: this.state.minDate, max: this.state.maxDate }}
                                                 ref={this.pickRange1}
@@ -2775,7 +2754,21 @@ export default class ExtrapolateDataComponent extends React.Component {
                                         </Table>
                                     </div>
                                 </div>}
-                            {this.state.showData && <div id="tableDiv" className="extrapolateTable pt-lg-5"></div>}
+                            {this.state.dataChanged && <div className="row float-right mt-lg-3 mr-0 pb-2 pt-2 "> <Button type="button" id="formSubmitButton" size="md" color="success" className="float-right mr-0" onClick={() => this.saveForecastConsumptionExtrapolation()}><i className="fa fa-check"></i>{i18n.t('static.pipeline.save')}</Button>&nbsp;</div>}
+                            {/* {this.state.showData && <div id="tableDiv" className="extrapolateTable pt-lg-5"></div>} */}
+                            <div className="row" style={{ display: this.state.show ? "block" : "none" }}>
+                                <div className="col-md-10 pt-4 pb-3">
+                                    <ul className="legendcommitversion">
+                                        <li><span className="legendcommitversionText">{i18n.t('static.common.forecastPeriod')} = Purple, italics. </span></li>
+                                        <li><span className="legendcommitversionText">{i18n.t('static.consumption.actual')}= Bold.  </span></li>
+                                    </ul>
+                                </div>
+                                <div className="col-md-12 pl-0 pr-0 mt-lg-3">
+                                    <div id="tableDiv" className="jexcelremoveReadonlybackground" style={{ display: this.state.show && !this.state.loading ? "block" : "none" }}>
+                                    </div>
+                                </div>
+                            </div>
+
                         </div>
                         <div style={{ display: this.state.loading ? "block" : "none" }}>
                             <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
@@ -2792,8 +2785,8 @@ export default class ExtrapolateDataComponent extends React.Component {
                     <CardFooter>
                         <FormGroup>
                             <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                            {this.state.dataChanged && <>    <Button type="button" id="formSubmitButton" size="md" color="success" className="float-right mr-1" onClick={() => this.saveForecastConsumptionExtrapolation()}><i className="fa fa-check"></i>{i18n.t('static.pipeline.save')}</Button>&nbsp;</>}
-                            {this.state.showData && <>                                    <Button type="button" id="dataCheck" size="md" color="info" className="float-right mr-1" onClick={() => this.openDataCheckModel()}><i className="fa fa-check"></i>{i18n.t('static.common.dataCheck')}</Button></>}
+                            <button className="mr-1 float-right btn btn-info btn-md" onClick={this.toggledata}>{this.state.show ? i18n.t('static.common.hideData') : i18n.t('static.common.showData')}</button>
+                            {this.state.showData && <> <Button type="button" id="dataCheck" size="md" color="info" className="float-right mr-1" onClick={() => this.openDataCheckModel()}><i className="fa fa-check"></i>{i18n.t('static.common.dataCheck')}</Button></>}
                             &nbsp;
                         </FormGroup>
                     </CardFooter>

@@ -10,6 +10,7 @@ import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
 import i18n from '../../i18n';
 import { JEXCEL_PAGINATION_OPTION, JEXCEL_DATE_FORMAT_SM, JEXCEL_PRO_KEY } from '../../Constants.js';
+import moment from 'moment';
 const entityname = 'Tree Template';
 export default class ListTreeTemplate extends Component {
 
@@ -59,6 +60,8 @@ export default class ListTreeTemplate extends Component {
             data[3] = treeTemplateList[j].monthsInPast;
             data[4] = treeTemplateList[j].monthsInFuture;
             data[5] = treeTemplateList[j].active;
+            data[6] = treeTemplateList[j].lastModifiedBy.username;
+            data[7] = (treeTemplateList[j].lastModifiedDate ? moment(treeTemplateList[j].lastModifiedDate).format(`YYYY-MM-DD`) : null)
             if (selStatus != "") {
                 if (tempSelStatus == treeTemplateList[j].active) {
                     treeTemplateArray[count] = data;
@@ -113,6 +116,17 @@ export default class ListTreeTemplate extends Component {
                         { id: true, name: i18n.t('static.common.active') },
                         { id: false, name: i18n.t('static.common.disabled') }
                     ]
+                },
+                {
+                    title: i18n.t('static.common.lastModifiedBy'),
+                    type: 'text',
+                    readOnly: true
+                },
+                {
+                    title: i18n.t('static.common.lastModifiedDate'),
+                    type: 'calendar',
+                    options: { format: JEXCEL_DATE_FORMAT_SM },
+                    readOnly: true
                 },
 
             ],

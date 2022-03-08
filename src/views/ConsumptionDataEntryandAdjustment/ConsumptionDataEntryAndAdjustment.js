@@ -618,16 +618,24 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
             elInstance.setComments(col, "");
           }
         }
+        console.log("possibleStockDayY---------->",possibleStockDayY);
+        console.log("possibleStockDayY---------->noOfMonths",noOfMonths);   
+        console.log("possibleStockDayY---------->noOfMonths",noOfMonths);        
         if (possibleStockDayY.includes(y.toString())) {
           var noOfMonths = elInstance.getColumnData(x)[0];
           if (rowData[x] == "") {
+
+        console.log("possibleStockDayY---------->In IF",rowData[x]);
           } else if (rowData[x < 0] || rowData[x] > noOfMonths) {
+            console.log("possibleStockDayY---------->In Esle IF",(colArr[x]).concat(parseInt(y) + 1));
+            
             var col = (colArr[x]).concat(parseInt(y) + 1);
             elInstance.setStyle(col, "background-color", "transparent");
             elInstance.setStyle(col, "background-color", "yellow");
             elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
             valid = false;
           } else {
+            console.log("possibleStockDayY---------->In Esle",(colArr[x]).concat(parseInt(y) + 1));
             var col = (colArr[x]).concat(parseInt(y) + 1);
             elInstance.setStyle(col, "background-color", "transparent");
             elInstance.setComments(col, "");
@@ -839,6 +847,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
           var curUser = AuthenticationService.getLoggedInUserId();
           var consumptionUnit = this.state.selectedConsumptionUnitObject;
+          console.log("consumptionUnit---->",consumptionUnit)
           var fullConsumptionList = this.state.consumptionList.filter(c => c.planningUnit.id != consumptionUnit.planningUnit.id);
           if (this.state.selectedConsumptionUnitId == 0) {
             var json = this.state.smallTableEl.getJson(null, false);
@@ -1716,7 +1725,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         yAxes: [{
           scaleLabel: {
             display: true,
-            labelString: "",
+          //  labelString: getLabelText(this.state.selectedConsumptionUnitObject.consumptionDataType == 1 ? this.state.selectedConsumptionUnitObject.planningUnit.forecastingUnit.label : this.state.selectedConsumptionUnitObject.consumptionDataType == 2 ? this.state.selectedConsumptionUnitObject.planningUnit.label : this.state.selectedConsumptionUnitObject.otherUnit.label, this.state.lang),
             fontColor: 'black'
           },
           stacked: true,
