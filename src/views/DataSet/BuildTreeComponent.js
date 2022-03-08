@@ -5873,7 +5873,7 @@ export default class BuildTree extends Component {
                 label: getLabelText(this.state.currentItemConfig.context.payload.label, this.state.lang),
                 stack: 1,
                 yAxisID: 'A',
-                backgroundColor: '#A7C6ED',
+                backgroundColor: '#BA0C2F',
                 borderColor: grey,
                 pointBackgroundColor: grey,
                 pointBorderColor: '#fff',
@@ -6073,7 +6073,7 @@ export default class BuildTree extends Component {
                                             <Label htmlFor="currencyId">{i18n.t('static.common.month')}<span class="red Reqasterisk">*</span></Label>
                                             <div className="controls edit">
                                                 <Picker
-
+                                                    className="tabindex=0"
                                                     id="month"
                                                     name="month"
                                                     ref={this.pickAMonth1}
@@ -6083,6 +6083,7 @@ export default class BuildTree extends Component {
                                                     }}
                                                     lang={pickerLang.months}
                                                     // theme="dark"
+                                                    
                                                     onChange={this.handleAMonthChange1}
                                                     onDismiss={this.handleAMonthDissmis1}
                                                 >
