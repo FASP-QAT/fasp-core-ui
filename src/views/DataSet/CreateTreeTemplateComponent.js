@@ -936,6 +936,7 @@ export default class CreateTreeTemplate extends Component {
     resetNodeData() {
         console.log("reset node data function called");
         const { orgCurrentItemConfig, currentItemConfig } = this.state;
+        var nodeTypeId = currentItemConfig.context.payload.nodeType.id;
         currentItemConfig.context = JSON.parse(JSON.stringify(orgCurrentItemConfig));
         console.log("============1============", orgCurrentItemConfig);
         console.log("this.state.addNodeFlag reset 1---", this.state.addNodeFlag);
@@ -947,6 +948,9 @@ export default class CreateTreeTemplate extends Component {
             fuValues: this.state.addNodeFlag ? [] : { value: orgCurrentItemConfig.payload.nodeDataMap[0][0].fuNode.forecastingUnit.id, label: getLabelText(orgCurrentItemConfig.payload.nodeDataMap[0][0].fuNode.forecastingUnit.label, this.state.lang) + " | " + orgCurrentItemConfig.payload.nodeDataMap[0][0].fuNode.forecastingUnit.id },
             // fuLabels: []
         }, () => {
+            if (nodeTypeId == 4) {
+                this.getForecastingUnitListByTracerCategoryId();
+            }
             console.log("currentItemConfig after---", this.state.orgCurrentItemConfig)
         });
     }
@@ -2723,13 +2727,13 @@ export default class CreateTreeTemplate extends Component {
         (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.noOfForecastingUnitsPerPerson = usageTemplate.noOfForecastingUnits;
         (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageFrequency = usageTemplate.usageFrequencyCount;
         (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usagePeriod.usagePeriodId = usageTemplate.usageFrequencyUsagePeriod != null ? usageTemplate.usageFrequencyUsagePeriod.usagePeriodId : '';
-        (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.unit.id = usageTemplate.unit.id;
+        (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.unit.id = usageTemplate.forecastingUnit.unit.id;
         (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.id = usageTemplate.forecastingUnit.id;
-        (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.label.label_en = usageTemplate.forecastingUnit.id + "|" + getLabelText(usageTemplate.forecastingUnit.label, this.state.lang);
+        (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.label = usageTemplate.forecastingUnit.label;
         (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageType.id = usageTemplate.usageType.id;
         (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.tracerCategory.id = usageTemplate.tracerCategory.id;
         // for (var i = 0; i < newResult.length; i++) {
-        var autocompleteData = [{ value: usageTemplate.forecastingUnit.id, label: usageTemplate.forecastingUnit.id + "|" + getLabelText(usageTemplate.forecastingUnit.label, this.state.lang) }]
+        // var autocompleteData = [{ value: usageTemplate.forecastingUnit.id, label: usageTemplate.forecastingUnit.id + "|" + getLabelText(usageTemplate.forecastingUnit.label, this.state.lang) }]
         // }
 
 
@@ -2740,9 +2744,10 @@ export default class CreateTreeTemplate extends Component {
         }
         this.setState({
             currentItemConfig,
-            autocompleteData
+            fuValues: { value: usageTemplate.forecastingUnit.id, label: getLabelText(usageTemplate.forecastingUnit.label, this.state.lang) + " | " + usageTemplate.forecastingUnit.id },
         }, () => {
             console.log("copy from template---", this.state.currentItemConfig);
+            this.getForecastingUnitListByTracerCategoryId();
             this.getNoOfMonthsInUsagePeriod();
             this.getNoFURequired();
             this.getNoOfFUPatient();
@@ -3004,91 +3009,99 @@ export default class CreateTreeTemplate extends Component {
     }
     getForecastingUnitListByTracerCategoryId(event) {
         var tracerCategoryId = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.tracerCategory.id;
-        console.log("tracerCategoryId---", tracerCategoryId)
-        ForecastingUnitService.getForcastingUnitListByTracerCategoryId(tracerCategoryId).then(response => {
-            console.log("fu list---", response.data)
+        console.log("tracerCategoryId new---", tracerCategoryId)
+        if (tracerCategoryId != undefined && tracerCategoryId != 'undefined') {
+            ForecastingUnitService.getForcastingUnitListByTracerCategoryId(tracerCategoryId).then(response => {
+                console.log("fu list---", response.data)
 
 
-            let forecastingUnitMultiList = response.data.length > 0
-                && response.data.map((item, i) => {
-                    return ({ value: item.forecastingUnitId, label: getLabelText(item.label, this.state.lang) + " | " + item.forecastingUnitId })
+                let forecastingUnitMultiList = response.data.length > 0
+                    && response.data.map((item, i) => {
+                        return ({ value: item.forecastingUnitId, label: getLabelText(item.label, this.state.lang) + " | " + item.forecastingUnitId })
 
-                }, this);
-            // var autocompleteData = [];
+                    }, this);
+                // var autocompleteData = [];
 
-            // for (var i = 0; i < response.data.length; i++) {
-            //     // autocompleteData[i] = { value: response.data[i].forecastingUnitId, label: response.data[i].label.label_en + " [" + response.data[i].forecastingUnitId + "]" }
-            //     // autocompleteData[i] = { value: response.data[i].forecastingUnitId, label: response.data[i].forecastingUnitId + "|" + getLabelText(response.data[i].label, this.state.lang) }
-            // }
-            this.setState({
-                forecastingUnitMultiList,
-                forecastingUnitList: response.data
-            }, () => {
-                if (response.data.length == 1) {
-                    const currentItemConfig = this.state.currentItemConfig;
-                    (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.id = response.data[0].forecastingUnitId;
-                    (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.label.label_en = getLabelText(response.data[0].label, this.state.lang) + " | " + response.data[0].forecastingUnitId;
-                    this.setState({
-                        currentItemConfig: currentItemConfig
-                    }, () => {
-                        this.getForecastingUnitUnitByFUId(response.data[0].forecastingUnitId);
-                    })
-                }
-                // else {
-                //     const currentItemConfig = this.state.currentItemConfig;
-                //     (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.id = "";
-                //     (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.label.label_en = "";
-                //     this.setState({
-                //         currentItemConfig: currentItemConfig
-
-                //     }, () => {
-
-                //     })
+                // for (var i = 0; i < response.data.length; i++) {
+                //     // autocompleteData[i] = { value: response.data[i].forecastingUnitId, label: response.data[i].label.label_en + " [" + response.data[i].forecastingUnitId + "]" }
+                //     // autocompleteData[i] = { value: response.data[i].forecastingUnitId, label: response.data[i].forecastingUnitId + "|" + getLabelText(response.data[i].label, this.state.lang) }
                 // }
-            })
-
-
-        })
-            .catch(
-                error => {
-                    if (error.message === "Network Error") {
+                this.setState({
+                    forecastingUnitMultiList,
+                    forecastingUnitList: response.data
+                }, () => {
+                    if (response.data.length == 1) {
+                        const currentItemConfig = this.state.currentItemConfig;
+                        (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.id = response.data[0].forecastingUnitId;
+                        (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.label.label_en = getLabelText(response.data[0].label, this.state.lang) + " | " + response.data[0].forecastingUnitId;
                         this.setState({
-                            message: 'static.unkownError',
-                            loading: false
-                        });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
+                            currentItemConfig: currentItemConfig
+                        }, () => {
+                            this.getForecastingUnitUnitByFUId(response.data[0].forecastingUnitId);
+                        })
+                    }
+                    // else {
+                    //     const currentItemConfig = this.state.currentItemConfig;
+                    //     (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.id = "";
+                    //     (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.label.label_en = "";
+                    //     this.setState({
+                    //         currentItemConfig: currentItemConfig
 
-                            case 401:
-                                this.props.history.push(`/login/static.message.sessionExpired`)
-                                break;
-                            case 403:
-                                this.props.history.push(`/accessDenied`)
-                                break;
-                            case 500:
-                            case 404:
-                            case 406:
-                                this.setState({
-                                    message: error.response.data.messageCode,
-                                    loading: false
-                                });
-                                break;
-                            case 412:
-                                this.setState({
-                                    message: error.response.data.messageCode,
-                                    loading: false
-                                });
-                                break;
-                            default:
-                                this.setState({
-                                    message: 'static.unkownError',
-                                    loading: false
-                                });
-                                break;
+                    //     }, () => {
+
+                    //     })
+                    // }
+                })
+
+
+            })
+                .catch(
+                    error => {
+                        if (error.message === "Network Error") {
+                            this.setState({
+                                message: 'static.unkownError',
+                                loading: false
+                            });
+                        } else {
+                            switch (error.response ? error.response.status : "") {
+
+                                case 401:
+                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 403:
+                                    this.props.history.push(`/accessDenied`)
+                                    break;
+                                case 500:
+                                case 404:
+                                case 406:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false
+                                    });
+                                    break;
+                                case 412:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false
+                                    });
+                                    break;
+                                default:
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false
+                                    });
+                                    break;
+                            }
                         }
                     }
-                }
-            );
+                );
+        } else {
+            console.log("inside else of tracer category")
+            this.setState({
+                forecastingUnitMultiList: [],
+                forecastingUnitList: []
+            })
+        }
 
     }
 
