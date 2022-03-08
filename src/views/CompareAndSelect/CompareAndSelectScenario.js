@@ -113,6 +113,7 @@ class CompareAndSelectScenario extends Component {
         //
     }
     handleAMonthDissmis2 = (value) => {
+        console.log("Value@@@",value)
         this.setState({ singleValue2: value, }, () => {
             this.setMonth1List()
         })
@@ -186,13 +187,13 @@ class CompareAndSelectScenario extends Component {
 
             var treeScenarioList = [];
             var treeList = datasetJson.treeList;
-            var colourArray = ["#002F6C", "#BA0C2F", "#49A4A1", "#A7C6ED", "#212721", "#6C6463", "#EDB944", "#F48521"]
+            var colourArray = ["#002F6C", "#BA0C2F", "#118B70", "#EDB944", "#A7C6ED", "#651D32", "#6C6463", "#F48521", "#49A4A1", "#212721"]
             var colourArrayCount = 0;
             // var compareToConsumptionForecast = ["","","","22.7% above the highest consumption forecast.","7.9% below the lowest consumption forecast.","In between the highest and lowest consumption forecast."];
             var count = 0;
             var consumptionExtrapolation = datasetJson.consumptionExtrapolation.filter(c => c.planningUnit.id == this.state.planningUnitId);
             for (var ce = 0; ce < consumptionExtrapolation.length; ce++) {
-                if (colourArrayCount > 8) {
+                if (colourArrayCount > 10) {
                     colourArrayCount = 0;
                 }
                 treeScenarioList.push({ id: consumptionExtrapolation[ce].consumptionExtrapolationId, tree: consumptionExtrapolation[ce], scenario: consumptionExtrapolation[ce], checked: true, color: colourArray[colourArrayCount], type: "C", data: consumptionExtrapolation[ce].extrapolationDataList, readonly: false });
@@ -205,7 +206,7 @@ class CompareAndSelectScenario extends Component {
                 var scenarioList = treeList[tl].scenarioList;
                 for (var sl = 0; sl < scenarioList.length; sl++) {
                     var flatList = tree.tree.flatList.filter(c => c.payload.nodeDataMap[scenarioList[sl].id][0].puNode != null && c.payload.nodeDataMap[scenarioList[sl].id][0].puNode.planningUnit.id == this.state.planningUnitId);
-                    if (colourArrayCount > 9) {
+                    if (colourArrayCount > 10) {
                         colourArrayCount = 0;
                     }
                     var readonly = flatList.length > 0 ? false : true
@@ -1242,9 +1243,10 @@ class CompareAndSelectScenario extends Component {
                     monthList1.push(curDate);
                 }
                 // monthList1.pop();
-                var rangeValue = { from: { year: new Date(startDate).getFullYear(), month: new Date(startDate).getMonth() + 1 }, to: { year: new Date(stopDate).getFullYear(), month: new Date(stopDate).getMonth() + 1 } }
+                // var rangeValue = { from: { year: new Date(startDate).getFullYear(), month: new Date(startDate).getMonth() + 1 }, to: { year: new Date(stopDate).getFullYear(), month: new Date(stopDate).getMonth() + 1 } }
+                var rangeValue = { from: { year: Number(moment(startDate).startOf('month').format("YYYY")), month: Number(moment(startDate).startOf('month').format("M")) }, to: { year: Number(moment(stopDate).startOf('month').format("YYYY")), month: Number(moment(stopDate).startOf('month').format("M")) } }
 
-                var maxDateForSingleValue = { year: new Date(stopDate).getFullYear(), month: new Date(stopDate).getMonth() + 1 }
+                var maxDateForSingleValue = { year: Number(moment(stopDate).startOf('month').format("YYYY")), month: Number(moment(stopDate).startOf('month').format("M")) }
                 var regionList = datasetJson.regionList;
                 var forecastingUnitList = [];
                 var planningUnitList = datasetJson.planningUnitList
@@ -1393,27 +1395,6 @@ class CompareAndSelectScenario extends Component {
         }, () => {
             this.buildJexcel();
         })
-    }
-
-    getVersionIds() {
-        this.setState({ loading: true })
-        var versionListAll = this.state.versionListAll;
-        var planningUnitListAll = this.state.planningUnitListAll;
-        var reportPeriod = [{ programId: 1, startDate: '2020-09-01', endDate: '2021-08-30' }, { programId: 2, startDate: '2020-07-01', endDate: '2021-06-30' }, { programId: 3, startDate: '2020-11-01', endDate: '2021-10-30' }];
-        var startDate = reportPeriod.filter(c => c.programId == this.state.programId)[0].startDate;
-        var endDate = reportPeriod.filter(c => c.programId == this.state.programId)[0].endDate;
-
-        var rangeValue = { from: { year: new Date(startDate).getFullYear(), month: new Date(startDate).getMonth() + 1 }, to: { year: new Date(endDate).getFullYear(), month: new Date(endDate).getMonth() + 1 } }
-        let stopDate = endDate;
-        var monthArrayList = [];
-        let cursorDate = startDate;
-        for (var i = 0; moment(cursorDate).format("YYYY-MM") <= moment(stopDate).format("YYYY-MM"); i++) {
-            var dt = moment(startDate).add(i, 'months').format("YYYY-MM-DD");
-            cursorDate = moment(cursorDate).add(1, 'months').format("YYYY-MM-DD");
-            monthArrayList.push(dt);
-        }
-        // var scenarioList = [{ scenarioId: 1, label: "A. Consumption High", checked: true, color: "#4f81bd" }, { scenarioId: 2, label: "B. Consumption Med", checked: true, color: "#f79646" }, { scenarioId: 3, label: "C. Consumption Low", checked: true, color: "#000000" }, { scenarioId: 4, label: "D. Morbidity - assumption Y", checked: true, color: "#ff0000" }, { scenarioId: 5, label: "E. Demographic", checked: true, color: "#604a7b" }]
-        this.setState({ versions: versionListAll.filter(c => c.program.programId == this.state.programId), loading: false, planningUnits: planningUnitListAll.filter(c => c.program.programId == this.state.programId), rangeValue: rangeValue, monthArrayList: monthArrayList });
     }
 
     show() {
