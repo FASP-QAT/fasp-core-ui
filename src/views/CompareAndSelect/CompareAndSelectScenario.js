@@ -2063,6 +2063,7 @@ class CompareAndSelectScenario extends Component {
                                                                 ref="pickAMonth2"
                                                                 years={{ min: this.state.minDate, max: this.state.maxDateForSingleValue }}
                                                                 value={this.state.singleValue2}
+                                                                key={JSON.stringify(this.state.singleValue2)}
                                                                 lang={pickerLang}
                                                                 onChange={this.handleAMonthChange2}
                                                                 onDismiss={this.handleAMonthDissmis2}
