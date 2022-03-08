@@ -272,7 +272,7 @@ class ModelingValidation extends Component {
         var treeList = datasetJson.treeList.filter(c => c.active.toString() == "true");
         var startDate = moment(datasetJson.currentVersion.forecastStartDate).format("YYYY-MM-DD");
         var stopDate = moment(datasetJson.currentVersion.forecastStopDate).format("YYYY-MM-DD");
-        var rangeValue = { from: { year: moment(datasetJson.currentVersion.forecastStartDate).startOf('month').format("YYYY"), month: moment(datasetJson.currentVersion.forecastStartDate).startOf('month').format("M") }, to: { year: moment(datasetJson.currentVersion.forecastStopDate).startOf('month').format("YYYY"), month: moment(datasetJson.currentVersion.forecastStopDate).startOf('month').format("M") } }
+        var rangeValue = { from: { year: Number(moment(datasetJson.currentVersion.forecastStartDate).startOf('month').format("YYYY")), month: Number(moment(datasetJson.currentVersion.forecastStartDate).startOf('month').format("M")) }, to: { year: Number(moment(datasetJson.currentVersion.forecastStopDate).startOf('month').format("YYYY")), month: Number(moment(datasetJson.currentVersion.forecastStopDate).startOf('month').format("M")) } }
         var treeId = "";
         var event = {
             target: {
