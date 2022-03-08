@@ -268,7 +268,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 this.el.setValueFromCoords(8, y, selectedPlanningUnitObj.multiplier, true);
                 this.el.setValueFromCoords(9, y, (this.el.getValueFromCoords(3, y) / selectedPlanningUnitObj.multiplier).toFixed(6), true);
                 this.el.setValueFromCoords(10, y, 0, true);
-
+                this.el.setValueFromCoords(11, y, selectedPlanningUnitObj.forecastingUnit.tracerCategory.id, true);
                 // let match = this.state.forecastPlanignUnitListForNotDuplicate.filter(c => c.supplyPlanPlanningUnitId == this.el.getValueFromCoords(0, y))
                 // if (match.length > 0) {
                 //     let index = originalConsumptionList.findIndex(c => c.supplyPlanPlanningUnitId == this.el.getValueFromCoords(0, y))
@@ -851,6 +851,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                     data[8] = papuList[j].multiplier
                     data[9] = 1
                     data[10] = 1
+                    data[11] = planningUnitObj.forecastingUnit.tracerCategory.id
 
                     forecastPlanignUnitListForNotDuplicate.push({
                         supplyPlanPlanningUnitId: papuList[j].planningUnit.id,
@@ -862,6 +863,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                     data[8] = ''
                     data[9] = ''
                     data[10] = ''
+                    data[11] = ''
                 }
 
                 papuDataArr[count] = data;
@@ -963,6 +965,11 @@ export default class StepOneImportMapPlanningUnits extends Component {
                     type: 'hidden',
                     readOnly: true//10 K
                 },
+                {
+                    title: 'Match tracer category',
+                    type: 'hidden',
+                    readOnly: true//11 L
+                }
 
 
             ],
@@ -1023,7 +1030,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 }
 
             }.bind(this),
-            selectionCopy: false,
+            // selectionCopy: false,
             // pagination: localStorage.getItem("sesRecordCount"),
             pagination: 5000000,
             filters: true,
@@ -1067,7 +1074,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
 
     filterPlanningUnitBasedOnTracerCategory = function (instance, cell, c, r, source) {
         var mylist = [];
-        var value = (instance.jexcel.getJson(null, false)[r])[4];
+        var value = (instance.jexcel.getJson(null, false)[r])[5];
 
         var mylist = this.state.planningUnitListJexcel;
         console.log("mylist--------->100", mylist);
@@ -1091,20 +1098,20 @@ export default class StepOneImportMapPlanningUnits extends Component {
 
         console.log("mylist--------->103", mylist);
 
-        let forecastPlanignUnitListForNotDuplicate = this.state.forecastPlanignUnitListForNotDuplicate;
-        console.log("mylist--------->104", forecastPlanignUnitListForNotDuplicate);
-        for (var i = 0; i < forecastPlanignUnitListForNotDuplicate.length; i++) {
+        // let forecastPlanignUnitListForNotDuplicate = this.state.forecastPlanignUnitListForNotDuplicate;
+        // console.log("mylist--------->104", forecastPlanignUnitListForNotDuplicate);
+        // for (var i = 0; i < forecastPlanignUnitListForNotDuplicate.length; i++) {
 
-            const index = mylist.findIndex(c => c.id == forecastPlanignUnitListForNotDuplicate[i].forecastPlanningUnitId);
-            console.log("mylist--------->1041", index);
-            if (index > 0) {
-                const result = mylist.splice(index, 1);
-            }
+        //     const index = mylist.findIndex(c => c.id == forecastPlanignUnitListForNotDuplicate[i].forecastPlanningUnitId);
+        //     console.log("mylist--------->1041", index);
+        //     if (index > 0) {
+        //         const result = mylist.splice(index, 1);
+        //     }
 
-        }
+        // }
 
 
-        console.log("mylist--------->105", mylist);
+        // console.log("mylist--------->105", mylist);
 
         return mylist;
 
@@ -1158,11 +1165,11 @@ export default class StepOneImportMapPlanningUnits extends Component {
         if (programId != 0) {
 
             const countryId = this.state.programs.filter(c => c.programId == programId)[0].realmCountry.country.countryId;
-            console.log("countryId", countryId)
-            console.log("datasetlist==>", this.state.datasetList);
+            // console.log("countryId", countryId)
+            // console.log("datasetlist==>", this.state.datasetList);
             this.state.getDatasetFilterList = this.state.datasetList
             var datasetlist = this.state.getDatasetFilterList.filter(c => c.realmCountry.country.countryId == countryId);
-            console.log("datasetlist=based on country==>", datasetlist)
+            // console.log("datasetlist=based on country==>", datasetlist)
             this.setState({
                 data: [],
             }, () => {
@@ -1223,6 +1230,10 @@ export default class StepOneImportMapPlanningUnits extends Component {
         console.log("json.length-------", json.length);
         for (var y = 0; y < json.length; y++) {
             var value = this.el.getValueFromCoords(7, y);
+            var tracerCategoryId = this.el.getValueFromCoords(5, y);
+            var selectedPUTracerCategoryId = this.el.getValueFromCoords(11, y);
+            console.log("tracerCategoryId==>", tracerCategoryId)
+            console.log("selectedPUTracerCategoryId==>", selectedPUTracerCategoryId)
             if (value != -1) {
 
                 //ForecastPlanningUnit
@@ -1235,15 +1246,31 @@ export default class StepOneImportMapPlanningUnits extends Component {
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.label.fieldRequired'));
                     valid = false;
+                } else if (tracerCategoryId != selectedPUTracerCategoryId) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.common.tracerCategoryInvalidSelection'));
+                    valid = false;
+                } else if (!(budgetRegx.test(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.spacetext'));
+                    valid = false;
                 } else {
-                    if (!(budgetRegx.test(value))) {
-                        this.el.setStyle(col, "background-color", "transparent");
-                        this.el.setStyle(col, "background-color", "yellow");
-                        this.el.setComments(col, i18n.t('static.message.spacetext'));
-                        valid = false;
-                    } else {
-                        this.el.setStyle(col, "background-color", "transparent");
-                        this.el.setComments(col, "");
+                    for (var i = (json.length - 1); i >= 0; i--) {
+                        var map = new Map(Object.entries(json[i]));
+
+                        var planningUnitValue = map.get("7");
+                        if (planningUnitValue == value && y != i && i > y) {
+                            this.el.setStyle(col, "background-color", "transparent");
+                            this.el.setStyle(col, "background-color", "yellow");
+                            this.el.setComments(col, i18n.t('static.message.planningUnitAlreadyExists'));
+                            i = -1;
+                            valid = false;
+                        } else {
+                            this.el.setStyle(col, "background-color", "transparent");
+                            this.el.setComments(col, "");
+                        }
                     }
                 }
 
