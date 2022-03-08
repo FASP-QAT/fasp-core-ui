@@ -121,15 +121,15 @@ export default class StepThreeImportMapPlanningUnits extends Component {
 
         const headers = [];
         // columns.map((item, idx) => { headers[idx] = ((item.text).replaceAll(' ', '%20')) });
-        headers.push(i18n.t('static.importFromQATSupplyPlan.supplyPlanPlanningUnit'));
-        headers.push(i18n.t('static.importFromQATSupplyPlan.forecastPlanningUnit'));
-        headers.push(i18n.t('static.program.region'));
-        headers.push(i18n.t('static.inventoryDate.inventoryReport'));
-        headers.push(i18n.t('static.importFromQATSupplyPlan.supplyPlanConsumption'));
-        headers.push(i18n.t('static.importFromQATSupplyPlan.conversionFactor(SupplyPlantoForecast)'));
-        headers.push(i18n.t('static.importFromQATSupplyPlan.convertedActualConsumption(SupplyPlanModule)'));
-        headers.push(i18n.t('static.importFromQATSupplyPlan.currentQATConsumption'));
-        headers.push(i18n.t('static.quantimed.importData'));
+        headers.push(i18n.t('static.importFromQATSupplyPlan.supplyPlanPlanningUnit').replaceAll(' ', '%20'));
+        headers.push(i18n.t('static.importFromQATSupplyPlan.forecastPlanningUnit').replaceAll(' ', '%20'));
+        headers.push(i18n.t('static.program.region').replaceAll(' ', '%20'));
+        headers.push(i18n.t('static.inventoryDate.inventoryReport').replaceAll(' ', '%20'));
+        headers.push(i18n.t('static.importFromQATSupplyPlan.supplyPlanConsumption').replaceAll(' ', '%20'));
+        headers.push(i18n.t('static.importFromQATSupplyPlan.conversionFactor(SupplyPlantoForecast)').replaceAll(' ', '%20'));
+        headers.push(i18n.t('static.importFromQATSupplyPlan.convertedActualConsumption(SupplyPlanModule)').replaceAll(' ', '%20'));
+        headers.push(i18n.t('static.importFromQATSupplyPlan.currentQATConsumption').replaceAll(' ', '%20'));
+        headers.push(i18n.t('static.quantimed.importData').replaceAll(' ', '%20'));
 
 
         var A = [this.addDoubleQuoteToRowContent(headers)]
