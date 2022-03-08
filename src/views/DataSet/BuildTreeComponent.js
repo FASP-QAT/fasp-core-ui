@@ -1567,11 +1567,11 @@ export default class BuildTree extends Component {
         }
     }
     buildMomJexcelPercent() {
-        var parentStartValue = this.state.parentScenario.calculatedDataValue;
+        // var parentStartValue = this.state.parentScenario.calculatedDataValue;
         // console.log("parentStartValue---", parentStartValue)
-        var momList = this.state.momListPer;
+        var momList = this.state.momListPer == undefined ? [] : this.state.momListPer;
         console.log("momList percent node---", momList)
-        var momListParent = this.state.momListPerParent;
+        var momListParent = this.state.momListPerParent == undefined ? [] : this.state.momListPerParent;
         console.log("momListParent---", momListParent)
         var dataArray = [];
         let count = 0;
@@ -1702,7 +1702,7 @@ export default class BuildTree extends Component {
     }
 
     buildMomJexcel() {
-        var momList = this.state.momList;
+        var momList = this.state.momList == undefined ? [] : this.state.momList;
         console.log("momList--->", momList);
         var dataArray = [];
         let count = 0;
@@ -1892,7 +1892,8 @@ export default class BuildTree extends Component {
                 items: [],
                 selectedScenario: '',
                 programId,
-                singleValue2: { year: new Date(programData.currentVersion.forecastStartDate).getFullYear(), month: new Date(programData.currentVersion.forecastStartDate).getMonth() + 1 },
+                // singleValue2: { year: new Date(programData.currentVersion.forecastStartDate.replace(/-/g, '\/')).getFullYear(), month: new Date(Date.UTC(programData.currentVersion.forecastStartDate.replace(/-/g, '\/'))).getMonth() + 1 },
+                singleValue2: { year: new Date(programData.currentVersion.forecastStartDate.replace(/-/g, '\/')).getFullYear(), month: new Date(programData.currentVersion.forecastStartDate.replace(/-/g, '\/')).getMonth() + 1 },
                 // defYear1: { year: 2021, month: 1 },
                 // defYear2: { year: 2021, month: 12 },
                 forecastStartDate: programData.currentVersion.forecastStartDate,
@@ -2530,8 +2531,8 @@ export default class BuildTree extends Component {
         }.bind(this);
     }
     buildModelingJexcel() {
-        var scalingList = this.state.currentScenario.nodeDataModelingList;
-        console.log("scalingList---", scalingList);
+        var scalingList = this.state.currentScenario.nodeDataModelingList == undefined ? [] : this.state.currentScenario.nodeDataModelingList;
+        // console.log("scalingList---", scalingList);
         var dataArray = [];
         let count = 0;
 
@@ -2552,29 +2553,31 @@ export default class BuildTree extends Component {
             count++;
         }
         var scalingTotal = 0;
-        for (var j = 0; j < scalingList.length; j++) {
-            data = [];
-            data[0] = scalingList[j].transferNodeDataId
-            data[1] = scalingList[j].notes
-            data[2] = scalingList[j].modelingType.id
-            data[3] = scalingList[j].startDate
-            data[4] = scalingList[j].stopDate
-            data[5] = scalingList[j].modelingType.id != 2 ? parseFloat(scalingList[j].dataValue).toFixed(2) : ''
-            data[6] = scalingList[j].modelingType.id == 2 ? scalingList[j].dataValue : ''
-            data[7] = cleanUp
-            var nodeValue = this.state.currentScenario.calculatedDataValue;
-            var calculatedChangeForMonth;
-            if (scalingList[j].modelingType.id == 2 || scalingList[j].modelingType.id == 5) {
-                calculatedChangeForMonth = scalingList[j].dataValue;
-            } else if (scalingList[j].modelingType.id == 3 || scalingList[j].modelingType.id == 4) {
-                calculatedChangeForMonth = (nodeValue * scalingList[j].dataValue) / 100;
+        if (scalingList.length > 0) {
+            for (var j = 0; j < scalingList.length; j++) {
+                data = [];
+                data[0] = scalingList[j].transferNodeDataId
+                data[1] = scalingList[j].notes
+                data[2] = scalingList[j].modelingType.id
+                data[3] = scalingList[j].startDate
+                data[4] = scalingList[j].stopDate
+                data[5] = scalingList[j].modelingType.id != 2 ? parseFloat(scalingList[j].dataValue).toFixed(2) : ''
+                data[6] = scalingList[j].modelingType.id == 2 ? scalingList[j].dataValue : ''
+                data[7] = cleanUp
+                var nodeValue = this.state.currentScenario.calculatedDataValue;
+                var calculatedChangeForMonth;
+                if (scalingList[j].modelingType.id == 2 || scalingList[j].modelingType.id == 5) {
+                    calculatedChangeForMonth = scalingList[j].dataValue;
+                } else if (scalingList[j].modelingType.id == 3 || scalingList[j].modelingType.id == 4) {
+                    calculatedChangeForMonth = (nodeValue * scalingList[j].dataValue) / 100;
+                }
+                data[8] = scalingList[j].modelingType.id == 2 ? calculatedChangeForMonth : calculatedChangeForMonth
+                data[9] = scalingList[j].nodeDataModelingId
+                data[10] = 0
+                scalingTotal = parseFloat(scalingTotal) + parseFloat(calculatedChangeForMonth);
+                dataArray[count] = data;
+                count++;
             }
-            data[8] = scalingList[j].modelingType.id == 2 ? calculatedChangeForMonth : calculatedChangeForMonth
-            data[9] = scalingList[j].nodeDataModelingId
-            data[10] = 0
-            scalingTotal = parseFloat(scalingTotal) + parseFloat(calculatedChangeForMonth);
-            dataArray[count] = data;
-            count++;
         }
         this.setState({ scalingTotal }, () => {
         });
@@ -3352,7 +3355,7 @@ export default class BuildTree extends Component {
                             dataSetObj: dataEnc, minDate, maxDate,
                             forecastStartDate: programData.currentVersion.forecastStartDate,
                             forecastStopDate: programData.currentVersion.forecastStopDate, forecastPeriod,
-                            singleValue2: { year: new Date(programData.currentVersion.forecastStartDate).getFullYear(), month: new Date(programData.currentVersion.forecastStartDate).getMonth() + 1 },
+                            singleValue2: { year: new Date(programData.currentVersion.forecastStartDate.replace(/-/g, '\/')).getFullYear(), month: new Date(programData.currentVersion.forecastStartDate.replace(/-/g, '\/')).getMonth() + 1 },
                         }, () => {
                             this.fetchTracerCategoryList(programData);
                             this.setState({ loading: false })
@@ -5719,7 +5722,8 @@ export default class BuildTree extends Component {
 
 
         let bar = {}
-        if (this.state.momList.length > 0) {
+        var momList = this.state.momList == undefined ? [] : this.state.momList;
+        if (momList.length > 0) {
             var datasetsArr = [];
             datasetsArr.push(
                 {
@@ -6100,15 +6104,16 @@ export default class BuildTree extends Component {
                                                     name="month"
                                                     ref={this.pickAMonth1}
                                                     years={{ min: this.state.minDateValue, max: this.state.maxDate }}
+                                                    // year: new Date(this.state.currentScenario.month).getFullYear(), month: ("0" + (new Date(this.state.currentScenario.month).getMonth() + 1)).slice(-2)
                                                     value={{
-                                                        year: new Date(this.state.currentScenario.month).getFullYear(), month: ("0" + (new Date(this.state.currentScenario.month).getMonth() + 1)).slice(-2)
+                                                        year: new Date(this.state.currentScenario.month.replace(/-/g, '\/')).getFullYear(), month: ("0" + (new Date(this.state.currentScenario.month.replace(/-/g, '\/')).getMonth() + 1)).slice(-2)
                                                     }}
                                                     lang={pickerLang.months}
                                                     // theme="dark"
                                                     onChange={this.handleAMonthChange1}
                                                     onDismiss={this.handleAMonthDissmis1}
                                                 >
-                                                    <MonthBox value={this.makeText({ year: new Date(this.state.currentScenario.month).getFullYear(), month: ("0" + (new Date(this.state.currentScenario.month).getMonth() + 1)).slice(-2) })}
+                                                    <MonthBox value={this.makeText({ year: new Date(this.state.currentScenario.month.replace(/-/g, '\/')).getFullYear(), month: ("0" + (new Date(this.state.currentScenario.month.replace(/-/g, '\/')).getMonth() + 1)).slice(-2) })}
                                                         onClick={this.handleClickMonthBox1} />
                                                 </Picker>
                                             </div>
@@ -7043,12 +7048,12 @@ export default class BuildTree extends Component {
                                                 // years={{ min: { year: 2010, month: 2 }, max: { year: 2050, month: 9 } }}
                                                 years={{ min: this.state.minDate, max: this.state.maxDate }}
                                                 // value={this.state.singleValue2}
-                                                value={{ year: new Date(this.state.currentCalculatorStartDate).getFullYear(), month: ("0" + (new Date(this.state.currentCalculatorStartDate).getMonth() + 1)).slice(-2) }}
+                                                value={{ year: new Date(this.state.currentCalculatorStartDate.replace(/-/g, '\/')).getFullYear(), month: ("0" + (new Date(this.state.currentCalculatorStartDate.replace(/-/g, '\/')).getMonth() + 1)).slice(-2) }}
                                                 lang={pickerLang.months}
                                                 onChange={this.handleAMonthChange4}
                                                 onDismiss={this.handleAMonthDissmis4}
                                             >
-                                                <MonthBox value={this.makeText({ year: new Date(this.state.currentCalculatorStartDate).getFullYear(), month: ("0" + (new Date(this.state.currentCalculatorStartDate).getMonth() + 1)).slice(-2) })} onClick={this.handleClickMonthBox4} />
+                                                <MonthBox value={this.makeText({ year: new Date(this.state.currentCalculatorStartDate.replace(/-/g, '\/')).getFullYear(), month: ("0" + (new Date(this.state.currentCalculatorStartDate.replace(/-/g, '\/')).getMonth() + 1)).slice(-2) })} onClick={this.handleClickMonthBox4} />
                                             </Picker>
                                             {/* <FormFeedback className="red">{errors.nodeTitle}</FormFeedback> */}
                                         </FormGroup>
@@ -7059,12 +7064,12 @@ export default class BuildTree extends Component {
                                                 // years={{ min: { year: 2010, month: 2 }, max: { year: 2050, month: 9 } }}
                                                 years={{ min: this.state.minDate, max: this.state.maxDate }}
                                                 // value={this.state.singleValue2}
-                                                value={{ year: new Date(this.state.currentCalculatorStopDate).getFullYear(), month: ("0" + (new Date(this.state.currentCalculatorStopDate).getMonth() + 1)).slice(-2) }}
+                                                value={{ year: new Date(this.state.currentCalculatorStopDate.replace(/-/g, '\/')).getFullYear(), month: ("0" + (new Date(this.state.currentCalculatorStopDate.replace(/-/g, '\/')).getMonth() + 1)).slice(-2) }}
                                                 lang={pickerLang.months}
                                                 onChange={this.handleAMonthChange5}
                                                 onDismiss={this.handleAMonthDissmis5}
                                             >
-                                                <MonthBox value={this.makeText({ year: new Date(this.state.currentCalculatorStopDate).getFullYear(), month: ("0" + (new Date(this.state.currentCalculatorStopDate).getMonth() + 1)).slice(-2) })} onClick={this.handleClickMonthBox5} />
+                                                <MonthBox value={this.makeText({ year: new Date(this.state.currentCalculatorStopDate.replace(/-/g, '\/')).getFullYear(), month: ("0" + (new Date(this.state.currentCalculatorStopDate.replace(/-/g, '\/')).getMonth() + 1)).slice(-2) })} onClick={this.handleClickMonthBox5} />
                                             </Picker>
                                             {/* <FormFeedback className="red">{errors.nodeTitle}</FormFeedback> */}
                                         </FormGroup>
@@ -7571,9 +7576,9 @@ export default class BuildTree extends Component {
                 if (nodeDataModelingMap.length > 0) {
                     console.log("get payload 13");
                     if (nodeDataModelingMap[0].calculatedValue != null && nodeDataModelingMap[0].endValue != null) {
-                        console.log("nodeDataModelingMap[0]----",nodeDataModelingMap[0]);
+                        console.log("nodeDataModelingMap[0]----", nodeDataModelingMap[0]);
                         if (items[i].payload.nodeType.id == 5) {
-                            console.log("my console---",nodeDataModelingMap[0]);
+                            console.log("my console---", nodeDataModelingMap[0]);
                             (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].displayCalculatedDataValue = nodeDataModelingMap[0].calculatedMmdValue != null ? nodeDataModelingMap[0].calculatedMmdValue.toString() : '';
                         } else {
                             (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].displayCalculatedDataValue = nodeDataModelingMap[0].calculatedValue.toString();

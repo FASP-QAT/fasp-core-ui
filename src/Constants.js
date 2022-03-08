@@ -140,3 +140,4 @@ export const TREE_DIMENSION_ID = 5;
 export const REPORT_DATEPICKER_START_MONTH = 6;
 export const REPORT_DATEPICKER_END_MONTH = 12;
 export const ROUNDING_NUMBER = 0.15;
+export const ALPHA_BETA_GAMMA_VALUE = /^(0(\.\d+)?|1(\.0+)?)$/
