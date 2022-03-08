@@ -502,7 +502,7 @@ export default class ListTreeComponent extends Component {
                                     versionId: this.el.getValueFromCoords(9, y),
                                     treeId: this.el.getValueFromCoords(0, y),
                                     isModalOpen: !this.state.isModalOpen,
-                                    treeName: ''
+                                    treeName: this.el.getValueFromCoords(2, y) +"+copy"
                                 })
                             }.bind(this)
                         });
