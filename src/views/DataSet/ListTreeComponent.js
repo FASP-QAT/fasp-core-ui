@@ -721,7 +721,9 @@ export default class ListTreeComponent extends Component {
                             <Col sm={12} style={{ flexBasis: 'auto' }}>
                                 {/* <Card> */}
                                 <Formik
-                                    initialValues={initialValues}
+                                    initialValues={{
+                                        treeName : this.state.treeName
+                                    }}
                                     validate={validate(validationSchema)}
                                     onSubmit={(values, { setSubmitting, setErrors }) => {
 
