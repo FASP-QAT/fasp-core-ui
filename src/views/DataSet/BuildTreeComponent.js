@@ -6095,7 +6095,6 @@ export default class BuildTree extends Component {
                                             <Label htmlFor="currencyId">{i18n.t('static.common.month')}<span class="red Reqasterisk">*</span></Label>
                                             <div className="controls edit">
                                                 <Picker
-                                                    className="tabindex=0"
                                                     id="month"
                                                     name="month"
                                                     ref={this.pickAMonth1}
