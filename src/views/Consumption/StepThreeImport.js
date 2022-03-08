@@ -121,15 +121,15 @@ export default class StepThreeImportMapPlanningUnits extends Component {
 
         const headers = [];
         // columns.map((item, idx) => { headers[idx] = ((item.text).replaceAll(' ', '%20')) });
-        headers.push(i18n.t('static.importFromQATSupplyPlan.supplyPlanPlanningUnit'));
-        headers.push(i18n.t('static.importFromQATSupplyPlan.forecastPlanningUnit'));
-        headers.push(i18n.t('static.program.region'));
-        headers.push(i18n.t('static.inventoryDate.inventoryReport'));
-        headers.push(i18n.t('static.importFromQATSupplyPlan.supplyPlanConsumption'));
-        headers.push(i18n.t('static.importFromQATSupplyPlan.conversionFactor(SupplyPlantoForecast)'));
-        headers.push(i18n.t('static.importFromQATSupplyPlan.convertedActualConsumption(SupplyPlanModule)'));
-        headers.push(i18n.t('static.importFromQATSupplyPlan.currentQATConsumption'));
-        headers.push(i18n.t('static.quantimed.importData'));
+        headers.push(i18n.t('static.importFromQATSupplyPlan.supplyPlanPlanningUnit').replaceAll(' ', '%20'));
+        headers.push(i18n.t('static.importFromQATSupplyPlan.forecastPlanningUnit').replaceAll(' ', '%20'));
+        headers.push(i18n.t('static.program.region').replaceAll(' ', '%20'));
+        headers.push(i18n.t('static.inventoryDate.inventoryReport').replaceAll(' ', '%20'));
+        headers.push(i18n.t('static.importFromQATSupplyPlan.supplyPlanConsumption').replaceAll(' ', '%20'));
+        headers.push(i18n.t('static.importFromQATSupplyPlan.conversionFactor(SupplyPlantoForecast)').replaceAll(' ', '%20'));
+        headers.push(i18n.t('static.importFromQATSupplyPlan.convertedActualConsumption(SupplyPlanModule)').replaceAll(' ', '%20'));
+        headers.push(i18n.t('static.importFromQATSupplyPlan.currentQATConsumption').replaceAll(' ', '%20'));
+        headers.push(i18n.t('static.quantimed.importData').replaceAll(' ', '%20'));
 
 
         var A = [this.addDoubleQuoteToRowContent(headers)]
@@ -182,7 +182,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                         for (var i = 0; i < tableJson.length; i++) {
                             var map1 = new Map(Object.entries(tableJson[i]));
 
-                            let selectedPlanningUnitObj = this.props.items.planningUnitList.filter(c => c.planningUnitId == map1.get("0"))[0];
+                            let selectedPlanningUnitObj = this.props.items.planningUnitList.filter(c => c.planningUnitId == map1.get("1"))[0];
                             var forecastingUnitObj = selectedPlanningUnitObj.forecastingUnit;
                             forecastingUnitObj.multiplier = map1.get("5");
                             if (map1.get("9") == 0 && map1.get("8") == true) { //not pink
@@ -258,7 +258,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                             if (map1.get("9") == 1 && map1.get("8") == true) {
                                 let tempJsonPink = {
                                     regionId: map1.get("10"),
-                                    planningUnitId: map1.get("0"),
+                                    planningUnitId: map1.get("1"),
                                     month: map1.get("3"),
                                     // actualConsumption: map1.get("4"),
                                     amount: this.el.getValue(`E${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),

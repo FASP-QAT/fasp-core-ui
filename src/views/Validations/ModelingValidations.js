@@ -272,7 +272,7 @@ class ModelingValidation extends Component {
         var treeList = datasetJson.treeList.filter(c => c.active.toString() == "true");
         var startDate = moment(datasetJson.currentVersion.forecastStartDate).format("YYYY-MM-DD");
         var stopDate = moment(datasetJson.currentVersion.forecastStopDate).format("YYYY-MM-DD");
-        var rangeValue = { from: { year: new Date(startDate).getFullYear(), month: new Date(startDate).getMonth() + 1 }, to: { year: new Date(stopDate).getFullYear(), month: new Date(stopDate).getMonth() + 1 } }
+        var rangeValue = { from: { year: Number(moment(datasetJson.currentVersion.forecastStartDate).startOf('month').format("YYYY")), month: Number(moment(datasetJson.currentVersion.forecastStartDate).startOf('month').format("M")) }, to: { year: Number(moment(datasetJson.currentVersion.forecastStopDate).startOf('month').format("YYYY")), month: Number(moment(datasetJson.currentVersion.forecastStopDate).startOf('month').format("M")) } }
         var treeId = "";
         var event = {
             target: {
@@ -485,12 +485,12 @@ class ModelingValidation extends Component {
                 monthList.push(curDate)
             }
             let columns = [];
-            columns.push({ title: i18n.t('static.inventoryDate.inventoryReport'), type: 'calendar', options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker' },readOnly: true });
+            columns.push({ title: i18n.t('static.inventoryDate.inventoryReport'), type: 'calendar', options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker' }, readOnly: true });
             var nodeVal = [...new Set(this.state.nodeVal.map(ele => (ele.label)))];
             for (var k = 0; k < nodeVal.length; k++) {
                 columns.push({ title: nodeVal[k], readOnly: true, type: displayBy == 1 ? 'numeric' : 'hidden', mask: displayBy == 1 ? '#,##.00' : '#,##.00 %', decimal: '.' });
             }
-            columns.push({ title: i18n.t('static.supplyPlan.total'),readOnly: true, type: displayBy == 1 ? 'numeric' : 'hidden', mask: displayBy == 1 ? '#,##.00' : '#,## %' });
+            columns.push({ title: i18n.t('static.supplyPlan.total'), readOnly: true, type: displayBy == 1 ? 'numeric' : 'hidden', mask: displayBy == 1 ? '#,##.00' : '#,## %' });
             for (var k = 0; k < nodeVal.length; k++) {
                 columns.push({ title: nodeVal[k], readOnly: true, type: displayBy == 2 ? 'numeric' : 'hidden', mask: displayBy == 1 ? '#,##.00' : '#,##.00 %', decimal: '.' });
             }
@@ -1287,7 +1287,7 @@ class ModelingValidation extends Component {
 
         let bar = {}
         var datasetListForGraph = [];
-        var colourArray = ["#002F6C", "#BA0C2F", "#651D32", "#49A4A1", "#A7C6ED", "#212721", "#6C6463", "#EDB944", "#F48521", "#118B70", "#8C8985", "#CFCDC9"]
+        var colourArray = ["#002F6C", "#BA0C2F", "#118B70", "#EDB944", "#A7C6ED", "#651D32", "#6C6463", "#F48521", "#49A4A1", "#212721"]
         if (this.state.monthList.length > 0 && this.state.dataEl != undefined && this.state.dataEl != "") {
             var elInstance = this.state.dataEl;
             if (elInstance != undefined && this.state.dataEl != "") {
