@@ -6087,12 +6087,13 @@ font-style: italic!important;
 }
 
 .TreeTemplateHeight{
-  max-height: 100vh!important;
-  // overflow: scroll !important;
+  // height: 100vh!important;
+  min-height: calc(100vh - 50px)!important;
+    // overflow: scroll !important;
 }
 .VersionSettingMode{
-  height: 360px !important;
-  // max-height: calc(100vh - 340px) !important;
+  // height: 360px !important;
+  max-height: calc(100vh - 150px) !important;
   overflow-y: scroll;
   overflow-x: hidden;
 }
@@ -6104,4 +6105,11 @@ font-style: italic!important;
 .extrapolateTableFilter .jexcel_filters{
   top: 458.2188px!important;
   left: 296.203px;
+  }
+  .month-picker:focus { 
+    // outline: none; 
+    outline: 4px dashed darkorange;
+    border-color: #4dbd74;
+    // box-shadow: 0 0 0 0.2rem rgb(77 189 116 / 25%);
+    // border-color: #4dbd74;
   }

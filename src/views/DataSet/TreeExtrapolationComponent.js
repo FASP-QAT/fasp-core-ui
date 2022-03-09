@@ -7,7 +7,7 @@ import { Row, Col, Card, CardFooter, Button, Table, CardBody, Form, Modal, Modal
 import getLabelText from '../../CommonComponent/getLabelText';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow, jExcelLoadedFunctionWithoutPagination } from '../../CommonComponent/JExcelCommonFunctions.js';
-import { INDEXED_DB_VERSION, INDEXED_DB_NAME, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, JEXCEL_MONTH_PICKER_FORMAT, JEXCEL_DECIMAL_MONTHLY_CHANGE, JEXCEL_DECIMAL_NO_REGEX_LONG } from "../../Constants";
+import { ALPHA_BETA_GAMMA_VALUE,INDEXED_DB_VERSION, INDEXED_DB_NAME, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, JEXCEL_MONTH_PICKER_FORMAT, JEXCEL_DECIMAL_MONTHLY_CHANGE, JEXCEL_DECIMAL_NO_REGEX_LONG } from "../../Constants";
 import moment from "moment";
 import { Formik } from 'formik';
 import * as Yup from 'yup'
@@ -2488,7 +2488,7 @@ export default class TreeExtrapolationComponent extends React.Component {
             lineTension: 0,
             label: i18n.t('static.extrapolation.adjustedActuals'),
             backgroundColor: 'transparent',
-            borderColor: '#CFCDC9',
+            borderColor: '#002F6C',
             ticks: {
                 fontSize: 2,
                 fontColor: 'transparent',
@@ -2514,7 +2514,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                     lineTension: 0,
                     label: i18n.t('static.extrapolation.movingAverages'),
                     backgroundColor: 'transparent',
-                    borderColor: '#002f6c',
+                    borderColor: '#BA0C2F',
                     ticks: {
                         fontSize: 2,
                         fontColor: 'transparent',
@@ -2554,7 +2554,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                     lineTension: 0,
                     label: i18n.t('static.extrapolation.linearRegression'),
                     backgroundColor: 'transparent',
-                    borderColor: '#A7C6ED',
+                    borderColor: '#EDB944',
                     ticks: {
                         fontSize: 2,
                         fontColor: 'transparent',
@@ -2574,7 +2574,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                 lineTension: 0,
                 label: i18n.t('static.extrapolation.tesLower'),
                 backgroundColor: 'transparent',
-                borderColor: '#BA0C2F',
+                borderColor: '#A7C6ED',
                 borderStyle: 'dotted',
                 borderDash: [10, 10],
                 ticks: {
@@ -2596,7 +2596,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                 lineTension: 0,
                 label: i18n.t('static.extrapolation.tes'),
                 backgroundColor: 'transparent',
-                borderColor: '#BA0C2F',
+                borderColor: '#A7C6ED',
                 ticks: {
                     fontSize: 2,
                     fontColor: 'transparent',
@@ -2616,7 +2616,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                 lineTension: 0,
                 label: i18n.t('static.extrapolation.tesUpper'),
                 backgroundColor: 'transparent',
-                borderColor: '#BA0C2F',
+                borderColor: '#A7C6ED',
                 borderStyle: 'dotted',
                 borderDash: [10, 10],
                 ticks: {
@@ -2638,7 +2638,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                 lineTension: 0,
                 label: i18n.t('static.extrapolation.arima'),
                 backgroundColor: 'transparent',
-                borderColor: '#F48521',
+                borderColor: '#651D32',
                 ticks: {
                     fontSize: 2,
                     fontColor: 'transparent',

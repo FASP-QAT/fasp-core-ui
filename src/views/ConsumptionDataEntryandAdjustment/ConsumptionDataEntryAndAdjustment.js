@@ -1786,7 +1786,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
 
     let bar = {}
     var datasetListForGraph = [];
-    var colourArray = ["#002F6C", "#BA0C2F", "#49A4A1", "#A7C6ED", "#212721", "#BAOC2F", "#F48521"]
+    var colourArray = ["#BA0C2F", "#118B70", "#EDB944", "#A7C6ED", "#651D32", "#6C6463", "#F48521"]
     if (this.state.showDetailTable) {
       var elInstance = this.state.dataEl;
       if (elInstance != undefined) {
@@ -1797,7 +1797,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           // type: 'line',
           stack: 1,
           // backgroundColor: 'transparent',
-          backgroundColor: "#6C6463",
+          backgroundColor: "#002F6C",
           borderStyle: 'dotted',
           ticks: {
             fontSize: 2,

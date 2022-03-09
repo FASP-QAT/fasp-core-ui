@@ -1978,7 +1978,7 @@ export default class ExtrapolateDataComponent extends React.Component {
             lineTension: 0,
             label: i18n.t('static.extrapolation.adjustedActuals'),
             backgroundColor: 'transparent',
-            borderColor: '#6C6463',
+            borderColor: '#002F6C',
             ticks: {
                 fontSize: 2,
                 fontColor: 'transparent',
@@ -2003,7 +2003,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                     lineTension: 0,
                     label: i18n.t('static.extrapolation.movingAverages'),
                     backgroundColor: 'transparent',
-                    borderColor: '#002f6c',
+                    borderColor: '#BA0C2F',
                     ticks: {
                         fontSize: 2,
                         fontColor: 'transparent',
@@ -2042,7 +2042,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                     lineTension: 0,
                     label: i18n.t('static.extrapolation.linearRegression'),
                     backgroundColor: 'transparent',
-                    borderColor: '#A7C6ED',
+                    borderColor: '#EDB944',
                     ticks: {
                         fontSize: 2,
                         fontColor: 'transparent',
@@ -2061,7 +2061,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                 lineTension: 0,
                 label: i18n.t('static.extrapolation.tesLower'),
                 backgroundColor: 'transparent',
-                borderColor: '#BA0C2F',
+                borderColor: '#A7C6ED',
                 borderStyle: 'dotted',
                 borderDash: [10, 10],
                 ticks: {
@@ -2082,7 +2082,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                 lineTension: 0,
                 label: i18n.t('static.extrapolation.tes'),
                 backgroundColor: 'transparent',
-                borderColor: '#BA0C2F',
+                borderColor: '#A7C6ED',
                 ticks: {
                     fontSize: 2,
                     fontColor: 'transparent',
@@ -2101,7 +2101,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                 lineTension: 0,
                 label: i18n.t('static.extrapolation.tesUpper'),
                 backgroundColor: 'transparent',
-                borderColor: '#BA0C2F',
+                borderColor: '#A7C6ED',
                 borderStyle: 'dotted',
                 borderDash: [10, 10],
                 ticks: {
@@ -2122,7 +2122,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                 lineTension: 0,
                 label: i18n.t('static.extrapolation.arima'),
                 backgroundColor: 'transparent',
-                borderColor: '#F48521',
+                borderColor: '#651D32',
                 ticks: {
                     fontSize: 2,
                     fontColor: 'transparent',
