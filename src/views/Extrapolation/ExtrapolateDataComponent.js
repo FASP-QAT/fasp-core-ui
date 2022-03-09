@@ -356,6 +356,7 @@ export default class ExtrapolateDataComponent extends React.Component {
     handleRangeDissmis1(value) {
         this.setState({ rangeValue1: value }, () => {
             this.setExtrapolatedParameters(0)
+            this.getDateDifference()
         })
     }
 
@@ -768,6 +769,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                     if (regionId != "") {
                         this.setRegionId(regionEvent);
                     }
+                    this.getDateDifference()
                 })
             } else {
                 this.setState({
