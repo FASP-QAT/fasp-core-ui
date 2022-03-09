@@ -654,7 +654,7 @@ export default class ListTreeComponent extends Component {
                     <CardBody className="pb-lg-0 pt-lg-0">
                         <Col md="6 pl-0">
                             <div className="d-md-flex Selectdiv2">
-                                <FormGroup className="tab-ml-1 mt-md-2 mb-md-0 ">
+                                <FormGroup className="tab-ml-0 mt-md-2 mb-md-0 ">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
                                     <div className="controls SelectGo">
                                         <InputGroup>

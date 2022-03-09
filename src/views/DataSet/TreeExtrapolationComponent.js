@@ -200,6 +200,7 @@ export default class TreeExtrapolationComponent extends React.Component {
         var startDate = moment("2021-05-01").format("YYYY-MM-DD");
         var endDate = moment("2022-02-01").format("YYYY-MM-DD")
         this.state = {
+            popoverOpenStartMonth: false,
             maxMonth: '',
             extrapolationLoader: true,
             forecastNestedHeader: '5',
@@ -2319,6 +2320,12 @@ export default class TreeExtrapolationComponent extends React.Component {
     }
     toggledata = () => this.setState((currentState) => ({ show: !currentState.show }));
 
+    toggleStartMonth() {
+        this.setState({
+          popoverOpenStartMonth: !this.state.popoverOpenStartMonth,
+        });
+      }
+
     render() {
         const { filteredExtrapolationMethodList } = this.state;
         let extrapolationMethods = filteredExtrapolationMethodList.length > 0
@@ -2717,8 +2724,13 @@ export default class TreeExtrapolationComponent extends React.Component {
                                         {/* <Form name='simpleForm'> */}
                                         <div className=" pl-0">
                                             <div className="row">
+                                            <div>
+                                                                <Popover placement="top" isOpen={this.state.popoverOpenStartMonth} target="Popover1" trigger="hover" toggle={this.toggleStartMonth}>
+                                                                    <PopoverBody>To change the start month, please go back to the Node Data screen and change the month</PopoverBody>
+                                                                </Popover>
+                                                            </div>
                                                 <FormGroup className="col-md-3 pl-lg-0">
-                                                    <Label htmlFor="appendedInputButton">Start Month for Historical Data<span className="stock-box-icon fa fa-sort-desc ml-1"></span></Label>
+                                                    <Label htmlFor="appendedInputButton">Start Month for Historical Data<span className="stock-box-icon fa fa-sort-desc ml-1"></span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={this.toggleStartMonth} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                                     <div className="controls edit disabledColor">
                                                         <Picker
 

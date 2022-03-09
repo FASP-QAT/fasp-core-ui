@@ -7031,7 +7031,7 @@ export default class BuildTree extends Component {
 
                                 </>
                             }
-                            <div><Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.showMomData()}> <i className="fa fa-eye" style={{ color: '#fff' }}></i> {i18n.t('static.tree.viewMonthlyData')}</Button>
+                            <div><Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.showMomData()}><i className="fa fa-eye" style={{ color: '#fff' }}></i> {i18n.t('static.tree.viewMonthlyData')}</Button>
                                 {this.state.aggregationNode && <><Button color="success" size="md" className="float-right mr-1" type="button" onClick={(e) => this.formSubmitLoader(e)}> <i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
                                     <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button></>}
                             </div>
@@ -8106,6 +8106,12 @@ export default class BuildTree extends Component {
                 <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
                     <Card className="mb-lg-0">
                         <div className="pb-lg-0">
+                        <div className="Card-header-reporticon pb-1">
+                        <span className="compareAndSelect-larrow"> <i className="cui-arrow-left icons " > </i></span>
+                        <span className="compareAndSelect-rarrow"> <i className="cui-arrow-right icons " > </i></span>
+                        <span className="compareAndSelect-larrowText"> {i18n.t('static.common.backTo')} <a href="/#/validation/modelingValidation" className="supplyplanformulas">{i18n.t('static.dashboard.modelingValidation')}</a> </span>
+                        <span className="compareAndSelect-rarrowText"> {i18n.t('static.common.continueTo')}  <a href="/#/validation/productValidation" className="supplyplanformulas">{i18n.t('static.dashboard.productValidation')}</a> </span><br/>
+                        </div>
                             {/* <div className="card-header-actions">
                                 <div className="card-header-action pr-4 pt-lg-0">
 
@@ -8135,7 +8141,7 @@ export default class BuildTree extends Component {
                                 <div className="col-md-12 pl-lg-3">
                                     <div className='col-md-4 pt-lg-2'>
                                         <a className="pr-lg-0 pt-lg-1 float-left">
-                                            <span style={{ cursor: 'pointer' }} onClick={this.cancelClicked}><i className="fa fa-long-arrow-left" style={{ color: '#20a8d8', fontSize: '13px' }}></i> <small className="supplyplanformulas">{'Return To List'}</small></span>
+                                            <span style={{ cursor: 'pointer' }} onClick={this.cancelClicked}><i className="cui-arrow-left icons" style={{ color: '#002F6C', fontSize: '13px' }}></i> <small className="supplyplanformulas">{'Return To List'}</small></span>
                                         </a>
                                     </div>
                                     {/* <div className="col-md-6">
