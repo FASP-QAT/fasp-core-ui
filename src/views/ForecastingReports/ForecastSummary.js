@@ -1364,6 +1364,7 @@ class ForecastSummary extends Component {
     }
 
     forecastChanged = function (instance, cell, x, y, value) {
+        var tableJson = this.el.getJson(null, false);
         var elInstance = this.state.dataEl;
         var rowData = elInstance.getRowData(y);
         var possiblex = [];
@@ -1388,6 +1389,13 @@ class ForecastSummary extends Component {
                 }
                 // elInstance.setValueFromCoords((Number(x) + 1), y, totalForecast.toFixed(2), true);
                 elInstance.setValueFromCoords((Number(x) + 1), y, Math.round(totalForecast), true);
+                let loopVar = 4;
+                let total = 0;
+                for (var r = 0; r < this.state.regRegionList.length; r++) {
+                    total = total + this.el.getValueFromCoords(loopVar, y);
+                    loopVar = loopVar + 3;
+                }
+                elInstance.setValueFromCoords((Object.keys(tableJson[0]).length - 1), y, Math.round(total), true);
             }
         }
     }
@@ -2150,7 +2158,9 @@ class ForecastSummary extends Component {
                     console.log("Index+++", index)
                     console.log("Reg+++", dataList[dl].region.regionId)
                     var pu = planningUnitList1[index];
-                    pu.selectedForecastMap[dataList[dl].region.regionId] = { "scenarioId": dataList[dl].scenarioId, "consumptionExtrapolationId": dataList[dl].consumptionExtrapolationId, "totalForecast": dataList[dl].totalForecast, notes: dataList[dl].notes };
+                    let treeId = pu.selectedForecastMap[dataList[dl].region.regionId].treeId;
+                    console.log("TreeId-----------> ", treeId);
+                    pu.selectedForecastMap[dataList[dl].region.regionId] = { "scenarioId": dataList[dl].scenarioId, "consumptionExtrapolationId": dataList[dl].consumptionExtrapolationId, "totalForecast": dataList[dl].totalForecast, notes: dataList[dl].notes, treeId: treeId };
                     planningUnitList1[index] = pu;
                 }
                 console.log("PlanningUnitList1+++", planningUnitList1);
