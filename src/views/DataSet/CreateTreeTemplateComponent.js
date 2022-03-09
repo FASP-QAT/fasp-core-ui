@@ -3757,7 +3757,7 @@ export default class CreateTreeTemplate extends Component {
                                 [{
                                     nodeDataId: 1,
                                     notes: '',
-                                    month: new Date(),
+                                    month: moment(new Date()).format('YYYY-MM-DD'),
                                     dataValue: '',
                                     fuNode: {
                                         forecastingUnit: {
@@ -3812,7 +3812,7 @@ export default class CreateTreeTemplate extends Component {
                                 nodeDataModelingList: [],
                                 nodeDataOverrideList: [],
                                 nodeDataMomList: [],
-                                month: new Date(),
+                                month: moment(new Date()).format('YYYY-MM-DD'),
                                 dataValue: '',
                                 fuNode: {
                                     forecastingUnit: {
@@ -4914,13 +4914,13 @@ export default class CreateTreeTemplate extends Component {
                                                     name="month"
                                                     ref={this.pickAMonth1}
                                                     years={{ min: this.state.minDateValue, max: this.state.maxDate }}
-                                                    value={{ year: new Date((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].month.replace(/-/g, '\/')).getFullYear(), month: ("0" + (new Date((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].month.replace(/-/g, '\/')).getMonth() + 1)).slice(-2) }}
+                                                    value={{ year: new Date(((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].month).replace(/-/g, '\/')).getFullYear(), month: ("0" + (new Date(((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].month).replace(/-/g, '\/')).getMonth() + 1)).slice(-2) }}
                                                     lang={pickerLang.months}
                                                     // theme="dark"
                                                     onChange={this.handleAMonthChange1}
                                                     onDismiss={this.handleAMonthDissmis1}
                                                 >
-                                                    <MonthBox value={this.makeText({ year: new Date((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].month.replace(/-/g, '\/')).getFullYear(), month: ("0" + (new Date((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].month.replace(/-/g, '\/')).getMonth() + 1)).slice(-2) })}
+                                                    <MonthBox value={this.makeText({ year: new Date(((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].month).replace(/-/g, '\/')).getFullYear(), month: ("0" + (new Date(((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].month).replace(/-/g, '\/')).getMonth() + 1)).slice(-2) })}
                                                         onClick={this.handleClickMonthBox1} />
                                                 </Picker>
                                             </div>
@@ -6595,7 +6595,7 @@ export default class CreateTreeTemplate extends Component {
                                                             nodeDataModelingList: [],
                                                             nodeDataOverrideList: [],
                                                             nodeDataMomList: [],
-                                                            month: new Date(),
+                                                            month: moment(new Date()).format('YYYY-MM-DD'),
                                                             dataValue: '',
                                                             calculatedDataValue: '',
                                                             notes: '',
@@ -6646,7 +6646,8 @@ export default class CreateTreeTemplate extends Component {
                                                     label_en: itemConfig.payload.label.label_en
                                                 },
                                                 nodeUnit: {
-                                                    id: itemConfig.payload.nodeUnit.id
+                                                    id: itemConfig.payload.nodeUnit.id,
+                                                    label: itemConfig.payload.nodeUnit.label
                                                 },
                                                 nodeDataMap: [
                                                     [
