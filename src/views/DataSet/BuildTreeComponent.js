@@ -5123,7 +5123,10 @@ export default class BuildTree extends Component {
             var nodeUnit = document.getElementById("nodeUnitId");
             var selectedText = nodeUnit.options[nodeUnit.selectedIndex].text;
             var label = {
-                label_en: selectedText
+                label_en: selectedText,
+                label_fr: '',
+                label_sp: '',
+                label_pr: ''
             }
             currentItemConfig.context.payload.nodeUnit.label = label;
 
@@ -5763,6 +5766,7 @@ export default class BuildTree extends Component {
                         id: 'A',
                         scaleLabel: {
                             display: true,
+                            // labelString: this.state.currentItemConfig.context.payload.nodeUnit.label != null ? this.state.currentItemConfig.context.payload.nodeType.id > 3 ? getLabelText(this.state.currentItemConfig.parentItem.payload.nodeUnit.label, this.state.lang) : getLabelText(this.state.currentItemConfig.context.payload.nodeUnit.label, this.state.lang) : '',
                             labelString: this.state.currentItemConfig.context.payload.nodeUnit.label != null ? this.state.currentItemConfig.context.payload.nodeType.id > 3 ? getLabelText(this.state.currentItemConfig.parentItem.payload.nodeUnit.label, this.state.lang) : getLabelText(this.state.currentItemConfig.context.payload.nodeUnit.label, this.state.lang) : '',
                             // labelString: "",
                             fontColor: 'black'
@@ -8019,7 +8023,8 @@ export default class BuildTree extends Component {
                                                     label_en: itemConfig.payload.label.label_en
                                                 },
                                                 nodeUnit: {
-                                                    id: itemConfig.payload.nodeUnit.id
+                                                    id: itemConfig.payload.nodeUnit.id,
+                                                    label: itemConfig.payload.nodeUnit.label
                                                 },
                                                 nodeDataMap: itemConfig.payload.nodeDataMap
                                             }
