@@ -47,6 +47,7 @@ import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'reac
 import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
 import paginationFactory from 'react-bootstrap-table2-paginator';
 import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
+import { falseDependencies } from 'mathjs';
 
 const ref = React.createRef();
 const pickerLang = {
@@ -2114,6 +2115,7 @@ export default class PlanningUnitSetting extends Component {
                         // loading: false,
                         message: i18n.t('static.mt.dataUpdateSuccess'),
                         color: "green",
+                        isChanged1: false,
                         // allowAdd: false
                     }, () => {
                         listOfDisablePuNode = [...new Set(listOfDisablePuNode)];
@@ -2346,8 +2348,8 @@ export default class PlanningUnitSetting extends Component {
         data[13] = 0;
         data[14] = true;
         data[15] = "";
-        // data[16] = true;
-        // data[17] = true;
+        data[16] = true;
+        data[17] = true;
 
         this.el.insertRow(
             data, 0, 1

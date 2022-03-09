@@ -775,9 +775,9 @@ class DefaultLayout extends Component {
   }
 
   refreshPage() {
-    setTimeout(() => {
-      window.location.reload(false);
-    }, 0);
+    // setTimeout(() => {
+    //   window.location.reload(false);
+    // }, 0);
   }
 
   checkEvent = (e) => {

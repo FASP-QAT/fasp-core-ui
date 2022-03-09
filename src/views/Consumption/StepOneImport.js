@@ -1468,6 +1468,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                                     value={rangeValue}
                                     lang={pickerLang}
                                     //theme="light"
+                                    key={JSON.stringify(rangeValue)}
                                     onChange={this.handleRangeChange}
                                     onDismiss={this.handleRangeDissmis}
                                 >

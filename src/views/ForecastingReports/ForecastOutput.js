@@ -2265,6 +2265,7 @@ class ForecastOutput extends Component {
                             // backgroundColor: item.color,//stacked
                             borderColor: backgroundColor[index],
                             borderStyle: 'dotted',
+                            // borderWidth: 1,
                             ticks: {
                                 fontSize: 2,
                                 fontColor: 'transparent',

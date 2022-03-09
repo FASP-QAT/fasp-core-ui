@@ -1735,7 +1735,7 @@ class usageTemplate extends Component {
                         console.log(response);
                         // this.props.history.push(`/realmCountry/listRealmCountry/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                         this.setState({
-                            message: i18n.t('static.usagePeriod.addUpdateMessage'), color: 'green'
+                            message: i18n.t('static.usagePeriod.addUpdateMessage'), color: 'green', isChanged1: false
                         },
                             () => {
                                 this.hideSecondComponent();
