@@ -7,7 +7,7 @@ import { Row, Col, Card, CardFooter, Button, Table, CardBody, Form, Modal, Modal
 import getLabelText from '../../CommonComponent/getLabelText';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow, jExcelLoadedFunctionWithoutPagination } from '../../CommonComponent/JExcelCommonFunctions.js';
-import { ALPHA_BETA_GAMMA_VALUE,INDEXED_DB_VERSION, INDEXED_DB_NAME, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, JEXCEL_MONTH_PICKER_FORMAT, JEXCEL_DECIMAL_MONTHLY_CHANGE, JEXCEL_DECIMAL_NO_REGEX_LONG } from "../../Constants";
+import { SEASONALITY_REGEX, ALPHA_BETA_GAMMA_VALUE, INDEXED_DB_VERSION, INDEXED_DB_NAME, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, JEXCEL_MONTH_PICKER_FORMAT, JEXCEL_DECIMAL_MONTHLY_CHANGE, JEXCEL_DECIMAL_NO_REGEX_LONG } from "../../Constants";
 import moment from "moment";
 import { Formik } from 'formik';
 import * as Yup from 'yup'
@@ -55,10 +55,10 @@ const validationSchemaExtrapolation = function (values) {
                     }
                 }),
         seasonalityId:
-            Yup.string().test('seasonalityId', 'Please enter positive number.',
+            Yup.string().test('seasonalityId', 'Please enter a valid whole number between 1 & 24.',
                 function (value) {
                     console.log("***3**", document.getElementById("smoothingId").value);
-                    var testNumber = document.getElementById("seasonalityId").value != "" ? JEXCEL_INTEGER_REGEX.test(document.getElementById("seasonalityId").value) : false;
+                    var testNumber = document.getElementById("seasonalityId").value != "" ? SEASONALITY_REGEX.test(document.getElementById("seasonalityId").value) : false;
                     // console.log("*****", testNumber);
                     if ((document.getElementById("smoothingId").value) == "true" && (document.getElementById("seasonalityId").value == "" || testNumber == false)) {
                         return false;
@@ -200,6 +200,7 @@ export default class TreeExtrapolationComponent extends React.Component {
         var startDate = moment("2021-05-01").format("YYYY-MM-DD");
         var endDate = moment("2022-02-01").format("YYYY-MM-DD")
         this.state = {
+            showJexcelData: true,
             maxMonth: '',
             extrapolationLoader: true,
             forecastNestedHeader: '5',
@@ -739,7 +740,10 @@ export default class TreeExtrapolationComponent extends React.Component {
         this.changeNotes = this.changeNotes.bind(this);
         this.checkActualValuesGap = this.checkActualValuesGap.bind(this);
         this.saveJexcelData = this.saveJexcelData.bind(this);
-        // this.updateState = this.updateState.bind(this);
+        this.toggleJexcelData = this.toggleJexcelData.bind(this);
+    }
+    toggleJexcelData() {
+        this.setState({ showJexcelData: !this.state.showJexcelData })
     }
     saveJexcelData() {
         var jexcelDataArr = [];
@@ -2514,7 +2518,8 @@ export default class TreeExtrapolationComponent extends React.Component {
                     lineTension: 0,
                     label: i18n.t('static.extrapolation.movingAverages'),
                     backgroundColor: 'transparent',
-                    borderColor: '#BA0C2F',
+                    borderColor: '#002f6c',
+                    borderWidth: this.state.nodeDataExtrapolation.extrapolationMethod != null && this.state.nodeDataExtrapolation.extrapolationMethod.id == 7 ? 4 : 2,
                     ticks: {
                         fontSize: 2,
                         fontColor: 'transparent',
@@ -2534,6 +2539,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                 label: i18n.t('static.extrapolation.semiAverages'),
                 backgroundColor: 'transparent',
                 borderColor: '#118B70',
+                borderWidth: this.state.nodeDataExtrapolation.extrapolationMethod != null && this.state.nodeDataExtrapolation.extrapolationMethod.id == 6 ? 4 : 2,
                 ticks: {
                     fontSize: 2,
                     fontColor: 'transparent',
@@ -2554,7 +2560,8 @@ export default class TreeExtrapolationComponent extends React.Component {
                     lineTension: 0,
                     label: i18n.t('static.extrapolation.linearRegression'),
                     backgroundColor: 'transparent',
-                    borderColor: '#EDB944',
+                    borderColor: '#A7C6ED',
+                    borderWidth: this.state.nodeDataExtrapolation.extrapolationMethod != null && this.state.nodeDataExtrapolation.extrapolationMethod.id == 5 ? 4 : 2,
                     ticks: {
                         fontSize: 2,
                         fontColor: 'transparent',
@@ -2577,6 +2584,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                 borderColor: '#A7C6ED',
                 borderStyle: 'dotted',
                 borderDash: [10, 10],
+                borderWidth: this.state.nodeDataExtrapolation.extrapolationMethod != null && this.state.nodeDataExtrapolation.extrapolationMethod.id == 2 ? 4 : 2,
                 ticks: {
                     fontSize: 2,
                     fontColor: 'transparent',
@@ -2596,7 +2604,8 @@ export default class TreeExtrapolationComponent extends React.Component {
                 lineTension: 0,
                 label: i18n.t('static.extrapolation.tes'),
                 backgroundColor: 'transparent',
-                borderColor: '#A7C6ED',
+                borderColor: '#BA0C2F',
+                borderWidth: this.state.nodeDataExtrapolation.extrapolationMethod != null && this.state.nodeDataExtrapolation.extrapolationMethod.id == 2 ? 4 : 2,
                 ticks: {
                     fontSize: 2,
                     fontColor: 'transparent',
@@ -2619,6 +2628,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                 borderColor: '#A7C6ED',
                 borderStyle: 'dotted',
                 borderDash: [10, 10],
+                borderWidth: this.state.nodeDataExtrapolation.extrapolationMethod != null && this.state.nodeDataExtrapolation.extrapolationMethod.id == 2 ? 4 : 2,
                 ticks: {
                     fontSize: 2,
                     fontColor: 'transparent',
@@ -2638,7 +2648,8 @@ export default class TreeExtrapolationComponent extends React.Component {
                 lineTension: 0,
                 label: i18n.t('static.extrapolation.arima'),
                 backgroundColor: 'transparent',
-                borderColor: '#651D32',
+                borderColor: '#F48521',
+                borderWidth: this.state.nodeDataExtrapolation.extrapolationMethod != null && this.state.nodeDataExtrapolation.extrapolationMethod.id == 4 ? 4 : 2,
                 ticks: {
                     fontSize: 2,
                     fontColor: 'transparent',
@@ -3102,14 +3113,14 @@ export default class TreeExtrapolationComponent extends React.Component {
                                             </div>
 
                                             <div className="col-md-12 row text-left pt-lg-3 pl-lg-0">
-                                                {/* <Button className="mr-1 btn btn-info btn-md " onClick={this.toggledata}>
-                                                {this.state.show ? i18n.t('static.common.hideData') : i18n.t('static.common.showData')}
-                                            </Button> */}
+                                                <Button className="mr-1 btn btn-info btn-md " onClick={this.toggleJexcelData}>
+                                                    {this.state.showJexcelData ? i18n.t('static.common.hideData') : i18n.t('static.common.showData')}
+                                                </Button>
                                                 <Button type="button" color="success" className="mr-1" size="md" onClick={this.interpolate}>Interpolate</Button>
                                             </div>
                                         </div>
                                         {/* </Form> */}
-                                        <div className="row pl-lg-0 pr-lg-0 pt-lg-3">
+                                        <div className="row pl-lg-0 pr-lg-0 pt-lg-3" style={{ display: this.state.showJexcelData ? 'block' : 'none' }}>
                                             <div className="col-md-6">
                                                 {/* <Button type="button" size="md" color="info" className="float-left mr-1" onClick={this.resetTree}>{'Show/hide data'}</Button> */}
                                             </div>
@@ -3136,7 +3147,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                 </FormGroup>
                                             </div>
                                         </div>
-                                        <div className="row pl-lg-0 pr-lg-0 extrapolateTable extrapolateTableFilter consumptionDataEntryTable">
+                                        <div className="row pl-lg-0 pr-lg-0 extrapolateTable consumptionDataEntryTable" style={{ display: this.state.showJexcelData ? 'block' : 'none' }}>
                                             <div id="tableDiv" className=""></div>
                                         </div>
                                         {/* Graph */}

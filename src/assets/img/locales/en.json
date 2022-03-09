@@ -2157,5 +2157,6 @@
     "static.supplyPlanFormula.maxMonthOfStockEx5": "Max = 7",
     "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18 )",
     "static.message.importSuccess": "Import successful",
-    "static.common.tracerCategoryInvalidSelection": "Selected Forcasting unit's Tracer category does not match"
+    "static.common.tracerCategoryInvalidSelection": "Selected Forcasting unit's Tracer category does not match",
+    "static.tree.hideMonthlyData":"Hide monthly data"
 }
