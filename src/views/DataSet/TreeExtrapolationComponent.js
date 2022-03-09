@@ -70,7 +70,7 @@ const validationSchemaExtrapolation = function (values) {
             Yup.string().test('gammaId', 'Please enter correct gamma value.',
                 function (value) {
                     console.log("***4**", document.getElementById("smoothingId").value);
-                    var testNumber = document.getElementById("gammaId").value != "" ? (/^\d{0,3}(\.\d{1,2})?$/).test(document.getElementById("gammaId").value) : false;
+                    var testNumber = document.getElementById("gammaId").value != "" ? ALPHA_BETA_GAMMA_VALUE.test(document.getElementById("gammaId").value) : false;
                     // console.log("*****", testNumber);
                     if ((document.getElementById("smoothingId").value) == "true" && (document.getElementById("gammaId").value == "" || testNumber == false)) {
                         return false;
@@ -82,7 +82,7 @@ const validationSchemaExtrapolation = function (values) {
             Yup.string().test('betaId', 'Please enter correct beta value.',
                 function (value) {
                     console.log("***5**", document.getElementById("smoothingId").value);
-                    var testNumber = document.getElementById("betaId").value != "" ? (/^\d{0,3}(\.\d{1,2})?$/).test(document.getElementById("betaId").value) : false;
+                    var testNumber = document.getElementById("betaId").value != "" ? ALPHA_BETA_GAMMA_VALUE.test(document.getElementById("betaId").value) : false;
                     // console.log("*****", testNumber);
                     if ((document.getElementById("smoothingId").value) == "true" && (document.getElementById("betaId").value == "" || testNumber == false)) {
                         return false;
@@ -94,7 +94,7 @@ const validationSchemaExtrapolation = function (values) {
             Yup.string().test('alphaId', 'Please enter correct alpha value.',
                 function (value) {
                     console.log("***6**", document.getElementById("smoothingId").value);
-                    var testNumber = document.getElementById("alphaId").value != "" ? (/^\d{0,3}(\.\d{1,2})?$/).test(document.getElementById("alphaId").value) : false;
+                    var testNumber = document.getElementById("alphaId").value != "" ? ALPHA_BETA_GAMMA_VALUE.test(document.getElementById("alphaId").value) : false;
                     // console.log("*****", testNumber);
                     if ((document.getElementById("smoothingId").value) == "true" && (document.getElementById("alphaId").value == "" || testNumber == false)) {
                         return false;
