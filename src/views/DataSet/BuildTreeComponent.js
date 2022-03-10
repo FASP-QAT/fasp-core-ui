@@ -444,7 +444,7 @@ export default class BuildTree extends Component {
             scenarioActionType: '',
             defYear1: { year: 2018, month: 4 },
             defYear2: { year: 2020, month: 9 },
-            showDiv: true,
+            showDiv: false,
             showDiv1: false,
             orgCurrentItemConfig: {},
             treeTemplateObj: [],
