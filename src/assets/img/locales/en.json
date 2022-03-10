@@ -2158,5 +2158,7 @@
     "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18 )",
     "static.message.importSuccess": "Import successful",
     "static.common.tracerCategoryInvalidSelection": "Selected Forcasting unit's Tracer category does not match",
-    "static.tree.hideMonthlyData":"Hide monthly data"
+    "static.tree.hideMonthlyData":"Hide monthly data",
+    "static.tree.decimalValidation12&2":"Please enter a valid number having max 12 digits before decimal and max 2 digit after decimal.",
+    "static.tree.decimalValidation10&2":"Please enter a valid number having max 10 digits before decimal and max 2 digit after decimal."
 }

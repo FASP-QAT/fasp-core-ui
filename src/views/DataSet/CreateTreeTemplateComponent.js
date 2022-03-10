@@ -100,7 +100,7 @@ const validationSchemaNodeData = function (values) {
                     }
                 }),
         percentageOfParent: Yup.string()
-            .test('percentageOfParent', i18n.t('static.validation.fieldRequired'),
+            .test('percentageOfParent', i18n.t('static.tree.decimalValidation10&2'),
                 function (value) {
                     var testNumber = document.getElementById("percentageOfParent").value != "" ? (/^\d{0,3}(\.\d{1,2})?$/).test(document.getElementById("percentageOfParent").value) : false;
                     // console.log(">>>>*", parseInt(document.getElementById("nodeTypeId").value) == 3 || parseInt(document.getElementById("nodeTypeId").value) == 4) && (document.getElementById("percentageOfParent").value == "" || testNumber == false);
@@ -179,7 +179,7 @@ const validationSchemaNodeData = function (values) {
                 }),
 
         forecastingUnitPerPersonsFC:
-            Yup.string().test('forecastingUnitPerPersonsFC', 'Please enter a valid number having max 12 digits before decimal and max 2 digit after decimal.',
+            Yup.string().test('forecastingUnitPerPersonsFC', i18n.t('static.tree.decimalValidation12&2'),
                 function (value) {
                     // console.log("*****", document.getElementById("nodeValue").value);
                     var testNumber = (/^\d{0,12}(\.\d{1,4})?$/).test((document.getElementById("forecastingUnitPerPersonsFC").value).replaceAll(",", ""));
@@ -226,7 +226,7 @@ const validationSchemaNodeData = function (values) {
                         return true;
                     }
                 }),
-        repeatCount: Yup.string().test('forecastingUnitPerPersonsFC', 'Please enter a valid number having max 12 digits before decimal and max 2 digit after decimal.',
+        repeatCount: Yup.string().test('forecastingUnitPerPersonsFC', i18n.t('static.tree.decimalValidation12&2'),
             function (value) {
                 var testNumber = (/^\d{0,12}(\.\d{1,4})?$/).test((document.getElementById("repeatCount").value).replaceAll(",", ""));
                 if (document.getElementById("oneTimeUsage").value == 2 && (document.getElementById("repeatCount").value == "" || testNumber == false)) {
@@ -611,7 +611,9 @@ export default class CreateTreeTemplate extends Component {
             if (regionIds != null) {
                 currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.forecastingUnit.id = regionIds.value;
                 currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.forecastingUnit.label.label_en = regionIds.label.split("|")[0];
-                currentItemConfig.context.payload.label.label_en = (regionIds.label.split("|")[0]).trim();
+                if (currentItemConfig.context.payload.label.label_en == "" || currentItemConfig.context.payload.label.label_en == null) {
+                    currentItemConfig.context.payload.label.label_en = (regionIds.label.split("|")[0]).trim();
+                }
                 this.setState({ showFUValidation: false }, () => {
                     this.getForecastingUnitUnitByFUId(regionIds.value);
                 });
@@ -3127,7 +3129,7 @@ export default class CreateTreeTemplate extends Component {
             this.setState({
                 forecastingUnitMultiList: [],
                 forecastingUnitList: [],
-                fuValues:[]
+                fuValues: []
             })
         }
 
