@@ -298,7 +298,7 @@ const validationSchema = function (values) {
             .required("Please select forecast method"),
         treeName: Yup.string()
             .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
-            .required("Please enter template name"),
+            .required(i18n.t('static.tree.templateNameRequired')),
         monthsInPast: Yup.string()
             .matches(/^\d{0,15}(,\d{3})*(\.\d{1,2})?$/, 'Enter valid positive numbers')
             .required("Please enter a number"),

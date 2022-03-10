@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import DatasetService from '../../api/DatasetService.js';
 import AuthenticationService from '../Common/AuthenticationService.js';
-import { Card, CardHeader, CardBody, Button, Col, FormGroup, Label, InputGroup, Input } from 'reactstrap';
+import { Card, CardHeader, CardBody, Button, Col, FormGroup, Label, InputGroup, Input, Modal, ModalBody, ModalFooter, ModalHeader, CardFooter, FormFeedback, Form } from 'reactstrap';
 import getLabelText from '../../CommonComponent/getLabelText'
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 import jexcel from 'jexcel-pro';
@@ -11,22 +11,224 @@ import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../Com
 import i18n from '../../i18n';
 import { JEXCEL_PAGINATION_OPTION, JEXCEL_DATE_FORMAT_SM, JEXCEL_PRO_KEY } from '../../Constants.js';
 import moment from 'moment';
+import { Formik } from 'formik';
+import * as Yup from 'yup'
+import '../Forms/ValidationForms/ValidationForms.css';
 const entityname = 'Tree Template';
+const validationSchema = function (values) {
+    return Yup.object().shape({
+        treeTemplateName: Yup.string()
+            .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
+            .required(i18n.t('static.tree.templateNameRequired')),
+    })
+}
+
+const initialValues = {
+    treeTemplateName: "",
+}
+
+const validate = (getValidationSchema) => {
+    return (values) => {
+        const validationSchema = getValidationSchema(values)
+        try {
+            validationSchema.validateSync(values, { abortEarly: false })
+            return {}
+        } catch (error) {
+            return getErrorsFromValidationError(error)
+        }
+    }
+}
+
+const getErrorsFromValidationError = (validationError) => {
+    const FIRST_ERROR = 0
+    return validationError.inner.reduce((errors, error) => {
+        return {
+            ...errors,
+            [error.path]: error.errors[FIRST_ERROR],
+        }
+    }, {})
+}
 export default class ListTreeTemplate extends Component {
 
     constructor(props) {
         super(props);
         this.state = {
+            color:'',
+            treeTemplateId: '',
             treeTemplateList: [],
             message: '',
-            loading: true
+            loading: true,
+            treeTemplateName: '',
+            isModalOpen: false
         }
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.buildJexcel = this.buildJexcel.bind(this);
         this.buildTree = this.buildTree.bind(this);
         this.addTreeTemplate = this.addTreeTemplate.bind(this);
+        this.copyDeleteTree = this.copyDeleteTree.bind(this);
+        this.modelOpenClose = this.modelOpenClose.bind(this);
+        this.getTreeTemplateList = this.getTreeTemplateList.bind(this);
     }
 
+    getTreeTemplateList() {
+        DatasetService.getTreeTemplateList().then(response => {
+            console.log("tree template list---", response.data)
+            var treeTemplateList = response.data.sort((a, b) => {
+                var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                return itemLabelA > itemLabelB ? 1 : -1;
+            });
+            this.setState({
+                treeTemplateList,
+                loading: false
+            }, () => { this.buildJexcel() })
+        })
+            .catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                                break;
+                        }
+                    }
+                }
+            );
+    }
+    modelOpenClose() {
+        this.setState({
+            isModalOpen: !this.state.isModalOpen,
+        })
+    }
+    dataChange(event) {
+        if (event.target.name == "treeTemplateName") {
+            this.setState({
+                treeTemplateName: event.target.value,
+            });
+        }
+    };
+
+    touchAll(setTouched, errors) {
+        setTouched({
+            treeTemplateName: true
+        }
+        )
+        this.validateForm(errors)
+    }
+    validateForm(errors) {
+        this.findFirstError('modalForm', (fieldName) => {
+            return Boolean(errors[fieldName])
+        })
+    }
+    findFirstError(formName, hasError) {
+        const form = document.forms[formName]
+        for (let i = 0; i < form.length; i++) {
+            if (hasError(form[i].name)) {
+                form[i].focus()
+                break
+            }
+        }
+    }
+
+    copyDeleteTree(treeTemplateId) {
+
+        console.log("treeTemplateId--------------->", treeTemplateId);
+        var treeTemplate = this.state.treeTemplateList.filter(x => x.treeTemplateId == treeTemplateId)[0];
+        treeTemplate.label.label_en = this.state.treeTemplateName;
+
+        DatasetService.addTreeTemplate(treeTemplate)
+            .then(response => {
+                console.log("after adding tree---", response.data);
+                if (response.status == 200) {
+                    this.setState({
+                        message: i18n.t('static.message.addTreeTemplate'),
+                        color: 'green',
+                        loading: false
+                    }, () => {
+                        this.getTreeTemplateList();
+                        this.hideSecondComponent();
+                    });
+                    // this.props.history.push(`/dataset/listTreeTemplate/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
+                } else {
+                    this.setState({
+                        message: response.data.messageCode, loading: false
+                    },
+                        () => {
+                            this.hideSecondComponent();
+                        })
+                }
+
+            }).catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                                break;
+                        }
+                    }
+                }
+            );
+
+    }
 
     addTreeTemplate(event) {
 
@@ -154,7 +356,23 @@ export default class ListTreeTemplate extends Component {
             filters: true,
             license: JEXCEL_PRO_KEY,
             contextMenu: function (obj, x, y, e) {
-                return false;
+                var items = [];
+                if (y != null) {
+                    if (obj.options.allowInsertRow == true) {
+                        items.push({
+                            title: i18n.t('static.common.duplicateTemplate'),
+                            onclick: function () {
+                                this.setState({
+                                    treeTemplateId: this.el.getValueFromCoords(0, y),
+                                    isModalOpen: !this.state.isModalOpen,
+                                    treeTemplateName: this.el.getValueFromCoords(1, y) + "+copy"
+                                })
+                            }.bind(this)
+                        });
+                    }
+                }
+
+                return items;
             }.bind(this),
             // contextMenu: function (obj, x, y, e) {
             //     var items = [];
@@ -207,59 +425,7 @@ export default class ListTreeTemplate extends Component {
     }
     componentDidMount() {
         this.hideFirstComponent();
-        DatasetService.getTreeTemplateList().then(response => {
-            console.log("tree template list---", response.data)
-            var treeTemplateList = response.data.sort((a, b) => {
-                var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-                var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
-                return itemLabelA > itemLabelB ? 1 : -1;
-            });
-            this.setState({
-                treeTemplateList,
-                loading: false
-            }, () => { this.buildJexcel() })
-        })
-            .catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({
-                            message: 'static.unkownError',
-                            loading: false
-                        });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
-
-                            case 401:
-                                this.props.history.push(`/login/static.message.sessionExpired`)
-                                break;
-                            case 403:
-                                this.props.history.push(`/accessDenied`)
-                                break;
-                            case 500:
-                            case 404:
-                            case 406:
-                                this.setState({
-                                    message: error.response.data.messageCode,
-                                    loading: false
-                                });
-                                break;
-                            case 412:
-                                this.setState({
-                                    message: error.response.data.messageCode,
-                                    loading: false
-                                });
-                                break;
-                            default:
-                                this.setState({
-                                    message: 'static.unkownError',
-                                    loading: false
-                                });
-                                break;
-                        }
-                    }
-                }
-            );
-
+        this.getTreeTemplateList();
     }
 
     loaded = function (instance, cell, x, y, value) {
@@ -300,7 +466,7 @@ export default class ListTreeTemplate extends Component {
                     this.setState({ loading: loading })
                 }} />
                 <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
-                <h5 className="red" id="div2">{i18n.t(this.state.message, { entityname })}</h5>
+                <h5 className={this.state.color} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <Card>
                     <div className="Card-header-addicon">
                         {/* <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong> */}
@@ -355,6 +521,90 @@ export default class ListTreeTemplate extends Component {
                             </div>
                         </div>
                     </CardBody>
+                    <Modal isOpen={this.state.isModalOpen}
+                        className={'modal-md ' + this.props.className}>
+                        <ModalHeader>
+                            <strong>Template Details</strong>
+                        </ModalHeader>
+                        <ModalBody className='pb-lg-0'>
+                            {/* <h6 className="red" id="div3"></h6> */}
+                            <Col sm={12} style={{ flexBasis: 'auto' }}>
+                                {/* <Card> */}
+                                <Formik
+                                    initialValues={{
+                                        treeTemplateName: this.state.treeTemplateName
+                                    }}
+                                    validate={validate(validationSchema)}
+                                    onSubmit={(values, { setSubmitting, setErrors }) => {
+                                        this.setState({ loading: true }, () => {
+                                            this.copyDeleteTree(this.state.treeTemplateId);
+                                            this.setState({
+                                                isModalOpen: !this.state.isModalOpen,
+                                            })
+                                        });
+
+                                    }}
+
+
+                                    render={
+                                        ({
+                                            values,
+                                            errors,
+                                            touched,
+                                            handleChange,
+                                            handleBlur,
+                                            handleSubmit,
+                                            isSubmitting,
+                                            isValid,
+                                            setTouched,
+                                            handleReset
+                                        }) => (
+                                            <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='modalForm' autocomplete="off">
+                                                {/* <CardBody> */}
+                                                <div className="row">
+
+                                                    <FormGroup className="col-md-12">
+                                                        <Label for="number1">Template Name<span className="red Reqasterisk">*</span></Label>
+                                                        <div className="controls">
+                                                            <Input type="text"
+                                                                bsSize="sm"
+                                                                name="treeTemplateName"
+                                                                id="treeTemplateName"
+                                                                valid={!errors.treeTemplateName && this.state.treeTemplateName != ''}
+                                                                invalid={touched.treeTemplateName && !!errors.treeTemplateName}
+                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                                onBlur={handleBlur}
+                                                                required
+                                                                value={this.state.treeTemplateName}
+                                                            />
+                                                            <FormFeedback className="red">{errors.treeTemplateName}</FormFeedback>
+                                                        </div>
+
+                                                    </FormGroup>
+                                                    <FormGroup className="col-md-12 float-right pt-lg-4">
+                                                        <Button type="button" color="danger" className="mr-1 float-right" size="md" onClick={this.modelOpenClose}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                                        <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                                        &nbsp;
+
+                                                    </FormGroup>
+                                                </div>
+                                                {/* <CardFooter>
+                                                        <FormGroup>
+                                                            <Button type="button" color="danger" className="mr-1 float-right" size="md" onClick={this.modelOpenClose}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                                            <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                                            &nbsp;
+
+                                                        </FormGroup>
+                                                    </CardFooter> */}
+                                            </Form>
+
+                                        )} />
+
+                                {/* </Card> */}
+                            </Col>
+                            <br />
+                        </ModalBody>
+                    </Modal>
                 </Card>
 
             </div>

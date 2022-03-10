@@ -23,6 +23,7 @@ const entityname = i18n.t('static.common.listtree');
 const validationSchema = function (values) {
     return Yup.object().shape({
         treeName: Yup.string()
+            .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
             .required(i18n.t('static.validation.selectTreeName')),
     })
 }
@@ -292,9 +293,9 @@ export default class ListTreeComponent extends Component {
                     } else if (localStorage.getItem("sesDatasetId") != "" && this.state.datasetList.filter(c => c.id == localStorage.getItem("sesDatasetId")).length > 0) {
                         datasetId = localStorage.getItem("sesDatasetId");
                     }
-                    console.log("datasetId---",datasetId);
-                    this.setState({ datasetId },()=>{this.getTreeList();})
-                    
+                    console.log("datasetId---", datasetId);
+                    this.setState({ datasetId }, () => { this.getTreeList(); })
+
                 });
 
             }.bind(this);
@@ -502,7 +503,7 @@ export default class ListTreeComponent extends Component {
                                     versionId: this.el.getValueFromCoords(9, y),
                                     treeId: this.el.getValueFromCoords(0, y),
                                     isModalOpen: !this.state.isModalOpen,
-                                    treeName: this.el.getValueFromCoords(2, y) +"+copy"
+                                    treeName: this.el.getValueFromCoords(2, y) + "+copy"
                                 })
                             }.bind(this)
                         });
@@ -722,7 +723,7 @@ export default class ListTreeComponent extends Component {
                                 {/* <Card> */}
                                 <Formik
                                     initialValues={{
-                                        treeName : this.state.treeName
+                                        treeName: this.state.treeName
                                     }}
                                     validate={validate(validationSchema)}
                                     onSubmit={(values, { setSubmitting, setErrors }) => {
