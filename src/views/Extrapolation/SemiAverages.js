@@ -13,9 +13,13 @@ export function calculateSemiAverages(inputData, noOfProjectionMonths, props) {
     initializeSemiAverage(data, actualMonths);
     for (let x = 1; x <= actualMonths + noOfMonthsForProjection; x++) {
         if (x <= actualMonths) {
-            data[x - 1].forecast = getSemiAverage(x);
+            var semiAvg = getSemiAverage(x);
+            data[x - 1].forecast = semiAvg > 0 ? semiAvg :0;
+            // data[x - 1].forecast = getSemiAverage(x);
         } else {
-            data[x - 1] = { "month": x, "actual": null, "forecast": getSemiAverage(x) };
+            var semiAvg = getSemiAverage(x);
+            data[x - 1] = { "month": x, "actual": null, "forecast": semiAvg > 0 ? semiAvg :0};
+            // data[x - 1] = { "month": x, "actual": null, "forecast": getSemiAverage(x) };
         }
     }
     for (let y = 1; y <= actualMonths + noOfMonthsForProjection; y++) {
