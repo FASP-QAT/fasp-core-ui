@@ -840,7 +840,7 @@ class usageTemplate extends Component {
                 //(papuList[j].oneTimeUsage == false ? '' : `=ROUND(N${parseInt(j) + 1},2)`)//hidden
 
                 let unitName = (this.state.dimensionList.filter(c => c.id == papuList[j].unit.id)[0]).name;
-                let string = "Every " + papuList[j].noOfPatients + " " + unitName + " - requires " + papuList[j].noOfForecastingUnits + " " + papuList[j].forecastingUnit.unit.label.label_en;
+                let string = "Every " + (papuList[j].noOfPatients).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") + " " + unitName + " - requires " + papuList[j].noOfForecastingUnits + " " + papuList[j].forecastingUnit.unit.label.label_en;
 
                 // let string = "Every " + papuList[j].noOfPatients + " patient - requires " + papuList[j].noOfForecastingUnits + " " + papuList[j].unit.label.label_en;
                 if (!papuList[j].oneTimeUsage) { //one time usage false
@@ -981,6 +981,8 @@ class usageTemplate extends Component {
                     type: 'numeric',
                     // readOnly: true
                     textEditor: true, //8 I
+                    mask: '#,##',
+                    disabledMaskOnEdition: true
                 },
                 // {
                 //     // title: i18n.t('static.usageTemplate.people'),
