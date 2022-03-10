@@ -84,7 +84,8 @@ export default class StepOneImportMapPlanningUnits extends Component {
             stepOneData: [],
             forecastPlanignUnitListForNotDuplicate: [],
             selectedForecastProgram: '',
-            getDatasetFilterList: []
+            getDatasetFilterList: [],
+            selSource1: [],
         }
         this.changed = this.changed.bind(this);
         this.buildJexcel = this.buildJexcel.bind(this);
@@ -893,7 +894,15 @@ export default class StepOneImportMapPlanningUnits extends Component {
         this.el.destroy();
 
         var json = [];
-        var data = papuDataArr;
+
+        var papuList1 = this.state.selSource1;
+        var data;
+        if (papuList1 != "") {
+            data = papuList1
+        } else {
+            data = papuDataArr
+        }
+        // var data = papuDataArr;
 
         var options = {
             data: data,
@@ -1342,12 +1351,14 @@ export default class StepOneImportMapPlanningUnits extends Component {
             }
             this.setState({
                 stepOneData: changedpapuList,
+                selSource1: tableJson
 
             }, () => {
                 this.props.finishedStepOne();
             })
             console.log("FINAL SUBMIT changedpapuList---", changedpapuList);
             this.props.updateStepOneData("stepOneData", changedpapuList);
+            this.props.updateStepOneData("selSource1", tableJson);
 
         } else {
             console.log("Something went wrong");

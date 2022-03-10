@@ -54,7 +54,8 @@ export default class StepTwoImportMapPlanningUnits extends Component {
             // loading: false,
             selSource: [],
             programRegionList: [],
-            forecastProgramRegionList: []
+            forecastProgramRegionList: [],
+            selSource2: []
 
         }
         this.changed = this.changed.bind(this);
@@ -100,11 +101,13 @@ export default class StepTwoImportMapPlanningUnits extends Component {
             }
             this.setState({
                 stepTwoData: changedpapuList,
-
+                selSource2: tableJson
             }, () => {
                 this.props.finishedStepTwo();
             })
             this.props.updateStepOneData("stepTwoData", changedpapuList);
+            this.props.updateStepOneData("selSource2", tableJson);
+
             console.log("FINAL SUBMIT changedpapuList---", changedpapuList);
 
         } else {
@@ -274,7 +277,15 @@ export default class StepTwoImportMapPlanningUnits extends Component {
         this.el.destroy();
 
         var json = [];
-        var data = papuDataArr;
+
+        var papuList11 = this.state.selSource2;
+        var data;
+        if (papuList11 != "") {
+            data = papuList11
+        } else {
+            data = papuDataArr
+        }
+        // var data = papuDataArr;
 
         var options = {
             data: data,
