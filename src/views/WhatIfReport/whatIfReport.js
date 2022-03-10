@@ -807,7 +807,7 @@ export default class WhatIfReportComponent extends React.Component {
                                 var receivedDate = shipmentUnFundedList[i].receivedDate;
                                 var expectedDeliveryDate = shipmentUnFundedList[i].expectedDeliveryDate;
                                 if (shipmentUnFundedList[i].localProcurement) {
-                                    var addLeadTimes = this.props.items.planningUnitListAll.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value)[0].localProcurementLeadTime;
+                                    var addLeadTimes = this.state.planningUnitListAll.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value)[0].localProcurementLeadTime;
                                     var leadTimesPerStatus = addLeadTimes / 5;
                                     arrivedDate = moment(expectedDeliveryDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
                                     shippedDate = moment(arrivedDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
@@ -881,7 +881,7 @@ export default class WhatIfReportComponent extends React.Component {
                                 var receivedDate = shipmentUnFundedList[i].receivedDate;
                                 var expectedDeliveryDate = shipmentUnFundedList[i].expectedDeliveryDate;
                                 if (shipmentUnFundedList[i].localProcurement) {
-                                    var addLeadTimes = this.props.items.planningUnitListAll.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value)[0].localProcurementLeadTime;
+                                    var addLeadTimes = this.state.planningUnitListAll.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value)[0].localProcurementLeadTime;
                                     var leadTimesPerStatus = addLeadTimes / 5;
                                     arrivedDate = moment(expectedDeliveryDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
                                     shippedDate = moment(arrivedDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
@@ -956,7 +956,7 @@ export default class WhatIfReportComponent extends React.Component {
                                 var receivedDate = shipmentUnFundedList[i].receivedDate;
                                 var expectedDeliveryDate = shipmentUnFundedList[i].expectedDeliveryDate;
                                 if (shipmentUnFundedList[i].localProcurement) {
-                                    var addLeadTimes = this.props.items.planningUnitListAll.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value)[0].localProcurementLeadTime;
+                                    var addLeadTimes = this.state.planningUnitListAll.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value)[0].localProcurementLeadTime;
                                     var leadTimesPerStatus = addLeadTimes / 5;
                                     arrivedDate = moment(expectedDeliveryDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
                                     shippedDate = moment(arrivedDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
@@ -1332,7 +1332,7 @@ export default class WhatIfReportComponent extends React.Component {
                         var receivedDate = shipmentUnFundedList[i].receivedDate;
                         var expectedDeliveryDate = shipmentUnFundedList[i].expectedDeliveryDate;
                         if (shipmentUnFundedList[i].localProcurement) {
-                            var addLeadTimes = this.props.items.planningUnitListAll.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value)[0].localProcurementLeadTime;
+                            var addLeadTimes = this.state.planningUnitListAll.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value)[0].localProcurementLeadTime;
                             var leadTimesPerStatus = addLeadTimes / 5;
                             arrivedDate = moment(expectedDeliveryDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
                             shippedDate = moment(arrivedDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
@@ -1437,7 +1437,7 @@ export default class WhatIfReportComponent extends React.Component {
                         var receivedDate = shipmentUnFundedList[i].receivedDate;
                         var expectedDeliveryDate = shipmentUnFundedList[i].expectedDeliveryDate;
                         if (shipmentUnFundedList[i].localProcurement) {
-                            var addLeadTimes = this.props.items.planningUnitListAll.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value)[0].localProcurementLeadTime;
+                            var addLeadTimes = this.state.planningUnitListAll.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value)[0].localProcurementLeadTime;
                             var leadTimesPerStatus = addLeadTimes / 5;
                             arrivedDate = moment(expectedDeliveryDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
                             shippedDate = moment(arrivedDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
@@ -1543,7 +1543,7 @@ export default class WhatIfReportComponent extends React.Component {
                         var receivedDate = shipmentUnFundedList[i].receivedDate;
                         var expectedDeliveryDate = shipmentUnFundedList[i].expectedDeliveryDate;
                         if (shipmentUnFundedList[i].localProcurement) {
-                            var addLeadTimes = this.props.items.planningUnitListAll.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value)[0].localProcurementLeadTime;
+                            var addLeadTimes = this.state.planningUnitListAll.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value)[0].localProcurementLeadTime;
                             var leadTimesPerStatus = addLeadTimes / 5;
                             arrivedDate = moment(expectedDeliveryDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
                             shippedDate = moment(arrivedDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
