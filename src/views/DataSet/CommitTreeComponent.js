@@ -905,6 +905,7 @@ export default class CommitTreeComponent extends React.Component {
                                     </div>
                                 </div>
                             </Form>
+                            <b><div className="mb-2"> <span>{i18n.t('static.commitTree.note')}</span></div></b>
                             <div style={{ display: this.state.loading ? "none" : "block" }}>
                                 {(this.state.showCompare) &&
                                     <>
