@@ -85,11 +85,11 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     if (cont == true) {
       this.setState({
         consumptionChanged: false
-   },()=>{
-    let id = AuthenticationService.displayDashboardBasedOnRole();
-    this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.message.cancelled', { entityname }))
-   })
-     }
+      }, () => {
+        let id = AuthenticationService.displayDashboardBasedOnRole();
+        this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.message.cancelled', { entityname }))
+      })
+    }
   }
 
   buildDataJexcel(consumptionUnitId) {
@@ -527,7 +527,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         elInstance.setStyle(col, "background-color", "transparent");
         elInstance.setStyle(col, "background-color", "yellow");
         elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
-      }else {
+      } else {
         var col = (colArr[x]).concat(parseInt(y) + 1);
         elInstance.setStyle(col, "background-color", "transparent");
         elInstance.setComments(col, "");
@@ -540,7 +540,9 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         var col = (colArr[x]).concat(parseInt(y) + 1);
         elInstance.setStyle(col, "background-color", "transparent");
         elInstance.setStyle(col, "background-color", "yellow");
-        elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
+        // elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
+        elInstance.setComments(col, "Please enter any positive number upto 100");
+
       }
       else {
         var col = (colArr[x]).concat(parseInt(y) + 1);
@@ -555,7 +557,8 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         var col = (colArr[x]).concat(parseInt(y) + 1);
         elInstance.setStyle(col, "background-color", "transparent");
         elInstance.setStyle(col, "background-color", "yellow");
-        elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
+        // elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
+        elInstance.setComments(col,"Please enter positive value lesser than number of days.");
       } else {
         var col = (colArr[x]).concat(parseInt(y) + 1);
         elInstance.setStyle(col, "background-color", "transparent");
@@ -584,7 +587,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       actualConsumptionStart += 8;
       reportRateStart += 8;
       stockDayStart += 8;
-     }
+    }
     for (var y = 0; y < json.length; y++) {
       for (var x = 1; x < 37; x++) {
         var rowData = elInstance.getRowData(y);
@@ -596,12 +599,13 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
             elInstance.setStyle(col, "background-color", "yellow");
             elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
             valid = false;
-          }else{
+          } else {
             var col = (colArr[x]).concat(parseInt(y) + 1);
             elInstance.setStyle(col, "background-color", "transparent");
             elInstance.setComments(col, "");
           }
         }
+
         if (possibleReportRateY.includes(y.toString())) {
           if (rowData[x] == "") {
           }
@@ -609,7 +613,8 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
             var col = (colArr[x]).concat(parseInt(y) + 1);
             elInstance.setStyle(col, "background-color", "transparent");
             elInstance.setStyle(col, "background-color", "yellow");
-            elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
+            //elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
+            elInstance.setComments(col, "Please enter any positive number upto 100");
             valid = false;
           }
           else {
@@ -618,24 +623,18 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
             elInstance.setComments(col, "");
           }
         }
-        console.log("possibleStockDayY---------->",possibleStockDayY);
-        console.log("possibleStockDayY---------->noOfMonths",noOfMonths);   
-        console.log("possibleStockDayY---------->noOfMonths",noOfMonths);        
-        if (possibleStockDayY.includes(y.toString())) {
-          var noOfMonths = elInstance.getColumnData(x)[0];
-          if (rowData[x] == "") {
 
-        console.log("possibleStockDayY---------->In IF",rowData[x]);
-          } else if (rowData[x < 0] || rowData[x] > noOfMonths) {
-            console.log("possibleStockDayY---------->In Esle IF",(colArr[x]).concat(parseInt(y) + 1));
-            
+        if (possibleStockDayY.includes(y.toString())) {
+          var stockOutdays = elInstance.getColumnData(x)[0];
+          if (rowData[x] == "") {
+          } else if (rowData[x] < 0 || rowData[x] > stockOutdays) {
             var col = (colArr[x]).concat(parseInt(y) + 1);
             elInstance.setStyle(col, "background-color", "transparent");
             elInstance.setStyle(col, "background-color", "yellow");
-            elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
+            // elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
+            elInstance.setComments(col,"Please enter positive value lesser than number of days.");
             valid = false;
           } else {
-            console.log("possibleStockDayY---------->In Esle",(colArr[x]).concat(parseInt(y) + 1));
             var col = (colArr[x]).concat(parseInt(y) + 1);
             elInstance.setStyle(col, "background-color", "transparent");
             elInstance.setComments(col, "");
@@ -847,7 +846,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
           var curUser = AuthenticationService.getLoggedInUserId();
           var consumptionUnit = this.state.selectedConsumptionUnitObject;
-          console.log("consumptionUnit---->",consumptionUnit)
+          console.log("consumptionUnit---->", consumptionUnit)
           var fullConsumptionList = this.state.consumptionList.filter(c => c.planningUnit.id != consumptionUnit.planningUnit.id);
           if (this.state.selectedConsumptionUnitId == 0) {
             var json = this.state.smallTableEl.getJson(null, false);
@@ -972,7 +971,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
               showDetailTable: true,
               loading: false,
               message: i18n.t('static.compareAndSelect.dataSaved'),
-              messageColor:"green",
+              messageColor: "green",
               consumptionChanged: false
             }, () => {
               this.getDatasetData();
@@ -986,8 +985,8 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       this.setState({
         loading: false,
         message: i18n.t('static.supplyPlan.validationFailed'),
-        messageColor:"red"
-       })
+        messageColor: "red"
+      })
     }
   }
 
@@ -1064,7 +1063,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
   }
 
   componentDidMount() {
-   this.hideSecondComponent();
+    this.hideSecondComponent();
     this.getDatasetList();
   }
 
@@ -1725,7 +1724,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         yAxes: [{
           scaleLabel: {
             display: true,
-          //  labelString: getLabelText(this.state.selectedConsumptionUnitObject.consumptionDataType == 1 ? this.state.selectedConsumptionUnitObject.planningUnit.forecastingUnit.label : this.state.selectedConsumptionUnitObject.consumptionDataType == 2 ? this.state.selectedConsumptionUnitObject.planningUnit.label : this.state.selectedConsumptionUnitObject.otherUnit.label, this.state.lang),
+            //  labelString: getLabelText(this.state.selectedConsumptionUnitObject.consumptionDataType == 1 ? this.state.selectedConsumptionUnitObject.planningUnit.forecastingUnit.label : this.state.selectedConsumptionUnitObject.consumptionDataType == 2 ? this.state.selectedConsumptionUnitObject.planningUnit.label : this.state.selectedConsumptionUnitObject.otherUnit.label, this.state.lang),
             fontColor: 'black'
           },
           stacked: true,
@@ -1986,7 +1985,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                                     var totalRegionPU = 0;
                                     return (<tr style={{ display: this.state.consumptionUnitShowArr.includes(item.planningUnit.id) ? "" : "none" }}>
                                       <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
-                                      <td className="sticky-col first-col clone text-left" style={{textIndent:'30px'}}>{"   " + getLabelText(r.label, this.state.lang)}</td>
+                                      <td className="sticky-col first-col clone text-left" style={{ textIndent: '30px' }}>{"   " + getLabelText(r.label, this.state.lang)}</td>
                                       {this.state.monthArray.map((item1, count) => {
                                         var data = this.state.planningUnitTotalListRegion.filter(c => c.planningUnitId == item.planningUnit.id && moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM") && c.region.regionId == r.regionId)
                                         totalRegion += Number(data[0].qty);

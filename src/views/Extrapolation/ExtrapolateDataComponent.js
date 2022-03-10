@@ -31,6 +31,9 @@ import pdfIcon from '../../assets/img/pdf.png';
 import jsPDF from 'jspdf';
 import { LOGO } from "../../CommonComponent/Logo";
 import { Formik } from "formik";
+import { i } from "mathjs";
+import { JEXCEL_INTEGER_REGEX } from '../../Constants.js'
+
 
 const entityname = i18n.t('static.dashboard.extrapolation');
 const pickerLang = {
@@ -62,7 +65,7 @@ const validationSchemaExtrapolation = function (values) {
         seasonalityId:
             Yup.string().test('seasonalityId', 'Please provide valid input.',
                 function (value) {
-                    var testNumber = document.getElementById("seasonalityId").value != "" ? (/^\d{0,3}(\.\d{1,2})?$/).test(document.getElementById("seasonalityId").value) : false;
+                    var testNumber = document.getElementById("seasonalityId").value != "" ? JEXCEL_INTEGER_REGEX.test(document.getElementById("seasonalityId").value) : false;
                     if ((document.getElementById("smoothingId").value) == "true" && (document.getElementById("seasonalityId").value == "" || testNumber == false)) {
                         return false;
                     } else {
@@ -160,6 +163,7 @@ export default class ExtrapolateDataComponent extends React.Component {
         this.options = props.options;
         var startDate1 = moment(Date.now()).subtract(6, 'months').startOf('month').format("YYYY-MM-DD");
         var endDate1 = moment(Date.now()).add(18, 'months').startOf('month').format("YYYY-MM-DD")
+        // var endDate1 = moment(Date.now()).startOf('month').format("YYYY-MM-DD")
         var startDate = moment("2021-05-01").format("YYYY-MM-DD");
         var endDate = moment("2022-02-01").format("YYYY-MM-DD");
 
@@ -215,6 +219,12 @@ export default class ExtrapolateDataComponent extends React.Component {
             noOfMonthsForASeason: 4,
             confidence: 0.95,
             monthsForMovingAverage: 6,
+            alphaValidate: true,
+            betaValidate: true,
+            gammaValidate: true,
+            noOfMonthsForASeasonValidate: true,
+            confidenceValidate: true,
+            monthsForMovingAverageValidate: true,
             CI: "",
             // showAdvanceId: true,
             arimaId: true,
@@ -482,7 +492,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                     {
                         title: i18n.t('static.extrapolation.arima'),
                         type: this.state.arimaId ? 'numeric' : 'hidden',
-                        mask: '#,##.00', decimal: '.',readOnly:false
+                        mask: '#,##.00', decimal: '.', readOnly: false
                     }
                 ],
             text: {
@@ -1035,12 +1045,13 @@ export default class ExtrapolateDataComponent extends React.Component {
                     putRequest.onerror = function (event) {
                     }.bind(this);
                     putRequest.onsuccess = function (event) {
+                        console.log("save");
                         // let id = AuthenticationService.displayDashboardBasedOnRole();
                         // this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/green/' + i18n.t('static.compareAndSelect.dataSaved'));
-                        console.log("IN_SAVE")
                         this.setState({
                             dataEl: "",
                             loading: false,
+                            dataChanged:false,
                             message: i18n.t('static.compareAndSelect.dataSaved')
                         }, () => {
                             this.componentDidMount();
@@ -1123,43 +1134,75 @@ export default class ExtrapolateDataComponent extends React.Component {
                 var startDate = moment(datasetJson.currentVersion.forecastStartDate).format("YYYY-MM-DD");
                 var stopDate = moment(datasetJson.currentVersion.forecastStopDate).format("YYYY-MM-DD");
                 var consumptionExtrapolationList = datasetJson.consumptionExtrapolation;
-                var monthsForMovingAverage = this.state.monthsForMovingAverage;
+                var monthsForMovingAverage;
+                if (this.state.monthsForMovingAverageValidate) { monthsForMovingAverage = this.state.monthsForMovingAverage; }
+                else { monthsForMovingAverage = 6 }
                 var consumptionExtrapolationFiltered = consumptionExtrapolationList.filter(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId);
                 var consumptionExtrapolationData = consumptionExtrapolationList.filter(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId && c.extrapolationMethod.id == 6)//Semi Averages
                 var consumptionExtrapolationMovingData = consumptionExtrapolationList.filter(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId && c.extrapolationMethod.id == 7)//Moving averages
                 var consumptionExtrapolationRegression = consumptionExtrapolationList.filter(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId && c.extrapolationMethod.id == 5)//Linear Regression
                 var consumptionExtrapolationTESL = consumptionExtrapolationList.filter(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId && c.extrapolationMethod.id == 1)//TES L            
-                var movingAvgId = consumptionExtrapolationFiltered.length > 0 ? false : true;
-                var semiAvgId = consumptionExtrapolationFiltered.length > 0 ? false : true;
-                var linearRegressionId = consumptionExtrapolationFiltered.length > 0 ? false : true;
-                var smoothingId = consumptionExtrapolationFiltered.length > 0 ? false : true;
-                var arimaId = consumptionExtrapolationFiltered.length > 0 ? false : true;
+                var movingAvgId = this.state.movingAvgId;
+                var semiAvgId = this.state.semiAvgId;
+                var linearRegressionId = this.state.linearRegressionId;
+                var smoothingId = this.state.smoothingId;
+                var arimaId = this.state.arimaId;
 
-                if (consumptionExtrapolationMovingData.length > 0) {
+                // var movingAvgId = consumptionExtrapolationFiltered.length > 0 ? false : true;
+                // var semiAvgId = consumptionExtrapolationFiltered.length > 0 ? false : true;
+                // var linearRegressionId = consumptionExtrapolationFiltered.length > 0 ? false : true;
+                // var smoothingId = consumptionExtrapolationFiltered.length > 0 ? false : true;
+                // var arimaId = consumptionExtrapolationFiltered.length > 0 ? false : true;
+
+
+                if (movingAvgId && consumptionExtrapolationMovingData.length > 0) {
                     monthsForMovingAverage = consumptionExtrapolationMovingData[0].jsonProperties.months;
-                    movingAvgId = true;
                 }
 
-                if (consumptionExtrapolationData.length > 0) {
-                    semiAvgId = true;
-                }
+                // if (consumptionExtrapolationMovingData.length > 0) {
+                //     monthsForMovingAverage = consumptionExtrapolationMovingData[0].jsonProperties.months;
+                //     movingAvgId = true;
+                // }
 
-                if (consumptionExtrapolationRegression.length > 0) {
-                    linearRegressionId = true;
+                // if (consumptionExtrapolationData.length > 0) {
+                //     semiAvgId = true;
+                // }
+
+                // if (consumptionExtrapolationRegression.length > 0) {
+                //     linearRegressionId = true;
+                // }
+
+                var confidenceLevel;
+                if (this.state.confidenceValidate) {
+                    confidenceLevel = this.state.confidenceLevelId;
+                } else {
+                    confidenceLevel = 0.95
                 }
-                var confidenceLevel = this.state.confidenceLevelId;
-                var seasonality = this.state.noOfMonthsForASeason;
+                var seasonality;
+                if (this.state.noOfMonthsForASeasonValidate) {
+                    seasonality = this.state.noOfMonthsForASeason;
+                } else {
+                    seasonality = 4;
+                }
                 var alpha = this.state.alpha;
                 var beta = this.state.beta;
                 var gamma = this.state.gamma;
-                if (consumptionExtrapolationTESL.length > 0) {
+                if (smoothingId && consumptionExtrapolationTESL.length > 0) {
                     confidenceLevel = consumptionExtrapolationTESL[0].jsonProperties.confidenceLevel;
                     seasonality = consumptionExtrapolationTESL[0].jsonProperties.seasonality;
                     alpha = consumptionExtrapolationTESL[0].jsonProperties.alpha;
                     beta = consumptionExtrapolationTESL[0].jsonProperties.beta;
                     gamma = consumptionExtrapolationTESL[0].jsonProperties.gamma;
-                    smoothingId = true;
                 }
+                // if (consumptionExtrapolationTESL.length > 0) {
+                //     confidenceLevel = consumptionExtrapolationTESL[0].jsonProperties.confidenceLevel;
+                //     seasonality = consumptionExtrapolationTESL[0].jsonProperties.seasonality;
+                //     alpha = consumptionExtrapolationTESL[0].jsonProperties.alpha;
+                //     beta = consumptionExtrapolationTESL[0].jsonProperties.beta;
+                //     gamma = consumptionExtrapolationTESL[0].jsonProperties.gamma;
+                //     smoothingId = true;
+                // }
+
                 this.setState({
                     actualConsumptionList: actualConsumptionList,
                     startDate: startDate,
@@ -1223,28 +1266,6 @@ export default class ExtrapolateDataComponent extends React.Component {
         csvRow.push('"' + (i18n.t('static.extrapolation.dateRangeForHistoricData') + ' : ' + this.makeText(this.state.rangeValue1.from) + ' ~ ' + this.makeText(this.state.rangeValue1.to)).replaceAll(' ', '%20') + '"')
         csvRow.push('')
         csvRow.push('')
-        // csvRow.push('"' + (i18n.t('static.extrapolation.selectedExtraploationMethods')).replaceAll(' ', '%20') + '"')
-        // csvRow.push('')
-        // if (this.state.movingAvgId) {
-        //     csvRow.push('"' + (i18n.t('static.extrapolation.movingAverages')).replaceAll(' ', '%20') + '"')
-        //     csvRow.push('')
-        // }
-        // if (this.state.semiAvgId) {
-        //     csvRow.push('"' + (i18n.t('static.extrapolation.semiAverages')).replaceAll(' ', '%20') + '"')
-        //     csvRow.push('')
-        // }
-        // if (this.state.linearRegressionId) {
-        //     csvRow.push('"' + (i18n.t('static.extrapolation.linearRegression').replaceAll(' ', '%20')) + '"')
-        //     csvRow.push('')
-        // }
-        // if (this.state.smoothingId) {
-        //     csvRow.push('"' + (i18n.t('static.extrapolation.tes')).replaceAll(' ', '%20') + '"')
-        //     csvRow.push('')
-        // }
-        // if (this.state.arimaId) {
-        //     csvRow.push('"' + (i18n.t('static.extrapolation.arima')).replaceAll(' ', '%20') + '"')
-        //     csvRow.push('')
-        // }
         csvRow.push('')
 
         var columns = [];
@@ -1504,16 +1525,20 @@ export default class ExtrapolateDataComponent extends React.Component {
 
     setSeasonals(e) {
         var seasonals = e.target.value;
-        var testNumber = seasonals != "" ? (/^\d{0,3}(\.\d{1,2})?$/).test(seasonals) : false;
+        var testNumber = seasonals != "" ? JEXCEL_INTEGER_REGEX.test(seasonals) : false;
+        console.log("testNumber", testNumber);
         if (this.state.smoothingId && testNumber == false) {
+
             this.setState({
                 noOfMonthsForASeason: seasonals,
+                noOfMonthsForASeasonValidate: false,
                 loading: false
             })
         }
         else {
             this.setState({
                 noOfMonthsForASeason: seasonals,
+                noOfMonthsForASeasonValidate: true,
                 dataChanged: true
             }, () => {
                 this.buildJxl()
@@ -1527,12 +1552,14 @@ export default class ExtrapolateDataComponent extends React.Component {
         if (this.state.smoothingId && testNumber == false) {
             this.setState({
                 confidenceLevelId: confidenceLevelId,
+                confidenceValidate: false,
                 loading: false
             })
         }
         else {
             this.setState({
                 confidenceLevelId: confidenceLevelId,
+                confidenceValidate: true,
                 dataChanged: true
             }, () => {
                 this.buildJxl()
@@ -1547,12 +1574,14 @@ export default class ExtrapolateDataComponent extends React.Component {
         if (this.state.movingAvgId && (monthsForMovingAverage == "" || testNumber == false)) {
             this.setState({
                 monthsForMovingAverage: monthsForMovingAverage,
+                monthsForMovingAverageValidate: false,
                 loading: false
             })
         } else {
             this.setState({
                 loading: true,
                 monthsForMovingAverage: monthsForMovingAverage,
+                monthsForMovingAverageValidate: true,
                 dataChanged: true
             }, () => {
                 this.buildJxl()
@@ -2225,7 +2254,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                 bsSize="sm"
                                                 value={this.state.planningUnitId}
                                                 onChange={(e) => { this.setPlanningUnitId(e); }}
-                                                // className="selectWrapText"
+                                            // className="selectWrapText"
                                             >
                                                 <option value="">{i18n.t('static.common.select')}</option>
                                                 {planningUnits}
@@ -2275,7 +2304,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                         </h5>
                                     </FormGroup>
                                     <FormGroup className="col-md-4">
-                                        <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.dateRangeForHistoricData')+"    "}<i>(Forecast: {makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)})</i> <span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
+                                        <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.dateRangeForHistoricData') + "    "}<i>(Forecast: {makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)})</i> <span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
                                         <div className="controls edit">
                                             <Picker
                                                 years={{ min: this.state.minDate, max: this.state.maxDate }}
@@ -2283,7 +2312,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                 value={rangeValue1}
                                                 lang={pickerLang}
                                                 // theme="light"
-                                                onChange={this.getDateDifference}
+                                                //  onChange={this.getDateDifference}
                                                 onDismiss={this.handleRangeDissmis1}
                                                 readOnly
                                             >
@@ -2761,8 +2790,8 @@ export default class ExtrapolateDataComponent extends React.Component {
                             <div className="row" style={{ display: this.state.show ? "block" : "none" }}>
                                 <div className="col-md-10 pt-4 pb-3">
                                     <ul className="legendcommitversion">
-                                        <li><span className="legendcommitversionText">{i18n.t('static.common.forecastPeriod')} = Purple, italics. </span></li>
-                                        <li><span className="legendcommitversionText">{i18n.t('static.consumption.actual')}= Bold.  </span></li>
+                                        <li><span className="legendcolor" style={{ backgroundColor: "purple", border: "1px solid #000" }}></span> <span className="legendcommitversionText">{i18n.t('static.common.forecastPeriod')}</span></li>
+                                        <li><span className="legendcolor" style={{ backgroundColor: "black", border: "1px solid #000" }}></span> <span className="legendcommitversionText">{i18n.t('static.consumption.actual')}</span></li>
                                     </ul>
                                 </div>
                                 <div className="col-md-12 pl-0 pr-0 mt-lg-3">

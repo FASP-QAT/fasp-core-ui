@@ -1,7 +1,7 @@
 import regression from 'regression';
 import { calculateError } from '../Extrapolation/ErrorCalculations.js';
 export function calculateLinearRegression(inputData, noOfProjectionMonths, props) {
-    console.log("InputData@@@",inputData)
+    console.log("InputData@@@", inputData)
     const data = inputData;
 
     const noOfMonthsForProjection = noOfProjectionMonths;
@@ -13,9 +13,13 @@ export function calculateLinearRegression(inputData, noOfProjectionMonths, props
 
     for (let x = 1; x <= actualMonths + noOfMonthsForProjection; x++) {
         if (x <= actualMonths) {
-            data[x - 1].forecast = getLinearRegression(x, gradient, yIntercept);
+            var linearReg = getLinearRegression(x, gradient, yIntercept);
+            data[x - 1].forecast = linearReg > 0 ? linearReg : 0;
+            // data[x - 1].forecast = getLinearRegression(x, gradient, yIntercept);
         } else {
-            data[x - 1] = { "month": x, "actual": null, "forecast": getLinearRegression(x, gradient, yIntercept) };
+            var linearReg = getLinearRegression(x, gradient, yIntercept);
+            data[x - 1] = { "month": x, "actual": null, "forecast": linearReg > 0 ? linearReg : 0 };
+            // data[x - 1] = { "month": x, "actual": null, "forecast": getLinearRegression(x, gradient, yIntercept) };
         }
     }
     calculateError(data, "linearRegressionError", props);
@@ -26,7 +30,7 @@ export function calculateLinearRegression(inputData, noOfProjectionMonths, props
     // }
 }
 
-function getLinearRegression(month,gradient,yIntercept) {
+function getLinearRegression(month, gradient, yIntercept) {
     return gradient * month + yIntercept;
 }
 
