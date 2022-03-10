@@ -100,7 +100,7 @@ const validationSchemaNodeData = function (values) {
                     }
                 }),
         percentageOfParent: Yup.string()
-            .test('percentageOfParent', i18n.t('static.validation.fieldRequired'),
+            .test('percentageOfParent', i18n.t('static.tree.decimalValidation10&2'),
                 function (value) {
                     var testNumber = document.getElementById("percentageOfParent").value != "" ? (/^\d{0,3}(\.\d{1,2})?$/).test(document.getElementById("percentageOfParent").value) : false;
                     // console.log(">>>>*", parseInt(document.getElementById("nodeTypeId").value) == 3 || parseInt(document.getElementById("nodeTypeId").value) == 4) && (document.getElementById("percentageOfParent").value == "" || testNumber == false);
@@ -192,7 +192,7 @@ const validationSchemaNodeData = function (values) {
                 }),
 
         forecastingUnitPerPersonsFC:
-            Yup.string().test('forecastingUnitPerPersonsFC', 'Please enter a valid number having max 12 digits before decimal and max 2 digit after decimal.',
+            Yup.string().test('forecastingUnitPerPersonsFC', i18n.t('static.tree.decimalValidation12&2'),
                 function (value) {
                     // console.log("*****", document.getElementById("nodeValue").value);
                     var testNumber = (/^\d{0,12}(\.\d{1,4})?$/).test((document.getElementById("forecastingUnitPerPersonsFC").value).replaceAll(",", ""));
@@ -210,7 +210,7 @@ const validationSchemaNodeData = function (values) {
         // .nullable()
         // .typeError('Must be a number'),
         usageFrequencyCon: Yup.string()
-            .test('usageFrequencyCon', 'Please enter a valid number having max 12 digits before decimal and max 2 digit after decimal.',
+            .test('usageFrequencyCon', i18n.t('static.tree.decimalValidation12&2'),
                 function (value) {
                     // console.log("@@@>1", (parseInt(document.getElementById("nodeTypeId").value) == 4));
                     // console.log("@@@>1", document.getElementById("usageTypeIdFU").value == 2);
@@ -223,7 +223,7 @@ const validationSchemaNodeData = function (values) {
                     }
                 }),
         usageFrequencyDis: Yup.string()
-            .test('usageFrequencyDis', 'Please enter a valid number having max 12 digits before decimal and max 2 digit after decimal.',
+            .test('usageFrequencyDis', i18n.t('static.tree.decimalValidation12&2'),
                 function (value) {
                     console.log("@@@>1", document.getElementById("usageTypeIdFU").value == 1);
                     console.log("@@@>2", (document.getElementById("oneTimeUsage").value == 'false' || document.getElementById("oneTimeUsage").value == false));
@@ -278,7 +278,7 @@ const validationSchemaNodeData = function (values) {
                         return true;
                     }
                 }),
-        repeatCount: Yup.string().test('repeatCount', 'Please enter a valid number having max 12 digits before decimal and max 2 digit after decimal.',
+        repeatCount: Yup.string().test('repeatCount', i18n.t('static.tree.decimalValidation12&2'),
             function (value) {
                 console.log("one time usage--->>>", document.getElementById("oneTimeUsage").value);
                 console.log("final result---", (document.getElementById("usageTypeIdFU").value == 1 && document.getElementById("oneTimeUsage").value === "false" && (document.getElementById("repeatCount").value == "")))
@@ -3532,14 +3532,16 @@ export default class BuildTree extends Component {
             if (regionIds != null) {
                 currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.forecastingUnit.id = regionIds.value;
                 currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.forecastingUnit.label.label_en = regionIds.label.split("|")[0];
-                currentItemConfig.context.payload.label.label_en = (regionIds.label.split("|")[0]).trim();
+                if (currentItemConfig.context.payload.label.label_en == "" || currentItemConfig.context.payload.label.label_en == null) {
+                    currentItemConfig.context.payload.label.label_en = (regionIds.label.split("|")[0]).trim();
+                }
                 this.setState({ showFUValidation: false }, () => {
                     this.getForecastingUnitUnitByFUId(regionIds.value);
                 });
             } else {
                 currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.forecastingUnit.id = "";
                 currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.forecastingUnit.label.label_en = "";
-                currentItemConfig.context.payload.label.label_en = "";
+                // currentItemConfig.context.payload.label.label_en = "";
                 this.setState({ showFUValidation: true });
             }
             console.log("regionValues---", this.state.fuValues);
@@ -4297,7 +4299,8 @@ export default class BuildTree extends Component {
             }, this);
 
         this.setState({
-            forecastingUnitMultiList
+            forecastingUnitMultiList,
+            fuValues: tracerCategoryId == "" || tracerCategoryId == undefined ? [] : (this.state.currentScenario.fuNode.forecastingUnit.id != undefined && this.state.currentScenario.fuNode.forecastingUnit.id != "" ? { value: this.state.currentScenario.fuNode.forecastingUnit.id, label: getLabelText(this.state.currentScenario.fuNode.forecastingUnit.label, this.state.lang) + " | " + this.state.currentScenario.fuNode.forecastingUnit.id } : [])
         }, () => {
             // console.log("my autocomplete data---", autocompleteData);
             if (filteredForecastingUnitList.length == 1) {
@@ -6113,7 +6116,7 @@ export default class BuildTree extends Component {
                                                     }}
                                                     lang={pickerLang.months}
                                                     // theme="dark"
-                                                    
+
                                                     onChange={this.handleAMonthChange1}
                                                     onDismiss={this.handleAMonthDissmis1}
                                                 >
