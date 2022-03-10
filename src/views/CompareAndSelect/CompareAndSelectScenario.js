@@ -113,7 +113,7 @@ class CompareAndSelectScenario extends Component {
         //
     }
     handleAMonthDissmis2 = (value) => {
-        console.log("Value@@@",value)
+        console.log("Value@@@", value)
         this.setState({ singleValue2: value, }, () => {
             this.setMonth1List()
         })
@@ -1705,7 +1705,7 @@ class CompareAndSelectScenario extends Component {
             && forecastingUnitList.map((item, i) => {
                 return (
                     <option key={i} value={item.id}>
-                        {getLabelText(item.label, this.state.lang)}
+                        {getLabelText(item.label, this.state.lang) + " | " + item.id}
                     </option>
                 )
             }, this);
@@ -1725,7 +1725,7 @@ class CompareAndSelectScenario extends Component {
             && planningUnitList.map((item, i) => {
                 return (
                     <option key={i} value={item.planningUnit.id}>
-                        {getLabelText(item.planningUnit.label, this.state.lang)}
+                        {getLabelText(item.planningUnit.label, this.state.lang) + " | " + item.planningUnit.id}
                     </option>
                 )
             }, this);
