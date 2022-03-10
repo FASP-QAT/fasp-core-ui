@@ -3482,6 +3482,8 @@ export default class BuildTree extends Component {
         doc.end();
 
         if (typeof stream !== 'undefined') {
+            // var nodeUnit = document.getElementById("nodeUnitId");
+            // var selectedText = nodeUnit.options[nodeUnit.selectedIndex].text;
             stream.on('finish', function () {
                 var string = stream.toBlob('application/pdf');
                 window.saveAs(string, 'tree.pdf');
