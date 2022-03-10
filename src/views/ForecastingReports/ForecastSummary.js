@@ -1172,7 +1172,7 @@ class ForecastSummary extends Component {
                                             data = [];
                                             data[0] = puListFiltered[j].planningUnit.forecastingUnit.label.label_en;
                                             data[1] = puListFiltered[j].planningUnit;
-                                            data[2] = puListFiltered[j].planningUnit.label.label_en;
+                                            data[2] = getLabelText(puListFiltered[j].planningUnit.label,this.state.lang)+" | "+puListFiltered[j].planningUnit.id;
                                             var total = 0;
                                             for (var k = 0; k < regRegionList.length; k++) {
                                                 var filterForecastSelected = puListFiltered[j].selectedForecastMap[regRegionList[k].regionId]
@@ -2503,7 +2503,7 @@ class ForecastSummary extends Component {
                                                                                         <>
                                                                                             <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                                                             {/* <td>{item1.forecastingUnit.label.label_en}</td> */}
-                                                                                            <td className='text-left  sticky-col first-col clone'>{item1.planningUnit.label.label_en}</td>
+                                                                                            <td className='text-left  sticky-col first-col clone'>{getLabelText(item1.planningUnit.label,this.state.lang)+" | "+item1.planningUnit.id}</td>
                                                                                             <td>{item1.totalForecastedQuantity}</td>
                                                                                             {!this.state.hideColumn &&
                                                                                                 <>
