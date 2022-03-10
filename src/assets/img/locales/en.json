@@ -1486,7 +1486,7 @@
     "static.report.selectProblemType": "Select Problem Type",
     "static.country.countrycodetext2": "Enter Country Display Name2",
     "static.supplyplan.inventoryDataEntry": "Inventory data entry",
-    "static.message.login.locked": "User account is locked",
+    "static.message.login.locked": "User account is locked. Please click the 'Forgot Password' button on the login page to reset your password. ",
     "static.datasourcetype.datasourcetype": "Data source type",
     "static.program.errorSelectAtleastOneProgram": "Select at least one program to load",
     "static.problemReport.resolved": "Resolved",
