@@ -284,14 +284,14 @@ class ForecastSummary extends Component {
 
             var A = [this.addDoubleQuoteToRowContent(headers)]
 
-            // this.state.buildCSVTable.map(ele => 
-            //     A.push(this.addDoubleQuoteToRowContent([ ((ele.supplyPlanPlanningUnit).replaceAll(',', ' ')).replaceAll(' ', '%20'), 
-            //     ((ele.forecastPlanningUnit).replaceAll(',', ' ')).replaceAll(' ', '%20'), 
-            //     ele.region, this.dateFormatter(ele.month).replaceAll(' ', '%20'), 
-            //     ele.supplyPlanConsumption, 
-            //     ele.multiplier, 
-            //     ele.convertedConsumption, 
-            //     ele.currentQATConsumption, 
+            // this.state.buildCSVTable.map(ele =>
+            //     A.push(this.addDoubleQuoteToRowContent([ ((ele.supplyPlanPlanningUnit).replaceAll(',', ' ')).replaceAll(' ', '%20'),
+            //     ((ele.forecastPlanningUnit).replaceAll(',', ' ')).replaceAll(' ', '%20'),
+            //     ele.region, this.dateFormatter(ele.month).replaceAll(' ', '%20'),
+            //     ele.supplyPlanConsumption,
+            //     ele.multiplier,
+            //     ele.convertedConsumption,
+            //     ele.currentQATConsumption,
             //     ele.import == true ? 'Yes' : 'No' ])));
 
             this.state.summeryData.map(ele => {
@@ -986,7 +986,7 @@ class ForecastSummary extends Component {
                                                             let consumptionList = nodeDataMomList.map(m => {
                                                                 return {
                                                                     consumptionDate: m.month,
-                                                                    consumptionQty: (m.calculatedValue).toFixed(2)
+                                                                    consumptionQty: (m.calculatedMmdValue).toFixed(2)
                                                                 }
                                                             });
                                                             let jsonTemp = { objUnit: planningUnitList[j].planningUnit, scenario: { id: 1, label: treeList[p].label.label_en + filteredScenario[0].label.label_en }, display: true, color: "#ba0c2f", consumptionList: consumptionList }
@@ -1127,7 +1127,7 @@ class ForecastSummary extends Component {
                                     for (var tl = 0; tl < treeList.length; tl++) {
                                         var scenarioList = treeList[tl].scenarioList;
                                         for (var sl = 0; sl < scenarioList.length; sl++) {
-                                            tsList.push({ id: "T" + scenarioList[sl].id, name: treeList[tl].label.label_en + " - " + scenarioList[sl].label.label_en, flatList: treeList[tl].tree.flatList, planningUnitId: "", type: "T", id1: scenarioList[sl].id, totalForecast: 0 });
+                                            tsList.push({ id: "T" + treeList[tl].treeId + '~' + scenarioList[sl].id, name: treeList[tl].label.label_en + " - " + scenarioList[sl].label.label_en, flatList: treeList[tl].tree.flatList, planningUnitId: "", type: "T", id1: scenarioList[sl].id, treeId: treeList[tl].treeId, totalForecast: 0 });
                                         }
                                     }
                                     for (var ce = 0; ce < consumptionExtrapolation.length; ce++) {
@@ -1178,7 +1178,7 @@ class ForecastSummary extends Component {
                                                 var filterForecastSelected = puListFiltered[j].selectedForecastMap[regRegionList[k].regionId]
                                                 console.log("filterForecastSelected+++", filterForecastSelected);
                                                 console.log("filterForecastSelected != undefined ? filterForecastSelected.notes : +++", filterForecastSelected != undefined ? filterForecastSelected.notes : "");
-                                                data[(k + 1) * 3] = (filterForecastSelected != undefined) ? (filterForecastSelected.scenarioId > 0) ? "T" + filterForecastSelected.scenarioId : (filterForecastSelected.consumptionExtrapolationId > 0) ? "C" + filterForecastSelected.consumptionExtrapolationId : "" : "";
+                                                data[(k + 1) * 3] = (filterForecastSelected != undefined) ? (filterForecastSelected.scenarioId > 0) ? "T" + filterForecastSelected.treeId + "~" + filterForecastSelected.scenarioId : (filterForecastSelected.consumptionExtrapolationId > 0) ? "C" + filterForecastSelected.consumptionExtrapolationId : "" : "";
                                                 data[((k + 1) * 3) + 1] = filterForecastSelected != undefined ? filterForecastSelected.totalForecast : "";
                                                 total += Number(filterForecastSelected != undefined ? filterForecastSelected.totalForecast : 0);
                                                 data[((k + 1) * 3) + 2] = filterForecastSelected != undefined ? filterForecastSelected.notes : "";
@@ -1384,7 +1384,7 @@ class ForecastSummary extends Component {
 
                     var nodeDataMomList = flatListFilter[0].payload.nodeDataMap[tsListFilter.id1][0].nodeDataMomList.filter(c => moment(c.month).format("YYYY-MM-DD") >= moment(this.state.regDatasetJson.forecastStartDate).format("YYYY-MM-DD") && moment(c.month).format("YYYY-MM-DD") <= moment(this.state.regDatasetJson.forecastStopDate).format("YYYY-MM-DD"));
                     nodeDataMomList.map(ele => {
-                        totalForecast += Number(ele.calculatedValue);
+                        totalForecast += Number(ele.calculatedMmdValue);
                     });
                 }
                 // elInstance.setValueFromCoords((Number(x) + 1), y, totalForecast.toFixed(2), true);
@@ -1696,8 +1696,10 @@ class ForecastSummary extends Component {
                 beforeEndDateDisplay.setMonth(beforeEndDateDisplay.getMonth() - 1);
 
                 this.setState({
-                    forecastPeriod: months[new Date(forecastStartDateNew).getMonth()] + ' ' + new Date(forecastStartDateNew).getFullYear() + ' ~ ' + months[new Date(forecastStopDateNew).getMonth()] + ' ' + new Date(forecastStopDateNew).getFullYear(),
-                    rangeValue: { from: { year: new Date(forecastStartDateNew).getFullYear(), month: new Date(forecastStartDateNew).getMonth() + 1 }, to: { year: new Date(forecastStopDateNew).getFullYear(), month: new Date(forecastStopDateNew).getMonth() + 1 } },
+                    // forecastPeriod: months[new Date(forecastStartDateNew).getMonth()] + ' ' + new Date(forecastStartDateNew).getFullYear() + ' ~ ' + months[new Date(forecastStopDateNew).getMonth()] + ' ' + new Date(forecastStopDateNew).getFullYear(),
+                    forecastPeriod: months[Number(moment(forecastStartDateNew).startOf('month').format("M")) - 1] + ' ' + Number(moment(forecastStartDateNew).startOf('month').format("YYYY")) + ' ~ ' + months[Number(moment(forecastStopDateNew).startOf('month').format("M")) - 1] + ' ' + Number(moment(forecastStopDateNew).startOf('month').format("YYYY")),
+                    // rangeValue: { from: { year: new Date(forecastStartDateNew).getFullYear(), month: new Date(forecastStartDateNew).getMonth() + 1 }, to: { year: new Date(forecastStopDateNew).getFullYear(), month: new Date(forecastStopDateNew).getMonth() + 1 } },
+                    rangeValue: { from: { year: Number(moment(forecastStartDateNew).startOf('month').format("YYYY")), month: Number(moment(forecastStartDateNew).startOf('month').format("M")) }, to: { year: Number(moment(forecastStopDateNew).startOf('month').format("YYYY")), month: Number(moment(forecastStopDateNew).startOf('month').format("M")) } },
                     startDateDisplay: months[new Date(forecastStartDateNew).getMonth()] + ' ' + new Date(forecastStartDateNew).getFullYear(),
                     endDateDisplay: months[new Date(forecastStopDateNew).getMonth()] + ' ' + new Date(forecastStopDateNew).getFullYear(),
                     beforeEndDateDisplay: months[new Date(beforeEndDateDisplay).getMonth()] + ' ' + new Date(beforeEndDateDisplay).getFullYear(),
@@ -2106,7 +2108,7 @@ class ForecastSummary extends Component {
 
     saveSelectedForecast() {
         var id = this.state.regDatasetJson.id;
-        var json = this.state.dataEl.getJson(null, false).filter(c => c[12] == 2);
+        var json = this.state.dataEl.getJson(null, false).filter(c => c[this.state.regRegionList.length*3+3] == 2);
         console.log("Json+++", json);
         var dataList = [];
         for (var j = 0; j < json.length; j++) {
@@ -2118,6 +2120,7 @@ class ForecastSummary extends Component {
                     dataList.push({
                         planningUnit: json[j][1],
                         scenarioId: tsList[0].type == "T" ? tsList[0].id1 : null,
+                        treeId: tsList[0].type == "T" ? tsList[0].treeId : null,
                         consumptionExtrapolationId: tsList[0].type == "C" ? tsList[0].id1 : null,
                         totalForecast: json[j][((k + 1) * 3) + 1],
                         notes: json[j][((k + 1) * 3) + 2],
@@ -2158,9 +2161,9 @@ class ForecastSummary extends Component {
                     console.log("Index+++", index)
                     console.log("Reg+++", dataList[dl].region.regionId)
                     var pu = planningUnitList1[index];
-                    let treeId = pu.selectedForecastMap[dataList[dl].region.regionId].treeId;
-                    console.log("TreeId-----------> ", treeId);
-                    pu.selectedForecastMap[dataList[dl].region.regionId] = { "scenarioId": dataList[dl].scenarioId, "consumptionExtrapolationId": dataList[dl].consumptionExtrapolationId, "totalForecast": dataList[dl].totalForecast, notes: dataList[dl].notes, treeId: treeId };
+                    // let treeId = pu.selectedForecastMap[dataList[dl].region.regionId].treeId;
+                    // console.log("TreeId-----------> ", treeId);
+                    pu.selectedForecastMap[dataList[dl].region.regionId] = { "scenarioId": dataList[dl].scenarioId, "consumptionExtrapolationId": dataList[dl].consumptionExtrapolationId, "totalForecast": dataList[dl].totalForecast, notes: dataList[dl].notes, treeId: dataList[dl].treeId };
                     planningUnitList1[index] = pu;
                 }
                 console.log("PlanningUnitList1+++", planningUnitList1);
@@ -2254,7 +2257,7 @@ class ForecastSummary extends Component {
                                 <span style={{ cursor: 'pointer' }} onClick={() => { this.backToMonthlyForecast() }}><i className="fa fa-long-arrow-left" style={{ color: '#20a8d8', fontSize: '13px' }}></i> <small className="supplyplanformulas">{i18n.t('static.forecastReport.returnToMonthlyForecast')}</small></span>
                             </a> */}
                             <span className="compareAndSelect-larrow"> <i className="cui-arrow-left icons " > </i></span>
-                            <span className="compareAndSelect-larrowText"> {i18n.t('static.common.backTo')} <a href="/#/forecastReport/forecastOutput">{'Monthly Forecast'}</a> </span>
+                            <span className="compareAndSelect-larrowText"> {i18n.t('static.common.backTo')} <a href="/#/forecastReport/forecastOutput" className='supplyplanformulas'>{'Monthly Forecast'}</a> </span>
 
                             {/* <a className="card-header-action">
                                 Back to <span style={{ cursor: 'pointer' }} onClick={() => { this.backToMonthlyForecast() }}><small className="supplyplanformulas">Monthly Forecast</small></span>
