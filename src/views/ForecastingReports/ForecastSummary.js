@@ -1189,7 +1189,7 @@ class ForecastSummary extends Component {
                                         }
                                     }
                                     var columns = [];
-                                    columns.push({ title: i18n.t('static.product.unit1'), type: 'hidden', width: 100, readOnly: true });//A0
+                                    columns.push({ title: i18n.t('static.product.unit1'), type: 'hidden', width: 100 , readOnly: true });//A0
                                     columns.push({ title: i18n.t('static.product.product'), type: 'hidden', width: 100, readOnly: true });//B1
                                     columns.push({ title: i18n.t('static.product.product'), type: 'text', width: 100, readOnly: true });//C2
                                     for (var k = 0; k < regRegionList.length; k++) {
@@ -1295,6 +1295,7 @@ class ForecastSummary extends Component {
                                                     for (var r = 0; r < rowData.length; r++) {
                                                         var cell = elInstance.getCell((colArr[r]).concat(parseInt(y) + 1))
                                                         cell.classList.add('readonly');
+                                                        cell.classList.add('regionBold');
                                                     }
                                                 }
                                                 // if (rowData[12] == 1) {
@@ -2608,7 +2609,7 @@ class ForecastSummary extends Component {
                                                     </div>
                                                 }
                                                 {this.state.regPlanningUnitList.length > 0 && this.state.displayId == 2 &&
-                                                    <div className='ForecastSummaryTable'>
+                                                    <div className='ForecastSummaryTable datdEntryRow'>
                                                         <div id="tableDiv" className="table-responsive consumptionDataEntryTable">
                                                         </div>
                                                     </div>
