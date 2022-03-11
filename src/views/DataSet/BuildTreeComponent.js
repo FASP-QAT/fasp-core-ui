@@ -5521,9 +5521,13 @@ export default class BuildTree extends Component {
     onHighlightChanged(event, data) {
         const { context: item } = data;
         const { config } = this.state;
-        // console.log("data1---", item.title);
+        console.log("my notes---", item.title);
         // console.log("data2---", item.id);
         // item.id
+
+        // <Popover placement="top" isOpen={this.state.popoverOpenMa} target="Popover1" trigger="hover" toggle={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)}>
+        //                                                             <PopoverBody>{i18n.t('static.tooltip.MovingAverages')}</PopoverBody>
+        //                                                         </Popover>
         if (item != null) {
 
             this.setState({
@@ -5540,6 +5544,8 @@ export default class BuildTree extends Component {
             })
         }
     };
+
+
     onCursoChanged(event, data) {
         console.log("Data@@@", data)
         const { context: item } = data;
@@ -8048,6 +8054,12 @@ export default class BuildTree extends Component {
                                     this.getNodeTypeFollowUpList(itemConfig.payload.nodeType.id);
                                     if (itemConfig.payload.nodeType.id == 2 || itemConfig.payload.nodeType.id == 3) {
                                         var tracerCategoryId = "";
+                                        if (this.state.tracerCategoryList.length == 1) {
+                                            this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.forecastingUnit.tracerCategory.id = this.state.tracerCategoryList[0].tracerCategoryId;
+                                            this.state.currentScenario = this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0];
+                                            tracerCategoryId = this.state.tracerCategoryList[0].tracerCategoryId;
+
+                                        }
                                         this.filterUsageTemplateList(tracerCategoryId);
                                         this.getForecastingUnitListByTracerCategoryId();
                                     }
@@ -8605,7 +8617,8 @@ export default class BuildTree extends Component {
                                             <Provider>
                                                 <div className="placeholder TreeTemplateHeight" style={{ clear: 'both', marginTop: '25px', border: '1px solid #a7c6ed' }} >
                                                     {/* <OrgDiagram centerOnCursor={true} config={config} onHighlightChanged={this.onHighlightChanged} /> */}
-                                                    <OrgDiagram centerOnCursor={true} config={config} onCursorChanged={this.onCursoChanged} />
+                                                    {/* <OrgDiagram centerOnCursor={true} config={config} onCursorChanged={this.onCursoChanged} onHighlightChanged={this.onHighlightChanged}/> */}
+                                                    <OrgDiagram centerOnCursor={true} config={config} onCursorChanged={this.onCursoChanged}/>
                                                 </div>
                                             </Provider>
                                         </div>

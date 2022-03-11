@@ -317,109 +317,152 @@ export default class ListTreeComponent extends Component {
         } else if (operationId == 3) {
             // program = (this.state.datasetList.filter(x => x.id == programId)[0]);
             var maxTreeId = treeList.length > 0 ? Math.max(...treeList.map(o => o.treeId)) : 0;
+            treeId = parseInt(maxTreeId) + 1;
             var nodeDataMap = {};
             var tempArray = [];
-            var tempJson = {
-                nodeDataId: 1,
-                notes: '',
-                month: moment(program.programData.currentVersion.forecastStartDate).startOf('month').format("YYYY-MM-DD"),
-                dataValue: "",
-                calculatedDataValue: '',
-                displayDataValue: '',
-                nodeDataModelingList: [],
-                nodeDataOverrideList: [],
-                nodeDataMomList: [],
-                fuNode: {
-                    noOfForecastingUnitsPerPerson: '',
-                    usageFrequency: '',
-                    forecastingUnit: {
-                        label: {
-                            label_en: ''
-                        },
-                        tracerCategory: {
-
-                        },
-                        unit: {
-                            id: ''
-                        }
-                    },
-                    usageType: {
-                        id: ''
-                    },
-                    usagePeriod: {
-                        usagePeriodId: ''
-                    },
-                    repeatUsagePeriod: {
-                        usagePeriodId: ''
-                    },
-                    noOfPersons: ''
-                },
-                puNode: {
-                    planningUnit: {
-                        unit: {
-
-                        }
-                    },
-                    refillMonths: ''
+            var tempJson = {};
+            var tempTree = {};
+            var treeTemplateId = document.getElementById('templateId').value;
+            if (treeTemplateId != "") {
+                var treeTemplate = this.state.treeTemplateList.filter(x => x.treeTemplateId == treeTemplateId)[0];
+                console.log("treeTemplate 123----", treeTemplate);
+                var flatList = treeTemplate.flatList;
+                for (let i = 0; i < flatList.length; i++) {
+                    nodeDataMap = {};
+                    tempArray = [];
+                    // var nodeDataMap[1] = flatList.payload.nodeDataMap[0][0];
+                    console.log("flatList[i]---", flatList[i]);
+                    tempJson = flatList[i].payload.nodeDataMap[0][0];
+                    tempArray.push(tempJson);
+                    nodeDataMap[1] = tempArray;
+                    flatList[i].payload.nodeDataMap = nodeDataMap;
                 }
-            };
-            tempArray.push(tempJson);
-            nodeDataMap[1] = tempArray;
-            treeId = parseInt(maxTreeId) + 1;
-            console.log("region values---", this.state.regionValues);
-            // console.log("curTreeObj.regionList---", curTreeObj.regionList);
-            var tempTree = {
-                treeId: treeId,
-                active: this.state.active,
-                forecastMethod: this.state.forecastMethod,
-                label: {
-                    label_en: this.state.treeName,
-                    label_fr: '',
-                    label_sp: '',
-                    label_pr: ''
-                },
-                notes: this.state.notes,
-                regionList: this.state.regionList,
-                scenarioList: [{
-                    id: 1,
+                tempTree = {
+                    treeId: treeId,
+                    active: this.state.active,
+                    forecastMethod: treeTemplate.forecastMethod,
+                    label: treeTemplate.label,
+                    notes: this.state.notes,
+                    regionList: this.state.regionList,
+                    scenarioList: [{
+                        id: 1,
+                        label: {
+                            label_en: i18n.t('static.realm.default'),
+                            label_fr: '',
+                            label_sp: '',
+                            label_pr: ''
+                        },
+                        active: true,
+                        notes: ''
+                    }],
+                    tree: {
+                        flatList: flatList
+                    }
+                }
+            } else {
+                tempJson = {
+                    nodeDataId: 1,
+                    notes: '',
+                    month: moment(program.programData.currentVersion.forecastStartDate).startOf('month').format("YYYY-MM-DD"),
+                    dataValue: "",
+                    calculatedDataValue: '',
+                    displayDataValue: '',
+                    nodeDataModelingList: [],
+                    nodeDataOverrideList: [],
+                    nodeDataMomList: [],
+                    fuNode: {
+                        noOfForecastingUnitsPerPerson: '',
+                        usageFrequency: '',
+                        forecastingUnit: {
+                            label: {
+                                label_en: ''
+                            },
+                            tracerCategory: {
+
+                            },
+                            unit: {
+                                id: ''
+                            }
+                        },
+                        usageType: {
+                            id: ''
+                        },
+                        usagePeriod: {
+                            usagePeriodId: ''
+                        },
+                        repeatUsagePeriod: {
+                            usagePeriodId: ''
+                        },
+                        noOfPersons: ''
+                    },
+                    puNode: {
+                        planningUnit: {
+                            unit: {
+
+                            }
+                        },
+                        refillMonths: ''
+                    }
+                };
+                tempArray.push(tempJson);
+                nodeDataMap[1] = tempArray;
+                tempTree = {
+                    treeId: treeId,
+                    active: this.state.active,
+                    forecastMethod: this.state.forecastMethod,
                     label: {
-                        label_en: i18n.t('static.realm.default'),
+                        label_en: this.state.treeName,
                         label_fr: '',
                         label_sp: '',
                         label_pr: ''
                     },
-                    active: true,
-                    notes: ''
-                }],
-                tree: {
-                    flatList: [{
+                    notes: this.state.notes,
+                    regionList: this.state.regionList,
+                    scenarioList: [{
                         id: 1,
-                        level: 0,
-                        parent: null,
-                        sortOrder: "00",
-                        payload: {
-                            label: {
-                                label_en: ''
-                            },
-                            nodeType: {
-                                id: 2
-                            },
-                            nodeUnit: {
-                                id: ''
-                            },
-                            extrapolation: false,
-                            nodeDataMap: nodeDataMap
+                        label: {
+                            label_en: i18n.t('static.realm.default'),
+                            label_fr: '',
+                            label_sp: '',
+                            label_pr: ''
                         },
-                        parentItem: {
+                        active: true,
+                        notes: ''
+                    }],
+                    tree: {
+                        flatList: [{
+                            id: 1,
+                            level: 0,
+                            parent: null,
+                            sortOrder: "00",
                             payload: {
+                                label: {
+                                    label_en: ''
+                                },
+                                nodeType: {
+                                    id: 2
+                                },
                                 nodeUnit: {
+                                    id: ''
+                                },
+                                extrapolation: false,
+                                nodeDataMap: nodeDataMap
+                            },
+                            parentItem: {
+                                payload: {
+                                    nodeUnit: {
 
+                                    }
                                 }
                             }
-                        }
-                    }]
+                        }]
+                    }
                 }
             }
+
+            console.log("region values---", this.state.regionValues);
+            // console.log("curTreeObj.regionList---", curTreeObj.regionList);
+
 
             treeList.push(tempTree);
         }
@@ -537,6 +580,7 @@ export default class ListTreeComponent extends Component {
     getTreeList() {
         // var proList = [];
         // var datasetId = document.getElementById('datasetId').value;
+        var realmCountryId = "";
         var datasetId = document.getElementById("datasetId").value;
         localStorage.setItem("sesDatasetId", datasetId);
         var datasetList = this.state.datasetList;
@@ -544,14 +588,16 @@ export default class ListTreeComponent extends Component {
         if (datasetId != 0) {
             datasetList = datasetList.filter(x => x.id == datasetId);
             console.log('inside if')
+            realmCountryId = datasetList[0].programData.realmCountry.realmCountryId;
             // proList.push(datasetList)
         }
 
         // console.log("pro list---", proList);
         this.setState({
             datasetId,
-            datasetIdModal : datasetId,
-            treeData: datasetList
+            datasetIdModal: datasetId,
+            treeData: datasetList,
+            realmCountryId
         }, () => {
             this.buildJexcel();
         });
@@ -631,10 +677,28 @@ export default class ListTreeComponent extends Component {
             });
             // this.buildTree();
         } else {
-            this.props.history.push({
-                pathname: `/dataSet/buildTree/template/${event.target.value}`,
-                // state: { role }
+            console.log("id--->>>",this.state.datasetIdModal);
+            var treeTemplate = this.state.treeTemplateList.filter(x => x.treeTemplateId == event.target.value)[0];
+            console.log("treeTemplate---", treeTemplate)
+            this.setState({
+                treeFlag: false,
+                isModalOpen: !this.state.isModalOpen,
+                treeName: treeTemplate.label.label_en,
+                active: treeTemplate.active,
+                forecastMethod: treeTemplate.forecastMethod,
+                regionId: '',
+                regionList: [],
+                regionValues: [],
+                notes: ''
+            }, () => {
+                if (this.state.datasetIdModal != "") {
+                    this.getRegionList();
+                }
             });
+            // this.props.history.push({
+            //     pathname: `/dataSet/buildTree/template/${event.target.value}`,
+            //     // state: { role }
+            // });
         }
 
     }
