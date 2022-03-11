@@ -242,8 +242,12 @@ export default class CommitTreeComponent extends React.Component {
                 let programData = myResult.filter(c => (c.id == programId));
                 this.setState({
                     programDataLocal: programData[0].datasetJson,
+                    programCode:programData[0].datasetJson.programCode,
+                    version:programData[0].version,
+                    pageName:i18n.t('static.button.commit'),
                     programDataDownloaded: datasetJson,
-                    programName: programData[0].name + '~v' + programData[0].version + ' (local)',
+                    programName: programData[0].datasetJson.programCode + '~v' + programData[0].version + ' (local)',
+                    programNameOriginal: getLabelText(datasetJson.label, this.state.lang),
                     forecastStartDate: programData[0].datasetJson.currentVersion.forecastStartDate,
                     forecastStopDate: programData[0].datasetJson.currentVersion.forecastStopDate,
                     notes: programData[0].datasetJson.currentVersion.notes

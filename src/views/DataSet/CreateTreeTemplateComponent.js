@@ -32,7 +32,7 @@ import TracerCategoryService from '../../api/TracerCategoryService';
 import ForecastingUnitService from '../../api/ForecastingUnitService';
 import PlanningUnitService from '../../api/PlanningUnitService';
 import UsageTemplateService from '../../api/UsageTemplateService';
-import { INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY, JEXCEL_PAGINATION_OPTION, JEXCEL_DECIMAL_MONTHLY_CHANGE, JEXCEL_PRO_KEY, TREE_DIMENSION_ID, JEXCEL_MONTH_PICKER_FORMAT, DATE_FORMAT_CAP_WITHOUT_DATE, JEXCEL_DECIMAL_NO_REGEX_LONG } from '../../Constants.js'
+import { INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY, JEXCEL_PAGINATION_OPTION, JEXCEL_DECIMAL_MONTHLY_CHANGE, JEXCEL_PRO_KEY, TREE_DIMENSION_ID, JEXCEL_MONTH_PICKER_FORMAT, DATE_FORMAT_CAP_WITHOUT_DATE, JEXCEL_DECIMAL_NO_REGEX_LONG, DATE_FORMAT_CAP } from '../../Constants.js'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import TextField from '@material-ui/core/TextField';
@@ -55,6 +55,7 @@ import Size from '../../../node_modules/basicprimitives/src/graphics/structs/Siz
 import classNames from 'classnames';
 import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
+import AuthenticationService from '../Common/AuthenticationService';
 
 
 const entityname = 'Tree Template';
@@ -723,10 +724,56 @@ export default class CreateTreeTemplate extends Component {
         var legalSize = { width: 612.00, height: 1008.00 }
         var scale = Math.min(legalSize.width / (sample3size.width + 300), legalSize.height / (sample3size.height + 300))
         doc.scale(scale);
-        doc.fontSize(25)
-            .text('Tree Template PDF', 30, 30);
+        doc
+            .fillColor('#002f6c')
+            .fontSize(20)
+            .font('Helvetica')
+            .text('Tree Template PDF', doc.page.width / 2, 20);
 
-        sampleChart.draw(doc, 60, 100);
+        doc
+            .fillColor('#002f6c')
+            .fontSize(12)
+            .font('Helvetica')
+            .text(i18n.t('static.supplyPlan.runDate') + " " + moment(new Date()).format(`${DATE_FORMAT_CAP}`), 30, 40);
+
+        doc
+            .fillColor('#002f6c')
+            .fontSize(12)
+            .font('Helvetica')
+            .text(i18n.t('static.supplyPlan.runTime') + " " + moment(new Date()).format('hh:mm A'), 30, 55);
+
+        doc
+            .fillColor('#002f6c')
+            .fontSize(12)
+            .font('Helvetica')
+            .text(i18n.t('static.user.user') + ': ' + AuthenticationService.getLoggedInUsername(), 30, 70);
+
+        doc
+            .fillColor('#002f6c')
+            .fontSize(12)
+            .font('Helvetica')
+            .text("Forecast Method" + ': ' + document.getElementById("forecastMethodId").selectedOptions[0].text, 30, 85);
+
+        doc
+            .fillColor('#002f6c')
+            .fontSize(12)
+            .font('Helvetica')
+            .text("Template Name" + ': ' + this.state.treeTemplate.label.label_en, 30, 100);
+
+        doc
+            .fillColor('#002f6c')
+            .fontSize(12)
+            .font('Helvetica')
+            .text("Months In Past" + ': ' + document.getElementById("monthsInPast").value, 30, 115);
+
+        doc
+            .fillColor('#002f6c')
+            .fontSize(12)
+            .font('Helvetica')
+            .text("Months In Future" + ': ' + document.getElementById("monthsInFuture").value, 30, 130);
+
+
+        sampleChart.draw(doc, 60, 165);
 
         doc.restore();
 
@@ -735,7 +782,7 @@ export default class CreateTreeTemplate extends Component {
         if (typeof stream !== 'undefined') {
             stream.on('finish', function () {
                 var string = stream.toBlob('application/pdf');
-                window.saveAs(string, 'Tree Template.pdf');
+                window.saveAs(string, i18n.t('static.dataset.TreeTemplate') + '.pdf');
             });
         } else {
             alert('Error: Failed to create file stream.');
@@ -4552,7 +4599,7 @@ export default class CreateTreeTemplate extends Component {
                 }]
             },
             tooltips: {
-                enabled: true,
+                enabled: false,
                 custom: CustomTooltips,
                 callbacks: {
                     label: function (tooltipItem, data) {
@@ -4698,7 +4745,7 @@ export default class CreateTreeTemplate extends Component {
                 }]
             },
             tooltips: {
-                enabled: true,
+                enabled: false,
                 custom: CustomTooltips,
                 callbacks: {
                     label: function (tooltipItem, data) {
@@ -6304,6 +6351,24 @@ export default class CreateTreeTemplate extends Component {
         dataArray.push(new Paragraph({
         }));
         dataArray.push(new Paragraph({
+            children: [new TextRun({ "text": i18n.t('static.supplyPlan.runDate') + " : ", bold: true }), new TextRun({ "text": moment(new Date()).format(`${DATE_FORMAT_CAP}`) })],
+            spacing: {
+                after: 150,
+            },
+        }));
+        dataArray.push(new Paragraph({
+            children: [new TextRun({ "text": i18n.t('static.supplyPlan.runTime') + " : ", bold: true }), new TextRun({ "text": moment(new Date()).format('hh:mm A') })],
+            spacing: {
+                after: 150,
+            },
+        }));
+        dataArray.push(new Paragraph({
+            children: [new TextRun({ "text": i18n.t('static.user.user') + " : ", bold: true }), new TextRun({ "text": AuthenticationService.getLoggedInUsername() })],
+            spacing: {
+                after: 150,
+            },
+        }));
+        dataArray.push(new Paragraph({
             children: [new TextRun({ "text": i18n.t('static.forecastMethod.forecastMethod') + " : ", bold: true }), new TextRun({ "text": document.getElementById("forecastMethodId").selectedOptions[0].text })],
             spacing: {
                 after: 150,
@@ -6408,7 +6473,7 @@ export default class CreateTreeTemplate extends Component {
         });
 
         Packer.toBlob(doc).then(blob => {
-            saveAs(blob, "TreeValidation.docx");
+            saveAs(blob, i18n.t('static.dataset.TreeTemplate') + "-" + "TreeValidation" + ".docx");
         });
     }
 

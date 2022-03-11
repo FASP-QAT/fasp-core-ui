@@ -18,7 +18,7 @@ import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
 import ProgramService from '../../api/ProgramService';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, polling, DATE_FORMAT_CAP_WITHOUT_DATE, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, } from '../../Constants.js'
+import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, polling, DATE_FORMAT_CAP_WITHOUT_DATE, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, TITLE_FONT, } from '../../Constants.js'
 import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import pdfIcon from '../../assets/img/pdf.png';
@@ -244,6 +244,18 @@ class ForecastSummary extends Component {
 
     exportCSV() {
         var csvRow = [];
+
+        csvRow.push('"' + (i18n.t('static.supplyPlan.runDate') + ' : ' + moment(new Date()).format(`${DATE_FORMAT_CAP}`)).replaceAll(' ', '%20') + '"')
+        csvRow.push('')
+        csvRow.push('"' + (i18n.t('static.supplyPlan.runTime') + ' : ' + moment(new Date()).format('hh:mm A')).replaceAll(' ', '%20') + '"')
+        csvRow.push('')
+        csvRow.push('"' + (i18n.t('static.user.user') + ' : ' + AuthenticationService.getLoggedInUsername()).replaceAll(' ', '%20') + '"')
+        csvRow.push('')
+        csvRow.push('"' + (this.state.programs.filter(c => c.programId == this.state.programId)[0].programCode + " " + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text)).replaceAll(' ', '%20') + '"')
+        csvRow.push('')
+        csvRow.push('"' + (document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+        csvRow.push('')
+
         csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
         csvRow.push('')
         csvRow.push('"' + (i18n.t('static.report.version*') + ' : ' + document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
@@ -404,7 +416,7 @@ class ForecastSummary extends Component {
             var a = document.createElement("a")
             a.href = 'data:attachment/csv,' + csvString
             a.target = "_Blank"
-            a.download = i18n.t('static.forecastReport.forecastSummary') + ".csv"
+            a.download = this.state.programs.filter(c => c.programId == this.state.programId)[0].programCode+ "-" + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text)+"-"+i18n.t('static.forecastReport.forecastSummary')+"-"+document.getElementById("displayId").selectedOptions[0].text + ".csv"
             document.body.appendChild(a)
             a.click();
 
@@ -482,7 +494,7 @@ class ForecastSummary extends Component {
             var a = document.createElement("a")
             a.href = 'data:attachment/csv,' + csvString
             a.target = "_Blank"
-            a.download = i18n.t('static.forecastReport.forecastSummary') + ".csv"
+            a.download = this.state.programs.filter(c => c.programId == this.state.programId)[0].programCode+ "-" + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text)+"-"+i18n.t('static.forecastReport.forecastSummary')+"-"+document.getElementById("displayId").selectedOptions[0].text + ".csv"
             document.body.appendChild(a)
             a.click();
 
@@ -525,7 +537,25 @@ class ForecastSummary extends Component {
                 doc.setFont('helvetica', 'bold')
                 doc.setPage(i)
                 doc.addImage(LOGO, 'png', 0, 10, 180, 50, 'FAST');
-
+                doc.setFontSize(8)
+                doc.setFont('helvetica', 'normal')
+                doc.setTextColor("#002f6c");
+                doc.text(i18n.t('static.supplyPlan.runDate') + " " + moment(new Date()).format(`${DATE_FORMAT_CAP}`), doc.internal.pageSize.width - 40, 20, {
+                    align: 'right'
+                })
+                doc.text(i18n.t('static.supplyPlan.runTime') + " " + moment(new Date()).format('hh:mm A'), doc.internal.pageSize.width - 40, 30, {
+                    align: 'right'
+                })
+                doc.text(i18n.t('static.user.user') + ': ' + AuthenticationService.getLoggedInUsername(), doc.internal.pageSize.width - 40, 40, {
+                    align: 'right'
+                })
+                doc.text(this.state.programs.filter(c => c.programId == this.state.programId)[0].programCode + " " + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text), doc.internal.pageSize.width - 40, 50, {
+                    align: 'right'
+                })
+                doc.text(document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width - 40, 60, {
+                    align: 'right'
+                })
+                doc.setFontSize(TITLE_FONT)
                 doc.setTextColor("#002f6c");
                 doc.text(i18n.t('static.forecastReport.forecastSummary'), doc.internal.pageSize.width / 2, 60, {
                     align: 'center'
@@ -670,7 +700,7 @@ class ForecastSummary extends Component {
             doc.autoTable(content);
             addHeaders(doc)
             addFooters(doc)
-            doc.save(i18n.t('static.forecastReport.forecastSummary') + ".pdf")
+            doc.save(this.state.programs.filter(c => c.programId == this.state.programId)[0].programCode+ "-" + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text)+"-"+i18n.t('static.forecastReport.forecastSummary')+"-"+document.getElementById("displayId").selectedOptions[0].text + ".pdf")
         } else {//National
 
             let headers = [];
@@ -808,7 +838,7 @@ class ForecastSummary extends Component {
             doc.autoTable(content);
             addHeaders(doc)
             addFooters(doc)
-            doc.save(i18n.t('static.forecastReport.forecastSummary') + ".pdf")
+            doc.save(this.state.programs.filter(c => c.programId == this.state.programId)[0].programCode+ "-" + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text)+"-"+i18n.t('static.forecastReport.forecastSummary')+"-"+document.getElementById("displayId").selectedOptions[0].text + ".pdf")
 
         }
     }
@@ -1172,7 +1202,7 @@ class ForecastSummary extends Component {
                                             data = [];
                                             data[0] = puListFiltered[j].planningUnit.forecastingUnit.label.label_en;
                                             data[1] = puListFiltered[j].planningUnit;
-                                            data[2] = getLabelText(puListFiltered[j].planningUnit.label,this.state.lang)+" | "+puListFiltered[j].planningUnit.id;
+                                            data[2] = getLabelText(puListFiltered[j].planningUnit.label, this.state.lang) + " | " + puListFiltered[j].planningUnit.id;
                                             var total = 0;
                                             for (var k = 0; k < regRegionList.length; k++) {
                                                 var filterForecastSelected = puListFiltered[j].selectedForecastMap[regRegionList[k].regionId]
@@ -1189,7 +1219,7 @@ class ForecastSummary extends Component {
                                         }
                                     }
                                     var columns = [];
-                                    columns.push({ title: i18n.t('static.product.unit1'), type: 'hidden', width: 100 , readOnly: true });//A0
+                                    columns.push({ title: i18n.t('static.product.unit1'), type: 'hidden', width: 100, readOnly: true });//A0
                                     columns.push({ title: i18n.t('static.product.product'), type: 'hidden', width: 100, readOnly: true });//B1
                                     columns.push({ title: i18n.t('static.product.product'), type: 'text', width: 100, readOnly: true });//C2
                                     for (var k = 0; k < regRegionList.length; k++) {
@@ -2504,7 +2534,7 @@ class ForecastSummary extends Component {
                                                                                         <>
                                                                                             <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                                                             {/* <td>{item1.forecastingUnit.label.label_en}</td> */}
-                                                                                            <td className='text-left  sticky-col first-col clone'>{getLabelText(item1.planningUnit.label,this.state.lang)+" | "+item1.planningUnit.id}</td>
+                                                                                            <td className='text-left  sticky-col first-col clone'>{getLabelText(item1.planningUnit.label, this.state.lang) + " | " + item1.planningUnit.id}</td>
                                                                                             <td>{item1.totalForecastedQuantity}</td>
                                                                                             {!this.state.hideColumn &&
                                                                                                 <>
