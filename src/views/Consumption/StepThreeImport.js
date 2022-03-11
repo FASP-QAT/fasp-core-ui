@@ -43,7 +43,7 @@ import { JEXCEL_INTEGER_REGEX, JEXCEL_DECIMAL_LEAD_TIME, JEXCEL_DECIMAL_CATELOG_
 import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import CryptoJS from 'crypto-js';
-
+import { Prompt } from 'react-router';
 
 
 export default class StepThreeImportMapPlanningUnits extends Component {
@@ -63,6 +63,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
             stopDate: '',
             buildCSVTable: [],
             languageEl: '',
+            isChanged1: true
 
         }
 
@@ -71,6 +72,19 @@ export default class StepThreeImportMapPlanningUnits extends Component {
         this.exportCSV = this.exportCSV.bind(this);
         this.changeColor = this.changeColor.bind(this);
 
+    }
+
+    componentWillUnmount() {
+        clearTimeout(this.timeout);
+        window.onbeforeunload = null;
+    }
+
+    componentDidUpdate = () => {
+        if (this.state.isChanged1 == true) {
+            window.onbeforeunload = () => true
+        } else {
+            window.onbeforeunload = undefined
+        }
     }
 
     changeColor() {
@@ -367,6 +381,9 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                                 //     // this.buildJExcel();
                                 // });
                                 console.log("Data update success");
+                                this.setState({
+                                    isChanged1: false
+                                })
 
                                 // this.props.history.push(`/importFromQATSupplyPlan/listImportFromQATSupplyPlan/` + 'green/' + i18n.t('static.mt.dataUpdateSuccess'))
                                 // this.props.history.push(`/dataentry/consumptionDataEntryAndAdjustment`)
@@ -748,6 +765,10 @@ export default class StepThreeImportMapPlanningUnits extends Component {
         const { rangeValue } = this.state
         return (
             <>
+                <Prompt
+                    when={this.state.isChanged1 == true}
+                    message={i18n.t("static.dataentry.confirmmsg")}
+                />
                 <div className="pr-lg-0 Card-header-reporticon">
                     {/* <i className="icon-menu"></i><strong>{i18n.t('static.dashboard.globalconsumption')}</strong> */}
                     {this.state.buildCSVTable.length > 0 && <div className="card-header-actions">

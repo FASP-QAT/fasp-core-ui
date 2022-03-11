@@ -42,6 +42,7 @@ import CryptoJS from 'crypto-js'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import TracerCategoryService from "../../api/TracerCategoryService";
 import moment from "moment";
+import { Prompt } from 'react-router';
 
 const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
@@ -86,6 +87,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
             selectedForecastProgram: '',
             getDatasetFilterList: [],
             selSource1: [],
+            isChanged1: false
         }
         this.changed = this.changed.bind(this);
         this.buildJexcel = this.buildJexcel.bind(this);
@@ -112,6 +114,19 @@ export default class StepOneImportMapPlanningUnits extends Component {
         setTimeout(function () {
             document.getElementById('div12').style.display = 'none';
         }, 8000);
+    }
+
+    componentWillUnmount() {
+        clearTimeout(this.timeout);
+        window.onbeforeunload = null;
+    }
+
+    componentDidUpdate = () => {
+        if (this.state.isChanged1 == true) {
+            window.onbeforeunload = () => true
+        } else {
+            window.onbeforeunload = undefined
+        }
     }
 
     getPlanningUnitList() {
@@ -397,7 +412,9 @@ export default class StepOneImportMapPlanningUnits extends Component {
             }
 
         }
-
+        this.setState({
+            isChanged1: true,
+        });
 
 
     }
@@ -1403,6 +1420,10 @@ export default class StepOneImportMapPlanningUnits extends Component {
 
         return (
             <>
+                <Prompt
+                    when={this.state.isChanged1 == true}
+                    message={i18n.t("static.dataentry.confirmmsg")}
+                />
                 <AuthenticationServiceComponent history={this.props.history} />
                 <h5 className="red" id="div12">{this.state.message}</h5>
 

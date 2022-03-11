@@ -39,6 +39,7 @@ import { JEXCEL_INTEGER_REGEX, JEXCEL_DECIMAL_LEAD_TIME, JEXCEL_DECIMAL_CATELOG_
 import moment from "moment";
 import CryptoJS from 'crypto-js';
 import { contrast } from "../../CommonComponent/JavascriptCommonFunctions";
+import { Prompt } from 'react-router';
 
 const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
@@ -55,7 +56,8 @@ export default class StepTwoImportMapPlanningUnits extends Component {
             selSource: [],
             programRegionList: [],
             forecastProgramRegionList: [],
-            selSource2: []
+            selSource2: [],
+            isChanged1: true
 
         }
         this.changed = this.changed.bind(this);
@@ -64,6 +66,19 @@ export default class StepTwoImportMapPlanningUnits extends Component {
         this.oneditionend = this.oneditionend.bind(this);
         this.formSubmit = this.formSubmit.bind(this);
 
+    }
+
+    componentWillUnmount() {
+        clearTimeout(this.timeout);
+        window.onbeforeunload = null;
+    }
+
+    componentDidUpdate = () => {
+        if (this.state.isChanged1 == true) {
+            window.onbeforeunload = () => true
+        } else {
+            window.onbeforeunload = undefined
+        }
     }
 
     formSubmit = function () {
@@ -406,6 +421,10 @@ export default class StepTwoImportMapPlanningUnits extends Component {
         const { rangeValue } = this.state
         return (
             <>
+                <Prompt
+                    when={this.state.isChanged1 == true}
+                    message={i18n.t("static.dataentry.confirmmsg")}
+                />
                 <AuthenticationServiceComponent history={this.props.history} />
                 <h4 className="red">{this.props.message}</h4>
 
