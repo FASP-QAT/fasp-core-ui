@@ -1706,7 +1706,7 @@ class ForecastOutput extends Component {
                     // rangeValue: { from: { year: new Date(forecastStartDateNew).getFullYear(), month: new Date(forecastStartDateNew).getMonth() + 1 }, to: { year: new Date(forecastStopDateNew).getFullYear(), month: new Date(forecastStopDateNew).getMonth() + 1 } },
                     rangeValue: { from: { year: Number(moment(forecastStartDateNew).startOf('month').format("YYYY")), month: Number(moment(forecastStartDateNew).startOf('month').format("M")) }, to: { year: Number(moment(forecastStopDateNew).startOf('month').format("YYYY")), month: Number(moment(forecastStopDateNew).startOf('month').format("M")) } },
                     // forecastPeriod: month[new Date(forecastStartDateNew).getMonth()] + ' ' + new Date(forecastStartDateNew).getFullYear() + ' ~ ' + month[new Date(forecastStopDateNew).getMonth()] + ' ' + new Date(forecastStopDateNew).getFullYear(),
-                    forecastPeriod: month[Number(moment(forecastStartDateNew).startOf('month').format("M"))-1] + ' ' + Number(moment(forecastStartDateNew).startOf('month').format("YYYY")) + ' ~ ' + month[Number(moment(forecastStopDateNew).startOf('month').format("M"))-1] + ' ' + Number(moment(forecastStopDateNew).startOf('month').format("YYYY")),
+                    forecastPeriod: month[Number(moment(forecastStartDateNew).startOf('month').format("M")) - 1] + ' ' + Number(moment(forecastStartDateNew).startOf('month').format("YYYY")) + ' ~ ' + month[Number(moment(forecastStopDateNew).startOf('month').format("M")) - 1] + ' ' + Number(moment(forecastStopDateNew).startOf('month').format("YYYY")),
                 }, () => { })
 
             } else {//server version
@@ -2127,6 +2127,16 @@ class ForecastOutput extends Component {
         });
     }
 
+    filterOptions = async (options, filter) => {
+        if (filter) {
+            return options.filter((i) =>
+                i.label.toLowerCase().includes(filter.toLowerCase())
+            );
+        } else {
+            return options;
+        }
+    };
+
 
     render() {
 
@@ -2307,7 +2317,8 @@ class ForecastOutput extends Component {
                     })
                     datasetsArr.push(
                         {
-                            label: item.objUnit.label.label_en,
+                            // label: item.objUnit.label.label_en,
+                            label: item.objUnit.label.label_en + ' ' + item.scenario.label,
                             type: 'line',
                             stack: 3,
                             yAxisID: 'A',
@@ -2645,6 +2656,7 @@ class ForecastOutput extends Component {
                                                         onChange={(e) => this.setForecastingUnit(e)}
                                                         options={forecastingUnitList && forecastingUnitList.length > 0 ? forecastingUnitList : []}
                                                         value={this.state.forecastingUnitValues}
+                                                        filterOptions={this.filterOptions}
                                                         labelledBy={i18n.t('static.common.select')}
                                                         disabled={this.state.loading}
                                                     />
@@ -2662,6 +2674,7 @@ class ForecastOutput extends Component {
                                                         id="planningUnitId"
                                                         options={planningUnitList && planningUnitList.length > 0 ? planningUnitList : []}
                                                         value={this.state.planningUnitValues}
+                                                        filterOptions={this.filterOptions}
                                                         onChange={(e) => { this.handlePlanningUnitChange(e) }}
                                                         labelledBy={i18n.t('static.common.select')}
                                                         disabled={this.state.loading}
