@@ -1088,6 +1088,10 @@ class VersionSettingsComponent extends Component {
                             onclick: function () {
                                 this.setState({
                                     programName: rowData[1] + "~v" + rowData[2],
+                                    programCode: rowData[1],
+                                    version: rowData[2],
+                                    pageName: i18n.t('static.versionSettings.versionSettings'),
+                                    programNameOriginal: getLabelText(rowData[18].label, this.state.lang),
                                     programId: rowData[11]
                                 })
                                 this.openModalPopup(rowData[18]);
@@ -1519,9 +1523,9 @@ class VersionSettingsComponent extends Component {
                             </div> */}
                         </ModalBody>
                         <div className="col-md-12 pb-lg-5 pt-lg-3">
-                                <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={() => { this.openModalPopup() }}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={this.synchronize}><i className="fa fa-check"></i>{i18n.t('static.report.ok')}</Button>
-                            </div>
+                            <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={() => { this.openModalPopup() }}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                            <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={this.synchronize}><i className="fa fa-check"></i>{i18n.t('static.report.ok')}</Button>
+                        </div>
                     </div>
                 </Modal >
             </div>

@@ -22,7 +22,7 @@ import moment from 'moment';
 import Picker from 'react-month-picker';
 import SelectSearch from 'react-select-search';
 import MonthBox from '../../CommonComponent/MonthBox.js';
-import { ROUNDING_NUMBER, INDEXED_DB_NAME, INDEXED_DB_VERSION, TREE_DIMENSION_ID, SECRET_KEY, JEXCEL_MONTH_PICKER_FORMAT, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, JEXCEL_DECIMAL_NO_REGEX_LONG, DATE_FORMAT_CAP_WITHOUT_DATE, JEXCEL_DECIMAL_MONTHLY_CHANGE } from '../../Constants.js'
+import { ROUNDING_NUMBER, INDEXED_DB_NAME, INDEXED_DB_VERSION, TREE_DIMENSION_ID, SECRET_KEY, JEXCEL_MONTH_PICKER_FORMAT, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, JEXCEL_DECIMAL_NO_REGEX_LONG, DATE_FORMAT_CAP_WITHOUT_DATE, JEXCEL_DECIMAL_MONTHLY_CHANGE, DATE_FORMAT_CAP, TITLE_FONT } from '../../Constants.js'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import jexcel from 'jexcel-pro';
 import "../../../node_modules/jexcel-pro/dist/jexcel.css";
@@ -3196,6 +3196,26 @@ export default class BuildTree extends Component {
         }));
         dataArray.push(new Paragraph({
         }));
+
+        dataArray.push(new Paragraph({
+            children: [new TextRun({ "text": i18n.t('static.supplyPlan.runDate') + " : ", bold: true }), new TextRun({ "text": moment(new Date()).format(`${DATE_FORMAT_CAP}`) })],
+            spacing: {
+                after: 150,
+            },
+        }));
+        dataArray.push(new Paragraph({
+            children: [new TextRun({ "text": i18n.t('static.supplyPlan.runTime') + " : ", bold: true }), new TextRun({ "text": moment(new Date()).format('hh:mm A') })],
+            spacing: {
+                after: 150,
+            },
+        }));
+        dataArray.push(new Paragraph({
+            children: [new TextRun({ "text": i18n.t('static.user.user') + " : ", bold: true }), new TextRun({ "text": AuthenticationService.getLoggedInUsername() })],
+            spacing: {
+                after: 150,
+            },
+        }));
+
         dataArray.push(new Paragraph({
             children: [new TextRun({ "text": i18n.t('static.consumption.program') + " : ", bold: true }), new TextRun({ "text": document.getElementById("datasetId").selectedOptions[0].text })],
             spacing: {
@@ -3302,7 +3322,7 @@ export default class BuildTree extends Component {
         });
 
         Packer.toBlob(doc).then(blob => {
-            saveAs(blob, "TreeValidation.docx");
+            saveAs(blob, this.state.dataSetObj.programData.programCode + "-" + i18n.t("static.supplyPlan.v") + this.state.dataSetObj.programData.currentVersion.versionId + "-" + i18n.t('static.common.managetree') + "-" + "TreeValidation" + "-" + document.getElementById("treeId").selectedOptions[0].text + "-" + document.getElementById("scenarioId").selectedOptions[0].text + ".docx");
         });
     }
 
@@ -3472,10 +3492,61 @@ export default class BuildTree extends Component {
         var legalSize = { width: 612.00, height: 1008.00 }
         var scale = Math.min(legalSize.width / (sample3size.width + 300), legalSize.height / (sample3size.height + 300))
         doc.scale(scale);
-        doc.fontSize(25)
-            .text('Tree PDF', 30, 30);
+        doc
+            .fillColor('#002f6c')
+            .fontSize(20)
+            .font('Helvetica')
+            .text('Tree PDF', doc.page.width/2, 20);
 
-        sampleChart.draw(doc, 60, 100);
+        doc
+            .fillColor('#002f6c')
+            .fontSize(12)
+            .font('Helvetica')
+            .text(i18n.t('static.supplyPlan.runDate') + " " + moment(new Date()).format(`${DATE_FORMAT_CAP}`), 30, 40);
+
+        doc
+            .fillColor('#002f6c')
+            .fontSize(12)
+            .font('Helvetica')
+            .text(i18n.t('static.supplyPlan.runTime') + " " + moment(new Date()).format('hh:mm A'), 30, 55);
+
+        doc
+            .fillColor('#002f6c')
+            .fontSize(12)
+            .font('Helvetica')
+            .text(i18n.t('static.user.user') + ': ' + AuthenticationService.getLoggedInUsername(), 30, 70);
+
+        doc
+            .fillColor('#002f6c')
+            .fontSize(12)
+            .font('Helvetica')
+            .text(getLabelText(this.state.dataSetObj.programData.label, this.state.lang), 30, 85);
+
+            doc
+            .fillColor('#002f6c')
+            .fontSize(12)
+            .font('Helvetica')
+            .text(i18n.t('static.consumption.program') + ': ' + document.getElementById("datasetId").selectedOptions[0].text, 30, 100);
+
+            doc
+            .fillColor('#002f6c')
+            .fontSize(12)
+            .font('Helvetica')
+            .text(i18n.t('static.forecastMethod.tree') + ': ' + document.getElementById("treeId").selectedOptions[0].text, 30, 115); 
+
+            doc
+            .fillColor('#002f6c')
+            .fontSize(12)
+            .font('Helvetica')
+            .text(i18n.t('static.whatIf.scenario') + ': ' + document.getElementById("scenarioId").selectedOptions[0].text, 30, 130); 
+            doc
+            .fillColor('#002f6c')
+            .fontSize(12)
+            .font('Helvetica')
+            .text("Display Date(Forecast: "+this.state.forecastPeriod+")" + ': ' + this.makeText(this.state.singleValue2), 30, 145); 
+
+
+        sampleChart.draw(doc, 60, 180);
 
         doc.restore();
 
@@ -3485,9 +3556,9 @@ export default class BuildTree extends Component {
             // var nodeUnit = document.getElementById("nodeUnitId");
             // var selectedText = nodeUnit.options[nodeUnit.selectedIndex].text;
             stream.on('finish', function () {
-                var string = stream.toBlob('application/pdf');
-                window.saveAs(string, 'tree.pdf');
-            });
+                var string = stream.toBlob('application/pdf');                
+                window.saveAs(string, this.state.dataSetObj.programData.programCode + "-" + i18n.t("static.supplyPlan.v") + this.state.dataSetObj.programData.currentVersion.versionId + "-" + i18n.t('static.common.managetree') + "-" + document.getElementById("treeId").selectedOptions[0].text + "-" + document.getElementById("scenarioId").selectedOptions[0].text+".pdf");
+            }.bind(this));
         } else {
             alert('Error: Failed to create file stream.');
         }
@@ -5688,7 +5759,7 @@ export default class BuildTree extends Component {
                 }]
             },
             tooltips: {
-                enabled: true,
+                enabled: false,
                 custom: CustomTooltips,
                 callbacks: {
                     label: function (tooltipItem, data) {
@@ -5836,7 +5907,7 @@ export default class BuildTree extends Component {
                 }]
             },
             tooltips: {
-                enabled: true,
+                enabled: false,
                 custom: CustomTooltips,
                 callbacks: {
                     label: function (tooltipItem, data) {
@@ -8111,12 +8182,12 @@ export default class BuildTree extends Component {
                 <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
                     <Card className="mb-lg-0">
                         <div className="pb-lg-0">
-                        <div className="Card-header-reporticon pb-1">
-                        <span className="compareAndSelect-larrow"> <i className="cui-arrow-left icons " > </i></span>
-                        <span className="compareAndSelect-rarrow"> <i className="cui-arrow-right icons " > </i></span>
-                        <span className="compareAndSelect-larrowText"> {i18n.t('static.common.continueTo')} <a href="/#/validation/modelingValidation" className="supplyplanformulas">{i18n.t('static.dashboard.modelingValidation')}</a> </span>
-                        <span className="compareAndSelect-rarrowText"> {i18n.t('static.common.continueTo')}  <a href="/#/validation/productValidation" className="supplyplanformulas">{i18n.t('static.dashboard.productValidation')}</a> </span><br/>
-                        </div>
+                            <div className="Card-header-reporticon pb-1">
+                                <span className="compareAndSelect-larrow"> <i className="cui-arrow-left icons " > </i></span>
+                                <span className="compareAndSelect-rarrow"> <i className="cui-arrow-right icons " > </i></span>
+                                <span className="compareAndSelect-larrowText"> {i18n.t('static.common.continueTo')} <a href="/#/validation/modelingValidation" className="supplyplanformulas">{i18n.t('static.dashboard.modelingValidation')}</a> </span>
+                                <span className="compareAndSelect-rarrowText"> {i18n.t('static.common.continueTo')}  <a href="/#/validation/productValidation" className="supplyplanformulas">{i18n.t('static.dashboard.productValidation')}</a> </span><br />
+                            </div>
                             {/* <div className="card-header-actions">
                                 <div className="card-header-action pr-4 pt-lg-0">
 
