@@ -250,10 +250,10 @@ class EditSupplyPlanStatus extends Component {
             problemReportChanged: 1
         })
         var elInstance = this.state.problemEl;
-        var problemListDate = moment(Date.now()).subtract(12, 'months').endOf('month').format("YYYY-MM-DD");
+        // var problemListDate = moment(Date.now()).subtract(12, 'months').endOf('month').format("YYYY-MM-DD");
         let problemList = this.state.problemList;
         var rowData1 = elInstance.getRowData(y);
-        problemList = problemList.filter(c => moment(c.createdDate).format("YYYY-MM-DD") > problemListDate && c.problemReportId == rowData1[0]);
+        problemList = problemList.filter(c => c.problemReportId == rowData1[0]);
         // console.log("problemList in changed method ***", problemList);
         if (x == 10) {
             if (problemList[0].problemStatus.id != value) {
@@ -3555,9 +3555,9 @@ class EditSupplyPlanStatus extends Component {
     }
 
     buildJExcel() {
-        var problemListDate = moment(Date.now()).subtract(12, 'months').endOf('month').format("YYYY-MM-DD");
+        // var problemListDate = moment(Date.now()).subtract(12, 'months').endOf('month').format("YYYY-MM-DD");
         let problemList = this.state.problemList;
-        problemList = problemList.filter(c => moment(c.createdDate).format("YYYY-MM-DD") > problemListDate);
+        problemList = problemList;
         console.log("problemList---->", problemList);
         let problemArray = [];
         let count = 0;
