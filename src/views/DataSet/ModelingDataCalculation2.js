@@ -398,6 +398,14 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                 }
                             }
                             calculatedValue = totalValue;
+                            var lag = nodeDataMapForScenario.fuNode.lagInMonths;
+                            console.log("Lag in months++++", lag);
+                            if (i >= lag) {
+                                // calculatedValue = 0;
+                            } else {
+                                calculatedValue = 0;
+                            }
+
                         }
                         if (payload.nodeType.id == 5) {
                             if (!isTemplate) {
