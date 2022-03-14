@@ -305,18 +305,18 @@ export function calculateModelingData(dataset, props, page) {
         datasetJson.nodeDataModelingList = nodeDataList;
         var encryptedDatasetJson = (CryptoJS.AES.encrypt(JSON.stringify(datasetJson), SECRET_KEY)).toString();
         dataset.programData = encryptedDatasetJson;
-        var datasetTransaction = db1.transaction(['datasetData'], 'readwrite');
-        var datasetOs = datasetTransaction.objectStore('datasetData');
-        var putRequest = datasetOs.put(dataset);
-        putRequest.onerror = function (event) {
-        }.bind(this);
-        putRequest.onsuccess = function (event) {
+        // var datasetTransaction = db1.transaction(['datasetData'], 'readwrite');
+        // var datasetOs = datasetTransaction.objectStore('datasetData');
+        // var putRequest = datasetOs.put(dataset);
+        // putRequest.onerror = function (event) {
+        // }.bind(this);
+        // putRequest.onsuccess = function (event) {
             if (page == "syncPage") {
                 props.fetchData(1, dataset.id);
             } else {
                 props.updateState("loading", false);
                 console.log("Data saved")
             }
-        }.bind(this)
+        // }.bind(this)
     }.bind(this)
 }

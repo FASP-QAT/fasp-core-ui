@@ -139,3 +139,7 @@ export const MAX_PROGRAM_CODE_LENGTH = 50;
 export const TREE_DIMENSION_ID = 5;
 export const REPORT_DATEPICKER_START_MONTH = 6;
 export const REPORT_DATEPICKER_END_MONTH = 12;
+export const ROUNDING_NUMBER = 0.15;
+export const ALPHA_BETA_GAMMA_VALUE = /^(?:(?:[0])(?:\.\d{1,2})?|1(?:\.0\d{0,1})?)$/
+export const SEASONALITY_REGEX = /^(?:[1-9]|[1][0-9]|2[0-4])$/
+export const TITLE_FONT=11

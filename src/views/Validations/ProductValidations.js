@@ -11,7 +11,7 @@ import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
 import i18n from '../../i18n'
 import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
-import { DATE_FORMAT_CAP_WITHOUT_DATE, SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, JEXCEL_PRO_KEY, JEXCEL_PAGINATION_OPTION, JEXCEL_MONTH_PICKER_FORMAT } from '../../Constants.js'
+import { DATE_FORMAT_CAP_WITHOUT_DATE, SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, JEXCEL_PRO_KEY, JEXCEL_PAGINATION_OPTION, JEXCEL_MONTH_PICKER_FORMAT, DATE_FORMAT_CAP, TITLE_FONT } from '../../Constants.js'
 import moment from "moment";
 import pdfIcon from '../../assets/img/pdf.png';
 import csvicon from '../../assets/img/csv.png'
@@ -28,6 +28,7 @@ import ProgramService from '../../api/ProgramService';
 import DatasetService from '../../api/DatasetService';
 import jsPDF from "jspdf";
 import { LOGO } from '../../CommonComponent/Logo';
+import AuthenticationService from '../Common/AuthenticationService';
 
 class ProductValidation extends Component {
     constructor(props) {
@@ -522,10 +523,10 @@ class ProductValidation extends Component {
                 data = [];
                 data[0] = finalData[i].name;
                 data[1] = getLabelText(this.state.utList.filter(c => c.id == finalData[i].parentNodeNodeDataMap.fuNode.usageType.id)[0].label, this.state.lang);
-                data[2] = getLabelText(finalData[i].parentNodeNodeDataMap.fuNode.forecastingUnit.label, this.state.lang);
+                data[2] = getLabelText(finalData[i].parentNodeNodeDataMap.fuNode.forecastingUnit.label, this.state.lang) + " | " + finalData[i].parentNodeNodeDataMap.fuNode.forecastingUnit.id;
                 data[3] = usageText;
                 var planningUnitObj = finalData[i].nodeDataMap != "" ? this.state.datasetData.planningUnitList.filter(c => c.planningUnit.id == finalData[i].nodeDataMap.puNode.planningUnit.id) : [];
-                data[4] = finalData[i].nodeDataMap != "" && planningUnitObj.length > 0 ? getLabelText(planningUnitObj[0].planningUnit.label, this.state.lang) : "";
+                data[4] = finalData[i].nodeDataMap != "" && planningUnitObj.length > 0 ? getLabelText(planningUnitObj[0].planningUnit.label, this.state.lang) + " | " + planningUnitObj[0].planningUnit.id : "";
                 data[5] = usageTextPU;
                 data[6] = selectedPlanningUnit != undefined && selectedPlanningUnit.length > 0 && finalData[i].nodeDataMap != "" ? qty.toFixed(2) : "";
                 data[7] = selectedPlanningUnit != undefined && selectedPlanningUnit.length > 0 && finalData[i].nodeDataMap != "" ? this.formatter((price / currency.conversionRateToUsd).toFixed(2)) : "";
@@ -609,6 +610,7 @@ class ProductValidation extends Component {
                 pagination: false,
                 search: false,
                 columnSorting: false,
+                defaultColWidth: 120,
                 tableOverflow: true,
                 wordWrap: true,
                 allowInsertColumn: false,
@@ -926,6 +928,26 @@ class ProductValidation extends Component {
                 doc.setFont('helvetica', 'bold')
                 doc.setPage(i)
                 doc.addImage(LOGO, 'png', 0, 10, 180, 50, 'FAST');
+
+                doc.setFontSize(8)
+                doc.setFont('helvetica', 'normal')
+                doc.setTextColor("#002f6c");
+                doc.text(i18n.t('static.supplyPlan.runDate') + " " + moment(new Date()).format(`${DATE_FORMAT_CAP}`), doc.internal.pageSize.width - 40, 20, {
+                    align: 'right'
+                })
+                doc.text(i18n.t('static.supplyPlan.runTime') + " " + moment(new Date()).format('hh:mm A'), doc.internal.pageSize.width - 40, 30, {
+                    align: 'right'
+                })
+                doc.text(i18n.t('static.user.user') + ': ' + AuthenticationService.getLoggedInUsername(), doc.internal.pageSize.width - 40, 40, {
+                    align: 'right'
+                })
+                doc.text(this.state.datasetData.programCode + " " + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text), doc.internal.pageSize.width - 40, 50, {
+                    align: 'right'
+                })
+                doc.text(document.getElementById("datasetId").selectedOptions[0].text, doc.internal.pageSize.width - 40, 60, {
+                    align: 'right'
+                })
+                doc.setFontSize(TITLE_FONT)
                 /*doc.addImage(data, 10, 30, {
                   align: 'justify'
                 });*/
@@ -1061,7 +1083,7 @@ class ProductValidation extends Component {
         doc.autoTable(content);
         addHeaders(doc)
         addFooters(doc)
-        doc.save(i18n.t('static.dashboard.productValidation').concat('.pdf'));
+        doc.save(this.state.datasetData.programCode+ "-" + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text)+"-"+i18n.t('static.dashboard.productValidation')+"-"+document.getElementById("treeId").selectedOptions[0].text+"-"+document.getElementById("scenarioId").selectedOptions[0].text + ".pdf")
         //creates PDF from img
         /*  var doc = new jsPDF('landscape');
           doc.setFontSize(20);
@@ -1071,6 +1093,18 @@ class ProductValidation extends Component {
 
     exportCSV() {
         var csvRow = [];
+
+        csvRow.push('"' + (i18n.t('static.supplyPlan.runDate') + ' : ' + moment(new Date()).format(`${DATE_FORMAT_CAP}`)).replaceAll(' ', '%20') + '"')
+        csvRow.push('')
+        csvRow.push('"' + (i18n.t('static.supplyPlan.runTime') + ' : ' + moment(new Date()).format('hh:mm A')).replaceAll(' ', '%20') + '"')
+        csvRow.push('')
+        csvRow.push('"' + (i18n.t('static.user.user') + ' : ' + AuthenticationService.getLoggedInUsername()).replaceAll(' ', '%20') + '"')
+        csvRow.push('')
+        csvRow.push('"' + (this.state.datasetData.programCode + " " + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text)).replaceAll(' ', '%20') + '"')
+        csvRow.push('')
+        csvRow.push('"' + (document.getElementById("datasetId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+        csvRow.push('')
+        
         csvRow.push('"' + (i18n.t('static.dashboard.programheader') + ' : ' + document.getElementById("datasetId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
         csvRow.push('')
         csvRow.push('"' + (i18n.t('static.report.version') + ' : ' + document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
@@ -1109,7 +1143,7 @@ class ProductValidation extends Component {
         var a = document.createElement("a")
         a.href = 'data:attachment/csv,' + csvString
         a.target = "_Blank"
-        a.download = i18n.t('static.dashboard.productValidation') + ".csv"
+        a.download = this.state.datasetData.programCode+ "-" + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text)+"-"+i18n.t('static.dashboard.productValidation')+"-"+document.getElementById("treeId").selectedOptions[0].text+"-"+document.getElementById("scenarioId").selectedOptions[0].text + ".csv"
         document.body.appendChild(a)
         a.click()
     }
