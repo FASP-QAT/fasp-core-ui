@@ -822,7 +822,8 @@ export default class BuildTree extends Component {
     }
 
     formSubmitLoader() {
-        // alert("load 1")
+        console.log("node id cur node---", this.state.currentItemConfig.context.payload);
+        console.log("validate---", validateNodeData(validationSchemaNodeData));
         this.setState({
             modelingJexcelLoader: true
         }, () => {
@@ -989,9 +990,21 @@ export default class BuildTree extends Component {
 
 
     toggleCollapse() {
-        this.setState({
-            showDiv: !this.state.showDiv
-        })
+        var treeId = this.state.treeId;
+        if (treeId != null && treeId != "") {
+            this.setState({
+                showDiv: !this.state.showDiv
+            })
+        } else {
+            confirmAlert({
+                message: "Please select a tree.",
+                buttons: [
+                    {
+                        label: i18n.t('static.report.ok')
+                    }
+                ]
+            });
+        }
     }
     toggleDropdown() {
         this.setState({
@@ -1052,6 +1065,7 @@ export default class BuildTree extends Component {
 
             }
             if (parameterName == 'type' && value == 0) {
+                this.saveTreeData();
                 this.calculateValuesForAggregateNode(this.state.items);
             }
             console.log("returmed list---", this.state.nodeDataMomList);
@@ -1081,83 +1095,96 @@ export default class BuildTree extends Component {
     }
     saveTreeData() {
         console.log("saving tree data for calculation>>>");
-        this.setState({ loading: true });
-        let { curTreeObj } = this.state;
-        let { treeData } = this.state;
-        let { dataSetObj } = this.state;
-        var items = this.state.items;
-        let tempProgram = JSON.parse(JSON.stringify(dataSetObj))
-        // var databytes = CryptoJS.AES.decrypt(dataSetObj.programData, SECRET_KEY);
-        // var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
-        var programData = tempProgram.programData;
-        programData.treeList = treeData;
-        console.log("program data>>>", programData);
+        this.setState({ loading: true }, () => {
+            let { curTreeObj } = this.state;
+            let { treeData } = this.state;
+            let { dataSetObj } = this.state;
+            var items = this.state.items;
+            let tempProgram = JSON.parse(JSON.stringify(dataSetObj))
+            // var databytes = CryptoJS.AES.decrypt(dataSetObj.programData, SECRET_KEY);
+            // var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
+            var programData = tempProgram.programData;
+            programData.treeList = treeData;
+            console.log("program data>>>", programData);
 
-        curTreeObj.tree.flatList = items;
-        curTreeObj.scenarioList = this.state.scenarioList;
-        var findTreeIndex = treeData.findIndex(n => n.treeId == curTreeObj.treeId);
-        treeData[findTreeIndex] = curTreeObj;
+            curTreeObj.tree.flatList = items;
+            curTreeObj.scenarioList = this.state.scenarioList;
+            var findTreeIndex = treeData.findIndex(n => n.treeId == curTreeObj.treeId);
+            treeData[findTreeIndex] = curTreeObj;
 
-        // var databytes = CryptoJS.AES.decrypt(dataSetObj.programData, SECRET_KEY);
-        // var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
-        programData.treeList = treeData;
-        console.log("dataSetDecrypt>>>", programData);
+            // var databytes = CryptoJS.AES.decrypt(dataSetObj.programData, SECRET_KEY);
+            // var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
+            programData.treeList = treeData;
+            console.log("dataSetDecrypt>>>", programData);
 
 
-        programData = (CryptoJS.AES.encrypt(JSON.stringify(programData), SECRET_KEY)).toString();
-        tempProgram.programData = programData;
+            programData = (CryptoJS.AES.encrypt(JSON.stringify(programData), SECRET_KEY)).toString();
+            tempProgram.programData = programData;
 
-        console.log("encpyDataSet>>>", tempProgram)
-        // store update object in indexdb
-        var db1;
-        getDatabase();
-        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-        openRequest.onerror = function (event) {
-            this.setState({
-                message: i18n.t('static.program.errortext'),
-                color: 'red'
-            })
-            this.hideSecondComponent()
-        }.bind(this);
-        openRequest.onsuccess = function (e) {
-            db1 = e.target.result;
-            var transaction = db1.transaction(['datasetData'], 'readwrite');
-            var programTransaction = transaction.objectStore('datasetData');
-            // programs.forEach(program => {
-            var programRequest = programTransaction.put(tempProgram);
-            transaction.oncomplete = function (event) {
+            console.log("encpyDataSet>>>", tempProgram)
+            // store update object in indexdb
+            var db1;
+            getDatabase();
+            var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+            openRequest.onerror = function (event) {
+                this.setState({
+                    message: i18n.t('static.program.errortext'),
+                    color: 'red'
+                })
+                this.hideSecondComponent()
+            }.bind(this);
+            openRequest.onsuccess = function (e) {
                 db1 = e.target.result;
-                var detailTransaction = db1.transaction(['datasetDetails'], 'readwrite');
-                var datasetDetailsTransaction = detailTransaction.objectStore('datasetDetails');
-                console.log("this.props.match.params.programId---", this.state.programId);
-                var datasetDetailsRequest = datasetDetailsTransaction.get(this.state.programId);
-                datasetDetailsRequest.onsuccess = function (e) {
-                    console.log("all good >>>>");
-                    console.log("Data update success");
-                    var datasetDetailsRequestJson = datasetDetailsRequest.result;
-                    datasetDetailsRequestJson.changed = 1;
-                    var programQPLDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
-                    programQPLDetailsRequest1.onsuccess = function (event) {
-                        this.setState({
-                            loading: false,
-                            message: i18n.t("static.mt.dataUpdateSuccess"),
-                            color: "green",
-                        }, () => {
-                            this.hideSecondComponent();
-                        });
+                var transaction = db1.transaction(['datasetData'], 'readwrite');
+                var programTransaction = transaction.objectStore('datasetData');
+                // programs.forEach(program => {
+                var programRequest = programTransaction.put(tempProgram);
+                transaction.oncomplete = function (event) {
+                    db1 = e.target.result;
+                    var detailTransaction = db1.transaction(['datasetDetails'], 'readwrite');
+                    var datasetDetailsTransaction = detailTransaction.objectStore('datasetDetails');
+                    console.log("this.props.match.params.programId---", this.state.programId);
+                    var datasetDetailsRequest = datasetDetailsTransaction.get(this.state.programId);
+                    datasetDetailsRequest.onsuccess = function (e) {
+                        console.log("all good >>>>");
                         console.log("Data update success");
-                    }.bind(this)
-                    programQPLDetailsRequest1.onerror = function (event) {
+                        var datasetDetailsRequestJson = datasetDetailsRequest.result;
+                        datasetDetailsRequestJson.changed = 1;
+                        var programQPLDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
+                        programQPLDetailsRequest1.onsuccess = function (event) {
+                            this.setState({
+                                loading: false,
+                                message: i18n.t("static.mt.dataUpdateSuccess"),
+                                color: "green",
+                            }, () => {
+                                this.hideSecondComponent();
+                            });
+                            console.log("Data update success");
+                        }.bind(this)
+                        programQPLDetailsRequest1.onerror = function (event) {
+                            this.setState({
+                                loading: false,
+                                message: 'Error occured.',
+                                color: "red",
+                            });
+                            console.log("Data update success");
+                        }.bind(this)
+
+                    }.bind(this);
+                    datasetDetailsRequest.onerror = function (event) {
                         this.setState({
                             loading: false,
                             message: 'Error occured.',
                             color: "red",
+                        }, () => {
+                            this.hideSecondComponent();
                         });
-                        console.log("Data update success");
+                        console.log("Data update errr");
                     }.bind(this)
 
+
                 }.bind(this);
-                datasetDetailsRequest.onerror = function (event) {
+                transaction.onerror = function (event) {
                     this.setState({
                         loading: false,
                         message: 'Error occured.',
@@ -1166,21 +1193,9 @@ export default class BuildTree extends Component {
                         this.hideSecondComponent();
                     });
                     console.log("Data update errr");
-                }.bind(this)
-
-
+                }.bind(this);
             }.bind(this);
-            transaction.onerror = function (event) {
-                this.setState({
-                    loading: false,
-                    message: 'Error occured.',
-                    color: "red",
-                }, () => {
-                    this.hideSecondComponent();
-                });
-                console.log("Data update errr");
-            }.bind(this);
-        }.bind(this);
+        });
 
     }
 
@@ -1880,6 +1895,7 @@ export default class BuildTree extends Component {
     setStartAndStopDateOfProgram(programId) {
         console.log("programId>>>", this.state.datasetList);
         var proList = [];
+        localStorage.setItem("sesDatasetId", programId);
         if (programId != "") {
             var dataSetObj = JSON.parse(JSON.stringify(this.state.datasetList.filter(c => c.id == programId)[0]));;
             console.log("dataSetObj>>>", dataSetObj);
@@ -6994,6 +7010,54 @@ export default class BuildTree extends Component {
                             )} />
                 </TabPane>
                 <TabPane tabId="2">
+                    {/* <Formik
+                        enableReinitialize={true}
+                        // initialValues={initialValuesNodeData}
+                        // validateOnChange={true}
+                        initialValues={{
+                            nodeTitle: this.state.currentItemConfig.context.payload.label.label_en,
+                            nodeTypeId: this.state.currentItemConfig.context.payload.nodeType.id,
+                            nodeUnitId: this.state.currentItemConfig.context.payload.nodeUnit.id,
+                            forecastingUnitId: this.state.fuValues,
+                            // showFUValidation : true
+                            // percentageOfParent: (this.state.currentItemConfig.context.payload.nodeDataMap[1])[0].dataValue
+                        }}
+                        validate={validateNodeData(validationSchemaNodeData)}
+                        onSubmit={(values, { setSubmitting, setErrors }) => {
+                            console.log("all ok>>>", this.state.currentItemConfig);
+                            this.setState({ loading: true, openAddNodeModal: false }, () => {
+                                setTimeout(() => {
+                                    console.log("inside set timeout on submit")
+                                    if (this.state.addNodeFlag) {
+                                        this.onAddButtonClick(this.state.currentItemConfig)
+                                    } else {
+                                        this.updateNodeInfoInJson(this.state.currentItemConfig)
+                                    }
+                                    this.setState({
+                                        cursorItem: 0,
+                                        highlightItem: 0
+                                    })
+                                }, 0);
+                            })
+
+
+                        }}
+                        render={
+                            ({
+                                values,
+                                errors,
+                                touched,
+                                handleChange,
+                                handleBlur,
+                                handleSubmit,
+                                isSubmitting,
+                                isValid,
+                                setTouched,
+                                handleReset,
+                                setFieldValue,
+                                setFieldTouched
+                            }) => (
+                                <Form className="needs-validation" onSubmit={handleSubmit} onReset={handleReset} noValidate name='nodeDataForm' autocomplete="off"> */}
                     <div className="row pt-lg-0" style={{ float: 'right', marginTop: '-42px' }}>
                         <div className="row pl-lg-0 pr-lg-3">
                             {/* <SupplyPlanFormulas ref="formulaeChild" /> */}
@@ -7003,44 +7067,14 @@ export default class BuildTree extends Component {
                             </a>
                         </div>
                     </div>
-                    {/* <div className="row pl-lg-5 pb-lg-3 pt-lg-0">
-                        <div className="offset-md-10 col-md-6 pl-lg-4">
-                            <SupplyPlanFormulas ref="formulaeChild" />
-                            <a className="">
-                                <span style={{ cursor: 'pointer' }} onClick={() => { this.refs.formulaeChild.toggleShowTermLogic() }}><i className="" style={{ color: '#20a8d8' }}></i> <small className="supplyplanformulas">{'Show terms and logic'}</small></span>
-
-                            </a>
-                        </div>
-                    </div> */}
                     <div className="row pl-lg-2 pr-lg-2">
-
-                        {/* 
-                        <FormGroup className="col-md-2 pt-lg-1">
-                            <Label htmlFor="">Node Title<span class="red Reqasterisk">*</span></Label>
-                        </FormGroup>
-                        <FormGroup className="col-md-4 pl-lg-0">
-
-                            <Input type="text"
-                                id="nodeTitleModeling"
-                                name="nodeTitleModeling"
-                                bsSize="sm"
-                                readOnly="true"
-                                // valid={!errors.nodeTitle && this.state.currentItemConfig.context.payload.label.label_en != ''}
-                                // invalid={touched.nodeTitle && !!errors.nodeTitle}
-                                // onBlur={handleBlur}
-                                onChange={(e) => { this.dataChange(e) }}
-                                value={this.state.currentItemConfig.context.payload.label.label_en}>
-                            </Input>
-                        </FormGroup> */}
                         <FormGroup className="col-md-2 pt-lg-1">
                             <Label htmlFor="">{i18n.t('static.common.month')}<span class="red Reqasterisk">*</span></Label>
                         </FormGroup>
                         <FormGroup className="col-md-4 pl-lg-0">
                             <Picker
                                 ref={this.pickAMonth2}
-                                // years={{ min: { year: 2010, month: 2 }, max: { year: 2050, month: 9 } }}
                                 years={{ min: this.state.minDate, max: this.state.maxDate }}
-                                // value={this.state.singleValue2}
                                 value={{
                                     year:
                                         new Date(this.state.scalingMonth).getFullYear(), month: ("0" + (new Date(this.state.scalingMonth).getMonth() + 1)).slice(-2)
@@ -7048,7 +7082,6 @@ export default class BuildTree extends Component {
                                 lang={pickerLang.months}
                                 onChange={this.handleAMonthChange2}
                                 onDismiss={this.handleAMonthDissmis2}
-                            // className="ReadonlyPicker"
                             >
                                 <MonthBox value={this.makeText({ year: new Date(this.state.scalingMonth).getFullYear(), month: ("0" + (new Date(this.state.scalingMonth).getMonth() + 1)).slice(-2) })}
                                     onClick={this.handleClickMonthBox2} />
@@ -7086,17 +7119,11 @@ export default class BuildTree extends Component {
                                 <fieldset className="scheduler-border">
                                     <legend className="scheduler-border">{i18n.t('static.tree.modelingCalculaterTool')}</legend>
                                     <div className="row">
-                                        {/* <div className="row"> */}
-                                        {/* <FormGroup className="col-md-12 pt-lg-1">
-                                        <Label htmlFor=""><b>Modeling Calculater Tool</b></Label>
-                                    </FormGroup> */}
                                         <FormGroup className="col-md-6">
                                             <Label htmlFor="currencyId">{i18n.t('static.common.startdate')}<span class="red Reqasterisk">*</span></Label>
                                             <Picker
                                                 ref={this.pickAMonth4}
-                                                // years={{ min: { year: 2010, month: 2 }, max: { year: 2050, month: 9 } }}
                                                 years={{ min: this.state.minDate, max: this.state.maxDate }}
-                                                // value={this.state.singleValue2}
                                                 value={{ year: new Date(this.state.currentCalculatorStartDate.replace(/-/g, '\/')).getFullYear(), month: ("0" + (new Date(this.state.currentCalculatorStartDate.replace(/-/g, '\/')).getMonth() + 1)).slice(-2) }}
                                                 lang={pickerLang.months}
                                                 onChange={this.handleAMonthChange4}
@@ -7104,15 +7131,12 @@ export default class BuildTree extends Component {
                                             >
                                                 <MonthBox value={this.makeText({ year: new Date(this.state.currentCalculatorStartDate.replace(/-/g, '\/')).getFullYear(), month: ("0" + (new Date(this.state.currentCalculatorStartDate.replace(/-/g, '\/')).getMonth() + 1)).slice(-2) })} onClick={this.handleClickMonthBox4} />
                                             </Picker>
-                                            {/* <FormFeedback className="red">{errors.nodeTitle}</FormFeedback> */}
                                         </FormGroup>
                                         <FormGroup className="col-md-6">
                                             <Label htmlFor="currencyId">{i18n.t('static.tree.targetDate')}<span class="red Reqasterisk">*</span></Label>
                                             <Picker
                                                 ref={this.pickAMonth5}
-                                                // years={{ min: { year: 2010, month: 2 }, max: { year: 2050, month: 9 } }}
                                                 years={{ min: this.state.minDate, max: this.state.maxDate }}
-                                                // value={this.state.singleValue2}
                                                 value={{ year: new Date(this.state.currentCalculatorStopDate.replace(/-/g, '\/')).getFullYear(), month: ("0" + (new Date(this.state.currentCalculatorStopDate.replace(/-/g, '\/')).getMonth() + 1)).slice(-2) }}
                                                 lang={pickerLang.months}
                                                 onChange={this.handleAMonthChange5}
@@ -7120,7 +7144,6 @@ export default class BuildTree extends Component {
                                             >
                                                 <MonthBox value={this.makeText({ year: new Date(this.state.currentCalculatorStopDate.replace(/-/g, '\/')).getFullYear(), month: ("0" + (new Date(this.state.currentCalculatorStopDate.replace(/-/g, '\/')).getMonth() + 1)).slice(-2) })} onClick={this.handleClickMonthBox5} />
                                             </Picker>
-                                            {/* <FormFeedback className="red">{errors.nodeTitle}</FormFeedback> */}
                                         </FormGroup>
                                         {this.state.currentItemConfig.context.payload.nodeType.id <= 2 && <FormGroup className="col-md-6">
                                             <Label htmlFor="currencyId">{i18n.t('static.tree.startValue')}<span class="red Reqasterisk">*</span></Label>
@@ -7468,6 +7491,9 @@ export default class BuildTree extends Component {
                             </fieldset>
                         </div>
                     }
+                    {/* <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAllNodeData(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button> */}
+                    {/* </Form> */}
+                    {/* )} /> */}
                 </TabPane>
                 <TabPane tabId="3">
                     {/* <ConsumptionInSupplyPlanComponent ref="consumptionChild" items={this.state} toggleLarge={this.toggleLarge} updateState={this.updateState} formSubmit={this.formSubmit} hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} consumptionPage="consumptionDataEntry" useLocalData={1} /> */}
@@ -8048,6 +8074,7 @@ export default class BuildTree extends Component {
                                             level: itemConfig.level,
                                             parent: itemConfig.id,
                                             payload: {
+                                                nodeId: '',
                                                 label: {
                                                     label_en: ''
                                                 },
@@ -8409,7 +8436,8 @@ export default class BuildTree extends Component {
                                                 }}
                                                 validate={validate(validationSchema)}
                                                 onSubmit={(values, { setSubmitting, setErrors }) => {
-                                                    this.createOrUpdateTree();
+                                                    this.saveTreeData();
+                                                    // this.createOrUpdateTree();
                                                 }}
                                                 render={
                                                     ({
@@ -8649,7 +8677,7 @@ export default class BuildTree extends Component {
                                                 <div className="placeholder TreeTemplateHeight" style={{ clear: 'both', marginTop: '25px', border: '1px solid #a7c6ed' }} >
                                                     {/* <OrgDiagram centerOnCursor={true} config={config} onHighlightChanged={this.onHighlightChanged} /> */}
                                                     {/* <OrgDiagram centerOnCursor={true} config={config} onCursorChanged={this.onCursoChanged} onHighlightChanged={this.onHighlightChanged}/> */}
-                                                    <OrgDiagram centerOnCursor={true} config={config} onCursorChanged={this.onCursoChanged}/>
+                                                    <OrgDiagram centerOnCursor={true} config={config} onCursorChanged={this.onCursoChanged} />
                                                 </div>
                                             </Provider>
                                         </div>
@@ -8670,7 +8698,7 @@ export default class BuildTree extends Component {
                                                 <div className="col-md-6 pl-lg-0"> </div>
                                                 <div className="col-md-6 pr-lg-0"> <Button type="button" size="md" color="info" className="float-right mr-1" onClick={() => this.callAfterScenarioChange(this.state.selectedScenario)}><i className="fa fa-calculator"></i> {i18n.t('static.tree.calculated')}</Button>
                                                     {/* <Button type="button" size="md" color="warning" className="float-right mr-1" onClick={this.resetTree}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button> */}
-                                                    <Button type="button" color="success" className="mr-1 float-right" size="md" onClick={() => this.saveTreeData()}><i className="fa fa-check"> </i>{i18n.t('static.pipeline.save')}</Button>
+                                                    {/* <Button type="button" color="success" className="mr-1 float-right" size="md" onClick={() => this.saveTreeData()}><i className="fa fa-check"> </i>{i18n.t('static.pipeline.save')}</Button> */}
                                                 </div>
                                             </div>
                                         </CardFooter>
