@@ -63,7 +63,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
             stopDate: '',
             buildCSVTable: [],
             languageEl: '',
-            isChanged1: true
+            isChanged1: false
 
         }
 
@@ -753,7 +753,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
         var languageEl = jexcel(document.getElementById("mapImport"), options);
         this.el = languageEl;
         this.setState({
-            languageEl: languageEl, loading: false, buildCSVTable: buildCSVTable
+            languageEl: languageEl, loading: false, buildCSVTable: buildCSVTable, isChanged1: true
         }, () => {
             this.props.updateStepOneData("loading", false);
             this.changeColor();
