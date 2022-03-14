@@ -1613,11 +1613,14 @@ export default class BuildTree extends Component {
         var patients = 0;
         var grandParentMomList = [];
         var noOfBottlesInOneVisit = 0;
+        var lagInMonths = 0;
         if (this.state.currentItemConfig.context.payload.nodeType.id == 5) {
             monthsPerVisit = (this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].puNode.refillMonths;
             var parent = (this.state.currentItemConfig.context.parent);
             var parentFiltered = (this.state.items.filter(c => c.id == parent))[0];
+
             var parentNodeNodeData = (parentFiltered.payload.nodeDataMap[this.state.selectedScenario])[0];
+            lagInMonths = parentNodeNodeData.fuNode.lagInMonths;
             if (parentNodeNodeData.fuNode.usageType.id == 2) {
                 var daysPerMonth = 365 / 12;
 
@@ -1636,6 +1639,7 @@ export default class BuildTree extends Component {
 
             }
         }
+        console.log("Lag in months@@@", lagInMonths)
         for (var j = 0; j < momList.length; j++) {
             data = [];
             data[0] = momList[j].month
@@ -1649,7 +1653,7 @@ export default class BuildTree extends Component {
             data[6] = this.state.currentItemConfig.context.payload.nodeType.id != 5 ? `=ROUND((E${parseInt(j) + 1}*${momListParent[j].calculatedValue}/100)*L${parseInt(j) + 1},2)` : `=ROUND((E${parseInt(j) + 1}*${momListParent[j].calculatedValue}/100)/${(this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].puNode.planningUnit.multiplier},2)`;
             // data[6] = this.state.manualChange ? momList[j].calculatedValue : ((momListParent[j].manualChange > 0) ? momListParent[j].endValueWithManualChangeWMC : momListParent[j].calculatedValueWMC *  momList[j].endValueWithManualChangeWMC) / 100
             data[7] = this.state.currentScenario.nodeDataId
-            data[8] = this.state.currentItemConfig.context.payload.nodeType.id == 5 && parentNodeNodeData.fuNode.usageType.id == 2 ? `=ROUND((O${parseInt(j) + 1}*${noOfBottlesInOneVisit}*E${parseInt(j) + 1}/100),0)` : `=G${parseInt(j) + 1}`;
+            data[8] = this.state.currentItemConfig.context.payload.nodeType.id == 5 && parentNodeNodeData.fuNode.usageType.id == 2 ? j >= lagInMonths ? `=P${parseInt(j) + 1 - lagInMonths}` : 0 : j >= lagInMonths?`=P${parseInt(j) + 1}`:0;
             data[9] = `=ROUND(IF(B${parseInt(j) + 1}+C${parseInt(j) + 1}<0,0,IF(B${parseInt(j) + 1}+C${parseInt(j) + 1}>100,100,B${parseInt(j) + 1}+C${parseInt(j) + 1})),2)`
             data[10] = this.state.currentScenario.manualChangesEffectFuture;
             data[11] = this.state.currentItemConfig.context.payload.nodeType.id == 4 ? fuPerMonth : 1;
@@ -1667,7 +1671,7 @@ export default class BuildTree extends Component {
                 data[13] = 0;
                 data[14] = 0;
             }
-
+            data[15] = this.state.currentItemConfig.context.payload.nodeType.id == 5 && parentNodeNodeData.fuNode.usageType.id == 2 ? `=ROUND((O${parseInt(j) + 1}*${noOfBottlesInOneVisit}*E${parseInt(j) + 1}/100),0)` : `=G${parseInt(j) + 1}`;
             // `=ROUND(((E${parseInt(j) + 1}*F${parseInt(j) + 1})/100),0)`
             dataArray[count] = data;
             count++;
@@ -1765,6 +1769,11 @@ export default class BuildTree extends Component {
                 },
                 {
                     title: 'No of patients',
+                    type: 'hidden',
+
+                },
+                {
+                    title: 'Without Lag',
                     type: 'hidden',
 
                 },
