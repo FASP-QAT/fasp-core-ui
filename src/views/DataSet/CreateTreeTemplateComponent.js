@@ -2104,7 +2104,24 @@ export default class CreateTreeTemplate extends Component {
                         items.push({
                             title: i18n.t("static.common.deleterow"),
                             onclick: function () {
-                                obj.deleteRow(parseInt(y));
+                                if (obj.getJson(null, false).length == 1) {
+                                    var data = [];
+                                    data[0] = 0;
+                                    data[1] = "";
+                                    data[2] = "";
+                                    data[3] = "";
+                                    data[4] = "";
+                                    data[5] = "";
+                                    data[6] = "";
+                                    data[7] = cleanUp;
+                                    data[8] = "";
+                                    data[9] = "";
+                                    data[10] = 1;
+                                    obj.insertRow(data, 0, 1);
+                                    obj.deleteRow(parseInt(y) + 1);
+                                } else {
+                                    obj.deleteRow(parseInt(y));
+                                }
                             }
                         });
                         // }

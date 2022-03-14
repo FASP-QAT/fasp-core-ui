@@ -1711,7 +1711,7 @@ export default class BuildTree extends Component {
             data[0] = momList[j].month
             data[1] = j == 0 ? parseFloat(momList[j].startValue).toFixed(2) : `=ROUND(IF(I1==true,G${parseInt(j)},D${parseInt(j)}),2)`
             data[2] = parseFloat(momList[j].difference).toFixed(2)
-            data[3] = `=ROUND(IF(B${parseInt(j)+1}+C${parseInt(j)+1}<0,0,(B${parseInt(j)+1}+C${parseInt(j)+1})),2)`;
+            data[3] = `=ROUND(IF(B${parseInt(j) + 1}+C${parseInt(j) + 1}<0,0,(B${parseInt(j) + 1}+C${parseInt(j) + 1})),2)`;
             data[4] = parseFloat(momList[j].seasonalityPerc).toFixed(2)
             data[5] = parseFloat(momList[j].manualChange).toFixed(2)
             data[6] = `=ROUND(D${parseInt(j) + 1}+(D${parseInt(j) + 1}*E${parseInt(j) + 1}/100)+F${parseInt(j) + 1},2)`
@@ -2761,7 +2761,26 @@ export default class BuildTree extends Component {
                         items.push({
                             title: i18n.t("static.common.deleterow"),
                             onclick: function () {
-                                obj.deleteRow(parseInt(y));
+                                if (obj.getJson(null, false).length == 1) {
+                                    var data = [];
+                                    data[0] = 0;
+                                    data[1] = "";
+                                    data[2] = "";
+                                    data[3] = "";
+                                    data[4] = "";
+                                    data[5] = "";
+                                    data[6] = "";
+                                    data[7] = cleanUp;
+                                    data[8] = "";
+                                    data[9] = "";
+                                    data[10] = 1;
+                                    obj.insertRow(data, 0, 1);
+                                    obj.deleteRow(parseInt(y) + 1);
+                                } else {
+                                    obj.deleteRow(parseInt(y));
+                                }
+
+
                             }
                         });
                         // }
@@ -8695,7 +8714,7 @@ export default class BuildTree extends Component {
                                                 <div className="placeholder TreeTemplateHeight" style={{ clear: 'both', marginTop: '25px', border: '1px solid #a7c6ed' }} >
                                                     {/* <OrgDiagram centerOnCursor={true} config={config} onHighlightChanged={this.onHighlightChanged} /> */}
                                                     {/* <OrgDiagram centerOnCursor={true} config={config} onCursorChanged={this.onCursoChanged} onHighlightChanged={this.onHighlightChanged}/> */}
-                                                    <OrgDiagram centerOnCursor={true} config={config} onCursorChanged={this.onCursoChanged}/>
+                                                    <OrgDiagram centerOnCursor={true} config={config} onCursorChanged={this.onCursoChanged} />
                                                 </div>
                                             </Provider>
                                         </div>
