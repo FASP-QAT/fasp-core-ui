@@ -1709,13 +1709,14 @@ export default class BuildTree extends Component {
         for (var j = 0; j < momList.length; j++) {
             data = [];
             data[0] = momList[j].month
-            data[1] = parseFloat(momList[j].startValue).toFixed(2)
+            data[1] = j == 0 ? parseFloat(momList[j].startValue).toFixed(2) : `=ROUND(IF(I1==true,G${parseInt(j)},D${parseInt(j)}),2)`
             data[2] = parseFloat(momList[j].difference).toFixed(2)
-            data[3] = parseFloat(parseFloat(momList[j].startValue) + parseFloat(momList[j].difference)) < 0 ? 0 : parseFloat(parseFloat(momList[j].startValue) + parseFloat(momList[j].difference)).toFixed(2)
+            data[3] = `=ROUND(IF(B${parseInt(j)+1}+C${parseInt(j)+1}<0,0,(B${parseInt(j)+1}+C${parseInt(j)+1})),2)`;
             data[4] = parseFloat(momList[j].seasonalityPerc).toFixed(2)
             data[5] = parseFloat(momList[j].manualChange).toFixed(2)
-            data[6] = parseFloat(momList[j].endValue).toFixed(2)
+            data[6] = `=ROUND(D${parseInt(j) + 1}+(D${parseInt(j) + 1}*E${parseInt(j) + 1}/100)+F${parseInt(j) + 1},2)`
             data[7] = this.state.currentScenario.nodeDataId
+            data[8] = this.state.currentScenario.manualChangesEffectFuture;
             dataArray[count] = data;
             count++;
         }
@@ -1781,6 +1782,10 @@ export default class BuildTree extends Component {
                 },
                 {
                     title: "Node data id",
+                    type: 'hidden',
+                },
+                {
+                    title: "Manual change Effect future month",
                     type: 'hidden',
                 }
 
@@ -2001,6 +2006,7 @@ export default class BuildTree extends Component {
         const { currentItemConfig } = this.state;
 
         if (e.target.name === "manualChange") {
+            this.state.momEl.setValueFromCoords(8, 0, checked, true);
             (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].manualChangesEffectFuture = (e.target.checked == true ? true : false)
             var nodes = this.state.items;
             var findNodeIndex = nodes.findIndex(n => n.id == currentItemConfig.context.id);
@@ -2010,7 +2016,7 @@ export default class BuildTree extends Component {
                 items: nodes,
                 currentScenario: (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0]
             }, () => {
-                this.calculateMOMData(0, 1);
+                //     this.calculateMOMData(0, 1);
                 console.log('manual change---', this.state.manualChange);
             });
         } else if (e.target.name === "seasonality") {
@@ -2822,55 +2828,55 @@ export default class BuildTree extends Component {
 
     changed1 = function (instance, cell, x, y, value) {
         // 4 & 5
-        this.setState({
-            momJexcelLoader: true
-        }, () => {
-            setTimeout(() => {
-                console.log("hi anchal")
-                var json = this.state.momEl.getJson(null, false);
-                console.log("momData>>>", json);
-                var overrideListArray = [];
-                for (var i = 0; i < json.length; i++) {
-                    var map1 = new Map(Object.entries(json[i]));
-                    if ((map1.get("4") != '' && map1.get("4") != 0.00) || (map1.get("5") != '' && map1.get("5") != 0.00)) {
-                        var overrideData = {
-                            month: map1.get("0"),
-                            seasonalityPerc: map1.get("4"),
-                            manualChange: (map1.get("5") != '' && map1.get("5") != 0.00) ? (map1.get("5")).replaceAll(",", "") : map1.get("5"),
-                            nodeDataId: map1.get("7"),
-                            active: true
-                        }
-                        console.log("overrideData>>>", overrideData);
-                        overrideListArray.push(overrideData);
-                    }
-                }
-                console.log("overRide data list>>>", overrideListArray);
-                let { currentItemConfig } = this.state;
-                let { curTreeObj } = this.state;
-                let { treeData } = this.state;
-                let { dataSetObj } = this.state;
-                var items = this.state.items;
-                (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].nodeDataOverrideList = overrideListArray;
-                this.setState({ currentItemConfig }, () => {
-                    // console.log("currentIemConfigInUpdetMom>>>", currentItemConfig);
-                    var findNodeIndex = items.findIndex(n => n.id == currentItemConfig.context.id);
-                    items[findNodeIndex] = currentItemConfig.context;
-                    // console.log("items>>>", items);
-                    curTreeObj.tree.flatList = items;
+        // this.setState({
+        //     momJexcelLoader: true
+        // }, () => {
+        //     setTimeout(() => {
+        //         console.log("hi anchal")
+        //         var json = this.state.momEl.getJson(null, false);
+        //         console.log("momData>>>", json);
+        //         var overrideListArray = [];
+        //         for (var i = 0; i < json.length; i++) {
+        //             var map1 = new Map(Object.entries(json[i]));
+        //             if ((map1.get("4") != '' && map1.get("4") != 0.00) || (map1.get("5") != '' && map1.get("5") != 0.00)) {
+        //                 var overrideData = {
+        //                     month: map1.get("0"),
+        //                     seasonalityPerc: map1.get("4"),
+        //                     manualChange: (map1.get("5") != '' && map1.get("5") != 0.00) ? (map1.get("5")).replaceAll(",", "") : map1.get("5"),
+        //                     nodeDataId: map1.get("7"),
+        //                     active: true
+        //                 }
+        //                 console.log("overrideData>>>", overrideData);
+        //                 overrideListArray.push(overrideData);
+        //             }
+        //         }
+        //         console.log("overRide data list>>>", overrideListArray);
+        //         let { currentItemConfig } = this.state;
+        //         let { curTreeObj } = this.state;
+        //         let { treeData } = this.state;
+        //         let { dataSetObj } = this.state;
+        //         var items = this.state.items;
+        //         (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].nodeDataOverrideList = overrideListArray;
+        //         this.setState({ currentItemConfig }, () => {
+        //             // console.log("currentIemConfigInUpdetMom>>>", currentItemConfig);
+        //             var findNodeIndex = items.findIndex(n => n.id == currentItemConfig.context.id);
+        //             items[findNodeIndex] = currentItemConfig.context;
+        //             // console.log("items>>>", items);
+        //             curTreeObj.tree.flatList = items;
 
-                    var findTreeIndex = treeData.findIndex(n => n.treeId == curTreeObj.treeId);
-                    treeData[findTreeIndex] = curTreeObj;
+        //             var findTreeIndex = treeData.findIndex(n => n.treeId == curTreeObj.treeId);
+        //             treeData[findTreeIndex] = curTreeObj;
 
-                    // var databytes = CryptoJS.AES.decrypt(dataSetObj.programData, SECRET_KEY);
-                    // var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
-                    var programData = dataSetObj.programData;
-                    programData.treeList = treeData;
-                    // dataSetObj.programData = programData;
-                    console.log("dataSetDecrypt>>>", programData);
-                    calculateModelingData(dataSetObj, this, '', currentItemConfig.context.id, this.state.selectedScenario, 1, this.state.treeId, false);
-                });
-            }, 0);
-        })
+        //             // var databytes = CryptoJS.AES.decrypt(dataSetObj.programData, SECRET_KEY);
+        //             // var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
+        //             var programData = dataSetObj.programData;
+        //             programData.treeList = treeData;
+        //             // dataSetObj.programData = programData;
+        //             console.log("dataSetDecrypt>>>", programData);
+        //             // calculateModelingData(dataSetObj, this, '', currentItemConfig.context.id, this.state.selectedScenario, 1, this.state.treeId, false);
+        //         });
+        //     }, 0);
+        // })
 
     }.bind(this);
     changed2 = function (instance, cell, x, y, value) {
@@ -3496,7 +3502,7 @@ export default class BuildTree extends Component {
             .fillColor('#002f6c')
             .fontSize(20)
             .font('Helvetica')
-            .text('Tree PDF', doc.page.width/2, 20);
+            .text('Tree PDF', doc.page.width / 2, 20);
 
         doc
             .fillColor('#002f6c')
@@ -3522,28 +3528,28 @@ export default class BuildTree extends Component {
             .font('Helvetica')
             .text(getLabelText(this.state.dataSetObj.programData.label, this.state.lang), 30, 85);
 
-            doc
+        doc
             .fillColor('#002f6c')
             .fontSize(12)
             .font('Helvetica')
             .text(i18n.t('static.consumption.program') + ': ' + document.getElementById("datasetId").selectedOptions[0].text, 30, 100);
 
-            doc
+        doc
             .fillColor('#002f6c')
             .fontSize(12)
             .font('Helvetica')
-            .text(i18n.t('static.forecastMethod.tree') + ': ' + document.getElementById("treeId").selectedOptions[0].text, 30, 115); 
+            .text(i18n.t('static.forecastMethod.tree') + ': ' + document.getElementById("treeId").selectedOptions[0].text, 30, 115);
 
-            doc
+        doc
             .fillColor('#002f6c')
             .fontSize(12)
             .font('Helvetica')
-            .text(i18n.t('static.whatIf.scenario') + ': ' + document.getElementById("scenarioId").selectedOptions[0].text, 30, 130); 
-            doc
+            .text(i18n.t('static.whatIf.scenario') + ': ' + document.getElementById("scenarioId").selectedOptions[0].text, 30, 130);
+        doc
             .fillColor('#002f6c')
             .fontSize(12)
             .font('Helvetica')
-            .text("Display Date(Forecast: "+this.state.forecastPeriod+")" + ': ' + this.makeText(this.state.singleValue2), 30, 145); 
+            .text("Display Date(Forecast: " + this.state.forecastPeriod + ")" + ': ' + this.makeText(this.state.singleValue2), 30, 145);
 
 
         sampleChart.draw(doc, 60, 180);
@@ -3556,8 +3562,8 @@ export default class BuildTree extends Component {
             // var nodeUnit = document.getElementById("nodeUnitId");
             // var selectedText = nodeUnit.options[nodeUnit.selectedIndex].text;
             stream.on('finish', function () {
-                var string = stream.toBlob('application/pdf');                
-                window.saveAs(string, this.state.dataSetObj.programData.programCode + "-" + i18n.t("static.supplyPlan.v") + this.state.dataSetObj.programData.currentVersion.versionId + "-" + i18n.t('static.common.managetree') + "-" + document.getElementById("treeId").selectedOptions[0].text + "-" + document.getElementById("scenarioId").selectedOptions[0].text+".pdf");
+                var string = stream.toBlob('application/pdf');
+                window.saveAs(string, this.state.dataSetObj.programData.programCode + "-" + i18n.t("static.supplyPlan.v") + this.state.dataSetObj.programData.currentVersion.versionId + "-" + i18n.t('static.common.managetree') + "-" + document.getElementById("treeId").selectedOptions[0].text + "-" + document.getElementById("scenarioId").selectedOptions[0].text + ".pdf");
             }.bind(this));
         } else {
             alert('Error: Failed to create file stream.');
