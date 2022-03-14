@@ -533,6 +533,7 @@ export default class ExtrapolateDataComponent extends React.Component {
             search: false,
             columnSorting: true,
             tableOverflow: true,
+            defaultColWidth: 120,
             wordWrap: true,
             allowInsertColumn: false,
             allowManualInsertColumn: false,
@@ -2336,7 +2337,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                         </h5>
                                     </FormGroup>
                                     <FormGroup className="col-md-4">
-                                        <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.dateRangeForHistoricData') + "    "}<i>(Forecast: {makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)})</i> <span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
+                                        <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.dateRangeForHistoricData') + "    "}<i>(Forecast: {makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)})</i> </Label>
                                         <div className="controls edit">
                                             <Picker
                                                 years={{ min: this.state.minDate, max: this.state.maxDate }}
@@ -2699,26 +2700,26 @@ export default class ExtrapolateDataComponent extends React.Component {
                                     </ul>
                                 </div>}
                             {this.state.showData &&
-                                <div className="table-scroll">
-                                    <div className="table-wrap table-responsive">
-                                        <Table className="table-bordered text-center mt-2 overflowhide main-table " bordered size="sm" >
+                                <div className="">
+                                    <div className="">
+                                        <Table className="table-bordered text-center mt-2 overflowhide main-table " bordered size="sm" style={{width:'unset'}}>
                                             <thead>
                                                 <tr>
-                                                    <td width="230px"><b>{i18n.t('static.common.errors')}</b></td>
+                                                    <td width="160px"><b>{i18n.t('static.common.errors')}</b></td>
                                                     {this.state.movingAvgId &&
-                                                        <td width="110px"><b>{i18n.t('static.extrapolation.movingAverages')}</b></td>
+                                                        <td width="160px"><b>{i18n.t('static.extrapolation.movingAverages')}</b></td>
                                                     }
                                                     {this.state.semiAvgId &&
-                                                        <td width="110px"><b>{i18n.t('static.extrapolation.semiAverages')}</b></td>
+                                                        <td width="160px"><b>{i18n.t('static.extrapolation.semiAverages')}</b></td>
                                                     }
                                                     {this.state.linearRegressionId &&
-                                                        <td width="110px"><b>{i18n.t('static.extrapolation.linearRegression')}</b></td>
+                                                        <td width="160px"><b>{i18n.t('static.extrapolation.linearRegression')}</b></td>
                                                     }
                                                     {this.state.smoothingId &&
-                                                        <td width="110px"><b>{i18n.t('static.extrapolation.tes')}</b></td>
+                                                        <td width="160px"><b>{i18n.t('static.extrapolation.tes')}</b></td>
                                                     }
                                                     {this.state.arimaId &&
-                                                        <td width="110px"><b>{i18n.t('static.extrapolation.arima')}</b></td>
+                                                        <td width="160px"><b>{i18n.t('static.extrapolation.arima')}</b></td>
                                                     }
                                                 </tr>
                                             </thead>
@@ -2826,8 +2827,10 @@ export default class ExtrapolateDataComponent extends React.Component {
                                         <li><span className="legendcolor" style={{ backgroundColor: "black", border: "1px solid #000" }}></span> <span className="legendcommitversionText">{i18n.t('static.consumption.actual')}</span></li>
                                     </ul>
                                 </div>
-                                <div className="col-md-12 pl-0 pr-0 mt-lg-3">
+                                <div className="row  mt-lg-3">
+                                <div className="pl-lg-4 pr-lg-4">
                                     <div id="tableDiv" className="jexcelremoveReadonlybackground" style={{ display: this.state.show && !this.state.loading ? "block" : "none" }}>
+                                    </div>
                                     </div>
                                 </div>
                             </div>
