@@ -807,6 +807,7 @@ class ForecastOutput extends Component {
                                     if (selectedForecastMap[Object.keys(selectedForecastMap)[0]] != undefined && selectedForecastMap[Object.keys(selectedForecastMap)[0]] != null && selectedForecastMap[Object.keys(selectedForecastMap)[0]] != '') {
                                         let selectedForecastMapObjIn = (selectedForecastMap[Object.keys(selectedForecastMap)[0]]);
 
+                                        let treeId = selectedForecastMapObjIn.treeId;
                                         let scenarioId = selectedForecastMapObjIn.scenarioId;
                                         let consumptionExtrapolationId = selectedForecastMapObjIn.consumptionExtrapolationId;
 
@@ -814,7 +815,8 @@ class ForecastOutput extends Component {
                                             // console.log("Test------------>IF");
 
                                             for (let j = 0; j < treeList.length; j++) {
-                                                let filteredScenario = treeList[j].scenarioList.filter(c => c.id == scenarioId);
+                                                // let filteredScenario = treeList[j].scenarioList.filter(c => c.id == scenarioId);
+                                                let filteredScenario = (treeList[j].treeId == treeId ? treeList[j].scenarioList.filter(c => c.id == scenarioId) : []);
                                                 if (filteredScenario.length > 0) {
                                                     let flatlist = treeList[j].tree.flatList;
 
@@ -836,7 +838,7 @@ class ForecastOutput extends Component {
                                                                 return {
                                                                     consumptionDate: m.month,
                                                                     // consumptionQty: (m.calculatedValue).toFixed(2)
-                                                                    consumptionQty: parseInt(m.calculatedValue)
+                                                                    consumptionQty: parseInt(m.calculatedMmdValue)
                                                                 }
                                                             });
                                                             let jsonTemp = { objUnit: planningUniObj.planningUnit, scenario: { id: 1, label: '(' + treeList[j].label.label_en + ' - ' + filteredScenario[0].label.label_en + ')' }, display: true, color: "#ba0c2f", consumptionList: consumptionList }
@@ -908,6 +910,7 @@ class ForecastOutput extends Component {
                                         if (selectedForecastMap[Object.keys(selectedForecastMap)[0]] != undefined && selectedForecastMap[Object.keys(selectedForecastMap)[0]] != '' && selectedForecastMap[Object.keys(selectedForecastMap)[0]] != null) {
                                             let selectedForecastMapObjIn = (selectedForecastMap[Object.keys(selectedForecastMap)[0]]);
 
+                                            let treeId = selectedForecastMapObjIn.treeId;
                                             let scenarioId = selectedForecastMapObjIn.scenarioId;
                                             let consumptionExtrapolationId = selectedForecastMapObjIn.consumptionExtrapolationId;
 
@@ -915,7 +918,8 @@ class ForecastOutput extends Component {
                                                 // console.log("Test------------>IF");
 
                                                 for (let j = 0; j < treeList.length; j++) {
-                                                    let filteredScenario = treeList[j].scenarioList.filter(c => c.id == scenarioId);
+                                                    // let filteredScenario = treeList[j].scenarioList.filter(c => c.id == scenarioId);
+                                                    let filteredScenario = (treeList[j].treeId == treeId ? treeList[j].scenarioList.filter(c => c.id == scenarioId) : []);
                                                     if (filteredScenario.length > 0) {
                                                         let flatlist = treeList[j].tree.flatList;
 
@@ -937,7 +941,8 @@ class ForecastOutput extends Component {
                                                                     return {
                                                                         consumptionDate: m.month,
                                                                         // consumptionQty: (m.calculatedValue * forecastingUniObj[l].planningUnit.multiplier).toFixed(2)
-                                                                        consumptionQty: parseInt(m.calculatedValue * forecastingUniObj[l].planningUnit.multiplier)
+                                                                        // consumptionQty: parseInt(m.calculatedValue * forecastingUniObj[l].planningUnit.multiplier)
+                                                                        consumptionQty: parseInt(m.calculatedValue)
                                                                     }
                                                                 });
                                                                 // let jsonTemp = { objUnit: forecastingUniObj[l].planningUnit.forecastingUnit, scenario: { id: 1, label: treeList[j].label.label_en + filteredScenario[0].label.label_en }, display: true, color: "#ba0c2f", consumptionList: consumptionList }
@@ -1470,7 +1475,9 @@ class ForecastOutput extends Component {
                         var lang = this.state.lang;
                         // let planningUnitList = programData.planningUnitList.map(o => o.planningUnit)
 
-                        let planningUnitList = programData.planningUnitList.map(o => {
+                        let planningUnitActiveList = programData.planningUnitList.filter(c => c.active == true);
+
+                        let planningUnitList = planningUnitActiveList.map(o => {
                             let planningUnitObj1 = o.planningUnit;
                             let planningUnitObj2 = { selectedForecastMap: o.selectedForecastMap };
                             return {
@@ -2141,7 +2148,7 @@ class ForecastOutput extends Component {
     render() {
 
         const backgroundColor = [
-            "#002F6C", "#BA0C2F", "#118B70", "#EDB944", "#A7C6ED", 
+            "#002F6C", "#BA0C2F", "#118B70", "#EDB944", "#A7C6ED",
             "#651D32", "#6C6463", "#F48521", "#49A4A1", "#212721"
             // '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
             // '#205493', '#651D32', '#6C6463', '#BC8985', '#cfcdc9',

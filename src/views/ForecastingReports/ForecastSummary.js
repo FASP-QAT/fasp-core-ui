@@ -931,6 +931,7 @@ class ForecastSummary extends Component {
                             console.log("Test------------>1", filteredProgram);
 
                             let planningUnitList = filteredProgram.planningUnitList;
+                            planningUnitList = planningUnitList.filter(c => c.active == true);
                             let summeryData = [];
                             let tempData = [];
 
@@ -963,12 +964,14 @@ class ForecastSummary extends Component {
 
                                     if (((selectedForecastMapObjIn.scenarioId != null) ? true : ((selectedForecastMapObjIn.consumptionExtrapolationId != 0) ? true : false))) {
 
+                                        let treeId = selectedForecastMapObjIn.treeId;
                                         let scenarioId = selectedForecastMapObjIn.scenarioId;
                                         let consumptionExtrapolationId = selectedForecastMapObjIn.consumptionExtrapolationId;
 
                                         if (scenarioId != null) {//scenarioId
                                             for (let p = 0; p < treeList.length; p++) {
-                                                let filteredScenario = treeList[p].scenarioList.filter(c => c.id == scenarioId);
+                                                // let filteredScenario = treeList[p].scenarioList.filter(c => c.id == scenarioId);
+                                                let filteredScenario = (treeList[p].treeId == treeId ? treeList[p].scenarioList.filter(c => c.id == scenarioId) : []);
                                                 if (filteredScenario.length > 0) {
                                                     let flatlist = treeList[p].tree.flatList;
                                                     let listContainNodeType5 = flatlist.filter(c => c.payload.nodeType.id == 5);
@@ -1172,7 +1175,7 @@ class ForecastSummary extends Component {
                                             data = [];
                                             data[0] = puListFiltered[j].planningUnit.forecastingUnit.label.label_en;
                                             data[1] = puListFiltered[j].planningUnit;
-                                            data[2] = getLabelText(puListFiltered[j].planningUnit.label,this.state.lang)+" | "+puListFiltered[j].planningUnit.id;
+                                            data[2] = getLabelText(puListFiltered[j].planningUnit.label, this.state.lang) + " | " + puListFiltered[j].planningUnit.id;
                                             var total = 0;
                                             for (var k = 0; k < regRegionList.length; k++) {
                                                 var filterForecastSelected = puListFiltered[j].selectedForecastMap[regRegionList[k].regionId]
@@ -1189,7 +1192,7 @@ class ForecastSummary extends Component {
                                         }
                                     }
                                     var columns = [];
-                                    columns.push({ title: i18n.t('static.product.unit1'), type: 'hidden', width: 100 , readOnly: true });//A0
+                                    columns.push({ title: i18n.t('static.product.unit1'), type: 'hidden', width: 100, readOnly: true });//A0
                                     columns.push({ title: i18n.t('static.product.product'), type: 'hidden', width: 100, readOnly: true });//B1
                                     columns.push({ title: i18n.t('static.product.product'), type: 'text', width: 100, readOnly: true });//C2
                                     for (var k = 0; k < regRegionList.length; k++) {
@@ -2504,7 +2507,7 @@ class ForecastSummary extends Component {
                                                                                         <>
                                                                                             <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                                                             {/* <td>{item1.forecastingUnit.label.label_en}</td> */}
-                                                                                            <td className='text-left  sticky-col first-col clone'>{getLabelText(item1.planningUnit.label,this.state.lang)+" | "+item1.planningUnit.id}</td>
+                                                                                            <td className='text-left  sticky-col first-col clone'>{getLabelText(item1.planningUnit.label, this.state.lang) + " | " + item1.planningUnit.id}</td>
                                                                                             <td>{item1.totalForecastedQuantity}</td>
                                                                                             {!this.state.hideColumn &&
                                                                                                 <>
