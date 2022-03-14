@@ -18,7 +18,7 @@ import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
 import ProgramService from '../../api/ProgramService';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, polling, DATE_FORMAT_CAP_WITHOUT_DATE } from '../../Constants.js'
+import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, polling, DATE_FORMAT_CAP_WITHOUT_DATE, TITLE_FONT, DATE_FORMAT_CAP } from '../../Constants.js'
 import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import pdfIcon from '../../assets/img/pdf.png';
@@ -347,6 +347,16 @@ class ForecastOutput extends Component {
 
     exportCSV() {
         var csvRow = [];
+        csvRow.push('"' + (i18n.t('static.supplyPlan.runDate') + ' : ' + moment(new Date()).format(`${DATE_FORMAT_CAP}`)).replaceAll(' ', '%20') + '"')
+        csvRow.push('')
+        csvRow.push('"' + (i18n.t('static.supplyPlan.runTime') + ' : ' + moment(new Date()).format('hh:mm A')).replaceAll(' ', '%20') + '"')
+        csvRow.push('')
+        csvRow.push('"' + (i18n.t('static.user.user') + ' : ' + AuthenticationService.getLoggedInUsername()).replaceAll(' ', '%20') + '"')
+        csvRow.push('')
+        csvRow.push('"' + (this.state.programs.filter(c => c.programId == this.state.programId)[0].programCode + " " + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text)).replaceAll(' ', '%20') + '"')
+        csvRow.push('')
+        csvRow.push('"' + (document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+        csvRow.push('')
         csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
         csvRow.push('')
         csvRow.push('"' + (i18n.t('static.report.version*') + ' : ' + document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
@@ -466,7 +476,7 @@ class ForecastOutput extends Component {
         var a = document.createElement("a")
         a.href = 'data:attachment/csv,' + csvString
         a.target = "_Blank"
-        a.download = i18n.t('static.dashboard.monthlyForecast') + ".csv"
+        a.download = this.state.programs.filter(c => c.programId == this.state.programId)[0].programCode+ "-" + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text)+"-"+i18n.t('static.dashboard.monthlyForecast')+ ".csv"
         document.body.appendChild(a)
         a.click();
 
@@ -506,6 +516,26 @@ class ForecastOutput extends Component {
                 doc.setFont('helvetica', 'bold')
                 doc.setPage(i)
                 doc.addImage(LOGO, 'png', 0, 10, 180, 50, 'FAST');
+                doc.setTextColor("#002f6c");
+                doc.setFontSize(8)
+                doc.setFont('helvetica', 'normal')
+                doc.setTextColor("#002f6c");
+                doc.text(i18n.t('static.supplyPlan.runDate') + " " + moment(new Date()).format(`${DATE_FORMAT_CAP}`), doc.internal.pageSize.width - 40, 20, {
+                    align: 'right'
+                })
+                doc.text(i18n.t('static.supplyPlan.runTime') + " " + moment(new Date()).format('hh:mm A'), doc.internal.pageSize.width - 40, 30, {
+                    align: 'right'
+                })
+                doc.text(i18n.t('static.user.user') + ': ' + AuthenticationService.getLoggedInUsername(), doc.internal.pageSize.width - 40, 40, {
+                    align: 'right'
+                })
+                doc.text(this.state.programs.filter(c => c.programId == this.state.programId)[0].programCode + " " + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text), doc.internal.pageSize.width - 40, 50, {
+                    align: 'right'
+                })
+                doc.text(document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width - 40, 60, {
+                    align: 'right'
+                })
+                doc.setFontSize(TITLE_FONT)
                 doc.setTextColor("#002f6c");
                 doc.text(i18n.t('static.dashboard.monthlyForecast'), doc.internal.pageSize.width / 2, 60, {
                     align: 'center'
@@ -680,7 +710,7 @@ class ForecastOutput extends Component {
         doc.autoTable(content);
         addHeaders(doc)
         addFooters(doc)
-        doc.save(i18n.t('static.dashboard.monthlyForecast').concat('.pdf'));
+        doc.save(this.state.programs.filter(c => c.programId == this.state.programId)[0].programCode+ "-" + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text)+"-"+i18n.t('static.dashboard.monthlyForecast') + ".pdf")
 
     }
 
@@ -807,6 +837,7 @@ class ForecastOutput extends Component {
                                     if (selectedForecastMap[Object.keys(selectedForecastMap)[0]] != undefined && selectedForecastMap[Object.keys(selectedForecastMap)[0]] != null && selectedForecastMap[Object.keys(selectedForecastMap)[0]] != '') {
                                         let selectedForecastMapObjIn = (selectedForecastMap[Object.keys(selectedForecastMap)[0]]);
 
+                                        let treeId = selectedForecastMapObjIn.treeId;
                                         let scenarioId = selectedForecastMapObjIn.scenarioId;
                                         let consumptionExtrapolationId = selectedForecastMapObjIn.consumptionExtrapolationId;
 
@@ -814,7 +845,8 @@ class ForecastOutput extends Component {
                                             // console.log("Test------------>IF");
 
                                             for (let j = 0; j < treeList.length; j++) {
-                                                let filteredScenario = treeList[j].scenarioList.filter(c => c.id == scenarioId);
+                                                // let filteredScenario = treeList[j].scenarioList.filter(c => c.id == scenarioId);
+                                                let filteredScenario = (treeList[j].treeId == treeId ? treeList[j].scenarioList.filter(c => c.id == scenarioId) : []);
                                                 if (filteredScenario.length > 0) {
                                                     let flatlist = treeList[j].tree.flatList;
 
@@ -836,7 +868,7 @@ class ForecastOutput extends Component {
                                                                 return {
                                                                     consumptionDate: m.month,
                                                                     // consumptionQty: (m.calculatedValue).toFixed(2)
-                                                                    consumptionQty: parseInt(m.calculatedValue)
+                                                                    consumptionQty: parseInt(m.calculatedMmdValue)
                                                                 }
                                                             });
                                                             let jsonTemp = { objUnit: planningUniObj.planningUnit, scenario: { id: 1, label: '(' + treeList[j].label.label_en + ' - ' + filteredScenario[0].label.label_en + ')' }, display: true, color: "#ba0c2f", consumptionList: consumptionList }
@@ -908,6 +940,7 @@ class ForecastOutput extends Component {
                                         if (selectedForecastMap[Object.keys(selectedForecastMap)[0]] != undefined && selectedForecastMap[Object.keys(selectedForecastMap)[0]] != '' && selectedForecastMap[Object.keys(selectedForecastMap)[0]] != null) {
                                             let selectedForecastMapObjIn = (selectedForecastMap[Object.keys(selectedForecastMap)[0]]);
 
+                                            let treeId = selectedForecastMapObjIn.treeId;
                                             let scenarioId = selectedForecastMapObjIn.scenarioId;
                                             let consumptionExtrapolationId = selectedForecastMapObjIn.consumptionExtrapolationId;
 
@@ -915,7 +948,8 @@ class ForecastOutput extends Component {
                                                 // console.log("Test------------>IF");
 
                                                 for (let j = 0; j < treeList.length; j++) {
-                                                    let filteredScenario = treeList[j].scenarioList.filter(c => c.id == scenarioId);
+                                                    // let filteredScenario = treeList[j].scenarioList.filter(c => c.id == scenarioId);
+                                                    let filteredScenario = (treeList[j].treeId == treeId ? treeList[j].scenarioList.filter(c => c.id == scenarioId) : []);
                                                     if (filteredScenario.length > 0) {
                                                         let flatlist = treeList[j].tree.flatList;
 
@@ -937,7 +971,8 @@ class ForecastOutput extends Component {
                                                                     return {
                                                                         consumptionDate: m.month,
                                                                         // consumptionQty: (m.calculatedValue * forecastingUniObj[l].planningUnit.multiplier).toFixed(2)
-                                                                        consumptionQty: parseInt(m.calculatedValue * forecastingUniObj[l].planningUnit.multiplier)
+                                                                        // consumptionQty: parseInt(m.calculatedValue * forecastingUniObj[l].planningUnit.multiplier)
+                                                                        consumptionQty: parseInt(m.calculatedValue)
                                                                     }
                                                                 });
                                                                 // let jsonTemp = { objUnit: forecastingUniObj[l].planningUnit.forecastingUnit, scenario: { id: 1, label: treeList[j].label.label_en + filteredScenario[0].label.label_en }, display: true, color: "#ba0c2f", consumptionList: consumptionList }
@@ -1470,7 +1505,9 @@ class ForecastOutput extends Component {
                         var lang = this.state.lang;
                         // let planningUnitList = programData.planningUnitList.map(o => o.planningUnit)
 
-                        let planningUnitList = programData.planningUnitList.map(o => {
+                        let planningUnitActiveList = programData.planningUnitList.filter(c => c.active == true);
+
+                        let planningUnitList = planningUnitActiveList.map(o => {
                             let planningUnitObj1 = o.planningUnit;
                             let planningUnitObj2 = { selectedForecastMap: o.selectedForecastMap };
                             return {
@@ -1703,8 +1740,10 @@ class ForecastOutput extends Component {
 
                 this.setState({
                     // forecastPeriod: (month[new Date((month[d1.getMonth()] + '-' + d1.getFullYear())).getMonth()]) + ' ' + (startDateSplit[1] - 3) + ' ~ ' + month[forecastStopDate.getMonth()] + ' ' + forecastStopDate.getFullYear(),
-                    rangeValue: { from: { year: new Date(forecastStartDateNew).getFullYear(), month: new Date(forecastStartDateNew).getMonth() + 1 }, to: { year: new Date(forecastStopDateNew).getFullYear(), month: new Date(forecastStopDateNew).getMonth() + 1 } },
-                    forecastPeriod: month[new Date(forecastStartDateNew).getMonth()] + ' ' + new Date(forecastStartDateNew).getFullYear() + ' ~ ' + month[new Date(forecastStopDateNew).getMonth()] + ' ' + new Date(forecastStopDateNew).getFullYear(),
+                    // rangeValue: { from: { year: new Date(forecastStartDateNew).getFullYear(), month: new Date(forecastStartDateNew).getMonth() + 1 }, to: { year: new Date(forecastStopDateNew).getFullYear(), month: new Date(forecastStopDateNew).getMonth() + 1 } },
+                    rangeValue: { from: { year: Number(moment(forecastStartDateNew).startOf('month').format("YYYY")), month: Number(moment(forecastStartDateNew).startOf('month').format("M")) }, to: { year: Number(moment(forecastStopDateNew).startOf('month').format("YYYY")), month: Number(moment(forecastStopDateNew).startOf('month').format("M")) } },
+                    // forecastPeriod: month[new Date(forecastStartDateNew).getMonth()] + ' ' + new Date(forecastStartDateNew).getFullYear() + ' ~ ' + month[new Date(forecastStopDateNew).getMonth()] + ' ' + new Date(forecastStopDateNew).getFullYear(),
+                    forecastPeriod: month[Number(moment(forecastStartDateNew).startOf('month').format("M")) - 1] + ' ' + Number(moment(forecastStartDateNew).startOf('month').format("YYYY")) + ' ~ ' + month[Number(moment(forecastStopDateNew).startOf('month').format("M")) - 1] + ' ' + Number(moment(forecastStopDateNew).startOf('month').format("YYYY")),
                 }, () => { })
 
             } else {//server version
@@ -2125,17 +2164,29 @@ class ForecastOutput extends Component {
         });
     }
 
+    filterOptions = async (options, filter) => {
+        if (filter) {
+            return options.filter((i) =>
+                i.label.toLowerCase().includes(filter.toLowerCase())
+            );
+        } else {
+            return options;
+        }
+    };
+
 
     render() {
 
         const backgroundColor = [
-            '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
-            '#205493', '#651D32', '#6C6463', '#BC8985', '#cfcdc9',
-            '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
-            '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
-            '#205493', '#651D32', '#6C6463', '#BC8985', '#cfcdc9',
-            '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
-            '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
+            "#002F6C", "#BA0C2F", "#118B70", "#EDB944", "#A7C6ED",
+            "#651D32", "#6C6463", "#F48521", "#49A4A1", "#212721"
+            // '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
+            // '#205493', '#651D32', '#6C6463', '#BC8985', '#cfcdc9',
+            // '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
+            // '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
+            // '#205493', '#651D32', '#6C6463', '#BC8985', '#cfcdc9',
+            // '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
+            // '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
         ]
 
         var chartOptions = {
@@ -2305,7 +2356,8 @@ class ForecastOutput extends Component {
                     })
                     datasetsArr.push(
                         {
-                            label: item.objUnit.label.label_en,
+                            // label: item.objUnit.label.label_en,
+                            label: item.objUnit.label.label_en + ' ' + item.scenario.label,
                             type: 'line',
                             stack: 3,
                             yAxisID: 'A',
@@ -2438,8 +2490,8 @@ class ForecastOutput extends Component {
 
                             <span className="compareAndSelect-larrow"> <i className="cui-arrow-left icons " > </i></span>
                             <span className="compareAndSelect-rarrow"> <i className="cui-arrow-right icons " > </i></span>
-                            <span className="compareAndSelect-larrowText"> {i18n.t('static.common.backTo')} <a href="/#/report/compareAndSelectScenario">{'Compare And Select Forecast'}</a> </span>
-                            <span className="compareAndSelect-rarrowText"> {i18n.t('static.common.continueTo')} <a href="/#/forecastReport/forecastSummary">{'Forecast Summary'}</a></span><br />
+                            <span className="compareAndSelect-larrowText"> {i18n.t('static.common.backTo')} <a href="/#/report/compareAndSelectScenario" className='supplyplanformulas'>{'Compare And Select Forecast'}</a> </span>
+                            <span className="compareAndSelect-rarrowText"> {i18n.t('static.common.continueTo')} <a href="/#/forecastReport/forecastSummary" className='supplyplanformulas'>{'Forecast Summary'}</a></span><br />
 
                         </div>
                     </div>
@@ -2532,6 +2584,7 @@ class ForecastOutput extends Component {
                                                         value={rangeValue}
                                                         lang={pickerLang}
                                                         //theme="light"
+                                                        key={JSON.stringify(rangeValue)}
                                                         onChange={this.handleRangeChange}
                                                         onDismiss={this.handleRangeDissmis}
                                                     >
@@ -2642,6 +2695,7 @@ class ForecastOutput extends Component {
                                                         onChange={(e) => this.setForecastingUnit(e)}
                                                         options={forecastingUnitList && forecastingUnitList.length > 0 ? forecastingUnitList : []}
                                                         value={this.state.forecastingUnitValues}
+                                                        filterOptions={this.filterOptions}
                                                         labelledBy={i18n.t('static.common.select')}
                                                         disabled={this.state.loading}
                                                     />
@@ -2659,6 +2713,7 @@ class ForecastOutput extends Component {
                                                         id="planningUnitId"
                                                         options={planningUnitList && planningUnitList.length > 0 ? planningUnitList : []}
                                                         value={this.state.planningUnitValues}
+                                                        filterOptions={this.filterOptions}
                                                         onChange={(e) => { this.handlePlanningUnitChange(e) }}
                                                         labelledBy={i18n.t('static.common.select')}
                                                         disabled={this.state.loading}

@@ -280,6 +280,18 @@ class ApplicationDashboard extends Component {
     this.props.history.push(url);
   }
 
+  redirectToCrudWithValue = (url, programId, versionId, typeId) => {
+
+    if (typeId == 1) {
+      let obj = { label: this.state.datasetList.filter(c => c.programId == programId && c.versionId == versionId)[0].programCode, value: programId }
+      localStorage.setItem("sesForecastProgramIds", JSON.stringify([obj]));
+    } else {
+      localStorage.setItem("sesDatasetId", this.state.datasetList.filter(c => c.programId == programId && c.versionId == versionId)[0].id);
+    }
+
+    this.props.history.push(url);
+  }
+
   hideFirstComponent() {
     this.timeout = setTimeout(function () {
       document.getElementById('div1').style.display = 'none';
@@ -1442,9 +1454,9 @@ class ApplicationDashboard extends Component {
                             <DropdownToggle caret className="p-0" color="transparent">
                             </DropdownToggle>
                             <DropdownMenu right>
-                              <DropdownItem onClick={() => this.redirectToCrud("/dataset/versionSettings")}>{'Version Settings'}</DropdownItem>
-                              <DropdownItem onClick={() => this.redirectToCrud("/dataset/listTree")}>{'Tree'}</DropdownItem>
-                              <DropdownItem onClick={() => this.redirectToCrud("/dataentry/consumptionDataEntryAndAdjustment")}>{'Consumption'}</DropdownItem>
+                              <DropdownItem onClick={() => this.redirectToCrudWithValue("/dataset/versionSettings", item.programId, item.versionId, 1)}>{'Version Settings'}</DropdownItem>
+                              <DropdownItem onClick={() => this.redirectToCrudWithValue("/dataset/listTree", item.programId, item.versionId, 2)}>{'Tree'}</DropdownItem>
+                              <DropdownItem onClick={() => this.redirectToCrudWithValue("/dataentry/consumptionDataEntryAndAdjustment", item.programId, item.versionId, 2)}>{'Consumption'}</DropdownItem>
                               {/*<DropdownItem onClick={() => this.redirectToCrud(/report/problemList / 1 / + item.id + "/false")}>{i18n.t('static.dashboard.qatProblemList')}</DropdownItem> */}
                             </DropdownMenu>
                           </Dropdown>

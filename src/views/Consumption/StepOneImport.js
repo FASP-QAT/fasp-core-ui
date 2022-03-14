@@ -42,6 +42,7 @@ import CryptoJS from 'crypto-js'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import TracerCategoryService from "../../api/TracerCategoryService";
 import moment from "moment";
+import { Prompt } from 'react-router';
 
 const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
@@ -84,7 +85,9 @@ export default class StepOneImportMapPlanningUnits extends Component {
             stepOneData: [],
             forecastPlanignUnitListForNotDuplicate: [],
             selectedForecastProgram: '',
-            getDatasetFilterList: []
+            getDatasetFilterList: [],
+            selSource1: [],
+            isChanged1: false
         }
         this.changed = this.changed.bind(this);
         this.buildJexcel = this.buildJexcel.bind(this);
@@ -111,6 +114,19 @@ export default class StepOneImportMapPlanningUnits extends Component {
         setTimeout(function () {
             document.getElementById('div12').style.display = 'none';
         }, 8000);
+    }
+
+    componentWillUnmount() {
+        clearTimeout(this.timeout);
+        window.onbeforeunload = null;
+    }
+
+    componentDidUpdate = () => {
+        if (this.state.isChanged1 == true) {
+            window.onbeforeunload = () => true
+        } else {
+            window.onbeforeunload = undefined
+        }
     }
 
     getPlanningUnitList() {
@@ -396,7 +412,9 @@ export default class StepOneImportMapPlanningUnits extends Component {
             }
 
         }
-
+        this.setState({
+            isChanged1: true,
+        });
 
 
     }
@@ -893,7 +911,15 @@ export default class StepOneImportMapPlanningUnits extends Component {
         this.el.destroy();
 
         var json = [];
-        var data = papuDataArr;
+
+        var papuList1 = this.state.selSource1;
+        var data;
+        if (papuList1 != "") {
+            data = papuList1
+        } else {
+            data = papuDataArr
+        }
+        // var data = papuDataArr;
 
         var options = {
             data: data,
@@ -1342,12 +1368,14 @@ export default class StepOneImportMapPlanningUnits extends Component {
             }
             this.setState({
                 stepOneData: changedpapuList,
+                selSource1: tableJson
 
             }, () => {
                 this.props.finishedStepOne();
             })
             console.log("FINAL SUBMIT changedpapuList---", changedpapuList);
             this.props.updateStepOneData("stepOneData", changedpapuList);
+            this.props.updateStepOneData("selSource1", tableJson);
 
         } else {
             console.log("Something went wrong");
@@ -1392,6 +1420,10 @@ export default class StepOneImportMapPlanningUnits extends Component {
 
         return (
             <>
+                <Prompt
+                    when={this.state.isChanged1 == true}
+                    message={i18n.t("static.dataentry.confirmmsg")}
+                />
                 <AuthenticationServiceComponent history={this.props.history} />
                 <h5 className="red" id="div12">{this.state.message}</h5>
 

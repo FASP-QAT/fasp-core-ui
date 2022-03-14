@@ -840,7 +840,7 @@ class usageTemplate extends Component {
                 //(papuList[j].oneTimeUsage == false ? '' : `=ROUND(N${parseInt(j) + 1},2)`)//hidden
 
                 let unitName = (this.state.dimensionList.filter(c => c.id == papuList[j].unit.id)[0]).name;
-                let string = "Every " + papuList[j].noOfPatients + " " + unitName + " - requires " + papuList[j].noOfForecastingUnits + " " + papuList[j].forecastingUnit.unit.label.label_en;
+                let string = "Every " + (papuList[j].noOfPatients).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") + " " + unitName + " - requires " + papuList[j].noOfForecastingUnits + " " + papuList[j].forecastingUnit.unit.label.label_en;
 
                 // let string = "Every " + papuList[j].noOfPatients + " patient - requires " + papuList[j].noOfForecastingUnits + " " + papuList[j].unit.label.label_en;
                 if (!papuList[j].oneTimeUsage) { //one time usage false
@@ -923,7 +923,7 @@ class usageTemplate extends Component {
         var options = {
             data: data,
             columnDrag: true,
-            // freezeColumns: 2,
+            freezeColumns: 2,
             colWidths: [100, 100, 100, 100, 150, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 120],
             columns: [
 
@@ -981,6 +981,8 @@ class usageTemplate extends Component {
                     type: 'numeric',
                     // readOnly: true
                     textEditor: true, //8 I
+                    mask: '#,##',
+                    disabledMaskOnEdition: true
                 },
                 // {
                 //     // title: i18n.t('static.usageTemplate.people'),
@@ -2919,10 +2921,13 @@ class usageTemplate extends Component {
                     <CardBody className="p-0">
 
                         <Col xs="12" sm="12">
-                            <h5>{i18n.t('static.common.customWarningMessage')}</h5>
+                            {/* <h5>{i18n.t('static.common.customWarningMessage')}</h5> */}
+                            <h5>{'[Placeholder]'}</h5>
                             <h5>{i18n.t('static.usageTemplate.usageTemplateText')}</h5>
                             <span className=""><h5><i class="fa fa-calculator" aria-hidden="true"></i>  {i18n.t('static.usageTemplate.calculatorReminderText')}</h5></span>
-                            <div id="paputableDiv" className="table-responsive consumptionDataEntryTable" style={{ display: this.state.loading ? "none" : "block" }}>
+                            <div className="UsageTemplateTable">
+                                <div id="paputableDiv" className="table-responsive consumptionDataEntryTable" style={{ display: this.state.loading ? "none" : "block" }}>
+                                </div>
                             </div>
                             <div style={{ display: this.state.loading ? "block" : "none" }}>
                                 <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >

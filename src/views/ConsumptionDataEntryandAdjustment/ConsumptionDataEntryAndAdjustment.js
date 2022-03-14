@@ -6,7 +6,7 @@ import {
   CardFooter, Button, Col, Form, InputGroup, Modal, ModalHeader, ModalBody
 } from 'reactstrap';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, DATE_FORMAT_CAP_WITHOUT_DATE } from '../../Constants.js'
+import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, DATE_FORMAT_CAP_WITHOUT_DATE, DATE_FORMAT_CAP, TITLE_FONT } from '../../Constants.js'
 import getLabelText from '../../CommonComponent/getLabelText'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import i18n from '../../i18n';
@@ -85,11 +85,11 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     if (cont == true) {
       this.setState({
         consumptionChanged: false
-   },()=>{
-    let id = AuthenticationService.displayDashboardBasedOnRole();
-    this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.message.cancelled', { entityname }))
-   })
-     }
+      }, () => {
+        let id = AuthenticationService.displayDashboardBasedOnRole();
+        this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.message.cancelled', { entityname }))
+      })
+    }
   }
 
   buildDataJexcel(consumptionUnitId) {
@@ -527,7 +527,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         elInstance.setStyle(col, "background-color", "transparent");
         elInstance.setStyle(col, "background-color", "yellow");
         elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
-      }else {
+      } else {
         var col = (colArr[x]).concat(parseInt(y) + 1);
         elInstance.setStyle(col, "background-color", "transparent");
         elInstance.setComments(col, "");
@@ -540,7 +540,9 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         var col = (colArr[x]).concat(parseInt(y) + 1);
         elInstance.setStyle(col, "background-color", "transparent");
         elInstance.setStyle(col, "background-color", "yellow");
-        elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
+        // elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
+        elInstance.setComments(col, "Please enter any positive number upto 100");
+
       }
       else {
         var col = (colArr[x]).concat(parseInt(y) + 1);
@@ -555,7 +557,8 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         var col = (colArr[x]).concat(parseInt(y) + 1);
         elInstance.setStyle(col, "background-color", "transparent");
         elInstance.setStyle(col, "background-color", "yellow");
-        elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
+        // elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
+        elInstance.setComments(col, "Please enter positive value lesser than number of days.");
       } else {
         var col = (colArr[x]).concat(parseInt(y) + 1);
         elInstance.setStyle(col, "background-color", "transparent");
@@ -584,7 +587,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       actualConsumptionStart += 8;
       reportRateStart += 8;
       stockDayStart += 8;
-     }
+    }
     for (var y = 0; y < json.length; y++) {
       for (var x = 1; x < 37; x++) {
         var rowData = elInstance.getRowData(y);
@@ -596,12 +599,13 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
             elInstance.setStyle(col, "background-color", "yellow");
             elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
             valid = false;
-          }else{
+          } else {
             var col = (colArr[x]).concat(parseInt(y) + 1);
             elInstance.setStyle(col, "background-color", "transparent");
             elInstance.setComments(col, "");
           }
         }
+
         if (possibleReportRateY.includes(y.toString())) {
           if (rowData[x] == "") {
           }
@@ -609,7 +613,8 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
             var col = (colArr[x]).concat(parseInt(y) + 1);
             elInstance.setStyle(col, "background-color", "transparent");
             elInstance.setStyle(col, "background-color", "yellow");
-            elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
+            //elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
+            elInstance.setComments(col, "Please enter any positive number upto 100");
             valid = false;
           }
           else {
@@ -618,24 +623,18 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
             elInstance.setComments(col, "");
           }
         }
-        console.log("possibleStockDayY---------->",possibleStockDayY);
-        console.log("possibleStockDayY---------->noOfMonths",noOfMonths);   
-        console.log("possibleStockDayY---------->noOfMonths",noOfMonths);        
-        if (possibleStockDayY.includes(y.toString())) {
-          var noOfMonths = elInstance.getColumnData(x)[0];
-          if (rowData[x] == "") {
 
-        console.log("possibleStockDayY---------->In IF",rowData[x]);
-          } else if (rowData[x < 0] || rowData[x] > noOfMonths) {
-            console.log("possibleStockDayY---------->In Esle IF",(colArr[x]).concat(parseInt(y) + 1));
-            
+        if (possibleStockDayY.includes(y.toString())) {
+          var stockOutdays = elInstance.getColumnData(x)[0];
+          if (rowData[x] == "") {
+          } else if (rowData[x] < 0 || rowData[x] > stockOutdays) {
             var col = (colArr[x]).concat(parseInt(y) + 1);
             elInstance.setStyle(col, "background-color", "transparent");
             elInstance.setStyle(col, "background-color", "yellow");
-            elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
+            // elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
+            elInstance.setComments(col, "Please enter positive value lesser than number of days.");
             valid = false;
           } else {
-            console.log("possibleStockDayY---------->In Esle",(colArr[x]).concat(parseInt(y) + 1));
             var col = (colArr[x]).concat(parseInt(y) + 1);
             elInstance.setStyle(col, "background-color", "transparent");
             elInstance.setComments(col, "");
@@ -847,7 +846,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
           var curUser = AuthenticationService.getLoggedInUserId();
           var consumptionUnit = this.state.selectedConsumptionUnitObject;
-          console.log("consumptionUnit---->",consumptionUnit)
+          console.log("consumptionUnit---->", consumptionUnit)
           var fullConsumptionList = this.state.consumptionList.filter(c => c.planningUnit.id != consumptionUnit.planningUnit.id);
           if (this.state.selectedConsumptionUnitId == 0) {
             var json = this.state.smallTableEl.getJson(null, false);
@@ -972,7 +971,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
               showDetailTable: true,
               loading: false,
               message: i18n.t('static.compareAndSelect.dataSaved'),
-              messageColor:"green",
+              messageColor: "green",
               consumptionChanged: false
             }, () => {
               this.getDatasetData();
@@ -986,8 +985,8 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       this.setState({
         loading: false,
         message: i18n.t('static.supplyPlan.validationFailed'),
-        messageColor:"red"
-       })
+        messageColor: "red"
+      })
     }
   }
 
@@ -1064,7 +1063,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
   }
 
   componentDidMount() {
-   this.hideSecondComponent();
+    this.hideSecondComponent();
     this.getDatasetList();
   }
 
@@ -1074,6 +1073,18 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
 
   exportCSV() {
     var csvRow = [];
+
+    csvRow.push('"' + (i18n.t('static.supplyPlan.runDate') + ' : ' + moment(new Date()).format(`${DATE_FORMAT_CAP}`)).replaceAll(' ', '%20') + '"')
+    csvRow.push('')
+    csvRow.push('"' + (i18n.t('static.supplyPlan.runTime') + ' : ' + moment(new Date()).format('hh:mm A')).replaceAll(' ', '%20') + '"')
+    csvRow.push('')
+    csvRow.push('"' + (i18n.t('static.user.user') + ' : ' + AuthenticationService.getLoggedInUsername()).replaceAll(' ', '%20') + '"')
+    csvRow.push('')
+    csvRow.push('"' + (document.getElementById("datasetId").selectedOptions[0].text.toString().split("~")[0] + " " + (document.getElementById("datasetId").selectedOptions[0].text.toString().split("~")[1])).replaceAll(' ', '%20') + '"')
+    csvRow.push('')
+    csvRow.push('"' + (getLabelText(this.state.datasetJson.label, this.state.lang)).replaceAll(' ', '%20') + '"')
+    csvRow.push('')
+
     var elInstance = this.state.dataEl;
     var actualConsumption = 3;
     var reportingRateCount = 4;
@@ -1225,6 +1236,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     a.href = 'data:attachment/csv,' + csvString
     a.target = "_Blank"
     a.download = i18n.t('static.dashboard.dataEntryAndAdjustment') + ".csv"
+    a.download = document.getElementById("datasetId").selectedOptions[0].text.toString().split("~")[0] + "-" + document.getElementById("datasetId").selectedOptions[0].text.toString().split("~")[1] + "-" + i18n.t('static.dashboard.dataEntryAndAdjustment') + "-" + (this.state.selectedConsumptionUnitId > 0 ? document.getElementById("planningUnitId").selectedOptions[0].text : "") + ".csv"
     document.body.appendChild(a)
     a.click()
   }
@@ -1561,6 +1573,27 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         doc.setFont('helvetica', 'bold')
         doc.setPage(i)
         doc.addImage(LOGO, 'png', 0, 10, 180, 50, 'FAST');
+
+        doc.setFontSize(8)
+        doc.setFont('helvetica', 'normal')
+        doc.setTextColor("#002f6c");
+        doc.text(i18n.t('static.supplyPlan.runDate') + " " + moment(new Date()).format(`${DATE_FORMAT_CAP}`), doc.internal.pageSize.width - 40, 20, {
+          align: 'right'
+        })
+        doc.text(i18n.t('static.supplyPlan.runTime') + " " + moment(new Date()).format('hh:mm A'), doc.internal.pageSize.width - 40, 30, {
+          align: 'right'
+        })
+        doc.text(i18n.t('static.user.user') + ': ' + AuthenticationService.getLoggedInUsername(), doc.internal.pageSize.width - 40, 40, {
+          align: 'right'
+        })
+        doc.text(document.getElementById("datasetId").selectedOptions[0].text.toString().split("~")[0] + " " + (document.getElementById("datasetId").selectedOptions[0].text.toString().split("~")[1]), doc.internal.pageSize.width - 40, 50, {
+          align: 'right'
+        })
+        doc.text(getLabelText(this.state.datasetJson.label, this.state.lang), doc.internal.pageSize.width - 40, 60, {
+          align: 'right'
+        })
+        doc.setFontSize(TITLE_FONT)
+
         /*doc.addImage(data, 10, 30, {
           align: 'justify'
         });*/
@@ -1693,7 +1726,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     })
     addHeaders(doc)
     addFooters(doc)
-    doc.save(i18n.t('static.common.dataCheck').concat('.pdf'));
+    doc.save(document.getElementById("datasetId").selectedOptions[0].text.toString().split("~")[0] + "-" + document.getElementById("datasetId").selectedOptions[0].text.toString().split("~")[1] + "-" + i18n.t('static.dashboard.dataEntryAndAdjustment')+"-"+i18n.t('static.common.dataCheck') + '.pdf');
   }
 
   render() {
@@ -1725,7 +1758,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         yAxes: [{
           scaleLabel: {
             display: true,
-          //  labelString: getLabelText(this.state.selectedConsumptionUnitObject.consumptionDataType == 1 ? this.state.selectedConsumptionUnitObject.planningUnit.forecastingUnit.label : this.state.selectedConsumptionUnitObject.consumptionDataType == 2 ? this.state.selectedConsumptionUnitObject.planningUnit.label : this.state.selectedConsumptionUnitObject.otherUnit.label, this.state.lang),
+            //  labelString: getLabelText(this.state.selectedConsumptionUnitObject.consumptionDataType == 1 ? this.state.selectedConsumptionUnitObject.planningUnit.forecastingUnit.label : this.state.selectedConsumptionUnitObject.consumptionDataType == 2 ? this.state.selectedConsumptionUnitObject.planningUnit.label : this.state.selectedConsumptionUnitObject.otherUnit.label, this.state.lang),
             fontColor: 'black'
           },
           stacked: true,
@@ -1986,7 +2019,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                                     var totalRegionPU = 0;
                                     return (<tr style={{ display: this.state.consumptionUnitShowArr.includes(item.planningUnit.id) ? "" : "none" }}>
                                       <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
-                                      <td className="sticky-col first-col clone text-left" style={{textIndent:'30px'}}>{"   " + getLabelText(r.label, this.state.lang)}</td>
+                                      <td className="sticky-col first-col clone text-left" style={{ textIndent: '30px' }}>{"   " + getLabelText(r.label, this.state.lang)}</td>
                                       {this.state.monthArray.map((item1, count) => {
                                         var data = this.state.planningUnitTotalListRegion.filter(c => c.planningUnitId == item.planningUnit.id && moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM") && c.region.regionId == r.regionId)
                                         totalRegion += Number(data[0].qty);

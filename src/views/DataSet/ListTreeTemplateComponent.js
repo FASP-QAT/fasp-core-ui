@@ -484,7 +484,7 @@ export default class ListTreeTemplate extends Component {
                         {/* <div id="loader" className="center"></div> */}
                         <Col md="3 pl-0">
                             <div className="d-md-flex Selectdiv2">
-                                <FormGroup className="tab-ml-1 mt-md-2 mb-md-0 ">
+                                <FormGroup className="tab-ml-0 mt-md-2 mb-md-0 ">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.common.status')}</Label>
                                     <div className="controls SelectGo">
                                         <InputGroup>

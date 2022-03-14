@@ -2531,7 +2531,8 @@ input::placeholder {
   /////multi select checkbox css//
   
   .supplyplanformulas{
-    color: #20a8d8 !important;
+    // color: #20a8d8 !important;
+    color: #002F6C!important;
     font-size: 12px!important;
     font-weight: bold!important;
   }
@@ -5579,23 +5580,29 @@ border: 1px solid #eee;
 
   .compareAndSelect-larrow {
   float: left;
-  color: #20a8d8;
+  // color: #20a8d8;
+  color: #002f6c;
   font-size: 13px;
+  margin-top: 1px;
 }
 .compareAndSelect-rarrow {
   float: right;
-  color: #20a8d8;
+  color: #002f6c;
+  // color: #20a8d8;
   font-size: 13px;
+  margin-top: 2px;
   // margin-right: 9%;
 }
 
 .compareAndSelect-larrowText {
   float: left;  
   font-size: 13px;
+  
 }
 .compareAndSelect-rarrowText {
   float: right;  
   font-size: 13px;
+ 
   // margin-right: 9%;
 }
 .selectWrapText{
@@ -5769,7 +5776,7 @@ font-style: italic!important;
   color: #212721;
 }
 .MorginTopMonth{
-  margin-top: 31px;
+  margin-top: 48px;
 }
 .ForecastSummaryTable .jexcel > thead{
   position: sticky;
@@ -5925,20 +5932,19 @@ font-style: italic!important;
 .bold{
   font-weight: bold;
 }
-.TreeIconStyleCopyPaddingTop{
-  padding-top: 0px;
-}
+// .TreeIconStyleCopyPaddingTop{
+//   padding-top: 0px;
+// }
 
-.TreeIconStyleDeletePaddingTop{
-  padding-top: 3px;
-}
-.TreeIconStylePlusPaddingTop{
-  // padding-top: 21px;
-  padding-top: 10px;
-    position: inherit;
-    bottom: 0px;
-    left:1px;
-}
+// .TreeIconStyleDeletePaddingTop{
+//   padding-top: 3px;
+// }
+// .TreeIconStylePlusPaddingTop{
+//   padding-top: 10px;
+//     position: inherit;
+//     bottom: 0px;
+//     left:1px;
+// }
 .modelingTransferTable .jexcel_container.with-tabs .jexcel_filter{
   margin-top: 0px!important;
     padding-top: 0px!important;
@@ -6113,3 +6119,41 @@ font-style: italic!important;
     // box-shadow: 0 0 0 0.2rem rgb(77 189 116 / 25%);
     // border-color: #4dbd74;
   }
+  @media screen and (min-width: 768px){
+.month-picker > .rmp-container .rmp-popup.range {
+    width: 34.6rem!important;
+    padding: 0.6rem;
+}
+  }
+.UsageTemplateTable.jexcel>thead>tr>td {
+  border: 1px solid #ccc!important;
+}
+.UsageTemplateTable .jexcel tbody .jexcel_freezed {
+  position: relative;
+  background-color: #fff;
+  box-shadow: 1px 1px 1px 4.1px #ccc!important;
+  -webkit-box-shadow: 2px 4px 4px 4.1px #ccc!important;
+  -moz-box-shadow: 2px 4px 4px 4.1px #ccc!important;
+}
+.UsageTemplateTable .jexcel>thead>tr>td {
+  border-top: 1px solid #ccc;
+  border-left: 1px solid #ccc;
+  border-right: 1px solid transparent;
+  border-bottom: 1px solid transparent;
+  background-color: #f3f3f3;
+  padding: 2px;
+  cursor: pointer;
+  box-sizing: border-box;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  position: sticky;
+  top: 0;
+  left: 0px;
+  z-index: 2;
+  background-repeat: no-repeat;
+  background-position: center right 5px;
+}
+.MarginLeftDropdown{
+  right: 0;
+  margin-right: 17px;
+}
