@@ -6128,3 +6128,32 @@ font-style: italic!important;
 .UsageTemplateTable.jexcel>thead>tr>td {
   border: 1px solid #ccc!important;
 }
+.UsageTemplateTable .jexcel tbody .jexcel_freezed {
+  position: relative;
+  background-color: #fff;
+  box-shadow: 1px 1px 1px 4.1px #ccc!important;
+  -webkit-box-shadow: 2px 4px 4px 4.1px #ccc!important;
+  -moz-box-shadow: 2px 4px 4px 4.1px #ccc!important;
+}
+.UsageTemplateTable .jexcel>thead>tr>td {
+  border-top: 1px solid #ccc;
+  border-left: 1px solid #ccc;
+  border-right: 1px solid transparent;
+  border-bottom: 1px solid transparent;
+  background-color: #f3f3f3;
+  padding: 2px;
+  cursor: pointer;
+  box-sizing: border-box;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  position: sticky;
+  top: 0;
+  left: 0px;
+  z-index: 2;
+  background-repeat: no-repeat;
+  background-position: center right 5px;
+}
+.MarginLeftDropdown{
+  right: 0;
+  margin-right: 17px;
+}
