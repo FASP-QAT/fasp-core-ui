@@ -2766,8 +2766,8 @@ export default class BuildTree extends Component {
                                     data[0] = 0;
                                     data[1] = "";
                                     data[2] = "";
-                                    data[3] = "";
-                                    data[4] = "";
+                                    data[3] = this.state.minMonth
+                                    data[4] = this.state.maxMonth
                                     data[5] = "";
                                     data[6] = "";
                                     data[7] = cleanUp;
@@ -2781,7 +2781,7 @@ export default class BuildTree extends Component {
                                 }
 
 
-                            }
+                            }.bind(this)
                         });
                         // }
                     }
