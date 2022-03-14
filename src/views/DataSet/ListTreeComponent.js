@@ -7,7 +7,7 @@ import AuthenticationServiceComponent from '../Common/AuthenticationServiceCompo
 import jexcel from 'jexcel-pro';
 import "../../../node_modules/jexcel-pro/dist/jexcel.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
-import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
+import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow, jExcelLoadedFunctionWithoutSearch } from '../../CommonComponent/JExcelCommonFunctions.js'
 import i18n from '../../i18n';
 import { JEXCEL_PAGINATION_OPTION, JEXCEL_DATE_FORMAT_SM, JEXCEL_PRO_KEY } from '../../Constants.js';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
@@ -233,7 +233,7 @@ export default class ListTreeComponent extends Component {
 
     loadedMissingPU = function (instance, cell, x, y, value) {
         console.log("loaded 2---",document.getElementsByClassName('jexcel_pagination'));
-        jExcelLoadedFunction(instance);
+        jExcelLoadedFunctionWithoutSearch(instance);
     }
 
     findMissingPUs() {
