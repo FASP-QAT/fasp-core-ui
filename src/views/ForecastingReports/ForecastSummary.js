@@ -961,6 +961,7 @@ class ForecastSummary extends Component {
                             console.log("Test------------>1", filteredProgram);
 
                             let planningUnitList = filteredProgram.planningUnitList;
+                            planningUnitList = planningUnitList.filter(c => c.active == true);
                             let summeryData = [];
                             let tempData = [];
 
@@ -993,12 +994,14 @@ class ForecastSummary extends Component {
 
                                     if (((selectedForecastMapObjIn.scenarioId != null) ? true : ((selectedForecastMapObjIn.consumptionExtrapolationId != 0) ? true : false))) {
 
+                                        let treeId = selectedForecastMapObjIn.treeId;
                                         let scenarioId = selectedForecastMapObjIn.scenarioId;
                                         let consumptionExtrapolationId = selectedForecastMapObjIn.consumptionExtrapolationId;
 
                                         if (scenarioId != null) {//scenarioId
                                             for (let p = 0; p < treeList.length; p++) {
-                                                let filteredScenario = treeList[p].scenarioList.filter(c => c.id == scenarioId);
+                                                // let filteredScenario = treeList[p].scenarioList.filter(c => c.id == scenarioId);
+                                                let filteredScenario = (treeList[p].treeId == treeId ? treeList[p].scenarioList.filter(c => c.id == scenarioId) : []);
                                                 if (filteredScenario.length > 0) {
                                                     let flatlist = treeList[p].tree.flatList;
                                                     let listContainNodeType5 = flatlist.filter(c => c.payload.nodeType.id == 5);
