@@ -232,8 +232,8 @@ export default class ListTreeComponent extends Component {
     }
 
     loadedMissingPU = function (instance, cell, x, y, value) {
-        console.log("loaded 2---",document.getElementsByClassName('jexcel_pagination'));
-        jExcelLoadedFunctionWithoutSearch(instance);
+        console.log("loaded 2---",document.getElementsByClassName('jexcel'));
+        jExcelLoadedFunctionOnlyHideRow(instance,1);
     }
 
     findMissingPUs() {
@@ -1117,7 +1117,7 @@ export default class ListTreeComponent extends Component {
         }
     };
     loaded = function (instance, cell, x, y, value) {
-        jExcelLoadedFunction(instance);
+        jExcelLoadedFunction(instance,0);
     }
 
     selected = function (instance, cell, x, y, value) {
