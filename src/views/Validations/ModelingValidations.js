@@ -1406,6 +1406,9 @@ class ModelingValidation extends Component {
 
                 <Card>
                     <div className="Card-header-reporticon pb-2">
+                        <span className="compareAndSelect-larrow"> <i className="cui-arrow-left icons " > </i></span>
+                        <span className="compareAndSelect-larrowText"> {i18n.t('static.common.backTo')} <a href={this.state.datasetId != -1 && this.state.datasetId != "" && this.state.datasetId != undefined ? "/#/dataSet/buildTree/tree/0/" + this.state.datasetId : "/#/dataSet/buildTree"} className="supplyplanformulas">{i18n.t('static.common.managetree')}</a> </span>
+                       
                         {/* {this.state.dataList.length > 0 && */}
                         <div className="card-header-actions">
                             <a className="card-header-action">
