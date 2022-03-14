@@ -8323,11 +8323,11 @@ export default class BuildTree extends Component {
                                                             </Input>
                                                             <InputGroupAddon addonType="append" onClick={this.toggleDropdown}>
                                                                 {/* <InputGroupText><i class="fa fa-plus icons" aria-hidden="true" data-toggle="tooltip" data-html="true" data-placement="bottom" onClick={this.openScenarioModal} title=""></i></InputGroupText> */}
-                                                                <InputGroupText><i class="fa fa-caret-down icons" data-bind="label" id="searchLabel" title=""></i></InputGroupText>
+                                                                <InputGroupText><i class="fa fa-cog icons" data-bind="label" id="searchLabel" title=""></i></InputGroupText>
 
                                                             </InputGroupAddon>
                                                         </InputGroup>
-                                                        <div class="list-group DropdownScenario" style={{ display: this.state.showDiv1 ? 'block' : 'none' }}>
+                                                        <div class="list-group DropdownScenario MarginLeftDropdown" style={{ display: this.state.showDiv1 ? 'block' : 'none' }}>
                                                             <p class="list-group-item list-group-item-action" onClick={() => { this.openScenarioModal(1) }}>Add Scenario</p>
                                                             <p class="list-group-item list-group-item-action" onClick={() => { this.openScenarioModal(2) }}>Edit Scenario</p>
                                                             <p class="list-group-item list-group-item-action" onClick={() => { this.openScenarioModal(3) }}>Delete Scenario</p>
