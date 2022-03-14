@@ -1101,6 +1101,7 @@ export default class BuildTree extends Component {
             let { dataSetObj } = this.state;
             var items = this.state.items;
             let tempProgram = JSON.parse(JSON.stringify(dataSetObj))
+            console.log("save tree data items>>>", items);
             // var databytes = CryptoJS.AES.decrypt(dataSetObj.programData, SECRET_KEY);
             // var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
             var programData = tempProgram.programData;
@@ -1599,6 +1600,7 @@ export default class BuildTree extends Component {
             data[3] = parseFloat(momList[j].manualChange).toFixed(2)
             data[4] = parseFloat(momList[j].endValue).toFixed(2)
             // `=B${parseInt(j) + 1}+C${parseInt(j) + 1}+D${parseInt(j) + 1}`
+            console.log("momListParent j---", momList[j].month + "value", momListParent[j].calculatedValue)
             data[5] = parseFloat(momListParent[j].calculatedValue).toFixed(2)
             data[6] = parseFloat(momList[j].calculatedValue).toFixed(2)
             // data[6] = this.state.manualChange ? momList[j].calculatedValue : ((momListParent[j].manualChange > 0) ? momListParent[j].endValueWithManualChangeWMC : momListParent[j].calculatedValueWMC *  momList[j].endValueWithManualChangeWMC) / 100
@@ -2087,77 +2089,101 @@ export default class BuildTree extends Component {
                     var item = items.filter(x => x.id == this.state.currentItemConfig.context.id)[0];
                     const itemIndex1 = items.findIndex(o => o.id === this.state.currentItemConfig.context.id);
                     console.log("itemIndex1--->>>", itemIndex1);
-                    for (var i = 0; i < tableJson.length; i++) {
-                        var map1 = new Map(Object.entries(tableJson[i]));
-                        console.log("10 map---" + map1.get("10"));
-                        if (parseInt(map1.get("10")) === 1) {
-                            console.log("10 map true---");
+                    if (itemIndex1 != -1) {
+                        for (var i = 0; i < tableJson.length; i++) {
+                            var map1 = new Map(Object.entries(tableJson[i]));
+                            console.log("10 map---" + map1.get("10"));
+                            if (parseInt(map1.get("10")) === 1) {
+                                console.log("10 map true---");
 
-                            var parts1 = map1.get("3").split('-');
-                            var startDate = parts1[0] + "-" + parts1[1] + "-01"
-                            var parts2 = map1.get("4").split('-');
-                            var stopDate = parts2[0] + "-" + parts2[1] + "-01"
-                            if (map1.get("9") != "" && map1.get("9") != 0) {
-                                console.log("inside 9 map true---");
-                                const itemIndex = data.findIndex(o => o.nodeDataModelingId === map1.get("9"));
-                                obj = data.filter(x => x.nodeDataModelingId == map1.get("9"))[0];
-                                console.log("obj--->>>>>", obj);
-                                var transfer = map1[0] != "" ? map1.get("0") : '';
-                                console.log("transfer---", transfer);
-                                obj.transferNodeDataId = transfer;
-                                obj.notes = map1.get("1");
-                                obj.modelingType.id = map1.get("2");
-                                obj.startDate = startDate;
-                                obj.stopDate = stopDate;
-                                obj.dataValue = map1.get("2") == 2 ? map1.get("6").toString().replaceAll(",", "") : map1.get("5").toString().replaceAll(",", "").split("%")[0];
-                                obj.nodeDataModelingId = map1.get("9")
-                                // data[itemIndex] = obj;
-                                // dataArr.push(obj);
-                            } else {
-                                obj = {
-                                    transferNodeDataId: map1[0] != "" ? map1.get("0") : '',
-                                    notes: map1.get("1"),
-                                    modelingType: {
-                                        id: map1.get("2")
-                                    },
-                                    startDate: startDate,
-                                    stopDate: stopDate,
-                                    dataValue: map1.get("2") == 2 ? map1.get("6").toString().replaceAll(",", "") : map1.get("5").toString().replaceAll(",", ""),
-                                    nodeDataModelingId: parseInt(maxModelingId) + 1
+                                var parts1 = map1.get("3").split('-');
+                                var startDate = parts1[0] + "-" + parts1[1] + "-01"
+                                var parts2 = map1.get("4").split('-');
+                                var stopDate = parts2[0] + "-" + parts2[1] + "-01"
+                                if (map1.get("9") != "" && map1.get("9") != 0) {
+                                    console.log("inside 9 map true---");
+                                    const itemIndex = data.findIndex(o => o.nodeDataModelingId === map1.get("9"));
+                                    obj = data.filter(x => x.nodeDataModelingId == map1.get("9"))[0];
+                                    console.log("obj--->>>>>", obj);
+                                    var transfer = map1[0] != "" ? map1.get("0") : '';
+                                    console.log("transfer---", transfer);
+                                    obj.transferNodeDataId = transfer;
+                                    obj.notes = map1.get("1");
+                                    obj.modelingType.id = map1.get("2");
+                                    obj.startDate = startDate;
+                                    obj.stopDate = stopDate;
+                                    obj.dataValue = map1.get("2") == 2 ? map1.get("6").toString().replaceAll(",", "") : map1.get("5").toString().replaceAll(",", "").split("%")[0];
+                                    obj.nodeDataModelingId = map1.get("9")
+                                    // data[itemIndex] = obj;
+                                    // dataArr.push(obj);
+                                } else {
+                                    obj = {
+                                        transferNodeDataId: map1[0] != "" ? map1.get("0") : '',
+                                        notes: map1.get("1"),
+                                        modelingType: {
+                                            id: map1.get("2")
+                                        },
+                                        startDate: startDate,
+                                        stopDate: stopDate,
+                                        dataValue: map1.get("2") == 2 ? map1.get("6").toString().replaceAll(",", "") : map1.get("5").toString().replaceAll(",", ""),
+                                        nodeDataModelingId: parseInt(maxModelingId) + 1
+                                    }
+                                    maxModelingId++;
                                 }
-                                maxModelingId++;
+                                dataArr.push(obj);
+
                             }
-                            dataArr.push(obj);
-                            console.log("dataArr--->>>", dataArr);
-                            (item.payload.nodeDataMap[this.state.selectedScenario])[0].nodeDataModelingList = dataArr;
-                            console.log("item---", item);
-                            items[itemIndex1] = item;
-                            console.log("items---", items);
                         }
+
+                        console.log("dataArr--->>>", dataArr);
+                        item.payload = this.state.currentItemConfig.context.payload;
+                        if (dataArr.length > 0) {
+                            (item.payload.nodeDataMap[this.state.selectedScenario])[0].nodeDataModelingList = dataArr;
+                        }
+                        console.log("item---", item);
+                        items[itemIndex1] = item;
+                        console.log("items---", items);
+
+                        let { curTreeObj } = this.state;
+                        let { treeData } = this.state;
+                        let { dataSetObj } = this.state;
+                        console.log("save tree data items 1>>>", items);
+                        curTreeObj.tree.flatList = items;
+                        var findTreeIndex = treeData.findIndex(n => n.treeId == curTreeObj.treeId);
+                        treeData[findTreeIndex] = curTreeObj;
+                        var programData = dataSetObj.programData;
+                        programData.treeList = treeData;
+                        console.log("dataSetDecrypt>>>", programData);
+                        dataSetObj.programData = programData;
+
+                        console.log("encpyDataSet>>>", dataSetObj)
+                        this.setState({
+                            dataSetObj,
+                            items,
+                            scalingList: dataArr,
+                            // openAddNodeModal: false,
+                            activeTab1: new Array(2).fill('2')
+                        }, () => {
+                            console.log("save tree data items 2>>>", this.state.items);
+                            this.calculateMOMData(0, 0);
+                        });
+                    } else {
+                        this.setState({
+                            modelingJexcelLoader: false
+                        }, () => {
+                            // setTimeout(() => {
+                            alert("You are creating a new node.Please submit the node data first and then apply modeling/transfer.");
+                            // confirmAlert({
+                            //     message: "You are creating a new node.Please submit the node data first and then apply modeling/transfer.",
+                            //     buttons: [
+                            //         {
+                            //             label: i18n.t('static.report.ok')
+                            //         }
+                            //     ]
+                            // });
+                            // }, 0);
+                        });
                     }
-
-                    let { curTreeObj } = this.state;
-                    let { treeData } = this.state;
-                    let { dataSetObj } = this.state;
-                    curTreeObj.tree.flatList = items;
-                    var findTreeIndex = treeData.findIndex(n => n.treeId == curTreeObj.treeId);
-                    treeData[findTreeIndex] = curTreeObj;
-                    var programData = dataSetObj.programData;
-                    programData.treeList = treeData;
-                    console.log("dataSetDecrypt>>>", programData);
-                    dataSetObj.programData = programData;
-
-                    console.log("encpyDataSet>>>", dataSetObj)
-                    this.setState({
-                        dataSetObj,
-                        items,
-                        scalingList: dataArr,
-                        // openAddNodeModal: false,
-                        activeTab1: new Array(2).fill('2')
-                    }, () => {
-                        console.log("going to call MOM data", this.state.items);
-                        this.calculateMOMData(0, 0);
-                    });
                 } catch (err) {
                     console.log("scaling err---", err);
                     localStorage.setItem("scalingErrorTree", err);
@@ -5396,7 +5422,7 @@ export default class BuildTree extends Component {
                 // (newItem.payload.nodeDataMap[scenarioList[i].id])[0] = (newItem.payload.nodeDataMap[this.state.selectedScenario]);
             }
         }
-        console.log("add button clicked value after update---", newItem.payload.nodeDataMap.size);
+        console.log("add button clicked value after update---", newItem);
         console.log("add button clicked value after update---", newItem.payload.nodeDataMap.length);
         this.setState({
             items: [...items, newItem],
