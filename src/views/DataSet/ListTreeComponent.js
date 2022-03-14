@@ -232,7 +232,7 @@ export default class ListTreeComponent extends Component {
     }
 
     loadedMissingPU = function (instance, cell, x, y, value) {
-        console.log("loaded 2---",document.getElementsByClassName('jexcel_pagination'));
+        console.log("loaded 2---", document.getElementsByClassName('jexcel_pagination'));
         jExcelLoadedFunction(instance);
     }
 
@@ -245,12 +245,14 @@ export default class ListTreeComponent extends Component {
         console.log("dataset---", dataset);
         console.log("treeTemplate---", treeTemplate);
         var puNodeList = treeTemplate.flatList.filter(x => x.payload.nodeType.id == 5);
+        console.log("puNodeList---", puNodeList);
         console.log("planningUnitIdListTemplate---", puNodeList.map((x) => x.payload.nodeDataMap[0][0].puNode.planningUnit.id).join(', '));
         var planningUnitList = dataset.programData.planningUnitList.filter(x => x.treeForecast == true);
-        console.log("planningUnitIdListPUSettings---", planningUnitList.map((x) => x.planningUnitId).join(', '));
+        console.log("planningUnitList---", planningUnitList);
+        console.log("planningUnitIdListPUSettings---", planningUnitList.map((x) => x.planningUnit.id).join(', '));
         for (let i = 0; i < puNodeList.length; i++) {
             console.log("pu Id---", puNodeList[i].payload.nodeDataMap[0][0].puNode.planningUnit.id);
-            if (planningUnitList.filter(x => x.planningUnitId == puNodeList[i].payload.nodeDataMap[0][0].puNode.planningUnit.id).length == 0) {
+            if (planningUnitList.filter(x => x.planningUnit.id == puNodeList[i].payload.nodeDataMap[0][0].puNode.planningUnit.id).length == 0) {
                 var parentNodeData = treeTemplate.flatList.filter(x => x.id == puNodeList[i].parent)[0];
                 console.log("parentNodeData---", parentNodeData);
                 json = {
@@ -443,7 +445,8 @@ export default class ListTreeComponent extends Component {
             var tempJson = {};
             var tempTree = {};
             var treeTemplateId = document.getElementById('templateId').value;
-            if (treeTemplateId != "") {
+            console.log("treeTemplateId===",treeTemplateId);
+            if (treeTemplateId != "" && treeTemplateId != 0) {
                 var treeTemplate = this.state.treeTemplateList.filter(x => x.treeTemplateId == treeTemplateId)[0];
                 console.log("treeTemplate 123----", treeTemplate);
                 var flatList = treeTemplate.flatList;
@@ -461,7 +464,12 @@ export default class ListTreeComponent extends Component {
                     treeId: treeId,
                     active: this.state.active,
                     forecastMethod: treeTemplate.forecastMethod,
-                    label: treeTemplate.label,
+                    label: {
+                        label_en: this.state.treeName,
+                        label_fr: '',
+                        label_sp: '',
+                        label_pr: ''
+                    },
                     notes: this.state.notes,
                     regionList: this.state.regionList,
                     scenarioList: [{
@@ -1081,9 +1089,9 @@ export default class ListTreeComponent extends Component {
             }, () => {
                 localStorage.setItem("sesDatasetId", event.target.value);
                 this.getRegionList();
-                if (document.getElementById('templateId').value != "") {
-                    this.findMissingPUs();
-                }
+                // if (document.getElementById('templateId').value != "") {
+                //     this.findMissingPUs();
+                // }
             });
         }
 
@@ -1483,7 +1491,7 @@ export default class ListTreeComponent extends Component {
                                                     </div>
 
                                                     <div className="col-md-12" style={{ display: 'inline-block' }}>
-                                                        {!this.state.treeFlag && <><div><b>Missing Planning Units:</b></div><br /></>}
+                                                        {(!this.state.treeFlag && this.state.treeTemplate != "") && <><div><b>Missing Planning Units:</b></div><br /></>}
                                                         <div id="missingPUJexcel" className="RowClickable">
                                                         </div>
                                                     </div>
