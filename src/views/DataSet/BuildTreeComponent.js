@@ -1591,20 +1591,83 @@ export default class BuildTree extends Component {
         console.log("momListParent---", momListParent)
         var dataArray = [];
         let count = 0;
+        var fuPerMonth, totalValue, usageFrequency, convertToMonth;
+        if (this.state.currentItemConfig.context.payload.nodeType.id == 4) {
+            var noOfForecastingUnitsPerPerson = (this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.noOfForecastingUnitsPerPerson;
+            if ((this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.usageType.id == 2 || ((this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.oneTimeUsage != "true" && (this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.oneTimeUsage != true)) {
+                usageFrequency = (this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.usageFrequency;
+                convertToMonth = (this.state.usagePeriodList.filter(c => c.usagePeriodId == (this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.usagePeriod.usagePeriodId))[0].convertToMonth;
+            }
+            if ((this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.usageType.id == 2) {
+                fuPerMonth = ((noOfForecastingUnitsPerPerson / usageFrequency) * convertToMonth);
+            } else {
+                var noOfPersons = (this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.noOfPersons;
+                if ((this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.oneTimeUsage == "true" || (this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.oneTimeUsage == true) {
+                    fuPerMonth = noOfForecastingUnitsPerPerson / noOfPersons;
+                } else {
+                    fuPerMonth = ((noOfForecastingUnitsPerPerson / noOfPersons) * usageFrequency * convertToMonth);
+                }
+            }
+        }
+        var monthsPerVisit = 1;
+        var patients = 0;
+        var grandParentMomList = [];
+        var noOfBottlesInOneVisit = 0;
+        if (this.state.currentItemConfig.context.payload.nodeType.id == 5) {
+            monthsPerVisit = (this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].puNode.refillMonths;
+            var parent = (this.state.currentItemConfig.context.parent);
+            var parentFiltered = (this.state.items.filter(c => c.id == parent))[0];
+            var parentNodeNodeData = (parentFiltered.payload.nodeDataMap[this.state.selectedScenario])[0];
+            if (parentNodeNodeData.fuNode.usageType.id == 2) {
+                var daysPerMonth = 365 / 12;
+
+                var grandParent = parentFiltered.parent;
+                var grandParentFiltered = (this.state.items.filter(c => c.id == grandParent))[0];
+                var patients = 0;
+                var grandParentNodeData = (grandParentFiltered.payload.nodeDataMap[this.state.selectedScenario])[0];
+                grandParentMomList = grandParentNodeData.nodeDataMomList;
+                console.log("grandParentNodeData$$$%%%", grandParentNodeData)
+                if (grandParentNodeData != undefined) {
+                    patients = grandParentNodeData.calculatedDataValue != null ? grandParentNodeData.calculatedDataValue : grandParentNodeData.dataValue;
+                } else {
+                    patients = 0;
+                }
+                var noOfBottlesInOneVisit = (this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].puNode.puPerVisit;
+
+            }
+        }
         for (var j = 0; j < momList.length; j++) {
             data = [];
             data[0] = momList[j].month
-            data[1] = parseFloat(momList[j].startValue).toFixed(2)
+            data[1] = j == 0 ? parseFloat(momList[j].startValue).toFixed(2) : `=ROUND(IF(K1==true,E${parseInt(j)},J${parseInt(j)}),2)`
             data[2] = parseFloat(momList[j].difference).toFixed(2)
             data[3] = parseFloat(momList[j].manualChange).toFixed(2)
-            data[4] = parseFloat(momList[j].endValue).toFixed(2)
+            data[4] = `=ROUND(IF(B${parseInt(j) + 1}+C${parseInt(j) + 1}+D${parseInt(j) + 1}<0,0,IF(B${parseInt(j) + 1}+C${parseInt(j) + 1}+D${parseInt(j) + 1}>100,100,B${parseInt(j) + 1}+C${parseInt(j) + 1}+D${parseInt(j) + 1})),2)`
             // `=B${parseInt(j) + 1}+C${parseInt(j) + 1}+D${parseInt(j) + 1}`
             console.log("momListParent j---", momList[j].month + "value", momListParent[j].calculatedValue)
             data[5] = parseFloat(momListParent[j].calculatedValue).toFixed(2)
-            data[6] = parseFloat(momList[j].calculatedValue).toFixed(2)
+            data[6] = this.state.currentItemConfig.context.payload.nodeType.id != 5 ? `=ROUND((E${parseInt(j) + 1}*${momListParent[j].calculatedValue}/100)*L${parseInt(j) + 1},2)` : `=ROUND((E${parseInt(j) + 1}*${momListParent[j].calculatedValue}/100)/${(this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].puNode.planningUnit.multiplier},2)`;
             // data[6] = this.state.manualChange ? momList[j].calculatedValue : ((momListParent[j].manualChange > 0) ? momListParent[j].endValueWithManualChangeWMC : momListParent[j].calculatedValueWMC *  momList[j].endValueWithManualChangeWMC) / 100
             data[7] = this.state.currentScenario.nodeDataId
-            data[8] = parseFloat(momList[j].calculatedMmdValue).toFixed(2)
+            data[8] = this.state.currentItemConfig.context.payload.nodeType.id == 5 && parentNodeNodeData.fuNode.usageType.id == 2 ? `=ROUND((O${parseInt(j) + 1}*${noOfBottlesInOneVisit}*E${parseInt(j) + 1}/100),0)` : `=G${parseInt(j) + 1}`;
+            data[9] = `=ROUND(IF(B${parseInt(j) + 1}+C${parseInt(j) + 1}<0,0,IF(B${parseInt(j) + 1}+C${parseInt(j) + 1}>100,100,B${parseInt(j) + 1}+C${parseInt(j) + 1})),2)`
+            data[10] = this.state.currentScenario.manualChangesEffectFuture;
+            data[11] = this.state.currentItemConfig.context.payload.nodeType.id == 4 ? fuPerMonth : 1;
+            data[12] = `=FLOOR.MATH(${j}/${monthsPerVisit},1)`;
+            if (this.state.currentItemConfig.context.payload.nodeType.id == 5 && parentNodeNodeData.fuNode.usageType.id == 2) {
+                var dataValue = 0;
+                if (Math.floor(j / monthsPerVisit) == 0) {
+                    dataValue = (patients / monthsPerVisit) + (j == 0 ? grandParentMomList[j].calculatedValue - patients : grandParentMomList[j].calculatedValue - grandParentMomList[j - 1].calculatedValue)
+                } else {
+                    dataValue = dataArray[j - monthsPerVisit][14] + (j == 0 ? grandParentMomList[j].calculatedValue - patients : grandParentMomList[j].calculatedValue - grandParentMomList[j - 1].calculatedValue)
+                }
+                data[13] = j == 0 ? grandParentMomList[j].calculatedValue - patients : grandParentMomList[j].calculatedValue - grandParentMomList[j - 1].calculatedValue;
+                data[14] = dataValue;
+            } else {
+                data[13] = 0;
+                data[14] = 0;
+            }
+
             // `=ROUND(((E${parseInt(j) + 1}*F${parseInt(j) + 1})/100),0)`
             dataArray[count] = data;
             count++;
@@ -1674,7 +1737,37 @@ export default class BuildTree extends Component {
                     type: this.state.currentItemConfig.context.payload.nodeType.id == 5 ? 'numeric' : 'hidden',
                     mask: '#,##.00', decimal: '.',
                     readOnly: true
-                }
+                },
+                {
+                    title: 'Perc without manual change',
+                    type: 'hidden',
+
+                },
+                {
+                    title: 'Manual change',
+                    type: 'hidden',
+
+                },
+                {
+                    title: 'FU per month',
+                    type: 'hidden',
+
+                },
+                {
+                    title: 'Cycle',
+                    type: 'hidden',
+
+                },
+                {
+                    title: 'Diff',
+                    type: 'hidden',
+
+                },
+                {
+                    title: 'No of patients',
+                    type: 'hidden',
+
+                },
 
             ],
             text: {
@@ -2019,12 +2112,16 @@ export default class BuildTree extends Component {
 
         });
     }
-    momCheckbox(e) {
+    momCheckbox(e, type) {
         var checked = e.target.checked;
         const { currentItemConfig } = this.state;
 
         if (e.target.name === "manualChange") {
-            this.state.momEl.setValueFromCoords(8, 0, checked, true);
+            if (type == 1) {
+                this.state.momEl.setValueFromCoords(8, 0, checked, true);
+            } else {
+                this.state.momElPer.setValueFromCoords(10, 0, checked, true);
+            }
             (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].manualChangesEffectFuture = (e.target.checked == true ? true : false)
             var nodes = this.state.items;
             var findNodeIndex = nodes.findIndex(n => n.id == currentItemConfig.context.id);
@@ -2941,59 +3038,59 @@ export default class BuildTree extends Component {
 
     }.bind(this);
     changed2 = function (instance, cell, x, y, value) {
-        this.setState({
-            momJexcelLoader: true
-        }, () => {
-            setTimeout(() => {
-                var json = this.state.momElPer.getJson(null, false);
-                console.log("momData>>>", json);
-                var overrideListArray = [];
-                for (var i = 0; i < json.length; i++) {
-                    var map1 = new Map(Object.entries(json[i]));
-                    if (map1.get("3") != '' && map1.get("3") != 0.00) {
-                        var overrideData = {
-                            month: map1.get("0"),
-                            seasonalityPerc: 0,
-                            manualChange: map1.get("3"),
-                            nodeDataId: map1.get("7"),
-                            active: true
-                        }
-                        console.log("overrideData>>>", overrideData);
-                        overrideListArray.push(overrideData);
-                    }
-                }
-                console.log("overRide data list>>>", overrideListArray);
-                let { currentItemConfig } = this.state;
-                let { curTreeObj } = this.state;
-                let { treeData } = this.state;
-                let { dataSetObj } = this.state;
-                var items = this.state.items;
-                (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].nodeDataOverrideList = overrideListArray;
-                this.setState({ currentItemConfig }, () => {
-                    // console.log("currentIemConfigInUpdetMom>>>", currentItemConfig);
-                    var findNodeIndex = items.findIndex(n => n.id == currentItemConfig.context.id);
-                    items[findNodeIndex] = currentItemConfig.context;
-                    // console.log("items>>>", items);
-                    curTreeObj.tree.flatList = items;
+        // this.setState({
+        //     momJexcelLoader: true
+        // }, () => {
+        //     setTimeout(() => {
+        //         var json = this.state.momElPer.getJson(null, false);
+        //         console.log("momData>>>", json);
+        //         var overrideListArray = [];
+        //         for (var i = 0; i < json.length; i++) {
+        //             var map1 = new Map(Object.entries(json[i]));
+        //             if (map1.get("3") != '' && map1.get("3") != 0.00) {
+        //                 var overrideData = {
+        //                     month: map1.get("0"),
+        //                     seasonalityPerc: 0,
+        //                     manualChange: map1.get("3"),
+        //                     nodeDataId: map1.get("7"),
+        //                     active: true
+        //                 }
+        //                 console.log("overrideData>>>", overrideData);
+        //                 overrideListArray.push(overrideData);
+        //             }
+        //         }
+        //         console.log("overRide data list>>>", overrideListArray);
+        //         let { currentItemConfig } = this.state;
+        //         let { curTreeObj } = this.state;
+        //         let { treeData } = this.state;
+        //         let { dataSetObj } = this.state;
+        //         var items = this.state.items;
+        //         (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].nodeDataOverrideList = overrideListArray;
+        //         this.setState({ currentItemConfig }, () => {
+        //             // console.log("currentIemConfigInUpdetMom>>>", currentItemConfig);
+        //             var findNodeIndex = items.findIndex(n => n.id == currentItemConfig.context.id);
+        //             items[findNodeIndex] = currentItemConfig.context;
+        //             // console.log("items>>>", items);
+        //             curTreeObj.tree.flatList = items;
 
-                    var findTreeIndex = treeData.findIndex(n => n.treeId == curTreeObj.treeId);
-                    treeData[findTreeIndex] = curTreeObj;
-                    console.log("treeData---", treeData);
-                    console.log("dataSetObj---", dataSetObj);
-                    var programData = dataSetObj.programData;
-                    console.log("dataSetDecrypt>>>1", programData);
-                    programData.treeList = treeData;
-                    console.log("dataSetDecrypt>>>2", programData);
+        //             var findTreeIndex = treeData.findIndex(n => n.treeId == curTreeObj.treeId);
+        //             treeData[findTreeIndex] = curTreeObj;
+        //             console.log("treeData---", treeData);
+        //             console.log("dataSetObj---", dataSetObj);
+        //             var programData = dataSetObj.programData;
+        //             console.log("dataSetDecrypt>>>1", programData);
+        //             programData.treeList = treeData;
+        //             console.log("dataSetDecrypt>>>2", programData);
 
 
-                    //  programData = (CryptoJS.AES.encrypt(JSON.stringify(programData), SECRET_KEY)).toString();
-                    //  dataSetObj.programData = programData;
+        //             //  programData = (CryptoJS.AES.encrypt(JSON.stringify(programData), SECRET_KEY)).toString();
+        //             //  dataSetObj.programData = programData;
 
-                    console.log("encpyDataSet>>>", dataSetObj)
-                    calculateModelingData(dataSetObj, this, '', currentItemConfig.context.id, this.state.selectedScenario, 1, this.state.treeId, false);
-                });
-            }, 0);
-        })
+        //             console.log("encpyDataSet>>>", dataSetObj)
+        //             calculateModelingData(dataSetObj, this, '', currentItemConfig.context.id, this.state.selectedScenario, 1, this.state.treeId, false);
+        //         });
+        //     }, 0);
+        // })
     }.bind(this);
     changed = function (instance, cell, x, y, value) {
         //Modeling type
@@ -6023,6 +6120,7 @@ export default class BuildTree extends Component {
 
         let bar1 = {}
         if (this.state.momListPer != null && this.state.momListPer.length > 0 && this.state.momElPer != '') {
+            console.log("this.state.momElPer.getValue(`G${parseInt(index) + 1}`, true))", this.state.momElPer.getValue(`G${parseInt(2) + 1}`, true))
             var datasetsArr = [];
 
             datasetsArr.push(
@@ -6058,7 +6156,7 @@ export default class BuildTree extends Component {
                 pointBorderColor: '#fff',
                 pointHoverBackgroundColor: '#fff',
                 pointHoverBorderColor: grey,
-                data: (this.state.momElPer).getJson(null, false).map((item, index) => (item[6])),
+                data: (this.state.momElPer).getJson(null, false).map((item, index) => (this.state.momElPer.getValue(`G${parseInt(index) + 1}`, true).toString().replaceAll("\,", ""))),
             }
             )
 
@@ -7446,7 +7544,7 @@ export default class BuildTree extends Component {
                                                     name="manualChange"
                                                     // checked={true}
                                                     checked={this.state.currentScenario.manualChangesEffectFuture}
-                                                    onClick={(e) => { this.momCheckbox(e); }}
+                                                    onClick={(e) => { this.momCheckbox(e, 1); }}
                                                 />
                                                 <Label
                                                     className="form-check-label"
@@ -7534,7 +7632,7 @@ export default class BuildTree extends Component {
                                                         name="manualChange"
                                                         // checked={true}
                                                         checked={this.state.currentScenario.manualChangesEffectFuture}
-                                                        onClick={(e) => { this.momCheckbox(e); }}
+                                                        onClick={(e) => { this.momCheckbox(e, 2); }}
                                                     />
                                                     <Label
                                                         className="form-check-label"
