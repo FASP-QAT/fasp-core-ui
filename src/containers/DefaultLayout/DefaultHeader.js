@@ -195,7 +195,7 @@ class DefaultHeader extends Component {
             </span>
           </NavItem> */}
 
-          <NavItem className="">
+{this.props.activeModule == 1 && <NavItem className="">
             <span className="nav-link">
               <a href={localStorage.getItem('lang') == 'en' ?
                 "../../../../src/ShowGuidanceHtmlFile/ShowGuidanceEn.html" :
@@ -210,6 +210,7 @@ class DefaultHeader extends Component {
               </a>
             </span>
           </NavItem>
+  }
 
           <NavItem className="">
             <span className="nav-link">

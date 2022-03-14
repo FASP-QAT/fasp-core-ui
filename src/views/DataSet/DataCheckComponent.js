@@ -1,6 +1,6 @@
 import moment from "moment";
 import getLabelText from "../../CommonComponent/getLabelText";
-import { DATE_FORMAT_CAP_WITHOUT_DATE, JEXCEL_MONTH_PICKER_FORMAT, JEXCEL_PAGINATION_OPTION } from "../../Constants";
+import { DATE_FORMAT_CAP_WITHOUT_DATE, JEXCEL_MONTH_PICKER_FORMAT, JEXCEL_PAGINATION_OPTION, TITLE_FONT } from "../../Constants";
 import i18n from '../../i18n';
 import jexcel from 'jexcel-pro';
 import { DATE_FORMAT_CAP, JEXCEL_DATE_FORMAT_SM, JEXCEL_PRO_KEY } from '../../Constants.js';
@@ -8,6 +8,7 @@ import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow, jExcelLoadedFunc
 import { LOGO } from "../../CommonComponent/Logo";
 import jsPDF from 'jspdf';
 import "jspdf-autotable";
+import AuthenticationService from "../Common/AuthenticationService";
 
 export function dataCheck(props, datasetJson) {
     var PgmTreeList = datasetJson.treeList.filter(c => c.active.toString() == "true");
@@ -155,7 +156,7 @@ export function dataCheck(props, datasetJson) {
                             var payloadChild = nodeChildrenList[ncl].payload;
                             var nodeDataMapChild = payloadChild.nodeDataMap;
                             var nodeDataMapForScenario = (nodeDataMapChild[scenarioList[ndm].id])[0];
-                            var nodeModellingList = nodeDataMapForScenario.nodeDataMomList!=undefined?nodeDataMapForScenario.nodeDataMomList.filter(c => c.month == curDate):[];
+                            var nodeModellingList = nodeDataMapForScenario.nodeDataMomList != undefined ? nodeDataMapForScenario.nodeDataMomList.filter(c => c.month == curDate) : [];
                             var nodeModellingListFiltered = nodeModellingList;
                             if (nodeModellingListFiltered.length > 0) {
                                 totalPercentage += nodeModellingListFiltered[0].endValue;
@@ -244,7 +245,7 @@ export function dataCheck(props, datasetJson) {
         }
         //No Forecast selected
         var selectedForecast = datasetPlanningUnit[dpu].selectedForecastMap;
-        console.log("selectedForecast$$$$%%%%",selectedForecast);
+        console.log("selectedForecast$$$$%%%%", selectedForecast);
         var regionArray = [];
         for (var drl = 0; drl < datasetRegionList.length; drl++) {
             if (selectedForecast[datasetRegionList[drl].regionId] == undefined || (selectedForecast[datasetRegionList[drl].regionId].scenarioId == null && selectedForecast[datasetRegionList[drl].regionId].consumptionExtrapolationId == null)) {
@@ -476,6 +477,26 @@ export function exportPDF(props) {
             doc.setFont('helvetica', 'bold')
             doc.setPage(i)
             doc.addImage(LOGO, 'png', 0, 10, 180, 50, 'FAST');
+
+            doc.setFontSize(8)
+            doc.setFont('helvetica', 'normal')
+            doc.setTextColor("#002f6c");
+            doc.text(i18n.t('static.supplyPlan.runDate') + " " + moment(new Date()).format(`${DATE_FORMAT_CAP}`), doc.internal.pageSize.width - 40, 20, {
+                align: 'right'
+            })
+            doc.text(i18n.t('static.supplyPlan.runTime') + " " + moment(new Date()).format('hh:mm A'), doc.internal.pageSize.width - 40, 30, {
+                align: 'right'
+            })
+            doc.text(i18n.t('static.user.user') + ': ' + AuthenticationService.getLoggedInUsername(), doc.internal.pageSize.width - 40, 40, {
+                align: 'right'
+            })
+            doc.text(props.state.programCode + " " + i18n.t("static.supplyPlan.v") + (props.state.version), doc.internal.pageSize.width - 40, 50, {
+                align: 'right'
+            })
+            doc.text(props.state.programNameOriginal, doc.internal.pageSize.width - 40, 60, {
+                align: 'right'
+            })
+            doc.setFontSize(TITLE_FONT)
             /*doc.addImage(data, 10, 30, {
               align: 'justify'
             });*/
@@ -1141,7 +1162,7 @@ export function exportPDF(props) {
 
     addHeaders(doc)
     addFooters(doc)
-    doc.save(i18n.t('static.commitTree.forecastValidation').concat('.pdf'));
+    doc.save(props.state.programCode + "-" + i18n.t("static.supplyPlan.v") + (props.state.version) + "-" + props.state.pageName + "-" + i18n.t('static.commitTree.forecastValidation') + ".pdf")
 }
 
 export function noForecastSelectedClicked(planningUnitId, regionId, props) {

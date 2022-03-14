@@ -1,7 +1,7 @@
 import moment from 'moment';
 
 export function calculateModelingData(dataset, props, page, nodeId, scenarioId, type, treeId, isTemplate) {
-    console.log("modelling dataset---", dataset);
+    console.log("modelling dataset---", nodeId);
     // console.log("modeling nodeId---", nodeId);
     // console.log("modelling scenarioId---", scenarioId);
     nodeId = -1;
@@ -155,7 +155,7 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
         for (var fl = 0; fl < flatList.length; fl++) {
             // console.log("FlatList$$$", flatList[fl]);
             var payload = flatList[fl].payload;
-            if (payload.nodeType.id != 1 && payload.extrapolation!=undefined && payload.extrapolation.toString() == "false") {
+            if (payload.nodeType.id != 1 && (payload.extrapolation == undefined || payload.extrapolation.toString() == "false")) {
                 var nodeDataMap = payload.nodeDataMap;
                 var scenarioList = tree.scenarioList;
                 if (scenarioId != -1) {
@@ -470,12 +470,12 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                         var pu = puFilter[0];
                                         fuPerPu = pu.planningUnit.multiplier;
                                     }
-                                }else{
+                                } else {
                                     fuPerPu = nodeDataMapForScenario.puNode.planningUnit.multiplier;
                                 }
 
                                 var monthsPerVisit = nodeDataMapForScenario.puNode.refillMonths;
-                                var noOfBottlesInOneVisit = 6;
+                                var noOfBottlesInOneVisit = nodeDataMapForScenario.puNode.puPerVisit;
                                 var puPerBaseMonth = Math.floor(patients / monthsPerVisit);
                                 var puPerMonthBalance = patients - puPerBaseMonth * monthsPerVisit + puPerBaseMonth;
                                 console.log("daysPerMonth$$$%%%", daysPerMonth);
@@ -506,15 +506,16 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                 var noOfPatientsNew = 0;
                                 var noOfPatients = 0;
                                 if (cycle == 0) {
-                                    var mod = monthNo % monthsPerVisit;
-                                    console.log("mod$$$%%%", mod);
-                                    if (mod == 0) {
-                                        noOfPatientsNew = puPerMonthBalance + deltaPatients;
-                                    } else {
-                                        noOfPatientsNew = puPerBaseMonth + deltaPatients;
-                                    }
-                                    console.log("noOfPatientsNew$$$%%%", noOfPatientsNew);
-                                    noOfPatients = noOfPatientsNew;
+                                    // var mod = monthNo % monthsPerVisit;
+                                    // console.log("mod$$$%%%", mod);
+                                    // if (mod == 0) {
+                                    //     noOfPatientsNew = puPerMonthBalance + deltaPatients;
+                                    // } else {
+                                    //     noOfPatientsNew = puPerBaseMonth + deltaPatients;
+                                    // }
+                                    // console.log("noOfPatientsNew$$$%%%", noOfPatientsNew);
+                                    noOfPatients = (patients / monthsPerVisit) + deltaPatients;
+                                    console.log("noOfPatients@@@", noOfPatients);
                                     calculatedMMdPatients.push({ month: curDate, value: noOfPatients });
                                 } else {
                                     var prevCycleValue = calculatedMMdPatients.filter(c => moment(c.month).format("YYYY-MM") == moment(curDate).add(-monthsPerVisit, 'months').format("YYYY-MM"))[0].value;

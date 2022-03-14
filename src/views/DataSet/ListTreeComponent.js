@@ -18,12 +18,63 @@ import { INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY } from '../../Constants
 import CryptoJS from 'crypto-js'
 import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
+import classNames from 'classnames';
+import Select from 'react-select';
+import 'react-select/dist/react-select.min.css';
+import moment from 'moment';
 const entityname = i18n.t('static.common.listtree');
 
 const validationSchema = function (values) {
     return Yup.object().shape({
+        datasetIdModal: Yup.string()
+            .test('datasetIdModal', 'Please select program',
+                function (value) {
+                    console.log("@@@ 1", document.getElementById("treeFlag").value);
+                    console.log("@@@ 2", document.getElementById("datasetIdModal").value);
+                    if (document.getElementById("treeFlag").value == "false" && document.getElementById("datasetIdModal").value == "") {
+                        return false;
+                    } else {
+                        return true;
+                    }
+                }),
         treeName: Yup.string()
+            .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
             .required(i18n.t('static.validation.selectTreeName')),
+        forecastMethodId: Yup.string()
+            .test('forecastMethodId', i18n.t('static.validation.selectForecastMethod'),
+                function (value) {
+                    console.log("@@@ 3", document.getElementById("treeFlag").value);
+                    console.log("@@@ 4", document.getElementById("forecastMethodId").value);
+                    if (document.getElementById("treeFlag").value == "false" && document.getElementById("forecastMethodId").value == "") {
+                        console.log("fm false");
+                        return false;
+                    } else {
+                        console.log("fm true");
+                        return true;
+                    }
+                }),
+        treeFlag: Yup.boolean(),
+        regionId: Yup.string()
+            .when("treeFlag", {
+                is: val => {
+                    return document.getElementById("treeFlag").value === "false";
+
+                },
+                then: Yup.string()
+                    .required(i18n.t('static.common.regiontext'))
+                    .typeError(i18n.t('static.common.regiontext')),
+                otherwise: Yup.string().notRequired()
+            }),
+        // regionId: Yup.string()
+        //     .test('regionId', i18n.t('static.validation.selectForecastMethod'),
+        //         function (value) {
+        //             // console.log("@@@",(parseInt(document.getElementById("nodeTypeId").value) == 3 || parseInt(document.getElementById("nodeTypeId").value) == 2) && document.getElementById("nodeUnitId").value == "");
+        //             if (document.getElementById("treeFlag").value == "false" && document.getElementById("regionId").value == "") {
+        //                 return false;
+        //             } else {
+        //                 return true;
+        //             }
+        //         }),
     })
 }
 
@@ -58,6 +109,20 @@ export default class ListTreeComponent extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            active: true,
+            forecastMethod: {
+                id: "",
+                label: {
+                    label_en: '',
+                    label_fr: '',
+                    label_sp: '',
+                    label_pr: ''
+                }
+            },
+            regionId: '',
+            regionList: [],
+            regionValues: [],
+            notes: '',
             treeTemplateList: [],
             treeData: [],
             datasetList: [],
@@ -68,7 +133,11 @@ export default class ListTreeComponent extends Component {
             programId: '',
             versionId: '',
             treeId: '',
-            datasetId: ''
+            datasetId: '',
+            treeFlag: true,
+            forecastMethodList: [],
+            realmCountryId: '',
+            datasetIdModal: ''
         }
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.buildJexcel = this.buildJexcel.bind(this);
@@ -79,14 +148,115 @@ export default class ListTreeComponent extends Component {
         this.getTreeTemplateList = this.getTreeTemplateList.bind(this);
         this.copyDeleteTree = this.copyDeleteTree.bind(this);
         this.modelOpenClose = this.modelOpenClose.bind(this);
+        this.getForecastMethodList = this.getForecastMethodList.bind(this);
+        this.getRegionList = this.getRegionList.bind(this);
+    }
+    handleRegionChange = (regionIds) => {
+        console.log("regionIds---", regionIds);
+
+        this.setState({
+            regionValues: regionIds.map(ele => ele),
+            // regionLabels: regionIds.map(ele => ele.label)
+        }, () => {
+            console.log("regionValues---", this.state.regionValues);
+            // console.log("regionLabels---", this.state.regionLabels);
+            // if ((this.state.regionValues).length > 0) {
+            var regionList = [];
+            var regions = this.state.regionValues;
+            console.log("regions---", regions)
+            for (let i = 0; i < regions.length; i++) {
+                var json = {
+                    id: regions[i].value,
+                    label: {
+                        label_en: regions[i].label
+                    }
+                }
+                regionList.push(json);
+            }
+            console.log("final regionList---", regionList);
+            this.setState({ regionList });
+            // }
+        })
     }
 
 
+    getRegionList() {
+        var db1;
+        getDatabase();
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var transaction = db1.transaction(['region'], 'readwrite');
+            var program = transaction.objectStore('region');
+            var getRequest = program.getAll();
+
+            getRequest.onerror = function (event) {
+                // Handle errors!
+            };
+            getRequest.onsuccess = function (event) {
+                var myResult = [];
+                myResult = getRequest.result;
+                var regionList = [];
+                if (this.state.realmCountryId != null && this.state.realmCountryId != "") {
+                    regionList = myResult.filter(x => x.realmCountry.realmCountryId == this.state.realmCountryId);
+                    console.log("filter if regionList---", regionList);
+                } else {
+                    regionList = myResult;
+                    this.setState({
+                        regionValues: []
+                    });
+                    console.log("filter else regionList---", regionList);
+                }
+                var regionMultiList = []
+                regionList.map(c => {
+                    regionMultiList.push({ label: getLabelText(c.label, this.state.lang), value: c.regionId })
+                })
+                this.setState({
+                    regionList,
+                    regionMultiList
+                });
+                for (var i = 0; i < myResult.length; i++) {
+                    console.log("myResult--->", myResult[i])
+
+                }
+
+            }.bind(this);
+        }.bind(this);
+    }
+    getForecastMethodList() {
+        const lan = 'en';
+        var db1;
+        var storeOS;
+        getDatabase();
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var planningunitTransaction = db1.transaction(['forecastMethod'], 'readwrite');
+            var planningunitOs = planningunitTransaction.objectStore('forecastMethod');
+            var planningunitRequest = planningunitOs.getAll();
+            var planningList = []
+            planningunitRequest.onerror = function (event) {
+                // Handle errors!
+            };
+            planningunitRequest.onsuccess = function (e) {
+                var myResult = [];
+                myResult = planningunitRequest.result;
+                console.log("myResult===============2", myResult)
+                this.setState({
+                    forecastMethodList: myResult.filter(x => x.forecastMethodTypeId == 1)
+                }, () => {
+
+                })
+            }.bind(this);
+        }.bind(this)
+    }
+
     touchAll(setTouched, errors) {
         setTouched({
-            'picker1': true,
-            'picker2': true,
-            'number1': true
+            treeName: true,
+            forecastMethodId: true,
+            regionId: true,
+            datasetIdModal: true
         }
         )
         this.validateForm(errors)
@@ -109,18 +279,15 @@ export default class ListTreeComponent extends Component {
     copyDeleteTree(treeId, programId, versionId, operationId) {
 
         console.log("TreeId--------------->", treeId, programId, versionId, operationId);
-        var program = (this.state.datasetList.filter(x => x.programId == programId && x.version == versionId)[0]);
+        var program = this.state.treeFlag ? (this.state.datasetList.filter(x => x.programId == programId && x.version == versionId)[0]) : (this.state.datasetList.filter(x => x.id == programId)[0]);
         let tempProgram = JSON.parse(JSON.stringify(program))
-
+        let treeList = program.programData.treeList;
         if (operationId == 1) {//delete
-            let treeList = program.programData.treeList;
             const index = treeList.findIndex(c => c.treeId == treeId);
             if (index > 0) {
                 const result = treeList.splice(index, 1);
             }
-            tempProgram.programData.treeList = treeList;
-        } else {//copy
-            let treeList = program.programData.treeList;
+        } else if (operationId == 2) {//copy
             let treeName = this.state.treeName;
 
             for (let i = 0; i < treeList.length; i++) {
@@ -147,9 +314,160 @@ export default class ListTreeComponent extends Component {
             }
 
             console.log("TreeId--------------->12", treeList);
-            tempProgram.programData.treeList = treeList;
+        } else if (operationId == 3) {
+            // program = (this.state.datasetList.filter(x => x.id == programId)[0]);
+            var maxTreeId = treeList.length > 0 ? Math.max(...treeList.map(o => o.treeId)) : 0;
+            treeId = parseInt(maxTreeId) + 1;
+            var nodeDataMap = {};
+            var tempArray = [];
+            var tempJson = {};
+            var tempTree = {};
+            var treeTemplateId = document.getElementById('templateId').value;
+            if (treeTemplateId != "") {
+                var treeTemplate = this.state.treeTemplateList.filter(x => x.treeTemplateId == treeTemplateId)[0];
+                console.log("treeTemplate 123----", treeTemplate);
+                var flatList = treeTemplate.flatList;
+                for (let i = 0; i < flatList.length; i++) {
+                    nodeDataMap = {};
+                    tempArray = [];
+                    // var nodeDataMap[1] = flatList.payload.nodeDataMap[0][0];
+                    console.log("flatList[i]---", flatList[i]);
+                    tempJson = flatList[i].payload.nodeDataMap[0][0];
+                    tempArray.push(tempJson);
+                    nodeDataMap[1] = tempArray;
+                    flatList[i].payload.nodeDataMap = nodeDataMap;
+                }
+                tempTree = {
+                    treeId: treeId,
+                    active: this.state.active,
+                    forecastMethod: treeTemplate.forecastMethod,
+                    label: treeTemplate.label,
+                    notes: this.state.notes,
+                    regionList: this.state.regionList,
+                    scenarioList: [{
+                        id: 1,
+                        label: {
+                            label_en: i18n.t('static.realm.default'),
+                            label_fr: '',
+                            label_sp: '',
+                            label_pr: ''
+                        },
+                        active: true,
+                        notes: ''
+                    }],
+                    tree: {
+                        flatList: flatList
+                    }
+                }
+            } else {
+                tempJson = {
+                    nodeDataId: 1,
+                    notes: '',
+                    month: moment(program.programData.currentVersion.forecastStartDate).startOf('month').format("YYYY-MM-DD"),
+                    dataValue: "",
+                    calculatedDataValue: '',
+                    displayDataValue: '',
+                    nodeDataModelingList: [],
+                    nodeDataOverrideList: [],
+                    nodeDataMomList: [],
+                    fuNode: {
+                        noOfForecastingUnitsPerPerson: '',
+                        usageFrequency: '',
+                        forecastingUnit: {
+                            label: {
+                                label_en: ''
+                            },
+                            tracerCategory: {
+
+                            },
+                            unit: {
+                                id: ''
+                            }
+                        },
+                        usageType: {
+                            id: ''
+                        },
+                        usagePeriod: {
+                            usagePeriodId: ''
+                        },
+                        repeatUsagePeriod: {
+                            usagePeriodId: ''
+                        },
+                        noOfPersons: ''
+                    },
+                    puNode: {
+                        planningUnit: {
+                            unit: {
+
+                            }
+                        },
+                        refillMonths: ''
+                    }
+                };
+                tempArray.push(tempJson);
+                nodeDataMap[1] = tempArray;
+                tempTree = {
+                    treeId: treeId,
+                    active: this.state.active,
+                    forecastMethod: this.state.forecastMethod,
+                    label: {
+                        label_en: this.state.treeName,
+                        label_fr: '',
+                        label_sp: '',
+                        label_pr: ''
+                    },
+                    notes: this.state.notes,
+                    regionList: this.state.regionList,
+                    scenarioList: [{
+                        id: 1,
+                        label: {
+                            label_en: i18n.t('static.realm.default'),
+                            label_fr: '',
+                            label_sp: '',
+                            label_pr: ''
+                        },
+                        active: true,
+                        notes: ''
+                    }],
+                    tree: {
+                        flatList: [{
+                            id: 1,
+                            level: 0,
+                            parent: null,
+                            sortOrder: "00",
+                            payload: {
+                                label: {
+                                    label_en: ''
+                                },
+                                nodeType: {
+                                    id: 2
+                                },
+                                nodeUnit: {
+                                    id: ''
+                                },
+                                extrapolation: false,
+                                nodeDataMap: nodeDataMap
+                            },
+                            parentItem: {
+                                payload: {
+                                    nodeUnit: {
+
+                                    }
+                                }
+                            }
+                        }]
+                    }
+                }
+            }
+
+            console.log("region values---", this.state.regionValues);
+            // console.log("curTreeObj.regionList---", curTreeObj.regionList);
+
+
+            treeList.push(tempTree);
         }
 
+        tempProgram.programData.treeList = treeList;
         var programData = (CryptoJS.AES.encrypt(JSON.stringify(tempProgram.programData), SECRET_KEY)).toString();
         tempProgram.programData = programData;
 
@@ -178,7 +496,32 @@ export default class ListTreeComponent extends Component {
                     message: i18n.t('static.mt.dataUpdateSuccess'),
                     color: "green",
                 }, () => {
-                    this.getDatasetList();
+                    if (operationId == 3) {
+                        confirmAlert({
+                            message: "Do you want to move to manage tree page?",
+                            buttons: [
+                                {
+                                    label: i18n.t('static.program.yes'),
+                                    onClick: () => {
+                                        this.props.history.push({
+                                            pathname: `/dataSet/buildTree/tree/${treeId}/${programId}`,
+                                            // state: { role }
+                                        });
+
+                                    }
+                                },
+                                {
+                                    label: i18n.t('static.program.no'),
+                                    onClick: () => {
+                                        this.getDatasetList();
+                                    }
+                                }
+                            ]
+                        });
+                    } else {
+                        this.getDatasetList();
+                    }
+
                 });
                 console.log("Data update success1");
                 // alert("success");
@@ -237,6 +580,7 @@ export default class ListTreeComponent extends Component {
     getTreeList() {
         // var proList = [];
         // var datasetId = document.getElementById('datasetId').value;
+        var realmCountryId = "";
         var datasetId = document.getElementById("datasetId").value;
         localStorage.setItem("sesDatasetId", datasetId);
         var datasetList = this.state.datasetList;
@@ -244,13 +588,16 @@ export default class ListTreeComponent extends Component {
         if (datasetId != 0) {
             datasetList = datasetList.filter(x => x.id == datasetId);
             console.log('inside if')
+            realmCountryId = datasetList[0].programData.realmCountry.realmCountryId;
             // proList.push(datasetList)
         }
 
         // console.log("pro list---", proList);
         this.setState({
             datasetId,
-            treeData: datasetList
+            datasetIdModal: datasetId,
+            treeData: datasetList,
+            realmCountryId
         }, () => {
             this.buildJexcel();
         });
@@ -286,15 +633,17 @@ export default class ListTreeComponent extends Component {
                 this.setState({
                     datasetList: myResult
                 }, () => {
-                    var datasetId = "";
+                    var datasetId = "", realmCountryId = "";
                     if (this.state.datasetList.length == 1) {
                         datasetId = this.state.datasetList[0].id;
+                        realmCountryId = this.state.datasetList[0].programData.realmCountry.realmCountryId;
                     } else if (localStorage.getItem("sesDatasetId") != "" && this.state.datasetList.filter(c => c.id == localStorage.getItem("sesDatasetId")).length > 0) {
                         datasetId = localStorage.getItem("sesDatasetId");
+                        realmCountryId = this.state.datasetList.filter(x => x.id == datasetId)[0].programData.realmCountry.realmCountryId;
                     }
-                    console.log("datasetId---",datasetId);
-                    this.setState({ datasetId },()=>{this.getTreeList();})
-                    
+                    console.log("datasetId---", datasetId);
+                    this.setState({ datasetId, datasetIdModal: datasetId, realmCountryId }, () => { this.getTreeList(); })
+
                 });
 
             }.bind(this);
@@ -303,12 +652,53 @@ export default class ListTreeComponent extends Component {
 
     onTemplateChange(event) {
         if (event.target.value == 0 || event.target.value == "") {
-            this.buildTree();
-        } else {
-            this.props.history.push({
-                pathname: `/dataSet/buildTree/template/${event.target.value}`,
-                // state: { role }
+            this.setState({
+                treeFlag: false,
+                isModalOpen: !this.state.isModalOpen,
+                treeName: '',
+                active: true,
+                forecastMethod: {
+                    id: "",
+                    label: {
+                        label_en: '',
+                        label_fr: '',
+                        label_sp: '',
+                        label_pr: ''
+                    }
+                },
+                regionId: '',
+                regionList: [],
+                regionValues: [],
+                notes: ''
+            }, () => {
+                if (this.state.datasetIdModal != "") {
+                    this.getRegionList();
+                }
             });
+            // this.buildTree();
+        } else {
+            console.log("id--->>>",this.state.datasetIdModal);
+            var treeTemplate = this.state.treeTemplateList.filter(x => x.treeTemplateId == event.target.value)[0];
+            console.log("treeTemplate---", treeTemplate)
+            this.setState({
+                treeFlag: false,
+                isModalOpen: !this.state.isModalOpen,
+                treeName: treeTemplate.label.label_en,
+                active: treeTemplate.active,
+                forecastMethod: treeTemplate.forecastMethod,
+                regionId: '',
+                regionList: [],
+                regionValues: [],
+                notes: ''
+            }, () => {
+                if (this.state.datasetIdModal != "") {
+                    this.getRegionList();
+                }
+            });
+            // this.props.history.push({
+            //     pathname: `/dataSet/buildTree/template/${event.target.value}`,
+            //     // state: { role }
+            // });
         }
 
     }
@@ -482,7 +872,10 @@ export default class ListTreeComponent extends Component {
                                         {
                                             label: i18n.t('static.program.yes'),
                                             onClick: () => {
-                                                this.copyDeleteTree(this.el.getValueFromCoords(0, y), this.el.getValueFromCoords(7, y), this.el.getValueFromCoords(9, y), 1);
+                                                this.setState({ treeFlag: true }, () => {
+                                                    this.copyDeleteTree(this.el.getValueFromCoords(0, y), this.el.getValueFromCoords(7, y), this.el.getValueFromCoords(9, y), 1);
+                                                })
+
                                             }
                                         },
                                         {
@@ -502,7 +895,8 @@ export default class ListTreeComponent extends Component {
                                     versionId: this.el.getValueFromCoords(9, y),
                                     treeId: this.el.getValueFromCoords(0, y),
                                     isModalOpen: !this.state.isModalOpen,
-                                    treeName: ''
+                                    treeName: this.el.getValueFromCoords(2, y) + "+copy",
+                                    treeFlag: true
                                 })
                             }.bind(this)
                         });
@@ -535,10 +929,12 @@ export default class ListTreeComponent extends Component {
         this.hideFirstComponent();
         this.getDatasetList();
         this.getTreeTemplateList();
+        this.getForecastMethodList();
     }
     modelOpenClose() {
         this.setState({
             isModalOpen: !this.state.isModalOpen,
+            treeFlag: true
         })
     }
     dataChange(event) {
@@ -546,6 +942,50 @@ export default class ListTreeComponent extends Component {
             this.setState({
                 treeName: event.target.value,
             });
+        }
+
+        if (event.target.name == "datasetIdModal") {
+            var realmCountryId = "";
+            if (event.target.value != "") {
+                var program = (this.state.datasetList.filter(x => x.id == event.target.value)[0]);
+                realmCountryId = program.programData.realmCountry.realmCountryId;
+            }
+            this.setState({
+                realmCountryId,
+                datasetIdModal: event.target.value,
+            }, () => {
+                localStorage.setItem("sesDatasetId", event.target.value);
+                this.getRegionList();
+            });
+        }
+
+        if (event.target.name == "forecastMethodId") {
+            var forecastMethod = document.getElementById("forecastMethodId");
+            var selectedText = forecastMethod.options[forecastMethod.selectedIndex].text;
+            let label = {
+                label_en: selectedText,
+                label_fr: '',
+                label_sp: '',
+                label_pr: ''
+            }
+            this.setState({
+                forecastMethod: {
+                    id: event.target.value,
+                    label: label
+                },
+            });
+        }
+
+        if (event.target.name == "notes") {
+            this.setState({
+                notes: event.target.value,
+            });
+        }
+        if (event.target.name == "active") {
+            this.setState({
+                active: event.target.id === "active11" ? false : true
+            });
+
         }
     };
     loaded = function (instance, cell, x, y, value) {
@@ -594,6 +1034,16 @@ export default class ListTreeComponent extends Component {
             && treeTemplateList.map((item, i) => {
                 return (
                     <option key={i} value={item.treeTemplateId}>
+                        {getLabelText(item.label, this.state.lang)}
+                    </option>
+                )
+            }, this);
+
+        const { forecastMethodList } = this.state;
+        let forecastMethods = forecastMethodList.length > 0
+            && forecastMethodList.map((item, i) => {
+                return (
+                    <option key={i} value={item.forecastMethodId}>
                         {getLabelText(item.label, this.state.lang)}
                     </option>
                 )
@@ -654,7 +1104,7 @@ export default class ListTreeComponent extends Component {
                     <CardBody className="pb-lg-0 pt-lg-0">
                         <Col md="6 pl-0">
                             <div className="d-md-flex Selectdiv2">
-                                <FormGroup className="tab-ml-1 mt-md-2 mb-md-0 ">
+                                <FormGroup className="tab-ml-0 mt-md-2 mb-md-0 ">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
                                     <div className="controls SelectGo">
                                         <InputGroup>
@@ -715,19 +1165,26 @@ export default class ListTreeComponent extends Component {
                         className={'modal-md ' + this.props.className}>
                         <ModalHeader>
                             <strong>Tree Details</strong>
+                            <Button size="md" onClick={this.modelOpenClose} color="danger" style={{ paddingTop: '0px', paddingBottom: '0px', paddingLeft: '3px', paddingRight: '3px' }} className="submitBtn float-right mr-1"> <i className="fa fa-times"></i></Button>
                         </ModalHeader>
                         <ModalBody className='pb-lg-0'>
                             {/* <h6 className="red" id="div3"></h6> */}
                             <Col sm={12} style={{ flexBasis: 'auto' }}>
                                 {/* <Card> */}
                                 <Formik
-                                    initialValues={initialValues}
+                                    initialValues={{
+                                        treeName: this.state.treeName,
+                                        forecastMethodId: this.state.forecastMethod.id,
+                                        datasetIdModal: this.state.datasetIdModal,
+                                        regionId: this.state.regionValues
+                                    }}
                                     validate={validate(validationSchema)}
                                     onSubmit={(values, { setSubmitting, setErrors }) => {
-
-                                        this.copyDeleteTree(this.state.treeId, this.state.programId, this.state.versionId, 2);
-                                        this.setState({
-                                            isModalOpen: !this.state.isModalOpen,
+                                        this.setState({ loading: true }, () => {
+                                            this.copyDeleteTree(this.state.treeId, this.state.treeFlag ? this.state.programId : this.state.datasetIdModal, this.state.treeFlag ? this.state.versionId : 0, this.state.treeFlag ? 2 : 3);
+                                            this.setState({
+                                                isModalOpen: !this.state.isModalOpen,
+                                            })
                                         })
 
                                     }}
@@ -744,30 +1201,158 @@ export default class ListTreeComponent extends Component {
                                             isSubmitting,
                                             isValid,
                                             setTouched,
-                                            handleReset
+                                            handleReset,
+                                            setFieldValue,
+                                            setFieldTouched
                                         }) => (
                                             <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='modalForm' autocomplete="off">
                                                 {/* <CardBody> */}
                                                 <div className="row">
+                                                    <Input type="hidden"
+                                                        name="treeFlag"
+                                                        id="treeFlag"
+                                                        value={this.state.treeFlag}
+                                                    />
+                                                    <div style={{ display: this.state.treeFlag ? "none" : "block" }} className="col-md-12">
+                                                        <FormGroup className="col-md-12">
+                                                            <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}<span className="red Reqasterisk">*</span></Label>
+                                                            <div className="controls">
 
-                                                    <FormGroup className="col-md-12">
-                                                        <Label for="number1">Tree Name<span className="red Reqasterisk">*</span></Label>
-                                                        <div className="controls">
-                                                            <Input type="text"
-                                                                bsSize="sm"
-                                                                name="treeName"
-                                                                id="treeName"
-                                                                valid={!errors.treeName && this.state.treeName != ''}
-                                                                invalid={touched.treeName && !!errors.treeName}
-                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                                onBlur={handleBlur}
-                                                                required
-                                                                value={this.state.treeName}
-                                                            />
-                                                            <FormFeedback className="red">{errors.treeName}</FormFeedback>
-                                                        </div>
+                                                                <Input
+                                                                    type="select"
+                                                                    name="datasetIdModal"
+                                                                    id="datasetIdModal"
+                                                                    bsSize="sm"
+                                                                    valid={!errors.datasetIdModal && this.state.datasetIdModal != null ? this.state.datasetIdModal : '' != ''}
+                                                                    invalid={touched.datasetIdModal && !!errors.datasetIdModal}
+                                                                    onBlur={handleBlur}
+                                                                    onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                                    value={this.state.datasetIdModal}
+                                                                >
+                                                                    <option value="">{"Please select program"}</option>
+                                                                    {datasets}
+                                                                </Input>
+                                                                <FormFeedback>{errors.datasetIdModal}</FormFeedback>
+                                                            </div>
 
-                                                    </FormGroup>
+                                                        </FormGroup>
+
+                                                        <FormGroup className="col-md-12">
+                                                            <Label htmlFor="currencyId">{i18n.t('static.forecastMethod.forecastMethod')}<span class="red Reqasterisk">*</span></Label>
+                                                            <div className="controls">
+
+                                                                <Input
+                                                                    type="select"
+                                                                    name="forecastMethodId"
+                                                                    id="forecastMethodId"
+                                                                    bsSize="sm"
+                                                                    valid={!errors.forecastMethodId && this.state.forecastMethod.id != null ? this.state.forecastMethod.id : '' != ''}
+                                                                    invalid={touched.forecastMethodId && !!errors.forecastMethodId}
+                                                                    onBlur={handleBlur}
+                                                                    onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                                    required
+                                                                    value={this.state.forecastMethod.id}
+                                                                >
+                                                                    <option value="">{i18n.t('static.common.forecastmethod')}</option>
+                                                                    {forecastMethods}
+                                                                </Input>
+                                                                <FormFeedback>{errors.forecastMethodId}</FormFeedback>
+                                                            </div>
+
+                                                        </FormGroup>
+                                                    </div>
+                                                    <div className="col-md-12">
+                                                        <FormGroup className="col-md-12">
+                                                            <Label for="number1">Tree Name<span className="red Reqasterisk">*</span></Label>
+                                                            <div className="controls">
+                                                                <Input type="text"
+                                                                    bsSize="sm"
+                                                                    name="treeName"
+                                                                    id="treeName"
+                                                                    valid={!errors.treeName && this.state.treeName != ''}
+                                                                    invalid={touched.treeName && !!errors.treeName}
+                                                                    onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                                    onBlur={handleBlur}
+                                                                    required
+                                                                    value={this.state.treeName}
+                                                                />
+                                                                <FormFeedback className="red">{errors.treeName}</FormFeedback>
+                                                            </div>
+
+                                                        </FormGroup>
+                                                    </div>
+                                                    <div style={{ display: this.state.treeFlag ? "none" : "block" }} className="col-md-12">
+                                                        <FormGroup className="col-md-12">
+                                                            <Label htmlFor="currencyId">{i18n.t('static.region.region')}<span class="red Reqasterisk">*</span></Label>
+                                                            <div className="controls">
+                                                                <Select
+                                                                    className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
+                                                                        { 'is-valid': !errors.regionId },
+                                                                        { 'is-invalid': (touched.regionId && !!errors.regionId || this.state.regionValues.length == 0) }
+                                                                    )}
+                                                                    bsSize="sm"
+                                                                    onChange={(e) => {
+                                                                        handleChange(e);
+                                                                        setFieldValue("regionId", e);
+                                                                        this.handleRegionChange(e);
+                                                                    }}
+                                                                    onBlur={() => setFieldTouched("regionId", true)}
+                                                                    multi
+                                                                    options={this.state.regionMultiList}
+                                                                    value={this.state.regionValues}
+                                                                />
+                                                                <FormFeedback>{errors.regionId}</FormFeedback>
+                                                            </div>
+
+                                                        </FormGroup>
+                                                        <FormGroup className="col-md-12">
+                                                            <Label htmlFor="currencyId">{i18n.t('static.common.note')}</Label>
+                                                            <div className="controls">
+                                                                <Input type="textarea"
+                                                                    id="notes"
+                                                                    name="notes"
+                                                                    onChange={(e) => { this.dataChange(e) }}
+                                                                    value={this.state.notes}
+                                                                ></Input>
+                                                            </div>
+
+                                                        </FormGroup>
+                                                        <FormGroup className="col-md-12">
+                                                            <Label className="P-absltRadio">{i18n.t('static.common.status')}</Label>
+                                                            <FormGroup check inline>
+                                                                <Input
+                                                                    className="form-check-input"
+                                                                    type="radio"
+                                                                    id="active10"
+                                                                    name="active"
+                                                                    value={true}
+                                                                    checked={this.state.active === true}
+                                                                    onChange={(e) => { this.dataChange(e) }}
+                                                                />
+                                                                <Label
+                                                                    className="form-check-label"
+                                                                    check htmlFor="inline-radio1">
+                                                                    {i18n.t('static.common.active')}
+                                                                </Label>
+                                                            </FormGroup>
+                                                            <FormGroup check inline>
+                                                                <Input
+                                                                    className="form-check-input"
+                                                                    type="radio"
+                                                                    id="active11"
+                                                                    name="active"
+                                                                    value={false}
+                                                                    checked={this.state.active === false}
+                                                                    onChange={(e) => { this.dataChange(e) }}
+                                                                />
+                                                                <Label
+                                                                    className="form-check-label"
+                                                                    check htmlFor="inline-radio2">
+                                                                    {i18n.t('static.common.disabled')}
+                                                                </Label>
+                                                            </FormGroup>
+                                                        </FormGroup>
+                                                    </div>
                                                     <FormGroup className="col-md-12 float-right pt-lg-4">
                                                         <Button type="button" color="danger" className="mr-1 float-right" size="md" onClick={this.modelOpenClose}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                                         <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>

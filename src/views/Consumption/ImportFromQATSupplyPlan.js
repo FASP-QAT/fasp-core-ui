@@ -86,6 +86,8 @@ export default class ImportFromQATSupplyPlan extends Component {
             planningUnitListJexcel: [],
             forecastProgramVersionId: '',
             planningUnitList: [],
+            selSource1: [],
+            selSource2: [],
 
             // step2
             stepTwoData: [],

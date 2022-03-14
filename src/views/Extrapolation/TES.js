@@ -14,7 +14,7 @@ export function calculateTES(inputData, alphaParam, betaParam, gammaParam, confi
     console.log("noOfProjectionMonths%%%", noOfProjectionMonths)
     console.log("confidence%%%", confidenceLevel);
 
-   
+
     const tTable = [
         { "df": 1, "zValue": [1.963, 3.078, 6.314, 31.82, 63.66, 318.31] },
         { "df": 2, "zValue": [1.386, 1.886, 2.92, 6.965, 9.925, 22.327] },
@@ -59,9 +59,13 @@ export function calculateTES(inputData, alphaParam, betaParam, gammaParam, confi
 
     for (let x = 0; x < result.length; x++) {
         if (x >= actualLength) {
-            data.push({ "month": (x + 1), "actual": null, "forecast": result[x] })
+            var tesValue = result[x];
+            data.push({ "month": (x + 1), "actual": null, "forecast": tesValue > 0 ? tesValue : 0 })
+            // data.push({ "month": (x + 1), "actual": null, "forecast": result[x] })
         } else {
-            data[x].forecast = result[x]
+            var tesValue = result[x];
+            data[x].forecast = tesValue > 0 ? tesValue : 0;
+            // data[x].forecast = result[x]
         }
     }
     const zValue = getZValue(result.length, confidence, tTable)
@@ -73,8 +77,8 @@ export function calculateTES(inputData, alphaParam, betaParam, gammaParam, confi
     console.log("CI = " + CI)
     console.log("Data%%%", data)
     calculateError(data, "tesError", props);
-    console.log("tesData input----",inputData);
-    console.log("tesData output----",data);
+    console.log("tesData input----", inputData);
+    console.log("tesData output----", data);
     props.updateState("tesData", data);
     props.updateState("CI", CI);
     // let errors = getErrors(data)
