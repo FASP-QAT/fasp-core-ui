@@ -425,12 +425,17 @@ function addCommas(cell1, row) {
 export default class BuildTree extends Component {
     constructor(props) {
         super(props);
+        
         this.pickAMonth3 = React.createRef()
         this.pickAMonth2 = React.createRef()
         this.pickAMonth1 = React.createRef()
         this.pickAMonth4 = React.createRef()
         this.pickAMonth5 = React.createRef()
         this.state = {
+            popoverOpenNodeValue:false,
+            popoverOpenSenariotree:false,
+            popoverOpenNodeType: false,
+            popoverOpenNodeTitle: false,
             showFUValidation: true,
             fuValues: [],
             fuLabels: [],
@@ -650,6 +655,10 @@ export default class BuildTree extends Component {
             modelingJexcelLoader: false,
             momJexcelLoader: false,
         }
+        this.toggleNodeValue = this.toggleNodeValue.bind(this);
+        this.toggleNodeType = this.toggleNodeType.bind(this);
+        this.toggleNodeTitle = this.toggleNodeTitle.bind(this);
+        this.toggleSenariotree = this.toggleSenariotree.bind(this);
         this.onRemoveItem = this.onRemoveItem.bind(this);
         this.canDropItem = this.canDropItem.bind(this);
         this.onMoveItem = this.onMoveItem.bind(this);
@@ -985,7 +994,27 @@ export default class BuildTree extends Component {
             // console.log("currentScenario---", this.state.currentScenario);
         });
     }
-
+    
+    toggleNodeValue() {
+        this.setState({
+            popoverOpenNodeValue: !this.state.popoverOpenNodeValue,
+        });
+      }
+    toggleNodeType() {
+        this.setState({
+            popoverOpenNodeType: !this.state.popoverOpenNodeType,
+        });
+      }
+    toggleNodeTitle() {
+        this.setState({
+            popoverOpenNodeTitle: !this.state.popoverOpenNodeTitle,
+        });
+      }
+    toggleSenariotree() {
+        this.setState({
+          popoverOpenSenariotree: !this.state.popoverOpenSenariotree,
+        });
+      }
 
     toggleCollapse() {
         this.setState({
@@ -6062,9 +6091,14 @@ export default class BuildTree extends Component {
                                             </a>
                                         </div>
                                     </div>
+                                    <div>
+                                                                <Popover placement="top" isOpen={this.state.popoverOpenSenariotree} target="Popover3" trigger="hover" toggle={this.toggleSenariotree}>
+                                                                    <PopoverBody>{i18n.t('static.tooltip.scenario')}</PopoverBody>
+                                                                </Popover>
+                                                            </div>
                                     <div className="row">
                                         <FormGroup className="col-md-6">
-                                            <Label htmlFor="currencyId">{i18n.t('static.whatIf.scenario')}</Label>
+                                            <Label htmlFor="currencyId">{i18n.t('static.whatIf.scenario')} <i class="fa fa-info-circle icons pl-lg-2" id="Popover3" onClick={this.toggleSenariotree} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                             <Input type="text"
                                                 name="scenarioTxt"
                                                 bsSize="sm"
@@ -6085,8 +6119,13 @@ export default class BuildTree extends Component {
                                                         : this.state.currentItemConfig.parentItem.payload.label.label_en}
                                                 ></Input>
                                             </FormGroup>}
+                                            <div>
+                                                                <Popover placement="top" isOpen={this.state.popoverOpenNodeTitle} target="Popover4" trigger="hover" toggle={this.toggleNodeTitle}>
+                                                                    <PopoverBody>{i18n.t('static.tooltip.NodeTitle')}</PopoverBody>
+                                                                </Popover>
+                                                            </div>
                                         <FormGroup className="col-md-6">
-                                            <Label htmlFor="currencyId">{i18n.t('static.tree.nodeTitle')}<span class="red Reqasterisk">*</span></Label>
+                                            <Label htmlFor="currencyId">{i18n.t('static.tree.nodeTitle')}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover4" onClick={this.toggleNodeTitle} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                             <Input type="text"
                                                 id="nodeTitle"
                                                 name="nodeTitle"
@@ -6100,12 +6139,12 @@ export default class BuildTree extends Component {
                                             <FormFeedback className="red">{errors.nodeTitle}</FormFeedback>
                                         </FormGroup>
                                         <div>
-                                            <Popover placement="top" isOpen={this.state.popoverOpen} target="Popover1" trigger="hover" toggle={this.toggle}>
-                                                <PopoverBody>{i18n.t('static.tree.lagMessage')}</PopoverBody>
+                                            <Popover placement="top" isOpen={this.state.popoverOpenNodeType} target="Popover5" trigger="hover" toggle={this.toggleNodeType}>
+                                                <PopoverBody>{i18n.t('static.tooltip.NodeType')}</PopoverBody>
                                             </Popover>
                                         </div>
                                         <FormGroup className={"col-md-6"}>
-                                            <Label htmlFor="currencyId">{i18n.t('static.tree.nodeType')}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={this.toggle} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
+                                            <Label htmlFor="currencyId">{i18n.t('static.tree.nodeType')}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover5" onClick={this.toggleNodeType} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                             <Input
                                                 type="select"
                                                 id="nodeTypeId"
@@ -6242,8 +6281,13 @@ export default class BuildTree extends Component {
 
                                         {/* } */}
                                         {/* {this.state.aggregationNode && */}
+                                        <div>
+                                            <Popover placement="top" isOpen={this.state.popoverOpenNodeValue} target="Popover6" trigger="hover" toggle={this.toggleNodeValue}>
+                                                <PopoverBody>{i18n.t('static.tooltip.NodeType')}</PopoverBody>
+                                            </Popover>
+                                        </div>
                                         <FormGroup className="col-md-6" style={{ display: this.state.aggregationNode ? 'block' : 'none' }}>
-                                            <Label htmlFor="currencyId">{i18n.t('static.tree.nodeValue')}{this.state.numberNode}<span class="red Reqasterisk">*</span></Label>
+                                            <Label htmlFor="currencyId">{i18n.t('static.tree.nodeValue')}{this.state.numberNode}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover6" onClick={this.toggleNodeValue} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                             <Input type="text"
                                                 id="nodeValue"
                                                 name="nodeValue"

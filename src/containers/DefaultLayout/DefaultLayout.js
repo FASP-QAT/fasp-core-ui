@@ -3394,17 +3394,17 @@ class DefaultLayout extends Component {
                           hidden: ((((this.state.businessFunctions.includes('ROLE_BF_LIST_IMPORT_FROM_QAT_SUPPLY_PLAN')) || (this.state.businessFunctions.includes('ROLE_BF_EXTRAPOLATION')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_EQUIVALENCY_UNIT_MAPPING')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_USAGE_TEMPLATE'))) && this.state.activeTab == 1) ? false : true)
                         },
                         children: [
-                          {
-                            name: i18n.t('static.importFromQATSupplyPlan.importFromQATSupplyPlan'),
-                            url: '/importFromQATSupplyPlan/listImportFromQATSupplyPlan',
-                            icon: 'cui-cloud-download FontBoldIcon',
-                            attributes: {
-                              hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_IMPORT_FROM_QAT_SUPPLY_PLAN') && this.state.activeTab == 1 ? false : true),
-                              onClick: e => {
-                                this.refreshPage();
-                              }
-                            }
-                          },
+                          // {
+                          //   name: i18n.t('static.importFromQATSupplyPlan.importFromQATSupplyPlan'),
+                          //   url: '/importFromQATSupplyPlan/listImportFromQATSupplyPlan',
+                          //   icon: 'cui-cloud-download FontBoldIcon',
+                          //   attributes: {
+                          //     hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_IMPORT_FROM_QAT_SUPPLY_PLAN') && this.state.activeTab == 1 ? false : true),
+                          //     onClick: e => {
+                          //       this.refreshPage();
+                          //     }
+                          //   }
+                          // },
                           // {
                           //   name: i18n.t('static.LoadConsumptionFromSupplyPlanning.LoadConsumptionFromSupplyPlanning'),
                           //   url: '/importFromQATSupplyPlan/listImportFromQATSupplyPlan',
