@@ -76,6 +76,79 @@ export function jExcelLoadedFunction(instance, number) {
     // document.getElementById("clearBtnID").onclick= function(){alert("ok");}
 }
 
+export function jExcelLoadedFunctionWithoutSearch(instance, number) {
+    if (number == undefined) {
+        number = 0;
+    }
+    var obj = {};
+    obj.options = {};
+    var elInstance = instance.jexcel;
+    elInstance.hideIndex(0);
+    var pagignation = document.getElementsByClassName('jexcel_pagination')[number];
+    pagignation.classList.add('row');
+    // var searchContainer = document.getElementsByClassName('jexcel_filter')[number];
+    // var searchDiv = (document.getElementsByClassName('jexcel_filter')[number]).childNodes[1];
+    // searchDiv.removeChild(((document.getElementsByClassName('jexcel_filter')[number]).childNodes[1]).childNodes[0]);
+    // document.getElementsByClassName("jexcel_search")[number].placeholder = i18n.t('static.jexcel.search');
+    // searchContainer.classList.add('TableCust');
+    // var clearBtn = document.createElement('button');
+    // clearBtn.type = "button";
+    // clearBtn.classList.add('btn-default');
+    // clearBtn.classList.add('btn');
+    // clearBtn.classList.add('jexcel_clear_btn');
+
+    // var clarText = document.createTextNode(i18n.t('static.jexcel.clear'));
+    // clearBtn.setAttribute("id", "clearBtnID");
+    // clearBtn.onclick = function () {
+        // document.getElementsByClassName("jexcel_search")[number].value = "";
+        // elInstance.search('')
+    // };
+    // clearBtn.appendChild(clarText);
+    // searchContainer.appendChild(clearBtn);
+
+    // var paginationFirst=document.getElementsByClassName('jexcel_pagination')[0];
+    // var paginationInfo = paginationFirst.createElement('span');
+    // paginationInfo.classList.add('bottom_entries');
+    // paginationInfo.classList.add('col-md-7');
+    // paginationInfo.classList.add('order-2');
+    // paginationInfo.classList.add('pl-lg-0');
+
+
+    // var paginationPages = paginationFirst.createElement('div');
+    // paginationPages.classList.add('col-md-4');
+    // paginationPages.classList.add('order-3');
+    // paginationPages.classList.add('f-End');
+
+    // obj.pagination.appendChild(paginationInfo);
+    // obj.pagination.appendChild(paginationPages);
+    //  obj.pagination.appendChild(paginationUpdateContainer);
+
+    var jexcel_pagination = document.getElementsByClassName('jexcel_pagination')[number];
+    jexcel_pagination.lastChild.classList.add('order-3');
+    jexcel_pagination.firstChild.classList.add('order-2');
+    jexcel_pagination.firstChild.classList.add('mr-auto');
+    jexcel_pagination.firstChild.classList.add('pl-0');
+    // document.getElementsByClassName('jexcel_pagination')[number].value = localStorage.getItem("sesRecordCount")
+    // document.getElementsByClassName('jexcel_pagination')[number].value = 25
+    var pageSelect = document.getElementsByClassName('jexcel_pagination_dropdown')[number];
+    pageSelect.options[3].innerHTML = "All";
+
+    pageSelect.addEventListener("change", () => paginationChange(number));
+
+
+    var jexcel_filterFirstdiv = document.getElementsByClassName('jexcel_filter')[number];
+    var filter = jexcel_filterFirstdiv.firstChild;
+    filter.classList.add('order-1');
+    filter.classList.add('pr-1');
+    filter.classList.add('ml-2');
+    jexcel_pagination.appendChild(filter);
+
+
+
+
+    // document.getElementById("clearBtnID").onclick= function(){alert("ok");}
+}
+
 export function paginationChange(number) {
     var recordCount = document.getElementsByClassName('jexcel_pagination_dropdown')[number].value;
     localStorage.setItem("sesRecordCount", recordCount)

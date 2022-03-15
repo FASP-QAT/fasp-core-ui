@@ -731,9 +731,9 @@ const routes = [
   { path: '/planningUnitSetting/listPlanningUnitSetting', exact: true, name: 'static.updatePlanningUnit.updatePlanningUnit', component: PlanningUnitSetting },
 
   { path: '/forecastReport/consumptionForecastError', name: 'Consumption Forecast Error', component: ConsumptionForecastError },
-  { path: '/forecastReport/forecastOutput',exact:true, name: 'static.MonthlyForecast.MonthlyForecast', component: ForecastOutput },
+  { path: '/forecastReport/forecastOutput', exact: true, name: 'static.MonthlyForecast.MonthlyForecast', component: ForecastOutput },
   { path: '/forecastReport/forecastOutput/:programId/:versionId', name: 'static.MonthlyForecast.MonthlyForecast', component: ForecastOutput },
-  { path: '/forecastReport/forecastSummary',exact:true ,name: 'static.ForecastSummary.ForecastSummary', component: ForecastSummary },
+  { path: '/forecastReport/forecastSummary', exact: true, name: 'static.ForecastSummary.ForecastSummary', component: ForecastSummary },
   { path: '/forecastReport/forecastSummary/:programId/:versionId', name: 'static.ForecastSummary.ForecastSummary', component: ForecastSummary },
 
 ];
@@ -3245,35 +3245,6 @@ class DefaultLayout extends Component {
                         icon: 'fa fa-list',
                         attributes: { hidden: ((((this.state.businessFunctions.includes('ROLE_BF_IMPORT_PROGARM')) || (this.state.businessFunctions.includes('ROLE_BF_EXPORT_PROGARM')) || (this.state.businessFunctions.includes('ROLE_BF_DELETE_LOCAL_PROGRAM'))) && this.state.activeTab == 2) ? false : true) },
                         children: [
-                          // {
-                          //   name: i18n.t('static.dashboard.programs'),
-                          //   icon: 'fa fa-list',
-                          //   // attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_DOWNLOAD_PROGRAM') ? false : true) },
-                          //   children: [
-                          //     {
-                          //       name: i18n.t('static.program.deleteLocalProgram'),
-                          //       url: '/program/deleteLocalProgram',
-                          //       icon: 'fa fa-trash',
-                          //       attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_DELETE_LOCAL_PROGARM') ? false : true) }
-                          //     },
-                          //     {
-                          //       name: i18n.t('static.dashboard.importprogram'),
-                          //       url: '/program/importProgram',
-                          //       icon: 'fa fa-cloud-download',
-                          //       attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_IMPORT_EXPORT_PROGARM') ? false : true) }
-                          //     },
-                          //     {
-                          //       name: i18n.t('static.dashboard.exportprogram'),
-                          //       url: '/program/exportProgram',
-                          //       icon: 'fa fa-sign-in',
-                          //       attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_IMPORT_EXPORT_PROGARM') ? false : true) }
-                          //     },
-
-                          //   ]
-                          // },
-
-
-
                           {
                             name: i18n.t('static.dashboard.importprogram'),
                             url: '/program/importProgram',
@@ -3307,35 +3278,17 @@ class DefaultLayout extends Component {
                               }
                             }
                           },
-                          // {
-                          //   name: i18n.t('static.consumptionDetailHead.consumptionDetail'),
-                          //   url: '/consumptionDetails',
-                          //   icon: 'fa fa-list',
-                          //   attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN') ? false : true) }
-                          // },
-                          // {
-                          //   name: i18n.t('static.inventoryDetailHead.inventoryDetail'),
-                          //   url: '/inventory/addInventory',
-                          //   icon: 'fa fa-list',
-                          //   attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN') ? false : true) }
-                          // },
-                          // {
-                          //   name: i18n.t('static.shipmentDetailHead.shipmentDetail'),
-                          //   url: '/shipment/shipmentDetails',
-                          //   icon: 'fa fa-list',
-                          //   attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN') ? false : true) }
-                          // }
                         ]
                       },
                       {
                         name: i18n.t('static.common.datasetmanagement'),
                         icon: 'fa fa-list',
-                       
+
                         attributes: {
-                          hidden: ((((this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_DATASET')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_EQUIVALENCY_UNIT_MAPPING')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_TREE_TEMPLATE')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_USAGE_TEMPLATE'))) && this.state.activeTab == 1) ? false : true)
+                          hidden: ((((this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_PLANNING_UNIT_SETTING'))) && this.state.activeTab == 1) ? false : true)
                         },
                         children: [
-                          
+
                           {
                             name: i18n.t('static.UpdateversionSettings.UpdateversionSettings'),
                             url: '/dataset/versionSettings',
@@ -3358,7 +3311,7 @@ class DefaultLayout extends Component {
                               }
                             }
                           },
-                    
+
                           {
                             name: 'Import Program',
                             url: '/dataset/importDataset',
@@ -3381,7 +3334,7 @@ class DefaultLayout extends Component {
                               }
                             }
                           },
-                         
+
                         ]
                       },
                       {
@@ -3391,7 +3344,7 @@ class DefaultLayout extends Component {
                         // hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true)
                         // },
                         attributes: {
-                          hidden: ((((this.state.businessFunctions.includes('ROLE_BF_LIST_IMPORT_FROM_QAT_SUPPLY_PLAN')) || (this.state.businessFunctions.includes('ROLE_BF_EXTRAPOLATION')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_EQUIVALENCY_UNIT_MAPPING')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_USAGE_TEMPLATE'))) && this.state.activeTab == 1) ? false : true)
+                          hidden: ((((this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_DATA_ENTRY_ADJUSTMENT')) || (this.state.businessFunctions.includes('ROLE_BF_EXTRAPOLATION'))) && this.state.activeTab == 1) ? false : true)
                         },
                         children: [
                           // {
@@ -3404,12 +3357,6 @@ class DefaultLayout extends Component {
                           //       this.refreshPage();
                           //     }
                           //   }
-                          // },
-                          // {
-                          //   name: i18n.t('static.LoadConsumptionFromSupplyPlanning.LoadConsumptionFromSupplyPlanning'),
-                          //   url: '/importFromQATSupplyPlan/listImportFromQATSupplyPlan',
-                          //   icon: 'fa fa-dot-circle-o',
-                          //   attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_IMPORT_FROM_QAT_SUPPLY_PLAN') && this.state.activeTab == 1 ? false : true) }
                           // },
                           {
                             name: i18n.t('static.dashboard.dataEntryAndAdjustments'),
@@ -3444,7 +3391,7 @@ class DefaultLayout extends Component {
                         // hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true)
                         // },
                         attributes: {
-                          hidden: ((((this.state.businessFunctions.includes('ROLE_BF_LIST_TREE')) || (this.state.businessFunctions.includes('ROLE_BF_PRODUCT_VALIDATION')) || (this.state.businessFunctions.includes('ROLE_BF_MODELING_VALIDATION')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_DATASET')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_EQUIVALENCY_UNIT_MAPPING')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_USAGE_TEMPLATE')) || (this.state.businessFunctions.includes('ROLE_BF_COMMIT_DATASET'))) && this.state.activeTab == 1) ? false : true)
+                          hidden: ((((this.state.businessFunctions.includes('ROLE_BF_LIST_TREE')) || (this.state.businessFunctions.includes('ROLE_BF_PRODUCT_VALIDATION')) || (this.state.businessFunctions.includes('ROLE_BF_MODELING_VALIDATION'))) && this.state.activeTab == 1) ? false : true)
                         },
                         children: [
 
@@ -3459,18 +3406,6 @@ class DefaultLayout extends Component {
                               }
                             }
                           },
-                    
-                          // {
-                          //   name: i18n.t('static.usageTemplate.usageTemplate'),
-                          //   url: '/usageTemplate/listUsageTemplate',
-                          //   icon: 'fa fa-leaf',
-                          //   attributes: {
-                          //     hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_USAGE_TEMPLATE') && this.state.activeTab == 1 ? false : true),
-                          //     onClick: e => {
-                          //       this.refreshPage();
-                          //     }
-                          //   }
-                          // },
                           {
                             name: i18n.t('static.dashboard.modelingValidation'),
                             url: '/validation/modelingValidation',
@@ -3495,13 +3430,6 @@ class DefaultLayout extends Component {
                             }
                             // attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true) }
                           },
-                          // {
-                          //   name: "Commit",
-                          //   url: '/dataset/commitTree',
-                          //   icon: 'fa fa-th',
-                          //   attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_COMMIT_DATASET') && this.state.activeTab == 1 ? false : true) }
-                          // }
-
                         ]
                       },
 
@@ -3512,7 +3440,7 @@ class DefaultLayout extends Component {
                         // hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true)
                         // },
                         attributes: {
-                          hidden: ((((this.state.businessFunctions.includes('ROLE_BF_COMPARE_AND_SELECT')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_MONTHLY_FORECAST')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_FORECAST_SUMMARY'))) && this.state.activeTab == 1) ? false : true)
+                          hidden: ((((this.state.businessFunctions.includes('ROLE_BF_COMPARE_AND_SELECT')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_MONTHLY_FORECAST')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_FORECAST_SUMMARY')) || (this.state.businessFunctions.includes('ROLE_BF_COMPARE_VERSION'))) && this.state.activeTab == 1) ? false : true)
                         },
                         children: [
                           // {
