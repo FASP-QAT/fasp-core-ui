@@ -51,6 +51,7 @@ import PDFDocument from 'pdfkit-nodejs-webpack';
 import blobStream from 'blob-stream';
 import OrgDiagramPdfkit from '../TreePDF/OrgDiagramPdfkit';
 import Size from '../../../node_modules/basicprimitives/src/graphics/structs/Size';
+import { i } from 'mathjs';
 
 // const ref = React.createRef();
 const entityname = 'Tree';
@@ -444,6 +445,8 @@ export default class BuildTree extends Component {
         this.pickAMonth4 = React.createRef()
         this.pickAMonth5 = React.createRef()
         this.state = {
+            hideFUPUNode: false,
+            hidePUNode: false,
             viewMonthlyData: true,
             showFUValidation: true,
             fuValues: [],
@@ -1114,6 +1117,13 @@ export default class BuildTree extends Component {
             let { treeData } = this.state;
             let { dataSetObj } = this.state;
             var items = this.state.items;
+            for (let i = 0; i < items.length; i++) {
+                var item = items[i];
+                if (item.payload.nodeType.id == 4 || item.payload.nodeType.id == 5) {
+                    item.isVisible = true;
+                }
+                // arr.push(item);
+            }
             let tempProgram = JSON.parse(JSON.stringify(dataSetObj))
             console.log("save tree data items>>>", items);
             // var databytes = CryptoJS.AES.decrypt(dataSetObj.programData, SECRET_KEY);
@@ -1172,6 +1182,19 @@ export default class BuildTree extends Component {
                                 message: i18n.t("static.mt.dataUpdateSuccess"),
                                 color: "green",
                             }, () => {
+                                for (let i = 0; i < items.length; i++) {
+                                    var item = items[i];
+                                    if (this.state.hideFUPUNode) {
+                                        if (item.payload.nodeType.id == 4 || item.payload.nodeType.id == 5) {
+                                            item.isVisible = false;
+                                        }
+                                    } else if (this.state.hidePUNode && item.payload.nodeType.id == 5) {
+                                        item.isVisible = false;
+                                    }
+                                    // arr.push(item);
+                                }
+                                console.log("hide fu pu---", this.state.hideFUPUNode);
+                                console.log("hide pu---", this.state.hidePUNode);
                                 this.hideSecondComponent();
                             });
                             console.log("Data update success");
@@ -4622,18 +4645,25 @@ export default class BuildTree extends Component {
         var arr = [];
         for (let i = 0; i < itemsList.length; i++) {
             var item = itemsList[i];
+            // if (this.state.hideFUPUNode) {
             if (item.payload.nodeType.id == 5) {
-                if (e.target.checked == true) {
+                if (this.state.hideFUPUNode) {
                     item.isVisible = false;
                 } else {
-                    item.isVisible = true;
+                    if (e.target.checked == true) {
+                        item.isVisible = false;
+                    } else {
+                        item.isVisible = true;
+                    }
                 }
 
             }
+            // }
             arr.push(item);
         }
         this.setState({
-            items: arr
+            items: arr,
+            hidePUNode: e.target.checked
         });
     }
     filterPlanningUnitAndForecastingUnitNodes(e) {
@@ -4646,13 +4676,15 @@ export default class BuildTree extends Component {
                 if (e.target.checked == true) {
                     item.isVisible = false;
                 } else {
-                    item.isVisible = true;
+
+                    item.isVisible = item.payload.nodeType.id == 4 ? true : (item.payload.nodeType.id == 5 && this.state.hidePUNode ? false : true);
                 }
             }
             arr.push(item);
         }
         this.setState({
-            items: arr
+            items: arr,
+            hideFUPUNode: e.target.checked
         });
     }
 
@@ -5621,6 +5653,7 @@ export default class BuildTree extends Component {
         var pu = this.state.planningUnitList.filter(x => x.id == this.state.tempPlanningUnitId)[0];
         newItem.payload.label = pu.label;
         newItem.payload.nodeType.id = 5;
+        // newItem.isVisible = this.state.hideFUPUNode || this.state.hidePUNode ? false : true;
         // var parentSortOrder = items.filter(c => c.id == parent)[0].sortOrder;
         // var childList = items.filter(c => c.parent == parent);
         newItem.sortOrder = itemConfig.context.sortOrder.concat(".").concat(("00").slice(-2));
@@ -5696,6 +5729,15 @@ export default class BuildTree extends Component {
         newItem.id = nodeId;
         newItem.level = parseInt(itemConfig.context.level + 1);
         newItem.payload.nodeId = nodeId;
+        // if (newItem.payload.nodeType.id == 4 || newItem.payload.nodeType.id == 5) {
+        //     if (this.state.hideFUPUNode) {
+        //         newItem.isVisible = false;
+        //     } else if (this.state.hidePUNode && newItem.payload.nodeType.id == 5) {
+        //         newItem.isVisible = false;
+        //     } else {
+        //         newItem.isVisible = true;
+        //     }
+        // }
         // newItem.payload.extrapolate = itemConfig.context.payload.extrapolate;
         var parentSortOrder = items.filter(c => c.id == itemConfig.context.parent)[0].sortOrder;
         var childList = items.filter(c => c.parent == itemConfig.context.parent);
