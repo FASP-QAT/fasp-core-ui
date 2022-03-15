@@ -55,7 +55,8 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       allPlanningUnitList: [],
       message: "",
       messageColor: "green",
-      consumptionChanged: false
+      consumptionChanged: false,
+      selectedConsumptionUnitObject: { "consumptionDataType": "" }
     }
     this.loaded = this.loaded.bind(this);
     this.buildDataJexcel = this.buildDataJexcel.bind(this);
@@ -526,7 +527,9 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         var col = (colArr[x]).concat(parseInt(y) + 1);
         elInstance.setStyle(col, "background-color", "transparent");
         elInstance.setStyle(col, "background-color", "yellow");
-        elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
+        // elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
+        elInstance.setComments(col, "Please enter a positive number')");
+      
       } else {
         var col = (colArr[x]).concat(parseInt(y) + 1);
         elInstance.setStyle(col, "background-color", "transparent");
@@ -558,7 +561,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         elInstance.setStyle(col, "background-color", "transparent");
         elInstance.setStyle(col, "background-color", "yellow");
         // elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
-        elInstance.setComments(col,"Please enter positive value lesser than number of days.");
+        elInstance.setComments(col, "Please enter positive value lesser than number of days.");
       } else {
         var col = (colArr[x]).concat(parseInt(y) + 1);
         elInstance.setStyle(col, "background-color", "transparent");
@@ -597,7 +600,8 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
             var col = (colArr[x]).concat(parseInt(y) + 1);
             elInstance.setStyle(col, "background-color", "transparent");
             elInstance.setStyle(col, "background-color", "yellow");
-            elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
+        // elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
+            elInstance.setComments(col, "Please enter a positive number')");
             valid = false;
           } else {
             var col = (colArr[x]).concat(parseInt(y) + 1);
@@ -632,7 +636,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
             elInstance.setStyle(col, "background-color", "transparent");
             elInstance.setStyle(col, "background-color", "yellow");
             // elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
-            elInstance.setComments(col,"Please enter positive value lesser than number of days.");
+            elInstance.setComments(col, "Please enter positive value lesser than number of days.");
             valid = false;
           } else {
             var col = (colArr[x]).concat(parseInt(y) + 1);
@@ -717,7 +721,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         //   index = fullConsumptionList.findIndex(c => c.planningUnit.id == consumptionUnit.planningUnit.id && c.region.id == regionList[r].regionId && moment(c.month).format("YYYY-MM") == moment(monthArray[i].date).format("YYYY-MM"));
         // index = fullConsumptionList.findIndex(con =>  con.region.id == regionList[r].regionId && moment(con.month).format("YYYY-MM") == moment(monthArray[i].date).format("YYYY-MM"));
 
-        if (columnData[actualConsumptionCount] > 0) {
+        if (columnData[actualConsumptionCount] >= 0) {
           if (index != -1) {
             fullConsumptionList[index].actualConsumption = columnData[actualConsumptionCount];
             fullConsumptionList[index].daysOfStockOut = columnData[daysOfStockOutCount];
@@ -967,7 +971,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
 
 
             this.setState({
-              dataEl: "",
+              // dataEl: "",
               showDetailTable: true,
               loading: false,
               message: i18n.t('static.compareAndSelect.dataSaved'),
@@ -1724,7 +1728,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         yAxes: [{
           scaleLabel: {
             display: true,
-            //  labelString: getLabelText(this.state.selectedConsumptionUnitObject.consumptionDataType == 1 ? this.state.selectedConsumptionUnitObject.planningUnit.forecastingUnit.label : this.state.selectedConsumptionUnitObject.consumptionDataType == 2 ? this.state.selectedConsumptionUnitObject.planningUnit.label : this.state.selectedConsumptionUnitObject.otherUnit.label, this.state.lang),
+            labelString: getLabelText(this.state.selectedConsumptionUnitObject.consumptionDataType == "" ? "" : this.state.selectedConsumptionUnitObject.consumptionDataType == 1 ? this.state.selectedConsumptionUnitObject.planningUnit.forecastingUnit.label : this.state.selectedConsumptionUnitObject.consumptionDataType == 2 ? this.state.selectedConsumptionUnitObject.planningUnit.label : this.state.selectedConsumptionUnitObject.otherUnit.label, this.state.lang),
             fontColor: 'black'
           },
           stacked: true,
@@ -1970,7 +1974,11 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                                     <td className="BorderNoneSupplyPlan sticky-col first-col clone1" onClick={() => this.toggleAccordion(item.planningUnit.id)}>
                                       {this.state.consumptionUnitShowArr.includes(item.planningUnit.id) ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i>}
                                     </td>
-                                    <td className="sticky-col first-col clone hoverTd" align="left" onClick={() => { this.buildDataJexcel(item.planningUnit.id) }}>{item.consumptionDataType == 1 ? getLabelText(item.planningUnit.forecastingUnit.label, this.state.lang) : item.consumptionDataType == 2 ? getLabelText(item.planningUnit.label, this.state.lang) : getLabelText(item.otherUnit.label, this.state.lang)}</td>
+                                    <td className="sticky-col first-col clone hoverTd" align="left" onClick={() => { this.buildDataJexcel(item.planningUnit.id) }}>
+                                      {
+                                        this.state.showInPlanningUnit ?getLabelText(item.planningUnit.label, this.state.lang):getLabelText(item.planningUnit.forecastingUnit.label, this.state.lang)
+                                        // item.consumptionDataType == 1 ? getLabelText(item.planningUnit.forecastingUnit.label, this.state.lang) : item.consumptionDataType == 2 ? getLabelText(item.planningUnit.label, this.state.lang) : getLabelText(item.otherUnit.label, this.state.lang)
+                                               }</td>
                                     {this.state.monthArray.map((item1, count) => {
                                       var data = this.state.planningUnitTotalList.filter(c => c.planningUnitId == item.planningUnit.id && moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM"))
                                       total += Number(data[0].qty);

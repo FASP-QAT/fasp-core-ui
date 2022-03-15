@@ -1049,13 +1049,14 @@ export default class ExtrapolateDataComponent extends React.Component {
                         // let id = AuthenticationService.displayDashboardBasedOnRole();
                         // this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/green/' + i18n.t('static.compareAndSelect.dataSaved'));
                         this.setState({
-                            dataEl: "",
+                            // dataEl: "",
                             loading: false,
                             dataChanged:false,
                             message: i18n.t('static.compareAndSelect.dataSaved')
-                        }, () => {
-                            this.componentDidMount();
                         })
+                        // , () => {
+                        //     this.componentDidMount();
+                        // })
 
                     }.bind(this);
                 }.bind(this);
@@ -1116,10 +1117,8 @@ export default class ExtrapolateDataComponent extends React.Component {
             // Need to filter
             var actualConsumptionListForPlanningUnitAndRegion = datasetJson.actualConsumptionList.filter(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId);
             if (actualConsumptionListForPlanningUnitAndRegion.length > 1) {
-                let actualMin = moment.min(actualConsumptionListForPlanningUnitAndRegion.map(d => moment(d.month)));
-                let actualMax = moment.max(actualConsumptionListForPlanningUnitAndRegion.map(d => moment(d.month)));
-
-
+                 let actualMin = moment.min(actualConsumptionListForPlanningUnitAndRegion.map(d => moment(d.month)));
+                 let actualMax = moment.max(actualConsumptionListForPlanningUnitAndRegion.map(d => moment(d.month)));
                 var rangeValue1 = "";
                 if (updateRangeValue == 0) {
                     rangeValue1 = this.state.rangeValue1;
