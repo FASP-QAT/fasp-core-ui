@@ -444,6 +444,7 @@ export default class BuildTree extends Component {
         this.pickAMonth4 = React.createRef()
         this.pickAMonth5 = React.createRef()
         this.state = {
+            viewMonthlyData: true,
             showFUValidation: true,
             fuValues: [],
             fuLabels: [],
@@ -1667,7 +1668,7 @@ export default class BuildTree extends Component {
             data[6] = this.state.currentItemConfig.context.payload.nodeType.id != 5 ? `=ROUND((E${parseInt(j) + 1}*${momListParent[j].calculatedValue}/100)*L${parseInt(j) + 1},2)` : `=ROUND((E${parseInt(j) + 1}*${momListParent[j].calculatedValue}/100)/${(this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].puNode.planningUnit.multiplier},2)`;
             // data[6] = this.state.manualChange ? momList[j].calculatedValue : ((momListParent[j].manualChange > 0) ? momListParent[j].endValueWithManualChangeWMC : momListParent[j].calculatedValueWMC *  momList[j].endValueWithManualChangeWMC) / 100
             data[7] = this.state.currentScenario.nodeDataId
-            data[8] = this.state.currentItemConfig.context.payload.nodeType.id == 5 && parentNodeNodeData.fuNode.usageType.id == 2 ? j >= lagInMonths ? `=P${parseInt(j) + 1 - lagInMonths}` : 0 : j >= lagInMonths?`=P${parseInt(j) + 1}`:0;
+            data[8] = this.state.currentItemConfig.context.payload.nodeType.id == 5 && parentNodeNodeData.fuNode.usageType.id == 2 ? j >= lagInMonths ? `=P${parseInt(j) + 1 - lagInMonths}` : 0 : j >= lagInMonths ? `=P${parseInt(j) + 1}` : 0;
             data[9] = `=ROUND(IF(B${parseInt(j) + 1}+C${parseInt(j) + 1}<0,0,IF(B${parseInt(j) + 1}+C${parseInt(j) + 1}>100,100,B${parseInt(j) + 1}+C${parseInt(j) + 1})),2)`
             data[10] = this.state.currentScenario.manualChangesEffectFuture;
             data[11] = this.state.currentItemConfig.context.payload.nodeType.id == 4 ? fuPerMonth : 1;
@@ -1723,7 +1724,7 @@ export default class BuildTree extends Component {
                 {
                     title: i18n.t('static.tree.manualChange'),
                     type: 'numeric',
-                    mask: '#,##.00', decimal: '.'
+                    mask: '#,##.00%', decimal: '.'
 
                 },
                 {
@@ -1897,7 +1898,7 @@ export default class BuildTree extends Component {
                     // 4
                     title: i18n.t('static.tree.seasonalityIndex'),
                     type: this.state.seasonality == true ? 'numeric' : 'hidden',
-                    mask: '#,##.00', decimal: '.',
+                    mask: '#,##.00%', decimal: '.',
                     readOnly: !this.state.aggregationNode ? true : false
                 },
                 {
@@ -1989,13 +1990,27 @@ export default class BuildTree extends Component {
             var getMomDataForCurrentNodeParent = this.state.parentScenario.nodeDataMomList;
             console.log("in if>>>>", getMomDataForCurrentNodeParent);
 
-            this.setState({ showMomDataPercent: true, showMomData: false, momListPer: getMomDataForCurrentNode, momListPerParent: getMomDataForCurrentNodeParent }, () => {
-                this.buildMomJexcelPercent();
+            this.setState({ showMomDataPercent: !this.state.showMomDataPercent, showMomData: false, momListPer: getMomDataForCurrentNode, momListPerParent: getMomDataForCurrentNodeParent }, () => {
+                if (this.state.showMomDataPercent) {
+                    console.log("inside show mom data percent node");
+                    this.setState({ viewMonthlyData: false }, () => {
+                        this.buildMomJexcelPercent();
+                    })
+                } else {
+                    this.setState({ viewMonthlyData: true });
+                }
             });
         } else {
             console.log("in else>>>>");
-            this.setState({ showMomDataPercent: false, showMomData: true, momList: getMomDataForCurrentNode }, () => {
-                this.buildMomJexcel();
+            this.setState({ showMomDataPercent: false, showMomData: !this.state.showMomData, momList: getMomDataForCurrentNode }, () => {
+                if (this.state.showMomData) {
+                    console.log("inside show mom data number node");
+                    this.setState({ viewMonthlyData: false }, () => {
+                        this.buildMomJexcel();
+                    })
+                } else {
+                    this.setState({ viewMonthlyData: true });
+                }
             });
         }
 
@@ -2236,7 +2251,7 @@ export default class BuildTree extends Component {
                                         },
                                         startDate: startDate,
                                         stopDate: stopDate,
-                                        dataValue: map1.get("2") == 2 ? map1.get("6").toString().replaceAll(",", "") : map1.get("5").toString().replaceAll(",", ""),
+                                        dataValue: map1.get("2") == 2 ? map1.get("6").toString().replaceAll(",", "") : map1.get("5").toString().replaceAll(",", "").split("%")[0],
                                         nodeDataModelingId: parseInt(maxModelingId) + 1
                                     }
                                     maxModelingId++;
@@ -2787,7 +2802,7 @@ export default class BuildTree extends Component {
                 {
                     title: i18n.t('static.tree.monthlyChange%'),
                     type: 'numeric',
-                    mask: '#,##.00', decimal: '.',
+                    mask: '#,##.00%', decimal: '.',
                 },
                 {
                     title: i18n.t('static.tree.MonthlyChange#'),
@@ -3022,7 +3037,7 @@ export default class BuildTree extends Component {
         //             if ((map1.get("4") != '' && map1.get("4") != 0.00) || (map1.get("5") != '' && map1.get("5") != 0.00)) {
         //                 var overrideData = {
         //                     month: map1.get("0"),
-        //                     seasonalityPerc: map1.get("4"),
+        //                     seasonalityPerc: map1.get("4").toString().replaceAll(",", "").split("%")[0],
         //                     manualChange: (map1.get("5") != '' && map1.get("5") != 0.00) ? (map1.get("5")).replaceAll(",", "") : map1.get("5"),
         //                     nodeDataId: map1.get("7"),
         //                     active: true
@@ -3074,7 +3089,7 @@ export default class BuildTree extends Component {
         //                 var overrideData = {
         //                     month: map1.get("0"),
         //                     seasonalityPerc: 0,
-        //                     manualChange: map1.get("3"),
+        //                     manualChange: map1.get("3").toString().replaceAll(",", "").split("%")[0],
         //                     nodeDataId: map1.get("7"),
         //                     active: true
         //                 }
@@ -3141,10 +3156,14 @@ export default class BuildTree extends Component {
                 instance.jexcel.setComments(col, "");
             }
         }
+
+        var startDate = instance.jexcel.getValue(`D${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+        var stopDate = instance.jexcel.getValue(`E${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+
         // Start date
         if (x == 3) {
             var col = ("D").concat(parseInt(y) + 1);
-
+            var diff1 = moment(stopDate).diff(moment(startDate), 'months');
             if (value == "") {
                 instance.jexcel.setStyle(col, "background-color", "transparent");
                 instance.jexcel.setStyle(col, "background-color", "yellow");
@@ -3152,11 +3171,19 @@ export default class BuildTree extends Component {
             } else {
                 instance.jexcel.setStyle(col, "background-color", "transparent");
                 instance.jexcel.setComments(col, "");
+                var col1 = ("E").concat(parseInt(y) + 1)
+                if (diff1 <= 0) {
+                    instance.jexcel.setStyle(col1, "background-color", "transparent");
+                    instance.jexcel.setStyle(col1, "background-color", "yellow");
+                    instance.jexcel.setComments(col1, 'Please enter valid date');
+                } else {
+                    instance.jexcel.setStyle(col1, "background-color", "transparent");
+                    instance.jexcel.setComments(col1, "");
+                }
             }
-            this.state.modelingEl.setValueFromCoords(4, y, '', true);
+            // this.state.modelingEl.setValueFromCoords(4, y, '', true);
         }
-        var startDate = instance.jexcel.getValue(`D${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-        var stopDate = instance.jexcel.getValue(`E${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+
         // Stop date
         if (x == 4) {
             var col = ("E").concat(parseInt(y) + 1);
@@ -3187,7 +3214,7 @@ export default class BuildTree extends Component {
             // Monthly change %
             if (x == 5 && rowData[2] != 2) {
                 var col = ("F").concat(parseInt(y) + 1);
-                value = value.toString().replaceAll(",", "");
+                value = value.toString().replaceAll(",", "").split("%")[0];
                 if (value == "") {
                     instance.jexcel.setStyle(col, "background-color", "transparent");
                     instance.jexcel.setStyle(col, "background-color", "yellow");
@@ -4548,7 +4575,7 @@ export default class BuildTree extends Component {
         var scenarioId = this.state.selectedScenario;
         console.log("%%%tracerCategoryId---", tracerCategoryId)
         var forecastingUnitList = this.state.forecastingUnitList;
-        var filteredForecastingUnitList = tracerCategoryId != "" ? this.state.forecastingUnitList.filter(x => x.tracerCategory.id == tracerCategoryId) : forecastingUnitList;
+        var filteredForecastingUnitList = tracerCategoryId != "" ? this.state.forecastingUnitList.filter(x => x.tracerCategory.id == tracerCategoryId) : [];
         // var autocompleteData = [];
         // for (var i = 0; i < forecastingUnitList.length; i++) {
         //     autocompleteData[i] = { value: forecastingUnitList[i].id, label: forecastingUnitList[i].id + "|" + getLabelText(forecastingUnitList[i].label, this.state.lang) }
@@ -5619,7 +5646,7 @@ export default class BuildTree extends Component {
             (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].puNode.puPerVisit = "";
         }
 
-        
+
         (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].puNode.sharePlanningUnit = false;
         (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].puNode.planningUnit.multiplier = pu.multiplier;
         // if (itemConfig.context.payload.nodeType.id == 4) {
@@ -5899,6 +5926,7 @@ export default class BuildTree extends Component {
         const { context: item } = data;
         if (item != null) {
             this.setState({
+                viewMonthlyData: true,
                 usageTemplateId: '',
                 sameLevelNodeList: [],
                 showCalculatorFields: false,
@@ -6489,20 +6517,25 @@ export default class BuildTree extends Component {
                                         {/* <> */}
                                         <FormGroup className="col-md-6" style={{ display: this.state.numberNode ? 'block' : 'none' }}>
                                             <Label htmlFor="currencyId">{i18n.t('static.tree.percentageOfParent')}<span class="red Reqasterisk">*</span></Label>
-                                            <Input type="text"
-                                                id="percentageOfParent"
-                                                name="percentageOfParent"
-                                                bsSize="sm"
-                                                valid={!errors.percentageOfParent && this.state.currentScenario.dataValue != ''}
-                                                invalid={touched.percentageOfParent && !!errors.percentageOfParent}
-                                                onBlur={handleBlur}
-                                                onChange={(e) => {
-                                                    handleChange(e);
-                                                    this.dataChange(e)
-                                                }}
-                                                // step={.01}
-                                                value={this.state.currentScenario.dataValue}></Input>
-                                            <FormFeedback className="red">{errors.percentageOfParent}</FormFeedback>
+                                            <InputGroup>
+                                                <Input type="text"
+                                                    id="percentageOfParent"
+                                                    name="percentageOfParent"
+                                                    bsSize="sm"
+                                                    valid={!errors.percentageOfParent && this.state.currentScenario.dataValue != ''}
+                                                    invalid={touched.percentageOfParent && !!errors.percentageOfParent}
+                                                    onBlur={handleBlur}
+                                                    onChange={(e) => {
+                                                        handleChange(e);
+                                                        this.dataChange(e)
+                                                    }}
+                                                    // step={.01}
+                                                    value={this.state.currentScenario.dataValue}></Input>
+                                                <InputGroupAddon addonType="append">
+                                                    <InputGroupText><i class="fa fa-percent icons" data-toggle="collapse" aria-expanded="false"></i></InputGroupText>
+                                                </InputGroupAddon>
+                                                <FormFeedback className="red">{errors.percentageOfParent}</FormFeedback>
+                                            </InputGroup>
                                         </FormGroup>
                                         <FormGroup className="col-md-6" style={{ display: this.state.numberNode ? 'block' : 'none' }}>
                                             <Label htmlFor="currencyId">{i18n.t('static.tree.parentValue')} {i18n.t('static.common.for')} {moment(this.state.parentScenario.month).format(`MMM-YYYY`)}</Label>
@@ -7408,7 +7441,7 @@ export default class BuildTree extends Component {
 
                                 </>
                             }
-                            <div><Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.showMomData()}><i className="fa fa-eye" style={{ color: '#fff' }}></i> {i18n.t('static.tree.viewMonthlyData')}</Button>
+                            <div><Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.showMomData()}><i className={this.state.viewMonthlyData ? "fa fa-eye" : "fa fa-eye-slash"} style={{ color: '#fff' }}></i> {this.state.viewMonthlyData ? i18n.t('static.tree.viewMonthlyData') : i18n.t('static.tree.hideMonthlyData')}</Button>
                                 {this.state.aggregationNode && <><Button color="success" size="md" className="float-right mr-1" type="button" onClick={(e) => this.formSubmitLoader(e)}> <i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
                                     <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button></>}
                             </div>
@@ -8307,6 +8340,9 @@ export default class BuildTree extends Component {
                                 nodeDataMap[this.state.selectedScenario] = tempArray;
                                 // tempArray.push(nodeDataMap);
                                 this.setState({
+                                    showMomDataPercent: false,
+                                    showMomData: false,
+                                    viewMonthlyData: true,
                                     tempPlanningUnitId: '',
                                     parentValue: "",
                                     fuValues: [],
