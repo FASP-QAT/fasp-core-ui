@@ -1490,68 +1490,122 @@ export default class BuildTree extends Component {
     updateMomDataInDataSet() {
         this.setState({
             momJexcelLoader: true
-        });
-        let { dataSetObj } = this.state;
-        var dataSetObjCopy = JSON.parse(JSON.stringify(dataSetObj));
-        var programData = dataSetObjCopy.programData;
-        console.log("dataSetDecrypt>>>", programData);
+        }, () => {
+            setTimeout(() => {
+                var nodeTypeId = this.state.currentItemConfig.context.payload.nodeType.id;
+                var json = nodeTypeId == 2 ? this.state.momEl.getJson(null, false) : this.state.momElPer.getJson(null, false);
+                console.log("momData>>>", json);
+                var overrideListArray = [];
+                for (var i = 0; i < json.length; i++) {
+                    var map1 = new Map(Object.entries(json[i]));
+                    if (nodeTypeId == 2) {
+                        if ((map1.get("4") != '' && map1.get("4") != 0.00) || (map1.get("5") != '' && map1.get("5") != 0.00)) {
+                            var overrideData = {
+                                month: map1.get("0"),
+                                seasonalityPerc: map1.get("4").toString().replaceAll(",", "").split("%")[0],
+                                manualChange: (map1.get("5") != '' && map1.get("5") != 0.00) ? (map1.get("5")).replaceAll(",", "") : map1.get("5"),
+                                nodeDataId: map1.get("7"),
+                                active: true
+                            }
+                            console.log("overrideData>>>", overrideData);
+                            overrideListArray.push(overrideData);
+                        }
+                    } else if (nodeTypeId == 3 || nodeTypeId == 4 || nodeTypeId == 5) {
+                        if (map1.get("3") != '' && map1.get("3") != 0.00) {
+                            var overrideData = {
+                                month: map1.get("0"),
+                                seasonalityPerc: 0,
+                                manualChange: map1.get("3").toString().replaceAll(",", "").split("%")[0],
+                                nodeDataId: map1.get("7"),
+                                active: true
+                            }
+                            console.log("overrideData>>>", overrideData);
+                            overrideListArray.push(overrideData);
+                        }
+                    }
+                }
+                console.log("overRide data list>>>", overrideListArray);
+                let { currentItemConfig } = this.state;
+                let { curTreeObj } = this.state;
+                let { treeData } = this.state;
+                let { dataSetObj } = this.state;
+                var dataSetObjCopy = JSON.parse(JSON.stringify(dataSetObj));
+                var items = this.state.items;
+                (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].nodeDataOverrideList = overrideListArray;
+                this.setState({ currentItemConfig }, () => {
+                    var findNodeIndex = items.findIndex(n => n.id == currentItemConfig.context.id);
+                    items[findNodeIndex] = currentItemConfig.context;
+                    console.log("items>>>", items);
+                    curTreeObj.tree.flatList = items;
 
-        programData = (CryptoJS.AES.encrypt(JSON.stringify(programData), SECRET_KEY)).toString();
-        dataSetObjCopy.programData = programData;
+                    var findTreeIndex = treeData.findIndex(n => n.treeId == curTreeObj.treeId);
+                    treeData[findTreeIndex] = curTreeObj;
 
-        console.log("encpyDataSet>>>", dataSetObjCopy)
-        // store update object in indexdb
-        var db1;
-        getDatabase();
-        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-        openRequest.onerror = function (event) {
-            this.setState({
-                message: i18n.t('static.program.errortext'),
-                color: 'red'
-            })
-            this.hideFirstComponent()
-        }.bind(this);
-        openRequest.onsuccess = function (e) {
-            db1 = e.target.result;
-            var transaction = db1.transaction(['datasetData'], 'readwrite');
-            var programTransaction = transaction.objectStore('datasetData');
-            // programs.forEach(program => {
-            var programRequest = programTransaction.put(dataSetObjCopy);
-            console.log("---hurrey---");
-            // })
-            transaction.oncomplete = function (event) {
-                console.log("all good >>>>");
+                    // var databytes = CryptoJS.AES.decrypt(dataSetObj.programData, SECRET_KEY);
+                    // var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
+                    var programData = dataSetObjCopy.programData;
+                    programData.treeList = treeData;
+                    // programData = (CryptoJS.AES.encrypt(JSON.stringify(programData), SECRET_KEY)).toString();
+                    // dataSetObjCopy.programData = programData;
+                    // dataSetObj.programData = programData;
+                    console.log("dataSetDecrypt>>>", programData);
+                    calculateModelingData(dataSetObjCopy, this, '', currentItemConfig.context.id, this.state.selectedScenario, 1, this.state.treeId, false);
+                    // store update object in indexdb
+                    //     var db1;
+                    //     getDatabase();
+                    //     var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+                    //     openRequest.onerror = function (event) {
+                    //         this.setState({
+                    //             message: i18n.t('static.program.errortext'),
+                    //             color: 'red'
+                    //         })
+                    //         this.hideFirstComponent()
+                    //     }.bind(this);
+                    //     openRequest.onsuccess = function (e) {
+                    //         db1 = e.target.result;
+                    //         var transaction = db1.transaction(['datasetData'], 'readwrite');
+                    //         var programTransaction = transaction.objectStore('datasetData');
+                    //         // programs.forEach(program => {
+                    //         var programRequest = programTransaction.put(dataSetObjCopy);
+                    //         console.log("---hurrey---");
+                    //         // })
+                    //         transaction.oncomplete = function (event) {
+                    //             console.log("all good >>>>");
 
-                this.setState({
-                    momJexcelLoader: false
-                });
-                console.log("Data update success");
-            }.bind(this);
-            transaction.onerror = function (event) {
-                this.setState({
-                    loading: false,
-                    message: 'Error occured.',
-                    color: "red",
-                }, () => {
-                    this.hideSecondComponent();
-                });
-                console.log("Data update errr");
-            }.bind(this);
-        }.bind(this);
-        // nodeDataId,month,manualChangeValue,seconalityPer
-    }
+                    //             this.setState({
+                    //                 momJexcelLoader: false
+                    //             });
+                    //             console.log("Data update success");
+                    //         }.bind(this);
+                    //         transaction.onerror = function (event) {
+                    //             this.setState({
+                    //                 loading: false,
+                    //                 message: 'Error occured.',
+                    //                 color: "red",
+                    //             }, () => {
+                    //                 this.hideSecondComponent();
+                    //             });
+                    //             console.log("Data update errr");
+                    //         }.bind(this);
+                    //     }.bind(this);
+                    // });
+
+                }, 0);
+            });
+
+        }
     getStartValueForMonth(dateValue) {
-        console.log("***", this.state.parentNodeDataMap);
-    }
+            console.log("***", this.state.parentNodeDataMap);
+        }
     openScenarioModal(type) {
-        console.log("type---------", type);
-        var scenarioId = this.state.selectedScenario;
-        this.setState({
-            scenarioActionType: type,
-            showDiv1: false
+            console.log("type---------", type);
+            var scenarioId = this.state.selectedScenario;
+            this.setState({
+                scenarioActionType: type,
+                showDiv1: false
 
-        })
-        if (type != 3) {
+            })
+        if(type != 3) {
             if (type == 2) {
                 console.log("edit scenario");
                 if (scenarioId != "") {
