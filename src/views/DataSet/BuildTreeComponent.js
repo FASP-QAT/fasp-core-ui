@@ -143,6 +143,19 @@ const validationSchemaNodeData = function (values) {
                     .typeError('Please select forecasting unit'),
                 otherwise: Yup.string().notRequired()
             }),
+
+        planningUnitIdFUFlag: Yup.boolean(),
+        planningUnitIdFU: Yup.string()
+            .when("planningUnitIdFUFlag", {
+                is: val => {
+                    return document.getElementById("planningUnitIdFUFlag").value === "true";
+
+                },
+                then: Yup.string()
+                    .required('Please select planning unit')
+                    .typeError('Please select planning unit'),
+                otherwise: Yup.string().notRequired()
+            }),
         // forecastingUnitId: Yup.string()
         //     .test('forecastingUnitId', 'Please select forecasting unit 1',
         //         function (value) {
@@ -745,6 +758,7 @@ export default class BuildTree extends Component {
         this.updateExtrapolationData = this.updateExtrapolationData.bind(this);
         this.round = this.round.bind(this);
         this.calculatePUPerVisit = this.calculatePUPerVisit.bind(this);
+        this.createPUNode = this.createPUNode.bind(this);
     }
     calculatePUPerVisit(isRefillMonth) {
         var currentScenario = this.state.currentScenario;
@@ -3783,6 +3797,7 @@ export default class BuildTree extends Component {
                 }
                 this.setState({ showFUValidation: false }, () => {
                     this.getForecastingUnitUnitByFUId(regionIds.value);
+
                 });
             } else {
                 currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.forecastingUnit.id = "";
@@ -3790,6 +3805,7 @@ export default class BuildTree extends Component {
                 // currentItemConfig.context.payload.label.label_en = "";
                 this.setState({ showFUValidation: true });
             }
+            this.getPlanningUnitListByFUId(regionIds.value);
             console.log("regionValues---", this.state.fuValues);
             console.log("regionLabels---", this.state.fuLabels);
             // if ((this.state.regionValues).length > 0) {
@@ -5518,6 +5534,11 @@ export default class BuildTree extends Component {
             (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode = fuNode;
         }
 
+
+        if (event.target.name === "planningUnitIdFU") {
+            this.setState({ tempPlanningUnitId: event.target.value });
+        }
+
         if (event.target.name === "planningUnitId") {
             if (event.target.value != "") {
                 var pu = (this.state.planningUnitList.filter(c => c.id == event.target.value))[0];
@@ -5558,6 +5579,84 @@ export default class BuildTree extends Component {
                     this.calculatePUPerVisit(true);
                 } else { }
             }
+        });
+    }
+    createPUNode(itemConfig, parent) {
+        console.log("create PU node---", itemConfig);
+        const { items } = this.state;
+        var maxNodeId = items.length > 0 ? Math.max(...items.map(o => o.id)) : 0;
+        var nodeId = parseInt(maxNodeId + 1);
+        var newItem = itemConfig.context;
+        newItem.parent = parent;
+        newItem.id = nodeId;
+        newItem.level = parseInt(itemConfig.context.level + 2);
+        newItem.payload.nodeId = nodeId;
+        var pu = this.state.planningUnitList.filter(x => x.id == this.state.tempPlanningUnitId)[0];
+        newItem.payload.label = pu.label;
+        newItem.payload.nodeType.id = 5;
+        // var parentSortOrder = items.filter(c => c.id == parent)[0].sortOrder;
+        // var childList = items.filter(c => c.parent == parent);
+        newItem.sortOrder = itemConfig.context.sortOrder.concat(".").concat(("00").slice(-2));
+        console.log("pu node month---", (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].month);
+        (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].nodeDataId = this.getMaxNodeDataId();
+        (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].dataValue = 100;
+        (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].displayDataValue = (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].dataValue;
+        (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].displayCalculatedDataValue = (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].calculatedDataValue;
+        // (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].month = moment((newItem.payload.nodeDataMap[this.state.selectedScenario])[0].month).startOf('month').format("YYYY-MM-DD")
+        (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].puNode.planningUnit.id = this.state.tempPlanningUnitId;
+        (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].puNode.planningUnit.label = pu.label;
+        try {
+            var refillMonths = this.round(parseFloat(pu.multiplier / (itemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod)).toFixed(2));
+            (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].puNode.refillMonths = refillMonths;
+            console.log("AUTO refillMonths---", refillMonths);
+            // console.log("PUPERVISIT noOfForecastingUnitsPerPerson---", parentScenario.fuNode.noOfForecastingUnitsPerPerson);
+            console.log("AUTO noOfMonthsInUsagePeriod---", this.state.noOfMonthsInUsagePeriod);
+            var puPerVisit = this.round(parseFloat(((itemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod) * refillMonths) / pu.multiplier).toFixed(2));
+            console.log("AUTO puPerVisit---", puPerVisit);
+            (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].puNode.puPerVisit = puPerVisit;
+        } catch (err) {
+            (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].puNode.refillMonths = 1;
+            (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].puNode.puPerVisit = "";
+        }
+
+        
+        (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].puNode.sharePlanningUnit = false;
+        (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].puNode.planningUnit.multiplier = pu.multiplier;
+        // if (itemConfig.context.payload.nodeType.id == 4) {
+        //     (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.forecastingUnit.label.label_en = (itemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.forecastingUnit.label.label_en;
+        // }
+        var scenarioList = this.state.scenarioList.filter(x => x.id != this.state.selectedScenario);
+        if (scenarioList.length > 0) {
+            for (let i = 0; i < scenarioList.length; i++) {
+                var tempArray = [];
+                var nodeDataMap = {};
+                tempArray.push(JSON.parse(JSON.stringify((newItem.payload.nodeDataMap[this.state.selectedScenario])[0])));
+                console.log("tempArray---", tempArray);
+                nodeDataMap = newItem.payload.nodeDataMap;
+                tempArray[0].nodeDataId = this.getMaxNodeDataId();
+                nodeDataMap[scenarioList[i].id] = tempArray;
+                // nodeDataMap[scenarioList[i].id][0].nodeDataId = scenarioList[i].id;
+                newItem.payload.nodeDataMap = nodeDataMap;
+                // (newItem.payload.nodeDataMap[scenarioList[i].id])[0] = (newItem.payload.nodeDataMap[this.state.selectedScenario]);
+            }
+        }
+        console.log("pu node add button clicked value after update---", newItem);
+        console.log("pu node add button clicked value after update---", newItem.payload.nodeDataMap.length);
+        this.setState({
+            items: [...items, newItem],
+            cursorItem: nodeId,
+            converionFactor: pu.multiplier
+        }, () => {
+
+            console.log("on add items-------", this.state.items);
+            if (!itemConfig.context.payload.extrapolation) {
+                this.calculateMOMData(newItem.id, 0);
+            } else {
+                this.setState({
+                    loading: false
+                })
+            }
+            // this.calculateValuesForAggregateNode(this.state.items);
         });
     }
     onAddButtonClick(itemConfig) {
@@ -5604,12 +5703,16 @@ export default class BuildTree extends Component {
         }, () => {
 
             console.log("on add items-------", this.state.items);
-            if (!itemConfig.context.payload.extrapolation) {
-                this.calculateMOMData(newItem.id, 0);
+            if (itemConfig.context.payload.nodeType.id == 4) {
+                this.createPUNode(JSON.parse(JSON.stringify(itemConfig)), nodeId);
             } else {
-                this.setState({
-                    loading: false
-                })
+                if (!itemConfig.context.payload.extrapolation) {
+                    this.calculateMOMData(newItem.id, 0);
+                } else {
+                    this.setState({
+                        loading: false
+                    })
+                }
             }
             // this.calculateValuesForAggregateNode(this.state.items);
         });
@@ -5675,6 +5778,7 @@ export default class BuildTree extends Component {
 
         this.setState(this.getDeletedItems(items, [itemConfig.id]), () => {
             this.calculateValuesForAggregateNode(this.state.items);
+            this.saveTreeData();
         });
     }
     onMoveItem(parentid, itemid) {
@@ -6801,40 +6905,40 @@ export default class BuildTree extends Component {
                                                     />
                                                     <FormFeedback>{errors.forecastingUnitId}</FormFeedback>
                                                 </div><br />
-                                                {/* <div className="controls fuNodeAutocomplete"
-                                                >
-                                                    <Autocomplete
-                                                        id="forecastingUnitId"
-                                                        name="forecastingUnitId"
-                                                        // value={{ value: this.state.currentItemConfig.context.payload.nodeType.id == 4 ? this.state.currentScenario.fuNode.forecastingUnit.id : "", label: this.state.currentItemConfig.context.payload.nodeType.id == 4 ? this.state.currentScenario.fuNode.forecastingUnit.label.label_en : "" }}
-                                                        defaultValue={{ value: this.state.currentItemConfig.context.payload.nodeType.id == 4 ? this.state.currentScenario.fuNode.forecastingUnit.id : "", label: this.state.currentItemConfig.context.payload.nodeType.id == 4 ? this.state.currentScenario.fuNode.forecastingUnit.label.label_en : "" }}
-                                                        options={this.state.autocompleteData}
-                                                        getOptionLabel={(option) => option.label}
-                                                        // style={{ width: 1000 }}
-                                                        onChange={(event, value) => {
-                                                            console.log("combo 2 ro combo box---", value);
-                                                            // console.log("combo 2 ro combo box---", event.target.value);
-                                                            // if(){
-                                                            this.state.currentScenario.fuNode.forecastingUnit.id = value.value;
-                                                            (this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.forecastingUnit.id = value.value;
-                                                            if (value != null) {
-                                                                this.state.currentScenario.fuNode.forecastingUnit.label.label_en = value.label;
-                                                                (this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.forecastingUnit.label.label_en = value.label;
-                                                               
-                                                            }
-                                                            console.log("autocomplete data---", this.state.currentItemConfig)
-                                                            this.getForecastingUnitUnitByFUId(value.value);
-
-                                                        }} 
-                                                        renderInput={(params) => <TextField {...params} variant="outlined"
-                                                            onChange={(e) => {
-                                                                // this.searchErpOrderData(e.target.value)
-                                                            }} />}
-                                                    />
-
-                                                </div> */}
                                             </FormGroup>
+                                            <Input type="hidden"
+                                                id="planningUnitIdFUFlag"
+                                                name="planningUnitIdFUFlag"
+                                                value={this.state.addNodeFlag}
+                                            />
+                                            <FormGroup className="col-md-12" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.addNodeFlag == true ? 'block' : 'none' }}>
+                                                <Label htmlFor="currencyId">{i18n.t('static.product.product')}<span class="red Reqasterisk">*</span></Label>
+                                                <div className="controls ">
+                                                    {/* <InMultiputGroup> */}
+                                                    <Input type="select"
+                                                        id="planningUnitIdFU"
+                                                        name="planningUnitIdFU"
+                                                        bsSize="sm"
+                                                        valid={!errors.planningUnitIdFU}
+                                                        invalid={touched.planningUnitIdFU && !!errors.planningUnitIdFU}
+                                                        onBlur={handleBlur}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                        value={this.state.tempPlanningUnitId}
+                                                    >
 
+                                                        <option value="">{i18n.t('static.common.select')}</option>
+                                                        {this.state.planningUnitList.length > 0
+                                                            && this.state.planningUnitList.map((item, i) => {
+                                                                return (
+                                                                    <option key={i} value={item.id}>
+                                                                        {getLabelText(item.label, this.state.lang) + " | " + item.id}
+                                                                    </option>
+                                                                )
+                                                            }, this)}
+                                                    </Input>
+                                                    <FormFeedback>{errors.planningUnitIdFU}</FormFeedback>
+                                                </div><br />
+                                            </FormGroup>
                                             <FormGroup className="col-md-6" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 4 ? 'block' : 'none' }}>
                                                 <Label htmlFor="currencyId">{i18n.t('static.common.typeofuse')}<span class="red Reqasterisk">*</span></Label>
                                                 <Input
@@ -8203,6 +8307,7 @@ export default class BuildTree extends Component {
                                 nodeDataMap[this.state.selectedScenario] = tempArray;
                                 // tempArray.push(nodeDataMap);
                                 this.setState({
+                                    tempPlanningUnitId: '',
                                     parentValue: "",
                                     fuValues: [],
                                     fuLabels: [],
