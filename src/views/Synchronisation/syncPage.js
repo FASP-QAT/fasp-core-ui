@@ -3456,10 +3456,9 @@ export default class syncPage extends Component {
       }
       problemReportList = (problemReportList.concat(oldProgramDataProblem.filter(c => c.problemReportId == 0))).filter(c => c.newAdded != true);
       problemReportList = problemReportList.filter(c => c.planningUnitActive != false && c.regionActive != false);
-      var problemListDate = moment(Date.now()).subtract(12, 'months').endOf('month').format("YYYY-MM-DD");
+      // var problemListDate = moment(Date.now()).subtract(12, 'months').endOf('month').format("YYYY-MM-DD");
       if (problemReportList.filter(c =>
-        c.problemStatus.id == OPEN_PROBLEM_STATUS_ID &&
-        moment(c.createdDate).format("YYYY-MM-DD") > problemListDate
+        c.problemStatus.id == OPEN_PROBLEM_STATUS_ID
       ).length > 0 && document.getElementById("versionType").value == FINAL_VERSION_TYPE && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes("ROLE_BF_READONLY_ACCESS_REALM_ADMIN")) {
         alert(i18n.t("static.commitVersion.cannotCommitWithOpenProblems"))
         this.setState({ loading: false });
@@ -4445,11 +4444,12 @@ export default class syncPage extends Component {
         var latestOtherProblemListEntries = latestProgramDataProblemList.filter(c => !(existingProblemReportId.includes(c.problemReportId)));
         mergedProblemListData = mergedProblemListData.concat(latestOtherProblemListEntries);
         mergedProblemListData = mergedProblemListData.filter(c => c.planningUnitActive != false && c.regionActive != false)
-        var problemListDate = moment(Date.now()).subtract(12, 'months').endOf('month').format("YYYY-MM-DD");
+        // var problemListDate = moment(Date.now()).subtract(12, 'months').endOf('month').format("YYYY-MM-DD");
         this.setState({
           openCount: mergedProblemListData.filter(c =>
-            c.problemStatus.id == OPEN_PROBLEM_STATUS_ID &&
-            moment(c.createdDate).format("YYYY-MM-DD") > problemListDate).length
+            c.problemStatus.id == OPEN_PROBLEM_STATUS_ID
+            //  && moment(c.createdDate).format("YYYY-MM-DD") > problemListDate
+            ).length
         })
 
         var data = [];
