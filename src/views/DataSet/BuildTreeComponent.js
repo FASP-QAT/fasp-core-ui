@@ -143,6 +143,19 @@ const validationSchemaNodeData = function (values) {
                     .typeError('Please select forecasting unit'),
                 otherwise: Yup.string().notRequired()
             }),
+
+        planningUnitIdFUFlag: Yup.boolean(),
+        planningUnitIdFU: Yup.string()
+            .when("planningUnitIdFUFlag", {
+                is: val => {
+                    return document.getElementById("planningUnitIdFUFlag").value === "true";
+
+                },
+                then: Yup.string()
+                    .required('Please select planning unit')
+                    .typeError('Please select planning unit'),
+                otherwise: Yup.string().notRequired()
+            }),
         // forecastingUnitId: Yup.string()
         //     .test('forecastingUnitId', 'Please select forecasting unit 1',
         //         function (value) {
@@ -3678,6 +3691,7 @@ export default class BuildTree extends Component {
                 }
                 this.setState({ showFUValidation: false }, () => {
                     this.getForecastingUnitUnitByFUId(regionIds.value);
+
                 });
             } else {
                 currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.forecastingUnit.id = "";
@@ -3685,6 +3699,7 @@ export default class BuildTree extends Component {
                 // currentItemConfig.context.payload.label.label_en = "";
                 this.setState({ showFUValidation: true });
             }
+            this.getPlanningUnitListByFUId(regionIds.value);
             console.log("regionValues---", this.state.fuValues);
             console.log("regionLabels---", this.state.fuLabels);
             // if ((this.state.regionValues).length > 0) {
@@ -5470,15 +5485,37 @@ export default class BuildTree extends Component {
         newItem.id = nodeId;
         newItem.level = parseInt(itemConfig.context.level + 2);
         newItem.payload.nodeId = nodeId;
-
+        var pu = this.state.planningUnitList.filter(x => x.id == this.state.tempPlanningUnitId)[0];
+        newItem.payload.label = pu.label;
+        newItem.payload.nodeType.id = 5;
         // var parentSortOrder = items.filter(c => c.id == parent)[0].sortOrder;
         // var childList = items.filter(c => c.parent == parent);
-        // newItem.sortOrder = parentSortOrder.concat(".").concat(("0" + (Number(childList.length) + 1)).slice(-2));
+        newItem.sortOrder = itemConfig.context.sortOrder.concat(".").concat(("00").slice(-2));
+        console.log("pu node month---", (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].month);
         (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].nodeDataId = this.getMaxNodeDataId();
         (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].dataValue = 100;
         (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].displayDataValue = (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].dataValue;
         (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].displayCalculatedDataValue = (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].calculatedDataValue;
-        (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].month = moment((newItem.payload.nodeDataMap[this.state.selectedScenario])[0].month).startOf('month').format("YYYY-MM-DD")
+        // (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].month = moment((newItem.payload.nodeDataMap[this.state.selectedScenario])[0].month).startOf('month').format("YYYY-MM-DD")
+        (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].puNode.planningUnit.id = this.state.tempPlanningUnitId;
+        (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].puNode.planningUnit.label = pu.label;
+        try {
+            var refillMonths = this.round(parseFloat(pu.multiplier / (itemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod)).toFixed(2));
+            (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].puNode.refillMonths = refillMonths;
+            console.log("AUTO refillMonths---", refillMonths);
+            // console.log("PUPERVISIT noOfForecastingUnitsPerPerson---", parentScenario.fuNode.noOfForecastingUnitsPerPerson);
+            console.log("AUTO noOfMonthsInUsagePeriod---", this.state.noOfMonthsInUsagePeriod);
+            var puPerVisit = this.round(parseFloat(((itemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod) * refillMonths) / pu.multiplier).toFixed(2));
+            console.log("AUTO puPerVisit---", puPerVisit);
+            (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].puNode.puPerVisit = puPerVisit;
+        } catch (err) {
+            (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].puNode.refillMonths = 1;
+            (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].puNode.puPerVisit = "";
+        }
+
+        
+        (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].puNode.sharePlanningUnit = false;
+        (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].puNode.planningUnit.multiplier = pu.multiplier;
         // if (itemConfig.context.payload.nodeType.id == 4) {
         //     (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.forecastingUnit.label.label_en = (itemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.forecastingUnit.label.label_en;
         // }
@@ -5501,7 +5538,8 @@ export default class BuildTree extends Component {
         console.log("pu node add button clicked value after update---", newItem.payload.nodeDataMap.length);
         this.setState({
             items: [...items, newItem],
-            cursorItem: nodeId
+            cursorItem: nodeId,
+            converionFactor: pu.multiplier
         }, () => {
 
             console.log("on add items-------", this.state.items);
@@ -5560,7 +5598,7 @@ export default class BuildTree extends Component {
 
             console.log("on add items-------", this.state.items);
             if (itemConfig.context.payload.nodeType.id == 4) {
-                this.createPUNode(JSON.parse(JSON.stringify(itemConfig)),nodeId);
+                this.createPUNode(JSON.parse(JSON.stringify(itemConfig)), nodeId);
             } else {
                 if (!itemConfig.context.payload.extrapolation) {
                     this.calculateMOMData(newItem.id, 0);
@@ -5634,6 +5672,7 @@ export default class BuildTree extends Component {
 
         this.setState(this.getDeletedItems(items, [itemConfig.id]), () => {
             this.calculateValuesForAggregateNode(this.state.items);
+            this.saveTreeData();
         });
     }
     onMoveItem(parentid, itemid) {
@@ -6760,7 +6799,12 @@ export default class BuildTree extends Component {
                                                     <FormFeedback>{errors.forecastingUnitId}</FormFeedback>
                                                 </div><br />
                                             </FormGroup>
-                                            <FormGroup className="col-md-12" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 4 ? 'block' : 'none' }}>
+                                            <Input type="hidden"
+                                                id="planningUnitIdFUFlag"
+                                                name="planningUnitIdFUFlag"
+                                                value={this.state.addNodeFlag}
+                                            />
+                                            <FormGroup className="col-md-12" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.addNodeFlag == true ? 'block' : 'none' }}>
                                                 <Label htmlFor="currencyId">{i18n.t('static.product.product')}<span class="red Reqasterisk">*</span></Label>
                                                 <div className="controls ">
                                                     {/* <InMultiputGroup> */}
