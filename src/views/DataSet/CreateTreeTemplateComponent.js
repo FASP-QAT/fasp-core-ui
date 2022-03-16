@@ -32,7 +32,7 @@ import TracerCategoryService from '../../api/TracerCategoryService';
 import ForecastingUnitService from '../../api/ForecastingUnitService';
 import PlanningUnitService from '../../api/PlanningUnitService';
 import UsageTemplateService from '../../api/UsageTemplateService';
-import { NUMBER_NODE_ID, PERCENTAGE_NODE_ID, FU_NODE_ID, PU_NODE_ID, INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY, JEXCEL_PAGINATION_OPTION, JEXCEL_DECIMAL_MONTHLY_CHANGE, JEXCEL_PRO_KEY, TREE_DIMENSION_ID, JEXCEL_MONTH_PICKER_FORMAT, DATE_FORMAT_CAP_WITHOUT_DATE, JEXCEL_DECIMAL_NO_REGEX_LONG, DATE_FORMAT_CAP } from '../../Constants.js'
+import { POSITIVE_WHOLE_NUMBER,NUMBER_NODE_ID, PERCENTAGE_NODE_ID, FU_NODE_ID, PU_NODE_ID, INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY, JEXCEL_PAGINATION_OPTION, JEXCEL_DECIMAL_MONTHLY_CHANGE, JEXCEL_PRO_KEY, TREE_DIMENSION_ID, JEXCEL_MONTH_PICKER_FORMAT, DATE_FORMAT_CAP_WITHOUT_DATE, JEXCEL_DECIMAL_NO_REGEX_LONG, DATE_FORMAT_CAP } from '../../Constants.js'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import TextField from '@material-ui/core/TextField';
@@ -262,9 +262,9 @@ const validationSchemaNodeData = function (values) {
             .test('refillMonths', 'Please enter a valid number having less then 10 digits.',
                 function (value) {
                     // console.log("*****", document.getElementById("nodeValue").value);
-                    // var testNumber = (/^(?!$)\d{0,10}?$/).test((document.getElementById("refillMonths").value).replaceAll(",", ""));
+                    var testNumber = POSITIVE_WHOLE_NUMBER.test((document.getElementById("refillMonths").value).replaceAll(",", ""));
                     // console.log("*****", testNumber);
-                    if ((document.getElementById("nodeTypeId").value == 5 && document.getElementById("usageTypeIdPU").value == 2) && (document.getElementById("refillMonths").value == "")) {
+                    if ((document.getElementById("nodeTypeId").value == 5 && document.getElementById("usageTypeIdPU").value == 2) && (document.getElementById("refillMonths").value == "" || testNumber == false)) {
                         return false;
                     } else {
                         return true;
@@ -5187,7 +5187,7 @@ export default class CreateTreeTemplate extends Component {
                                         <FormGroup className="col-md-6" style={{ display: this.state.numberNode ? 'block' : 'none' }}>
                                             <Label htmlFor="currencyId">Percentage of Parent<span class="red Reqasterisk">*</span></Label>
                                             <InputGroup>
-                                                <Input type="text"
+                                                <Input type="number"
                                                     id="percentageOfParent"
                                                     name="percentageOfParent"
                                                     bsSize="sm"
@@ -5219,7 +5219,7 @@ export default class CreateTreeTemplate extends Component {
                                         {/* {(this.state.aggregationNode && this.state.currentItemConfig.context.payload.nodeType.id != 1) && */}
                                         <FormGroup className="col-md-6" style={{ display: this.state.aggregationNode ? 'block' : 'none' }}>
                                             <Label htmlFor="currencyId">Node Value<span class="red Reqasterisk">*</span></Label>
-                                            <Input type="text"
+                                            <Input type="number"
                                                 id="nodeValue"
                                                 name="nodeValue"
                                                 bsSize="sm"
@@ -5422,7 +5422,7 @@ export default class CreateTreeTemplate extends Component {
                                                 <Label htmlFor="currencyId">{i18n.t('static.tree.consumptionIntervalEveryXMonths')}<span class="red Reqasterisk">*</span></Label>
                                             </FormGroup>
                                             <FormGroup className="col-md-10" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 5 && this.state.currentItemConfig.parentItem.payload.nodeDataMap[0][0].fuNode.usageType.id == 2 ? 'block' : 'none' }}>
-                                                <Input type="text"
+                                                <Input type="number"
                                                     id="refillMonths"
                                                     name="refillMonths"
                                                     valid={!errors.refillMonths && this.state.currentItemConfig.context.payload.nodeType.id == 5 && this.state.currentItemConfig.parentItem.payload.nodeDataMap[0][0].fuNode.usageType.id == 2 ? this.state.currentItemConfig.context.payload.nodeDataMap[0][0].puNode.refillMonths != '' : !errors.refillMonths}
@@ -5468,7 +5468,7 @@ export default class CreateTreeTemplate extends Component {
                                                         <Label htmlFor="currencyId">{(this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.usageType.id == 2 ? "How many PU per interval per " : "How many PU per usage per "}{this.state.unitList.filter(c => c.unitId == this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id)[0].label.label_en}?</Label>
                                                     </FormGroup>
                                                     <FormGroup className="col-md-10">
-                                                        <Input type="text"
+                                                        <Input type="number"
                                                             id="puInterval"
                                                             name="puInterval"
                                                             // readOnly={true}
@@ -5674,7 +5674,7 @@ export default class CreateTreeTemplate extends Component {
 
                                             <FormGroup className="col-md-6" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 4 ? 'block' : 'none' }}>
                                                 <Label htmlFor="currencyId">{i18n.t('static.tree.lagInMonth0Immediate')}<span class="red Reqasterisk">*</span></Label>
-                                                <Input type="text"
+                                                <Input type="number"
                                                     id="lagInMonths"
                                                     name="lagInMonths"
                                                     bsSize="sm"
@@ -5697,7 +5697,7 @@ export default class CreateTreeTemplate extends Component {
 
                                             </FormGroup>
                                             <FormGroup className="col-md-5" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 4 ? 'block' : 'none' }} >
-                                                <Input type="text"
+                                                <Input type="number"
                                                     id="noOfPersons"
                                                     name="noOfPersons"
                                                     bsSize="sm"
@@ -5737,7 +5737,7 @@ export default class CreateTreeTemplate extends Component {
                                                 <Label htmlFor="currencyId">{i18n.t('static.tree.requires')}<span class="red Reqasterisk">*</span></Label>
                                             </FormGroup>
                                             <FormGroup className="col-md-5" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 4 ? 'block' : 'none' }}>
-                                                <Input type="text"
+                                                <Input type="number"
                                                     id="forecastingUnitPerPersonsFC"
                                                     name="forecastingUnitPerPersonsFC"
                                                     bsSize="sm"
@@ -5842,7 +5842,7 @@ export default class CreateTreeTemplate extends Component {
                                                         <Label htmlFor="currencyId">for<span class="red Reqasterisk">*</span></Label>
                                                     </FormGroup>
                                                     <FormGroup className="col-md-5" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usageType.id == 1 && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.oneTimeUsage != "true" && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.oneTimeUsage != true ? 'block' : 'none' }}>
-                                                        <Input type="text"
+                                                        <Input type="number"
                                                             id="repeatCount"
                                                             name="repeatCount"
                                                             bsSize="sm"
@@ -5890,7 +5890,7 @@ export default class CreateTreeTemplate extends Component {
                                                     <Label htmlFor="currencyId">{i18n.t('static.usageTemplate.every')}<span class="red Reqasterisk">*</span></Label>
                                                 </FormGroup>
                                                 <FormGroup className="col-md-5" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usageType.id == 2 ? 'block' : 'none' }}>
-                                                    <Input type="text"
+                                                    <Input type="number"
                                                         id="usageFrequency"
                                                         name="usageFrequency"
                                                         bsSize="sm"
@@ -6141,7 +6141,7 @@ export default class CreateTreeTemplate extends Component {
 
                                         <FormGroup className="col-md-5">
                                             <Label htmlFor="currencyId">{i18n.t('static.tree.targetEnding')} {this.state.currentItemConfig.context.payload.nodeType.id == 2 ? 'value' : '%'}<span class="red Reqasterisk">*</span></Label>
-                                            <Input type="text"
+                                            <Input type="number"
                                                 id="currentEndValue"
                                                 name="currentEndValue"
                                                 bsSize="sm"
@@ -6158,7 +6158,7 @@ export default class CreateTreeTemplate extends Component {
                                         </FormGroup>
                                         <FormGroup className="col-md-5">
                                             <Label htmlFor="currencyId">{this.state.currentItemConfig.context.payload.nodeType.id > 2 ? 'Change (% points)' : 'Target change (%)'}<span class="red Reqasterisk">*</span></Label>
-                                            <Input type="text"
+                                            <Input type="number"
                                                 id="currentTargetChangePercentage"
                                                 name="currentTargetChangePercentage"
                                                 bsSize="sm"
@@ -6177,7 +6177,7 @@ export default class CreateTreeTemplate extends Component {
                                         {/* {this.state.currentItemConfig.context.payload.nodeType.id != 3  */}
                                         {this.state.currentModelingType != 3 && this.state.currentModelingType != 4 && this.state.currentModelingType != 5 && <FormGroup className="col-md-6">
                                             <Label htmlFor="currencyId">{i18n.t('static.tree.Change(#)')}<span class="red Reqasterisk">*</span></Label>
-                                            <Input type="text"
+                                            <Input type="number"
                                                 id="currentTargetChangeNumber"
                                                 name="currentTargetChangeNumber"
                                                 bsSize="sm"
