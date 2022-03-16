@@ -751,7 +751,7 @@ export default class CommitTreeComponent extends React.Component {
                             return (
                                 <ul>
                                     <li key={j}>
-                                        <div><span className={item1.payload.nodeType.id == 4 ? "redColor" : ""}>{getLabelText(item1.payload.label, this.state.lang)}</span></div>
+                                        <div><span className={item1.payload.nodeType.id == 4 ? "redColor" : ""}>{getLabelText(item1.payload.label, this.state.lang)==""?i18n.t('static.forecastValidation.editMe'):getLabelText(item1.payload.label, this.state.lang)}</span></div>
                                     </li>
                                 </ul>
                             )
