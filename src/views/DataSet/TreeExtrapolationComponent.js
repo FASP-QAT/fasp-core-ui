@@ -2944,7 +2944,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                                         <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.seasonality')} <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenTes', !this.state.popoverOpenTes)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                                                         <Input
                                                                             className="controls"
-                                                                            type="text"
+                                                                            type="number"
                                                                             bsSize="sm"
                                                                             id="seasonalityId"
                                                                             name="seasonalityId"
@@ -2978,7 +2978,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                                         <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.alpha')} <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenTes', !this.state.popoverOpenTes)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                                                         <Input
                                                                             className="controls"
-                                                                            type="text"
+                                                                            type="number"
                                                                             id="alphaId"
                                                                             bsSize="sm"
                                                                             name="alphaId"
@@ -2997,7 +2997,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                                         <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.beta')} <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenTes', !this.state.popoverOpenTes)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                                                         <Input
                                                                             className="controls"
-                                                                            type="text"
+                                                                            type="number"
                                                                             id="betaId"
                                                                             bsSize="sm"
                                                                             name="betaId"
@@ -3016,7 +3016,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                                         <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.gamma')} <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenTes', !this.state.popoverOpenTes)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                                                         <Input
                                                                             className="controls"
-                                                                            type="text"
+                                                                            type="number"
                                                                             bsSize="sm"
                                                                             id="gammaId"
                                                                             name="gammaId"
@@ -3066,7 +3066,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                                         <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.p')} <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenTes', !this.state.popoverOpenTes)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                                                         <Input
                                                                             className="controls"
-                                                                            type="text"
+                                                                            type="number"
                                                                             id="pId"
                                                                             bsSize="sm"
                                                                             name="pId"
@@ -3085,7 +3085,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                                         <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.d')}</Label>
                                                                         <Input
                                                                             className="controls"
-                                                                            type="text"
+                                                                            type="number"
                                                                             id="dId"
                                                                             bsSize="sm"
                                                                             name="dId"
@@ -3104,7 +3104,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                                         <Label htmlFor="appendedInputButton">q <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenTes', !this.state.popoverOpenTes)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                                                         <Input
                                                                             className="controls"
-                                                                            type="text"
+                                                                            type="number"
                                                                             id="qId"
                                                                             bsSize="sm"
                                                                             name="qId"

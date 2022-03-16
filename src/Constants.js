@@ -147,3 +147,4 @@ export const NUMBER_NODE_ID=2;
 export const PERCENTAGE_NODE_ID=3;
 export const FU_NODE_ID=4;
 export const PU_NODE_ID=5;
+export const POSITIVE_WHOLE_NUMBER=/^[1-9]\d*$/
