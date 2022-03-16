@@ -43,7 +43,7 @@ const pickerLang = {
 const validationSchemaExtrapolation = function (values) {
     return Yup.object().shape({
         noOfMonthsId:
-            Yup.string().test('noOfMonthsId', 'Please provide valid input.',
+            Yup.string().test('noOfMonthsId', 'Please provide a positive integer.',
                 function (value) {
                     var testNumber = (/^[\d]*$/).test((document.getElementById("noOfMonthsId").value).replaceAll(",", ""));
                     if ((document.getElementById("movingAvgId").value) == "on" && (document.getElementById("noOfMonthsId").value == "" || testNumber == false)) {
@@ -63,7 +63,7 @@ const validationSchemaExtrapolation = function (values) {
                     }
                 }),
         seasonalityId:
-            Yup.string().test('seasonalityId', 'Please provide valid input.',
+            Yup.string().test('seasonalityId', 'Please provide a positive integer between 1 to 24.',
                 function (value) {
                     var testNumber = document.getElementById("seasonalityId").value != "" ? JEXCEL_INTEGER_REGEX.test(document.getElementById("seasonalityId").value) : false;
                     if ((document.getElementById("smoothingId").value) == "true" && (document.getElementById("seasonalityId").value == "" || testNumber == false)) {
@@ -73,7 +73,7 @@ const validationSchemaExtrapolation = function (values) {
                     }
                 }),
         gammaId:
-            Yup.string().test('gammaId', 'Please provide valid input.',
+            Yup.string().test('gammaId', 'Please provide a positive integer between 0 to 1.',
                 function (value) {
                     var testNumber = document.getElementById("gammaId").value != "" ? (/^\d{0,3}(\.\d{1,2})?$/).test(document.getElementById("gammaId").value) : false;
                     if ((document.getElementById("smoothingId").value) == "true" && (document.getElementById("gammaId").value == "" || testNumber == false)) {
@@ -83,7 +83,7 @@ const validationSchemaExtrapolation = function (values) {
                     }
                 }),
         betaId:
-            Yup.string().test('betaId', 'Please provide valid input.',
+            Yup.string().test('betaId', 'Please provide a positive integer between 0 to 1.',
                 function (value) {
                     var testNumber = document.getElementById("betaId").value != "" ? (/^\d{0,3}(\.\d{1,2})?$/).test(document.getElementById("betaId").value) : false;
                     if ((document.getElementById("smoothingId").value) == "true" && (document.getElementById("betaId").value == "" || testNumber == false)) {
@@ -93,7 +93,7 @@ const validationSchemaExtrapolation = function (values) {
                     }
                 }),
         alphaId:
-            Yup.string().test('alphaId', 'Please provide valid input.',
+            Yup.string().test('alphaId', 'Please provide a positive integer between 0 to 1.',
                 function (value) {
                     var testNumber = document.getElementById("alphaId").value != "" ? (/^\d{0,3}(\.\d{1,2})?$/).test(document.getElementById("alphaId").value) : false;
                     if ((document.getElementById("smoothingId").value) == "true" && (document.getElementById("alphaId").value == "" || testNumber == false)) {
@@ -365,7 +365,7 @@ export default class ExtrapolateDataComponent extends React.Component {
     }
     handleRangeDissmis1(value) {
         this.setState({ rangeValue1: value }, () => {
-            this.setExtrapolatedParameters(0)
+          //  this.setExtrapolatedParameters(0)
             this.getDateDifference()
         })
     }
@@ -806,6 +806,11 @@ export default class ExtrapolateDataComponent extends React.Component {
 
 
     saveForecastConsumptionExtrapolation() {
+        if ((this.state.movingAvgId && !this.state.monthsForMovingAverageValidate) ||
+        (this.state.smoothingId && !this.state.noOfMonthsForASeasonValidate) ||
+        (this.state.confidenceLevelId && !this.state.confidenceValidate)){
+            alert("Please provide the valid input");
+        }else{   
         this.setState({
             loading: true
         })
@@ -1064,6 +1069,7 @@ export default class ExtrapolateDataComponent extends React.Component {
             }.bind(this);
         }.bind(this);
     }
+    }
 
     setPlanningUnitId(e) {
         var cont = false;
@@ -1082,8 +1088,8 @@ export default class ExtrapolateDataComponent extends React.Component {
             localStorage.setItem("sesDatasetPlanningUnitId", e.target.value);
             this.setState({
                 planningUnitId: planningUnitId
-            }, () => {
-                this.setExtrapolatedParameters();
+            // }, () => {
+            //     this.setExtrapolatedParameters();
             })
         }
     }
@@ -1105,13 +1111,18 @@ export default class ExtrapolateDataComponent extends React.Component {
             localStorage.setItem("sesDatasetRegionId", e.target.value);
             this.setState({
                 regionId: regionId
-            }, () => {
-                this.setExtrapolatedParameters();
+            // }, () => {
+            //     this.setExtrapolatedParameters();
             })
         }
     }
 
     setExtrapolatedParameters(updateRangeValue) {
+        if ((this.state.movingAvgId && !this.state.monthsForMovingAverageValidate) ||
+            (this.state.smoothingId && !this.state.noOfMonthsForASeasonValidate) ||
+            (this.state.confidenceLevelId && !this.state.confidenceValidate)){
+                alert("Please provide the valid input");
+            }else{
         if (this.state.planningUnitId > 0 && this.state.regionId > 0) {
             this.setState({ loading: true })
             var datasetJson = this.state.datasetJson;
@@ -1242,6 +1253,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                 noDataMessage: ""
             })
         }
+    }
     }
     toggledata = () => this.setState((currentState) => ({ show: !currentState.show }));
 
@@ -2818,6 +2830,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                     </div>
                                 </div>}
                             {this.state.dataChanged && <div className="row float-right mt-lg-3 mr-0 pb-2 pt-2 "> <Button type="button" id="formSubmitButton" size="md" color="success" className="float-right mr-0" onClick={() => this.saveForecastConsumptionExtrapolation()}><i className="fa fa-check"></i>{i18n.t('static.pipeline.save')}</Button>&nbsp;</div>}
+                            <div className="row float-right mt-lg-3 mr-3 pb-2 pt-2 "><Button type="button" id="extrapolateButton" size="md" color="info" className="float-right mr-1" onClick={() =>this.setExtrapolatedParameters()}><i className="fa fa-check"></i>Extrapolate</Button></div>
                             {/* {this.state.showData && <div id="tableDiv" className="extrapolateTable pt-lg-5"></div>} */}
                             <div className="row" style={{ display: this.state.show ? "block" : "none" }}>
                                 <div className="col-md-10 pt-4 pb-3">
