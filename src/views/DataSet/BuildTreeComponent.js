@@ -2640,7 +2640,7 @@ export default class BuildTree extends Component {
         var startDate = this.state.currentCalculatorStartDate;
         var endDate = this.state.currentCalculatorStopDate;
         var monthDifference = moment(endDate).diff(startDate, 'months', true);
-        var getValue = e.target.value.toString().replaceAll(",", "");
+        var getValue = e.target.value!=""?e.target.value.toString().replaceAll(",", "").match(/^-?\d+(?:\.\d{0,2})?/)[0]:"";
         var getEndValueFromPercentage = (this.state.currentCalculatorStartValue * getValue) / 100;
 
 
