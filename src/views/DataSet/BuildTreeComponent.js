@@ -6289,7 +6289,7 @@ export default class BuildTree extends Component {
                         ticks: {
                             beginAtZero: true,
                             fontColor: 'black',
-                            stepSize: 100000,
+                            // stepSize: 100000,
                             callback: function (value) {
                                 var cell1 = value
                                 cell1 += '';
