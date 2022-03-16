@@ -308,9 +308,9 @@ const validationSchemaNodeData = function (values) {
             }),
         repeatUsagePeriodId: Yup.string().test('repeatUsagePeriodId', 'This field is required.',
             function (value) {
-                console.log("validate 1---",document.getElementById("repeatUsagePeriodId").value);
-                console.log("validate 2---",document.getElementById("usageTypeIdFU").value);
-                console.log("validate 3---",document.getElementById("oneTimeUsage").value);
+                console.log("validate 1---", document.getElementById("repeatUsagePeriodId").value);
+                console.log("validate 2---", document.getElementById("usageTypeIdFU").value);
+                console.log("validate 3---", document.getElementById("oneTimeUsage").value);
                 if (document.getElementById("usageTypeIdFU").value == 1 && (document.getElementById("oneTimeUsage").value == "false" || document.getElementById("oneTimeUsage").value == false) && (document.getElementById("repeatUsagePeriodId").value == "")) {
                     console.log("validate 4---");
                     return false;
@@ -968,7 +968,7 @@ export default class BuildTree extends Component {
             usageText: ""
         }, () => {
             if (nodeTypeId == 4) {
-                this.getForecastingUnitListByTracerCategoryId();
+                this.getForecastingUnitListByTracerCategoryId(0);
             }
             console.log("currentItemConfig after---", this.state.orgCurrentItemConfig)
         });
@@ -4292,21 +4292,30 @@ export default class BuildTree extends Component {
             console.log("filtered planning unit list---", this.state.planningUnitList);
             if (this.state.planningUnitList.length == 1) {
                 var { currentItemConfig } = this.state;
-                currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.planningUnit.id = this.state.planningUnitList[0].id;
-                currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.planningUnit.label = this.state.planningUnitList[0].label;
-                currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.planningUnit.multiplier = this.state.planningUnitList[0].multiplier;
-                currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.planningUnit.unit.id = this.state.planningUnitList[0].unit.id;
-                if (this.state.addNodeFlag && currentItemConfig.context.payload.nodeType.id == 5) {
-                    currentItemConfig.context.payload.label = this.state.planningUnitList[0].label;
+                console.log("pl 1---");
+                if (this.state.addNodeFlag == "false") {
+                    currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.planningUnit.id = this.state.planningUnitList[0].id;
+                    console.log("pl 2---");
+                    currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.planningUnit.label = this.state.planningUnitList[0].label;
+                    console.log("pl 3---");
+                    currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.planningUnit.multiplier = this.state.planningUnitList[0].multiplier;
+                    console.log("pl 4---");
+                    currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.planningUnit.unit.id = this.state.planningUnitList[0].unit.id;
+                    console.log("pl 5---");
+                    if (this.state.addNodeFlag && currentItemConfig.context.payload.nodeType.id == 5) {
+                        console.log("pl 6---");
+                        currentItemConfig.context.payload.label = this.state.planningUnitList[0].label;
+                    }
+                    console.log("pl 7---");
+                    this.setState({
+                        conversionFactor: this.state.planningUnitList[0].multiplier,
+                        currentItemConfig,
+                        currentScenario: currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0]
+                    });
                 }
-                this.setState({
-                    conversionFactor: this.state.planningUnitList[0].multiplier,
-                    currentItemConfig,
-                    currentScenario: currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0]
-                });
             }
             if (this.state.currentItemConfig.context.payload.nodeType.id == 5 && this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario].puNode != null) {
-                console.log("test---", (this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].puNode.planningUnit.id);
+                console.log("test---", this.state.currentItemConfig.context.payload);
                 // (this.state.currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].puNode.planningUnit.id
                 var conversionFactor = this.state.updatedPlanningUnitList.filter(x => x.id == this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.planningUnit.id)[0].multiplier;
                 console.log("conversionFactor---", conversionFactor);
@@ -4343,11 +4352,13 @@ export default class BuildTree extends Component {
         console.log("forecastingUnitId---", forecastingUnitId);
         console.log("%%%this.state.forecastingUnitList---", this.state.forecastingUnitList);
         const { currentItemConfig } = this.state;
-        var forecastingUnit = (this.state.forecastingUnitList.filter(c => c.id == forecastingUnitId))[0];
-        console.log("forecastingUnit---", forecastingUnit);
-        (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.forecastingUnit.unit.id = forecastingUnit.unit.id;
-        console.log("currentItemConfig---", currentItemConfig);
-        console.log("state items---", this.state.items);
+        var forecastingUnit = (this.state.forecastingUnitList.filter(c => c.id == forecastingUnitId));
+        if (forecastingUnit.length > 0) {
+            console.log("forecastingUnit---", forecastingUnit);
+            (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.forecastingUnit.unit.id = forecastingUnit[0].unit.id;
+            console.log("currentItemConfig---", currentItemConfig);
+            console.log("state items---", this.state.items);
+        }
         this.setState({
             currentItemConfig
         });
@@ -4412,7 +4423,7 @@ export default class BuildTree extends Component {
             fuValues: { value: usageTemplate.forecastingUnit.id, label: getLabelText(usageTemplate.forecastingUnit.label, this.state.lang) + " | " + usageTemplate.forecastingUnit.id },
         }, () => {
             console.log("copy from template---", this.state.currentScenario);
-            this.getForecastingUnitListByTracerCategoryId();
+            this.getForecastingUnitListByTracerCategoryId(0);
             this.getNoOfMonthsInUsagePeriod();
             this.getNoFURequired();
             this.getNoOfFUPatient();
@@ -4679,7 +4690,7 @@ export default class BuildTree extends Component {
         }
 
     }
-    getForecastingUnitListByTracerCategoryId() {
+    getForecastingUnitListByTracerCategoryId(type) {
         console.log("my tracer category---", this.state.currentScenario.fuNode.forecastingUnit.tracerCategory.id)
         var tracerCategoryId = this.state.currentScenario.fuNode.forecastingUnit.tracerCategory.id;
         var scenarioId = this.state.selectedScenario;
@@ -4699,27 +4710,35 @@ export default class BuildTree extends Component {
 
         this.setState({
             forecastingUnitMultiList,
-            fuValues: tracerCategoryId == "" || tracerCategoryId == undefined ? [] : (this.state.currentScenario.fuNode.forecastingUnit.id != undefined && this.state.currentScenario.fuNode.forecastingUnit.id != "" ? { value: this.state.currentScenario.fuNode.forecastingUnit.id, label: getLabelText(this.state.currentScenario.fuNode.forecastingUnit.label, this.state.lang) + " | " + this.state.currentScenario.fuNode.forecastingUnit.id } : []),
+            fuValues: tracerCategoryId == "" || tracerCategoryId == undefined ? [] : (this.state.currentScenario.fuNode.forecastingUnit.id != undefined && this.state.currentScenario.fuNode.forecastingUnit.id != "" && filteredForecastingUnitList.filter(x=>x.id == this.state.currentScenario.fuNode.forecastingUnit.id).length > 0 ? { value: this.state.currentScenario.fuNode.forecastingUnit.id, label: getLabelText(this.state.currentScenario.fuNode.forecastingUnit.label, this.state.lang) + " | " + this.state.currentScenario.fuNode.forecastingUnit.id } : []),
             tempPlanningUnitId: tracerCategoryId == "" || tracerCategoryId == undefined ? '' : this.state.tempPlanningUnitId,
             planningUnitList: tracerCategoryId == "" || tracerCategoryId == undefined ? [] : this.state.planningUnitList
         }, () => {
-            // console.log("my autocomplete data---", autocompleteData);
+            console.log("my autocomplete data fuValues---", this.state.fuValues);
             if (filteredForecastingUnitList.length == 1) {
                 console.log("fu list 1---");
                 const currentItemConfig = this.state.currentItemConfig;
                 (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.forecastingUnit.id = filteredForecastingUnitList[0].id;
                 (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.forecastingUnit.label = forecastingUnitList[0].label;
                 (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.forecastingUnit.tracerCategory.id = forecastingUnitList[0].tracerCategory.id;
-                var fuValues = { value: filteredForecastingUnitList[0].id, label: getLabelText(forecastingUnitList[0].label, this.state.lang) + " | " + filteredForecastingUnitList[0].id };
+
                 // var filteredPlanningUnitList = this.state.planningUnitList.filter(x => x.forecastingUnit.id == filteredForecastingUnitList[0].id);
                 this.setState({
                     currentItemConfig: currentItemConfig,
-                    currentScenario: (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0],
-                    fuValues
+                    currentScenario: (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0]
                 }, () => {
-                    console.log("cur item config--- ", this.state.currentItemConfig);
-                    this.getForecastingUnitUnitByFUId(filteredForecastingUnitList[0].id);
-                    this.getPlanningUnitListByFUId(filteredForecastingUnitList[0].id);
+                    if (type == 0) {
+                        var fuValues = { value: filteredForecastingUnitList[0].id, label: getLabelText(forecastingUnitList[0].label, this.state.lang) + " | " + filteredForecastingUnitList[0].id };
+                        // (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.forecastingUnit.unit.id = forecastingUnit[0].unit.id;
+                        this.setState({
+                            fuValues
+                        }, () => {
+
+                        });
+                    }
+                    console.log("cur item config fuValues--- ", this.state.fuValues);
+                    this.getForecastingUnitUnitByFUId(this.state.fuValues.value);
+                    this.getPlanningUnitListByFUId(this.state.fuValues.value);
                 })
             }
 
@@ -6106,7 +6125,7 @@ export default class BuildTree extends Component {
                         fuValues: { value: this.state.currentScenario.fuNode.forecastingUnit.id, label: getLabelText(this.state.currentScenario.fuNode.forecastingUnit.label, this.state.lang) + " | " + this.state.currentScenario.fuNode.forecastingUnit.id }
                         // fuLabels: getLabelText(this.state.currentScenario.fuNode.forecastingUnit.label, this.state.lang) + " | " + this.state.currentScenario.fuNode.forecastingUnit.id
                     });
-                    this.getForecastingUnitListByTracerCategoryId();
+                    this.getForecastingUnitListByTracerCategoryId(1);
                     this.getNodeUnitOfPrent();
                     this.getNoOfFUPatient();
                     this.getNoOfMonthsInUsagePeriod();
@@ -6118,7 +6137,8 @@ export default class BuildTree extends Component {
                     this.getPlanningUnitListByFUId((data.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode.forecastingUnit.id);
                     this.getNoOfMonthsInUsagePeriod();
                     this.state.currentItemConfig.context.payload.nodeUnit.id = this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id;
-                    var conversionFactor = this.state.updatedPlanningUnitList.filter(x => x.id == this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.planningUnit.id)[0].multiplier;
+                    var planningUnit = this.state.updatedPlanningUnitList.filter(x => x.id == this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.planningUnit.id);
+                    var conversionFactor = planningUnit.length > 0 ? planningUnit[0].multiplier : "";
                     console.log("conversionFactor---", conversionFactor);
                     this.setState({
                         conversionFactor
@@ -6955,33 +6975,33 @@ export default class BuildTree extends Component {
                                                 <FormFeedback className="red">{errors.sharePlanningUnit}</FormFeedback>
                                             </FormGroup>
                                             {/* {(this.state.currentItemConfig.context.payload.nodeType.id == 5) && */}
-                                                {/* <> */}
-                                                    <FormGroup className="col-md-2" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 5 ? 'block' : 'none' }}>
-                                                        <Label htmlFor="currencyId">{this.state.parentScenario.fuNode != null && this.state.parentScenario.fuNode.usageType.id == 2 ? "How many PU per interval per " : "How many PU per usage per "}{this.state.currentItemConfig.parentItem.parent != null && this.state.unitList.filter(c => c.unitId == this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id)[0].label.label_en}?</Label>
-                                                    </FormGroup>
-                                                    <FormGroup className="col-md-10" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 5 ? 'block' : 'none' }}>
-                                                        <Input type="number"
-                                                            id="puPerVisit"
-                                                            name="puPerVisit"
-                                                            readOnly={this.state.parentScenario.fuNode != null && this.state.parentScenario.fuNode.usageType.id == 2 ? false : true}
-                                                            bsSize="sm"
-                                                            valid={!errors.puPerVisit && this.state.currentItemConfig.context.payload.nodeType.id == 5 ? this.state.currentScenario.puNode.puPerVisit != '' : !errors.puPerVisit}
-                                                            invalid={touched.puPerVisit && !!errors.puPerVisit}
-                                                            onBlur={handleBlur}
-                                                            onChange={(e) => {
-                                                                handleChange(e);
-                                                                this.dataChange(e)
-                                                            }}
-                                                            value={this.state.parentScenario.fuNode != null  ? this.state.parentScenario.fuNode.usageType.id == 2 ? addCommas(this.state.currentScenario.puNode.puPerVisit) : (this.state.currentScenario.puNode.sharePlanningUnit == "true" || this.state.currentScenario.puNode.sharePlanningUnit == true ? (this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor) : this.round((this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor))) : ""}
-                                                        // value={addCommas(this.state.parentScenario.fuNode.usageType.id == 2 ? (((this.state.parentScenario.fuNode.noOfForecastingUnitsPerPerson /
-                                                        //     this.state.noOfMonthsInUsagePeriod) / this.state.conversionFactor) * this.state.currentScenario.puNode.refillMonths) : (this.state.currentScenario.puNode.sharePlanningUnit == "true" || this.state.currentScenario.puNode.sharePlanningUnit == true ? (this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor) : Math.round((this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor))))}
-                                                        >
+                                            {/* <> */}
+                                            <FormGroup className="col-md-2" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 5 ? 'block' : 'none' }}>
+                                                <Label htmlFor="currencyId">{this.state.currentItemConfig.parentItem != null && this.state.parentScenario.fuNode != null && this.state.parentScenario.fuNode.usageType.id == 2 ? "How many PU per interval per " : "How many PU per usage per "}{this.state.currentItemConfig.parentItem != null && this.state.currentItemConfig.parentItem.parent != null && this.state.unitList.filter(c => c.unitId == this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id)[0].label.label_en}?</Label>
+                                            </FormGroup>
+                                            <FormGroup className="col-md-10" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 5 ? 'block' : 'none' }}>
+                                                <Input type="number"
+                                                    id="puPerVisit"
+                                                    name="puPerVisit"
+                                                    readOnly={this.state.parentScenario.fuNode != null && this.state.parentScenario.fuNode.usageType.id == 2 ? false : true}
+                                                    bsSize="sm"
+                                                    valid={!errors.puPerVisit && this.state.currentItemConfig.context.payload.nodeType.id == 5 ? this.state.currentScenario.puNode.puPerVisit != '' : !errors.puPerVisit}
+                                                    invalid={touched.puPerVisit && !!errors.puPerVisit}
+                                                    onBlur={handleBlur}
+                                                    onChange={(e) => {
+                                                        handleChange(e);
+                                                        this.dataChange(e)
+                                                    }}
+                                                    value={this.state.currentItemConfig.parentItem != null && this.state.parentScenario.fuNode != null ? this.state.parentScenario.fuNode.usageType.id == 2 ? addCommas(this.state.currentScenario.puNode.puPerVisit) : (this.state.currentScenario.puNode.sharePlanningUnit == "true" || this.state.currentScenario.puNode.sharePlanningUnit == true ? (this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor) : this.round((this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor))) : ""}
+                                                // value={addCommas(this.state.parentScenario.fuNode.usageType.id == 2 ? (((this.state.parentScenario.fuNode.noOfForecastingUnitsPerPerson /
+                                                //     this.state.noOfMonthsInUsagePeriod) / this.state.conversionFactor) * this.state.currentScenario.puNode.refillMonths) : (this.state.currentScenario.puNode.sharePlanningUnit == "true" || this.state.currentScenario.puNode.sharePlanningUnit == true ? (this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor) : Math.round((this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor))))}
+                                                >
 
-                                                        </Input>
-                                                        <FormFeedback className="red">{errors.puPerVisit}</FormFeedback>
-                                                    </FormGroup>
+                                                </Input>
+                                                <FormFeedback className="red">{errors.puPerVisit}</FormFeedback>
+                                            </FormGroup>
 
-                                                {/* </>} */}
+                                            {/* </>} */}
                                         </div>
                                     </div>
                                     {/* Plannign unit end */}
@@ -6999,7 +7019,7 @@ export default class BuildTree extends Component {
                                                     // invalid={touched.tracerCategoryId && !!errors.tracerCategoryId}
                                                     onBlur={handleBlur}
                                                     onChange={(e) => {
-                                                        this.dataChange(e); this.getForecastingUnitListByTracerCategoryId(e)
+                                                        this.dataChange(e); this.getForecastingUnitListByTracerCategoryId(0)
                                                     }}
                                                     required
                                                     value={this.state.currentItemConfig.context.payload.nodeType.id == 4 ? this.state.currentScenario.fuNode.forecastingUnit.tracerCategory.id : ""}
@@ -8604,7 +8624,7 @@ export default class BuildTree extends Component {
 
                                         }
                                         this.filterUsageTemplateList(tracerCategoryId);
-                                        this.getForecastingUnitListByTracerCategoryId();
+                                        this.getForecastingUnitListByTracerCategoryId(0);
                                     }
                                     else if (itemConfig.payload.nodeType.id == 4) {
                                         console.log("fu id---", itemConfig);
