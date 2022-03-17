@@ -5968,8 +5968,13 @@ export default class BuildTree extends Component {
         console.log("end>>>", Date.now());
     }
     onRemoveButtonClick(itemConfig) {
-        const { items } = this.state;
+        var { items } = this.state;
         console.log("delete items---", items)
+        // let uniqueChars = [...new Set(items)];
+        const ids = items.map(o => o.id)
+        const filtered = items.filter(({ id }, index) => !ids.includes(id, index + 1))
+        console.log("delete unique items---", filtered)
+        items = filtered;
         console.log("delete id---", itemConfig.id)
         console.log("delete items count---", items.filter(x => x.id == itemConfig.id))
         this.setState(this.getDeletedItems(items, [itemConfig.id]), () => {
@@ -6128,7 +6133,7 @@ export default class BuildTree extends Component {
                 parentScenario: data.context.level == 0 ? [] : (data.parentItem.payload.nodeDataMap[this.state.selectedScenario])[0],
 
             }, () => {
-                console.log("555>>>", this.state.items);
+                console.log("555>>>", this.state.items.filter(x=>x.parent==12));
                 var scenarioId = this.state.selectedScenario;
                 console.log("cursor change current item config---", this.state.currentItemConfig);
                 if (data.context.level != 0) {
