@@ -2592,7 +2592,7 @@ class ForecastOutput extends Component {
                                                     </Picker>
                                                 </div>
                                             </FormGroup>
-
+                                          
                                             <FormGroup className="col-md-3">
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.forecastReport.yAxisInEquivalencyUnit')}  <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={this.toggleEu} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                                 <div className="controls ">
@@ -2615,7 +2615,7 @@ class ForecastOutput extends Component {
                                             </FormGroup>
                                             <div>
                                                 <Popover placement="top" isOpen={this.state.popoverOpen} target="Popover1" trigger="hover" toggle={this.toggleEu}>
-                                                    <PopoverBody>Need to add Info.</PopoverBody>
+                                                    <PopoverBody>{i18n.t('static.tooltip.yAxisInEquivalencyUnit')}</PopoverBody>
                                                 </Popover>
                                             </div>
 

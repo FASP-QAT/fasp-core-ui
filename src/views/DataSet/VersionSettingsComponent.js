@@ -969,7 +969,8 @@ class VersionSettingsComponent extends Component {
                 {
                     title: i18n.t('static.program.noOfDaysInMonth'),
                     type: 'dropdown',
-                    source: this.state.noOfDays
+                    source: this.state.noOfDays,
+                    width: '200',
                 },//13 N
 
 
@@ -1136,12 +1137,25 @@ class VersionSettingsComponent extends Component {
         jExcelLoadedFunction(instance);
         var asterisk = document.getElementsByClassName("resizable")[0];
         var tr = asterisk.firstChild;
+        tr.children[3].classList.add('InfoTr');
+        tr.children[14].classList.add('InfoTrAsteriskTheadtrTd');
+        tr.children[15].classList.add('InfoTr');
+        tr.children[16].classList.add('InfoTr');
+        tr.children[17].classList.add('InfoTr');
+
         tr.children[8].classList.add('AsteriskTheadtrTd');
         tr.children[10].classList.add('AsteriskTheadtrTd');
         // tr.children[16].classList.add('AsteriskTheadtrTd');
         // tr.children[15].classList.add('AsteriskTheadtrTd');
-        tr.children[14].classList.add('AsteriskTheadtrTd');
+        // tr.children[14].classList.add('AsteriskTheadtrTd');
         // tr.children[17].classList.add('AsteriskTheadtrTd');
+
+        tr.children[3].title = i18n.t('static.tooltip.version');
+        tr.children[14].title = i18n.t('static.tooltip.HashOfDaysInMonth');
+        tr.children[15].title = i18n.t('static.tooltip.FreightPercent');
+        tr.children[16].title = i18n.t('static.tooltip.ForecastThresholdHigh');
+        tr.children[17].title = i18n.t('static.tooltip.ForecastThresholdLow');
+
     }
     oncreateeditor = function (el, cell, x, y) {
         if (x == 4) {

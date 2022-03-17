@@ -4056,6 +4056,7 @@ class DefaultLayout extends Component {
                       className="bgColourRemoveLink tab1"
                       active={this.state.activeTab === '1'}
                       onClick={() => { this.toggle(0, '1'); }}
+                      href={`/#/ApplicationDashboard/${AuthenticationService.displayDashboardBasedOnRole()}`}
                       style={{ border: "none" }}
                       title={i18n.t('static.module.forecasting')}
                     >
@@ -4068,6 +4069,7 @@ class DefaultLayout extends Component {
                       className="bgColourRemoveLink tab2"
                       active={this.state.activeTab === '2'}
                       onClick={() => { this.toggle(0, '2'); }}
+                      href={`/#/ApplicationDashboard/${AuthenticationService.displayDashboardBasedOnRole()}`}
                       style={{ border: "none", padding: "0.75rem 0.2rem" }}
                       title={i18n.t('static.module.supplyPlanningMod')}
                     >
