@@ -2824,6 +2824,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                                         bsSize="sm"
                                                                         id="noOfMonthsId"
                                                                         name="noOfMonthsId"
+                                                                        step={1}
                                                                         value={this.state.monthsForMovingAverage}
                                                                         valid={!errors.noOfMonthsId && this.state.monthsForMovingAverage != null ? this.state.monthsForMovingAverage : '' != ''}
                                                                         invalid={touched.noOfMonthsId && !!errors.noOfMonthsId}
