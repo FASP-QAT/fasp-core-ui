@@ -2736,12 +2736,12 @@ export default class TreeExtrapolationComponent extends React.Component {
                                         <div className=" pl-0">
                                             <div className="row">
                                             <div>
-                                                                <Popover placement="top" isOpen={this.state.popoverOpenStartMonth} target="Popover1" trigger="hover" toggle={this.toggleStartMonth}>
+                                                                <Popover placement="top" isOpen={this.state.popoverOpenStartMonth} target="Popover3" trigger="hover" toggle={this.toggleStartMonth}>
                                                                     <PopoverBody>To change the start month, please go back to the Node Data screen and change the month</PopoverBody>
                                                                 </Popover>
                                                             </div>
                                                 <FormGroup className="col-md-3 pl-lg-0">
-                                                    <Label htmlFor="appendedInputButton">Start Month for Historical Data<span className="stock-box-icon fa fa-sort-desc ml-1"></span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={this.toggleStartMonth} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
+                                                    <Label htmlFor="appendedInputButton">Start Month for Historical Data<span className="stock-box-icon fa fa-sort-desc ml-1"></span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover3" onClick={this.toggleStartMonth} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                                     <div className="controls edit disabledColor">
                                                         <Picker
 
@@ -2793,7 +2793,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                     <div className="check inline pl-lg-3 pt-lg-2">
                                                         <div className="row pl-lg-1 pb-lg-2">
                                                             <div>
-                                                                <Popover placement="top" isOpen={this.state.popoverOpenMa} target="Popover1" trigger="hover" toggle={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)}>
+                                                                <Popover placement="top" isOpen={this.state.popoverOpenMa} target="Popover4" trigger="hover" toggle={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)}>
                                                                     <PopoverBody>{i18n.t('static.tooltip.MovingAverages')}</PopoverBody>
                                                                 </Popover>
                                                             </div>
@@ -2811,7 +2811,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                                     className="form-check-label"
                                                                     check htmlFor="inline-radio2" style={{ fontSize: '12px', marginTop: '2px' }}>
                                                                     <b>Moving Averages</b>
-                                                                    <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
+                                                                    <i class="fa fa-info-circle icons pl-lg-2" id="Popover4" onClick={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
                                                                 </Label>
                                                             </div>
                                                             {/* {this.state.movingAvgId && */}

@@ -5892,6 +5892,56 @@ font-style: italic!important;
         display : block ;
     }
 }
+.VersionSettingMarginTop .jexcel > thead.resizable > tr > .InfoTrAsteriskTheadtrTd::after {
+  font-family: 'FontAwesome';
+  content: '\f05a';
+    position: relative;
+     width: 3px;
+     height: 100%;
+     top: 0px;
+     left: 15px;
+     cursor: pointer;
+     font-size: 14px;
+     color:#002f6c;
+}
+.VersionSettingMarginTop .jexcel > thead.resizable > tr > .InfoTrAsteriskTheadtrTd::before {
+  font-family: 'FontAwesome';
+  content: '*';
+    position: relative;
+     width: 3px;
+     height: 100%;
+     top: 0px;
+     left: 120px;
+     cursor: pointer;
+     font-size: 14px;
+     color:#BA0C2F;
+   }
+
+   .UsageTemplateTable .jexcel > thead.resizable > tr > .InfoTrAsteriskTheadtrTd::after {
+    font-family: 'FontAwesome';
+    content: '\f05a';
+      position: relative;
+       width: 3px;
+       height: 100%;
+       top: 0px;
+       left: 6px;
+       cursor: pointer;
+       font-size: 14px;
+       color:#002f6c;
+  }
+  .UsageTemplateTable .jexcel > thead.resizable > tr > .InfoTrAsteriskTheadtrTd::before {
+    font-family: 'FontAwesome';
+    content: '*';
+      position: relative;
+       width: 3px;
+       height: 100%;
+       top: 0px;
+       left: 84px;
+       cursor: pointer;
+       font-size: 14px;
+       color:#BA0C2F;
+     }
+
 .jexcel > thead.resizable > tr > .InfoTrAsteriskTheadtrTd::after {
   font-family: 'FontAwesome';
   content: '\f05a';
