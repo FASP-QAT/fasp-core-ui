@@ -148,7 +148,7 @@ const validationSchemaNodeData = function (values) {
         planningUnitIdFU: Yup.string()
             .when("planningUnitIdFUFlag", {
                 is: val => {
-                    return document.getElementById("planningUnitIdFUFlag").value === "true" && document.getElementById("planningUnitIdFU").value === "";
+                    return parseInt(document.getElementById("nodeTypeId").value) == 4 && document.getElementById("planningUnitIdFUFlag").value === "true" && document.getElementById("planningUnitIdFU").value === "";
 
                 },
                 then: Yup.string()
@@ -930,12 +930,14 @@ export default class CreateTreeTemplate extends Component {
                 console.log("items---***", items);
                 this.setState({ items })
             }
-            if (parameterName == 'type' && value == 1) {
+            if (parameterName == 'type' && (value == 1 || value == 0)) {
                 if (this.state.currentItemConfig.context.payload.nodeType.id == 1 || this.state.currentItemConfig.context.payload.nodeType.id == 2) {
                     console.log("mom list ret---", this.state.nodeDataMomList.filter(x => x.nodeId == this.state.currentItemConfig.context.id));
                     this.setState({ momList: this.state.nodeDataMomList.filter(x => x.nodeId == this.state.currentItemConfig.context.id)[0].nodeDataMomList }, () => {
                         console.log("going to build mom jexcel");
-                        this.buildMomJexcel();
+                        if (value == 1 || (value == 0 && this.state.showMomData)) {
+                            this.buildMomJexcel();
+                        }
                     });
                 } else {
                     console.log("id to filter---", this.state.currentItemConfig.context.id)
@@ -943,7 +945,9 @@ export default class CreateTreeTemplate extends Component {
                     console.log("id to filter filter list---", this.state.nodeDataMomList.filter(x => x.nodeId == this.state.currentItemConfig.context.id)[0].nodeDataMomList)
                     this.setState({ momListPer: this.state.nodeDataMomList.filter(x => x.nodeId == this.state.currentItemConfig.context.id)[0].nodeDataMomList }, () => {
                         console.log("going to build mom jexcel percent");
+                        if (value == 1 || (value == 0 && this.state.showMomDataPercent)) {
                         this.buildMomJexcelPercent();
+                        }
                     });
                 }
 
@@ -1083,65 +1087,84 @@ export default class CreateTreeTemplate extends Component {
                     var items = this.state.items;
                     var item = items.filter(x => x.id == this.state.currentItemConfig.context.id)[0];
                     const itemIndex1 = items.findIndex(o => o.id === this.state.currentItemConfig.context.id);
-                    for (var i = 0; i < tableJson.length; i++) {
-                        var map1 = new Map(Object.entries(tableJson[i]));
-                        console.log("10 map---" + map1.get("10"))
-                        if (parseInt(map1.get("10")) === 1) {
-                            var parts1 = map1.get("3").split('-');
-                            var startDate = parts1[0] + "-" + parts1[1] + "-01"
-                            var parts2 = map1.get("4").split('-');
-                            var stopDate = parts2[0] + "-" + parts2[1] + "-01"
-                            if (map1.get("9") != "" && map1.get("9") != 0) {
-                                const itemIndex = data.findIndex(o => o.nodeDataModelingId === map1.get("9"));
-                                console.log("data[itemIndex]---", data[itemIndex]);
-                                obj = data.filter(x => x.nodeDataModelingId == map1.get("9"))[0];
-                                console.log("obj--->>>>>", obj);
-                                var transfer = map1[0] != "" ? map1.get("0") : '';
-                                console.log("transfer---", transfer);
-                                obj.transferNodeDataId = transfer;
-                                obj.notes = map1.get("1");
-                                obj.modelingType.id = map1.get("2");
-                                obj.startDate = startDate;
-                                obj.stopDate = stopDate;
-                                obj.dataValue = map1.get("2") == 2 ? map1.get("6").toString().replaceAll(",", "") : map1.get("5").toString().replaceAll(",", "").split("%")[0];
-                                obj.nodeDataModelingId = map1.get("9")
+                    if (itemIndex1 != -1) {
+                        for (var i = 0; i < tableJson.length; i++) {
+                            var map1 = new Map(Object.entries(tableJson[i]));
+                            console.log("10 map---" + map1.get("10"))
+                            if (parseInt(map1.get("10")) === 1) {
+                                var parts1 = map1.get("3").split('-');
+                                var startDate = parts1[0] + "-" + parts1[1] + "-01"
+                                var parts2 = map1.get("4").split('-');
+                                var stopDate = parts2[0] + "-" + parts2[1] + "-01"
+                                if (map1.get("9") != "" && map1.get("9") != 0) {
+                                    const itemIndex = data.findIndex(o => o.nodeDataModelingId === map1.get("9"));
+                                    console.log("data[itemIndex]---", data[itemIndex]);
+                                    obj = data.filter(x => x.nodeDataModelingId == map1.get("9"))[0];
+                                    console.log("obj--->>>>>", obj);
+                                    var transfer = map1[0] != "" ? map1.get("0") : '';
+                                    console.log("transfer---", transfer);
+                                    obj.transferNodeDataId = transfer;
+                                    obj.notes = map1.get("1");
+                                    obj.modelingType.id = map1.get("2");
+                                    obj.startDate = startDate;
+                                    obj.stopDate = stopDate;
+                                    obj.dataValue = map1.get("2") == 2 ? map1.get("6").toString().replaceAll(",", "") : map1.get("5").toString().replaceAll(",", "").split("%")[0];
+                                    obj.nodeDataModelingId = map1.get("9")
 
-                                // data[itemIndex] = obj;
-                            } else {
-                                console.log("maxModelingId---", maxModelingId);
-                                obj = {
-                                    transferNodeDataId: map1[0] != "" ? map1.get("0") : '',
-                                    notes: map1.get("1"),
-                                    modelingType: {
-                                        id: map1.get("2")
-                                    },
-                                    startDate: startDate,
-                                    stopDate: stopDate,
-                                    dataValue: map1.get("2") == 2 ? map1.get("6").toString().replaceAll(",", "") : map1.get("5").toString().replaceAll(",", "").split("%")[0],
-                                    nodeDataModelingId: parseInt(maxModelingId) + 1
+                                    // data[itemIndex] = obj;
+                                } else {
+                                    console.log("maxModelingId---", maxModelingId);
+                                    obj = {
+                                        transferNodeDataId: map1[0] != "" ? map1.get("0") : '',
+                                        notes: map1.get("1"),
+                                        modelingType: {
+                                            id: map1.get("2")
+                                        },
+                                        startDate: startDate,
+                                        stopDate: stopDate,
+                                        dataValue: map1.get("2") == 2 ? map1.get("6").toString().replaceAll(",", "") : map1.get("5").toString().replaceAll(",", "").split("%")[0],
+                                        nodeDataModelingId: parseInt(maxModelingId) + 1
+                                    }
+                                    maxModelingId++;
+                                    console.log("obj to push---", obj);
+                                    // data.push(obj);
                                 }
-                                maxModelingId++;
-                                console.log("obj to push---", obj);
-                                // data.push(obj);
+                                dataArr.push(obj);
                             }
-                            dataArr.push(obj);
-                            console.log("obj---", obj);
-                            console.log("dataArr--->>>", dataArr);
-                            (item.payload.nodeDataMap[0])[0].nodeDataModelingList = dataArr;
-                            console.log("item---", item);
-                            items[itemIndex1] = item;
-                            console.log("items---", items);
-                            // Call function by dolly
-                            this.setState({
-                                items,
-                                scalingList: dataArr,
-                                // openAddNodeModal: false,
-                                activeTab1: new Array(2).fill('2')
-                            }, () => {
-                                console.log("going to call MOM data");
-                                this.calculateMOMData(0, 0);
-                            });
                         }
+                        console.log("obj---", obj);
+                        console.log("dataArr--->>>", dataArr);
+                        (item.payload.nodeDataMap[0])[0].nodeDataModelingList = dataArr;
+                        console.log("item---", item);
+                        items[itemIndex1] = item;
+                        console.log("items---", items);
+                        // Call function by dolly
+                        this.setState({
+                            items,
+                            scalingList: dataArr,
+                            // openAddNodeModal: false,
+                            activeTab1: new Array(2).fill('2')
+                        }, () => {
+                            console.log("going to call MOM data");
+                            this.calculateMOMData(0, 0);
+                        });
+
+                    } else {
+                        this.setState({
+                            modelingJexcelLoader: false
+                        }, () => {
+                            // setTimeout(() => {
+                            alert("You are creating a new node.Please submit the node data first and then apply modeling/transfer.");
+                            // confirmAlert({
+                            //     message: "You are creating a new node.Please submit the node data first and then apply modeling/transfer.",
+                            //     buttons: [
+                            //         {
+                            //             label: i18n.t('static.report.ok')
+                            //         }
+                            //     ]
+                            // });
+                            // }, 0);
+                        });
                     }
                 } catch (err) {
                     console.log("scaling err---", err);
@@ -1387,7 +1410,7 @@ export default class CreateTreeTemplate extends Component {
         var startDate = this.state.currentCalculatorStartDate;
         var endDate = this.state.currentCalculatorStopDate;
         var monthDifference = moment(endDate).diff(startDate, 'months', true);
-        var getValue = e.target.value!=""?e.target.value.toString().replaceAll(",", "").match(/^-?\d+(?:\.\d{0,2})?/)[0]:"";
+        var getValue = e.target.value != "" ? e.target.value.toString().replaceAll(",", "").match(/^-?\d+(?:\.\d{0,2})?/)[0] : "";
         var getEndValueFromPercentage = (this.state.currentCalculatorStartValue * getValue) / 100;
 
 
@@ -2440,6 +2463,7 @@ export default class CreateTreeTemplate extends Component {
             if (x == 6 && rowData[2] == 2) {
                 var col = ("G").concat(parseInt(y) + 1);
                 var reg = JEXCEL_DECIMAL_MONTHLY_CHANGE;
+                value = value.toString().replaceAll(",", "");
                 if (value == "") {
                     instance.jexcel.setStyle(col, "background-color", "transparent");
                     instance.jexcel.setStyle(col, "background-color", "yellow");
@@ -4092,6 +4116,7 @@ export default class CreateTreeTemplate extends Component {
         var { currentItemConfig } = this.state;
         if ((nodeTypeId == 3 || nodeTypeId == 4 || nodeTypeId == 5) && this.state.addNodeFlag && currentItemConfig.context.payload.nodeDataMap[0][0].dataValue == "") {
             currentItemConfig.context.payload.nodeDataMap[0][0].dataValue = 100;
+            console.log("parent value template---", currentItemConfig.parentItem.payload.nodeDataMap[0][0].calculatedDataValue);
             currentItemConfig.context.payload.nodeDataMap[0][0].calculatedDataValue = ((100 * currentItemConfig.parentItem.payload.nodeDataMap[0][0].calculatedDataValue) / 100).toString()
             this.setState({ currentItemConfig })
         }
@@ -5234,7 +5259,7 @@ export default class CreateTreeTemplate extends Component {
                                         {/* {(this.state.aggregationNode && this.state.currentItemConfig.context.payload.nodeType.id != 1) && */}
                                         <FormGroup className="col-md-6" style={{ display: this.state.aggregationNode ? 'block' : 'none' }}>
                                             <Label htmlFor="currencyId">Node Value<span class="red Reqasterisk">*</span></Label>
-                                            <Input type="number"
+                                            <Input type="text"
                                                 id="nodeValue"
                                                 name="nodeValue"
                                                 bsSize="sm"

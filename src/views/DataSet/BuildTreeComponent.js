@@ -149,7 +149,7 @@ const validationSchemaNodeData = function (values) {
         planningUnitIdFU: Yup.string()
             .when("planningUnitIdFUFlag", {
                 is: val => {
-                    return document.getElementById("planningUnitIdFUFlag").value === "true" && document.getElementById("planningUnitIdFU").value == "";
+                    return parseInt(document.getElementById("nodeTypeId").value) == 4 && document.getElementById("planningUnitIdFUFlag").value === "true" && document.getElementById("planningUnitIdFU").value == "";
 
                 },
                 then: Yup.string()
@@ -1072,17 +1072,21 @@ export default class BuildTree extends Component {
                 console.log("items---***", items);
                 this.setState({ items })
             }
-            if (parameterName == 'type' && value == 1) {
+            if (parameterName == 'type' && (value == 1 || value == 0)) {
                 if (this.state.currentItemConfig.context.payload.nodeType.id == 1 || this.state.currentItemConfig.context.payload.nodeType.id == 2) {
                     console.log("mom list ret---", this.state.nodeDataMomList.filter(x => x.nodeId == this.state.currentItemConfig.context.id));
                     this.setState({ momList: this.state.nodeDataMomList.filter(x => x.nodeId == this.state.currentItemConfig.context.id)[0].nodeDataMomList }, () => {
                         console.log("going to build mom jexcel");
-                        this.buildMomJexcel();
+                        if (value == 1 || (value == 0 && this.state.showMomData)) {
+                            this.buildMomJexcel();
+                        }
                     });
                 } else {
                     this.setState({ momListPer: this.state.nodeDataMomList.filter(x => x.nodeId == this.state.currentItemConfig.context.id)[0].nodeDataMomList }, () => {
                         console.log("going to build mom jexcel percent");
-                        this.buildMomJexcelPercent();
+                        if (value == 1 || (value == 0 && this.state.showMomDataPercent)) {
+                            this.buildMomJexcelPercent();
+                        }
                     });
                 }
 
@@ -2640,7 +2644,7 @@ export default class BuildTree extends Component {
         var startDate = this.state.currentCalculatorStartDate;
         var endDate = this.state.currentCalculatorStopDate;
         var monthDifference = moment(endDate).diff(startDate, 'months', true);
-        var getValue = e.target.value!=""?e.target.value.toString().replaceAll(",", "").match(/^-?\d+(?:\.\d{0,2})?/)[0]:"";
+        var getValue = e.target.value != "" ? e.target.value.toString().replaceAll(",", "").match(/^-?\d+(?:\.\d{0,2})?/)[0] : "";
         var getEndValueFromPercentage = (this.state.currentCalculatorStartValue * getValue) / 100;
 
 
@@ -4710,7 +4714,7 @@ export default class BuildTree extends Component {
 
         this.setState({
             forecastingUnitMultiList,
-            fuValues: tracerCategoryId == "" || tracerCategoryId == undefined ? [] : (this.state.currentScenario.fuNode.forecastingUnit.id != undefined && this.state.currentScenario.fuNode.forecastingUnit.id != "" && filteredForecastingUnitList.filter(x=>x.id == this.state.currentScenario.fuNode.forecastingUnit.id).length > 0 ? { value: this.state.currentScenario.fuNode.forecastingUnit.id, label: getLabelText(this.state.currentScenario.fuNode.forecastingUnit.label, this.state.lang) + " | " + this.state.currentScenario.fuNode.forecastingUnit.id } : []),
+            fuValues: tracerCategoryId == "" || tracerCategoryId == undefined ? [] : (this.state.currentScenario.fuNode.forecastingUnit.id != undefined && this.state.currentScenario.fuNode.forecastingUnit.id != "" && filteredForecastingUnitList.filter(x => x.id == this.state.currentScenario.fuNode.forecastingUnit.id).length > 0 ? { value: this.state.currentScenario.fuNode.forecastingUnit.id, label: getLabelText(this.state.currentScenario.fuNode.forecastingUnit.label, this.state.lang) + " | " + this.state.currentScenario.fuNode.forecastingUnit.id } : []),
             tempPlanningUnitId: tracerCategoryId == "" || tracerCategoryId == undefined ? '' : this.state.tempPlanningUnitId,
             planningUnitList: tracerCategoryId == "" || tracerCategoryId == undefined ? [] : this.state.planningUnitList
         }, () => {
@@ -6720,7 +6724,7 @@ export default class BuildTree extends Component {
                                         {/* {this.state.aggregationNode && */}
                                         <FormGroup className="col-md-6" style={{ display: this.state.aggregationNode ? 'block' : 'none' }}>
                                             <Label htmlFor="currencyId">{i18n.t('static.tree.nodeValue')}{this.state.numberNode}<span class="red Reqasterisk">*</span></Label>
-                                            <Input type="number"
+                                            <Input type="text"
                                                 id="nodeValue"
                                                 name="nodeValue"
                                                 bsSize="sm"
