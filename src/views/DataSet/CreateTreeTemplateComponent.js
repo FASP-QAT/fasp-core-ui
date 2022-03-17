@@ -1046,7 +1046,11 @@ export default class CreateTreeTemplate extends Component {
                 }
             }
             this.state.modelingEl.setValueFromCoords(8, i, calculatedChangeForMonth, true);
-            scalingTotal = parseFloat(scalingTotal) + parseFloat(calculatedChangeForMonth);
+            // scalingTotal = parseFloat(scalingTotal) + parseFloat(calculatedChangeForMonth);
+        }
+        var scalingDifference=(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].nodeDataMomList.filter(c=>moment(c.month).format("YYYY-MM")==moment(date).format("YYYY-MM"));
+        if(scalingDifference.length>0){
+            scalingTotal+=scalingDifference[0].difference;
         }
         this.setState({ scalingTotal, scalingMonth: date });
 
