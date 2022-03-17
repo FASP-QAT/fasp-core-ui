@@ -5969,10 +5969,16 @@ export default class BuildTree extends Component {
     }
     onRemoveButtonClick(itemConfig) {
         const { items } = this.state;
-
+        console.log("delete items---", items)
+        console.log("delete id---", itemConfig.id)
+        console.log("delete items count---", items.filter(x => x.id == itemConfig.id))
         this.setState(this.getDeletedItems(items, [itemConfig.id]), () => {
-            this.calculateValuesForAggregateNode(this.state.items);
-            this.saveTreeData();
+            setTimeout(() => {
+                console.log("delete result---", this.getDeletedItems(items, [itemConfig.id]))
+                this.calculateValuesForAggregateNode(this.state.items);
+                console.log("delete agg value")
+                this.saveTreeData();
+            }, 0);
         });
     }
     onMoveItem(parentid, itemid) {
@@ -6012,20 +6018,30 @@ export default class BuildTree extends Component {
         this.setState(this.getDeletedItems(items, [id]));
     }
     getDeletedItems(items = [], deletedItems = []) {
+        console.log("delete tree deletedItems---", deletedItems)
+        console.log("delete tree before---", items)
+        console.log("delete tree before 1---", items.filter(x => x.id == 10))
         const tree = this.getTree(items);
+        console.log("delete tree---", tree)
         const hash = deletedItems.reduce((agg, itemid) => {
+            console.log("delete itemId---", itemid)
             agg.add(itemid.toString());
             return agg;
         }, new Set());
+        console.log("delete hash---", hash)
         const cursorParent = this.getDeletedItemsParent(tree, deletedItems, hash);
+        console.log("delete cursorParent---", cursorParent)
         const result = [];
         tree.loopLevels(this, (nodeid, node) => {
+            console.log("delete nodeid---", nodeid)
+            console.log("delete node---", node)
             if (hash.has(nodeid.toString())) {
+                console.log("delete inside if")
                 return tree.SKIP;
             }
             result.push(node);
         });
-
+        console.log("delete result---", result)
         return {
             items: result,
             cursorItem: cursorParent
@@ -8444,6 +8460,7 @@ export default class BuildTree extends Component {
                                             {
                                                 label: i18n.t('static.program.yes'),
                                                 onClick: () => {
+                                                    console.log("delete itemConfig---", itemConfig);
                                                     this.onRemoveButtonClick(itemConfig);
                                                 }
                                             },
