@@ -68,98 +68,10 @@ class ConsumptionForecastError extends Component {
             planningUnitId: "",
             consumptionAdjusted: 2,
             yaxisEquUnitId: 2,
-            // consumptionDataAll: [
-            //     { consumptionDate: '2020-07-01', consumptionQty: 8, region: { regionId: 1 }, actualFlag: false },
-            //     { consumptionDate: '2020-07-01', consumptionQty: 8, region: { regionId: 2 }, actualFlag: false },
-            //     { consumptionDate: '2020-07-01', consumptionQty: 8, region: { regionId: 3 }, actualFlag: false },
-            //     { consumptionDate: '2020-07-01', consumptionQty: 8, region: { regionId: 4 }, actualFlag: false },
-            //     { consumptionDate: '2020-07-01', consumptionQty: 12, region: { regionId: 1 }, actualFlag: true },
-            //     { consumptionDate: '2020-07-01', consumptionQty: 17, region: { regionId: 2 }, actualFlag: true },
-            //     { consumptionDate: '2020-07-01', consumptionQty: 17, region: { regionId: 3 }, actualFlag: true },
-            //     { consumptionDate: '2020-07-01', consumptionQty: 12, region: { regionId: 4 }, actualFlag: true },
-
-            //     { consumptionDate: '2020-08-01', consumptionQty: 10, region: { regionId: 1 }, actualFlag: false },
-            //     { consumptionDate: '2020-08-01', consumptionQty: 10, region: { regionId: 2 }, actualFlag: false },
-            //     { consumptionDate: '2020-08-01', consumptionQty: 10, region: { regionId: 3 }, actualFlag: false },
-            //     { consumptionDate: '2020-08-01', consumptionQty: 10, region: { regionId: 4 }, actualFlag: false },
-            //     { consumptionDate: '2020-08-01', consumptionQty: 10, region: { regionId: 1 }, actualFlag: true },
-            //     { consumptionDate: '2020-08-01', consumptionQty: 16, region: { regionId: 2 }, actualFlag: true },
-            //     { consumptionDate: '2020-08-01', consumptionQty: 16, region: { regionId: 3 }, actualFlag: true },
-            //     { consumptionDate: '2020-08-01', consumptionQty: 10, region: { regionId: 4 }, actualFlag: true },
-
-            //     { consumptionDate: '2020-09-01', consumptionQty: 10, region: { regionId: 1 }, actualFlag: false },
-            //     { consumptionDate: '2020-09-01', consumptionQty: 10, region: { regionId: 2 }, actualFlag: false },
-            //     { consumptionDate: '2020-09-01', consumptionQty: 10, region: { regionId: 3 }, actualFlag: false },
-            //     { consumptionDate: '2020-09-01', consumptionQty: 10, region: { regionId: 4 }, actualFlag: false },
-            //     { consumptionDate: '2020-09-01', consumptionQty: 6, region: { regionId: 1 }, actualFlag: true },
-            //     { consumptionDate: '2020-09-01', consumptionQty: 8, region: { regionId: 2 }, actualFlag: true },
-            //     { consumptionDate: '2020-09-01', consumptionQty: 8, region: { regionId: 3 }, actualFlag: true },
-            //     { consumptionDate: '2020-09-01', consumptionQty: 6, region: { regionId: 4 }, actualFlag: true },
-
-            //     { consumptionDate: '2020-10-01', consumptionQty: 9, region: { regionId: 1 }, actualFlag: false },
-            //     { consumptionDate: '2020-10-01', consumptionQty: 9, region: { regionId: 2 }, actualFlag: false },
-            //     { consumptionDate: '2020-10-01', consumptionQty: 9, region: { regionId: 3 }, actualFlag: false },
-            //     { consumptionDate: '2020-10-01', consumptionQty: 9, region: { regionId: 4 }, actualFlag: false },
-            //     { consumptionDate: '2020-10-01', consumptionQty: 6, region: { regionId: 1 }, actualFlag: true },
-            //     { consumptionDate: '2020-10-01', consumptionQty: 10, region: { regionId: 2 }, actualFlag: true },
-            //     { consumptionDate: '2020-10-01', consumptionQty: 10, region: { regionId: 3 }, actualFlag: true },
-            //     { consumptionDate: '2020-10-01', consumptionQty: 6, region: { regionId: 4 }, actualFlag: true },
-
-            //     { consumptionDate: '2020-11-01', consumptionQty: 9, region: { regionId: 1 }, actualFlag: false },
-            //     { consumptionDate: '2020-11-01', consumptionQty: 9, region: { regionId: 2 }, actualFlag: false },
-            //     { consumptionDate: '2020-11-01', consumptionQty: 9, region: { regionId: 3 }, actualFlag: false },
-            //     { consumptionDate: '2020-11-01', consumptionQty: 9, region: { regionId: 4 }, actualFlag: false },
-            //     { consumptionDate: '2020-11-01', consumptionQty: 10, region: { regionId: 1 }, actualFlag: true },
-            //     { consumptionDate: '2020-11-01', consumptionQty: 14, region: { regionId: 2 }, actualFlag: true },
-            //     { consumptionDate: '2020-11-01', consumptionQty: 14, region: { regionId: 3 }, actualFlag: true },
-            //     { consumptionDate: '2020-11-01', consumptionQty: 10, region: { regionId: 4 }, actualFlag: true },
-
-            //     { consumptionDate: '2020-12-01', consumptionQty: 13, region: { regionId: 1 }, actualFlag: false },
-            //     { consumptionDate: '2020-12-01', consumptionQty: 13, region: { regionId: 2 }, actualFlag: false },
-            //     { consumptionDate: '2020-12-01', consumptionQty: 13, region: { regionId: 3 }, actualFlag: false },
-            //     { consumptionDate: '2020-12-01', consumptionQty: 13, region: { regionId: 4 }, actualFlag: false },
-            //     { consumptionDate: '2020-12-01', consumptionQty: 8, region: { regionId: 1 }, actualFlag: true },
-            //     { consumptionDate: '2020-12-01', consumptionQty: 12, region: { regionId: 2 }, actualFlag: true },
-            //     { consumptionDate: '2020-12-01', consumptionQty: 12, region: { regionId: 3 }, actualFlag: true },
-            //     { consumptionDate: '2020-12-01', consumptionQty: 8, region: { regionId: 4 }, actualFlag: true },
-
-
-            //     { consumptionDate: '2021-01-01', consumptionQty: 8, region: { regionId: 1 }, actualFlag: false },
-            //     { consumptionDate: '2021-01-01', consumptionQty: 8, region: { regionId: 2 }, actualFlag: false },
-            //     { consumptionDate: '2021-01-01', consumptionQty: 8, region: { regionId: 3 }, actualFlag: false },
-            //     { consumptionDate: '2021-01-01', consumptionQty: 8, region: { regionId: 4 }, actualFlag: false },
-            //     { consumptionDate: '2021-01-01', consumptionQty: 7, region: { regionId: 1 }, actualFlag: true },
-            //     { consumptionDate: '2021-01-01', consumptionQty: 10, region: { regionId: 2 }, actualFlag: true },
-            //     { consumptionDate: '2021-01-01', consumptionQty: 10, region: { regionId: 3 }, actualFlag: true },
-            //     { consumptionDate: '2021-01-01', consumptionQty: 7, region: { regionId: 4 }, actualFlag: true },
-
-            //     { consumptionDate: '2021-02-01', consumptionQty: 9, region: { regionId: 1 }, actualFlag: false },
-            //     { consumptionDate: '2021-02-01', consumptionQty: 9, region: { regionId: 2 }, actualFlag: false },
-            //     { consumptionDate: '2021-02-01', consumptionQty: 9, region: { regionId: 3 }, actualFlag: false },
-            //     { consumptionDate: '2021-02-01', consumptionQty: 9, region: { regionId: 4 }, actualFlag: false },
-
-            //     { consumptionDate: '2021-03-01', consumptionQty: 9, region: { regionId: 1 }, actualFlag: false },
-            //     { consumptionDate: '2021-03-01', consumptionQty: 9, region: { regionId: 2 }, actualFlag: false },
-            //     { consumptionDate: '2021-03-01', consumptionQty: 9, region: { regionId: 3 }, actualFlag: false },
-            //     { consumptionDate: '2021-03-01', consumptionQty: 9, region: { regionId: 4 }, actualFlag: false },
-
-            //     { consumptionDate: '2021-04-01', consumptionQty: 9, region: { regionId: 1 }, actualFlag: false },
-            //     { consumptionDate: '2021-04-01', consumptionQty: 9, region: { regionId: 2 }, actualFlag: false },
-            //     { consumptionDate: '2021-04-01', consumptionQty: 9, region: { regionId: 3 }, actualFlag: false },
-            //     { consumptionDate: '2021-04-01', consumptionQty: 9, region: { regionId: 4 }, actualFlag: false },
-
-            //     { consumptionDate: '2021-05-01', consumptionQty: 9, region: { regionId: 1 }, actualFlag: false },
-            //     { consumptionDate: '2021-05-01', consumptionQty: 9, region: { regionId: 2 }, actualFlag: false },
-            //     { consumptionDate: '2021-05-01', consumptionQty: 9, region: { regionId: 3 }, actualFlag: false },
-            //     { consumptionDate: '2021-05-01', consumptionQty: 9, region: { regionId: 4 }, actualFlag: false },
-
-            //     { consumptionDate: '2021-06-01', consumptionQty: 9, region: { regionId: 1 }, actualFlag: false },
-            //     { consumptionDate: '2021-06-01', consumptionQty: 9, region: { regionId: 2 }, actualFlag: false },
-            //     { consumptionDate: '2021-06-01', consumptionQty: 9, region: { regionId: 3 }, actualFlag: false },
-            //     { consumptionDate: '2021-06-01', consumptionQty: 9, region: { regionId: 4 }, actualFlag: false },
-            // ],
             consumptionData: [],
-            // errorValues: ["39%", "66%", "48%", "32%", "30%", "37%", "32%", "28%", "NA", "NA", "NA", "NA", "NA"]
+            equivalencyUnitList: [],
+            programEquivalencyUnitList: [],
+            yaxisEquUnit: -1,
 
         };
         this.getPrograms = this.getPrograms.bind(this);
@@ -178,8 +90,86 @@ class ConsumptionForecastError extends Component {
         this.toggleAccordionTotalActual = this.toggleAccordionTotalActual.bind(this);
         this.toggleAccordionTotalF = this.toggleAccordionTotalForecast.bind(this);
         this.toggleAccordionTotalDiffernce = this.toggleAccordionTotalDiffernce.bind(this);
-        this.storeProduct = this.storeProduct.bind(this)
+        this.storeProduct = this.storeProduct.bind(this);
+        this.getEquivalencyUnitData = this.getEquivalencyUnitData.bind(this);
 
+    }
+
+    getEquivalencyUnitData() {
+        let programId = document.getElementById("programId").value;
+        let versionId = document.getElementById("versionId").value;
+        this.setState({
+            planningUnits: [],
+            planningUnitValues: [],
+            planningUnitLabels: [],
+
+            forecastingUnits: [],
+            forecastingUnitValues: [],
+            forecastingUnitLabels: [],
+        }, () => {
+            if (programId > 0 && versionId != 0) {
+                if (versionId.includes('Local')) {
+
+                    const lan = 'en';
+                    var db1;
+                    var storeOS;
+                    getDatabase();
+                    var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+                    openRequest.onsuccess = function (e) {
+                        db1 = e.target.result;
+                        var planningunitTransaction = db1.transaction(['equivalencyUnit'], 'readwrite');
+                        var planningunitOs = planningunitTransaction.objectStore('equivalencyUnit');
+                        var planningunitRequest = planningunitOs.getAll();
+                        var planningList = []
+                        planningunitRequest.onerror = function (event) {
+                            // Handle errors!
+                        };
+                        planningunitRequest.onsuccess = function (e) {
+                            var myResult = [];
+                            myResult = planningunitRequest.result;
+                            // var programId = (document.getElementById("programId").value).split("_")[0];
+                            var filteredEquList = []
+                            console.log("EquivalencyUnitList---------->", myResult);
+                            for (var i = 0; i < myResult.length; i++) {
+                                if (myResult[i].program != null) {
+                                    if (myResult[i].program.id == programId && myResult[i].active == true) {
+                                        filteredEquList.push(myResult[i]);
+                                    }
+                                } else {
+                                    filteredEquList.push(myResult[i]);
+                                }
+                            }
+                            console.log("EquivalencyUnitList---------->1", filteredEquList);
+
+                            let duplicateEquiUnit = filteredEquList.map(c => c.equivalencyUnit);
+                            const ids = duplicateEquiUnit.map(o => o.equivalencyUnitId)
+                            const filteredEQUnit = duplicateEquiUnit.filter(({ equivalencyUnitId }, index) => !ids.includes(equivalencyUnitId, index + 1))
+
+                            console.log("EquivalencyUnitList---------->2", filteredEQUnit);
+
+                            var lang = this.state.lang;
+                            this.setState({
+                                equivalencyUnitList: filteredEQUnit.sort(function (a, b) {
+                                    a = getLabelText(a.label, lang).toLowerCase();
+                                    b = getLabelText(b.label, lang).toLowerCase();
+                                    return a < b ? -1 : a > b ? 1 : 0;
+                                }),
+                                programEquivalencyUnitList: filteredEquList,
+                            }, () => {
+                                this.filterData();
+                            })
+                        }.bind(this);
+                    }.bind(this)
+
+                } else {//api call
+
+                }
+            }
+
+
+
+
+        })
     }
 
     storeProduct(e) {
@@ -359,15 +349,6 @@ class ConsumptionForecastError extends Component {
                             var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                             var programJson1 = JSON.parse(programData);
                             console.log("programJson1-------->1", programJson1);
-                            // let dupForecastingUnitObj = programJson1.consumptionList.map(ele => ele.consumptionUnit.forecastingUnit);
-                            // const ids = dupForecastingUnitObj.map(o => o.id)
-                            // const filtered = dupForecastingUnitObj.filter(({ id }, index) => !ids.includes(id, index + 1))
-                            // console.log("programJson1-------->2", filtered);
-
-                            // let dupPlanningUnitObjwithNull = programJson1.consumptionList.map(ele => ele.consumptionUnit.planningUnit);
-                            // let dupPlanningUnitObj = dupPlanningUnitObjwithNull.filter(c => c != null);
-                            // const idsPU = dupPlanningUnitObj.map(o => o.id)
-                            // const filteredPU = dupPlanningUnitObj.filter(({ id }, index) => !idsPU.includes(id, index + 1))
 
                             datasetList.push({
                                 programCode: filteredGetRequestList[i].programCode,
@@ -428,7 +409,6 @@ class ConsumptionForecastError extends Component {
                                     }
                                 })
 
-
                                 let actualConsumptionList3 = [];
                                 //filter based on region
                                 for (let k = 0; k < regionIds.length; k++) {
@@ -439,8 +419,13 @@ class ConsumptionForecastError extends Component {
 
                                 consumptionData = consumptionData.concat(actualConsumptionList3);
                                 console.log("Test------------>22", consumptionData);
+                                //end actual
 
-                                //forecast 
+
+
+
+
+                                //forecast start
                                 let filteredPlanningUnitList = filteredProgram.planningUnitList.filter(c => c.planningUnit.id == planningUnitId);
                                 console.log("Test------------>499", filteredPlanningUnitList);
                                 for (let k = 0; k < filteredPlanningUnitList.length; k++) {
@@ -449,153 +434,49 @@ class ConsumptionForecastError extends Component {
                                     let selectedForecastMap = planningUniObj.selectedForecastMap;
                                     let selectedForecastMapObjIn = (selectedForecastMap[Object.keys(selectedForecastMap)[0]]);
 
-                                    let consumptionExtrapolationId = selectedForecastMapObjIn.consumptionExtrapolationId;
-                                    console.log("Test------------>501", consumptionExtrapolationId);
-                                    if (consumptionExtrapolationId != null) {
-                                        console.log("Test------------>502", consumptionExtrapolationId);
-                                        let consumptionExtrapolationObj = consumptionExtrapolation.filter(c => c.consumptionExtrapolationId == consumptionExtrapolationId);
-                                        console.log("Test------------>503", consumptionExtrapolationObj);
-                                        if (consumptionExtrapolationObj.length > 0) {
-                                            console.log("Test------------>504", consumptionExtrapolationObj);
-                                            let regionId = consumptionExtrapolationObj[0].region.id;
-                                            let consumptionList = consumptionExtrapolationObj[0].extrapolationDataList.map(m => {
-                                                return {
-                                                    consumptionDate: m.month,
-                                                    consumptionQty: m.amount,
-                                                    region: { regionId: regionId },
-                                                    actualFlag: false
+                                    if (selectedForecastMapObjIn != undefined && selectedForecastMapObjIn != null && selectedForecastMapObjIn != '') {
+                                        let consumptionExtrapolationId = selectedForecastMapObjIn.consumptionExtrapolationId;
+                                        console.log("Test------------>501", consumptionExtrapolationId);
+                                        if (consumptionExtrapolationId != null) {
+                                            console.log("Test------------>502", consumptionExtrapolationId);
+                                            let consumptionExtrapolationObj = consumptionExtrapolation.filter(c => c.consumptionExtrapolationId == consumptionExtrapolationId);
+                                            console.log("Test------------>503", consumptionExtrapolationObj);
+                                            if (consumptionExtrapolationObj.length > 0) {
+                                                console.log("Test------------>504", consumptionExtrapolationObj);
+                                                let regionId = consumptionExtrapolationObj[0].region.id;
+                                                let consumptionList = consumptionExtrapolationObj[0].extrapolationDataList.map(m => {
+                                                    return {
+                                                        consumptionDate: m.month,
+                                                        consumptionQty: m.amount,
+                                                        region: { regionId: regionId },
+                                                        actualFlag: false
+                                                    }
+                                                });
+                                                console.log("Test------------>2.1", planningUniObj.planningUnit.id);
+                                                console.log("Test------------>2.2", consumptionList);
+
+                                                //filter based on region
+                                                let actualConsumptionList3 = [];
+                                                for (let j = 0; j < regionIds.length; j++) {
+                                                    let tempList = consumptionList.filter(c => c.region.regionId == regionIds[j]);
+                                                    actualConsumptionList3 = actualConsumptionList3.concat(tempList);
                                                 }
-                                            });
-                                            console.log("Test------------>2.1", planningUniObj.planningUnit.id);
-                                            console.log("Test------------>2.2", consumptionList);
 
-                                            //filter based on region
-                                            let actualConsumptionList3 = [];
-                                            for (let j = 0; j < regionIds.length; j++) {
-                                                let tempList = consumptionList.filter(c => c.region.regionId == regionIds[j]);
-                                                actualConsumptionList3 = actualConsumptionList3.concat(tempList);
+
+                                                consumptionData = consumptionData.concat(actualConsumptionList3);
+
                                             }
-
-                                            consumptionData = consumptionData.concat(actualConsumptionList3);
-
                                         }
                                     }
                                 }
-
                                 console.log("Test------------>333", consumptionData);
-
-                                // //remove hardcoded
-                                // var reportPeriod = [{ programId: 2, startDate: '2020-09-01', endDate: '2021-08-30' }, { programId: 1, startDate: '2020-07-01', endDate: '2021-06-30' }, { programId: 3, startDate: '2020-11-01', endDate: '2021-10-30' }];
-                                // // var startDate = reportPeriod.filter(c => c.programId == 1)[0].startDate;
-                                // // var endDate = reportPeriod.filter(c => c.programId == 1)[0].endDate;
-
-                                // let stopDate = endDate;
-                                // var monthArrayList = [];
-                                // let cursorDate = startDate;
-                                // for (var i = 0; moment(cursorDate).format("YYYY-MM") <= moment(stopDate).format("YYYY-MM"); i++) {
-                                //     var dt = moment(startDate).add(i, 'months').format("YYYY-MM-DD");
-                                //     cursorDate = moment(cursorDate).add(1, 'months').format("YYYY-MM-DD");
-                                //     monthArrayList.push(dt);
-                                // }
-                                // let tempConsumptionList = [
-                                //     { consumptionDate: '2020-07-01', consumptionQty: 8, region: { regionId: 70 }, actualFlag: false },
-                                //     { consumptionDate: '2020-07-01', consumptionQty: 8, region: { regionId: 73 }, actualFlag: false },
-                                //     { consumptionDate: '2020-07-01', consumptionQty: 8, region: { regionId: 74 }, actualFlag: false },
-                                //     { consumptionDate: '2020-07-01', consumptionQty: 8, region: { regionId: 4 }, actualFlag: false },
-                                //     { consumptionDate: '2020-07-01', consumptionQty: 12, region: { regionId: 70 }, actualFlag: true },
-                                //     { consumptionDate: '2020-07-01', consumptionQty: 17, region: { regionId: 73 }, actualFlag: true },
-                                //     { consumptionDate: '2020-07-01', consumptionQty: 17, region: { regionId: 74 }, actualFlag: true },
-                                //     { consumptionDate: '2020-07-01', consumptionQty: 12, region: { regionId: 4 }, actualFlag: true },
-
-                                //     { consumptionDate: '2020-08-01', consumptionQty: 10, region: { regionId: 70 }, actualFlag: false },
-                                //     { consumptionDate: '2020-08-01', consumptionQty: 10, region: { regionId: 73 }, actualFlag: false },
-                                //     { consumptionDate: '2020-08-01', consumptionQty: 10, region: { regionId: 74 }, actualFlag: false },
-                                //     { consumptionDate: '2020-08-01', consumptionQty: 10, region: { regionId: 4 }, actualFlag: false },
-                                //     { consumptionDate: '2020-08-01', consumptionQty: 10, region: { regionId: 70 }, actualFlag: true },
-                                //     { consumptionDate: '2020-08-01', consumptionQty: 16, region: { regionId: 73 }, actualFlag: true },
-                                //     { consumptionDate: '2020-08-01', consumptionQty: 16, region: { regionId: 74 }, actualFlag: true },
-                                //     { consumptionDate: '2020-08-01', consumptionQty: 10, region: { regionId: 4 }, actualFlag: true },
-
-                                //     { consumptionDate: '2020-09-01', consumptionQty: 10, region: { regionId: 70 }, actualFlag: false },
-                                //     { consumptionDate: '2020-09-01', consumptionQty: 10, region: { regionId: 73 }, actualFlag: false },
-                                //     { consumptionDate: '2020-09-01', consumptionQty: 10, region: { regionId: 74 }, actualFlag: false },
-                                //     { consumptionDate: '2020-09-01', consumptionQty: 10, region: { regionId: 4 }, actualFlag: false },
-                                //     { consumptionDate: '2020-09-01', consumptionQty: 6, region: { regionId: 70 }, actualFlag: true },
-                                //     { consumptionDate: '2020-09-01', consumptionQty: 8, region: { regionId: 73 }, actualFlag: true },
-                                //     { consumptionDate: '2020-09-01', consumptionQty: 8, region: { regionId: 74 }, actualFlag: true },
-                                //     { consumptionDate: '2020-09-01', consumptionQty: 6, region: { regionId: 4 }, actualFlag: true },
-
-                                //     { consumptionDate: '2020-10-01', consumptionQty: 9, region: { regionId: 70 }, actualFlag: false },
-                                //     { consumptionDate: '2020-10-01', consumptionQty: 9, region: { regionId: 73 }, actualFlag: false },
-                                //     { consumptionDate: '2020-10-01', consumptionQty: 9, region: { regionId: 74 }, actualFlag: false },
-                                //     { consumptionDate: '2020-10-01', consumptionQty: 9, region: { regionId: 4 }, actualFlag: false },
-                                //     { consumptionDate: '2020-10-01', consumptionQty: 6, region: { regionId: 70 }, actualFlag: true },
-                                //     { consumptionDate: '2020-10-01', consumptionQty: 10, region: { regionId: 73 }, actualFlag: true },
-                                //     { consumptionDate: '2020-10-01', consumptionQty: 10, region: { regionId: 74 }, actualFlag: true },
-                                //     { consumptionDate: '2020-10-01', consumptionQty: 6, region: { regionId: 4 }, actualFlag: true },
-
-                                //     { consumptionDate: '2020-11-01', consumptionQty: 9, region: { regionId: 70 }, actualFlag: false },
-                                //     { consumptionDate: '2020-11-01', consumptionQty: 9, region: { regionId: 73 }, actualFlag: false },
-                                //     { consumptionDate: '2020-11-01', consumptionQty: 9, region: { regionId: 74 }, actualFlag: false },
-                                //     { consumptionDate: '2020-11-01', consumptionQty: 9, region: { regionId: 4 }, actualFlag: false },
-                                //     { consumptionDate: '2020-11-01', consumptionQty: 10, region: { regionId: 70 }, actualFlag: true },
-                                //     { consumptionDate: '2020-11-01', consumptionQty: 14, region: { regionId: 73 }, actualFlag: true },
-                                //     { consumptionDate: '2020-11-01', consumptionQty: 14, region: { regionId: 74 }, actualFlag: true },
-                                //     { consumptionDate: '2020-11-01', consumptionQty: 10, region: { regionId: 4 }, actualFlag: true },
-
-                                //     { consumptionDate: '2020-12-01', consumptionQty: 13, region: { regionId: 70 }, actualFlag: false },
-                                //     { consumptionDate: '2020-12-01', consumptionQty: 13, region: { regionId: 73 }, actualFlag: false },
-                                //     { consumptionDate: '2020-12-01', consumptionQty: 13, region: { regionId: 74 }, actualFlag: false },
-                                //     { consumptionDate: '2020-12-01', consumptionQty: 13, region: { regionId: 4 }, actualFlag: false },
-                                //     { consumptionDate: '2020-12-01', consumptionQty: 8, region: { regionId: 70 }, actualFlag: true },
-                                //     { consumptionDate: '2020-12-01', consumptionQty: 12, region: { regionId: 73 }, actualFlag: true },
-                                //     { consumptionDate: '2020-12-01', consumptionQty: 12, region: { regionId: 74 }, actualFlag: true },
-                                //     { consumptionDate: '2020-12-01', consumptionQty: 8, region: { regionId: 4 }, actualFlag: true },
+                                //end forecast
 
 
-                                //     { consumptionDate: '2021-01-01', consumptionQty: 8, region: { regionId: 70 }, actualFlag: false },
-                                //     { consumptionDate: '2021-01-01', consumptionQty: 8, region: { regionId: 73 }, actualFlag: false },
-                                //     { consumptionDate: '2021-01-01', consumptionQty: 8, region: { regionId: 74 }, actualFlag: false },
-                                //     { consumptionDate: '2021-01-01', consumptionQty: 8, region: { regionId: 4 }, actualFlag: false },
-                                //     { consumptionDate: '2021-01-01', consumptionQty: 7, region: { regionId: 70 }, actualFlag: true },
-                                //     { consumptionDate: '2021-01-01', consumptionQty: 10, region: { regionId: 73 }, actualFlag: true },
-                                //     { consumptionDate: '2021-01-01', consumptionQty: 10, region: { regionId: 74 }, actualFlag: true },
-                                //     { consumptionDate: '2021-01-01', consumptionQty: 7, region: { regionId: 4 }, actualFlag: true },
 
-                                //     { consumptionDate: '2021-02-01', consumptionQty: 9, region: { regionId: 70 }, actualFlag: false },
-                                //     { consumptionDate: '2021-02-01', consumptionQty: 9, region: { regionId: 73 }, actualFlag: false },
-                                //     { consumptionDate: '2021-02-01', consumptionQty: 9, region: { regionId: 74 }, actualFlag: false },
-                                //     { consumptionDate: '2021-02-01', consumptionQty: 9, region: { regionId: 4 }, actualFlag: false },
-
-                                //     { consumptionDate: '2021-03-01', consumptionQty: 9, region: { regionId: 70 }, actualFlag: false },
-                                //     { consumptionDate: '2021-03-01', consumptionQty: 9, region: { regionId: 73 }, actualFlag: false },
-                                //     { consumptionDate: '2021-03-01', consumptionQty: 9, region: { regionId: 74 }, actualFlag: false },
-                                //     { consumptionDate: '2021-03-01', consumptionQty: 9, region: { regionId: 4 }, actualFlag: false },
-
-                                //     { consumptionDate: '2021-04-01', consumptionQty: 9, region: { regionId: 70 }, actualFlag: false },
-                                //     { consumptionDate: '2021-04-01', consumptionQty: 9, region: { regionId: 73 }, actualFlag: false },
-                                //     { consumptionDate: '2021-04-01', consumptionQty: 9, region: { regionId: 74 }, actualFlag: false },
-                                //     { consumptionDate: '2021-04-01', consumptionQty: 9, region: { regionId: 4 }, actualFlag: false },
-
-                                //     { consumptionDate: '2021-05-01', consumptionQty: 9, region: { regionId: 70 }, actualFlag: false },
-                                //     { consumptionDate: '2021-05-01', consumptionQty: 9, region: { regionId: 73 }, actualFlag: false },
-                                //     { consumptionDate: '2021-05-01', consumptionQty: 9, region: { regionId: 74 }, actualFlag: false },
-                                //     { consumptionDate: '2021-05-01', consumptionQty: 9, region: { regionId: 4 }, actualFlag: false },
-
-                                //     { consumptionDate: '2021-06-01', consumptionQty: 9, region: { regionId: 70 }, actualFlag: false },
-                                //     { consumptionDate: '2021-06-01', consumptionQty: 9, region: { regionId: 73 }, actualFlag: false },
-                                //     { consumptionDate: '2021-06-01', consumptionQty: 9, region: { regionId: 74 }, actualFlag: false },
-                                //     { consumptionDate: '2021-06-01', consumptionQty: 9, region: { regionId: 4 }, actualFlag: false },
-                                // ];
-
-                                // // let regionIdArr = [1, 2, 3, 4];
                                 let regionIdArr = regionIds.map(c => parseInt(c))
-                                // //end remove hard coded
-
-
 
                                 //start WAPE
-
                                 let forecast = monthArrayList.map(item => {
                                     var cd = consumptionData.filter(c => moment(c.consumptionDate).format("YYYY-MM-DD") == moment(item).format("YYYY-MM-DD") && !c.actualFlag && regionIdArr.includes(c.region.regionId));
                                     var sum = 0;
@@ -667,7 +548,8 @@ class ConsumptionForecastError extends Component {
                                     regionListFiltered: this.state.regionValues,
                                     regionIdArr: regionIds.map(c => parseInt(c)),
                                     consumptionData: consumptionData,
-                                    errorValues: wapeErrorValues
+                                    errorValues: wapeErrorValues,
+                                    message: ''
                                     // errorValues: ["39%", "66%", "48%", "32%", "30%", "37%", "32%", "28%", "NA", "NA", "NA", "NA", "NA"]
                                 });
 
@@ -675,14 +557,34 @@ class ConsumptionForecastError extends Component {
 
                             } else {//forecastingUnitId
 
+                                //actual
+                                let actualConsumptionList1 = actualConsumptionList.filter(c => c.planningUnit.id == planningUnitId);
+                                console.log("Test------------>1.1", actualConsumptionList1);
+                                let actualConsumptionList2 = actualConsumptionList1.map(m => {
+                                    return {
+                                        consumptionDate: m.month,
+                                        consumptionQty: m.amount,
+                                        region: { regionId: m.region.id },
+                                        actualFlag: true
+                                    }
+                                })
+
+                                let actualConsumptionList3 = [];
+                                //filter based on region
+                                for (let k = 0; k < regionIds.length; k++) {
+                                    let tempList = actualConsumptionList2.filter(c => c.region.regionId == regionIds[k]);
+                                    actualConsumptionList3 = actualConsumptionList3.concat(tempList);
+                                }
+
+
+                                consumptionData = consumptionData.concat(actualConsumptionList3);
+                                console.log("Test------------>22", consumptionData);
+                                //end actual
+
+
 
 
                             }
-
-
-
-
-                            //     { consumptionDate: '2020-07-01', consumptionQty: 8, region: { regionId: 1 }, actualFlag: false },
 
                         })
 
@@ -700,7 +602,20 @@ class ConsumptionForecastError extends Component {
 
 
 
-        } else {//validation msg
+        } else if (programId == -1) {//validation message            
+            this.setState({ message: i18n.t('static.common.selectProgram'), monthArrayList: [], regionListFiltered: [], regionIdArr: [], consumptionData: [], errorValues: [] });
+
+        } else if (versionId == -1) {
+            this.setState({ message: i18n.t('static.program.validversion'), monthArrayList: [], regionListFiltered: [], regionIdArr: [], consumptionData: [], errorValues: [] });
+
+        } else if (viewById == 1 && planningUnitId == -1) {
+            this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), monthArrayList: [], regionListFiltered: [], regionIdArr: [], consumptionData: [], errorValues: [] });
+
+        } else if (viewById == 2 && forecastingUnitId == -1) {
+            this.setState({ message: i18n.t('static.planningunit.forcastingunittext'), monthArrayList: [], regionListFiltered: [], regionIdArr: [], consumptionData: [], errorValues: [] });
+
+        } else if (regionIds.length == 0) {
+            this.setState({ message: 'Select Regions', monthArrayList: [], regionListFiltered: [], regionIdArr: [], consumptionData: [], errorValues: [] });
 
         }
 
@@ -827,6 +742,7 @@ class ConsumptionForecastError extends Component {
                     }),
                     downloadedProgramData: downloadedProgramData
                 }, () => {
+                    this.filterData();
                     console.log("programs------------------>", this.state.programs);
                 })
 
@@ -860,6 +776,7 @@ class ConsumptionForecastError extends Component {
             regionListFiltered: [],
             planningUnits: [],
             planningUnitId: '',
+            yaxisEquUnit: -1,
 
             foreastingUnits: [],
             forecastingUnitId: '',
@@ -871,18 +788,15 @@ class ConsumptionForecastError extends Component {
     }
 
     setVersionId(event) {
-        // this.setState({
-        //     versionId: event.target.value,
-        // }, () => {
-        //     // localStorage.setItem("sesVersionIdReport", '');
-        //     // this.filterVersion();
-        // })
 
-        var versionId = (event.target.value.split('(')[0]).trim();
+        var versionId = ((event == null || event == '' || event == undefined) ? ((this.state.versionId).toString().split('(')[0]) : (event.target.value.split('(')[0]).trim());
+        console.log("versionId----------->", versionId);
+        versionId = parseInt(versionId);
         var programId = this.state.programId;
         if (versionId != '' || versionId != undefined) {
             this.setState({
-                versionId: event.target.value,
+                versionId: ((event == null || event == '' || event == undefined) ? (this.state.versionId) : (event.target.value).trim()),
+                yaxisEquUnit: -1,
                 // equivalencyUnitId: '',
                 planningUnits: [],
                 planningUnitId: '',
@@ -897,12 +811,14 @@ class ConsumptionForecastError extends Component {
                 regionValues: [],
                 regionLabels: [],
             }, () => {
+                this.getEquivalencyUnitData();
                 this.getPlanningUnitForecastingUnit();
             })
         } else {
             this.setState({
                 versionId: event.target.value
             }, () => {
+                this.getEquivalencyUnitData();
                 this.getPlanningUnitForecastingUnit();
             })
         }
@@ -917,7 +833,6 @@ class ConsumptionForecastError extends Component {
     }
 
     getPlanningUnitForecastingUnit = () => {
-        // let equivalencyUnitIdd = document.getElementById("equivalencyUnitId").value;
         let programId = document.getElementById("programId").value;
         let versionId = document.getElementById("versionId").value;
 
@@ -941,6 +856,7 @@ class ConsumptionForecastError extends Component {
                         let programData = this.state.downloadedProgramData.filter(c => c.programId == programId && c.currentVersion.versionId == (versionId.split('(')[0]).trim())[0];
                         console.log("programData---------->", programData);
                         let forecastingUnitListTemp = [];
+                        var lang = this.state.lang;
 
                         let consumptionForecastTrueList = programData.planningUnitList.filter(c => c.consuptionForecast == true && c.active == true);
                         let planningUnitList = consumptionForecastTrueList.map(o => o.planningUnit);
@@ -955,65 +871,71 @@ class ConsumptionForecastError extends Component {
                         const forecastingUnitList = forecastingUnitListTemp.filter(({ id }, index) => !ids.includes(id, index + 1));
                         // console.log("PlanningUnitList----------------->3", filtered);
 
-                        // let dupForecastingUnitObj = programData.consumptionList.map(ele => ele.consumptionUnit.forecastingUnit);
-                        // const ids = dupForecastingUnitObj.map(o => o.id)
-                        // const filtered = dupForecastingUnitObj.filter(({ id }, index) => !ids.includes(id, index + 1))
-                        // // console.log("programData-------->2", filtered);
 
-                        // let dupPlanningUnitObjwithNull = programData.consumptionList.map(ele => ele.consumptionUnit.planningUnit);
-                        // let dupPlanningUnitObj = dupPlanningUnitObjwithNull.filter(c => c != null);
-                        // const idsPU = dupPlanningUnitObj.map(o => o.id)
-                        // const filteredPU = dupPlanningUnitObj.filter(({ id }, index) => !idsPU.includes(id, index + 1))
+                        let yaxisEquUnitId = document.getElementById("yaxisEquUnit").value;
+                        if (yaxisEquUnitId != -1) {//Yes
+                            let filteredProgramEQList = this.state.programEquivalencyUnitList.filter(c => c.equivalencyUnit.equivalencyUnitId == yaxisEquUnitId);
+                            let newPlanningUnitList = [];
+                            let newForecastingUnitList = [];
+                            for (var i = 0; i < forecastingUnitList.length; i++) {
+                                let temp = filteredProgramEQList.filter(c => c.forecastingUnit.id == forecastingUnitList[i].id);
+                                if (temp.length > 0) {
+                                    newForecastingUnitList.push(forecastingUnitList[i]);
+                                }
+                            }
 
-                        // let equivalencyUnitId = document.getElementById("equivalencyUnitId").value;
-                        // if (equivalencyUnitId != -1) {
-                        //     let filteredProgramEQList = this.state.programEquivalencyUnitList.filter(c => c.equivalencyUnit.equivalencyUnitId == equivalencyUnitId);
-                        //     let newPlanningUnitList = [];
-                        //     let newForecastingUnitList = [];
-                        //     for (var i = 0; i < forecastingUnitList.length; i++) {
-                        //         let temp = filteredProgramEQList.filter(c => c.forecastingUnit.id == forecastingUnitList[i].id);
-                        //         if (temp.length > 0) {
-                        //             newForecastingUnitList.push(forecastingUnitList[i]);
-                        //         }
-                        //     }
+                            for (var i = 0; i < planningUnitList.length; i++) {
+                                let temp = filteredProgramEQList.filter(c => c.forecastingUnit.id == planningUnitList[i].forecastingUnit.id);
+                                if (temp.length > 0) {
+                                    newPlanningUnitList.push(planningUnitList[i]);
+                                }
+                            }
 
-                        //     for (var i = 0; i < planningUnitList.length; i++) {
-                        //         let temp = filteredProgramEQList.filter(c => c.forecastingUnit.id == planningUnitList[i].forecastingUnit.id);
-                        //         if (temp.length > 0) {
-                        //             newPlanningUnitList.push(planningUnitList[i]);
-                        //         }
-                        //     }
+                            var yaxisEquUnitt = document.getElementById("yaxisEquUnit");
+                            var selectedText = yaxisEquUnitt.options[yaxisEquUnitt.selectedIndex].text;
 
-                        //     var equivalencyUnitt = document.getElementById("equivalencyUnitId");
-                        //     var selectedText = equivalencyUnitt.options[equivalencyUnitt.selectedIndex].text;
+                            newPlanningUnitList.sort(function (a, b) {
+                                a = getLabelText(a.label, lang).toLowerCase();
+                                b = getLabelText(b.label, lang).toLowerCase();
+                                return a < b ? -1 : a > b ? 1 : 0;
+                            });
 
-                        //     this.setState({
-                        //         planningUnits: newPlanningUnitList,
-                        //         forecastingUnits: newForecastingUnitList,
-                        //         equivalencyUnitLabel: selectedText
-                        //     }, () => {
-                        //         this.filterData();
-                        //     })
-                        // } else {
-                        //     this.setState({
-                        //         planningUnits: planningUnitList,
-                        //         forecastingUnits: forecastingUnitList,
-                        //         equivalencyUnitLabel: ''
-                        //         // planningUnits: filteredPU,
-                        //         // forecastingUnits: filtered
-                        //     }, () => {
-                        //         this.filterData();
-                        //     })
-                        // }
+                            newForecastingUnitList.sort(function (a, b) {
+                                a = getLabelText(a.label, lang).toLowerCase();
+                                b = getLabelText(b.label, lang).toLowerCase();
+                                return a < b ? -1 : a > b ? 1 : 0;
+                            })
 
-                        this.setState({
-                            planningUnits: planningUnitList,
-                            forecastingUnits: forecastingUnitList,
-                            // planningUnits: filteredPU,
-                            // forecastingUnits: filtered
-                        }, () => {
-                            this.getRegionList(programData.regionList);
-                        })
+                            this.setState({
+                                planningUnits: newPlanningUnitList,
+                                forecastingUnits: newForecastingUnitList,
+                                equivalencyUnitLabel: selectedText
+                            }, () => {
+                                this.getRegionList(programData.regionList);
+                                // this.filterData();
+                            })
+                        } else {//NO
+
+                            planningUnitList.sort(function (a, b) {
+                                a = getLabelText(a.label, lang).toLowerCase();
+                                b = getLabelText(b.label, lang).toLowerCase();
+                                return a < b ? -1 : a > b ? 1 : 0;
+                            });
+
+                            forecastingUnitList.sort(function (a, b) {
+                                a = getLabelText(a.label, lang).toLowerCase();
+                                b = getLabelText(b.label, lang).toLowerCase();
+                                return a < b ? -1 : a > b ? 1 : 0;
+                            })
+                            this.setState({
+                                planningUnits: planningUnitList,
+                                forecastingUnits: forecastingUnitList,
+                                equivalencyUnitLabel: ''
+                            }, () => {
+                                this.getRegionList(programData.regionList);
+                                // this.filterData();
+                            })
+                        }
 
                     }
                     else {
@@ -1277,11 +1199,11 @@ class ConsumptionForecastError extends Component {
             monthArrayList: [],
         }, () => {
             if (yaxisEquUnit == 1) {
-                document.getElementById("equivalencyUnitDiv").style.display = "block";
+                // document.getElementById("equivalencyUnitDiv").style.display = "block";
                 this.getEquivalencyUnitData();
 
             } else {
-                document.getElementById("equivalencyUnitDiv").style.display = "none";
+                // document.getElementById("equivalencyUnitDiv").style.display = "none";
                 this.getPlanningUnitForecastingUnit();
                 this.filterData();
             }
@@ -1482,6 +1404,16 @@ class ConsumptionForecastError extends Component {
                 )
             }, this);
 
+        const { equivalencyUnitList } = this.state;
+        let equivalencyUnitList1 = equivalencyUnitList.length > 0
+            && equivalencyUnitList.map((item, i) => {
+                return (
+                    <option key={i} value={item.equivalencyUnitId}>
+                        {item.label.label_en}
+                    </option>
+                )
+            }, this);
+
         const { versions } = this.state;
         let versionList = versions.length > 0
             && versions.map((item, i) => {
@@ -1629,6 +1561,28 @@ class ConsumptionForecastError extends Component {
                                                     </InputGroup>
                                                 </div>
                                             </FormGroup>
+
+                                            <FormGroup className="col-md-3">
+                                                <Label htmlFor="appendedInputButton">Y-axis in equivelency unit</Label>
+                                                <div className="controls ">
+                                                    <InputGroup>
+                                                        <Input
+                                                            type="select"
+                                                            name="yaxisEquUnit"
+                                                            id="yaxisEquUnit"
+                                                            bsSize="sm"
+                                                            value={this.state.yaxisEquUnit}
+                                                            onChange={(e) => { this.yAxisChange(e); }}
+                                                        // onChange={(e) => { this.dataChange(e); this.formSubmit() }}
+                                                        >
+                                                            <option value="-1">{i18n.t('static.program.no')}</option>
+                                                            {equivalencyUnitList1}
+                                                        </Input>
+
+                                                    </InputGroup>
+                                                </div>
+                                            </FormGroup>
+
                                             <FormGroup className="col-md-3">
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.common.display')}</Label>
                                                 <div className="controls">
@@ -1687,7 +1641,7 @@ class ConsumptionForecastError extends Component {
                                                             bsSize="sm"
                                                             onChange={this.filterData}
                                                             value={this.state.planningUnitId}
-                                                            onChange={this.setPlanningUnit}
+                                                            // onChange={this.setPlanningUnit}
                                                             onChange={(e) => { this.setPlanningUnit(e); }}
                                                         >
                                                             <option value="-1">{i18n.t('static.common.select')}</option>
@@ -1722,26 +1676,6 @@ class ConsumptionForecastError extends Component {
                                                 </div>
                                             </FormGroup>
 
-                                            <FormGroup className="col-md-3">
-                                                <Label htmlFor="appendedInputButton">Y-axis in equivelency unit</Label>
-                                                <div className="controls ">
-                                                    <InputGroup>
-                                                        <Input
-                                                            type="select"
-                                                            name="yaxisEquUnit"
-                                                            id="yaxisEquUnit"
-                                                            bsSize="sm"
-                                                            value={this.state.yaxisEquUnitId}
-                                                            onChange={(e) => { this.yAxisChange(e); }}
-                                                        // onChange={(e) => { this.dataChange(e); this.formSubmit() }}
-                                                        >
-                                                            <option value="1">{i18n.t('static.program.yes')}</option>
-                                                            <option value="2">{i18n.t('static.program.no')}</option>
-                                                        </Input>
-
-                                                    </InputGroup>
-                                                </div>
-                                            </FormGroup>
                                             <FormGroup className="col-md-3">
                                                 <Label htmlFor="appendedInputButton">Show consumption adjusted for stock out</Label>
                                                 <div className="controls ">

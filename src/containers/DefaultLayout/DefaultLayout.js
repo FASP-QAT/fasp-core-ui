@@ -3285,7 +3285,7 @@ class DefaultLayout extends Component {
                         icon: 'fa fa-list',
 
                         attributes: {
-                          hidden: ((((this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_PLANNING_UNIT_SETTING'))) && this.state.activeTab == 1) ? false : true)
+                          hidden: ((((this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY'))) && this.state.activeTab == 1) ? false : true)
                         },
                         children: [
 
@@ -3300,17 +3300,17 @@ class DefaultLayout extends Component {
                               }
                             }
                           },
-                          {
-                            name: i18n.t('static.updatePlanningUnit.updatePlanningUnit'),
-                            url: '/planningUnitSetting/listPlanningUnitSetting',
-                            icon: 'fa fa-cubes',
-                            attributes: {
-                              hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_PLANNING_UNIT_SETTING') && this.state.activeTab == 1 ? false : true),
-                              onClick: e => {
-                                this.refreshPage();
-                              }
-                            }
-                          },
+                          // {
+                          //   name: i18n.t('static.updatePlanningUnit.updatePlanningUnit'),
+                          //   url: '/planningUnitSetting/listPlanningUnitSetting',
+                          //   icon: 'fa fa-cubes',
+                          //   attributes: {
+                          //     hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_PLANNING_UNIT_SETTING') && this.state.activeTab == 1 ? false : true),
+                          //     onClick: e => {
+                          //       this.refreshPage();
+                          //     }
+                          //   }
+                          // },
 
                           {
                             name: 'Import Program',
