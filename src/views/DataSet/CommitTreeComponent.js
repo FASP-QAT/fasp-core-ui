@@ -542,6 +542,7 @@ export default class CommitTreeComponent extends React.Component {
                             programJson.currentVersion.versionType = { id: document.getElementById("versionTypeId").value };
                             programJson.currentVersion.notes = document.getElementById("notes").value;;
                             console.log("ProgramJson+++", programJson);
+                            console.log("this.state.comparedLatestVersion----",this.state.comparedLatestVersion);
                             //create saveDatasetData in ProgramService
                             DatasetService.saveDatasetData(programJson, this.state.comparedLatestVersion).then(response => {
                                 if (response.status == 200) {

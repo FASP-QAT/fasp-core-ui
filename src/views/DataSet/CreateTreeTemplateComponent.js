@@ -369,31 +369,31 @@ export default class CreateTreeTemplate extends Component {
         this.pickAMonth2 = React.createRef()
         this.pickAMonth1 = React.createRef()
         this.state = {
-            popoverOpenHowManyPUperIntervalPer:false,
-            popoverOpenWillClientsShareOnePU:false,
-            popoverOpenConsumptionIntervalEveryXMonths:false,
-            popoverOpenQATEstimateForInterval:false,
-            popoverOpenNoOfPUUsage:false,
-            popoverOpenConversionFactorFUPU:false,
-            popoverOpenPlanningUnitNode:false,
-            popoverOpenHashOfUMonth:false,
-            popoverOpenForecastingUnitPU:false,
-            popoverOpenTypeOfUsePU:false,
-            popoverOpenSingleUse:false,
-            popoverOpenLagInMonth:false,
-            popoverOpenTypeOfUse:false,
-            popoverOpenCopyFromTemplate:false,
-            popoverOpentracercategoryModelingType:false,
-            popoverOpenParentValue:false,
-            popoverOpenPercentageOfParent:false,
-            popoverOpenParent:false,
-            popoverOpenCalculatedMonthOnMonthChnage:false,
-            popoverOpenTargetChangeHash:false,
-            popoverOpenTargetChangePercent:false,
-            popoverOpenTargetEndingValue:false,
-            popoverOpenMonth:false,
-            popoverOpenNodeValue:false,
-            popoverOpenSenariotree:false,
+            popoverOpenHowManyPUperIntervalPer: false,
+            popoverOpenWillClientsShareOnePU: false,
+            popoverOpenConsumptionIntervalEveryXMonths: false,
+            popoverOpenQATEstimateForInterval: false,
+            popoverOpenNoOfPUUsage: false,
+            popoverOpenConversionFactorFUPU: false,
+            popoverOpenPlanningUnitNode: false,
+            popoverOpenHashOfUMonth: false,
+            popoverOpenForecastingUnitPU: false,
+            popoverOpenTypeOfUsePU: false,
+            popoverOpenSingleUse: false,
+            popoverOpenLagInMonth: false,
+            popoverOpenTypeOfUse: false,
+            popoverOpenCopyFromTemplate: false,
+            popoverOpentracercategoryModelingType: false,
+            popoverOpenParentValue: false,
+            popoverOpenPercentageOfParent: false,
+            popoverOpenParent: false,
+            popoverOpenCalculatedMonthOnMonthChnage: false,
+            popoverOpenTargetChangeHash: false,
+            popoverOpenTargetChangePercent: false,
+            popoverOpenTargetEndingValue: false,
+            popoverOpenMonth: false,
+            popoverOpenNodeValue: false,
+            popoverOpenSenariotree: false,
             popoverOpenNodeType: false,
             popoverOpenNodeTitle: false,
             hideFUPUNode: false,
@@ -578,16 +578,16 @@ export default class CreateTreeTemplate extends Component {
 
 
         }
-        this.toggleHowManyPUperIntervalPer= this.toggleHowManyPUperIntervalPer.bind(this);
-        this.toggleWillClientsShareOnePU= this.toggleWillClientsShareOnePU.bind(this);
-        this.toggleConsumptionIntervalEveryXMonths= this.toggleConsumptionIntervalEveryXMonths.bind(this);
-        this.toggleQATEstimateForInterval= this.toggleQATEstimateForInterval.bind(this);
-        this.toggleNoOfPUUsage= this.toggleNoOfPUUsage.bind(this);
-        this.toggleConversionFactorFUPU= this.toggleConversionFactorFUPU.bind(this);
-        this.togglePlanningUnitNode= this.togglePlanningUnitNode.bind(this);
-        this.toggleHashOfUMonth= this.toggleHashOfUMonth.bind(this);
-        this.toggleForecastingUnitPU= this.toggleForecastingUnitPU.bind(this);
-        this.toggleTypeOfUsePU= this.toggleTypeOfUsePU.bind(this);
+        this.toggleHowManyPUperIntervalPer = this.toggleHowManyPUperIntervalPer.bind(this);
+        this.toggleWillClientsShareOnePU = this.toggleWillClientsShareOnePU.bind(this);
+        this.toggleConsumptionIntervalEveryXMonths = this.toggleConsumptionIntervalEveryXMonths.bind(this);
+        this.toggleQATEstimateForInterval = this.toggleQATEstimateForInterval.bind(this);
+        this.toggleNoOfPUUsage = this.toggleNoOfPUUsage.bind(this);
+        this.toggleConversionFactorFUPU = this.toggleConversionFactorFUPU.bind(this);
+        this.togglePlanningUnitNode = this.togglePlanningUnitNode.bind(this);
+        this.toggleHashOfUMonth = this.toggleHashOfUMonth.bind(this);
+        this.toggleForecastingUnitPU = this.toggleForecastingUnitPU.bind(this);
+        this.toggleTypeOfUsePU = this.toggleTypeOfUsePU.bind(this);
         this.toggleSingleUse = this.toggleSingleUse.bind(this);
         this.toggleLagInMonth = this.toggleLagInMonth.bind(this);
         this.toggleTypeOfUse = this.toggleTypeOfUse.bind(this);
@@ -994,14 +994,14 @@ export default class CreateTreeTemplate extends Component {
                             this.buildMomJexcel();
                         }
                     });
-                } else  if (this.state.currentItemConfig.context.payload.nodeType.id == 3 || this.state.currentItemConfig.context.payload.nodeType.id == 4 || this.state.currentItemConfig.context.payload.nodeType.id == 5) {
+                } else if (this.state.currentItemConfig.context.payload.nodeType.id == 3 || this.state.currentItemConfig.context.payload.nodeType.id == 4 || this.state.currentItemConfig.context.payload.nodeType.id == 5) {
                     console.log("id to filter---", this.state.currentItemConfig.context.id)
                     console.log("id to filter list---", this.state.nodeDataMomList)
                     console.log("id to filter filter list---", this.state.nodeDataMomList.filter(x => x.nodeId == this.state.currentItemConfig.context.id)[0].nodeDataMomList)
                     this.setState({ momListPer: this.state.nodeDataMomList.filter(x => x.nodeId == this.state.currentItemConfig.context.id)[0].nodeDataMomList }, () => {
                         console.log("going to build mom jexcel percent");
                         if (value == 1 || (value == 0 && this.state.showMomDataPercent)) {
-                        this.buildMomJexcelPercent();
+                            this.buildMomJexcelPercent();
                         }
                     });
                 }
@@ -1103,9 +1103,9 @@ export default class CreateTreeTemplate extends Component {
             this.state.modelingEl.setValueFromCoords(8, i, calculatedChangeForMonth, true);
             // scalingTotal = parseFloat(scalingTotal) + parseFloat(calculatedChangeForMonth);
         }
-        var scalingDifference=(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].nodeDataMomList.filter(c=>moment(c.month).format("YYYY-MM")==moment(date).format("YYYY-MM"));
-        if(scalingDifference.length>0){
-            scalingTotal+=scalingDifference[0].difference;
+        var scalingDifference = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].nodeDataMomList.filter(c => moment(c.month).format("YYYY-MM") == moment(date).format("YYYY-MM"));
+        if (scalingDifference.length > 0) {
+            scalingTotal += scalingDifference[0].difference;
         }
         this.setState({ scalingTotal, scalingMonth: date });
 
@@ -1688,138 +1688,138 @@ export default class CreateTreeTemplate extends Component {
         this.setState({
             popoverOpenHowManyPUperIntervalPer: !this.state.popoverOpenHowManyPUperIntervalPer,
         });
-      }
+    }
     toggleWillClientsShareOnePU() {
         this.setState({
             popoverOpenWillClientsShareOnePU: !this.state.popoverOpenWillClientsShareOnePU,
         });
-      }
+    }
     toggleConsumptionIntervalEveryXMonths() {
         this.setState({
             popoverOpenConsumptionIntervalEveryXMonths: !this.state.popoverOpenConsumptionIntervalEveryXMonths,
         });
-      }
+    }
     toggleQATEstimateForInterval() {
         this.setState({
             popoverOpenQATEstimateForInterval: !this.state.popoverOpenQATEstimateForInterval,
         });
-      }
+    }
     toggleNoOfPUUsage() {
         this.setState({
             popoverOpenNoOfPUUsage: !this.state.popoverOpenNoOfPUUsage,
         });
-      }
+    }
     toggleConversionFactorFUPU() {
         this.setState({
             popoverOpenConversionFactorFUPU: !this.state.popoverOpenConversionFactorFUPU,
         });
-      }
+    }
     togglePlanningUnitNode() {
         this.setState({
             popoverOpenPlanningUnitNode: !this.state.popoverOpenPlanningUnitNode,
         });
-      }
+    }
     toggleHashOfUMonth() {
         this.setState({
             popoverOpenHashOfUMonth: !this.state.popoverOpenHashOfUMonth,
         });
-      }
+    }
     toggleForecastingUnitPU() {
         this.setState({
             popoverOpenForecastingUnitPU: !this.state.popoverOpenForecastingUnitPU,
         });
-      }
+    }
     toggleTypeOfUsePU() {
         this.setState({
             popoverOpenTypeOfUsePU: !this.state.popoverOpenTypeOfUsePU,
         });
-      }
+    }
     toggleSingleUse() {
         this.setState({
             popoverOpenSingleUse: !this.state.popoverOpenSingleUse,
         });
-      }
+    }
     toggleLagInMonth() {
         this.setState({
             popoverOpenLagInMonth: !this.state.popoverOpenLagInMonth,
         });
-      }
+    }
     toggleTypeOfUse() {
         this.setState({
             popoverOpenTypeOfUse: !this.state.popoverOpenTypeOfUse,
         });
-      }
+    }
     toggleCopyFromTemplate() {
         this.setState({
             popoverOpenCopyFromTemplate: !this.state.popoverOpenCopyFromTemplate,
         });
-      }
+    }
     toggletracercategoryModelingType() {
         this.setState({
             popoverOpentracercategoryModelingType: !this.state.popoverOpentracercategoryModelingType,
         });
-      }
+    }
     toggleParentValue() {
         this.setState({
             popoverOpenParentValue: !this.state.popoverOpenParentValue,
         });
-      }
+    }
     togglePercentageOfParent() {
         this.setState({
             popoverOpenPercentageOfParent: !this.state.popoverOpenPercentageOfParent,
         });
-      }
+    }
     toggleParent() {
         this.setState({
             popoverOpenParent: !this.state.popoverOpenParent,
         });
-      }
+    }
     toggleCalculatedMonthOnMonthChnage() {
         this.setState({
             popoverOpenCalculatedMonthOnMonthChnage: !this.state.popoverOpenCalculatedMonthOnMonthChnage,
         });
-      }
+    }
     toggleTargetChangeHash() {
         this.setState({
             popoverOpenTargetChangeHash: !this.state.popoverOpenTargetChangeHash,
         });
-      }
+    }
     toggleTargetChangePercent() {
         this.setState({
             popoverOpenTargetChangePercent: !this.state.popoverOpenTargetChangePercent,
         });
-      }
+    }
     toggleTargetEndingValue() {
         this.setState({
             popoverOpenTargetEndingValue: !this.state.popoverOpenTargetEndingValue,
         });
-      }
-    
+    }
+
     toggleMonth() {
         this.setState({
             popoverOpenMonth: !this.state.popoverOpenMonth,
         });
-      }
+    }
     toggleNodeValue() {
         this.setState({
             popoverOpenNodeValue: !this.state.popoverOpenNodeValue,
         });
-      }
+    }
     toggleNodeType() {
         this.setState({
             popoverOpenNodeType: !this.state.popoverOpenNodeType,
         });
-      }
+    }
     toggleNodeTitle() {
         this.setState({
             popoverOpenNodeTitle: !this.state.popoverOpenNodeTitle,
         });
-      }
+    }
     toggleSenariotree() {
         this.setState({
-          popoverOpenSenariotree: !this.state.popoverOpenSenariotree,
+            popoverOpenSenariotree: !this.state.popoverOpenSenariotree,
         });
-      }
+    }
 
 
     showMomData() {
@@ -4691,31 +4691,33 @@ export default class CreateTreeTemplate extends Component {
         const { items } = this.state;
         var maxNodeId = items.length > 0 ? Math.max(...items.map(o => o.id)) : 0;
         var nodeId = parseInt(maxNodeId + 1);
-        var newItem = itemConfig.context;
-        newItem.parent = itemConfig.context.parent;
-        newItem.id = nodeId;
-        newItem.level = parseInt(itemConfig.context.level + 1);
-        newItem.payload.nodeId = nodeId;
-        var parentSortOrder = items.filter(c => c.id == itemConfig.context.parent)[0].sortOrder;
-        var childList = items.filter(c => c.parent == itemConfig.context.parent);
-        newItem.sortOrder = parentSortOrder.concat(".").concat(("0" + (Number(childList.length) + 1)).slice(-2));
-        (newItem.payload.nodeDataMap[0])[0].nodeDataId = this.getMaxNodeDataId() + 1;
-        (newItem.payload.nodeDataMap[0])[0].month = moment((newItem.payload.nodeDataMap[0])[0].month).startOf('month').format("YYYY-MM-DD")
-        if (itemConfig.context.payload.nodeType.id == 4) {
-            (newItem.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.label.label_en = (itemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.label.label_en;
-        }
-        console.log("add button clicked value after update---", newItem);
-        this.setState({
-            items: [...items, newItem],
-            cursorItem: nodeId
-        }, () => {
+        // setTimeout(() => {
+            var newItem = itemConfig.context;
+            newItem.parent = itemConfig.context.parent;
+            newItem.id = nodeId;
+            newItem.level = parseInt(itemConfig.context.level + 1);
+            newItem.payload.nodeId = nodeId;
+            var parentSortOrder = items.filter(c => c.id == itemConfig.context.parent)[0].sortOrder;
+            var childList = items.filter(c => c.parent == itemConfig.context.parent);
+            newItem.sortOrder = parentSortOrder.concat(".").concat(("0" + (Number(childList.length) + 1)).slice(-2));
+            (newItem.payload.nodeDataMap[0])[0].nodeDataId = this.getMaxNodeDataId() + 1;
+            (newItem.payload.nodeDataMap[0])[0].month = moment((newItem.payload.nodeDataMap[0])[0].month).startOf('month').format("YYYY-MM-DD")
             if (itemConfig.context.payload.nodeType.id == 4) {
-                this.createPUNode(JSON.parse(JSON.stringify(itemConfig)), nodeId);
-            } else {
-                console.log("on add items-------", this.state.items);
-                this.calculateMOMData(newItem.id, 0);
+                (newItem.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.label.label_en = (itemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.label.label_en;
             }
-        });
+            console.log("add button clicked value after update---", newItem);
+            this.setState({
+                items: [...items, newItem],
+                cursorItem: nodeId
+            }, () => {
+                if (itemConfig.context.payload.nodeType.id == 4) {
+                    this.createPUNode(JSON.parse(JSON.stringify(itemConfig)), nodeId);
+                } else {
+                    console.log("on add items-------", this.state.items);
+                    this.calculateMOMData(newItem.id, 0);
+                }
+            });
+        // }, 0);
     }
 
     calculateValuesForAggregateNode(items) {
@@ -4764,7 +4766,10 @@ export default class CreateTreeTemplate extends Component {
     }
     onRemoveButtonClick(itemConfig) {
         const { items } = this.state;
-
+        const ids = items.map(o => o.id)
+        const filtered = items.filter(({ id }, index) => !ids.includes(id, index + 1))
+        console.log("delete unique items---", filtered)
+        items = filtered;
         this.setState(this.getDeletedItems(items, [itemConfig.id]), () => {
             this.calculateValuesForAggregateNode(this.state.items);
         });
@@ -4908,6 +4913,10 @@ export default class CreateTreeTemplate extends Component {
                 cursorItem: item.id,
                 usageText: ''
             }, () => {
+                console.log("555>>>", this.state.items);
+                const ids = this.state.items.map(o => o.id)
+                const filtered = this.state.items.filter(({ id }, index) => !ids.includes(id, index + 1))
+                console.log("edit unique items---", filtered)
                 console.log("highlighted item---", this.state.currentItemConfig.context)
                 this.getNodeTypeFollowUpList(data.context.level == 0 ? 0 : data.parentItem.payload.nodeType.id);
                 if (data.context.level != 0) {
@@ -5273,6 +5282,7 @@ export default class CreateTreeTemplate extends Component {
                         }}
                         validate={validateNodeData(validationSchemaNodeData)}
                         onSubmit={(values, { setSubmitting, setErrors }) => {
+                            setSubmitting(true);
                             this.setState({ loading: true, openAddNodeModal: false }, () => {
                                 console.log("all ok>>>");
                                 setTimeout(() => {
@@ -5307,13 +5317,13 @@ export default class CreateTreeTemplate extends Component {
                             }) => (
                                 <Form className="needs-validation" onSubmit={handleSubmit} onReset={handleReset} noValidate name='nodeDataForm' autocomplete="off">
                                     <div className="row">
-                                    <div>
-                                           <Popover placement="top" isOpen={this.state.popoverOpenParent} target="Popover2" trigger="hover" toggle={this.toggleParent}>
-                                               <PopoverBody>{i18n.t('static.tooltip.Parent')}</PopoverBody>
-                                           </Popover>
-                                       </div>
+                                        <div>
+                                            <Popover placement="top" isOpen={this.state.popoverOpenParent} target="Popover2" trigger="hover" toggle={this.toggleParent}>
+                                                <PopoverBody>{i18n.t('static.tooltip.Parent')}</PopoverBody>
+                                            </Popover>
+                                        </div>
                                         {this.state.level0 &&
-                                          
+
                                             <FormGroup className="col-md-6">
                                                 <Label htmlFor="currencyId">Parent <i class="fa fa-info-circle icons pl-lg-2" id="Popover2" onClick={this.toggleParent} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                                 <Input type="text"
@@ -5326,11 +5336,11 @@ export default class CreateTreeTemplate extends Component {
                                                         : this.state.currentItemConfig.parentItem.payload.label.label_en}
                                                 ></Input>
                                             </FormGroup>}
-                                            <div>
-                                                                <Popover placement="top" isOpen={this.state.popoverOpenNodeTitle} target="Popover3" trigger="hover" toggle={this.toggleNodeTitle}>
-                                                                    <PopoverBody>{i18n.t('static.tooltip.NodeTitle')}</PopoverBody>
-                                                                </Popover>
-                                                            </div>
+                                        <div>
+                                            <Popover placement="top" isOpen={this.state.popoverOpenNodeTitle} target="Popover3" trigger="hover" toggle={this.toggleNodeTitle}>
+                                                <PopoverBody>{i18n.t('static.tooltip.NodeTitle')}</PopoverBody>
+                                            </Popover>
+                                        </div>
                                         <FormGroup className="col-md-6">
                                             <Label htmlFor="currencyId">Node Title<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover3" onClick={this.toggleNodeTitle} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                             <Input type="text"
@@ -5433,10 +5443,10 @@ export default class CreateTreeTemplate extends Component {
                                         {/* {(this.state.numberNode && this.state.currentItemConfig.context.payload.nodeType.id != 1) && */}
                                         {/* <> */}
                                         <div>
-                                                                <Popover placement="top" isOpen={this.state.popoverOpenPercentageOfParent} target="Popover5" trigger="hover" toggle={this.togglePercentageOfParent}>
-                                                                    <PopoverBody>{i18n.t('static.tooltip.PercentageOfParent')}</PopoverBody>
-                                                                </Popover>
-                                                            </div>
+                                            <Popover placement="top" isOpen={this.state.popoverOpenPercentageOfParent} target="Popover5" trigger="hover" toggle={this.togglePercentageOfParent}>
+                                                <PopoverBody>{i18n.t('static.tooltip.PercentageOfParent')}</PopoverBody>
+                                            </Popover>
+                                        </div>
                                         <FormGroup className="col-md-6" style={{ display: this.state.numberNode ? 'block' : 'none' }}>
                                             <Label htmlFor="currencyId">Percentage of Parent<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover5" onClick={this.togglePercentageOfParent} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                             <InputGroup>
@@ -5457,10 +5467,10 @@ export default class CreateTreeTemplate extends Component {
                                             </InputGroup>
                                         </FormGroup>
                                         <div>
-                                                                <Popover placement="top" isOpen={this.state.popoverOpenParentValue} target="Popover6" trigger="hover" toggle={this.toggleParentValue}>
-                                                                    <PopoverBody>{i18n.t('static.tooltip.ParentValue')}</PopoverBody>
-                                                                </Popover>
-                                                            </div>
+                                            <Popover placement="top" isOpen={this.state.popoverOpenParentValue} target="Popover6" trigger="hover" toggle={this.toggleParentValue}>
+                                                <PopoverBody>{i18n.t('static.tooltip.ParentValue')}</PopoverBody>
+                                            </Popover>
+                                        </div>
                                         <FormGroup className="col-md-6" style={{ display: this.state.numberNode ? 'block' : 'none' }}>
                                             <Label htmlFor="currencyId">{i18n.t('static.tree.parentValue')} {this.state.currentItemConfig.context.level != 0 && i18n.t('static.common.for')} {this.state.currentItemConfig.context.level != 0 && moment(this.state.currentItemConfig.parentItem.payload.nodeDataMap[0][0].month).format(`MMM-YYYY`)} <i class="fa fa-info-circle icons pl-lg-2" id="Popover6" onClick={this.toggleParentValue} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                             <Input type="text"
@@ -5515,11 +5525,11 @@ export default class CreateTreeTemplate extends Component {
                                         <div className="row">
                                             {(this.state.currentItemConfig.context.payload.nodeType.id == 5) &&
                                                 <>
-                                                  <div>
-                                            <Popover placement="top" isOpen={this.state.popoverOpenTypeOfUsePU} target="Popover8" trigger="hover" toggle={this.toggleTypeOfUsePU}>
-                                                <PopoverBody>{i18n.t('static.tooltip.TypeOfUsePU')}</PopoverBody>
-                                            </Popover>
-                                        </div>
+                                                    <div>
+                                                        <Popover placement="top" isOpen={this.state.popoverOpenTypeOfUsePU} target="Popover8" trigger="hover" toggle={this.toggleTypeOfUsePU}>
+                                                            <PopoverBody>{i18n.t('static.tooltip.TypeOfUsePU')}</PopoverBody>
+                                                        </Popover>
+                                                    </div>
                                                     <FormGroup className="col-md-2">
                                                         <Label htmlFor="currencyId">{i18n.t('static.common.typeofuse')} <i class="fa fa-info-circle icons pl-lg-2" id="Popover8" onClick={this.toggleTypeOfUsePU} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
 
@@ -5624,11 +5634,11 @@ export default class CreateTreeTemplate extends Component {
                                             </FormGroup>
                                             {(this.state.currentItemConfig.context.payload.nodeType.id == 5) &&
                                                 <>
-                                                 <div>
-                                            <Popover placement="top" isOpen={this.state.popoverOpenConversionFactorFUPU} target="Popover8" trigger="hover" toggle={this.toggleConversionFactorFUPU}>
-                                                <PopoverBody>{i18n.t('static.tooltip.Conversionfactor')}</PopoverBody>
-                                            </Popover>
-                                        </div>
+                                                    <div>
+                                                        <Popover placement="top" isOpen={this.state.popoverOpenConversionFactorFUPU} target="Popover8" trigger="hover" toggle={this.toggleConversionFactorFUPU}>
+                                                            <PopoverBody>{i18n.t('static.tooltip.Conversionfactor')}</PopoverBody>
+                                                        </Popover>
+                                                    </div>
                                                     <FormGroup className="col-md-2">
                                                         <Label htmlFor="currencyId">Conversion Factor (FU:PU) <i class="fa fa-info-circle icons pl-lg-2" id="Popover8" onClick={this.toggleConversionFactorFUPU} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                                     </FormGroup>
@@ -5643,10 +5653,10 @@ export default class CreateTreeTemplate extends Component {
                                                         </Input>
                                                     </FormGroup>
                                                     <div>
-                                            <Popover placement="top" isOpen={this.state.popoverOpenNoOfPUUsage} target="Popover9" trigger="hover" toggle={this.toggleNoOfPUUsage}>
-                                                <PopoverBody>{i18n.t('static.tooltip.NoOfPUUsage')}</PopoverBody>
-                                            </Popover>
-                                        </div>
+                                                        <Popover placement="top" isOpen={this.state.popoverOpenNoOfPUUsage} target="Popover9" trigger="hover" toggle={this.toggleNoOfPUUsage}>
+                                                            <PopoverBody>{i18n.t('static.tooltip.NoOfPUUsage')}</PopoverBody>
+                                                        </Popover>
+                                                    </div>
                                                     <FormGroup className="col-md-2">
                                                         <Label htmlFor="currencyId">{(this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.usageType.id == 2 ? "# of PU / month / " : "# of PU / usage / "}{this.state.nodeUnitList.filter(c => c.unitId == this.state.currentItemConfig.context.payload.nodeUnit.id)[0].label.label_en} <i class="fa fa-info-circle icons pl-lg-2" id="Popover9" onClick={this.toggleNoOfPUUsage} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                                     </FormGroup>
@@ -5682,11 +5692,11 @@ export default class CreateTreeTemplate extends Component {
                                                     </FormGroup>
                                                     {(this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.usageType.id == 2 &&
                                                         <>
-                                                         <div>
-                                            <Popover placement="top" isOpen={this.state.popoverOpenQATEstimateForInterval} target="Popover11" trigger="hover" toggle={this.toggleQATEstimateForInterval}>
-                                                <PopoverBody>{i18n.t('static.tooltip.QATEstimateForInterval')}</PopoverBody>
-                                            </Popover>
-                                        </div>
+                                                            <div>
+                                                                <Popover placement="top" isOpen={this.state.popoverOpenQATEstimateForInterval} target="Popover11" trigger="hover" toggle={this.toggleQATEstimateForInterval}>
+                                                                    <PopoverBody>{i18n.t('static.tooltip.QATEstimateForInterval')}</PopoverBody>
+                                                                </Popover>
+                                                            </div>
                                                             <FormGroup className="col-md-2">
                                                                 <Label htmlFor="currencyId">{i18n.t('static.tree.QATEstimateForIntervalEvery_months')} <i class="fa fa-info-circle icons pl-lg-2" id="Popover11" onClick={this.toggleQATEstimateForInterval} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                                             </FormGroup>
@@ -5701,11 +5711,11 @@ export default class CreateTreeTemplate extends Component {
                                                                 </Input>
                                                             </FormGroup></>}
                                                 </>}
-                                                <div>
-                                            <Popover placement="top" isOpen={this.state.popoverOpenConsumptionIntervalEveryXMonths} target="Popover12" trigger="hover" toggle={this.toggleConsumptionIntervalEveryXMonths}>
-                                                <PopoverBody>{i18n.t('static.tooltip.ConsumptionIntervalEveryXMonths')}</PopoverBody>
-                                            </Popover>
-                                        </div>
+                                            <div>
+                                                <Popover placement="top" isOpen={this.state.popoverOpenConsumptionIntervalEveryXMonths} target="Popover12" trigger="hover" toggle={this.toggleConsumptionIntervalEveryXMonths}>
+                                                    <PopoverBody>{i18n.t('static.tooltip.ConsumptionIntervalEveryXMonths')}</PopoverBody>
+                                                </Popover>
+                                            </div>
                                             <FormGroup className="col-md-2" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 5 && this.state.currentItemConfig.parentItem.payload.nodeDataMap[0][0].fuNode.usageType.id == 2 ? 'block' : 'none' }}>
                                                 <Label htmlFor="currencyId">{i18n.t('static.tree.consumptionIntervalEveryXMonths')}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover12" onClick={this.toggleConsumptionIntervalEveryXMonths} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                             </FormGroup>
@@ -5727,10 +5737,10 @@ export default class CreateTreeTemplate extends Component {
                                                 <FormFeedback className="red">{errors.refillMonths}</FormFeedback>
                                             </FormGroup>
                                             <div>
-                                            <Popover placement="top" isOpen={this.state.popoverOpenWillClientsShareOnePU} target="Popover13" trigger="hover" toggle={this.toggleWillClientsShareOnePU}>
-                                                <PopoverBody>{i18n.t('static.tooltip.willClientsShareOnePU')}</PopoverBody>
-                                            </Popover>
-                                        </div>
+                                                <Popover placement="top" isOpen={this.state.popoverOpenWillClientsShareOnePU} target="Popover13" trigger="hover" toggle={this.toggleWillClientsShareOnePU}>
+                                                    <PopoverBody>{i18n.t('static.tooltip.willClientsShareOnePU')}</PopoverBody>
+                                                </Popover>
+                                            </div>
                                             <FormGroup className="col-md-2" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 5 && (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.usageType.id == 1 ? 'block' : 'none' }}>
                                                 <Label htmlFor="currencyId">{i18n.t('static.tree.willClientsShareOnePU?')}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover13" onClick={this.toggleWillClientsShareOnePU} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                             </FormGroup>
@@ -5758,7 +5768,7 @@ export default class CreateTreeTemplate extends Component {
                                             {/* {(this.state.currentItemConfig.context.payload.nodeType.id == 5) && */}
                                             {/* <> */}
                                             <FormGroup className="col-md-2" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 5 ? 'block' : 'none' }}>
-                                                <Label htmlFor="currencyId">{this.state.currentItemConfig.parentItem != null && (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode != null && (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.usageType.id == 2 ? "How many PU per interval per " : "How many PU per usage per "}{this.state.currentItemConfig.parentItem != null && this.state.currentItemConfig.parentItem.parent != null && this.state.unitList.filter(c => c.unitId == this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id)[0].label.label_en}?</Label>
+                                                <Label htmlFor="currencyId">{this.state.currentItemConfig.parentItem != null && (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode != null && (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.usageType.id == 2 ? "How many PU per interval per " : "How many PU per usage per "}{this.state.currentItemConfig.parentItem != null && this.state.currentItemConfig.parentItem.parent != null && this.state.unitList.filter(c => c.unitId == this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id).length > 0 && this.state.unitList.filter(c => c.unitId == this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id)[0].label.label_en}?</Label>
                                             </FormGroup>
                                             <FormGroup className="col-md-10" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 5 ? 'block' : 'none' }}>
                                                 <Input type="number"
@@ -5767,7 +5777,7 @@ export default class CreateTreeTemplate extends Component {
                                                     // readOnly={true}
                                                     bsSize="sm"
                                                     value={this.state.currentItemConfig.parentItem != null && (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode != null ? addCommas((this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.usageType.id == 2 ? ((((this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.noOfForecastingUnitsPerPerson /
-                                                        this.state.noOfMonthsInUsagePeriod) / this.state.conversionFactor) * (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.refillMonths) : ((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.sharePlanningUnit == "true" || (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.sharePlanningUnit == true ? (this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor) : Math.round((this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor)))) : ''}>
+                                                        this.state.noOfMonthsInUsagePeriod) / this.state.conversionFactor) * (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.refillMonths) : ((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.sharePlanningUnit == "true" || (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.sharePlanningUnit == true ? this.round(this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor) : this.round((this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor)))) : ''}>
                                                 </Input>
                                             </FormGroup>
                                             {/* </>} */}
@@ -5777,11 +5787,11 @@ export default class CreateTreeTemplate extends Component {
                                     {/* Plannign unit end */}
                                     <div>
                                         <div className="row">
-                                        <div>
-                                                                <Popover placement="top" isOpen={this.state.popoverOpentracercategoryModelingType} target="Popover14" trigger="hover" toggle={this.toggletracercategoryModelingType}>
-                                                                    <PopoverBody>{i18n.t('static.tooltip.tracercategoryModelingType')}</PopoverBody>
-                                                                </Popover>
-                                                            </div>
+                                            <div>
+                                                <Popover placement="top" isOpen={this.state.popoverOpentracercategoryModelingType} target="Popover14" trigger="hover" toggle={this.toggletracercategoryModelingType}>
+                                                    <PopoverBody>{i18n.t('static.tooltip.tracercategoryModelingType')}</PopoverBody>
+                                                </Popover>
+                                            </div>
                                             <FormGroup className="col-md-6" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 4 ? 'block' : 'none' }}>
                                                 <Label htmlFor="currencyId">{i18n.t('static.tracercategory.tracercategory')} <i class="fa fa-info-circle icons pl-lg-2" id="Popover14" onClick={this.toggletracercategoryModelingType} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                                 <Input
@@ -5811,10 +5821,10 @@ export default class CreateTreeTemplate extends Component {
                                                 <FormFeedback className="red">{errors.tracerCategoryId}</FormFeedback>
                                             </FormGroup>
                                             <div>
-                                                                <Popover placement="top" isOpen={this.state.popoverOpenCopyFromTemplate} target="Popover15" trigger="hover" toggle={this.toggleCopyFromTemplate}>
-                                                                    <PopoverBody>{i18n.t('static.tooltip.CopyFromTemplate')}</PopoverBody>
-                                                                </Popover>
-                                                            </div>
+                                                <Popover placement="top" isOpen={this.state.popoverOpenCopyFromTemplate} target="Popover15" trigger="hover" toggle={this.toggleCopyFromTemplate}>
+                                                    <PopoverBody>{i18n.t('static.tooltip.CopyFromTemplate')}</PopoverBody>
+                                                </Popover>
+                                            </div>
                                             <FormGroup className="col-md-6" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 4 ? 'block' : 'none' }}>
                                                 <Label htmlFor="currencyId">{i18n.t('static.tree.copyFromTemplate')}  <i class="fa fa-info-circle icons pl-lg-2" id="Popover15" onClick={this.toggleCopyFromTemplate} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                                 <Input
@@ -5945,10 +5955,10 @@ export default class CreateTreeTemplate extends Component {
                                                 </div><br />
                                             </FormGroup>
                                             <div>
-                                                                <Popover placement="top" isOpen={this.state.popoverOpenTypeOfUse} target="Popover16" trigger="hover" toggle={this.toggleTypeOfUse}>
-                                                                    <PopoverBody>{i18n.t('static.tooltip.TypeOfUse')}</PopoverBody>
-                                                                </Popover>
-                                                            </div>
+                                                <Popover placement="top" isOpen={this.state.popoverOpenTypeOfUse} target="Popover16" trigger="hover" toggle={this.toggleTypeOfUse}>
+                                                    <PopoverBody>{i18n.t('static.tooltip.TypeOfUse')}</PopoverBody>
+                                                </Popover>
+                                            </div>
                                             <FormGroup className="col-md-6" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 4 ? 'block' : 'none' }}>
                                                 <Label htmlFor="currencyId">{i18n.t('static.common.typeofuse')}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover16" onClick={this.toggleTypeOfUse} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                                 <Input
@@ -5979,12 +5989,12 @@ export default class CreateTreeTemplate extends Component {
                                                 <FormFeedback className="red">{errors.usageTypeIdFU}</FormFeedback>
                                             </FormGroup>
                                             <div>
-                                                                <Popover placement="top" isOpen={this.state.popoverOpenLagInMonth} target="Popover17" trigger="hover" toggle={this.toggleLagInMonth}>
-                                                                    <PopoverBody>{i18n.t('static.tooltip.LagInMonth')}</PopoverBody>
-                                                                </Popover>
-                                                            </div>
+                                                <Popover placement="top" isOpen={this.state.popoverOpenLagInMonth} target="Popover17" trigger="hover" toggle={this.toggleLagInMonth}>
+                                                    <PopoverBody>{i18n.t('static.tooltip.LagInMonth')}</PopoverBody>
+                                                </Popover>
+                                            </div>
                                             <FormGroup className="col-md-6" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 4 ? 'block' : 'none' }}>
-                                            <Label htmlFor="currencyId">{i18n.t('static.tree.lagInMonth0Immediate')}<span class="red Reqasterisk">*</span>  <i class="fa fa-info-circle icons pl-lg-2" id="Popover17" onClick={this.toggleLagInMonth} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
+                                                <Label htmlFor="currencyId">{i18n.t('static.tree.lagInMonth0Immediate')}<span class="red Reqasterisk">*</span>  <i class="fa fa-info-circle icons pl-lg-2" id="Popover17" onClick={this.toggleLagInMonth} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                                 <Input type="number"
                                                     id="lagInMonths"
                                                     name="lagInMonths"
@@ -6086,11 +6096,11 @@ export default class CreateTreeTemplate extends Component {
                                             </FormGroup>
                                             {/* {(this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usageType.id == 1) && */}
                                             <>
-                                            <div>
-                                                                <Popover placement="top" isOpen={this.state.popoverOpenSingleUse} target="Popover18" trigger="hover" toggle={this.toggleSingleUse}>
-                                                                    <PopoverBody>{i18n.t('static.tooltip.SingleUse')}</PopoverBody>
-                                                                </Popover>
-                                                            </div>
+                                                <div>
+                                                    <Popover placement="top" isOpen={this.state.popoverOpenSingleUse} target="Popover18" trigger="hover" toggle={this.toggleSingleUse}>
+                                                        <PopoverBody>{i18n.t('static.tooltip.SingleUse')}</PopoverBody>
+                                                    </Popover>
+                                                </div>
                                                 <FormGroup className="col-md-2" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usageType.id == 1 ? 'block' : 'none' }}>
                                                     <Label htmlFor="currencyId">{i18n.t('static.tree.singleUse')}<span class="red Reqasterisk">*</span>  <i class="fa fa-info-circle icons pl-lg-2" id="Popover18" onClick={this.toggleSingleUse} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                                 </FormGroup>
@@ -6334,11 +6344,11 @@ export default class CreateTreeTemplate extends Component {
                                 value={this.state.currentItemConfig.context.payload.label.label_en}>
                             </Input>
                         </FormGroup> */}
-                                          <div>
-                                                                <Popover placement="top" isOpen={this.state.popoverOpenMonth} target="Popover19" trigger="hover" toggle={this.toggleMonth}>
-                                                                    <PopoverBody>{i18n.t('static.tooltip.ModelingTransferMonth')}</PopoverBody>
-                                                                </Popover>
-                                                            </div>
+                        <div>
+                            <Popover placement="top" isOpen={this.state.popoverOpenMonth} target="Popover19" trigger="hover" toggle={this.toggleMonth}>
+                                <PopoverBody>{i18n.t('static.tooltip.ModelingTransferMonth')}</PopoverBody>
+                            </Popover>
+                        </div>
                         <FormGroup className="col-md-2 pt-lg-1">
                             <Label htmlFor="">{i18n.t('static.common.month')}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover19" onClick={this.toggleMonth} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                         </FormGroup>
@@ -6460,12 +6470,12 @@ export default class CreateTreeTemplate extends Component {
                                         {/* </div> */}
                                         {/* <div className="row"> */}
                                         <div>
-                                                                <Popover placement="top" isOpen={this.state.popoverOpenTargetEndingValue} target="Popover21" trigger="hover" toggle={this.toggleTargetEndingValue}>
-                                                                    <PopoverBody>{i18n.t('static.tooltip.TargetEndingValue')}</PopoverBody>
-                                                                </Popover>
-                                                            </div>
+                                            <Popover placement="top" isOpen={this.state.popoverOpenTargetEndingValue} target="Popover21" trigger="hover" toggle={this.toggleTargetEndingValue}>
+                                                <PopoverBody>{i18n.t('static.tooltip.TargetEndingValue')}</PopoverBody>
+                                            </Popover>
+                                        </div>
                                         <FormGroup className="col-md-5">
-                                        <Label htmlFor="currencyId">{i18n.t('static.tree.targetEnding')} {this.state.currentItemConfig.context.payload.nodeType.id == 2 ? 'value' : '%'}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover21" onClick={this.toggleTargetEndingValue} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
+                                            <Label htmlFor="currencyId">{i18n.t('static.tree.targetEnding')} {this.state.currentItemConfig.context.payload.nodeType.id == 2 ? 'value' : '%'}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover21" onClick={this.toggleTargetEndingValue} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                             <Input type="number"
                                                 id="currentEndValue"
                                                 name="currentEndValue"
@@ -6482,12 +6492,12 @@ export default class CreateTreeTemplate extends Component {
                                             <Label htmlFor="currencyId">{i18n.t('static.tree.or')}</Label>
                                         </FormGroup>
                                         <div>
-                                                                <Popover placement="top" isOpen={this.state.popoverOpenTargetChangePercent} target="Popover22" trigger="hover" toggle={this.toggleTargetChangePercent}>
-                                                                    <PopoverBody>{i18n.t('static.tooltip.TargetChangePercent')}</PopoverBody>
-                                                                </Popover>
-                                                            </div>
+                                            <Popover placement="top" isOpen={this.state.popoverOpenTargetChangePercent} target="Popover22" trigger="hover" toggle={this.toggleTargetChangePercent}>
+                                                <PopoverBody>{i18n.t('static.tooltip.TargetChangePercent')}</PopoverBody>
+                                            </Popover>
+                                        </div>
                                         <FormGroup className="col-md-5">
-                                        <Label htmlFor="currencyId">{this.state.currentItemConfig.context.payload.nodeType.id > 2 ? 'Change (% points)' : 'Target change (%)'}<span class="red Reqasterisk">*</span>  <i class="fa fa-info-circle icons pl-lg-2" id="Popover22" onClick={this.toggleTargetChangePercent} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
+                                            <Label htmlFor="currencyId">{this.state.currentItemConfig.context.payload.nodeType.id > 2 ? 'Change (% points)' : 'Target change (%)'}<span class="red Reqasterisk">*</span>  <i class="fa fa-info-circle icons pl-lg-2" id="Popover22" onClick={this.toggleTargetChangePercent} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                             <Input type="number"
                                                 id="currentTargetChangePercentage"
                                                 name="currentTargetChangePercentage"
@@ -6506,12 +6516,12 @@ export default class CreateTreeTemplate extends Component {
                                         }
                                         {/* {this.state.currentItemConfig.context.payload.nodeType.id != 3  */}
                                         <div>
-                                                                <Popover placement="top" isOpen={this.state.popoverOpenTargetChangeHash} target="Popover23" trigger="hover" toggle={this.toggleTargetChangeHash}>
-                                                                    <PopoverBody>{i18n.t('static.tooltip.TargetChangeHash')}</PopoverBody>
-                                                                </Popover>
-                                                            </div>
+                                            <Popover placement="top" isOpen={this.state.popoverOpenTargetChangeHash} target="Popover23" trigger="hover" toggle={this.toggleTargetChangeHash}>
+                                                <PopoverBody>{i18n.t('static.tooltip.TargetChangeHash')}</PopoverBody>
+                                            </Popover>
+                                        </div>
                                         {this.state.currentModelingType != 3 && this.state.currentModelingType != 4 && this.state.currentModelingType != 5 && <FormGroup className="col-md-6">
-                                             <Label htmlFor="currencyId">{i18n.t('static.tree.Change(#)')}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover23" onClick={this.toggleTargetChangeHash} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
+                                            <Label htmlFor="currencyId">{i18n.t('static.tree.Change(#)')}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover23" onClick={this.toggleTargetChangeHash} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                             <Input type="number"
                                                 id="currentTargetChangeNumber"
                                                 name="currentTargetChangeNumber"
@@ -6526,11 +6536,11 @@ export default class CreateTreeTemplate extends Component {
                                         }
                                     </div>
                                     <div className="row col-md-12 pl-lg-0">
-                                    <div>
-                                                                <Popover placement="top" isOpen={this.state.popoverOpenCalculatedMonthOnMonthChnage} target="Popover24" trigger="hover" toggle={this.toggleCalculatedMonthOnMonthChnage}>
-                                                                    <PopoverBody>{i18n.t('static.tooltip.CalculatedMonthOnMonthChnage')}</PopoverBody>
-                                                                </Popover>
-                                                            </div>
+                                        <div>
+                                            <Popover placement="top" isOpen={this.state.popoverOpenCalculatedMonthOnMonthChnage} target="Popover24" trigger="hover" toggle={this.toggleCalculatedMonthOnMonthChnage}>
+                                                <PopoverBody>{i18n.t('static.tooltip.CalculatedMonthOnMonthChnage')}</PopoverBody>
+                                            </Popover>
+                                        </div>
                                         <FormGroup className="col-md-6">
                                             <Label htmlFor="currencyId">{i18n.t('static.tree.CalculatedMonth-on-MonthChange')}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover24" onClick={this.toggleCalculatedMonthOnMonthChnage} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                             <Input type="text"
