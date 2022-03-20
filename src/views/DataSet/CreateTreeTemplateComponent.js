@@ -5303,15 +5303,16 @@ export default class CreateTreeTemplate extends Component {
                             }) => (
                                 <Form className="needs-validation" onSubmit={handleSubmit} onReset={handleReset} noValidate name='nodeDataForm' autocomplete="off">
                                     <div className="row">
-                                    <div>
-                                           <Popover placement="top" isOpen={this.state.popoverOpenParent} target="Popover2" trigger="hover" toggle={this.toggleParent}>
+                                    {/* <div>
+                                           <Popover placement="top" isOpen={this.state.popoverOpenParent} target="Popover35" trigger="hover" toggle={this.toggleParent}>
                                                <PopoverBody>{i18n.t('static.tooltip.Parent')}</PopoverBody>
                                            </Popover>
-                                       </div>
+                                       </div> */}
                                         {this.state.level0 &&
                                           
                                             <FormGroup className="col-md-6">
-                                                <Label htmlFor="currencyId">Parent <i class="fa fa-info-circle icons pl-lg-2" id="Popover2" onClick={this.toggleParent} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
+                                                {/* <Label htmlFor="currencyId">Parent <i class="fa fa-info-circle icons pl-lg-2" id="Popover35" onClick={this.toggleParent} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label> */}
+                                                <Label htmlFor="currencyId">Parent</Label>
                                                 <Input type="text"
                                                     name="parent"
                                                     bsSize="sm"
