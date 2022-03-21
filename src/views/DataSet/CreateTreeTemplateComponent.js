@@ -32,7 +32,7 @@ import TracerCategoryService from '../../api/TracerCategoryService';
 import ForecastingUnitService from '../../api/ForecastingUnitService';
 import PlanningUnitService from '../../api/PlanningUnitService';
 import UsageTemplateService from '../../api/UsageTemplateService';
-import { POSITIVE_WHOLE_NUMBER, NUMBER_NODE_ID, PERCENTAGE_NODE_ID, FU_NODE_ID, PU_NODE_ID, INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY, JEXCEL_PAGINATION_OPTION, JEXCEL_DECIMAL_MONTHLY_CHANGE, JEXCEL_PRO_KEY, TREE_DIMENSION_ID, JEXCEL_MONTH_PICKER_FORMAT, DATE_FORMAT_CAP_WITHOUT_DATE, JEXCEL_DECIMAL_NO_REGEX_LONG, DATE_FORMAT_CAP } from '../../Constants.js'
+import { ROUNDING_NUMBER, POSITIVE_WHOLE_NUMBER, NUMBER_NODE_ID, PERCENTAGE_NODE_ID, FU_NODE_ID, PU_NODE_ID, INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY, JEXCEL_PAGINATION_OPTION, JEXCEL_DECIMAL_MONTHLY_CHANGE, JEXCEL_PRO_KEY, TREE_DIMENSION_ID, JEXCEL_MONTH_PICKER_FORMAT, DATE_FORMAT_CAP_WITHOUT_DATE, JEXCEL_DECIMAL_NO_REGEX_LONG, DATE_FORMAT_CAP } from '../../Constants.js'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import TextField from '@material-ui/core/TextField';
@@ -511,7 +511,8 @@ export default class CreateTreeTemplate extends Component {
                                         planningUnit: {
 
                                         },
-                                        refillMonths: ''
+                                        refillMonths: '',
+                                        puPerVisit: ''
                                     },
                                     nodeDataModelingList: []
                                 }
@@ -534,7 +535,8 @@ export default class CreateTreeTemplate extends Component {
                                         planningUnit: {
                                             id: ''
                                         },
-                                        refillMonths: ''
+                                        refillMonths: '',
+                                        puPerVisit: ''
                                     }
                                 }
                             ]
@@ -668,6 +670,25 @@ export default class CreateTreeTemplate extends Component {
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.getMaxNodeDataId = this.getMaxNodeDataId.bind(this);
         this.exportPDF = this.exportPDF.bind(this);
+        this.round = this.round.bind(this);
+    }
+
+    round(value) {
+        console.log("Round input value---", value);
+        var result = (value - Math.floor(value)).toFixed(2);
+        console.log("Round result---", result);
+        console.log("Round condition---", `${ROUNDING_NUMBER}`);
+        if (result > `${ROUNDING_NUMBER}`) {
+            console.log("Round ceiling---", Math.ceil(value));
+            return Math.ceil(value);
+        } else {
+            console.log("Round floor---", Math.floor(value));
+            if (Math.floor(value) == 0) {
+                return Math.ceil(value);
+            } else {
+                return Math.floor(value);
+            }
+        }
     }
 
     handleFUChange = (regionIds) => {
@@ -906,7 +927,7 @@ export default class CreateTreeTemplate extends Component {
         })
     }
 
-    momCheckbox(e,type) {
+    momCheckbox(e, type) {
         var checked = e.target.checked;
         const { currentItemConfig } = this.state;
 
@@ -1198,7 +1219,10 @@ export default class CreateTreeTemplate extends Component {
                         }
                         console.log("obj---", obj);
                         console.log("dataArr--->>>", dataArr);
-                        (item.payload.nodeDataMap[0])[0].nodeDataModelingList = dataArr;
+                        item.payload = this.state.currentItemConfig.context.payload;
+                        if (dataArr.length > 0) {
+                            (item.payload.nodeDataMap[0])[0].nodeDataModelingList = dataArr;
+                        }
                         console.log("item---", item);
                         items[itemIndex1] = item;
                         console.log("items---", items);
@@ -4812,31 +4836,31 @@ export default class CreateTreeTemplate extends Component {
         var maxNodeId = items.length > 0 ? Math.max(...items.map(o => o.id)) : 0;
         var nodeId = parseInt(maxNodeId + 1);
         // setTimeout(() => {
-            var newItem = itemConfig.context;
-            newItem.parent = itemConfig.context.parent;
-            newItem.id = nodeId;
-            newItem.level = parseInt(itemConfig.context.level + 1);
-            newItem.payload.nodeId = nodeId;
-            var parentSortOrder = items.filter(c => c.id == itemConfig.context.parent)[0].sortOrder;
-            var childList = items.filter(c => c.parent == itemConfig.context.parent);
-            newItem.sortOrder = parentSortOrder.concat(".").concat(("0" + (Number(childList.length) + 1)).slice(-2));
-            (newItem.payload.nodeDataMap[0])[0].nodeDataId = this.getMaxNodeDataId() + 1;
-            (newItem.payload.nodeDataMap[0])[0].month = moment((newItem.payload.nodeDataMap[0])[0].month).startOf('month').format("YYYY-MM-DD")
+        var newItem = itemConfig.context;
+        newItem.parent = itemConfig.context.parent;
+        newItem.id = nodeId;
+        newItem.level = parseInt(itemConfig.context.level + 1);
+        newItem.payload.nodeId = nodeId;
+        var parentSortOrder = items.filter(c => c.id == itemConfig.context.parent)[0].sortOrder;
+        var childList = items.filter(c => c.parent == itemConfig.context.parent);
+        newItem.sortOrder = parentSortOrder.concat(".").concat(("0" + (Number(childList.length) + 1)).slice(-2));
+        (newItem.payload.nodeDataMap[0])[0].nodeDataId = this.getMaxNodeDataId() + 1;
+        (newItem.payload.nodeDataMap[0])[0].month = moment((newItem.payload.nodeDataMap[0])[0].month).startOf('month').format("YYYY-MM-DD")
+        if (itemConfig.context.payload.nodeType.id == 4) {
+            (newItem.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.label.label_en = (itemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.label.label_en;
+        }
+        console.log("add button clicked value after update---", newItem);
+        this.setState({
+            items: [...items, newItem],
+            cursorItem: nodeId
+        }, () => {
             if (itemConfig.context.payload.nodeType.id == 4) {
-                (newItem.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.label.label_en = (itemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.label.label_en;
+                this.createPUNode(JSON.parse(JSON.stringify(itemConfig)), nodeId);
+            } else {
+                console.log("on add items-------", this.state.items);
+                this.calculateMOMData(newItem.id, 0);
             }
-            console.log("add button clicked value after update---", newItem);
-            this.setState({
-                items: [...items, newItem],
-                cursorItem: nodeId
-            }, () => {
-                if (itemConfig.context.payload.nodeType.id == 4) {
-                    this.createPUNode(JSON.parse(JSON.stringify(itemConfig)), nodeId);
-                } else {
-                    console.log("on add items-------", this.state.items);
-                    this.calculateMOMData(newItem.id, 0);
-                }
-            });
+        });
         // }, 0);
     }
 
@@ -4865,7 +4889,7 @@ export default class CreateTreeTemplate extends Component {
 
                 this.setState({
                     items: items,
-                    openAddNodeModal: false,
+                    // openAddNodeModal: false,
                 }, () => {
                     console.log("updated tree data>>>", this.state);
                 });
@@ -4876,7 +4900,7 @@ export default class CreateTreeTemplate extends Component {
 
                 this.setState({
                     items: items,
-                    openAddNodeModal: false,
+                    // openAddNodeModal: false,
                 }, () => {
                     console.log("updated tree data>>>", this.state);
                 });
@@ -5437,7 +5461,7 @@ export default class CreateTreeTemplate extends Component {
                             }) => (
                                 <Form className="needs-validation" onSubmit={handleSubmit} onReset={handleReset} noValidate name='nodeDataForm' autocomplete="off">
                                     <div className="row">
-                                    {/* <div>
+                                        {/* <div>
                                            <Popover placement="top" isOpen={this.state.popoverOpenParent} target="Popover35" trigger="hover" toggle={this.toggleParent}>
                                                <PopoverBody>{i18n.t('static.tooltip.Parent')}</PopoverBody>
                                            </Popover>
@@ -6790,7 +6814,7 @@ export default class CreateTreeTemplate extends Component {
                                                         name="manualChange"
                                                         // checked={true}
                                                         checked={(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].manualChangesEffectFuture}
-                                                        onClick={(e) => { this.momCheckbox(e,1); }}
+                                                        onClick={(e) => { this.momCheckbox(e, 1); }}
                                                     />
                                                     <Label
                                                         className="form-check-label"
@@ -6875,7 +6899,7 @@ export default class CreateTreeTemplate extends Component {
                                                         name="manualChange"
                                                         // checked={true}
                                                         checked={(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].manualChangesEffectFuture}
-                                                        onClick={(e) => { this.momCheckbox(e,2); }}
+                                                        onClick={(e) => { this.momCheckbox(e, 2); }}
                                                     />
                                                     <Label
                                                         className="form-check-label"
@@ -7676,7 +7700,7 @@ export default class CreateTreeTemplate extends Component {
                                                             loading: true
                                                         }, () => {
                                                             this.hideSecondComponent();
-                                                            this.calculateMOMData(1, 0);
+                                                            this.calculateMOMData(1, 2);
                                                         });
                                                         // this.props.history.push(`/dataset/listTreeTemplate/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                                                     } else {
@@ -7761,7 +7785,7 @@ export default class CreateTreeTemplate extends Component {
                                                             color: 'green'
                                                         }, () => {
                                                             this.hideSecondComponent();
-                                                            this.calculateMOMData(1, 0);
+                                                            this.calculateMOMData(1, 2);
                                                         });
                                                         // this.props.history.push(`/dataset/listTreeTemplate/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                                                     } else {
