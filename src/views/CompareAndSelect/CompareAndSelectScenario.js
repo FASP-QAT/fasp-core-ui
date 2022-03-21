@@ -1627,7 +1627,7 @@ class CompareAndSelectScenario extends Component {
                                 var month = xAxis2.split('-')[0];
                                 var year = xAxis2.split('-')[1];
                                 var filterByYear = monthArrayList.filter(c => moment(c).format("YYYY") == moment(year).format("YYYY"));
-                                var divideByTwo = Math.round(filterByYear.length / 2);
+                                var divideByTwo = Math.floor(filterByYear.length / 2);
                                 if (moment(filterByYear[divideByTwo]).format("MMM") === month) {
                                     return year;
                                 } else {
