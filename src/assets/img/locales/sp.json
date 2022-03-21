@@ -334,7 +334,7 @@
     "static.report.wapeFormula": "Error de porcentaje absoluto ponderado (WAPE)",
     "static.tree.startValue": "Valor inicial",
     "static.program.organisation": "Organización",
-    "static.commitTree.note": "Nota: antes de comprometerse, recuerde un pronóstico para cada unidad de planificación en la pantalla `Comparar y seleccionar`",
+    "static.commitTree.note": "Antes de comprometerse, recuerde seleccionar un pronóstico para cada unidad de planificación en la pantalla `Comparar y seleccionar`.",
     "static.commitTree.modeling": "Modelado",
     "static.mt.selectShipmentId": "Seleccione la identificación de envío",
     "static.procurementUnit.validSupplierIdText": "Seleccionar fabricante",
