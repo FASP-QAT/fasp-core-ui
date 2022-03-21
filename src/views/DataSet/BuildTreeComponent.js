@@ -453,6 +453,7 @@ export default class BuildTree extends Component {
         this.pickAMonth4 = React.createRef()
         this.pickAMonth5 = React.createRef()
         this.state = {
+            isSubmitClicked: false,
             popoverOpenHowManyPUperIntervalPer: false,
             popoverOpenWillClientsShareOnePU: false,
             popoverOpenConsumptionIntervalEveryXMonths: false,
@@ -1280,7 +1281,7 @@ export default class BuildTree extends Component {
                     });
                 }
                 this.saveTreeData();
-                
+
 
             }
             // if (parameterName == 'type' && value == 0) {
@@ -6085,7 +6086,8 @@ export default class BuildTree extends Component {
         console.log("add button clicked value after update---", newItem.payload.nodeDataMap.length);
         this.setState({
             items: [...items, newItem],
-            cursorItem: nodeId
+            cursorItem: nodeId,
+            isSubmitClicked: false
         }, () => {
 
             console.log("on add items-------", this.state.items);
@@ -6387,7 +6389,8 @@ export default class BuildTree extends Component {
         nodes[findNodeIndex] = currentItemConfig.context;
         console.log("nodes---", nodes);
         this.setState({
-            items: nodes
+            items: nodes,
+            isSubmitClicked: false
         }, () => {
             console.log("updated tree data+++", this.state);
             // this.calculateValuesForAggregateNode(this.state.items);
@@ -6711,22 +6714,22 @@ export default class BuildTree extends Component {
                         validate={validateNodeData(validationSchemaNodeData)}
                         onSubmit={(values, { setSubmitting, setErrors }) => {
                             console.log("all ok>>>", this.state.currentItemConfig);
-                            setSubmitting(true);
-                            this.setState({ loading: true, openAddNodeModal: false }, () => {
-                                setTimeout(() => {
-                                    console.log("inside set timeout on submit")
-                                    if (this.state.addNodeFlag) {
-                                        this.onAddButtonClick(this.state.currentItemConfig)
-                                    } else {
-                                        this.updateNodeInfoInJson(this.state.currentItemConfig)
-                                    }
-                                    this.setState({
-                                        cursorItem: 0,
-                                        highlightItem: 0
-                                    })
-                                }, 0);
-                            })
-
+                            if (!this.state.isSubmitClicked) {
+                                this.setState({ loading: true, openAddNodeModal: false, isSubmitClicked: true }, () => {
+                                    setTimeout(() => {
+                                        console.log("inside set timeout on submit")
+                                        if (this.state.addNodeFlag) {
+                                            this.onAddButtonClick(this.state.currentItemConfig)
+                                        } else {
+                                            this.updateNodeInfoInJson(this.state.currentItemConfig)
+                                        }
+                                        this.setState({
+                                            cursorItem: 0,
+                                            highlightItem: 0
+                                        })
+                                    }, 0);
+                                })
+                            }
 
                         }}
                         render={
