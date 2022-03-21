@@ -5972,7 +5972,7 @@ export default class BuildTree extends Component {
         var newItem = itemConfig.context;
         newItem.parent = parent;
         newItem.id = nodeId;
-        newItem.level = parseInt(itemConfig.context.level + 2);
+        newItem.level = parseInt(itemConfig.context.level + 1);
         newItem.payload.nodeId = nodeId;
         var pu = this.state.planningUnitList.filter(x => x.id == this.state.tempPlanningUnitId)[0];
         newItem.payload.label = pu.label;
