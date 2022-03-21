@@ -1280,10 +1280,8 @@ export default class BuildTree extends Component {
                         }
                     });
                 }
-                this.saveTreeData();
-
-
             }
+            this.saveTreeData();
             // if (parameterName == 'type' && value == 0) {
             //     this.saveTreeData();
             //     this.updateTreeData();
@@ -6164,20 +6162,22 @@ export default class BuildTree extends Component {
         console.log("end>>>", Date.now());
     }
     onRemoveButtonClick(itemConfig) {
-        var { items } = this.state;
-        console.log("delete items---", items)
-        // let uniqueChars = [...new Set(items)];
-        const ids = items.map(o => o.id)
-        const filtered = items.filter(({ id }, index) => !ids.includes(id, index + 1))
-        console.log("delete unique items---", filtered)
-        items = filtered;
-        console.log("delete id---", itemConfig.id)
-        console.log("delete items count---", items.filter(x => x.id == itemConfig.id))
-        this.setState(this.getDeletedItems(items, [itemConfig.id]), () => {
-            setTimeout(() => {
-                console.log("delete result---", this.getDeletedItems(items, [itemConfig.id]))
-                this.calculateMOMData(0, 0);
-            }, 0);
+        this.setState({ loading: true }, () => {
+            var { items } = this.state;
+            console.log("delete items---", items)
+            // let uniqueChars = [...new Set(items)];
+            const ids = items.map(o => o.id)
+            const filtered = items.filter(({ id }, index) => !ids.includes(id, index + 1))
+            console.log("delete unique items---", filtered)
+            items = filtered;
+            console.log("delete id---", itemConfig.id)
+            console.log("delete items count---", items.filter(x => x.id == itemConfig.id))
+            this.setState(this.getDeletedItems(items, [itemConfig.id]), () => {
+                setTimeout(() => {
+                    console.log("delete result---", this.getDeletedItems(items, [itemConfig.id]))
+                    this.calculateMOMData(0, 2);
+                }, 0);
+            });
         });
     }
     onMoveItem(parentid, itemid) {
