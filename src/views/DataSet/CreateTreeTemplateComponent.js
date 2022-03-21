@@ -369,6 +369,7 @@ export default class CreateTreeTemplate extends Component {
         this.pickAMonth2 = React.createRef()
         this.pickAMonth1 = React.createRef()
         this.state = {
+            isSubmitClicked: false,
             popoverOpenHowManyPUperIntervalPer: false,
             popoverOpenWillClientsShareOnePU: false,
             popoverOpenConsumptionIntervalEveryXMonths: false,
@@ -1681,7 +1682,8 @@ export default class CreateTreeTemplate extends Component {
                             (itemConfig.payload.nodeDataMap[0])[0].displayCalculatedDataValue = ((itemConfig.payload.nodeDataMap[0])[0].totalValue != null ? addCommas(Math.round((itemConfig.payload.nodeDataMap[0])[0].totalValue).toString()) : "0");
                             return "= " + ((itemConfig.payload.nodeDataMap[0])[0].totalValue != null ? addCommas(Math.round((itemConfig.payload.nodeDataMap[0])[0].totalValue).toString()) : "0");
                         } else if (itemConfig.payload.nodeType.id == 5) {
-                            totalValue = (this.state.items.filter(x => x.id == itemConfig.parent)[0].payload.nodeDataMap[0][0].totalValue * (itemConfig.payload.nodeDataMap[0])[0].dataValue) / 100;
+                            totalValue = ((this.state.items.filter(x => x.id == itemConfig.parent)[0].payload.nodeDataMap[0][0].totalValue * (itemConfig.payload.nodeDataMap[0])[0].dataValue) / 100) / (itemConfig.payload.nodeDataMap[0])[0].puNode.planningUnit.multiplier;
+                            // totalValue = (this.state.items.filter(x => x.id == itemConfig.parent)[0].payload.nodeDataMap[0][0].totalValue * (itemConfig.payload.nodeDataMap[0])[0].dataValue) / 100;
                             (itemConfig.payload.nodeDataMap[0])[0].displayCalculatedDataValue = (totalValue != null ? addCommas(Math.round(totalValue).toString()) : "0");
                             return "= " + (totalValue != null ? addCommas(Math.round(totalValue).toString()) : "0");
                         }
@@ -4852,7 +4854,8 @@ export default class CreateTreeTemplate extends Component {
         console.log("add button clicked value after update---", newItem);
         this.setState({
             items: [...items, newItem],
-            cursorItem: nodeId
+            cursorItem: nodeId,
+            isSubmitClicked: false
         }, () => {
             if (itemConfig.context.payload.nodeType.id == 4) {
                 this.createPUNode(JSON.parse(JSON.stringify(itemConfig)), nodeId);
@@ -5115,7 +5118,8 @@ export default class CreateTreeTemplate extends Component {
         nodes[findNodeIndex] = currentItemConfig.context;
         // nodes[findNodeIndex].valueType = currentItemConfig.valueType;
         this.setState({
-            items: nodes
+            items: nodes,
+            isSubmitClicked: false
         }, () => {
             console.log("updated tree data+++", this.state);
             this.calculateMOMData(0, 0);
@@ -5426,23 +5430,23 @@ export default class CreateTreeTemplate extends Component {
                         }}
                         validate={validateNodeData(validationSchemaNodeData)}
                         onSubmit={(values, { setSubmitting, setErrors }) => {
-                            setSubmitting(true);
-                            this.setState({ loading: true, openAddNodeModal: false }, () => {
-                                console.log("all ok>>>");
-                                setTimeout(() => {
-                                    console.log("inside set timeout on submit")
-                                    if (this.state.addNodeFlag) {
-                                        this.onAddButtonClick(this.state.currentItemConfig)
-                                    } else {
-                                        this.updateNodeInfoInJson(this.state.currentItemConfig)
-                                    }
-                                    this.setState({
-                                        cursorItem: 0,
-                                        highlightItem: 0
-                                    })
-                                }, 0);
-                            })
-
+                            if (!this.state.isSubmitClicked) {
+                                this.setState({ loading: true, openAddNodeModal: false, isSubmitClicked: true }, () => {
+                                    console.log("all ok>>>");
+                                    setTimeout(() => {
+                                        console.log("inside set timeout on submit")
+                                        if (this.state.addNodeFlag) {
+                                            this.onAddButtonClick(this.state.currentItemConfig)
+                                        } else {
+                                            this.updateNodeInfoInJson(this.state.currentItemConfig)
+                                        }
+                                        this.setState({
+                                            cursorItem: 0,
+                                            highlightItem: 0
+                                        })
+                                    }, 0);
+                                })
+                            }
                         }}
                         render={
                             ({
