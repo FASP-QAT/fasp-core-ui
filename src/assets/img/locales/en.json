@@ -335,7 +335,7 @@
     "static.report.wapeFormula": "Weighted Absolute Percentage Error (WAPE)",
     "static.tree.startValue": "Start Value",
     "static.program.organisation": "Organization",
-    "static.commitTree.note": "Note: Before committing, remember to a forecast for each planning unit in the `Compare and Select` screen",
+    "static.commitTree.note": "Before committing, remember to select a forecast for each planning unit in the `Compare and Select` screen",
     "static.commitTree.modeling": "Modeling",
     "static.mt.selectShipmentId": "Please select shipment id",
     "static.procurementUnit.validSupplierIdText": "Select Manufacturer",

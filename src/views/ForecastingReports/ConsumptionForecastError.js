@@ -9,9 +9,10 @@ import {
 } from 'reactstrap';
 import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
 import getLabelText from '../../CommonComponent/getLabelText';
+import AuthenticationService from '../Common/AuthenticationService.js';
 import ProgramService from '../../api/ProgramService';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, polling, DATE_FORMAT_CAP_WITHOUT_DATE } from '../../Constants.js'
+import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, polling, DATE_FORMAT_CAP_WITHOUT_DATE, DATE_FORMAT_CAP, TITLE_FONT } from '../../Constants.js'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 import NumberFormat from 'react-number-format';
@@ -21,6 +22,8 @@ import MonthBox from '../../CommonComponent/MonthBox.js'
 import moment from "moment";
 import pdfIcon from '../../assets/img/pdf.png';
 import csvicon from '../../assets/img/csv.png'
+import { LOGO } from '../../CommonComponent/Logo.js'
+import jsPDF from "jspdf";
 import "jspdf-autotable";
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 const ref = React.createRef();
@@ -296,10 +299,399 @@ class ConsumptionForecastError extends Component {
     toggledata = () => this.setState((currentState) => ({ show: !currentState.show }));
 
     exportCSV() {
+
+        var csvRow = [];
+        csvRow.push('"' + (i18n.t('static.supplyPlan.runDate') + ' : ' + moment(new Date()).format(`${DATE_FORMAT_CAP}`)).replaceAll(' ', '%20') + '"')
+        csvRow.push('')
+        csvRow.push('"' + (i18n.t('static.supplyPlan.runTime') + ' : ' + moment(new Date()).format('hh:mm A')).replaceAll(' ', '%20') + '"')
+        csvRow.push('')
+        csvRow.push('"' + (i18n.t('static.user.user') + ' : ' + AuthenticationService.getLoggedInUsername()).replaceAll(' ', '%20') + '"')
+        csvRow.push('')
+        csvRow.push('"' + (this.state.programs.filter(c => c.programId == this.state.programId)[0].programCode + " " + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text)).replaceAll(' ', '%20') + '"')
+        csvRow.push('')
+        csvRow.push('"' + (document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+        csvRow.push('')
+        csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+        csvRow.push('')
+        csvRow.push('"' + (i18n.t('static.report.version*') + ' : ' + document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+        csvRow.push('')
+        csvRow.push('"' + (i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ', '%20') + '"')
+        csvRow.push('')
+        csvRow.push('"' + ('Time Window' + ' : ' + document.getElementById("timeWindowId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+        csvRow.push('')
+        csvRow.push('"' + (i18n.t('static.forecastReport.yAxisInEquivalencyUnit') + ' : ' + document.getElementById("yaxisEquUnit").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+        csvRow.push('')
+        csvRow.push('"' + ('Report View' + ' : ' + document.getElementById("viewById").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+        csvRow.push('')
+        if (document.getElementById("viewById").value == 1) {
+            csvRow.push('"' + ('Planning Unit' + ' : ' + document.getElementById("planningUnitId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+            csvRow.push('')
+        } else {
+            csvRow.push('"' + ('Forecasting unit' + ' : ' + document.getElementById("forecastingUnitId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+            csvRow.push('')
+        }
+        this.state.regionLabels.map(ele =>
+            csvRow.push('"' + ('Region' + ' : ' + ele.toString()).replaceAll(' ', '%20') + '"'))
+
+        csvRow.push('')
+        csvRow.push('"' + ('Show consumption adjusted for stock out' + ' : ' + document.getElementById("consumptionAdjusted").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+
+        csvRow.push('')
+        csvRow.push('')
+
+        const headers = [];
+        headers.push('');
+        headers.push('Average')
+
+        this.state.monthArrayList.map(item => (
+            headers.push(moment(item).format(DATE_FORMAT_CAP_WITHOUT_DATE))
+        ))
+
+        var A = [this.addDoubleQuoteToRowContent(headers)]
+
+        let B = this.addDoubleQuoteToRowContent([(('Error').replaceAll(',', ' ')).replaceAll(' ', '%20')])
+        {
+            this.state.errorValues.map(item => (
+                B = B.concat(item)
+            ))
+        }
+
+        A.push(B)
+        // ----------
+        B = [i18n.t('static.consumption.forcast'), ''];
+
+        this.state.monthArrayList.map(item => {
+            var cd = this.state.consumptionData.filter(c => moment(c.consumptionDate).format("YYYY-MM-DD") == moment(item).format("YYYY-MM-DD") && !c.actualFlag && this.state.regionIdArr.includes(c.region.regionId));
+            var sum = 0;
+            cd.map(c => { sum += c.consumptionQty });
+            B = B.concat(sum);
+        })
+
+        A.push(B)
+        // ----------
+
+        this.state.regionListFiltered.map(item1 => {
+            B = [item1.label, ''];
+            this.state.monthArrayList.map(item => {
+                var cd = this.state.consumptionData.filter(c => moment(c.consumptionDate).format("YYYY-MM-DD") == moment(item).format("YYYY-MM-DD") && !c.actualFlag && c.region.regionId == item1.value);
+                B = B.concat(cd.length > 0 ? cd[0].consumptionQty : "")
+            })
+            A.push(B);
+        })
+        // ----------
+
+        B = [i18n.t('static.consumption.actual'), ''];
+
+        this.state.monthArrayList.map(item => {
+            var cd = this.state.consumptionData.filter(c => moment(c.consumptionDate).format("YYYY-MM-DD") == moment(item).format("YYYY-MM-DD") && c.actualFlag && this.state.regionIdArr.includes(c.region.regionId));
+            var sum = 0;
+            cd.map(c => { sum += c.consumptionQty });
+            B = B.concat(cd.length > 0 ? sum : "NA");
+        })
+
+        A.push(B);
+        // ----------
+
+        this.state.regionListFiltered.map(item1 => {
+            B = [item1.label, ''];
+            this.state.monthArrayList.map(item => {
+                var cd = this.state.consumptionData.filter(c => moment(c.consumptionDate).format("YYYY-MM-DD") == moment(item).format("YYYY-MM-DD") && c.actualFlag && c.region.regionId == item1.value);
+                B = B.concat(cd.length > 0 ? cd[0].consumptionQty : "")
+            })
+            A.push(B);
+        })
+        // ----------
+
+        B = ['Difference', ''];
+        this.state.monthArrayList.map(item => {
+            var cd = this.state.consumptionData.filter(c => moment(c.consumptionDate).format("YYYY-MM-DD") == moment(item).format("YYYY-MM-DD") && !c.actualFlag && this.state.regionIdArr.includes(c.region.regionId));
+            var sum = 0;
+            cd.map(c => { sum += c.consumptionQty });
+            var cd1 = this.state.consumptionData.filter(c => moment(c.consumptionDate).format("YYYY-MM-DD") == moment(item).format("YYYY-MM-DD") && c.actualFlag && this.state.regionIdArr.includes(c.region.regionId));
+            var sum1 = 0;
+            cd1.map(c => { sum1 += c.consumptionQty });
+            B = B.concat(sum1 > 0 ? sum1 - sum : "NA")
+        })
+        A.push(B);
+        // ----------
+
+        this.state.regionListFiltered.map(item1 => {
+            B = [item1.label, ''];
+            this.state.monthArrayList.map(item => {
+                var cd = this.state.consumptionData.filter(c => moment(c.consumptionDate).format("YYYY-MM-DD") == moment(item).format("YYYY-MM-DD") && c.actualFlag && c.region.regionId == item1.value);
+                var cd1 = this.state.consumptionData.filter(c => moment(c.consumptionDate).format("YYYY-MM-DD") == moment(item).format("YYYY-MM-DD") && !c.actualFlag && c.region.regionId == item1.value);
+                B = B.concat((cd.length > 0 && cd1.length > 0) ? cd[0].consumptionQty - cd1[0].consumptionQty : "")
+            })
+            A.push(B);
+        })
+
+
+        for (var i = 0; i < A.length; i++) {
+            // console.log(A[i])
+            csvRow.push(A[i].join(","))
+        }
+
+        var csvString = csvRow.join("%0A")
+        // console.log('csvString' + csvString)
+        var a = document.createElement("a")
+        a.href = 'data:attachment/csv,' + csvString
+        a.target = "_Blank"
+        a.download = this.state.programs.filter(c => c.programId == this.state.programId)[0].programCode+ "-" + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text)+"-"+'Consumption Forecast Error'+ ".csv"
+        document.body.appendChild(a)
+        a.click();
+
+    }
+
+    addDoubleQuoteToRowContent = (arr) => {
+        return arr.map(ele => '"' + ele + '"')
     }
 
 
     exportPDF = () => {
+
+        const addFooters = doc => {
+
+            const pageCount = doc.internal.getNumberOfPages()
+
+            doc.setFont('helvetica', 'bold')
+            doc.setFontSize(6)
+            for (var i = 1; i <= pageCount; i++) {
+                doc.setPage(i)
+
+                doc.setPage(i)
+                doc.text('Page ' + String(i) + ' of ' + String(pageCount), doc.internal.pageSize.width / 9, doc.internal.pageSize.height - 30, {
+                    align: 'center'
+                })
+                doc.text('Copyright © 2020 ' + i18n.t('static.footer'), doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
+                    align: 'center'
+                })
+
+            }
+        }
+
+        const addHeaders = doc => {
+
+            const pageCount = doc.internal.getNumberOfPages()
+            for (var i = 1; i <= pageCount; i++) {
+                doc.setFontSize(12)
+                doc.setFont('helvetica', 'bold')
+                doc.setPage(i)
+                doc.addImage(LOGO, 'png', 0, 10, 180, 50, 'FAST');
+                doc.setTextColor("#002f6c");
+                doc.setFontSize(8)
+                doc.setFont('helvetica', 'normal')
+                doc.setTextColor("#002f6c");
+                doc.text(i18n.t('static.supplyPlan.runDate') + " " + moment(new Date()).format(`${DATE_FORMAT_CAP}`), doc.internal.pageSize.width - 40, 20, {
+                    align: 'right'
+                })
+                doc.text(i18n.t('static.supplyPlan.runTime') + " " + moment(new Date()).format('hh:mm A'), doc.internal.pageSize.width - 40, 30, {
+                    align: 'right'
+                })
+                doc.text(i18n.t('static.user.user') + ': ' + AuthenticationService.getLoggedInUsername(), doc.internal.pageSize.width - 40, 40, {
+                    align: 'right'
+                })
+                doc.text(this.state.programs.filter(c => c.programId == this.state.programId)[0].programCode + " " + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text), doc.internal.pageSize.width - 40, 50, {
+                    align: 'right'
+                })
+                doc.text(document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width - 40, 60, {
+                    align: 'right'
+                })
+                doc.setFontSize(TITLE_FONT)
+                doc.setTextColor("#002f6c");
+                doc.text(i18n.t('static.dashboard.monthlyForecast'), doc.internal.pageSize.width / 2, 60, {
+                    align: 'center'
+                })
+                if (i == 1) {
+                    doc.setFont('helvetica', 'normal')
+                    doc.setFontSize(8)
+                    doc.text(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
+                        align: 'left'
+                    })
+                    doc.text(i18n.t('static.report.version*') + ' : ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130, {
+                        align: 'left'
+                    })
+                    doc.text(i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to), doc.internal.pageSize.width / 8, 150, {
+                        align: 'left'
+                    })
+                    doc.text('Time Window' + ' : ' + document.getElementById("timeWindowId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 170, {
+                        align: 'left'
+                    })
+                    doc.text(i18n.t('static.forecastReport.yAxisInEquivalencyUnit') + ' : ' + document.getElementById("yaxisEquUnit").selectedOptions[0].text, doc.internal.pageSize.width / 8, 190, {
+                        align: 'left'
+                    })
+                    doc.text('Reporting View' + ' : ' + document.getElementById("viewById").selectedOptions[0].text, doc.internal.pageSize.width / 8, 210, {
+                        align: 'left'
+                    })
+                    if (document.getElementById("viewById").value == 1) {
+                        doc.text(i18n.t('static.planningunit.planningunit') + ' : ' + document.getElementById("planningUnitId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 230, {
+                            align: 'left'
+                        })
+                    } else {
+                        doc.text(i18n.t('static.product.unit1') + ' : ' + document.getElementById("forecastingUnitId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 230, {
+                            align: 'left'
+                        })
+                    }
+                    // let startY1 = 0;
+
+                    var regionText = doc.splitTextToSize(('Region' + ' : ' + this.state.regionLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
+                    doc.text(doc.internal.pageSize.width / 8, 250, regionText)
+                    // startY1 = 230 + (doc.splitTextToSize(('Region' + ' : ' + this.state.regionLabels.join('; ')), doc.internal.pageSize.width * 3 / 4).length * 10)
+
+                    doc.text('Show consumption adjusted for stock out' + ' : ' + document.getElementById("consumptionAdjusted").selectedOptions[0].text, doc.internal.pageSize.width / 8, 270, {
+                        align: 'left'
+                    })
+
+                }
+
+            }
+        }
+
+        const unit = "pt";
+        const size = "A4"; // Use A1, A2, A3 or A4
+        const orientation = "landscape"; // portrait or landscape
+
+        const marginLeft = 10;
+        const doc = new jsPDF(orientation, unit, size);
+
+        doc.setFontSize(8);
+        var canvas = document.getElementById("cool-canvas");
+
+        //creates image
+
+        var canvasImg = canvas.toDataURL("image/png", 1.0);
+        var width = doc.internal.pageSize.width;
+        var height = doc.internal.pageSize.height;
+        var h1 = 100;
+        var aspectwidth1 = (width - h1);
+
+        doc.addImage(canvasImg, 'png', 50, 280, 750, 260, 'CANVAS');
+
+        //table start
+        const headers = [];
+
+        headers.push('');
+        headers.push('Average')
+
+        this.state.monthArrayList.map(item => (
+            headers.push(moment(item).format(DATE_FORMAT_CAP_WITHOUT_DATE))
+        ))
+
+
+        var header = [headers]
+        var A = [];
+        let data = []
+
+        A.push('Error')
+        {
+            this.state.errorValues.map(item => (
+                A = A.concat(item)
+            ))
+        }
+        data.push(A);
+
+        //---------------
+        A = [];
+        A.push(i18n.t('static.consumption.forcast'), '')
+
+        this.state.monthArrayList.map(item => {
+            var cd = this.state.consumptionData.filter(c => moment(c.consumptionDate).format("YYYY-MM-DD") == moment(item).format("YYYY-MM-DD") && !c.actualFlag && this.state.regionIdArr.includes(c.region.regionId));
+            var sum = 0;
+            cd.map(c => { sum += c.consumptionQty });
+            A = A.concat(sum);
+        })
+
+        data.push(A);
+
+        //---------------
+
+        this.state.regionListFiltered.map(item1 => {
+            A = [];
+            A.push(item1.label, '')
+            this.state.monthArrayList.map(item => {
+                var cd = this.state.consumptionData.filter(c => moment(c.consumptionDate).format("YYYY-MM-DD") == moment(item).format("YYYY-MM-DD") && !c.actualFlag && c.region.regionId == item1.value);
+                A = A.concat(cd.length > 0 ? cd[0].consumptionQty : "")
+            })
+            data.push(A);
+        })
+
+        //---------------
+
+        A = [];
+        A.push(i18n.t('static.consumption.actual'), '')
+
+        this.state.monthArrayList.map(item => {
+            var cd = this.state.consumptionData.filter(c => moment(c.consumptionDate).format("YYYY-MM-DD") == moment(item).format("YYYY-MM-DD") && c.actualFlag && this.state.regionIdArr.includes(c.region.regionId));
+            var sum = 0;
+            cd.map(c => { sum += c.consumptionQty });
+            A = A.concat(cd.length > 0 ? sum : "NA");
+        })
+
+        data.push(A);
+
+        //---------------
+
+        this.state.regionListFiltered.map(item1 => {
+            A = [];
+            A.push(item1.label, '')
+            this.state.monthArrayList.map(item => {
+                var cd = this.state.consumptionData.filter(c => moment(c.consumptionDate).format("YYYY-MM-DD") == moment(item).format("YYYY-MM-DD") && c.actualFlag && c.region.regionId == item1.value);
+                A = A.concat(cd.length > 0 ? cd[0].consumptionQty : "")
+            })
+            data.push(A);
+        })
+
+        //---------------
+
+        A = [];
+        A.push('Difference', '')
+        this.state.monthArrayList.map(item => {
+            var cd = this.state.consumptionData.filter(c => moment(c.consumptionDate).format("YYYY-MM-DD") == moment(item).format("YYYY-MM-DD") && !c.actualFlag && this.state.regionIdArr.includes(c.region.regionId));
+            var sum = 0;
+            cd.map(c => { sum += c.consumptionQty });
+            var cd1 = this.state.consumptionData.filter(c => moment(c.consumptionDate).format("YYYY-MM-DD") == moment(item).format("YYYY-MM-DD") && c.actualFlag && this.state.regionIdArr.includes(c.region.regionId));
+            var sum1 = 0;
+            cd1.map(c => { sum1 += c.consumptionQty });
+            A = A.concat(sum1 > 0 ? sum1 - sum : "NA")
+        })
+        data.push(A);
+
+        //---------------
+
+        this.state.regionListFiltered.map(item1 => {
+            A = [];
+            A.push(item1.label, '')
+            this.state.monthArrayList.map(item => {
+                var cd = this.state.consumptionData.filter(c => moment(c.consumptionDate).format("YYYY-MM-DD") == moment(item).format("YYYY-MM-DD") && c.actualFlag && c.region.regionId == item1.value);
+                var cd1 = this.state.consumptionData.filter(c => moment(c.consumptionDate).format("YYYY-MM-DD") == moment(item).format("YYYY-MM-DD") && !c.actualFlag && c.region.regionId == item1.value);
+                A = A.concat((cd.length > 0 && cd1.length > 0) ? cd[0].consumptionQty - cd1[0].consumptionQty : "")
+            })
+            data.push(A);
+        })
+
+        let content = {
+            margin: { top: 80, bottom: 50 },
+            startY: height,
+            head: header,
+            body: data,
+            styles: { lineWidth: 1, fontSize: 8, halign: 'center' },
+            // rowPageBreak: 'auto',
+            // tableWidth: 'auto',
+            horizontalPageBreak: true,
+            horizontalPageBreakRepeat: 0,
+            columnStyles: [
+                { halign: "left" },
+                { halign: "left" },
+            ]
+
+        };
+
+
+
+        doc.autoTable(content);
+        addHeaders(doc)
+        addFooters(doc)
+        doc.save(this.state.programs.filter(c => c.programId == this.state.programId)[0].programCode + "-" + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text) + "-" + 'Consumption Forecast Error' + ".pdf")
+
     }
 
     filterData() {
@@ -1307,6 +1699,7 @@ class ConsumptionForecastError extends Component {
                     }.bind(this)
                 },
                 enabled: false,
+                intersect: false,
                 custom: CustomTooltips
             },
             maintainAspectRatio: false
@@ -1464,7 +1857,7 @@ class ConsumptionForecastError extends Component {
                             </div>
                         }
                         {checkOnline === 'Offline' &&
-                            this.state.offlineConsumptionList.length > 0 &&
+                            this.state.consumptionData.length > 0 &&
                             <div className="card-header-actions">
                                 <a className="card-header-action">
 
