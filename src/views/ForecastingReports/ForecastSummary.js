@@ -721,25 +721,25 @@ class ForecastSummary extends Component {
                 let A = [];
                 let propertyName = [];
                 if (!this.state.hideColumn) {
-                    propertyName.push((ele.stock1 == null ? '' : ele.stock1));
-                    propertyName.push((ele.existingShipments == null ? '' : ele.existingShipments));
-                    propertyName.push((ele.stock2 == null ? '' : ele.stock2));
-                    propertyName.push((ele.desiredMonthOfStock1 == null ? '' : ele.desiredMonthOfStock1));
-                    propertyName.push((ele.desiredMonthOfStock2 == null ? '' : ele.desiredMonthOfStock2));
+                    propertyName.push((ele.stock1 == null ? '' : (ele.stock1).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")));
+                    propertyName.push((ele.existingShipments == null ? '' : (ele.existingShipments).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")));
+                    propertyName.push((ele.stock2 == null ? '' : (ele.stock2).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")));
+                    propertyName.push((ele.desiredMonthOfStock1 == null ? '' : (ele.desiredMonthOfStock1).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")));
+                    propertyName.push((ele.desiredMonthOfStock2 == null ? '' : (ele.desiredMonthOfStock2).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")));
                 }
                 let propertyName1 = [];
                 if (!this.state.hideColumn) {
                     propertyName1.push((ele.priceType == null ? '' : ele.priceType));
-                    propertyName1.push((ele.unitPrice == null ? '' : ele.unitPrice));
+                    propertyName1.push((ele.unitPrice == null ? '' : (ele.unitPrice).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")));
                 }
 
                 if (ele.id != 0) {
                     A.push((
                         (ele.tracerCategory.label.label_en)),
                         ((ele.planningUnit.label.label_en)),
-                        (ele.totalForecastedQuantity == null ? '' : ele.totalForecastedQuantity)
+                        (ele.totalForecastedQuantity == null ? '' : (ele.totalForecastedQuantity).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","))
                     )
-                    A = A.concat(propertyName).concat([(ele.procurementGap == null ? '' : ele.procurementGap)].concat(propertyName1).concat([(ele.procurementNeeded == null ? '' : ele.procurementNeeded), (ele.notes == null ? '' : ele.notes)]));
+                    A = A.concat(propertyName).concat([(ele.procurementGap == null ? '' : (ele.procurementGap).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","))].concat(propertyName1).concat([(ele.procurementNeeded == null ? '' : (ele.procurementNeeded).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")), (ele.notes == null ? '' : ele.notes)]));
                 }
 
                 return (ele.id != 0 &&
@@ -761,7 +761,7 @@ class ForecastSummary extends Component {
                     '',
                     '',
                     i18n.t('static.forecastReport.productCost'),
-                    this.state.totalProductCost,
+                    this.state.totalProductCost.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","),
                     ''
                 ])
                 data.push([
@@ -776,7 +776,7 @@ class ForecastSummary extends Component {
                     '',
                     '',
                     i18n.t('static.forecastReport.freight') + '(7%)',
-                    (0.07 * this.state.totalProductCost),
+                    (0.07 * this.state.totalProductCost).toFixed(2).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","),
                     ''
                 ])
                 data.push([
@@ -791,7 +791,8 @@ class ForecastSummary extends Component {
                     '',
                     '',
                     i18n.t('static.shipment.totalCost'),
-                    (this.state.totalProductCost + 0.07 * this.state.totalProductCost),
+                    // (this.state.totalProductCost + 0.07 * this.state.totalProductCost),
+                    (parseFloat(parseFloat(this.state.totalProductCost) + parseFloat(0.07 * this.state.totalProductCost)).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","),
                     ''
                 ])
             } else {
@@ -800,7 +801,7 @@ class ForecastSummary extends Component {
                     '',
                     '',
                     i18n.t('static.forecastReport.productCost'),
-                    this.state.totalProductCost,
+                    (this.state.totalProductCost).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","),
                     ''
                 ])
                 data.push([
@@ -808,7 +809,7 @@ class ForecastSummary extends Component {
                     '',
                     '',
                     i18n.t('static.forecastReport.freight') + '(7%)',
-                    (0.07 * this.state.totalProductCost),
+                    (0.07 * this.state.totalProductCost).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","),
                     ''
                 ])
                 data.push([
@@ -816,7 +817,7 @@ class ForecastSummary extends Component {
                     '',
                     '',
                     i18n.t('static.shipment.totalCost'),
-                    (this.state.totalProductCost + 0.07 * this.state.totalProductCost),
+                    (this.state.totalProductCost + 0.07 * this.state.totalProductCost).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","),
                     ''
                 ])
             }
@@ -2543,25 +2544,25 @@ class ForecastSummary extends Component {
                                                                                             <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                                                             {/* <td>{item1.forecastingUnit.label.label_en}</td> */}
                                                                                             <td className='text-left  sticky-col first-col clone'>{getLabelText(item1.planningUnit.label, this.state.lang) + " | " + item1.planningUnit.id}</td>
-                                                                                            <td>{item1.totalForecastedQuantity}</td>
+                                                                                            <td>{(item1.totalForecastedQuantity).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
                                                                                             {!this.state.hideColumn &&
                                                                                                 <>
-                                                                                                    <td>{item1.stock1}</td>
-                                                                                                    <td>{item1.existingShipments}</td>
+                                                                                                    <td>{(item1.stock1).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
+                                                                                                    <td>{(item1.existingShipments).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
                                                                                                     {/* <td>{item1.stock2}</td> */}
-                                                                                                    {item1.isStock2Red == true ? <td className="red">{item1.stock2}</td> : <td>{item1.stock2}</td>}
-                                                                                                    <td>{item1.desiredMonthOfStock1}</td>
-                                                                                                    <td>{item1.desiredMonthOfStock2}</td>
+                                                                                                    {item1.isStock2Red == true ? <td className="red">{(item1.stock2).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td> : <td>{(item1.stock2).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>}
+                                                                                                    <td>{(item1.desiredMonthOfStock1).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
+                                                                                                    <td>{(item1.desiredMonthOfStock2).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
                                                                                                 </>
                                                                                             }
-                                                                                            {item1.isProcurementGapRed == true ? <td className="red">{item1.procurementGap}</td> : <td>{item1.procurementGap}</td>}
+                                                                                            {item1.isProcurementGapRed == true ? <td className="red">{(item1.procurementGap).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td> : <td>{(item1.procurementGap).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>}
                                                                                             {!this.state.hideColumn &&
                                                                                                 <>
                                                                                                     {item1.isPriceTypeRed == true ? <td className="red">{item1.priceType}</td> : <td>{item1.priceType}</td>}
-                                                                                                    <td>{item1.unitPrice}</td>
+                                                                                                    <td>{(item1.unitPrice).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
                                                                                                 </>
                                                                                             }
-                                                                                            <td>{item1.procurementNeeded}</td>
+                                                                                            <td>{(item1.procurementNeeded).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
                                                                                             <td>{item1.notes}</td>
                                                                                         </>
                                                                                     }
@@ -2588,7 +2589,7 @@ class ForecastSummary extends Component {
                                                                         <td></td>
                                                                         <td></td>
                                                                         <td><b>{i18n.t('static.forecastReport.productCost')}</b></td>
-                                                                        <td><b>{this.state.totalProductCost}</b></td>
+                                                                        <td><b>{(this.state.totalProductCost).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</b></td>
                                                                         <td></td>
                                                                     </tr>
                                                                     <tr>
@@ -2604,7 +2605,7 @@ class ForecastSummary extends Component {
                                                                         <td></td>
                                                                         <td></td>
                                                                         <td><b>{i18n.t('static.forecastReport.freight')} (7%)</b></td>
-                                                                        <td><b>{(0.07 * this.state.totalProductCost).toFixed(2)}</b></td>
+                                                                        <td><b>{((0.07 * this.state.totalProductCost).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</b></td>
                                                                         <td></td>
                                                                     </tr>
                                                                     <tr>
@@ -2620,7 +2621,7 @@ class ForecastSummary extends Component {
                                                                         <td></td>
                                                                         <td></td>
                                                                         <td><b>{i18n.t('static.shipment.totalCost')}</b></td>
-                                                                        <td><b>{parseFloat(parseFloat(this.state.totalProductCost) + parseFloat(0.07 * this.state.totalProductCost)).toFixed(2)}</b></td>
+                                                                        <td><b>{(parseFloat(parseFloat(this.state.totalProductCost) + parseFloat(0.07 * this.state.totalProductCost)).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</b></td>
                                                                         <td></td>
                                                                     </tr>
                                                                 </tfoot>
@@ -2633,7 +2634,7 @@ class ForecastSummary extends Component {
                                                                         <td className='text-left sticky-col first-col clone'></td>
                                                                         <td></td>
                                                                         <td><b>{i18n.t('static.forecastReport.productCost')}</b></td>
-                                                                        <td><b>{this.state.totalProductCost}</b></td>
+                                                                        <td><b>{(this.state.totalProductCost).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</b></td>
                                                                         <td></td>
                                                                     </tr>
                                                                     <tr>
@@ -2642,7 +2643,7 @@ class ForecastSummary extends Component {
                                                                         <td className='text-left sticky-col first-col clone'></td>
                                                                         <td></td>
                                                                         <td><b>{i18n.t('static.forecastReport.freight')} (7%)</b></td>
-                                                                        <td><b>{0.07 * this.state.totalProductCost}</b></td>
+                                                                        <td><b>{(0.07 * this.state.totalProductCost).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</b></td>
                                                                         <td></td>
                                                                     </tr>
                                                                     <tr>
@@ -2651,7 +2652,7 @@ class ForecastSummary extends Component {
                                                                         <td className='text-left sticky-col first-col clone'></td>
                                                                         <td></td>
                                                                         <td><b>{i18n.t('static.shipment.totalCost')}</b></td>
-                                                                        <td><b>{this.state.totalProductCost + 0.07 * this.state.totalProductCost}</b></td>
+                                                                        <td><b>{(this.state.totalProductCost + 0.07 * this.state.totalProductCost).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</b></td>
                                                                         <td></td>
                                                                     </tr>
                                                                 </tfoot>

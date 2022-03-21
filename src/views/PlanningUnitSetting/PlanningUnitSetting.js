@@ -631,6 +631,10 @@ export default class PlanningUnitSetting extends Component {
         if (x == 8) {
             var col = ("I").concat(parseInt(y) + 1);
             this.el.setValueFromCoords(10, y, 1, true);
+            value = this.el.getValue(`I${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+            if (value == '' || value == null) {
+                value = this.el.getValueFromCoords(8, y);
+            }
             // value = this.el.getValue(`I${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             // var reg = DECIMAL_NO_REGEX;
             var reg = JEXCEL_DECIMAL_CATELOG_PRICE;
