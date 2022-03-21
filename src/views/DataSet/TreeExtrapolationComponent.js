@@ -2736,12 +2736,12 @@ export default class TreeExtrapolationComponent extends React.Component {
                                         <div className=" pl-0">
                                             <div className="row">
                                             <div>
-                                                                <Popover placement="top" isOpen={this.state.popoverOpenStartMonth} target="Popover3" trigger="hover" toggle={this.toggleStartMonth}>
+                                                                <Popover placement="top" isOpen={this.state.popoverOpenStartMonth} target="Popover1" trigger="hover" toggle={this.toggleStartMonth}>
                                                                     <PopoverBody>To change the start month, please go back to the Node Data screen and change the month</PopoverBody>
                                                                 </Popover>
                                                             </div>
                                                 <FormGroup className="col-md-3 pl-lg-0">
-                                                    <Label htmlFor="appendedInputButton">Start Month for Historical Data<span className="stock-box-icon fa fa-sort-desc ml-1"></span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover3" onClick={this.toggleStartMonth} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
+                                                    <Label htmlFor="appendedInputButton">Start Month for Historical Data<span className="stock-box-icon fa fa-sort-desc ml-1"></span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={this.toggleStartMonth} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                                     <div className="controls edit disabledColor">
                                                         <Picker
 
