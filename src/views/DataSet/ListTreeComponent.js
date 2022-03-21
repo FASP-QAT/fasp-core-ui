@@ -109,6 +109,7 @@ export default class ListTreeComponent extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            isSubmitClicked: false,
             missingPUList: [],
             treeTemplate: '',
             active: true,
@@ -232,8 +233,8 @@ export default class ListTreeComponent extends Component {
     }
 
     loadedMissingPU = function (instance, cell, x, y, value) {
-        console.log("loaded 2---",document.getElementsByClassName('jexcel'));
-        jExcelLoadedFunctionOnlyHideRow(instance,1);
+        console.log("loaded 2---", document.getElementsByClassName('jexcel'));
+        jExcelLoadedFunctionOnlyHideRow(instance, 1);
     }
 
     findMissingPUs() {
@@ -445,7 +446,7 @@ export default class ListTreeComponent extends Component {
             var tempJson = {};
             var tempTree = {};
             var treeTemplateId = document.getElementById('templateId').value;
-            console.log("treeTemplateId===",treeTemplateId);
+            console.log("treeTemplateId===", treeTemplateId);
             if (treeTemplateId != "" && treeTemplateId != 0) {
                 var treeTemplate = this.state.treeTemplateList.filter(x => x.treeTemplateId == treeTemplateId)[0];
                 console.log("treeTemplate 123----", treeTemplate);
@@ -623,6 +624,7 @@ export default class ListTreeComponent extends Component {
                     // loading: false,
                     message: i18n.t('static.mt.dataUpdateSuccess'),
                     color: "green",
+                    isSubmitClicked: false
                 }, () => {
                     if (operationId == 3) {
                         confirmAlert({
@@ -1125,7 +1127,7 @@ export default class ListTreeComponent extends Component {
         }
     };
     loaded = function (instance, cell, x, y, value) {
-        jExcelLoadedFunction(instance,0);
+        jExcelLoadedFunction(instance, 0);
     }
 
     selected = function (instance, cell, x, y, value) {
@@ -1316,12 +1318,14 @@ export default class ListTreeComponent extends Component {
                                     }}
                                     validate={validate(validationSchema)}
                                     onSubmit={(values, { setSubmitting, setErrors }) => {
-                                        this.setState({ loading: true }, () => {
-                                            this.copyDeleteTree(this.state.treeId, this.state.treeFlag ? this.state.programId : this.state.datasetIdModal, this.state.treeFlag ? this.state.versionId : 0, this.state.treeFlag ? 2 : 3);
-                                            this.setState({
-                                                isModalOpen: !this.state.isModalOpen,
+                                        if (!this.state.isSubmitClicked) {
+                                            this.setState({ loading: true, isSubmitClicked: true }, () => {
+                                                this.copyDeleteTree(this.state.treeId, this.state.treeFlag ? this.state.programId : this.state.datasetIdModal, this.state.treeFlag ? this.state.versionId : 0, this.state.treeFlag ? 2 : 3);
+                                                this.setState({
+                                                    isModalOpen: !this.state.isModalOpen,
+                                                })
                                             })
-                                        })
+                                        }
 
                                     }}
 

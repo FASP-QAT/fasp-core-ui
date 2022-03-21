@@ -1061,9 +1061,9 @@ export default class BuildTree extends Component {
             // currentScenario: (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0]
 
         }, () => {
+            console.log('month value --->', this.state.singleValue2)
             this.handleAMonthDissmis3(this.state.singleValue2, 0);
-            this.calculateValuesForAggregateNode(items);
-            // console.log("currentScenario---", this.state.currentScenario);
+            // this.calculateValuesForAggregateNode(items);
         });
     }
     toggleHowManyPUperIntervalPer() {
@@ -1279,15 +1279,17 @@ export default class BuildTree extends Component {
                         }
                     });
                 }
-
-
-            }
-            if (parameterName == 'type' && value == 0) {
                 this.saveTreeData();
-                this.calculateValuesForAggregateNode(this.state.items);
+                
+
             }
+            // if (parameterName == 'type' && value == 0) {
+            //     this.saveTreeData();
+            //     this.updateTreeData();
+            //     this.calculateValuesForAggregateNode(this.state.items);
+            // }
             console.log("returmed list---", this.state.nodeDataMomList);
-            this.updateTreeData();
+
         })
     }
 
@@ -1396,6 +1398,7 @@ export default class BuildTree extends Component {
                                 }
                                 console.log("hide fu pu---", this.state.hideFUPUNode);
                                 console.log("hide pu---", this.state.hidePUNode);
+                                this.handleAMonthDissmis3(this.state.singleValue2, 0);
                                 this.hideSecondComponent();
                             });
                             console.log("Data update success");
@@ -4304,6 +4307,9 @@ export default class BuildTree extends Component {
                     for (var k = 0; k < treeList.length; k++) {
                         proList.push(treeList[k])
                     }
+                    this.setState({
+                        singleValue2: { year: new Date(programData.currentVersion.forecastStartDate.replace(/-/g, '\/')).getFullYear(), month: new Date(programData.currentVersion.forecastStartDate.replace(/-/g, '\/')).getMonth() + 1 }
+                    })
                 } else {
                     console.log("inside else condition-------------------->");
                     for (var i = 0; i < myResult.length; i++) {
@@ -6044,58 +6050,58 @@ export default class BuildTree extends Component {
         var maxNodeId = items.length > 0 ? Math.max(...items.map(o => o.id)) : 0;
         var nodeId = parseInt(maxNodeId + 1);
         // setTimeout(() => {
-            var newItem = itemConfig.context;
-            newItem.parent = itemConfig.context.parent;
-            newItem.id = nodeId;
-            newItem.level = parseInt(itemConfig.context.level + 1);
-            newItem.payload.nodeId = nodeId;
+        var newItem = itemConfig.context;
+        newItem.parent = itemConfig.context.parent;
+        newItem.id = nodeId;
+        newItem.level = parseInt(itemConfig.context.level + 1);
+        newItem.payload.nodeId = nodeId;
 
-            var parentSortOrder = items.filter(c => c.id == itemConfig.context.parent)[0].sortOrder;
-            var childList = items.filter(c => c.parent == itemConfig.context.parent);
-            newItem.sortOrder = parentSortOrder.concat(".").concat(("0" + (Number(childList.length) + 1)).slice(-2));
-            (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].nodeDataId = this.getMaxNodeDataId();
-            (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].displayDataValue = (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].dataValue;
-            (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].displayCalculatedDataValue = (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].calculatedDataValue;
-            (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].month = moment((newItem.payload.nodeDataMap[this.state.selectedScenario])[0].month).startOf('month').format("YYYY-MM-DD")
+        var parentSortOrder = items.filter(c => c.id == itemConfig.context.parent)[0].sortOrder;
+        var childList = items.filter(c => c.parent == itemConfig.context.parent);
+        newItem.sortOrder = parentSortOrder.concat(".").concat(("0" + (Number(childList.length) + 1)).slice(-2));
+        (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].nodeDataId = this.getMaxNodeDataId();
+        (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].displayDataValue = (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].dataValue;
+        (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].displayCalculatedDataValue = (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].calculatedDataValue;
+        (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].month = moment((newItem.payload.nodeDataMap[this.state.selectedScenario])[0].month).startOf('month').format("YYYY-MM-DD")
+        if (itemConfig.context.payload.nodeType.id == 4) {
+            (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.forecastingUnit.label.label_en = (itemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.forecastingUnit.label.label_en;
+        }
+        var scenarioList = this.state.scenarioList.filter(x => x.id != this.state.selectedScenario);
+        if (scenarioList.length > 0) {
+            for (let i = 0; i < scenarioList.length; i++) {
+                var tempArray = [];
+                var nodeDataMap = {};
+                tempArray.push(JSON.parse(JSON.stringify((newItem.payload.nodeDataMap[this.state.selectedScenario])[0])));
+                console.log("tempArray---", tempArray);
+                nodeDataMap = newItem.payload.nodeDataMap;
+                tempArray[0].nodeDataId = this.getMaxNodeDataId();
+                nodeDataMap[scenarioList[i].id] = tempArray;
+                // nodeDataMap[scenarioList[i].id][0].nodeDataId = scenarioList[i].id;
+                newItem.payload.nodeDataMap = nodeDataMap;
+                // (newItem.payload.nodeDataMap[scenarioList[i].id])[0] = (newItem.payload.nodeDataMap[this.state.selectedScenario]);
+            }
+        }
+        console.log("add button clicked value after update---", newItem);
+        console.log("add button clicked value after update---", newItem.payload.nodeDataMap.length);
+        this.setState({
+            items: [...items, newItem],
+            cursorItem: nodeId
+        }, () => {
+
+            console.log("on add items-------", this.state.items);
             if (itemConfig.context.payload.nodeType.id == 4) {
-                (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.forecastingUnit.label.label_en = (itemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.forecastingUnit.label.label_en;
-            }
-            var scenarioList = this.state.scenarioList.filter(x => x.id != this.state.selectedScenario);
-            if (scenarioList.length > 0) {
-                for (let i = 0; i < scenarioList.length; i++) {
-                    var tempArray = [];
-                    var nodeDataMap = {};
-                    tempArray.push(JSON.parse(JSON.stringify((newItem.payload.nodeDataMap[this.state.selectedScenario])[0])));
-                    console.log("tempArray---", tempArray);
-                    nodeDataMap = newItem.payload.nodeDataMap;
-                    tempArray[0].nodeDataId = this.getMaxNodeDataId();
-                    nodeDataMap[scenarioList[i].id] = tempArray;
-                    // nodeDataMap[scenarioList[i].id][0].nodeDataId = scenarioList[i].id;
-                    newItem.payload.nodeDataMap = nodeDataMap;
-                    // (newItem.payload.nodeDataMap[scenarioList[i].id])[0] = (newItem.payload.nodeDataMap[this.state.selectedScenario]);
-                }
-            }
-            console.log("add button clicked value after update---", newItem);
-            console.log("add button clicked value after update---", newItem.payload.nodeDataMap.length);
-            this.setState({
-                items: [...items, newItem],
-                cursorItem: nodeId
-            }, () => {
-
-                console.log("on add items-------", this.state.items);
-                if (itemConfig.context.payload.nodeType.id == 4) {
-                    this.createPUNode(JSON.parse(JSON.stringify(itemConfig)), nodeId);
+                this.createPUNode(JSON.parse(JSON.stringify(itemConfig)), nodeId);
+            } else {
+                if (!itemConfig.context.payload.extrapolation) {
+                    this.calculateMOMData(newItem.id, 0);
                 } else {
-                    if (!itemConfig.context.payload.extrapolation) {
-                        this.calculateMOMData(newItem.id, 0);
-                    } else {
-                        this.setState({
-                            loading: false
-                        })
-                    }
+                    this.setState({
+                        loading: false
+                    })
                 }
-                // this.calculateValuesForAggregateNode(this.state.items);
-            });
+            }
+            // this.calculateValuesForAggregateNode(this.state.items);
+        });
         // }, 0);
 
     }
@@ -6133,7 +6139,7 @@ export default class BuildTree extends Component {
 
                 this.setState({
                     items: items,
-                    openAddNodeModal: false,
+                    // openAddNodeModal: false,
                 }, () => {
                     console.log("updated tree data>>>", this.state);
                 });
@@ -6147,7 +6153,7 @@ export default class BuildTree extends Component {
 
                 this.setState({
                     items: items,
-                    openAddNodeModal: false,
+                    // openAddNodeModal: false,
                 }, () => {
                     console.log("updated tree data>>>", this.state);
                 });
@@ -6168,9 +6174,7 @@ export default class BuildTree extends Component {
         this.setState(this.getDeletedItems(items, [itemConfig.id]), () => {
             setTimeout(() => {
                 console.log("delete result---", this.getDeletedItems(items, [itemConfig.id]))
-                this.calculateValuesForAggregateNode(this.state.items);
-                console.log("delete agg value")
-                this.saveTreeData();
+                this.calculateMOMData(0, 0);
             }, 0);
         });
     }
@@ -8467,14 +8471,11 @@ export default class BuildTree extends Component {
     updateTreeData(date) {
         var items = this.state.items;
         console.log("items>>>", items);
-        console.log("get payload 111");
         for (let i = 0; i < items.length; i++) {
-            console.log("get payload 12");
-            // console.log("this.state.modelinDataForScenario---", this.state.modelinDataForScenario);
             console.log("items[i]---", items[i]);
-            console.log("items[i].payload.nodeDataMap[this.state.selectedScenario][0]---", items[i].id);
-            console.log("items[i].payload.nodeDataMap[this.state.selectedScenario][0].modelling---", items[i].payload.nodeDataMap[this.state.selectedScenario][0]);
             if (items[i].payload.nodeDataMap[this.state.selectedScenario][0].nodeDataMomList != null) {
+                console.log("before filter mom---", items[i].payload.nodeDataMap[this.state.selectedScenario][0].nodeDataMomList);
+                console.log("before filter date---", moment(date).format('YYYY-MM'));
                 var nodeDataModelingMap = items[i].payload.nodeDataMap[this.state.selectedScenario][0].nodeDataMomList.filter(x => moment(x.month).format('YYYY-MM') == moment(date).format('YYYY-MM'));
                 console.log("nodeDataModelingMap>>>", nodeDataModelingMap);
                 if (nodeDataModelingMap.length > 0) {
@@ -8537,6 +8538,9 @@ export default class BuildTree extends Component {
         }
         this.setState({
             items
+        }, () => {
+            console.log("final updated items---", this.state.items);
+            // this.calculateValuesForAggregateNode(this.state.items);
         })
     }
     render() {
