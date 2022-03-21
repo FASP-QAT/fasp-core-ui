@@ -1254,7 +1254,7 @@ class VersionSettingsComponent extends Component {
         let missingMonths = missingMonthList.length > 0 ? missingMonthList.map((item, i) => {
             return (
                 <li key={i}>
-                    <div><span><div className="hoverDiv" onClick={() => missingMonthsClicked(item.planningUnitId, this)}>{getLabelText(item.planningUnitLabel, this.state.lang) + " - " + getLabelText(item.regionLabel, this.state.lang) + ": "}</div>{"" + item.monthsArray}</span></div>
+                    <div className="hoverDiv" onClick={() => missingMonthsClicked(item.planningUnitId, this)}><span>{getLabelText(item.planningUnitLabel, this.state.lang) + " - " + getLabelText(item.regionLabel, this.state.lang) + ": "}</span></div>{"" + item.monthsArray}
                 </li>
             )
         }, this) : <span>{i18n.t('static.forecastValidation.noMissingGaps')}</span>;
@@ -1264,7 +1264,7 @@ class VersionSettingsComponent extends Component {
         let consumption = consumptionListlessTwelve.length > 0 ? consumptionListlessTwelve.map((item, i) => {
             return (
                 <li key={i}>
-                    <div><span><div className="hoverDiv" onClick={() => missingMonthsClicked(item.planningUnitId, this)}>{getLabelText(item.planningUnitLabel, this.state.lang) + " - " + getLabelText(item.regionLabel, this.state.lang) + ": "}</div></span><span>{item.noOfMonths + " month(s)"}</span></div>
+                    <div className="hoverDiv" onClick={() => missingMonthsClicked(item.planningUnitId, this)}><span>{getLabelText(item.planningUnitLabel, this.state.lang) + " - " + getLabelText(item.regionLabel, this.state.lang) + ": "}</span></div><span>{item.noOfMonths + " month(s)"}</span>
                 </li>
             )
         }, this) : <span>{i18n.t('static.forecastValidation.noMonthsHaveLessData')}</span>;

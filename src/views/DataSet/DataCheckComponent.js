@@ -110,7 +110,7 @@ export function dataCheck(props, datasetJson) {
             }
         }
     }
-    var datasetPlanningUnit = datasetJson.planningUnitList;
+    var datasetPlanningUnit = datasetJson.planningUnitList.filter(c => c.active.toString() == "true");
     var notSelectedPlanningUnitList = [];
     var datasetPlanningUnitTreeList = datasetPlanningUnit.filter(c => c.treeForecast.toString() == "true");
     for (var dp = 0; dp < datasetPlanningUnitTreeList.length; dp++) {
