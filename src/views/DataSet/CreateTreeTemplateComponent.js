@@ -1024,8 +1024,9 @@ export default class CreateTreeTemplate extends Component {
                 } else if (this.state.currentItemConfig.context.payload.nodeType.id == 3 || this.state.currentItemConfig.context.payload.nodeType.id == 4 || this.state.currentItemConfig.context.payload.nodeType.id == 5) {
                     console.log("id to filter---", this.state.currentItemConfig.context.id)
                     console.log("id to filter list---", this.state.nodeDataMomList)
-                    console.log("id to filter filter list---", this.state.nodeDataMomList.filter(x => x.nodeId == this.state.currentItemConfig.context.id)[0].nodeDataMomList)
-                    this.setState({ momListPer: this.state.nodeDataMomList.filter(x => x.nodeId == this.state.currentItemConfig.context.id)[0].nodeDataMomList }, () => {
+                    // console.log("id to filter filter list---", this.state.nodeDataMomList.filter(x => x.nodeId == this.state.currentItemConfig.context.id)[0].nodeDataMomList)
+                    var momList=this.state.nodeDataMomList.filter(x => x.nodeId == this.state.currentItemConfig.context.id);
+                    this.setState({ momListPer: momList.length>0?momList[0].nodeDataMomList:[] }, () => {
                         console.log("going to build mom jexcel percent");
                         if (value == 1 || (value == 0 && this.state.showMomDataPercent)) {
                             this.buildMomJexcelPercent();
@@ -3728,6 +3729,7 @@ export default class CreateTreeTemplate extends Component {
     }
     findFirstError(formName, hasError) {
         const form = document.forms[formName]
+        console.log("Form@@@#####",form)
         for (let i = 0; i < form.length; i++) {
             if (hasError(form[i].name)) {
                 form[i].focus()
@@ -4199,8 +4201,9 @@ export default class CreateTreeTemplate extends Component {
         //             }
         //         }
         //     );
-        if (this.props.match.params.templateId != -1) {
-            DatasetService.getTreeTemplateById(this.props.match.params.templateId).then(response => {
+        if (this.props.match.params.templateId != -1 || this.state.treeTemplate.treeTemplateId>0) {
+            var treeTemplateId=this.props.match.params.templateId != -1 ?this.props.match.params.templateId:this.state.treeTemplate.treeTemplateId;
+            DatasetService.getTreeTemplateById(treeTemplateId).then(response => {
                 console.log("my tree---", response.data);
                 var items = response.data.flatList;
                 var arr = [];
