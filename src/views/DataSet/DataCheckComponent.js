@@ -220,6 +220,9 @@ export function dataCheck(props, datasetJson) {
                 }
 
                 //Consumption : missing months
+                var consumptionListFilteredForMonth = consumptionList.filter(c => c.planningUnit.id == puId && c.region.id == regionId);
+                let actualMin = moment.min(consumptionListFilteredForMonth.map(d => moment(d.month)));
+                curDate = moment(actualMin).format("YYYY-MM-DD");
                 for (var i = 0; moment(curDate).format("YYYY-MM") < moment(Date.now()).format("YYYY-MM"); i++) {
                     var consumptionListFilteredForMonth = consumptionList.filter(c => c.planningUnit.id == puId && c.region.id == regionId);
                     let actualMin = moment.min(consumptionListFilteredForMonth.map(d => moment(d.month)));
