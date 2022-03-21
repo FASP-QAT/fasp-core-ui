@@ -4912,13 +4912,18 @@ export default class CreateTreeTemplate extends Component {
         console.log("end>>>", Date.now());
     }
     onRemoveButtonClick(itemConfig) {
-        const { items } = this.state;
-        const ids = items.map(o => o.id)
-        const filtered = items.filter(({ id }, index) => !ids.includes(id, index + 1))
-        console.log("delete unique items---", filtered)
-        items = filtered;
-        this.setState(this.getDeletedItems(items, [itemConfig.id]), () => {
-            this.calculateValuesForAggregateNode(this.state.items);
+        this.setState({ loading: true }, () => {
+            const { items } = this.state;
+            const ids = items.map(o => o.id)
+            const filtered = items.filter(({ id }, index) => !ids.includes(id, index + 1))
+            console.log("delete unique items---", filtered)
+            items = filtered;
+            this.setState(this.getDeletedItems(items, [itemConfig.id]), () => {
+                setTimeout(() => {
+                    console.log("delete result---", this.getDeletedItems(items, [itemConfig.id]))
+                    this.calculateMOMData(0, 2);
+                }, 0);
+            });
         });
     }
     onMoveItem(parentid, itemid) {
