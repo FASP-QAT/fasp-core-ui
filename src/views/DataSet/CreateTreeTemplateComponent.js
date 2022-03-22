@@ -1952,9 +1952,9 @@ export default class CreateTreeTemplate extends Component {
             data[3] = parseFloat(momList[j].manualChange).toFixed(2)
             data[4] = `=ROUND(IF(B${parseInt(j) + 1}+C${parseInt(j) + 1}+D${parseInt(j) + 1}<0,0,IF(B${parseInt(j) + 1}+C${parseInt(j) + 1}+D${parseInt(j) + 1}>100,100,B${parseInt(j) + 1}+C${parseInt(j) + 1}+D${parseInt(j) + 1})),2)`
             // `=B${parseInt(j) + 1}+C${parseInt(j) + 1}+D${parseInt(j) + 1}`
-            console.log("momListParent j---", momList[j].month + "value", momListParent[j].calculatedValue)
-            data[5] = parseFloat(momListParent[j].calculatedValue).toFixed(2)
-            data[6] = this.state.currentItemConfig.context.payload.nodeType.id != 5 ? `=ROUND((E${parseInt(j) + 1}*${momListParent[j].calculatedValue}/100)*L${parseInt(j) + 1},2)` : `=ROUND((E${parseInt(j) + 1}*${momListParent[j].calculatedValue}/100)/${(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.planningUnit.multiplier},2)`;
+            var momListParentForMonth = momListParent.filter(c => moment(c.month).format("YYYY-MM") == moment(momList[j].month).format("YYYY-MM"));
+            data[5] = momListParentForMonth.length > 0 ? parseFloat(momListParentForMonth[0].calculatedValue).toFixed(2) : 0;
+            data[6] = this.state.currentItemConfig.context.payload.nodeType.id != 5 ? `=ROUND((E${parseInt(j) + 1}*${momListParentForMonth.length > 0 ? parseFloat(momListParentForMonth[0].calculatedValue) : 0}/100)*L${parseInt(j) + 1},2)` : `=ROUND((E${parseInt(j) + 1}*${momListParentForMonth.length > 0 ? parseFloat(momListParentForMonth[0].calculatedValue) : 0}/100)/${(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.planningUnit.multiplier},2)`;
             // data[6] = this.state.manualChange ? momList[j].calculatedValue : ((momListParent[j].manualChange > 0) ? momListParent[j].endValueWithManualChangeWMC : momListParent[j].calculatedValueWMC *  momList[j].endValueWithManualChangeWMC) / 100
             data[7] = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].nodeDataId
             data[8] = this.state.currentItemConfig.context.payload.nodeType.id == 5 && parentNodeNodeData.fuNode.usageType.id == 2 ? j >= lagInMonths ? `=P${parseInt(j) + 1 - lagInMonths}` : 0 : j >= lagInMonths ? `=P${parseInt(j) + 1}` : 0;
@@ -1998,7 +1998,7 @@ export default class CreateTreeTemplate extends Component {
                 },
                 {
                     title: i18n.t('static.tree.%of') + " " + getLabelText(this.state.currentItemConfig.parentItem.payload.label, this.state.lang) + " " + i18n.t('static.tree.monthStart'),
-                    type: 'numeric',
+                    type: 'hidden',
                     mask: '#,##.00', decimal: '.',
                     readOnly: true
 
@@ -2029,7 +2029,7 @@ export default class CreateTreeTemplate extends Component {
 
                 },
                 {
-                    title: getLabelText(this.state.currentItemConfig.context.payload.label, this.state.lang) + " " + i18n.t('static.tree.MonthEnd'),
+                    title: getLabelText(this.state.currentItemConfig.context.payload.label, this.state.lang) + " " + i18n.t('static.consumption.forcast'),
                     type: 'numeric',
                     mask: '#,##.00', decimal: '.',
                     readOnly: true
@@ -2121,6 +2121,8 @@ export default class CreateTreeTemplate extends Component {
 
     loadedMomPer = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance, 1);
+        var cell = instance.jexcel.getCell("D1");
+        cell.classList.add('readonly');
     }
 
     buildMomJexcel() {
@@ -2161,7 +2163,7 @@ export default class CreateTreeTemplate extends Component {
                 {
                     // 1
                     title: i18n.t('static.tree.monthStartNoSeasonality'),
-                    type: 'numeric',
+                    type: 'hidden',
                     mask: '#,##.00', decimal: '.',
                     readOnly: true
 
@@ -2194,7 +2196,7 @@ export default class CreateTreeTemplate extends Component {
 
                 },
                 {
-                    title: i18n.t('static.tree.MonthEnd'),
+                    title: i18n.t('static.tree.nodeForecast'),
                     type: 'numeric',
                     mask: '#,##.00', decimal: '.',
                     readOnly: true
@@ -2272,6 +2274,10 @@ export default class CreateTreeTemplate extends Component {
 
     loadedMom = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance, 1);
+        var cell = instance.jexcel.getCell("E1");
+        cell.classList.add('readonly');
+        var cell = instance.jexcel.getCell("F1");
+        cell.classList.add('readonly');
     }
 
     addRow = function () {
@@ -2280,7 +2286,7 @@ export default class CreateTreeTemplate extends Component {
         data[0] = 0;
         data[1] = "";
         data[2] = this.state.currentItemConfig.context.payload.nodeType.id == PERCENTAGE_NODE_ID || this.state.currentItemConfig.context.payload.nodeType.id == FU_NODE_ID || this.state.currentItemConfig.context.payload.nodeType.id == PU_NODE_ID ? 5 : '';
-        data[3] = this.state.minMonth
+        data[3] = moment(this.state.currentItemConfig.context.payload.nodeDataMap[0][0].month).startOf('month').add(1,'months').format("YYYY-MM-DD")
         data[4] = this.state.maxMonth
         data[5] = "";
         data[6] = "";
@@ -2320,7 +2326,7 @@ export default class CreateTreeTemplate extends Component {
             data[0] = ''
             data[1] = ''
             data[2] = this.state.currentItemConfig.context.payload.nodeType.id == PERCENTAGE_NODE_ID || this.state.currentItemConfig.context.payload.nodeType.id == FU_NODE_ID || this.state.currentItemConfig.context.payload.nodeType.id == PU_NODE_ID ? 5 : '';
-            data[3] = this.state.minMonth
+            data[3] = moment(this.state.currentItemConfig.context.payload.nodeDataMap[0][0].month).startOf('month').add(1,'months').format("YYYY-MM-DD")
             data[4] = this.state.maxMonth
             data[5] = ''
             data[6] = ''
@@ -2387,12 +2393,12 @@ export default class CreateTreeTemplate extends Component {
                 {
                     title: i18n.t('static.common.startdate'),
                     type: 'calendar',
-                    options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker', validRange: [this.state.minMonth, this.state.maxMonth] }, width: 100
+                    options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker', validRange: [moment(this.state.currentItemConfig.context.payload.nodeDataMap[0][0].month).startOf('month').add(1,'months').format("YYYY-MM-DD"), this.state.maxMonth] }, width: 100
                 },
                 {
                     title: i18n.t('static.common.stopdate'),
                     type: 'calendar',
-                    options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker', validRange: [this.state.minMonth, this.state.maxMonth] }, width: 100
+                    options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker', validRange: [moment(this.state.currentItemConfig.context.payload.nodeDataMap[0][0].month).startOf('month').add(1,'months').format("YYYY-MM-DD"), this.state.maxMonth] }, width: 100
                 },
                 {
                     title: i18n.t('static.tree.monthlyChange%'),
@@ -2538,7 +2544,7 @@ export default class CreateTreeTemplate extends Component {
                                     data[0] = 0;
                                     data[1] = "";
                                     data[2] = "";
-                                    data[3] = this.state.minMonth
+                                    data[3] = moment(this.state.currentItemConfig.context.payload.nodeDataMap[0][0].month).startOf('month').add(1,'months').format("YYYY-MM-DD")
                                     data[4] = this.state.maxMonth
                                     data[5] = "";
                                     data[6] = "";
