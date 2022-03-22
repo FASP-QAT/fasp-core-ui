@@ -5817,27 +5817,52 @@ font-style: italic!important;
    border-bottom: 0px solid #c8ced3!important;
 }
 .Firstcolum{
-  position: sticky;
-    left: 0;
-    z-index: 999;
+  // position: sticky;
+  //   left: 0;
+  //   z-index: 999;
+
+  width: 120px;
+  left: 0;
+  z-index: 2;
+  /* width: 100px; */
+  /* min-width: 100px; */
+  /* max-width: 100px; */
+  // z-index: 999;
 }
 .Secondcolum{
-  position: sticky;
+  // position: sticky;
   // left: 61px;
-  left:53px;
-  z-index: 999;
+  // left:53px;
+  // z-index: 999;
+  width: 150px;
+    left: 54px;
+    z-index: 3;
+    min-width:150px;
+    max-width: 150px;
 }
 .Thirdcolum{
-  position: sticky;
-  left: 253px;
-  z-index: 999;
+  // position: sticky;
+  // left: 128px;
+  // z-index: 999;
+
+  left: 204px;
+  z-index: 4;
+  /* z-index: 999; */
+  width: 200px;
+  // position: -webkit-sticky;
+  /* position: sticky; */
+  /* left: 210px; */
+  /* z-index: 4; */
+  min-width: 200px;
+  max-width: 200px;
+  /* left: 200px;*/
 }
 .MonthlyForecastdWidth {
   overflow: hidden !important;
-  min-width: 167px !important;
+  // min-width: 167px !important;
   word-wrap: break-word !important;
-  z-index: 100;
-  position: sticky;
+  // z-index: 100;
+  // position: sticky;
   /* border: none !important; */
 }
 
@@ -6204,9 +6229,32 @@ font-style: italic!important;
   background-position: center right 5px;
 }
 .MarginLeftDropdown{
-  right: 0;
-  margin-right: 17px;
+  // right: 0;
+  // margin-right: 17px;
+  top: 6px!important;
+    left: 25px!important;
 }
 .jupload:not(.input):before {
   position: absolute;
+}
+.SettingIcon .btn-secondary{
+  color: #5c6873!important;
+  background-color: #f0f3f5 !important;
+  border-color: #f0f3f5 !important;
+}
+.SettingIcon .btn {
+  display: inline-block;
+  font-weight: 400;
+  color: #23282c;
+  text-align: center;
+  vertical-align: middle;
+  user-select: none;
+  background-color: transparent;
+  border: 1px solid transparent;
+  padding: 0px;
+  font-size: 0.875rem;
+  height: 14px;
+  line-height: 8px;
+  border-radius: 0.25rem;
+  transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
