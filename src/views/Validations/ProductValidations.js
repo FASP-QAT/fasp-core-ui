@@ -1063,7 +1063,7 @@ class ProductValidation extends Component {
         columns.push(i18n.t('static.supplyPlan.pricePerPlanningUnit'));
         columns.push(i18n.t('static.productValidation.cost'));
         const headers = [columns]
-        const data = this.state.dataEl.getJson(null, false).map(ele => [ele[0], ele[1], ele[2], ele[3], ele[4], ele[5], this.formatter(ele[6]), this.formatter(ele[7]), this.formatter(Number(ele[8]).toFixed(2))]);
+        const data = this.state.dataEl.getJson(null, false).map(ele => [ele[0], ele[1], ele[2], ele[3], ele[4], ele[5], this.formatter(ele[6]), this.formatter(ele[7]), ele[8]!=""?this.formatter(Number(ele[8]).toFixed(2)):""]);
         // doc.addPage()
         let content = {
             margin: { top: 80, bottom: 50 },
@@ -1134,7 +1134,7 @@ class ProductValidation extends Component {
         columns.map((item, idx) => { headers[idx] = (item).replaceAll(' ', '%20') });
 
         var A = [this.addDoubleQuoteToRowContent(headers)];
-        this.state.dataEl.getJson(null, false).map(ele => A.push(this.addDoubleQuoteToRowContent([ele[0].replaceAll(',', ' ').replaceAll(' ', '%20'), ele[1].replaceAll(',', ' ').replaceAll(' ', '%20'), ele[2].replaceAll(',', ' ').replaceAll(' ', '%20'), ele[3].replaceAll(',', ' ').replaceAll(' ', '%20'), ele[4].replaceAll(',', ' ').replaceAll(' ', '%20'), ele[5].replaceAll(',', ' ').replaceAll(' ', '%20'), ele[6].replaceAll(',', ' ').replaceAll(' ', '%20'), ele[7].replaceAll(',', ' ').replaceAll(' ', '%20'), ele[9] != 1 ? (Number(ele[6] * ele[7])).toString().replaceAll(',', ' ').replaceAll(' ', '%20') : ele[8].toString().replaceAll(',', ' ').replaceAll(' ', '%20')])));
+        this.state.dataEl.getJson(null, false).map(ele => A.push(this.addDoubleQuoteToRowContent([ele[0].replaceAll(',', ' ').replaceAll(' ', '%20'), ele[1].replaceAll(',', ' ').replaceAll(' ', '%20'), ele[2].replaceAll(',', ' ').replaceAll(' ', '%20'), ele[3].replaceAll(',', ' ').replaceAll(' ', '%20'), ele[4].replaceAll(',', ' ').replaceAll(' ', '%20'), ele[5].replaceAll(',', ' ').replaceAll(' ', '%20'), ele[6].replaceAll(',', ' ').replaceAll(' ', '%20'), ele[7].replaceAll(',', ' ').replaceAll(' ', '%20'), ele[9] != 1 ? (ele[6]!="" && ele[7]!=""?(Number(ele[6] * ele[7])).toString().replaceAll(',', ' ').replaceAll(' ', '%20'):"") : ele[8].toString().replaceAll(',', ' ').replaceAll(' ', '%20')])));
 
         for (var i = 0; i < A.length; i++) {
             csvRow.push(A[i].join(","))

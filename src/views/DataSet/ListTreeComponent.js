@@ -7,7 +7,7 @@ import AuthenticationServiceComponent from '../Common/AuthenticationServiceCompo
 import jexcel from 'jexcel-pro';
 import "../../../node_modules/jexcel-pro/dist/jexcel.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
-import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
+import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow, jExcelLoadedFunctionWithoutSearch } from '../../CommonComponent/JExcelCommonFunctions.js'
 import i18n from '../../i18n';
 import { JEXCEL_PAGINATION_OPTION, JEXCEL_DATE_FORMAT_SM, JEXCEL_PRO_KEY } from '../../Constants.js';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
@@ -109,6 +109,9 @@ export default class ListTreeComponent extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            isSubmitClicked: false,
+            missingPUList: [],
+            treeTemplate: '',
             active: true,
             forecastMethod: {
                 id: "",
@@ -150,6 +153,122 @@ export default class ListTreeComponent extends Component {
         this.modelOpenClose = this.modelOpenClose.bind(this);
         this.getForecastMethodList = this.getForecastMethodList.bind(this);
         this.getRegionList = this.getRegionList.bind(this);
+        this.findMissingPUs = this.findMissingPUs.bind(this);
+        this.buildMissingPUJexcel = this.buildMissingPUJexcel.bind(this);
+    }
+    buildMissingPUJexcel() {
+        var missingPUList = this.state.missingPUList;
+        console.log("missingPUList--->", missingPUList);
+        var dataArray = [];
+        let count = 0;
+        if (missingPUList.length > 0) {
+            for (var j = 0; j < missingPUList.length; j++) {
+                data = [];
+                // data[0] = missingPUList[j].month
+                // data[1] = missingPUList[j].startValue
+                data[0] = getLabelText(missingPUList[j].tracerCategory.label, this.state.lang)
+                data[1] = getLabelText(missingPUList[j].planningUnit.label, this.state.lang) + " | " + missingPUList[j].planningUnit.id
+                dataArray[count] = data;
+                count++;
+            }
+        }
+        this.el = jexcel(document.getElementById("missingPUJexcel"), '');
+        this.el.destroy();
+        var data = dataArray;
+        console.log("DataArray>>>", dataArray);
+
+        var options = {
+            data: data,
+            columnDrag: true,
+            colWidths: [50, 50],
+            colHeaderClasses: ["Reqasterisk"],
+            columns: [
+                {
+                    // 0
+                    title: i18n.t('static.tracercategory.tracercategory'),
+                    type: 'test',
+                    readOnly: true
+                },
+                {
+                    // 1
+                    title: i18n.t('static.product.product'),
+                    type: 'text',
+                    readOnly: true
+
+                }
+
+            ],
+            text: {
+                // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1}`,
+                showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                show: '',
+                entries: '',
+            },
+            onload: this.loadedMissingPU,
+            pagination: localStorage.getItem("sesRecordCount"),
+            search: false,
+            columnSorting: true,
+            tableOverflow: true,
+            wordWrap: true,
+            allowInsertColumn: false,
+            allowManualInsertColumn: false,
+            allowDeleteRow: false,
+            copyCompatibility: true,
+            allowExport: false,
+            paginationOptions: JEXCEL_PAGINATION_OPTION,
+            position: 'top',
+            filters: true,
+            license: JEXCEL_PRO_KEY,
+            contextMenu: function (obj, x, y, e) {
+                return false;
+            }.bind(this),
+
+        };
+        var missingPUJexcel = jexcel(document.getElementById("missingPUJexcel"), options);
+        this.el = missingPUJexcel;
+        this.setState({
+            missingPUJexcel
+        }
+        );
+    }
+
+    loadedMissingPU = function (instance, cell, x, y, value) {
+        console.log("loaded 2---", document.getElementsByClassName('jexcel'));
+        jExcelLoadedFunctionOnlyHideRow(instance, 1);
+    }
+
+    findMissingPUs() {
+        var missingPUList = [];
+        var json;
+        var treeTemplate = this.state.treeTemplate;
+        console.log("dataset Id template---", this.state.datasetIdModal);
+        var dataset = this.state.datasetList.filter(x => x.id == this.state.datasetIdModal)[0];
+        console.log("dataset---", dataset);
+        console.log("treeTemplate---", treeTemplate);
+        var puNodeList = treeTemplate.flatList.filter(x => x.payload.nodeType.id == 5);
+        console.log("puNodeList---", puNodeList);
+        console.log("planningUnitIdListTemplate---", puNodeList.map((x) => x.payload.nodeDataMap[0][0].puNode.planningUnit.id).join(', '));
+        var planningUnitList = dataset.programData.planningUnitList.filter(x => x.treeForecast == true);
+        console.log("planningUnitList---", planningUnitList);
+        console.log("planningUnitIdListPUSettings---", planningUnitList.map((x) => x.planningUnit.id).join(', '));
+        for (let i = 0; i < puNodeList.length; i++) {
+            console.log("pu Id---", puNodeList[i].payload.nodeDataMap[0][0].puNode.planningUnit.id);
+            if (planningUnitList.filter(x => x.planningUnit.id == puNodeList[i].payload.nodeDataMap[0][0].puNode.planningUnit.id).length == 0) {
+                var parentNodeData = treeTemplate.flatList.filter(x => x.id == puNodeList[i].parent)[0];
+                console.log("parentNodeData---", parentNodeData);
+                json = {
+                    tracerCategory: parentNodeData.payload.nodeDataMap[0][0].fuNode.forecastingUnit.tracerCategory,
+                    planningUnit: puNodeList[i].payload.nodeDataMap[0][0].puNode.planningUnit
+                };
+                missingPUList.push(json);
+            }
+        }
+        console.log("missingPUList---", missingPUList);
+        this.setState({
+            missingPUList
+        }, () => {
+            this.buildMissingPUJexcel();
+        });
     }
     handleRegionChange = (regionIds) => {
         console.log("regionIds---", regionIds);
@@ -213,7 +332,11 @@ export default class ListTreeComponent extends Component {
                 })
                 this.setState({
                     regionList,
-                    regionMultiList
+                    regionMultiList,
+                    missingPUList: []
+                }, () => {
+                    if (this.state.treeTemplate != "")
+                        this.findMissingPUs();
                 });
                 for (var i = 0; i < myResult.length; i++) {
                     console.log("myResult--->", myResult[i])
@@ -323,10 +446,11 @@ export default class ListTreeComponent extends Component {
             var tempJson = {};
             var tempTree = {};
             var treeTemplateId = document.getElementById('templateId').value;
-            if (treeTemplateId != "") {
+            console.log("treeTemplateId===", treeTemplateId);
+            if (treeTemplateId != "" && treeTemplateId != 0) {
                 var treeTemplate = this.state.treeTemplateList.filter(x => x.treeTemplateId == treeTemplateId)[0];
                 console.log("treeTemplate 123----", treeTemplate);
-                var flatList = treeTemplate.flatList;
+                var flatList = JSON.parse(JSON.stringify(treeTemplate.flatList));
                 for (let i = 0; i < flatList.length; i++) {
                     nodeDataMap = {};
                     tempArray = [];
@@ -341,7 +465,12 @@ export default class ListTreeComponent extends Component {
                     treeId: treeId,
                     active: this.state.active,
                     forecastMethod: treeTemplate.forecastMethod,
-                    label: treeTemplate.label,
+                    label: {
+                        label_en: this.state.treeName,
+                        label_fr: '',
+                        label_sp: '',
+                        label_pr: ''
+                    },
                     notes: this.state.notes,
                     regionList: this.state.regionList,
                     scenarioList: [{
@@ -364,8 +493,8 @@ export default class ListTreeComponent extends Component {
                     nodeDataId: 1,
                     notes: '',
                     month: moment(program.programData.currentVersion.forecastStartDate).startOf('month').format("YYYY-MM-DD"),
-                    dataValue: "",
-                    calculatedDataValue: '',
+                    dataValue: "0",
+                    calculatedDataValue: '0',
                     displayDataValue: '',
                     nodeDataModelingList: [],
                     nodeDataOverrideList: [],
@@ -495,6 +624,7 @@ export default class ListTreeComponent extends Component {
                     // loading: false,
                     message: i18n.t('static.mt.dataUpdateSuccess'),
                     color: "green",
+                    isSubmitClicked: false
                 }, () => {
                     if (operationId == 3) {
                         confirmAlert({
@@ -653,6 +783,7 @@ export default class ListTreeComponent extends Component {
     onTemplateChange(event) {
         if (event.target.value == 0 || event.target.value == "") {
             this.setState({
+                treeTemplate: '',
                 treeFlag: false,
                 isModalOpen: !this.state.isModalOpen,
                 treeName: '',
@@ -672,12 +803,13 @@ export default class ListTreeComponent extends Component {
                 notes: ''
             }, () => {
                 if (this.state.datasetIdModal != "") {
+                    console.log("this.state.datasetIdModal---", this.state.datasetIdModal)
                     this.getRegionList();
                 }
             });
             // this.buildTree();
         } else {
-            console.log("id--->>>",this.state.datasetIdModal);
+            console.log("id--->>>", this.state.datasetIdModal);
             var treeTemplate = this.state.treeTemplateList.filter(x => x.treeTemplateId == event.target.value)[0];
             console.log("treeTemplate---", treeTemplate)
             this.setState({
@@ -689,9 +821,11 @@ export default class ListTreeComponent extends Component {
                 regionId: '',
                 regionList: [],
                 regionValues: [],
-                notes: ''
+                notes: '',
+                treeTemplate
             }, () => {
-                if (this.state.datasetIdModal != "") {
+                if (this.state.datasetIdModal != "" && this.state.datasetIdModal != 0) {
+                    console.log("this.state.datasetIdModal---", this.state.datasetIdModal)
                     this.getRegionList();
                 }
             });
@@ -895,8 +1029,9 @@ export default class ListTreeComponent extends Component {
                                     versionId: this.el.getValueFromCoords(9, y),
                                     treeId: this.el.getValueFromCoords(0, y),
                                     isModalOpen: !this.state.isModalOpen,
-                                    treeName: this.el.getValueFromCoords(2, y) + "+copy",
-                                    treeFlag: true
+                                    treeName: this.el.getValueFromCoords(2, y) + "(copy)",
+                                    treeFlag: true,
+                                    treeTemplate: ''
                                 })
                             }.bind(this)
                         });
@@ -956,6 +1091,9 @@ export default class ListTreeComponent extends Component {
             }, () => {
                 localStorage.setItem("sesDatasetId", event.target.value);
                 this.getRegionList();
+                // if (document.getElementById('templateId').value != "") {
+                //     this.findMissingPUs();
+                // }
             });
         }
 
@@ -989,7 +1127,7 @@ export default class ListTreeComponent extends Component {
         }
     };
     loaded = function (instance, cell, x, y, value) {
-        jExcelLoadedFunction(instance);
+        jExcelLoadedFunction(instance, 0);
     }
 
     selected = function (instance, cell, x, y, value) {
@@ -1180,12 +1318,14 @@ export default class ListTreeComponent extends Component {
                                     }}
                                     validate={validate(validationSchema)}
                                     onSubmit={(values, { setSubmitting, setErrors }) => {
-                                        this.setState({ loading: true }, () => {
-                                            this.copyDeleteTree(this.state.treeId, this.state.treeFlag ? this.state.programId : this.state.datasetIdModal, this.state.treeFlag ? this.state.versionId : 0, this.state.treeFlag ? 2 : 3);
-                                            this.setState({
-                                                isModalOpen: !this.state.isModalOpen,
+                                        if (!this.state.isSubmitClicked) {
+                                            this.setState({ loading: true, isSubmitClicked: true }, () => {
+                                                this.copyDeleteTree(this.state.treeId, this.state.treeFlag ? this.state.programId : this.state.datasetIdModal, this.state.treeFlag ? this.state.versionId : 0, this.state.treeFlag ? 2 : 3);
+                                                this.setState({
+                                                    isModalOpen: !this.state.isModalOpen,
+                                                })
                                             })
-                                        })
+                                        }
 
                                     }}
 
@@ -1353,6 +1493,12 @@ export default class ListTreeComponent extends Component {
                                                             </FormGroup>
                                                         </FormGroup>
                                                     </div>
+
+                                                    <div className="col-md-12" style={{ display: 'inline-block' }}>
+                                                        {(!this.state.treeFlag && this.state.treeTemplate != "") && <><div><b>Missing Planning Units:</b></div><br /></>}
+                                                        <div id="missingPUJexcel" className="RowClickable">
+                                                        </div>
+                                                    </div>
                                                     <FormGroup className="col-md-12 float-right pt-lg-4">
                                                         <Button type="button" color="danger" className="mr-1 float-right" size="md" onClick={this.modelOpenClose}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                                         <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
@@ -1360,6 +1506,7 @@ export default class ListTreeComponent extends Component {
 
                                                     </FormGroup>
                                                 </div>
+
                                                 {/* <CardFooter>
                                                         <FormGroup>
                                                             <Button type="button" color="danger" className="mr-1 float-right" size="md" onClick={this.modelOpenClose}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
@@ -1380,7 +1527,7 @@ export default class ListTreeComponent extends Component {
 
                 </Card>
 
-            </div>
+            </div >
         );
     }
 }

@@ -1,7 +1,7 @@
 import moment from 'moment';
 
 export function calculateModelingData(dataset, props, page, nodeId, scenarioId, type, treeId, isTemplate) {
-    console.log("modelling dataset---", nodeId);
+    console.log("modelling dataset---", dataset);
     // console.log("modeling nodeId---", nodeId);
     // console.log("modelling scenarioId---", scenarioId);
     nodeId = -1;
@@ -398,6 +398,14 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                 }
                             }
                             calculatedValue = totalValue;
+                            var lag = nodeDataMapForScenario.fuNode.lagInMonths;
+                            console.log("Lag in months++++", lag);
+                            if (i >= lag) {
+                                // calculatedValue = 0;
+                            } else {
+                                calculatedValue = 0;
+                            }
+
                         }
                         if (payload.nodeType.id == 5) {
                             if (!isTemplate) {

@@ -924,7 +924,7 @@ class usageTemplate extends Component {
             data: data,
             columnDrag: true,
             freezeColumns: 2,
-            colWidths: [100, 100, 100, 100, 150, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 120],
+            // colWidths: [100, 100, 100, 100, 150, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 120],
             columns: [
 
                 {
@@ -936,16 +936,19 @@ class usageTemplate extends Component {
                     title: i18n.t('static.forecastProgram.forecastProgram'),
                     type: 'autocomplete',
                     source: this.state.typeList,
+                    width:'130',
                     filter: this.filterDataset //1 B
                 },
                 {
                     title: i18n.t('static.usageTemplate.usageName'),
                     type: 'text',
+                    width:'150',
                     textEditor: true,//2 C
                 },
                 {
                     title: i18n.t('static.tracercategory.tracercategory'),
                     type: 'autocomplete',
+                    width:'150',
                     source: this.state.tracerCategoryList, //3 D
                     filter: this.filterTracerCategoryByProgramId
 
@@ -953,17 +956,20 @@ class usageTemplate extends Component {
                 {
                     title: i18n.t('static.product.unit1'),
                     type: 'autocomplete',
+                    width:'150',
                     source: this.state.forecastingUnitList,
                     filter: this.filterForecastingUnitBasedOnTracerCategory //4 E
                 },
                 {
                     title: i18n.t('static.usageTemplate.lagInMonth'),
                     type: 'numeric',
+                    width:'150',
                     textEditor: true, //5 F
                 },
                 {
                     title: i18n.t('static.supplyPlan.type'),
                     type: 'dropdown',
+                    width:'100',
                     source: [
                         { id: 1, name: i18n.t('static.usageTemplate.discrete') },
                         { id: 2, name: i18n.t('static.usageTemplate.continuous') }
@@ -973,6 +979,7 @@ class usageTemplate extends Component {
                     title: i18n.t('static.usageTemplate.people'),
                     type: 'hidden',
                     readOnly: true,
+                    width:'130',
                     textEditor: true, //7 H
                 },
                 {
@@ -982,6 +989,7 @@ class usageTemplate extends Component {
                     // readOnly: true
                     textEditor: true, //8 I
                     mask: '#,##',
+                    width:'130',
                     disabledMaskOnEdition: true
                 },
                 // {
@@ -994,17 +1002,20 @@ class usageTemplate extends Component {
                 {
                     title: 'Person(s) Unit',
                     type: 'autocomplete',
+                    width:'130',
                     source: this.state.dimensionList, //9 J
                 },
                 {
                     title: i18n.t('static.usageTemplate.fuPerPersonPerTime'),
                     type: 'hidden',
                     readOnly: true,
+                    width:'130',
                     textEditor: true, //10 K
                 },
                 {
                     title: i18n.t('static.usageTemplate.fuPerPersonPerTime'),
                     type: 'numeric',
+                    width:'130',
                     // readOnly: true
                     textEditor: true, //11 L
                 },
@@ -1012,17 +1023,20 @@ class usageTemplate extends Component {
                     title: i18n.t('static.usageTemplate.fuPerPersonPerTime'),
                     type: 'hidden',
                     readOnly: true,
+                    width:'130',
                     source: this.state.unitList, //12 M
                 },
                 {
                     title: i18n.t('static.usageTemplate.fuPerPersonPerTime'),
                     type: 'hidden',//hidden black
                     readOnly: true,
+                    width:'130',
                     textEditor: true, //13 N
                 },
                 {
                     title: i18n.t('static.usageTemplate.onTimeUsage?'),
                     type: 'checkbox',
+                    width:'130',
                     readOnly: false
                     // readOnly: true //14 O
                 },
@@ -1030,6 +1044,7 @@ class usageTemplate extends Component {
                     // title: i18n.t('static.usageTemplate.usageFrequency'),
                     title: '# of times/Frequency',
                     type: 'numeric',
+                    width:'130',
                     // readOnly: true
                     textEditor: true,
                     decimal: '.', //15 P
@@ -1038,12 +1053,14 @@ class usageTemplate extends Component {
                     title: i18n.t('static.usageTemplate.usageFrequency'),
                     type: 'hidden',
                     readOnly: true,
+                    width:'130',
                     textEditor: true, //16 Q
                 },
                 {
                     // title: i18n.t('static.usageTemplate.usageFrequency'),
                     title: 'Frequency',
                     type: 'autocomplete',
+                    width:'130',
                     source: this.state.usagePeriodList, //17 R
                     filter: this.filterUsagePeriod1
                 },
@@ -1051,17 +1068,20 @@ class usageTemplate extends Component {
                     title: i18n.t('static.usageTemplate.fuPerPersonPerMonth'),
                     type: 'hidden',//hidden black
                     readOnly: true,
+                    width:'130',
                     textEditor: true, //18 S
                 },
                 {
                     title: ' ',//empty for
                     type: 'hidden',
                     readOnly: true,
+                    width:'130',
                     textEditor: true, //19 T
                 },
                 {
                     title: i18n.t('static.usagePeriod.usagePeriod'),
                     type: 'numeric',
+                    width:'130',
                     // readOnly: true
                     textEditor: true, //20 U
                 },
@@ -1069,6 +1089,7 @@ class usageTemplate extends Component {
                     // title: i18n.t('static.usagePeriod.usagePeriod'),
                     title: 'Period Unit',
                     type: 'autocomplete',
+                    width:'130',
                     source: this.state.usagePeriodList, //21 V
                     filter: this.filterUsagePeriod2
                 },
@@ -1076,13 +1097,14 @@ class usageTemplate extends Component {
                     title: i18n.t('static.usagePeriod.fuRequired'),
                     type: 'text',//hidden black
                     readOnly: true,
+                    width:'130',
                     textEditor: true, //22 W
                 },
                 {
                     title: i18n.t('static.usagePeriod.usageInWords'),
                     type: 'text',
                     readOnly: true,
-                    width: 200,
+                    width: 180,
                     textEditor: true, //23 X
                 },
                 {
@@ -1811,16 +1833,57 @@ class usageTemplate extends Component {
         var asterisk = document.getElementsByClassName("resizable")[0];
         var tr = asterisk.firstChild;
         // tr.children[1].classList.add('AsteriskTheadtrTd');
-        tr.children[2].classList.add('AsteriskTheadtrTd');
-        tr.children[3].classList.add('AsteriskTheadtrTd');
+        // tr.children[2].classList.add('AsteriskTheadtrTd');
+        // tr.children[3].classList.add('AsteriskTheadtrTd');
         tr.children[4].classList.add('AsteriskTheadtrTd');
         tr.children[5].classList.add('AsteriskTheadtrTd');
-        tr.children[6].classList.add('AsteriskTheadtrTd');
-        tr.children[7].classList.add('AsteriskTheadtrTd');
+        // tr.children[6].classList.add('AsteriskTheadtrTd');
+        // tr.children[7].classList.add('AsteriskTheadtrTd');
 
         tr.children[16].classList.add('CalculatorTheadtr');
         tr.children[17].classList.add('CalculatorTheadtr');
         tr.children[18].classList.add('CalculatorTheadtr');
+
+
+        tr.children[2].classList.add('InfoTrAsteriskTheadtrTd');
+        tr.children[3].classList.add('InfoTrAsteriskTheadtrTd');
+        tr.children[6].classList.add('InfoTrAsteriskTheadtrTd');
+        tr.children[7].classList.add('InfoTrAsteriskTheadtrTd');
+        tr.children[8].classList.add('InfoTr');
+        tr.children[9].classList.add('InfoTr');
+        tr.children[10].classList.add('InfoTr');
+        tr.children[11].classList.add('InfoTr');
+        tr.children[12].classList.add('InfoTr');
+        tr.children[13].classList.add('InfoTr');
+        tr.children[14].classList.add('InfoTr');
+        tr.children[15].classList.add('InfoTr');
+        tr.children[16].classList.add('InfoTr');
+        tr.children[17].classList.add('InfoTr');
+        tr.children[18].classList.add('InfoTr');
+        tr.children[19].classList.add('InfoTr');
+        tr.children[20].classList.add('InfoTr');
+        tr.children[21].classList.add('InfoTr');
+        tr.children[22].classList.add('InfoTr');
+        tr.children[23].classList.add('InfoTr');
+        tr.children[24].classList.add('InfoTr');
+
+        tr.children[2].title = i18n.t('static.tooltip.ForecastProgram');
+        tr.children[3].title = i18n.t('static.tooltip.UsageName');
+        tr.children[6].title = i18n.t('static.tooltip.LagInMonth');
+        tr.children[7].title = i18n.t('static.tooltip.UsageType');
+        tr.children[9].title = i18n.t('static.tooltip.Persons');
+        tr.children[10].title = i18n.t('static.tooltip.PersonsUnit');
+        tr.children[12].title = i18n.t('static.tooltip.FUPersonTime');
+        tr.children[15].title = i18n.t('static.tooltip.OneTimeUsage');
+        tr.children[16].title = i18n.t('static.tooltip.OfTimeFreqwency');
+        tr.children[18].title = i18n.t('static.tooltip.Freqwency');
+        tr.children[21].title = i18n.t('static.tooltip.UsagePeriod');
+        tr.children[22].title = i18n.t('static.tooltip.PeriodUnit');
+        tr.children[23].title = i18n.t('static.tooltip.OfFuRequired');
+        tr.children[24].title = i18n.t('static.tooltip.UsageInWords');
+       
+
+
     }
     // -----------start of changed function
     changed = function (instance, cell, x, y, value) {
@@ -2921,12 +2984,13 @@ class usageTemplate extends Component {
                     <CardBody className="p-0">
 
                         <Col xs="12" sm="12">
-                            <h5>{i18n.t('static.common.customWarningMessage')}</h5>
+                            {/* <h5>{i18n.t('static.common.customWarningMessage')}</h5> */}
+                            <h5>{'[Placeholder]'}</h5>
                             <h5>{i18n.t('static.usageTemplate.usageTemplateText')}</h5>
                             <span className=""><h5><i class="fa fa-calculator" aria-hidden="true"></i>  {i18n.t('static.usageTemplate.calculatorReminderText')}</h5></span>
                             <div className="UsageTemplateTable">
-                            <div id="paputableDiv" className="table-responsive consumptionDataEntryTable" style={{ display: this.state.loading ? "none" : "block" }}>
-                            </div>
+                                <div id="paputableDiv" className="table-responsive consumptionDataEntryTable" style={{ display: this.state.loading ? "none" : "block" }}>
+                                </div>
                             </div>
                             <div style={{ display: this.state.loading ? "block" : "none" }}>
                                 <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >

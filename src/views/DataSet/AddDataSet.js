@@ -40,6 +40,7 @@ let initialValues = {
     programCode1: '',
     userId: '',
     programNotes: '',
+    forecastProgramInMonth: ''
 }
 
 const validationSchema = function (values) {
@@ -61,6 +62,9 @@ const validationSchema = function (values) {
             .required(i18n.t('static.program.validmanagertext')),
         regionId: Yup.string()
             .required(i18n.t('static.program.validRegionstext')),
+        forecastProgramInMonth: Yup.string()
+            .matches(/^[0-9]{0,5}$/, 'Forecast period should not contain negative number, decimal numbers, characters & special symbols')
+            .required('Enter forecast period (months)'),
     })
 }
 
@@ -827,6 +831,7 @@ export default class AddForecastProgram extends Component {
             regionId: true,
             userId: true,
             healthAreaId: true,
+            forecastProgramInMonth: true
 
         }
         )
@@ -926,6 +931,7 @@ export default class AddForecastProgram extends Component {
                                     programCode1: this.state.uniqueCode,
                                     userId: this.state.program.programManager.userId,
                                     programNotes: this.state.program.programNotes,
+                                    forecastProgramInMonth: this.state.forecastProgramInMonth
                                 }}
                                 validate={validate(validationSchema)}
 
@@ -1228,17 +1234,19 @@ export default class AddForecastProgram extends Component {
                                                 </FormGroup>
 
                                                 <FormGroup>
-                                                    <Label htmlFor="company">{i18n.t('static.versionSettings.ForecastPeriodInMonth')}</Label>
+                                                    <Label htmlFor="company">{i18n.t('static.versionSettings.ForecastPeriodInMonth')}<span class="red Reqasterisk">*</span></Label>
                                                     <Input
                                                         type="number" name="forecastProgramInMonth"
                                                         bsSize="sm"
                                                         onChange={(e) => { this.dataChange(e) }}
+                                                        valid={!errors.forecastProgramInMonth && this.state.forecastProgramInMonth != ''}
+                                                        invalid={touched.forecastProgramInMonth && !!errors.forecastProgramInMonth}
                                                         // onBlur={handleBlur}
                                                         onBlur={(e) => { handleBlur(e); this.calculateForecastProgramInMonth() }}
                                                         value={this.state.forecastProgramInMonth}
                                                         id="forecastProgramInMonth" />
-                                                    {/* <FormFeedback>{errors.forecastProgramInMonth}</FormFeedback> */}
-                                                    <h5 className="red">{this.state.message1}</h5>
+                                                    {/* <h5 className="red">{this.state.message1}</h5> */}
+                                                    <FormFeedback>{errors.forecastProgramInMonth}</FormFeedback>
                                                 </FormGroup>
 
                                                 <FormGroup>

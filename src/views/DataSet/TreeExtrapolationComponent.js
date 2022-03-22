@@ -58,7 +58,7 @@ const validationSchemaExtrapolation = function (values) {
             Yup.string().test('seasonalityId', 'Please enter a valid whole number between 1 & 24.',
                 function (value) {
                     console.log("***3**", document.getElementById("smoothingId").value);
-                    var testNumber = document.getElementById("seasonalityId").value != "" ? SEASONALITY_REGEX.test(document.getElementById("seasonalityId").value) : false;
+                    var testNumber = document.getElementById("seasonalityId").value != "" ? (/^(?:[1-9]|[1][0-9]|2[0-4])$/).test(document.getElementById("seasonalityId").value) : false;
                     // console.log("*****", testNumber);
                     if ((document.getElementById("smoothingId").value) == "true" && (document.getElementById("seasonalityId").value == "" || testNumber == false)) {
                         return false;
@@ -70,7 +70,7 @@ const validationSchemaExtrapolation = function (values) {
             Yup.string().test('gammaId', 'Please enter correct gamma value.',
                 function (value) {
                     console.log("***4**", document.getElementById("smoothingId").value);
-                    var testNumber = document.getElementById("gammaId").value != "" ? (/^\d{0,3}(\.\d{1,2})?$/).test(document.getElementById("gammaId").value) : false;
+                    var testNumber = document.getElementById("gammaId").value != "" ? (/^(?:(?:[0])(?:\.\d{1,2})?|1(?:\.0\d{0,1})?)$/).test(document.getElementById("gammaId").value) : false;
                     // console.log("*****", testNumber);
                     if ((document.getElementById("smoothingId").value) == "true" && (document.getElementById("gammaId").value == "" || testNumber == false)) {
                         return false;
@@ -82,7 +82,7 @@ const validationSchemaExtrapolation = function (values) {
             Yup.string().test('betaId', 'Please enter correct beta value.',
                 function (value) {
                     console.log("***5**", document.getElementById("smoothingId").value);
-                    var testNumber = document.getElementById("betaId").value != "" ? (/^\d{0,3}(\.\d{1,2})?$/).test(document.getElementById("betaId").value) : false;
+                    var testNumber = document.getElementById("betaId").value != "" ? (/^(?:(?:[0])(?:\.\d{1,2})?|1(?:\.0\d{0,1})?)$/).test(document.getElementById("betaId").value) : false;
                     // console.log("*****", testNumber);
                     if ((document.getElementById("smoothingId").value) == "true" && (document.getElementById("betaId").value == "" || testNumber == false)) {
                         return false;
@@ -94,7 +94,7 @@ const validationSchemaExtrapolation = function (values) {
             Yup.string().test('alphaId', 'Please enter correct alpha value.',
                 function (value) {
                     console.log("***6**", document.getElementById("smoothingId").value);
-                    var testNumber = document.getElementById("alphaId").value != "" ? (/^\d{0,3}(\.\d{1,2})?$/).test(document.getElementById("alphaId").value) : false;
+                    var testNumber = document.getElementById("alphaId").value != "" ? (/^(?:(?:[0])(?:\.\d{1,2})?|1(?:\.0\d{0,1})?)$/).test(document.getElementById("alphaId").value) : false;
                     // console.log("*****", testNumber);
                     if ((document.getElementById("smoothingId").value) == "true" && (document.getElementById("alphaId").value == "" || testNumber == false)) {
                         return false;
@@ -2793,7 +2793,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                     <div className="check inline pl-lg-3 pt-lg-2">
                                                         <div className="row pl-lg-1 pb-lg-2">
                                                             <div>
-                                                                <Popover placement="top" isOpen={this.state.popoverOpenMa} target="Popover1" trigger="hover" toggle={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)}>
+                                                                <Popover placement="top" isOpen={this.state.popoverOpenMa} target="Popover4" trigger="hover" toggle={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)}>
                                                                     <PopoverBody>{i18n.t('static.tooltip.MovingAverages')}</PopoverBody>
                                                                 </Popover>
                                                             </div>
@@ -2811,7 +2811,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                                     className="form-check-label"
                                                                     check htmlFor="inline-radio2" style={{ fontSize: '12px', marginTop: '2px' }}>
                                                                     <b>Moving Averages</b>
-                                                                    <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
+                                                                    <i class="fa fa-info-circle icons pl-lg-2" id="Popover4" onClick={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
                                                                 </Label>
                                                             </div>
                                                             {/* {this.state.movingAvgId && */}
@@ -2824,6 +2824,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                                         bsSize="sm"
                                                                         id="noOfMonthsId"
                                                                         name="noOfMonthsId"
+                                                                        step={1}
                                                                         value={this.state.monthsForMovingAverage}
                                                                         valid={!errors.noOfMonthsId && this.state.monthsForMovingAverage != null ? this.state.monthsForMovingAverage : '' != ''}
                                                                         invalid={touched.noOfMonthsId && !!errors.noOfMonthsId}
@@ -2944,10 +2945,13 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                                         <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.seasonality')} <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenTes', !this.state.popoverOpenTes)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                                                         <Input
                                                                             className="controls"
-                                                                            type="text"
+                                                                            type="number"
                                                                             bsSize="sm"
                                                                             id="seasonalityId"
                                                                             name="seasonalityId"
+                                                                            min={1}
+                                                                            max={24}
+                                                                            step={1}
                                                                             value={this.state.noOfMonthsForASeason}
                                                                             valid={!errors.seasonalityId && this.state.noOfMonthsForASeason != null ? this.state.noOfMonthsForASeason : '' != ''}
                                                                             invalid={touched.seasonalityId && !!errors.seasonalityId}
@@ -2978,10 +2982,13 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                                         <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.alpha')} <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenTes', !this.state.popoverOpenTes)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                                                         <Input
                                                                             className="controls"
-                                                                            type="text"
+                                                                            type="number"
                                                                             id="alphaId"
                                                                             bsSize="sm"
                                                                             name="alphaId"
+                                                                            min={0}
+                                                                            max={1}
+                                                                            step={0.1}
                                                                             value={this.state.alpha}
                                                                             valid={!errors.alphaId && this.state.alpha != null ? this.state.alpha : '' != ''}
                                                                             invalid={touched.alphaId && !!errors.alphaId}
@@ -2997,10 +3004,13 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                                         <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.beta')} <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenTes', !this.state.popoverOpenTes)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                                                         <Input
                                                                             className="controls"
-                                                                            type="text"
+                                                                            type="number"
                                                                             id="betaId"
                                                                             bsSize="sm"
                                                                             name="betaId"
+                                                                            min={0}
+                                                                            max={1}
+                                                                            step={0.1}
                                                                             value={this.state.beta}
                                                                             valid={!errors.betaId && this.state.beta != null ? this.state.beta : '' != ''}
                                                                             invalid={touched.betaId && !!errors.betaId}
@@ -3016,10 +3026,13 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                                         <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.gamma')} <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenTes', !this.state.popoverOpenTes)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                                                         <Input
                                                                             className="controls"
-                                                                            type="text"
+                                                                            type="number"
                                                                             bsSize="sm"
                                                                             id="gammaId"
                                                                             name="gammaId"
+                                                                            min={0}
+                                                                            max={1}
+                                                                            step={0.1}
                                                                             value={this.state.gamma}
                                                                             valid={!errors.gammaId && this.state.gamma != null ? this.state.gamma : '' != ''}
                                                                             invalid={touched.gammaId && !!errors.gammaId}
@@ -3066,7 +3079,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                                         <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.p')} <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenTes', !this.state.popoverOpenTes)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                                                         <Input
                                                                             className="controls"
-                                                                            type="text"
+                                                                            type="number"
                                                                             id="pId"
                                                                             bsSize="sm"
                                                                             name="pId"
@@ -3085,7 +3098,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                                         <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.d')}</Label>
                                                                         <Input
                                                                             className="controls"
-                                                                            type="text"
+                                                                            type="number"
                                                                             id="dId"
                                                                             bsSize="sm"
                                                                             name="dId"
@@ -3104,7 +3117,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                                         <Label htmlFor="appendedInputButton">q <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenTes', !this.state.popoverOpenTes)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                                                         <Input
                                                                             className="controls"
-                                                                            type="text"
+                                                                            type="number"
                                                                             id="qId"
                                                                             bsSize="sm"
                                                                             name="qId"

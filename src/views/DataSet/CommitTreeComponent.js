@@ -542,6 +542,7 @@ export default class CommitTreeComponent extends React.Component {
                             programJson.currentVersion.versionType = { id: document.getElementById("versionTypeId").value };
                             programJson.currentVersion.notes = document.getElementById("notes").value;;
                             console.log("ProgramJson+++", programJson);
+                            console.log("this.state.comparedLatestVersion----",this.state.comparedLatestVersion);
                             //create saveDatasetData in ProgramService
                             DatasetService.saveDatasetData(programJson, this.state.comparedLatestVersion).then(response => {
                                 if (response.status == 200) {
@@ -715,7 +716,7 @@ export default class CommitTreeComponent extends React.Component {
         let missingMonths = missingMonthList.length > 0 ? missingMonthList.map((item, i) => {
             return (
                 <li key={i}>
-                    <div><span><div className="hoverDiv" onClick={() => missingMonthsClicked(item.planningUnitId, this)}>{getLabelText(item.planningUnitLabel, this.state.lang) + " - " + getLabelText(item.regionLabel, this.state.lang) + ": "}</div>{"" + item.monthsArray}</span></div>
+                    <div className="hoverDiv" onClick={() => missingMonthsClicked(item.planningUnitId, this)}><span>{getLabelText(item.planningUnitLabel, this.state.lang) + " - " + getLabelText(item.regionLabel, this.state.lang) + ": "}</span></div>{"" + item.monthsArray}
                 </li>
             )
         }, this) : <span>{i18n.t('static.forecastValidation.noMissingGaps')}</span>;
@@ -725,7 +726,7 @@ export default class CommitTreeComponent extends React.Component {
         let consumption = consumptionListlessTwelve.length > 0 ? consumptionListlessTwelve.map((item, i) => {
             return (
                 <li key={i}>
-                    <div><span><div className="hoverDiv" onClick={() => missingMonthsClicked(item.planningUnitId, this)}>{getLabelText(item.planningUnitLabel, this.state.lang) + " - " + getLabelText(item.regionLabel, this.state.lang) + ": "}</div></span><span>{item.noOfMonths + " month(s)"}</span></div>
+                    <div className="hoverDiv" onClick={() => missingMonthsClicked(item.planningUnitId, this)}><span>{getLabelText(item.planningUnitLabel, this.state.lang) + " - " + getLabelText(item.regionLabel, this.state.lang) + ": "}</span></div><span>{item.noOfMonths + " month(s)"}</span>
                 </li>
             )
         }, this) : <span>{i18n.t('static.forecastValidation.noMonthsHaveLessData')}</span>;
@@ -751,7 +752,7 @@ export default class CommitTreeComponent extends React.Component {
                             return (
                                 <ul>
                                     <li key={j}>
-                                        <div><span className={item1.payload.nodeType.id == 4 ? "redColor" : ""}>{getLabelText(item1.payload.label, this.state.lang)}</span></div>
+                                        <div><span className={item1.payload.nodeType.id == 4 ? "redColor" : ""}>{getLabelText(item1.payload.label, this.state.lang)==""?i18n.t('static.forecastValidation.editMe'):getLabelText(item1.payload.label, this.state.lang)}</span></div>
                                     </li>
                                 </ul>
                             )

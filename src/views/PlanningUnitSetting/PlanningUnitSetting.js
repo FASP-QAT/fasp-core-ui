@@ -37,7 +37,7 @@ import {
     Col,
     Row,
     CardFooter,
-    Table, FormGroup, Input, InputGroup, InputGroupAddon, Label, Form, Modal, ModalHeader, ModalFooter, ModalBody, Button
+    Table, FormGroup, Input, InputGroup, InputGroupAddon, Label, Form, Modal, ModalHeader, ModalFooter, ModalBody, Popover, PopoverBody, PopoverHeader , Button
 } from 'reactstrap';
 import NumberFormat from 'react-number-format';
 
@@ -78,6 +78,7 @@ export default class PlanningUnitSetting extends Component {
         var dt1 = new Date();
         dt1.setMonth(dt1.getMonth() + REPORT_DATEPICKER_END_MONTH);
         this.state = {
+            popoverOpenProgramSetting: false,
             rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: dt1.getFullYear(), month: dt1.getMonth() + 1 } },
             minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
             maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
@@ -102,6 +103,7 @@ export default class PlanningUnitSetting extends Component {
             isChanged1: false
 
         }
+        this.toggleProgramSetting = this.toggleProgramSetting.bind(this);
         this.changed = this.changed.bind(this);
         this.getDatasetList = this.getDatasetList.bind(this);
         this.filterData = this.filterData.bind(this);
@@ -631,6 +633,10 @@ export default class PlanningUnitSetting extends Component {
         if (x == 8) {
             var col = ("I").concat(parseInt(y) + 1);
             this.el.setValueFromCoords(10, y, 1, true);
+            value = this.el.getValue(`I${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+            if (value == '' || value == null) {
+                value = this.el.getValueFromCoords(8, y);
+            }
             // value = this.el.getValue(`I${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             // var reg = DECIMAL_NO_REGEX;
             var reg = JEXCEL_DECIMAL_CATELOG_PRICE;
@@ -1881,7 +1887,13 @@ export default class PlanningUnitSetting extends Component {
         tr.children[5].classList.add('InfoTr');
         tr.children[6].classList.add('InfoTr');
         tr.children[7].classList.add('InfoTr');
-        // tr.children[8].classList.add('InfoTr');
+
+        
+        tr.children[5].title = i18n.t('static.tooltip.Stock');
+        tr.children[6].title = i18n.t('static.tooltip.ExistingShipments');
+        tr.children[7].title = i18n.t('static.tooltip.DesiredMonthsofStock');
+        tr.children[8].title = i18n.t('static.tooltip.PriceType');
+
 
     }
 
@@ -2358,6 +2370,14 @@ export default class PlanningUnitSetting extends Component {
         );
     };
 
+    toggleProgramSetting() {
+        this.setState({
+          popoverOpenProgramSetting: !this.state.popoverOpenProgramSetting,
+        });
+      }
+    
+      
+
     render() {
 
         const { SearchBar, ClearSearchButton } = Search;
@@ -2400,13 +2420,18 @@ export default class PlanningUnitSetting extends Component {
                     </div>
 
                     <CardBody className="pb-lg-3 pt-lg-0">
-                        <div className="TableCust" >
+                        <div className="" >
                             <div ref={ref}>
 
                                 <Col md="12 pl-0">
                                     <div className="row">
+                                    <div>
+                                                                <Popover placement="top" isOpen={this.state.popoverOpenProgramSetting} target="Popover2" trigger="hover" toggle={this.toggleProgramSetting}>
+                                                                    <PopoverBody>{i18n.t('static.tooltip.planningProgramSetting')} </PopoverBody>
+                                                                </Popover>
+                                                            </div>
                                         <FormGroup className="col-md-3">
-                                            <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
+                                            <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')} <i class="fa fa-info-circle icons pl-lg-2" id="Popover2" onClick={this.toggleProgramSetting} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                             <div className="controls ">
                                                 <InputGroup>
                                                     <Input
