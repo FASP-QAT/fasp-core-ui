@@ -246,6 +246,16 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                                     "planningUnit": {
                                         "id": selectedPlanningUnitObj.planningUnitId,
                                         "label": selectedPlanningUnitObj.label,
+                                        "forecastingUnit": {
+                                            "id": forecastingUnitObj.forecastingUnitId,
+                                            "label": forecastingUnitObj.label,
+                                            "productCategory": {
+                                                "id": forecastingUnitObj.productCategory.id,
+                                                "label": forecastingUnitObj.productCategory.label,
+                                                "idString": '' + forecastingUnitObj.productCategory.id
+                                            },
+                                            "idString": '' + forecastingUnitObj.forecastingUnitId
+                                        },
                                         "idString": '' + selectedPlanningUnitObj.planningUnitId,
                                     },
                                     "region": {

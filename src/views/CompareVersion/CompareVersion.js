@@ -56,6 +56,11 @@ class CompareVersion extends Component {
     setVersionId(e) {
         var versionId = e.target.value;
         localStorage.setItem("sesDatasetVersionId", versionId);
+        localStorage.setItem("sesForecastVersionIdReport", versionId);
+        var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+        var userId = userBytes.toString(CryptoJS.enc.Utf8);
+        localStorage.setItem("sesDatasetId", parseInt(localStorage.getItem("sesForecastProgramIdReport")) + '_v' + (versionId).replace('(Local)', '').trim() + '_uId_' + userId);
+        console.log("In datasetId@@@", localStorage.getItem("sesDatasetId"));
         this.setState({
             versionId: versionId,
             versionList1: [],
@@ -81,10 +86,11 @@ class CompareVersion extends Component {
     setDatasetId(e) {
         var datasetId = e.target.value;
         localStorage.setItem("sesLiveDatasetId", datasetId);
+        localStorage.setItem("sesForecastProgramIdReport", parseInt(datasetId));
         this.setState({
             datasetId: datasetId,
             versionList: [],
-            versionList1:[],
+            versionList1: [],
             versionId: "",
             versionId1: ""
         }, () => {
@@ -181,7 +187,7 @@ class CompareVersion extends Component {
         } else {
             this.setState({
                 versionList: [],
-                versionList1:[],
+                versionList1: [],
                 versionId: "",
                 versionId1: "",
                 firstDataSet: 0,
@@ -214,7 +220,7 @@ class CompareVersion extends Component {
             for (var v = 0; v < newVList.length; v++) {
                 versionList.push(newVList[v].versionId)
             }
-            versionList=versionList.filter(c=>c!=this.state.versionId);
+            versionList = versionList.filter(c => c != this.state.versionId);
 
             var versionId1 = "";
             var event1 = {
@@ -253,7 +259,7 @@ class CompareVersion extends Component {
         } else {
             this.setState({
                 versionList: [],
-                versionList1:[],
+                versionList1: [],
                 versionId: "",
                 versionId1: "",
                 firstDataSet: 0,
@@ -546,7 +552,7 @@ class CompareVersion extends Component {
                 )
             }, this);
 
-            const { versionList1 } = this.state;
+        const { versionList1 } = this.state;
         let versions1 = versionList1.length > 0
             && versionList1.map((item, i) => {
                 return (
