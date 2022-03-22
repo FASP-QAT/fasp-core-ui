@@ -436,7 +436,7 @@ class ConsumptionForecastError extends Component {
         var a = document.createElement("a")
         a.href = 'data:attachment/csv,' + csvString
         a.target = "_Blank"
-        a.download = this.state.programs.filter(c => c.programId == this.state.programId)[0].programCode+ "-" + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text)+"-"+'Consumption Forecast Error'+ ".csv"
+        a.download = this.state.programs.filter(c => c.programId == this.state.programId)[0].programCode + "-" + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text) + "-" + 'Consumption Forecast Error' + ".csv"
         document.body.appendChild(a)
         a.click();
 
@@ -950,12 +950,12 @@ class ConsumptionForecastError extends Component {
                             } else {//forecastingUnitId
 
                                 //actual
-                                let actualConsumptionList1 = actualConsumptionList.filter(c => c.planningUnit.id == planningUnitId);
-                                console.log("Test------------>1.1", actualConsumptionList1);
+                                let actualConsumptionList1 = actualConsumptionList.filter(c => c.planningUnit.forecastingUnit.id == forecastingUnitId);
+                                console.log("Test------------>1.1 FU", actualConsumptionList1);
                                 let actualConsumptionList2 = actualConsumptionList1.map(m => {
                                     return {
                                         consumptionDate: m.month,
-                                        consumptionQty: m.amount,
+                                        consumptionQty: m.amount * m.planningUnit.multiplier,
                                         region: { regionId: m.region.id },
                                         actualFlag: true
                                     }
@@ -970,8 +970,137 @@ class ConsumptionForecastError extends Component {
 
 
                                 consumptionData = consumptionData.concat(actualConsumptionList3);
-                                console.log("Test------------>22", consumptionData);
+                                console.log("Test------------>22 FU", consumptionData);
                                 //end actual
+
+
+                                //forecast start
+                                let filteredPlanningUnitList = filteredProgram.planningUnitList.filter(c => c.planningUnit.forecastingUnit.id == forecastingUnitId);
+                                console.log("Test------------>499 FU", filteredPlanningUnitList);
+                                for (let k = 0; k < filteredPlanningUnitList.length; k++) {
+                                    console.log("Test------------>500 FU", filteredPlanningUnitList[k]);
+                                    let planningUniObj = filteredPlanningUnitList[k];
+                                    let selectedForecastMap = planningUniObj.selectedForecastMap;
+                                    let selectedForecastMapObjIn = (selectedForecastMap[Object.keys(selectedForecastMap)[0]]);
+
+                                    if (selectedForecastMapObjIn != undefined && selectedForecastMapObjIn != null && selectedForecastMapObjIn != '') {
+                                        let consumptionExtrapolationId = selectedForecastMapObjIn.consumptionExtrapolationId;
+                                        console.log("Test------------>501 FU", consumptionExtrapolationId);
+                                        if (consumptionExtrapolationId != null) {
+                                            console.log("Test------------>502 FU", consumptionExtrapolationId);
+                                            let consumptionExtrapolationObj = consumptionExtrapolation.filter(c => c.consumptionExtrapolationId == consumptionExtrapolationId);
+                                            console.log("Test------------>503 FU", consumptionExtrapolationObj);
+                                            if (consumptionExtrapolationObj.length > 0) {
+                                                console.log("Test------------>504 FU", consumptionExtrapolationObj);
+                                                let regionId = consumptionExtrapolationObj[0].region.id;
+                                                let consumptionList = consumptionExtrapolationObj[0].extrapolationDataList.map(m => {
+                                                    return {
+                                                        consumptionDate: m.month,
+                                                        consumptionQty: m.amount * consumptionExtrapolationObj[0].planningUnit.multiplier,
+                                                        region: { regionId: regionId },
+                                                        actualFlag: false
+                                                    }
+                                                });
+                                                console.log("Test------------>2.1 FU", planningUniObj.planningUnit.id);
+                                                console.log("Test------------>2.2 FU", consumptionList);
+
+                                                //filter based on region
+                                                let actualConsumptionList3 = [];
+                                                for (let j = 0; j < regionIds.length; j++) {
+                                                    let tempList = consumptionList.filter(c => c.region.regionId == regionIds[j]);
+                                                    actualConsumptionList3 = actualConsumptionList3.concat(tempList);
+                                                }
+
+
+                                                consumptionData = consumptionData.concat(actualConsumptionList3);
+
+                                            }
+                                        }
+                                    }
+                                }
+                                console.log("Test------------>333 FU", consumptionData);
+                                //end forecast
+
+
+
+                                let regionIdArr = regionIds.map(c => parseInt(c))
+
+                                //start WAPE
+                                let forecast = monthArrayList.map(item => {
+                                    var cd = consumptionData.filter(c => moment(c.consumptionDate).format("YYYY-MM-DD") == moment(item).format("YYYY-MM-DD") && !c.actualFlag && regionIdArr.includes(c.region.regionId));
+                                    var sum = 0;
+                                    cd.map(c => { sum += c.consumptionQty });
+                                    // return (<td><b>{sum}</b></td>)
+                                    return sum;
+                                });
+
+                                let actual = monthArrayList.map(item => {
+                                    var cd = consumptionData.filter(c => moment(c.consumptionDate).format("YYYY-MM-DD") == moment(item).format("YYYY-MM-DD") && c.actualFlag && regionIdArr.includes(c.region.regionId));
+                                    var sum = 0;
+                                    cd.map(c => { sum += c.consumptionQty });
+                                    // return (<td><b>{cd.length > 0 ? sum : "NA"}</b></td>)
+                                    return (cd.length > 0 ? sum : "NA");
+                                });
+
+                                let difference = monthArrayList.map(item => {
+                                    var cd = consumptionData.filter(c => moment(c.consumptionDate).format("YYYY-MM-DD") == moment(item).format("YYYY-MM-DD") && !c.actualFlag && regionIdArr.includes(c.region.regionId));
+                                    var sum = 0;
+                                    cd.map(c => { sum += c.consumptionQty });
+                                    var cd1 = consumptionData.filter(c => moment(c.consumptionDate).format("YYYY-MM-DD") == moment(item).format("YYYY-MM-DD") && c.actualFlag && regionIdArr.includes(c.region.regionId));
+                                    var sum1 = 0;
+                                    cd1.map(c => { sum1 += c.consumptionQty });
+                                    // return (<td><b>{sum1 > 0 ? sum1 - sum : "NA"}</b></td>)
+                                    return (sum1 > 0 ? sum1 - sum : "NA");
+                                });
+
+
+                                let wapeErrorValues = [];
+                                // timeWindowId = timeWindowId;
+                                let numOr0 = n => isNaN(n) ? 0 : n;
+                                for (var i = actual.length - 1; i >= 0; i--) {
+                                    let lastNActual = actual.slice(0, i + 1).slice(-timeWindowId);
+                                    let lastNDifference = difference.slice(0, i + 1).slice(-timeWindowId);
+                                    lastNDifference = lastNDifference.map(s => Math.abs(s));
+
+                                    // let addActual = ((lastNActual.reduce((a, b) => a + b)).toString().includes('NA') == true ? 'NA' : lastNActual.reduce((a, b) => numOr0(a) + numOr0(b)));
+                                    // let addDifference = lastNDifference.reduce((a, b) => numOr0(a) + numOr0(b));
+                                    // ((addActual).toString().includes('NA') == true ? wapeErrorValues.push('NA') : wapeErrorValues.push(Math.round(addDifference / addActual * 100) + " %"));
+
+                                    let addActual = ((lastNActual.reduce((a, b) => a + b)).toString().slice(-2) == "NA" ? 'NA' : lastNActual.reduce((a, b) => numOr0(a) + numOr0(b)));
+                                    let addDifference = lastNDifference.reduce((a, b) => numOr0(a) + numOr0(b));
+                                    ((addActual).toString().includes('NA') == true ? wapeErrorValues.push('NA') : wapeErrorValues.push(Math.round(addDifference / addActual * 100) + " %"));
+
+                                }
+
+                                wapeErrorValues = wapeErrorValues.reverse();
+                                wapeErrorValues.unshift(" ");
+
+                                console.log("WAP----------->forecast FU ", forecast);
+                                console.log("WAP----------->actual FU ", actual);
+                                console.log("WAP----------->difference FU ", difference);
+                                console.log("WAP----------->reverse FU ", wapeErrorValues);
+                                console.log("WAP----------->reverse1 FU ", this.state.regionValues);
+                                console.log("WAP----------->reverse2 FU ", regionIds);
+
+
+                                //end WAPE
+
+                                this.setState({
+                                    // consumptionData: consumptionData,
+                                    // monthArrayList: monthArrayList,
+                                    // regionIdArr: regionIds,
+
+                                    //remove hardcode data
+                                    monthArrayList: monthArrayList,
+                                    // regionListFiltered: [{ label: "East", value: 1 }, { label: "West", value: 2 }, { label: "North", value: 3 }, { label: "South", value: 4 }],
+                                    // regionIdArr: regionIdArr,
+                                    regionListFiltered: this.state.regionValues,
+                                    regionIdArr: regionIds.map(c => parseInt(c)),
+                                    consumptionData: consumptionData,
+                                    errorValues: wapeErrorValues,
+                                    message: ''
+                                    // errorValues: ["39%", "66%", "48%", "32%", "30%", "37%", "32%", "28%", "NA", "NA", "NA", "NA", "NA"]
+                                });
 
 
 
@@ -1626,6 +1755,27 @@ class ConsumptionForecastError extends Component {
         })
     }
 
+    calculateAverage = (value) => {
+        console.log("calculateAverage-------->0", value);
+        if (value.length > 0) {
+            let localValue = value;
+
+            localValue = localValue.filter(v1 => '' + v1 != ' ');
+
+            localValue.forEach((el, i, arr) => {
+                arr[i] = el.toString().replace(/%/g, "").trim();
+            });
+
+            localValue = localValue.map(Number);
+
+            localValue = localValue.filter(value => !Number.isNaN(value));
+
+            const sum = localValue.reduce((a, b) => a + b, 0);
+            const avg = (sum / localValue.length) || 0;
+            return avg.toFixed(1);
+        }
+    }
+
     render() {
 
         var chartOptions = {
@@ -1836,6 +1986,8 @@ class ConsumptionForecastError extends Component {
             return '?'
         }
 
+        let t1 = [];
+        let t2 = [];
         return (
             <div className="animated fadeIn" >
                 <AuthenticationServiceComponent history={this.props.history} />
@@ -2142,21 +2294,28 @@ class ConsumptionForecastError extends Component {
                                                                     <tr>
                                                                         <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                                         <td align="left" className="sticky-col first-col clone" style={{ color: '#8064a2' }}><b>Error*</b></td>
-                                                                        {this.state.errorValues.map(item => (
-                                                                            <td>{item}</td>
-                                                                        ))}
+                                                                        <td>{this.calculateAverage(this.state.errorValues)} %</td>
+                                                                        {this.state.errorValues.map((item, index) => {
+                                                                            return (index == 0 ? '' : <td>{item}</td>)
+                                                                        })}
                                                                     </tr>
                                                                     <tr>
                                                                         <td className="BorderNoneSupplyPlan sticky-col first-col clone1" onClick={() => this.toggleAccordionTotalForecast()}>
                                                                             {this.state.showTotalForecast ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i>}
                                                                         </td>
                                                                         <td align="left" className="sticky-col first-col clone" style={{ color: "#4f81bd" }}><b>{i18n.t('static.consumption.forcast')}</b></td>
-                                                                        {/* <td align="center"><b>39.4</b></td> */}
-                                                                        <td align="center"></td>
+
                                                                         {this.state.monthArrayList.map(item => {
                                                                             var cd = this.state.consumptionData.filter(c => moment(c.consumptionDate).format("YYYY-MM-DD") == moment(item).format("YYYY-MM-DD") && !c.actualFlag && this.state.regionIdArr.includes(c.region.regionId));
                                                                             var sum = 0;
-                                                                            cd.map(c => { sum += c.consumptionQty });
+                                                                            cd.map(c => { sum += parseInt(c.consumptionQty) });
+                                                                            t1.push(sum)
+                                                                        })}
+                                                                        <td align="center">{this.calculateAverage(t1)}</td>
+                                                                        {this.state.monthArrayList.map(item => {
+                                                                            var cd = this.state.consumptionData.filter(c => moment(c.consumptionDate).format("YYYY-MM-DD") == moment(item).format("YYYY-MM-DD") && !c.actualFlag && this.state.regionIdArr.includes(c.region.regionId));
+                                                                            var sum = 0;
+                                                                            cd.map(c => { sum += parseInt(c.consumptionQty) });
                                                                             return (<td><b>{sum}</b></td>)
                                                                         })}
                                                                     </tr>
@@ -2165,10 +2324,17 @@ class ConsumptionForecastError extends Component {
                                                                             <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                                             <td align="left" className="sticky-col first-col clone" style={{ color: "#4f81bd" }}><b>{item1.label}</b></td>
                                                                             {/* <td align="center">9.5</td> */}
-                                                                            <td align="center"></td>
+                                                                            {/* {t1.splice(0, t1.length)} */}
+
+                                                                            {this.state.monthArrayList.map((item, index) => {
+                                                                                t1.splice(0, t1.length)
+                                                                                var cd = this.state.consumptionData.filter(c => moment(c.consumptionDate).format("YYYY-MM-DD") == moment(item).format("YYYY-MM-DD") && !c.actualFlag && c.region.regionId == item1.value);
+                                                                                t2.push(cd.length > 0 ? parseInt(cd[0].consumptionQty) : "NA")
+                                                                            })}
+                                                                            <td align="center">{this.calculateAverage(t2)}</td>
                                                                             {this.state.monthArrayList.map(item => {
                                                                                 var cd = this.state.consumptionData.filter(c => moment(c.consumptionDate).format("YYYY-MM-DD") == moment(item).format("YYYY-MM-DD") && !c.actualFlag && c.region.regionId == item1.value);
-                                                                                return (<td>{cd.length > 0 ? cd[0].consumptionQty : ""}</td>)
+                                                                                return (<td>{cd.length > 0 ? parseInt(cd[0].consumptionQty) : "NA"}</td>)
                                                                             })}
                                                                         </tr>
                                                                     ))}
@@ -2177,12 +2343,20 @@ class ConsumptionForecastError extends Component {
                                                                             {this.state.showTotalActual ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i>}
                                                                         </td>
                                                                         <td align="left" className="sticky-col first-col clone" style={{ color: "#a6a6a6" }}><b>{i18n.t('static.consumption.actual')}</b></td>
-                                                                        {/* <td align="center"><b>41.7</b></td> */}
-                                                                        <td align="center"></td>
+                                                                        {/* {t1.splice(0, t1.length)} */}
+                                                                        {this.state.monthArrayList.map(item => {
+                                                                            t2.splice(0, t2.length)
+                                                                            var cd = this.state.consumptionData.filter(c => moment(c.consumptionDate).format("YYYY-MM-DD") == moment(item).format("YYYY-MM-DD") && c.actualFlag && this.state.regionIdArr.includes(c.region.regionId));
+                                                                            var sum = 0;
+                                                                            cd.map(c => { sum += parseInt(c.consumptionQty) });
+                                                                            t1.push(cd.length > 0 ? sum : "NA")
+                                                                        })}
+                                                                        <td align="center">{this.calculateAverage(t1)}</td>
+                                                                        {/* <td align="center"></td> */}
                                                                         {this.state.monthArrayList.map(item => {
                                                                             var cd = this.state.consumptionData.filter(c => moment(c.consumptionDate).format("YYYY-MM-DD") == moment(item).format("YYYY-MM-DD") && c.actualFlag && this.state.regionIdArr.includes(c.region.regionId));
                                                                             var sum = 0;
-                                                                            cd.map(c => { sum += c.consumptionQty });
+                                                                            cd.map(c => { sum += parseInt(c.consumptionQty) });
                                                                             return (<td><b>{cd.length > 0 ? sum : "NA"}</b></td>)
                                                                         })}
                                                                     </tr>
@@ -2190,11 +2364,16 @@ class ConsumptionForecastError extends Component {
                                                                         <tr className="totalActual">
                                                                             <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                                             <td align="left" className="sticky-col first-col clone" style={{ color: "#a6a6a6" }}><b>{item1.label}</b></td>
-                                                                            {/* <td align="center">{item1.value == 1 ? 8.4 : item1.value == 2 ? 12.4 : item1.value == 3 ? 12.4 : 8.4}</td> */}
-                                                                            <td align="center"></td>
+                                                                            {this.state.monthArrayList.map(item => {
+                                                                                t1.splice(0, t1.length)
+                                                                                var cd = this.state.consumptionData.filter(c => moment(c.consumptionDate).format("YYYY-MM-DD") == moment(item).format("YYYY-MM-DD") && c.actualFlag && c.region.regionId == item1.value);
+                                                                                t2.push(cd.length > 0 ? parseInt(cd[0].consumptionQty) : "NA")
+                                                                            })}
+                                                                            <td align="center">{this.calculateAverage(t2)}</td>
+                                                                            {/* <td align="center"></td> */}
                                                                             {this.state.monthArrayList.map(item => {
                                                                                 var cd = this.state.consumptionData.filter(c => moment(c.consumptionDate).format("YYYY-MM-DD") == moment(item).format("YYYY-MM-DD") && c.actualFlag && c.region.regionId == item1.value);
-                                                                                return (<td>{cd.length > 0 ? cd[0].consumptionQty : ""}</td>)
+                                                                                return (<td>{cd.length > 0 ? parseInt(cd[0].consumptionQty) : "NA"}</td>)
                                                                             })}
                                                                         </tr>
                                                                     ))}
@@ -2203,15 +2382,25 @@ class ConsumptionForecastError extends Component {
                                                                             {this.state.showTotalDifference ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i>}
                                                                         </td>
                                                                         <td align="left" className="sticky-col first-col clone"><b>Difference</b></td>
-                                                                        {/* <td align="center"><b>2.3</b></td> */}
-                                                                        <td align="center"><b></b></td>
+                                                                        {this.state.monthArrayList.map(item => {
+                                                                            t2.splice(0, t2.length)
+                                                                            var cd = this.state.consumptionData.filter(c => moment(c.consumptionDate).format("YYYY-MM-DD") == moment(item).format("YYYY-MM-DD") && !c.actualFlag && this.state.regionIdArr.includes(c.region.regionId));
+                                                                            var sum = 0;
+                                                                            cd.map(c => { sum += parseInt(c.consumptionQty) });
+                                                                            var cd1 = this.state.consumptionData.filter(c => moment(c.consumptionDate).format("YYYY-MM-DD") == moment(item).format("YYYY-MM-DD") && c.actualFlag && this.state.regionIdArr.includes(c.region.regionId));
+                                                                            var sum1 = 0;
+                                                                            cd1.map(c => { sum1 += parseInt(c.consumptionQty) });
+                                                                            t1.push(sum1 > 0 ? sum1 - sum : "NA")
+                                                                        })}
+                                                                        <td align="center"><b>{this.calculateAverage(t1)}</b></td>
+                                                                        {/* <td align="center"></td> */}
                                                                         {this.state.monthArrayList.map(item => {
                                                                             var cd = this.state.consumptionData.filter(c => moment(c.consumptionDate).format("YYYY-MM-DD") == moment(item).format("YYYY-MM-DD") && !c.actualFlag && this.state.regionIdArr.includes(c.region.regionId));
                                                                             var sum = 0;
-                                                                            cd.map(c => { sum += c.consumptionQty });
+                                                                            cd.map(c => { sum += parseInt(c.consumptionQty) });
                                                                             var cd1 = this.state.consumptionData.filter(c => moment(c.consumptionDate).format("YYYY-MM-DD") == moment(item).format("YYYY-MM-DD") && c.actualFlag && this.state.regionIdArr.includes(c.region.regionId));
                                                                             var sum1 = 0;
-                                                                            cd1.map(c => { sum1 += c.consumptionQty });
+                                                                            cd1.map(c => { sum1 += parseInt(c.consumptionQty) });
                                                                             return (<td><b>{sum1 > 0 ? sum1 - sum : "NA"}</b></td>)
                                                                         })}
                                                                     </tr>
@@ -2219,12 +2408,19 @@ class ConsumptionForecastError extends Component {
                                                                         <tr className="totalDifference">
                                                                             <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                                             <td align="left" className="sticky-col first-col clone"><b>{item1.label}</b></td>
-                                                                            {/* <td align="center">{item1.value == 1 ? -1.4 : item1.value == 2 ? 2.6 : item1.value == 3 ? 2.6 : -1.4}</td> */}
-                                                                            <td align="center"></td>
+                                                                            {this.state.monthArrayList.map(item => {
+                                                                                t1.splice(0, t1.length)
+                                                                                var cd = this.state.consumptionData.filter(c => moment(c.consumptionDate).format("YYYY-MM-DD") == moment(item).format("YYYY-MM-DD") && c.actualFlag && c.region.regionId == item1.value);
+                                                                                var cd1 = this.state.consumptionData.filter(c => moment(c.consumptionDate).format("YYYY-MM-DD") == moment(item).format("YYYY-MM-DD") && !c.actualFlag && c.region.regionId == item1.value);
+                                                                                t2.push((cd.length > 0 && cd1.length > 0) ? parseInt(cd[0].consumptionQty) - parseInt(cd1[0].consumptionQty) : "NA")
+                                                                            })}
+
+                                                                            <td align="center">{this.calculateAverage(t2)}</td>
+                                                                            {/* <td align="center"></td> */}
                                                                             {this.state.monthArrayList.map(item => {
                                                                                 var cd = this.state.consumptionData.filter(c => moment(c.consumptionDate).format("YYYY-MM-DD") == moment(item).format("YYYY-MM-DD") && c.actualFlag && c.region.regionId == item1.value);
                                                                                 var cd1 = this.state.consumptionData.filter(c => moment(c.consumptionDate).format("YYYY-MM-DD") == moment(item).format("YYYY-MM-DD") && !c.actualFlag && c.region.regionId == item1.value);
-                                                                                return (<td>{(cd.length > 0 && cd1.length > 0) ? cd[0].consumptionQty - cd1[0].consumptionQty : ""}</td>)
+                                                                                return (<td>{(cd.length > 0 && cd1.length > 0) ? parseInt(cd[0].consumptionQty) - parseInt(cd1[0].consumptionQty) : "NA"}</td>)
                                                                             })}
                                                                         </tr>
                                                                     ))}
