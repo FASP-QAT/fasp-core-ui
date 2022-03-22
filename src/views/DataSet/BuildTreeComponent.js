@@ -51,6 +51,7 @@ import PDFDocument from 'pdfkit-nodejs-webpack';
 import blobStream from 'blob-stream';
 import OrgDiagramPdfkit from '../TreePDF/OrgDiagramPdfkit';
 import Size from '../../../node_modules/basicprimitives/src/graphics/structs/Size';
+import { Prompt } from 'react-router';
 import { i } from 'mathjs';
 
 // const ref = React.createRef();
@@ -453,6 +454,7 @@ export default class BuildTree extends Component {
         this.pickAMonth4 = React.createRef()
         this.pickAMonth5 = React.createRef()
         this.state = {
+            isChanged: false,
             isSubmitClicked: false,
             popoverOpenHowManyPUperIntervalPer: false,
             popoverOpenWillClientsShareOnePU: false,
@@ -1319,6 +1321,10 @@ export default class BuildTree extends Component {
             let { treeData } = this.state;
             let { dataSetObj } = this.state;
             var items = this.state.items;
+            console.log("dataSetObj--->>>", dataSetObj)
+            console.log("treeData--->>>", treeData)
+            console.log("curTreeObj--->>>", curTreeObj)
+            console.log("tree items 1---", items);
             for (let i = 0; i < items.length; i++) {
                 var item = items[i];
                 if (item.payload.nodeType.id == 4 || item.payload.nodeType.id == 5) {
@@ -1326,6 +1332,7 @@ export default class BuildTree extends Component {
                 }
                 // arr.push(item);
             }
+            console.log("tree items 2---", items);
             let tempProgram = JSON.parse(JSON.stringify(dataSetObj))
             console.log("save tree data items>>>", items);
             // var databytes = CryptoJS.AES.decrypt(dataSetObj.programData, SECRET_KEY);
@@ -1334,8 +1341,10 @@ export default class BuildTree extends Component {
             programData.treeList = treeData;
             console.log("program data>>>", programData);
 
-            curTreeObj.tree.flatList = items;
             curTreeObj.scenarioList = this.state.scenarioList;
+            if (items.length > 0) {
+                curTreeObj.tree.flatList = items;
+            }
             var findTreeIndex = treeData.findIndex(n => n.treeId == curTreeObj.treeId);
             treeData[findTreeIndex] = curTreeObj;
 
@@ -1383,6 +1392,7 @@ export default class BuildTree extends Component {
                                 loading: false,
                                 message: i18n.t("static.mt.dataUpdateSuccess"),
                                 color: "green",
+                                isChanged: false
                             }, () => {
                                 for (let i = 0; i < items.length; i++) {
                                     var item = items[i];
@@ -3307,6 +3317,7 @@ export default class BuildTree extends Component {
     }.bind(this)
 
     changed1 = function (instance, cell, x, y, value) {
+        this.setState({ isChanged: true });
         // 4 & 5
         // this.setState({
         //     momJexcelLoader: true
@@ -3360,6 +3371,7 @@ export default class BuildTree extends Component {
 
     }.bind(this);
     changed2 = function (instance, cell, x, y, value) {
+        this.setState({ isChanged: true });
         // this.setState({
         //     momJexcelLoader: true
         // }, () => {
@@ -3545,6 +3557,7 @@ export default class BuildTree extends Component {
         }
         if (x != 10) {
             instance.jexcel.setValueFromCoords(10, y, 1, true);
+            this.setState({ isChanged: true });
         }
         this.calculateScalingTotal();
     }.bind(this);
@@ -5353,6 +5366,20 @@ export default class BuildTree extends Component {
             }.bind(this);
         }.bind(this)
     }
+
+    componentWillUnmount() {
+        clearTimeout(this.timeout);
+        window.onbeforeunload = null;
+    }
+
+    componentDidUpdate = () => {
+        if (this.state.isChanged == true) {
+            window.onbeforeunload = () => true
+        } else {
+            window.onbeforeunload = undefined
+        }
+    }
+
     componentDidMount() {
         this.setState({
             treeId: this.props.match.params.treeId,
@@ -5625,7 +5652,7 @@ export default class BuildTree extends Component {
         }
 
 
-        this.setState({ curTreeObj }, () => {
+        this.setState({ curTreeObj, isChanged: true }, () => {
             console.log("curTreeObj---", curTreeObj);
         });
 
@@ -5952,7 +5979,8 @@ export default class BuildTree extends Component {
         console.log("anchal 2---", this.state.selectedScenario)
         this.setState({
             currentItemConfig,
-            currentScenario: (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0]
+            currentScenario: (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0],
+            isChanged: true
         }, () => {
             console.log("after state update---", this.state.currentItemConfig);
             if (flag) {
@@ -9021,6 +9049,10 @@ export default class BuildTree extends Component {
             }]
         }
         return <div className="animated fadeIn">
+            <Prompt
+                when={this.state.isChanged == true}
+                message={i18n.t("static.dataentry.confirmmsg")}
+            />
             <AuthenticationServiceComponent history={this.props.history} />
             <h5 className={this.state.color} id="div2">
                 {i18n.t(this.state.message, { entityname })}</h5>

@@ -925,7 +925,8 @@ export default class TreeExtrapolationComponent extends React.Component {
         this.setState({
             nodeDataExtrapolation,
             nodeDataExtrapolationOptionList,
-            extrapolationLoader: false
+            extrapolationLoader: false,
+            isChanged:false
         }, () => {
             const { currentItemConfig } = this.props.items;
             currentItemConfig.context.payload.nodeDataMap[this.props.items.selectedScenario][0].nodeDataExtrapolation = this.state.nodeDataExtrapolation;
@@ -1062,6 +1063,7 @@ export default class TreeExtrapolationComponent extends React.Component {
         this.state.nodeDataExtrapolation.extrapolationMethod.id = e.target.value;
         this.state.dataExtrapolation.setValueFromCoords(13, 0, e.target.value, true);
         // this.buildJexcel();
+        this.setState({isChanged:true});
     }
 
     setMonthsForMovingAverage(e) {
@@ -1071,6 +1073,7 @@ export default class TreeExtrapolationComponent extends React.Component {
         var monthsForMovingAverage = e.target.value;
         this.setState({
             monthsForMovingAverage: monthsForMovingAverage,
+            isChanged:true
             // dataChanged: true
         }, () => {
             console.log("monthsForMovingAverage after state update---", this.state.monthsForMovingAverage);
@@ -1090,6 +1093,7 @@ export default class TreeExtrapolationComponent extends React.Component {
         var alpha = e.target.value;
         this.setState({
             alpha: alpha,
+            isChanged:true
             // dataChanged: true
         }, () => {
             // this.buildJxl();
@@ -1100,6 +1104,7 @@ export default class TreeExtrapolationComponent extends React.Component {
         var beta = e.target.value;
         this.setState({
             beta: beta,
+            isChanged:true
             // dataChanged: true
         }, () => {
             // this.buildJxl();
@@ -1110,6 +1115,7 @@ export default class TreeExtrapolationComponent extends React.Component {
         var gamma = e.target.value;
         this.setState({
             gamma: gamma,
+            isChanged:true
             // dataChanged: true
         }, () => {
             // this.buildJxl();
@@ -1120,7 +1126,7 @@ export default class TreeExtrapolationComponent extends React.Component {
         var confidenceLevelId = e.target.value;
         this.setState({
             confidenceLevelId: confidenceLevelId,
-            // dataChanged: true
+            isChanged:true
         }, () => {
             // this.buildJxl()
         })
@@ -1130,6 +1136,7 @@ export default class TreeExtrapolationComponent extends React.Component {
         var seasonals = e.target.value;
         this.setState({
             noOfMonthsForASeason: seasonals,
+            isChanged:true
             // dataChanged: true
         }, () => {
             // this.buildJxl()
@@ -1138,14 +1145,16 @@ export default class TreeExtrapolationComponent extends React.Component {
 
     setPId(e) {
         this.setState({
-            p: e.target.value
+            p: e.target.value,
+            isChanged:true
         }, () => {
             // this.buildJxl()
         })
     }
     setDId(e) {
         this.setState({
-            d: e.target.value
+            d: e.target.value,
+            isChanged:true
         }, () => {
             // this.buildJxl()
         })
@@ -1153,7 +1162,8 @@ export default class TreeExtrapolationComponent extends React.Component {
 
     setQId(e) {
         this.setState({
-            q: e.target.value
+            q: e.target.value,
+            isChanged:true
         }, () => {
             // this.buildJxl()
         })
@@ -1206,7 +1216,7 @@ export default class TreeExtrapolationComponent extends React.Component {
         nodeDataExtrapolation.extrapolationDataList = jexcelDataArr;
         console.log("jexcel data 1---", jexcelDataArr);
 
-        this.setState({ jexcelDataArr, nodeDataExtrapolation }, () => {
+        this.setState({ jexcelDataArr, nodeDataExtrapolation,isChanged:true }, () => {
             // setTimeout(() => {
             console.log("tableJson for extrapolation---", this.state.jexcelDataArr);
             if (jexcelDataArr.length > 0) {
@@ -1302,7 +1312,7 @@ export default class TreeExtrapolationComponent extends React.Component {
     }
 
     interpolate() {
-        this.setState({ extrapolationLoader: true }, () => {
+        this.setState({ extrapolationLoader: true,isChanged:true }, () => {
             setTimeout(() => {
                 var monthArray = this.state.monthArray;
                 var jexcelDataArr = [];
@@ -2089,6 +2099,8 @@ export default class TreeExtrapolationComponent extends React.Component {
                 instance.jexcel.setComments(col, "");
             }
         }
+
+        this.setState({isChanged:true})
     }.bind(this);
 
     setMovingAvgId(e) {
@@ -2097,7 +2109,8 @@ export default class TreeExtrapolationComponent extends React.Component {
         var filteredExtrapolationMethodList = this.state.filteredExtrapolationMethodList;
         var movingAvgId = e.target.checked;
         this.setState({
-            movingAvgId: movingAvgId
+            movingAvgId: movingAvgId,
+            isChanged:true
         }, () => {
             if (this.state.dataExtrapolation != "") {
                 if (movingAvgId) {
@@ -2137,7 +2150,8 @@ export default class TreeExtrapolationComponent extends React.Component {
         console.log("filteredExtrapolationMethodList--->>>>", this.state.extrapolationMethodList)
         var semiAvgId = e.target.checked;
         this.setState({
-            semiAvgId: semiAvgId
+            semiAvgId: semiAvgId,
+            isChanged:true
         }, () => {
             if (this.state.dataExtrapolation != "") {
                 if (semiAvgId) {
@@ -2182,7 +2196,8 @@ export default class TreeExtrapolationComponent extends React.Component {
         var filteredExtrapolationMethodList = this.state.filteredExtrapolationMethodList;
         var linearRegressionId = e.target.checked;
         this.setState({
-            linearRegressionId: linearRegressionId
+            linearRegressionId: linearRegressionId,
+            isChanged:true
         }, () => {
             if (this.state.dataExtrapolation != "") {
                 if (linearRegressionId) {
@@ -2225,7 +2240,8 @@ export default class TreeExtrapolationComponent extends React.Component {
         var filteredExtrapolationMethodList = this.state.filteredExtrapolationMethodList;
         var smoothingId = e.target.checked;
         this.setState({
-            smoothingId: smoothingId
+            smoothingId: smoothingId,
+            isChanged:true
         }, () => {
             if (this.state.dataExtrapolation != "") {
                 if (smoothingId) {
@@ -2273,7 +2289,8 @@ export default class TreeExtrapolationComponent extends React.Component {
         var filteredExtrapolationMethodList = this.state.filteredExtrapolationMethodList;
         var arimaId = e.target.checked;
         this.setState({
-            arimaId: arimaId
+            arimaId: arimaId,
+            isChanged:true
         }, () => {
             if (this.state.dataExtrapolation != "") {
                 if (arimaId) {
