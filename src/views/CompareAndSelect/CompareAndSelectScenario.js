@@ -1243,10 +1243,19 @@ class CompareAndSelectScenario extends Component {
     }
 
     setDatasetId(event) {
-        console.log("In datasetId@@@")
+        console.log("In datasetId@@@", event.target.value);
         this.setState({ loading: true })
         var datasetId = event.target.value;
         localStorage.setItem("sesDatasetId", datasetId);
+        localStorage.setItem("sesForecastProgramIdReport", parseInt(datasetId.split('_')[0]));
+        let versionIdSes = (event.target.value.split('_')[1]).replace('v', '') + ' (Local)';
+        // console.log("In datasetId@@@----1", localStorage.getItem("sesForecastProgramIdReport"));
+        // console.log("In datasetId@@@----2", versionIdSes);
+        localStorage.setItem("sesForecastVersionIdReport", versionIdSes);
+
+        localStorage.setItem("sesLiveDatasetId", parseInt(datasetId.split('_')[0]));
+        localStorage.setItem("sesDatasetCompareVersionId", versionIdSes);
+        localStorage.setItem("sesDatasetVersionId", versionIdSes);
         this.setState({
             datasetId: datasetId,
         }, () => {
@@ -1627,7 +1636,7 @@ class CompareAndSelectScenario extends Component {
                                 var month = xAxis2.split('-')[0];
                                 var year = xAxis2.split('-')[1];
                                 var filterByYear = monthArrayList.filter(c => moment(c).format("YYYY") == moment(year).format("YYYY"));
-                                var divideByTwo = Math.round(filterByYear.length / 2);
+                                var divideByTwo = Math.floor(filterByYear.length / 2);
                                 if (moment(filterByYear[divideByTwo]).format("MMM") === month) {
                                     return year;
                                 } else {

@@ -1024,8 +1024,9 @@ export default class CreateTreeTemplate extends Component {
                 } else if (this.state.currentItemConfig.context.payload.nodeType.id == 3 || this.state.currentItemConfig.context.payload.nodeType.id == 4 || this.state.currentItemConfig.context.payload.nodeType.id == 5) {
                     console.log("id to filter---", this.state.currentItemConfig.context.id)
                     console.log("id to filter list---", this.state.nodeDataMomList)
-                    console.log("id to filter filter list---", this.state.nodeDataMomList.filter(x => x.nodeId == this.state.currentItemConfig.context.id)[0].nodeDataMomList)
-                    this.setState({ momListPer: this.state.nodeDataMomList.filter(x => x.nodeId == this.state.currentItemConfig.context.id)[0].nodeDataMomList }, () => {
+                    // console.log("id to filter filter list---", this.state.nodeDataMomList.filter(x => x.nodeId == this.state.currentItemConfig.context.id)[0].nodeDataMomList)
+                    var momList=this.state.nodeDataMomList.filter(x => x.nodeId == this.state.currentItemConfig.context.id);
+                    this.setState({ momListPer: momList.length>0?momList[0].nodeDataMomList:[] }, () => {
                         console.log("going to build mom jexcel percent");
                         if (value == 1 || (value == 0 && this.state.showMomDataPercent)) {
                             this.buildMomJexcelPercent();
@@ -3728,6 +3729,7 @@ export default class CreateTreeTemplate extends Component {
     }
     findFirstError(formName, hasError) {
         const form = document.forms[formName]
+        console.log("Form@@@#####",form)
         for (let i = 0; i < form.length; i++) {
             if (hasError(form[i].name)) {
                 form[i].focus()
@@ -4199,8 +4201,9 @@ export default class CreateTreeTemplate extends Component {
         //             }
         //         }
         //     );
-        if (this.props.match.params.templateId != -1) {
-            DatasetService.getTreeTemplateById(this.props.match.params.templateId).then(response => {
+        if (this.props.match.params.templateId != -1 || this.state.treeTemplate.treeTemplateId>0) {
+            var treeTemplateId=this.props.match.params.templateId != -1 ?this.props.match.params.templateId:this.state.treeTemplate.treeTemplateId;
+            DatasetService.getTreeTemplateById(treeTemplateId).then(response => {
                 console.log("my tree---", response.data);
                 var items = response.data.flatList;
                 var arr = [];
@@ -4219,6 +4222,15 @@ export default class CreateTreeTemplate extends Component {
                         (items[i].payload.nodeDataMap[0])[0].calculatedDataValue = (parentValue * (items[i].payload.nodeDataMap[0])[0].dataValue) / 100;
                         (items[i].payload.nodeDataMap[0])[0].displayCalculatedDataValue = ((parentValue * (items[i].payload.nodeDataMap[0])[0].dataValue) / 100).toString();
                         (items[i].payload.nodeDataMap[0])[0].displayDataValue = (items[i].payload.nodeDataMap[0])[0].dataValue.toString();
+                        if (this.state.hideFUPUNode) {
+                            if (items[i].payload.nodeType.id == 4 || items[i].payload.nodeType.id == 5) {
+                                items[i].isVisible = false;
+                            }
+                        } else if (this.state.hidePUNode && items[i].payload.nodeType.id == 5) {
+                            items[i].isVisible = false;
+                        } else {
+                            items[i].isVisible = true;
+                        }
                     }
                     console.log("load---", items[i])
                     // arr.push(items[i]);
@@ -4778,7 +4790,7 @@ export default class CreateTreeTemplate extends Component {
         var newItem = itemConfig.context;
         newItem.parent = parent;
         newItem.id = nodeId;
-        newItem.level = parseInt(itemConfig.context.level + 2);
+        newItem.level = parseInt(itemConfig.context.level + 1);
         newItem.payload.nodeId = nodeId;
         var pu = this.state.planningUnitList.filter(x => x.planningUnitId == this.state.tempPlanningUnitId)[0];
         newItem.payload.label = pu.label;
@@ -4850,6 +4862,16 @@ export default class CreateTreeTemplate extends Component {
         (newItem.payload.nodeDataMap[0])[0].month = moment((newItem.payload.nodeDataMap[0])[0].month).startOf('month').format("YYYY-MM-DD")
         if (itemConfig.context.payload.nodeType.id == 4) {
             (newItem.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.label.label_en = (itemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.label.label_en;
+
+        }
+        if (this.state.hideFUPUNode) {
+            if (itemConfig.context.payload.nodeType.id == 4 || itemConfig.context.payload.nodeType.id == 5) {
+                newItem.isVisible = false;
+            }
+        } else if (this.state.hidePUNode && itemConfig.context.payload.nodeType.id == 5) {
+            newItem.isVisible = false;
+        } else {
+            newItem.isVisible = true;
         }
         console.log("add button clicked value after update---", newItem);
         this.setState({
@@ -4912,13 +4934,18 @@ export default class CreateTreeTemplate extends Component {
         console.log("end>>>", Date.now());
     }
     onRemoveButtonClick(itemConfig) {
-        const { items } = this.state;
-        const ids = items.map(o => o.id)
-        const filtered = items.filter(({ id }, index) => !ids.includes(id, index + 1))
-        console.log("delete unique items---", filtered)
-        items = filtered;
-        this.setState(this.getDeletedItems(items, [itemConfig.id]), () => {
-            this.calculateValuesForAggregateNode(this.state.items);
+        this.setState({ loading: true }, () => {
+            const { items } = this.state;
+            const ids = items.map(o => o.id)
+            const filtered = items.filter(({ id }, index) => !ids.includes(id, index + 1))
+            console.log("delete unique items---", filtered)
+            items = filtered;
+            this.setState(this.getDeletedItems(items, [itemConfig.id]), () => {
+                setTimeout(() => {
+                    console.log("delete result---", this.getDeletedItems(items, [itemConfig.id]))
+                    this.calculateMOMData(0, 2);
+                }, 0);
+            });
         });
     }
     onMoveItem(parentid, itemid) {
@@ -5113,8 +5140,19 @@ export default class CreateTreeTemplate extends Component {
 
     updateNodeInfoInJson(currentItemConfig) {
         console.log("update tree node called------------", currentItemConfig);
+        var nodeTypeId = currentItemConfig.context.payload.nodeType.id;
         var nodes = this.state.items;
         var findNodeIndex = nodes.findIndex(n => n.id == currentItemConfig.context.id);
+
+        if (this.state.hideFUPUNode) {
+            if (nodeTypeId == 4 || nodeTypeId == 5) {
+                currentItemConfig.context.isVisible = false;
+            }
+        } else if (this.state.hidePUNode && nodeTypeId == 5) {
+            currentItemConfig.context.isVisible = false;
+        } else {
+            currentItemConfig.context.isVisible = true;
+        }
         nodes[findNodeIndex] = currentItemConfig.context;
         // nodes[findNodeIndex].valueType = currentItemConfig.valueType;
         this.setState({
@@ -7692,6 +7730,15 @@ export default class CreateTreeTemplate extends Component {
                                                                 console.log("api parent value---", parentValue);
 
                                                                 (items[i].payload.nodeDataMap[0])[0].calculatedDataValue = (parentValue * (items[i].payload.nodeDataMap[0])[0].dataValue) / 100;
+                                                                if (this.state.hideFUPUNode) {
+                                                                    if (items[i].payload.nodeType.id == 4 || items[i].payload.nodeType.id == 5) {
+                                                                        items[i].isVisible = false;
+                                                                    }
+                                                                } else if (this.state.hidePUNode && items[i].payload.nodeType.id == 5) {
+                                                                    items[i].isVisible = false;
+                                                                } else {
+                                                                    items[i].isVisible = true;
+                                                                }
                                                             }
                                                             console.log("load---", items[i])
                                                             // arr.push(items[i]);

@@ -5817,27 +5817,52 @@ font-style: italic!important;
    border-bottom: 0px solid #c8ced3!important;
 }
 .Firstcolum{
-  position: sticky;
-    left: 0;
-    z-index: 999;
+  // position: sticky;
+  //   left: 0;
+  //   z-index: 999;
+
+  width: 120px;
+  left: 0;
+  z-index: 2;
+  /* width: 100px; */
+  /* min-width: 100px; */
+  /* max-width: 100px; */
+  // z-index: 999;
 }
 .Secondcolum{
-  position: sticky;
+  // position: sticky;
   // left: 61px;
-  left:53px;
-  z-index: 999;
+  // left:53px;
+  // z-index: 999;
+  width: 150px;
+    left: 54px;
+    z-index: 3;
+    min-width:150px;
+    max-width: 150px;
 }
 .Thirdcolum{
-  position: sticky;
-  left: 253px;
-  z-index: 999;
+  // position: sticky;
+  // left: 128px;
+  // z-index: 999;
+
+  left: 204px;
+  z-index: 4;
+  /* z-index: 999; */
+  width: 200px;
+  // position: -webkit-sticky;
+  /* position: sticky; */
+  /* left: 210px; */
+  /* z-index: 4; */
+  min-width: 200px;
+  max-width: 200px;
+  /* left: 200px;*/
 }
 .MonthlyForecastdWidth {
   overflow: hidden !important;
-  min-width: 167px !important;
+  // min-width: 167px !important;
   word-wrap: break-word !important;
-  z-index: 100;
-  position: sticky;
+  // z-index: 100;
+  // position: sticky;
   /* border: none !important; */
 }
 
