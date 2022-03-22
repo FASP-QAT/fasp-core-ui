@@ -4894,9 +4894,10 @@ export default class BuildTree extends Component {
 
     }
     getForecastingUnitListByTracerCategoryId(type) {
-        console.log("my tracer category---", this.state.currentScenario.fuNode.forecastingUnit.tracerCategory.id)
-        var tracerCategoryId = this.state.currentScenario.fuNode.forecastingUnit.tracerCategory.id;
         var scenarioId = this.state.selectedScenario;
+        console.log("my tracer category---", this.state.currentItemConfig.context.payload.nodeDataMap[scenarioId][0].fuNode.forecastingUnit.tracerCategory.id)
+        var tracerCategoryId = this.state.currentScenario.fuNode.forecastingUnit.tracerCategory.id;
+
         console.log("%%%tracerCategoryId---", tracerCategoryId)
         var forecastingUnitList = this.state.forecastingUnitList;
         var filteredForecastingUnitList = tracerCategoryId != "" ? this.state.forecastingUnitList.filter(x => x.tracerCategory.id == tracerCategoryId) : [];
@@ -5275,6 +5276,8 @@ export default class BuildTree extends Component {
     filterUsageTemplateList(tracerCategoryId) {
         var usageTemplateList = [];
         console.log("usage template tc---", tracerCategoryId)
+        console.log("usage template list all---", this.state.usageTemplateListAll)
+
         if (tracerCategoryId != "" && tracerCategoryId != null) {
             console.log("usage template if")
             usageTemplateList = this.state.usageTemplateListAll.filter(c => c.tracerCategory.id == tracerCategoryId);
@@ -5307,7 +5310,8 @@ export default class BuildTree extends Component {
             planningunitRequest.onsuccess = function (e) {
                 var myResult = [];
                 myResult = planningunitRequest.result;
-                console.log("myResult===============6", myResult)
+                console.log("myResult===============6", myResult);
+                console.log("fuIdArray---", fuIdArray);
                 var usageTemplateListAll = myResult.filter(el => fuIdArray.indexOf(el.forecastingUnit.id) != -1);
                 this.setState({
                     usageTemplateListAll
@@ -5822,8 +5826,28 @@ export default class BuildTree extends Component {
         // }
 
         if (event.target.name === "tracerCategoryId") {
-            console.log("currentItemConfig---", currentItemConfig);
-            (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.forecastingUnit.tracerCategory.id = event.target.value;
+            console.log("currentItemConfig before tc---", currentItemConfig);
+            var fuNode = (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode;
+            // var forecastingUnit = (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.forecastingUnit;
+
+            var forecastingUnit = {
+                id: fuNode.forecastingUnit.id,
+                label: fuNode.forecastingUnit.label,
+                unit: fuNode.forecastingUnit.unit,
+                tracerCategory: {
+                    id: event.target.value
+                }
+            }
+
+
+            fuNode.forecastingUnit = JSON.parse(JSON.stringify(forecastingUnit));
+            // fuNode.forecastingUnit = forecastingUnit;
+            console.log("tracerCategory obj---", fuNode);
+            // console.log("tracer category forecastingUnit obj---", fuNode);
+
+            (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode = fuNode;
+            console.log("tracer category on change---", event.target.value);
+            console.log("tracer category on change- obj--", currentItemConfig);
             this.filterUsageTemplateList(event.target.value);
         }
 
@@ -5955,6 +5979,7 @@ export default class BuildTree extends Component {
             currentScenario: (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0]
         }, () => {
             console.log("after state update---", this.state.currentItemConfig);
+            console.log("after state update current scenario---", this.state.currentScenario);
             if (flag) {
                 if (event.target.name === "planningUnitId") {
                     this.calculatePUPerVisit(false);
@@ -7331,7 +7356,7 @@ export default class BuildTree extends Component {
                                                         && this.state.tracerCategoryList.map((item, i) => {
                                                             return (
                                                                 <option key={i} value={item.tracerCategoryId}>
-                                                                    {getLabelText(item.label, this.state.lang)}
+                                                                    {getLabelText(item.label, this.state.lang) + "-" + item.tracerCategoryId}
                                                                 </option>
                                                             )
                                                         }, this)}
