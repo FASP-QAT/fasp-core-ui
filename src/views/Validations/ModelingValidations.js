@@ -507,14 +507,14 @@ class ModelingValidation extends Component {
                 var total = 0;
                 var totalPer = 0;
                 for (var k = 0; k < nodeVal.length; k++) {
-                    var flatListFiltered = flatList.filter(c => getLabelText(c.payload.label, this.state.lang) == nodeVal[k]);
+                    var flatListFiltered = flatList.filter(c => getLabelText(c.payload.label, this.state.lang) == nodeVal[k] && c.level==this.state.levelId);
                     var calculatedValueTotal = 0;
                     for (var fl = 0; fl < flatListFiltered.length; fl++) {
                         var nodeMomList = flatListFiltered[fl].payload.nodeDataMap[this.state.scenarioId][0].nodeDataMomList;
                         var checkIfPuNode = flatList.filter(c => c.id == flatListFiltered[fl].id)[0].payload.nodeType.id;
                         var cvList = nodeMomList.filter(c => moment(c.month).format("YYYY-MM-DD") == moment(monthList[j]).format("YYYY-MM-DD"));
                         if (cvList.length > 0) {
-                            calculatedValueTotal += checkIfPuNode == 5 ? cvList[0].calculatedMmdValue : cvList[0].calculatedValue;
+                            calculatedValueTotal += (checkIfPuNode == 5 ? cvList[0].calculatedMmdValue : cvList[0].calculatedValue);
                         } else {
                         }
                     }

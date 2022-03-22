@@ -32,6 +32,7 @@ import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../Com
 import jexcel from 'jexcel-pro';
 import "../../../node_modules/jexcel-pro/dist/jexcel.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
+import { Prompt } from 'react-router';
 import { DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_DATE_FORMAT_SM, JEXCEL_PRO_KEY } from '../../Constants.js';
 
 
@@ -108,6 +109,7 @@ class ForecastSummary extends Component {
             downloadedProgramData: [],
             allProgramList: [],
             regRegionList: [],
+            isChanged1: false
 
         };
         this.getPrograms = this.getPrograms.bind(this);
@@ -961,6 +963,11 @@ class ForecastSummary extends Component {
                         }, () => {
                             localStorage.setItem("sesForecastProgramIdReport", parseInt(programId));
                             localStorage.setItem("sesForecastVersionIdReport", document.getElementById("versionId").value);
+                            localStorage.setItem("sesDatasetId", parseInt(programId) + '_v' + (document.getElementById("versionId").value).replace('(Local)', '').trim() + '_uId_' + userId);
+
+                            localStorage.setItem("sesLiveDatasetId", parseInt(programId));
+                            localStorage.setItem("sesDatasetCompareVersionId", document.getElementById("versionId").value);
+                            localStorage.setItem("sesDatasetVersionId", document.getElementById("versionId").value);
 
                             let filteredProgram = this.state.datasetList.filter(c => c.programId == programId && c.versionId == (versionId.split('(')[0]).trim())[0];
                             console.log("Test------------>1", filteredProgram);
@@ -1217,8 +1224,8 @@ class ForecastSummary extends Component {
                                                 console.log("filterForecastSelected+++", filterForecastSelected);
                                                 console.log("filterForecastSelected != undefined ? filterForecastSelected.notes : +++", filterForecastSelected != undefined ? filterForecastSelected.notes : "");
                                                 data[(k + 1) * 3] = (filterForecastSelected != undefined) ? (filterForecastSelected.scenarioId > 0) ? "T" + filterForecastSelected.treeId + "~" + filterForecastSelected.scenarioId : (filterForecastSelected.consumptionExtrapolationId > 0) ? "C" + filterForecastSelected.consumptionExtrapolationId : "" : "";
-                                                data[((k + 1) * 3) + 1] = filterForecastSelected != undefined ? filterForecastSelected.totalForecast : "";
-                                                total += Number(filterForecastSelected != undefined ? filterForecastSelected.totalForecast : 0);
+                                                data[((k + 1) * 3) + 1] = filterForecastSelected != undefined ? Math.round(filterForecastSelected.totalForecast) : "";
+                                                total += Number(filterForecastSelected != undefined ? Math.round(filterForecastSelected.totalForecast) : 0);
                                                 data[((k + 1) * 3) + 2] = filterForecastSelected != undefined ? filterForecastSelected.notes : "";
                                             }
                                             data[(regRegionList.length * 3) + 3] = 2
@@ -1410,6 +1417,9 @@ class ForecastSummary extends Component {
         for (var r = 0; r < this.state.regRegionList.length; r++) {
             possiblex.push((r + 1) * 3);
         }
+        this.setState({
+            isChanged1: true,
+        });
         var index = possiblex.findIndex(c => c == x);
         if (index != -1) {
             if (value != "") {
@@ -1647,6 +1657,19 @@ class ForecastSummary extends Component {
         }.bind(this);
 
 
+    }
+
+    componentWillUnmount() {
+        clearTimeout(this.timeout);
+        window.onbeforeunload = null;
+    }
+
+    componentDidUpdate = () => {
+        if (this.state.isChanged1 == true) {
+            window.onbeforeunload = () => true
+        } else {
+            window.onbeforeunload = undefined
+        }
     }
 
     componentDidMount() {
@@ -1923,8 +1946,15 @@ class ForecastSummary extends Component {
             versionId: ((event == null || event == '' || event == undefined) ? (this.state.versionId) : (event.target.value).trim()),
         }, () => {
             // localStorage.setItem("sesVersionIdReport", '');
+            var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+            var userId = userBytes.toString(CryptoJS.enc.Utf8);
             localStorage.setItem("sesForecastProgramIdReport", parseInt(document.getElementById("programId").value));
             localStorage.setItem("sesForecastVersionIdReport", document.getElementById("versionId").value);
+            localStorage.setItem("sesDatasetId", parseInt(document.getElementById("programId").value) + '_v' + (document.getElementById("versionId").value).replace('(Local)', '').trim() + '_uId_' + userId);
+
+            localStorage.setItem("sesLiveDatasetId", parseInt(document.getElementById("programId").value));
+            localStorage.setItem("sesDatasetCompareVersionId", document.getElementById("versionId").value);
+            localStorage.setItem("sesDatasetVersionId", document.getElementById("versionId").value);
             this.setForecastPeriod();
             this.filterData();
         })
@@ -2217,6 +2247,9 @@ class ForecastSummary extends Component {
                 putRequest.onerror = function (event) {
                 }.bind(this);
                 putRequest.onsuccess = function (event) {
+                    this.setState({
+                        isChanged1: false
+                    })
                     let id = AuthenticationService.displayDashboardBasedOnRole();
                     this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/green/' + i18n.t('static.compareAndSelect.dataSaved'));
                 }.bind(this)
@@ -2260,6 +2293,10 @@ class ForecastSummary extends Component {
 
         return (
             <div className="animated fadeIn" >
+                <Prompt
+                    when={this.state.isChanged1 == true}
+                    message={i18n.t("static.dataentry.confirmmsg")}
+                />
                 <AuthenticationServiceComponent history={this.props.history} />
                 <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
                 <h5 className="red">{i18n.t(this.state.message)}</h5>

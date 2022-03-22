@@ -55,6 +55,7 @@ import Size from '../../../node_modules/basicprimitives/src/graphics/structs/Siz
 import classNames from 'classnames';
 import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
+import { Prompt } from 'react-router';
 import AuthenticationService from '../Common/AuthenticationService';
 
 
@@ -369,6 +370,7 @@ export default class CreateTreeTemplate extends Component {
         this.pickAMonth2 = React.createRef()
         this.pickAMonth1 = React.createRef()
         this.state = {
+            isChanged: false,
             isSubmitClicked: false,
             popoverOpenHowManyPUperIntervalPer: false,
             popoverOpenWillClientsShareOnePU: false,
@@ -1024,8 +1026,9 @@ export default class CreateTreeTemplate extends Component {
                 } else if (this.state.currentItemConfig.context.payload.nodeType.id == 3 || this.state.currentItemConfig.context.payload.nodeType.id == 4 || this.state.currentItemConfig.context.payload.nodeType.id == 5) {
                     console.log("id to filter---", this.state.currentItemConfig.context.id)
                     console.log("id to filter list---", this.state.nodeDataMomList)
-                    console.log("id to filter filter list---", this.state.nodeDataMomList.filter(x => x.nodeId == this.state.currentItemConfig.context.id)[0].nodeDataMomList)
-                    this.setState({ momListPer: this.state.nodeDataMomList.filter(x => x.nodeId == this.state.currentItemConfig.context.id)[0].nodeDataMomList }, () => {
+                    // console.log("id to filter filter list---", this.state.nodeDataMomList.filter(x => x.nodeId == this.state.currentItemConfig.context.id)[0].nodeDataMomList)
+                    var momList = this.state.nodeDataMomList.filter(x => x.nodeId == this.state.currentItemConfig.context.id);
+                    this.setState({ momListPer: momList.length > 0 ? momList[0].nodeDataMomList : [] }, () => {
                         console.log("going to build mom jexcel percent");
                         if (value == 1 || (value == 0 && this.state.showMomDataPercent)) {
                             this.buildMomJexcelPercent();
@@ -2613,6 +2616,7 @@ export default class CreateTreeTemplate extends Component {
         }
     }.bind(this)
     changed1 = function (instance, cell, x, y, value) {
+        this.setState({ isChanged: true });
         // // 4 & 5
         // this.setState({
         //     momJexcelLoader: true
@@ -2658,6 +2662,7 @@ export default class CreateTreeTemplate extends Component {
 
     }.bind(this);
     changed2 = function (instance, cell, x, y, value) {
+        this.setState({ isChanged: true });
         // this.setState({
         //     momJexcelLoader: true
         // }, () => {
@@ -2827,6 +2832,7 @@ export default class CreateTreeTemplate extends Component {
         }
         if (x != 10) {
             instance.jexcel.setValueFromCoords(10, y, 1, true);
+            this.setState({ isChanged: true });
         }
         this.calculateScalingTotal();
     }.bind(this);
@@ -3728,6 +3734,7 @@ export default class CreateTreeTemplate extends Component {
     }
     findFirstError(formName, hasError) {
         const form = document.forms[formName]
+        console.log("Form@@@#####", form)
         for (let i = 0; i < form.length; i++) {
             if (hasError(form[i].name)) {
                 form[i].focus()
@@ -3779,6 +3786,20 @@ export default class CreateTreeTemplate extends Component {
     calculateNodeValue() {
 
     }
+
+    componentWillUnmount() {
+        clearTimeout(this.timeout);
+        window.onbeforeunload = null;
+    }
+
+    componentDidUpdate = () => {
+        if (this.state.isChanged == true) {
+            window.onbeforeunload = () => true
+        } else {
+            window.onbeforeunload = undefined
+        }
+    }
+
     componentDidMount() {
         this.getNodeTyeList();
         this.getUsageTemplateList(0);
@@ -4199,8 +4220,9 @@ export default class CreateTreeTemplate extends Component {
         //             }
         //         }
         //     );
-        if (this.props.match.params.templateId != -1) {
-            DatasetService.getTreeTemplateById(this.props.match.params.templateId).then(response => {
+        if (this.props.match.params.templateId != -1 || this.state.treeTemplate.treeTemplateId > 0) {
+            var treeTemplateId = this.props.match.params.templateId != -1 ? this.props.match.params.templateId : this.state.treeTemplate.treeTemplateId;
+            DatasetService.getTreeTemplateById(treeTemplateId).then(response => {
                 console.log("my tree---", response.data);
                 var items = response.data.flatList;
                 var arr = [];
@@ -4775,7 +4797,7 @@ export default class CreateTreeTemplate extends Component {
         }
 
 
-        this.setState({ currentItemConfig }, () => {
+        this.setState({ currentItemConfig,isChanged:true }, () => {
             console.log("after state update---", this.state.currentItemConfig);
         });
     }
@@ -7604,6 +7626,10 @@ export default class CreateTreeTemplate extends Component {
             }]
         }
         return <div className="animated fadeIn">
+              <Prompt
+                    when={this.state.isChanged == true}
+                    message={i18n.t("static.dataentry.confirmmsg")}
+                />
             <AuthenticationServiceComponent history={this.props.history} />
             <h5 className={this.state.color} id="div2">
                 {i18n.t(this.state.message, { entityname })}</h5>
@@ -7745,7 +7771,8 @@ export default class CreateTreeTemplate extends Component {
                                                             items,
                                                             message: i18n.t('static.message.addTreeTemplate'),
                                                             color: 'green',
-                                                            loading: true
+                                                            loading: true,
+                                                            isChanged:false
                                                         }, () => {
                                                             this.hideSecondComponent();
                                                             this.calculateMOMData(1, 2);
@@ -7830,7 +7857,8 @@ export default class CreateTreeTemplate extends Component {
                                                             items,
                                                             message: i18n.t('static.message.editTreeTemplate'),
                                                             loading: true,
-                                                            color: 'green'
+                                                            color: 'green',
+                                                            isChanged:false
                                                         }, () => {
                                                             this.hideSecondComponent();
                                                             this.calculateMOMData(1, 2);

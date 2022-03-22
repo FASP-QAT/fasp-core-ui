@@ -139,10 +139,10 @@ export default class StepThreeImportMapPlanningUnits extends Component {
         headers.push(i18n.t('static.importFromQATSupplyPlan.forecastPlanningUnit').replaceAll(' ', '%20'));
         headers.push(i18n.t('static.program.region').replaceAll(' ', '%20'));
         headers.push(i18n.t('static.inventoryDate.inventoryReport').replaceAll(' ', '%20'));
-        headers.push(i18n.t('static.importFromQATSupplyPlan.supplyPlanConsumption').replaceAll(' ', '%20'));
+        headers.push(i18n.t('static.importFromQATSupplyPlan.actualConsumption(SupplyPlanModule)').replaceAll(' ', '%20'));
         headers.push(i18n.t('static.importFromQATSupplyPlan.conversionFactor(SupplyPlantoForecast)').replaceAll(' ', '%20'));
         headers.push(i18n.t('static.importFromQATSupplyPlan.convertedActualConsumption(SupplyPlanModule)').replaceAll(' ', '%20'));
-        headers.push(i18n.t('static.importFromQATSupplyPlan.currentQATConsumption').replaceAll(' ', '%20'));
+        headers.push(i18n.t('static.importFromQATSupplyPlan.currentActualConsumption(ForecastModule)').replaceAll(' ', '%20'));
         headers.push(i18n.t('static.quantimed.importData').replaceAll(' ', '%20'));
 
 
@@ -246,6 +246,16 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                                     "planningUnit": {
                                         "id": selectedPlanningUnitObj.planningUnitId,
                                         "label": selectedPlanningUnitObj.label,
+                                        "forecastingUnit": {
+                                            "id": forecastingUnitObj.forecastingUnitId,
+                                            "label": forecastingUnitObj.label,
+                                            "productCategory": {
+                                                "id": forecastingUnitObj.productCategory.id,
+                                                "label": forecastingUnitObj.productCategory.label,
+                                                "idString": '' + forecastingUnitObj.productCategory.id
+                                            },
+                                            "idString": '' + forecastingUnitObj.forecastingUnitId
+                                        },
                                         "idString": '' + selectedPlanningUnitObj.planningUnitId,
                                     },
                                     "region": {
