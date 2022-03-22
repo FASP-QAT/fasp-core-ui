@@ -524,11 +524,11 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                     // console.log("noOfPatientsNew$$$%%%", noOfPatientsNew);
                                     noOfPatients = (patients / monthsPerVisit) + deltaPatients;
                                     console.log("noOfPatients@@@", noOfPatients);
-                                    calculatedMMdPatients.push({ month: curDate, value: noOfPatients });
+                                    calculatedMMdPatients.push({ month: curDate, value: noOfPatients<0?0:noOfPatients });
                                 } else {
                                     var prevCycleValue = calculatedMMdPatients.filter(c => moment(c.month).format("YYYY-MM") == moment(curDate).add(-monthsPerVisit, 'months').format("YYYY-MM"))[0].value;
                                     noOfPatients = prevCycleValue + deltaPatients;
-                                    calculatedMMdPatients.push({ month: curDate, value: noOfPatients });
+                                    calculatedMMdPatients.push({ month: curDate, value: noOfPatients<0?0:noOfPatients });
                                 }
                                 // console.log("noOfPus$$$%%%", noOfPus);
                                 // calculatedMmdValue = noOfPus;
@@ -573,7 +573,7 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                             difference: difference,
                             seasonalityPerc: seasonalityPercTotal,
                             manualChange: manualChangeTotal,
-                            calculatedMmdValue: calculatedMmdValue
+                            calculatedMmdValue: calculatedMmdValue<0?0:calculatedMmdValue
                         })
                         // console.log("Node MOM List%%%", nodeDataList);
                     }
