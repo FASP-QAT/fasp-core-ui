@@ -57,7 +57,7 @@ export default class StepTwoImportMapPlanningUnits extends Component {
             programRegionList: [],
             forecastProgramRegionList: [],
             selSource2: [],
-            isChanged1: true
+            isChanged1: false
 
         }
         this.changed = this.changed.bind(this);
@@ -403,7 +403,8 @@ export default class StepTwoImportMapPlanningUnits extends Component {
 
         this.el = jexcel(document.getElementById("mapRegion"), options);
         this.setState({
-            loading: false
+            loading: false,
+            isChanged1: true
         })
         this.props.updateStepOneData("loading", false);
     }

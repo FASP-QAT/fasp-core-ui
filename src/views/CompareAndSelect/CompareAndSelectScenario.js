@@ -1627,7 +1627,7 @@ class CompareAndSelectScenario extends Component {
                                 var month = xAxis2.split('-')[0];
                                 var year = xAxis2.split('-')[1];
                                 var filterByYear = monthArrayList.filter(c => moment(c).format("YYYY") == moment(year).format("YYYY"));
-                                var divideByTwo = Math.round(filterByYear.length / 2);
+                                var divideByTwo = Math.floor(filterByYear.length / 2);
                                 if (moment(filterByYear[divideByTwo]).format("MMM") === month) {
                                     return year;
                                 } else {
@@ -1923,14 +1923,14 @@ class CompareAndSelectScenario extends Component {
                                             </ul><br />
                                             <Table hover responsive className="table-outline mb-0 d-sm-table table-bordered">
                                                 <thead><tr>
-                                                    <th style={{ "textAlign": "center" }}>{i18n.t('static.common.display?')}</th>
-                                                    <th style={{ "textAlign": "center" }} title={i18n.t('static.compareAndSelect.typeTitle')}>{i18n.t('static.equivalancyUnit.type')}</th>
-                                                    <th style={{ "textAlign": "center" }}>{i18n.t('static.consumption.forcast')}</th>
-                                                    <th style={{ "textAlign": "center" }}>{i18n.t('static.compareAndSelect.selectAsForecast')}</th>
+                                                    <th style={{ "textAlign": "center" }} title={i18n.t('static.tooltip.Display')}>{i18n.t('static.common.display?')} <i class="fa fa-info-circle icons pl-lg-2" id="Popover2" aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>
+                                                    <th style={{ "textAlign": "center" }} title={i18n.t('static.tooltip.CompareandSelectType')}>{i18n.t('static.equivalancyUnit.type')} <i class="fa fa-info-circle icons pl-lg-2" id="Popover3" aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>
+                                                    <th style={{ "textAlign": "center" }} title={i18n.t('static.tooltip.Forecst')}>{i18n.t('static.consumption.forcast')} <i class="fa fa-info-circle icons pl-lg-2" id="Popover4" aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>
+                                                    <th style={{ "textAlign": "center" }} title={i18n.t('static.tooltip.SelectAsForecast')}>{i18n.t('static.compareAndSelect.selectAsForecast')} <i class="fa fa-info-circle icons pl-lg-2" id="Popover5" aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>
                                                     <th style={{ "textAlign": "center" }} title={i18n.t('static.common.forForecastPeriod') + " " + moment(this.state.forecastStartDate).format(DATE_FORMAT_CAP_WITHOUT_DATE) + " " + i18n.t('static.jexcel.to') + " " + moment(this.state.forecastStopDate).format(DATE_FORMAT_CAP_WITHOUT_DATE)}>{i18n.t('static.compareAndSelect.totalForecast')}</th>
-                                                    <th style={{ "textAlign": "center" }}>{i18n.t('static.compareAndSelect.forecastError')}</th>
-                                                    <th style={{ "textAlign": "center" }}>{i18n.t('static.compareAndSelect.forecastErrorMonths')}</th>
-                                                    <th style={{ "textAlign": "center" }}>{i18n.t('static.compareAndSelect.compareToConsumptionForecast')}</th>
+                                                    <th style={{ "textAlign": "center" }} title={i18n.t('static.tooltip.ForecastError')}>{i18n.t('static.compareAndSelect.forecastError')} <i class="fa fa-info-circle icons pl-lg-2" id="Popover6" aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>
+                                                    <th style={{ "textAlign": "center" }} title={i18n.t('static.tooltip.ForecastErrorMonthUsed')}>{i18n.t('static.compareAndSelect.forecastErrorMonths')} <i class="fa fa-info-circle icons pl-lg-2" id="Popover7" aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>
+                                                    <th style={{ "textAlign": "center" }} title={i18n.t('static.tooltip.ComparetoConsumptionForecast')}>{i18n.t('static.compareAndSelect.compareToConsumptionForecast')} <i class="fa fa-info-circle icons pl-lg-2" id="Popover8" aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>
                                                 </tr></thead>
                                                 <tbody>
                                                     {/* <tr>

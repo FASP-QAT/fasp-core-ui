@@ -773,6 +773,11 @@ export default class SyncMasterData extends Component {
                                                                                                     var budRequest = budCObjectStore.clear();
                                                                                                     budRequest.onsuccess = function (event) {
 
+                                                                                                        var euC = db1.transaction(['equivalencyUnit'], 'readwrite');
+                                                                                                    var euCObjectStore = euC.objectStore('equivalencyUnit');
+                                                                                                    var euCRequest = euCObjectStore.clear();
+                                                                                                    euCRequest.onsuccess = function (event) {
+
                                                                                                         // country
                                                                                                         var countryTransaction = db1.transaction(['country'], 'readwrite');
                                                                                                         // console.log("M sync country transaction start")
@@ -1529,6 +1534,7 @@ export default class SyncMasterData extends Component {
                                                                 }.bind(this);
                                                             }.bind(this);
                                                         }.bind(this);
+                                                    }.bind(this);
 
                                                     }
 

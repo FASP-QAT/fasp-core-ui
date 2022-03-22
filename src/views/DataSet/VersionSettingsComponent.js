@@ -969,7 +969,8 @@ class VersionSettingsComponent extends Component {
                 {
                     title: i18n.t('static.program.noOfDaysInMonth'),
                     type: 'dropdown',
-                    source: this.state.noOfDays
+                    source: this.state.noOfDays,
+                    width: '200',
                 },//13 N
 
 
@@ -1136,12 +1137,25 @@ class VersionSettingsComponent extends Component {
         jExcelLoadedFunction(instance);
         var asterisk = document.getElementsByClassName("resizable")[0];
         var tr = asterisk.firstChild;
+        tr.children[3].classList.add('InfoTr');
+        tr.children[14].classList.add('InfoTrAsteriskTheadtrTd');
+        tr.children[15].classList.add('InfoTr');
+        tr.children[16].classList.add('InfoTr');
+        tr.children[17].classList.add('InfoTr');
+
         tr.children[8].classList.add('AsteriskTheadtrTd');
         tr.children[10].classList.add('AsteriskTheadtrTd');
         // tr.children[16].classList.add('AsteriskTheadtrTd');
         // tr.children[15].classList.add('AsteriskTheadtrTd');
-        tr.children[14].classList.add('AsteriskTheadtrTd');
+        // tr.children[14].classList.add('AsteriskTheadtrTd');
         // tr.children[17].classList.add('AsteriskTheadtrTd');
+
+        tr.children[3].title = i18n.t('static.tooltip.version');
+        tr.children[14].title = i18n.t('static.tooltip.HashOfDaysInMonth');
+        tr.children[15].title = i18n.t('static.tooltip.FreightPercent');
+        tr.children[16].title = i18n.t('static.tooltip.ForecastThresholdHigh');
+        tr.children[17].title = i18n.t('static.tooltip.ForecastThresholdLow');
+
     }
     oncreateeditor = function (el, cell, x, y) {
         if (x == 4) {
@@ -1240,7 +1254,7 @@ class VersionSettingsComponent extends Component {
         let missingMonths = missingMonthList.length > 0 ? missingMonthList.map((item, i) => {
             return (
                 <li key={i}>
-                    <div><span><div className="hoverDiv" onClick={() => missingMonthsClicked(item.planningUnitId, this)}>{getLabelText(item.planningUnitLabel, this.state.lang) + " - " + getLabelText(item.regionLabel, this.state.lang) + ": "}</div>{"" + item.monthsArray}</span></div>
+                    <div className="hoverDiv" onClick={() => missingMonthsClicked(item.planningUnitId, this)}><span>{getLabelText(item.planningUnitLabel, this.state.lang) + " - " + getLabelText(item.regionLabel, this.state.lang) + ": "}</span></div>{"" + item.monthsArray}
                 </li>
             )
         }, this) : <span>{i18n.t('static.forecastValidation.noMissingGaps')}</span>;
@@ -1250,7 +1264,7 @@ class VersionSettingsComponent extends Component {
         let consumption = consumptionListlessTwelve.length > 0 ? consumptionListlessTwelve.map((item, i) => {
             return (
                 <li key={i}>
-                    <div><span><div className="hoverDiv" onClick={() => missingMonthsClicked(item.planningUnitId, this)}>{getLabelText(item.planningUnitLabel, this.state.lang) + " - " + getLabelText(item.regionLabel, this.state.lang) + ": "}</div></span><span>{item.noOfMonths + " month(s)"}</span></div>
+                    <div className="hoverDiv" onClick={() => missingMonthsClicked(item.planningUnitId, this)}><span>{getLabelText(item.planningUnitLabel, this.state.lang) + " - " + getLabelText(item.regionLabel, this.state.lang) + ": "}</span></div><span>{item.noOfMonths + " month(s)"}</span>
                 </li>
             )
         }, this) : <span>{i18n.t('static.forecastValidation.noMonthsHaveLessData')}</span>;
@@ -1276,7 +1290,7 @@ class VersionSettingsComponent extends Component {
                             return (
                                 <ul>
                                     <li key={j}>
-                                        <div><span className={item1.payload.nodeType.id == 4 ? "redColor" : ""}>{getLabelText(item1.payload.label, this.state.lang)}</span></div>
+                                    <div><span className={item1.payload.nodeType.id == 4 ? "redColor" : ""}>{getLabelText(item1.payload.label, this.state.lang)==""?i18n.t('static.forecastValidation.editMe'):getLabelText(item1.payload.label, this.state.lang)}</span></div>
                                     </li>
                                 </ul>
                             )

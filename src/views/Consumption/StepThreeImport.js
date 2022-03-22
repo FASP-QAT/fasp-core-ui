@@ -63,7 +63,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
             stopDate: '',
             buildCSVTable: [],
             languageEl: '',
-            isChanged1: true
+            isChanged1: false
 
         }
 
@@ -139,10 +139,10 @@ export default class StepThreeImportMapPlanningUnits extends Component {
         headers.push(i18n.t('static.importFromQATSupplyPlan.forecastPlanningUnit').replaceAll(' ', '%20'));
         headers.push(i18n.t('static.program.region').replaceAll(' ', '%20'));
         headers.push(i18n.t('static.inventoryDate.inventoryReport').replaceAll(' ', '%20'));
-        headers.push(i18n.t('static.importFromQATSupplyPlan.supplyPlanConsumption').replaceAll(' ', '%20'));
+        headers.push(i18n.t('static.importFromQATSupplyPlan.actualConsumption(SupplyPlanModule)').replaceAll(' ', '%20'));
         headers.push(i18n.t('static.importFromQATSupplyPlan.conversionFactor(SupplyPlantoForecast)').replaceAll(' ', '%20'));
         headers.push(i18n.t('static.importFromQATSupplyPlan.convertedActualConsumption(SupplyPlanModule)').replaceAll(' ', '%20'));
-        headers.push(i18n.t('static.importFromQATSupplyPlan.currentQATConsumption').replaceAll(' ', '%20'));
+        headers.push(i18n.t('static.importFromQATSupplyPlan.currentActualConsumption(ForecastModule)').replaceAll(' ', '%20'));
         headers.push(i18n.t('static.quantimed.importData').replaceAll(' ', '%20'));
 
 
@@ -753,7 +753,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
         var languageEl = jexcel(document.getElementById("mapImport"), options);
         this.el = languageEl;
         this.setState({
-            languageEl: languageEl, loading: false, buildCSVTable: buildCSVTable
+            languageEl: languageEl, loading: false, buildCSVTable: buildCSVTable, isChanged1: true
         }, () => {
             this.props.updateStepOneData("loading", false);
             this.changeColor();

@@ -53,7 +53,8 @@ export default class ListTreeTemplate extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            color:'',
+            isSubmitClicked: false,
+            color: '',
             treeTemplateId: '',
             treeTemplateList: [],
             message: '',
@@ -172,7 +173,8 @@ export default class ListTreeTemplate extends Component {
                     this.setState({
                         message: i18n.t('static.message.addTreeTemplate'),
                         color: 'green',
-                        loading: false
+                        loading: false,
+                        isSubmitClicked: false
                     }, () => {
                         this.getTreeTemplateList();
                         this.hideSecondComponent();
@@ -192,7 +194,8 @@ export default class ListTreeTemplate extends Component {
                     if (error.message === "Network Error") {
                         this.setState({
                             message: 'static.unkownError',
-                            loading: false
+                            loading: false,
+                            isSubmitClicked: false
                         });
                     } else {
                         switch (error.response ? error.response.status : "") {
@@ -208,19 +211,22 @@ export default class ListTreeTemplate extends Component {
                             case 406:
                                 this.setState({
                                     message: error.response.data.messageCode,
-                                    loading: false
+                                    loading: false,
+                                    isSubmitClicked: false
                                 });
                                 break;
                             case 412:
                                 this.setState({
                                     message: error.response.data.messageCode,
-                                    loading: false
+                                    loading: false,
+                                    isSubmitClicked: false
                                 });
                                 break;
                             default:
                                 this.setState({
                                     message: 'static.unkownError',
-                                    loading: false
+                                    loading: false,
+                                    isSubmitClicked: false
                                 });
                                 break;
                         }
@@ -365,7 +371,7 @@ export default class ListTreeTemplate extends Component {
                                 this.setState({
                                     treeTemplateId: this.el.getValueFromCoords(0, y),
                                     isModalOpen: !this.state.isModalOpen,
-                                    treeTemplateName: this.el.getValueFromCoords(1, y) + "+copy"
+                                    treeTemplateName: this.el.getValueFromCoords(1, y) + "(copy)"
                                 })
                             }.bind(this)
                         });
@@ -536,13 +542,14 @@ export default class ListTreeTemplate extends Component {
                                     }}
                                     validate={validate(validationSchema)}
                                     onSubmit={(values, { setSubmitting, setErrors }) => {
-                                        this.setState({ loading: true }, () => {
-                                            this.copyDeleteTree(this.state.treeTemplateId);
-                                            this.setState({
-                                                isModalOpen: !this.state.isModalOpen,
-                                            })
-                                        });
-
+                                        if (!this.state.isSubmitClicked) {
+                                            this.setState({ loading: true, isSubmitClicked: true }, () => {
+                                                this.copyDeleteTree(this.state.treeTemplateId);
+                                                this.setState({
+                                                    isModalOpen: !this.state.isModalOpen,
+                                                })
+                                            });
+                                        }
                                     }}
 
 
