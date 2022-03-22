@@ -1947,9 +1947,9 @@ export default class BuildTree extends Component {
             data[3] = parseFloat(momList[j].manualChange).toFixed(2)
             data[4] = `=ROUND(IF(B${parseInt(j) + 1}+C${parseInt(j) + 1}+D${parseInt(j) + 1}<0,0,IF(B${parseInt(j) + 1}+C${parseInt(j) + 1}+D${parseInt(j) + 1}>100,100,B${parseInt(j) + 1}+C${parseInt(j) + 1}+D${parseInt(j) + 1})),2)`
             // `=B${parseInt(j) + 1}+C${parseInt(j) + 1}+D${parseInt(j) + 1}`
-            console.log("momListParent j---", momList[j].month + "value", momListParent[j].calculatedValue)
-            data[5] = parseFloat(momListParent[j].calculatedValue).toFixed(2)
-            data[6] = this.state.currentItemConfig.context.payload.nodeType.id != 5 ? `=ROUND((E${parseInt(j) + 1}*${momListParent[j].calculatedValue}/100)*L${parseInt(j) + 1},2)` : `=ROUND((E${parseInt(j) + 1}*${momListParent[j].calculatedValue}/100)/${(this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].puNode.planningUnit.multiplier},2)`;
+            var momListParentForMonth=momListParent.filter(c=>moment(c.month).format("YYYY-MM")==moment(momList[j].month).format("YYYY-MM"));
+            data[5] = momListParentForMonth.length>0?parseFloat(momListParentForMonth[0].calculatedValue).toFixed(2):0;
+            data[6] = this.state.currentItemConfig.context.payload.nodeType.id != 5 ? `=ROUND((E${parseInt(j) + 1}*${momListParentForMonth.length>0?parseFloat(momListParentForMonth[0].calculatedValue):0}/100)*L${parseInt(j) + 1},2)` : `=ROUND((E${parseInt(j) + 1}*${momListParentForMonth.length>0?parseFloat(momListParentForMonth[0].calculatedValue):0}/100)/${(this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].puNode.planningUnit.multiplier},2)`;
             // data[6] = this.state.manualChange ? momList[j].calculatedValue : ((momListParent[j].manualChange > 0) ? momListParent[j].endValueWithManualChangeWMC : momListParent[j].calculatedValueWMC *  momList[j].endValueWithManualChangeWMC) / 100
             data[7] = this.state.currentScenario.nodeDataId
             data[8] = this.state.currentItemConfig.context.payload.nodeType.id == 5 && parentNodeNodeData.fuNode.usageType.id == 2 ? j >= lagInMonths ? `=P${parseInt(j) + 1 - lagInMonths}` : 0 : j >= lagInMonths ? `=P${parseInt(j) + 1}` : 0;
