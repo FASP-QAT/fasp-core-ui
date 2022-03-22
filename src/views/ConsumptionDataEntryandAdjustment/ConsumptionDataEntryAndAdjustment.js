@@ -289,6 +289,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           filters: false,
           freezeColumns: 1,
           license: JEXCEL_PRO_KEY,
+          parseFormulas: true,
           contextMenu: function (obj, x, y, e) {
             return [];
           }.bind(this),
@@ -537,6 +538,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       }
     }
     if (possibleReportRateY.includes(y.toString())) {
+      value = elInstance.getValue(`${colArr[x]}${parseInt(y)+1}`, true);
       if (value == "") {
       }
       else if (value < 0 || value > 100) {
@@ -545,7 +547,6 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         elInstance.setStyle(col, "background-color", "yellow");
         // elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
         elInstance.setComments(col, "Please enter any positive number upto 100");
-
       }
       else {
         var col = (colArr[x]).concat(parseInt(y) + 1);
@@ -554,6 +555,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       }
     }
     if (possibleStockDayY.includes(y.toString())) {
+      value = elInstance.getValue(`${colArr[x]}${parseInt(y)+1}`, true);
       var stockOutdays = elInstance.getColumnData(x)[0];
       if (value == "") {
       } else if (value < 0 || value > stockOutdays) {
@@ -594,7 +596,8 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     for (var y = 0; y < json.length; y++) {
       for (var x = 1; x < 37; x++) {
         var rowData = elInstance.getRowData(y);
-        if (possibleActualConsumptionY.includes(y.toString())) {
+        var value = elInstance.getValue(`${colArr[x]}${parseInt(y)+1}`, true);
+       if (possibleActualConsumptionY.includes(y.toString())) {
           if (rowData[x] == "") {
           } else if (rowData[x] < 0) {
             var col = (colArr[x]).concat(parseInt(y) + 1);
@@ -611,10 +614,16 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         }
 
         if (possibleReportRateY.includes(y.toString())) {
-          if (rowData[x] == "") {
+          console.log("possibleReportRateY--",y.toString());
+          if (value == "") {
+            console.log("possibleReportRateY--If ", rowData[x]);
+            
           }
-          else if (rowData[x] < 0 || rowData[x] > 100) {
+          else if (value < 0 || value > 100) {
+            console.log("possibleReportRateY--If esle ",rowData[x]);
             var col = (colArr[x]).concat(parseInt(y) + 1);
+            console.log("possibleReportRateY--Col If esle  ",col);
+            
             elInstance.setStyle(col, "background-color", "transparent");
             elInstance.setStyle(col, "background-color", "yellow");
             //elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
@@ -623,6 +632,9 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           }
           else {
             var col = (colArr[x]).concat(parseInt(y) + 1);
+            
+            console.log("possibleReportRateY--Col esle  ",col);
+            
             elInstance.setStyle(col, "background-color", "transparent");
             elInstance.setComments(col, "");
           }
@@ -630,8 +642,8 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
 
         if (possibleStockDayY.includes(y.toString())) {
           var stockOutdays = elInstance.getColumnData(x)[0];
-          if (rowData[x] == "") {
-          } else if (rowData[x] < 0 || rowData[x] > stockOutdays) {
+          if (value == "") {
+          } else if (value < 0 || value > stockOutdays) {
             var col = (colArr[x]).concat(parseInt(y) + 1);
             elInstance.setStyle(col, "background-color", "transparent");
             elInstance.setStyle(col, "background-color", "yellow");
@@ -646,6 +658,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         }
       }
     }
+    console.log("valid--",valid)
     return valid;
   }
 
@@ -721,7 +734,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         //   index = fullConsumptionList.findIndex(c => c.planningUnit.id == consumptionUnit.planningUnit.id && c.region.id == regionList[r].regionId && moment(c.month).format("YYYY-MM") == moment(monthArray[i].date).format("YYYY-MM"));
         // index = fullConsumptionList.findIndex(con =>  con.region.id == regionList[r].regionId && moment(con.month).format("YYYY-MM") == moment(monthArray[i].date).format("YYYY-MM"));
 
-        if (columnData[actualConsumptionCount] >= 0) {
+        if (columnData[actualConsumptionCount] !== "") {
           if (index != -1) {
             fullConsumptionList[index].actualConsumption = columnData[actualConsumptionCount];
             fullConsumptionList[index].daysOfStockOut = columnData[daysOfStockOutCount];
@@ -758,16 +771,17 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
 
     for (var r = 0; r < regionList.length; r++) {
       for (var j = 0; j < monthArray.length; j++) {
-        var consumptionData = fullConsumptionList.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArray[j].date).format("YYYY-MM") && c.planningUnit.id == consumptionUnit.planningUnit.id && c.region.id == regionList[r].regionId && c.amount > 0);
+        var consumptionData = fullConsumptionList.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArray[j].date).format("YYYY-MM") && c.planningUnit.id == consumptionUnit.planningUnit.id && c.region.id == regionList[r].regionId && c.amount >= 0);
         if (consumptionData.length == 0) {
-          var startValList = fullConsumptionList.filter(c => moment(c.month).format("YYYY-MM") < moment(monthArray[j].date).format("YYYY-MM") && c.planningUnit.id == consumptionUnit.planningUnit.id && c.region.id == regionList[r].regionId && c.amount > 0)
+          var startValList = fullConsumptionList.filter(c => moment(c.month).format("YYYY-MM") < moment(monthArray[j].date).format("YYYY-MM") && c.planningUnit.id == consumptionUnit.planningUnit.id && c.region.id == regionList[r].regionId && c.amount >= 0)
             .sort(function (a, b) {
               return new Date(a.month) - new Date(b.month);
             });
-          var endValList = fullConsumptionList.filter(c => moment(c.month).format("YYYY-MM") > moment(monthArray[j].date).format("YYYY-MM") && c.planningUnit.id == consumptionUnit.planningUnit.id && c.region.id == regionList[r].regionId && c.amount > 0)
+          var endValList = fullConsumptionList.filter(c => moment(c.month).format("YYYY-MM") > moment(monthArray[j].date).format("YYYY-MM") && c.planningUnit.id == consumptionUnit.planningUnit.id && c.region.id == regionList[r].regionId && c.amount >= 0)
             .sort(function (a, b) {
               return new Date(a.month) - new Date(b.month);
             });
+            
           if (startValList.length > 0 && endValList.length > 0) {
             var startVal = startValList[startValList.length - 1].amount;
             var startMonthVal = startValList[startValList.length - 1].month;
@@ -780,7 +794,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
             const monthDiff = moment(new Date(endMonthVal)).diff(new Date(startMonthVal), 'months', true);
             var missingActualConsumption = Number(startVal) + (monthDifference * ((Number(endVal) - Number(startVal)) / monthDiff));
             var json = {
-              amount: missingActualConsumption.toFixed(2),
+              amount: missingActualConsumption.toFixed(0),
               planningUnit: {
                 id: consumptionUnit.planningUnit.id,
                 label: consumptionUnit.planningUnit.label
@@ -820,9 +834,8 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     })
     console.log("validation---------->before")
     var validation = this.checkValidationConsumption();
-    //console.log("validation---------->",validation)
-    //var validation =true; 
-    if (validation == true) {
+    console.log("validation---------->",validation)
+    if (validation) {
       console.log("INIF")
       var db1;
       var storeOS;
