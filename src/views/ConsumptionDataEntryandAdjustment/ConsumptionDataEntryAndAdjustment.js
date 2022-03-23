@@ -15,6 +15,8 @@ import 'react-select/dist/react-select.min.css';
 import AuthenticationService from "../Common/AuthenticationService.js";
 import moment from "moment"
 import jexcel from 'jexcel-pro';
+import "../../../node_modules/jexcel-pro/dist/jexcel.css";
+import "../../../node_modules/jsuites/dist/jsuites.css";
 import csvicon from '../../assets/img/csv.png';
 import { JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants.js';
 import { jExcelLoadedFunctionOnlyHideRow, checkValidtion } from '../../CommonComponent/JExcelCommonFunctions.js'
@@ -151,9 +153,9 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         var multiplier = 1;
         if (consumptionUnitId != 0) {
           if (consumptionUnit.consumptionDataType == 1) {
-            multiplier = consumptionUnit.planningUnit.multiplier;
-          } else if (consumptionUnit.consumptionDataType == 2) {
             multiplier = 1;
+          } else if (consumptionUnit.consumptionDataType == 2) {
+            multiplier = consumptionUnit.planningUnit.multiplier;
           } else {
             multiplier = consumptionUnit.otherUnit.multiplier;
           }
@@ -227,12 +229,24 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           dataArray.push(data);
 
           data = [];
+          console.log("multiplier-->", multiplier)
           data[0] = i18n.t('static.dataentry.convertedToPlanningUnit')
           for (var j = 0; j < monthArray.length; j++) {
             // data[j + 1] = `=ROUND(${colArr[j + 1]}${parseInt(dataArray.length)}/${colArr[monthArray.length + 1] + "0"},0)`;
-            data[j + 1] = `=ROUND(${colArr[j + 1]}${parseInt(dataArray.length)}/${multiplier},0)`;
+            var multiplier1 = 1;
+            if (consumptionUnitId != 0) {
+              if (consumptionUnit.consumptionDataType == 1) {
+                multiplier1 = consumptionUnit.planningUnit.multiplier;
+              } else if (consumptionUnit.consumptionDataType == 2) {
+                multiplier1 = 1;
+              } else {
+                multiplier1 = consumptionUnit.otherUnit.multiplier;
+              }
+            }
+            data[j + 1] = `=ROUND(${colArr[j + 1]}${parseInt(dataArray.length)}/${multiplier1},0)`;
           }
           data[monthArray.length + 1] = multiplier;
+
           dataArray.push(data);
           if (r != regionList.length - 1) {
             data = [];
@@ -340,14 +354,14 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           data[0] = consumptionUnit.consumptionDataType == 1 ? true : false;
           data[1] = 1;
           data[2] = getLabelText(consumptionUnit.planningUnit.forecastingUnit.label, this.state.lang);
-          data[3] = parseInt(consumptionUnit.planningUnit.multiplier);
+          data[3] = 1;
           data[4] = consumptionUnit.planningUnit.forecastingUnit.id;
           dataArray1.push(data);
           data = [];
           data[0] = consumptionUnit.consumptionDataType == 2 ? true : false;
           data[1] = 2;
           data[2] = getLabelText(consumptionUnit.planningUnit.label, this.state.lang);
-          data[3] = 1;
+          data[3] = parseInt(consumptionUnit.planningUnit.multiplier);
           data[4] = consumptionUnit.planningUnit.id;
           dataArray1.push(data);
           data = [];
@@ -530,7 +544,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         elInstance.setStyle(col, "background-color", "yellow");
         // elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
         elInstance.setComments(col, "Please enter a positive number')");
-      
+
       } else {
         var col = (colArr[x]).concat(parseInt(y) + 1);
         elInstance.setStyle(col, "background-color", "transparent");
@@ -538,7 +552,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       }
     }
     if (possibleReportRateY.includes(y.toString())) {
-      value = elInstance.getValue(`${colArr[x]}${parseInt(y)+1}`, true);
+      value = elInstance.getValue(`${colArr[x]}${parseInt(y) + 1}`, true);
       if (value == "") {
       }
       else if (value < 0 || value > 100) {
@@ -555,7 +569,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       }
     }
     if (possibleStockDayY.includes(y.toString())) {
-      value = elInstance.getValue(`${colArr[x]}${parseInt(y)+1}`, true);
+      value = elInstance.getValue(`${colArr[x]}${parseInt(y) + 1}`, true);
       var stockOutdays = elInstance.getColumnData(x)[0];
       if (value == "") {
       } else if (value < 0 || value > stockOutdays) {
@@ -596,14 +610,14 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     for (var y = 0; y < json.length; y++) {
       for (var x = 1; x < 37; x++) {
         var rowData = elInstance.getRowData(y);
-        var value = elInstance.getValue(`${colArr[x]}${parseInt(y)+1}`, true);
-       if (possibleActualConsumptionY.includes(y.toString())) {
+        var value = elInstance.getValue(`${colArr[x]}${parseInt(y) + 1}`, true);
+        if (possibleActualConsumptionY.includes(y.toString())) {
           if (rowData[x] == "") {
           } else if (rowData[x] < 0) {
             var col = (colArr[x]).concat(parseInt(y) + 1);
             elInstance.setStyle(col, "background-color", "transparent");
             elInstance.setStyle(col, "background-color", "yellow");
-        // elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
+            // elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
             elInstance.setComments(col, "Please enter a positive number')");
             valid = false;
           } else {
@@ -614,16 +628,16 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         }
 
         if (possibleReportRateY.includes(y.toString())) {
-          console.log("possibleReportRateY--",y.toString());
+          console.log("possibleReportRateY--", y.toString());
           if (value == "") {
             console.log("possibleReportRateY--If ", rowData[x]);
-            
+
           }
           else if (value < 0 || value > 100) {
-            console.log("possibleReportRateY--If esle ",rowData[x]);
+            console.log("possibleReportRateY--If esle ", rowData[x]);
             var col = (colArr[x]).concat(parseInt(y) + 1);
-            console.log("possibleReportRateY--Col If esle  ",col);
-            
+            console.log("possibleReportRateY--Col If esle  ", col);
+
             elInstance.setStyle(col, "background-color", "transparent");
             elInstance.setStyle(col, "background-color", "yellow");
             //elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
@@ -632,9 +646,9 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           }
           else {
             var col = (colArr[x]).concat(parseInt(y) + 1);
-            
-            console.log("possibleReportRateY--Col esle  ",col);
-            
+
+            console.log("possibleReportRateY--Col esle  ", col);
+
             elInstance.setStyle(col, "background-color", "transparent");
             elInstance.setComments(col, "");
           }
@@ -658,7 +672,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         }
       }
     }
-    console.log("valid--",valid)
+    console.log("valid--", valid)
     return valid;
   }
 
@@ -781,7 +795,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
             .sort(function (a, b) {
               return new Date(a.month) - new Date(b.month);
             });
-            
+
           if (startValList.length > 0 && endValList.length > 0) {
             var startVal = startValList[startValList.length - 1].amount;
             var startMonthVal = startValList[startValList.length - 1].month;
@@ -834,7 +848,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     })
     console.log("validation---------->before")
     var validation = this.checkValidationConsumption();
-    console.log("validation---------->",validation)
+    console.log("validation---------->", validation)
     if (validation) {
       console.log("INIF")
       var db1;
@@ -1743,7 +1757,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     })
     addHeaders(doc)
     addFooters(doc)
-    doc.save(document.getElementById("datasetId").selectedOptions[0].text.toString().split("~")[0] + "-" + document.getElementById("datasetId").selectedOptions[0].text.toString().split("~")[1] + "-" + i18n.t('static.dashboard.dataEntryAndAdjustment')+"-"+i18n.t('static.common.dataCheck') + '.pdf');
+    doc.save(document.getElementById("datasetId").selectedOptions[0].text.toString().split("~")[0] + "-" + document.getElementById("datasetId").selectedOptions[0].text.toString().split("~")[1] + "-" + i18n.t('static.dashboard.dataEntryAndAdjustment') + "-" + i18n.t('static.common.dataCheck') + '.pdf');
   }
 
   render() {
@@ -1902,7 +1916,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     let missingMonths = missingMonthList.length > 0 && missingMonthList.map((item, i) => {
       return (
         <li key={i}>
-          <div><span><b>{getLabelText(item.planningUnitLabel, this.state.lang) + " - " + getLabelText(item.regionLabel, this.state.lang) + " : "}</b>{"" + item.monthsArray}</span></div>
+          <div><span><b>{getLabelText(item.planningUnitLabel, this.state.lang) + " - " + getLabelText(item.regionLabel, this.state.lang) + " :"}</b>{"" + item.monthsArray}</span></div>
         </li>
       )
     }, this);
@@ -2023,9 +2037,9 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                                     </td>
                                     <td className="sticky-col first-col clone hoverTd" align="left" onClick={() => { this.buildDataJexcel(item.planningUnit.id) }}>
                                       {
-                                        this.state.showInPlanningUnit ?getLabelText(item.planningUnit.label, this.state.lang):getLabelText(item.planningUnit.forecastingUnit.label, this.state.lang)
+                                        this.state.showInPlanningUnit ? getLabelText(item.planningUnit.label, this.state.lang) : getLabelText(item.planningUnit.forecastingUnit.label, this.state.lang)
                                         // item.consumptionDataType == 1 ? getLabelText(item.planningUnit.forecastingUnit.label, this.state.lang) : item.consumptionDataType == 2 ? getLabelText(item.planningUnit.label, this.state.lang) : getLabelText(item.otherUnit.label, this.state.lang)
-                                               }</td>
+                                      }</td>
                                     {this.state.monthArray.map((item1, count) => {
                                       var data = this.state.planningUnitTotalList.filter(c => c.planningUnitId == item.planningUnit.id && moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM"))
                                       total += Number(data[0].qty);
@@ -2260,15 +2274,18 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         }
 
         //Consumption : missing months
+        var consumptionListFilteredForMonth = consumptionList.filter(c => c.planningUnit.id == puId && c.region.id == regionId);
+        let actualMin = moment.min(consumptionListFilteredForMonth.map(d => moment(d.month)));
+        curDate = moment(actualMin).format("YYYY-MM");
         for (var i = 0; moment(curDate).format("YYYY-MM") < moment(stopDate).format("YYYY-MM"); i++) {
-          var consumptionListFilteredForMonth = consumptionList.filter(c => c.planningUnit.id == puId && c.region.id == regionId);
-          let actualMin = moment.min(consumptionListFilteredForMonth.map(d => moment(d.month)));
+          // var consumptionListFilteredForMonth = consumptionList.filter(c => c.planningUnit.id == puId && c.region.id == regionId);
+          // let actualMin = moment.min(consumptionListFilteredForMonth.map(d => moment(d.month)));
           curDate = moment(actualMin).add(i, 'months').format("YYYY-MM-DD");
           var consumptionListForCurrentMonth = consumptionListFilteredForMonth.filter(c => moment(c.month).format("YYYY-MM") == moment(curDate).format("YYYY-MM"));
           var checkIfPrevMonthConsumptionAva = consumptionListFilteredForMonth.filter(c => moment(c.month).format("YYYY-MM") < moment(curDate).format("YYYY-MM"));
           var checkIfNextMonthConsumptionAva = consumptionListFilteredForMonth.filter(c => moment(c.month).format("YYYY-MM") > moment(curDate).format("YYYY-MM"));
           if (consumptionListForCurrentMonth.length == 0 && checkIfPrevMonthConsumptionAva.length > 0 && checkIfNextMonthConsumptionAva.length > 0) {
-            monthsArray.push(moment(curDate).format(DATE_FORMAT_CAP_WITHOUT_DATE));
+            monthsArray.push(" " + moment(curDate).format(DATE_FORMAT_CAP_WITHOUT_DATE));
           }
         }
 
