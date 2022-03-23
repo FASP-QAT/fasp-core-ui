@@ -622,12 +622,13 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                     var nodeDataMapForScenario = (nodeDataMap[scenarioList[ndm].id])[0];
                     // console.log("agg node data---", nodeDataMapForScenario);
                     var childNodeFlatList = flatListUnsorted.filter(c => c.parent == aggregateNodeList[fl - 1].id);
+                    var minMonth=moment.min(childNodeFlatList.map(d => moment(d.payload.nodeDataMap[scenarioList[ndm].id][0].month)));
                     // console.log("agg child&&&", childNodeFlatList);
                     // console.log("scenarioList[ndm].id&&&", scenarioList[ndm].id);
-                    var curDate = moment(nodeDataMapForScenario.month).startOf('month').format("YYYY-MM-DD");;
+                    var curDate = moment(minMonth).startOf('month').format("YYYY-MM-DD");;
                     var nodeDataList = [];
                     for (var i = 0; curDate < stopDate; i++) {
-                        curDate = moment(nodeDataMapForScenario.month).add(i, 'months').format("YYYY-MM-DD");
+                        curDate = moment(minMonth).add(i, 'months').format("YYYY-MM-DD");
                         var aggregatedStartValue = 0;
                         var aggregatedEndValue = 0;
                         var aggregatedCalculatedValue = 0;
