@@ -303,7 +303,7 @@ export function checkValidtion(type, colName, rowNo, value, elInstance, reg, gre
         }
     } else if (type == "dateWithInvalidDataEntry") {
         console.log("Value$####", moment(value).format("YYYY-MM-DD"))
-        console.log("Condition###", moment(value).format("YYYY-MM") > moment(Date.now()).startOf('month').add(MIN_DATE_RESTRICTION_IN_DATA_ENTRY, 'years').format("YYYY-MM") && moment(value).format("YYYY-MM") < moment(Date.now()).endOf('month').add(MAX_DATE_RESTRICTION_IN_DATA_ENTRY, 'years').format("YYYY-MM"));
+        console.log("Condition###", moment(value).format("YYYY-MM") > moment(MIN_DATE_RESTRICTION_IN_DATA_ENTRY).startOf('month').format("YYYY-MM"));
         var col = (colName).concat(parseInt(rowNo) + 1);
         if (value == "") {
             elInstance.setStyle(col, "background-color", "transparent");
@@ -323,7 +323,13 @@ export function checkValidtion(type, colName, rowNo, value, elInstance, reg, gre
                 elInstance.setComments(col, i18n.t('static.message.invaliddate'));
                 elInstance.setValueFromCoords(colNo, rowNo, "", true);
                 return false;
-            } else if (moment(value).format("YYYY-MM") > moment(Date.now()).startOf('month').add(MIN_DATE_RESTRICTION_IN_DATA_ENTRY, 'years').format("YYYY-MM") && moment(value).format("YYYY-MM") < moment(Date.now()).endOf('month').add(MAX_DATE_RESTRICTION_IN_DATA_ENTRY, 'years').format("YYYY-MM")) {
+            } else if (moment(value).isBefore(moment(MIN_DATE_RESTRICTION_IN_DATA_ENTRY).startOf('month').format("YYYY-MM"))) {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setStyle(col, "background-color", "yellow");
+                elInstance.setComments(col, i18n.t('static.message.invaliddate'));
+                // elInstance.setValueFromCoords(colNo, rowNo, "", true);
+                return false;
+            } else if (moment(value).isAfter(moment(Date.now()).add(MAX_DATE_RESTRICTION_IN_DATA_ENTRY,'years').endOf('month').format("YYYY-MM"))) {
                 elInstance.setStyle(col, "background-color", "transparent");
                 elInstance.setStyle(col, "background-color", "yellow");
                 elInstance.setComments(col, i18n.t('static.message.invaliddate'));
@@ -354,6 +360,24 @@ export function checkValidtion(type, colName, rowNo, value, elInstance, reg, gre
                 elInstance.setStyle(col, "background-color", "yellow");
                 elInstance.setComments(col, i18n.t('static.message.invaliddate'));
                 elInstance.setValueFromCoords(colNo, rowNo, "", true);
+                return false;
+            }else if (moment(value).format("YYYY-MM").toString().length != 7) {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setStyle(col, "background-color", "yellow");
+                elInstance.setComments(col, i18n.t('static.message.invaliddate'));
+                elInstance.setValueFromCoords(colNo, rowNo, "", true);
+                return false;
+            } else if (moment(value).isBefore(moment(MIN_DATE_RESTRICTION_IN_DATA_ENTRY).startOf('month').format("YYYY-MM"))) {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setStyle(col, "background-color", "yellow");
+                elInstance.setComments(col, i18n.t('static.message.invaliddate'));
+                // elInstance.setValueFromCoords(colNo, rowNo, "", true);
+                return false;
+            } else if (moment(value).isAfter(moment(Date.now()).add(MAX_DATE_RESTRICTION_IN_DATA_ENTRY,'years').endOf('month').format("YYYY-MM"))) {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setStyle(col, "background-color", "yellow");
+                elInstance.setComments(col, i18n.t('static.message.invaliddate'));
+                // elInstance.setValueFromCoords(colNo, rowNo, "", true);
                 return false;
             } else {
                 elInstance.setStyle(col, "background-color", "transparent");
