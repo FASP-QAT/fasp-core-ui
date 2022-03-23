@@ -53,6 +53,7 @@ import OrgDiagramPdfkit from '../TreePDF/OrgDiagramPdfkit';
 import Size from '../../../node_modules/basicprimitives/src/graphics/structs/Size';
 import { Prompt } from 'react-router';
 import { i } from 'mathjs';
+import RotatedText from 'basicprimitivesreact/dist/umd/Templates/RotatedText';
 
 // const ref = React.createRef();
 const entityname = 'Tree';
@@ -455,6 +456,7 @@ export default class BuildTree extends Component {
         this.pickAMonth5 = React.createRef()
         this.state = {
             isChanged: false,
+            levelModal: false,
             dropdownOpen: new Array(19).fill(false),
             isSubmitClicked: false,
             popoverOpenHowManyPUperIntervalPer: false,
@@ -831,7 +833,115 @@ export default class BuildTree extends Component {
         this.round = this.round.bind(this);
         this.calculatePUPerVisit = this.calculatePUPerVisit.bind(this);
         this.createPUNode = this.createPUNode.bind(this);
+        this.levelClicked = this.levelClicked.bind(this);
+        this.levelDeatilsSaved = this.levelDeatilsSaved.bind(this)
     }
+
+    levelClicked(data) {
+        var name = "";
+        var unit = "";
+        var levelNo = "";
+        if (data != "") {
+            console.log("Data@@@@###############", data.context.levels[0])
+            var treeLevelList = this.state.curTreeObj.levelList;
+            var levelListFiltered = treeLevelList.filter(c => c.levelNo == data.context.levels[0]);
+            levelNo = data.context.levels[0]
+            if (levelListFiltered.length > 0) {
+                name = levelListFiltered[0].label.label_en;
+                unit = levelListFiltered[0].unit.id;
+            }
+            console.log("Name@@@@###########", name);
+            console.log("Unit@@@@###########", unit);
+        }
+        this.setState({
+            levelModal: !this.state.levelModal,
+            levelName: name,
+            levelNo: levelNo,
+            levelUnit: unit
+        })
+
+    }
+
+    levelNameChanged(e) {
+        this.setState({
+            levelName: e.target.value
+        })
+    }
+
+    levelUnitChange(e) {
+        var nodeUnitId = e.target.value;
+        this.setState({
+            levelUnit: e.target.value
+        })
+    }
+
+    levelDeatilsSaved() {
+        const { curTreeObj } = this.state;
+        var treeLevelList = this.state.curTreeObj.levelList;
+        var levelListFiltered = treeLevelList.findIndex(c => c.levelNo == this.state.levelNo);
+        if (levelListFiltered != -1) {
+            if (this.state.levelName != "") {
+                treeLevelList[levelListFiltered].label = {
+                    label_en: this.state.levelName,
+                    label_sp: "",
+                    label_pr: "",
+                    label_fr: ""
+                };
+                var label = {}
+                if (this.state.levelUnit != "") {
+                    label = this.state.nodeUnitList.filter(c => c.nodeUnitId == this.state.levelUnit);
+                }
+                treeLevelList[levelListFiltered].unit = {
+                    id: this.state.levelUnit,
+                    label: label
+                }
+            } else {
+                treeLevelList.splice(levelListFiltered, 1);
+            }
+        } else {
+            if (this.state.levelName != "") {
+                var label = {}
+                if (this.state.levelUnit != "") {
+                    label = this.state.nodeUnitList.filter(c => c.nodeUnitId == this.state.levelUnit);
+                }
+                treeLevelList.push({
+                    levelId: null,
+                    levelNo: this.state.levelNo,
+                    label: {
+                        label_en: this.state.levelName,
+                        label_sp: "",
+                        label_pr: "",
+                        label_fr: ""
+                    },
+                    unit: {
+                        id: this.state.levelUnit,
+                        label: label
+                    }
+                })
+            }
+        }
+        curTreeObj.levelList = treeLevelList;
+        console.log("Cur Tree Obj@@@@@", curTreeObj)
+        this.setState({
+            levelModal: false,
+            curTreeObj,
+        }, () => {
+            this.saveTreeData()
+            // console.log("final tab list---", this.state.items);
+            // if (type == 1) {
+            //     var maxNodeDataId = temNodeDataMap.length > 0 ? Math.max(...temNodeDataMap.map(o => o.nodeDataId)) : 0;
+            //     console.log("scenarioId---", scenarioId);
+            //     for (var i = 0; i < items.length; i++) {
+            //         maxNodeDataId = parseInt(maxNodeDataId) + 1;
+            //         (items[i].payload.nodeDataMap[scenarioId])[0].nodeDataId = maxNodeDataId;
+            //         console.log("my node data id--->", (items[i].payload.nodeDataMap[scenarioId])[0].nodeDataId);
+            //     }
+            //     this.callAfterScenarioChange(scenarioId);
+            //     this.updateTreeData();
+            // }
+        });
+    }
+
     calculatePUPerVisit(isRefillMonth) {
         var currentScenario = this.state.currentScenario;
         var parentScenario = this.state.parentScenario;
@@ -3045,7 +3155,7 @@ export default class BuildTree extends Component {
             data[0] = ''
             data[1] = ''
             data[2] = this.state.currentItemConfig.context.payload.nodeType.id == PERCENTAGE_NODE_ID || this.state.currentItemConfig.context.payload.nodeType.id == FU_NODE_ID || this.state.currentItemConfig.context.payload.nodeType.id == PU_NODE_ID ? 5 : '';
-            data[3] = moment(this.state.currentScenario.month).startOf('month').add(1,'months').format("YYYY-MM-DD")
+            data[3] = moment(this.state.currentScenario.month).startOf('month').add(1, 'months').format("YYYY-MM-DD")
             data[4] = this.state.maxMonth
             data[5] = ''
             data[6] = ''
@@ -3113,12 +3223,12 @@ export default class BuildTree extends Component {
                 {
                     title: i18n.t('static.common.startdate'),
                     type: 'calendar',
-                    options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker', validRange: [moment(this.state.currentScenario.month).startOf('month').add(1,'months').format("YYYY-MM-DD"), this.state.maxMonth] }, width: 100
+                    options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker', validRange: [moment(this.state.currentScenario.month).startOf('month').add(1, 'months').format("YYYY-MM-DD"), this.state.maxMonth] }, width: 100
                 },
                 {
                     title: i18n.t('static.common.stopdate'),
                     type: 'calendar',
-                    options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker', validRange: [moment(this.state.currentScenario.month).startOf('month').add(1,'months').format("YYYY-MM-DD"), this.state.maxMonth] }, width: 100
+                    options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker', validRange: [moment(this.state.currentScenario.month).startOf('month').add(1, 'months').format("YYYY-MM-DD"), this.state.maxMonth] }, width: 100
                 },
                 {
                     title: i18n.t('static.tree.monthlyChange%'),
@@ -3264,7 +3374,7 @@ export default class BuildTree extends Component {
                                     data[0] = 0;
                                     data[1] = "";
                                     data[2] = "";
-                                    data[3] = moment(this.state.currentScenario.month).startOf('month').add(1,'months').format("YYYY-MM-DD")
+                                    data[3] = moment(this.state.currentScenario.month).startOf('month').add(1, 'months').format("YYYY-MM-DD")
                                     data[4] = this.state.maxMonth
                                     data[5] = "";
                                     data[6] = "";
@@ -3602,7 +3712,7 @@ export default class BuildTree extends Component {
         data[0] = 0;
         data[1] = "";
         data[2] = this.state.currentItemConfig.context.payload.nodeType.id == PERCENTAGE_NODE_ID || this.state.currentItemConfig.context.payload.nodeType.id == FU_NODE_ID || this.state.currentItemConfig.context.payload.nodeType.id == PU_NODE_ID ? 5 : '';
-        data[3] = moment(this.state.currentScenario.month).startOf('month').add(1,'months').format("YYYY-MM-DD");
+        data[3] = moment(this.state.currentScenario.month).startOf('month').add(1, 'months').format("YYYY-MM-DD");
         data[4] = this.state.maxMonth;
         data[5] = "";
         data[6] = "";
@@ -3943,13 +4053,15 @@ export default class BuildTree extends Component {
 
     exportPDF = () => {
         let treeLevel = this.state.items.length;
-        var treeLevelItems = []
+        var treeLevelItems = [];
+        var treeLevels = this.state.curTreeObj.forecastMethod.id != "" ? this.state.curTreeObj.levelList : [];
         for (var i = 0; i <= treeLevel; i++) {
+            var treeLevelFiltered = treeLevels.filter(c => c.levelNo == i);
             if (i == 0) {
                 treeLevelItems.push({
                     annotationType: AnnotationType.Level,
                     levels: [0],
-                    title: "Level 0",
+                    title: treeLevelFiltered.length > 0 ? getLabelText(treeLevelFiltered[0].label, this.state.lang) : "Level 0",
                     titleColor: "#002f6c",
                     fontWeight: "bold",
                     transForm: 'rotate(270deg)',
@@ -3964,7 +4076,7 @@ export default class BuildTree extends Component {
             else if (i % 2 == 0) {
                 treeLevelItems.push(new LevelAnnotationConfig({
                     levels: [i],
-                    title: "Level " + i,
+                    title: treeLevelFiltered.length > 0 ? getLabelText(treeLevelFiltered[0].label, this.state.lang) : "Level " + i,
                     titleColor: "#002f6c",
                     fontWeight: "bold",
                     transForm: 'rotate(270deg)',
@@ -3980,7 +4092,7 @@ export default class BuildTree extends Component {
             else {
                 treeLevelItems.push(new LevelAnnotationConfig({
                     levels: [i],
-                    title: "Level " + i,
+                    title: treeLevelFiltered.length > 0 ? getLabelText(treeLevelFiltered[0].label, this.state.lang) : "Level " + i,
                     titleColor: "#002f6c",
                     fontWeight: "bold",
                     transForm: 'rotate(270deg)',
@@ -8836,12 +8948,14 @@ export default class BuildTree extends Component {
         // regionMultiList = Array.from(regionMultiList);
         let treeLevel = this.state.items.length;
         const treeLevelItems = []
+        var treeLevels = this.state.curTreeObj.forecastMethod.id != "" ? this.state.curTreeObj.levelList : [];
         for (var i = 0; i <= treeLevel; i++) {
+            var treeLevelFiltered = treeLevels.filter(c => c.levelNo == i);
             if (i == 0) {
                 treeLevelItems.push({
                     annotationType: AnnotationType.Level,
                     levels: [0],
-                    title: "Level 0",
+                    title: treeLevelFiltered.length > 0 ? getLabelText(treeLevelFiltered[0].label, this.state.lang) : "Level 0",
                     titleColor: "#002f6c",
                     fontWeight: "bold",
                     transForm: 'rotate(270deg)',
@@ -8856,7 +8970,7 @@ export default class BuildTree extends Component {
             else if (i % 2 == 0) {
                 treeLevelItems.push(new LevelAnnotationConfig({
                     levels: [i],
-                    title: "Level " + i,
+                    title: treeLevelFiltered.length > 0 ? getLabelText(treeLevelFiltered[0].label, this.state.lang) : "Level " + i,
                     titleColor: "#002f6c",
                     fontWeight: "bold",
                     transForm: 'rotate(270deg)',
@@ -8872,7 +8986,7 @@ export default class BuildTree extends Component {
             else {
                 treeLevelItems.push(new LevelAnnotationConfig({
                     levels: [i],
-                    title: "Level " + i,
+                    title: treeLevelFiltered.length > 0 ? getLabelText(treeLevelFiltered[0].label, this.state.lang) : "Level " + i,
                     titleColor: "#002f6c",
                     fontWeight: "bold",
                     transForm: 'rotate(270deg)',
@@ -8899,6 +9013,51 @@ export default class BuildTree extends Component {
             defaultTemplateName: "contactTemplate",
             linesColor: Colors.Black,
             annotations: treeLevelItems,
+            onLevelTitleRender: ((data) => {
+                var { context, width, height } = data;
+                var { title, titleColor } = context;
+                var style = {
+                    position: "absolute",
+                    fontSize: "12px",
+                    fontFamily: "Trebuchet MS, Tahoma, Verdana, Arial, sans-serif",
+                    WebkitTapHighlightColor: "rgba(0,0,0,0)",
+                    WebkitUserSelect: "none",
+                    WebkitTouchCallout: "none",
+                    KhtmlUserSelect: "none",
+                    MozUserSelect: "none",
+                    msUserSelect: "none",
+                    userSelect: "none",
+                    boxSizing: "content-box",
+
+                    MozBorderRadius: "4px",
+                    WebkitBorderRadius: "4px",
+                    KhtmlBorderRadius: "4px",
+                    BorderRadius: "4px",
+
+                    background: "royalblue",
+                    borderWidth: 0,
+                    color: "white",
+                    padding: 0,
+                    width: "100%",
+                    height: "100%",
+                    left: "-1px",
+                    top: "-1px"
+                }
+                return <div style={{ ...style, background: titleColor }} onClick={(event) => {
+                    event.stopPropagation();
+                    //   console.log("Data@@@1111----------->",data)
+                    //   alert(`User clicked on level title ${title}`)
+                    this.levelClicked(data)
+                }}>
+                    <RotatedText
+                        width={width}
+                        height={height}
+                        orientation={'RotateRight'}
+                        horizontalAlignment={'center'}
+                        verticalAlignment={'middle'}
+                    >{title}</RotatedText>
+                </div>
+            }),
             onButtonsRender: (({ context: itemConfig }) => {
                 return <>
                     {itemConfig.parent != null &&
@@ -9963,6 +10122,52 @@ export default class BuildTree extends Component {
             </Modal>
             {/* </Draggable > */}
             {/* Scenario Modal end------------------------ */}
+            {/* Modal for level */}
+            <Modal isOpen={this.state.levelModal}
+                className={'modal-md'}>
+                <ModalHeader toggle={() => this.levelClicked("")} className="modalHeader">
+                    <strong>{i18n.t('static.tree.levelDetails')}</strong>
+                </ModalHeader>
+                <ModalBody>
+                    <FormGroup>
+                        <Label htmlFor="currencyId">{i18n.t('static.tree.levelName')}<span class="red Reqasterisk">*</span></Label>
+                        <Input type="text"
+                            id="levelName"
+                            name="levelName"
+                            required
+                            onChange={(e) => { this.levelNameChanged(e) }}
+                            value={this.state.levelName}
+                        ></Input>
+                    </FormGroup>
+                    <FormGroup>
+                        <Label htmlFor="currencyId">{i18n.t('static.tree.nodeUnit')}</Label>
+                        <Input
+                            type="select"
+                            id="levelUnit"
+                            name="levelUnit"
+                            bsSize="sm"
+                            onChange={(e) => { this.levelUnitChange(e) }}
+                            value={this.state.levelUnit}
+                        >
+                            <option value="">{i18n.t('static.common.select')}</option>
+                            {this.state.nodeUnitList.length > 0
+                                && this.state.nodeUnitList.map((item, i) => {
+                                    return (
+                                        <option key={i} value={item.unitId}>
+                                            {getLabelText(item.label, this.state.lang)}
+                                        </option>
+                                    )
+                                }, this)}
+                        </Input>
+                    </FormGroup>
+                </ModalBody>
+                <ModalFooter>
+                    <div className="mr-0">
+                        <Button type="submit" size="md" color="success" className="submitBtn float-right" onClick={this.levelDeatilsSaved}> <i className="fa fa-check"></i> {i18n.t('static.common.submit')}</Button>
+                    </div>
+                    <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.levelClicked("")}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                </ModalFooter>
+            </Modal>
 
         </div >
     }
