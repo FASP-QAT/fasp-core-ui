@@ -821,11 +821,11 @@ export function exportPDF(props) {
                 console.log("item.flatList%%%", item.flatList)
                 item.flatList.length > 0 && item.flatList.map((item1, j) => {
                     doc.setFont('helvetica', 'normal')
-                    if (item1.payload.nodeType.id == 4) {
-                        doc.setTextColor("red")
-                    } else {
+                    // if (item1.payload.nodeType.id == 4) {
+                    //     doc.setTextColor("red")
+                    // } else {
                         doc.setTextColor("black")
-                    }
+                    // }
 
                     planningText = doc.splitTextToSize(getLabelText(item1.payload.label, props.state.lang), doc.internal.pageSize.width * 3 / 4);
                     // doc.text(doc.internal.pageSize.width / 8, 110, planningText)

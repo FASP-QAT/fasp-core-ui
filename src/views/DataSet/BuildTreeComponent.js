@@ -13,7 +13,7 @@ import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 import { Formik } from 'formik';
 import * as Yup from 'yup'
 import '../../views/Forms/ValidationForms/ValidationForms.css'
-import { Row, Col, Card, CardFooter, Button, CardBody, Form, Modal, ModalBody, PopoverBody, Popover, ModalFooter, ModalHeader, FormGroup, Label, FormFeedback, Input, InputGroupAddon, Collapse, InputGroupText, Dropdown, DropdownItem, DropdownMenu, DropdownToggle, InputGroup } from 'reactstrap';
+import { Row, Col, Card, CardFooter, Button, CardBody, Form, Modal, ModalBody, PopoverBody, Popover, ModalFooter, ModalHeader, FormGroup, Label, FormFeedback, Input, InputGroupAddon, Collapse, InputGroupText, Dropdown, DropdownItem, DropdownMenu, DropdownToggle, ButtonDropdown, InputGroup } from 'reactstrap';
 import Provider from '../../Samples/Provider'
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import { Nav, NavItem, NavLink, TabContent, TabPane } from 'reactstrap';
@@ -51,7 +51,9 @@ import PDFDocument from 'pdfkit-nodejs-webpack';
 import blobStream from 'blob-stream';
 import OrgDiagramPdfkit from '../TreePDF/OrgDiagramPdfkit';
 import Size from '../../../node_modules/basicprimitives/src/graphics/structs/Size';
+import { Prompt } from 'react-router';
 import { i } from 'mathjs';
+import RotatedText from 'basicprimitivesreact/dist/umd/Templates/RotatedText';
 
 // const ref = React.createRef();
 const entityname = 'Tree';
@@ -453,6 +455,9 @@ export default class BuildTree extends Component {
         this.pickAMonth4 = React.createRef()
         this.pickAMonth5 = React.createRef()
         this.state = {
+            isChanged: false,
+            levelModal: false,
+            dropdownOpen: new Array(19).fill(false),
             isSubmitClicked: false,
             popoverOpenHowManyPUperIntervalPer: false,
             popoverOpenWillClientsShareOnePU: false,
@@ -703,6 +708,8 @@ export default class BuildTree extends Component {
             modelingJexcelLoader: false,
             momJexcelLoader: false,
         }
+        this.toggleDeropdownSetting = this.toggleDeropdownSetting.bind(this);
+        // this.onClick1 = this.onClick1.bind(this);
         this.toggleHowManyPUperIntervalPer = this.toggleHowManyPUperIntervalPer.bind(this);
         this.toggleWillClientsShareOnePU = this.toggleWillClientsShareOnePU.bind(this);
         this.toggleConsumptionIntervalEveryXMonths = this.toggleConsumptionIntervalEveryXMonths.bind(this);
@@ -826,7 +833,115 @@ export default class BuildTree extends Component {
         this.round = this.round.bind(this);
         this.calculatePUPerVisit = this.calculatePUPerVisit.bind(this);
         this.createPUNode = this.createPUNode.bind(this);
+        this.levelClicked = this.levelClicked.bind(this);
+        this.levelDeatilsSaved = this.levelDeatilsSaved.bind(this)
     }
+
+    levelClicked(data) {
+        var name = "";
+        var unit = "";
+        var levelNo = "";
+        if (data != "") {
+            console.log("Data@@@@###############", data.context.levels[0])
+            var treeLevelList = this.state.curTreeObj.levelList;
+            var levelListFiltered = treeLevelList.filter(c => c.levelNo == data.context.levels[0]);
+            levelNo = data.context.levels[0]
+            if (levelListFiltered.length > 0) {
+                name = levelListFiltered[0].label.label_en;
+                unit = levelListFiltered[0].unit.id;
+            }
+            console.log("Name@@@@###########", name);
+            console.log("Unit@@@@###########", unit);
+        }
+        this.setState({
+            levelModal: !this.state.levelModal,
+            levelName: name,
+            levelNo: levelNo,
+            levelUnit: unit
+        })
+
+    }
+
+    levelNameChanged(e) {
+        this.setState({
+            levelName: e.target.value
+        })
+    }
+
+    levelUnitChange(e) {
+        var nodeUnitId = e.target.value;
+        this.setState({
+            levelUnit: e.target.value
+        })
+    }
+
+    levelDeatilsSaved() {
+        const { curTreeObj } = this.state;
+        var treeLevelList = this.state.curTreeObj.levelList;
+        var levelListFiltered = treeLevelList.findIndex(c => c.levelNo == this.state.levelNo);
+        if (levelListFiltered != -1) {
+            if (this.state.levelName != "") {
+                treeLevelList[levelListFiltered].label = {
+                    label_en: this.state.levelName,
+                    label_sp: "",
+                    label_pr: "",
+                    label_fr: ""
+                };
+                var label = {}
+                if (this.state.levelUnit != "") {
+                    label = this.state.nodeUnitList.filter(c => c.nodeUnitId == this.state.levelUnit);
+                }
+                treeLevelList[levelListFiltered].unit = {
+                    id: this.state.levelUnit,
+                    label: label
+                }
+            } else {
+                treeLevelList.splice(levelListFiltered, 1);
+            }
+        } else {
+            if (this.state.levelName != "") {
+                var label = {}
+                if (this.state.levelUnit != "") {
+                    label = this.state.nodeUnitList.filter(c => c.nodeUnitId == this.state.levelUnit);
+                }
+                treeLevelList.push({
+                    levelId: null,
+                    levelNo: this.state.levelNo,
+                    label: {
+                        label_en: this.state.levelName,
+                        label_sp: "",
+                        label_pr: "",
+                        label_fr: ""
+                    },
+                    unit: {
+                        id: this.state.levelUnit,
+                        label: label
+                    }
+                })
+            }
+        }
+        curTreeObj.levelList = treeLevelList;
+        console.log("Cur Tree Obj@@@@@", curTreeObj)
+        this.setState({
+            levelModal: false,
+            curTreeObj,
+        }, () => {
+            this.saveTreeData()
+            // console.log("final tab list---", this.state.items);
+            // if (type == 1) {
+            //     var maxNodeDataId = temNodeDataMap.length > 0 ? Math.max(...temNodeDataMap.map(o => o.nodeDataId)) : 0;
+            //     console.log("scenarioId---", scenarioId);
+            //     for (var i = 0; i < items.length; i++) {
+            //         maxNodeDataId = parseInt(maxNodeDataId) + 1;
+            //         (items[i].payload.nodeDataMap[scenarioId])[0].nodeDataId = maxNodeDataId;
+            //         console.log("my node data id--->", (items[i].payload.nodeDataMap[scenarioId])[0].nodeDataId);
+            //     }
+            //     this.callAfterScenarioChange(scenarioId);
+            //     this.updateTreeData();
+            // }
+        });
+    }
+
     calculatePUPerVisit(isRefillMonth) {
         var currentScenario = this.state.currentScenario;
         var parentScenario = this.state.parentScenario;
@@ -975,9 +1090,9 @@ export default class BuildTree extends Component {
         console.log("unique fu list--->", forecastingUnitList);
         tracerCategoryList = [...new Map(tracerCategoryList.map(v => [v.tracerCategoryId, v])).values()];
         console.log("unique tc list--->", tracerCategoryList);
-
-        let forecastingUnitMultiList = forecastingUnitList.length > 0
-            && forecastingUnitList.map((item, i) => {
+        var forecastingUnitListNew = JSON.parse(JSON.stringify(forecastingUnitList));
+        let forecastingUnitMultiList = forecastingUnitListNew.length > 0
+            && forecastingUnitListNew.map((item, i) => {
                 return ({ value: item.id, label: getLabelText(item.label, this.state.lang) + " | " + item.id })
 
             }, this);
@@ -988,8 +1103,8 @@ export default class BuildTree extends Component {
             planningUnitList: updatedPlanningUnitList,
             updatedPlanningUnitList
         }, () => {
-            if (forecastingUnitList.length > 0) {
-                var fuIds = forecastingUnitList.map(x => x.id).join(", ");
+            if (forecastingUnitListNew.length > 0) {
+                var fuIds = forecastingUnitListNew.map(x => x.id).join(", ");
                 console.log("fuIds---", fuIds)
                 if (fuIds != "") {
                     var fuIdArray = fuIds.split(',').map(Number);
@@ -1065,6 +1180,24 @@ export default class BuildTree extends Component {
             console.log('month value --->', this.state.singleValue2)
             this.handleAMonthDissmis3(this.state.singleValue2, 0);
             // this.calculateValuesForAggregateNode(items);
+        });
+    }
+    // onClick1 () {
+    //     this.state({
+    //         showDiv1:false,
+    //     })
+    //     alert('hiiiii')
+    //     console.log(
+
+    //         "ShowDiv1",this.state.showDiv1
+    //     )
+
+    //     };
+
+    toggleDeropdownSetting(i) {
+        const newArray = this.state.dropdownOpen.map((element, index) => { return (index === i ? !element : false); });
+        this.setState({
+            dropdownOpen: newArray,
         });
     }
     toggleHowManyPUperIntervalPer() {
@@ -1319,6 +1452,10 @@ export default class BuildTree extends Component {
             let { treeData } = this.state;
             let { dataSetObj } = this.state;
             var items = this.state.items;
+            console.log("dataSetObj--->>>", dataSetObj)
+            console.log("treeData--->>>", treeData)
+            console.log("curTreeObj--->>>", curTreeObj)
+            console.log("tree items 1---", items);
             for (let i = 0; i < items.length; i++) {
                 var item = items[i];
                 if (item.payload.nodeType.id == 4 || item.payload.nodeType.id == 5) {
@@ -1326,6 +1463,7 @@ export default class BuildTree extends Component {
                 }
                 // arr.push(item);
             }
+            console.log("tree items 2---", items);
             let tempProgram = JSON.parse(JSON.stringify(dataSetObj))
             console.log("save tree data items>>>", items);
             // var databytes = CryptoJS.AES.decrypt(dataSetObj.programData, SECRET_KEY);
@@ -1334,8 +1472,10 @@ export default class BuildTree extends Component {
             programData.treeList = treeData;
             console.log("program data>>>", programData);
 
-            curTreeObj.tree.flatList = items;
             curTreeObj.scenarioList = this.state.scenarioList;
+            if (items.length > 0) {
+                curTreeObj.tree.flatList = items;
+            }
             var findTreeIndex = treeData.findIndex(n => n.treeId == curTreeObj.treeId);
             treeData[findTreeIndex] = curTreeObj;
 
@@ -1383,6 +1523,7 @@ export default class BuildTree extends Component {
                                 loading: false,
                                 message: i18n.t("static.mt.dataUpdateSuccess"),
                                 color: "green",
+                                isChanged: false
                             }, () => {
                                 for (let i = 0; i < items.length; i++) {
                                     var item = items[i];
@@ -1947,9 +2088,9 @@ export default class BuildTree extends Component {
             data[3] = parseFloat(momList[j].manualChange).toFixed(2)
             data[4] = `=ROUND(IF(B${parseInt(j) + 1}+C${parseInt(j) + 1}+D${parseInt(j) + 1}<0,0,IF(B${parseInt(j) + 1}+C${parseInt(j) + 1}+D${parseInt(j) + 1}>100,100,B${parseInt(j) + 1}+C${parseInt(j) + 1}+D${parseInt(j) + 1})),2)`
             // `=B${parseInt(j) + 1}+C${parseInt(j) + 1}+D${parseInt(j) + 1}`
-            console.log("momListParent j---", momList[j].month + "value", momListParent[j].calculatedValue)
-            data[5] = parseFloat(momListParent[j].calculatedValue).toFixed(2)
-            data[6] = this.state.currentItemConfig.context.payload.nodeType.id != 5 ? `=ROUND((E${parseInt(j) + 1}*${momListParent[j].calculatedValue}/100)*L${parseInt(j) + 1},2)` : `=ROUND((E${parseInt(j) + 1}*${momListParent[j].calculatedValue}/100)/${(this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].puNode.planningUnit.multiplier},2)`;
+            var momListParentForMonth = momListParent.filter(c => moment(c.month).format("YYYY-MM") == moment(momList[j].month).format("YYYY-MM"));
+            data[5] = momListParentForMonth.length > 0 ? parseFloat(momListParentForMonth[0].calculatedValue).toFixed(2) : 0;
+            data[6] = this.state.currentItemConfig.context.payload.nodeType.id != 5 ? `=ROUND((E${parseInt(j) + 1}*${momListParentForMonth.length > 0 ? parseFloat(momListParentForMonth[0].calculatedValue) : 0}/100)*L${parseInt(j) + 1},2)` : `=ROUND((E${parseInt(j) + 1}*${momListParentForMonth.length > 0 ? parseFloat(momListParentForMonth[0].calculatedValue) : 0}/100)/${(this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].puNode.planningUnit.multiplier},2)`;
             // data[6] = this.state.manualChange ? momList[j].calculatedValue : ((momListParent[j].manualChange > 0) ? momListParent[j].endValueWithManualChangeWMC : momListParent[j].calculatedValueWMC *  momList[j].endValueWithManualChangeWMC) / 100
             data[7] = this.state.currentScenario.nodeDataId
             data[8] = this.state.currentItemConfig.context.payload.nodeType.id == 5 && parentNodeNodeData.fuNode.usageType.id == 2 ? j >= lagInMonths ? `=P${parseInt(j) + 1 - lagInMonths}` : 0 : j >= lagInMonths ? `=P${parseInt(j) + 1}` : 0;
@@ -1994,7 +2135,7 @@ export default class BuildTree extends Component {
                 },
                 {
                     title: i18n.t('static.tree.%of') + " " + getLabelText(this.state.currentItemConfig.parentItem.payload.label, this.state.lang) + " " + i18n.t('static.tree.monthStart'),
-                    type: 'numeric',
+                    type: 'hidden',
                     mask: '#,##.00', decimal: '.',
                     readOnly: true
 
@@ -2025,7 +2166,7 @@ export default class BuildTree extends Component {
 
                 },
                 {
-                    title: getLabelText(this.state.currentItemConfig.context.payload.label, this.state.lang) + " " + i18n.t('static.tree.MonthEnd'),
+                    title: getLabelText(this.state.currentItemConfig.context.payload.label, this.state.lang) + " " + i18n.t('static.consumption.forcast'),
                     type: 'numeric',
                     mask: '#,##.00', decimal: '.',
                     readOnly: true
@@ -2117,6 +2258,8 @@ export default class BuildTree extends Component {
 
     loadedMomPer = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance, 1);
+        var cell = instance.jexcel.getCell("D1");
+        cell.classList.add('readonly');
     }
 
     buildMomJexcel() {
@@ -2159,7 +2302,7 @@ export default class BuildTree extends Component {
                 {
                     // 1
                     title: i18n.t('static.tree.monthStartNoSeasonality'),
-                    type: 'numeric',
+                    type: 'hidden',
                     mask: '#,##.00', decimal: '.',
                     readOnly: true
 
@@ -2193,7 +2336,7 @@ export default class BuildTree extends Component {
                     readOnly: !this.state.aggregationNode ? true : false
                 },
                 {
-                    title: i18n.t('static.tree.MonthEnd'),
+                    title: i18n.t('static.tree.nodeForecast'),
                     type: 'numeric',
                     mask: '#,##.00', decimal: '.',
                     readOnly: true
@@ -2263,6 +2406,10 @@ export default class BuildTree extends Component {
 
     loadedMom = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance, 1);
+        var cell = instance.jexcel.getCell("E1");
+        cell.classList.add('readonly');
+        var cell = instance.jexcel.getCell("F1");
+        cell.classList.add('readonly');
     }
 
     showMomData() {
@@ -3008,7 +3155,7 @@ export default class BuildTree extends Component {
             data[0] = ''
             data[1] = ''
             data[2] = this.state.currentItemConfig.context.payload.nodeType.id == PERCENTAGE_NODE_ID || this.state.currentItemConfig.context.payload.nodeType.id == FU_NODE_ID || this.state.currentItemConfig.context.payload.nodeType.id == PU_NODE_ID ? 5 : '';
-            data[3] = this.state.minMonth
+            data[3] = moment(this.state.currentScenario.month).startOf('month').add(1, 'months').format("YYYY-MM-DD")
             data[4] = this.state.maxMonth
             data[5] = ''
             data[6] = ''
@@ -3076,12 +3223,12 @@ export default class BuildTree extends Component {
                 {
                     title: i18n.t('static.common.startdate'),
                     type: 'calendar',
-                    options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker', validRange: [this.state.minMonth, this.state.maxMonth] }, width: 100
+                    options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker', validRange: [moment(this.state.currentScenario.month).startOf('month').add(1, 'months').format("YYYY-MM-DD"), this.state.maxMonth] }, width: 100
                 },
                 {
                     title: i18n.t('static.common.stopdate'),
                     type: 'calendar',
-                    options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker', validRange: [this.state.minMonth, this.state.maxMonth] }, width: 100
+                    options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker', validRange: [moment(this.state.currentScenario.month).startOf('month').add(1, 'months').format("YYYY-MM-DD"), this.state.maxMonth] }, width: 100
                 },
                 {
                     title: i18n.t('static.tree.monthlyChange%'),
@@ -3227,7 +3374,7 @@ export default class BuildTree extends Component {
                                     data[0] = 0;
                                     data[1] = "";
                                     data[2] = "";
-                                    data[3] = this.state.minMonth
+                                    data[3] = moment(this.state.currentScenario.month).startOf('month').add(1, 'months').format("YYYY-MM-DD")
                                     data[4] = this.state.maxMonth
                                     data[5] = "";
                                     data[6] = "";
@@ -3307,6 +3454,7 @@ export default class BuildTree extends Component {
     }.bind(this)
 
     changed1 = function (instance, cell, x, y, value) {
+        this.setState({ isChanged: true });
         // 4 & 5
         // this.setState({
         //     momJexcelLoader: true
@@ -3360,6 +3508,7 @@ export default class BuildTree extends Component {
 
     }.bind(this);
     changed2 = function (instance, cell, x, y, value) {
+        this.setState({ isChanged: true });
         // this.setState({
         //     momJexcelLoader: true
         // }, () => {
@@ -3545,11 +3694,16 @@ export default class BuildTree extends Component {
         }
         if (x != 10) {
             instance.jexcel.setValueFromCoords(10, y, 1, true);
+            this.setState({ isChanged: true });
         }
         this.calculateScalingTotal();
     }.bind(this);
     loadedMom = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance, 1);
+        var cell = instance.jexcel.getCell("E1");
+        cell.classList.add('readonly');
+        var cell = instance.jexcel.getCell("F1");
+        cell.classList.add('readonly');
     }
 
     addRow = function () {
@@ -3558,7 +3712,7 @@ export default class BuildTree extends Component {
         data[0] = 0;
         data[1] = "";
         data[2] = this.state.currentItemConfig.context.payload.nodeType.id == PERCENTAGE_NODE_ID || this.state.currentItemConfig.context.payload.nodeType.id == FU_NODE_ID || this.state.currentItemConfig.context.payload.nodeType.id == PU_NODE_ID ? 5 : '';
-        data[3] = this.state.minMonth;
+        data[3] = moment(this.state.currentScenario.month).startOf('month').add(1, 'months').format("YYYY-MM-DD");
         data[4] = this.state.maxMonth;
         data[5] = "";
         data[6] = "";
@@ -3899,13 +4053,15 @@ export default class BuildTree extends Component {
 
     exportPDF = () => {
         let treeLevel = this.state.items.length;
-        var treeLevelItems = []
+        var treeLevelItems = [];
+        var treeLevels = this.state.curTreeObj.forecastMethod.id != "" ? this.state.curTreeObj.levelList : [];
         for (var i = 0; i <= treeLevel; i++) {
+            var treeLevelFiltered = treeLevels.filter(c => c.levelNo == i);
             if (i == 0) {
                 treeLevelItems.push({
                     annotationType: AnnotationType.Level,
                     levels: [0],
-                    title: "Level 0",
+                    title: treeLevelFiltered.length > 0 ? getLabelText(treeLevelFiltered[0].label, this.state.lang) : "Level 0",
                     titleColor: "#002f6c",
                     fontWeight: "bold",
                     transForm: 'rotate(270deg)',
@@ -3920,7 +4076,7 @@ export default class BuildTree extends Component {
             else if (i % 2 == 0) {
                 treeLevelItems.push(new LevelAnnotationConfig({
                     levels: [i],
-                    title: "Level " + i,
+                    title: treeLevelFiltered.length > 0 ? getLabelText(treeLevelFiltered[0].label, this.state.lang) : "Level " + i,
                     titleColor: "#002f6c",
                     fontWeight: "bold",
                     transForm: 'rotate(270deg)',
@@ -3936,7 +4092,7 @@ export default class BuildTree extends Component {
             else {
                 treeLevelItems.push(new LevelAnnotationConfig({
                     levels: [i],
-                    title: "Level " + i,
+                    title: treeLevelFiltered.length > 0 ? getLabelText(treeLevelFiltered[0].label, this.state.lang) : "Level " + i,
                     titleColor: "#002f6c",
                     fontWeight: "bold",
                     transForm: 'rotate(270deg)',
@@ -4068,7 +4224,8 @@ export default class BuildTree extends Component {
 
         this.setState({
             regionValues: regionIds.map(ele => ele),
-            regionLabels: regionIds.map(ele => ele.label)
+            regionLabels: regionIds.map(ele => ele.label),
+            isChanged : true
         }, () => {
             console.log("regionValues---", this.state.regionValues);
             console.log("regionLabels---", this.state.regionLabels);
@@ -4098,6 +4255,7 @@ export default class BuildTree extends Component {
 
         this.setState({
             fuValues: regionIds != null ? regionIds : "",
+            isChanged : true
             // fuLabels: regionIds != null ? regionIds.label : ""
         }, () => {
             if (regionIds != null) {
@@ -4606,7 +4764,7 @@ export default class BuildTree extends Component {
         (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.usagePeriod.usagePeriodId = usageTemplate.usageFrequencyUsagePeriod != null ? usageTemplate.usageFrequencyUsagePeriod.usagePeriodId : '';
         (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.forecastingUnit.unit.id = usageTemplate.forecastingUnit.unit.id;
         (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.forecastingUnit.id = usageTemplate.forecastingUnit.id;
-        (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.forecastingUnit.label = usageTemplate.forecastingUnit.label;
+        (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.forecastingUnit.label.label_en = usageTemplate.forecastingUnit.label.label_en;
         (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.usageType.id = usageTemplate.usageType.id;
         (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.forecastingUnit.tracerCategory.id = usageTemplate.tracerCategory.id;
         currentItemConfig.context.payload.label = usageTemplate.forecastingUnit.label;
@@ -4618,7 +4776,9 @@ export default class BuildTree extends Component {
         if ((currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.usageType.id == 1) {
             (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.oneTimeUsage = usageTemplate.oneTimeUsage;
             (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.repeatCount = usageTemplate.repeatCount;
-            (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.repeatUsagePeriod.usagePeriodId = usageTemplate.repeatUsagePeriod != null ? usageTemplate.repeatUsagePeriod.usagePeriodId : '';
+            if (!usageTemplate.oneTimeUsage) {
+                (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.repeatUsagePeriod.usagePeriodId = usageTemplate.repeatUsagePeriod != null ? usageTemplate.repeatUsagePeriod.usagePeriodId : '';
+            }
         }
         this.setState({
             currentItemConfig,
@@ -4894,12 +5054,15 @@ export default class BuildTree extends Component {
 
     }
     getForecastingUnitListByTracerCategoryId(type) {
-        console.log("my tracer category---", this.state.currentScenario.fuNode.forecastingUnit.tracerCategory.id)
-        var tracerCategoryId = this.state.currentScenario.fuNode.forecastingUnit.tracerCategory.id;
         var scenarioId = this.state.selectedScenario;
-        console.log("%%%tracerCategoryId---", tracerCategoryId)
+        console.log("my tracer category---", this.state.currentItemConfig.context.payload.nodeDataMap[scenarioId][0])
+        console.log("this.state.currentScenario---", this.state.currentScenario.fuNode.forecastingUnit.tracerCategory.id);
+        var tracerCategoryId = this.state.currentScenario.fuNode.forecastingUnit.tracerCategory.id;
+        console.log("my tracerCategoryId for test1---", tracerCategoryId)
         var forecastingUnitList = this.state.forecastingUnitList;
+        console.log("my tracerCategoryId for test2---", forecastingUnitList)
         var filteredForecastingUnitList = tracerCategoryId != "" ? this.state.forecastingUnitList.filter(x => x.tracerCategory.id == tracerCategoryId) : [];
+        console.log("my tracerCategoryId for test3---", filteredForecastingUnitList)
         // var autocompleteData = [];
         // for (var i = 0; i < forecastingUnitList.length; i++) {
         //     autocompleteData[i] = { value: forecastingUnitList[i].id, label: forecastingUnitList[i].id + "|" + getLabelText(forecastingUnitList[i].label, this.state.lang) }
@@ -4917,13 +5080,13 @@ export default class BuildTree extends Component {
             tempPlanningUnitId: tracerCategoryId == "" || tracerCategoryId == undefined ? '' : this.state.tempPlanningUnitId,
             planningUnitList: tracerCategoryId == "" || tracerCategoryId == undefined ? [] : this.state.planningUnitList
         }, () => {
-            console.log("my autocomplete data fuValues---", this.state.fuValues);
+            console.log("my autocomplete data fuValues---", filteredForecastingUnitList);
             if (filteredForecastingUnitList.length == 1) {
-                console.log("fu list 1---");
+                console.log("fu list 1---", forecastingUnitList[0]);
                 const currentItemConfig = this.state.currentItemConfig;
                 (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.forecastingUnit.id = filteredForecastingUnitList[0].id;
-                (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.forecastingUnit.label = forecastingUnitList[0].label;
-                (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.forecastingUnit.tracerCategory.id = forecastingUnitList[0].tracerCategory.id;
+                (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.forecastingUnit.label = filteredForecastingUnitList[0].label;
+                (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.forecastingUnit.tracerCategory.id = filteredForecastingUnitList[0].tracerCategory.id;
 
                 // var filteredPlanningUnitList = this.state.planningUnitList.filter(x => x.forecastingUnit.id == filteredForecastingUnitList[0].id);
                 this.setState({
@@ -4931,15 +5094,20 @@ export default class BuildTree extends Component {
                     currentScenario: (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0]
                 }, () => {
                     if (type == 0) {
-                        var fuValues = { value: filteredForecastingUnitList[0].id, label: getLabelText(forecastingUnitList[0].label, this.state.lang) + " | " + filteredForecastingUnitList[0].id };
+                        console.log("my take 1---",filteredForecastingUnitList[0]);
+                        var fuValues = { value: filteredForecastingUnitList[0].id, label: getLabelText(filteredForecastingUnitList[0].label, this.state.lang) + " | " + filteredForecastingUnitList[0].id };
+                        console.log("before cur item config fuValues--- ", this.state.fuValues);
+                        console.log("before 2--- ",fuValues);
                         // (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.forecastingUnit.unit.id = forecastingUnit[0].unit.id;
                         this.setState({
                             fuValues
                         }, () => {
-
+                            console.log("aftercur item config fuValues--- ", this.state.fuValues);
                         });
+                    } else {
+                        console.log("type 0 in else");
                     }
-                    console.log("cur item config fuValues--- ", this.state.fuValues);
+
                     this.getForecastingUnitUnitByFUId(this.state.fuValues.value);
                     this.getPlanningUnitListByFUId(this.state.fuValues.value);
                 })
@@ -5275,6 +5443,8 @@ export default class BuildTree extends Component {
     filterUsageTemplateList(tracerCategoryId) {
         var usageTemplateList = [];
         console.log("usage template tc---", tracerCategoryId)
+        console.log("usage template list all---", this.state.usageTemplateListAll)
+
         if (tracerCategoryId != "" && tracerCategoryId != null) {
             console.log("usage template if")
             usageTemplateList = this.state.usageTemplateListAll.filter(c => c.tracerCategory.id == tracerCategoryId);
@@ -5307,7 +5477,8 @@ export default class BuildTree extends Component {
             planningunitRequest.onsuccess = function (e) {
                 var myResult = [];
                 myResult = planningunitRequest.result;
-                console.log("myResult===============6", myResult)
+                console.log("myResult===============6", myResult);
+                console.log("fuIdArray---", fuIdArray);
                 var usageTemplateListAll = myResult.filter(el => fuIdArray.indexOf(el.forecastingUnit.id) != -1);
                 this.setState({
                     usageTemplateListAll
@@ -5353,6 +5524,20 @@ export default class BuildTree extends Component {
             }.bind(this);
         }.bind(this)
     }
+
+    componentWillUnmount() {
+        clearTimeout(this.timeout);
+        window.onbeforeunload = null;
+    }
+
+    componentDidUpdate = () => {
+        if (this.state.isChanged == true) {
+            window.onbeforeunload = () => true
+        } else {
+            window.onbeforeunload = undefined
+        }
+    }
+
     componentDidMount() {
         this.setState({
             treeId: this.props.match.params.treeId,
@@ -5625,7 +5810,7 @@ export default class BuildTree extends Component {
         }
 
 
-        this.setState({ curTreeObj }, () => {
+        this.setState({ curTreeObj, isChanged: true }, () => {
             console.log("curTreeObj---", curTreeObj);
         });
 
@@ -5822,8 +6007,70 @@ export default class BuildTree extends Component {
         // }
 
         if (event.target.name === "tracerCategoryId") {
-            console.log("currentItemConfig---", currentItemConfig);
-            (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.forecastingUnit.tracerCategory.id = event.target.value;
+            console.log("currentItemConfig before tc---", currentItemConfig);
+            var fuNode = (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode;
+            // var forecastingUnit = (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.forecastingUnit;
+            // var tracerCategory = {
+            //     "id": parseInt(event.target.value),
+            //     "label": {
+            //         "active": true,
+            //         "createdBy": "",
+            //         "createdDate": "",
+            //         "labelId": "",
+            //         "label_en": "",
+            //         "label_fr": "",
+            //         "label_pr": "",
+            //         "label_sp": "",
+            //         "lastModifiedBy": "",
+            //         "lastModifiedDate": ""
+            //     },
+            //     "idString": ''
+            // }
+
+            // var forecastingUnit = {
+            //     "id": fuNode.forecastingUnit.id,
+            //     "label": fuNode.forecastingUnit.label,
+            //     "unit": fuNode.forecastingUnit.unit,
+            //     "tracerCategory": {
+            //         "id": parseInt(event.target.value),
+            //         "label": {
+            //             "active": true,
+            //             "createdBy": "",
+            //             "createdDate": "",
+            //             "labelId": "",
+            //             "label_en": "",
+            //             "label_fr": "",
+            //             "label_pr": "",
+            //             "label_sp": "",
+            //             "lastModifiedBy": "",
+            //             "lastModifiedDate": ""
+            //         },
+            //         "idString": ''
+            //     }
+            // }
+            // console.log("tracerCategory obj 1---", tracerCategory);
+            // // forecastingUnit.tracerCategory = tracerCategory;
+            // console.log("tracerCategory obj 2---", forecastingUnit);
+
+            // var value = event.target.value;
+            // var forecastingUnit = {
+            //     id: fuNode.forecastingUnit.id,
+            //     label: fuNode.forecastingUnit.label,
+            //     unit: fuNode.forecastingUnit.unit,
+            //     tracerCategory: {
+            //         id: 6
+            //     }
+            // }
+
+
+            // fuNode.forecastingUnit = JSON.parse(JSON.stringify(forecastingUnit));
+            // fuNode.forecastingUnit = forecastingUnit;
+            // console.log("tracerCategory obj 3---", fuNode);
+            // console.log("scenarioId---", scenarioId);
+
+            currentItemConfig.context.payload.nodeDataMap[scenarioId][0].fuNode.forecastingUnit.tracerCategory.id = event.target.value;
+            console.log("tracer category on change---", event.target.value);
+            console.log("tracer category on change- obj--", currentItemConfig);
             this.filterUsageTemplateList(event.target.value);
         }
 
@@ -5952,9 +6199,11 @@ export default class BuildTree extends Component {
         console.log("anchal 2---", this.state.selectedScenario)
         this.setState({
             currentItemConfig,
-            currentScenario: (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0]
+            currentScenario: (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0],
+            isChanged: true
         }, () => {
             console.log("after state update---", this.state.currentItemConfig);
+            console.log("after state update current scenario---", this.state.currentScenario);
             if (flag) {
                 if (event.target.name === "planningUnitId") {
                     this.calculatePUPerVisit(false);
@@ -6340,12 +6589,10 @@ export default class BuildTree extends Component {
                 }
                 this.getNodeTypeFollowUpList(data.context.level == 0 ? 0 : data.parentItem.payload.nodeType.id);
                 if (data.context.payload.nodeType.id == 4) {
-                    console.log("on curso tracer category---", (data.context.payload.nodeDataMap[scenarioId])[0].fuNode.forecastingUnit.id);
+                    console.log("on curso tracer category---", (data.context.payload.nodeDataMap[scenarioId])[0].fuNode.forecastingUnit.tracerCategory.id);
                     console.log("on curso tracer category list---", this.state.tracerCategoryList);
-                    // fuValues: { value: this.state.currentScenario.fuNode.forecastingUnit.id, label: getLabelText(this.state.currentScenario.fuNode.forecastingUnit.label, this.state.lang) + " | " + this.state.currentScenario.fuNode.forecastingUnit.id },
                     this.setState({
                         fuValues: { value: this.state.currentScenario.fuNode.forecastingUnit.id, label: getLabelText(this.state.currentScenario.fuNode.forecastingUnit.label, this.state.lang) + " | " + this.state.currentScenario.fuNode.forecastingUnit.id }
-                        // fuLabels: getLabelText(this.state.currentScenario.fuNode.forecastingUnit.label, this.state.lang) + " | " + this.state.currentScenario.fuNode.forecastingUnit.id
                     });
                     this.getForecastingUnitListByTracerCategoryId(1);
                     this.getNodeUnitOfPrent();
@@ -6758,13 +7005,13 @@ export default class BuildTree extends Component {
                                         </div>
                                     </div>
                                     <div>
-                                        <Popover placement="top" isOpen={this.state.popoverOpenSenariotree} target="Popover3" trigger="hover" toggle={this.toggleSenariotree}>
+                                        <Popover placement="top" isOpen={this.state.popoverOpenSenariotree} target="Popover1" trigger="hover" toggle={this.toggleSenariotree}>
                                             <PopoverBody>{i18n.t('static.tooltip.scenario')}</PopoverBody>
                                         </Popover>
                                     </div>
                                     <div className="row">
                                         <FormGroup className="col-md-6">
-                                            <Label htmlFor="currencyId">{i18n.t('static.whatIf.scenario')} <i class="fa fa-info-circle icons pl-lg-2" id="Popover3" onClick={this.toggleSenariotree} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
+                                            <Label htmlFor="currencyId">{i18n.t('static.whatIf.scenario')} <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={this.toggleSenariotree} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                             <Input type="text"
                                                 name="scenarioTxt"
                                                 bsSize="sm"
@@ -6772,14 +7019,15 @@ export default class BuildTree extends Component {
                                                 value={this.state.selectedScenarioLabel}
                                             ></Input>
                                         </FormGroup>
-                                        <div>
+                                        {/* <div>
                                             <Popover placement="top" isOpen={this.state.popoverOpenParent} target="Popover2" trigger="hover" toggle={this.toggleParent}>
                                                 <PopoverBody>{i18n.t('static.tooltip.Parent')}</PopoverBody>
                                             </Popover>
-                                        </div>
+                                        </div> */}
                                         {this.state.level0 &&
                                             <FormGroup className="col-md-6">
-                                                <Label htmlFor="currencyId">{i18n.t('static.tree.parent')} <i class="fa fa-info-circle icons pl-lg-2" id="Popover2" onClick={this.toggleParent} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
+                                                <Label htmlFor="currencyId">{i18n.t('static.tree.parent')} </Label>
+                                                {/* <Label htmlFor="currencyId">{i18n.t('static.tree.parent')} <i class="fa fa-info-circle icons pl-lg-2" id="Popover2" onClick={this.toggleParent} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label> */}
                                                 <Input type="text"
                                                     name="parent"
                                                     bsSize="sm"
@@ -6791,12 +7039,12 @@ export default class BuildTree extends Component {
                                                 ></Input>
                                             </FormGroup>}
                                         <div>
-                                            <Popover placement="top" isOpen={this.state.popoverOpenNodeTitle} target="Popover4" trigger="hover" toggle={this.toggleNodeTitle}>
+                                            <Popover placement="top" isOpen={this.state.popoverOpenNodeTitle} target="Popover3" trigger="hover" toggle={this.toggleNodeTitle}>
                                                 <PopoverBody>{i18n.t('static.tooltip.NodeTitle')}</PopoverBody>
                                             </Popover>
                                         </div>
                                         <FormGroup className="col-md-6">
-                                            <Label htmlFor="currencyId">{i18n.t('static.tree.nodeTitle')}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover4" onClick={this.toggleNodeTitle} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
+                                            <Label htmlFor="currencyId">{i18n.t('static.tree.nodeTitle')}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover3" onClick={this.toggleNodeTitle} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                             <Input type="text"
                                                 id="nodeTitle"
                                                 name="nodeTitle"
@@ -6810,12 +7058,12 @@ export default class BuildTree extends Component {
                                             <FormFeedback className="red">{errors.nodeTitle}</FormFeedback>
                                         </FormGroup>
                                         <div>
-                                            <Popover placement="top" isOpen={this.state.popoverOpenNodeType} target="Popover5" trigger="hover" toggle={this.toggleNodeType}>
+                                            <Popover placement="top" isOpen={this.state.popoverOpenNodeType} target="Popover4" trigger="hover" toggle={this.toggleNodeType}>
                                                 <PopoverBody>{i18n.t('static.tooltip.NodeType')}</PopoverBody>
                                             </Popover>
                                         </div>
                                         <FormGroup className={"col-md-6"}>
-                                            <Label htmlFor="currencyId">{i18n.t('static.tree.nodeType')}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover5" onClick={this.toggleNodeType} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
+                                            <Label htmlFor="currencyId">{i18n.t('static.tree.nodeType')}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover4" onClick={this.toggleNodeType} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                             <Input
                                                 type="select"
                                                 id="nodeTypeId"
@@ -6920,12 +7168,12 @@ export default class BuildTree extends Component {
                                         {/* {this.state.numberNode && */}
                                         {/* <> */}
                                         <div>
-                                            <Popover placement="top" isOpen={this.state.popoverOpenPercentageOfParent} target="Popover03" trigger="hover" toggle={this.togglePercentageOfParent}>
+                                            <Popover placement="top" isOpen={this.state.popoverOpenPercentageOfParent} target="Popover5" trigger="hover" toggle={this.togglePercentageOfParent}>
                                                 <PopoverBody>{i18n.t('static.tooltip.PercentageOfParent')}</PopoverBody>
                                             </Popover>
                                         </div>
                                         <FormGroup className="col-md-6" style={{ display: this.state.numberNode ? 'block' : 'none' }}>
-                                            <Label htmlFor="currencyId">{i18n.t('static.tree.percentageOfParent')}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover03" onClick={this.togglePercentageOfParent} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
+                                            <Label htmlFor="currencyId">{i18n.t('static.tree.percentageOfParent')}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover5" onClick={this.togglePercentageOfParent} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                             <InputGroup>
                                                 <Input type="number"
                                                     id="percentageOfParent"
@@ -6947,12 +7195,12 @@ export default class BuildTree extends Component {
                                             </InputGroup>
                                         </FormGroup>
                                         <div>
-                                            <Popover placement="top" isOpen={this.state.popoverOpenParentValue} target="Popover04" trigger="hover" toggle={this.toggleParentValue}>
+                                            <Popover placement="top" isOpen={this.state.popoverOpenParentValue} target="Popover6" trigger="hover" toggle={this.toggleParentValue}>
                                                 <PopoverBody>{i18n.t('static.tooltip.ParentValue')}</PopoverBody>
                                             </Popover>
                                         </div>
                                         <FormGroup className="col-md-6" style={{ display: this.state.numberNode ? 'block' : 'none' }}>
-                                            <Label htmlFor="currencyId">{i18n.t('static.tree.parentValue')} {i18n.t('static.common.for')} {moment(this.state.parentScenario.month).format(`MMM-YYYY`)} <i class="fa fa-info-circle icons pl-lg-2" id="Popover04" onClick={this.toggleParentValue} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
+                                            <Label htmlFor="currencyId">{i18n.t('static.tree.parentValue')} {i18n.t('static.common.for')} {moment(this.state.parentScenario.month).format(`MMM-YYYY`)} <i class="fa fa-info-circle icons pl-lg-2" id="Popover6" onClick={this.toggleParentValue} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                             <Input type="text"
                                                 id="parentValue"
                                                 name="parentValue"
@@ -6968,12 +7216,12 @@ export default class BuildTree extends Component {
                                         {/* } */}
                                         {/* {this.state.aggregationNode && */}
                                         <div>
-                                            <Popover placement="top" isOpen={this.state.popoverOpenNodeValue} target="Popover6" trigger="hover" toggle={this.toggleNodeValue}>
+                                            <Popover placement="top" isOpen={this.state.popoverOpenNodeValue} target="Popover7" trigger="hover" toggle={this.toggleNodeValue}>
                                                 <PopoverBody>{i18n.t('static.tooltip.NodeValue')}</PopoverBody>
                                             </Popover>
                                         </div>
                                         <FormGroup className="col-md-6" style={{ display: this.state.aggregationNode ? 'block' : 'none' }}>
-                                            <Label htmlFor="currencyId">{i18n.t('static.tree.nodeValue')}{this.state.numberNode}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover6" onClick={this.toggleNodeValue} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
+                                            <Label htmlFor="currencyId">{i18n.t('static.tree.nodeValue')}{this.state.numberNode}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover7" onClick={this.toggleNodeValue} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                             <Input type="text"
                                                 id="nodeValue"
                                                 name="nodeValue"
@@ -7011,12 +7259,12 @@ export default class BuildTree extends Component {
                                             {(this.state.currentItemConfig.context.payload.nodeType.id == 5) &&
                                                 <>
                                                     <div>
-                                                        <Popover placement="top" isOpen={this.state.popoverOpenTypeOfUsePU} target="Popover11" trigger="hover" toggle={this.toggleTypeOfUsePU}>
+                                                        <Popover placement="top" isOpen={this.state.popoverOpenTypeOfUsePU} target="Popover8" trigger="hover" toggle={this.toggleTypeOfUsePU}>
                                                             <PopoverBody>{i18n.t('static.tooltip.TypeOfUsePU')}</PopoverBody>
                                                         </Popover>
                                                     </div>
                                                     <FormGroup className="col-md-2">
-                                                        <Label htmlFor="currencyId">{i18n.t('static.common.typeofuse')} <i class="fa fa-info-circle icons pl-lg-2" id="Popover11" onClick={this.toggleTypeOfUsePU} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
+                                                        <Label htmlFor="currencyId">{i18n.t('static.common.typeofuse')} <i class="fa fa-info-circle icons pl-lg-2" id="Popover8" onClick={this.toggleTypeOfUsePU} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
 
                                                     </FormGroup>
                                                     <FormGroup className="col-md-10">
@@ -7042,12 +7290,12 @@ export default class BuildTree extends Component {
                                                         </Input>
                                                     </FormGroup>
                                                     <div>
-                                                        <Popover placement="top" isOpen={this.state.popoverOpenForecastingUnitPU} target="Popover12" trigger="hover" toggle={this.toggleForecastingUnitPU}>
+                                                        <Popover placement="top" isOpen={this.state.popoverOpenForecastingUnitPU} target="Popover9" trigger="hover" toggle={this.toggleForecastingUnitPU}>
                                                             <PopoverBody>{i18n.t('static.tooltip.TypeOfUsePU')}</PopoverBody>
                                                         </Popover>
                                                     </div>
                                                     <FormGroup className="col-md-2">
-                                                        <Label htmlFor="currencyId">{i18n.t('static.product.unit1')} <i class="fa fa-info-circle icons pl-lg-2" id="Popover12" onClick={this.toggleForecastingUnitPU} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
+                                                        <Label htmlFor="currencyId">{i18n.t('static.product.unit1')} <i class="fa fa-info-circle icons pl-lg-2" id="Popover9" onClick={this.toggleForecastingUnitPU} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
 
                                                     </FormGroup>
                                                     <FormGroup className="col-md-10">
@@ -7061,12 +7309,12 @@ export default class BuildTree extends Component {
                                                         </Input>
                                                     </FormGroup>
                                                     <div>
-                                                        <Popover placement="top" isOpen={this.state.popoverOpenHashOfUMonth} target="Popover13" trigger="hover" toggle={this.toggleHashOfUMonth}>
+                                                        <Popover placement="top" isOpen={this.state.popoverOpenHashOfUMonth} target="Popover11" trigger="hover" toggle={this.toggleHashOfUMonth}>
                                                             <PopoverBody>{i18n.t('static.tooltip.TypeOfUsePU')}</PopoverBody>
                                                         </Popover>
                                                     </div>
                                                     <FormGroup className="col-md-2">
-                                                        <Label htmlFor="currencyId">{this.state.parentScenario.fuNode.usageType.id == 2 ? "# of FU / month / " : "# of FU / usage / "}{this.state.nodeUnitList.filter(c => c.unitId == this.state.currentItemConfig.context.payload.nodeUnit.id)[0].label.label_en} <i class="fa fa-info-circle icons pl-lg-2" id="Popover13" onClick={this.toggleHashOfUMonth} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
+                                                        <Label htmlFor="currencyId">{this.state.parentScenario.fuNode.usageType.id == 2 ? "# of FU / month / " : "# of FU / usage / "}{this.state.nodeUnitList.filter(c => c.unitId == this.state.currentItemConfig.context.payload.nodeUnit.id)[0].label.label_en} <i class="fa fa-info-circle icons pl-lg-2" id="Popover11" onClick={this.toggleHashOfUMonth} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                                     </FormGroup>
                                                     <FormGroup className="col-md-5">
                                                         <Input type="text"
@@ -7102,12 +7350,12 @@ export default class BuildTree extends Component {
                                                 </>
                                             }
                                             <div>
-                                                <Popover placement="top" isOpen={this.state.popoverOpenPlanningUnitNode} target="Popover14" trigger="hover" toggle={this.togglePlanningUnitNode}>
+                                                <Popover placement="top" isOpen={this.state.popoverOpenPlanningUnitNode} target="Popover12" trigger="hover" toggle={this.togglePlanningUnitNode}>
                                                     <PopoverBody>{i18n.t('static.tooltip.planningUnitNode')}</PopoverBody>
                                                 </Popover>
                                             </div>
                                             <FormGroup className="col-md-2" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 5 ? 'block' : 'none' }}>
-                                                <Label htmlFor="currencyId">{i18n.t('static.product.product')}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover14" onClick={this.togglePlanningUnitNode} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
+                                                <Label htmlFor="currencyId">{i18n.t('static.product.product')}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover12" onClick={this.togglePlanningUnitNode} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
 
                                             </FormGroup>
                                             <FormGroup className="col-md-10" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 5 ? 'block' : 'none' }}>
@@ -7136,12 +7384,12 @@ export default class BuildTree extends Component {
                                             {(this.state.currentItemConfig.context.payload.nodeType.id == 5) &&
                                                 <>
                                                     <div>
-                                                        <Popover placement="top" isOpen={this.state.popoverOpenConversionFactorFUPU} target="Popover15" trigger="hover" toggle={this.toggleConversionFactorFUPU}>
+                                                        <Popover placement="top" isOpen={this.state.popoverOpenConversionFactorFUPU} target="Popover13" trigger="hover" toggle={this.toggleConversionFactorFUPU}>
                                                             <PopoverBody>{i18n.t('static.tooltip.Conversionfactor')}</PopoverBody>
                                                         </Popover>
                                                     </div>
                                                     <FormGroup className="col-md-2">
-                                                        <Label htmlFor="currencyId">{i18n.t('static.conversion.ConversionFactorFUPU')} <i class="fa fa-info-circle icons pl-lg-2" id="Popover15" onClick={this.toggleConversionFactorFUPU} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
+                                                        <Label htmlFor="currencyId">{i18n.t('static.conversion.ConversionFactorFUPU')} <i class="fa fa-info-circle icons pl-lg-2" id="Popover13" onClick={this.toggleConversionFactorFUPU} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                                     </FormGroup>
                                                     <FormGroup className="col-md-10">
                                                         <Input type="text"
@@ -7154,12 +7402,12 @@ export default class BuildTree extends Component {
                                                         </Input>
                                                     </FormGroup>
                                                     <div>
-                                                        <Popover placement="top" isOpen={this.state.popoverOpenNoOfPUUsage} target="Popover16" trigger="hover" toggle={this.toggleNoOfPUUsage}>
+                                                        <Popover placement="top" isOpen={this.state.popoverOpenNoOfPUUsage} target="Popover14" trigger="hover" toggle={this.toggleNoOfPUUsage}>
                                                             <PopoverBody>{i18n.t('static.tooltip.NoOfPUUsage')}</PopoverBody>
                                                         </Popover>
                                                     </div>
                                                     <FormGroup className="col-md-2">
-                                                        <Label htmlFor="currencyId">{this.state.parentScenario.fuNode.usageType.id == 2 ? "# of PU / month / " : "# of PU / usage / "}{this.state.nodeUnitList.filter(c => c.unitId == this.state.currentItemConfig.context.payload.nodeUnit.id)[0].label.label_en} <i class="fa fa-info-circle icons pl-lg-2" id="Popover16" onClick={this.toggleNoOfPUUsage} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
+                                                        <Label htmlFor="currencyId">{this.state.parentScenario.fuNode.usageType.id == 2 ? "# of PU / month / " : "# of PU / usage / "}{this.state.nodeUnitList.filter(c => c.unitId == this.state.currentItemConfig.context.payload.nodeUnit.id)[0].label.label_en} <i class="fa fa-info-circle icons pl-lg-2" id="Popover14" onClick={this.toggleNoOfPUUsage} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                                     </FormGroup>
                                                     <FormGroup className="col-md-5">
                                                         <Input type="text"
@@ -7195,12 +7443,12 @@ export default class BuildTree extends Component {
                                                     {this.state.parentScenario.fuNode.usageType.id == 2 &&
                                                         <>
                                                             <div>
-                                                                <Popover placement="top" isOpen={this.state.popoverOpenQATEstimateForInterval} target="Popover17" trigger="hover" toggle={this.toggleQATEstimateForInterval}>
+                                                                <Popover placement="top" isOpen={this.state.popoverOpenQATEstimateForInterval} target="Popover15" trigger="hover" toggle={this.toggleQATEstimateForInterval}>
                                                                     <PopoverBody>{i18n.t('static.tooltip.QATEstimateForInterval')}</PopoverBody>
                                                                 </Popover>
                                                             </div>
                                                             <FormGroup className="col-md-2">
-                                                                <Label htmlFor="currencyId">{i18n.t('static.tree.QATEstimateForIntervalEvery_months')} <i class="fa fa-info-circle icons pl-lg-2" id="Popover17" onClick={this.toggleQATEstimateForInterval} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
+                                                                <Label htmlFor="currencyId">{i18n.t('static.tree.QATEstimateForIntervalEvery_months')} <i class="fa fa-info-circle icons pl-lg-2" id="Popover15" onClick={this.toggleQATEstimateForInterval} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                                             </FormGroup>
                                                             <FormGroup className="col-md-10">
                                                                 <Input type="text"
@@ -7217,12 +7465,12 @@ export default class BuildTree extends Component {
                                                         </>}
                                                 </>}
                                             <div>
-                                                <Popover placement="top" isOpen={this.state.popoverOpenConsumptionIntervalEveryXMonths} target="Popover18" trigger="hover" toggle={this.toggleConsumptionIntervalEveryXMonths}>
+                                                <Popover placement="top" isOpen={this.state.popoverOpenConsumptionIntervalEveryXMonths} target="Popover16" trigger="hover" toggle={this.toggleConsumptionIntervalEveryXMonths}>
                                                     <PopoverBody>{i18n.t('static.tooltip.ConsumptionIntervalEveryXMonths')}</PopoverBody>
                                                 </Popover>
                                             </div>
                                             <FormGroup className="col-md-2" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 5 && this.state.parentScenario.fuNode.usageType.id == 2 ? 'block' : 'none' }}>
-                                                <Label htmlFor="currencyId">{i18n.t('static.tree.consumptionIntervalEveryXMonths')}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover18" onClick={this.toggleConsumptionIntervalEveryXMonths} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
+                                                <Label htmlFor="currencyId">{i18n.t('static.tree.consumptionIntervalEveryXMonths')}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover16" onClick={this.toggleConsumptionIntervalEveryXMonths} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                             </FormGroup>
                                             <FormGroup className="col-md-10" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 5 && this.state.parentScenario.fuNode.usageType.id == 2 ? 'block' : 'none' }}>
                                                 <Input type="number"
@@ -7243,12 +7491,12 @@ export default class BuildTree extends Component {
                                             </FormGroup>
 
                                             <div>
-                                                <Popover placement="top" isOpen={this.state.popoverOpenWillClientsShareOnePU} target="Popover19" trigger="hover" toggle={this.toggleWillClientsShareOnePU}>
+                                                <Popover placement="top" isOpen={this.state.popoverOpenWillClientsShareOnePU} target="Popover17" trigger="hover" toggle={this.toggleWillClientsShareOnePU}>
                                                     <PopoverBody>{i18n.t('static.tooltip.willClientsShareOnePU')}</PopoverBody>
                                                 </Popover>
                                             </div>
                                             <FormGroup className="col-md-2" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 5 && this.state.parentScenario.fuNode.usageType.id == 1 ? 'block' : 'none' }}>
-                                                <Label htmlFor="currencyId">{i18n.t('static.tree.willClientsShareOnePU?')}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover19" onClick={this.toggleWillClientsShareOnePU} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
+                                                <Label htmlFor="currencyId">{i18n.t('static.tree.willClientsShareOnePU?')}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover17" onClick={this.toggleWillClientsShareOnePU} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                             </FormGroup>
                                             <FormGroup className="col-md-10" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 5 && this.state.parentScenario.fuNode.usageType.id == 1 ? 'block' : 'none' }}>
                                                 <Input type="select"
@@ -7306,12 +7554,12 @@ export default class BuildTree extends Component {
                                     <div>
                                         <div className="row">
                                             <div>
-                                                <Popover placement="top" isOpen={this.state.popoverOpentracercategoryModelingType} target="Popover05" trigger="hover" toggle={this.toggletracercategoryModelingType}>
+                                                <Popover placement="top" isOpen={this.state.popoverOpentracercategoryModelingType} target="Popover18" trigger="hover" toggle={this.toggletracercategoryModelingType}>
                                                     <PopoverBody>{i18n.t('static.tooltip.tracercategoryModelingType')}</PopoverBody>
                                                 </Popover>
                                             </div>
                                             <FormGroup className="col-md-6" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 4 ? 'block' : 'none' }}>
-                                                <Label htmlFor="currencyId">{i18n.t('static.tracercategory.tracercategory')} <i class="fa fa-info-circle icons pl-lg-2" id="Popover05" onClick={this.toggletracercategoryModelingType} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
+                                                <Label htmlFor="currencyId">{i18n.t('static.tracercategory.tracercategory')} <i class="fa fa-info-circle icons pl-lg-2" id="Popover18" onClick={this.toggletracercategoryModelingType} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                                 <Input
                                                     type="select"
                                                     id="tracerCategoryId"
@@ -7331,7 +7579,7 @@ export default class BuildTree extends Component {
                                                         && this.state.tracerCategoryList.map((item, i) => {
                                                             return (
                                                                 <option key={i} value={item.tracerCategoryId}>
-                                                                    {getLabelText(item.label, this.state.lang)}
+                                                                    {getLabelText(item.label, this.state.lang) + "-" + item.tracerCategoryId}
                                                                 </option>
                                                             )
                                                         }, this)}
@@ -7339,12 +7587,12 @@ export default class BuildTree extends Component {
                                                 <FormFeedback className="red">{errors.tracerCategoryId}</FormFeedback>
                                             </FormGroup>
                                             <div>
-                                                <Popover placement="top" isOpen={this.state.popoverOpenCopyFromTemplate} target="Popover2" trigger="hover" toggle={this.toggleCopyFromTemplate}>
+                                                <Popover placement="top" isOpen={this.state.popoverOpenCopyFromTemplate} target="Popover19" trigger="hover" toggle={this.toggleCopyFromTemplate}>
                                                     <PopoverBody>{i18n.t('static.tooltip.CopyFromTemplate')}</PopoverBody>
                                                 </Popover>
                                             </div>
                                             <FormGroup className="col-md-6" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 4 ? 'block' : 'none' }}>
-                                                <Label htmlFor="currencyId">{i18n.t('static.tree.copyFromTemplate')} <i class="fa fa-info-circle icons pl-lg-2" id="Popover2" onClick={this.toggleCopyFromTemplate} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
+                                                <Label htmlFor="currencyId">{i18n.t('static.tree.copyFromTemplate')} <i class="fa fa-info-circle icons pl-lg-2" id="Popover19" onClick={this.toggleCopyFromTemplate} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                                 <Input
                                                     type="select"
                                                     name="usageTemplateId"
@@ -7444,12 +7692,12 @@ export default class BuildTree extends Component {
                                                 </div><br />
                                             </FormGroup>
                                             <div>
-                                                <Popover placement="top" isOpen={this.state.popoverOpenTypeOfUse} target="Popover3" trigger="hover" toggle={this.toggleTypeOfUse}>
+                                                <Popover placement="top" isOpen={this.state.popoverOpenTypeOfUse} target="Popover21" trigger="hover" toggle={this.toggleTypeOfUse}>
                                                     <PopoverBody>{i18n.t('static.tooltip.TypeOfUse')}</PopoverBody>
                                                 </Popover>
                                             </div>
                                             <FormGroup className="col-md-6" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 4 ? 'block' : 'none' }}>
-                                                <Label htmlFor="currencyId">{i18n.t('static.common.typeofuse')}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover3" onClick={this.toggleTypeOfUse} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
+                                                <Label htmlFor="currencyId">{i18n.t('static.common.typeofuse')}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover21" onClick={this.toggleTypeOfUse} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                                 <Input
                                                     type="select"
                                                     id="usageTypeIdFU"
@@ -7478,12 +7726,12 @@ export default class BuildTree extends Component {
                                                 <FormFeedback className="red">{errors.usageTypeIdFU}</FormFeedback>
                                             </FormGroup>
                                             <div>
-                                                <Popover placement="top" isOpen={this.state.popoverOpenLagInMonth} target="Popover4" trigger="hover" toggle={this.toggleLagInMonth}>
+                                                <Popover placement="top" isOpen={this.state.popoverOpenLagInMonth} target="Popover22" trigger="hover" toggle={this.toggleLagInMonth}>
                                                     <PopoverBody>{i18n.t('static.tooltip.LagInMonth')}</PopoverBody>
                                                 </Popover>
                                             </div>
                                             <FormGroup className="col-md-6" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 4 ? 'block' : 'none' }}>
-                                                <Label htmlFor="currencyId">{i18n.t('static.tree.lagInMonth0Immediate')}<span class="red Reqasterisk">*</span>  <i class="fa fa-info-circle icons pl-lg-2" id="Popover4" onClick={this.toggleLagInMonth} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
+                                                <Label htmlFor="currencyId">{i18n.t('static.tree.lagInMonth0Immediate')}<span class="red Reqasterisk">*</span>  <i class="fa fa-info-circle icons pl-lg-2" id="Popover22" onClick={this.toggleLagInMonth} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                                 <Input type="number"
                                                     id="lagInMonths"
                                                     name="lagInMonths"
@@ -7586,12 +7834,12 @@ export default class BuildTree extends Component {
                                             {/* {(this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentScenario.fuNode.usageType.id == 1) && */}
                                             <>
                                                 <div>
-                                                    <Popover placement="top" isOpen={this.state.popoverOpenSingleUse} target="Popover5" trigger="hover" toggle={this.toggleSingleUse}>
+                                                    <Popover placement="top" isOpen={this.state.popoverOpenSingleUse} target="Popover23" trigger="hover" toggle={this.toggleSingleUse}>
                                                         <PopoverBody>{i18n.t('static.tooltip.SingleUse')}</PopoverBody>
                                                     </Popover>
                                                 </div>
                                                 <FormGroup className="col-md-2" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentScenario.fuNode.usageType.id == 1 ? 'block' : 'none' }}>
-                                                    <Label htmlFor="currencyId">{i18n.t('static.tree.singleUse')}<span class="red Reqasterisk">*</span>  <i class="fa fa-info-circle icons pl-lg-2" id="Popover5" onClick={this.toggleSingleUse} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
+                                                    <Label htmlFor="currencyId">{i18n.t('static.tree.singleUse')}<span class="red Reqasterisk">*</span>  <i class="fa fa-info-circle icons pl-lg-2" id="Popover23" onClick={this.toggleSingleUse} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                                 </FormGroup>
                                                 <FormGroup className="col-md-10" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentScenario.fuNode.usageType.id == 1 ? 'block' : 'none' }}>
                                                     <Input type="select"
@@ -7886,12 +8134,12 @@ export default class BuildTree extends Component {
                     </div>
                     <div className="row pl-lg-2 pr-lg-2">
                         <div>
-                            <Popover placement="top" isOpen={this.state.popoverOpenMonth} target="Popover7" trigger="hover" toggle={this.toggleMonth}>
+                            <Popover placement="top" isOpen={this.state.popoverOpenMonth} target="Popover24" trigger="hover" toggle={this.toggleMonth}>
                                 <PopoverBody>{i18n.t('static.tooltip.ModelingTransferMonth')}</PopoverBody>
                             </Popover>
                         </div>
                         <FormGroup className="col-md-2 pt-lg-1">
-                            <Label htmlFor="">{i18n.t('static.common.month')}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover7" onClick={this.toggleMonth} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
+                            <Label htmlFor="">{i18n.t('static.common.month')}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover24" onClick={this.toggleMonth} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                         </FormGroup>
                         <FormGroup className="col-md-4 pl-lg-0">
                             <Picker
@@ -7998,12 +8246,12 @@ export default class BuildTree extends Component {
                                         {/* </div> */}
                                         {/* <div className="row"> */}
                                         <div>
-                                            <Popover placement="top" isOpen={this.state.popoverOpenTargetEndingValue} target="Popover8" trigger="hover" toggle={this.toggleTargetEndingValue}>
+                                            <Popover placement="top" isOpen={this.state.popoverOpenTargetEndingValue} target="Popover25" trigger="hover" toggle={this.toggleTargetEndingValue}>
                                                 <PopoverBody>{i18n.t('static.tooltip.TargetEndingValue')}</PopoverBody>
                                             </Popover>
                                         </div>
                                         <FormGroup className="col-md-5">
-                                            <Label htmlFor="currencyId">{i18n.t('static.tree.targetEnding')} {this.state.currentItemConfig.context.payload.nodeType.id == 2 ? 'value' : '%'}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover8" onClick={this.toggleTargetEndingValue} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
+                                            <Label htmlFor="currencyId">{i18n.t('static.tree.targetEnding')} {this.state.currentItemConfig.context.payload.nodeType.id == 2 ? 'value' : '%'}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover25" onClick={this.toggleTargetEndingValue} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                             <Input type="number"
                                                 id="currentEndValue"
                                                 name="currentEndValue"
@@ -8020,12 +8268,12 @@ export default class BuildTree extends Component {
                                             <Label htmlFor="currencyId">{i18n.t('static.tree.or')}</Label>
                                         </FormGroup>
                                         <div>
-                                            <Popover placement="top" isOpen={this.state.popoverOpenTargetChangePercent} target="Popover9" trigger="hover" toggle={this.toggleTargetChangePercent}>
+                                            <Popover placement="top" isOpen={this.state.popoverOpenTargetChangePercent} target="Popover26" trigger="hover" toggle={this.toggleTargetChangePercent}>
                                                 <PopoverBody>{i18n.t('static.tooltip.TargetChangePercent')}</PopoverBody>
                                             </Popover>
                                         </div>
                                         <FormGroup className="col-md-5">
-                                            <Label htmlFor="currencyId">{this.state.currentItemConfig.context.payload.nodeType.id > 2 ? 'Change (% points)' : 'Target change (%)'}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover9" onClick={this.toggleTargetChangePercent} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
+                                            <Label htmlFor="currencyId">{this.state.currentItemConfig.context.payload.nodeType.id > 2 ? 'Change (% points)' : 'Target change (%)'}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover26" onClick={this.toggleTargetChangePercent} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                             <Input type="number"
                                                 id="currentTargetChangePercentage"
                                                 name="currentTargetChangePercentage"
@@ -8060,12 +8308,12 @@ export default class BuildTree extends Component {
                                     </div>
                                     <div className="row col-md-12 pl-lg-0">
                                         <div>
-                                            <Popover placement="top" isOpen={this.state.popoverOpenCalculatedMonthOnMonthChnage} target="Popover01" trigger="hover" toggle={this.toggleCalculatedMonthOnMonthChnage}>
+                                            <Popover placement="top" isOpen={this.state.popoverOpenCalculatedMonthOnMonthChnage} target="Popover27" trigger="hover" toggle={this.toggleCalculatedMonthOnMonthChnage}>
                                                 <PopoverBody>{i18n.t('static.tooltip.CalculatedMonthOnMonthChnage')}</PopoverBody>
                                             </Popover>
                                         </div>
                                         <FormGroup className="col-md-6">
-                                            <Label htmlFor="currencyId">{i18n.t('static.tree.CalculatedMonth-on-MonthChange')}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover01" onClick={this.toggleCalculatedMonthOnMonthChnage} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
+                                            <Label htmlFor="currencyId">{i18n.t('static.tree.CalculatedMonth-on-MonthChange')}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover27" onClick={this.toggleCalculatedMonthOnMonthChnage} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                             <Input type="text"
                                                 id="calculatedMomChange"
                                                 name="calculatedMomChange"
@@ -8546,6 +8794,10 @@ export default class BuildTree extends Component {
             // this.calculateValuesForAggregateNode(this.state.items);
         })
     }
+
+
+
+
     render() {
         const { datasetList } = this.state;
         const { items } = this.state;
@@ -8570,6 +8822,7 @@ export default class BuildTree extends Component {
 
             return connectDropTarget(connectDragSource(
                 // <div className="ContactTemplate" style={{ opacity, backgroundColor: Colors.White, borderColor: Colors.Black }}>
+
                 <div className="ContactTemplate boxContactTemplate">
                     <div className={itemConfig.payload.nodeType.id == 5
                         || itemConfig.payload.nodeType.id == 4 ? "ContactTitleBackground TemplateTitleBgblue" :
@@ -8607,6 +8860,7 @@ export default class BuildTree extends Component {
                 </div>
             ))
         }
+
 
         const NodeDragSource = DragSource(
             ItemTypes.NODE,
@@ -8683,23 +8937,25 @@ export default class BuildTree extends Component {
 
             }, this);
 
-        const { forecastingUnitList } = this.state;
-        let forecastingUnitMultiList = forecastingUnitList.length > 0
-            && forecastingUnitList.map((item, i) => {
-                return ({ value: item.id, label: getLabelText(item.label, this.state.lang) })
+        // const { forecastingUnitList } = this.state;
+        // let forecastingUnitMultiList = forecastingUnitList.length > 0
+        //     && forecastingUnitList.map((item, i) => {
+        //         return ({ value: item.id, label: getLabelText(item.label, this.state.lang) })
 
-            }, this);
-        console.log("forecastingUnitMultiList---", forecastingUnitMultiList);
+        //     }, this);
+        // console.log("forecastingUnitMultiList---", forecastingUnitMultiList);
 
         // regionMultiList = Array.from(regionMultiList);
         let treeLevel = this.state.items.length;
         const treeLevelItems = []
+        var treeLevels = this.state.curTreeObj.forecastMethod.id != "" ? this.state.curTreeObj.levelList : [];
         for (var i = 0; i <= treeLevel; i++) {
+            var treeLevelFiltered = treeLevels.filter(c => c.levelNo == i);
             if (i == 0) {
                 treeLevelItems.push({
                     annotationType: AnnotationType.Level,
                     levels: [0],
-                    title: "Level 0",
+                    title: treeLevelFiltered.length > 0 ? getLabelText(treeLevelFiltered[0].label, this.state.lang) : "Level 0",
                     titleColor: "#002f6c",
                     fontWeight: "bold",
                     transForm: 'rotate(270deg)',
@@ -8714,7 +8970,7 @@ export default class BuildTree extends Component {
             else if (i % 2 == 0) {
                 treeLevelItems.push(new LevelAnnotationConfig({
                     levels: [i],
-                    title: "Level " + i,
+                    title: treeLevelFiltered.length > 0 ? getLabelText(treeLevelFiltered[0].label, this.state.lang) : "Level " + i,
                     titleColor: "#002f6c",
                     fontWeight: "bold",
                     transForm: 'rotate(270deg)',
@@ -8730,7 +8986,7 @@ export default class BuildTree extends Component {
             else {
                 treeLevelItems.push(new LevelAnnotationConfig({
                     levels: [i],
-                    title: "Level " + i,
+                    title: treeLevelFiltered.length > 0 ? getLabelText(treeLevelFiltered[0].label, this.state.lang) : "Level " + i,
                     titleColor: "#002f6c",
                     fontWeight: "bold",
                     transForm: 'rotate(270deg)',
@@ -8757,6 +9013,51 @@ export default class BuildTree extends Component {
             defaultTemplateName: "contactTemplate",
             linesColor: Colors.Black,
             annotations: treeLevelItems,
+            onLevelTitleRender: ((data) => {
+                var { context, width, height } = data;
+                var { title, titleColor } = context;
+                var style = {
+                    position: "absolute",
+                    fontSize: "12px",
+                    fontFamily: "Trebuchet MS, Tahoma, Verdana, Arial, sans-serif",
+                    WebkitTapHighlightColor: "rgba(0,0,0,0)",
+                    WebkitUserSelect: "none",
+                    WebkitTouchCallout: "none",
+                    KhtmlUserSelect: "none",
+                    MozUserSelect: "none",
+                    msUserSelect: "none",
+                    userSelect: "none",
+                    boxSizing: "content-box",
+
+                    MozBorderRadius: "4px",
+                    WebkitBorderRadius: "4px",
+                    KhtmlBorderRadius: "4px",
+                    BorderRadius: "4px",
+
+                    background: "royalblue",
+                    borderWidth: 0,
+                    color: "white",
+                    padding: 0,
+                    width: "100%",
+                    height: "100%",
+                    left: "-1px",
+                    top: "-1px"
+                }
+                return <div style={{ ...style, background: titleColor }} onClick={(event) => {
+                    event.stopPropagation();
+                    //   console.log("Data@@@1111----------->",data)
+                    //   alert(`User clicked on level title ${title}`)
+                    this.levelClicked(data)
+                }}>
+                    <RotatedText
+                        width={width}
+                        height={height}
+                        orientation={'RotateRight'}
+                        horizontalAlignment={'center'}
+                        verticalAlignment={'middle'}
+                    >{title}</RotatedText>
+                </div>
+            }),
             onButtonsRender: (({ context: itemConfig }) => {
                 return <>
                     {itemConfig.parent != null &&
@@ -9021,6 +9322,10 @@ export default class BuildTree extends Component {
             }]
         }
         return <div className="animated fadeIn">
+            <Prompt
+                when={this.state.isChanged == true}
+                message={i18n.t("static.dataentry.confirmmsg")}
+            />
             <AuthenticationServiceComponent history={this.props.history} />
             <h5 className={this.state.color} id="div2">
                 {i18n.t(this.state.message, { entityname })}</h5>
@@ -9127,19 +9432,21 @@ export default class BuildTree extends Component {
                                                                 {treeList}
                                                             </Input>
                                                             <InputGroupAddon addonType="append" onClick={this.toggleCollapse}>
-                                                                <InputGroupText><i class="fa fa-cog icons" data-toggle="collapse" aria-expanded="false"></i></InputGroupText>
+                                                                <InputGroupText><i class="fa fa-cog icons" data-toggle="collapse" aria-expanded="false" style={{ cursor: 'pointer' }}></i></InputGroupText>
 
                                                             </InputGroupAddon>
                                                         </InputGroup>
                                                         {/* <FormFeedback>{errors.languageId}</FormFeedback> */}
                                                     </FormGroup>
                                                     <FormGroup className="col-md-3 pl-lg-0">
-
                                                         <Label htmlFor="languageId">{i18n.t('static.whatIf.scenario')}</Label>
+
                                                         <InputGroup>
+
                                                             {/* <InputGroupAddon addonType="append">
                                                                         <InputGroupText><i class="fa fa-plus icons" aria-hidden="true" data-toggle="tooltip" data-html="true" data-placement="bottom" onClick={this.showPopUp} title=""></i></InputGroupText>
                                                                     </InputGroupAddon> */}
+
                                                             <Input
                                                                 type="select"
                                                                 name="scenarioId"
@@ -9148,6 +9455,7 @@ export default class BuildTree extends Component {
                                                                 // valid={!errors.languageId && this.state.user.language.languageId != ''}
                                                                 // invalid={touched.languageId && !!errors.languageId}
                                                                 onChange={(e) => { this.dataChange(e) }}
+                                                                // onClick={() => { this.onClick1() }}
                                                                 // onBlur={handleBlur}
                                                                 required
                                                                 value={this.state.selectedScenario}
@@ -9155,20 +9463,37 @@ export default class BuildTree extends Component {
                                                                 <option value="">{i18n.t('static.common.select')}</option>
                                                                 {scenarios}
                                                             </Input>
+
+
                                                             <InputGroupAddon addonType="append" onClick={this.toggleDropdown}>
                                                                 {/* <InputGroupText><i class="fa fa-plus icons" aria-hidden="true" data-toggle="tooltip" data-html="true" data-placement="bottom" onClick={this.openScenarioModal} title=""></i></InputGroupText> */}
-                                                                <InputGroupText><i class="fa fa-cog icons" data-bind="label" id="searchLabel" title=""></i></InputGroupText>
+                                                                <InputGroupText className='SettingIcon'>
+                                                                    <ButtonDropdown isOpen={this.state.dropdownOpen[0]} toggle={() => { this.toggleDeropdownSetting(0); }}>
+                                                                        <DropdownToggle>
+                                                                            <i class="fa fa-cog icons" data-bind="label" id="searchLabel" title=""></i>
+                                                                        </DropdownToggle>
+                                                                        <DropdownMenu right className="MarginLeftDropdown">
+                                                                            <DropdownItem onClick={() => { this.openScenarioModal(1) }}>Add Scenario</DropdownItem>
+                                                                            <DropdownItem onClick={() => { this.openScenarioModal(2) }}>Edit Scenario</DropdownItem>
+                                                                            <DropdownItem onClick={() => { this.openScenarioModal(3) }}>Delete Scenario</DropdownItem>
+                                                                        </DropdownMenu>
+                                                                    </ButtonDropdown>
+                                                                </InputGroupText>
 
                                                             </InputGroupAddon>
                                                         </InputGroup>
-                                                        <div class="list-group DropdownScenario MarginLeftDropdown" style={{ display: this.state.showDiv1 ? 'block' : 'none' }}>
+
+                                                        {/* <div class="list-group DropdownScenario MarginLeftDropdown" style={{ display: this.state.showDiv1 ? 'block' : 'none' }}>
                                                             <p class="list-group-item list-group-item-action" onClick={() => { this.openScenarioModal(1) }}>Add Scenario</p>
                                                             <p class="list-group-item list-group-item-action" onClick={() => { this.openScenarioModal(2) }}>Edit Scenario</p>
                                                             <p class="list-group-item list-group-item-action" onClick={() => { this.openScenarioModal(3) }}>Delete Scenario</p>
+                                                           
 
-                                                        </div>
+                                                        </div> */}
+
                                                         {/* <FormFeedback>{errors.languageId}</FormFeedback> */}
                                                     </FormGroup>
+
                                                     <FormGroup className="col-md-3 pl-lg-0">
                                                         <Label htmlFor="languageId">
                                                             {/* {i18n.t('static.supplyPlan.date')}  */}
@@ -9797,6 +10122,52 @@ export default class BuildTree extends Component {
             </Modal>
             {/* </Draggable > */}
             {/* Scenario Modal end------------------------ */}
+            {/* Modal for level */}
+            <Modal isOpen={this.state.levelModal}
+                className={'modal-md'}>
+                <ModalHeader toggle={() => this.levelClicked("")} className="modalHeader">
+                    <strong>{i18n.t('static.tree.levelDetails')}</strong>
+                </ModalHeader>
+                <ModalBody>
+                    <FormGroup>
+                        <Label htmlFor="currencyId">{i18n.t('static.tree.levelName')}<span class="red Reqasterisk">*</span></Label>
+                        <Input type="text"
+                            id="levelName"
+                            name="levelName"
+                            required
+                            onChange={(e) => { this.levelNameChanged(e) }}
+                            value={this.state.levelName}
+                        ></Input>
+                    </FormGroup>
+                    <FormGroup>
+                        <Label htmlFor="currencyId">{i18n.t('static.tree.nodeUnit')}</Label>
+                        <Input
+                            type="select"
+                            id="levelUnit"
+                            name="levelUnit"
+                            bsSize="sm"
+                            onChange={(e) => { this.levelUnitChange(e) }}
+                            value={this.state.levelUnit}
+                        >
+                            <option value="">{i18n.t('static.common.select')}</option>
+                            {this.state.nodeUnitList.length > 0
+                                && this.state.nodeUnitList.map((item, i) => {
+                                    return (
+                                        <option key={i} value={item.unitId}>
+                                            {getLabelText(item.label, this.state.lang)}
+                                        </option>
+                                    )
+                                }, this)}
+                        </Input>
+                    </FormGroup>
+                </ModalBody>
+                <ModalFooter>
+                    <div className="mr-0">
+                        <Button type="submit" size="md" color="success" className="submitBtn float-right" onClick={this.levelDeatilsSaved}> <i className="fa fa-check"></i> {i18n.t('static.common.submit')}</Button>
+                    </div>
+                    <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.levelClicked("")}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                </ModalFooter>
+            </Modal>
 
         </div >
     }

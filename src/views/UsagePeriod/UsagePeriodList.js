@@ -513,7 +513,7 @@ class UsagePeriod extends Component {
                         console.log(response);
                         // window.location.reload();
                         this.setState({
-                            message: i18n.t('static.usagePeriod.addUpdateMessage'), color: 'green'
+                            message: i18n.t('static.usagePeriod.addUpdateMessage'), color: 'green', isChanged: false
                         },
                             () => {
                                 this.hideSecondComponent();
