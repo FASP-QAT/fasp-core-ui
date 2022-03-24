@@ -8984,7 +8984,7 @@ export default class BuildTree extends Component {
         // regionMultiList = Array.from(regionMultiList);
         let treeLevel = this.state.items.length;
         const treeLevelItems = []
-        var treeLevels = this.state.curTreeObj.forecastMethod.id != "" ? this.state.curTreeObj.levelList : [];
+        var treeLevels = this.state.curTreeObj.forecastMethod.id != "" && this.state.curTreeObj.levelList!=undefined ? this.state.curTreeObj.levelList : [];
         for (var i = 0; i <= treeLevel; i++) {
             var treeLevelFiltered = treeLevels.filter(c => c.levelNo == i);
             if (i == 0) {
