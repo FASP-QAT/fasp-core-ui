@@ -710,17 +710,18 @@ export default class CreateTreeTemplate extends Component {
                 }
                 this.setState({ showFUValidation: false }, () => {
                     this.getForecastingUnitUnitByFUId(regionIds.value);
+                    this.getPlanningUnitListByFUId(regionIds.value);
                 });
             } else {
                 currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.forecastingUnit.id = "";
                 currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.forecastingUnit.label.label_en = "";
                 currentItemConfig.context.payload.label.label_en = "";
-                this.setState({ showFUValidation: true });
+                this.setState({ showFUValidation: true, planningUnitList: [] });
             }
             console.log("regionValues---", this.state.fuValues);
             console.log("regionLabels---", this.state.fuLabels);
             this.setState({ currentItemConfig }, () => {
-                this.getPlanningUnitListByFUId(regionIds.value);
+
             });
         })
     }
@@ -2288,7 +2289,7 @@ export default class CreateTreeTemplate extends Component {
         data[0] = 0;
         data[1] = "";
         data[2] = this.state.currentItemConfig.context.payload.nodeType.id == PERCENTAGE_NODE_ID || this.state.currentItemConfig.context.payload.nodeType.id == FU_NODE_ID || this.state.currentItemConfig.context.payload.nodeType.id == PU_NODE_ID ? 5 : '';
-        data[3] = moment(this.state.currentItemConfig.context.payload.nodeDataMap[0][0].month).startOf('month').add(1,'months').format("YYYY-MM-DD")
+        data[3] = moment(this.state.currentItemConfig.context.payload.nodeDataMap[0][0].month).startOf('month').add(1, 'months').format("YYYY-MM-DD")
         data[4] = this.state.maxMonth
         data[5] = "";
         data[6] = "";
@@ -2328,7 +2329,7 @@ export default class CreateTreeTemplate extends Component {
             data[0] = ''
             data[1] = ''
             data[2] = this.state.currentItemConfig.context.payload.nodeType.id == PERCENTAGE_NODE_ID || this.state.currentItemConfig.context.payload.nodeType.id == FU_NODE_ID || this.state.currentItemConfig.context.payload.nodeType.id == PU_NODE_ID ? 5 : '';
-            data[3] = moment(this.state.currentItemConfig.context.payload.nodeDataMap[0][0].month).startOf('month').add(1,'months').format("YYYY-MM-DD")
+            data[3] = moment(this.state.currentItemConfig.context.payload.nodeDataMap[0][0].month).startOf('month').add(1, 'months').format("YYYY-MM-DD")
             data[4] = this.state.maxMonth
             data[5] = ''
             data[6] = ''
@@ -2395,12 +2396,12 @@ export default class CreateTreeTemplate extends Component {
                 {
                     title: i18n.t('static.common.startdate'),
                     type: 'calendar',
-                    options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker', validRange: [moment(this.state.currentItemConfig.context.payload.nodeDataMap[0][0].month).startOf('month').add(1,'months').format("YYYY-MM-DD"), this.state.maxMonth] }, width: 100
+                    options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker', validRange: [moment(this.state.currentItemConfig.context.payload.nodeDataMap[0][0].month).startOf('month').add(1, 'months').format("YYYY-MM-DD"), this.state.maxMonth] }, width: 100
                 },
                 {
                     title: i18n.t('static.common.stopdate'),
                     type: 'calendar',
-                    options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker', validRange: [moment(this.state.currentItemConfig.context.payload.nodeDataMap[0][0].month).startOf('month').add(1,'months').format("YYYY-MM-DD"), this.state.maxMonth] }, width: 100
+                    options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker', validRange: [moment(this.state.currentItemConfig.context.payload.nodeDataMap[0][0].month).startOf('month').add(1, 'months').format("YYYY-MM-DD"), this.state.maxMonth] }, width: 100
                 },
                 {
                     title: i18n.t('static.tree.monthlyChange%'),
@@ -2415,6 +2416,7 @@ export default class CreateTreeTemplate extends Component {
                 {
                     title: i18n.t('static.tree.modelingCalculater'),
                     type: 'image',
+                    readOnly: true
                 },
                 {
                     title: i18n.t('static.tree.calculatedChangeForMonth'),
@@ -2546,7 +2548,7 @@ export default class CreateTreeTemplate extends Component {
                                     data[0] = 0;
                                     data[1] = "";
                                     data[2] = "";
-                                    data[3] = moment(this.state.currentItemConfig.context.payload.nodeDataMap[0][0].month).startOf('month').add(1,'months').format("YYYY-MM-DD")
+                                    data[3] = moment(this.state.currentItemConfig.context.payload.nodeDataMap[0][0].month).startOf('month').add(1, 'months').format("YYYY-MM-DD")
                                     data[4] = this.state.maxMonth
                                     data[5] = "";
                                     data[6] = "";
@@ -3299,7 +3301,13 @@ export default class CreateTreeTemplate extends Component {
         if ((currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageType.id == 1) {
             (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.oneTimeUsage = usageTemplate.oneTimeUsage;
             (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.repeatCount = usageTemplate.repeatCount;
-            (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.repeatUsagePeriod.usagePeriodId = usageTemplate.repeatUsagePeriod != null ? usageTemplate.repeatUsagePeriod.usagePeriodId : '';
+            if (!usageTemplate.oneTimeUsage) {
+                console.log("repeat copy template---", currentItemConfig.context.payload.nodeDataMap[0][0].fuNode);
+                var repeatUsagePeriod = {
+                    usagePeriodId: usageTemplate.repeatUsagePeriod != null ? usageTemplate.repeatUsagePeriod.usagePeriodId : ''
+                };
+                (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.repeatUsagePeriod = repeatUsagePeriod;
+            }
         }
         this.setState({
             currentItemConfig,
@@ -3593,6 +3601,7 @@ export default class CreateTreeTemplate extends Component {
                         (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.id = response.data[0].forecastingUnitId;
                         (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.label.label_en = getLabelText(response.data[0].label, this.state.lang) + " | " + response.data[0].forecastingUnitId;
                         (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.tracerCategory.id = response.data[0].tracerCategory.id;
+                        (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.unit.id = response.data[0].unit.id;
 
                         this.setState({
                             currentItemConfig: currentItemConfig,
@@ -4804,7 +4813,7 @@ export default class CreateTreeTemplate extends Component {
         }
 
 
-        this.setState({ currentItemConfig,isChanged:true }, () => {
+        this.setState({ currentItemConfig, isChanged: true }, () => {
             console.log("after state update---", this.state.currentItemConfig);
         });
     }
@@ -7633,10 +7642,10 @@ export default class CreateTreeTemplate extends Component {
             }]
         }
         return <div className="animated fadeIn">
-              <Prompt
-                    when={this.state.isChanged == true}
-                    message={i18n.t("static.dataentry.confirmmsg")}
-                />
+            <Prompt
+                when={this.state.isChanged == true}
+                message={i18n.t("static.dataentry.confirmmsg")}
+            />
             <AuthenticationServiceComponent history={this.props.history} />
             <h5 className={this.state.color} id="div2">
                 {i18n.t(this.state.message, { entityname })}</h5>
@@ -7779,7 +7788,7 @@ export default class CreateTreeTemplate extends Component {
                                                             message: i18n.t('static.message.addTreeTemplate'),
                                                             color: 'green',
                                                             loading: true,
-                                                            isChanged:false
+                                                            isChanged: false
                                                         }, () => {
                                                             this.hideSecondComponent();
                                                             this.calculateMOMData(1, 2);
@@ -7865,7 +7874,7 @@ export default class CreateTreeTemplate extends Component {
                                                             message: i18n.t('static.message.editTreeTemplate'),
                                                             loading: true,
                                                             color: 'green',
-                                                            isChanged:false
+                                                            isChanged: false
                                                         }, () => {
                                                             this.hideSecondComponent();
                                                             this.calculateMOMData(1, 2);

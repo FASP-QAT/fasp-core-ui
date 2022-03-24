@@ -1148,7 +1148,7 @@ export default class BuildTree extends Component {
     callAfterScenarioChange(scenarioId) {
         console.log("&&&&scenarioId---", scenarioId);
         let { curTreeObj } = this.state;
-
+        console.log("&&&&curTreeObj---", curTreeObj);
         var items = curTreeObj.tree.flatList;
         var scenarioId = scenarioId;
         console.log("items***&---", items);
@@ -2258,8 +2258,8 @@ export default class BuildTree extends Component {
 
     loadedMomPer = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance, 1);
-        var cell = instance.jexcel.getCell("D1");
-        cell.classList.add('readonly');
+        // var cell = instance.jexcel.getCell("D1");
+        // cell.classList.add('readonly');
     }
 
     buildMomJexcel() {
@@ -2406,10 +2406,10 @@ export default class BuildTree extends Component {
 
     loadedMom = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance, 1);
-        var cell = instance.jexcel.getCell("E1");
-        cell.classList.add('readonly');
-        var cell = instance.jexcel.getCell("F1");
-        cell.classList.add('readonly');
+        // var cell = instance.jexcel.getCell("E1");
+        // cell.classList.add('readonly');
+        // var cell = instance.jexcel.getCell("F1");
+        // cell.classList.add('readonly');
     }
 
     showMomData() {
@@ -3243,6 +3243,7 @@ export default class BuildTree extends Component {
                 {
                     title: i18n.t('static.tree.modelingCalculater'),
                     type: 'image',
+                    readOnly: true
                 },
                 {
                     title: i18n.t('static.tree.calculatedChangeForMonth'),
@@ -3700,10 +3701,10 @@ export default class BuildTree extends Component {
     }.bind(this);
     loadedMom = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance, 1);
-        var cell = instance.jexcel.getCell("E1");
-        cell.classList.add('readonly');
-        var cell = instance.jexcel.getCell("F1");
-        cell.classList.add('readonly');
+        // var cell = instance.jexcel.getCell("E1");
+        // cell.classList.add('readonly');
+        // var cell = instance.jexcel.getCell("F1");
+        // cell.classList.add('readonly');
     }
 
     addRow = function () {
@@ -4225,7 +4226,7 @@ export default class BuildTree extends Component {
         this.setState({
             regionValues: regionIds.map(ele => ele),
             regionLabels: regionIds.map(ele => ele.label),
-            isChanged : true
+            isChanged: true
         }, () => {
             console.log("regionValues---", this.state.regionValues);
             console.log("regionLabels---", this.state.regionLabels);
@@ -4255,7 +4256,7 @@ export default class BuildTree extends Component {
 
         this.setState({
             fuValues: regionIds != null ? regionIds : "",
-            isChanged : true
+            isChanged: true
             // fuLabels: regionIds != null ? regionIds.label : ""
         }, () => {
             if (regionIds != null) {
@@ -4393,12 +4394,23 @@ export default class BuildTree extends Component {
                 // selectedScenario:0
             }, () => {
                 if (curTreeObj.scenarioList.length == 1) {
-                    this.setState({ selectedScenario: curTreeObj.scenarioList[0].id })
+                    // this.setState({ selectedScenario: curTreeObj.scenarioList[0].id })
 
                     var scenarioId = curTreeObj.scenarioList[0].id;
                     // var scenario = document.getElementById("scenarioId");
                     var selectedText = curTreeObj.scenarioList[0].label.label_en;
 
+                    this.setState({
+                        selectedScenario: scenarioId,
+                        selectedScenarioLabel: selectedText,
+                        currentScenario: []
+                    }, () => {
+                        console.log("@@@---", this.state.selectedScenario);
+                        this.callAfterScenarioChange(scenarioId);
+                    });
+                } else if (this.props.match.params.scenarioId != null && this.props.match.params.scenarioId != "") {
+                    var scenarioId = this.props.match.params.scenarioId;
+                    var selectedText = curTreeObj.scenarioList.filter(x => x.id == scenarioId)[0].label.label_en;
                     this.setState({
                         selectedScenario: scenarioId,
                         selectedScenarioLabel: selectedText,
@@ -5087,6 +5099,7 @@ export default class BuildTree extends Component {
                 (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.forecastingUnit.id = filteredForecastingUnitList[0].id;
                 (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.forecastingUnit.label = filteredForecastingUnitList[0].label;
                 (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.forecastingUnit.tracerCategory.id = filteredForecastingUnitList[0].tracerCategory.id;
+                (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.forecastingUnit.unit.id = filteredForecastingUnitList[0].unit.id;
 
                 // var filteredPlanningUnitList = this.state.planningUnitList.filter(x => x.forecastingUnit.id == filteredForecastingUnitList[0].id);
                 this.setState({
@@ -5094,10 +5107,10 @@ export default class BuildTree extends Component {
                     currentScenario: (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0]
                 }, () => {
                     if (type == 0) {
-                        console.log("my take 1---",filteredForecastingUnitList[0]);
+                        console.log("my take 1---", filteredForecastingUnitList[0]);
                         var fuValues = { value: filteredForecastingUnitList[0].id, label: getLabelText(filteredForecastingUnitList[0].label, this.state.lang) + " | " + filteredForecastingUnitList[0].id };
                         console.log("before cur item config fuValues--- ", this.state.fuValues);
-                        console.log("before 2--- ",fuValues);
+                        console.log("before 2--- ", fuValues);
                         // (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.forecastingUnit.unit.id = forecastingUnit[0].unit.id;
                         this.setState({
                             fuValues
@@ -5480,10 +5493,13 @@ export default class BuildTree extends Component {
                 console.log("myResult===============6", myResult);
                 console.log("fuIdArray---", fuIdArray);
                 var usageTemplateListAll = myResult.filter(el => fuIdArray.indexOf(el.forecastingUnit.id) != -1);
+                console.log("before usageTemplateList All===============>", usageTemplateListAll)
+                console.log("before1 usageTemplateList All===============>", myResult.filter(el => el.forecastingUnit.id == 2665))
+                console.log("before2 usageTemplateList All===============>", myResult.filter(el => el.forecastingUnit.id == 915))
                 this.setState({
                     usageTemplateListAll
                 }, () => {
-                    console.log("usageTemplateList All===============>", this.state.usageTemplateListAll)
+                    console.log("after usageTemplateList All===============>", this.state.usageTemplateListAll)
                 })
             }.bind(this);
         }.bind(this)
@@ -5554,7 +5570,9 @@ export default class BuildTree extends Component {
             this.getDatasetList();
             this.getModelingTypeList();
             this.getRegionList();
-
+            // if (this.props.match.params.scenarioId != null && this.props.match.params.scenarioId != "") {
+            //     this.callAfterScenarioChange(this.props.match.params.scenarioId);
+            // }
         })
     }
     addScenario() {
@@ -8742,16 +8760,16 @@ export default class BuildTree extends Component {
                         (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].displayDataValue = nodeDataModelingMap[0].endValue.toString();
                     } else {
                         console.log("get payload 14");
-                        (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].displayCalculatedDataValue = (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].calculatedDataValue.toString();
-                        (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].displayDataValue = (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].dataValue.toString();
+                        (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].displayCalculatedDataValue = "0";
+                        (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].displayDataValue = "0";
                     }
                 } else {
-                    (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].displayCalculatedDataValue = (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].calculatedDataValue.toString();
-                    (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].displayDataValue = (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].dataValue.toString();
+                    (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].displayCalculatedDataValue = "0";
+                    (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].displayDataValue = "0";
                 }
             } else {
-                (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].displayCalculatedDataValue = (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].calculatedDataValue.toString();
-                (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].displayDataValue = (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].dataValue.toString();
+                (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].displayCalculatedDataValue = "0";
+                (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].displayDataValue = "0";
             }
             //
             if (items[i].payload.nodeType.id == 4) {
