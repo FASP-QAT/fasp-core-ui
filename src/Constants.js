@@ -148,3 +148,5 @@ export const PERCENTAGE_NODE_ID=3;
 export const FU_NODE_ID=4;
 export const PU_NODE_ID=5;
 export const POSITIVE_WHOLE_NUMBER=/^[1-9]\d*$/
+export const MIN_DATE_RESTRICTION_IN_DATA_ENTRY='1990-01-01';
+export const MAX_DATE_RESTRICTION_IN_DATA_ENTRY=200;
