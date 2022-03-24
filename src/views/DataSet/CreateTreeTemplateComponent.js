@@ -579,7 +579,8 @@ export default class CreateTreeTemplate extends Component {
             currentEndValueEdit: false,
             currentTargetChangePercentageEdit: false,
             currentTargetChangeNumberEdit: false,
-            currentRowIndex: ''
+            currentRowIndex: '',
+            lastRowDeleted:false
 
 
         }
@@ -1167,7 +1168,7 @@ export default class CreateTreeTemplate extends Component {
         if (this.state.modelingJexcelLoader === true) {
             var validation = this.checkValidation();
             console.log("validation---", validation);
-            if (validation == true) {
+            if (this.state.lastRowDeleted==true || validation == true) {
                 try {
                     var tableJson = this.state.modelingEl.getJson(null, false);
                     var data = this.state.scalingList;
@@ -1227,6 +1228,9 @@ export default class CreateTreeTemplate extends Component {
                         item.payload = this.state.currentItemConfig.context.payload;
                         if (dataArr.length > 0) {
                             (item.payload.nodeDataMap[0])[0].nodeDataModelingList = dataArr;
+                        }
+                        if(this.state.lastRowDeleted==true){
+                            (item.payload.nodeDataMap[this.state.selectedScenario])[0].nodeDataModelingList = [];
                         }
                         console.log("item---", item);
                         items[itemIndex1] = item;
@@ -2562,6 +2566,9 @@ export default class CreateTreeTemplate extends Component {
                                     data[10] = 1;
                                     obj.insertRow(data, 0, 1);
                                     obj.deleteRow(parseInt(y) + 1);
+                                    this.setState({
+                                        lastRowDeleted:true
+                                    })
                                 } else {
                                     obj.deleteRow(parseInt(y));
                                 }
@@ -2717,6 +2724,9 @@ export default class CreateTreeTemplate extends Component {
         // });
     }.bind(this);
     changed = function (instance, cell, x, y, value) {
+        this.setState({
+            lastRowDeleted:false
+        })
         //Modeling type
         if (x == 2) {
             var col = ("C").concat(parseInt(y) + 1);

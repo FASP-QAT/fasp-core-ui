@@ -707,6 +707,7 @@ export default class BuildTree extends Component {
             loading: false,
             modelingJexcelLoader: false,
             momJexcelLoader: false,
+            lastRowDeleted:false
         }
         this.toggleDeropdownSetting = this.toggleDeropdownSetting.bind(this);
         // this.onClick1 = this.onClick1.bind(this);
@@ -2636,7 +2637,7 @@ export default class BuildTree extends Component {
         if (this.state.modelingJexcelLoader === true) {
             var validation = this.checkValidation();
             console.log("validation---", validation);
-            if (validation == true) {
+            if (this.state.lastRowDeleted==true || validation == true) {
                 try {
                     console.log("entered if ---", new Date());
                     var tableJson = this.state.modelingEl.getJson(null, false);
@@ -2700,6 +2701,9 @@ export default class BuildTree extends Component {
                         item.payload = this.state.currentItemConfig.context.payload;
                         if (dataArr.length > 0) {
                             (item.payload.nodeDataMap[this.state.selectedScenario])[0].nodeDataModelingList = dataArr;
+                        }
+                        if(this.state.lastRowDeleted==true){
+                            (item.payload.nodeDataMap[this.state.selectedScenario])[0].nodeDataModelingList = [];
                         }
                         console.log("item---", item);
                         items[itemIndex1] = item;
@@ -3389,6 +3393,9 @@ export default class BuildTree extends Component {
                                     data[10] = 1;
                                     obj.insertRow(data, 0, 1);
                                     obj.deleteRow(parseInt(y) + 1);
+                                    this.setState({
+                                        lastRowDeleted:true
+                                    })
                                 } else {
                                     obj.deleteRow(parseInt(y));
                                 }
@@ -3571,6 +3578,9 @@ export default class BuildTree extends Component {
     changed = function (instance, cell, x, y, value) {
         //Modeling type
         // instance.jexcel
+        this.setState({
+            lastRowDeleted:false
+        })
         if (x == 2) {
             var col = ("C").concat(parseInt(y) + 1);
             if (value == "") {
