@@ -2258,8 +2258,10 @@ export default class BuildTree extends Component {
 
     loadedMomPer = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance, 1);
-        var cell = instance.jexcel.getCell("D1");
-        cell.classList.add('readonly');
+        if (instance.jexcel.getJson(null, false).length > 0) {
+            var cell = instance.jexcel.getCell("D1");
+            cell.classList.add('readonly');
+        }
     }
 
     buildMomJexcel() {
@@ -2406,10 +2408,12 @@ export default class BuildTree extends Component {
 
     loadedMom = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance, 1);
-        var cell = instance.jexcel.getCell("E1");
-        cell.classList.add('readonly');
-        var cell = instance.jexcel.getCell("F1");
-        cell.classList.add('readonly');
+        if (instance.jexcel.getJson(null, false).length > 0) {
+            var cell = instance.jexcel.getCell("E1");
+            cell.classList.add('readonly');
+            var cell = instance.jexcel.getCell("F1");
+            cell.classList.add('readonly');
+        }
     }
 
     showMomData() {
@@ -3700,10 +3704,12 @@ export default class BuildTree extends Component {
     }.bind(this);
     loadedMom = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance, 1);
-        var cell = instance.jexcel.getCell("E1");
-        cell.classList.add('readonly');
-        var cell = instance.jexcel.getCell("F1");
-        cell.classList.add('readonly');
+        if (instance.jexcel.getJson(null, false).length > 0) {
+            var cell = instance.jexcel.getCell("E1");
+            cell.classList.add('readonly');
+            var cell = instance.jexcel.getCell("F1");
+            cell.classList.add('readonly');
+        }
     }
 
     addRow = function () {
@@ -4225,7 +4231,7 @@ export default class BuildTree extends Component {
         this.setState({
             regionValues: regionIds.map(ele => ele),
             regionLabels: regionIds.map(ele => ele.label),
-            isChanged : true
+            isChanged: true
         }, () => {
             console.log("regionValues---", this.state.regionValues);
             console.log("regionLabels---", this.state.regionLabels);
@@ -4255,7 +4261,7 @@ export default class BuildTree extends Component {
 
         this.setState({
             fuValues: regionIds != null ? regionIds : "",
-            isChanged : true
+            isChanged: true
             // fuLabels: regionIds != null ? regionIds.label : ""
         }, () => {
             if (regionIds != null) {
@@ -5094,10 +5100,10 @@ export default class BuildTree extends Component {
                     currentScenario: (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0]
                 }, () => {
                     if (type == 0) {
-                        console.log("my take 1---",filteredForecastingUnitList[0]);
+                        console.log("my take 1---", filteredForecastingUnitList[0]);
                         var fuValues = { value: filteredForecastingUnitList[0].id, label: getLabelText(filteredForecastingUnitList[0].label, this.state.lang) + " | " + filteredForecastingUnitList[0].id };
                         console.log("before cur item config fuValues--- ", this.state.fuValues);
-                        console.log("before 2--- ",fuValues);
+                        console.log("before 2--- ", fuValues);
                         // (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.forecastingUnit.unit.id = forecastingUnit[0].unit.id;
                         this.setState({
                             fuValues
