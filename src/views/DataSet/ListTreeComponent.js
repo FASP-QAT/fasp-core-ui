@@ -558,6 +558,7 @@ export default class ListTreeComponent extends Component {
                         active: true,
                         notes: ''
                     }],
+                    levelList:[],
                     tree: {
                         flatList: [{
                             id: 1,

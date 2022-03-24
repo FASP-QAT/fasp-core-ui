@@ -26,20 +26,20 @@ export default function LevelTitleTemplate(options, orientation) {
       titleColor = config.titleColor || levelTitleColor,
       label = config.title,
       fontColor = config.titleFontColor || levelTitleFontColor;
-
-    if(textOrientation == TextOrientationType.Auto) {
-      switch (orientation) {
-        case OrientationType.Top:
-          textOrientation = TextOrientationType.RotateRight;
-          break;
-        case OrientationType.Bottom:
-          textOrientation = TextOrientationType.RotateLeft;
-          break;
-        case OrientationType.Left:
-        case OrientationType.Right:
-          break;
-      }
-    }
+      textOrientation = TextOrientationType.RotateLeft;
+    // if(textOrientation == TextOrientationType.Auto) {
+    //   switch (orientation) {
+    //     case OrientationType.Top:
+    //       textOrientation = TextOrientationType.RotateRight;
+    //       break;
+    //     case OrientationType.Bottom:
+          
+    //       break;
+    //     case OrientationType.Left:
+    //     case OrientationType.Right:
+    //       break;
+    //   }
+    // }
 
     var fontSize = parseInt(levelTitleFontSize, 10);
     position.width=30;
