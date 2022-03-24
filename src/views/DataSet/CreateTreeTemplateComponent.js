@@ -5355,7 +5355,7 @@ export default class CreateTreeTemplate extends Component {
                         id: 'A',
                         scaleLabel: {
                             display: true,
-                            labelString: this.state.currentItemConfig.context.payload.nodeUnit.label != null ? this.state.currentItemConfig.context.payload.nodeType.id > 3 ? getLabelText(this.state.currentItemConfig.parentItem.payload.nodeUnit.label, this.state.lang) : getLabelText(this.state.currentItemConfig.context.payload.nodeUnit.label, this.state.lang) : '',
+                            labelString: this.state.currentItemConfig.context.payload.nodeType.id > 3 ? this.state.currentItemConfig.context.payload.nodeUnit.id!="" ?getLabelText(this.state.nodeUnitList.filter(c=>c.unitId==this.state.currentItemConfig.context.payload.nodeUnit.id)[0].label, this.state.lang):"" : this.state.currentItemConfig.context.payload.nodeUnit.label!=null?getLabelText(this.state.currentItemConfig.context.payload.nodeUnit.label, this.state.lang):"",
                             // labelString: "",
                             fontColor: 'black'
                         },
