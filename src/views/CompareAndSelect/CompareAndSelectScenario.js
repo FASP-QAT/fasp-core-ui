@@ -144,7 +144,8 @@ class CompareAndSelectScenario extends Component {
         }
         var curDate = moment(startDate).format("YYYY-MM-DD");
         var monthList = [];
-        for (var i = 0; moment(curDate).format("YYYY-MM") < moment(stopDate).format("YYYY-MM"); i++) {
+        monthList.push(curDate);
+        for (var i = 1; moment(curDate).format("YYYY-MM") < moment(stopDate).format("YYYY-MM"); i++) {
             curDate = moment(startDate).add(i, 'months').format("YYYY-MM-DD");
             monthList.push(curDate);
         }
@@ -280,6 +281,7 @@ class CompareAndSelectScenario extends Component {
         var data = [];
         var dataArr = [];
         var consumptionData = this.state.actualConsumptionList;
+        console.log("this.state.monthList@@@@@",this.state.monthList)
         var monthArrayListWithoutFormat = this.state.monthList;
         var actualConsumptionListForMonth = [];
         var consumptionDataForTree = [];
@@ -386,6 +388,7 @@ class CompareAndSelectScenario extends Component {
             // dataArr.push(data)
         }
 
+        console.log("@@@@Month1 List",this.state.monthList1)
         var monthArrayListWithoutFormat = this.state.monthList1;
         for (var m = 0; m < monthArrayListWithoutFormat.length; m++) {
             data = [];
