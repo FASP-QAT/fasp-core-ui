@@ -238,6 +238,14 @@ export default class ExtrapolateDataComponent extends React.Component {
             popoverOpenLr: false,
             popoverOpenTes: false,
             popoverOpenArima: false,
+            popoverOpenP: false,
+            popoverOpenQ: false,
+            popoverOpenGamma: false,
+            popoverOpenBeta: false,
+            popoverOpenAlpha: false,
+            popoverOpenSeaonality: false,
+            popoverOpenConfidence: false,
+            popoverOpenError: false,
             extrapolationMethodId: -1,
             confidenceLevelId: 0.85,
             showGuidance: false,
@@ -710,7 +718,14 @@ export default class ExtrapolateDataComponent extends React.Component {
         tr.children[6].classList.add('InfoTr');
         tr.children[7].classList.add('InfoTr');
         tr.children[8].classList.add('InfoTr');
-        // tr.children[9].classList.add('InfoTr');
+        tr.children[9].classList.add('InfoTr');
+        tr.children[3].title = i18n.t('static.tooltip.MovingAverages');
+        tr.children[4].title = i18n.t('static.tooltip.SemiAverages');
+        tr.children[5].title = i18n.t('static.tooltip.LinearRegression');
+        // tr.children[6].title = i18n.t('static.tooltip.Tes');
+        tr.children[7].title = i18n.t('static.tooltip.Tes');
+        // tr.children[8].title = i18n.t('static.tooltip.arima');
+        tr.children[9].title = i18n.t('static.tooltip.arima');
 
 
     }
@@ -2426,7 +2441,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                         <div className="check inline  pl-lg-3 pt-lg-3">
                                                             <div>
                                                                 <Popover placement="top" isOpen={this.state.popoverOpenMa} target="Popover1" trigger="hover" toggle={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)}>
-                                                                    <PopoverBody>Need to add Info.</PopoverBody>
+                                                                    <PopoverBody>{i18n.t('static.tooltip.MovingAverages')}</PopoverBody>
                                                                 </Popover>
                                                             </div>
                                                             <div>
@@ -2463,8 +2478,8 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                             </div>
 
                                                             <div>
-                                                                <Popover placement="top" isOpen={this.state.popoverOpenSa} target="Popover1" trigger="hover" toggle={() => this.toggle('popoverOpenMa', !this.state.popoverOpenSa)}>
-                                                                    <PopoverBody>Need to add Info.</PopoverBody>
+                                                                <Popover placement="top" isOpen={this.state.popoverOpenSa} target="Popover2" trigger="hover" toggle={() => this.toggle('popoverOpenSa', !this.state.popoverOpenSa)}>
+                                                                    <PopoverBody>{i18n.t('static.tooltip.SemiAverages')}</PopoverBody>
                                                                 </Popover>
                                                             </div>
                                                             <div className="pt-lg-2">
@@ -2480,12 +2495,12 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                                     className="form-check-label"
                                                                     check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
                                                                     <b>{i18n.t('static.extrapolation.semiAverages')}</b>
-                                                                    <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenSa', !this.state.popoverOpenSa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
+                                                                    <i class="fa fa-info-circle icons pl-lg-2" id="Popover2" onClick={() => this.toggle('popoverOpenSa', !this.state.popoverOpenSa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
                                                                 </Label>
                                                             </div>
                                                             <div>
-                                                                <Popover placement="top" isOpen={this.state.popoverOpenLr} target="Popover1" trigger="hover" toggle={() => this.toggle('popoverOpenLr', !this.state.popoverOpenLr)}>
-                                                                    <PopoverBody>Need to add Info.</PopoverBody>
+                                                                <Popover placement="top" isOpen={this.state.popoverOpenLr} target="Popover3" trigger="hover" toggle={() => this.toggle('popoverOpenLr', !this.state.popoverOpenLr)}>
+                                                                    <PopoverBody>{i18n.t('static.tooltip.LinearRegression')}</PopoverBody>
                                                                 </Popover>
                                                             </div>
                                                             <div className="pt-lg-2">
@@ -2501,12 +2516,12 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                                     className="form-check-label"
                                                                     check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
                                                                     <b>{i18n.t('static.extrapolation.linearRegression')}</b>
-                                                                    <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenLr', !this.state.popoverOpenLr)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
+                                                                    <i class="fa fa-info-circle icons pl-lg-2" id="Popover3" onClick={() => this.toggle('popoverOpenLr', !this.state.popoverOpenLr)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
                                                                 </Label>
                                                             </div>
                                                             <div>
-                                                                <Popover placement="top" isOpen={this.state.popoverOpenTes} target="Popover1" trigger="hover" toggle={() => this.toggle('popoverOpenMa', !this.state.popoverOpenTes)}>
-                                                                    <PopoverBody>Need to add Info.</PopoverBody>
+                                                                <Popover placement="top" isOpen={this.state.popoverOpenTes} target="Popover4" trigger="hover" toggle={() => this.toggle('popoverOpenTes', !this.state.popoverOpenTes)}>
+                                                                    <PopoverBody>{i18n.t('static.tooltip.Tes')}</PopoverBody>
                                                                 </Popover>
                                                             </div>
                                                             <div className="pt-lg-2">
@@ -2522,13 +2537,20 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                                     className="form-check-label"
                                                                     check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
                                                                     <b>{i18n.t('static.extrapolation.tripleExponential')}</b>
-                                                                    <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenTes', !this.state.popoverOpenTes)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
+                                                                    <i class="fa fa-info-circle icons pl-lg-2" id="Popover4" onClick={() => this.toggle('popoverOpenTes', !this.state.popoverOpenTes)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
                                                                 </Label>
                                                             </div>
 
                                                             <div className="row col-md-12 pt-lg-2" style={{ display: this.state.smoothingId ? '' : 'none' }}>
+                                                                <div>
+                                                                    <Popover placement="top" isOpen={this.state.popoverOpenConfidence} target="Popover6" trigger="hover" toggle={() => this.toggle('popoverOpenConfidence', !this.state.popoverOpenConfidence)}>
+                                                                        <PopoverBody>{i18n.t('static.tooltip.confidenceLevel')}</PopoverBody>
+                                                                    </Popover>
+                                                                </div>
                                                                 <div className="col-md-2">
-                                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.confidenceLevel')}</Label>
+                                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.confidenceLevel')}
+                                                                        <i class="fa fa-info-circle icons pl-lg-2" id="Popover6" onClick={() => this.toggle('popoverOpenConfidence', !this.state.popoverOpenConfidence)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
+                                                                    </Label>
                                                                     <Input
                                                                         type="select"
                                                                         id="confidenceLevelId"
@@ -2549,8 +2571,16 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                                     </Input>
                                                                     <FormFeedback>{errors.confidenceLevelId}</FormFeedback>
                                                                 </div>
+                                                                <div>
+                                                                    <Popover placement="top" isOpen={this.state.popoverOpenSeaonality} target="Popover7" trigger="hover" toggle={() => this.toggle('popoverOpenSeaonality', !this.state.popoverOpenSeaonality)}>
+                                                                        <PopoverBody>{i18n.t('static.tooltip.seasonality')}</PopoverBody>
+                                                                    </Popover>
+                                                                </div>
                                                                 <div className="col-md-2">
-                                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.seasonality')}</Label>
+                                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.seasonality')}
+                                                                        <i class="fa fa-info-circle icons pl-lg-2" id="Popover7" onClick={() => this.toggle('popoverOpenSeaonality', !this.state.popoverOpenSeaonality)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
+                                                                    </Label>
+
                                                                     <Input
                                                                         className="controls"
                                                                         type="number"
@@ -2580,9 +2610,15 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                             Show Advance
                                                         </Label>
                                                     </div> */}
-
+                                                                <div>
+                                                                    <Popover placement="top" isOpen={this.state.popoverOpenAlpha} target="Popover8" trigger="hover" toggle={() => this.toggle('popoverOpenAlpha', !this.state.popoverOpenAlpha)}>
+                                                                        <PopoverBody>{i18n.t('static.tooltip.alpha')}</PopoverBody>
+                                                                    </Popover>
+                                                                </div>
                                                                 <div className="col-md-2">
-                                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.alpha')}</Label>
+                                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.alpha')}
+                                                                        <i class="fa fa-info-circle icons pl-lg-2" id="Popover8" onClick={() => this.toggle('popoverOpenAlpha', !this.state.popoverOpenAlpha)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
+                                                                    </Label>
                                                                     <Input
                                                                         className="controls"
                                                                         type="number"
@@ -2597,8 +2633,16 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                                     />
                                                                     <FormFeedback>{errors.alphaId}</FormFeedback>
                                                                 </div>
+                                                                <div>
+                                                                    <Popover placement="top" isOpen={this.state.popoverOpenBeta} target="Popover9" trigger="hover" toggle={() => this.toggle('popoverOpenBeta', !this.state.popoverOpenBeta)}>
+                                                                        <PopoverBody>{i18n.t('static.tooltip.beta')}</PopoverBody>
+                                                                    </Popover>
+                                                                </div>
+
                                                                 <div className="col-md-2">
-                                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.beta')}</Label>
+                                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.beta')}
+                                                                        <i class="fa fa-info-circle icons pl-lg-2" id="Popover9" onClick={() => this.toggle('popoverOpenBeta', !this.state.popoverOpenBeta)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
+                                                                    </Label>
                                                                     <Input
                                                                         className="controls"
                                                                         type="number"
@@ -2613,8 +2657,16 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                                     />
                                                                     <FormFeedback>{errors.betaId}</FormFeedback>
                                                                 </div>
+
+                                                                <div>
+                                                                    <Popover placement="top" isOpen={this.state.popoverOpenGamma} target="Popover10" trigger="hover" toggle={() => this.toggle('popoverOpenGamma', !this.state.popoverOpenGamma)}>
+                                                                        <PopoverBody>{i18n.t('static.tooltip.gamma')}</PopoverBody>
+                                                                    </Popover>
+                                                                </div>
                                                                 <div className="col-md-2">
-                                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.gamma')}</Label>
+                                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.gamma')}
+                                                                        <i class="fa fa-info-circle icons pl-lg-2" id="Popover10" onClick={() => this.toggle('popoverOpenGamma', !this.state.popoverOpenGamma)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
+                                                                    </Label>
                                                                     <Input
                                                                         className="controls"
                                                                         type="number"
@@ -2641,8 +2693,8 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                             </div>
 
                                                             <div>
-                                                                <Popover placement="top" isOpen={this.state.popoverOpenArima} target="Popover1" trigger="hover" toggle={() => this.toggle('popoverOpenArima', !this.state.popoverOpenArima)}>
-                                                                    <PopoverBody>Need to add Info.</PopoverBody>
+                                                                <Popover placement="top" isOpen={this.state.popoverOpenArima} target="Popover5" trigger="hover" toggle={() => this.toggle('popoverOpenArima', !this.state.popoverOpenArima)}>
+                                                                    <PopoverBody>{i18n.t('static.tooltip.arima')}</PopoverBody>
                                                                 </Popover>
                                                             </div>
                                                             <div className="pt-lg-2">
@@ -2658,13 +2710,20 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                                     className="form-check-label"
                                                                     check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
                                                                     <b>{i18n.t('static.extrapolation.arimaFull')}</b>
-                                                                    <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenArima', !this.state.popoverOpenArima)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
+                                                                    <i class="fa fa-info-circle icons pl-lg-2" id="Popover5" onClick={() => this.toggle('popoverOpenArima', !this.state.popoverOpenArima)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
                                                                 </Label>
                                                             </div>
 
                                                             <div className="row col-md-12 pt-lg-2" style={{ display: this.state.arimaId ? '' : 'none' }}>
+                                                                <div>
+                                                                    <Popover placement="top" isOpen={this.state.popoverOpenP} target="Popover11" trigger="hover" toggle={() => this.toggle('popoverOpenP', !this.state.popoverOpenP)}>
+                                                                        <PopoverBody>{i18n.t('static.tooltip.p')}</PopoverBody>
+                                                                    </Popover>
+                                                                </div>
                                                                 <div className="col-md-2">
-                                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.p')}</Label>
+                                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.p')}
+                                                                        <i class="fa fa-info-circle icons pl-lg-2" id="Popover11" onClick={() => this.toggle('popoverOpenP', !this.state.popoverOpenP)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
+                                                                    </Label>
                                                                     <Input
                                                                         className="controls"
                                                                         type="number"
@@ -2683,8 +2742,15 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                                         bsSize="sm"
                                                                     />
                                                                 </div>
+                                                                <div>
+                                                                    <Popover placement="top" isOpen={this.state.popoverOpenQ} target="Popover12" trigger="hover" toggle={() => this.toggle('popoverOpenQ', !this.state.popoverOpenQ)}>
+                                                                        <PopoverBody>{i18n.t('static.tooltip.q')}</PopoverBody>
+                                                                    </Popover>
+                                                                </div>
                                                                 <div className="col-md-2">
-                                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.q')}</Label>
+                                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.q')}
+                                                                        <i class="fa fa-info-circle icons pl-lg-2" id="Popover12" onClick={() => this.toggle('popoverOpenQ', !this.state.popoverOpenQ)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
+                                                                    </Label>
                                                                     <Input
                                                                         className="controls"
                                                                         type="number"
@@ -2730,7 +2796,8 @@ export default class ExtrapolateDataComponent extends React.Component {
                                         <Table className="table-bordered text-center mt-2 overflowhide main-table " bordered size="sm" style={{ width: 'unset' }}>
                                             <thead>
                                                 <tr>
-                                                    <td width="160px"><b>{i18n.t('static.common.errors')}</b></td>
+                                                    <td width="160px"><b>{i18n.t('static.common.errors')}</b>
+                                                        <i class="fa fa-info-circle icons pl-lg-2" id="Popover13" onClick={() => this.toggle('popoverOpenError', !this.state.popoverOpenError)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></td>
                                                     {this.state.movingAvgId &&
                                                         <td width="160px"><b>{i18n.t('static.extrapolation.movingAverages')}</b></td>
                                                     }
