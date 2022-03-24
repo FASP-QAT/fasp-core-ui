@@ -5651,7 +5651,8 @@ export default class BuildTree extends Component {
             items,
             selectedScenario: scenarioId,
             scenarioList: scenarioList.filter(x => x.active == true),
-            openAddScenarioModal: false
+            openAddScenarioModal: false,
+            isChanged:true
         }, () => {
             console.log("final tab list---", this.state.items);
             if (type == 1) {
@@ -5663,8 +5664,9 @@ export default class BuildTree extends Component {
                     console.log("my node data id--->", (items[i].payload.nodeDataMap[scenarioId])[0].nodeDataId);
                 }
                 this.callAfterScenarioChange(scenarioId);
-                this.updateTreeData();
+                // this.updateTreeData();
             }
+            this.saveTreeData();
         });
     }
     nodeTypeChange(value) {
