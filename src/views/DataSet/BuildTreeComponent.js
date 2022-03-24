@@ -707,7 +707,7 @@ export default class BuildTree extends Component {
             loading: false,
             modelingJexcelLoader: false,
             momJexcelLoader: false,
-            lastRowDeleted:false
+            lastRowDeleted: false
         }
         this.toggleDeropdownSetting = this.toggleDeropdownSetting.bind(this);
         // this.onClick1 = this.onClick1.bind(this);
@@ -2112,7 +2112,17 @@ export default class BuildTree extends Component {
                 data[13] = 0;
                 data[14] = 0;
             }
-            data[15] = this.state.currentItemConfig.context.payload.nodeType.id == 5 && parentNodeNodeData.fuNode.usageType.id == 2 ? `=ROUND((O${parseInt(j) + 1}*${noOfBottlesInOneVisit}*E${parseInt(j) + 1}/100),0)` : `=G${parseInt(j) + 1}`;
+            var nodeDataMomListPercForFU = [];
+            var fuPercentage = 0;
+            if (this.state.currentItemConfig.context.payload.nodeType.id == 5 && parentNodeNodeData.fuNode.usageType.id == 2) {
+                if (parentNodeNodeData.nodeDataMomList != undefined) {
+                    nodeDataMomListPercForFU = parentNodeNodeData.nodeDataMomList.filter(c => moment(c.month).format("YYYY-MM") == moment(momList[j].month).format("YYYY-MM"));
+                    if (nodeDataMomListPercForFU.length > 0) {
+                        fuPercentage = nodeDataMomListPercForFU[0].endValue;
+                    }
+                }
+            }
+            data[15] = this.state.currentItemConfig.context.payload.nodeType.id == 5 && parentNodeNodeData.fuNode.usageType.id == 2 ? `=ROUND((O${parseInt(j) + 1}*${noOfBottlesInOneVisit}*(E${parseInt(j) + 1}/100)*${fuPercentage}/100),0)` : `=G${parseInt(j) + 1}`;
             // `=ROUND(((E${parseInt(j) + 1}*F${parseInt(j) + 1})/100),0)`
             dataArray[count] = data;
             count++;
@@ -2637,7 +2647,7 @@ export default class BuildTree extends Component {
         if (this.state.modelingJexcelLoader === true) {
             var validation = this.checkValidation();
             console.log("validation---", validation);
-            if (this.state.lastRowDeleted==true || validation == true) {
+            if (this.state.lastRowDeleted == true || validation == true) {
                 try {
                     console.log("entered if ---", new Date());
                     var tableJson = this.state.modelingEl.getJson(null, false);
@@ -2702,7 +2712,7 @@ export default class BuildTree extends Component {
                         if (dataArr.length > 0) {
                             (item.payload.nodeDataMap[this.state.selectedScenario])[0].nodeDataModelingList = dataArr;
                         }
-                        if(this.state.lastRowDeleted==true){
+                        if (this.state.lastRowDeleted == true) {
                             (item.payload.nodeDataMap[this.state.selectedScenario])[0].nodeDataModelingList = [];
                         }
                         console.log("item---", item);
@@ -3394,7 +3404,7 @@ export default class BuildTree extends Component {
                                     obj.insertRow(data, 0, 1);
                                     obj.deleteRow(parseInt(y) + 1);
                                     this.setState({
-                                        lastRowDeleted:true
+                                        lastRowDeleted: true
                                     })
                                 } else {
                                     obj.deleteRow(parseInt(y));
@@ -3579,7 +3589,7 @@ export default class BuildTree extends Component {
         //Modeling type
         // instance.jexcel
         this.setState({
-            lastRowDeleted:false
+            lastRowDeleted: false
         })
         if (x == 2) {
             var col = ("C").concat(parseInt(y) + 1);
@@ -5668,7 +5678,7 @@ export default class BuildTree extends Component {
             selectedScenario: scenarioId,
             scenarioList: scenarioList.filter(x => x.active == true),
             openAddScenarioModal: false,
-            isChanged:true
+            isChanged: true
         }, () => {
             console.log("final tab list---", this.state.items);
             if (type == 1) {
@@ -6812,7 +6822,7 @@ export default class BuildTree extends Component {
 
             };
         }
-
+        console.log("this.state.currentItemConfig.context.payload.nodeUnit@@@@####", this.state.currentItemConfig.context.payload.nodeUnit);
         var chartOptions1 = {
             title: {
                 display: false,
@@ -8984,7 +8994,7 @@ export default class BuildTree extends Component {
         // regionMultiList = Array.from(regionMultiList);
         let treeLevel = this.state.items.length;
         const treeLevelItems = []
-        var treeLevels = this.state.curTreeObj.forecastMethod.id != "" && this.state.curTreeObj.levelList!=undefined ? this.state.curTreeObj.levelList : [];
+        var treeLevels = this.state.curTreeObj.forecastMethod.id != "" && this.state.curTreeObj.levelList != undefined ? this.state.curTreeObj.levelList : [];
         for (var i = 0; i <= treeLevel; i++) {
             var treeLevelFiltered = treeLevels.filter(c => c.levelNo == i);
             if (i == 0) {

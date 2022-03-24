@@ -580,7 +580,7 @@ export default class CreateTreeTemplate extends Component {
             currentTargetChangePercentageEdit: false,
             currentTargetChangeNumberEdit: false,
             currentRowIndex: '',
-            lastRowDeleted:false
+            lastRowDeleted: false
 
 
         }
@@ -1168,7 +1168,7 @@ export default class CreateTreeTemplate extends Component {
         if (this.state.modelingJexcelLoader === true) {
             var validation = this.checkValidation();
             console.log("validation---", validation);
-            if (this.state.lastRowDeleted==true || validation == true) {
+            if (this.state.lastRowDeleted == true || validation == true) {
                 try {
                     var tableJson = this.state.modelingEl.getJson(null, false);
                     var data = this.state.scalingList;
@@ -1229,7 +1229,7 @@ export default class CreateTreeTemplate extends Component {
                         if (dataArr.length > 0) {
                             (item.payload.nodeDataMap[0])[0].nodeDataModelingList = dataArr;
                         }
-                        if(this.state.lastRowDeleted==true){
+                        if (this.state.lastRowDeleted == true) {
                             (item.payload.nodeDataMap[this.state.selectedScenario])[0].nodeDataModelingList = [];
                         }
                         console.log("item---", item);
@@ -1982,7 +1982,17 @@ export default class CreateTreeTemplate extends Component {
                 data[13] = 0;
                 data[14] = 0;
             }
-            data[15] = this.state.currentItemConfig.context.payload.nodeType.id == 5 && parentNodeNodeData.fuNode.usageType.id == 2 ? `=ROUND((O${parseInt(j) + 1}*${noOfBottlesInOneVisit}*E${parseInt(j) + 1}/100),0)` : `=G${parseInt(j) + 1}`;
+            var nodeDataMomListPercForFU = [];
+            var fuPercentage = 0;
+            if (this.state.currentItemConfig.context.payload.nodeType.id == 5 && parentNodeNodeData.fuNode.usageType.id == 2) {
+                if (parentNodeNodeData.nodeDataMomList != undefined) {
+                    nodeDataMomListPercForFU = parentNodeNodeData.nodeDataMomList.filter(c => moment(c.month).format("YYYY-MM") == moment(momList[j].month).format("YYYY-MM"));
+                    if (nodeDataMomListPercForFU.length > 0) {
+                        fuPercentage = nodeDataMomListPercForFU[0].endValue;
+                    }
+                }
+            }
+            data[15] = this.state.currentItemConfig.context.payload.nodeType.id == 5 && parentNodeNodeData.fuNode.usageType.id == 2 ? `=ROUND((O${parseInt(j) + 1}*${noOfBottlesInOneVisit}*(E${parseInt(j) + 1}/100)*${fuPercentage}/100),0)` : `=G${parseInt(j) + 1}`;
             // `=ROUND(((E${parseInt(j) + 1}*F${parseInt(j) + 1})/100),0)`
             dataArray[count] = data;
             count++;
@@ -2567,7 +2577,7 @@ export default class CreateTreeTemplate extends Component {
                                     obj.insertRow(data, 0, 1);
                                     obj.deleteRow(parseInt(y) + 1);
                                     this.setState({
-                                        lastRowDeleted:true
+                                        lastRowDeleted: true
                                     })
                                 } else {
                                     obj.deleteRow(parseInt(y));
@@ -2725,7 +2735,7 @@ export default class CreateTreeTemplate extends Component {
     }.bind(this);
     changed = function (instance, cell, x, y, value) {
         this.setState({
-            lastRowDeleted:false
+            lastRowDeleted: false
         })
         //Modeling type
         if (x == 2) {
