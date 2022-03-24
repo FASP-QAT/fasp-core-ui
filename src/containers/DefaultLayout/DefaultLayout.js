@@ -1039,7 +1039,7 @@ class DefaultLayout extends Component {
                         name: i18n.t('static.translations.translations'),
                         icon: 'fa fa-list',
                         // attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_VIEW_TRANSLATIONS') ? false : true) },
-                        attributes: { hidden: ((this.state.businessFunctions.includes('ROLE_BF_LABEL_TRANSLATIONS')) || (this.state.businessFunctions.includes('ROLE_BF_DATABASE_TRANSLATION')) ? false : true) },
+                        attributes: { hidden: ((this.state.businessFunctions.includes('ROLE_BF_LABEL_TRANSLATIONS')) || (this.state.businessFunctions.includes('ROLE_BUSINESS_FUNCTION_EDIT_APPLICATION_LABELS')) || (this.state.businessFunctions.includes('ROLE_BUSINESS_FUNCTION_EDIT_REALM_LABELS')) || (this.state.businessFunctions.includes('ROLE_BUSINESS_FUNCTION_EDIT_PROGRAM_LABELS')) ? false : true) },
                         children: [
                           {
                             name: i18n.t('static.label.labelTranslations'),
@@ -1051,7 +1051,7 @@ class DefaultLayout extends Component {
                             name: i18n.t('static.label.databaseTranslations'),
                             url: '/translations/databaseTranslations',
                             icon: 'fa fa-exchange',
-                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_DATABASE_TRANSLATION') ? false : true) }
+                            attributes: { hidden: ((this.state.businessFunctions.includes('ROLE_BUSINESS_FUNCTION_EDIT_APPLICATION_LABELS') || this.state.businessFunctions.includes('ROLE_BUSINESS_FUNCTION_EDIT_REALM_LABELS') || this.state.businessFunctions.includes('ROLE_BUSINESS_FUNCTION_EDIT_PROGRAM_LABELS')) ? false : true) }
                           }
                         ]
                       },
