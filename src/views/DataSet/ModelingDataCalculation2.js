@@ -524,11 +524,11 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                     // console.log("noOfPatientsNew$$$%%%", noOfPatientsNew);
                                     noOfPatients = (patients / monthsPerVisit) + deltaPatients;
                                     console.log("noOfPatients@@@", noOfPatients);
-                                    calculatedMMdPatients.push({ month: curDate, value: noOfPatients });
+                                    calculatedMMdPatients.push({ month: curDate, value: noOfPatients<0?0:noOfPatients });
                                 } else {
                                     var prevCycleValue = calculatedMMdPatients.filter(c => moment(c.month).format("YYYY-MM") == moment(curDate).add(-monthsPerVisit, 'months').format("YYYY-MM"))[0].value;
                                     noOfPatients = prevCycleValue + deltaPatients;
-                                    calculatedMMdPatients.push({ month: curDate, value: noOfPatients });
+                                    calculatedMMdPatients.push({ month: curDate, value: noOfPatients<0?0:noOfPatients });
                                 }
                                 // console.log("noOfPus$$$%%%", noOfPus);
                                 // calculatedMmdValue = noOfPus;
@@ -573,7 +573,7 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                             difference: difference,
                             seasonalityPerc: seasonalityPercTotal,
                             manualChange: manualChangeTotal,
-                            calculatedMmdValue: calculatedMmdValue
+                            calculatedMmdValue: calculatedMmdValue<0?0:calculatedMmdValue
                         })
                         // console.log("Node MOM List%%%", nodeDataList);
                     }
@@ -622,12 +622,13 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                     var nodeDataMapForScenario = (nodeDataMap[scenarioList[ndm].id])[0];
                     // console.log("agg node data---", nodeDataMapForScenario);
                     var childNodeFlatList = flatListUnsorted.filter(c => c.parent == aggregateNodeList[fl - 1].id);
+                    var minMonth=moment.min(childNodeFlatList.map(d => moment(d.payload.nodeDataMap[scenarioList[ndm].id][0].month)));
                     // console.log("agg child&&&", childNodeFlatList);
                     // console.log("scenarioList[ndm].id&&&", scenarioList[ndm].id);
-                    var curDate = moment(nodeDataMapForScenario.month).startOf('month').format("YYYY-MM-DD");;
+                    var curDate = moment(minMonth).startOf('month').format("YYYY-MM-DD");;
                     var nodeDataList = [];
                     for (var i = 0; curDate < stopDate; i++) {
-                        curDate = moment(nodeDataMapForScenario.month).add(i, 'months').format("YYYY-MM-DD");
+                        curDate = moment(minMonth).add(i, 'months').format("YYYY-MM-DD");
                         var aggregatedStartValue = 0;
                         var aggregatedEndValue = 0;
                         var aggregatedCalculatedValue = 0;

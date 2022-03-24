@@ -476,7 +476,7 @@ class ForecastOutput extends Component {
         var a = document.createElement("a")
         a.href = 'data:attachment/csv,' + csvString
         a.target = "_Blank"
-        a.download = this.state.programs.filter(c => c.programId == this.state.programId)[0].programCode+ "-" + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text)+"-"+i18n.t('static.dashboard.monthlyForecast')+ ".csv"
+        a.download = this.state.programs.filter(c => c.programId == this.state.programId)[0].programCode + "-" + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text) + "-" + i18n.t('static.dashboard.monthlyForecast') + ".csv"
         document.body.appendChild(a)
         a.click();
 
@@ -710,7 +710,7 @@ class ForecastOutput extends Component {
         doc.autoTable(content);
         addHeaders(doc)
         addFooters(doc)
-        doc.save(this.state.programs.filter(c => c.programId == this.state.programId)[0].programCode+ "-" + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text)+"-"+i18n.t('static.dashboard.monthlyForecast') + ".pdf")
+        doc.save(this.state.programs.filter(c => c.programId == this.state.programId)[0].programCode + "-" + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text) + "-" + i18n.t('static.dashboard.monthlyForecast') + ".pdf")
 
     }
 
@@ -798,6 +798,7 @@ class ForecastOutput extends Component {
                             // }
                         }
                         console.log("DATASET-------->", datasetList);
+                        console.log("Version-------->", document.getElementById("versionId").value);
                         this.setState({
                             datasetList: datasetList,
                             datasetList1: datasetList1,
@@ -805,6 +806,13 @@ class ForecastOutput extends Component {
                         }, () => {
                             localStorage.setItem("sesForecastProgramIdReport", parseInt(programId));
                             localStorage.setItem("sesForecastVersionIdReport", document.getElementById("versionId").value);
+                            localStorage.setItem("sesDatasetId", parseInt(programId) + '_v' + (document.getElementById("versionId").value).replace('(Local)', '').trim() + '_uId_' + userId);
+
+                            localStorage.setItem("sesLiveDatasetId", parseInt(programId));
+                            localStorage.setItem("sesDatasetCompareVersionId", document.getElementById("versionId").value);
+                            localStorage.setItem("sesDatasetVersionId", document.getElementById("versionId").value);
+
+                            console.log("In datasetId@@@", localStorage.getItem("sesDatasetId"));
 
                             let filteredProgram = this.state.datasetList.filter(c => c.programId == programId && c.versionId == (versionId.split('(')[0]).trim())[0];
 
@@ -1872,8 +1880,16 @@ class ForecastOutput extends Component {
             }, () => {
                 // localStorage.setItem("sesVersionIdReport", this.state.versionId);
                 // (viewById == 1 ? this.getPlanningUnitForecastingUnit() : this.getForecastingUnit());
+                var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                var userId = userBytes.toString(CryptoJS.enc.Utf8);
+
                 localStorage.setItem("sesForecastProgramIdReport", parseInt(document.getElementById("programId").value));
                 localStorage.setItem("sesForecastVersionIdReport", document.getElementById("versionId").value);
+                localStorage.setItem("sesDatasetId", parseInt(document.getElementById("programId").value) + '_v' + (document.getElementById("versionId").value).replace('(Local)', '').trim() + '_uId_' + userId);
+
+                localStorage.setItem("sesLiveDatasetId", parseInt(document.getElementById("programId").value));
+                localStorage.setItem("sesDatasetCompareVersionId", document.getElementById("versionId").value);
+                localStorage.setItem("sesDatasetVersionId", document.getElementById("versionId").value);
                 this.setForecastPeriod();
                 this.filterData();
                 this.getEquivalencyUnitData();
@@ -2592,7 +2608,7 @@ class ForecastOutput extends Component {
                                                     </Picker>
                                                 </div>
                                             </FormGroup>
-                                          
+
                                             <FormGroup className="col-md-3">
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.forecastReport.yAxisInEquivalencyUnit')}  <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={this.toggleEu} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                                 <div className="controls ">

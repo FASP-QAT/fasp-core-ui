@@ -840,7 +840,7 @@ class usageTemplate extends Component {
                 //(papuList[j].oneTimeUsage == false ? '' : `=ROUND(N${parseInt(j) + 1},2)`)//hidden
 
                 let unitName = (this.state.dimensionList.filter(c => c.id == papuList[j].unit.id)[0]).name;
-                let string = "Every " + (papuList[j].noOfPatients).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") + " " + unitName + " - requires " + papuList[j].noOfForecastingUnits + " " + papuList[j].forecastingUnit.unit.label.label_en;
+                let string = "Every " + (papuList[j].noOfPatients).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") + " " + unitName + "(s) - requires " + papuList[j].noOfForecastingUnits + " " + papuList[j].forecastingUnit.unit.label.label_en;
 
                 // let string = "Every " + papuList[j].noOfPatients + " patient - requires " + papuList[j].noOfForecastingUnits + " " + papuList[j].unit.label.label_en;
                 if (!papuList[j].oneTimeUsage) { //one time usage false
@@ -2109,7 +2109,7 @@ class usageTemplate extends Component {
                 unitName1 = this.state.unitList.filter(c => c.id == unitId)[0].name;
             }
 
-            let string = 'Every ' + this.el.getValue(`I${parseInt(y) + 1}`, true) + ' ' + unitName + ' - requires ' + this.el.getValue(`L${parseInt(y) + 1}`, true) + " " + unitName1;
+            let string = 'Every ' + this.el.getValue(`I${parseInt(y) + 1}`, true) + ' ' + unitName + '(s) - requires ' + this.el.getValue(`L${parseInt(y) + 1}`, true) + " " + unitName1;
 
             // let string = 'Every ' + this.el.getValue(`I${parseInt(y) + 1}`, true) + ' patient - requires ' + this.el.getValue(`L${parseInt(y) + 1}`, true) + " " + this.el.getValue(`M${parseInt(y) + 1}`, true);
 
