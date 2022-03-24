@@ -1214,7 +1214,7 @@ class AuthenticationService {
                         }
                         break;
                     case "/translations/databaseTranslations":
-                        if (bfunction.includes("ROLE_BF_DATABASE_TRANSLATION")) {
+                        if (bfunction.includes("ROLE_BUSINESS_FUNCTION_EDIT_APPLICATION_LABELS") || bfunction.includes("ROLE_BUSINESS_FUNCTION_EDIT_REALM_LABELS") || bfunction.includes("ROLE_BUSINESS_FUNCTION_EDIT_PROGRAM_LABELS")) {
                             return true;
                         }
                         break;
