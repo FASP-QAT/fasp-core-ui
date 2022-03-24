@@ -543,7 +543,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         elInstance.setStyle(col, "background-color", "transparent");
         elInstance.setStyle(col, "background-color", "yellow");
         // elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
-        elInstance.setComments(col, "Please enter a positive number')");
+        elInstance.setComments(col, "Please enter a positive number");
 
       } else {
         var col = (colArr[x]).concat(parseInt(y) + 1);
