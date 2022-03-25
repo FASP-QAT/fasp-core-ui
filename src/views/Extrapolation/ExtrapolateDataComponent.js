@@ -65,7 +65,8 @@ const validationSchemaExtrapolation = function (values) {
         seasonalityId:
             Yup.string().test('seasonalityId', 'Please provide a positive integer between 1 to 24.',
                 function (value) {
-                    var testNumber = document.getElementById("seasonalityId").value != "" ? JEXCEL_INTEGER_REGEX.test(document.getElementById("seasonalityId").value) : false;
+                    // var testNumber = document.getElementById("seasonalityId").value != "" ? JEXCEL_INTEGER_REGEX.test(document.getElementById("seasonalityId").value) : false;
+                    var testNumber = document.getElementById("seasonalityId").value != "" ? (/^(?:[1-9]|[1][0-9]|2[0-4])$/).test(document.getElementById("seasonalityId").value) : false;
                     if ((document.getElementById("smoothingId").value) == "true" && (document.getElementById("seasonalityId").value == "" || testNumber == false)) {
                         return false;
                     } else {
@@ -75,7 +76,8 @@ const validationSchemaExtrapolation = function (values) {
         gammaId:
             Yup.string().test('gammaId', 'Please provide a positive integer between 0 to 1.',
                 function (value) {
-                    var testNumber = document.getElementById("gammaId").value != "" ? (/^\d{0,3}(\.\d{1,2})?$/).test(document.getElementById("gammaId").value) : false;
+                    // var testNumber = document.getElementById("gammaId").value != "" ? (/^\d{0,3}(\.\d{1,2})?$/).test(document.getElementById("gammaId").value) : false;
+                    var testNumber = document.getElementById("gammaId").value != "" ? (/^(?:(?:[0])(?:\.\d{1,2})?|1(?:\.0\d{0,1})?)$/).test(document.getElementById("gammaId").value) : false;
                     if ((document.getElementById("smoothingId").value) == "true" && (document.getElementById("gammaId").value == "" || testNumber == false)) {
                         return false;
                     } else {
@@ -85,7 +87,8 @@ const validationSchemaExtrapolation = function (values) {
         betaId:
             Yup.string().test('betaId', 'Please provide a positive integer between 0 to 1.',
                 function (value) {
-                    var testNumber = document.getElementById("betaId").value != "" ? (/^\d{0,3}(\.\d{1,2})?$/).test(document.getElementById("betaId").value) : false;
+                    // var testNumber = document.getElementById("betaId").value != "" ? (/^\d{0,3}(\.\d{1,2})?$/).test(document.getElementById("betaId").value) : false;
+                    var testNumber = document.getElementById("betaId").value != "" ? (/^(?:(?:[0])(?:\.\d{1,2})?|1(?:\.0\d{0,1})?)$/).test(document.getElementById("betaId").value) : false;
                     if ((document.getElementById("smoothingId").value) == "true" && (document.getElementById("betaId").value == "" || testNumber == false)) {
                         return false;
                     } else {
@@ -95,7 +98,8 @@ const validationSchemaExtrapolation = function (values) {
         alphaId:
             Yup.string().test('alphaId', 'Please provide a positive integer between 0 to 1.',
                 function (value) {
-                    var testNumber = document.getElementById("alphaId").value != "" ? (/^\d{0,3}(\.\d{1,2})?$/).test(document.getElementById("alphaId").value) : false;
+                    // var testNumber = document.getElementById("alphaId").value != "" ? (/^\d{0,3}(\.\d{1,2})?$/).test(document.getElementById("alphaId").value) : false;
+                    var testNumber = document.getElementById("alphaId").value != "" ? (/^(?:(?:[0])(?:\.\d{1,2})?|1(?:\.0\d{0,1})?)$/).test(document.getElementById("alphaId").value) : false;
                     if ((document.getElementById("smoothingId").value) == "true" && (document.getElementById("alphaId").value == "" || testNumber == false)) {
                         return false;
                     } else {
@@ -522,17 +526,17 @@ export default class ExtrapolateDataComponent extends React.Component {
                     }
                     if (rowData[2] || rowData[3] || rowData[4] || rowData[5] || rowData[6] || rowData[7]) {
                         var cell = elInstance.getCell(("C").concat(parseInt(y) + 1))
-                        cell.classList.add('jexcelBoldPurpleCell');
+                        cell.classList.add('jexcelPurpleCell');
                         var cell = elInstance.getCell(("D").concat(parseInt(y) + 1))
-                        cell.classList.add('jexcelBoldPurpleCell');
+                        cell.classList.add('jexcelPurpleCell');
                         var cell = elInstance.getCell(("E").concat(parseInt(y) + 1))
-                        cell.classList.add('jexcelBoldPurpleCell');
+                        cell.classList.add('jexcelPurpleCell');
                         var cell = elInstance.getCell(("F").concat(parseInt(y) + 1))
-                        cell.classList.add('jexcelBoldPurpleCell');
+                        cell.classList.add('jexcelPurpleCell');
                         var cell = elInstance.getCell(("G").concat(parseInt(y) + 1))
-                        cell.classList.add('jexcelBoldPurpleCell');
+                        cell.classList.add('jexcelPurpleCell');
                         var cell = elInstance.getCell(("H").concat(parseInt(y) + 1))
-                        cell.classList.add('jexcelBoldPurpleCell');
+                        cell.classList.add('jexcelPurpleCell');
                     }
                 }
             }.bind(this),
@@ -1577,7 +1581,7 @@ export default class ExtrapolateDataComponent extends React.Component {
 
     setSeasonals(e) {
         var seasonals = e.target.value;
-        var testNumber = seasonals != "" ? JEXCEL_INTEGER_REGEX.test(seasonals) : false;
+        var testNumber = seasonals != "" ? (/^(?:[1-9]|[1][0-9]|2[0-4])$/).test(seasonals) : false;
         console.log("testNumber", testNumber);
         if (this.state.smoothingId && testNumber == false) {
 
