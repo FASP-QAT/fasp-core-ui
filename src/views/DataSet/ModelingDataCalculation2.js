@@ -172,6 +172,7 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                     var curDate = moment(nodeDataMapForScenario.month).startOf('month').format("YYYY-MM-DD");
                     var nodeDataList = [];
                     var calculatedMMdPatients = [];
+                    var calculatedValueForLag= [];
                     for (var i = 0; curDate < stopDate; i++) {
                         // console.log("curDate---", curDate);
                         curDate = moment(nodeDataMapForScenario.month).add(i, 'months').format("YYYY-MM-DD");
@@ -398,10 +399,11 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                 }
                             }
                             calculatedValue = totalValue;
+                            calculatedValueForLag.push(calculatedValue);
                             var lag = nodeDataMapForScenario.fuNode.lagInMonths;
                             console.log("Lag in months++++", lag);
                             if (i >= lag) {
-                                // calculatedValue = 0;
+                                calculatedValue = calculatedValueForLag[i-lag];
                             } else {
                                 calculatedValue = 0;
                             }
