@@ -54,6 +54,8 @@ class ForecastSummary extends Component {
             versions: [],
             show: false,
             message: '',
+            message1: '',
+            color: '',
             rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
             minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
             maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
@@ -136,7 +138,15 @@ class ForecastSummary extends Component {
         this.backToMonthlyForecast = this.backToMonthlyForecast.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
         this.setForecastPeriod = this.setForecastPeriod.bind(this);
+        this.hideSecondComponent = this.hideSecondComponent.bind(this);
 
+    }
+
+    hideSecondComponent() {
+        document.getElementById('div2').style.display = 'block';
+        setTimeout(function () {
+            document.getElementById('div2').style.display = 'none';
+        }, 8000);
     }
 
     cancelClicked() {
@@ -2323,10 +2333,15 @@ class ForecastSummary extends Component {
                 }.bind(this);
                 putRequest.onsuccess = function (event) {
                     this.setState({
-                        isChanged1: false
-                    })
-                    let id = AuthenticationService.displayDashboardBasedOnRole();
-                    this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/green/' + i18n.t('static.compareAndSelect.dataSaved'));
+                        isChanged1: false,
+                        message1: i18n.t('static.compareAndSelect.dataSaved'),
+                        color: 'green'
+                    },
+                        () => {
+                            this.hideSecondComponent();
+                        })
+                    // let id = AuthenticationService.displayDashboardBasedOnRole();
+                    // this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/green/' + i18n.t('static.compareAndSelect.dataSaved'));
                 }.bind(this)
             }.bind(this)
         }.bind(this)
@@ -2375,6 +2390,7 @@ class ForecastSummary extends Component {
                 <AuthenticationServiceComponent history={this.props.history} />
                 <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
                 <h5 className="red">{i18n.t(this.state.message)}</h5>
+                <h5 style={{ color: this.state.color }} id="div2">{this.state.message1}</h5>
 
                 <Card>
                     <div className="Card-header-reporticon pb-2">
