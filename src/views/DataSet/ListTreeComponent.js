@@ -782,7 +782,7 @@ export default class ListTreeComponent extends Component {
     }
 
     onTemplateChange(event) {
-        if (event.target.value == 0 || event.target.value == "") {
+        if (event.target.value == 0) {
             this.setState({
                 treeTemplate: '',
                 treeFlag: false,
@@ -809,7 +809,7 @@ export default class ListTreeComponent extends Component {
                 }
             });
             // this.buildTree();
-        } else {
+        } else if (event.target.value != 0 && event.target.value != "") {
             console.log("id--->>>", this.state.datasetIdModal);
             var treeTemplate = this.state.treeTemplateList.filter(x => x.treeTemplateId == event.target.value)[0];
             console.log("treeTemplate---", treeTemplate)
@@ -897,7 +897,10 @@ export default class ListTreeComponent extends Component {
         };
 
         if (treeArray.length > 0) {
-            sortArray(treeArray);
+            // sortArray(treeArray);
+            treeArray.sort(function(a,b){
+                return a[1].localeCompare(b[1]) || a[2].localeCompare(b[2]);
+            })
         }
         this.el = jexcel(document.getElementById("tableDiv"), '');
         this.el.destroy();
@@ -1030,7 +1033,7 @@ export default class ListTreeComponent extends Component {
                                     versionId: this.el.getValueFromCoords(9, y),
                                     treeId: this.el.getValueFromCoords(0, y),
                                     isModalOpen: !this.state.isModalOpen,
-                                    treeName: this.el.getValueFromCoords(2, y) + "(copy)",
+                                    treeName: this.el.getValueFromCoords(2, y) + " (copy)",
                                     treeFlag: true,
                                     treeTemplate: ''
                                 })

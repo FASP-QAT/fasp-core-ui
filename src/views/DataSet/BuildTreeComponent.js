@@ -7626,7 +7626,7 @@ export default class BuildTree extends Component {
                                                         && this.state.tracerCategoryList.map((item, i) => {
                                                             return (
                                                                 <option key={i} value={item.tracerCategoryId}>
-                                                                    {getLabelText(item.label, this.state.lang) + "-" + item.tracerCategoryId}
+                                                                    {getLabelText(item.label, this.state.lang)}
                                                                 </option>
                                                             )
                                                         }, this)}

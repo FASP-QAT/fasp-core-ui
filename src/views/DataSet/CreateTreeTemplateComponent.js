@@ -4386,7 +4386,8 @@ export default class CreateTreeTemplate extends Component {
                                     nodeDataId: 1,
                                     notes: '',
                                     month: moment(new Date()).format('YYYY-MM-DD'),
-                                    dataValue: '',
+                                    dataValue: '0',
+                                    calculatedDataValue : '0',
                                     fuNode: {
                                         forecastingUnit: {
                                             tracerCategory: {
@@ -4441,7 +4442,8 @@ export default class CreateTreeTemplate extends Component {
                                 nodeDataOverrideList: [],
                                 nodeDataMomList: [],
                                 month: moment(new Date()).format('YYYY-MM-DD'),
-                                dataValue: '',
+                                dataValue: '0',
+                                calculatedDataValue : '0',
                                 fuNode: {
                                     forecastingUnit: {
                                         tracerCategory: {
@@ -5355,7 +5357,7 @@ export default class CreateTreeTemplate extends Component {
                         id: 'A',
                         scaleLabel: {
                             display: true,
-                            labelString: this.state.currentItemConfig.context.payload.nodeType.id > 3 ? this.state.currentItemConfig.context.payload.nodeUnit.id!="" ?getLabelText(this.state.nodeUnitList.filter(c=>c.unitId==this.state.currentItemConfig.context.payload.nodeUnit.id)[0].label, this.state.lang):"" : this.state.currentItemConfig.context.payload.nodeUnit.label!=null?getLabelText(this.state.currentItemConfig.context.payload.nodeUnit.label, this.state.lang):"",
+                            labelString: this.state.currentItemConfig.context.payload.nodeType.id > 3 ? this.state.currentItemConfig.context.payload.nodeUnit.id != "" ? getLabelText(this.state.nodeUnitList.filter(c => c.unitId == this.state.currentItemConfig.context.payload.nodeUnit.id)[0].label, this.state.lang) : "" : this.state.currentItemConfig.context.payload.nodeUnit.label != null ? getLabelText(this.state.currentItemConfig.context.payload.nodeUnit.label, this.state.lang) : "",
                             // labelString: "",
                             fontColor: 'black'
                         },
@@ -6767,7 +6769,7 @@ export default class CreateTreeTemplate extends Component {
                                             </Popover>
                                         </div> */}
                                         {this.state.currentModelingType != 3 && this.state.currentModelingType != 4 && this.state.currentModelingType != 5 && <FormGroup className="col-md-6">
-                                        <Label htmlFor="currencyId">{i18n.t('static.tree.Change(#)')}<span class="red Reqasterisk">*</span> </Label>
+                                            <Label htmlFor="currencyId">{i18n.t('static.tree.Change(#)')}<span class="red Reqasterisk">*</span> </Label>
                                             {/* <Label htmlFor="currencyId">{i18n.t('static.tree.Change(#)')}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover24" onClick={this.toggleTargetChangeHash} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label> */}
                                             <Input type="number"
                                                 id="currentTargetChangeNumber"
@@ -7610,9 +7612,10 @@ export default class CreateTreeTemplate extends Component {
                                     console.log("add click config---", this.state.currentItemConfig);
                                     console.log("add click nodeflag---", this.state.addNodeFlag);
                                     console.log("item config---", itemConfig);
+                                    console.log("parent value check---", itemConfig.payload.nodeDataMap[0][0].calculatedDataValue);
                                     this.setState({
                                         orgCurrentItemConfig: JSON.parse(JSON.stringify(this.state.currentItemConfig.context)),
-                                        parentValue: itemConfig.payload.nodeDataMap[0][0].calculatedDataValue
+                                        parentValue: itemConfig.payload.nodeDataMap[0][0].calculatedDataValue != null ? itemConfig.payload.nodeDataMap[0][0].calculatedDataValue : 0
                                     });
 
                                     this.getNodeTypeFollowUpList(itemConfig.payload.nodeType.id);
