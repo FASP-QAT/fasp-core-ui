@@ -165,8 +165,8 @@ export default class ExtrapolateDataComponent extends React.Component {
     constructor(props) {
         super(props);
         this.options = props.options;
-        var startDate1 = moment(Date.now()).subtract(6, 'months').startOf('month').format("YYYY-MM-DD");
-        var endDate1 = moment(Date.now()).add(18, 'months').startOf('month').format("YYYY-MM-DD")
+        var startDate1 = moment(Date.now()).subtract(24, 'months').startOf('month').format("YYYY-MM-DD");
+        var endDate1 = moment(Date.now()).startOf('month').format("YYYY-MM-DD")
         // var endDate1 = moment(Date.now()).startOf('month').format("YYYY-MM-DD")
         var startDate = moment("2021-05-01").format("YYYY-MM-DD");
         var endDate = moment("2022-02-01").format("YYYY-MM-DD");
@@ -236,7 +236,7 @@ export default class ExtrapolateDataComponent extends React.Component {
             rangeValue: { from: { year: new Date(startDate).getFullYear(), month: new Date(startDate).getMonth() + 1 }, to: { year: new Date(endDate).getFullYear(), month: new Date(endDate).getMonth() + 1 } },
             rangeValue1: { from: { year: new Date(startDate1).getFullYear(), month: new Date(startDate1).getMonth() + 1 }, to: { year: new Date(endDate1).getFullYear(), month: new Date(endDate1).getMonth() + 1 } },
             minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
-            maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
+            maxDate: { year: new Date(endDate1).getFullYear(), month: new Date().getMonth() + 1 },
             popoverOpenMa: false,
             popoverOpenSa: false,
             popoverOpenLr: false,
@@ -790,8 +790,8 @@ export default class ExtrapolateDataComponent extends React.Component {
                     regionList: regionList,
                     datasetJson: forecastProgramListFilter.datasetData,
                     rangeValue: rangeValue,
-                    rangeValue1: rangeValue,
-                    maxDate: { year: new Date(stopDate).getFullYear(), month: new Date(stopDate).getMonth() + 1 },
+                    // rangeValue1: rangeValue,
+                    // maxDate: { year: new Date(stopDate).getFullYear(), month: new Date(stopDate).getMonth() + 1 },
                     loading: false
                 }, () => {
                     if (planningUnitId != "") {
