@@ -2739,9 +2739,11 @@ export default class CreateTreeTemplate extends Component {
         // });
     }.bind(this);
     changed = function (instance, cell, x, y, value) {
-        this.setState({
-            lastRowDeleted: false
-        })
+        if (this.state.lastRowDeleted != false) {
+            this.setState({
+                lastRowDeleted: false
+            })
+        }
         //Modeling type
         if (x == 2) {
             var col = ("C").concat(parseInt(y) + 1);
@@ -2843,6 +2845,16 @@ export default class CreateTreeTemplate extends Component {
                     this.state.modelingEl.setValueFromCoords(8, y, calculatedChangeForMonth, true);
                 }
 
+            }
+            if (x == 2 && rowData[2] != 2 && rowData[5] != "") {
+                instance.jexcel.setStyle(col, "background-color", "transparent");
+                instance.jexcel.setComments(col, "");
+                if (rowData[2] != 5) {
+                    calculatedChangeForMonth = parseFloat((nodeValue * rowData[5]) / 100).toFixed(2);
+                } else {
+                    calculatedChangeForMonth = parseFloat(rowData[5]).toFixed();
+                }
+                this.state.modelingEl.setValueFromCoords(8, y, calculatedChangeForMonth, true);
             }
             // Monthly change #
             if (x == 6 && rowData[2] == 2) {
