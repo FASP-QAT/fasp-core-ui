@@ -1032,6 +1032,7 @@ class ForecastSummary extends Component {
                                                         console.log("Test------------>6", listContainNodeType5[0].payload);
                                                         console.log("Test------------>7", (listContainNodeType5[0].payload.nodeDataMap[scenarioId]));
 
+                                                        let myTempData = [];
                                                         for (let k = 0; k < listContainNodeType5.length; k++) {
                                                             let arrayOfNodeDataMap = (listContainNodeType5[k].payload.nodeDataMap[scenarioId]).filter(c => c.puNode.planningUnit.id == planningUnitList[j].planningUnit.id)
                                                             console.log("Test------------>7.1", arrayOfNodeDataMap);
@@ -1052,8 +1053,7 @@ class ForecastSummary extends Component {
                                                                     let jsonTemp = { objUnit: planningUnitList[j].planningUnit, scenario: { id: 1, label: treeList[p].label.label_en + filteredScenario[0].label.label_en }, display: true, color: "#ba0c2f", consumptionList: consumptionList }
                                                                     consumptionData.push(jsonTemp);
                                                                 }
-
-                                                                break;
+                                                                // break;
                                                             }
                                                         }
 
