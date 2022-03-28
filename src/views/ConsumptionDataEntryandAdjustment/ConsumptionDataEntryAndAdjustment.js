@@ -283,9 +283,10 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           onload: this.loaded,
           onchange: function (instance, cell, x, y, value) {
             this.consumptionDataChanged(instance, cell, x, y, value)
-            this.setState({
-              consumptionChanged: true
-            })
+            // this.setState({
+            //   consumptionChanged: true
+            // })
+            if(this.state.consumptionChangedFlag!=true){this.setState({consumptionChangedFlag:true})}
           }.bind(this),
 
           pagination: false,
@@ -537,6 +538,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     }
     var elInstance = this.state.dataEl;
     if (possibleActualConsumptionY.includes(y.toString())) {
+      value = elInstance.getValue(`${colArr[x]}${parseInt(y) + 1}`, true);
       if (value == "") {
       } else if (value < 0) {
         var col = (colArr[x]).concat(parseInt(y) + 1);
@@ -609,11 +611,11 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     }
     for (var y = 0; y < json.length; y++) {
       for (var x = 1; x < 37; x++) {
-        var rowData = elInstance.getRowData(y);
+        // var rowData = elInstance.getRowData(y);
         var value = elInstance.getValue(`${colArr[x]}${parseInt(y) + 1}`, true);
         if (possibleActualConsumptionY.includes(y.toString())) {
-          if (rowData[x] == "") {
-          } else if (rowData[x] < 0) {
+          if (value == "") {
+          } else if (value < 0) {
             var col = (colArr[x]).concat(parseInt(y) + 1);
             elInstance.setStyle(col, "background-color", "transparent");
             elInstance.setStyle(col, "background-color", "yellow");
@@ -630,14 +632,10 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         if (possibleReportRateY.includes(y.toString())) {
           console.log("possibleReportRateY--", y.toString());
           if (value == "") {
-            console.log("possibleReportRateY--If ", rowData[x]);
 
           }
           else if (value < 0 || value > 100) {
-            console.log("possibleReportRateY--If esle ", rowData[x]);
             var col = (colArr[x]).concat(parseInt(y) + 1);
-            console.log("possibleReportRateY--Col If esle  ", col);
-
             elInstance.setStyle(col, "background-color", "transparent");
             elInstance.setStyle(col, "background-color", "yellow");
             //elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
@@ -749,6 +747,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         // index = fullConsumptionList.findIndex(con =>  con.region.id == regionList[r].regionId && moment(con.month).format("YYYY-MM") == moment(monthArray[i].date).format("YYYY-MM"));
 
         if (columnData[actualConsumptionCount] !== "") {
+          console.log("columnData[actualConsumptionCount]",columnData[actualConsumptionCount])
           if (index != -1) {
             fullConsumptionList[index].actualConsumption = columnData[actualConsumptionCount];
             fullConsumptionList[index].daysOfStockOut = columnData[daysOfStockOutCount];
@@ -846,11 +845,8 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     this.setState({
       loading: true
     })
-    console.log("validation---------->before")
     var validation = this.checkValidationConsumption();
-    console.log("validation---------->", validation)
     if (validation) {
-      console.log("INIF")
       var db1;
       var storeOS;
       getDatabase();
@@ -877,7 +873,6 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
           var curUser = AuthenticationService.getLoggedInUserId();
           var consumptionUnit = this.state.selectedConsumptionUnitObject;
-          console.log("consumptionUnit---->", consumptionUnit)
           var fullConsumptionList = this.state.consumptionList.filter(c => c.planningUnit.id != consumptionUnit.planningUnit.id);
           if (this.state.selectedConsumptionUnitId == 0) {
             var json = this.state.smallTableEl.getJson(null, false);
@@ -978,7 +973,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           var planningUnitList = datasetJson.planningUnitList;
           if (this.state.selectedConsumptionUnitId == 0) {
             planningUnitList.push(consumptionUnit);
-          }
+          }      
           var planningUnitIndex = planningUnitList.findIndex(c => c.planningUnit.id == consumptionUnit.planningUnit.id);
           planningUnitList[planningUnitIndex].consumptionNotes = document.getElementById("consumptionNotes").value;
           datasetJson.actualConsumptionList = fullConsumptionList;
@@ -1012,7 +1007,6 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         }.bind(this)
       }.bind(this)
     } else {
-      console.log("INELSE")
       this.setState({
         loading: false,
         message: i18n.t('static.supplyPlan.validationFailed'),

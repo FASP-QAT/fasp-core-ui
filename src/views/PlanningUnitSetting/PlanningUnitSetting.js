@@ -37,7 +37,7 @@ import {
     Col,
     Row,
     CardFooter,
-    Table, FormGroup, Input, InputGroup, InputGroupAddon, Label, Form, Modal, ModalHeader, ModalFooter, ModalBody, Popover, PopoverBody, PopoverHeader , Button
+    Table, FormGroup, Input, InputGroup, InputGroupAddon, Label, Form, Modal, ModalHeader, ModalFooter, ModalBody, Popover, PopoverBody, PopoverHeader, Button
 } from 'reactstrap';
 import NumberFormat from 'react-number-format';
 
@@ -1888,7 +1888,7 @@ export default class PlanningUnitSetting extends Component {
         tr.children[6].classList.add('InfoTr');
         tr.children[7].classList.add('InfoTr');
 
-        
+
         tr.children[5].title = i18n.t('static.tooltip.Stock');
         tr.children[6].title = i18n.t('static.tooltip.ExistingShipments');
         tr.children[7].title = i18n.t('static.tooltip.DesiredMonthsofStock');
@@ -2372,11 +2372,11 @@ export default class PlanningUnitSetting extends Component {
 
     toggleProgramSetting() {
         this.setState({
-          popoverOpenProgramSetting: !this.state.popoverOpenProgramSetting,
+            popoverOpenProgramSetting: !this.state.popoverOpenProgramSetting,
         });
-      }
-    
-      
+    }
+
+
 
     render() {
 
@@ -2425,11 +2425,11 @@ export default class PlanningUnitSetting extends Component {
 
                                 <Col md="12 pl-0">
                                     <div className="row">
-                                    <div>
-                                                                <Popover placement="top" isOpen={this.state.popoverOpenProgramSetting} target="Popover2" trigger="hover" toggle={this.toggleProgramSetting}>
-                                                                    <PopoverBody>{i18n.t('static.tooltip.planningProgramSetting')} </PopoverBody>
-                                                                </Popover>
-                                                            </div>
+                                        <div>
+                                            <Popover placement="top" isOpen={this.state.popoverOpenProgramSetting} target="Popover2" trigger="hover" toggle={this.toggleProgramSetting}>
+                                                <PopoverBody>{i18n.t('static.tooltip.planningProgramSetting')} </PopoverBody>
+                                            </Popover>
+                                        </div>
                                         <FormGroup className="col-md-3">
                                             <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')} <i class="fa fa-info-circle icons pl-lg-2" id="Popover2" onClick={this.toggleProgramSetting} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                             <div className="controls ">
@@ -2520,7 +2520,9 @@ export default class PlanningUnitSetting extends Component {
                             {/* {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MANAGE_REALM_COUNTRY_PLANNING_UNIT') && */}
                             <FormGroup>
                                 <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                <Button type="submit" size="md" color="success" onClick={this.formSubmit} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                {this.state.isChanged1 &&
+                                    <Button type="submit" size="md" color="success" onClick={this.formSubmit} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                }
                                 <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>
                                 &nbsp;
                             </FormGroup>
