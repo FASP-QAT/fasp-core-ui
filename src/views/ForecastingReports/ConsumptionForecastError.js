@@ -26,6 +26,7 @@ import { LOGO } from '../../CommonComponent/Logo.js'
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { index } from 'mathjs';
 const ref = React.createRef();
 const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
@@ -95,6 +96,7 @@ class ConsumptionForecastError extends Component {
         this.toggleAccordionTotalDiffernce = this.toggleAccordionTotalDiffernce.bind(this);
         this.storeProduct = this.storeProduct.bind(this);
         this.getEquivalencyUnitData = this.getEquivalencyUnitData.bind(this);
+        this.calculateDaysInMonth = this.calculateDaysInMonth.bind(this);
 
     }
 
@@ -340,6 +342,7 @@ class ConsumptionForecastError extends Component {
         csvRow.push('')
 
         const headers = [];
+        let t1 = [];
         headers.push('');
         headers.push('Average')
 
@@ -350,20 +353,28 @@ class ConsumptionForecastError extends Component {
         var A = [this.addDoubleQuoteToRowContent(headers)]
 
         let B = this.addDoubleQuoteToRowContent([(('Error').replaceAll(',', ' ')).replaceAll(' ', '%20')])
-        {
-            this.state.errorValues.map(item => (
-                B = B.concat(item)
-            ))
-        }
+        B = B.concat(this.calculateAverage(this.state.errorValues) + ' %')
+        this.state.errorValues.map((item, index) => {
+            return (index == 0 ? '' : B = B.concat(item))
+        })
+
 
         A.push(B)
         // ----------
-        B = [i18n.t('static.consumption.forcast'), ''];
+        B = [i18n.t('static.consumption.forcast')];
 
         this.state.monthArrayList.map(item => {
             var cd = this.state.consumptionData.filter(c => moment(c.consumptionDate).format("YYYY-MM-DD") == moment(item).format("YYYY-MM-DD") && !c.actualFlag && this.state.regionIdArr.includes(c.region.regionId));
             var sum = 0;
-            cd.map(c => { sum += c.consumptionQty });
+            cd.map(c => { sum += parseInt(c.consumptionQty) });
+            t1.push(sum)
+        })
+        B = B.concat(this.calculateAverage(t1));
+
+        this.state.monthArrayList.map(item => {
+            var cd = this.state.consumptionData.filter(c => moment(c.consumptionDate).format("YYYY-MM-DD") == moment(item).format("YYYY-MM-DD") && !c.actualFlag && this.state.regionIdArr.includes(c.region.regionId));
+            var sum = 0;
+            cd.map(c => { sum += parseInt(c.consumptionQty) });
             B = B.concat(sum);
         })
 
@@ -371,21 +382,38 @@ class ConsumptionForecastError extends Component {
         // ----------
 
         this.state.regionListFiltered.map(item1 => {
-            B = [item1.label, ''];
+            B = [item1.label];
+            t1 = [];
+
+            this.state.monthArrayList.map((item, index) => {
+                var cd = this.state.consumptionData.filter(c => moment(c.consumptionDate).format("YYYY-MM-DD") == moment(item).format("YYYY-MM-DD") && !c.actualFlag && c.region.regionId == item1.value);
+                t1.push(cd.length > 0 ? parseInt(cd[0].consumptionQty) : "NA")
+            })
+            B = B.concat(this.calculateAverage(t1));
+
             this.state.monthArrayList.map(item => {
                 var cd = this.state.consumptionData.filter(c => moment(c.consumptionDate).format("YYYY-MM-DD") == moment(item).format("YYYY-MM-DD") && !c.actualFlag && c.region.regionId == item1.value);
-                B = B.concat(cd.length > 0 ? cd[0].consumptionQty : "")
+                B = B.concat(cd.length > 0 ? parseInt(cd[0].consumptionQty) : "NA")
             })
             A.push(B);
         })
         // ----------
 
-        B = [i18n.t('static.consumption.actual'), ''];
+        B = [i18n.t('static.consumption.actual')];
+        t1 = [];
 
         this.state.monthArrayList.map(item => {
             var cd = this.state.consumptionData.filter(c => moment(c.consumptionDate).format("YYYY-MM-DD") == moment(item).format("YYYY-MM-DD") && c.actualFlag && this.state.regionIdArr.includes(c.region.regionId));
             var sum = 0;
-            cd.map(c => { sum += c.consumptionQty });
+            cd.map(c => { sum += parseInt(c.consumptionQty) });
+            t1.push(cd.length > 0 ? sum : "NA")
+        })
+        B = B.concat(this.calculateAverage(t1));
+
+        this.state.monthArrayList.map(item => {
+            var cd = this.state.consumptionData.filter(c => moment(c.consumptionDate).format("YYYY-MM-DD") == moment(item).format("YYYY-MM-DD") && c.actualFlag && this.state.regionIdArr.includes(c.region.regionId));
+            var sum = 0;
+            cd.map(c => { sum += parseInt(c.consumptionQty) });
             B = B.concat(cd.length > 0 ? sum : "NA");
         })
 
@@ -393,34 +421,65 @@ class ConsumptionForecastError extends Component {
         // ----------
 
         this.state.regionListFiltered.map(item1 => {
-            B = [item1.label, ''];
+            t1 = [];
+            B = [item1.label];
             this.state.monthArrayList.map(item => {
                 var cd = this.state.consumptionData.filter(c => moment(c.consumptionDate).format("YYYY-MM-DD") == moment(item).format("YYYY-MM-DD") && c.actualFlag && c.region.regionId == item1.value);
-                B = B.concat(cd.length > 0 ? cd[0].consumptionQty : "")
+                t1.push(cd.length > 0 ? parseInt(cd[0].consumptionQty) : "NA")
+            })
+
+            B = B.concat(this.calculateAverage(t1));
+
+            this.state.monthArrayList.map(item => {
+                var cd = this.state.consumptionData.filter(c => moment(c.consumptionDate).format("YYYY-MM-DD") == moment(item).format("YYYY-MM-DD") && c.actualFlag && c.region.regionId == item1.value);
+                B = B.concat(cd.length > 0 ? parseInt(cd[0].consumptionQty) : "NA")
             })
             A.push(B);
         })
         // ----------
 
-        B = ['Difference', ''];
+        B = ['Difference'];
+        t1 = [];
         this.state.monthArrayList.map(item => {
             var cd = this.state.consumptionData.filter(c => moment(c.consumptionDate).format("YYYY-MM-DD") == moment(item).format("YYYY-MM-DD") && !c.actualFlag && this.state.regionIdArr.includes(c.region.regionId));
             var sum = 0;
-            cd.map(c => { sum += c.consumptionQty });
+            cd.map(c => { sum += parseInt(c.consumptionQty) });
             var cd1 = this.state.consumptionData.filter(c => moment(c.consumptionDate).format("YYYY-MM-DD") == moment(item).format("YYYY-MM-DD") && c.actualFlag && this.state.regionIdArr.includes(c.region.regionId));
             var sum1 = 0;
-            cd1.map(c => { sum1 += c.consumptionQty });
+            cd1.map(c => { sum1 += parseInt(c.consumptionQty) });
+            t1.push(sum1 > 0 ? sum1 - sum : "NA")
+        })
+
+        B = B.concat(this.calculateAverage(t1));
+
+        this.state.monthArrayList.map(item => {
+            var cd = this.state.consumptionData.filter(c => moment(c.consumptionDate).format("YYYY-MM-DD") == moment(item).format("YYYY-MM-DD") && !c.actualFlag && this.state.regionIdArr.includes(c.region.regionId));
+            var sum = 0;
+            cd.map(c => { sum += parseInt(c.consumptionQty) });
+            var cd1 = this.state.consumptionData.filter(c => moment(c.consumptionDate).format("YYYY-MM-DD") == moment(item).format("YYYY-MM-DD") && c.actualFlag && this.state.regionIdArr.includes(c.region.regionId));
+            var sum1 = 0;
+            cd1.map(c => { sum1 += parseInt(c.consumptionQty) });
             B = B.concat(sum1 > 0 ? sum1 - sum : "NA")
         })
         A.push(B);
         // ----------
 
         this.state.regionListFiltered.map(item1 => {
-            B = [item1.label, ''];
+            B = [item1.label];
+            t1 = [];
+
+            this.state.monthArrayList.map(item => {                
+                var cd = this.state.consumptionData.filter(c => moment(c.consumptionDate).format("YYYY-MM-DD") == moment(item).format("YYYY-MM-DD") && c.actualFlag && c.region.regionId == item1.value);
+                var cd1 = this.state.consumptionData.filter(c => moment(c.consumptionDate).format("YYYY-MM-DD") == moment(item).format("YYYY-MM-DD") && !c.actualFlag && c.region.regionId == item1.value);
+                t1.push((cd.length > 0 && cd1.length > 0) ? parseInt(cd[0].consumptionQty) - parseInt(cd1[0].consumptionQty) : "NA")
+            })
+
+            B = B.concat(this.calculateAverage(t1));
+
             this.state.monthArrayList.map(item => {
                 var cd = this.state.consumptionData.filter(c => moment(c.consumptionDate).format("YYYY-MM-DD") == moment(item).format("YYYY-MM-DD") && c.actualFlag && c.region.regionId == item1.value);
                 var cd1 = this.state.consumptionData.filter(c => moment(c.consumptionDate).format("YYYY-MM-DD") == moment(item).format("YYYY-MM-DD") && !c.actualFlag && c.region.regionId == item1.value);
-                B = B.concat((cd.length > 0 && cd1.length > 0) ? cd[0].consumptionQty - cd1[0].consumptionQty : "")
+                B = B.concat((cd.length > 0 && cd1.length > 0) ? parseInt(cd[0].consumptionQty) - parseInt(cd1[0].consumptionQty) : "NA")
             })
             A.push(B);
         })
@@ -579,24 +638,33 @@ class ConsumptionForecastError extends Component {
 
         var header = [headers]
         var A = [];
-        let data = []
+        let data = [];
+        let t1 = [];
 
         A.push('Error')
         {
-            this.state.errorValues.map(item => (
-                A = A.concat(item)
-            ))
+            this.state.errorValues.map((item, index) => {
+                return (index == 0 ? A = A.concat(this.calculateAverage(this.state.errorValues) + ' %') : A = A.concat(item))
+            })
         }
         data.push(A);
 
         //---------------
         A = [];
-        A.push(i18n.t('static.consumption.forcast'), '')
+        t1 = [];
+        A.push(i18n.t('static.consumption.forcast'))
 
         this.state.monthArrayList.map(item => {
             var cd = this.state.consumptionData.filter(c => moment(c.consumptionDate).format("YYYY-MM-DD") == moment(item).format("YYYY-MM-DD") && !c.actualFlag && this.state.regionIdArr.includes(c.region.regionId));
             var sum = 0;
-            cd.map(c => { sum += c.consumptionQty });
+            cd.map(c => { sum += parseInt(c.consumptionQty) });
+            t1.push(sum)
+        })
+        A = A.concat(this.calculateAverage(t1));
+        this.state.monthArrayList.map(item => {
+            var cd = this.state.consumptionData.filter(c => moment(c.consumptionDate).format("YYYY-MM-DD") == moment(item).format("YYYY-MM-DD") && !c.actualFlag && this.state.regionIdArr.includes(c.region.regionId));
+            var sum = 0;
+            cd.map(c => { sum += parseInt(c.consumptionQty) });
             A = A.concat(sum);
         })
 
@@ -606,10 +674,16 @@ class ConsumptionForecastError extends Component {
 
         this.state.regionListFiltered.map(item1 => {
             A = [];
-            A.push(item1.label, '')
+            t1 = [];
+            A.push(item1.label)
+            this.state.monthArrayList.map((item, index) => {
+                var cd = this.state.consumptionData.filter(c => moment(c.consumptionDate).format("YYYY-MM-DD") == moment(item).format("YYYY-MM-DD") && !c.actualFlag && c.region.regionId == item1.value);
+                t1.push(cd.length > 0 ? parseInt(cd[0].consumptionQty) : "NA")
+            })
+            A = A.concat(this.calculateAverage(t1));
             this.state.monthArrayList.map(item => {
                 var cd = this.state.consumptionData.filter(c => moment(c.consumptionDate).format("YYYY-MM-DD") == moment(item).format("YYYY-MM-DD") && !c.actualFlag && c.region.regionId == item1.value);
-                A = A.concat(cd.length > 0 ? cd[0].consumptionQty : "")
+                A = A.concat(cd.length > 0 ? parseInt(cd[0].consumptionQty) : "NA")
             })
             data.push(A);
         })
@@ -617,12 +691,21 @@ class ConsumptionForecastError extends Component {
         //---------------
 
         A = [];
-        A.push(i18n.t('static.consumption.actual'), '')
+        t1 = [];
+        A.push(i18n.t('static.consumption.actual'))
 
         this.state.monthArrayList.map(item => {
             var cd = this.state.consumptionData.filter(c => moment(c.consumptionDate).format("YYYY-MM-DD") == moment(item).format("YYYY-MM-DD") && c.actualFlag && this.state.regionIdArr.includes(c.region.regionId));
             var sum = 0;
-            cd.map(c => { sum += c.consumptionQty });
+            cd.map(c => { sum += parseInt(c.consumptionQty) });
+            t1.push(cd.length > 0 ? sum : "NA")
+        })
+        A = A.concat(this.calculateAverage(t1));
+
+        this.state.monthArrayList.map(item => {
+            var cd = this.state.consumptionData.filter(c => moment(c.consumptionDate).format("YYYY-MM-DD") == moment(item).format("YYYY-MM-DD") && c.actualFlag && this.state.regionIdArr.includes(c.region.regionId));
+            var sum = 0;
+            cd.map(c => { sum += parseInt(c.consumptionQty) });
             A = A.concat(cd.length > 0 ? sum : "NA");
         })
 
@@ -632,10 +715,18 @@ class ConsumptionForecastError extends Component {
 
         this.state.regionListFiltered.map(item1 => {
             A = [];
-            A.push(item1.label, '')
+            t1 = [];
+            A.push(item1.label)
+
             this.state.monthArrayList.map(item => {
                 var cd = this.state.consumptionData.filter(c => moment(c.consumptionDate).format("YYYY-MM-DD") == moment(item).format("YYYY-MM-DD") && c.actualFlag && c.region.regionId == item1.value);
-                A = A.concat(cd.length > 0 ? cd[0].consumptionQty : "")
+                t1.push(cd.length > 0 ? parseInt(cd[0].consumptionQty) : "NA")
+            })
+            A = A.concat(this.calculateAverage(t1));
+
+            this.state.monthArrayList.map(item => {
+                var cd = this.state.consumptionData.filter(c => moment(c.consumptionDate).format("YYYY-MM-DD") == moment(item).format("YYYY-MM-DD") && c.actualFlag && c.region.regionId == item1.value);
+                A = A.concat(cd.length > 0 ? parseInt(cd[0].consumptionQty) : "NA")
             })
             data.push(A);
         })
@@ -643,14 +734,28 @@ class ConsumptionForecastError extends Component {
         //---------------
 
         A = [];
-        A.push('Difference', '')
+        t1 = [];
+        A.push('Difference')
+
         this.state.monthArrayList.map(item => {
             var cd = this.state.consumptionData.filter(c => moment(c.consumptionDate).format("YYYY-MM-DD") == moment(item).format("YYYY-MM-DD") && !c.actualFlag && this.state.regionIdArr.includes(c.region.regionId));
             var sum = 0;
-            cd.map(c => { sum += c.consumptionQty });
+            cd.map(c => { sum += parseInt(c.consumptionQty) });
             var cd1 = this.state.consumptionData.filter(c => moment(c.consumptionDate).format("YYYY-MM-DD") == moment(item).format("YYYY-MM-DD") && c.actualFlag && this.state.regionIdArr.includes(c.region.regionId));
             var sum1 = 0;
-            cd1.map(c => { sum1 += c.consumptionQty });
+            cd1.map(c => { sum1 += parseInt(c.consumptionQty) });
+            t1.push(sum1 > 0 ? sum1 - sum : "NA")
+        })
+
+        A = A.concat(this.calculateAverage(t1));
+
+        this.state.monthArrayList.map(item => {
+            var cd = this.state.consumptionData.filter(c => moment(c.consumptionDate).format("YYYY-MM-DD") == moment(item).format("YYYY-MM-DD") && !c.actualFlag && this.state.regionIdArr.includes(c.region.regionId));
+            var sum = 0;
+            cd.map(c => { sum += parseInt(c.consumptionQty) });
+            var cd1 = this.state.consumptionData.filter(c => moment(c.consumptionDate).format("YYYY-MM-DD") == moment(item).format("YYYY-MM-DD") && c.actualFlag && this.state.regionIdArr.includes(c.region.regionId));
+            var sum1 = 0;
+            cd1.map(c => { sum1 += parseInt(c.consumptionQty) });
             A = A.concat(sum1 > 0 ? sum1 - sum : "NA")
         })
         data.push(A);
@@ -659,11 +764,21 @@ class ConsumptionForecastError extends Component {
 
         this.state.regionListFiltered.map(item1 => {
             A = [];
-            A.push(item1.label, '')
+            t1 = [];
+            A.push(item1.label)
+
             this.state.monthArrayList.map(item => {
                 var cd = this.state.consumptionData.filter(c => moment(c.consumptionDate).format("YYYY-MM-DD") == moment(item).format("YYYY-MM-DD") && c.actualFlag && c.region.regionId == item1.value);
                 var cd1 = this.state.consumptionData.filter(c => moment(c.consumptionDate).format("YYYY-MM-DD") == moment(item).format("YYYY-MM-DD") && !c.actualFlag && c.region.regionId == item1.value);
-                A = A.concat((cd.length > 0 && cd1.length > 0) ? cd[0].consumptionQty - cd1[0].consumptionQty : "")
+                t1.push((cd.length > 0 && cd1.length > 0) ? parseInt(cd[0].consumptionQty) - parseInt(cd1[0].consumptionQty) : "NA")
+            })
+
+            A = A.concat(this.calculateAverage(t1));
+
+            this.state.monthArrayList.map(item => {
+                var cd = this.state.consumptionData.filter(c => moment(c.consumptionDate).format("YYYY-MM-DD") == moment(item).format("YYYY-MM-DD") && c.actualFlag && c.region.regionId == item1.value);
+                var cd1 = this.state.consumptionData.filter(c => moment(c.consumptionDate).format("YYYY-MM-DD") == moment(item).format("YYYY-MM-DD") && !c.actualFlag && c.region.regionId == item1.value);
+                A = A.concat((cd.length > 0 && cd1.length > 0) ? parseInt(cd[0].consumptionQty) - parseInt(cd1[0].consumptionQty) : "NA")
             })
             data.push(A);
         })
@@ -694,6 +809,13 @@ class ConsumptionForecastError extends Component {
 
     }
 
+    calculateDaysInMonth(date) {
+        var dt = new Date(date);
+        var month = dt.getMonth() + 1;
+        var year = dt.getFullYear();
+        return new Date(year, month, 0).getDate();
+    }
+
     filterData() {
         let programId = document.getElementById("programId").value;
         let versionId = document.getElementById("versionId").value;
@@ -701,6 +823,7 @@ class ConsumptionForecastError extends Component {
         let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate();
         let timeWindowId = document.getElementById("timeWindowId").value;
         let viewById = document.getElementById("viewById").value;
+        let consumptionAdjForStockOutId = document.getElementById("consumptionAdjusted").value;
         let regionIds = this.state.regionValues.map(ele => (ele.value).toString())
         let planningUnitId = -1;
         let forecastingUnitId = -1;
@@ -795,7 +918,8 @@ class ConsumptionForecastError extends Component {
                                 let actualConsumptionList2 = actualConsumptionList1.map(m => {
                                     return {
                                         consumptionDate: m.month,
-                                        consumptionQty: m.amount,
+                                        // consumptionQty: m.amount,
+                                        consumptionQty: (consumptionAdjForStockOutId == 2 ? m.amount : (m.daysOfStockOut == null ? m.amount : parseInt(this.calculateDaysInMonth(m.month) / (this.calculateDaysInMonth(m.month) - m.daysOfStockOut) * m.amount))),
                                         region: { regionId: m.region.id },
                                         actualFlag: true
                                     }
@@ -955,7 +1079,8 @@ class ConsumptionForecastError extends Component {
                                 let actualConsumptionList2 = actualConsumptionList1.map(m => {
                                     return {
                                         consumptionDate: m.month,
-                                        consumptionQty: m.amount * m.planningUnit.multiplier,
+                                        // consumptionQty: m.amount * m.puMultiplier,
+                                        consumptionQty: (consumptionAdjForStockOutId == 2 ? parseInt(m.amount * m.puMultiplier) : (m.daysOfStockOut == null ? parseInt(m.amount * m.puMultiplier) : parseInt(this.calculateDaysInMonth(m.month) / (this.calculateDaysInMonth(m.month) - m.daysOfStockOut) * (m.amount * m.puMultiplier)))),
                                         region: { regionId: m.region.id },
                                         actualFlag: true
                                     }
