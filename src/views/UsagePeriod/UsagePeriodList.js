@@ -781,7 +781,7 @@ class UsagePeriod extends Component {
 
                         <Col xs="12" sm="12">
                             {/* <h5 className="red">{i18n.t('static.common.customWarningMessage')}</h5> */}
-                            <h5>{'[Placeholder]'}</h5>
+                            <h5>{i18n.t("static.placeholder.placeholder")}</h5>
                             <div className="table-responsive consumptionDataEntryTable">
                                 {/* <div id="paputableDiv" style={{ display: this.state.loading ? "none" : "block" }} className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_PERIOD') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"}> */}
 

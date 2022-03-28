@@ -2806,7 +2806,7 @@ class ForecastOutput extends Component {
                         </div>
                     </div>
                     <div className='col-md-12 pt-lg-2 pb-lg-3'>
-                        <span className="pr-lg-0 pt-lg-1">This report aggregates regional forecasts. For disaggregated regional forecasts, export CSV.</span>
+                        <span className="pr-lg-0 pt-lg-1">{i18n.t('static.placeholder.monthlyForecastReport')}</span>
                     </div>
                     {/* <div className="Card-header-reporticon ">
                         <div className="card-header-actions">

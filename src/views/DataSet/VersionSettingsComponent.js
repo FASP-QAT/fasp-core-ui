@@ -1175,7 +1175,7 @@ class VersionSettingsComponent extends Component {
     }
 
     componentDidUpdate = () => {
-        if (this.state.isChanged1 == true) {
+        if (this.state.isChanged == true) {
             window.onbeforeunload = () => true
         } else {
             window.onbeforeunload = undefined
@@ -1354,7 +1354,7 @@ class VersionSettingsComponent extends Component {
         return (
             <div className="animated">
                 <Prompt
-                    when={this.state.isChanged1 == true}
+                    when={this.state.isChanged == true}
                     message={i18n.t("static.dataentry.confirmmsg")}
                 />
                 <AuthenticationServiceComponent history={this.props.history} />
