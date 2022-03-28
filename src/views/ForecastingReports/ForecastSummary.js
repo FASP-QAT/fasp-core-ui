@@ -54,6 +54,8 @@ class ForecastSummary extends Component {
             versions: [],
             show: false,
             message: '',
+            message1: '',
+            color: '',
             rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
             minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
             maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
@@ -136,7 +138,15 @@ class ForecastSummary extends Component {
         this.backToMonthlyForecast = this.backToMonthlyForecast.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
         this.setForecastPeriod = this.setForecastPeriod.bind(this);
+        this.hideSecondComponent = this.hideSecondComponent.bind(this);
 
+    }
+
+    hideSecondComponent() {
+        document.getElementById('div2').style.display = 'block';
+        setTimeout(function () {
+            document.getElementById('div2').style.display = 'none';
+        }, 8000);
     }
 
     cancelClicked() {
@@ -284,7 +294,8 @@ class ForecastSummary extends Component {
             if (!this.state.hideColumn) {
                 headers.push((i18n.t('static.report.stock')).replaceAll(' ', '%20') + (i18n.t('static.forecastReport.endOf')).replaceAll(' ', '%20') + this.state.beforeEndDateDisplay + ')');
                 headers.push((i18n.t('static.forecastReport.existingShipments')).replaceAll(' ', '%20') + '(' + this.state.startDateDisplay + ' - ' + this.state.endDateDisplay + ')');
-                headers.push((i18n.t('static.report.stock')).replaceAll(' ', '%20') + (i18n.t('static.forecastReport.endOf')).replaceAll(' ', '%20') + this.state.endDateDisplay + ')');
+                // headers.push((i18n.t('static.report.stock')).replaceAll(' ', '%20') + (i18n.t('static.forecastReport.endOf')).replaceAll(' ', '%20') + this.state.endDateDisplay + ')');
+                headers.push(('Stock or Unmet Demand').replaceAll(' ', '%20') + (i18n.t('static.forecastReport.endOf')).replaceAll(' ', '%20') + this.state.endDateDisplay + ')');
                 headers.push((i18n.t('static.forecastReport.desiredMonthsOfStock')).replaceAll(' ', '%20') + (i18n.t('static.forecastReport.endOf')).replaceAll(' ', '%20') + this.state.endDateDisplay + ')');
                 headers.push((i18n.t('static.forecastReport.desiredStock')).replaceAll(' ', '%20') + (i18n.t('static.forecastReport.endOf')).replaceAll(' ', '%20') + this.state.endDateDisplay + ')');
             }
@@ -708,7 +719,8 @@ class ForecastSummary extends Component {
             let headers = [];
             let headers1 = ['', i18n.t('static.product.product'), i18n.t('static.forecastReport.totalForecastQuantity')];
             if (!this.state.hideColumn) {
-                headers1 = headers1.concat([i18n.t('static.report.stock') + i18n.t('static.forecastReport.endOf') + this.state.beforeEndDateDisplay + ')', i18n.t('static.forecastReport.existingShipments') + '(' + this.state.startDateDisplay + ' - ' + this.state.endDateDisplay + ')', i18n.t('static.report.stock') + i18n.t('static.forecastReport.endOf') + this.state.endDateDisplay + ')', i18n.t('static.forecastReport.desiredMonthsOfStock') + i18n.t('static.forecastReport.endOf') + this.state.endDateDisplay + ')', i18n.t('static.forecastReport.desiredStock') + i18n.t('static.forecastReport.endOf') + this.state.endDateDisplay + ')']);
+                // headers1 = headers1.concat([i18n.t('static.report.stock') + i18n.t('static.forecastReport.endOf') + this.state.beforeEndDateDisplay + ')', i18n.t('static.forecastReport.existingShipments') + '(' + this.state.startDateDisplay + ' - ' + this.state.endDateDisplay + ')', i18n.t('static.report.stock') + i18n.t('static.forecastReport.endOf') + this.state.endDateDisplay + ')', i18n.t('static.forecastReport.desiredMonthsOfStock') + i18n.t('static.forecastReport.endOf') + this.state.endDateDisplay + ')', i18n.t('static.forecastReport.desiredStock') + i18n.t('static.forecastReport.endOf') + this.state.endDateDisplay + ')']);
+                headers1 = headers1.concat([i18n.t('static.report.stock') + i18n.t('static.forecastReport.endOf') + this.state.beforeEndDateDisplay + ')', i18n.t('static.forecastReport.existingShipments') + '(' + this.state.startDateDisplay + ' - ' + this.state.endDateDisplay + ')', 'Stock or Unmet Demand' + i18n.t('static.forecastReport.endOf') + this.state.endDateDisplay + ')', i18n.t('static.forecastReport.desiredMonthsOfStock') + i18n.t('static.forecastReport.endOf') + this.state.endDateDisplay + ')', i18n.t('static.forecastReport.desiredStock') + i18n.t('static.forecastReport.endOf') + this.state.endDateDisplay + ')']);
             }
             headers1 = headers1.concat([i18n.t('static.forecastReport.procurementSurplus')]);
             if (!this.state.hideColumn) {
@@ -1000,139 +1012,213 @@ class ForecastSummary extends Component {
                                 console.log("Test------------>4", (selectedForecastMap[Object.keys(selectedForecastMap)[0]]));
 
                                 if ((selectedForecastMap[Object.keys(selectedForecastMap)[0]]) != undefined && (selectedForecastMap[Object.keys(selectedForecastMap)[0]]) != '' && (selectedForecastMap[Object.keys(selectedForecastMap)[0]]) != null) {
-                                    let selectedForecastMapObjIn = (selectedForecastMap[Object.keys(selectedForecastMap)[0]]);
 
-                                    console.log("checkPU------------>2", selectedForecastMapObjIn);
+                                    let keys = Object.keys(selectedForecastMap);
+                                    for (let k = 0; k < keys.length; k++) {
+                                        let selectedForecastMapObjIn = (selectedForecastMap[keys[k]]);
+                                        console.log("checkPU------------>2", selectedForecastMapObjIn);
+                                        if (((selectedForecastMapObjIn.scenarioId != null) ? true : ((selectedForecastMapObjIn.consumptionExtrapolationId != 0) ? true : false))) {
+                                            let treeId = selectedForecastMapObjIn.treeId;
+                                            let scenarioId = selectedForecastMapObjIn.scenarioId;
+                                            let consumptionExtrapolationId = selectedForecastMapObjIn.consumptionExtrapolationId;
+                                            if (scenarioId != null) {//scenarioId
+                                                for (let p = 0; p < treeList.length; p++) {
+                                                    // let filteredScenario = treeList[p].scenarioList.filter(c => c.id == scenarioId);
+                                                    let filteredScenario = (treeList[p].treeId == treeId ? treeList[p].scenarioList.filter(c => c.id == scenarioId) : []);
+                                                    if (filteredScenario.length > 0) {
+                                                        let flatlist = treeList[p].tree.flatList;
+                                                        let listContainNodeType5 = flatlist.filter(c => c.payload.nodeType.id == 5);
+                                                        console.log("Test------------>5", listContainNodeType5);
+                                                        console.log("Test------------>6", listContainNodeType5[0].payload);
+                                                        console.log("Test------------>7", (listContainNodeType5[0].payload.nodeDataMap[scenarioId]));
 
-                                    if (((selectedForecastMapObjIn.scenarioId != null) ? true : ((selectedForecastMapObjIn.consumptionExtrapolationId != 0) ? true : false))) {
+                                                        let myTempData = [];
+                                                        for (let k = 0; k < listContainNodeType5.length; k++) {
+                                                            let arrayOfNodeDataMap = (listContainNodeType5[k].payload.nodeDataMap[scenarioId]).filter(c => c.puNode.planningUnit.id == planningUnitList[j].planningUnit.id)
+                                                            console.log("Test------------>7.1", arrayOfNodeDataMap);
 
-                                        let treeId = selectedForecastMapObjIn.treeId;
-                                        let scenarioId = selectedForecastMapObjIn.scenarioId;
-                                        let consumptionExtrapolationId = selectedForecastMapObjIn.consumptionExtrapolationId;
+                                                            if (arrayOfNodeDataMap.length > 0) {
+                                                                console.log("Test------------>8", arrayOfNodeDataMap[0].nodeDataMomList);
+                                                                nodeDataMomList = arrayOfNodeDataMap[0].nodeDataMomList;
+                                                                let consumptionList = nodeDataMomList.map(m => {
+                                                                    return {
+                                                                        consumptionDate: m.month,
+                                                                        consumptionQty: (m.calculatedMmdValue).toFixed(2)
+                                                                    }
+                                                                });
 
-                                        if (scenarioId != null) {//scenarioId
-                                            for (let p = 0; p < treeList.length; p++) {
-                                                // let filteredScenario = treeList[p].scenarioList.filter(c => c.id == scenarioId);
-                                                let filteredScenario = (treeList[p].treeId == treeId ? treeList[p].scenarioList.filter(c => c.id == scenarioId) : []);
-                                                if (filteredScenario.length > 0) {
-                                                    let flatlist = treeList[p].tree.flatList;
-                                                    let listContainNodeType5 = flatlist.filter(c => c.payload.nodeType.id == 5);
-                                                    console.log("Test------------>5", listContainNodeType5);
-                                                    console.log("Test------------>6", listContainNodeType5[0].payload);
-                                                    console.log("Test------------>7", (listContainNodeType5[0].payload.nodeDataMap[scenarioId]));
-
-                                                    for (let k = 0; k < listContainNodeType5.length; k++) {
-                                                        let arrayOfNodeDataMap = (listContainNodeType5[k].payload.nodeDataMap[scenarioId]).filter(c => c.puNode.planningUnit.id == planningUnitList[j].planningUnit.id)
-                                                        console.log("Test------------>7.1", arrayOfNodeDataMap);
-
-                                                        if (arrayOfNodeDataMap.length > 0) {
-                                                            console.log("Test------------>8", arrayOfNodeDataMap[0].nodeDataMomList);
-                                                            nodeDataMomList = arrayOfNodeDataMap[0].nodeDataMomList;
-                                                            let consumptionList = nodeDataMomList.map(m => {
-                                                                return {
-                                                                    consumptionDate: m.month,
-                                                                    consumptionQty: (m.calculatedMmdValue).toFixed(2)
+                                                                if (consumptionData.length > 0) {
+                                                                    consumptionData[0].consumptionList = consumptionData[0].consumptionList.concat(consumptionList);
+                                                                } else {
+                                                                    let jsonTemp = { objUnit: planningUnitList[j].planningUnit, scenario: { id: 1, label: treeList[p].label.label_en + filteredScenario[0].label.label_en }, display: true, color: "#ba0c2f", consumptionList: consumptionList }
+                                                                    consumptionData.push(jsonTemp);
                                                                 }
-                                                            });
-                                                            let jsonTemp = { objUnit: planningUnitList[j].planningUnit, scenario: { id: 1, label: treeList[p].label.label_en + filteredScenario[0].label.label_en }, display: true, color: "#ba0c2f", consumptionList: consumptionList }
-                                                            consumptionData.push(jsonTemp);
-
-                                                            break;
+                                                                // break;
+                                                            }
                                                         }
+
                                                     }
 
                                                 }
+                                            } else {//consumptionExtrapolationId
 
-                                            }
-                                        } else {//consumptionExtrapolationId
-
-                                            let consumptionExtrapolationObj = consumptionExtrapolation.filter(c => c.consumptionExtrapolationId == consumptionExtrapolationId);
-                                            console.log("consumptionExtrapolationObj----------->", consumptionExtrapolationObj);
-                                            if (consumptionExtrapolationObj.length > 0) {
-                                                let consumptionList = consumptionExtrapolationObj[0].extrapolationDataList.map(m => {
-                                                    return {
-                                                        consumptionDate: m.month,
-                                                        // consumptionQty: (m.amount).toFixed(2)
-                                                        consumptionQty: (m.amount == null ? 0 : Number(m.amount).toFixed(2))
+                                                let consumptionExtrapolationObj = consumptionExtrapolation.filter(c => c.consumptionExtrapolationId == consumptionExtrapolationId);
+                                                console.log("consumptionExtrapolationObj----------->", consumptionExtrapolationObj);
+                                                if (consumptionExtrapolationObj.length > 0) {
+                                                    let consumptionList = consumptionExtrapolationObj[0].extrapolationDataList.map(m => {
+                                                        return {
+                                                            consumptionDate: m.month,
+                                                            // consumptionQty: (m.amount).toFixed(2)
+                                                            consumptionQty: (m.amount == null ? 0 : Number(m.amount).toFixed(2))
+                                                        }
+                                                    });
+                                                    if (consumptionData.length > 0) {
+                                                        consumptionData[0].consumptionList = consumptionData[0].consumptionList.concat(consumptionList);
+                                                    } else {
+                                                        let jsonTemp = { objUnit: planningUnitList[j].planningUnit, scenario: { id: 1, label: "" }, display: true, color: "#ba0c2f", consumptionList: consumptionList }
+                                                        consumptionData.push(jsonTemp);
                                                     }
-                                                });
-                                                let jsonTemp = { objUnit: planningUnitList[j].planningUnit, scenario: { id: 1, label: "" }, display: true, color: "#ba0c2f", consumptionList: consumptionList }
-                                                consumptionData.push(jsonTemp);
 
-                                            }
 
-                                        }
-
-                                        let totalForecastedQuantity0ri = 0;
-                                        let tempList = [];
-                                        let tempList1 = [];
-                                        let resultTrue = [];
-                                        if (consumptionData.length > 0) {
-                                            let cursorDate = startDate;
-                                            for (var i = 0; moment(cursorDate).format("YYYY-MM") <= moment(endDate).format("YYYY-MM"); i++) {
-                                                var dt = moment(startDate).add(i, 'months').format("YYYY-MM-DD");
-                                                cursorDate = moment(cursorDate).add(1, 'months').format("YYYY-MM-DD");
-                                                tempList = tempList.concat(consumptionData[0].consumptionList.filter(c => moment(c.consumptionDate).isSame(dt)));
-                                            }
-
-                                            tempList1 = tempList.map(m => {
-                                                return {
-                                                    consumptionDate: m.consumptionDate,
-                                                    consumptionQty: m.consumptionQty,
-                                                    id: 1
                                                 }
-                                            });
-
-                                            // logic for add same date data
-                                            resultTrue = Object.values(tempList1.reduce((a, { consumptionDate, consumptionQty, id }) => {
-                                                if (!a[id])
-                                                    a[id] = Object.assign({}, { consumptionDate, consumptionQty, id });
-                                                else
-                                                    // a[id].consumptionQty += consumptionQty;
-                                                    a[id].consumptionQty = parseFloat(a[id].consumptionQty) + parseFloat(consumptionQty);
-                                                return a;
-                                            }, {}));
-
-                                            totalForecastedQuantity0ri = (resultTrue.length > 0 ? parseFloat(resultTrue[0].consumptionQty).toFixed(2) : 0);
-
+                                            }
                                         }
-                                        // console.log("consumptionData----->1", consumptionData);
-                                        // console.log("consumptionData----->2", tempList);
-                                        // console.log("consumptionData----->3", resultTrue);
 
-
-
-
-
-
-                                        //obj parameter decleration
-                                        let tracerCategory = planningUnitList[j].planningUnit.forecastingUnit.tracerCategory;
-                                        let forecastingUnit = planningUnitList[j].planningUnit.forecastingUnit;
-                                        let planningUnit = planningUnitList[j].planningUnit;
-                                        let totalForecastedQuantity = totalForecastedQuantity0ri;
-                                        let stock1 = planningUnitList[j].stock;
-                                        let existingShipments = planningUnitList[j].existingShipments;
-                                        let stock2 = (planningUnitList[j].stock + planningUnitList[j].existingShipments) - totalForecastedQuantity0ri;
-                                        let isStock2Red = (stock2 < 0 ? true : false);
-                                        let desiredMonthOfStock1 = planningUnitList[j].monthsOfStock;
-                                        let desiredMonthOfStock2 = planningUnitList[j].monthsOfStock * totalForecastedQuantity0ri / total_months;
-                                        let tempProcurementGap = ((planningUnitList[j].stock + planningUnitList[j].existingShipments) - totalForecastedQuantity0ri) - (planningUnitList[j].monthsOfStock * totalForecastedQuantity0ri / total_months);
-                                        let procurementGap = (tempProcurementGap < 0 ? '(' + tempProcurementGap + ')' : tempProcurementGap);
-                                        let isProcurementGapRed = (tempProcurementGap < 0 ? true : false)
-                                        let priceType = (planningUnitList[j].procurementAgent == null && planningUnitList[j].price == null ? i18n.t('static.forecastReport.NoPriceTypeAvailable') : (planningUnitList[j].procurementAgent != null ? planningUnitList[j].procurementAgent.code : i18n.t('static.forecastReport.custom')));
-                                        let isPriceTypeRed = (planningUnitList[j].procurementAgent == null && planningUnitList[j].price == null ? true : false);
-                                        let unitPrice = planningUnitList[j].price;
-                                        let procurementNeeded = (isProcurementGapRed == true ? '$ ' + (tempProcurementGap * unitPrice).toFixed(2) : '');
-                                        let notes = planningUnitList[j].consumptionNotes;
-
-                                        let obj = { id: 1, tempTracerCategoryId: tracerCategory.id, display: false, tracerCategory: tracerCategory, forecastingUnit: forecastingUnit, planningUnit: planningUnit, totalForecastedQuantity: totalForecastedQuantity, stock1: stock1, existingShipments: existingShipments, stock2: stock2, isStock2Red: isStock2Red, desiredMonthOfStock1: desiredMonthOfStock1, desiredMonthOfStock2: desiredMonthOfStock2, procurementGap: procurementGap, isProcurementGapRed: isProcurementGapRed, priceType: priceType, isPriceTypeRed: isPriceTypeRed, unitPrice: unitPrice, procurementNeeded: procurementNeeded, notes: notes }
-                                        tempData.push(obj);
-
-                                        if (isProcurementGapRed == true) {
-                                            totalProductCost = totalProductCost + (tempProcurementGap * unitPrice);
-                                            totalProductCost = parseFloat(totalProductCost).toFixed(2);
-                                        }
                                     }
+
+
+                                    // let selectedForecastMapObjIn = (selectedForecastMap[Object.keys(selectedForecastMap)[0]]);
+                                    // console.log("checkPU------------>2", selectedForecastMapObjIn);
+
+                                    // let treeId = selectedForecastMapObjIn.treeId;
+                                    // let scenarioId = selectedForecastMapObjIn.scenarioId;
+                                    // let consumptionExtrapolationId = selectedForecastMapObjIn.consumptionExtrapolationId;
+
+                                    // if (scenarioId != null) {//scenarioId
+                                    //     for (let p = 0; p < treeList.length; p++) {
+                                    //         // let filteredScenario = treeList[p].scenarioList.filter(c => c.id == scenarioId);
+                                    //         let filteredScenario = (treeList[p].treeId == treeId ? treeList[p].scenarioList.filter(c => c.id == scenarioId) : []);
+                                    //         if (filteredScenario.length > 0) {
+                                    //             let flatlist = treeList[p].tree.flatList;
+                                    //             let listContainNodeType5 = flatlist.filter(c => c.payload.nodeType.id == 5);
+                                    //             console.log("Test------------>5", listContainNodeType5);
+                                    //             console.log("Test------------>6", listContainNodeType5[0].payload);
+                                    //             console.log("Test------------>7", (listContainNodeType5[0].payload.nodeDataMap[scenarioId]));
+
+                                    //             for (let k = 0; k < listContainNodeType5.length; k++) {
+                                    //                 let arrayOfNodeDataMap = (listContainNodeType5[k].payload.nodeDataMap[scenarioId]).filter(c => c.puNode.planningUnit.id == planningUnitList[j].planningUnit.id)
+                                    //                 console.log("Test------------>7.1", arrayOfNodeDataMap);
+
+                                    //                 if (arrayOfNodeDataMap.length > 0) {
+                                    //                     console.log("Test------------>8", arrayOfNodeDataMap[0].nodeDataMomList);
+                                    //                     nodeDataMomList = arrayOfNodeDataMap[0].nodeDataMomList;
+                                    //                     let consumptionList = nodeDataMomList.map(m => {
+                                    //                         return {
+                                    //                             consumptionDate: m.month,
+                                    //                             consumptionQty: (m.calculatedMmdValue).toFixed(2)
+                                    //                         }
+                                    //                     });
+                                    //                     let jsonTemp = { objUnit: planningUnitList[j].planningUnit, scenario: { id: 1, label: treeList[p].label.label_en + filteredScenario[0].label.label_en }, display: true, color: "#ba0c2f", consumptionList: consumptionList }
+                                    //                     consumptionData.push(jsonTemp);
+
+                                    //                     break;
+                                    //                 }
+                                    //             }
+
+                                    //         }
+
+                                    //     }
+                                    // } else {//consumptionExtrapolationId
+
+                                    //     let consumptionExtrapolationObj = consumptionExtrapolation.filter(c => c.consumptionExtrapolationId == consumptionExtrapolationId);
+                                    //     console.log("consumptionExtrapolationObj----------->", consumptionExtrapolationObj);
+                                    //     if (consumptionExtrapolationObj.length > 0) {
+                                    //         let consumptionList = consumptionExtrapolationObj[0].extrapolationDataList.map(m => {
+                                    //             return {
+                                    //                 consumptionDate: m.month,
+                                    //                 // consumptionQty: (m.amount).toFixed(2)
+                                    //                 consumptionQty: (m.amount == null ? 0 : Number(m.amount).toFixed(2))
+                                    //             }
+                                    //         });
+                                    //         let jsonTemp = { objUnit: planningUnitList[j].planningUnit, scenario: { id: 1, label: "" }, display: true, color: "#ba0c2f", consumptionList: consumptionList }
+                                    //         consumptionData.push(jsonTemp);
+
+                                    //     }
+                                    // }
+
+
+
+
+
+
+                                    let totalForecastedQuantity0ri = 0;
+                                    let tempList = [];
+                                    let tempList1 = [];
+                                    let resultTrue = [];
+                                    if (consumptionData.length > 0) {
+                                        let cursorDate = startDate;
+                                        for (var i = 0; moment(cursorDate).format("YYYY-MM") <= moment(endDate).format("YYYY-MM"); i++) {
+                                            var dt = moment(startDate).add(i, 'months').format("YYYY-MM-DD");
+                                            cursorDate = moment(cursorDate).add(1, 'months').format("YYYY-MM-DD");
+                                            tempList = tempList.concat(consumptionData[0].consumptionList.filter(c => moment(c.consumptionDate).isSame(dt)));
+                                        }
+
+                                        tempList1 = tempList.map(m => {
+                                            return {
+                                                consumptionDate: m.consumptionDate,
+                                                consumptionQty: m.consumptionQty,
+                                                id: 1
+                                            }
+                                        });
+
+                                        // logic for add same date data
+                                        resultTrue = Object.values(tempList1.reduce((a, { consumptionDate, consumptionQty, id }) => {
+                                            if (!a[id])
+                                                a[id] = Object.assign({}, { consumptionDate, consumptionQty, id });
+                                            else
+                                                // a[id].consumptionQty += consumptionQty;
+                                                a[id].consumptionQty = parseFloat(a[id].consumptionQty) + parseFloat(consumptionQty);
+                                            return a;
+                                        }, {}));
+
+                                        totalForecastedQuantity0ri = (resultTrue.length > 0 ? parseFloat(resultTrue[0].consumptionQty).toFixed(2) : 0);
+
+                                    }
+
+
+
+
+
+
+                                    //obj parameter decleration
+                                    let tracerCategory = planningUnitList[j].planningUnit.forecastingUnit.tracerCategory;
+                                    let forecastingUnit = planningUnitList[j].planningUnit.forecastingUnit;
+                                    let planningUnit = planningUnitList[j].planningUnit;
+                                    let totalForecastedQuantity = totalForecastedQuantity0ri;
+                                    let stock1 = planningUnitList[j].stock;
+                                    let existingShipments = planningUnitList[j].existingShipments;
+                                    let stock2 = (planningUnitList[j].stock + planningUnitList[j].existingShipments) - totalForecastedQuantity0ri;
+                                    let isStock2Red = (stock2 < 0 ? true : false);
+                                    let desiredMonthOfStock1 = planningUnitList[j].monthsOfStock;
+                                    let desiredMonthOfStock2 = planningUnitList[j].monthsOfStock * totalForecastedQuantity0ri / total_months;
+                                    let tempProcurementGap = ((planningUnitList[j].stock + planningUnitList[j].existingShipments) - totalForecastedQuantity0ri) - (planningUnitList[j].monthsOfStock * totalForecastedQuantity0ri / total_months);
+                                    let procurementGap = (tempProcurementGap < 0 ? tempProcurementGap : tempProcurementGap);
+                                    let isProcurementGapRed = (tempProcurementGap < 0 ? true : false)
+                                    let priceType = (planningUnitList[j].procurementAgent == null && planningUnitList[j].price == null ? i18n.t('static.forecastReport.NoPriceTypeAvailable') : (planningUnitList[j].procurementAgent != null ? planningUnitList[j].procurementAgent.code : i18n.t('static.forecastReport.custom')));
+                                    let isPriceTypeRed = (planningUnitList[j].procurementAgent == null && planningUnitList[j].price == null ? true : false);
+                                    let unitPrice = planningUnitList[j].price;
+                                    // let procurementNeeded = (isProcurementGapRed == true ? '$ ' + (tempProcurementGap * unitPrice).toFixed(2) : '');
+                                    let procurementNeeded = (isProcurementGapRed == true ? '$ ' + (Math.abs(tempProcurementGap) * unitPrice).toFixed(2) : '');
+                                    let notes = planningUnitList[j].consumptionNotes;
+
+                                    let obj = { id: 1, tempTracerCategoryId: tracerCategory.id, display: false, tracerCategory: tracerCategory, forecastingUnit: forecastingUnit, planningUnit: planningUnit, totalForecastedQuantity: totalForecastedQuantity, stock1: stock1, existingShipments: existingShipments, stock2: stock2, isStock2Red: isStock2Red, desiredMonthOfStock1: desiredMonthOfStock1, desiredMonthOfStock2: desiredMonthOfStock2, procurementGap: procurementGap, isProcurementGapRed: isProcurementGapRed, priceType: priceType, isPriceTypeRed: isPriceTypeRed, unitPrice: unitPrice, procurementNeeded: procurementNeeded, notes: notes }
+                                    tempData.push(obj);
+
+                                    if (isProcurementGapRed == true) {
+                                        totalProductCost = totalProductCost + (Math.abs(tempProcurementGap) * unitPrice);
+                                        totalProductCost = parseFloat(totalProductCost).toFixed(2);
+                                    }
+
                                 }
 
 
@@ -2248,10 +2334,15 @@ class ForecastSummary extends Component {
                 }.bind(this);
                 putRequest.onsuccess = function (event) {
                     this.setState({
-                        isChanged1: false
-                    })
-                    let id = AuthenticationService.displayDashboardBasedOnRole();
-                    this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/green/' + i18n.t('static.compareAndSelect.dataSaved'));
+                        isChanged1: false,
+                        message1: i18n.t('static.compareAndSelect.dataSaved'),
+                        color: 'green'
+                    },
+                        () => {
+                            this.hideSecondComponent();
+                        })
+                    // let id = AuthenticationService.displayDashboardBasedOnRole();
+                    // this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/green/' + i18n.t('static.compareAndSelect.dataSaved'));
                 }.bind(this)
             }.bind(this)
         }.bind(this)
@@ -2300,6 +2391,7 @@ class ForecastSummary extends Component {
                 <AuthenticationServiceComponent history={this.props.history} />
                 <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
                 <h5 className="red">{i18n.t(this.state.message)}</h5>
+                <h5 style={{ color: this.state.color }} id="div2">{this.state.message1}</h5>
 
                 <Card>
                     <div className="Card-header-reporticon pb-2">
@@ -2490,7 +2582,7 @@ class ForecastSummary extends Component {
                                 <Col md="12" className="pl-lg-0" style={{ display: this.state.loading ? "none" : "block" }}>
                                     <div>
                                         {/* <p>Some text here to explain users this is not a detailed supply plan, Just high level estimate.</p> */}
-                                        <p>[Placeholder]</p>
+                                        <p>{i18n.t("static.placeholder.placeholder")}</p>
                                     </div>
                                 </Col>
                                 <Col md="12" className='pl-lg-0' style={{ display: this.state.loading ? "none" : "block" }}>
@@ -2517,7 +2609,8 @@ class ForecastSummary extends Component {
                                                                         <>
                                                                             <th className="text-center" style={{ width: '7%' }}>{i18n.t('static.report.stock')} <span className="FontWeightNormal">{i18n.t('static.forecastReport.endOf')} {this.state.beforeEndDateDisplay})</span> </th>
                                                                             <th className="text-center" style={{ width: '' }}>{i18n.t('static.forecastReport.existingShipments')} <span className="FontWeightNormal">({this.state.startDateDisplay + ' - ' + this.state.endDateDisplay})</span> </th>
-                                                                            <th className="text-center" title={(i18n.t('static.report.stock') + ' ' + i18n.t('static.forecastReport.endOf') + ' ' + this.state.beforeEndDateDisplay) + ' + ' + (i18n.t('static.forecastReport.existingShipments') + '( ' + this.state.startDateDisplay + ' - ' + this.state.endDateDisplay + ' )') + ' - ' + (i18n.t('static.forecastReport.totalForecastQuantity'))} style={{ width: '8%' }}>{i18n.t('static.report.stock')} <span className="FontWeightNormal">{i18n.t('static.forecastReport.endOf')} {this.state.endDateDisplay})</span> <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
+                                                                            {/* <th className="text-center" title={(i18n.t('static.report.stock') + ' ' + i18n.t('static.forecastReport.endOf') + ' ' + this.state.beforeEndDateDisplay) + ' + ' + (i18n.t('static.forecastReport.existingShipments') + '( ' + this.state.startDateDisplay + ' - ' + this.state.endDateDisplay + ' )') + ' - ' + (i18n.t('static.forecastReport.totalForecastQuantity'))} style={{ width: '8%' }}>{i18n.t('static.report.stock')} <span className="FontWeightNormal">{i18n.t('static.forecastReport.endOf')} {this.state.endDateDisplay})</span> <i className="fa fa-info-circle icons ToltipInfoicon"></i></th> */}
+                                                                            <th className="text-center" title={(i18n.t('static.report.stock') + ' ' + i18n.t('static.forecastReport.endOf') + ' ' + this.state.beforeEndDateDisplay) + ' + ' + (i18n.t('static.forecastReport.existingShipments') + '( ' + this.state.startDateDisplay + ' - ' + this.state.endDateDisplay + ' )') + ' - ' + (i18n.t('static.forecastReport.totalForecastQuantity'))} style={{ width: '8%' }}>{'Stock or Unmet Demand'} <span className="FontWeightNormal">{i18n.t('static.forecastReport.endOf')} {this.state.endDateDisplay})</span> <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
                                                                             <th className="text-center" style={{ width: '7%' }}>{i18n.t('static.forecastReport.desiredMonthsOfStock')} <span className="FontWeightNormal">{i18n.t('static.forecastReport.endOf')} {this.state.endDateDisplay})</span> </th>
                                                                             <th className="text-center" title={(i18n.t('static.forecastReport.desiredMonthsOfStock') + ' ' + i18n.t('static.forecastReport.endOf') + ' ' + this.state.endDateDisplay) + ') * ' + i18n.t('static.forecastReport.totalForecastQuantity') + ' / ' + 'Difference between months'} style={{ width: '8%' }}>{i18n.t('static.forecastReport.desiredStock')} <span className="FontWeightNormal">{i18n.t('static.forecastReport.endOf')} {this.state.endDateDisplay})</span> <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
                                                                         </>
@@ -2581,25 +2674,25 @@ class ForecastSummary extends Component {
                                                                                             <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                                                             {/* <td>{item1.forecastingUnit.label.label_en}</td> */}
                                                                                             <td className='text-left  sticky-col first-col clone'>{getLabelText(item1.planningUnit.label, this.state.lang) + " | " + item1.planningUnit.id}</td>
-                                                                                            <td>{(item1.totalForecastedQuantity).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
+                                                                                            <td>{(item1.totalForecastedQuantity != null ? (item1.totalForecastedQuantity).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : '')}</td>
                                                                                             {!this.state.hideColumn &&
                                                                                                 <>
-                                                                                                    <td>{(item1.stock1).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
-                                                                                                    <td>{(item1.existingShipments).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
+                                                                                                    <td>{(item1.stock1 != null ? (item1.stock1).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : '')}</td>
+                                                                                                    <td>{(item1.existingShipments != null ? (item1.existingShipments).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : '')}</td>
                                                                                                     {/* <td>{item1.stock2}</td> */}
-                                                                                                    {item1.isStock2Red == true ? <td className="red">{(item1.stock2).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td> : <td>{(item1.stock2).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>}
-                                                                                                    <td>{(item1.desiredMonthOfStock1).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
-                                                                                                    <td>{(item1.desiredMonthOfStock2).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
+                                                                                                    {item1.isStock2Red == true ? <td className="red">{(item1.stock2 != null ? (item1.stock2).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : '')}</td> : <td>{(item1.stock2 != null ? (item1.stock2).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : '')}</td>}
+                                                                                                    <td>{(item1.desiredMonthOfStock1 != null ? (item1.desiredMonthOfStock1).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : '')}</td>
+                                                                                                    <td>{(item1.desiredMonthOfStock2 != null ? (item1.desiredMonthOfStock2).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : '')}</td>
                                                                                                 </>
                                                                                             }
-                                                                                            {item1.isProcurementGapRed == true ? <td className="red">{(item1.procurementGap).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td> : <td>{(item1.procurementGap).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>}
+                                                                                            {item1.isProcurementGapRed == true ? <td className="red">{(item1.procurementGap != null ? (item1.procurementGap).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : '')}</td> : <td>{(item1.procurementGap != null ? (item1.procurementGap).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : '')}</td>}
                                                                                             {!this.state.hideColumn &&
                                                                                                 <>
                                                                                                     {item1.isPriceTypeRed == true ? <td className="red">{item1.priceType}</td> : <td>{item1.priceType}</td>}
-                                                                                                    <td>{(item1.unitPrice).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
+                                                                                                    <td>{(item1.unitPrice != null ? (item1.unitPrice).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : '')}</td>
                                                                                                 </>
                                                                                             }
-                                                                                            <td>{(item1.procurementNeeded).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
+                                                                                            <td>{(item1.procurementNeeded != null ? (item1.procurementNeeded).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : '')}</td>
                                                                                             <td>{item1.notes}</td>
                                                                                         </>
                                                                                     }
@@ -2741,7 +2834,9 @@ class ForecastSummary extends Component {
                             <FormGroup>
                                 <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                 <Button type="reset" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.filterData}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
-                                <Button type="submit" size="md" color="success" className="submitBtn float-right mr-1" onClick={this.saveSelectedForecast}> <i className="fa fa-check"></i> {i18n.t('static.common.submit')}</Button>
+                                {this.state.isChanged1 &&
+                                    <Button type="submit" size="md" color="success" className="submitBtn float-right mr-1" onClick={this.saveSelectedForecast}> <i className="fa fa-check"></i> {i18n.t('static.common.submit')}</Button>
+                                }
                             </FormGroup>
                         </FormGroup>
                     </CardFooter>}
