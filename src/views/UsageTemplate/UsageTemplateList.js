@@ -936,19 +936,19 @@ class usageTemplate extends Component {
                     title: i18n.t('static.forecastProgram.forecastProgram'),
                     type: 'autocomplete',
                     source: this.state.typeList,
-                    width:'130',
+                    width: '130',
                     filter: this.filterDataset //1 B
                 },
                 {
                     title: i18n.t('static.usageTemplate.usageName'),
                     type: 'text',
-                    width:'150',
+                    width: '150',
                     textEditor: true,//2 C
                 },
                 {
                     title: i18n.t('static.tracercategory.tracercategory'),
                     type: 'autocomplete',
-                    width:'150',
+                    width: '150',
                     source: this.state.tracerCategoryList, //3 D
                     filter: this.filterTracerCategoryByProgramId
 
@@ -956,20 +956,20 @@ class usageTemplate extends Component {
                 {
                     title: i18n.t('static.product.unit1'),
                     type: 'autocomplete',
-                    width:'150',
+                    width: '150',
                     source: this.state.forecastingUnitList,
                     filter: this.filterForecastingUnitBasedOnTracerCategory //4 E
                 },
                 {
                     title: i18n.t('static.usageTemplate.lagInMonth'),
                     type: 'numeric',
-                    width:'150',
+                    width: '150',
                     textEditor: true, //5 F
                 },
                 {
                     title: i18n.t('static.supplyPlan.type'),
                     type: 'dropdown',
-                    width:'100',
+                    width: '100',
                     source: [
                         { id: 1, name: i18n.t('static.usageTemplate.discrete') },
                         { id: 2, name: i18n.t('static.usageTemplate.continuous') }
@@ -979,7 +979,7 @@ class usageTemplate extends Component {
                     title: i18n.t('static.usageTemplate.people'),
                     type: 'hidden',
                     readOnly: true,
-                    width:'130',
+                    width: '130',
                     textEditor: true, //7 H
                 },
                 {
@@ -989,7 +989,7 @@ class usageTemplate extends Component {
                     // readOnly: true
                     textEditor: true, //8 I
                     mask: '#,##',
-                    width:'130',
+                    width: '130',
                     disabledMaskOnEdition: true
                 },
                 // {
@@ -1002,20 +1002,20 @@ class usageTemplate extends Component {
                 {
                     title: 'Person(s) Unit',
                     type: 'autocomplete',
-                    width:'130',
+                    width: '130',
                     source: this.state.dimensionList, //9 J
                 },
                 {
                     title: i18n.t('static.usageTemplate.fuPerPersonPerTime'),
                     type: 'hidden',
                     readOnly: true,
-                    width:'130',
+                    width: '130',
                     textEditor: true, //10 K
                 },
                 {
                     title: i18n.t('static.usageTemplate.fuPerPersonPerTime'),
                     type: 'numeric',
-                    width:'130',
+                    width: '130',
                     // readOnly: true
                     textEditor: true, //11 L
                 },
@@ -1023,20 +1023,20 @@ class usageTemplate extends Component {
                     title: i18n.t('static.usageTemplate.fuPerPersonPerTime'),
                     type: 'hidden',
                     readOnly: true,
-                    width:'130',
+                    width: '130',
                     source: this.state.unitList, //12 M
                 },
                 {
                     title: i18n.t('static.usageTemplate.fuPerPersonPerTime'),
                     type: 'hidden',//hidden black
                     readOnly: true,
-                    width:'130',
+                    width: '130',
                     textEditor: true, //13 N
                 },
                 {
                     title: i18n.t('static.usageTemplate.onTimeUsage?'),
                     type: 'checkbox',
-                    width:'130',
+                    width: '130',
                     readOnly: false
                     // readOnly: true //14 O
                 },
@@ -1044,7 +1044,7 @@ class usageTemplate extends Component {
                     // title: i18n.t('static.usageTemplate.usageFrequency'),
                     title: '# of times/Frequency',
                     type: 'numeric',
-                    width:'130',
+                    width: '130',
                     // readOnly: true
                     textEditor: true,
                     decimal: '.', //15 P
@@ -1053,14 +1053,14 @@ class usageTemplate extends Component {
                     title: i18n.t('static.usageTemplate.usageFrequency'),
                     type: 'hidden',
                     readOnly: true,
-                    width:'130',
+                    width: '130',
                     textEditor: true, //16 Q
                 },
                 {
                     // title: i18n.t('static.usageTemplate.usageFrequency'),
                     title: 'Frequency',
                     type: 'autocomplete',
-                    width:'130',
+                    width: '130',
                     source: this.state.usagePeriodList, //17 R
                     filter: this.filterUsagePeriod1
                 },
@@ -1068,20 +1068,20 @@ class usageTemplate extends Component {
                     title: i18n.t('static.usageTemplate.fuPerPersonPerMonth'),
                     type: 'hidden',//hidden black
                     readOnly: true,
-                    width:'130',
+                    width: '130',
                     textEditor: true, //18 S
                 },
                 {
                     title: ' ',//empty for
                     type: 'hidden',
                     readOnly: true,
-                    width:'130',
+                    width: '130',
                     textEditor: true, //19 T
                 },
                 {
                     title: i18n.t('static.usagePeriod.usagePeriod'),
                     type: 'numeric',
-                    width:'130',
+                    width: '130',
                     // readOnly: true
                     textEditor: true, //20 U
                 },
@@ -1089,7 +1089,7 @@ class usageTemplate extends Component {
                     // title: i18n.t('static.usagePeriod.usagePeriod'),
                     title: 'Period Unit',
                     type: 'autocomplete',
-                    width:'130',
+                    width: '130',
                     source: this.state.usagePeriodList, //21 V
                     filter: this.filterUsagePeriod2
                 },
@@ -1097,7 +1097,7 @@ class usageTemplate extends Component {
                     title: i18n.t('static.usagePeriod.fuRequired'),
                     type: 'text',//hidden black
                     readOnly: true,
-                    width:'130',
+                    width: '130',
                     textEditor: true, //22 W
                 },
                 {
@@ -1881,7 +1881,7 @@ class usageTemplate extends Component {
         tr.children[22].title = i18n.t('static.tooltip.PeriodUnit');
         tr.children[23].title = i18n.t('static.tooltip.OfFuRequired');
         tr.children[24].title = i18n.t('static.tooltip.UsageInWords');
-       
+
 
 
     }
@@ -2985,7 +2985,7 @@ class usageTemplate extends Component {
 
                         <Col xs="12" sm="12">
                             {/* <h5>{i18n.t('static.common.customWarningMessage')}</h5> */}
-                            <h5>{'[Placeholder]'}</h5>
+                            <h5>{i18n.t("static.placeholder.placeholder")}</h5>
                             <h5>{i18n.t('static.usageTemplate.usageTemplateText')}</h5>
                             <span className=""><h5><i class="fa fa-calculator" aria-hidden="true"></i>  {i18n.t('static.usageTemplate.calculatorReminderText')}</h5></span>
                             <div className="UsageTemplateTable">
@@ -3010,7 +3010,9 @@ class usageTemplate extends Component {
                         {(this.state.roleArray.includes('ROLE_REALM_ADMIN') || this.state.roleArray.includes('ROLE_DATASET_ADMIN')) &&
                             <FormGroup>
                                 <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                <Button type="submit" size="md" color="success" onClick={this.formSubmit} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                {this.state.isChanged1 &&
+                                    <Button type="submit" size="md" color="success" onClick={this.formSubmit} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                }
                                 <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i>{i18n.t('static.common.addRow')}</Button>
                                 &nbsp;
                             </FormGroup>

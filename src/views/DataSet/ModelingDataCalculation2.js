@@ -172,6 +172,7 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                     var curDate = moment(nodeDataMapForScenario.month).startOf('month').format("YYYY-MM-DD");
                     var nodeDataList = [];
                     var calculatedMMdPatients = [];
+                    var calculatedValueForLag= [];
                     for (var i = 0; curDate < stopDate; i++) {
                         // console.log("curDate---", curDate);
                         curDate = moment(nodeDataMapForScenario.month).add(i, 'months').format("YYYY-MM-DD");
@@ -326,16 +327,16 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                             if (endValue < 0) {
                                 endValue = 0;
                             }
-                            if (endValue > 100) {
-                                endValue = 100;
-                            }
+                            // if (endValue > 100) {
+                            //     endValue = 100;
+                            // }
 
                             if (endValueWMC < 0) {
                                 endValueWMC = 0;
                             }
-                            if (endValueWMC > 100) {
-                                endValueWMC = 100;
-                            }
+                            // if (endValueWMC > 100) {
+                            //     endValueWMC = 100;
+                            // }
                         } else if (payload.nodeType.id == 2) {
                             if (endValue < 0) {
                                 endValue = 0;
@@ -398,10 +399,11 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                 }
                             }
                             calculatedValue = totalValue;
+                            calculatedValueForLag.push(calculatedValue);
                             var lag = nodeDataMapForScenario.fuNode.lagInMonths;
                             console.log("Lag in months++++", lag);
                             if (i >= lag) {
-                                // calculatedValue = 0;
+                                calculatedValue = calculatedValueForLag[i-lag];
                             } else {
                                 calculatedValue = 0;
                             }

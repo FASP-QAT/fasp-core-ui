@@ -258,6 +258,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                                         },
                                         "idString": '' + selectedPlanningUnitObj.planningUnitId,
                                     },
+                                    "puMultiplier": selectedPlanningUnitObj.multiplier,
                                     "region": {
                                         "id": map1.get("10"),
                                         "label": regionObj.label,

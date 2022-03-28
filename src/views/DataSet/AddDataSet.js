@@ -173,7 +173,7 @@ export default class AddForecastProgram extends Component {
 
             organisationCode: '',
             realmCountryCode: '',
-            forecastProgramInMonth: '',
+            forecastProgramInMonth: 13,
 
             regionList: [],
             regionId: [],
@@ -1236,7 +1236,7 @@ export default class AddForecastProgram extends Component {
                                                 <FormGroup>
                                                     <Label htmlFor="company">{i18n.t('static.versionSettings.ForecastPeriodInMonth')}<span class="red Reqasterisk">*</span></Label>
                                                     <Input
-                                                        type="number" name="forecastProgramInMonth"
+                                                        type="text" name="forecastProgramInMonth"
                                                         bsSize="sm"
                                                         onChange={(e) => { this.dataChange(e) }}
                                                         valid={!errors.forecastProgramInMonth && this.state.forecastProgramInMonth != ''}
