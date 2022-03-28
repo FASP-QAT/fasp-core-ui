@@ -172,6 +172,7 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                     var curDate = moment(nodeDataMapForScenario.month).startOf('month').format("YYYY-MM-DD");
                     var nodeDataList = [];
                     var calculatedMMdPatients = [];
+                    var calculatedValueForLag= [];
                     for (var i = 0; curDate < stopDate; i++) {
                         // console.log("curDate---", curDate);
                         curDate = moment(nodeDataMapForScenario.month).add(i, 'months').format("YYYY-MM-DD");
@@ -398,10 +399,11 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                 }
                             }
                             calculatedValue = totalValue;
+                            calculatedValueForLag.push(calculatedValue);
                             var lag = nodeDataMapForScenario.fuNode.lagInMonths;
                             console.log("Lag in months++++", lag);
                             if (i >= lag) {
-                                // calculatedValue = 0;
+                                calculatedValue = calculatedValueForLag[i-lag];
                             } else {
                                 calculatedValue = 0;
                             }
@@ -524,11 +526,11 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                     // console.log("noOfPatientsNew$$$%%%", noOfPatientsNew);
                                     noOfPatients = (patients / monthsPerVisit) + deltaPatients;
                                     console.log("noOfPatients@@@", noOfPatients);
-                                    calculatedMMdPatients.push({ month: curDate, value: noOfPatients<0?0:noOfPatients });
+                                    calculatedMMdPatients.push({ month: curDate, value: noOfPatients < 0 ? 0 : noOfPatients });
                                 } else {
                                     var prevCycleValue = calculatedMMdPatients.filter(c => moment(c.month).format("YYYY-MM") == moment(curDate).add(-monthsPerVisit, 'months').format("YYYY-MM"))[0].value;
                                     noOfPatients = prevCycleValue + deltaPatients;
-                                    calculatedMMdPatients.push({ month: curDate, value: noOfPatients<0?0:noOfPatients });
+                                    calculatedMMdPatients.push({ month: curDate, value: noOfPatients < 0 ? 0 : noOfPatients });
                                 }
                                 // console.log("noOfPus$$$%%%", noOfPus);
                                 // calculatedMmdValue = noOfPus;
@@ -538,13 +540,19 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                 var lag = parentNodeNodeData.fuNode.lagInMonths;
                                 var noOfFus = 0;
                                 if (i >= lag) {
-                                    noOfFus = Math.round((calculatedMMdPatients.filter(c => moment(c.month).format("YYYY-MM-DD") == moment(curDate).subtract(lag, 'months').format("YYYY-MM-DD"))[0].value * parentNodeNodeData.dataValue / 100) * noOfBottlesInOneVisit) * fuPerPu;
+                                    var nodeDataMomForParentPerc = parentNodeNodeData.nodeDataMomList.filter(c => moment(c.month).format("YYYY-MM") == moment(curDate).format("YYYY-MM"));
+                                    var percentageToMultiply = 0;
+                                    if (nodeDataMomForParentPerc.length > 0) {
+                                        percentageToMultiply = nodeDataMomForParentPerc[0].endValue;
+                                    }
+                                    noOfFus = Math.round((calculatedMMdPatients.filter(c => moment(c.month).format("YYYY-MM-DD") == moment(curDate).subtract(lag, 'months').format("YYYY-MM-DD"))[0].value * percentageToMultiply / 100) * noOfBottlesInOneVisit) * fuPerPu;
                                 } else {
                                     noOfFus = 0;
                                 }
 
                                 // if (parentNodeNodeData.fuNode.usageType.id == 2) {
-                                calculatedMmdValue = Math.round((noOfFus * nodeDataMapForScenario.dataValue / 100) / fuPerPu);
+
+                                calculatedMmdValue = Math.round((noOfFus * endValue / 100) / fuPerPu);
                                 // }
                                 // var grandParent = parentFiltered.parent;
                                 // var grandParentFiltered = (flatListUnsorted.filter(c => c.id == grandParent))[0];
@@ -573,7 +581,7 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                             difference: difference,
                             seasonalityPerc: seasonalityPercTotal,
                             manualChange: manualChangeTotal,
-                            calculatedMmdValue: calculatedMmdValue<0?0:calculatedMmdValue
+                            calculatedMmdValue: calculatedMmdValue < 0 ? 0 : calculatedMmdValue
                         })
                         // console.log("Node MOM List%%%", nodeDataList);
                     }
@@ -594,6 +602,9 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                     var findIndex = flatListUnsorted.findIndex(c => c.id == flatList[fl].id);
                     payload.nodeDataMap = nodeDataMap;
                     flatListUnsorted[findIndex].payload = payload;
+                    var findIndex1 = flatList.findIndex(c => c.id == flatList[fl].id);
+                    flatList[findIndex1].payload = payload;
+
                 }
                 // payload.nodeDataMap = nodeDataMap;
                 // flatList[fl].payload = payload;
@@ -622,7 +633,7 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                     var nodeDataMapForScenario = (nodeDataMap[scenarioList[ndm].id])[0];
                     // console.log("agg node data---", nodeDataMapForScenario);
                     var childNodeFlatList = flatListUnsorted.filter(c => c.parent == aggregateNodeList[fl - 1].id);
-                    var minMonth=moment.min(childNodeFlatList.map(d => moment(d.payload.nodeDataMap[scenarioList[ndm].id][0].month)));
+                    var minMonth = moment.min(childNodeFlatList.map(d => moment(d.payload.nodeDataMap[scenarioList[ndm].id][0].month)));
                     // console.log("agg child&&&", childNodeFlatList);
                     // console.log("scenarioList[ndm].id&&&", scenarioList[ndm].id);
                     var curDate = moment(minMonth).startOf('month').format("YYYY-MM-DD");;
@@ -682,6 +693,9 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                     // console.log("flatListUnsorted++++", aggregateNodeList[fl - 1].id)
                     payload.nodeDataMap = nodeDataMap;
                     flatListUnsorted[findIndex].payload = payload;
+
+                    var findIndex1 = flatList.findIndex(c => c.id == aggregateNodeList[fl - 1].id);
+                    flatList[findIndex1].payload = payload;
                 }
             }
         }

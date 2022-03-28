@@ -2010,12 +2010,12 @@ class DefaultLayout extends Component {
                               }
                             }
                           },
-                          // {
-                          //   name: 'Consumption Forecast Error',
-                          //   url: '/forecastReport/consumptionForecastError',
-                          //   icon: 'fa fa-signal',
-                          //   attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true) }
-                          // },
+                          {
+                            name: 'Consumption Forecast Error',
+                            url: '/forecastReport/consumptionForecastError',
+                            icon: 'fa fa-signal',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_MONTHLY_FORECAST') && this.state.activeTab == 1 ? false : true) }
+                          },
                         ]
                       },
                       // !this.state.businessFunctions.includes('ROLE_BF_VIEW_GUEST_SCREENS') &&
@@ -3501,6 +3501,17 @@ class DefaultLayout extends Component {
                             // attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true) }
                             attributes: {
                               hidden: (this.state.businessFunctions.includes('ROLE_BF_COMPARE_VERSION') && this.state.activeTab == 1 ? false : true),
+                              onClick: e => {
+                                this.refreshPage();
+                              }
+                            }
+                          },
+                          {
+                            name: 'Consumption Forecast Error',
+                            url: '/forecastReport/consumptionForecastError',
+                            icon: 'fa fa-signal',
+                            attributes: {
+                              hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_MONTHLY_FORECAST') && this.state.activeTab == 1 ? false : true),
                               onClick: e => {
                                 this.refreshPage();
                               }

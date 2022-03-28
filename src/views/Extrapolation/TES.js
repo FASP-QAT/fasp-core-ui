@@ -69,25 +69,17 @@ export function calculateTES(inputData, alphaParam, betaParam, gammaParam, confi
         }
     }
     const zValue = getZValue(result.length, confidence, tTable)
-    console.log("Result%%%", result)
-    console.log("Z value = " + zValue)
-    const stdDev = std(result)
-    console.log("Std dev = " + stdDev)
+    const stdDev =1;
+    try{
+      stdDev = std(result);
+    }catch(Expection){
+
+    }
     const CI = zValue * stdDev / sqrt(result.length)
-    console.log("CI = " + CI)
-    console.log("Data%%%", data)
     calculateError(data, "tesError", props);
-    console.log("tesData input----", inputData);
-    console.log("tesData output----", data);
     props.updateState("tesData", data);
     props.updateState("CI", CI);
-    // let errors = getErrors(data)
-    // console.log("rmse=" + errors.rmse)
-    // console.log("mape=" + errors.mape)
-    // console.log("mse=" + errors.mse)
-    // console.log("wape=" + errors.wape)
-    // console.log("rSqd=" + errors.rSqd)
-}
+    }
 
 function getZValue(df, confidence, tTable) {
     let final_t_table = null;
