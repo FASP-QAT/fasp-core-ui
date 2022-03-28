@@ -1561,10 +1561,12 @@ class CompareAndSelectScenario extends Component {
                 putRequest.onsuccess = function (event) {
                     this.setState({
                         message: 'static.compareAndSelect.dataSaved',
-                        color: 'green'
+                        color: 'green',
+                        datasetJson:datasetForEncryption,
+                        planningUnitList:planningUnitList1
                     }, () => {
                         this.hideFirstComponent()
-                        this.componentDidMount();
+                        this.showData();
                     })
                 }.bind(this)
             }.bind(this)
