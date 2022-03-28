@@ -1250,7 +1250,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                 stopDate: stopDate,
                                 rangeValue1: rangeValue1,
                                 minDate: actualMin,
-                                maxDate: actualMax,
+                              //  maxDate: actualMax,
                                 monthsForMovingAverage: monthsForMovingAverage,
                                 confidenceLevelId: confidenceLevel,
                                 noOfMonthsForASeason: seasonality,
@@ -2096,7 +2096,8 @@ export default class ExtrapolateDataComponent extends React.Component {
                         }
                         return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
                     }
-                }
+                },
+                intersect:false
 
             },
 
