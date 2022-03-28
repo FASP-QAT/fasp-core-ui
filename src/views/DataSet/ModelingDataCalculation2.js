@@ -633,7 +633,16 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                     var nodeDataMapForScenario = (nodeDataMap[scenarioList[ndm].id])[0];
                     // console.log("agg node data---", nodeDataMapForScenario);
                     var childNodeFlatList = flatListUnsorted.filter(c => c.parent == aggregateNodeList[fl - 1].id);
-                    var minMonth = moment.min(childNodeFlatList.map(d => moment(d.payload.nodeDataMap[scenarioList[ndm].id][0].month)));
+                    var monthList=[];
+                    childNodeFlatList.map(d=>{
+                        if(d.payload.nodeDataMap[scenarioList[ndm].id][0].nodeDataMomList!=undefined && d.payload.nodeDataMap[scenarioList[ndm].id][0].nodeDataMomList.length>0){
+                            monthList.push(moment(d.payload.nodeDataMap[scenarioList[ndm].id][0].nodeDataMomList[0].month).format("YYYY-MM-DD"));
+                        }else{
+                            monthList.push(moment(d.payload.nodeDataMap[scenarioList[ndm].id][0].month).format("YYYY-MM-DD"));
+                        }
+                    })
+                    var minMonth = moment.min(monthList.map(d => moment(d)));
+                    // var minMonth = moment.min();
                     // console.log("agg child&&&", childNodeFlatList);
                     // console.log("scenarioList[ndm].id&&&", scenarioList[ndm].id);
                     var curDate = moment(minMonth).startOf('month').format("YYYY-MM-DD");;
