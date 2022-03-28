@@ -281,7 +281,7 @@ class CompareAndSelectScenario extends Component {
         var data = [];
         var dataArr = [];
         var consumptionData = this.state.actualConsumptionList;
-        console.log("this.state.monthList@@@@@",this.state.monthList)
+        console.log("this.state.monthList@@@@@", this.state.monthList)
         var monthArrayListWithoutFormat = this.state.monthList;
         var actualConsumptionListForMonth = [];
         var consumptionDataForTree = [];
@@ -303,7 +303,7 @@ class CompareAndSelectScenario extends Component {
             multiplier = selectedPlanningUnit.length > 0 ? selectedPlanningUnit[0].planningUnit.multiplier : 1;
         }
         if (this.state.viewById == 3) {
-            var selectedEquivalencyUnit = this.state.equivalencyUnitList.filter(c => c.equivalencyUnitMappingId == this.state.equivalencyUnitId);
+            var selectedEquivalencyUnit = this.state.equivalencyUnitListAll.filter(c => c.equivalencyUnitMappingId == this.state.equivalencyUnitId);
             multiplier = selectedEquivalencyUnit.length > 0 ? selectedEquivalencyUnit[0].convertToEu : 1;
         }
         var actualCalculationDataType = selectedPlanningUnit.consumptionDataType;
@@ -388,7 +388,7 @@ class CompareAndSelectScenario extends Component {
             // dataArr.push(data)
         }
 
-        console.log("@@@@Month1 List",this.state.monthList1)
+        console.log("@@@@Month1 List", this.state.monthList1)
         var monthArrayListWithoutFormat = this.state.monthList1;
         for (var m = 0; m < monthArrayListWithoutFormat.length; m++) {
             data = [];
@@ -552,16 +552,17 @@ class CompareAndSelectScenario extends Component {
             var planningUnitId = e.target.value;
             console.log("Forecasting Unit^^^", name[0].planningUnit.forecastingUnit.id);
             console.log("this.state.equivalencyUnitList^^^", this.state.equivalencyUnitList);
-            var equivalencyUnit = this.state.equivalencyUnitList.filter(c => c.forecastingUnit.id == name[0].planningUnit.forecastingUnit.id && c.equivalencyUnit.active);
+            var equivalencyUnit = this.state.equivalencyUnitListAll.filter(c => c.forecastingUnit.id == name[0].planningUnit.forecastingUnit.id && c.equivalencyUnit.active);
             console.log("Equivalency Unit^^^", equivalencyUnit)
             var viewById = this.state.viewById;
             this.setState({
                 planningUnitId: planningUnitId,
                 planningUnitLabel: name.length > 0 ? name[0].planningUnit.label : "",
                 forecastingUnitId: name.length > 0 ? name[0].planningUnit.forecastingUnit.id : "",
-                equivalencyUnitId: equivalencyUnit.length > 0 ? equivalencyUnit[0].equivalencyUnitMappingId : 0,
+                equivalencyUnitId: equivalencyUnit.length == 1 ? equivalencyUnit[0].equivalencyUnitMappingId : 0,
                 loading: false,
-                viewById: viewById == 3 && equivalencyUnit.length == 0 ? 1 : viewById
+                viewById: viewById == 3 && equivalencyUnit.length == 0 ? 1 : viewById,
+                equivalencyUnitList: equivalencyUnit
             }, () => {
                 if (planningUnitId > 0) {
                     this.showData();
@@ -1146,7 +1147,8 @@ class CompareAndSelectScenario extends Component {
                         }),
                         equivalencyUnitList: euList,
                         loading: false,
-                        datasetId: datasetId
+                        datasetId: datasetId,
+                        equivalencyUnitListAll: euList
                     }, () => {
                         if (datasetId != "") {
                             this.setDatasetId(event);
@@ -1584,7 +1586,7 @@ class CompareAndSelectScenario extends Component {
         var chartOptions = {
             title: {
                 display: true,
-                text: (this.state.viewById == 1 && this.state.planningUnitId > 0 ? getLabelText(this.state.planningUnitList.filter(c => c.planningUnit.id == this.state.planningUnitId)[0].planningUnit.label, this.state.lang) : this.state.viewById == 2 && this.state.forecastingUnitId > 0 && this.state.planningUnitId > 0 ? getLabelText(this.state.forecastingUnitList.filter(c => c.id == this.state.forecastingUnitId)[0].label, this.state.lang) : this.state.equivalencyUnitId > 0 && this.state.planningUnitId > 0 ? getLabelText(this.state.equivalencyUnitList.filter(c => c.equivalencyUnitMappingId == this.state.equivalencyUnitId)[0].equivalencyUnit.label, this.state.lang) : "") + " ( " + this.state.regionName + " )"
+                text: ((this.state.viewById == 1 || this.state.viewById == 3) && this.state.planningUnitId > 0 ? getLabelText(this.state.planningUnitList.filter(c => c.planningUnit.id == this.state.planningUnitId)[0].planningUnit.label, this.state.lang) : this.state.viewById == 2 && this.state.forecastingUnitId > 0 && this.state.planningUnitId > 0 ? getLabelText(this.state.forecastingUnitList.filter(c => c.id == this.state.forecastingUnitId)[0].label, this.state.lang) : "") + " ( " + this.state.regionName + " )"
             },
             scales: {
                 yAxes: [
@@ -2027,7 +2029,7 @@ class CompareAndSelectScenario extends Component {
                                                                 {i18n.t('static.dashboard.forecastingunit')}
                                                             </Label>
                                                         </FormGroup><br />
-                                                        <FormGroup check inline style={{ display: this.state.equivalencyUnitId > 0 ? 'block' : 'none' }}>
+                                                        <FormGroup check inline style={{ display: this.state.equivalencyUnitList.length > 0 ? 'block' : 'none' }}>
                                                             <Input
                                                                 className="form-check-input"
                                                                 type="radio"
@@ -2074,7 +2076,7 @@ class CompareAndSelectScenario extends Component {
                                                                     className="selectWrapText"
                                                                     name="equivalencyUnitId"
                                                                     id="equivalencyUnitId"
-                                                                    disabled={true}
+                                                                    // disabled={true}
                                                                     value={this.state.equivalencyUnitId}
                                                                     onChange={this.setEquivalencyUnit}
                                                                     bsSize="sm"
@@ -2121,7 +2123,7 @@ class CompareAndSelectScenario extends Component {
                                                             </Picker>
                                                         </div>
                                                     </FormGroup>}
-                                                    <div className="col-md-12 p-0">
+                                                    {((this.state.viewById == 3 && this.state.equivalencyUnitId > 0) || (this.state.viewById == 1 || this.state.viewById == 2)) && <div className="col-md-12 p-0">
                                                         <div className="col-md-12">
                                                             <div className="chart-wrapper chart-graph-report">
                                                                 <Bar id="cool-canvas" data={bar} options={chartOptions} />
@@ -2136,7 +2138,7 @@ class CompareAndSelectScenario extends Component {
                                                             </button>
 
                                                         </div>
-                                                    </div>
+                                                    </div>}
 
 
 
