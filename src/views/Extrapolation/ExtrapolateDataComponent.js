@@ -448,7 +448,7 @@ export default class ExtrapolateDataComponent extends React.Component {
             data[2] = movingAvgDataFilter.length > 0 && movingAvgDataFilter[0].forecast != null ? movingAvgDataFilter[0].forecast.toFixed(2) : '';
             data[3] = semiAvgDataFilter.length > 0 && semiAvgDataFilter[0].forecast != null ? semiAvgDataFilter[0].forecast.toFixed(2) : '';
             data[4] = linearRegressionDataFilter.length > 0 && linearRegressionDataFilter[0].forecast != null ? linearRegressionDataFilter[0].forecast.toFixed(2) : '';
-            data[5] = tesDataFilter.length > 0 && tesDataFilter[0].forecast != null ? (Number(tesDataFilter[0].forecast) - CI).toFixed(2) : '';
+            data[5] = tesDataFilter.length > 0 && tesDataFilter[0].forecast != null ? (Number(tesDataFilter[0].forecast) - CI)>0 ?(Number(tesDataFilter[0].forecast) - CI).toFixed(2) : 0 :'';
             data[6] = tesDataFilter.length > 0 && tesDataFilter[0].forecast != null ? Number(tesDataFilter[0].forecast).toFixed(2) : '';
             data[7] = tesDataFilter.length > 0 && tesDataFilter[0].forecast != null ? (Number(tesDataFilter[0].forecast) + CI).toFixed(2) : '';
             // data[8] = '';
@@ -698,15 +698,15 @@ export default class ExtrapolateDataComponent extends React.Component {
         calculateSemiAverages(inputDataSemiAverage, noOfMonthsForProjection, this);
         calculateLinearRegression(inputDataLinearRegression, noOfMonthsForProjection, this);
         console.log("inputDataTes.length+++", inputDataTes.length);
-        if (inputDataTes.length >= (this.state.noOfMonthsForASeason * 2)) {
+        // if (inputDataTes.length >= (this.state.noOfMonthsForASeason * 2)) {
             calculateTES(inputDataTes, this.state.alpha, this.state.beta, this.state.gamma, this.state.confidenceLevelId, this.state.noOfMonthsForASeason, noOfMonthsForProjection, this);
-        } else {
-            this.setState({
-                tesData: [],
-                CI: 0,
-                tesError: { "rmse": "", "mape": "", "mse": "", "wape": "", "rSqd": "" }
-            })
-        }
+        // } else {
+        //     this.setState({
+        //         tesData: [],
+        //         CI: 0,
+        //         tesError: { "rmse": "", "mape": "", "mse": "", "wape": "", "rSqd": "" }
+        //     })
+        // }
     }
 
     loaded = function (instance, cell, x, y, value) {
@@ -1489,7 +1489,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                 B.push(linearRegressionDataFilter[0].forecast.toFixed(2))
             }
             if (this.state.smoothingId && tesDataFilter.length > 0 && tesDataFilter[0].forecast != null) {
-                B.push((Number(tesDataFilter[0].forecast) - CI).toFixed(2),
+                B.push((Number(tesDataFilter[0].forecast) - CI)>0?(Number(tesDataFilter[0].forecast) - CI).toFixed(2):'',
                     Number(tesDataFilter[0].forecast).toFixed(2),
                     (Number(tesDataFilter[0].forecast) + CI).toFixed(2))
             } if (this.state.arimaId) {
@@ -1528,15 +1528,20 @@ export default class ExtrapolateDataComponent extends React.Component {
         if (this.state.smoothingId && testNumber == false) {
             this.setState({
                 alpha: alpha,
-                loading: false
+                loading: false,
+                show:false,
+                showData:false
             })
         }
         else {
             this.setState({
                 alpha: alpha,
+                show:false,
+                showData:false,
                 dataChanged: true
-            }, () => {
-                this.buildJxl();
+            //     dataChanged: true
+            // }, () => {
+            //     this.buildJxl();
             })
         }
     }
@@ -1547,15 +1552,19 @@ export default class ExtrapolateDataComponent extends React.Component {
         if (this.state.smoothingId && testNumber == false) {
             this.setState({
                 beta: beta,
-                loading: false
+                loading: false,
+                show:false,
+                showData:false
             })
         }
         else {
             this.setState({
                 beta: beta,
+                show:false,
+                showData:false,
                 dataChanged: true
-            }, () => {
-                this.buildJxl();
+            // }, () => {
+            //     this.buildJxl();
             })
         }
     }
@@ -1566,15 +1575,21 @@ export default class ExtrapolateDataComponent extends React.Component {
         if (this.state.smoothingId && testNumber == false) {
             this.setState({
                 gamma: gamma,
-                loading: false
+                loading: false,
+                show:false,
+                showData:false,
+                dataChanged: true
             })
         }
         else {
             this.setState({
                 gamma: gamma,
+                show:false,
+                showData:false,
                 dataChanged: true
-            }, () => {
-                this.buildJxl();
+            //     dataChanged: true
+            // }, () => {
+            //     this.buildJxl();
             })
         }
     }
@@ -1582,22 +1597,27 @@ export default class ExtrapolateDataComponent extends React.Component {
     setSeasonals(e) {
         var seasonals = e.target.value;
         var testNumber = seasonals != "" ? (/^(?:[1-9]|[1][0-9]|2[0-4])$/).test(seasonals) : false;
-        console.log("testNumber", testNumber);
+        console.log("testNumberS", testNumber);
         if (this.state.smoothingId && testNumber == false) {
 
             this.setState({
                 noOfMonthsForASeason: seasonals,
                 noOfMonthsForASeasonValidate: false,
-                loading: false
+                loading: false,
+                show:false,
+                showData:false
             })
         }
         else {
             this.setState({
                 noOfMonthsForASeason: seasonals,
                 noOfMonthsForASeasonValidate: true,
+                show:false,
+                showData:false,
                 dataChanged: true
-            }, () => {
-                this.buildJxl()
+            //     dataChanged: true
+            // }, () => {
+            //     this.buildJxl()
             })
         }
     }
@@ -1609,16 +1629,20 @@ export default class ExtrapolateDataComponent extends React.Component {
             this.setState({
                 confidenceLevelId: confidenceLevelId,
                 confidenceValidate: false,
-                loading: false
+                loading: false,
+                show:false,
+                showData:false
             })
         }
         else {
             this.setState({
                 confidenceLevelId: confidenceLevelId,
                 confidenceValidate: true,
+                show:false,
+                showData:false,
                 dataChanged: true
-            }, () => {
-                this.buildJxl()
+            // }, () => {
+            //     this.buildJxl()
             })
         }
     }
@@ -1631,16 +1655,20 @@ export default class ExtrapolateDataComponent extends React.Component {
             this.setState({
                 monthsForMovingAverage: monthsForMovingAverage,
                 monthsForMovingAverageValidate: false,
-                loading: false
+                loading: false,
+                showData:false,
+                show:false
             })
         } else {
             this.setState({
-                loading: true,
+                //loading: true,
                 monthsForMovingAverage: monthsForMovingAverage,
                 monthsForMovingAverageValidate: true,
-                dataChanged: true
-            }, () => {
-                this.buildJxl()
+               dataChanged: true,
+                showData:false,
+                show:false
+            // }, () => {
+            //     this.buildJxl()
             })
         }
     }
@@ -1648,45 +1676,50 @@ export default class ExtrapolateDataComponent extends React.Component {
         var movingAvgId = e.target.checked;
         this.setState({
             movingAvgId: movingAvgId,
+            show:false,
             dataChanged: true
-        }, () => {
-            this.buildActualJxl()
+        // }, () => {
+        //     this.buildActualJxl()
         })
     }
     setSemiAvgId(e) {
         var semiAvgId = e.target.checked;
         this.setState({
             semiAvgId: semiAvgId,
+            show:false,
             dataChanged: true
-        }, () => {
-            this.buildActualJxl()
+        // }, () => {
+        //     this.buildActualJxl()
         })
     }
     setLinearRegressionId(e) {
         var linearRegressionId = e.target.checked;
         this.setState({
             linearRegressionId: linearRegressionId,
+            show:false,
             dataChanged: true
-        }, () => {
-            this.buildActualJxl()
+        // }, () => {
+        //     this.buildActualJxl()
         })
     }
     setSmoothingId(e) {
         var smoothingId = e.target.checked;
         this.setState({
             smoothingId: smoothingId,
+            show:false,
             dataChanged: true
-        }, () => {
-            this.buildActualJxl()
+        // }, () => {
+        //     this.buildActualJxl()
         })
     }
     setArimaId(e) {
         var arimaId = e.target.checked;
         this.setState({
             arimaId: arimaId,
+            show:false,
             dataChanged: true
-        }, () => {
-            this.buildActualJxl()
+        // }, () => {
+        //     this.buildActualJxl()
         })
     }
     // setShowAdvanceId(e) {
@@ -1718,7 +1751,7 @@ export default class ExtrapolateDataComponent extends React.Component {
         const monthsDiff = moment(new Date(endDate)).diff(new Date(startDate), 'months', true);
         console.log("monthsDiff-->", monthsDiff);
         this.setState({
-            monthsDiff: Math.round(monthsDiff)
+            monthsDiff: Math.round(monthsDiff)+1
         });
     }
 
@@ -2179,7 +2212,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                 pointStyle: 'line',
                 pointBorderWidth: 5,
                 yValueFormatString: "###,###,###,###",
-                data: this.state.tesData.map((item, index) => (item.forecast > 0 && moment(startDate).add(item.month, 'months').format("YYYY-MM") > moment(stopDate).format("YYYY-MM") ? (item.forecast - this.state.CI).toFixed(2) : null))
+                data: this.state.tesData.map((item, index) => (item.forecast > 0 && moment(startDate).add(item.month, 'months').format("YYYY-MM") > moment(stopDate).format("YYYY-MM") ? (item.forecast - this.state.CI)?(item.forecast - this.state.CI).toFixed(2) :0: null))
             })
         }
         if (this.state.smoothingId) {
