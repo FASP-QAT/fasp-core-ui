@@ -3595,9 +3595,11 @@ export default class BuildTree extends Component {
     changed = function (instance, cell, x, y, value) {
         //Modeling type
         // instance.jexcel
+        if (this.state.lastRowDeleted != false) {
         this.setState({
             lastRowDeleted: false
         })
+    }
         if (x == 2) {
             var col = ("C").concat(parseInt(y) + 1);
             if (value == "") {
@@ -3700,6 +3702,16 @@ export default class BuildTree extends Component {
                     }
                     this.state.modelingEl.setValueFromCoords(8, y, calculatedChangeForMonth, true);
                 }
+            }
+            if (x == 2 && rowData[2] != 2 && rowData[5] != "") {
+                instance.jexcel.setStyle(col, "background-color", "transparent");
+                instance.jexcel.setComments(col, "");
+                if (rowData[2] != 5) {
+                    calculatedChangeForMonth = parseFloat((nodeValue * rowData[5]) / 100).toFixed(2);
+                } else {
+                    calculatedChangeForMonth = parseFloat(rowData[5]).toFixed();
+                }
+                this.state.modelingEl.setValueFromCoords(8, y, calculatedChangeForMonth, true);
             }
             // Monthly change #
             if (x == 6 && rowData[2] == 2) {
