@@ -31,7 +31,7 @@ import { Link } from 'react-router-dom';
 // import { NavLink } from 'react-router-dom';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import AuthenticationService from '../Common/AuthenticationService';
-import MultiSelect from 'react-multi-select-component';
+import {MultiSelect} from 'react-multi-select-component';
 import ProblemListFormulas from '../Report/ProblemListFormulas.js'
 import DataSourceService from '../../api/DataSourceService';
 import RealmCountryService from '../../api/RealmCountryService';
@@ -2393,7 +2393,7 @@ class EditSupplyPlanStatus extends Component {
         const chartOptions = {
             title: {
                 display: true,
-                text: this.state.planningUnitName != "" && this.state.planningUnitName != undefined && this.state.planningUnitName != null ? entityname + " - " + this.state.planningUnitName : entityname
+                text: this.state.planningUnitName != "" && this.state.planningUnitName != undefined && this.state.planningUnitName != null ? (this.state.program.programCode + "~v" + this.state.program.currentVersion.versionId + " - " + this.state.planningUnitName) : entityname
             },
             scales: {
                 yAxes: [{
