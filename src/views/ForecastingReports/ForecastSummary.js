@@ -1185,6 +1185,7 @@ class ForecastSummary extends Component {
 
                                     }
 
+                                    totalForecastedQuantity0ri = Math.round(totalForecastedQuantity0ri);
 
 
 
@@ -1858,68 +1859,67 @@ class ForecastSummary extends Component {
 
 
             } else {//server version
-                // let selectedForecastProgram = this.state.programs.filter(c => c.programId == programId && c.currentVersion.versionId == versionId)[0];
-                // console.log("Test-----------------111", selectedForecastProgram);
+                let selectedForecastProgram = this.state.programs.filter(c => c.programId == programId && c.currentVersion.versionId == versionId)[0];
+                console.log("Test-----------------111", selectedForecastProgram);
 
-                // let tempObj = {
-                //     forecastStartDate: (selectedForecastProgram.currentVersion.forecastStartDate ? moment(selectedForecastProgram.currentVersion.forecastStartDate).format(`MMM-YYYY`) : ''),
-                //     forecastStopDate: (selectedForecastProgram.currentVersion.forecastStopDate ? moment(selectedForecastProgram.currentVersion.forecastStopDate).format(`MMM-YYYY`) : ''),
-                // }
+                let tempObj = {
+                    forecastStartDate: (selectedForecastProgram.currentVersion.forecastStartDate ? moment(selectedForecastProgram.currentVersion.forecastStartDate).format(`MMM-YYYY`) : ''),
+                    forecastStopDate: (selectedForecastProgram.currentVersion.forecastStopDate ? moment(selectedForecastProgram.currentVersion.forecastStopDate).format(`MMM-YYYY`) : ''),
+                }
 
-                // selectedForecastProgram = {
-                //     ...selectedForecastProgram,
-                //     ...tempObj
-                // }
+                selectedForecastProgram = {
+                    ...selectedForecastProgram,
+                    ...tempObj
+                }
 
-                // let startDateSplit = selectedForecastProgram.forecastStartDate.split('-');
-                // let stopDateSplit = selectedForecastProgram.forecastStopDate.split('-');
+                let startDateSplit = selectedForecastProgram.forecastStartDate.split('-');
+                let stopDateSplit = selectedForecastProgram.forecastStopDate.split('-');
 
 
-                // let forecastStopDate = new Date(selectedForecastProgram.forecastStartDate);
-                // forecastStopDate.setMonth(forecastStopDate.getMonth() - 1);
+                let forecastStopDate = new Date(selectedForecastProgram.forecastStartDate);
+                forecastStopDate.setMonth(forecastStopDate.getMonth() - 1);
 
-                // let d11 = new Date(startDateSplit[1] - 3 + '-' + (new Date(selectedForecastProgram.currentVersion.forecastStartDate).getMonth() + 1) + '-01 00:00:00');
-                // d11.setMonth(d11.getMonth() - 1);
+                let d11 = new Date(startDateSplit[1] - 3 + '-' + (new Date(selectedForecastProgram.currentVersion.forecastStartDate).getMonth() + 1) + '-01 00:00:00');
+                d11.setMonth(d11.getMonth() - 1);
 
-                // let d1 = new Date(selectedForecastProgram.currentVersion.forecastStartDate);
-                // let d2 = new Date(selectedForecastProgram.currentVersion.forecastStopDate);
-                // var month = [
-                //     "Jan",
-                //     "Feb",
-                //     "Mar",
-                //     "Apr",
-                //     "May",
-                //     "Jun",
-                //     "Jul",
-                //     "Aug",
-                //     "Sep",
-                //     "Oct",
-                //     "Nov",
-                //     "Dec",
-                // ]
+                let d1 = new Date(selectedForecastProgram.currentVersion.forecastStartDate);
+                let d2 = new Date(selectedForecastProgram.currentVersion.forecastStopDate);
+                var month = [
+                    "Jan",
+                    "Feb",
+                    "Mar",
+                    "Apr",
+                    "May",
+                    "Jun",
+                    "Jul",
+                    "Aug",
+                    "Sep",
+                    "Oct",
+                    "Nov",
+                    "Dec",
+                ]
 
-                // let startDateSplit1 = ((month[d1.getMonth()] + '-' + d1.getFullYear())).split('-');
-                // let stopDateSplit1 = ((month[d2.getMonth()] + '-' + d2.getFullYear())).split('-');
 
-                // let forecastStopDate1 = new Date((month[d1.getMonth()] + '-' + d1.getFullYear()));
-                // forecastStopDate1.setMonth(forecastStopDate1.getMonth() - 1);
-                // console.log("Test-----------------111", startDateSplit);
+                let forecastStopDate1 = new Date((month[d1.getMonth()] + '-' + d1.getFullYear()));
+                forecastStopDate1.setMonth(forecastStopDate1.getMonth() - 1);
+                console.log("Test-----------------111", startDateSplit);
 
-                // let forecastStartDateNew = selectedForecastProgram.forecastStartDate;
-                // let forecastStopDateNew = selectedForecastProgram.forecastStopDate;
+                let forecastStartDateNew = selectedForecastProgram.forecastStartDate;
+                let forecastStopDateNew = selectedForecastProgram.forecastStopDate;
 
-                // let beforeEndDateDisplay = new Date(selectedForecastProgram.forecastStartDate);
-                // beforeEndDateDisplay.setMonth(beforeEndDateDisplay.getMonth() - 1);
+                let beforeEndDateDisplay = new Date(selectedForecastProgram.forecastStartDate);
+                beforeEndDateDisplay.setMonth(beforeEndDateDisplay.getMonth() - 1);
 
-                // this.setState({
-                //     forecastPeriod: months[new Date(forecastStartDateNew).getMonth()] + ' ' + new Date(forecastStartDateNew).getFullYear() + ' ~ ' + months[new Date(forecastStopDateNew).getMonth()] + ' ' + new Date(forecastStopDateNew).getFullYear(),
-                //     rangeValue: { from: { year: new Date(forecastStartDateNew).getFullYear(), month: new Date(forecastStartDateNew).getMonth() + 1 }, to: { year: new Date(forecastStopDateNew).getFullYear(), month: new Date(forecastStopDateNew).getMonth() + 1 } },
-                //     startDateDisplay: months[new Date(forecastStartDateNew).getMonth()] + ' ' + new Date(forecastStartDateNew).getFullYear(),
-                //     endDateDisplay: months[new Date(forecastStopDateNew).getMonth()] + ' ' + new Date(forecastStopDateNew).getFullYear(),
-                //     beforeEndDateDisplay: months[new Date(beforeEndDateDisplay).getMonth()] + ' ' + new Date(beforeEndDateDisplay).getFullYear(),
-                // }, () => {
+                this.setState({
+                    forecastPeriod: months[Number(moment(forecastStartDateNew).startOf('month').format("M")) - 1] + ' ' + Number(moment(forecastStartDateNew).startOf('month').format("YYYY")) + ' ~ ' + months[Number(moment(forecastStopDateNew).startOf('month').format("M")) - 1] + ' ' + Number(moment(forecastStopDateNew).startOf('month').format("YYYY")),
+                    rangeValue: { from: { year: Number(moment(forecastStartDateNew).startOf('month').format("YYYY")), month: Number(moment(forecastStartDateNew).startOf('month').format("M")) }, to: { year: Number(moment(forecastStopDateNew).startOf('month').format("YYYY")), month: Number(moment(forecastStopDateNew).startOf('month').format("M")) } },
+                    startDateDisplay: months[new Date(forecastStartDateNew).getMonth()] + ' ' + new Date(forecastStartDateNew).getFullYear(),
+                    endDateDisplay: months[new Date(forecastStopDateNew).getMonth()] + ' ' + new Date(forecastStopDateNew).getFullYear(),
+                    beforeEndDateDisplay: months[new Date(beforeEndDateDisplay).getMonth()] + ' ' + new Date(beforeEndDateDisplay).getFullYear(),
+                }, () => {
 
-                // })
+                })
+
             }
 
         } else {
