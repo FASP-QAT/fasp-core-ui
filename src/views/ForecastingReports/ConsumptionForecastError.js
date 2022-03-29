@@ -26,6 +26,7 @@ import { LOGO } from '../../CommonComponent/Logo.js'
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import EquivalancyUnitService from "../../api/EquivalancyUnitService";
 import { index } from 'mathjs';
 const ref = React.createRef();
 const pickerLang = {
@@ -167,6 +168,107 @@ class ConsumptionForecastError extends Component {
                     }.bind(this)
 
                 } else {//api call
+
+
+                    EquivalancyUnitService.getEquivalancyUnitMappingList().then(response => {
+                        if (response.status == 200) {
+                            console.log("EQ1------->", response.data);
+                            var listArray = response.data;
+                            listArray.sort((a, b) => {
+                                var itemLabelA = getLabelText(a.equivalencyUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                                var itemLabelB = getLabelText(b.equivalencyUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                                return itemLabelA > itemLabelB ? 1 : -1;
+                            });
+
+                            var filteredEquList = []
+                            for (var i = 0; i < listArray.length; i++) {
+                                if (listArray[i].program != null) {
+                                    if (listArray[i].program.id == programId && listArray[i].active == true) {
+                                        filteredEquList.push(listArray[i]);
+                                    }
+                                } else {
+                                    filteredEquList.push(listArray[i]);
+                                }
+                            }
+                            console.log("EquivalencyUnitList---------->1", filteredEquList);
+                            let duplicateEquiUnit = filteredEquList.map(c => c.equivalencyUnit);
+                            const ids = duplicateEquiUnit.map(o => o.equivalencyUnitId)
+                            const filteredEQUnit = duplicateEquiUnit.filter(({ equivalencyUnitId }, index) => !ids.includes(equivalencyUnitId, index + 1))
+
+
+                            console.log("EquivalencyUnitList---------->2", filteredEQUnit);
+
+                            var lang = this.state.lang;
+
+
+                            this.setState({
+                                equivalencyUnitList: filteredEQUnit.sort(function (a, b) {
+                                    a = getLabelText(a.label, lang).toLowerCase();
+                                    b = getLabelText(b.label, lang).toLowerCase();
+                                    return a < b ? -1 : a > b ? 1 : 0;
+                                }),
+                                programEquivalencyUnitList: filteredEquList,
+                            }, () => {
+                                this.filterData();
+                            })
+
+
+                        } else {
+                            this.setState({
+                                message: response.data.messageCode, loading: false
+                            },
+                                () => {
+                                    this.hideSecondComponent();
+                                })
+                        }
+
+                    })
+                        .catch(
+                            error => {
+                                if (error.message === "Network Error") {
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false,
+                                        color: "#BA0C2F",
+                                    });
+                                } else {
+                                    switch (error.response ? error.response.status : "") {
+
+                                        case 401:
+                                            this.props.history.push(`/login/static.message.sessionExpired`)
+                                            break;
+                                        case 403:
+                                            this.props.history.push(`/accessDenied`)
+                                            break;
+                                        case 500:
+                                        case 404:
+                                        case 406:
+                                            this.setState({
+                                                message: error.response.data.messageCode,
+                                                loading: false,
+                                                color: "#BA0C2F",
+                                            });
+                                            break;
+                                        case 412:
+                                            this.setState({
+                                                message: error.response.data.messageCode,
+                                                loading: false,
+                                                color: "#BA0C2F",
+                                            });
+                                            break;
+                                        default:
+                                            this.setState({
+                                                message: 'static.unkownError',
+                                                loading: false,
+                                                color: "#BA0C2F",
+                                            });
+                                            break;
+                                    }
+                                }
+                            }
+                        );
+
+
 
                 }
             }
@@ -468,7 +570,7 @@ class ConsumptionForecastError extends Component {
             B = [item1.label];
             t1 = [];
 
-            this.state.monthArrayList.map(item => {                
+            this.state.monthArrayList.map(item => {
                 var cd = this.state.consumptionData.filter(c => moment(c.consumptionDate).format("YYYY-MM-DD") == moment(item).format("YYYY-MM-DD") && c.actualFlag && c.region.regionId == item1.value);
                 var cd1 = this.state.consumptionData.filter(c => moment(c.consumptionDate).format("YYYY-MM-DD") == moment(item).format("YYYY-MM-DD") && !c.actualFlag && c.region.regionId == item1.value);
                 t1.push((cd.length > 0 && cd1.length > 0) ? parseInt(cd[0].consumptionQty) - parseInt(cd1[0].consumptionQty) : "NA")
