@@ -6,7 +6,7 @@ import i18n from '../../i18n';
 import getLabelText from '../../CommonComponent/getLabelText';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { jExcelLoadedFunctionOnlyHideRow, checkValidtion, inValid, positiveValidation, jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
-import { SECRET_KEY, JEXCEL_INTEGER_REGEX_FOR_DATA_ENTRY, INVENTORY_DATA_SOURCE_TYPE, JEXCEL_NEGATIVE_INTEGER_NO_REGEX_FOR_DATA_ENTRY, QAT_DATA_SOURCE_ID, NOTES_FOR_QAT_ADJUSTMENTS, INDEXED_DB_VERSION, INDEXED_DB_NAME, DATE_FORMAT_CAP, JEXCEL_DATE_FORMAT_WITHOUT_DATE, JEXCEL_PAGINATION_OPTION, INVENTORY_MONTHS_IN_PAST, JEXCEL_MONTH_PICKER_FORMAT, JEXCEL_PRO_KEY, INVENTORY_MODIFIED, ADJUSTMENT_MODIFIED } from "../../Constants";
+import { SECRET_KEY, JEXCEL_INTEGER_REGEX_FOR_DATA_ENTRY, INVENTORY_DATA_SOURCE_TYPE, JEXCEL_NEGATIVE_INTEGER_NO_REGEX_FOR_DATA_ENTRY, QAT_DATA_SOURCE_ID, NOTES_FOR_QAT_ADJUSTMENTS, INDEXED_DB_VERSION, INDEXED_DB_NAME, DATE_FORMAT_CAP, JEXCEL_DATE_FORMAT_WITHOUT_DATE, JEXCEL_PAGINATION_OPTION, INVENTORY_MONTHS_IN_PAST, JEXCEL_MONTH_PICKER_FORMAT, JEXCEL_PRO_KEY, INVENTORY_MODIFIED, ADJUSTMENT_MODIFIED, MIN_DATE_RESTRICTION_IN_DATA_ENTRY, MAX_DATE_RESTRICTION_IN_DATA_ENTRY } from "../../Constants";
 import moment from "moment";
 import CryptoJS from 'crypto-js'
 import { calculateSupplyPlan } from "./SupplyPlanCalculations";
@@ -328,7 +328,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                         data: inventoryDataArr,
                         columnDrag: true,
                         columns: [
-                            { title: i18n.t('static.inventory.inventoryDate'), type: 'calendar', options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker' }, width: 80, readOnly: readonlyRegionAndMonth },
+                            { title: i18n.t('static.inventory.inventoryDate'), type: 'calendar', options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker',validRange: [moment(MIN_DATE_RESTRICTION_IN_DATA_ENTRY).startOf('month').format("YYYY-MM-DD"), moment(Date.now()).add(MAX_DATE_RESTRICTION_IN_DATA_ENTRY,'years').endOf('month').format("YYYY-MM-DD")] }, width: 80, readOnly: readonlyRegionAndMonth },
                             { title: i18n.t('static.region.region'), type: 'dropdown', readOnly: readonlyRegionAndMonth, source: this.props.items.regionList, width: 100 },
                             { title: i18n.t('static.inventory.dataSource'), type: 'dropdown', source: dataSourceList, width: 180, filter: this.filterDataSource },
                             { title: i18n.t('static.supplyPlan.alternatePlanningUnit'), type: 'dropdown', source: realmCountryPlanningUnitList, filter: this.filterRealmCountryPlanningUnit, width: 180 },
@@ -906,7 +906,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
             elInstance.setValueFromCoords(15, y, 1, true);
         }
         if (x == 0) {
-            var valid = checkValidtion("dateWithInvalid", "A", y, rowData[0], elInstance, "", "", "", 0);
+            var valid = checkValidtion("dateWithInvalidDataEntry", "A", y, rowData[0], elInstance, "", "", "", 0);
             if (valid == false) {
                 elInstance.setValueFromCoords(16, y, 1, true);
             } else {
@@ -1546,7 +1546,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                         positiveValidation(colArr[c], y, elInstance);
                     }
                     var col = ("C").concat(parseInt(y) + 1);
-                    var validation = checkValidtion("dateWithInvalid", "A", y, rowData[0], elInstance, "", "", "", 0);
+                    var validation = checkValidtion("dateWithInvalidDataEntry", "A", y, rowData[0], elInstance, "", "", "", 0);
                     if (validation == false) {
                         valid = false;
                         elInstance.setValueFromCoords(16, y, 1, true);
