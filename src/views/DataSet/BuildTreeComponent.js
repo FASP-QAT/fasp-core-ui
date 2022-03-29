@@ -890,7 +890,7 @@ export default class BuildTree extends Component {
                 };
                 var label = {}
                 if (this.state.levelUnit != "") {
-                    label = this.state.nodeUnitList.filter(c => c.nodeUnitId == this.state.levelUnit);
+                    label = this.state.nodeUnitList.filter(c => c.unitId == this.state.levelUnit)[0].label;
                 }
                 treeLevelList[levelListFiltered].unit = {
                     id: this.state.levelUnit,
@@ -903,7 +903,7 @@ export default class BuildTree extends Component {
             if (this.state.levelName != "") {
                 var label = {}
                 if (this.state.levelUnit != "") {
-                    label = this.state.nodeUnitList.filter(c => c.nodeUnitId == this.state.levelUnit);
+                    label = this.state.nodeUnitList.filter(c => c.unitId == this.state.levelUnit)[0].label;
                 }
                 treeLevelList.push({
                     levelId: null,
