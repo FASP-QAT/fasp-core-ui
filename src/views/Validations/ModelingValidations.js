@@ -1423,11 +1423,12 @@ class ModelingValidation extends Component {
             }, this);
 
         const { levelList } = this.state;
+        const levelListForNames = this.state.levelList.length > 0 ? this.state.treeListFiltered.levelList : [];
         let levels = levelList.length > 0
             && levelList.map((item, i) => {
                 return (
                     <option key={i} value={item}>
-                        {item}
+                        {levelListForNames.filter(c => c.levelNo == item).length > 0 ? getLabelText(levelListForNames.filter(c => c.levelNo == item)[0].label, this.state.lang) : i18n.t("static.common.level") + " " + item}
                     </option>
                 )
             }, this);
