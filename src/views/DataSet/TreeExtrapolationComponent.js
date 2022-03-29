@@ -1748,7 +1748,8 @@ export default class TreeExtrapolationComponent extends React.Component {
             columns: [
                 {
                     title: 'Month',
-                    type: 'calendar', options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker' }, width: 100
+                    type: 'calendar', options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker' }, width: 100,
+                    readOnly: true
                 },
                 {
                     title: getLabelText(this.props.items.currentItemConfig.context.payload.label, this.state.lang),
