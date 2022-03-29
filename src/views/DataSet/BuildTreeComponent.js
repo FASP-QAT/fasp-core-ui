@@ -2167,13 +2167,13 @@ export default class BuildTree extends Component {
 
                 },
                 {
-                    title: i18n.t('static.tree.%of') + " " + getLabelText(this.state.currentItemConfig.parentItem.payload.label, this.state.lang) + " " + i18n.t('static.tree.MonthEnd'),
+                    title: i18n.t('static.tree.%of') + " " + getLabelText(this.state.currentItemConfig.parentItem.payload.label, this.state.lang),
                     type: 'numeric',
                     mask: '#,##.00', decimal: '.',
                     readOnly: true
                 },
                 {
-                    title: getLabelText(this.state.currentItemConfig.parentItem.payload.label, this.state.lang) + " " + i18n.t('static.tree.MonthEnd'),
+                    title: getLabelText(this.state.currentItemConfig.parentItem.payload.label, this.state.lang),
                     type: 'numeric',
                     mask: '#,##.00', decimal: '.',
                     readOnly: true
@@ -2332,7 +2332,7 @@ export default class BuildTree extends Component {
                 },
                 {
                     // 3
-                    title: i18n.t('static.tree.monthlyEndNoSeasonality'),
+                    title: getLabelText(this.state.currentItemConfig.context.payload.label, this.state.lang) + " " + i18n.t('static.tree.monthlyEndNoSeasonality'),
                     type: 'numeric',
                     mask: '#,##.00', decimal: '.',
                     readOnly: true
@@ -2352,7 +2352,7 @@ export default class BuildTree extends Component {
                     readOnly: !this.state.aggregationNode ? true : false
                 },
                 {
-                    title: i18n.t('static.tree.nodeForecast'),
+                    title: getLabelText(this.state.currentItemConfig.context.payload.label, this.state.lang) + " " + i18n.t('static.consumption.forcast'),
                     type: 'numeric',
                     mask: '#,##.00', decimal: '.',
                     readOnly: true
