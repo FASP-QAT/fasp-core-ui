@@ -2648,7 +2648,7 @@ export default class BuildTree extends Component {
     formSubmit() {
         console.log("entry ---", new Date())
         if (this.state.modelingJexcelLoader === true) {
-            var validation = this.checkValidation();
+            var validation = this.state.lastRowDeleted == true ? true : this.checkValidation();
             console.log("validation---", validation);
             if (this.state.lastRowDeleted == true || validation == true) {
                 try {
@@ -2739,6 +2739,7 @@ export default class BuildTree extends Component {
                             dataSetObj,
                             items,
                             scalingList: dataArr,
+                            lastRowDeleted: false,
                             // openAddNodeModal: false,
                             activeTab1: new Array(2).fill('2')
                         }, () => {
@@ -3406,6 +3407,9 @@ export default class BuildTree extends Component {
                                     data[10] = 1;
                                     obj.insertRow(data, 0, 1);
                                     obj.deleteRow(parseInt(y) + 1);
+                                    var col = ("C").concat(parseInt(0) + 1);
+                                    obj.setStyle(col, "background-color", "transparent");
+                                    obj.setComments(col, "");
                                     this.setState({
                                         lastRowDeleted: true
                                     })
