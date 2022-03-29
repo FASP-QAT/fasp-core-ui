@@ -180,7 +180,7 @@ export default class ListTreeComponent extends Component {
         var options = {
             data: data,
             columnDrag: true,
-            colWidths: [50, 50],
+            colWidths: [20, 80],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
@@ -558,7 +558,7 @@ export default class ListTreeComponent extends Component {
                         active: true,
                         notes: ''
                     }],
-                    levelList:[],
+                    levelList: [],
                     tree: {
                         flatList: [{
                             id: 1,
@@ -823,7 +823,8 @@ export default class ListTreeComponent extends Component {
                 regionList: [],
                 regionValues: [],
                 notes: '',
-                treeTemplate
+                treeTemplate,
+                missingPUList : []
             }, () => {
                 if (this.state.datasetIdModal != "" && this.state.datasetIdModal != 0) {
                     console.log("this.state.datasetIdModal---", this.state.datasetIdModal)
@@ -898,7 +899,7 @@ export default class ListTreeComponent extends Component {
 
         if (treeArray.length > 0) {
             // sortArray(treeArray);
-            treeArray.sort(function(a,b){
+            treeArray.sort(function (a, b) {
                 return a[1].localeCompare(b[1]) || a[2].localeCompare(b[2]);
             })
         }
@@ -1500,8 +1501,9 @@ export default class ListTreeComponent extends Component {
                                                     </div>
 
                                                     <div className="col-md-12" style={{ display: 'inline-block' }}>
-                                                        {(!this.state.treeFlag && this.state.treeTemplate != "") && <><div><b>Missing Planning Units:</b></div><br /></>}
-                                                        <div id="missingPUJexcel" className="RowClickable">
+                                                        <div style={{display : this.state.missingPUList.length > 0 ? 'block' : 'none'}}><div><b>Missing Planning Units:(<a href="/#/planningUnitSetting/listPlanningUnitSetting" className="supplyplanformulas">Update Planning Units</a>)</b></div><br />
+                                                            <div id="missingPUJexcel" className="RowClickable">
+                                                            </div>
                                                         </div>
                                                     </div>
                                                     <FormGroup className="col-md-12 float-right pt-lg-4">

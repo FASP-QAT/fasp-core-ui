@@ -9160,6 +9160,7 @@ export default class BuildTree extends Component {
                                     calculatedDataValue: "",
                                     nodeDataModelingList: [],
                                     nodeDataOverrideList: [],
+                                    nodeDataMomList: [],
                                     fuNode: {
                                         lagInMonths: 0,
                                         noOfForecastingUnitsPerPerson: '',
