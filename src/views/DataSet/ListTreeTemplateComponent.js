@@ -371,7 +371,7 @@ export default class ListTreeTemplate extends Component {
                                 this.setState({
                                     treeTemplateId: this.el.getValueFromCoords(0, y),
                                     isModalOpen: !this.state.isModalOpen,
-                                    treeTemplateName: this.el.getValueFromCoords(1, y) + "(copy)"
+                                    treeTemplateName: this.el.getValueFromCoords(1, y) + " (copy)"
                                 })
                             }.bind(this)
                         });
