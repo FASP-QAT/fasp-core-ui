@@ -6,7 +6,7 @@ import i18n from '../../i18n';
 import getLabelText from '../../CommonComponent/getLabelText';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { jExcelLoadedFunctionOnlyHideRow, checkValidtion, inValid, positiveValidation, jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
-import { SECRET_KEY, SHIPMENT_DATA_SOURCE_TYPE, DELIVERED_SHIPMENT_STATUS, TBD_PROCUREMENT_AGENT_ID, TBD_FUNDING_SOURCE, SUBMITTED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, APPROVED_SHIPMENT_STATUS, SHIPPED_SHIPMENT_STATUS, JEXCEL_DECIMAL_NO_REGEX_FOR_DATA_ENTRY, JEXCEL_INTEGER_REGEX_FOR_DATA_ENTRY, CANCELLED_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, ON_HOLD_SHIPMENT_STATUS, INDEXED_DB_VERSION, INDEXED_DB_NAME, ALPHABET_NUMBER_REGEX, JEXCEL_DATE_FORMAT, BATCH_PREFIX, NONE_SELECTED_DATA_SOURCE_ID, LABEL_WITH_SPECIAL_SYMBOL_REGEX, BATCH_NO_REGEX, JEXCEL_PAGINATION_OPTION, USD_CURRENCY_ID, JEXCEL_MONTH_PICKER_FORMAT, JEXCEL_PRO_KEY, SHIPMENT_MODIFIED, TOTAL_MONTHS_TO_DISPLAY_IN_SUPPLY_PLAN } from "../../Constants";
+import { SECRET_KEY, SHIPMENT_DATA_SOURCE_TYPE, DELIVERED_SHIPMENT_STATUS, TBD_PROCUREMENT_AGENT_ID, TBD_FUNDING_SOURCE, SUBMITTED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, APPROVED_SHIPMENT_STATUS, SHIPPED_SHIPMENT_STATUS, JEXCEL_DECIMAL_NO_REGEX_FOR_DATA_ENTRY, JEXCEL_INTEGER_REGEX_FOR_DATA_ENTRY, CANCELLED_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, ON_HOLD_SHIPMENT_STATUS, INDEXED_DB_VERSION, INDEXED_DB_NAME, ALPHABET_NUMBER_REGEX, JEXCEL_DATE_FORMAT, BATCH_PREFIX, NONE_SELECTED_DATA_SOURCE_ID, LABEL_WITH_SPECIAL_SYMBOL_REGEX, BATCH_NO_REGEX, JEXCEL_PAGINATION_OPTION, USD_CURRENCY_ID, JEXCEL_MONTH_PICKER_FORMAT, JEXCEL_PRO_KEY, SHIPMENT_MODIFIED, TOTAL_MONTHS_TO_DISPLAY_IN_SUPPLY_PLAN, MAX_DATE_RESTRICTION_IN_DATA_ENTRY, MIN_DATE_RESTRICTION_IN_DATA_ENTRY } from "../../Constants";
 import moment, { invalid } from "moment";
 import { paddingZero, generateRandomAplhaNumericCode, contrast } from "../../CommonComponent/JavascriptCommonFunctions";
 import CryptoJS from 'crypto-js'
@@ -585,7 +585,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                 { type: 'text', title: i18n.t('static.report.id'), width: 80, readOnly: true },
                                                 { type: 'hidden', title: i18n.t('static.supplyPlan.qatProduct'), width: 150 },
                                                 { type: 'dropdown', title: i18n.t('static.shipmentDataEntry.shipmentStatus'), source: shipmentStatusList, filter: this.filterShipmentStatus, width: 100 },
-                                                { type: 'calendar', title: i18n.t('static.common.receivedate'), options: { format: JEXCEL_DATE_FORMAT }, width: 150 },
+                                                { type: 'calendar', title: i18n.t('static.common.receivedate'), options: { format: JEXCEL_DATE_FORMAT,validRange: [moment(MIN_DATE_RESTRICTION_IN_DATA_ENTRY).startOf('month').format("YYYY-MM-DD"), moment(Date.now()).add(MAX_DATE_RESTRICTION_IN_DATA_ENTRY,'years').endOf('month').format("YYYY-MM-DD")] }, width: 150 },
                                                 { type: 'dropdown', title: i18n.t("static.supplyPlan.shipmentMode"), source: [{ id: 1, name: i18n.t('static.supplyPlan.sea') }, { id: 2, name: i18n.t('static.supplyPlan.air') }], width: 100 },
                                                 { type: 'dropdown', title: i18n.t('static.procurementagent.procurementagent'), source: procurementAgentList, filter: this.filterProcurementAgent, width: 120 },
                                                 { type: 'checkbox', title: i18n.t('static.shipmentDataEntry.localProcurement'), width: 80, readOnly: !shipmentEditable },
@@ -980,7 +980,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                                     type: 'calendar',
                                                                                     options: {
                                                                                         format: JEXCEL_DATE_FORMAT,
-                                                                                        validRange: [null, (moment(Date.now()).format("YYYY-MM-DD")).toString()]
+                                                                                        validRange: [moment(MIN_DATE_RESTRICTION_IN_DATA_ENTRY).startOf('month').format("YYYY-MM-DD"), (moment(Date.now()).format("YYYY-MM-DD")).toString()]
                                                                                     }
                                                                                 },
                                                                                 {
@@ -988,7 +988,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                                     type: 'calendar',
                                                                                     options: {
                                                                                         format: JEXCEL_DATE_FORMAT,
-                                                                                        validRange: [null, (moment(Date.now()).format("YYYY-MM-DD")).toString()]
+                                                                                        validRange: [moment(MIN_DATE_RESTRICTION_IN_DATA_ENTRY).startOf('month').format("YYYY-MM-DD"), (moment(Date.now()).format("YYYY-MM-DD")).toString()]
                                                                                     }
                                                                                 },
                                                                                 {
@@ -996,7 +996,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                                     type: 'calendar',
                                                                                     options: {
                                                                                         format: JEXCEL_DATE_FORMAT,
-                                                                                        validRange: [null, (moment(Date.now()).format("YYYY-MM-DD")).toString()]
+                                                                                        validRange: [moment(MIN_DATE_RESTRICTION_IN_DATA_ENTRY).startOf('month').format("YYYY-MM-DD"), (moment(Date.now()).format("YYYY-MM-DD")).toString()]
                                                                                     }
                                                                                 },
                                                                                 {
@@ -1004,7 +1004,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                                     type: 'calendar',
                                                                                     options: {
                                                                                         format: JEXCEL_DATE_FORMAT,
-                                                                                        validRange: [null, (moment(Date.now()).format("YYYY-MM-DD")).toString()]
+                                                                                        validRange: [moment(MIN_DATE_RESTRICTION_IN_DATA_ENTRY).startOf('month').format("YYYY-MM-DD"), (moment(Date.now()).format("YYYY-MM-DD")).toString()]
                                                                                     }
                                                                                 },
                                                                                 {
@@ -1012,7 +1012,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                                     type: 'calendar',
                                                                                     options: {
                                                                                         format: JEXCEL_DATE_FORMAT,
-                                                                                        validRange: [null, (moment(Date.now()).format("YYYY-MM-DD")).toString()]
+                                                                                        validRange: [moment(MIN_DATE_RESTRICTION_IN_DATA_ENTRY).startOf('month').format("YYYY-MM-DD"), (moment(Date.now()).format("YYYY-MM-DD")).toString()]
                                                                                     }
                                                                                 },
                                                                                 {
@@ -1020,7 +1020,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                                     type: 'calendar',
                                                                                     options: {
                                                                                         format: JEXCEL_DATE_FORMAT,
-                                                                                        validRange: shipmentStatus == DELIVERED_SHIPMENT_STATUS ? [null, (moment(Date.now()).format("YYYY-MM-DD")).toString()] : [null, null]
+                                                                                        validRange: shipmentStatus == DELIVERED_SHIPMENT_STATUS ? [moment(MIN_DATE_RESTRICTION_IN_DATA_ENTRY).startOf('month').format("YYYY-MM-DD"), (moment(Date.now()).format("YYYY-MM-DD")).toString()] : [moment(MIN_DATE_RESTRICTION_IN_DATA_ENTRY).startOf('month').format("YYYY-MM-DD"), moment(Date.now()).add(MAX_DATE_RESTRICTION_IN_DATA_ENTRY,'years').endOf('month').format("YYYY-MM-DD")]
                                                                                     }
                                                                                 },
                                                                                 {
@@ -1662,7 +1662,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     type: 'calendar',
                     options: {
                         format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker',
-                        validRange: [moment(expectedDeliveryDate).format("YYYY-MM-DD"), null]
+                        validRange: [moment(expectedDeliveryDate).format("YYYY-MM-DD"), moment(Date.now()).add(MAX_DATE_RESTRICTION_IN_DATA_ENTRY,'years').endOf('month').format("YYYY-MM-DD")]
                     }
                 },
                 {
@@ -2522,7 +2522,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     elInstance.setValueFromCoords(6, y, 1, true);
                 }
             }
-            var valid = checkValidtion("dateWithInvalid", "B", y, rowData[1], elInstance, "", "", "", 1);
+            var valid = checkValidtion("dateWithInvalidDataEntry", "B", y, rowData[1], elInstance, "", "", "", 1);
             if (valid) {
                 var expectedDeliveryDate = (this.state.shipmentsEl).getRowData(parseInt(rowData[4]))[4];
                 if (moment(rowData[1]).format("YYYY-MM") <= moment(expectedDeliveryDate).format("YYYY-MM")) {
@@ -2595,7 +2595,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     inValid("A", y, i18n.t('static.label.fieldRequired'), elInstance);
                     valid = false;
                 }
-                var validation = checkValidtion("dateWithInvalid", "B", y, rowData[1], elInstance, "", "", "", 1);
+                var validation = checkValidtion("dateWithInvalidDataEntry", "B", y, rowData[1], elInstance, "", "", "", 1);
                 if (validation.toString() == "false") {
                     valid = false;
                 } else {
