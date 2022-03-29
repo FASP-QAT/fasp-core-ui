@@ -172,7 +172,7 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                     var curDate = moment(nodeDataMapForScenario.month).startOf('month').format("YYYY-MM-DD");
                     var nodeDataList = [];
                     var calculatedMMdPatients = [];
-                    var calculatedValueForLag= [];
+                    var calculatedValueForLag = [];
                     for (var i = 0; curDate < stopDate; i++) {
                         // console.log("curDate---", curDate);
                         curDate = moment(nodeDataMapForScenario.month).add(i, 'months').format("YYYY-MM-DD");
@@ -403,7 +403,7 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                             var lag = nodeDataMapForScenario.fuNode.lagInMonths;
                             console.log("Lag in months++++", lag);
                             if (i >= lag) {
-                                calculatedValue = calculatedValueForLag[i-lag];
+                                calculatedValue = calculatedValueForLag[i - lag];
                             } else {
                                 calculatedValue = 0;
                             }
@@ -458,7 +458,7 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                             var parent = (flatList[fl].parent);
                             var parentFiltered = (flatListUnsorted.filter(c => c.id == parent))[0];
                             var parentNodeNodeData = (parentFiltered.payload.nodeDataMap[scenarioList[ndm].id])[0];
-                            if (parentNodeNodeData.fuNode.usageType.id == 2) {
+                            if (parentNodeNodeData.fuNode.usageType.id == 2 && nodeDataMapForScenario.puNode.refillMonths > 1) {
                                 var daysPerMonth = 365 / 12;
 
                                 var grandParent = parentFiltered.parent;
@@ -545,7 +545,7 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                     if (nodeDataMomForParentPerc.length > 0) {
                                         percentageToMultiply = nodeDataMomForParentPerc[0].endValue;
                                     }
-                                    noOfFus = Math.round((calculatedMMdPatients.filter(c => moment(c.month).format("YYYY-MM-DD") == moment(curDate).subtract(lag, 'months').format("YYYY-MM-DD"))[0].value * percentageToMultiply / 100) * noOfBottlesInOneVisit) * fuPerPu;
+                                    noOfFus = (((calculatedMMdPatients.filter(c => moment(c.month).format("YYYY-MM-DD") == moment(curDate).subtract(lag, 'months').format("YYYY-MM-DD"))[0].value * percentageToMultiply / 100) * noOfBottlesInOneVisit) * fuPerPu).toFixed(2);
                                 } else {
                                     noOfFus = 0;
                                 }
@@ -633,11 +633,11 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                     var nodeDataMapForScenario = (nodeDataMap[scenarioList[ndm].id])[0];
                     // console.log("agg node data---", nodeDataMapForScenario);
                     var childNodeFlatList = flatListUnsorted.filter(c => c.parent == aggregateNodeList[fl - 1].id);
-                    var monthList=[];
-                    childNodeFlatList.map(d=>{
-                        if(d.payload.nodeDataMap[scenarioList[ndm].id][0].nodeDataMomList!=undefined && d.payload.nodeDataMap[scenarioList[ndm].id][0].nodeDataMomList.length>0){
+                    var monthList = [];
+                    childNodeFlatList.map(d => {
+                        if (d.payload.nodeDataMap[scenarioList[ndm].id][0].nodeDataMomList != undefined && d.payload.nodeDataMap[scenarioList[ndm].id][0].nodeDataMomList.length > 0) {
                             monthList.push(moment(d.payload.nodeDataMap[scenarioList[ndm].id][0].nodeDataMomList[0].month).format("YYYY-MM-DD"));
-                        }else{
+                        } else {
                             monthList.push(moment(d.payload.nodeDataMap[scenarioList[ndm].id][0].month).format("YYYY-MM-DD"));
                         }
                     })
