@@ -2675,6 +2675,8 @@ export default class BuildTree extends Component {
                                 var startDate = parts1[0] + "-" + parts1[1] + "-01"
                                 var parts2 = map1.get("4").split('-');
                                 var stopDate = parts2[0] + "-" + parts2[1] + "-01"
+                                startDate=moment(map1.get("3")).startOf('month').format("YYYY-MM-DD");
+                                stopDate=moment(map1.get("4")).startOf('month').format("YYYY-MM-DD");
                                 if (map1.get("9") != "" && map1.get("9") != 0) {
                                     console.log("inside 9 map true---");
                                     const itemIndex = data.findIndex(o => o.nodeDataModelingId === map1.get("9"));
