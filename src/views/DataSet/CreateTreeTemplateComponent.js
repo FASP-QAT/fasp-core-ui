@@ -1230,7 +1230,7 @@ export default class CreateTreeTemplate extends Component {
                             (item.payload.nodeDataMap[0])[0].nodeDataModelingList = dataArr;
                         }
                         if (this.state.lastRowDeleted == true) {
-                            (item.payload.nodeDataMap[this.state.selectedScenario])[0].nodeDataModelingList = [];
+                            (item.payload.nodeDataMap[0])[0].nodeDataModelingList = [];
                         }
                         console.log("item---", item);
                         items[itemIndex1] = item;
@@ -1920,7 +1920,7 @@ export default class CreateTreeTemplate extends Component {
                     fuPerMonth = ((noOfForecastingUnitsPerPerson / noOfPersons) * usageFrequency * convertToMonth);
                 }
             }
-            lagInMonths = (this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.lagInMonths;
+            lagInMonths = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.lagInMonths;
         }
         var monthsPerVisit = 1;
         var patients = 0;
@@ -2034,13 +2034,13 @@ export default class CreateTreeTemplate extends Component {
 
                 },
                 {
-                    title: i18n.t('static.tree.%of') + " " + getLabelText(this.state.currentItemConfig.parentItem.payload.label, this.state.lang) + " " + i18n.t('static.tree.MonthEnd'),
+                    title: i18n.t('static.tree.%of') + " " + getLabelText(this.state.currentItemConfig.parentItem.payload.label, this.state.lang),
                     type: 'numeric',
                     mask: '#,##.00', decimal: '.',
                     readOnly: true
                 },
                 {
-                    title: getLabelText(this.state.currentItemConfig.parentItem.payload.label, this.state.lang) + " " + i18n.t('static.tree.MonthEnd'),
+                    title: getLabelText(this.state.currentItemConfig.parentItem.payload.label, this.state.lang),
                     type: 'numeric',
                     mask: '#,##.00', decimal: '.',
                     readOnly: true
@@ -2048,7 +2048,7 @@ export default class CreateTreeTemplate extends Component {
                 },
                 {
                     title: getLabelText(this.state.currentItemConfig.context.payload.label, this.state.lang) + " " + i18n.t('static.consumption.forcast'),
-                    type: this.state.currentItemConfig.context.payload.nodeType.id == 4 ? 'hidden' : 'numeric',
+                    type: this.state.currentItemConfig.context.payload.nodeType.id == 4 || this.state.currentItemConfig.context.payload.nodeType.id == 5 ? 'hidden' : 'numeric',
                     mask: '#,##.00', decimal: '.',
                     readOnly: true
                 },
@@ -2058,7 +2058,7 @@ export default class CreateTreeTemplate extends Component {
 
                 },
                 {
-                    title: this.state.currentItemConfig.context.payload.nodeType.id == 4 ? getLabelText(this.state.currentItemConfig.context.payload.label, this.state.lang) + " " + i18n.t('static.consumption.forcast') : '# of PUs',
+                    title: this.state.currentItemConfig.context.payload.nodeType.id == 4 || this.state.currentItemConfig.context.payload.nodeType.id == 5 ? getLabelText(this.state.currentItemConfig.context.payload.label, this.state.lang) + " " + i18n.t('static.consumption.forcast') : '# of PUs',
                     type: this.state.currentItemConfig.context.payload.nodeType.id == 5 || this.state.currentItemConfig.context.payload.nodeType.id == 4 ? 'numeric' : 'hidden',
                     mask: '#,##.00', decimal: '.',
                     readOnly: true
@@ -2197,7 +2197,7 @@ export default class CreateTreeTemplate extends Component {
                 },
                 {
                     // 3
-                    title: i18n.t('static.tree.monthlyEndNoSeasonality'),
+                    title: getLabelText(this.state.currentItemConfig.context.payload.label, this.state.lang) + " " + i18n.t('static.tree.monthlyEndNoSeasonality'),
                     type: 'numeric',
                     mask: '#,##.00', decimal: '.',
                     readOnly: true
@@ -2216,7 +2216,7 @@ export default class CreateTreeTemplate extends Component {
 
                 },
                 {
-                    title: i18n.t('static.tree.nodeForecast'),
+                    title: getLabelText(this.state.currentItemConfig.context.payload.label, this.state.lang) + " " + i18n.t('static.consumption.forcast'),
                     type: 'numeric',
                     mask: '#,##.00', decimal: '.',
                     readOnly: true
