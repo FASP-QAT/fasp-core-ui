@@ -309,36 +309,36 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 //     })
                 // }
 
-                let forecastPlanignUnitListForNotDuplicate = this.state.forecastPlanignUnitListForNotDuplicate;
-                forecastPlanignUnitListForNotDuplicate.push({
-                    supplyPlanPlanningUnitId: this.el.getValueFromCoords(1, y),
-                    forecastPlanningUnitId: this.el.getValueFromCoords(7, y)
-                })
+                // let forecastPlanignUnitListForNotDuplicate = this.state.forecastPlanignUnitListForNotDuplicate;
+                // forecastPlanignUnitListForNotDuplicate.push({
+                //     supplyPlanPlanningUnitId: this.el.getValueFromCoords(1, y),
+                //     forecastPlanningUnitId: this.el.getValueFromCoords(7, y)
+                // })
 
-                const ids = forecastPlanignUnitListForNotDuplicate.map(o => o.supplyPlanPlanningUnitId)
-                const filtered = forecastPlanignUnitListForNotDuplicate.filter(({ supplyPlanPlanningUnitId }, index) => !ids.includes(supplyPlanPlanningUnitId, index + 1))
-                this.setState({
-                    forecastPlanignUnitListForNotDuplicate: filtered
-                })
+                // const ids = forecastPlanignUnitListForNotDuplicate.map(o => o.supplyPlanPlanningUnitId)
+                // const filtered = forecastPlanignUnitListForNotDuplicate.filter(({ supplyPlanPlanningUnitId }, index) => !ids.includes(supplyPlanPlanningUnitId, index + 1))
+                // this.setState({
+                //     forecastPlanignUnitListForNotDuplicate: filtered
+                // })
 
 
             } else {
-                let SupplyPlanningUnitId = this.el.getValueFromCoords(1, y);
-                console.log("MYVALUE----------->1", SupplyPlanningUnitId);
+                // let SupplyPlanningUnitId = this.el.getValueFromCoords(1, y);
+                // console.log("MYVALUE----------->1", SupplyPlanningUnitId);
 
-                let forecastPlanignUnitListForNotDuplicate = this.state.forecastPlanignUnitListForNotDuplicate;
-                console.log("MYVALUE----------->2", forecastPlanignUnitListForNotDuplicate);
-                let index = forecastPlanignUnitListForNotDuplicate.filter(c => c.supplyPlanPlanningUnitId == SupplyPlanningUnitId);
-                console.log("MYVALUE----------->3", index);
-                if (index.length > 0) {
-                    console.log("MYVALUE----------->41", forecastPlanignUnitListForNotDuplicate.filter(c => c.supplyPlanPlanningUnitId != SupplyPlanningUnitId));
+                // let forecastPlanignUnitListForNotDuplicate = this.state.forecastPlanignUnitListForNotDuplicate;
+                // console.log("MYVALUE----------->2", forecastPlanignUnitListForNotDuplicate);
+                // let index = forecastPlanignUnitListForNotDuplicate.filter(c => c.supplyPlanPlanningUnitId == SupplyPlanningUnitId);
+                // console.log("MYVALUE----------->3", index);
+                // if (index.length > 0) {
+                //     console.log("MYVALUE----------->41", forecastPlanignUnitListForNotDuplicate.filter(c => c.supplyPlanPlanningUnitId != SupplyPlanningUnitId));
 
-                    this.setState({
-                        forecastPlanignUnitListForNotDuplicate: forecastPlanignUnitListForNotDuplicate.filter(c => c.supplyPlanPlanningUnitId != SupplyPlanningUnitId)
-                    })
-                } else {
-                    console.log("MYVALUE----------->42", forecastPlanignUnitListForNotDuplicate);
-                }
+                //     this.setState({
+                //         forecastPlanignUnitListForNotDuplicate: forecastPlanignUnitListForNotDuplicate.filter(c => c.supplyPlanPlanningUnitId != SupplyPlanningUnitId)
+                //     })
+                // } else {
+                //     console.log("MYVALUE----------->42", forecastPlanignUnitListForNotDuplicate);
+                // }
 
 
 
@@ -416,11 +416,11 @@ export default class StepOneImportMapPlanningUnits extends Component {
             }
 
         }
-        this.setState({
-            isChanged1: true,
-        });
-
-
+        if (!this.state.isChanged1) {
+            this.setState({
+                isChanged1: true,
+            });
+        }
     }
 
     oneditionend = function (instance, cell, x, y, value) {
