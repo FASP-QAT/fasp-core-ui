@@ -2432,11 +2432,11 @@ export default class BuildTree extends Component {
 
     showMomData() {
         console.log("show mom data---", this.state.currentScenario);
-        var getMomDataForCurrentNode = this.state.currentScenario.nodeDataMomList;
+        var getMomDataForCurrentNode = this.state.items.filter(x => x.id == this.state.currentItemConfig.context.id).length > 0 ? this.state.items.filter(x => x.id == this.state.currentItemConfig.context.id)[0].payload.nodeDataMap[this.state.selectedScenario][0].nodeDataMomList : [];
         console.log("getMomDataForCurrentNode>>>", getMomDataForCurrentNode);
         if (this.state.currentItemConfig.context.payload.nodeType.id > 2) {
             console.log("mom list parent---", this.state.parentScenario);
-            var getMomDataForCurrentNodeParent = this.state.parentScenario.nodeDataMomList;
+            var getMomDataForCurrentNodeParent = this.state.items.filter(x => x.id == this.state.currentItemConfig.context.parent).length > 0 ? this.state.items.filter(x => x.id == this.state.currentItemConfig.context.parent)[0].payload.nodeDataMap[this.state.selectedScenario][0].nodeDataMomList : []
             console.log("in if>>>>", getMomDataForCurrentNodeParent);
 
             this.setState({ showMomDataPercent: !this.state.showMomDataPercent, showMomData: false, momListPer: getMomDataForCurrentNode, momListPerParent: getMomDataForCurrentNodeParent }, () => {
@@ -2453,7 +2453,7 @@ export default class BuildTree extends Component {
             console.log("in else>>>>");
             this.setState({ showMomDataPercent: false, showMomData: !this.state.showMomData, momList: getMomDataForCurrentNode }, () => {
                 if (this.state.showMomData) {
-                    console.log("inside show mom data number node");
+                    console.log("inside show mom data number node---", this.state.momList);
                     this.setState({ viewMonthlyData: false }, () => {
                         this.buildMomJexcel();
                     })
