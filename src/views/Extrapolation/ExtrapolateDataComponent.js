@@ -2711,6 +2711,9 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                                         id="gammaId"
                                                                         bsSize="sm"
                                                                         name="gammaId"
+                                                                        min={0}
+                                                                        max={1}
+                                                                        step={0.1}
                                                                         value={this.state.gamma}
                                                                         valid={!errors.gammaId && this.state.gamma != null ? this.state.gamma : '' != ''}
                                                                         invalid={touched.gammaId && !!errors.gammaId}
