@@ -26,6 +26,7 @@ import { LOGO } from '../../CommonComponent/Logo.js'
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import EquivalancyUnitService from "../../api/EquivalancyUnitService";
 import { index } from 'mathjs';
 const ref = React.createRef();
 const pickerLang = {
@@ -76,6 +77,7 @@ class ConsumptionForecastError extends Component {
             equivalencyUnitList: [],
             programEquivalencyUnitList: [],
             yaxisEquUnit: -1,
+            filteredProgramEQList: [],
 
         };
         this.getPrograms = this.getPrograms.bind(this);
@@ -167,6 +169,107 @@ class ConsumptionForecastError extends Component {
                     }.bind(this)
 
                 } else {//api call
+
+
+                    EquivalancyUnitService.getEquivalancyUnitMappingList().then(response => {
+                        if (response.status == 200) {
+                            console.log("EQ1------->", response.data);
+                            var listArray = response.data;
+                            listArray.sort((a, b) => {
+                                var itemLabelA = getLabelText(a.equivalencyUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                                var itemLabelB = getLabelText(b.equivalencyUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                                return itemLabelA > itemLabelB ? 1 : -1;
+                            });
+
+                            var filteredEquList = []
+                            for (var i = 0; i < listArray.length; i++) {
+                                if (listArray[i].program != null) {
+                                    if (listArray[i].program.id == programId && listArray[i].active == true) {
+                                        filteredEquList.push(listArray[i]);
+                                    }
+                                } else {
+                                    filteredEquList.push(listArray[i]);
+                                }
+                            }
+                            console.log("EquivalencyUnitList---------->1", filteredEquList);
+                            let duplicateEquiUnit = filteredEquList.map(c => c.equivalencyUnit);
+                            const ids = duplicateEquiUnit.map(o => o.equivalencyUnitId)
+                            const filteredEQUnit = duplicateEquiUnit.filter(({ equivalencyUnitId }, index) => !ids.includes(equivalencyUnitId, index + 1))
+
+
+                            console.log("EquivalencyUnitList---------->2", filteredEQUnit);
+
+                            var lang = this.state.lang;
+
+
+                            this.setState({
+                                equivalencyUnitList: filteredEQUnit.sort(function (a, b) {
+                                    a = getLabelText(a.label, lang).toLowerCase();
+                                    b = getLabelText(b.label, lang).toLowerCase();
+                                    return a < b ? -1 : a > b ? 1 : 0;
+                                }),
+                                programEquivalencyUnitList: filteredEquList,
+                            }, () => {
+                                this.filterData();
+                            })
+
+
+                        } else {
+                            this.setState({
+                                message: response.data.messageCode, loading: false
+                            },
+                                () => {
+                                    this.hideSecondComponent();
+                                })
+                        }
+
+                    })
+                        .catch(
+                            error => {
+                                if (error.message === "Network Error") {
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false,
+                                        color: "#BA0C2F",
+                                    });
+                                } else {
+                                    switch (error.response ? error.response.status : "") {
+
+                                        case 401:
+                                            this.props.history.push(`/login/static.message.sessionExpired`)
+                                            break;
+                                        case 403:
+                                            this.props.history.push(`/accessDenied`)
+                                            break;
+                                        case 500:
+                                        case 404:
+                                        case 406:
+                                            this.setState({
+                                                message: error.response.data.messageCode,
+                                                loading: false,
+                                                color: "#BA0C2F",
+                                            });
+                                            break;
+                                        case 412:
+                                            this.setState({
+                                                message: error.response.data.messageCode,
+                                                loading: false,
+                                                color: "#BA0C2F",
+                                            });
+                                            break;
+                                        default:
+                                            this.setState({
+                                                message: 'static.unkownError',
+                                                loading: false,
+                                                color: "#BA0C2F",
+                                            });
+                                            break;
+                                    }
+                                }
+                            }
+                        );
+
+
 
                 }
             }
@@ -468,7 +571,7 @@ class ConsumptionForecastError extends Component {
             B = [item1.label];
             t1 = [];
 
-            this.state.monthArrayList.map(item => {                
+            this.state.monthArrayList.map(item => {
                 var cd = this.state.consumptionData.filter(c => moment(c.consumptionDate).format("YYYY-MM-DD") == moment(item).format("YYYY-MM-DD") && c.actualFlag && c.region.regionId == item1.value);
                 var cd1 = this.state.consumptionData.filter(c => moment(c.consumptionDate).format("YYYY-MM-DD") == moment(item).format("YYYY-MM-DD") && !c.actualFlag && c.region.regionId == item1.value);
                 t1.push((cd.length > 0 && cd1.length > 0) ? parseInt(cd[0].consumptionQty) - parseInt(cd1[0].consumptionQty) : "NA")
@@ -823,6 +926,7 @@ class ConsumptionForecastError extends Component {
         let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate();
         let timeWindowId = document.getElementById("timeWindowId").value;
         let viewById = document.getElementById("viewById").value;
+        let yaxisEquUnit = document.getElementById("yaxisEquUnit").value;
         let consumptionAdjForStockOutId = document.getElementById("consumptionAdjusted").value;
         let regionIds = this.state.regionValues.map(ele => (ele.value).toString())
         let planningUnitId = -1;
@@ -915,15 +1019,37 @@ class ConsumptionForecastError extends Component {
                                 //actual
                                 let actualConsumptionList1 = actualConsumptionList.filter(c => c.planningUnit.id == planningUnitId);
                                 console.log("Test------------>1.1", actualConsumptionList1);
-                                let actualConsumptionList2 = actualConsumptionList1.map(m => {
-                                    return {
-                                        consumptionDate: m.month,
-                                        // consumptionQty: m.amount,
-                                        consumptionQty: (consumptionAdjForStockOutId == 2 ? m.amount : (m.daysOfStockOut == null ? m.amount : parseInt(this.calculateDaysInMonth(m.month) / (this.calculateDaysInMonth(m.month) - m.daysOfStockOut) * m.amount))),
-                                        region: { regionId: m.region.id },
-                                        actualFlag: true
-                                    }
-                                })
+
+                                let actualConsumptionList2 = [];
+                                if (yaxisEquUnit != -1) {//yes
+
+                                    let planningUniObj = filteredProgram.planningUnitList.filter(c => c.planningUnit.id == planningUnitId)[0];
+                                    let convertToEu = this.state.filteredProgramEQList.filter(c => c.forecastingUnit.id == planningUniObj.planningUnit.forecastingUnit.id)[0].convertToEu;
+
+                                    actualConsumptionList2 = actualConsumptionList1.map(m => {
+                                        return {
+                                            consumptionDate: m.month,
+                                            // consumptionQty: m.amount,
+                                            consumptionQty: (consumptionAdjForStockOutId == 2 ? Math.round(m.amount / convertToEu) : (m.daysOfStockOut == null ? Math.round(m.amount / convertToEu) : Math.round((this.calculateDaysInMonth(m.month) / (this.calculateDaysInMonth(m.month) - m.daysOfStockOut) * m.amount) / convertToEu))),
+                                            region: { regionId: m.region.id },
+                                            actualFlag: true
+                                        }
+                                    })
+
+                                } else {//no
+
+                                    actualConsumptionList2 = actualConsumptionList1.map(m => {
+                                        return {
+                                            consumptionDate: m.month,
+                                            // consumptionQty: m.amount,
+                                            consumptionQty: (consumptionAdjForStockOutId == 2 ? m.amount : (m.daysOfStockOut == null ? m.amount : parseInt(this.calculateDaysInMonth(m.month) / (this.calculateDaysInMonth(m.month) - m.daysOfStockOut) * m.amount))),
+                                            region: { regionId: m.region.id },
+                                            actualFlag: true
+                                        }
+                                    })
+
+                                }
+
 
                                 let actualConsumptionList3 = [];
                                 //filter based on region
@@ -960,14 +1086,36 @@ class ConsumptionForecastError extends Component {
                                             if (consumptionExtrapolationObj.length > 0) {
                                                 console.log("Test------------>504", consumptionExtrapolationObj);
                                                 let regionId = consumptionExtrapolationObj[0].region.id;
-                                                let consumptionList = consumptionExtrapolationObj[0].extrapolationDataList.map(m => {
-                                                    return {
-                                                        consumptionDate: m.month,
-                                                        consumptionQty: m.amount,
-                                                        region: { regionId: regionId },
-                                                        actualFlag: false
-                                                    }
-                                                });
+
+                                                let consumptionList = [];
+                                                if (yaxisEquUnit != -1) {//yes
+
+                                                    let convertToEu = this.state.filteredProgramEQList.filter(c => c.forecastingUnit.id == planningUniObj.planningUnit.forecastingUnit.id)[0].convertToEu;
+
+
+                                                    consumptionList = consumptionExtrapolationObj[0].extrapolationDataList.map(m => {
+                                                        return {
+                                                            consumptionDate: m.month,
+                                                            consumptionQty: Math.round(m.amount / convertToEu),
+                                                            region: { regionId: regionId },
+                                                            actualFlag: false
+                                                        }
+                                                    });
+                                                } else {
+                                                    consumptionList = consumptionExtrapolationObj[0].extrapolationDataList.map(m => {
+                                                        return {
+                                                            consumptionDate: m.month,
+                                                            consumptionQty: m.amount,
+                                                            region: { regionId: regionId },
+                                                            actualFlag: false
+                                                        }
+                                                    });
+                                                }
+
+
+
+
+
                                                 console.log("Test------------>2.1", planningUniObj.planningUnit.id);
                                                 console.log("Test------------>2.2", consumptionList);
 
@@ -1076,15 +1224,38 @@ class ConsumptionForecastError extends Component {
                                 //actual
                                 let actualConsumptionList1 = actualConsumptionList.filter(c => c.planningUnit.forecastingUnit.id == forecastingUnitId);
                                 console.log("Test------------>1.1 FU", actualConsumptionList1);
-                                let actualConsumptionList2 = actualConsumptionList1.map(m => {
-                                    return {
-                                        consumptionDate: m.month,
-                                        // consumptionQty: m.amount * m.puMultiplier,
-                                        consumptionQty: (consumptionAdjForStockOutId == 2 ? parseInt(m.amount * m.puMultiplier) : (m.daysOfStockOut == null ? parseInt(m.amount * m.puMultiplier) : parseInt(this.calculateDaysInMonth(m.month) / (this.calculateDaysInMonth(m.month) - m.daysOfStockOut) * (m.amount * m.puMultiplier)))),
-                                        region: { regionId: m.region.id },
-                                        actualFlag: true
-                                    }
-                                })
+
+                                let actualConsumptionList2 = [];
+
+                                if (yaxisEquUnit != -1) {//yes
+                                    let convertToEu = this.state.filteredProgramEQList.filter(c => c.forecastingUnit.id == forecastingUnitId)[0].convertToEu;
+
+                                    actualConsumptionList2 = actualConsumptionList1.map(m => {
+                                        return {
+                                            consumptionDate: m.month,
+                                            // consumptionQty: m.amount * m.puMultiplier,
+                                            consumptionQty: (consumptionAdjForStockOutId == 2 ? Math.round(m.amount * m.puMultiplier / convertToEu) : (m.daysOfStockOut == null ? Math.round(m.amount * m.puMultiplier / convertToEu) : Math.round((this.calculateDaysInMonth(m.month) / (this.calculateDaysInMonth(m.month) - m.daysOfStockOut) * (m.amount * m.puMultiplier)) / convertToEu))),
+                                            region: { regionId: m.region.id },
+                                            actualFlag: true
+                                        }
+                                    })
+
+                                } else {
+                                    actualConsumptionList2 = actualConsumptionList1.map(m => {
+                                        return {
+                                            consumptionDate: m.month,
+                                            // consumptionQty: m.amount * m.puMultiplier,
+                                            consumptionQty: (consumptionAdjForStockOutId == 2 ? parseInt(m.amount * m.puMultiplier) : (m.daysOfStockOut == null ? parseInt(m.amount * m.puMultiplier) : parseInt(this.calculateDaysInMonth(m.month) / (this.calculateDaysInMonth(m.month) - m.daysOfStockOut) * (m.amount * m.puMultiplier)))),
+                                            region: { regionId: m.region.id },
+                                            actualFlag: true
+                                        }
+                                    })
+
+                                }
+
+
+
+
 
                                 let actualConsumptionList3 = [];
                                 //filter based on region
@@ -1118,14 +1289,34 @@ class ConsumptionForecastError extends Component {
                                             if (consumptionExtrapolationObj.length > 0) {
                                                 console.log("Test------------>504 FU", consumptionExtrapolationObj);
                                                 let regionId = consumptionExtrapolationObj[0].region.id;
-                                                let consumptionList = consumptionExtrapolationObj[0].extrapolationDataList.map(m => {
-                                                    return {
-                                                        consumptionDate: m.month,
-                                                        consumptionQty: m.amount * consumptionExtrapolationObj[0].planningUnit.multiplier,
-                                                        region: { regionId: regionId },
-                                                        actualFlag: false
-                                                    }
-                                                });
+
+                                                let consumptionList = [];
+                                                if (yaxisEquUnit != -1) {//yes
+
+                                                    let convertToEu = this.state.filteredProgramEQList.filter(c => c.forecastingUnit.id == forecastingUnitId)[0].convertToEu;
+
+                                                    consumptionList = consumptionExtrapolationObj[0].extrapolationDataList.map(m => {
+                                                        return {
+                                                            consumptionDate: m.month,
+                                                            consumptionQty: Math.round(m.amount * consumptionExtrapolationObj[0].planningUnit.multiplier / convertToEu),
+                                                            region: { regionId: regionId },
+                                                            actualFlag: false
+                                                        }
+                                                    });
+                                                } else {
+                                                    consumptionList = consumptionExtrapolationObj[0].extrapolationDataList.map(m => {
+                                                        return {
+                                                            consumptionDate: m.month,
+                                                            consumptionQty: m.amount * consumptionExtrapolationObj[0].planningUnit.multiplier,
+                                                            region: { regionId: regionId },
+                                                            actualFlag: false
+                                                        }
+                                                    });
+                                                }
+
+
+
+
                                                 console.log("Test------------>2.1 FU", planningUniObj.planningUnit.id);
                                                 console.log("Test------------>2.2 FU", consumptionList);
 
@@ -1555,7 +1746,8 @@ class ConsumptionForecastError extends Component {
                             this.setState({
                                 planningUnits: newPlanningUnitList,
                                 forecastingUnits: newForecastingUnitList,
-                                equivalencyUnitLabel: selectedText
+                                equivalencyUnitLabel: selectedText,
+                                filteredProgramEQList: filteredProgramEQList
                             }, () => {
                                 this.getRegionList(programData.regionList);
                                 // this.filterData();

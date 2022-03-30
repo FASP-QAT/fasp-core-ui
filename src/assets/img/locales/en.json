@@ -1626,7 +1626,7 @@
     "static.dataset.manageProgramInfo": "Update Program Info",
     "static.tooltip.ForecastThresholdHigh  ": "Used in Compare and Select screen to compare tree forecasts againt consumption forecasts QAT will flag any tree forecasts that are this % above the highest consumption forecast",
     "static.batchDetails.warningFefo": "NOTE: The only batch remaining is FEFO, which is the default setting. (You will not see the FEFO row when you return to this screen, but FEFO will be applied.)",
-    "static.tree.monthlyEndNoSeasonality": "Node Forecast (No seasonality)",
+    "static.tree.monthlyEndNoSeasonality": "(No seasonality)",
     "static.whatIf.supplyPlanSaved": "Supply plan saved successfully.",
     "static.procurementUnit.procurementUnitText": "Enter Procurement Unit Name",
     "static.shipmentDataentry.procurementAgentOrderNo": "Proc. Agent Order No.",

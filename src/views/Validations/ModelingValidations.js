@@ -507,12 +507,12 @@ class ModelingValidation extends Component {
                 var total = 0;
                 var totalPer = 0;
                 for (var k = 0; k < nodeVal.length; k++) {
-                    var flatListFiltered = flatList.filter(c => getLabelText(c.payload.label, this.state.lang) == nodeVal[k] && c.level==this.state.levelId);
+                    var flatListFiltered = flatList.filter(c => getLabelText(c.payload.label, this.state.lang) == nodeVal[k] && c.level == this.state.levelId);
                     var calculatedValueTotal = 0;
                     for (var fl = 0; fl < flatListFiltered.length; fl++) {
                         var nodeMomList = flatListFiltered[fl].payload.nodeDataMap[this.state.scenarioId][0].nodeDataMomList;
                         var checkIfPuNode = flatList.filter(c => c.id == flatListFiltered[fl].id)[0].payload.nodeType.id;
-                        var cvList = nodeMomList.filter(c => moment(c.month).format("YYYY-MM-DD") == moment(monthList[j]).format("YYYY-MM-DD"));
+                        var cvList = nodeMomList != undefined ? nodeMomList.filter(c => moment(c.month).format("YYYY-MM-DD") == moment(monthList[j]).format("YYYY-MM-DD")) : [];
                         if (cvList.length > 0) {
                             calculatedValueTotal += (checkIfPuNode == 5 ? cvList[0].calculatedMmdValue : cvList[0].calculatedValue);
                         } else {
@@ -529,7 +529,7 @@ class ModelingValidation extends Component {
                     for (var fl = 0; fl < flatListFiltered.length; fl++) {
                         var nodeMomList = flatListFiltered[fl].payload.nodeDataMap[this.state.scenarioId][0].nodeDataMomList;
                         var checkIfPuNode = flatList.filter(c => c.id == flatListFiltered[fl].id)[0].payload.nodeType.id;
-                        var cvList = nodeMomList.filter(c => moment(c.month).format("YYYY-MM-DD") == moment(monthList[j]).format("YYYY-MM-DD"));
+                        var cvList = nodeMomList != undefined ? nodeMomList.filter(c => moment(c.month).format("YYYY-MM-DD") == moment(monthList[j]).format("YYYY-MM-DD")) : [];
                         if (cvList.length > 0) {
                             calculatedValueTotal += checkIfPuNode == 5 ? cvList[0].calculatedMmdValue : cvList[0].calculatedValue;
                         } else {
@@ -1128,7 +1128,7 @@ class ModelingValidation extends Component {
         doc.autoTable(content);
         addHeaders(doc)
         addFooters(doc)
-        doc.save(this.state.datasetData.programCode+ "-" + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text)+"-"+i18n.t('static.dashboard.modelingValidation')+"-"+document.getElementById("treeId").selectedOptions[0].text+"-"+document.getElementById("scenarioId").selectedOptions[0].text + ".pdf")
+        doc.save(this.state.datasetData.programCode + "-" + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text) + "-" + i18n.t('static.dashboard.modelingValidation') + "-" + document.getElementById("treeId").selectedOptions[0].text + "-" + document.getElementById("scenarioId").selectedOptions[0].text + ".pdf")
         //creates PDF from img
         /*  var doc = new jsPDF('landscape');
           doc.setFontSize(20);
@@ -1138,7 +1138,7 @@ class ModelingValidation extends Component {
 
     exportCSV() {
         var csvRow = [];
-        
+
         csvRow.push('"' + (i18n.t('static.supplyPlan.runDate') + ' : ' + moment(new Date()).format(`${DATE_FORMAT_CAP}`)).replaceAll(' ', '%20') + '"')
         csvRow.push('')
         csvRow.push('"' + (i18n.t('static.supplyPlan.runTime') + ' : ' + moment(new Date()).format('hh:mm A')).replaceAll(' ', '%20') + '"')
@@ -1212,7 +1212,7 @@ class ModelingValidation extends Component {
         var a = document.createElement("a")
         a.href = 'data:attachment/csv,' + csvString
         a.target = "_Blank"
-        a.download = this.state.datasetData.programCode+ "-" + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text)+"-"+i18n.t('static.dashboard.modelingValidation')+"-"+document.getElementById("treeId").selectedOptions[0].text+"-"+document.getElementById("scenarioId").selectedOptions[0].text + ".csv"
+        a.download = this.state.datasetData.programCode + "-" + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text) + "-" + i18n.t('static.dashboard.modelingValidation') + "-" + document.getElementById("treeId").selectedOptions[0].text + "-" + document.getElementById("scenarioId").selectedOptions[0].text + ".csv"
         document.body.appendChild(a)
         a.click()
     }
@@ -1423,11 +1423,12 @@ class ModelingValidation extends Component {
             }, this);
 
         const { levelList } = this.state;
+        const levelListForNames = this.state.levelList.length > 0 ? this.state.treeListFiltered.levelList : [];
         let levels = levelList.length > 0
             && levelList.map((item, i) => {
                 return (
                     <option key={i} value={item}>
-                        {item}
+                        {levelListForNames.filter(c => c.levelNo == item).length > 0 ? getLabelText(levelListForNames.filter(c => c.levelNo == item)[0].label, this.state.lang) : i18n.t("static.common.level") + " " + item}
                     </option>
                 )
             }, this);
@@ -1442,7 +1443,7 @@ class ModelingValidation extends Component {
                     <div className="Card-header-reporticon pb-2">
                         <span className="compareAndSelect-larrow"> <i className="cui-arrow-left icons " > </i></span>
                         <span className="compareAndSelect-larrowText"> {i18n.t('static.common.backTo')} <a href={this.state.datasetId != -1 && this.state.datasetId != "" && this.state.datasetId != undefined ? "/#/dataSet/buildTree/tree/0/" + this.state.datasetId : "/#/dataSet/buildTree"} className="supplyplanformulas">{i18n.t('static.common.managetree')}</a> </span>
-                       
+
                         {/* {this.state.dataList.length > 0 && */}
                         <div className="card-header-actions">
                             <a className="card-header-action">
