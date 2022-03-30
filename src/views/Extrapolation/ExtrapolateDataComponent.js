@@ -1678,48 +1678,48 @@ export default class ExtrapolateDataComponent extends React.Component {
             movingAvgId: movingAvgId,
             show:false,
             dataChanged: true
-        // }, () => {
-        //     this.buildActualJxl()
+        }, () => {
+            this.buildActualJxl()
         })
     }
     setSemiAvgId(e) {
         var semiAvgId = e.target.checked;
         this.setState({
             semiAvgId: semiAvgId,
-            show:false,
+            // show:false,
             dataChanged: true
-        // }, () => {
-        //     this.buildActualJxl()
+        }, () => {
+            this.buildActualJxl()
         })
     }
     setLinearRegressionId(e) {
         var linearRegressionId = e.target.checked;
         this.setState({
             linearRegressionId: linearRegressionId,
-            show:false,
+            // show:false,
             dataChanged: true
-        // }, () => {
-        //     this.buildActualJxl()
+        }, () => {
+            this.buildActualJxl()
         })
     }
     setSmoothingId(e) {
         var smoothingId = e.target.checked;
         this.setState({
             smoothingId: smoothingId,
-            show:false,
+           // show:false,
             dataChanged: true
-        // }, () => {
-        //     this.buildActualJxl()
+        }, () => {
+            this.buildActualJxl()
         })
     }
     setArimaId(e) {
         var arimaId = e.target.checked;
         this.setState({
             arimaId: arimaId,
-            show:false,
+            // show:false,
             dataChanged: true
-        // }, () => {
-        //     this.buildActualJxl()
+        }, () => {
+            this.buildActualJxl()
         })
     }
     // setShowAdvanceId(e) {
