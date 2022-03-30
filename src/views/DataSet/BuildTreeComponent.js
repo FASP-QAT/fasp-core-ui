@@ -1145,9 +1145,14 @@ export default class BuildTree extends Component {
         console.log("reset node data function called");
         const { orgCurrentItemConfig, currentItemConfig } = this.state;
         var nodeTypeId = currentItemConfig.context.payload.nodeType.id;
+        console.log("reset node data function called 1---",currentItemConfig);
         currentItemConfig.context = JSON.parse(JSON.stringify(orgCurrentItemConfig));
         // currentScenario = JSON.parse(JSON.stringify((orgCurrentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0]));
         console.log("============1============", orgCurrentItemConfig);
+        if (nodeTypeId == 5) {
+            console.log("reset node data function called 2---",orgCurrentItemConfig);
+            currentItemConfig.context.payload.nodeUnit.id = this.state.items.filter(x => x.id == currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id;
+        }
         this.setState({
             currentItemConfig,
             currentScenario: (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0],
@@ -1155,6 +1160,7 @@ export default class BuildTree extends Component {
             fuValues: this.state.addNodeFlag ? [] : { value: orgCurrentItemConfig.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.forecastingUnit.id, label: getLabelText(orgCurrentItemConfig.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.forecastingUnit.label, this.state.lang) + " | " + orgCurrentItemConfig.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.forecastingUnit.id },
             usageText: ""
         }, () => {
+            console.log("reset node data function called 3---",this.state.currentItemConfig);
             if (nodeTypeId == 4) {
                 this.getForecastingUnitListByTracerCategoryId(0);
             }
@@ -2691,8 +2697,8 @@ export default class BuildTree extends Component {
                                 var startDate = parts1[0] + "-" + parts1[1] + "-01"
                                 var parts2 = map1.get("4").split('-');
                                 var stopDate = parts2[0] + "-" + parts2[1] + "-01"
-                                startDate=moment(map1.get("3")).startOf('month').format("YYYY-MM-DD");
-                                stopDate=moment(map1.get("4")).startOf('month').format("YYYY-MM-DD");
+                                startDate = moment(map1.get("3")).startOf('month').format("YYYY-MM-DD");
+                                stopDate = moment(map1.get("4")).startOf('month').format("YYYY-MM-DD");
                                 if (map1.get("9") != "" && map1.get("9") != 0) {
                                     console.log("inside 9 map true---");
                                     const itemIndex = data.findIndex(o => o.nodeDataModelingId === map1.get("9"));
@@ -7442,6 +7448,7 @@ export default class BuildTree extends Component {
                                             </div>
                                             <FormGroup className="col-md-2" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 5 ? 'block' : 'none' }}>
                                                 <Label htmlFor="currencyId">{i18n.t('static.product.product')}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover12" onClick={this.togglePlanningUnitNode} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
+                                                {/* {this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.planningUnit.id} */}
 
                                             </FormGroup>
                                             <FormGroup className="col-md-10" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 5 ? 'block' : 'none' }}>
@@ -7453,7 +7460,7 @@ export default class BuildTree extends Component {
                                                     invalid={touched.planningUnitId && !!errors.planningUnitId}
                                                     onBlur={handleBlur}
                                                     onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                    value={this.state.currentItemConfig.context.payload.nodeType.id == 5 ? this.state.currentScenario.puNode.planningUnit.id : ""}>
+                                                    value={this.state.currentItemConfig.context.payload.nodeType.id == 5 ? this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.planningUnit.id : ""}>
 
                                                     <option value="">{i18n.t('static.common.select')}</option>
                                                     {this.state.planningUnitList.length > 0
