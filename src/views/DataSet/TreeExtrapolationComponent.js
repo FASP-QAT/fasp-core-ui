@@ -706,11 +706,11 @@ export default class TreeExtrapolationComponent extends React.Component {
             minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
             maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
             rangeValue: { from: { year: new Date(startDate).getFullYear(), month: new Date(startDate).getMonth() + 1 }, to: { year: new Date(endDate).getFullYear(), month: new Date(endDate).getMonth() + 1 } },
-            movingAvgId: false,
-            semiAvgId: false,
-            linearRegressionId: false,
-            smoothingId: false,
-            arimaId: false,
+            movingAvgId: true,
+            semiAvgId: true,
+            linearRegressionId: true,
+            smoothingId: true,
+            arimaId: true,
             // movingAvgId: true,
             // semiAvgId: true,
             // linearRegressionId: true,
@@ -1516,7 +1516,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                     }, () => {
                         if (this.props.items.currentScenario.nodeDataExtrapolationOptionList == null) {
                             console.log("### inside did mount if")
-                            this.setState({ extrapolationLoader: false, forecastNestedHeader: 0 }, () => {
+                            this.setState({ extrapolationLoader: false, forecastNestedHeader: 5, filteredExtrapolationMethodList: JSON.parse(JSON.stringify(this.state.extrapolationMethodList)) }, () => {
                                 console.log("### inside did mount if state update")
                                 this.buildJexcel();
                             })
@@ -2236,6 +2236,8 @@ export default class TreeExtrapolationComponent extends React.Component {
                     //     }
                     // }
                     json1 = this.state.extrapolationMethodList.filter(c => c.id == 5)[0];
+                    console.log("this.state.extrapolationMethodList---",this.state.extrapolationMethodList);
+                    console.log("filteredExtrapolationMethodList json1---",json1)
                     // this.state.nodeDataExtrapolationOptionList.push(json);
                     filteredExtrapolationMethodList.push(json1);
                     if (this.state.dataExtrapolation != null) {
@@ -2245,6 +2247,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                     // const index = this.state.nodeDataExtrapolationOptionList.findIndex(c => c.extrapolationMethod.id == 5);
                     const index1 = filteredExtrapolationMethodList.findIndex(c => c.id == 5);
                     filteredExtrapolationMethodList.splice(index1, 1);
+                    console.log("filteredExtrapolationMethodList after update---",filteredExtrapolationMethodList)
                     // this.state.nodeDataExtrapolationOptionList.splice(index, 1);
                     if (this.state.dataExtrapolation != null) {
                         this.state.dataExtrapolation.hideColumn(6);
@@ -2444,6 +2447,7 @@ export default class TreeExtrapolationComponent extends React.Component {
 
     render() {
         const { filteredExtrapolationMethodList } = this.state;
+        console.log("render filteredExtrapolationMethodList ---",filteredExtrapolationMethodList)
         let extrapolationMethods = filteredExtrapolationMethodList.length > 0
             && filteredExtrapolationMethodList.map((item, i) => {
                 return (
@@ -3254,6 +3258,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                     {this.state.showJexcelData ? i18n.t('static.common.hideData') : i18n.t('static.common.showData')}
                                                 </Button>
                                                 <Button type="button" color="success" className="mr-1" size="md" onClick={this.interpolate}>Interpolate</Button>
+                                                <Button type="button" id="dataCheck" size="md" color="info" className="float-right mr-1" onClick={() => this.checkActualValuesGap(true)}>Extrapolate</Button>
                                             </div>
                                         </div>
                                         {/* </Form> */}
@@ -3472,7 +3477,6 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                 </FormGroup>
                                                 <FormGroup className="pl-lg-3 ExtrapolateSaveBtn">
                                                     <Button type="submit" color="success" onClick={() => this.touchAllExtrapolation(setTouched, errors)} className="mr-1 float-right" size="md"><i className="fa fa-check"></i>{i18n.t('static.pipeline.save')}</Button>
-                                                    <Button type="button" id="dataCheck" size="md" color="info" className="float-right mr-1" onClick={() => this.checkActualValuesGap(true)}><i className="fa fa-check"></i>Extrapolate</Button>
                                                 </FormGroup>
                                             </Row>
                                         </div>
