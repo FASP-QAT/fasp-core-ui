@@ -1144,23 +1144,50 @@ export default class BuildTree extends Component {
     resetNodeData() {
         console.log("reset node data function called");
         const { orgCurrentItemConfig, currentItemConfig } = this.state;
-        var nodeTypeId = currentItemConfig.context.payload.nodeType.id;
-        console.log("reset node data function called 1---",currentItemConfig);
+        var nodeTypeId;
+        var fuValues = [];
+        if (currentItemConfig.context.level != 0 && currentItemConfig.parentItem.payload.nodeType.id == 4) {
+            nodeTypeId = PU_NODE_ID;
+            console.log("reset node data function called 0.1---", currentItemConfig);
+        } else {
+            nodeTypeId = currentItemConfig.context.payload.nodeType.id;
+        }
+        // conso
+        console.log("reset node data function called 1---", currentItemConfig);
         currentItemConfig.context = JSON.parse(JSON.stringify(orgCurrentItemConfig));
         // currentScenario = JSON.parse(JSON.stringify((orgCurrentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0]));
         console.log("============1============", orgCurrentItemConfig);
         if (nodeTypeId == 5) {
-            console.log("reset node data function called 2---",orgCurrentItemConfig);
+            console.log("reset node data function called 2---", orgCurrentItemConfig);
+            currentItemConfig.context.payload.nodeType.id = nodeTypeId;
+
             currentItemConfig.context.payload.nodeUnit.id = this.state.items.filter(x => x.id == currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id;
+            if (this.state.addNodeFlag) {
+                var parentCalculatedDataValue = this.state.items.filter(x => x.id == currentItemConfig.context.parent)[0].payload.nodeDataMap[this.state.selectedScenario][0].calculatedDataValue;
+                console.log("parentCalculatedDataValue 1---", this.state.items.filter(x => x.id == currentItemConfig.context.parent)[0].payload.nodeDataMap[this.state.selectedScenario][0]);
+                console.log("parentCalculatedDataValue 2---", parentCalculatedDataValue);
+                currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].dataValue = 100;
+                currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].calculatedDataValue = ((100 * parentCalculatedDataValue) / 100).toString();
+            }
+            var planningUnit = this.state.updatedPlanningUnitList.filter(x => x.id == currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.planningUnit.id);
+            var conversionFactor = planningUnit.length > 0 ? planningUnit[0].multiplier : "";
+            console.log("conversionFactor---", conversionFactor);
+            this.setState({
+                conversionFactor
+            }, () => {
+                this.getUsageText();
+            });
+        } else if (nodeTypeId == 4 && !this.state.addNodeFlag) {
+            fuValues = { value: orgCurrentItemConfig.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.forecastingUnit.id, label: getLabelText(orgCurrentItemConfig.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.forecastingUnit.label, this.state.lang) + " | " + orgCurrentItemConfig.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.forecastingUnit.id };
         }
         this.setState({
             currentItemConfig,
             currentScenario: (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0],
             usageTemplateId: "",
-            fuValues: this.state.addNodeFlag ? [] : { value: orgCurrentItemConfig.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.forecastingUnit.id, label: getLabelText(orgCurrentItemConfig.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.forecastingUnit.label, this.state.lang) + " | " + orgCurrentItemConfig.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.forecastingUnit.id },
+            fuValues: fuValues,
             usageText: ""
         }, () => {
-            console.log("reset node data function called 3---",this.state.currentItemConfig);
+            console.log("reset node data function called 3---", this.state.currentScenario);
             if (nodeTypeId == 4) {
                 this.getForecastingUnitListByTracerCategoryId(0);
             }
@@ -5096,30 +5123,33 @@ export default class BuildTree extends Component {
                 //PU
                 console.log("pu>>>", this.state.currentItemConfig);
                 console.log("puList>>>", this.state.currentItemConfig.parentItem.parent);
-                ;
-                var nodeUnitTxt = this.state.unitList.filter(c => c.unitId == this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id)[0].label.label_en;
-                if (this.state.addNodeFlag) {
-                    var planningUnitId = document.getElementById("planningUnitId");
-                    var planningUnit = planningUnitId.options[planningUnitId.selectedIndex].text;
-                } else {
-                    var planningUnit = this.state.updatedPlanningUnitList.filter(c => c.id == this.state.currentScenario.puNode.planningUnit.id)[0].label.label_en;
-                }
-                if ((this.state.currentItemConfig.parentItem.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.usageType.id == 1) {
-                    var sharePu;
-                    if (this.state.currentScenario.puNode.sharePlanningUnit == "true") {
-                        sharePu = (this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor);
+                if (this.state.currentScenario.puNode.planningUnit.id != null && this.state.currentScenario.puNode.planningUnit.id != "") {
+                    var nodeUnitTxt = this.state.unitList.filter(c => c.unitId == this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id)[0].label.label_en;
+                    if (this.state.addNodeFlag) {
+                        var planningUnitId = document.getElementById("planningUnitId");
+                        var planningUnit = planningUnitId.options[planningUnitId.selectedIndex].text;
                     } else {
-                        sharePu = Math.round((this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor));
+                        var planningUnit = this.state.updatedPlanningUnitList.filter(c => c.id == this.state.currentScenario.puNode.planningUnit.id)[0].label.label_en;
                     }
-                    usageText = i18n.t('static.tree.forEach') + " " + nodeUnitTxt + " " + i18n.t('static.tree.weNeed') + " " + sharePu + " " + planningUnit;
+                    if ((this.state.currentItemConfig.parentItem.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.usageType.id == 1) {
+                        var sharePu;
+                        if (this.state.currentScenario.puNode.sharePlanningUnit == "true") {
+                            sharePu = (this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor);
+                        } else {
+                            sharePu = Math.round((this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor));
+                        }
+                        usageText = i18n.t('static.tree.forEach') + " " + nodeUnitTxt + " " + i18n.t('static.tree.weNeed') + " " + sharePu + " " + planningUnit;
+                    } else {
+                        // need grand parent here 
+                        // console.log("1>>>", (this.state.currentItemConfig.parentItem.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.noOfForecastingUnitsPerPerson);
+                        // console.log("2>>>", this.state.noOfMonthsInUsagePeriod);
+                        // console.log("3>>>", this.state.conversionFactor);
+                        // console.log("4>>>", this.state.currentScenario.puNode.refillMonths);
+                        var puPerInterval = ((((this.state.currentItemConfig.parentItem.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod) / this.state.conversionFactor) * this.state.currentScenario.puNode.refillMonths);
+                        usageText = i18n.t('static.tree.forEach') + " " + nodeUnitTxt + " " + i18n.t('static.tree.weNeed') + " " + addCommas(puPerInterval) + " " + planningUnit + " " + i18n.t('static.usageTemplate.every') + " " + this.state.currentScenario.puNode.refillMonths + " " + i18n.t('static.report.month');
+                    }
                 } else {
-                    // need grand parent here 
-                    // console.log("1>>>", (this.state.currentItemConfig.parentItem.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.noOfForecastingUnitsPerPerson);
-                    // console.log("2>>>", this.state.noOfMonthsInUsagePeriod);
-                    // console.log("3>>>", this.state.conversionFactor);
-                    // console.log("4>>>", this.state.currentScenario.puNode.refillMonths);
-                    var puPerInterval = ((((this.state.currentItemConfig.parentItem.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod) / this.state.conversionFactor) * this.state.currentScenario.puNode.refillMonths);
-                    usageText = i18n.t('static.tree.forEach') + " " + nodeUnitTxt + " " + i18n.t('static.tree.weNeed') + " " + addCommas(puPerInterval) + " " + planningUnit + " " + i18n.t('static.usageTemplate.every') + " " + this.state.currentScenario.puNode.refillMonths + " " + i18n.t('static.report.month');
+                    usageText = "";
                 }
             }
         } catch (err) {
@@ -7460,7 +7490,7 @@ export default class BuildTree extends Component {
                                                     invalid={touched.planningUnitId && !!errors.planningUnitId}
                                                     onBlur={handleBlur}
                                                     onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                    value={this.state.currentItemConfig.context.payload.nodeType.id == 5 ? this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.planningUnit.id : ""}>
+                                                    value={this.state.currentItemConfig.context.payload.nodeType.id == 5 ? this.state.currentScenario.puNode.planningUnit.id : ""}>
 
                                                     <option value="">{i18n.t('static.common.select')}</option>
                                                     {this.state.planningUnitList.length > 0
@@ -9232,7 +9262,7 @@ export default class BuildTree extends Component {
                                         planningUnit: {
                                             id: '',
                                             unit: {
-
+                                                id: ''
                                             },
                                             multiplier: ''
                                         },
