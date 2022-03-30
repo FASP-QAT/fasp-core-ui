@@ -355,9 +355,10 @@ export default class CommitTreeComponent extends React.Component {
                             var transaction1 = db1.transaction(['datasetDetails'], 'readwrite');
                             var program1 = transaction1.objectStore('datasetDetails');
                             var getRequest1 = program1.put(myResult);
+                            var message=i18n.t('static.commitTree.commitFailed').concat(" - ").concat(resp.data.failedReason).toString().replaceAll(":"," ");
                             getRequest1.onsuccess = function (e) {
                                 this.setState({
-                                    message: i18n.t('static.commitTree.commitFailed'),
+                                    message: message,
                                     color: 'red',
                                     loading: false
                                 })
