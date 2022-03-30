@@ -3253,20 +3253,29 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                 </FormGroup>
                                             </div>
 
-                                            <div className="col-md-12 row text-left pt-lg-3 pl-lg-0">
-                                                <Button className="mr-1 btn btn-info btn-md " onClick={this.toggleJexcelData}>
-                                                    {this.state.showJexcelData ? i18n.t('static.common.hideData') : i18n.t('static.common.showData')}
+                                            <div className="col-md-12 row text-left pt-lg-0 pl-lg-0">
+                                                
+                                                <div className="col-md-6 pl-lg-0">
+                                                <Button type="button" color="success" className="float-left mr-1" size="md" onClick={this.interpolate}>Interpolate</Button>
+                                                <Button type="button" id="dataCheck" size="md" color="info" className="mr-1" onClick={() => this.checkActualValuesGap(true)}>Extrapolate</Button>
+                                                </div>
+                                                <div className="col-md-6 pr-lg-0">
+                                                <Button className="btn btn-info btn-md float-right" onClick={this.toggleJexcelData}>
+                                                <i className={this.state.showJexcelData ? "fa fa-eye" : "fa fa-eye-slash"} style={{ color: '#fff' }}></i> {this.state.showJexcelData ? i18n.t('static.common.hideData') : i18n.t('static.common.showData')}
                                                 </Button>
-                                                <Button type="button" color="success" className="mr-1" size="md" onClick={this.interpolate}>Interpolate</Button>
-                                                <Button type="button" id="dataCheck" size="md" color="info" className="float-right mr-1" onClick={() => this.checkActualValuesGap(true)}>Extrapolate</Button>
+                                                {/* <Button className="mr-1 btn btn-info btn-md " onClick={this.toggleJexcelData}>
+                                                    {this.state.showJexcelData ? i18n.t('static.common.hideData') : i18n.t('static.common.showData')}
+                                                </Button> */}
+                                                </div>
                                             </div>
+                                         
                                         </div>
                                         {/* </Form> */}
                                         <div className="row pl-lg-0 pr-lg-0 pt-lg-3" style={{ display: this.state.showJexcelData ? 'block' : 'none' }}>
                                             <div className="col-md-6">
                                                 {/* <Button type="button" size="md" color="info" className="float-left mr-1" onClick={this.resetTree}>{'Show/hide data'}</Button> */}
                                             </div>
-                                            <div className="col-md-6 float-right" style={{ marginTop: '-42px' }}>
+                                            <div className="col-md-6 float-right" style={{ marginTop: '0px' }}>
                                                 <FormGroup className="float-right" >
                                                     <div className="check inline pl-lg-1 pt-lg-0">
                                                         <div>

@@ -6170,7 +6170,9 @@ font-style: italic!important;
 
 .TreeTemplateHeight{
   // height: 100vh!important;
-  min-height: calc(100vh - 50px)!important;
+  // min-height: calc(100vh - 50px)!important;
+    // overflow: scroll !important;
+    min-height: calc(100vh - 427px) !important;
     // overflow: scroll !important;
 }
 .VersionSettingMode{
@@ -6281,4 +6283,7 @@ font-style: italic!important;
   // text-overflow: ellipsis;
   // // width: 200px;
   // word-wrap: break-word;
+}
+.ModelingTableMargin{
+  margin: 0 auto;
 }
