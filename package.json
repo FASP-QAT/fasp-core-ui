@@ -58,7 +58,7 @@
     "jspdf": "^1.5.3",
     "jspdf-autotable": "^3.5.3",
     "jsstore": "^3.7.6",
-    "jsuites": "^4.1.0",
+    "jsuites": "^4.11.1",
     "jszip": "^3.2.2",
     "jwt-decode": "^2.2.0",
     "moment": "^2.24.0",
