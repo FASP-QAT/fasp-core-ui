@@ -6287,3 +6287,9 @@ font-style: italic!important;
 .ModelingTableMargin{
   margin: 0 auto;
 }
+@media (min-width: 1920px) {
+  .TreeTemplateHeight{
+     min-height: calc(100vh - 427px) !important;
+     
+  }
+}
