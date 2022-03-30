@@ -1859,12 +1859,14 @@ class ForecastSummary extends Component {
 
 
             } else {//server version
-                let selectedForecastProgram = this.state.programs.filter(c => c.programId == programId && c.currentVersion.versionId == versionId)[0];
+                let selectedForecastProgram = this.state.programs.filter(c => c.programId == programId)[0];
+
+                let selectedVersion = selectedForecastProgram.versionList.filter(c => c.versionId == versionId)[0];
                 console.log("Test-----------------111", selectedForecastProgram);
 
                 let tempObj = {
-                    forecastStartDate: (selectedForecastProgram.currentVersion.forecastStartDate ? moment(selectedForecastProgram.currentVersion.forecastStartDate).format(`MMM-YYYY`) : ''),
-                    forecastStopDate: (selectedForecastProgram.currentVersion.forecastStopDate ? moment(selectedForecastProgram.currentVersion.forecastStopDate).format(`MMM-YYYY`) : ''),
+                    forecastStartDate: (selectedVersion.forecastStartDate ? moment(selectedVersion.forecastStartDate).format(`MMM-YYYY`) : ''),
+                    forecastStopDate: (selectedVersion.forecastStopDate ? moment(selectedVersion.forecastStopDate).format(`MMM-YYYY`) : ''),
                 }
 
                 selectedForecastProgram = {
@@ -1879,11 +1881,11 @@ class ForecastSummary extends Component {
                 let forecastStopDate = new Date(selectedForecastProgram.forecastStartDate);
                 forecastStopDate.setMonth(forecastStopDate.getMonth() - 1);
 
-                let d11 = new Date(startDateSplit[1] - 3 + '-' + (new Date(selectedForecastProgram.currentVersion.forecastStartDate).getMonth() + 1) + '-01 00:00:00');
+                let d11 = new Date(startDateSplit[1] - 3 + '-' + (new Date(selectedVersion.forecastStartDate).getMonth() + 1) + '-01 00:00:00');
                 d11.setMonth(d11.getMonth() - 1);
 
-                let d1 = new Date(selectedForecastProgram.currentVersion.forecastStartDate);
-                let d2 = new Date(selectedForecastProgram.currentVersion.forecastStopDate);
+                let d1 = new Date(selectedVersion.forecastStartDate);
+                let d2 = new Date(selectedVersion.forecastStopDate);
                 var month = [
                     "Jan",
                     "Feb",

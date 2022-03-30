@@ -2147,11 +2147,14 @@ class ForecastOutput extends Component {
                 }, () => { })
 
             } else {//server version
-                let selectedForecastProgram = this.state.programs.filter(c => c.programId == programId && c.currentVersion.versionId == versionId)[0]
+                let selectedForecastProgram = this.state.programs.filter(c => c.programId == programId)[0];
+
+                let currentProgramVersion = selectedForecastProgram.versionList.filter(c => c.versionId == versionId)[0];
+
                 console.log("selectedForecastProgram---------->", selectedForecastProgram);
 
-                let d1 = new Date(selectedForecastProgram.currentVersion.forecastStartDate);
-                let d2 = new Date(selectedForecastProgram.currentVersion.forecastStopDate);
+                let d1 = new Date(currentProgramVersion.forecastStartDate);
+                let d2 = new Date(currentProgramVersion.forecastStopDate);
                 var month = [
                     "Jan",
                     "Feb",
@@ -2170,10 +2173,10 @@ class ForecastOutput extends Component {
                 let forecastStopDate = new Date((month[d1.getMonth()] + '-' + d1.getFullYear()));
                 forecastStopDate.setMonth(forecastStopDate.getMonth() - 1);
 
-                let forecastStartDateNew = selectedForecastProgram.currentVersion.forecastStartDate;
-                let forecastStopDateNew = selectedForecastProgram.currentVersion.forecastStopDate;
+                let forecastStartDateNew = currentProgramVersion.forecastStartDate;
+                let forecastStopDateNew = currentProgramVersion.forecastStopDate;
 
-                let beforeEndDateDisplay = new Date(selectedForecastProgram.forecastStartDate);
+                let beforeEndDateDisplay = new Date(currentProgramVersion.forecastStartDate);
                 beforeEndDateDisplay.setMonth(beforeEndDateDisplay.getMonth() - 1);
 
                 this.setState({
