@@ -350,6 +350,22 @@ function addCommas(cell1, row) {
         cell1 += '';
         var x = cell1.replaceAll(",", "").split('.');
         var x1 = x[0];
+        var x2 = x.length > 1 ? '.' + x[1].slice(0, 4) : '';
+        var rgx = /(\d+)(\d{3})/;
+        while (rgx.test(x1)) {
+            x1 = x1.replace(rgx, '$1' + ',' + '$2');
+        }
+        return x1 + x2;
+        // return cell1.toString().replaceAll(",", "").replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+    } else {
+        return "";
+    }
+}
+function addCommasTwoDecimal(cell1, row) {
+    if (cell1 != null && cell1 != "") {
+        cell1 += '';
+        var x = cell1.replaceAll(",", "").split('.');
+        var x1 = x[0];
         var x2 = x.length > 1 ? '.' + x[1].slice(0, 2) : '';
         var rgx = /(\d+)(\d{3})/;
         while (rgx.test(x1)) {
@@ -1616,9 +1632,9 @@ export default class CreateTreeTemplate extends Component {
                     if (type == 1) {
                         if (itemConfig.payload.nodeType.id == 1) {
                             (itemConfig.payload.nodeDataMap[0])[0].displayDataValue = (itemConfig.payload.nodeDataMap[0])[0].dataValue != "" ? (itemConfig.payload.nodeDataMap[0])[0].dataValue : "0";
-                            return addCommas((itemConfig.payload.nodeDataMap[0])[0].displayDataValue.toString());
+                            return addCommasTwoDecimal((itemConfig.payload.nodeDataMap[0])[0].displayDataValue.toString());
                         } else {
-                            return addCommas((itemConfig.payload.nodeDataMap[0])[0].dataValue.toString());
+                            return addCommasTwoDecimal((itemConfig.payload.nodeDataMap[0])[0].dataValue.toString());
                         }
                     } else if (type == 3) {
                         var childList = this.state.items.filter(c => c.parent == itemConfig.id && (c.payload.nodeType.id == 3 || c.payload.nodeType.id == 4 || c.payload.nodeType.id == 5));
@@ -1661,7 +1677,7 @@ export default class CreateTreeTemplate extends Component {
                                 }
                             }
                             (itemConfig.payload.nodeDataMap[0])[0].totalValue = totalValue;
-                            (itemConfig.payload.nodeDataMap[0])[0].fuPerMonth = addCommas(Math.round(fuPerMonth));
+                            (itemConfig.payload.nodeDataMap[0])[0].fuPerMonth = addCommasTwoDecimal(Math.round(fuPerMonth));
                             // var items = this.state.items;
                             // var tempItem = items.filter(x=>x.id == itemConfig.id);
                             // tempItem.fuPerMonth = fuPerMonth;
@@ -1669,11 +1685,11 @@ export default class CreateTreeTemplate extends Component {
                             // var findNodeIndex = items.findIndex(n => n.id == itemConfig.id);
                             // items[findNodeIndex] = tempItem;
 
-                            return addCommas((itemConfig.payload.nodeDataMap[0])[0].dataValue.toString()) + "% of parent, " + addCommas(Math.round(fuPerMonth)) + "/" + 'Month';
+                            return addCommasTwoDecimal((itemConfig.payload.nodeDataMap[0])[0].dataValue.toString()) + "% of parent, " + addCommasTwoDecimal(Math.round(fuPerMonth)) + "/" + 'Month';
                         } else if (itemConfig.payload.nodeType.id == 5) {
-                            return addCommas((itemConfig.payload.nodeDataMap[0])[0].dataValue.toString()) + "% of parent, conversion = " + (itemConfig.payload.nodeDataMap[0])[0].puNode.planningUnit.multiplier;
+                            return addCommasTwoDecimal((itemConfig.payload.nodeDataMap[0])[0].dataValue.toString()) + "% of parent, conversion = " + (itemConfig.payload.nodeDataMap[0])[0].puNode.planningUnit.multiplier;
                         } else {
-                            return addCommas((itemConfig.payload.nodeDataMap[0])[0].dataValue.toString()) + "% of parent";
+                            return addCommasTwoDecimal((itemConfig.payload.nodeDataMap[0])[0].dataValue.toString()) + "% of parent";
                         }
                     } else if (type == 3) {
                         var childList = this.state.items.filter(c => c.parent == itemConfig.id && (c.payload.nodeType.id == 3 || c.payload.nodeType.id == 4 || c.payload.nodeType.id == 5));
@@ -1690,16 +1706,16 @@ export default class CreateTreeTemplate extends Component {
                         }
                     } else {
                         if (itemConfig.payload.nodeType.id == 4) {
-                            (itemConfig.payload.nodeDataMap[0])[0].displayCalculatedDataValue = ((itemConfig.payload.nodeDataMap[0])[0].totalValue != null ? addCommas(Math.round((itemConfig.payload.nodeDataMap[0])[0].totalValue).toString()) : "0");
-                            return "= " + ((itemConfig.payload.nodeDataMap[0])[0].totalValue != null ? addCommas(Math.round((itemConfig.payload.nodeDataMap[0])[0].totalValue).toString()) : "0");
+                            (itemConfig.payload.nodeDataMap[0])[0].displayCalculatedDataValue = ((itemConfig.payload.nodeDataMap[0])[0].totalValue != null ? addCommasTwoDecimal(Math.round((itemConfig.payload.nodeDataMap[0])[0].totalValue).toString()) : "0");
+                            return "= " + ((itemConfig.payload.nodeDataMap[0])[0].totalValue != null ? addCommasTwoDecimal(Math.round((itemConfig.payload.nodeDataMap[0])[0].totalValue).toString()) : "0");
                         } else if (itemConfig.payload.nodeType.id == 5) {
                             totalValue = ((this.state.items.filter(x => x.id == itemConfig.parent)[0].payload.nodeDataMap[0][0].totalValue * (itemConfig.payload.nodeDataMap[0])[0].dataValue) / 100) / (itemConfig.payload.nodeDataMap[0])[0].puNode.planningUnit.multiplier;
                             // totalValue = (this.state.items.filter(x => x.id == itemConfig.parent)[0].payload.nodeDataMap[0][0].totalValue * (itemConfig.payload.nodeDataMap[0])[0].dataValue) / 100;
-                            (itemConfig.payload.nodeDataMap[0])[0].displayCalculatedDataValue = (totalValue != null ? addCommas(Math.round(totalValue).toString()) : "0");
-                            return "= " + (totalValue != null ? addCommas(Math.round(totalValue).toString()) : "0");
+                            (itemConfig.payload.nodeDataMap[0])[0].displayCalculatedDataValue = (totalValue != null ? addCommasTwoDecimal(Math.round(totalValue).toString()) : "0");
+                            return "= " + (totalValue != null ? addCommasTwoDecimal(Math.round(totalValue).toString()) : "0");
                         }
                         else {
-                            return "= " + ((itemConfig.payload.nodeDataMap[0])[0].calculatedDataValue != null ? addCommas((itemConfig.payload.nodeDataMap[0])[0].calculatedDataValue.toString()) : "0");
+                            return "= " + ((itemConfig.payload.nodeDataMap[0])[0].calculatedDataValue != null ? addCommasTwoDecimal((itemConfig.payload.nodeDataMap[0])[0].calculatedDataValue.toString()) : "0");
                         }
                     }
                 }

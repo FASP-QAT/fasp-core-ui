@@ -433,6 +433,22 @@ function addCommas(cell1, row) {
         cell1 += '';
         var x = cell1.replaceAll(",", "").split('.');
         var x1 = x[0];
+        var x2 = x.length > 1 ? '.' + x[1].slice(0, 4) : '';
+        var rgx = /(\d+)(\d{3})/;
+        while (rgx.test(x1)) {
+            x1 = x1.replace(rgx, '$1' + ',' + '$2');
+        }
+        return x1 + x2;
+        // return cell1.toString().replaceAll(",", "").replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+    } else {
+        return "";
+    }
+}
+function addCommasTwoDecimal(cell1, row) {
+    if (cell1 != null && cell1 != "") {
+        cell1 += '';
+        var x = cell1.replaceAll(",", "").split('.');
+        var x1 = x[0];
         var x2 = x.length > 1 ? '.' + x[1].slice(0, 2) : '';
         var rgx = /(\d+)(\d{3})/;
         while (rgx.test(x1)) {
@@ -3814,7 +3830,7 @@ export default class BuildTree extends Component {
                     if (type == 1) {
                         console.log("get payload 1--->", (itemConfig.payload.nodeDataMap[scenarioId])[0]);
                         console.log("get payload 1--->>>", (itemConfig.payload.nodeDataMap[scenarioId])[0].displayDataValue);
-                        return addCommas((itemConfig.payload.nodeDataMap[scenarioId])[0].displayDataValue);
+                        return addCommasTwoDecimal((itemConfig.payload.nodeDataMap[scenarioId])[0].displayDataValue);
                     } else if (type == 3) {
                         console.log("get payload 2");
                         var childList = this.state.items.filter(c => c.parent == itemConfig.id && (c.payload.nodeType.id == 3 || c.payload.nodeType.id == 4 || c.payload.nodeType.id == 5));
@@ -3837,19 +3853,13 @@ export default class BuildTree extends Component {
                     if (type == 1) {
                         console.log("get payload 5", (itemConfig.payload.nodeDataMap[scenarioId])[0].fuNode);
                         if (itemConfig.payload.nodeType.id == 4) {
-                            // if ((itemConfig.payload.nodeDataMap[scenarioId])[0].fuNode.usageType.id == 2) {
-                            // console.log("test---", (itemConfig.payload.nodeDataMap[scenarioId])[0].fuNode.usagePeriod.usagePeriodId);
-                            // console.log("this.state.usagePeriodList---", this.state.usagePeriodList);
-                            return addCommas((itemConfig.payload.nodeDataMap[scenarioId])[0].displayDataValue) + "% of parent, " + addCommas((itemConfig.payload.nodeDataMap[scenarioId])[0].fuPerMonth) + "/" + 'Month';
-                            // } else {
-                            //     return addCommas((itemConfig.payload.nodeDataMap[scenarioId])[0].displayDataValue) + "% of parent";
-                            // }
+                            return addCommasTwoDecimal((itemConfig.payload.nodeDataMap[scenarioId])[0].displayDataValue) + "% of parent, " + addCommasTwoDecimal((itemConfig.payload.nodeDataMap[scenarioId])[0].fuPerMonth) + "/" + 'Month';
 
                         } else if (itemConfig.payload.nodeType.id == 5) {
                             console.log("payload get puNode---", (itemConfig.payload.nodeDataMap[scenarioId])[0]);
-                            return addCommas((itemConfig.payload.nodeDataMap[scenarioId])[0].displayDataValue) + "% of parent, conversion = " + (itemConfig.payload.nodeDataMap[scenarioId])[0].puNode.planningUnit.multiplier;
+                            return addCommasTwoDecimal((itemConfig.payload.nodeDataMap[scenarioId])[0].displayDataValue) + "% of parent, conversion = " + (itemConfig.payload.nodeDataMap[scenarioId])[0].puNode.planningUnit.multiplier;
                         } else {
-                            return addCommas((itemConfig.payload.nodeDataMap[scenarioId])[0].displayDataValue) + "% of parent";
+                            return addCommasTwoDecimal((itemConfig.payload.nodeDataMap[scenarioId])[0].displayDataValue) + "% of parent";
                         }
 
                     } else if (type == 3) {
@@ -3871,7 +3881,7 @@ export default class BuildTree extends Component {
                         }
                     } else {
                         console.log("get payload 8");
-                        return "= " + ((itemConfig.payload.nodeDataMap[scenarioId])[0].displayCalculatedDataValue != null ? addCommas((itemConfig.payload.nodeDataMap[scenarioId])[0].displayCalculatedDataValue) : "");
+                        return "= " + ((itemConfig.payload.nodeDataMap[scenarioId])[0].displayCalculatedDataValue != null ? addCommasTwoDecimal((itemConfig.payload.nodeDataMap[scenarioId])[0].displayCalculatedDataValue) : "");
                     }
                 }
             }
@@ -4888,7 +4898,8 @@ export default class BuildTree extends Component {
         }
         console.log("usagePeriodId dis---", usagePeriodId);
         var noOfMonthsInUsagePeriod = 0;
-        if (usagePeriodId != null && usagePeriodId != "") {
+        if ((usagePeriodId != null && usagePeriodId != "") && (usageTypeId == 2 || (oneTimeUsage == "false" || oneTimeUsage == false))) {
+            console.log("inside if no fu");
             var convertToMonth = (this.state.usagePeriodList.filter(c => c.usagePeriodId == usagePeriodId))[0].convertToMonth;
             console.log("convertToMonth dis---", convertToMonth);
             console.log("repeat count---", (this.state.currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.repeatCount);
@@ -4932,11 +4943,12 @@ export default class BuildTree extends Component {
             console.log("noFURequired---", noFURequired);
 
         } else if (usageTypeId == 1 && oneTimeUsage != null && (oneTimeUsage == "true" || oneTimeUsage == true)) {
+            console.log("inside else if no fu");
             if (this.state.currentItemConfig.context.payload.nodeType.id == 4) {
-                noFURequired = (this.state.currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.noOfForecastingUnitsPerPerson / (this.state.currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.noOfPersons;
+                noFURequired = (this.state.currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.noOfForecastingUnitsPerPerson;
             } else {
                 console.log("--->>>>>>>>>>>>>>>>>>>>>>>>>>", (this.state.currentItemConfig.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode);
-                noFURequired = (this.state.currentItemConfig.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode.noOfForecastingUnitsPerPerson / (this.state.currentItemConfig.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode.noOfPersons;
+                noFURequired = (this.state.currentItemConfig.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode.noOfForecastingUnitsPerPerson;
             }
             // noOfMonthsInUsagePeriod = noOfFUPatient;
         }
