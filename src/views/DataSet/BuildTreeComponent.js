@@ -906,6 +906,7 @@ export default class BuildTree extends Component {
                     label_fr: ""
                 };
                 var label = {}
+                var levelUnit = null;
                 if (this.state.levelUnit != "") {
                     label = this.state.nodeUnitList.filter(c => c.unitId == this.state.levelUnit)[0].label;
                     items.map((i, count) => {
@@ -916,17 +917,19 @@ export default class BuildTree extends Component {
                             }
                         }
                     })
+                    levelUnit = {
+                        id: parseInt(this.state.levelUnit),
+                        label: label
+                    }
                 }
-                treeLevelList[levelListFiltered].unit = {
-                    id: this.state.levelUnit,
-                    label: label
-                }
+                treeLevelList[levelListFiltered].unit = levelUnit
             } else {
                 treeLevelList.splice(levelListFiltered, 1);
             }
         } else {
             if (this.state.levelName != "") {
                 var label = {}
+                var levelUnit = null;
                 if (this.state.levelUnit != "") {
                     label = this.state.nodeUnitList.filter(c => c.unitId == this.state.levelUnit)[0].label;
                     items.map((i, count) => {
@@ -937,6 +940,10 @@ export default class BuildTree extends Component {
                             }
                         }
                     })
+                    levelUnit = {
+                        id: parseInt(this.state.levelUnit),
+                        label: label
+                    }
                 }
                 treeLevelList.push({
                     levelId: null,
@@ -947,10 +954,7 @@ export default class BuildTree extends Component {
                         label_pr: "",
                         label_fr: ""
                     },
-                    unit: {
-                        id: this.state.levelUnit,
-                        label: label
-                    }
+                    unit: levelUnit
                 })
             }
         }
@@ -6376,7 +6380,7 @@ export default class BuildTree extends Component {
                     label_fr: ""
                 },
                 unit: {
-                    id: unitId,
+                    id: parseInt(unitId),
                     label: label
                 }
             })
@@ -6482,7 +6486,7 @@ export default class BuildTree extends Component {
                     label_fr: ""
                 },
                 unit: {
-                    id: unitId,
+                    id: parseInt(unitId),
                     label: label
                 }
             })
@@ -6833,7 +6837,7 @@ export default class BuildTree extends Component {
                     label = this.state.nodeUnitList.filter(c => c.unitId == unitId)[0].label;
                 }
                 treeLevelList[levelListFiltered].unit = {
-                    id: unitId,
+                    id: parseInt(unitId),
                     label: label
                 }
 
