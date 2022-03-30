@@ -865,7 +865,7 @@ export default class BuildTree extends Component {
             levelNo = data.context.levels[0]
             if (levelListFiltered.length > 0) {
                 name = levelListFiltered[0].label.label_en;
-                unit = levelListFiltered[0].unit.id;
+                unit = levelListFiltered[0].unit != null ? levelListFiltered[0].unit.id : "";
             }
             console.log("Name@@@@###########", name);
             console.log("Unit@@@@###########", unit);
@@ -896,6 +896,7 @@ export default class BuildTree extends Component {
         const { curTreeObj } = this.state;
         var treeLevelList = this.state.curTreeObj.levelList;
         var levelListFiltered = treeLevelList.findIndex(c => c.levelNo == this.state.levelNo);
+        var items = this.state.items;
         if (levelListFiltered != -1) {
             if (this.state.levelName != "") {
                 treeLevelList[levelListFiltered].label = {
@@ -907,6 +908,14 @@ export default class BuildTree extends Component {
                 var label = {}
                 if (this.state.levelUnit != "") {
                     label = this.state.nodeUnitList.filter(c => c.unitId == this.state.levelUnit)[0].label;
+                    items.map((i, count) => {
+                        if (i.level == this.state.levelNo && parseInt(i.payload.nodeType.id) <= 3) {
+                            items[count].payload.nodeUnit = {
+                                id: this.state.levelUnit,
+                                label: label
+                            }
+                        }
+                    })
                 }
                 treeLevelList[levelListFiltered].unit = {
                     id: this.state.levelUnit,
@@ -920,6 +929,14 @@ export default class BuildTree extends Component {
                 var label = {}
                 if (this.state.levelUnit != "") {
                     label = this.state.nodeUnitList.filter(c => c.unitId == this.state.levelUnit)[0].label;
+                    items.map((i, count) => {
+                        if (i.level == this.state.levelNo && parseInt(i.payload.nodeType.id) <= 3) {
+                            items[count].payload.nodeUnit = {
+                                id: this.state.levelUnit,
+                                label: label
+                            }
+                        }
+                    })
                 }
                 treeLevelList.push({
                     levelId: null,
@@ -6340,6 +6357,31 @@ export default class BuildTree extends Component {
         var newItem = itemConfig.context;
         newItem.parent = parent;
         newItem.id = nodeId;
+        const { curTreeObj } = this.state;
+        var treeLevelList = curTreeObj.levelList;
+        var levelListFiltered = treeLevelList.findIndex(c => c.levelNo == parseInt(itemConfig.context.level + 1));
+        if (levelListFiltered == -1) {
+            var label = {}
+            var unitId = this.state.currentItemConfig.context.payload.nodeType.id == 4 ? this.state.currentItemConfig.parentItem.payload.nodeUnit.id : this.state.currentItemConfig.context.payload.nodeUnit.id;
+            if (unitId != "") {
+                label = this.state.nodeUnitList.filter(c => c.unitId == unitId)[0].label;
+            }
+            treeLevelList.push({
+                levelId: null,
+                levelNo: parseInt(itemConfig.context.level + 1),
+                label: {
+                    label_en: "Level" + " " + parseInt(itemConfig.context.level + 1),
+                    label_sp: "",
+                    label_pr: "",
+                    label_fr: ""
+                },
+                unit: {
+                    id: unitId,
+                    label: label
+                }
+            })
+        }
+        curTreeObj.levelList = treeLevelList;
         newItem.level = parseInt(itemConfig.context.level + 2);
         newItem.payload.nodeId = nodeId;
         var pu = this.state.planningUnitList.filter(x => x.id == this.state.tempPlanningUnitId)[0];
@@ -6397,7 +6439,8 @@ export default class BuildTree extends Component {
         this.setState({
             items: [...items, newItem],
             cursorItem: nodeId,
-            converionFactor: pu.multiplier
+            converionFactor: pu.multiplier,
+            curTreeObj
         }, () => {
 
             console.log("on add items-------", this.state.items);
@@ -6420,6 +6463,31 @@ export default class BuildTree extends Component {
         var newItem = itemConfig.context;
         newItem.parent = itemConfig.context.parent;
         newItem.id = nodeId;
+        const { curTreeObj } = this.state;
+        var treeLevelList = curTreeObj.levelList;
+        var levelListFiltered = treeLevelList.findIndex(c => c.levelNo == parseInt(itemConfig.context.level + 1));
+        if (levelListFiltered == -1) {
+            var label = {}
+            var unitId = this.state.currentItemConfig.context.payload.nodeType.id == 4 ? this.state.currentItemConfig.parentItem.payload.nodeUnit.id : this.state.currentItemConfig.context.payload.nodeUnit.id;
+            if (unitId != "") {
+                label = this.state.nodeUnitList.filter(c => c.unitId == unitId)[0].label;
+            }
+            treeLevelList.push({
+                levelId: null,
+                levelNo: parseInt(itemConfig.context.level + 1),
+                label: {
+                    label_en: "Level" + " " + parseInt(itemConfig.context.level + 1),
+                    label_sp: "",
+                    label_pr: "",
+                    label_fr: ""
+                },
+                unit: {
+                    id: unitId,
+                    label: label
+                }
+            })
+        }
+        curTreeObj.levelList = treeLevelList;
         newItem.level = parseInt(itemConfig.context.level + 1);
         newItem.payload.nodeId = nodeId;
 
@@ -6453,7 +6521,8 @@ export default class BuildTree extends Component {
         this.setState({
             items: [...items, newItem],
             cursorItem: nodeId,
-            isSubmitClicked: false
+            isSubmitClicked: false,
+            curTreeObj
         }, () => {
 
             console.log("on add items-------", this.state.items);
@@ -6751,10 +6820,32 @@ export default class BuildTree extends Component {
         var findNodeIndex = nodes.findIndex(n => n.id == currentItemConfig.context.id);
         console.log("findNodeIndex---", findNodeIndex);
         nodes[findNodeIndex] = currentItemConfig.context;
+
+        const { curTreeObj } = this.state;
+
+        var treeLevelList = curTreeObj.levelList;
+        if (currentItemConfig.context.level == 0) {
+            var levelListFiltered = treeLevelList.findIndex(c => c.levelNo == parseInt(currentItemConfig.context.level));
+            if (levelListFiltered != -1) {
+                var unitId = currentItemConfig.context.payload.nodeType.id == 4 ? currentItemConfig.parentItem.payload.nodeUnit.id : currentItemConfig.context.payload.nodeUnit.id;
+                var label = {}
+                if (unitId != "") {
+                    label = this.state.nodeUnitList.filter(c => c.unitId == unitId)[0].label;
+                }
+                treeLevelList[levelListFiltered].unit = {
+                    id: unitId,
+                    label: label
+                }
+
+            }
+            curTreeObj.levelList = treeLevelList;
+        }
+
         console.log("nodes---", nodes);
         this.setState({
             items: nodes,
-            isSubmitClicked: false
+            isSubmitClicked: false,
+            curTreeObj
         }, () => {
             console.log("updated tree data+++", this.state);
             // this.calculateValuesForAggregateNode(this.state.items);
@@ -7137,29 +7228,29 @@ export default class BuildTree extends Component {
                                                 value={this.state.selectedScenarioLabel}
                                             ></Input>
                                         </FormGroup>
-                                       
+
                                         {this.state.level0 &&
-                                        <>
-                                         <div>
-                                         <Popover placement="top" isOpen={this.state.popoverOpenParent} target="Popover2" trigger="hover" toggle={this.toggleParent}>
-                                             <PopoverBody>{i18n.t('static.tooltip.Parent')}</PopoverBody>
-                                         </Popover>
-                                     </div>
-                                            <FormGroup className="col-md-6">
-                                                {/* <Label htmlFor="currencyId">{i18n.t('static.tree.parent')} </Label> */}
-                                                <Label htmlFor="currencyId">{i18n.t('static.tree.parent')} <i class="fa fa-info-circle icons pl-lg-2" id="Popover2" onClick={this.toggleParent} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
-                                                <Input type="text"
-                                                    name="parent"
-                                                    bsSize="sm"
-                                                    readOnly={true}
-                                                    value={this.state.currentItemConfig.context.level != 0
-                                                        && this.state.addNodeFlag !== "true"
-                                                        ? this.state.currentItemConfig.parentItem.payload.label.label_en
-                                                        : this.state.currentItemConfig.parentItem.payload.label.label_en}
-                                                ></Input>
-                                            </FormGroup>
+                                            <>
+                                                <div>
+                                                    <Popover placement="top" isOpen={this.state.popoverOpenParent} target="Popover2" trigger="hover" toggle={this.toggleParent}>
+                                                        <PopoverBody>{i18n.t('static.tooltip.Parent')}</PopoverBody>
+                                                    </Popover>
+                                                </div>
+                                                <FormGroup className="col-md-6">
+                                                    {/* <Label htmlFor="currencyId">{i18n.t('static.tree.parent')} </Label> */}
+                                                    <Label htmlFor="currencyId">{i18n.t('static.tree.parent')} <i class="fa fa-info-circle icons pl-lg-2" id="Popover2" onClick={this.toggleParent} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
+                                                    <Input type="text"
+                                                        name="parent"
+                                                        bsSize="sm"
+                                                        readOnly={true}
+                                                        value={this.state.currentItemConfig.context.level != 0
+                                                            && this.state.addNodeFlag !== "true"
+                                                            ? this.state.currentItemConfig.parentItem.payload.label.label_en
+                                                            : this.state.currentItemConfig.parentItem.payload.label.label_en}
+                                                    ></Input>
+                                                </FormGroup>
                                             </>}
-                                           
+
                                         <div>
                                             <Popover placement="top" isOpen={this.state.popoverOpenNodeTitle} target="Popover3" trigger="hover" toggle={this.toggleNodeTitle}>
                                                 <PopoverBody>{i18n.t('static.tooltip.NodeTitle')}</PopoverBody>
@@ -7339,7 +7430,7 @@ export default class BuildTree extends Component {
                                         {/* {this.state.aggregationNode && */}
                                         <div>
                                             <Popover placement="top" isOpen={this.state.popoverOpenNodeValue} target="Popover7" trigger="hover" toggle={this.toggleNodeValue}>
-                                                <PopoverBody>{this.state.numberNode ?i18n.t('static.tooltip.NodeValue'):i18n.t('static.tooltip.NumberNodeValue')}</PopoverBody>
+                                                <PopoverBody>{this.state.numberNode ? i18n.t('static.tooltip.NodeValue') : i18n.t('static.tooltip.NumberNodeValue')}</PopoverBody>
                                             </Popover>
                                         </div>
                                         <FormGroup className="col-md-6" style={{ display: this.state.aggregationNode ? 'block' : 'none' }}>
@@ -9271,6 +9362,12 @@ export default class BuildTree extends Component {
                                 };
                                 tempArray.push(tempJson);
                                 nodeDataMap[this.state.selectedScenario] = tempArray;
+                                console.log("itemConfig.level@@@@@@@@@@@@#################@@@@@@@@@@@@", itemConfig.level);
+                                var getLevelUnit = this.state.curTreeObj.levelList.filter(c => c.levelNo == itemConfig.level + 1);
+                                var levelUnitId = ""
+                                if (getLevelUnit.length > 0) {
+                                    levelUnitId = getLevelUnit[0].unit.id;
+                                }
                                 // tempArray.push(nodeDataMap);
                                 this.setState({
                                     showMomDataPercent: false,
@@ -9348,7 +9445,7 @@ export default class BuildTree extends Component {
                                                     id: ''
                                                 },
                                                 nodeUnit: {
-                                                    id: ''
+                                                    id: levelUnitId
                                                 },
                                                 extrapolation: false,
                                                 nodeDataMap: nodeDataMap

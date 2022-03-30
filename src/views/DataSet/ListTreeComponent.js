@@ -473,6 +473,7 @@ export default class ListTreeComponent extends Component {
                     },
                     notes: this.state.notes,
                     regionList: this.state.regionList,
+                    levelList: [],
                     scenarioList: [{
                         id: 1,
                         label: {
@@ -558,7 +559,20 @@ export default class ListTreeComponent extends Component {
                         active: true,
                         notes: ''
                     }],
-                    levelList: [],
+                    levelList: [{
+                        levelId: null,
+                        levelNo: 0,
+                        label: {
+                            label_en: "Level 0",
+                            label_sp: "",
+                            label_pr: "",
+                            label_fr: ""
+                        },
+                        unit: {
+                            id: "",
+                            label: {}
+                        }
+                    }],
                     tree: {
                         flatList: [{
                             id: 1,
@@ -824,7 +838,7 @@ export default class ListTreeComponent extends Component {
                 regionValues: [],
                 notes: '',
                 treeTemplate,
-                missingPUList : []
+                missingPUList: []
             }, () => {
                 if (this.state.datasetIdModal != "" && this.state.datasetIdModal != 0) {
                     console.log("this.state.datasetIdModal---", this.state.datasetIdModal)
@@ -1501,7 +1515,7 @@ export default class ListTreeComponent extends Component {
                                                     </div>
 
                                                     <div className="col-md-12" style={{ display: 'inline-block' }}>
-                                                        <div style={{display : this.state.missingPUList.length > 0 ? 'block' : 'none'}}><div><b>Missing Planning Units:(<a href="/#/planningUnitSetting/listPlanningUnitSetting" className="supplyplanformulas">Update Planning Units</a>)</b></div><br />
+                                                        <div style={{ display: this.state.missingPUList.length > 0 ? 'block' : 'none' }}><div><b>Missing Planning Units:(<a href="/#/planningUnitSetting/listPlanningUnitSetting" className="supplyplanformulas">Update Planning Units</a>)</b></div><br />
                                                             <div id="missingPUJexcel" className="RowClickable">
                                                             </div>
                                                         </div>
