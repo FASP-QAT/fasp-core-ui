@@ -7071,15 +7071,17 @@ export default class BuildTree extends Component {
                                                 value={this.state.selectedScenarioLabel}
                                             ></Input>
                                         </FormGroup>
-                                        {/* <div>
-                                            <Popover placement="top" isOpen={this.state.popoverOpenParent} target="Popover2" trigger="hover" toggle={this.toggleParent}>
-                                                <PopoverBody>{i18n.t('static.tooltip.Parent')}</PopoverBody>
-                                            </Popover>
-                                        </div> */}
+                                       
                                         {this.state.level0 &&
+                                        <>
+                                         <div>
+                                         <Popover placement="top" isOpen={this.state.popoverOpenParent} target="Popover2" trigger="hover" toggle={this.toggleParent}>
+                                             <PopoverBody>{i18n.t('static.tooltip.Parent')}</PopoverBody>
+                                         </Popover>
+                                     </div>
                                             <FormGroup className="col-md-6">
-                                                <Label htmlFor="currencyId">{i18n.t('static.tree.parent')} </Label>
-                                                {/* <Label htmlFor="currencyId">{i18n.t('static.tree.parent')} <i class="fa fa-info-circle icons pl-lg-2" id="Popover2" onClick={this.toggleParent} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label> */}
+                                                {/* <Label htmlFor="currencyId">{i18n.t('static.tree.parent')} </Label> */}
+                                                <Label htmlFor="currencyId">{i18n.t('static.tree.parent')} <i class="fa fa-info-circle icons pl-lg-2" id="Popover2" onClick={this.toggleParent} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                                 <Input type="text"
                                                     name="parent"
                                                     bsSize="sm"
@@ -7089,7 +7091,9 @@ export default class BuildTree extends Component {
                                                         ? this.state.currentItemConfig.parentItem.payload.label.label_en
                                                         : this.state.currentItemConfig.parentItem.payload.label.label_en}
                                                 ></Input>
-                                            </FormGroup>}
+                                            </FormGroup>
+                                            </>}
+                                           
                                         <div>
                                             <Popover placement="top" isOpen={this.state.popoverOpenNodeTitle} target="Popover3" trigger="hover" toggle={this.toggleNodeTitle}>
                                                 <PopoverBody>{i18n.t('static.tooltip.NodeTitle')}</PopoverBody>
@@ -7269,7 +7273,7 @@ export default class BuildTree extends Component {
                                         {/* {this.state.aggregationNode && */}
                                         <div>
                                             <Popover placement="top" isOpen={this.state.popoverOpenNodeValue} target="Popover7" trigger="hover" toggle={this.toggleNodeValue}>
-                                                <PopoverBody>{i18n.t('static.tooltip.NodeValue')}</PopoverBody>
+                                                <PopoverBody>{this.state.numberNode ?i18n.t('static.tooltip.NodeValue'):i18n.t('static.tooltip.NumberNodeValue')}</PopoverBody>
                                             </Popover>
                                         </div>
                                         <FormGroup className="col-md-6" style={{ display: this.state.aggregationNode ? 'block' : 'none' }}>
