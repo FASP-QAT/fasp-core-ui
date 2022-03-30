@@ -31,7 +31,7 @@ function getCoefficient(data) {
             cnt++
         }
     }
-    let wape = eBar / xBar
+    let wape = absEBar / xBar
     xBar = xBar / cnt
     yBar = yBar / cnt
     xxBar = xxBar / cnt

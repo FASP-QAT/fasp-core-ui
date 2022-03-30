@@ -617,7 +617,8 @@ class ModelingValidation extends Component {
             var flatDataForLevel = treeListFiltered.tree.flatList.filter(c => c.level == levelId);
             var flatData = flatDataForLevel[0];
             var nodeUnit = this.state.unitList.filter(c => c.unitId == flatData.payload.nodeUnit.id);
-            levelUnit = nodeUnit.length > 0 ? getLabelText(nodeUnit[0].label, this.state.lang) : ""
+            var levelListFilter = treeListFiltered.levelList.filter(c => c.levelNo == levelId)[0];
+            levelUnit = levelListFilter.unit != null ? getLabelText(levelListFilter.unit.label, this.state.lang) : "";
             var nodeList = [];
             var nodeVal = [];
             var nodeIdArr = [];
