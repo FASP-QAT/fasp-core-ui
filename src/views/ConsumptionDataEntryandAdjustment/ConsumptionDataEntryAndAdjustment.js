@@ -223,7 +223,8 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           data = [];
           data[0] = i18n.t('static.dataentry.adjustedConsumption')
           for (var j = 0; j < monthArray.length; j++) {
-            data[j + 1] = `=ROUND((${colArr[j + 1]}${parseInt(dataArray.length - 3)}/${colArr[j + 1]}${parseInt(dataArray.length - 2)}/(1-(${colArr[j + 1]}${parseInt(dataArray.length - 1)}/${colArr[j + 1] + "1"})))*100,0)`;
+            // data[j + 1] = `=ROUND((${colArr[j + 1]}${parseInt(dataArray.length - 3)}/${colArr[j + 1]}${parseInt(dataArray.length - 2)}/(1-(${colArr[j + 1]}${parseInt(dataArray.length - 1)}/${colArr[j + 1] + "1"})))*100,0)`;
+            data[j + 1] = `=IF(${colArr[j + 1]}${parseInt(dataArray.length - 3)}=='','',ROUND((${colArr[j + 1]}${parseInt(dataArray.length - 3)}/${colArr[j + 1]}${parseInt(dataArray.length - 2)}/(1-(${colArr[j + 1]}${parseInt(dataArray.length - 1)}/${colArr[j + 1] + "1"})))*100,0))`;
           }
           data[monthArray.length + 1] = multiplier;
           dataArray.push(data);
@@ -742,7 +743,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     var elInstance = this.state.dataEl;
     for (var i = 0; i < monthArray.length; i++) {
       var columnData = elInstance.getColumnData([i + 1]);
-      var actualConsumptionCount = 2;
+      var actualConsumptionCount = 6;
       var reportingRateCount = 3;
       var daysOfStockOutCount = 4;
       for (var r = 0; r < regionList.length; r++) {
