@@ -237,6 +237,7 @@ export default class ExtrapolateDataComponent extends React.Component {
             rangeValue1: { from: { year: new Date(startDate1).getFullYear(), month: new Date(startDate1).getMonth() + 1 }, to: { year: new Date(endDate1).getFullYear(), month: new Date(endDate1).getMonth() + 1 } },
             minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
             maxDate: { year: new Date(endDate1).getFullYear(), month: new Date().getMonth() + 1 },
+            popoverOpenD: false,
             popoverOpenMa: false,
             popoverOpenSa: false,
             popoverOpenLr: false,
@@ -268,6 +269,7 @@ export default class ExtrapolateDataComponent extends React.Component {
             dataChanged: false,
             noDataMessage: ""
         }
+        // this.toggleD = this.toggleD.bind(this);
         this.toggle = this.toggle.bind(this)
         this.reset = this.reset.bind(this)
         this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
@@ -730,6 +732,7 @@ export default class ExtrapolateDataComponent extends React.Component {
         tr.children[7].title = i18n.t('static.tooltip.Tes');
         // tr.children[8].title = i18n.t('static.tooltip.arima');
         tr.children[9].title = i18n.t('static.tooltip.arima');
+        tr.children[2].title = 'Historic time series data may need to be adjusted for reporting rate and/or for stock out rate to better reflect actual demand. Update these on the "Data Entry and Adjustment" screen.';
 
 
     }
@@ -1728,7 +1731,11 @@ export default class ExtrapolateDataComponent extends React.Component {
     //         showAdvanceId: showAdvanceId
     //     })
     // }
-
+    // toggleD() {
+    //     this.setState({
+    //         popoverOpenD: !this.state.popoverOpenD,
+    //     });
+    // }
     toggle(key, value) {
         this.setState({
             [key]: value,
@@ -2773,8 +2780,13 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                                         bsSize="sm"
                                                                     />
                                                                 </div>
+                                                                <div>
+                                                                <Popover placement="top" isOpen={this.state.popoverOpenD} target="Popover14" trigger="hover" toggle={() => this.toggle('popoverOpenD', !this.state.popoverOpenD)}>
+                                                                        <PopoverBody>{i18n.t('static.tooltip.d')}</PopoverBody>
+                                                                    </Popover>
+                                                                    </div>
                                                                 <div className="col-md-2">
-                                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.d')}</Label>
+                                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.d')} <i class="fa fa-info-circle icons pl-lg-2" id="Popover14" onClick={() => this.toggle('popoverOpenD', !this.state.popoverOpenD)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                                                     <Input
                                                                         className="controls"
                                                                         type="number"
@@ -2837,22 +2849,22 @@ export default class ExtrapolateDataComponent extends React.Component {
                                         <Table className="table-bordered text-center mt-2 overflowhide main-table " bordered size="sm" style={{ width: 'unset' }}>
                                             <thead>
                                                 <tr>
-                                                    <td width="160px"><b>{i18n.t('static.common.errors')}</b>
-                                                        <i class="fa fa-info-circle icons pl-lg-2" id="Popover13" onClick={() => this.toggle('popoverOpenError', !this.state.popoverOpenError)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></td>
+                                                    <td width="160px" title={i18n.t('static.tooltip.errors')}><b>{i18n.t('static.common.errors')}</b>
+                                                        <i class="fa fa-info-circle icons pl-lg-2" id="Popover13" aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></td>
                                                     {this.state.movingAvgId &&
-                                                        <td width="160px"><b>{i18n.t('static.extrapolation.movingAverages')}</b></td>
+                                                        <td width="160px" title={i18n.t('static.tooltip.MovingAverages')}><b>{i18n.t('static.extrapolation.movingAverages')}</b> <i class="fa fa-info-circle icons pl-lg-2" id="Popover15" aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></td>
                                                     }
                                                     {this.state.semiAvgId &&
-                                                        <td width="160px"><b>{i18n.t('static.extrapolation.semiAverages')}</b></td>
+                                                        <td width="160px" title={i18n.t('static.tooltip.SemiAverages')}><b>{i18n.t('static.extrapolation.semiAverages')}</b> <i class="fa fa-info-circle icons pl-lg-2" id="Popover16" aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></td>
                                                     }
                                                     {this.state.linearRegressionId &&
-                                                        <td width="160px"><b>{i18n.t('static.extrapolation.linearRegression')}</b></td>
+                                                        <td width="160px" title={i18n.t('static.tooltip.LinearRegression')}><b>{i18n.t('static.extrapolation.linearRegression')}</b> <i class="fa fa-info-circle icons pl-lg-2" id="Popover17" aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></td>
                                                     }
                                                     {this.state.smoothingId &&
-                                                        <td width="160px"><b>{i18n.t('static.extrapolation.tes')}</b></td>
+                                                        <td width="160px" title={i18n.t('static.tooltip.Tes')}><b>{i18n.t('static.extrapolation.tes')}</b> <i class="fa fa-info-circle icons pl-lg-2" id="Popover18" aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></td>
                                                     }
                                                     {this.state.arimaId &&
-                                                        <td width="160px"><b>{i18n.t('static.extrapolation.arima')}</b></td>
+                                                        <td width="160px" title={i18n.t('static.tooltip.arima')}><b>{i18n.t('static.extrapolation.arima')}</b> <i class="fa fa-info-circle icons pl-lg-2" id="Popover19" aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></td>
                                                     }
                                                 </tr>
                                             </thead>
