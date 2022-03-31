@@ -2230,6 +2230,5 @@
     "static.organisation.organisationheader": "Organização",
     "static.supplyPlanFormula.maxMonthOfStockEx5": "Máx = 7",
     "static.supplyPlanFormula.maxMonthOfStockEx4": "Máx = Menor entre (7,18)",
-    "static.message.importSuccess": "Importação bem-sucedida",
-    "static.common.tracerCategoryInvalidSelection": "A categoria Tracer da unidade de previsão selecionada não corresponde"
+    "static.common.dataEnteredIn": "Dados inseridos"
 }
