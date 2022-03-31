@@ -464,6 +464,7 @@ function addCommasTwoDecimal(cell1, row) {
 export default class BuildTree extends Component {
     constructor(props) {
         super(props);
+        var curDate = moment(Date.now()).format("YYYY-MM-DD");
 
         this.pickAMonth3 = React.createRef()
         this.pickAMonth2 = React.createRef()
@@ -521,7 +522,7 @@ export default class BuildTree extends Component {
             showDiv1: false,
             orgCurrentItemConfig: {},
             treeTemplateObj: [],
-            scalingMonth: new Date(),
+            scalingMonth: { year: Number(moment(curDate).startOf('month').format("YYYY")), month: Number(moment(curDate).startOf('month').format("M")) },
             showModelingValidation: true,
             scenario: {
                 id: '',
@@ -723,7 +724,8 @@ export default class BuildTree extends Component {
             loading: false,
             modelingJexcelLoader: false,
             momJexcelLoader: false,
-            lastRowDeleted: false
+            lastRowDeleted: false,
+            showDate: false
         }
         this.toggleDeropdownSetting = this.toggleDeropdownSetting.bind(this);
         // this.onClick1 = this.onClick1.bind(this);
@@ -2571,8 +2573,9 @@ export default class BuildTree extends Component {
                 // defYear2: { year: 2021, month: 12 },
                 forecastStartDate: programData.currentVersion.forecastStartDate,
                 forecastStopDate: programData.currentVersion.forecastStopDate,
-                minDate: { year: new Date(programData.currentVersion.forecastStartDate).getFullYear(), month: new Date(programData.currentVersion.forecastStartDate).getMonth() + 1 },
-                maxDate: { year: new Date(programData.currentVersion.forecastStopDate).getFullYear(), month: new Date(programData.currentVersion.forecastStopDate).getMonth() + 1 },
+                minDate: { year: Number(moment(programData.currentVersion.forecastStartDate).startOf('month').format("YYYY")), month: Number(moment(programData.currentVersion.forecastStartDate).startOf('month').format("M")) },
+                maxDate: { year: Number(moment(programData.currentVersion.forecastStopDate).startOf('month').format("YYYY")), month: Number(moment(programData.currentVersion.forecastStopDate).startOf('month').format("M")) },
+                showDate: true
             }, () => {
                 console.log("program id after update--->", this.state.programId);
                 console.log("program min date--->", this.state.minDate);
@@ -4134,8 +4137,8 @@ export default class BuildTree extends Component {
                         console.log("decryptedDataset---", databytes);
                         var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
                         dataEnc.programData = programData;
-                        var minDate = { year: new Date(programData.currentVersion.forecastStartDate).getFullYear(), month: new Date(programData.currentVersion.forecastStartDate).getMonth() + 1 };
-                        var maxDate = { year: new Date(programData.currentVersion.forecastStopDate).getFullYear(), month: new Date(programData.currentVersion.forecastStopDate).getMonth() + 1 };
+                        var minDate = { year: Number(moment(programData.currentVersion.forecastStartDate).startOf('month').format("YYYY")), month: Number(moment(programData.currentVersion.forecastStartDate).startOf('month').format("M")) };
+                        var maxDate = { year: Number(moment(programData.currentVersion.forecastStopDate).startOf('month').format("YYYY")), month: Number(moment(programData.currentVersion.forecastStopDate).startOf('month').format("M")) };
                         var forecastPeriod = moment(programData.currentVersion.forecastStartDate).format(`MMM-YYYY`) + " ~ " + moment(programData.currentVersion.forecastStopDate).format(`MMM-YYYY`);
                         console.log("forecastPeriod 1---", forecastPeriod);
                         console.log("dataSetObj.programData***>>>", dataEnc);
@@ -4144,6 +4147,7 @@ export default class BuildTree extends Component {
                             forecastStartDate: programData.currentVersion.forecastStartDate,
                             forecastStopDate: programData.currentVersion.forecastStopDate, forecastPeriod,
                             singleValue2: { year: new Date(programData.currentVersion.forecastStartDate.replace(/-/g, '\/')).getFullYear(), month: new Date(programData.currentVersion.forecastStartDate.replace(/-/g, '\/')).getMonth() + 1 },
+                            showDate: true
                         }, () => {
                             this.fetchTracerCategoryList(programData);
                             this.setState({ loading: false })
@@ -8363,15 +8367,12 @@ export default class BuildTree extends Component {
                             <Picker
                                 ref={this.pickAMonth2}
                                 years={{ min: this.state.minDate, max: this.state.maxDate }}
-                                value={{
-                                    year:
-                                        new Date(this.state.scalingMonth).getFullYear(), month: ("0" + (new Date(this.state.scalingMonth).getMonth() + 1)).slice(-2)
-                                }}
+                                value={this.state.scalingMonth}
                                 lang={pickerLang.months}
                                 onChange={this.handleAMonthChange2}
                                 onDismiss={this.handleAMonthDissmis2}
                             >
-                                <MonthBox value={this.makeText({ year: new Date(this.state.scalingMonth).getFullYear(), month: ("0" + (new Date(this.state.scalingMonth).getMonth() + 1)).slice(-2) })}
+                                <MonthBox value={this.makeText(this.state.scalingMonth)}
                                     onClick={this.handleClickMonthBox2} />
                             </Picker>
                         </FormGroup>
@@ -8846,20 +8847,19 @@ export default class BuildTree extends Component {
         this.pickAMonth2.current.show()
     }
     handleAMonthChange2 = (year, month) => {
-        console.log("value>>>", year);
-        console.log("text>>>", month)
-        var month = parseInt(month) < 10 ? "0" + month : month
-        var date = year + "-" + month + "-" + "01"
-        this.filterScalingDataByMonth(date);
-        // let { currentItemConfig } = this.state;
-        // (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].month = date;
-        this.setState({ scalingMonth: date }, () => {
-            console.log("after state update---", this.state.currentItemConfig);
-        });
+
         //
         //
     }
     handleAMonthDissmis2 = (value) => {
+        console.log("Value@@@@@@@@###################", value);
+        let startDate = value.year + '-' + value.month + '-01';
+        this.filterScalingDataByMonth(moment(startDate).format("YYYY-MM-DD"));
+        // let { currentItemConfig } = this.state;
+        // (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].month = date;
+        this.setState({ scalingMonth: value }, () => {
+            console.log("after state update---", this.state.currentItemConfig);
+        });
         console.log("dismiss>>", value);
         // this.setState({ singleValue2: value, }, () => {
         // this.fetchData();
@@ -8881,7 +8881,7 @@ export default class BuildTree extends Component {
         console.log("forecastStartDate>>", this.state.forecastStartDate);
         console.log("forecastStopDate>>", moment(date).isBetween(this.state.forecastStartDate, this.state.forecastStopDate));
         this.updateTreeData(date);
-        if (moment(date).isBetween(this.state.forecastStartDate, this.state.forecastStopDate, undefined, '[)')) {
+        if (moment(date).format("YYYY-MM") >= moment(this.state.forecastStartDate).format("YYYY-MM") && moment(date).format("YYYY-MM") <= moment(this.state.forecastStopDate).format("YYYY-MM")) {
             this.setState({ singleValue2: value, }, () => {
 
 
@@ -9724,7 +9724,7 @@ export default class BuildTree extends Component {
                                                         {/* <FormFeedback>{errors.languageId}</FormFeedback> */}
                                                     </FormGroup>
 
-                                                    <FormGroup className="col-md-3 pl-lg-0">
+                                                    {this.state.showDate && <FormGroup className="col-md-3 pl-lg-0">
                                                         <Label htmlFor="languageId">
                                                             {/* {i18n.t('static.supplyPlan.date')}  */}
                                                             Display Date <i>(Forecast: {this.state.forecastPeriod})</i></Label>
@@ -9734,7 +9734,8 @@ export default class BuildTree extends Component {
                                                                 id="monthPicker"
                                                                 name="monthPicker"
                                                                 years={{ min: this.state.minDate, max: this.state.maxDate }}
-                                                                value={singleValue2}
+                                                                value={this.state.singleValue2}
+                                                                key={JSON.stringify(this.state.singleValue2)}
                                                                 lang={pickerLang.months}
                                                                 // theme="dark"
                                                                 onChange={this.handleAMonthChange3}
@@ -9762,7 +9763,7 @@ export default class BuildTree extends Component {
                                                                                 onClick={this.handleClickMonthBox1} />
                                                                         </Picker> */}
                                                         </div>
-                                                    </FormGroup>
+                                                    </FormGroup>}
                                                     {/* 
                                                     <FormGroup className="col-md-2" >
                                                         <div className="check inline  pl-lg-1 pt-lg-0">
