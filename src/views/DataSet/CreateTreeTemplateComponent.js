@@ -361,6 +361,35 @@ function addCommas(cell1, row) {
         return "";
     }
 }
+
+function addCommasAllowTenDigitBeforeDecimal(cell1, row) {
+
+    if (cell1 != null && cell1 != "") {
+        console.log("Comma---Inside if");
+        cell1 += '';
+        console.log("Comma---append blank");
+        var x = cell1.replaceAll(",", "").split('.');
+        console.log("Comma---x---", x);
+        var x1 = x[0];
+        console.log("Comma---x1---", x1);
+        var x2 = x.length > 1 ? '.' + x[1].slice(0, 4) : '';
+        console.log("Comma---x2---", x2);
+        var rgx = /(\d+)(\d{10})/;
+        console.log("Comma---reg");
+        while (rgx.test(x1)) {
+            console.log("Comma---indide while");
+            x1 = x1.replace(rgx, '$1' + ',' + '$2');
+            console.log("Comma---x1 replace---", x1);
+        }
+        console.log("Comma---x1+x2---", x1 + x2);
+        return x1 + x2;
+        // return cell1.toString().replaceAll(",", "").replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+    } else {
+        console.log("Comma---");
+        return "";
+    }
+}
+
 function addCommasTwoDecimal(cell1, row) {
     if (cell1 != null && cell1 != "") {
         cell1 += '';
@@ -3186,7 +3215,7 @@ export default class CreateTreeTemplate extends Component {
         });
     }
     cancelClicked() {
-        this.props.history.push(`/dataset/listTreeTemplate/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
+        this.props.history.push(`/dataset/listTreeTemplate/`)
     }
 
 
@@ -6377,7 +6406,7 @@ export default class CreateTreeTemplate extends Component {
                                                         handleChange(e);
                                                         this.dataChange(e)
                                                     }}
-                                                    value={addCommas(this.state.currentItemConfig.context.payload.nodeType.id == 4 ? this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.noOfPersons : "")}>
+                                                    value={addCommasAllowTenDigitBeforeDecimal(this.state.currentItemConfig.context.payload.nodeType.id == 4 ? this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.noOfPersons : "")}>
 
                                                 </Input>
                                                 <FormFeedback className="red">{errors.noOfPersons}</FormFeedback>
@@ -6416,7 +6445,7 @@ export default class CreateTreeTemplate extends Component {
                                                         handleChange(e);
                                                         this.dataChange(e)
                                                     }}
-                                                    value={addCommas(this.state.currentItemConfig.context.payload.nodeType.id == 4 ? this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.noOfForecastingUnitsPerPerson : "")}>
+                                                    value={addCommasAllowTenDigitBeforeDecimal(this.state.currentItemConfig.context.payload.nodeType.id == 4 ? this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.noOfForecastingUnitsPerPerson : "")}>
 
                                                 </Input>
                                                 <FormFeedback className="red">{errors.forecastingUnitPerPersonsFC}</FormFeedback>
@@ -6481,7 +6510,7 @@ export default class CreateTreeTemplate extends Component {
                                                             name="usageFrequency"
                                                             bsSize="sm"
                                                             onChange={(e) => { this.dataChange(e) }}
-                                                            value={this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usageType.id == 1 && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.oneTimeUsage != "true" ? this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usageFrequency : ""}></Input>
+                                                            value={this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usageType.id == 1 && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.oneTimeUsage != "true" ? addCommasAllowTenDigitBeforeDecimal(this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usageFrequency) : ""}></Input>
                                                     </FormGroup>
                                                     <FormGroup className="col-md-2" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usageType.id == 1 && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.oneTimeUsage != "true" && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.oneTimeUsage != true ? 'block' : 'none' }}>
                                                         <Input type="text"
@@ -6526,7 +6555,7 @@ export default class CreateTreeTemplate extends Component {
                                                                 handleChange(e);
                                                                 this.dataChange(e)
                                                             }}
-                                                            value={addCommas(this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usageType.id == 1 && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.oneTimeUsage != "true" ? this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.repeatCount : "")}>
+                                                            value={addCommasAllowTenDigitBeforeDecimal(this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usageType.id == 1 && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.oneTimeUsage != "true" ? this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.repeatCount : "")}>
                                                         </Input>
                                                         <FormFeedback className="red">{errors.repeatCount}</FormFeedback>
                                                     </FormGroup>
@@ -6828,7 +6857,7 @@ export default class CreateTreeTemplate extends Component {
                                                 name="currentEndValue"
                                                 bsSize="sm"
                                                 onChange={(e) => { this.dataChange(e); this.calculateMomByEndValue(e) }}
-                                                value={addCommas(this.state.currentEndValue)}
+                                                value={this.state.currentItemConfig.context.payload.nodeType.id == 2 ? addCommasAllowTenDigitBeforeDecimal(this.state.currentEndValue) : addCommas(this.state.currentEndValue)}
                                                 readOnly={this.state.currentEndValueEdit}
                                             >
                                             </Input>
@@ -6875,7 +6904,7 @@ export default class CreateTreeTemplate extends Component {
                                                 name="currentTargetChangeNumber"
                                                 bsSize="sm"
                                                 onChange={(e) => { this.dataChange(e); this.calculateMomByChangeInNumber(e) }}
-                                                value={addCommas(this.state.currentTargetChangeNumber)}
+                                                value={addCommasAllowTenDigitBeforeDecimal(this.state.currentTargetChangeNumber)}
                                                 readOnly={this.state.currentTargetChangeNumberEdit}
                                             >
                                             </Input>
