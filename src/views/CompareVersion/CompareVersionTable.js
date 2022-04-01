@@ -621,6 +621,7 @@ export default class CompareVersion extends Component {
                 {
                     title: "Forecast Qty",
                     type: 'text',
+                   
                 },
                 {
                     title: "Notes",
@@ -758,6 +759,22 @@ export default class CompareVersion extends Component {
                 }
             }
         }
+        else{
+            var asterisk = document.getElementsByClassName("resizable")[0];
+            // var tr = asterisk.firstChild;
+            var tr = asterisk.firstChild.nextSibling;
+            console.log("asterisk", asterisk.firstChild.nextSibling)
+    
+            tr.children[3].classList.add('InfoTr');
+            tr.children[4].classList.add('InfoTr');
+            tr.children[6].classList.add('InfoTr');
+            tr.children[7].classList.add('InfoTr');
+
+            tr.children[3].title = "Forecast method that was selected for the final forecast. Forecasts are selected in the Compare and Select Forecast screen.";
+            tr.children[4].title = "Quantity forecasted for the entire forecast period.";
+            tr.children[6].title = "Forecast method that was selected for the final forecast. Forecasts are selected in the Compare and Select Forecast screen.";
+            tr.children[7].title = "Quantity forecasted for the entire forecast period.";
+        }
     }
 
     render() {
@@ -765,7 +782,7 @@ export default class CompareVersion extends Component {
             <div>
                 {/* Resolve conflicts modal */}
                 <Modal isOpen={this.state.conflicts}
-                    className={'modal-lg ' + this.props.className, "modalWidth"} style={{ display: this.state.loading ? "none" : "block" }}>
+                    className={'modal-lg ' + this.props.className + "modalWidth"} style={{ display: this.state.loading ? "none" : "block" }}>
                     <ModalHeader toggle={() => this.toggleLarge()} className="modalHeaderSupplyPlan">
                         <strong>{i18n.t('static.commitVersion.resolveConflicts')}</strong>
                         <ul className="legendcommitversion">
