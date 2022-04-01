@@ -3510,7 +3510,7 @@ export default class BuildTree extends Component {
                                     var data = [];
                                     data[0] = 0;
                                     data[1] = "";
-                                    data[2] = "";
+                                    data[2] = this.state.currentItemConfig.context.payload.nodeType.id == PERCENTAGE_NODE_ID || this.state.currentItemConfig.context.payload.nodeType.id == FU_NODE_ID || this.state.currentItemConfig.context.payload.nodeType.id == PU_NODE_ID ? 5 : '';
                                     data[3] = moment(this.state.currentScenario.month).startOf('month').add(1, 'months').format("YYYY-MM-DD")
                                     data[4] = this.state.maxMonth
                                     data[5] = "";
@@ -3524,8 +3524,12 @@ export default class BuildTree extends Component {
                                     var col = ("C").concat(parseInt(0) + 1);
                                     obj.setStyle(col, "background-color", "transparent");
                                     obj.setComments(col, "");
+                                    var col = ("F").concat(parseInt(0) + 1);
+                                    obj.setStyle(col, "background-color", "transparent");
+                                    obj.setComments(col, "");
                                     this.setState({
-                                        lastRowDeleted: true
+                                        lastRowDeleted: true,
+                                        scalingTotal: ""
                                     })
                                 } else {
                                     obj.deleteRow(parseInt(y));

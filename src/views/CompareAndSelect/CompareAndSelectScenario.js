@@ -77,7 +77,8 @@ class CompareAndSelectScenario extends Component {
             singleValue2: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
             maxDateForSingleValue: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
             showForecastPeriod: false,
-            treeScenarioList: []
+            treeScenarioList: [],
+            actualConsumptionListForMonth:[]
         };
         this.getDatasets = this.getDatasets.bind(this);
         this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
@@ -1716,7 +1717,7 @@ class CompareAndSelectScenario extends Component {
                     },
                     lineTension: 0.1,
                     pointStyle: 'line',
-                    pointRadius: 0,
+                    pointRadius: this.state.actualConsumptionListForMonth.length==1?3:0,
                     showInLegend: true,
                     data: this.state.actualConsumptionListForMonth
                 }
@@ -1737,7 +1738,7 @@ class CompareAndSelectScenario extends Component {
                         lineTension: 0.1,
                         borderWidth: (this.state.selectedTreeScenarioId == item.id) ? 5 : 3,
                         pointStyle: 'line',
-                        pointRadius: 0,
+                        pointRadius: this.state.consumptionDataForTree.filter(c => c.id == item.id).length==1?3:0,
                         showInLegend: true,
                         data: this.state.consumptionDataForTree.filter(c => c.id == item.id).map((ele, index) => (ele.value))
                     }
