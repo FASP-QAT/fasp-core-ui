@@ -78,7 +78,7 @@ class CompareAndSelectScenario extends Component {
             maxDateForSingleValue: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
             showForecastPeriod: false,
             treeScenarioList: [],
-            actualConsumptionListForMonth:[]
+            actualConsumptionListForMonth: []
         };
         this.getDatasets = this.getDatasets.bind(this);
         this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
@@ -251,6 +251,11 @@ class CompareAndSelectScenario extends Component {
                 showAllData: true,
                 loading: false
             }, () => {
+                if (this.state.viewById == 1) {
+                    document.getElementById("planningUnitDiv").style.display = "block";
+                } else {
+                    document.getElementById("planningUnitDiv").style.display = "none";
+                }
                 this.scenarioOrderChanged(selectedTreeScenarioId)
                 // this.buildJexcel()
             })
@@ -1491,6 +1496,11 @@ class CompareAndSelectScenario extends Component {
         this.setState({
             viewById: viewById,
         }, () => {
+            if (viewById == 1) {
+                document.getElementById("planningUnitDiv").style.display = "block";
+            } else {
+                document.getElementById("planningUnitDiv").style.display = "none";
+            }
             if (viewById == 2) {
                 document.getElementById("forecastingUnitDiv").style.display = "block";
             } else {
@@ -1563,8 +1573,8 @@ class CompareAndSelectScenario extends Component {
                     this.setState({
                         message: 'static.compareAndSelect.dataSaved',
                         color: 'green',
-                        datasetJson:datasetForEncryption,
-                        planningUnitList:planningUnitList1
+                        datasetJson: datasetForEncryption,
+                        planningUnitList: planningUnitList1
                     }, () => {
                         this.hideFirstComponent()
                         this.showData();
@@ -1717,7 +1727,7 @@ class CompareAndSelectScenario extends Component {
                     },
                     lineTension: 0.1,
                     pointStyle: 'line',
-                    pointRadius: this.state.actualConsumptionListForMonth.length==1?3:0,
+                    pointRadius: this.state.actualConsumptionListForMonth.length == 1 ? 3 : 0,
                     showInLegend: true,
                     data: this.state.actualConsumptionListForMonth
                 }
@@ -1738,7 +1748,7 @@ class CompareAndSelectScenario extends Component {
                         lineTension: 0.1,
                         borderWidth: (this.state.selectedTreeScenarioId == item.id) ? 5 : 3,
                         pointStyle: 'line',
-                        pointRadius: this.state.consumptionDataForTree.filter(c => c.id == item.id).length==1?3:0,
+                        pointRadius: this.state.consumptionDataForTree.filter(c => c.id == item.id).length == 1 ? 3 : 0,
                         showInLegend: true,
                         data: this.state.consumptionDataForTree.filter(c => c.id == item.id).map((ele, index) => (ele.value))
                     }
@@ -1936,14 +1946,15 @@ class CompareAndSelectScenario extends Component {
                                             <ul style={{ marginLeft: '-2.5rem' }}><b style={{ color: this.state.treeScenarioList.filter(c => c.id == this.state.selectedTreeScenarioId).length > 0 ? "#000" : "#BA0C2F" }}>{i18n.t('static.compareAndSelect.selectOne') + " " + getLabelText(this.state.planningUnitLabel, this.state.lang) + " " + i18n.t('static.compareAndSelect.andRegion') + " " + this.state.regionName}</b><br /></ul>
                                             <ul className="legendcommitversion">
                                                 <li><i class="fa fa-exclamation-triangle"></i><i> {i18n.t('static.compareAndSelect.missingData')}</i></li>
-                                                <li><span className=" greenlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.extrapolation.lowestError')} </span></li>
+                                                <li><span className="greenlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.extrapolation.lowestError')} </span></li>
+                                                <li><span className="bluelegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.compareVersion.selectedForecast')} </span></li>
                                             </ul><br />
                                             <Table hover responsive className="table-outline mb-0 d-sm-table table-bordered">
                                                 <thead><tr>
+                                                    <th style={{ "textAlign": "center" }} title={i18n.t('static.tooltip.SelectAsForecast')}>{i18n.t('static.compareAndSelect.selectAsForecast')} <i class="fa fa-info-circle icons pl-lg-2" id="Popover5" aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>
                                                     <th style={{ "textAlign": "center" }} title={i18n.t('static.tooltip.Display')}>{i18n.t('static.common.display?')} <i class="fa fa-info-circle icons pl-lg-2" id="Popover2" aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>
                                                     <th style={{ "textAlign": "center" }} title={i18n.t('static.tooltip.CompareandSelectType')}>{i18n.t('static.equivalancyUnit.type')} <i class="fa fa-info-circle icons pl-lg-2" id="Popover3" aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>
                                                     <th style={{ "textAlign": "center" }} title={i18n.t('static.tooltip.Forecst')}>{i18n.t('static.consumption.forcast')} <i class="fa fa-info-circle icons pl-lg-2" id="Popover4" aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>
-                                                    <th style={{ "textAlign": "center" }} title={i18n.t('static.tooltip.SelectAsForecast')}>{i18n.t('static.compareAndSelect.selectAsForecast')} <i class="fa fa-info-circle icons pl-lg-2" id="Popover5" aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>
                                                     <th style={{ "textAlign": "center" }} title={i18n.t('static.common.forForecastPeriod') + " " + moment(this.state.forecastStartDate).format(DATE_FORMAT_CAP_WITHOUT_DATE) + " " + i18n.t('static.jexcel.to') + " " + moment(this.state.forecastStopDate).format(DATE_FORMAT_CAP_WITHOUT_DATE)}>{i18n.t('static.compareAndSelect.totalForecast')}</th>
                                                     <th style={{ "textAlign": "center" }} title={i18n.t('static.tooltip.ForecastError')}>{i18n.t('static.compareAndSelect.forecastError')} <i class="fa fa-info-circle icons pl-lg-2" id="Popover6" aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>
                                                     <th style={{ "textAlign": "center" }} title={i18n.t('static.tooltip.ForecastErrorMonthUsed')}>{i18n.t('static.compareAndSelect.forecastErrorMonths')} <i class="fa fa-info-circle icons pl-lg-2" id="Popover7" aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>
@@ -1961,11 +1972,11 @@ class CompareAndSelectScenario extends Component {
                                                         <td align="center"></td>
                                                     </tr> */}
                                                     {this.state.treeScenarioList.map((item, idx) => (
-                                                        <tr id="addr0" style={{ backgroundColor: item.readonly ? "#CFCDC9" : "" }}>
+                                                        <tr id="addr0" style={{ backgroundColor: item.readonly ? "#CFCDC9" : this.state.selectedTreeScenarioId == item.id?"#d1e3f5":"" }}>
+                                                            <td align="center"><input style={{width:"100%",height:"1.5em"}}type="radio" id="selectAsForecast" name="selectAsForecast" checked={this.state.selectedTreeScenarioId == item.id ? true : false} onClick={() => this.scenarioOrderChanged(item.id)} disabled={item.readonly}></input></td>
                                                             <td align="center"><input type="checkbox" id={"scenarioCheckbox" + item.id} checked={item.checked} onChange={() => this.scenarioCheckedChanged(item.id)} disabled={item.readonly} /></td>
                                                             <td align="center" >{item.type == "T" ? i18n.t('static.forecastMethod.tree') : i18n.t('static.compareAndSelect.cons')}</td>
                                                             <td><i class="fa fa-circle" style={{ color: item.color }} aria-hidden="true"></i> {" "}{item.type == "T" ? getLabelText(item.tree.label, this.state.lang) + " - " + getLabelText(item.scenario.label, this.state.lang) : getLabelText(item.scenario.extrapolationMethod.label, this.state.lang)}{"  "}{item.readonly && <i class="fa fa-exclamation-triangle"></i>}</td>
-                                                            <td align="center"><input type="radio" id="selectAsForecast" name="selectAsForecast" checked={this.state.selectedTreeScenarioId == item.id ? true : false} onClick={() => this.scenarioOrderChanged(item.id)} disabled={item.readonly}></input></td>
                                                             <td align="center">{item.readonly ? "" : <NumberFormat displayType={'text'} thousandSeparator={true} value={Math.round(this.state.totalArray[idx])} />}</td>
                                                             <td align="center" style={{ color: Math.min(...this.state.actualDiff.filter(c => c != 0)) == this.state.actualDiff[idx] ? "#118b70" : "#000000" }}>{item.readonly ? i18n.t('static.supplyPlanFormula.na') : this.state.totalArray[idx] > 0 && this.state.actualDiff.length > 0 ? <NumberFormat displayType={'text'} thousandSeparator={true} value={(((this.state.actualDiff[idx]) / this.state.totalActual) * 100).toFixed(4)} /> : ""}</td>
                                                             <td align="center">{item.readonly ? i18n.t('static.supplyPlanFormula.na') : <NumberFormat displayType={'text'} thousandSeparator={true} value={this.state.countArray.length > 0 && this.state.countArray[idx] != undefined ? this.state.countArray[idx] + 1 : ""} />}</td>
@@ -2048,6 +2059,27 @@ class CompareAndSelectScenario extends Component {
                                                                 {i18n.t('static.equivalancyUnit.equivalancyUnit')}
                                                             </Label>
                                                         </FormGroup>
+                                                    </FormGroup>
+                                                    <FormGroup className="col-md-4" id="planningUnitDiv" style={{ display: "none" }}>
+                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.report.planningUnit')}</Label>
+                                                        <div className="controls">
+                                                            <InputGroup>
+                                                                <Input
+                                                                    type="select"
+                                                                    name="planningUnitId"
+                                                                    id="planningUnitId"
+                                                                    bsSize="sm"
+                                                                    disabled={true}
+                                                                    onChange={(e) => this.setPlanningUnitId(e)}
+                                                                    value={this.state.planningUnitId}
+                                                                    className="selectWrapText removeDropdownArrow"
+                                                                >
+                                                                    <option value="0">{i18n.t('static.common.select')}</option>
+                                                                    {planningUnits}
+                                                                </Input>
+
+                                                            </InputGroup>
+                                                        </div>
                                                     </FormGroup>
                                                     <FormGroup className="col-md-4" id="forecastingUnitDiv" style={{ display: "none" }}>
                                                         <Label htmlFor="appendedInputButton">{i18n.t('static.product.unit1')}</Label>
