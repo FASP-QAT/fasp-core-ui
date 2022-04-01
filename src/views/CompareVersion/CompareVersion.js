@@ -97,6 +97,7 @@ class CompareVersion extends Component {
             this.getVersionList();
         })
     }
+    
 
     // loaded = function (instance, cell, x, y, value) {
     //     jExcelLoadedFunctionOnlyHideRow(instance);
@@ -530,6 +531,7 @@ class CompareVersion extends Component {
             })
         }
     }
+
 
     render() {
         const { datasetList } = this.state;
