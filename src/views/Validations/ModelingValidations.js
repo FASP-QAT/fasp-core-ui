@@ -338,6 +338,12 @@ class ModelingValidation extends Component {
         if (this.state.treeId > 0) {
             var treeListFiltered = treeList.filter(c => c.treeId == this.state.treeId)[0];
             var levelList = [...new Set(treeListFiltered.tree.flatList.map(ele => (ele.level)))]
+            if (treeListFiltered.tree.flatList.filter(c => c.payload.nodeType.id == 4).length > 0) {
+                levelList.push(-1);
+            }
+            if (treeListFiltered.tree.flatList.filter(c => c.payload.nodeType.id == 5).length > 0) {
+                levelList.push(-2);
+            }
             var scenarioList = treeListFiltered.scenarioList;
             var scenarioId = "";
             var event = {
@@ -462,7 +468,7 @@ class ModelingValidation extends Component {
     }
 
     getData() {
-        if (this.state.scenarioId > 0 && this.state.levelId >= 0 && this.state.nodeVal.length > 0) {
+        if (this.state.scenarioId > 0 && this.state.levelId != "" && this.state.nodeVal.length > 0) {
             this.setState({
                 loading: true,
                 show: true
@@ -507,7 +513,7 @@ class ModelingValidation extends Component {
                 var total = 0;
                 var totalPer = 0;
                 for (var k = 0; k < nodeVal.length; k++) {
-                    var flatListFiltered = flatList.filter(c => getLabelText(c.payload.label, this.state.lang) == nodeVal[k] && c.level == this.state.levelId);
+                    var flatListFiltered = flatList.filter(c => getLabelText(c.payload.label, this.state.lang) == nodeVal[k] && (this.state.levelId == -1 ? c.payload.nodeType.id == 4 : this.state.levelId == -2 ? c.payload.nodeType.id == 5 : c.level == this.state.levelId));
                     var calculatedValueTotal = 0;
                     for (var fl = 0; fl < flatListFiltered.length; fl++) {
                         var nodeMomList = flatListFiltered[fl].payload.nodeDataMap[this.state.scenarioId][0].nodeDataMomList;
@@ -614,11 +620,19 @@ class ModelingValidation extends Component {
         var levelUnit = "";
         if (levelId !== "") {
             var treeListFiltered = this.state.treeListFiltered;
-            var flatDataForLevel = treeListFiltered.tree.flatList.filter(c => c.level == levelId);
+            var flatDataForLevel = [];
+            if (levelId == -1) {
+                flatDataForLevel = treeListFiltered.tree.flatList.filter(c => c.payload.nodeType.id == 4);
+            } else if (levelId == -2) {
+                flatDataForLevel = treeListFiltered.tree.flatList.filter(c => c.payload.nodeType.id == 5);
+            } else {
+                flatDataForLevel = treeListFiltered.tree.flatList.filter(c => c.level == levelId);
+            }
+
             var flatData = flatDataForLevel[0];
             var nodeUnit = this.state.unitList.filter(c => c.unitId == flatData.payload.nodeUnit.id);
             var levelListFilter = treeListFiltered.levelList.filter(c => c.levelNo == levelId)[0];
-            levelUnit = levelListFilter!=undefined && levelListFilter.unit != null ? getLabelText(levelListFilter.unit.label, this.state.lang) : "";
+            levelUnit = levelListFilter != undefined && levelListFilter.unit != null ? getLabelText(levelListFilter.unit.label, this.state.lang) : "";
             var nodeList = [];
             var nodeVal = [];
             var nodeIdArr = [];
@@ -1427,11 +1441,19 @@ class ModelingValidation extends Component {
         const levelListForNames = this.state.levelList.length > 0 ? this.state.treeListFiltered.levelList : [];
         let levels = levelList.length > 0
             && levelList.map((item, i) => {
-                return (
-                    <option key={i} value={item}>
-                        {levelListForNames.filter(c => c.levelNo == item).length > 0 ? getLabelText(levelListForNames.filter(c => c.levelNo == item)[0].label, this.state.lang) : i18n.t("static.common.level") + " " + item}
-                    </option>
-                )
+                if (item != -1 && item != -2) {
+                    return (
+                        <option key={i} value={item}>
+                            {levelListForNames.filter(c => c.levelNo == item).length > 0 ? getLabelText(levelListForNames.filter(c => c.levelNo == item)[0].label, this.state.lang) : i18n.t("static.common.level") + " " + item}
+                        </option>
+                    )
+                } else {
+                    return (
+                        <option key={i} value={item}>
+                            {item == -1 ? i18n.t('static.modelingValidation.fuLevel') : i18n.t('static.modelingValidation.puLevel')}
+                        </option>
+                    )
+                }
             }, this);
 
         return (

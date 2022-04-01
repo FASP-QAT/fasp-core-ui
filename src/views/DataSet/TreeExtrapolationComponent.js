@@ -1682,7 +1682,7 @@ export default class TreeExtrapolationComponent extends React.Component {
             data[0] = monthArray[j]
             data[1] = cellData != null && cellData != "" ? cellData.amount : (moment(monthArray[j]).isSame(this.props.items.currentItemConfig.context.payload.nodeDataMap[this.props.items.selectedScenario][0].month) ? this.props.items.currentItemConfig.context.payload.nodeDataMap[this.props.items.selectedScenario][0].calculatedDataValue : "");
             data[2] = cellData != null && cellData != "" ? cellData.reportingRate : 100
-            data[3] = `=ROUND((B${parseInt(j) + 1}*C${parseInt(j) + 1})/100,4)`
+            data[3] = `=ROUND((B${parseInt(j) + 1}/(C${parseInt(j) + 1}/100)),4)`
             // data[4] = this.state.movingAvgData[j+1].actual
             count1 = moment(this.state.minMonth).format("YYYY-MM") == moment(monthArray[j]).format("YYYY-MM") ? 0 : moment(this.state.minMonth).format("YYYY-MM") < moment(monthArray[j]).format("YYYY-MM") ? count1 : '';
             // console.log("month-", monthArray[j] + " count value-", count1 + " tes data-", this.state.tesData[count1]);
