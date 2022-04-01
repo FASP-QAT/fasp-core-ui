@@ -6474,7 +6474,7 @@ export default class BuildTree extends Component {
         // newItem.isVisible = this.state.hideFUPUNode || this.state.hidePUNode ? false : true;
         // var parentSortOrder = items.filter(c => c.id == parent)[0].sortOrder;
         // var childList = items.filter(c => c.parent == parent);
-        newItem.sortOrder = itemConfig.context.sortOrder.concat(".").concat(("00").slice(-2));
+        newItem.sortOrder = itemConfig.context.sortOrder.concat(".").concat(("01").slice(-2));
         console.log("pu node month---", (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].month);
         (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].nodeDataId = this.getMaxNodeDataId();
         (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].dataValue = 100;

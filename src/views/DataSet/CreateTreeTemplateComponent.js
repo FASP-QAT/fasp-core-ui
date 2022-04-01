@@ -4984,7 +4984,7 @@ export default class CreateTreeTemplate extends Component {
         newItem.payload.nodeType.id = 5;
         // var parentSortOrder = items.filter(c => c.id == parent)[0].sortOrder;
         // var childList = items.filter(c => c.parent == parent);
-        newItem.sortOrder = itemConfig.context.sortOrder.concat(".").concat(("00").slice(-2));
+        newItem.sortOrder = itemConfig.context.sortOrder.concat(".").concat(("01").slice(-2));
         // console.log("pu node month---", (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].month);
         (newItem.payload.nodeDataMap[0])[0].nodeDataId = this.getMaxNodeDataId() + 1;
         (newItem.payload.nodeDataMap[0])[0].dataValue = 100;
