@@ -2683,6 +2683,19 @@ export default class CreateTreeTemplate extends Component {
 
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
+      
+            var asterisk = document.getElementsByClassName("resizable")[0];
+            var tr = asterisk.firstChild;
+            tr.children[1].classList.add('InfoTr');
+            tr.children[3].classList.add('InfoTr');
+            tr.children[8].classList.add('InfoTr');
+            tr.children[9].classList.add('InfoTr');
+    
+            tr.children[1].title = i18n.t('static.tooltip.Transfercloumn');
+            tr.children[3].title = i18n.t('static.tooltip.ModelingType');
+            tr.children[8].title = i18n.t('static.tooltip.ModelingCalculator');
+            tr.children[9].title = i18n.t('static.tooltip.CalculatorChangeforMonth');
+       
     }
     selected = function (instance, cell, x, y, value) {
         if (y == 7) {
