@@ -1306,6 +1306,7 @@ class ForecastSummary extends Component {
                                             data[1] = puListFiltered[j].planningUnit;
                                             data[2] = getLabelText(puListFiltered[j].planningUnit.label, this.state.lang) + " | " + puListFiltered[j].planningUnit.id;
                                             var total = 0;
+                                            let selectedForecastQty = 0;
                                             for (var k = 0; k < regRegionList.length; k++) {
                                                 var filterForecastSelected = puListFiltered[j].selectedForecastMap[regRegionList[k].regionId]
                                                 console.log("filterForecastSelected+++", filterForecastSelected);
@@ -1314,9 +1315,14 @@ class ForecastSummary extends Component {
                                                 data[((k + 1) * 3) + 1] = filterForecastSelected != undefined ? Math.round(filterForecastSelected.totalForecast) : "";
                                                 total += Number(filterForecastSelected != undefined ? Math.round(filterForecastSelected.totalForecast) : 0);
                                                 data[((k + 1) * 3) + 2] = filterForecastSelected != undefined ? filterForecastSelected.notes : "";
+
+                                                if ((filterForecastSelected != undefined ? Math.round(filterForecastSelected.totalForecast) : "") != "") {
+                                                    selectedForecastQty = selectedForecastQty + 1;
+                                                }
                                             }
                                             data[(regRegionList.length * 3) + 3] = 2
-                                            data[(regRegionList.length * 3) + 4] = total;
+                                            // data[(regRegionList.length * 3) + 4] = total;
+                                            data[(regRegionList.length * 3) + 4] = (selectedForecastQty == "" ? "" : total);
                                             dataArray.push(data);
                                         }
                                     }
