@@ -295,6 +295,7 @@ export default class AddForecastProgram extends Component {
         // console.log("singleValue1------->1", value);
         this.setState({ singleValue1: value, }, () => {
             // this.fetchData();
+            this.calculateForecastEndDate();
         }, () => {
 
         })
@@ -1261,6 +1262,7 @@ export default class AddForecastProgram extends Component {
                                                             theme="dark"
                                                             onChange={this.handleAMonthChange2}
                                                             onDismiss={this.handleAMonthDissmis2}
+                                                            key={JSON.stringify(singleValue2)}
                                                         >
                                                             <MonthBox value={this.makeText(singleValue2)} onClick={this.handleClickMonthBox2} />
                                                         </Picker>
@@ -1324,7 +1326,7 @@ export default class AddForecastProgram extends Component {
         this.state.regionList = [];
         program.regionArray = [];
 
-        this.state.forecastProgramInMonth = '';
+        this.state.forecastProgramInMonth = 13;
         this.state.singleValue1 = { year: new Date().getFullYear(), month: new Date().getMonth() + 1 };
         this.state.singleValue2 = { year: new Date().getFullYear() + 1, month: new Date().getMonth() + 1 };
         this.state.minDate = { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 };

@@ -13,6 +13,7 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import RealmService from '../../api/RealmService';
 import getLabelText from '../../CommonComponent/getLabelText';
 import PlanningUnitService from '../../api/PlanningUnitService';
+import ForecastingUnitService from '../../api/ForecastingUnitService';
 import ProductService from '../../api/ProductService';
 import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
@@ -1600,6 +1601,25 @@ class ForecastOutput extends Component {
             } else {//api call
 
 
+                let inputJson = {
+                    "programId": programId,
+                    "versionId": versionId,
+                    "startDate": startDate,
+                    "stopDate": endDate,
+                    "reportView": viewById,
+                    "aggregateByYear": (xaxisId == 1 ? true : false),
+                    "unitIds": (viewById == 1 ? planningUnitIds : forecastingUnitIds)
+                }
+
+                console.log("OnlineInputJson---------------->", inputJson);
+
+
+
+
+
+
+
+
 
             }
 
@@ -2029,63 +2049,203 @@ class ForecastOutput extends Component {
                     }
                     else {
 
-                        // ProgramService.getActiveProgramPlaningUnitListByProgramId(programId).then(response => {
-                        //     console.log('**' + JSON.stringify(response.data))
-                        //     var listArray = response.data;
-                        //     listArray.sort((a, b) => {
-                        //         var itemLabelA = getLabelText(a.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
-                        //         var itemLabelB = getLabelText(b.planningUnit.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
-                        //         return itemLabelA > itemLabelB ? 1 : -1;
-                        //     });
-                        //     this.setState({
-                        //         planningUnits: listArray,
-                        //         message: ''
-                        //     }, () => {
-                        //         this.filterData();
-                        //     })
-                        // }).catch(
-                        //     error => {
-                        //         this.setState({
-                        //             planningUnits: [],
-                        //         })
-                        //         if (error.message === "Network Error") {
-                        //             this.setState({
-                        //                 message: 'static.unkownError',
-                        //                 loading: false
-                        //             });
-                        //         } else {
-                        //             switch (error.response ? error.response.status : "") {
+                        PlanningUnitService.getPlanningUnitListByProgramVersionIdForSelectedForecastMap(programId, versionId).then(response => {
+                            console.log('**' + JSON.stringify(response.data))
+                            var listArray = response.data;
+                            listArray.sort((a, b) => {
+                                var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                                var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                                return itemLabelA > itemLabelB ? 1 : -1;
+                            });
+                            this.setState({
+                                planningUnits: listArray,
+                                message: ''
+                            }, () => {
 
-                        //                 case 401:
-                        //                     this.props.history.push(`/login/static.message.sessionExpired`)
-                        //                     break;
-                        //                 case 403:
-                        //                     this.props.history.push(`/accessDenied`)
-                        //                     break;
-                        //                 case 500:
-                        //                 case 404:
-                        //                 case 406:
-                        //                     this.setState({
-                        //                         message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }),
-                        //                         loading: false
-                        //                     });
-                        //                     break;
-                        //                 case 412:
-                        //                     this.setState({
-                        //                         message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }),
-                        //                         loading: false
-                        //                     });
-                        //                     break;
-                        //                 default:
-                        //                     this.setState({
-                        //                         message: 'static.unkownError',
-                        //                         loading: false
-                        //                     });
-                        //                     break;
-                        //             }
-                        //         }
-                        //     }
-                        // );
+                                ForecastingUnitService.getForecastingUnitListByProgramVersionIdForSelectedForecastMap(programId, versionId).then(response => {
+                                    console.log('**' + JSON.stringify(response.data))
+                                    var listArray = response.data;
+                                    listArray.sort((a, b) => {
+                                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
+                                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
+                                        return itemLabelA > itemLabelB ? 1 : -1;
+                                    });
+                                    this.setState({
+                                        forecastingUnits: listArray,
+                                        message: ''
+                                    }, () => {
+
+                                        let yaxisEquUnitId = document.getElementById("yaxisEquUnit").value;
+
+
+                                        if (yaxisEquUnitId != -1) {//Yes
+                                            let filteredProgramEQList = this.state.programEquivalencyUnitList.filter(c => c.equivalencyUnit.equivalencyUnitId == yaxisEquUnitId);
+                                            let newPlanningUnitList = [];
+                                            let newForecastingUnitList = [];
+
+                                            let forecastingUnitList = this.state.forecastingUnits;
+                                            let planningUnitList = this.state.planningUnits;
+
+                                            for (var i = 0; i < forecastingUnitList.length; i++) {
+                                                let temp = filteredProgramEQList.filter(c => c.forecastingUnit.id == forecastingUnitList[i].id);
+                                                if (temp.length > 0) {
+                                                    newForecastingUnitList.push(forecastingUnitList[i]);
+                                                }
+                                            }
+
+                                            for (var i = 0; i < planningUnitList.length; i++) {
+                                                let temp = filteredProgramEQList.filter(c => c.forecastingUnit.id == planningUnitList[i].forecastingUnit.id);
+                                                if (temp.length > 0) {
+                                                    newPlanningUnitList.push(planningUnitList[i]);
+                                                }
+                                            }
+
+                                            var yaxisEquUnitt = document.getElementById("yaxisEquUnit");
+                                            var selectedText = yaxisEquUnitt.options[yaxisEquUnitt.selectedIndex].text;
+
+                                            newPlanningUnitList.sort(function (a, b) {
+                                                a = getLabelText(a.label, lang).toLowerCase();
+                                                b = getLabelText(b.label, lang).toLowerCase();
+                                                return a < b ? -1 : a > b ? 1 : 0;
+                                            });
+
+                                            newForecastingUnitList.sort(function (a, b) {
+                                                a = getLabelText(a.label, lang).toLowerCase();
+                                                b = getLabelText(b.label, lang).toLowerCase();
+                                                return a < b ? -1 : a > b ? 1 : 0;
+                                            })
+
+                                            this.setState({
+                                                planningUnits: newPlanningUnitList,
+                                                forecastingUnits: newForecastingUnitList,
+                                                planningUnitValues: newPlanningUnitList.map((item, i) => {
+                                                    return ({ label: getLabelText(item.label, this.state.lang), value: item.id })
+
+                                                }, this),
+                                                planningUnitLabels: newPlanningUnitList.map((item, i) => {
+                                                    return (getLabelText(item.label, this.state.lang))
+                                                }, this),
+                                                equivalencyUnitLabel: selectedText,
+                                                filteredProgramEQList: filteredProgramEQList
+                                            }, () => {
+                                                this.filterData();
+                                            })
+
+                                        } else {//NO
+
+                                            this.setState({
+                                                planningUnitValues: this.state.planningUnits.map((item, i) => {
+                                                    return ({ label: getLabelText(item.label, this.state.lang), value: item.id })
+
+                                                }, this),
+                                                planningUnitLabels: this.state.planningUnits.map((item, i) => {
+                                                    return (getLabelText(item.label, this.state.lang))
+                                                }, this),
+                                                equivalencyUnitLabel: ''
+                                            }, () => {
+                                                this.filterData();
+                                            })
+
+                                        }
+
+
+
+
+
+
+
+                                    })
+                                }).catch(
+                                    error => {
+                                        this.setState({
+                                            planningUnits: [],
+                                        })
+                                        if (error.message === "Network Error") {
+                                            this.setState({
+                                                message: 'static.unkownError',
+                                                loading: false
+                                            });
+                                        } else {
+                                            switch (error.response ? error.response.status : "") {
+
+                                                case 401:
+                                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                                    break;
+                                                case 403:
+                                                    this.props.history.push(`/accessDenied`)
+                                                    break;
+                                                case 500:
+                                                case 404:
+                                                case 406:
+                                                    this.setState({
+                                                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }),
+                                                        loading: false
+                                                    });
+                                                    break;
+                                                case 412:
+                                                    this.setState({
+                                                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }),
+                                                        loading: false
+                                                    });
+                                                    break;
+                                                default:
+                                                    this.setState({
+                                                        message: 'static.unkownError',
+                                                        loading: false
+                                                    });
+                                                    break;
+                                            }
+                                        }
+                                    }
+                                );
+
+
+
+
+                            })
+                        }).catch(
+                            error => {
+                                this.setState({
+                                    planningUnits: [],
+                                })
+                                if (error.message === "Network Error") {
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false
+                                    });
+                                } else {
+                                    switch (error.response ? error.response.status : "") {
+
+                                        case 401:
+                                            this.props.history.push(`/login/static.message.sessionExpired`)
+                                            break;
+                                        case 403:
+                                            this.props.history.push(`/accessDenied`)
+                                            break;
+                                        case 500:
+                                        case 404:
+                                        case 406:
+                                            this.setState({
+                                                message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }),
+                                                loading: false
+                                            });
+                                            break;
+                                        case 412:
+                                            this.setState({
+                                                message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.planningunit.planningunit') }),
+                                                loading: false
+                                            });
+                                            break;
+                                        default:
+                                            this.setState({
+                                                message: 'static.unkownError',
+                                                loading: false
+                                            });
+                                            break;
+                                    }
+                                }
+                            }
+                        );
                     }
                 }
             });
