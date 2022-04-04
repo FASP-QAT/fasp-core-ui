@@ -6179,8 +6179,8 @@ font-style: italic!important;
 }
 
 .TreeTemplateHeight{
-  min-height: 100vh;
-  // min-height: calc(100vh - 50px)!important;
+  // min-height: 100vh;
+  min-height: calc(100vh - 50px)!important;
     // overflow: scroll !important;
     // min-height: calc(100vh - 427px) !important;
     // overflow: scroll !important;
@@ -6302,4 +6302,8 @@ font-style: italic!important;
      min-height: calc(100vh - 427px) !important;
      
   }
+}
+.addtreebg option[value="0"]{
+  font-family: 'FontAwesome';
+  content: "\f067";
 }
