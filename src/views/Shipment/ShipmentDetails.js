@@ -49,8 +49,8 @@ export default class ShipmentDetails extends React.Component {
             showShipments: 0,
             shipmentChangedFlag: 0,
             shipmentModalTitle: "",
-            shipmentType: { value: 1, label: i18n.t('static.shipment.manualShipments') },
-            shipmentTypeIds: [1],
+            shipmentType: localStorage.getItem("sesShipmentType") != "" ? JSON.parse(localStorage.getItem("sesShipmentType")) : [{ value: 1, label: i18n.t('static.shipment.manualShipments') }, { value: 2, label: i18n.t('static.shipment.erpShipment') }],
+            shipmentTypeIds: localStorage.getItem("sesShipmentType") != "" ? [...new Set(JSON.parse(localStorage.getItem("sesShipmentType")).map(ele => ele.value))] : [1, 2],
             rangeValue: localStorage.getItem("sesRangeValue") != "" ? JSON.parse(localStorage.getItem("sesRangeValue")) : { from: { year: new Date(startDate).getFullYear(), month: new Date(startDate).getMonth() + 1 }, to: { year: new Date(endDate).getFullYear(), month: new Date(endDate).getMonth() + 1 } },
             minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
             maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
@@ -63,7 +63,7 @@ export default class ShipmentDetails extends React.Component {
             budgetList: [],
             shipmentStatusList: [],
             showBatchSaveButton: false,
-            programQPLDetails:[]
+            programQPLDetails: []
         }
         this.getPlanningUnitList = this.getPlanningUnitList.bind(this)
         this.formSubmit = this.formSubmit.bind(this);
@@ -492,6 +492,7 @@ export default class ShipmentDetails extends React.Component {
                 shipmentChangedFlag: 0,
                 shipmentTypeIds: shipmentTypeIds
             }, () => {
+                localStorage.setItem("sesShipmentType", JSON.stringify(value));
                 document.getElementById("shipmentsDetailsTableDiv").style.display = "none";
                 if (document.getElementById("addRowButtonId") != null) {
                     document.getElementById("addRowButtonId").style.display = "none";
@@ -601,7 +602,7 @@ export default class ShipmentDetails extends React.Component {
                         return a < b ? -1 : a > b ? 1 : 0;
                     }),
                     loading: false,
-                    programQPLDetails:getRequest.result
+                    programQPLDetails: getRequest.result
                 })
                 if (document.getElementById("addRowButtonId") != null) {
                     document.getElementById("addRowButtonId").style.display = "none";
@@ -762,7 +763,7 @@ export default class ShipmentDetails extends React.Component {
                     if ((this.state.shipmentTypeIds).includes(1)) {
                         document.getElementById("addRowButtonId").style.display = "block";
                         var roleList = AuthenticationService.getLoggedInUserRole();
-                        if ((roleList.length == 1 && roleList[0].roleId == 'ROLE_GUEST_USER') || this.state.programQPLDetails.filter(c=>c.id==this.state.programId)[0].readonly) {
+                        if ((roleList.length == 1 && roleList[0].roleId == 'ROLE_GUEST_USER') || this.state.programQPLDetails.filter(c => c.id == this.state.programId)[0].readonly) {
                             document.getElementById("addRowButtonId").style.display = "none";
                         }
                     } else {
@@ -1055,7 +1056,7 @@ export default class ShipmentDetails extends React.Component {
                                         </div>
                                     </Form>
                                 )} />
-                                {(this.state.programQPLDetails.filter(c=>c.id==this.state.programId)).length>0 && (this.state.programQPLDetails.filter(c=>c.id==this.state.programId))[0].readonly == 1 && <h5  style={{ color: 'red' }}>{i18n.t('static.dataentry.readonly')}</h5>}
+                        {(this.state.programQPLDetails.filter(c => c.id == this.state.programId)).length > 0 && (this.state.programQPLDetails.filter(c => c.id == this.state.programId))[0].readonly == 1 && <h5 style={{ color: 'red' }}>{i18n.t('static.dataentry.readonly')}</h5>}
                         <div className="col-md-10 pb-3">
                             <ul className="legendcommitversion">
                                 <li><span className="redlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.supplyPlan.emergencyOrder')}</span></li>
