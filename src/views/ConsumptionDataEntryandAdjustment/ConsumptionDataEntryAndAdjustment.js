@@ -949,11 +949,11 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
               console.log("&&&&&&&&&&MonthList",monthArray[i]);
               var index = 0;
               index = fullConsumptionList.findIndex(c => c.planningUnit.id == consumptionUnit.planningUnit.id && c.region.id == regionList[r].regionId && moment(c.month).format("YYYY-MM") == moment(monthArray[i].date).format("YYYY-MM"));
-              var actualConsumptionValue = elInstance.getValue(`${colArr[i+1]}${parseInt(actualConsumptionCount) + 1}`, true);        
+              var actualConsumptionValue = elInstance.getValue(`${colArr[i+1]}${parseInt(actualConsumptionCount) + 1}`, true).replaceAll(",","");        
               var reportingRateValue = elInstance.getValue(`${colArr[i+1]}${parseInt(reportingRateCount) + 1}`, true);        
               var daysOfStockOutValue = elInstance.getValue(`${colArr[i+1]}${parseInt(daysOfStockOutCount) + 1}`, true);        
               console.log("&&&&&&&&&&ActualConsumptionValue",actualConsumptionValue);
-              if (actualConsumptionValue >= 0) {
+              if (actualConsumptionValue !== "") {
                 if (index != -1) {
                   fullConsumptionList[index].amount = actualConsumptionValue;
                   fullConsumptionList[index].reportingRate = reportingRateValue;
@@ -972,7 +972,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                     daysOfStockOut: daysOfStockOutValue,
                     exculde: false,
                     forecastConsumptionId: 0,
-                    month: moment(monthArray[i].date).format("YYYY-MM-DD"),
+                    month: moment(monthArray[i].date).startOf('month').format("YYYY-MM-DD"),
                     region: {
                       id: regionList[r].regionId,
                       label: regionList[r].label
