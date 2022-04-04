@@ -38,7 +38,7 @@ import ProgramService from '../../api/ProgramService';
 import FundingSourceService from '../../api/FundingSourceService';
 import ShipmentStatusService from '../../api/ShipmentStatusService';
 import { Online, Offline } from "react-detect-offline";
-import MultiSelect from 'react-multi-select-component';
+import {MultiSelect} from 'react-multi-select-component';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import { Multiselect } from 'multiselect-react-dropdown';
 import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';

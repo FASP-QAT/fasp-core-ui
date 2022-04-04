@@ -7,7 +7,7 @@ import { Row, Col, Card, CardFooter, Button, Table, CardBody, Form, Modal, Modal
 import getLabelText from '../../CommonComponent/getLabelText';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow, jExcelLoadedFunctionWithoutPagination } from '../../CommonComponent/JExcelCommonFunctions.js';
-import { SEASONALITY_REGEX, ALPHA_BETA_GAMMA_VALUE, INDEXED_DB_VERSION, INDEXED_DB_NAME, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, JEXCEL_MONTH_PICKER_FORMAT, JEXCEL_DECIMAL_MONTHLY_CHANGE, JEXCEL_DECIMAL_NO_REGEX_LONG } from "../../Constants";
+import { SEASONALITY_REGEX, ALPHA_BETA_GAMMA_VALUE, INDEXED_DB_VERSION, INDEXED_DB_NAME, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, JEXCEL_MONTH_PICKER_FORMAT,JEXCEL_DECIMAL_MONTHLY_CHANGE_4_DECIMAL, JEXCEL_DECIMAL_MONTHLY_CHANGE, JEXCEL_DECIMAL_NO_REGEX_LONG_4_DECIMAL } from "../../Constants";
 import moment from "moment";
 import { Formik } from 'formik';
 import * as Yup from 'yup'
@@ -106,7 +106,7 @@ const validationSchemaExtrapolation = function (values) {
             Yup.string().test('pId', 'Please enter correct p value.',
                 function (value) {
                     console.log("***7**", document.getElementById("arimaId").value);
-                    var testNumber = document.getElementById("pId").value != "" ? (/^\d{0,3}(\.\d{1,2})?$/).test(document.getElementById("pId").value) : false;
+                    var testNumber = document.getElementById("pId").value != "" ? (/^\d{0,3}(\.\d{1,4})?$/).test(document.getElementById("pId").value) : false;
                     // console.log("*****", testNumber);
                     if ((document.getElementById("arimaId").value) == "true" && (document.getElementById("pId").value == "" || testNumber == false)) {
                         return false;
@@ -118,7 +118,7 @@ const validationSchemaExtrapolation = function (values) {
             Yup.string().test('dId', 'Please enter correct d value.',
                 function (value) {
                     console.log("***8**", document.getElementById("arimaId").value);
-                    var testNumber = document.getElementById("dId").value != "" ? (/^\d{0,3}(\.\d{1,2})?$/).test(document.getElementById("dId").value) : false;
+                    var testNumber = document.getElementById("dId").value != "" ? (/^\d{0,3}(\.\d{1,4})?$/).test(document.getElementById("dId").value) : false;
                     // var testNumber = JEXCEL_INTEGER_REGEX.test((document.getElementById("dId").value).replaceAll(",", ""));
                     // console.log("*****", testNumber);
                     if ((document.getElementById("arimaId").value) == "true" && (document.getElementById("dId").value == "" || testNumber == false)) {
@@ -131,7 +131,7 @@ const validationSchemaExtrapolation = function (values) {
             Yup.string().test('qId', 'Please enter correct q value.',
                 function (value) {
                     console.log("***4 arima**", document.getElementById("arimaId").value);
-                    var testNumber = document.getElementById("qId").value != "" ? (/^\d{0,3}(\.\d{1,2})?$/).test(document.getElementById("qId").value) : false;
+                    var testNumber = document.getElementById("qId").value != "" ? (/^\d{0,3}(\.\d{1,4})?$/).test(document.getElementById("qId").value) : false;
                     console.log("*****", testNumber);
                     if ((document.getElementById("arimaId").value) == "true" && (document.getElementById("qId").value == "" || testNumber == false)) {
                         return false;
@@ -191,6 +191,23 @@ const getErrorsFromValidationErrorExtrapolation = (validationError) => {
             [error.path]: error.errors[FIRST_ERROR],
         }
     }, {})
+}
+function addCommasExtrapolation(cell1, row) {
+
+    if (cell1 != null && cell1 != "") {
+        cell1 += '';
+        var x = cell1.replaceAll(",", "").split('.');
+        var x1 = x[0];
+        var x2 = x.length > 1 ? '.' + x[1].slice(0, 4) : '';
+        var rgx = /(\d+)(\d{3})/;
+        while (rgx.test(x1)) {
+            x1 = x1.replace(rgx, '$1' + ',' + '$2');
+        }
+        return x1 + x2;
+        // return cell1.toString().replaceAll(",", "").replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+    } else {
+        return "";
+    }
 }
 export default class TreeExtrapolationComponent extends React.Component {
     constructor(props) {
@@ -706,24 +723,24 @@ export default class TreeExtrapolationComponent extends React.Component {
             minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
             maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
             rangeValue: { from: { year: new Date(startDate).getFullYear(), month: new Date(startDate).getMonth() + 1 }, to: { year: new Date(endDate).getFullYear(), month: new Date(endDate).getMonth() + 1 } },
-            movingAvgId: false,
-            semiAvgId: false,
-            linearRegressionId: false,
-            smoothingId: false,
-            arimaId: false,
+            movingAvgId: true,
+            semiAvgId: true,
+            linearRegressionId: true,
+            smoothingId: true,
+            arimaId: true,
             // movingAvgId: true,
             // semiAvgId: true,
             // linearRegressionId: true,
             // smoothingId: true,
             // arimaId: true,
-            popoverOpenQ:false,
-            popoverOpenD:false,
-            popoverOpenP:false,
-            popoverOpenGamma:false,
-            popoverOpenBeta:false,
-            popoverOpenAlpha:false,
-            popoverOpenSeasonality:false,
-            popoverOpenConfidenceLevel:false,
+            popoverOpenQ: false,
+            popoverOpenD: false,
+            popoverOpenP: false,
+            popoverOpenGamma: false,
+            popoverOpenBeta: false,
+            popoverOpenAlpha: false,
+            popoverOpenSeasonality: false,
+            popoverOpenConfidenceLevel: false,
             popoverOpenStartMonth: false,
             popoverOpenChooseMethod: false,
             popoverOpenMa: false,
@@ -766,6 +783,7 @@ export default class TreeExtrapolationComponent extends React.Component {
         this.saveJexcelData = this.saveJexcelData.bind(this);
         this.toggleJexcelData = this.toggleJexcelData.bind(this);
     }
+    
     toggleJexcelData() {
         this.setState({ showJexcelData: !this.state.showJexcelData })
     }
@@ -949,12 +967,17 @@ export default class TreeExtrapolationComponent extends React.Component {
             nodeDataExtrapolation,
             nodeDataExtrapolationOptionList,
             extrapolationLoader: false,
-            isChanged:false
+            isChanged: false
         }, () => {
             const { currentItemConfig } = this.props.items;
+            var mom = momList.filter(m => moment(m.month).format('YYYY-MM') == moment(currentItemConfig.context.payload.nodeDataMap[this.props.items.selectedScenario][0].month).format('YYYY-MM'));
             currentItemConfig.context.payload.nodeDataMap[this.props.items.selectedScenario][0].nodeDataExtrapolation = this.state.nodeDataExtrapolation;
             currentItemConfig.context.payload.nodeDataMap[this.props.items.selectedScenario][0].nodeDataMomList = momList;
             currentItemConfig.context.payload.nodeDataMap[this.props.items.selectedScenario][0].nodeDataExtrapolationOptionList = this.state.nodeDataExtrapolationOptionList;
+            if (currentItemConfig.context.payload.nodeDataMap[this.props.items.selectedScenario][0].dataValue == "" || currentItemConfig.context.payload.nodeDataMap[this.props.items.selectedScenario][0].dataValue == 0) {
+                currentItemConfig.context.payload.nodeDataMap[this.props.items.selectedScenario][0].dataValue = mom.length > 0 ? mom[0].calculatedValue : '0';
+                currentItemConfig.context.payload.nodeDataMap[this.props.items.selectedScenario][0].calculatedDataValue = mom.length > 0 ? mom[0].calculatedValue : '0';
+            }
             console.log("extrapolation data----", currentItemConfig);
             this.props.updateState("currentItemConfig", currentItemConfig);
         });
@@ -1000,7 +1023,7 @@ export default class TreeExtrapolationComponent extends React.Component {
             if (value != null && value != "") {
                 //Population
                 var col = ("B").concat(parseInt(y) + 1);
-                var reg = JEXCEL_DECIMAL_NO_REGEX_LONG;
+                var reg = JEXCEL_DECIMAL_NO_REGEX_LONG_4_DECIMAL;
                 var value = this.el.getValueFromCoords(1, y);
                 if (value != "" && !(reg.test(value.toString().replaceAll(",", "")))) {
                     this.state.dataExtrapolation.setStyle(col, "background-color", "transparent");
@@ -1034,7 +1057,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                 // Reporting rate
                 var col = ("C").concat(parseInt(y) + 1);
                 var value = this.el.getValueFromCoords(2, y);
-                var reg = JEXCEL_DECIMAL_NO_REGEX_LONG;
+                var reg = JEXCEL_DECIMAL_NO_REGEX_LONG_4_DECIMAL;
                 console.log("reporting rate value---", value)
                 var actualValue = this.state.dataExtrapolation.getValue(`B${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
                 // value.split("%")[0];
@@ -1063,7 +1086,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                 // Manual Change
                 var col = ("K").concat(parseInt(y) + 1);
                 var value = this.el.getValueFromCoords(10, y);
-                var reg = JEXCEL_DECIMAL_MONTHLY_CHANGE;
+                var reg = JEXCEL_DECIMAL_MONTHLY_CHANGE_4_DECIMAL;
                 value = value.toString().replaceAll(",", "");
                 if (value != "" && !(reg.test(value))) {
                     this.state.dataExtrapolation.setStyle(col, "background-color", "transparent");
@@ -1086,7 +1109,7 @@ export default class TreeExtrapolationComponent extends React.Component {
         this.state.nodeDataExtrapolation.extrapolationMethod.id = e.target.value;
         this.state.dataExtrapolation.setValueFromCoords(13, 0, e.target.value, true);
         // this.buildJexcel();
-        this.setState({isChanged:true});
+        this.setState({ isChanged: true });
     }
 
     setMonthsForMovingAverage(e) {
@@ -1096,7 +1119,7 @@ export default class TreeExtrapolationComponent extends React.Component {
         var monthsForMovingAverage = e.target.value;
         this.setState({
             monthsForMovingAverage: monthsForMovingAverage,
-            isChanged:true
+            isChanged: true
             // dataChanged: true
         }, () => {
             console.log("monthsForMovingAverage after state update---", this.state.monthsForMovingAverage);
@@ -1116,7 +1139,7 @@ export default class TreeExtrapolationComponent extends React.Component {
         var alpha = e.target.value;
         this.setState({
             alpha: alpha,
-            isChanged:true
+            isChanged: true
             // dataChanged: true
         }, () => {
             // this.buildJxl();
@@ -1127,7 +1150,7 @@ export default class TreeExtrapolationComponent extends React.Component {
         var beta = e.target.value;
         this.setState({
             beta: beta,
-            isChanged:true
+            isChanged: true
             // dataChanged: true
         }, () => {
             // this.buildJxl();
@@ -1138,7 +1161,7 @@ export default class TreeExtrapolationComponent extends React.Component {
         var gamma = e.target.value;
         this.setState({
             gamma: gamma,
-            isChanged:true
+            isChanged: true
             // dataChanged: true
         }, () => {
             // this.buildJxl();
@@ -1149,7 +1172,7 @@ export default class TreeExtrapolationComponent extends React.Component {
         var confidenceLevelId = e.target.value;
         this.setState({
             confidenceLevelId: confidenceLevelId,
-            isChanged:true
+            isChanged: true
         }, () => {
             // this.buildJxl()
         })
@@ -1159,7 +1182,7 @@ export default class TreeExtrapolationComponent extends React.Component {
         var seasonals = e.target.value;
         this.setState({
             noOfMonthsForASeason: seasonals,
-            isChanged:true
+            isChanged: true
             // dataChanged: true
         }, () => {
             // this.buildJxl()
@@ -1169,7 +1192,7 @@ export default class TreeExtrapolationComponent extends React.Component {
     setPId(e) {
         this.setState({
             p: e.target.value,
-            isChanged:true
+            isChanged: true
         }, () => {
             // this.buildJxl()
         })
@@ -1177,7 +1200,7 @@ export default class TreeExtrapolationComponent extends React.Component {
     setDId(e) {
         this.setState({
             d: e.target.value,
-            isChanged:true
+            isChanged: true
         }, () => {
             // this.buildJxl()
         })
@@ -1186,7 +1209,7 @@ export default class TreeExtrapolationComponent extends React.Component {
     setQId(e) {
         this.setState({
             q: e.target.value,
-            isChanged:true
+            isChanged: true
         }, () => {
             // this.buildJxl()
         })
@@ -1239,7 +1262,7 @@ export default class TreeExtrapolationComponent extends React.Component {
         nodeDataExtrapolation.extrapolationDataList = jexcelDataArr;
         console.log("jexcel data 1---", jexcelDataArr);
 
-        this.setState({ jexcelDataArr, nodeDataExtrapolation,isChanged:true }, () => {
+        this.setState({ jexcelDataArr, nodeDataExtrapolation, isChanged: true }, () => {
             // setTimeout(() => {
             console.log("tableJson for extrapolation---", this.state.jexcelDataArr);
             if (jexcelDataArr.length > 0) {
@@ -1335,7 +1358,7 @@ export default class TreeExtrapolationComponent extends React.Component {
     }
 
     interpolate() {
-        this.setState({ extrapolationLoader: true,isChanged:true }, () => {
+        this.setState({ extrapolationLoader: true, isChanged: true }, () => {
             setTimeout(() => {
                 var monthArray = this.state.monthArray;
                 var jexcelDataArr = [];
@@ -1394,7 +1417,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                 const index = jexcelDataArr.findIndex(c => c.month == monthArray[j]);
                                 var json = {
                                     month: monthArray[j],
-                                    amount: missingActualData % 1 != 0 ? missingActualData.toFixed(2) : missingActualData,
+                                    amount: missingActualData % 1 != 0 ? missingActualData.toFixed(4) : missingActualData,
                                     reportingRate: dataArr.reportingRate,
                                     manualChange: dataArr.manualChange
                                 }
@@ -1511,7 +1534,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                     }, () => {
                         if (this.props.items.currentScenario.nodeDataExtrapolationOptionList == null) {
                             console.log("### inside did mount if")
-                            this.setState({ extrapolationLoader: false, forecastNestedHeader: 0 }, () => {
+                            this.setState({ extrapolationLoader: false, forecastNestedHeader: 5, filteredExtrapolationMethodList: JSON.parse(JSON.stringify(this.state.extrapolationMethodList)) }, () => {
                                 console.log("### inside did mount if state update")
                                 this.buildJexcel();
                             })
@@ -1659,24 +1682,24 @@ export default class TreeExtrapolationComponent extends React.Component {
             data[0] = monthArray[j]
             data[1] = cellData != null && cellData != "" ? cellData.amount : (moment(monthArray[j]).isSame(this.props.items.currentItemConfig.context.payload.nodeDataMap[this.props.items.selectedScenario][0].month) ? this.props.items.currentItemConfig.context.payload.nodeDataMap[this.props.items.selectedScenario][0].calculatedDataValue : "");
             data[2] = cellData != null && cellData != "" ? cellData.reportingRate : 100
-            data[3] = `=ROUND((B${parseInt(j) + 1}*C${parseInt(j) + 1})/100,2)`
+            data[3] = `=ROUND((B${parseInt(j) + 1}/(C${parseInt(j) + 1}/100)),4)`
             // data[4] = this.state.movingAvgData[j+1].actual
             count1 = moment(this.state.minMonth).format("YYYY-MM") == moment(monthArray[j]).format("YYYY-MM") ? 0 : moment(this.state.minMonth).format("YYYY-MM") < moment(monthArray[j]).format("YYYY-MM") ? count1 : '';
-            console.log("month-", monthArray[j] + " count value-", count1 + " tes data-", this.state.tesData[count1]);
-            data[4] = this.state.movingAvgData.length > 0 && count1 != '' ? this.state.movingAvgData[count1] != null ? this.state.movingAvgData[count1].forecast.toFixed(2) : '' : ''
-            data[5] = this.state.semiAvgData.length > 0 && this.state.semiAvgData[count1] != null ? this.state.semiAvgData[count1].forecast.toFixed(2) : ''
-            console.log("lr data---", this.state.linearRegressionData);
-            console.log("lr count---", count1);
-            data[6] = this.state.linearRegressionData.length > 0 && this.state.linearRegressionData[count1] != null ? this.state.linearRegressionData[count1].forecast.toFixed(2) : ''
-            data[7] = this.state.tesData.length > 0 && this.state.tesData[count1] != null ? this.state.tesData[count1].forecast.toFixed(2) : ''
+            // console.log("month-", monthArray[j] + " count value-", count1 + " tes data-", this.state.tesData[count1]);
+            data[4] = this.state.movingAvgData.length > 0 && count1 != '' ? this.state.movingAvgData[count1] != null ? this.state.movingAvgData[count1].forecast.toFixed(4) : '' : ''
+            data[5] = this.state.semiAvgData.length > 0 && this.state.semiAvgData[count1] != null ? this.state.semiAvgData[count1].forecast.toFixed(4) : ''
+            // console.log("lr data---", this.state.linearRegressionData);
+            // console.log("lr count---", count1);
+            data[6] = this.state.linearRegressionData.length > 0 && this.state.linearRegressionData[count1] != null ? this.state.linearRegressionData[count1].forecast.toFixed(4) : ''
+            data[7] = this.state.tesData.length > 0 && this.state.tesData[count1] != null ? this.state.tesData[count1].forecast.toFixed(4) : ''
             data[8] = ""
             if (count1 >= 0) {
                 count1++;
             }
             // data[9] = `=IF(ISBLANK(B${parseInt(j) + 1}),10,ROUND(B${parseInt(j) + 1},2))`
-            data[9] = `=IF(D${parseInt(j) + 1} != "",ROUND(D${parseInt(j) + 1},2),IF(N1 == 2,H${parseInt(j) + 1},IF(N1 == 7,E${parseInt(j) + 1},IF(N1==5,G${parseInt(j) + 1},IF(N1 == 6,F${parseInt(j) + 1},'')))))` // J
+            data[9] = `=IF(D${parseInt(j) + 1} != "",ROUND(D${parseInt(j) + 1},4),IF(N1 == 2,H${parseInt(j) + 1},IF(N1 == 7,E${parseInt(j) + 1},IF(N1==5,G${parseInt(j) + 1},IF(N1 == 6,F${parseInt(j) + 1},'')))))` // J
             data[10] = cellData != null && cellData != "" ? cellData.manualChange : ""
-            data[11] = `=IF(M1 == true,ROUND(J${parseInt(j)} + K${parseInt(j)},2),ROUND(J${parseInt(j) + 1} + K${parseInt(j) + 1},2))`
+            data[11] = `=IF(M1 == true,ROUND(J${parseInt(j)} + K${parseInt(j)},4),ROUND(J${parseInt(j) + 1} + K${parseInt(j) + 1},4))`
             data[12] = this.props.items.currentItemConfig.context.payload.nodeDataMap[this.props.items.selectedScenario][0].manualChangesEffectFuture
             data[13] = this.state.nodeDataExtrapolation.extrapolationMethod.id
             // data[0] = list[j].month
@@ -1743,70 +1766,71 @@ export default class TreeExtrapolationComponent extends React.Component {
             columns: [
                 {
                     title: 'Month',
-                    type: 'calendar', options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker' }, width: 100
+                    type: 'calendar', options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker' }, width: 100,
+                    readOnly: true
                 },
                 {
                     title: getLabelText(this.props.items.currentItemConfig.context.payload.label, this.state.lang),
                     type: 'number',
-                    mask: '#,##.00'
+                    mask: '#,##0.0000'
                 },
                 {
                     title: 'Reporting Rate',
                     type: 'number',
-                    mask: '#,##.00%'
+                    mask: '#,##0.0000%'
                 },
                 {
                     title: getLabelText(this.props.items.currentItemConfig.context.payload.label, this.state.lang) + '(Adjusted)',
                     type: 'number',
                     readOnly: true,
-                    mask: '#,##.00'
+                    mask: '#,##0.0000'
                 },
                 {
                     title: 'Moving Averages',
                     type: this.state.movingAvgId ? 'number' : 'hidden',
-                    mask: '#,##.00',
+                    mask: '#,##0.0000',
                     readOnly: true
                 },
                 {
                     title: 'Semi-Averages',
                     type: this.state.semiAvgId ? 'number' : 'hidden',
-                    mask: '#,##.00',
+                    mask: '#,##0.0000',
                     readOnly: true
                 },
                 {
                     title: 'Linear Regression',
                     type: this.state.linearRegressionId ? 'number' : 'hidden',
-                    mask: '#,##.00',
+                    mask: '#,##0.0000',
                     readOnly: true
                 },
                 {
                     title: 'TES',
                     type: this.state.smoothingId ? 'number' : 'hidden',
-                    mask: '#,##.00',
+                    mask: '#,##0.0000',
                     readOnly: true
                 },
                 {
                     title: 'ARIMA',
                     type: this.state.arimaId ? 'number' : 'hidden',
-                    mask: '#,##.00',
+                    mask: '#,##0.0000',
                     readOnly: true
                 },
 
                 {
                     title: 'Selected Forecast',
                     type: 'number',
-                    mask: '#,##.00',
+                    mask: '#,##0.0000',
                     readOnly: true
                 },
                 {
                     title: 'Manual Change (+/-)',
                     type: 'number',
-                    mask: '#,##.00'
+                    mask: '#,##0.0000'
                 },
                 {
                     title: 'Month End (Final)',
                     type: 'number',
-                    mask: '#,##.00',
+                    mask: '#,##0.0000',
                     readOnly: true
                 },
                 {
@@ -2038,7 +2062,7 @@ export default class TreeExtrapolationComponent extends React.Component {
         // Population
         if (x == 1) {
             var col = ("B").concat(parseInt(y) + 1);
-            var reg = JEXCEL_DECIMAL_NO_REGEX_LONG;
+            var reg = JEXCEL_DECIMAL_NO_REGEX_LONG_4_DECIMAL;
             console.log("population value---", value)
             if (value != "" && !(reg.test(value.toString().replaceAll(",", "")))) {
                 instance.jexcel.setStyle(col, "background-color", "transparent");
@@ -2066,7 +2090,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                 }
                 var manualChange = instance.jexcel.getValue(`K${parseInt(y) + 1}`, true).toString().replaceAll(",", "").split("%")[0];
                 var col2 = ("K").concat(parseInt(y) + 1);
-                var reg1 = JEXCEL_DECIMAL_MONTHLY_CHANGE;
+                var reg1 = JEXCEL_DECIMAL_MONTHLY_CHANGE_4_DECIMAL;
                 if (manualChange != "" && !(reg1.test(manualChange))) {
                     instance.jexcel.setStyle(col2, "background-color", "transparent");
                     instance.jexcel.setStyle(col2, "background-color", "yellow");
@@ -2082,7 +2106,7 @@ export default class TreeExtrapolationComponent extends React.Component {
         // Reporting Rate
         if (x == 2) {
             var col = ("C").concat(parseInt(y) + 1);
-            var reg = JEXCEL_DECIMAL_NO_REGEX_LONG;
+            var reg = JEXCEL_DECIMAL_NO_REGEX_LONG_4_DECIMAL;
             console.log("reporting rate value---", value)
             var actualValue = instance.jexcel.getValue(`B${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             // value.split("%")[0];
@@ -2109,7 +2133,7 @@ export default class TreeExtrapolationComponent extends React.Component {
         // Manual change
         if (x == 10) {
             var col = ("K").concat(parseInt(y) + 1);
-            var reg = JEXCEL_DECIMAL_MONTHLY_CHANGE;
+            var reg = JEXCEL_DECIMAL_MONTHLY_CHANGE_4_DECIMAL;
             value = value.toString().replaceAll(",", "");
             var actualValue = instance.jexcel.getValue(`B${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             if (actualValue != "" && value != "" && !(reg.test(value))) {
@@ -2123,7 +2147,7 @@ export default class TreeExtrapolationComponent extends React.Component {
             }
         }
 
-        this.setState({isChanged:true})
+        this.setState({ isChanged: true })
     }.bind(this);
 
     setMovingAvgId(e) {
@@ -2133,7 +2157,7 @@ export default class TreeExtrapolationComponent extends React.Component {
         var movingAvgId = e.target.checked;
         this.setState({
             movingAvgId: movingAvgId,
-            isChanged:true
+            isChanged: true
         }, () => {
             if (this.state.dataExtrapolation != "") {
                 if (movingAvgId) {
@@ -2174,7 +2198,7 @@ export default class TreeExtrapolationComponent extends React.Component {
         var semiAvgId = e.target.checked;
         this.setState({
             semiAvgId: semiAvgId,
-            isChanged:true
+            isChanged: true
         }, () => {
             if (this.state.dataExtrapolation != "") {
                 if (semiAvgId) {
@@ -2220,7 +2244,7 @@ export default class TreeExtrapolationComponent extends React.Component {
         var linearRegressionId = e.target.checked;
         this.setState({
             linearRegressionId: linearRegressionId,
-            isChanged:true
+            isChanged: true
         }, () => {
             if (this.state.dataExtrapolation != "") {
                 if (linearRegressionId) {
@@ -2230,6 +2254,8 @@ export default class TreeExtrapolationComponent extends React.Component {
                     //     }
                     // }
                     json1 = this.state.extrapolationMethodList.filter(c => c.id == 5)[0];
+                    console.log("this.state.extrapolationMethodList---",this.state.extrapolationMethodList);
+                    console.log("filteredExtrapolationMethodList json1---",json1)
                     // this.state.nodeDataExtrapolationOptionList.push(json);
                     filteredExtrapolationMethodList.push(json1);
                     if (this.state.dataExtrapolation != null) {
@@ -2239,6 +2265,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                     // const index = this.state.nodeDataExtrapolationOptionList.findIndex(c => c.extrapolationMethod.id == 5);
                     const index1 = filteredExtrapolationMethodList.findIndex(c => c.id == 5);
                     filteredExtrapolationMethodList.splice(index1, 1);
+                    console.log("filteredExtrapolationMethodList after update---",filteredExtrapolationMethodList)
                     // this.state.nodeDataExtrapolationOptionList.splice(index, 1);
                     if (this.state.dataExtrapolation != null) {
                         this.state.dataExtrapolation.hideColumn(6);
@@ -2264,7 +2291,7 @@ export default class TreeExtrapolationComponent extends React.Component {
         var smoothingId = e.target.checked;
         this.setState({
             smoothingId: smoothingId,
-            isChanged:true
+            isChanged: true
         }, () => {
             if (this.state.dataExtrapolation != "") {
                 if (smoothingId) {
@@ -2313,7 +2340,7 @@ export default class TreeExtrapolationComponent extends React.Component {
         var arimaId = e.target.checked;
         this.setState({
             arimaId: arimaId,
-            isChanged:true
+            isChanged: true
         }, () => {
             if (this.state.dataExtrapolation != "") {
                 if (arimaId) {
@@ -2418,9 +2445,9 @@ export default class TreeExtrapolationComponent extends React.Component {
     }
     toggleStartMonth() {
         this.setState({
-          popoverOpenStartMonth: !this.state.popoverOpenStartMonth,
+            popoverOpenStartMonth: !this.state.popoverOpenStartMonth,
         });
-      }
+    }
     toggleMa() {
         this.setState({
             popoverOpenMa: !this.state.popoverOpenMa,
@@ -2434,10 +2461,11 @@ export default class TreeExtrapolationComponent extends React.Component {
     }
     toggledata = () => this.setState((currentState) => ({ show: !currentState.show }));
 
-   
+
 
     render() {
         const { filteredExtrapolationMethodList } = this.state;
+        console.log("render filteredExtrapolationMethodList ---",filteredExtrapolationMethodList)
         let extrapolationMethods = filteredExtrapolationMethodList.length > 0
             && filteredExtrapolationMethodList.map((item, i) => {
                 return (
@@ -2661,7 +2689,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                 pointStyle: 'line',
                 pointBorderWidth: 5,
                 yValueFormatString: "###,###,###,###",
-                // data: this.state.semiAvgData.map((item, index) => (item.forecast > 0 && moment(this.state.minMonth).format("YYYY-MM") <= moment(this.props.items.forecastStopDate).format("YYYY-MM") ? item.forecast.toFixed(2) : null))
+                // data: this.state.semiAvgData.map((item, index) => (item.forecast > 0 && moment(this.state.minMonth).format("YYYY-MM") <= moment(this.props.items.forecastStopDate).format("YYYY-MM") ? item.forecast.toFixed(4) : null))
                 data: this.state.jexcelDataArr.map((item, index) => (this.state.semiAvgData.filter(x => x.month == item.monthNo).length > 0 && (moment(this.state.maxMonth).format('YYYY-MM') == moment(item.month).format('YYYY-MM') || (moment(this.state.minMonth).format('YYYY-MM') < moment(item.month).format('YYYY-MM') && item.amount == "")) ? this.state.semiAvgData.filter(x => x.month == item.monthNo)[0].forecast : null))
             })
         }
@@ -2683,7 +2711,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                     pointStyle: 'line',
                     pointBorderWidth: 5,
                     yValueFormatString: "###,###,###,###",
-                    // data: this.state.linearRegressionData.map((item, index) => (item.forecast > 0 && moment(this.state.minMonth).format("YYYY-MM") <= moment(this.props.items.forecastStopDate).format("YYYY-MM") ? item.forecast.toFixed(2) : null))
+                    // data: this.state.linearRegressionData.map((item, index) => (item.forecast > 0 && moment(this.state.minMonth).format("YYYY-MM") <= moment(this.props.items.forecastStopDate).format("YYYY-MM") ? item.forecast.toFixed(4) : null))
                     data: this.state.jexcelDataArr.map((item, index) => (this.state.linearRegressionData.filter(x => x.month == item.monthNo).length > 0 && (moment(this.state.maxMonth).format('YYYY-MM') == moment(item.month).format('YYYY-MM') || (moment(this.state.minMonth).format('YYYY-MM') < moment(item.month).format('YYYY-MM') && item.amount == "")) ? this.state.linearRegressionData.filter(x => x.month == item.monthNo)[0].forecast : null))
                 })
         }
@@ -2706,7 +2734,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                 pointStyle: 'line',
                 pointBorderWidth: 5,
                 yValueFormatString: "###,###,###,###",
-                // data: this.state.tesData.map((item, index) => (item.forecast > 0 && moment(this.state.minMonth).format("YYYY-MM") <= moment(this.props.items.forecastStopDate).format("YYYY-MM") ? (item.forecast - this.state.CI).toFixed(2) : null))
+                // data: this.state.tesData.map((item, index) => (item.forecast > 0 && moment(this.state.minMonth).format("YYYY-MM") <= moment(this.props.items.forecastStopDate).format("YYYY-MM") ? (item.forecast - this.state.CI).toFixed(4) : null))
                 data: this.state.jexcelDataArr.map((item, index) => (this.state.tesData.filter(x => x.month == item.monthNo).length > 0 && (moment(this.state.maxMonth).format('YYYY-MM') == moment(item.month).format('YYYY-MM') || (moment(this.state.minMonth).format('YYYY-MM') < moment(item.month).format('YYYY-MM') && item.amount == "")) ? this.state.tesData.filter(x => x.month == item.monthNo)[0].forecast - this.state.CI : null))
             })
         }
@@ -2727,7 +2755,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                 pointStyle: 'line',
                 pointBorderWidth: 5,
                 yValueFormatString: "###,###,###,###",
-                // data: this.state.tesData.map((item, index) => (item.forecast > 0 && moment(this.state.minMonth).format("YYYY-MM") <= moment(this.props.items.forecastStopDate).format("YYYY-MM") ? item.forecast.toFixed(2) : null))
+                // data: this.state.tesData.map((item, index) => (item.forecast > 0 && moment(this.state.minMonth).format("YYYY-MM") <= moment(this.props.items.forecastStopDate).format("YYYY-MM") ? item.forecast.toFixed(4) : null))
                 data: this.state.jexcelDataArr.map((item, index) => (this.state.tesData.filter(x => x.month == item.monthNo).length > 0 && (moment(this.state.maxMonth).format('YYYY-MM') == moment(item.month).format('YYYY-MM') || (moment(this.state.minMonth).format('YYYY-MM') < moment(item.month).format('YYYY-MM') && item.amount == "")) ? this.state.tesData.filter(x => x.month == item.monthNo)[0].forecast : null))
             })
         }
@@ -2750,7 +2778,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                 pointStyle: 'line',
                 pointBorderWidth: 5,
                 yValueFormatString: "###,###,###,###",
-                // data: this.state.tesData.map((item, index) => (item.forecast > 0 && moment(this.state.minMonth).format("YYYY-MM") <= moment(this.props.items.forecastStopDate).format("YYYY-MM") ? (item.forecast + this.state.CI).toFixed(2) : null))
+                // data: this.state.tesData.map((item, index) => (item.forecast > 0 && moment(this.state.minMonth).format("YYYY-MM") <= moment(this.props.items.forecastStopDate).format("YYYY-MM") ? (item.forecast + this.state.CI).toFixed(4) : null))
                 data: this.state.jexcelDataArr.map((item, index) => (this.state.tesData.filter(x => x.month == item.monthNo).length > 0 && (moment(this.state.maxMonth).format('YYYY-MM') == moment(item.month).format('YYYY-MM') || (moment(this.state.minMonth).format('YYYY-MM') < moment(item.month).format('YYYY-MM') && item.amount == "")) ? this.state.tesData.filter(x => x.month == item.monthNo)[0].forecast + this.state.CI : null))
             })
         }
@@ -2841,11 +2869,11 @@ export default class TreeExtrapolationComponent extends React.Component {
                                         {/* <Form name='simpleForm'> */}
                                         <div className=" pl-0">
                                             <div className="row">
-                                            <div>
-                                                                <Popover placement="top" isOpen={this.state.popoverOpenStartMonth} target="Popover28" trigger="hover" toggle={this.toggleStartMonth}>
-                                                                    <PopoverBody>To change the start month, please go back to the Node Data screen and change the month</PopoverBody>
-                                                                </Popover>
-                                                            </div>
+                                                <div>
+                                                    <Popover placement="top" isOpen={this.state.popoverOpenStartMonth} target="Popover28" trigger="hover" toggle={this.toggleStartMonth}>
+                                                        <PopoverBody>To change the start month, please go back to the Node Data screen and change the month</PopoverBody>
+                                                    </Popover>
+                                                </div>
                                                 <FormGroup className="col-md-3 pl-lg-0">
                                                     <Label htmlFor="appendedInputButton">Start Month for Historical Data<span className="stock-box-icon fa fa-sort-desc ml-1"></span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover28" onClick={this.toggleStartMonth} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                                     <div className="controls edit disabledColor">
@@ -3243,19 +3271,29 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                 </FormGroup>
                                             </div>
 
-                                            <div className="col-md-12 row text-left pt-lg-3 pl-lg-0">
-                                                <Button className="mr-1 btn btn-info btn-md " onClick={this.toggleJexcelData}>
-                                                    {this.state.showJexcelData ? i18n.t('static.common.hideData') : i18n.t('static.common.showData')}
+                                            <div className="col-md-12 row text-left pt-lg-0 pl-lg-0">
+                                                
+                                                <div className="col-md-6 pl-lg-0">
+                                                <Button type="button" color="success" className="float-left mr-1" size="md" onClick={this.interpolate}>Interpolate</Button>
+                                                <Button type="button" id="dataCheck" size="md" color="info" className="mr-1" onClick={() => this.checkActualValuesGap(true)}>Extrapolate</Button>
+                                                </div>
+                                                <div className="col-md-6 pr-lg-0">
+                                                <Button className="btn btn-info btn-md float-right" onClick={this.toggleJexcelData}>
+                                                <i className={this.state.showJexcelData ? "fa fa-eye" : "fa fa-eye-slash"} style={{ color: '#fff' }}></i> {this.state.showJexcelData ? i18n.t('static.common.hideData') : i18n.t('static.common.showData')}
                                                 </Button>
-                                                <Button type="button" color="success" className="mr-1" size="md" onClick={this.interpolate}>Interpolate</Button>
+                                                {/* <Button className="mr-1 btn btn-info btn-md " onClick={this.toggleJexcelData}>
+                                                    {this.state.showJexcelData ? i18n.t('static.common.hideData') : i18n.t('static.common.showData')}
+                                                </Button> */}
+                                                </div>
                                             </div>
+                                         
                                         </div>
                                         {/* </Form> */}
                                         <div className="row pl-lg-0 pr-lg-0 pt-lg-3" style={{ display: this.state.showJexcelData ? 'block' : 'none' }}>
                                             <div className="col-md-6">
                                                 {/* <Button type="button" size="md" color="info" className="float-left mr-1" onClick={this.resetTree}>{'Show/hide data'}</Button> */}
                                             </div>
-                                            <div className="col-md-6 float-right" style={{ marginTop: '-42px' }}>
+                                            <div className="col-md-6 float-right" style={{ marginTop: '0px' }}>
                                                 <FormGroup className="float-right" >
                                                     <div className="check inline pl-lg-1 pt-lg-0">
                                                         <div>
@@ -3322,16 +3360,16 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                             <tr>
                                                                 <td className="text-left">{i18n.t('static.extrapolation.rmse')}</td>
                                                                 {this.state.movingAvgId &&
-                                                                    <td style={{ textAlign: "right", "fontWeight": this.state.minRmse == this.state.movingAvgError.rmse ? "bold" : "normal" }} bgcolor={this.state.minRmse == this.state.movingAvgError.rmse ? "#86cd99" : "#FFFFFF"}>{this.state.movingAvgError.rmse != "" ? this.state.movingAvgError.rmse.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
+                                                                    <td style={{ textAlign: "right", "fontWeight": this.state.minRmse == this.state.movingAvgError.rmse ? "bold" : "normal" }} bgcolor={this.state.minRmse == this.state.movingAvgError.rmse ? "#86cd99" : "#FFFFFF"}>{this.state.movingAvgError.rmse != "" ? addCommasExtrapolation(this.state.movingAvgError.rmse.toFixed(4).toString()) : ""}</td>
                                                                 }
                                                                 {this.state.semiAvgId &&
-                                                                    <td style={{ textAlign: "right", "fontWeight": this.state.minRmse == this.state.semiAvgError.rmse ? "bold" : "normal" }} bgcolor={this.state.minRmse == this.state.semiAvgError.rmse ? "#86cd99" : "#FFFFFF"}>{this.state.semiAvgError.rmse != "" ? this.state.semiAvgError.rmse.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
+                                                                    <td style={{ textAlign: "right", "fontWeight": this.state.minRmse == this.state.semiAvgError.rmse ? "bold" : "normal" }} bgcolor={this.state.minRmse == this.state.semiAvgError.rmse ? "#86cd99" : "#FFFFFF"}>{this.state.semiAvgError.rmse != "" ? addCommasExtrapolation(this.state.semiAvgError.rmse.toFixed(4).toString()) : ""}</td>
                                                                 }
                                                                 {this.state.linearRegressionId &&
-                                                                    <td style={{ textAlign: "right", "fontWeight": this.state.minRmse == this.state.linearRegressionError.rmse ? "bold" : "normal" }} bgcolor={this.state.minRmse == this.state.linearRegressionError.rmse ? "#86cd99" : "#FFFFFF"}>{this.state.linearRegressionError.rmse != "" ? this.state.linearRegressionError.rmse.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
+                                                                    <td style={{ textAlign: "right", "fontWeight": this.state.minRmse == this.state.linearRegressionError.rmse ? "bold" : "normal" }} bgcolor={this.state.minRmse == this.state.linearRegressionError.rmse ? "#86cd99" : "#FFFFFF"}>{this.state.linearRegressionError.rmse != "" ? addCommasExtrapolation(this.state.linearRegressionError.rmse.toFixed(4).toString()) : ""}</td>
                                                                 }
                                                                 {this.state.smoothingId &&
-                                                                    <td style={{ textAlign: "right", "fontWeight": this.state.minRmse == this.state.tesError.rmse ? "bold" : "normal" }} bgcolor={this.state.minRmse == this.state.tesError.rmse ? "#86cd99" : "#FFFFFF"}>{this.state.tesError.rmse != "" ? this.state.tesError.rmse.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
+                                                                    <td style={{ textAlign: "right", "fontWeight": this.state.minRmse == this.state.tesError.rmse ? "bold" : "normal" }} bgcolor={this.state.minRmse == this.state.tesError.rmse ? "#86cd99" : "#FFFFFF"}>{this.state.tesError.rmse != "" ? addCommasExtrapolation(this.state.tesError.rmse.toFixed(4).toString()) : ""}</td>
                                                                 }
                                                                 {this.state.arimaId &&
                                                                     <td></td>
@@ -3340,16 +3378,16 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                             <tr>
                                                                 <td className="text-left">{i18n.t('static.extrapolation.mape')}</td>
                                                                 {this.state.movingAvgId &&
-                                                                    <td style={{ textAlign: "right", "fontWeight": this.state.minMape == this.state.movingAvgError.mape ? "bold" : "normal" }} bgcolor={this.state.minMape == this.state.movingAvgError.mape ? "#86cd99" : "#FFFFFF"}>{this.state.movingAvgError.mape != "" ? this.state.movingAvgError.mape.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
+                                                                    <td style={{ textAlign: "right", "fontWeight": this.state.minMape == this.state.movingAvgError.mape ? "bold" : "normal" }} bgcolor={this.state.minMape == this.state.movingAvgError.mape ? "#86cd99" : "#FFFFFF"}>{this.state.movingAvgError.mape != "" ? addCommasExtrapolation(this.state.movingAvgError.mape.toFixed(4).toString()) : ""}</td>
                                                                 }
                                                                 {this.state.semiAvgId &&
-                                                                    <td style={{ textAlign: "right", "fontWeight": this.state.minMape == this.state.semiAvgError.mape ? "bold" : "normal" }} bgcolor={this.state.minMape == this.state.semiAvgError.mape ? "#86cd99" : "#FFFFFF"}>{this.state.semiAvgError.mape != "" ? this.state.semiAvgError.mape.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
+                                                                    <td style={{ textAlign: "right", "fontWeight": this.state.minMape == this.state.semiAvgError.mape ? "bold" : "normal" }} bgcolor={this.state.minMape == this.state.semiAvgError.mape ? "#86cd99" : "#FFFFFF"}>{this.state.semiAvgError.mape != "" ? addCommasExtrapolation(this.state.semiAvgError.mape.toFixed(4).toString()) : ""}</td>
                                                                 }
                                                                 {this.state.linearRegressionId &&
-                                                                    <td style={{ textAlign: "right", "fontWeight": this.state.minMape == this.state.linearRegressionError.mape ? "bold" : "normal" }} bgcolor={this.state.minMape == this.state.linearRegressionError.mape ? "#86cd99" : "#FFFFFF"}>{this.state.linearRegressionError.mape != "" ? this.state.linearRegressionError.mape.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
+                                                                    <td style={{ textAlign: "right", "fontWeight": this.state.minMape == this.state.linearRegressionError.mape ? "bold" : "normal" }} bgcolor={this.state.minMape == this.state.linearRegressionError.mape ? "#86cd99" : "#FFFFFF"}>{this.state.linearRegressionError.mape != "" ? addCommasExtrapolation(this.state.linearRegressionError.mape.toFixed(4).toString()) : ""}</td>
                                                                 }
                                                                 {this.state.smoothingId &&
-                                                                    <td style={{ textAlign: "right", "fontWeight": this.state.minMape == this.state.tesError.mape ? "bold" : "normal" }} bgcolor={this.state.minMape == this.state.tesError.mape ? "#86cd99" : "#FFFFFF"}>{this.state.tesError.mape != "" ? this.state.tesError.mape.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
+                                                                    <td style={{ textAlign: "right", "fontWeight": this.state.minMape == this.state.tesError.mape ? "bold" : "normal" }} bgcolor={this.state.minMape == this.state.tesError.mape ? "#86cd99" : "#FFFFFF"}>{this.state.tesError.mape != "" ? addCommasExtrapolation(this.state.tesError.mape.toFixed(4).toString()) : ""}</td>
                                                                 }
                                                                 {this.state.arimaId &&
                                                                     <td></td>
@@ -3358,16 +3396,16 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                             <tr>
                                                                 <td className="text-left">{i18n.t('static.extrapolation.mse')}</td>
                                                                 {this.state.movingAvgId &&
-                                                                    <td style={{ textAlign: "right", "fontWeight": this.state.minMse == this.state.movingAvgError.mse ? "bold" : "normal" }} bgcolor={this.state.minMse == this.state.movingAvgError.mse ? "#86cd99" : "#FFFFFF"}>{this.state.movingAvgError.mse != "" ? this.state.movingAvgError.mse.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
+                                                                    <td style={{ textAlign: "right", "fontWeight": this.state.minMse == this.state.movingAvgError.mse ? "bold" : "normal" }} bgcolor={this.state.minMse == this.state.movingAvgError.mse ? "#86cd99" : "#FFFFFF"}>{this.state.movingAvgError.mse != "" ? addCommasExtrapolation(this.state.movingAvgError.mse.toFixed(4).toString()) : ""}</td>
                                                                 }
                                                                 {this.state.semiAvgId &&
-                                                                    <td style={{ textAlign: "right", "fontWeight": this.state.minMse == this.state.semiAvgError.mse ? "bold" : "normal" }} bgcolor={this.state.minMse == this.state.semiAvgError.mse ? "#86cd99" : "#FFFFFF"}>{this.state.semiAvgError.mse != "" ? this.state.semiAvgError.mse.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
+                                                                    <td style={{ textAlign: "right", "fontWeight": this.state.minMse == this.state.semiAvgError.mse ? "bold" : "normal" }} bgcolor={this.state.minMse == this.state.semiAvgError.mse ? "#86cd99" : "#FFFFFF"}>{this.state.semiAvgError.mse != "" ? addCommasExtrapolation(this.state.semiAvgError.mse.toFixed(4)) : ""}</td>
                                                                 }
                                                                 {this.state.linearRegressionId &&
-                                                                    <td style={{ textAlign: "right", "fontWeight": this.state.minMse == this.state.linearRegressionError.mse ? "bold" : "normal" }} bgcolor={this.state.minMse == this.state.linearRegressionError.mse ? "#86cd99" : "#FFFFFF"}>{this.state.linearRegressionError.mse != "" ? this.state.linearRegressionError.mse.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
+                                                                    <td style={{ textAlign: "right", "fontWeight": this.state.minMse == this.state.linearRegressionError.mse ? "bold" : "normal" }} bgcolor={this.state.minMse == this.state.linearRegressionError.mse ? "#86cd99" : "#FFFFFF"}>{this.state.linearRegressionError.mse != "" ? addCommasExtrapolation(this.state.linearRegressionError.mse.toFixed(4).toString()) : ""}</td>
                                                                 }
                                                                 {this.state.smoothingId &&
-                                                                    <td style={{ textAlign: "right", "fontWeight": this.state.minMse == this.state.tesError.mse ? "bold" : "normal" }} bgcolor={this.state.minMse == this.state.tesError.mse ? "#86cd99" : "#FFFFFF"}>{this.state.tesError.mse != "" ? this.state.tesError.mse.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
+                                                                    <td style={{ textAlign: "right", "fontWeight": this.state.minMse == this.state.tesError.mse ? "bold" : "normal" }} bgcolor={this.state.minMse == this.state.tesError.mse ? "#86cd99" : "#FFFFFF"}>{this.state.tesError.mse != "" ? addCommasExtrapolation(this.state.tesError.mse.toFixed(4).toString()) : ""}</td>
                                                                 }
                                                                 {this.state.arimaId &&
                                                                     <td></td>
@@ -3376,16 +3414,16 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                             <tr>
                                                                 <td className="text-left">{i18n.t('static.extrapolation.wape')}</td>
                                                                 {this.state.movingAvgId &&
-                                                                    <td style={{ textAlign: "right", "fontWeight": this.state.minWape == this.state.movingAvgError.wape ? "bold" : "normal" }} bgcolor={this.state.minWape == this.state.movingAvgError.wape ? "#86cd99" : "#FFFFFF"}>{this.state.movingAvgError.wape != "" ? this.state.movingAvgError.wape.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
+                                                                    <td style={{ textAlign: "right", "fontWeight": this.state.minWape == this.state.movingAvgError.wape ? "bold" : "normal" }} bgcolor={this.state.minWape == this.state.movingAvgError.wape ? "#86cd99" : "#FFFFFF"}>{this.state.movingAvgError.wape != "" ? addCommasExtrapolation(this.state.movingAvgError.wape.toFixed(4).toString()) : ""}</td>
                                                                 }
                                                                 {this.state.semiAvgId &&
-                                                                    <td style={{ textAlign: "right", "fontWeight": this.state.minWape == this.state.semiAvgError.wape ? "bold" : "normal" }} bgcolor={this.state.minWape == this.state.semiAvgError.wape ? "#86cd99" : "#FFFFFF"}>{this.state.semiAvgError.wape != "" ? this.state.semiAvgError.wape.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
+                                                                    <td style={{ textAlign: "right", "fontWeight": this.state.minWape == this.state.semiAvgError.wape ? "bold" : "normal" }} bgcolor={this.state.minWape == this.state.semiAvgError.wape ? "#86cd99" : "#FFFFFF"}>{this.state.semiAvgError.wape != "" ? addCommasExtrapolation(this.state.semiAvgError.wape.toFixed(4).toString()) : ""}</td>
                                                                 }
                                                                 {this.state.linearRegressionId &&
-                                                                    <td style={{ textAlign: "right", "fontWeight": this.state.minWape == this.state.linearRegressionError.wape ? "bold" : "normal" }} bgcolor={this.state.minWape == this.state.linearRegressionError.wape ? "#86cd99" : "#FFFFFF"}>{this.state.linearRegressionError.wape != "" ? this.state.linearRegressionError.wape.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
+                                                                    <td style={{ textAlign: "right", "fontWeight": this.state.minWape == this.state.linearRegressionError.wape ? "bold" : "normal" }} bgcolor={this.state.minWape == this.state.linearRegressionError.wape ? "#86cd99" : "#FFFFFF"}>{this.state.linearRegressionError.wape != "" ? addCommasExtrapolation(this.state.linearRegressionError.wape.toFixed(4).toString()) : ""}</td>
                                                                 }
                                                                 {this.state.smoothingId &&
-                                                                    <td style={{ textAlign: "right", "fontWeight": this.state.minWape == this.state.tesError.wape ? "bold" : "normal" }} bgcolor={this.state.minWape == this.state.tesError.wape ? "#86cd99" : "#FFFFFF"}>{this.state.tesError.wape != "" ? this.state.tesError.wape.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
+                                                                    <td style={{ textAlign: "right", "fontWeight": this.state.minWape == this.state.tesError.wape ? "bold" : "normal" }} bgcolor={this.state.minWape == this.state.tesError.wape ? "#86cd99" : "#FFFFFF"}>{this.state.tesError.wape != "" ? addCommasExtrapolation(this.state.tesError.wape.toFixed(4).toString()) : ""}</td>
                                                                 }
                                                                 {this.state.arimaId &&
                                                                     <td></td>
@@ -3394,16 +3432,16 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                             <tr>
                                                                 <td className="text-left">{i18n.t('static.extrapolation.rSquare')}</td>
                                                                 {this.state.movingAvgId &&
-                                                                    <td style={{ textAlign: "right", "fontWeight": this.state.minRsqd == this.state.movingAvgError.rSqd ? "bold" : "normal" }} bgcolor={this.state.minRsqd == this.state.movingAvgError.rSqd ? "#86cd99" : "#FFFFFF"}>{this.state.movingAvgError.rSqd != "" ? this.state.movingAvgError.rSqd.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
+                                                                    <td style={{ textAlign: "right", "fontWeight": this.state.minRsqd == this.state.movingAvgError.rSqd ? "bold" : "normal" }} bgcolor={this.state.minRsqd == this.state.movingAvgError.rSqd ? "#86cd99" : "#FFFFFF"}>{this.state.movingAvgError.rSqd != "" ? addCommasExtrapolation(this.state.movingAvgError.rSqd.toFixed(4).toString()) : ""}</td>
                                                                 }
                                                                 {this.state.semiAvgId &&
-                                                                    <td style={{ textAlign: "right", "fontWeight": this.state.minRsqd == this.state.semiAvgError.rSqd ? "bold" : "normal" }} bgcolor={this.state.minRsqd == this.state.semiAvgError.rSqd ? "#86cd99" : "#FFFFFF"}>{this.state.semiAvgError.rSqd != "" ? this.state.semiAvgError.rSqd.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
+                                                                    <td style={{ textAlign: "right", "fontWeight": this.state.minRsqd == this.state.semiAvgError.rSqd ? "bold" : "normal" }} bgcolor={this.state.minRsqd == this.state.semiAvgError.rSqd ? "#86cd99" : "#FFFFFF"}>{this.state.semiAvgError.rSqd != "" ? addCommasExtrapolation(this.state.semiAvgError.rSqd.toFixed(4).toString()) : ""}</td>
                                                                 }
                                                                 {this.state.linearRegressionId &&
-                                                                    <td style={{ textAlign: "right", "fontWeight": this.state.minRsqd == this.state.linearRegressionError.rSqd ? "bold" : "normal" }} bgcolor={this.state.minRsqd == this.state.linearRegressionError.rSqd ? "#86cd99" : "#FFFFFF"}>{this.state.linearRegressionError.rSqd != "" ? this.state.linearRegressionError.rSqd.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
+                                                                    <td style={{ textAlign: "right", "fontWeight": this.state.minRsqd == this.state.linearRegressionError.rSqd ? "bold" : "normal" }} bgcolor={this.state.minRsqd == this.state.linearRegressionError.rSqd ? "#86cd99" : "#FFFFFF"}>{this.state.linearRegressionError.rSqd != "" ? addCommasExtrapolation(this.state.linearRegressionError.rSqd.toFixed(4).toString()) : ""}</td>
                                                                 }
                                                                 {this.state.smoothingId &&
-                                                                    <td style={{ textAlign: "right", "fontWeight": this.state.minRsqd == this.state.tesError.rSqd ? "bold" : "normal" }} bgcolor={this.state.minRsqd == this.state.tesError.rSqd ? "#86cd99" : "#FFFFFF"}>{this.state.tesError.rSqd != "" ? this.state.tesError.rSqd.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
+                                                                    <td style={{ textAlign: "right", "fontWeight": this.state.minRsqd == this.state.tesError.rSqd ? "bold" : "normal" }} bgcolor={this.state.minRsqd == this.state.tesError.rSqd ? "#86cd99" : "#FFFFFF"}>{this.state.tesError.rSqd != "" ? addCommasExtrapolation(this.state.tesError.rSqd.toFixed(4).toString()) : ""}</td>
                                                                 }
                                                                 {this.state.arimaId &&
                                                                     <td></td>
@@ -3466,7 +3504,6 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                 </FormGroup>
                                                 <FormGroup className="pl-lg-3 ExtrapolateSaveBtn">
                                                     <Button type="submit" color="success" onClick={() => this.touchAllExtrapolation(setTouched, errors)} className="mr-1 float-right" size="md"><i className="fa fa-check"></i>{i18n.t('static.pipeline.save')}</Button>
-                                                    <Button type="button" id="dataCheck" size="md" color="info" className="float-right mr-1" onClick={() => this.checkActualValuesGap(true)}><i className="fa fa-check"></i>Extrapolate</Button>
                                                 </FormGroup>
                                             </Row>
                                         </div>

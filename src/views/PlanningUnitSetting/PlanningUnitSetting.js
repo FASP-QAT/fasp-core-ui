@@ -1827,16 +1827,16 @@ export default class PlanningUnitSetting extends Component {
 
         console.log("mylist--------->32", mylist);
 
-        var tableJson = this.el.getJson(null, false);
-        let tempList = [];
-        for (var i = 0; i < tableJson.length; i++) {
-            var map1 = new Map(Object.entries(tableJson[i]));
-            tempList.push(parseInt(map1.get("1")));
-        }
+        // var tableJson = this.el.getJson(null, false);
+        // let tempList = [];
+        // for (var i = 0; i < tableJson.length; i++) {
+        //     var map1 = new Map(Object.entries(tableJson[i]));
+        //     tempList.push(parseInt(map1.get("1")));
+        // }
 
-        for (var i = 0; i < tempList.length; i++) {
-            mylist = mylist.filter(c => c.id != tempList[i]);
-        }
+        // for (var i = 0; i < tempList.length; i++) {
+        //     mylist = mylist.filter(c => c.id != tempList[i]);
+        // }
 
         return mylist;
 

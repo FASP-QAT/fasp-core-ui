@@ -223,7 +223,8 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           data = [];
           data[0] = i18n.t('static.dataentry.adjustedConsumption')
           for (var j = 0; j < monthArray.length; j++) {
-            data[j + 1] = `=ROUND((${colArr[j + 1]}${parseInt(dataArray.length - 3)}/${colArr[j + 1]}${parseInt(dataArray.length - 2)}/(1-(${colArr[j + 1]}${parseInt(dataArray.length - 1)}/${colArr[j + 1] + "1"})))*100,0)`;
+            // data[j + 1] = `=ROUND((${colArr[j + 1]}${parseInt(dataArray.length - 3)}/${colArr[j + 1]}${parseInt(dataArray.length - 2)}/(1-(${colArr[j + 1]}${parseInt(dataArray.length - 1)}/${colArr[j + 1] + "1"})))*100,0)`;
+            data[j + 1] = `=IF(${colArr[j + 1]}${parseInt(dataArray.length - 3)}=='','',ROUND((${colArr[j + 1]}${parseInt(dataArray.length - 3)}/${colArr[j + 1]}${parseInt(dataArray.length - 2)}/(1-(${colArr[j + 1]}${parseInt(dataArray.length - 1)}/${colArr[j + 1] + "1"})))*100,0))`;
           }
           data[monthArray.length + 1] = multiplier;
           dataArray.push(data);
@@ -286,7 +287,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
             // this.setState({
             //   consumptionChanged: true
             // })
-            if(this.state.consumptionChangedFlag!=true){this.setState({consumptionChangedFlag:true})}
+            if(this.state.consumptionChanged!=true){this.setState({consumptionChanged:true})}
           }.bind(this),
 
           pagination: false,
@@ -539,6 +540,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     var elInstance = this.state.dataEl;
     if (possibleActualConsumptionY.includes(y.toString())) {
       value = elInstance.getValue(`${colArr[x]}${parseInt(y) + 1}`, true);
+      value=value.replaceAll(',','');
       if (value == "") {
       } else if (value < 0) {
         var col = (colArr[x]).concat(parseInt(y) + 1);
@@ -555,6 +557,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     }
     if (possibleReportRateY.includes(y.toString())) {
       value = elInstance.getValue(`${colArr[x]}${parseInt(y) + 1}`, true);
+      value=value.replaceAll(',','');
       if (value == "") {
       }
       else if (value < 0 || value > 100) {
@@ -572,6 +575,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     }
     if (possibleStockDayY.includes(y.toString())) {
       value = elInstance.getValue(`${colArr[x]}${parseInt(y) + 1}`, true);
+      value=value.replaceAll(',','');
       var stockOutdays = elInstance.getColumnData(x)[0];
       if (value == "") {
       } else if (value < 0 || value > stockOutdays) {
@@ -613,6 +617,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       for (var x = 1; x < 37; x++) {
         // var rowData = elInstance.getRowData(y);
         var value = elInstance.getValue(`${colArr[x]}${parseInt(y) + 1}`, true);
+        value=value.replaceAll(',','');
         if (possibleActualConsumptionY.includes(y.toString())) {
           if (value == "") {
           } else if (value < 0) {
@@ -680,7 +685,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     var regionList = this.state.regionList;
     var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
     var curUser = AuthenticationService.getLoggedInUserId();
-
+    var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF', 'AG', 'AH', 'AI', 'AJ', 'AK', 'AL', 'AM', 'AN']
     var consumptionUnit = this.state.selectedConsumptionUnitObject;
     if (this.state.selectedConsumptionUnitId == 0) {
       var json = this.state.smallTableEl.getJson(null, false);
@@ -738,23 +743,23 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     var elInstance = this.state.dataEl;
     for (var i = 0; i < monthArray.length; i++) {
       var columnData = elInstance.getColumnData([i + 1]);
-      var actualConsumptionCount = 2;
+      var actualConsumptionCount = 6;
       var reportingRateCount = 3;
       var daysOfStockOutCount = 4;
       for (var r = 0; r < regionList.length; r++) {
         var index = -1;
         //   index = fullConsumptionList.findIndex(c => c.planningUnit.id == consumptionUnit.planningUnit.id && c.region.id == regionList[r].regionId && moment(c.month).format("YYYY-MM") == moment(monthArray[i].date).format("YYYY-MM"));
         // index = fullConsumptionList.findIndex(con =>  con.region.id == regionList[r].regionId && moment(con.month).format("YYYY-MM") == moment(monthArray[i].date).format("YYYY-MM"));
-
-        if (columnData[actualConsumptionCount] !== "") {
-          console.log("columnData[actualConsumptionCount]",columnData[actualConsumptionCount])
+        var value = elInstance.getValue(`${colArr[i+1]}${parseInt(actualConsumptionCount) + 1}`, true);        
+        console.log("value----->",value); 
+        if (value !== "") {
           if (index != -1) {
-            fullConsumptionList[index].actualConsumption = columnData[actualConsumptionCount];
+            fullConsumptionList[index].amount = value.replaceAll(',','');
             fullConsumptionList[index].daysOfStockOut = columnData[daysOfStockOutCount];
             fullConsumptionList[index].reportingRate = columnData[reportingRateCount];
           } else {
             var json = {
-              amount: columnData[actualConsumptionCount],
+              amount: value.replaceAll(',',''),
               planningUnit: {
                 id: consumptionUnit.planningUnit.id,
                 label: consumptionUnit.planningUnit.label
@@ -781,16 +786,18 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         daysOfStockOutCount += 8
       }
     }
-
+      console.log("fullConsumptionList--->",fullConsumptionList);
+      
     for (var r = 0; r < regionList.length; r++) {
       for (var j = 0; j < monthArray.length; j++) {
-        var consumptionData = fullConsumptionList.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArray[j].date).format("YYYY-MM") && c.planningUnit.id == consumptionUnit.planningUnit.id && c.region.id == regionList[r].regionId && c.amount >= 0);
+        var consumptionData = fullConsumptionList.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArray[j].date).format("YYYY-MM") && c.planningUnit.id == consumptionUnit.planningUnit.id && c.region.id == regionList[r].regionId && Number(c.amount) >= 0);
+        console.log("consumptionData---->",consumptionData)
         if (consumptionData.length == 0) {
-          var startValList = fullConsumptionList.filter(c => moment(c.month).format("YYYY-MM") < moment(monthArray[j].date).format("YYYY-MM") && c.planningUnit.id == consumptionUnit.planningUnit.id && c.region.id == regionList[r].regionId && c.amount >= 0)
+          var startValList = fullConsumptionList.filter(c => moment(c.month).format("YYYY-MM") < moment(monthArray[j].date).format("YYYY-MM") && c.planningUnit.id == consumptionUnit.planningUnit.id && c.region.id == regionList[r].regionId && Number(c.amount) >= 0)
             .sort(function (a, b) {
               return new Date(a.month) - new Date(b.month);
             });
-          var endValList = fullConsumptionList.filter(c => moment(c.month).format("YYYY-MM") > moment(monthArray[j].date).format("YYYY-MM") && c.planningUnit.id == consumptionUnit.planningUnit.id && c.region.id == regionList[r].regionId && c.amount >= 0)
+          var endValList = fullConsumptionList.filter(c => moment(c.month).format("YYYY-MM") > moment(monthArray[j].date).format("YYYY-MM") && c.planningUnit.id == consumptionUnit.planningUnit.id && c.region.id == regionList[r].regionId && Number(c.amount) >= 0)
             .sort(function (a, b) {
               return new Date(a.month) - new Date(b.month);
             });
@@ -936,6 +943,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
             for (var r = 0; r < regionList.length; r++) {
               var index = 0;
               index = fullConsumptionList.findIndex(c => c.planningUnit.id == consumptionUnit.planningUnit.id && c.region.id == regionList[r].regionId && moment(c.month).format("YYYY-MM") == moment(monthArray[i].date).format("YYYY-MM"));
+              
               if (columnData[actualConsumptionCount] > 0) {
                 if (index != -1) {
                   fullConsumptionList[index].amount = columnData[actualConsumptionCount];
@@ -965,6 +973,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                   fullConsumptionList.push(json);
                 }
               }
+              console.log("fullConsumptionList---->",fullConsumptionList);
               actualConsumptionCount += 8;
               reportingRateCount += 8;
               daysOfStockOutCount += 8
@@ -1806,7 +1815,8 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           gridLines: {
             drawBorder: true, lineWidth: 0
           },
-          stacked: true
+          
+          //stacked: true
         }]
       },
       tooltips: {
@@ -1852,17 +1862,19 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         datasetListForGraph.push({
           label: getLabelText(this.state.selectedConsumptionUnitObject.consumptionDataType == 1 ? this.state.selectedConsumptionUnitObject.planningUnit.forecastingUnit.label : this.state.selectedConsumptionUnitObject.consumptionDataType == 2 ? this.state.selectedConsumptionUnitObject.planningUnit.label : this.state.selectedConsumptionUnitObject.otherUnit.label, this.state.lang),
           data: this.state.planningUnitTotalList.filter(c => c.planningUnitId == this.state.selectedConsumptionUnitObject.planningUnit.id).map(item => (item.qty > 0 ? item.qty : null)),
-          // type: 'line',
-          stack: 1,
-          // backgroundColor: 'transparent',
-          backgroundColor: "#002F6C",
+          type: 'line',
+          // stack: 1,
+          backgroundColor: 'transparent',
+          // backgroundColor: "#002F6C",
           borderStyle: 'dotted',
           ticks: {
             fontSize: 2,
             fontColor: 'transparent',
           },
-          // lineTension: 0,
-          // pointStyle: 'line',
+          lineTension: 0,
+          pointStyle: 'line',
+          pointBorderWidth: 5,
+          borderColor: '#000',
           // pointRadius: 0,
           showInLegend: true,
         })

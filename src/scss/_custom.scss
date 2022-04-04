@@ -1759,6 +1759,16 @@ h5,
   background-color:#86cd99;
   border-color: 1px solid #86cd99;
 }
+
+.legend .bluelegend .legendcommitversion{
+  background-color:rgb(209, 227, 245);
+  border-color: 1px solid rgb(209, 227, 245);
+}
+
+.bluelegend{
+  background-color:rgb(209, 227, 245);
+  border-color: 1px solid rgb(209, 227, 245);
+}
 .legend .redlegend {
   background-color: #BA0C2F;
   border-color: 1px solid #BA0C2F;
@@ -6169,8 +6179,10 @@ font-style: italic!important;
 }
 
 .TreeTemplateHeight{
-  // height: 100vh!important;
-  min-height: calc(100vh - 50px)!important;
+  min-height: 100vh;
+  // min-height: calc(100vh - 50px)!important;
+    // overflow: scroll !important;
+    // min-height: calc(100vh - 427px) !important;
     // overflow: scroll !important;
 }
 .VersionSettingMode{
@@ -6281,4 +6293,13 @@ font-style: italic!important;
   // text-overflow: ellipsis;
   // // width: 200px;
   // word-wrap: break-word;
+}
+.ModelingTableMargin{
+  margin: 0 auto;
+}
+@media (min-width: 1920px) {
+  .TreeTemplateHeight{
+     min-height: calc(100vh - 427px) !important;
+     
+  }
 }

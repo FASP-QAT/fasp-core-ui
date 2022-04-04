@@ -63,6 +63,7 @@ class VersionSettingsComponent extends Component {
             loading: true,
             versionTypeList: [],
             versionSettingsList: [],
+            versionSettingsListForOther: [],
             rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
             minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
             maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
@@ -630,12 +631,18 @@ class VersionSettingsComponent extends Component {
 
     getDatasetById(datasetIds) {
         var versionSettingsList = [];
-        this.state.uniquePrograms.map(dataset => {
+        var versionSettingsListForOther = []
+        this.state.datasetList.map(dataset => {
             if (datasetIds.includes(dataset.programId)) {
                 versionSettingsList.push(dataset);
             }
         })
-        this.setState({ versionSettingsList }, () => { this.buildJExcel() });
+        this.state.uniquePrograms.map(dataset => {
+            if (datasetIds.includes(dataset.programId)) {
+                versionSettingsListForOther.push(dataset);
+            }
+        })
+        this.setState({ versionSettingsList, versionSettingsListForOther }, () => { this.buildJExcel() });
     }
     getVersionTypeList() {
         var db1;
@@ -768,7 +775,16 @@ class VersionSettingsComponent extends Component {
     }
 
     buildJExcel() {
-        let versionSettingsList = this.state.versionSettingsList;
+        let versionSettingsListUnSorted = this.state.versionSettingsList;
+        let versionSettingsListForOther = this.state.versionSettingsListForOther;
+        let versionSettingsList = versionSettingsListUnSorted.sort(
+            function (a, b) {
+                if (a.programCode === b.programCode) {
+                    // Price is only important when cities are the same
+                    return b.version - a.version;
+                }
+                return a.programCode > b.programCode ? 1 : -1;
+            });
         let versionSettingsArray = [];
         let count = 0;
         var versionTypeId = document.getElementById('versionTypeId').value;
@@ -830,18 +846,18 @@ class VersionSettingsComponent extends Component {
         }
         // console.log("versionSettingsArray------->", versionSettingsArray);
 
-        for (var j = 0; j < versionSettingsList.length; j++) {
-            var databytes = CryptoJS.AES.decrypt(versionSettingsList[j].programData, SECRET_KEY);
+        for (var j = 0; j < versionSettingsListForOther.length; j++) {
+            var databytes = CryptoJS.AES.decrypt(versionSettingsListForOther[j].programData, SECRET_KEY);
             var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
             var rangeValue = this.state.rangeValue;
             let startDate = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
             let stopDate = rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
             var versionList = programData.versionList.filter(c => moment(c.createdDate).format("YYYY-MM") >= moment(startDate).format("YYYY-MM") && moment(c.createdDate).format("YYYY-MM") <= moment(stopDate).format("YYYY-MM"));
-            for (var k = 0; k < versionList.length; k++) {
+            for (var k = versionList.length - 1; k >= 0; k--) {
 
                 data = [];
-                data[0] = versionSettingsList[j].programId
-                data[1] = versionSettingsList[j].programCode
+                data[0] = versionSettingsListForOther[j].programId
+                data[1] = versionSettingsListForOther[j].programCode
                 data[2] = versionList[k].versionId
                 data[3] = getLabelText(versionList[k].versionType.label, this.state.lang);
                 data[4] = versionList[k].notes
@@ -1175,7 +1191,7 @@ class VersionSettingsComponent extends Component {
     }
 
     componentDidUpdate = () => {
-        if (this.state.isChanged1 == true) {
+        if (this.state.isChanged == true) {
             window.onbeforeunload = () => true
         } else {
             window.onbeforeunload = undefined
@@ -1290,7 +1306,7 @@ class VersionSettingsComponent extends Component {
                             return (
                                 <ul>
                                     <li key={j}>
-                                    <div><span>{getLabelText(item1.payload.label, this.state.lang)==""?i18n.t('static.forecastValidation.editMe'):getLabelText(item1.payload.label, this.state.lang)}</span></div>
+                                        <div><span>{getLabelText(item1.payload.label, this.state.lang) == "" ? i18n.t('static.forecastValidation.editMe') : getLabelText(item1.payload.label, this.state.lang)}</span></div>
                                     </li>
                                 </ul>
                             )
@@ -1354,7 +1370,7 @@ class VersionSettingsComponent extends Component {
         return (
             <div className="animated">
                 <Prompt
-                    when={this.state.isChanged1 == true}
+                    when={this.state.isChanged == true}
                     message={i18n.t("static.dataentry.confirmmsg")}
                 />
                 <AuthenticationServiceComponent history={this.props.history} />
