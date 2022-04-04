@@ -39,7 +39,7 @@ import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
 import { grey } from '@material-ui/core/colors';
 import docicon from '../../assets/img/doc.png'
 import { saveAs } from "file-saver";
-import { Document, ImageRun, Packer, Paragraph, ShadingType, TextRun } from "docx";
+import { convertInchesToTwip, Document, ImageRun, Packer, Paragraph, ShadingType, TextRun } from "docx";
 import { calculateModelingData } from '../../views/DataSet/ModelingDataCalculation2';
 import TreeExtrapolationComponent from '../../views/DataSet/TreeExtrapolationComponent';
 import AuthenticationService from '../Common/AuthenticationService';
@@ -1256,7 +1256,7 @@ export default class BuildTree extends Component {
         console.log("items***&---", items);
         for (let i = 0; i < items.length; i++) {
             console.log("&&&&item---", items[i]);
-            console.log("my scenario---",scenarioId);
+            console.log("my scenario---", scenarioId);
             // console.log("current item --->", items[i]);
             if (items[i].payload.nodeType.id == 1 || items[i].payload.nodeType.id == 2) {
                 (items[i].payload.nodeDataMap[scenarioId])[0].calculatedDataValue = (items[i].payload.nodeDataMap[scenarioId])[0].dataValue;
@@ -3580,7 +3580,7 @@ export default class BuildTree extends Component {
         tr.children[3].title = i18n.t('static.tooltip.ModelingType');
         tr.children[8].title = i18n.t('static.tooltip.ModelingCalculator');
         tr.children[9].title = i18n.t('static.tooltip.CalculatorChangeforMonth');
-       
+
     }
     selected = function (instance, cell, x, y, value) {
         if (y == 7) {
@@ -4078,7 +4078,7 @@ export default class BuildTree extends Component {
             var row1 = "";
             var level = items[i].level;
             for (var j = 1; j <= level; j++) {
-                row = row.concat("\t");
+                // row = row.concat("\t");
             }
             if (items[i].payload.nodeType.id == 1 || items[i].payload.nodeType.id == 2) {
                 row = row.concat(addCommas((items[i].payload.nodeDataMap[this.state.selectedScenario])[0].dataValue))
@@ -4092,6 +4092,7 @@ export default class BuildTree extends Component {
                 spacing: {
                     after: 150,
                 },
+                indent: { left: convertInchesToTwip(0.5*level) },
             }));
             if (i != 0) {
                 var filteredList = this.state.items.filter(c => c.sortOrder > items[i].sortOrder && c.parent == items[i].parent);
@@ -4107,7 +4108,7 @@ export default class BuildTree extends Component {
                     var row3 = "";
                     var row4 = parentName;
                     for (var j = 1; j <= items[i].level; j++) {
-                        row3 = row3.concat("\t");
+                        // row3 = row3.concat("\t");
                     }
                     if (items[i].payload.nodeType.id == 1 || items[i].payload.nodeType.id == 2) {
                         row = row.concat("NA ")
@@ -4127,6 +4128,7 @@ export default class BuildTree extends Component {
                                 fill: "cfcdc9"
                             },
                             style: row != "NA " ? total != 100 ? "aside" : "" : "",
+                            indent: { left: convertInchesToTwip(0.5*items[i].level) },
                         }))
                     }
                 }
@@ -10163,14 +10165,14 @@ export default class BuildTree extends Component {
                                             </div>
                                         </div>
                                         {/* <CardFooter style={{ backgroundColor: 'transparent', borderTop: '0px solid #c8ced3', display: this.state.selectedScenario != '' ? "block" : "none" }}> */}
-                                            {/* <div class="row"> */}
-                                                {/* <div className="col-md-6 pl-lg-0"> <h5 style={{ color: '#BA0C2F' }}>{i18n.t('static.tree.pleaseSaveAndDoARecalculateAfterDragAndDrop.')}</h5></div> */}
-                                                {/* <div className="col-md-6 pl-lg-0"> </div> */}
-                                                {/* <div className="col-md-6 pr-lg-0"> <Button type="button" size="md" color="info" className="float-right mr-1" onClick={() => this.callAfterScenarioChange(this.state.selectedScenario)}><i className="fa fa-calculator"></i> {i18n.t('static.tree.calculated')}</Button> */}
-                                                    {/* <Button type="button" size="md" color="warning" className="float-right mr-1" onClick={this.resetTree}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button> */}
-                                                    {/* <Button type="button" color="success" className="mr-1 float-right" size="md" onClick={() => this.saveTreeData()}><i className="fa fa-check"> </i>{i18n.t('static.pipeline.save')}</Button> */}
-                                                {/* </div> */}
-                                            {/* </div> */}
+                                        {/* <div class="row"> */}
+                                        {/* <div className="col-md-6 pl-lg-0"> <h5 style={{ color: '#BA0C2F' }}>{i18n.t('static.tree.pleaseSaveAndDoARecalculateAfterDragAndDrop.')}</h5></div> */}
+                                        {/* <div className="col-md-6 pl-lg-0"> </div> */}
+                                        {/* <div className="col-md-6 pr-lg-0"> <Button type="button" size="md" color="info" className="float-right mr-1" onClick={() => this.callAfterScenarioChange(this.state.selectedScenario)}><i className="fa fa-calculator"></i> {i18n.t('static.tree.calculated')}</Button> */}
+                                        {/* <Button type="button" size="md" color="warning" className="float-right mr-1" onClick={this.resetTree}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button> */}
+                                        {/* <Button type="button" color="success" className="mr-1 float-right" size="md" onClick={() => this.saveTreeData()}><i className="fa fa-check"> </i>{i18n.t('static.pipeline.save')}</Button> */}
+                                        {/* </div> */}
+                                        {/* </div> */}
                                         {/* </CardFooter> */}
                                     </Form>
 
