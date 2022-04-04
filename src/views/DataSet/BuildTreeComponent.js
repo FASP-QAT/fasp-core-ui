@@ -1256,13 +1256,15 @@ export default class BuildTree extends Component {
         console.log("items***&---", items);
         for (let i = 0; i < items.length; i++) {
             console.log("&&&&item---", items[i]);
-            console.log("current item --->", items[i].payload.nodeDataMap[scenarioId][0]);
+            console.log("my scenario---",scenarioId);
+            // console.log("current item --->", items[i]);
             if (items[i].payload.nodeType.id == 1 || items[i].payload.nodeType.id == 2) {
                 (items[i].payload.nodeDataMap[scenarioId])[0].calculatedDataValue = (items[i].payload.nodeDataMap[scenarioId])[0].dataValue;
             } else {
                 var findNodeIndex = items.findIndex(n => n.id == items[i].parent);
                 var parentValue = (items[findNodeIndex].payload.nodeDataMap[scenarioId])[0].calculatedDataValue;
                 console.log("api parent value---", parentValue);
+                console.log("api parent value after---", items[i]);
 
                 (items[i].payload.nodeDataMap[scenarioId])[0].calculatedDataValue = (parentValue * (items[i].payload.nodeDataMap[scenarioId])[0].dataValue) / 100;
             }
@@ -6680,7 +6682,7 @@ export default class BuildTree extends Component {
         this.setState(this.getDeletedItems(items, [itemConfig.id]), () => {
             setTimeout(() => {
                 console.log("delete result---", this.getDeletedItems(items, [itemConfig.id]))
-                this.calculateMOMData(0, 0);
+                this.calculateMOMData(0, 2);
             }, 0);
         });
     }
