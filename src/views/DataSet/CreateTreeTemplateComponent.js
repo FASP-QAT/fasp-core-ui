@@ -46,7 +46,7 @@ import ModelingTypeService from "../../api/ModelingTypeService";
 import docicon from '../../assets/img/doc.png';
 import AggregationNode from '../../assets/img/Aggregation-icon.png';
 import { saveAs } from "file-saver";
-import { Document, ImageRun, Packer, Paragraph, ShadingType, TextRun } from "docx";
+import { convertInchesToTwip, Document, ImageRun, Packer, Paragraph, ShadingType, TextRun } from "docx";
 import { calculateModelingData } from '../../views/DataSet/ModelingDataCalculation2';
 import PDFDocument from 'pdfkit-nodejs-webpack';
 import blobStream from 'blob-stream';
@@ -7328,7 +7328,7 @@ export default class CreateTreeTemplate extends Component {
             var row1 = "";
             var level = items[i].level;
             for (var j = 1; j <= level; j++) {
-                row = row.concat("\t");
+                // row = row.concat("\t");
             }
             if (items[i].payload.nodeType.id == 1 || items[i].payload.nodeType.id == 2) {
                 row = row.concat(addCommas((items[i].payload.nodeDataMap[0])[0].dataValue))
@@ -7342,6 +7342,7 @@ export default class CreateTreeTemplate extends Component {
                 spacing: {
                     after: 150,
                 },
+                indent: { left: convertInchesToTwip(0.5*level) },
             }));
             if (i != 0) {
                 var filteredList = this.state.items.filter(c => c.sortOrder > items[i].sortOrder && c.parent == items[i].parent);
@@ -7357,7 +7358,7 @@ export default class CreateTreeTemplate extends Component {
                     var row3 = "";
                     var row4 = parentName;
                     for (var j = 1; j <= items[i].level; j++) {
-                        row3 = row3.concat("\t");
+                        // row3 = row3.concat("\t");
                     }
                     if (items[i].payload.nodeType.id == 1 || items[i].payload.nodeType.id == 2) {
                         row = row.concat("NA ")
@@ -7376,7 +7377,8 @@ export default class CreateTreeTemplate extends Component {
                                 type: ShadingType.CLEAR,
                                 fill: "cfcdc9"
                             },
-                            style: row != "NA " ? total != 100 ? "aside" : "" : ""
+                            style: row != "NA " ? total != 100 ? "aside" : "" : "",
+                            indent: { left: convertInchesToTwip(0.5*items[i].level) },
                         }))
                     }
                 }
@@ -7420,7 +7422,7 @@ export default class CreateTreeTemplate extends Component {
 
             return connectDropTarget(connectDragSource(
                 // <div className="ContactTemplate " style={{ opacity, backgroundColor: Colors.White, borderColor: Colors.Black }}>
-                <div className="ContactTemplate boxContactTemplate">
+                <div className="ContactTemplate boxContactTemplate" title={itemConfig.payload.nodeDataMap[0][0].notes}>
                     <div className={itemConfig.payload.nodeType.id == 5 || itemConfig.payload.nodeType.id == 4 ? "ContactTitleBackground TemplateTitleBgblue" : "ContactTitleBackground TemplateTitleBg"}
                     >
                         <div className={itemConfig.payload.nodeType.id == 5 || itemConfig.payload.nodeType.id == 4 ? "ContactTitle TitleColorWhite" : "ContactTitle TitleColor"}>
