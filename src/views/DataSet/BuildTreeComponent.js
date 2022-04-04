@@ -4092,7 +4092,7 @@ export default class BuildTree extends Component {
                 spacing: {
                     after: 150,
                 },
-                indent: { left: convertInchesToTwip(0.5*level) },
+                indent: { left: convertInchesToTwip(0.5 * level) },
             }));
             if (i != 0) {
                 var filteredList = this.state.items.filter(c => c.sortOrder > items[i].sortOrder && c.parent == items[i].parent);
@@ -4128,7 +4128,7 @@ export default class BuildTree extends Component {
                                 fill: "cfcdc9"
                             },
                             style: row != "NA " ? total != 100 ? "aside" : "" : "",
-                            indent: { left: convertInchesToTwip(0.5*items[i].level) },
+                            indent: { left: convertInchesToTwip(0.5 * items[i].level) },
                         }))
                     }
                 }
@@ -9439,7 +9439,7 @@ export default class BuildTree extends Component {
                                 var getLevelUnit = this.state.curTreeObj.levelList.filter(c => c.levelNo == itemConfig.level + 1);
                                 var levelUnitId = ""
                                 if (getLevelUnit.length > 0) {
-                                    levelUnitId = getLevelUnit[0].unit.id;
+                                    levelUnitId = getLevelUnit[0].unit != null ? getLevelUnit[0].unit.id : "";
                                 }
                                 // tempArray.push(nodeDataMap);
                                 this.setState({
