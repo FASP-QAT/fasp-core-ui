@@ -234,9 +234,10 @@ export default class ExtrapolateDataComponent extends React.Component {
             arimaId: true,
             dataList: [{ 'months': 'Jan-2020', 'actuals': '155', 'tesLcb': '155', 'tesM': '155', 'tesUcb': '155', 'arimaForecast': '155', 'linearRegression': '211', 'semiAveragesForecast': '277', 'movingAverages': '' }, { 'months': 'Feb-2020', 'actuals': '180', 'tesLcb': '180', 'tesM': '180', 'tesUcb': '180', 'arimaForecast': '180', 'linearRegression': '225', 'semiAveragesForecast': '283', 'movingAverages': '155' }, { 'months': 'Mar-2020', 'actuals': '260', 'tesLcb': '260', 'tesM': '260', 'tesUcb': '260', 'arimaForecast': '260', 'linearRegression': '240', 'semiAveragesForecast': '288', 'movingAverages': '168' }, { 'months': 'Apr-2020', 'actuals': '560', 'tesLcb': '560', 'tesM': '560', 'tesUcb': '560', 'arimaForecast': '560', 'linearRegression': '254', 'semiAveragesForecast': '294', 'movingAverages': '198' }, { 'months': 'May-2020', 'actuals': '160', 'tesLcb': '160', 'tesM': '160', 'tesUcb': '160', 'arimaForecast': '160', 'linearRegression': '268', 'semiAveragesForecast': '299', 'movingAverages': '289' }, { 'months': 'Jun-2020', 'actuals': '185', 'tesLcb': '185', 'tesM': '185', 'tesUcb': '185', 'arimaForecast': '185', 'linearRegression': '282', 'semiAveragesForecast': '304', 'movingAverages': '263' }, { 'months': 'Jul-2020', 'actuals': '270', 'tesLcb': '270', 'tesM': '270', 'tesUcb': '270', 'arimaForecast': '270', 'linearRegression': '297', 'semiAveragesForecast': '310', 'movingAverages': '269' }, { 'months': 'Aug-2020', 'actuals': '600', 'tesLcb': '600', 'tesM': '600', 'tesUcb': '600', 'arimaForecast': '600', 'linearRegression': '311', 'semiAveragesForecast': '315', 'movingAverages': '287' }, { 'months': 'Sep-2020', 'actuals': '165', 'tesLcb': '165', 'tesM': '165', 'tesUcb': '165', 'arimaForecast': '165', 'linearRegression': '325', 'semiAveragesForecast': '321', 'movingAverages': '355' }, { 'months': 'Oct-2020', 'actuals': '190', 'tesLcb': '190', 'tesM': '190', 'tesUcb': '190', 'arimaForecast': '190', 'linearRegression': '339', 'semiAveragesForecast': '326', 'movingAverages': '276' }, { 'months': 'Nov-2020', 'actuals': '280', 'tesLcb': '280', 'tesM': '280', 'tesUcb': '280', 'arimaForecast': '280', 'linearRegression': '354', 'semiAveragesForecast': '332', 'movingAverages': '282' }, { 'months': 'Dec-2020', 'actuals': '635', 'tesLcb': '635', 'tesM': '635', 'tesUcb': '635', 'arimaForecast': '635', 'linearRegression': '368', 'semiAveragesForecast': '337', 'movingAverages': '301' }, { 'months': 'Jan-2021', 'actuals': '172', 'tesLcb': '172', 'tesM': '172', 'tesUcb': '172', 'arimaForecast': '172', 'linearRegression': '382', 'semiAveragesForecast': '342', 'movingAverages': '374' }, { 'months': 'Feb-2021', 'actuals': '226', 'tesLcb': '226', 'tesM': '226', 'tesUcb': '226', 'arimaForecast': '226', 'linearRegression': '396', 'semiAveragesForecast': '348', 'movingAverages': '288' }, { 'months': 'Mar-2021', 'actuals': '329', 'tesLcb': '329', 'tesM': '329', 'tesUcb': '329', 'arimaForecast': '329', 'linearRegression': '411', 'semiAveragesForecast': '353', 'movingAverages': '301' }, { 'months': 'Apr-2021', 'actuals': '721', 'tesLcb': '721', 'tesM': '721', 'tesUcb': '721', 'arimaForecast': '721', 'linearRegression': '425', 'semiAveragesForecast': '359', 'movingAverages': '328' }, { 'months': 'May-2021', 'actuals': '', 'tesLcb': '332', 'tesM': '', 'tesUcb': '', 'arimaForecast': '363', 'linearRegression': '439', 'semiAveragesForecast': '364', 'movingAverages': '417' }, { 'months': 'Jun-2021', 'actuals': '', 'tesLcb': '619', 'tesM': '', 'tesUcb': '', 'arimaForecast': '362', 'linearRegression': '453', 'semiAveragesForecast': '370', 'movingAverages': '373' }, { 'months': 'Jul-2021', 'actuals': '', 'tesLcb': '575', 'tesM': '', 'tesUcb': '', 'arimaForecast': '361', 'linearRegression': '468', 'semiAveragesForecast': '375', 'movingAverages': '413' }, { 'months': 'Aug-2021', 'actuals': '', 'tesLcb': '280', 'tesM': '', 'tesUcb': '', 'arimaForecast': '360', 'linearRegression': '482', 'semiAveragesForecast': '381', 'movingAverages': '451' }, { 'months': 'Sep-2021', 'actuals': '', 'tesLcb': '389', 'tesM': '', 'tesUcb': '', 'arimaForecast': '359', 'linearRegression': '496', 'semiAveragesForecast': '386', 'movingAverages': '475' }, { 'months': 'Oct-2021', 'actuals': '', 'tesLcb': '540', 'tesM': '', 'tesUcb': '', 'arimaForecast': '358', 'linearRegression': '510', 'semiAveragesForecast': '391', 'movingAverages': '426' }, { 'months': 'Nov-2021', 'actuals': '', 'tesLcb': '359', 'tesM': '', 'tesUcb': '', 'arimaForecast': '358', 'linearRegression': '525', 'semiAveragesForecast': '397', 'movingAverages': '427' }, { 'months': 'Dec-2021', 'actuals': '', 'tesLcb': '834', 'tesM': '', 'tesUcb': '', 'arimaForecast': '357', 'linearRegression': '539', 'semiAveragesForecast': '402', 'movingAverages': '438' }, { 'months': 'Jan-2022', 'actuals': '', 'tesLcb': '437', 'tesM': '', 'tesUcb': '', 'arimaForecast': '357', 'linearRegression': '553', 'semiAveragesForecast': '408', 'movingAverages': '443' }, { 'months': 'Feb-2022', 'actuals': '', 'tesLcb': '756', 'tesM': '', 'tesUcb': '', 'arimaForecast': '356', 'linearRegression': '567', 'semiAveragesForecast': '413', 'movingAverages': '442' }],
             rangeValue: { from: { year: new Date(startDate).getFullYear(), month: new Date(startDate).getMonth() + 1 }, to: { year: new Date(endDate).getFullYear(), month: new Date(endDate).getMonth() + 1 } },
-            rangeValue1: { from: { year: new Date(startDate1).getFullYear(), month: new Date(startDate1).getMonth() + 1 }, to: { year: new Date(endDate1).getFullYear(), month: new Date(endDate1).getMonth() + 1 } },
+            rangeValue1: { from: { year: Number(moment(startDate1).startOf('month').format("YYYY")), month: Number(moment(startDate1).startOf('month').format("M")) }, to: { year: Number(moment(endDate1).startOf('month').format("YYYY")), month: Number(moment(endDate1).startOf('month').format("M")) } },
             minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
             maxDate: { year: new Date(endDate1).getFullYear(), month: new Date().getMonth() + 1 },
+            popoverOpenD: false,
             popoverOpenMa: false,
             popoverOpenSa: false,
             popoverOpenLr: false,
@@ -268,6 +269,7 @@ export default class ExtrapolateDataComponent extends React.Component {
             dataChanged: false,
             noDataMessage: ""
         }
+        // this.toggleD = this.toggleD.bind(this);
         this.toggle = this.toggle.bind(this)
         this.reset = this.reset.bind(this)
         this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
@@ -424,6 +426,7 @@ export default class ExtrapolateDataComponent extends React.Component {
     buildActualJxl() {
         //Jexcel table
         var actualConsumptionList = this.state.actualConsumptionList;
+        console.log("actualConsumptionList",actualConsumptionList)
         var monthArray = this.state.monthArray;
         let rangeValue = this.state.rangeValue1;
         var startMonth = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
@@ -438,6 +441,7 @@ export default class ExtrapolateDataComponent extends React.Component {
             //     inputData.push({ "month": inputData.length + 1, "actual": consumptionData[0].amount, "forecast": null })
             // }
             var movingAvgDataFilter = this.state.movingAvgData.filter(c => moment(startMonth).add(c.month - 1, 'months').format("YYYY-MM") == moment(monthArray[j]).format("YYYY-MM"))
+           console.log("movingAvgDataFilter",movingAvgDataFilter);
             var semiAvgDataFilter = this.state.semiAvgData.filter(c => moment(startMonth).add(c.month - 1, 'months').format("YYYY-MM") == moment(monthArray[j]).format("YYYY-MM"))
             var linearRegressionDataFilter = this.state.linearRegressionData.filter(c => moment(startMonth).add(c.month - 1, 'months').format("YYYY-MM") == moment(monthArray[j]).format("YYYY-MM"))
             var tesDataFilter = this.state.tesData.filter(c => moment(startMonth).add(c.month - 1, 'months').format("YYYY-MM") == moment(monthArray[j]).format("YYYY-MM"))
@@ -545,7 +549,7 @@ export default class ExtrapolateDataComponent extends React.Component {
             search: false,
             columnSorting: true,
             tableOverflow: true,
-            defaultColWidth: 120,
+            defaultColWidth: 130,
             wordWrap: true,
             allowInsertColumn: false,
             allowManualInsertColumn: false,
@@ -730,6 +734,7 @@ export default class ExtrapolateDataComponent extends React.Component {
         tr.children[7].title = i18n.t('static.tooltip.Tes');
         // tr.children[8].title = i18n.t('static.tooltip.arima');
         tr.children[9].title = i18n.t('static.tooltip.arima');
+        tr.children[2].title = 'Historic time series data may need to be adjusted for reporting rate and/or for stock out rate to better reflect actual demand. Update these on the "Data Entry and Adjustment" screen.';
 
 
     }
@@ -1109,8 +1114,8 @@ export default class ExtrapolateDataComponent extends React.Component {
             this.setState({
                 planningUnitId: planningUnitId,
                 showData: false
-                // }, () => {
-                //     this.setExtrapolatedParameters();
+                }, () => {
+                    this.setExtrapolatedParameters();
             })
         }
     }
@@ -1133,11 +1138,101 @@ export default class ExtrapolateDataComponent extends React.Component {
             this.setState({
                 regionId: regionId,
                 showData: false
-                // }, () => {
-                //     this.setExtrapolatedParameters();
+                }, () => {
+                    this.setExtrapolatedParameters();
             })
         }
     }
+
+//     showDataOnPlanningAndRegionChange(){
+//     if (this.state.planningUnitId > 0 && this.state.regionId > 0) {
+//         var datasetJson = this.state.datasetJson;
+//         var actualConsumptionListForPlanningUnitAndRegion = datasetJson.actualConsumptionList.filter(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId);
+//         var consumptionExtrapolationList = datasetJson.consumptionExtrapolation;
+//         console.log("consumptionExtrapolationList-->",consumptionExtrapolationList);    
+//         if (consumptionExtrapolationList.length>1 && actualConsumptionListForPlanningUnitAndRegion.length > 1) {
+//             this.setState({ loading: true })
+//             let actualMin = moment.min(actualConsumptionListForPlanningUnitAndRegion.map(d => moment(d.month)));
+//             let actualMax = moment.max(actualConsumptionListForPlanningUnitAndRegion.map(d => moment(d.month)));
+//             var rangeValue1 = "";
+//             // if (updateRangeValue == 0) {
+//                 // rangeValue1 = this.state.rangeValue1;
+//             // } else {
+//                 rangeValue1 = { from: { year: new Date(actualMin).getFullYear(), month: new Date(actualMin).getMonth() + 1 }, to: { year: new Date(actualMax).getFullYear(), month: new Date(actualMax).getMonth() + 1 } }
+//             // }
+//             var rangeValue = rangeValue1;
+//             let startDate1 = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
+//             let stopDate1 = rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
+//             var actualConsumptionList = datasetJson.actualConsumptionList.filter(c => moment(c.month).format("YYYY-MM") >= moment(startDate1).format("YYYY-MM") && moment(c.month).format("YYYY-MM") <= moment(stopDate1).format("YYYY-MM"));
+//             var startDate = moment(datasetJson.currentVersion.forecastStartDate).format("YYYY-MM-DD");
+//             var stopDate = moment(datasetJson.currentVersion.forecastStopDate).format("YYYY-MM-DD");
+//         var monthsForMovingAverage = this.state.monthsForMovingAverage;
+//         var consumptionExtrapolationFiltered = consumptionExtrapolationList.filter(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId);
+//         var consumptionExtrapolationData = consumptionExtrapolationList.filter(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId && c.extrapolationMethod.id == 6)//Semi Averages
+//         var consumptionExtrapolationMovingData = consumptionExtrapolationList.filter(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId && c.extrapolationMethod.id == 7)//Moving averages
+//         var consumptionExtrapolationRegression = consumptionExtrapolationList.filter(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId && c.extrapolationMethod.id == 5)//Linear Regression
+//         var consumptionExtrapolationTESL = consumptionExtrapolationList.filter(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId && c.extrapolationMethod.id == 1)//TES L            
+//         var movingAvgId = consumptionExtrapolationFiltered.length > 0 ? false : true;
+//         var semiAvgId = consumptionExtrapolationFiltered.length > 0 ? false : true;
+//         var linearRegressionId = consumptionExtrapolationFiltered.length > 0 ? false : true;
+//         var smoothingId = consumptionExtrapolationFiltered.length > 0 ? false : true;
+//         var arimaId = consumptionExtrapolationFiltered.length > 0 ? false : true;
+
+//         if (consumptionExtrapolationMovingData.length > 0) {
+//             monthsForMovingAverage = consumptionExtrapolationMovingData[0].jsonProperties.months;
+//             movingAvgId = true;
+//             }
+//         if (consumptionExtrapolationData.length > 0) {
+//             semiAvgId = true;
+//             }
+//         if (consumptionExtrapolationRegression.length > 0) {
+//             linearRegressionId = true;
+//             }
+//         var confidenceLevel = this.state.confidenceLevelId;
+//         var seasonality = this.state.noOfMonthsForASeason;
+//         var alpha = this.state.alpha;
+//         var beta = this.state.beta;
+//         var gamma = this.state.gamma;
+//         if (smoothingId && consumptionExtrapolationTESL.length > 0) {
+//             confidenceLevel = consumptionExtrapolationTESL[0].jsonProperties.confidenceLevel;
+//             seasonality = consumptionExtrapolationTESL[0].jsonProperties.seasonality;
+//             alpha = consumptionExtrapolationTESL[0].jsonProperties.alpha;
+//             beta = consumptionExtrapolationTESL[0].jsonProperties.beta;
+//             gamma = consumptionExtrapolationTESL[0].jsonProperties.gamma;
+//             smoothingId = true;
+//         }
+//         this.setState({
+//             actualConsumptionList: actualConsumptionList,
+//             startDate: startDate,
+//             stopDate: stopDate,
+//             rangeValue1: rangeValue1,
+//             minDate: actualMin,
+//           //  maxDate: actualMax,
+//             monthsForMovingAverage: monthsForMovingAverage,
+//             confidenceLevelId: confidenceLevel,
+//             noOfMonthsForASeason: seasonality,
+//             alpha: alpha,
+//             beta: beta,
+//             gamma: gamma,
+//             showData: true,
+//             movingAvgId: movingAvgId,
+//             semiAvgId: semiAvgId,
+//             linearRegressionId: linearRegressionId,
+//             smoothingId: smoothingId,
+//             arimaId: arimaId,
+//             movingAvgData:consumptionExtrapolationMovingData,
+//             semiAvgData:consumptionExtrapolationFiltered,
+//             linearRegressionData:consumptionExtrapolationRegression,
+//             tesData:consumptionExtrapolationTESL,
+//             noDataMessage: "",
+//             dataChanged: true,
+//             loading: false
+//         }, () => {
+//             this.buildActualJxl();
+//         })
+//     }
+// }
+// }
 
     setExtrapolatedParameters(updateRangeValue) {
         if (this.state.planningUnitId <= 0 || this.state.planningUnitId == "") {
@@ -1250,7 +1345,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                 stopDate: stopDate,
                                 rangeValue1: rangeValue1,
                                 minDate: actualMin,
-                                maxDate: actualMax,
+                              //  maxDate: actualMax,
                                 monthsForMovingAverage: monthsForMovingAverage,
                                 confidenceLevelId: confidenceLevel,
                                 noOfMonthsForASeason: seasonality,
@@ -1678,48 +1773,48 @@ export default class ExtrapolateDataComponent extends React.Component {
             movingAvgId: movingAvgId,
             show:false,
             dataChanged: true
-        // }, () => {
-        //     this.buildActualJxl()
+        }, () => {
+            this.buildActualJxl()
         })
     }
     setSemiAvgId(e) {
         var semiAvgId = e.target.checked;
         this.setState({
             semiAvgId: semiAvgId,
-            show:false,
+            // show:false,
             dataChanged: true
-        // }, () => {
-        //     this.buildActualJxl()
+        }, () => {
+            this.buildActualJxl()
         })
     }
     setLinearRegressionId(e) {
         var linearRegressionId = e.target.checked;
         this.setState({
             linearRegressionId: linearRegressionId,
-            show:false,
+            // show:false,
             dataChanged: true
-        // }, () => {
-        //     this.buildActualJxl()
+        }, () => {
+            this.buildActualJxl()
         })
     }
     setSmoothingId(e) {
         var smoothingId = e.target.checked;
         this.setState({
             smoothingId: smoothingId,
-            show:false,
+           // show:false,
             dataChanged: true
-        // }, () => {
-        //     this.buildActualJxl()
+        }, () => {
+            this.buildActualJxl()
         })
     }
     setArimaId(e) {
         var arimaId = e.target.checked;
         this.setState({
             arimaId: arimaId,
-            show:false,
+            // show:false,
             dataChanged: true
-        // }, () => {
-        //     this.buildActualJxl()
+        }, () => {
+            this.buildActualJxl()
         })
     }
     // setShowAdvanceId(e) {
@@ -1728,7 +1823,11 @@ export default class ExtrapolateDataComponent extends React.Component {
     //         showAdvanceId: showAdvanceId
     //     })
     // }
-
+    // toggleD() {
+    //     this.setState({
+    //         popoverOpenD: !this.state.popoverOpenD,
+    //     });
+    // }
     toggle(key, value) {
         this.setState({
             [key]: value,
@@ -2096,7 +2195,8 @@ export default class ExtrapolateDataComponent extends React.Component {
                         }
                         return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
                     }
-                }
+                },
+                intersect:false
 
             },
 
@@ -2710,6 +2810,9 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                                         id="gammaId"
                                                                         bsSize="sm"
                                                                         name="gammaId"
+                                                                        min={0}
+                                                                        max={1}
+                                                                        step={0.1}
                                                                         value={this.state.gamma}
                                                                         valid={!errors.gammaId && this.state.gamma != null ? this.state.gamma : '' != ''}
                                                                         invalid={touched.gammaId && !!errors.gammaId}
@@ -2769,8 +2872,13 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                                         bsSize="sm"
                                                                     />
                                                                 </div>
+                                                                <div>
+                                                                <Popover placement="top" isOpen={this.state.popoverOpenD} target="Popover14" trigger="hover" toggle={() => this.toggle('popoverOpenD', !this.state.popoverOpenD)}>
+                                                                        <PopoverBody>{i18n.t('static.tooltip.d')}</PopoverBody>
+                                                                    </Popover>
+                                                                    </div>
                                                                 <div className="col-md-2">
-                                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.d')}</Label>
+                                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.d')} <i class="fa fa-info-circle icons pl-lg-2" id="Popover14" onClick={() => this.toggle('popoverOpenD', !this.state.popoverOpenD)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                                                     <Input
                                                                         className="controls"
                                                                         type="number"
@@ -2833,22 +2941,22 @@ export default class ExtrapolateDataComponent extends React.Component {
                                         <Table className="table-bordered text-center mt-2 overflowhide main-table " bordered size="sm" style={{ width: 'unset' }}>
                                             <thead>
                                                 <tr>
-                                                    <td width="160px"><b>{i18n.t('static.common.errors')}</b>
-                                                        <i class="fa fa-info-circle icons pl-lg-2" id="Popover13" onClick={() => this.toggle('popoverOpenError', !this.state.popoverOpenError)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></td>
+                                                    <td width="160px" title={i18n.t('static.tooltip.errors')}><b>{i18n.t('static.common.errors')}</b>
+                                                        <i class="fa fa-info-circle icons pl-lg-2" id="Popover13" aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></td>
                                                     {this.state.movingAvgId &&
-                                                        <td width="160px"><b>{i18n.t('static.extrapolation.movingAverages')}</b></td>
+                                                        <td width="160px" title={i18n.t('static.tooltip.MovingAverages')}><b>{i18n.t('static.extrapolation.movingAverages')}</b> <i class="fa fa-info-circle icons pl-lg-2" id="Popover15" aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></td>
                                                     }
                                                     {this.state.semiAvgId &&
-                                                        <td width="160px"><b>{i18n.t('static.extrapolation.semiAverages')}</b></td>
+                                                        <td width="160px" title={i18n.t('static.tooltip.SemiAverages')}><b>{i18n.t('static.extrapolation.semiAverages')}</b> <i class="fa fa-info-circle icons pl-lg-2" id="Popover16" aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></td>
                                                     }
                                                     {this.state.linearRegressionId &&
-                                                        <td width="160px"><b>{i18n.t('static.extrapolation.linearRegression')}</b></td>
+                                                        <td width="160px" title={i18n.t('static.tooltip.LinearRegression')}><b>{i18n.t('static.extrapolation.linearRegression')}</b> <i class="fa fa-info-circle icons pl-lg-2" id="Popover17" aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></td>
                                                     }
                                                     {this.state.smoothingId &&
-                                                        <td width="160px"><b>{i18n.t('static.extrapolation.tes')}</b></td>
+                                                        <td width="160px" title={i18n.t('static.tooltip.Tes')}><b>{i18n.t('static.extrapolation.tes')}</b> <i class="fa fa-info-circle icons pl-lg-2" id="Popover18" aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></td>
                                                     }
                                                     {this.state.arimaId &&
-                                                        <td width="160px"><b>{i18n.t('static.extrapolation.arima')}</b></td>
+                                                        <td width="160px" title={i18n.t('static.tooltip.arima')}><b>{i18n.t('static.extrapolation.arima')}</b> <i class="fa fa-info-circle icons pl-lg-2" id="Popover19" aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></td>
                                                     }
                                                 </tr>
                                             </thead>
@@ -2958,7 +3066,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                     </ul>
                                 </div>
                                 <div className="row  mt-lg-3">
-                                    <div className="pl-lg-4 pr-lg-4">
+                                    <div className="pl-lg-4 pr-lg-4 ModelingValidationTable">
                                         <div id="tableDiv" className="jexcelremoveReadonlybackground" style={{ display: this.state.show && !this.state.loading ? "block" : "none" }}>
                                         </div>
                                     </div>

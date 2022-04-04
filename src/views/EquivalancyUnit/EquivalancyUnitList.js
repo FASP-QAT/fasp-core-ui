@@ -62,7 +62,8 @@ class EquivalancyUnit extends Component {
             loading1: true,
             loading2: true,
             isChanged: false,
-            isChanged1: false
+            isChanged1: false,
+            countVar: 0,
         }
 
         this.cancelClicked = this.cancelClicked.bind(this);
@@ -76,6 +77,7 @@ class EquivalancyUnit extends Component {
         this.buildJexcel = this.buildJexcel.bind(this);
         this.filterData = this.filterData.bind(this);
         this.getHealthArea = this.getHealthArea.bind(this);
+        this.checkAndMarkDuplicate = this.checkAndMarkDuplicate.bind(this);
 
         this.getEquivalancyUnitMappingData = this.getEquivalancyUnitMappingData.bind(this);
 
@@ -555,6 +557,7 @@ class EquivalancyUnit extends Component {
                 data[13] = papuList[j].forecastingUnit.id
                 data[14] = (papuList[j].program == null ? -1 : papuList[j].program.id) //Type
                 data[15] = 0;
+                data[16] = count;
                 papuDataArr[count] = data;
                 count++;
             }
@@ -686,6 +689,10 @@ class EquivalancyUnit extends Component {
                 },
                 {
                     title: 'addNewRow',
+                    type: 'hidden'
+                },
+                {
+                    title: 'countVar',
                     type: 'hidden'
                 }
 
@@ -950,6 +957,7 @@ class EquivalancyUnit extends Component {
                                 title: i18n.t("static.common.deleterow"),
                                 onclick: function () {
                                     obj.deleteRow(parseInt(y));
+                                    this.setState({ countVar: this.state.countVar - 1 })
                                 }
                             });
                             // Line
@@ -966,7 +974,8 @@ class EquivalancyUnit extends Component {
         this.el = table1Instance;
         this.setState({
             table1Instance: table1Instance,
-            loading: false
+            loading: false,
+            countVar: count
         })
     }
 
@@ -1860,6 +1869,9 @@ class EquivalancyUnit extends Component {
         data[13] = 0;
         data[14] = 0;
         data[15] = 1;
+        data[16] = this.state.countVar + 1;
+
+        this.setState({ countVar: this.state.countVar + 1 })
 
         elInstance.insertRow(
             data, 0, 1
@@ -2010,11 +2022,68 @@ class EquivalancyUnit extends Component {
         }
     }
 
+    checkAndMarkDuplicate() {
+        var elInstance = this.state.table1Instance;
+        var tableJson = elInstance.getJson(null, false);
+
+        console.log("tableJson------->", tableJson);
+
+        let array = tableJson.map(m => {
+            return {
+                equivalencyUnitId: parseInt(m[1]),
+                forecastingUnitId: parseInt(m[4]),
+                programId: parseInt(m[8]),
+                countVar: m[16],
+                isChanged: m[12]
+            }
+        });
+
+        console.log("tableJson------->1.1", array);
+
+        let duplicates = array
+            .map((el, i) => {
+                return array.find((element, index) => {
+                    if (i !== index && element.equivalencyUnitId === el.equivalencyUnitId && element.forecastingUnitId === el.forecastingUnitId && element.programId === el.programId) {
+                        return el
+                    }
+                })
+            })
+            .filter(x => x);
+
+        console.log("tableJson------->1", duplicates);
+
+        // duplicates = duplicates.filter(c => c.isChanged == 1);
+
+        if (duplicates.length > 0) {
+            for (var k = 0; k < duplicates.length; k++) {
+                for (var y = 0; y < tableJson.length; y++) {
+                    var value = elInstance.getValueFromCoords(16, y);
+                    // console.log("tableJson------->3", value);
+                    if (duplicates[k].countVar == parseInt(value)) {
+                        console.log("tableJson------->4", y);
+                        var col = ("B").concat(parseInt(y) + 1);
+                        elInstance.setStyle(col, "background-color", "yellow");
+
+                        var col = ("E").concat(parseInt(y) + 1);
+                        elInstance.setStyle(col, "background-color", "yellow");
+
+                        var col = ("I").concat(parseInt(y) + 1);
+                        elInstance.setStyle(col, "background-color", "yellow");
+                        y = tableJson.length;
+                    }
+                }
+            }
+        }
+
+
+    }
+
     formSubmit = function () {
 
         var validation = this.checkValidation();
         var elInstance = this.state.table1Instance;
         if (validation == true) {
+            this.checkAndMarkDuplicate();
             this.setState({ loading: true })
             var tableJson = elInstance.getJson(null, false);
             console.log("tableJson---", tableJson);

@@ -280,9 +280,13 @@ export default class StepOneImportMapPlanningUnits extends Component {
             let ForecastPlanningUnitId = this.el.getValueFromCoords(7, y);
             if (ForecastPlanningUnitId != -1 && ForecastPlanningUnitId != null && ForecastPlanningUnitId != '') {
                 var selectedPlanningUnitObj = this.state.planningUnitList.filter(c => c.planningUnitId == ForecastPlanningUnitId)[0];
+                let multiplier = "";
+                if (selectedPlanningUnitObj.forecastingUnit.forecastingUnitId == this.el.getValueFromCoords(12, y)) {
+                    multiplier = (this.el.getValueFromCoords(3, y) / selectedPlanningUnitObj.multiplier).toFixed(6)
+                }
                 this.el.setValueFromCoords(6, y, ForecastPlanningUnitId, true);
                 this.el.setValueFromCoords(8, y, selectedPlanningUnitObj.multiplier, true);
-                this.el.setValueFromCoords(9, y, (this.el.getValueFromCoords(3, y) / selectedPlanningUnitObj.multiplier).toFixed(6), true);
+                this.el.setValueFromCoords(9, y, multiplier, true);
                 this.el.setValueFromCoords(10, y, 0, true);
                 this.el.setValueFromCoords(11, y, selectedPlanningUnitObj.forecastingUnit.tracerCategory.id, true);
                 // let match = this.state.forecastPlanignUnitListForNotDuplicate.filter(c => c.supplyPlanPlanningUnitId == this.el.getValueFromCoords(0, y))
@@ -305,36 +309,36 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 //     })
                 // }
 
-                let forecastPlanignUnitListForNotDuplicate = this.state.forecastPlanignUnitListForNotDuplicate;
-                forecastPlanignUnitListForNotDuplicate.push({
-                    supplyPlanPlanningUnitId: this.el.getValueFromCoords(1, y),
-                    forecastPlanningUnitId: this.el.getValueFromCoords(7, y)
-                })
+                // let forecastPlanignUnitListForNotDuplicate = this.state.forecastPlanignUnitListForNotDuplicate;
+                // forecastPlanignUnitListForNotDuplicate.push({
+                //     supplyPlanPlanningUnitId: this.el.getValueFromCoords(1, y),
+                //     forecastPlanningUnitId: this.el.getValueFromCoords(7, y)
+                // })
 
-                const ids = forecastPlanignUnitListForNotDuplicate.map(o => o.supplyPlanPlanningUnitId)
-                const filtered = forecastPlanignUnitListForNotDuplicate.filter(({ supplyPlanPlanningUnitId }, index) => !ids.includes(supplyPlanPlanningUnitId, index + 1))
-                this.setState({
-                    forecastPlanignUnitListForNotDuplicate: filtered
-                })
+                // const ids = forecastPlanignUnitListForNotDuplicate.map(o => o.supplyPlanPlanningUnitId)
+                // const filtered = forecastPlanignUnitListForNotDuplicate.filter(({ supplyPlanPlanningUnitId }, index) => !ids.includes(supplyPlanPlanningUnitId, index + 1))
+                // this.setState({
+                //     forecastPlanignUnitListForNotDuplicate: filtered
+                // })
 
 
             } else {
-                let SupplyPlanningUnitId = this.el.getValueFromCoords(1, y);
-                console.log("MYVALUE----------->1", SupplyPlanningUnitId);
+                // let SupplyPlanningUnitId = this.el.getValueFromCoords(1, y);
+                // console.log("MYVALUE----------->1", SupplyPlanningUnitId);
 
-                let forecastPlanignUnitListForNotDuplicate = this.state.forecastPlanignUnitListForNotDuplicate;
-                console.log("MYVALUE----------->2", forecastPlanignUnitListForNotDuplicate);
-                let index = forecastPlanignUnitListForNotDuplicate.filter(c => c.supplyPlanPlanningUnitId == SupplyPlanningUnitId);
-                console.log("MYVALUE----------->3", index);
-                if (index.length > 0) {
-                    console.log("MYVALUE----------->41", forecastPlanignUnitListForNotDuplicate.filter(c => c.supplyPlanPlanningUnitId != SupplyPlanningUnitId));
+                // let forecastPlanignUnitListForNotDuplicate = this.state.forecastPlanignUnitListForNotDuplicate;
+                // console.log("MYVALUE----------->2", forecastPlanignUnitListForNotDuplicate);
+                // let index = forecastPlanignUnitListForNotDuplicate.filter(c => c.supplyPlanPlanningUnitId == SupplyPlanningUnitId);
+                // console.log("MYVALUE----------->3", index);
+                // if (index.length > 0) {
+                //     console.log("MYVALUE----------->41", forecastPlanignUnitListForNotDuplicate.filter(c => c.supplyPlanPlanningUnitId != SupplyPlanningUnitId));
 
-                    this.setState({
-                        forecastPlanignUnitListForNotDuplicate: forecastPlanignUnitListForNotDuplicate.filter(c => c.supplyPlanPlanningUnitId != SupplyPlanningUnitId)
-                    })
-                } else {
-                    console.log("MYVALUE----------->42", forecastPlanignUnitListForNotDuplicate);
-                }
+                //     this.setState({
+                //         forecastPlanignUnitListForNotDuplicate: forecastPlanignUnitListForNotDuplicate.filter(c => c.supplyPlanPlanningUnitId != SupplyPlanningUnitId)
+                //     })
+                // } else {
+                //     console.log("MYVALUE----------->42", forecastPlanignUnitListForNotDuplicate);
+                // }
 
 
 
@@ -412,11 +416,11 @@ export default class StepOneImportMapPlanningUnits extends Component {
             }
 
         }
-        this.setState({
-            isChanged1: true,
-        });
-
-
+        if (!this.state.isChanged1) {
+            this.setState({
+                isChanged1: true,
+            });
+        }
     }
 
     oneditionend = function (instance, cell, x, y, value) {
@@ -883,6 +887,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                     data[10] = ''
                     data[11] = ''
                 }
+                data[12] = planningUnitObj.forecastingUnit.forecastingUnitId
 
                 papuDataArr[count] = data;
                 count++;
@@ -995,6 +1000,11 @@ export default class StepOneImportMapPlanningUnits extends Component {
                     title: 'Match tracer category',
                     type: 'hidden',
                     readOnly: true//11 L
+                },
+                {
+                    title: 'Supply plan Forcast unit id',
+                    type: 'hidden',
+                    readOnly: true//12 M
                 }
 
 

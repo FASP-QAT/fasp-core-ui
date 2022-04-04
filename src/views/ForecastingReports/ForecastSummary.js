@@ -1185,6 +1185,7 @@ class ForecastSummary extends Component {
 
                                     }
 
+                                    totalForecastedQuantity0ri = Math.round(totalForecastedQuantity0ri);
 
 
 
@@ -1207,14 +1208,15 @@ class ForecastSummary extends Component {
                                     let priceType = (planningUnitList[j].procurementAgent == null && planningUnitList[j].price == null ? i18n.t('static.forecastReport.NoPriceTypeAvailable') : (planningUnitList[j].procurementAgent != null ? planningUnitList[j].procurementAgent.code : i18n.t('static.forecastReport.custom')));
                                     let isPriceTypeRed = (planningUnitList[j].procurementAgent == null && planningUnitList[j].price == null ? true : false);
                                     let unitPrice = planningUnitList[j].price;
-                                    let procurementNeeded = (isProcurementGapRed == true ? '$ ' + (tempProcurementGap * unitPrice).toFixed(2) : '');
+                                    // let procurementNeeded = (isProcurementGapRed == true ? '$ ' + (tempProcurementGap * unitPrice).toFixed(2) : '');
+                                    let procurementNeeded = (isProcurementGapRed == true ? '$ ' + (Math.abs(tempProcurementGap) * unitPrice).toFixed(2) : '');
                                     let notes = planningUnitList[j].consumptionNotes;
 
                                     let obj = { id: 1, tempTracerCategoryId: tracerCategory.id, display: false, tracerCategory: tracerCategory, forecastingUnit: forecastingUnit, planningUnit: planningUnit, totalForecastedQuantity: totalForecastedQuantity, stock1: stock1, existingShipments: existingShipments, stock2: stock2, isStock2Red: isStock2Red, desiredMonthOfStock1: desiredMonthOfStock1, desiredMonthOfStock2: desiredMonthOfStock2, procurementGap: procurementGap, isProcurementGapRed: isProcurementGapRed, priceType: priceType, isPriceTypeRed: isPriceTypeRed, unitPrice: unitPrice, procurementNeeded: procurementNeeded, notes: notes }
                                     tempData.push(obj);
 
                                     if (isProcurementGapRed == true) {
-                                        totalProductCost = totalProductCost + (tempProcurementGap * unitPrice);
+                                        totalProductCost = totalProductCost + (Math.abs(tempProcurementGap) * unitPrice);
                                         totalProductCost = parseFloat(totalProductCost).toFixed(2);
                                     }
 
@@ -1304,6 +1306,7 @@ class ForecastSummary extends Component {
                                             data[1] = puListFiltered[j].planningUnit;
                                             data[2] = getLabelText(puListFiltered[j].planningUnit.label, this.state.lang) + " | " + puListFiltered[j].planningUnit.id;
                                             var total = 0;
+                                            let selectedForecastQty = 0;
                                             for (var k = 0; k < regRegionList.length; k++) {
                                                 var filterForecastSelected = puListFiltered[j].selectedForecastMap[regRegionList[k].regionId]
                                                 console.log("filterForecastSelected+++", filterForecastSelected);
@@ -1312,9 +1315,14 @@ class ForecastSummary extends Component {
                                                 data[((k + 1) * 3) + 1] = filterForecastSelected != undefined ? Math.round(filterForecastSelected.totalForecast) : "";
                                                 total += Number(filterForecastSelected != undefined ? Math.round(filterForecastSelected.totalForecast) : 0);
                                                 data[((k + 1) * 3) + 2] = filterForecastSelected != undefined ? filterForecastSelected.notes : "";
+
+                                                if ((filterForecastSelected != undefined ? Math.round(filterForecastSelected.totalForecast) : "") != "") {
+                                                    selectedForecastQty = selectedForecastQty + 1;
+                                                }
                                             }
                                             data[(regRegionList.length * 3) + 3] = 2
-                                            data[(regRegionList.length * 3) + 4] = total;
+                                            // data[(regRegionList.length * 3) + 4] = total;
+                                            data[(regRegionList.length * 3) + 4] = (selectedForecastQty == "" ? "" : total);
                                             dataArray.push(data);
                                         }
                                     }
@@ -1857,68 +1865,69 @@ class ForecastSummary extends Component {
 
 
             } else {//server version
-                // let selectedForecastProgram = this.state.programs.filter(c => c.programId == programId && c.currentVersion.versionId == versionId)[0];
-                // console.log("Test-----------------111", selectedForecastProgram);
+                let selectedForecastProgram = this.state.programs.filter(c => c.programId == programId)[0];
 
-                // let tempObj = {
-                //     forecastStartDate: (selectedForecastProgram.currentVersion.forecastStartDate ? moment(selectedForecastProgram.currentVersion.forecastStartDate).format(`MMM-YYYY`) : ''),
-                //     forecastStopDate: (selectedForecastProgram.currentVersion.forecastStopDate ? moment(selectedForecastProgram.currentVersion.forecastStopDate).format(`MMM-YYYY`) : ''),
-                // }
+                let selectedVersion = selectedForecastProgram.versionList.filter(c => c.versionId == versionId)[0];
+                console.log("Test-----------------111", selectedForecastProgram);
 
-                // selectedForecastProgram = {
-                //     ...selectedForecastProgram,
-                //     ...tempObj
-                // }
+                let tempObj = {
+                    forecastStartDate: (selectedVersion.forecastStartDate ? moment(selectedVersion.forecastStartDate).format(`MMM-YYYY`) : ''),
+                    forecastStopDate: (selectedVersion.forecastStopDate ? moment(selectedVersion.forecastStopDate).format(`MMM-YYYY`) : ''),
+                }
 
-                // let startDateSplit = selectedForecastProgram.forecastStartDate.split('-');
-                // let stopDateSplit = selectedForecastProgram.forecastStopDate.split('-');
+                selectedForecastProgram = {
+                    ...selectedForecastProgram,
+                    ...tempObj
+                }
+
+                let startDateSplit = selectedForecastProgram.forecastStartDate.split('-');
+                let stopDateSplit = selectedForecastProgram.forecastStopDate.split('-');
 
 
-                // let forecastStopDate = new Date(selectedForecastProgram.forecastStartDate);
-                // forecastStopDate.setMonth(forecastStopDate.getMonth() - 1);
+                let forecastStopDate = new Date(selectedForecastProgram.forecastStartDate);
+                forecastStopDate.setMonth(forecastStopDate.getMonth() - 1);
 
-                // let d11 = new Date(startDateSplit[1] - 3 + '-' + (new Date(selectedForecastProgram.currentVersion.forecastStartDate).getMonth() + 1) + '-01 00:00:00');
-                // d11.setMonth(d11.getMonth() - 1);
+                let d11 = new Date(startDateSplit[1] - 3 + '-' + (new Date(selectedVersion.forecastStartDate).getMonth() + 1) + '-01 00:00:00');
+                d11.setMonth(d11.getMonth() - 1);
 
-                // let d1 = new Date(selectedForecastProgram.currentVersion.forecastStartDate);
-                // let d2 = new Date(selectedForecastProgram.currentVersion.forecastStopDate);
-                // var month = [
-                //     "Jan",
-                //     "Feb",
-                //     "Mar",
-                //     "Apr",
-                //     "May",
-                //     "Jun",
-                //     "Jul",
-                //     "Aug",
-                //     "Sep",
-                //     "Oct",
-                //     "Nov",
-                //     "Dec",
-                // ]
+                let d1 = new Date(selectedVersion.forecastStartDate);
+                let d2 = new Date(selectedVersion.forecastStopDate);
+                var month = [
+                    "Jan",
+                    "Feb",
+                    "Mar",
+                    "Apr",
+                    "May",
+                    "Jun",
+                    "Jul",
+                    "Aug",
+                    "Sep",
+                    "Oct",
+                    "Nov",
+                    "Dec",
+                ]
 
-                // let startDateSplit1 = ((month[d1.getMonth()] + '-' + d1.getFullYear())).split('-');
-                // let stopDateSplit1 = ((month[d2.getMonth()] + '-' + d2.getFullYear())).split('-');
 
-                // let forecastStopDate1 = new Date((month[d1.getMonth()] + '-' + d1.getFullYear()));
-                // forecastStopDate1.setMonth(forecastStopDate1.getMonth() - 1);
-                // console.log("Test-----------------111", startDateSplit);
+                let forecastStopDate1 = new Date((month[d1.getMonth()] + '-' + d1.getFullYear()));
+                forecastStopDate1.setMonth(forecastStopDate1.getMonth() - 1);
+                console.log("Test-----------------111", startDateSplit);
 
-                // let forecastStartDateNew = selectedForecastProgram.forecastStartDate;
-                // let forecastStopDateNew = selectedForecastProgram.forecastStopDate;
+                let forecastStartDateNew = selectedForecastProgram.forecastStartDate;
+                let forecastStopDateNew = selectedForecastProgram.forecastStopDate;
 
-                // let beforeEndDateDisplay = new Date(selectedForecastProgram.forecastStartDate);
-                // beforeEndDateDisplay.setMonth(beforeEndDateDisplay.getMonth() - 1);
+                let beforeEndDateDisplay = new Date(selectedForecastProgram.forecastStartDate);
+                beforeEndDateDisplay.setMonth(beforeEndDateDisplay.getMonth() - 1);
 
-                // this.setState({
-                //     forecastPeriod: months[new Date(forecastStartDateNew).getMonth()] + ' ' + new Date(forecastStartDateNew).getFullYear() + ' ~ ' + months[new Date(forecastStopDateNew).getMonth()] + ' ' + new Date(forecastStopDateNew).getFullYear(),
-                //     rangeValue: { from: { year: new Date(forecastStartDateNew).getFullYear(), month: new Date(forecastStartDateNew).getMonth() + 1 }, to: { year: new Date(forecastStopDateNew).getFullYear(), month: new Date(forecastStopDateNew).getMonth() + 1 } },
-                //     startDateDisplay: months[new Date(forecastStartDateNew).getMonth()] + ' ' + new Date(forecastStartDateNew).getFullYear(),
-                //     endDateDisplay: months[new Date(forecastStopDateNew).getMonth()] + ' ' + new Date(forecastStopDateNew).getFullYear(),
-                //     beforeEndDateDisplay: months[new Date(beforeEndDateDisplay).getMonth()] + ' ' + new Date(beforeEndDateDisplay).getFullYear(),
-                // }, () => {
+                this.setState({
+                    forecastPeriod: months[Number(moment(forecastStartDateNew).startOf('month').format("M")) - 1] + ' ' + Number(moment(forecastStartDateNew).startOf('month').format("YYYY")) + ' ~ ' + months[Number(moment(forecastStopDateNew).startOf('month').format("M")) - 1] + ' ' + Number(moment(forecastStopDateNew).startOf('month').format("YYYY")),
+                    rangeValue: { from: { year: Number(moment(forecastStartDateNew).startOf('month').format("YYYY")), month: Number(moment(forecastStartDateNew).startOf('month').format("M")) }, to: { year: Number(moment(forecastStopDateNew).startOf('month').format("YYYY")), month: Number(moment(forecastStopDateNew).startOf('month').format("M")) } },
+                    startDateDisplay: months[new Date(forecastStartDateNew).getMonth()] + ' ' + new Date(forecastStartDateNew).getFullYear(),
+                    endDateDisplay: months[new Date(forecastStopDateNew).getMonth()] + ' ' + new Date(forecastStopDateNew).getFullYear(),
+                    beforeEndDateDisplay: months[new Date(beforeEndDateDisplay).getMonth()] + ' ' + new Date(beforeEndDateDisplay).getFullYear(),
+                }, () => {
 
-                // })
+                })
+
             }
 
         } else {
@@ -2581,7 +2590,7 @@ class ForecastSummary extends Component {
                                 <Col md="12" className="pl-lg-0" style={{ display: this.state.loading ? "none" : "block" }}>
                                     <div>
                                         {/* <p>Some text here to explain users this is not a detailed supply plan, Just high level estimate.</p> */}
-                                        <p>[Placeholder]</p>
+                                        <p>{i18n.t("static.placeholder.placeholder")}</p>
                                     </div>
                                 </Col>
                                 <Col md="12" className='pl-lg-0' style={{ display: this.state.loading ? "none" : "block" }}>
@@ -2673,25 +2682,25 @@ class ForecastSummary extends Component {
                                                                                             <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                                                             {/* <td>{item1.forecastingUnit.label.label_en}</td> */}
                                                                                             <td className='text-left  sticky-col first-col clone'>{getLabelText(item1.planningUnit.label, this.state.lang) + " | " + item1.planningUnit.id}</td>
-                                                                                            <td>{(item1.totalForecastedQuantity).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
+                                                                                            <td>{(item1.totalForecastedQuantity != null ? (item1.totalForecastedQuantity).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : '')}</td>
                                                                                             {!this.state.hideColumn &&
                                                                                                 <>
-                                                                                                    <td>{(item1.stock1).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
-                                                                                                    <td>{(item1.existingShipments).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
+                                                                                                    <td>{(item1.stock1 != null ? (item1.stock1).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : '')}</td>
+                                                                                                    <td>{(item1.existingShipments != null ? (item1.existingShipments).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : '')}</td>
                                                                                                     {/* <td>{item1.stock2}</td> */}
-                                                                                                    {item1.isStock2Red == true ? <td className="red">{(item1.stock2).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td> : <td>{(item1.stock2).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>}
-                                                                                                    <td>{(item1.desiredMonthOfStock1).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
-                                                                                                    <td>{(item1.desiredMonthOfStock2).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
+                                                                                                    {item1.isStock2Red == true ? <td className="red">{(item1.stock2 != null ? (item1.stock2).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : '')}</td> : <td>{(item1.stock2 != null ? (item1.stock2).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : '')}</td>}
+                                                                                                    <td>{(item1.desiredMonthOfStock1 != null ? (item1.desiredMonthOfStock1).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : '')}</td>
+                                                                                                    <td>{(item1.desiredMonthOfStock2 != null ? (item1.desiredMonthOfStock2).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : '')}</td>
                                                                                                 </>
                                                                                             }
-                                                                                            {item1.isProcurementGapRed == true ? <td className="red">{(item1.procurementGap).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td> : <td>{(item1.procurementGap).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>}
+                                                                                            {item1.isProcurementGapRed == true ? <td className="red">{(item1.procurementGap != null ? (item1.procurementGap).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : '')}</td> : <td>{(item1.procurementGap != null ? (item1.procurementGap).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : '')}</td>}
                                                                                             {!this.state.hideColumn &&
                                                                                                 <>
                                                                                                     {item1.isPriceTypeRed == true ? <td className="red">{item1.priceType}</td> : <td>{item1.priceType}</td>}
-                                                                                                    <td>{(item1.unitPrice).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
+                                                                                                    <td>{(item1.unitPrice != null ? (item1.unitPrice).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : '')}</td>
                                                                                                 </>
                                                                                             }
-                                                                                            <td>{(item1.procurementNeeded).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
+                                                                                            <td>{(item1.procurementNeeded != null ? (item1.procurementNeeded).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : '')}</td>
                                                                                             <td>{item1.notes}</td>
                                                                                         </>
                                                                                     }
