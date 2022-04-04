@@ -9674,7 +9674,7 @@ export default class BuildTree extends Component {
 
                                 </div>
                             </div>
-                            <div className="row">
+                            {/* <div className="row">
                                 <div className="col-md-12 pl-lg-3">
                                     <div className="col-md-12">
                                         <span className="pr-lg-0 pt-lg-0 float-left">
@@ -9683,7 +9683,7 @@ export default class BuildTree extends Component {
                                     </div>
 
                                 </div>
-                            </div>
+                            </div> */}
                         </div>
                         <CardBody className="pt-lg-1 pl-lg-0 pr-lg-0">
                             <div className="container-fluid pl-lg-3 pr-lg-3">
@@ -10160,16 +10160,16 @@ export default class BuildTree extends Component {
                                                 </div>
                                             </div>
                                         </div>
-                                        <CardFooter style={{ backgroundColor: 'transparent', borderTop: '0px solid #c8ced3', display: this.state.selectedScenario != '' ? "block" : "none" }}>
-                                            <div class="row">
+                                        {/* <CardFooter style={{ backgroundColor: 'transparent', borderTop: '0px solid #c8ced3', display: this.state.selectedScenario != '' ? "block" : "none" }}> */}
+                                            {/* <div class="row"> */}
                                                 {/* <div className="col-md-6 pl-lg-0"> <h5 style={{ color: '#BA0C2F' }}>{i18n.t('static.tree.pleaseSaveAndDoARecalculateAfterDragAndDrop.')}</h5></div> */}
-                                                <div className="col-md-6 pl-lg-0"> </div>
-                                                <div className="col-md-6 pr-lg-0"> <Button type="button" size="md" color="info" className="float-right mr-1" onClick={() => this.callAfterScenarioChange(this.state.selectedScenario)}><i className="fa fa-calculator"></i> {i18n.t('static.tree.calculated')}</Button>
+                                                {/* <div className="col-md-6 pl-lg-0"> </div> */}
+                                                {/* <div className="col-md-6 pr-lg-0"> <Button type="button" size="md" color="info" className="float-right mr-1" onClick={() => this.callAfterScenarioChange(this.state.selectedScenario)}><i className="fa fa-calculator"></i> {i18n.t('static.tree.calculated')}</Button> */}
                                                     {/* <Button type="button" size="md" color="warning" className="float-right mr-1" onClick={this.resetTree}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button> */}
                                                     {/* <Button type="button" color="success" className="mr-1 float-right" size="md" onClick={() => this.saveTreeData()}><i className="fa fa-check"> </i>{i18n.t('static.pipeline.save')}</Button> */}
-                                                </div>
-                                            </div>
-                                        </CardFooter>
+                                                {/* </div> */}
+                                            {/* </div> */}
+                                        {/* </CardFooter> */}
                                     </Form>
 
                                 </>
