@@ -146,7 +146,7 @@ export default class ExportDataset extends Component {
                 getRequest.onsuccess = function (event) {
                     var myResult = [];
                     myResult = getRequest.result;
-                    console.log("MyResult+++",myResult);
+                    console.log("MyResult+++", myResult);
                     var dTransaction = db1.transaction(['downloadedDatasetData'], 'readwrite');
                     var dProgram = dTransaction.objectStore('downloadedDatasetData');
                     var dGetRequest = dProgram.getAll();
@@ -236,52 +236,70 @@ export default class ExportDataset extends Component {
                                                                         budgetRequest.onsuccess = function (event) {
                                                                             var budgetList = [];
                                                                             budgetList = budgetRequest.result;
-                                                                            for (var i = 0; i < myResult.length; i++) {
-                                                                                for (var j = 0; j < programId.length; j++) {
-                                                                                    if (myResult[i].id == programId[j].value) {
+                                                                            var usageTemplateTransaction = db1.transaction(['usageTemplate'], 'readwrite');
+                                                                            var usageTemplateOs = usageTemplateTransaction.objectStore('usageTemplate');
+                                                                            var usageTemplateRequest = usageTemplateOs.getAll();
+                                                                            usageTemplateRequest.onsuccess = function (event) {
+                                                                                var usageTemplateList = [];
+                                                                                usageTemplateList = usageTemplateRequest.result;
 
-                                                                                        myResult[i].countryList = countryList;
-                                                                                        myResult[i].forecastingUnitList = forecastingUnitList;
-                                                                                        myResult[i].planningUnitList = planningUnitList;
-                                                                                        myResult[i].procurementUnitList = procurementUnitList;
-                                                                                        myResult[i].realmCountryList = realmCountryList;
-                                                                                        myResult[i].realmCountryPlanningUnitList = realmCountryPlanningUnitList;
-                                                                                        myResult[i].procurementAgentPlanningUnitList = procurementAgentPlanningUnitList;
-                                                                                        myResult[i].procurementAgentProcurementUnitList = procurementAgentProcurementUnitList;
-                                                                                        myResult[i].programList = programList;
-                                                                                        myResult[i].programPlanningUnitList = programPlanningUnitList;
-                                                                                        myResult[i].regionList = regionList;
-                                                                                        myResult[i].budgetList = budgetList;
-                                                                                        var programQPLResultFiltered = programQPLResult.filter(c => c.id == programId[j].value)[0];
-                                                                                        myResult[i].changed = programQPLResultFiltered.changed;
-                                                                                        // myResult[i].openCount = programQPLResultFiltered.openCount;
-                                                                                        // myResult[i].addressedCount = programQPLResultFiltered.addressedCount;
-                                                                                        myResult[i].readonly = programQPLResultFiltered.readonly;
+                                                                                var equivalencyUnitTransaction = db1.transaction(['equivalencyUnit'], 'readwrite');
+                                                                                var equivalencyUnitOs = equivalencyUnitTransaction.objectStore('equivalencyUnit');
+                                                                                var equivalencyUnitRequest = equivalencyUnitOs.getAll();
+                                                                                equivalencyUnitRequest.onsuccess = function (event) {
+                                                                                    var equivalencyUnitList = [];
+                                                                                    equivalencyUnitList = equivalencyUnitRequest.result;
 
-                                                                                        var txt = JSON.stringify(myResult[i]);
-                                                                                        var dArray = dMyResult.filter(c => c.id == programId[j].value)[0];
-                                                                                        var txt1 = JSON.stringify(dArray)
-                                                                                        // var programDataBytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
-                                                                                        // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                                                                                        var labelName = (programId[j].label).replaceAll("/", "-")
-                                                                                        // zip.file(labelName + "_" + parseInt(j + 1) + ".txt", programData);
-                                                                                        console.log("Txt ", txt);
-                                                                                        console.log("Txt 1", txt1);
-                                                                                        zip.file(labelName + "_" + parseInt(j + 1) + ".txt", txt + "@~-~@" + txt1);
+                                                                                    for (var i = 0; i < myResult.length; i++) {
+                                                                                        for (var j = 0; j < programId.length; j++) {
+                                                                                            if (myResult[i].id == programId[j].value) {
+
+                                                                                                myResult[i].countryList = countryList;
+                                                                                                myResult[i].forecastingUnitList = forecastingUnitList;
+                                                                                                myResult[i].planningUnitList = planningUnitList;
+                                                                                                myResult[i].procurementUnitList = procurementUnitList;
+                                                                                                myResult[i].realmCountryList = realmCountryList;
+                                                                                                myResult[i].realmCountryPlanningUnitList = realmCountryPlanningUnitList;
+                                                                                                myResult[i].procurementAgentPlanningUnitList = procurementAgentPlanningUnitList;
+                                                                                                myResult[i].procurementAgentProcurementUnitList = procurementAgentProcurementUnitList;
+                                                                                                myResult[i].programList = programList;
+                                                                                                myResult[i].programPlanningUnitList = programPlanningUnitList;
+                                                                                                myResult[i].regionList = regionList;
+                                                                                                myResult[i].budgetList = budgetList;
+                                                                                                myResult[i].usageTemplateList = usageTemplateList;
+                                                                                                myResult[i].equivalencyUnitList = equivalencyUnitList;
+                                                                                                var programQPLResultFiltered = programQPLResult.filter(c => c.id == programId[j].value)[0];
+                                                                                                myResult[i].changed = programQPLResultFiltered.changed;
+                                                                                                // myResult[i].openCount = programQPLResultFiltered.openCount;
+                                                                                                // myResult[i].addressedCount = programQPLResultFiltered.addressedCount;
+                                                                                                myResult[i].readonly = programQPLResultFiltered.readonly;
+
+                                                                                                var txt = JSON.stringify(myResult[i]);
+                                                                                                var dArray = dMyResult.filter(c => c.id == programId[j].value)[0];
+                                                                                                var txt1 = JSON.stringify(dArray)
+                                                                                                // var programDataBytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
+                                                                                                // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                                                                                                var labelName = (programId[j].label).replaceAll("/", "-")
+                                                                                                // zip.file(labelName + "_" + parseInt(j + 1) + ".txt", programData);
+                                                                                                console.log("Txt ", txt);
+                                                                                                console.log("Txt 1", txt1);
+                                                                                                zip.file(labelName + "_" + parseInt(j + 1) + ".txt", txt + "@~-~@" + txt1);
+                                                                                            }
+                                                                                        }
+                                                                                        if (i == myResult.length - 1) {
+                                                                                            zip.generateAsync({
+                                                                                                type: "blob"
+                                                                                            }).then(function (content) {
+                                                                                                FileSaver.saveAs(content, "download.zip");
+                                                                                                let id = AuthenticationService.displayDashboardBasedOnRole();
+                                                                                                this.setState({ loading: false });
+                                                                                                this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/green/' + i18n.t('static.program.dataexportsuccess'))
+
+                                                                                            }.bind(this));
+                                                                                        }
                                                                                     }
-                                                                                }
-                                                                                if (i == myResult.length - 1) {
-                                                                                    zip.generateAsync({
-                                                                                        type: "blob"
-                                                                                    }).then(function (content) {
-                                                                                        FileSaver.saveAs(content, "download.zip");
-                                                                                        let id = AuthenticationService.displayDashboardBasedOnRole();
-                                                                                        this.setState({ loading: false });
-                                                                                        this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/green/' + i18n.t('static.program.dataexportsuccess'))
-
-                                                                                    }.bind(this));
-                                                                                }
-                                                                            }
+                                                                                }.bind(this)
+                                                                            }.bind(this)
                                                                         }.bind(this)
                                                                     }.bind(this)
                                                                 }.bind(this)
@@ -292,9 +310,9 @@ export default class ExportDataset extends Component {
                                             }.bind(this)
                                         }.bind(this)
                                     }.bind(this)
-                                }.bind(this)
+                                }.bind(this);
                             }.bind(this)
-                        }.bind(this);
+                        }.bind(this)
                     }.bind(this)
                 }.bind(this)
             }.bind(this)

@@ -252,6 +252,10 @@ export default class ImportDataset extends Component {
                                                 delete json.regionList;
                                                 var budgetList = json.budgetList;
                                                 delete json.budgetList;
+                                                var usageTemplateList = json.usageTemplateList;
+                                                delete json.usageList;
+                                                var equivalencyUnitList = json.equivalencyUnitList;
+                                                delete json.equivalencyUnitList;
 
                                                 var countryTransaction = db1.transaction(['country'], 'readwrite');
                                                 console.log("M sync country transaction start")
@@ -347,6 +351,20 @@ export default class ImportDataset extends Component {
                                                 for (var i = 0; i < budgetList.length; i++) {
                                                     console.log("M sync in for", i)
                                                     budgetObjectStore.put(budgetList[i]);
+                                                }
+
+                                                var usageTemplateTransaction = db1.transaction(['usageTemplate'], 'readwrite');
+                                                var usageTemplateObjectStore = usageTemplateTransaction.objectStore('usageTemplate');
+                                                for (var i = 0; i < usageTemplateList.length; i++) {
+                                                    console.log("M sync in for", i)
+                                                    usageTemplateObjectStore.put(usageTemplateList[i]);
+                                                }
+
+                                                var equivalencyUnitTransaction = db1.transaction(['equivalencyUnit'], 'readwrite');
+                                                var equivalencyUnitObjectStore = equivalencyUnitTransaction.objectStore('equivalencyUnit');
+                                                for (var i = 0; i < equivalencyUnitList.length; i++) {
+                                                    console.log("M sync in for", i)
+                                                    equivalencyUnitObjectStore.put(equivalencyUnitList[i]);
                                                 }
 
                                                 var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
@@ -471,6 +489,10 @@ export default class ImportDataset extends Component {
                                                                 delete json.regionList;
                                                                 var budgetList = json.budgetList;
                                                                 delete json.budgetList;
+                                                                var usageTemplateList = json.usageTemplateList;
+                                                                delete json.usageList;
+                                                                var equivalencyUnitList = json.equivalencyUnitList;
+                                                                delete json.equivalencyUnitList;
 
                                                                 var countryTransaction = db1.transaction(['country'], 'readwrite');
                                                                 console.log("M sync country transaction start")
@@ -566,6 +588,20 @@ export default class ImportDataset extends Component {
                                                                 for (var i = 0; i < budgetList.length; i++) {
                                                                     console.log("M sync in for", i)
                                                                     budgetObjectStore.put(budgetList[i]);
+                                                                }
+
+                                                                var usageTemplateTransaction = db1.transaction(['usageTemplate'], 'readwrite');
+                                                                var usageTemplateObjectStore = usageTemplateTransaction.objectStore('usageTemplate');
+                                                                for (var i = 0; i < usageTemplateList.length; i++) {
+                                                                    console.log("M sync in for", i)
+                                                                    usageTemplateObjectStore.put(usageTemplateList[i]);
+                                                                }
+
+                                                                var equivalencyUnitTransaction = db1.transaction(['equivalencyUnit'], 'readwrite');
+                                                                var equivalencyUnitObjectStore = equivalencyUnitTransaction.objectStore('equivalencyUnit');
+                                                                for (var i = 0; i < equivalencyUnitList.length; i++) {
+                                                                    console.log("M sync in for", i)
+                                                                    equivalencyUnitObjectStore.put(equivalencyUnitList[i]);
                                                                 }
 
 
