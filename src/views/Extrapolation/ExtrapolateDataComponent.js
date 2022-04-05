@@ -432,6 +432,8 @@ export default class ExtrapolateDataComponent extends React.Component {
         var startMonth = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
         var dataArray = [];
         var data = [];
+        console.log("monthArray",monthArray)
+        
         var consumptionDataArr = [];
         for (var j = 0; j < monthArray.length; j++) {
             data = [];
@@ -688,7 +690,12 @@ export default class ExtrapolateDataComponent extends React.Component {
         var inputDataTes = [];
         for (var j = 0; moment(curDate).format("YYYY-MM") < moment(stopDate).format("YYYY-MM"); j++) {
             curDate = moment(startDate).startOf('month').add(j, 'months').format("YYYY-MM-DD");
-            var consumptionData = actualConsumptionList.filter(c => moment(c.month).format("YYYY-MM") == moment(curDate).format("YYYY-MM") && c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId)
+          console.log("actualConsumptionList",actualConsumptionList);
+        //   var consumptionData = actualConsumptionList.filter(c => moment(c.month).format("YYYY-MM") == moment(curDate).format("YYYY-MM") && c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId)
+       
+          var consumptionData = actualConsumptionList.filter(c => moment(c.month).format("YYYY-MM") == moment(curDate).format("YYYY-MM"))
+        //    && c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId)
+           console.log("consumptionData--->",consumptionData)
             inputDataMovingAvg.push({ "month": inputDataMovingAvg.length + 1, "actual": consumptionData.length > 0 ? Number(consumptionData[0].amount) : null, "forecast": null })
             inputDataSemiAverage.push({ "month": inputDataSemiAverage.length + 1, "actual": consumptionData.length > 0 ? Number(consumptionData[0].amount) : null, "forecast": null })
             inputDataLinearRegression.push({ "month": inputDataLinearRegression.length + 1, "actual": consumptionData.length > 0 ? Number(consumptionData[0].amount) : null, "forecast": null })
@@ -1115,7 +1122,8 @@ export default class ExtrapolateDataComponent extends React.Component {
                 planningUnitId: planningUnitId,
                 showData: false
                 }, () => {
-                    this.showDataOnPlanningAndRegionChange();
+                    this.setExtrapolatedParameters();
+                  //  this.showDataOnPlanningAndRegionChange();
             })
         }
     }
@@ -1139,7 +1147,8 @@ export default class ExtrapolateDataComponent extends React.Component {
                 regionId: regionId,
                 showData: false
                 }, () => {
-                    this.showDataOnPlanningAndRegionChange();
+                    this.setExtrapolatedParameters();
+                 //   this.showDataOnPlanningAndRegionChange();
             })
         }
     }
@@ -1166,6 +1175,18 @@ export default class ExtrapolateDataComponent extends React.Component {
             var actualConsumptionList = datasetJson.actualConsumptionList.filter(c => moment(c.month).format("YYYY-MM") >= moment(startDate1).format("YYYY-MM") && moment(c.month).format("YYYY-MM") <= moment(stopDate1).format("YYYY-MM"));
             var startDate = moment(datasetJson.currentVersion.forecastStartDate).format("YYYY-MM-DD");
             var stopDate = moment(datasetJson.currentVersion.forecastStopDate).format("YYYY-MM-DD");
+            var minStartDate = startDate1;
+            var maxStopDate = stopDate1;
+          
+            if (moment(startDate1).format("YYYY-MM") > moment(startDate).format("YYYY-MM")) {
+                minStartDate = startDate;
+            }
+            if (moment(stopDate1).format("YYYY-MM") < moment(stopDate).format("YYYY-MM")) {
+                maxStopDate = stopDate;
+            }
+            var monthArray = [];
+            var curDate1 = minStartDate;
+    
         var monthsForMovingAverage = this.state.monthsForMovingAverage;
         var consumptionExtrapolationFiltered = consumptionExtrapolationList.filter(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId);
         var consumptionExtrapolationData = consumptionExtrapolationList.filter(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId && c.extrapolationMethod.id == 6)//Semi Averages
@@ -1201,6 +1222,18 @@ export default class ExtrapolateDataComponent extends React.Component {
             gamma = consumptionExtrapolationTESL[0].jsonProperties.gamma;
             smoothingId = true;
         }
+        let curDate = startDate;
+
+var inputDataMovingAvg = [];
+var inputDataSemiAverage = [];
+var inputDataLinearRegression = [];
+var inputDataTes = [];
+        for (var m = 0; curDate1 < moment(maxStopDate).add(-1, 'months').format("YYYY-MM-DD"); m++) {
+            curDate1 = moment(minStartDate).add(m, 'months').format("YYYY-MM-DD");
+            monthArray.push(curDate1);
+           var extrapolationDataMovingAvg= consumptionExtrapolationMovingData[0].extrapolationDataList.filter(e => moment(e.month).format("YYYY-MM") == moment(curDate).format("YYYY-MM"));
+            inputDataMovingAvg.push({ "month": inputDataMovingAvg.length + 1, "actual": extrapolationDataMovingAvg.length > 0 ? Number(extrapolationDataMovingAvg[0].amount) : null, "forecast": null })            
+        }
         this.setState({
             actualConsumptionList: actualConsumptionList,
             startDate: startDate,
@@ -1220,13 +1253,14 @@ export default class ExtrapolateDataComponent extends React.Component {
             linearRegressionId: linearRegressionId,
             smoothingId: smoothingId,
             arimaId: arimaId,
-            movingAvgData:consumptionExtrapolationMovingData,
+            movingAvgData:inputDataMovingAvg,
             semiAvgData:consumptionExtrapolationFiltered,
             linearRegressionData:consumptionExtrapolationRegression,
             tesData:consumptionExtrapolationTESL,
             noDataMessage: "",
             dataChanged: true,
-            loading: false
+            loading: false,
+            monthArray:monthArray
         }, () => {
             this.buildActualJxl();
         })
@@ -1267,6 +1301,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                             let startDate1 = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
                             let stopDate1 = rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
                             var actualConsumptionList = datasetJson.actualConsumptionList.filter(c => moment(c.month).format("YYYY-MM") >= moment(startDate1).format("YYYY-MM") && moment(c.month).format("YYYY-MM") <= moment(stopDate1).format("YYYY-MM"));
+                            console.log("actualConsumptionList--->",actualConsumptionList)
                             var startDate = moment(datasetJson.currentVersion.forecastStartDate).format("YYYY-MM-DD");
                             var stopDate = moment(datasetJson.currentVersion.forecastStopDate).format("YYYY-MM-DD");
                             var consumptionExtrapolationList = datasetJson.consumptionExtrapolation;
@@ -1573,6 +1608,7 @@ export default class ExtrapolateDataComponent extends React.Component {
             var semiAvgDataFilter = this.state.semiAvgData.filter(c => moment(startMonth).add(c.month - 1, 'months').format("YYYY-MM") == moment(monthArray[j]).format("YYYY-MM"))
             var linearRegressionDataFilter = this.state.linearRegressionData.filter(c => moment(startMonth).add(c.month - 1, 'months').format("YYYY-MM") == moment(monthArray[j]).format("YYYY-MM"))
             var tesDataFilter = this.state.tesData.filter(c => moment(startMonth).add(c.month - 1, 'months').format("YYYY-MM") == moment(monthArray[j]).format("YYYY-MM"))
+            console.log("consumptionData--->",consumptionData)
             B.push(
                 moment(monthArray[j]).format(DATE_FORMAT_CAP_WITHOUT_DATE).toString().replaceAll(',', ' ').replaceAll(' ', '%20'),
                 consumptionData.length > 0 ? consumptionData[0].amount : "")
