@@ -811,7 +811,6 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
             var endMonthVal = endValList[0].month;
             notes += regionList[r].label + " " + moment(monthArray[j].date).format("YYYY-MM");
             //y=y1+(x-x1)*(y2-y1)/(x2-x1);
-            // missingActualConsumption = startValKaAmount +( currentMonthAndStartMonthKaDifference ((endValKaAmount - startValKaAmount)/ endMonthAndStartMonthKaDiffrence))
             const monthDifference = moment(new Date(monthArray[j].date)).diff(new Date(startMonthVal), 'months', true);
             const monthDiff = moment(new Date(endMonthVal)).diff(new Date(startMonthVal), 'months', true);
             var missingActualConsumption = Number(startVal) + (monthDifference * ((Number(endVal) - Number(startVal)) / monthDiff));
@@ -1492,12 +1491,14 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                     }
                     planningUnitTotalListRegion.push({ planningUnitId: planningUnitList[cul].planningUnit.id, month: curDate, qty: qty != "" ? Math.round(qty) : "", qtyInPU: qtyInPU != "" ? Math.round(qtyInPU) : "", reportingRate: reportingRate, region: regionList[r], multiplier: multiplier, actualConsumption: actualConsumption, daysOfStockOut: daysOfStockOut, noOfDays: noOfDays })
            console.log("planningUnitTotalListRegion-->",planningUnitTotalListRegion);
-                    if (qty != "") {
+                    if (qty !== "") {
                       totalQty = Number(totalQty) + Number(qty);
                       totalQtyPU = Number(totalQtyPU) + Number(qtyInPU);
                     }
                   }
-                  planningUnitTotalList.push({ planningUnitId: planningUnitList[cul].planningUnit.id, month: curDate, qty: totalQty != "" ? Math.round(totalQty) : "", qtyInPU: totalQtyPU != "" ? Math.round(totalQtyPU) : "" })
+                  console.log("&&totalQty--->",totalQty)
+                  planningUnitTotalList.push({ planningUnitId: planningUnitList[cul].planningUnit.id, month: curDate, qty: totalQty !== "" ? Math.round(totalQty) : "", qtyInPU: totalQtyPU != "" ? Math.round(totalQtyPU) : "" })
+                 console.log("&&planningUnitTotalList------>",planningUnitTotalList)
                   totalPlanningUnit += totalQty;
                   totalPlanningUnitPU += totalQtyPU;
                 }
