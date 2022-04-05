@@ -7,7 +7,7 @@ import {
   CardFooter, Button, Col, Form, InputGroup, Modal, ModalHeader, ModalBody, ModalFooter, FormFeedback
 } from 'reactstrap';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, DATE_FORMAT_CAP_WITHOUT_DATE, DATE_FORMAT_CAP, TITLE_FONT, JEXCEL_DECIMAL_CATELOG_PRICE } from '../../Constants.js'
+import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, DATE_FORMAT_CAP_WITHOUT_DATE, DATE_FORMAT_CAP, TITLE_FONT, JEXCEL_DECIMAL_CATELOG_PRICE, SPECIAL_CHARECTER_WITH_NUM } from '../../Constants.js'
 import getLabelText from '../../CommonComponent/getLabelText'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import i18n from '../../i18n';
@@ -30,6 +30,7 @@ import jsPDF from 'jspdf';
 import { LOGO } from "../../CommonComponent/Logo";
 import { green } from "@material-ui/core/colors";
 import { red } from "@material-ui/core/colors";
+import * as Yup from 'yup';
 
 const entityname = i18n.t('static.dashboard.dataEntryAndAdjustment');
 const initialValues = {
@@ -2359,8 +2360,8 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                       </FormGroup>
                       <FormGroup className="col-md-6" id="otherUnitNameDiv" style={{ display: this.state.showOtherUnitNameField ? 'block' : 'none' }}>
                         <Label htmlFor="appendedInputButton">{i18n.t('static.common.otherUnitName')}</Label>
-                        <div className="controls ">
-                          <InputGroup>
+                        {/* <div className="controls "> */}
+                          {/* <InputGroup> */}
                             <Input
                               type="text"
                               name="otherUnitName"
@@ -2374,13 +2375,13 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                             // onChange={(e) => this.setState({ consumptionChanged: true })}
                             >
                             </Input>
-                          </InputGroup>
-                        </div>
+                          {/* </InputGroup> */}
+                        {/* </div> */}
                         <FormFeedback className="red">{errors.otherUnitName}</FormFeedback>
                       </FormGroup>
                       <FormGroup className="col-md-6" style={{ display: this.state.showDetailTable ? 'block' : 'none' }}>
                         <Label htmlFor="appendedInputButton">{i18n.t('static.importFromQATSupplyPlan.multiplierTo')}</Label>
-                        <InputGroup>
+                        {/* <InputGroup> */}
                           <Input
                             className="controls"
                             type="number"
@@ -2399,7 +2400,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                             required
                           >
                           </Input>
-                        </InputGroup>
+                        {/* </InputGroup> */}
                         <FormFeedback className="red">{errors.otherUnitMultiplier}</FormFeedback>
                       </FormGroup>
                     </ModalBody>
