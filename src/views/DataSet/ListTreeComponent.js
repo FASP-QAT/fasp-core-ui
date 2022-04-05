@@ -1238,7 +1238,7 @@ export default class ListTreeComponent extends Component {
                                                             className="addtreebg"
                                                             onChange={(e) => { this.onTemplateChange(e) }}
                                                         >
-                                                            <option value="" disabled selected hidden>Select option</option>
+                                                            <option value="" disabled selected hidden>Select</option>
                                                             {/* <option value="">{i18n.t('static.tree.+AddTree')}</option> */}
                                                             <option value="0">+ {i18n.t('static.tree.blank')}</option>
                                                             {treeTemplates}
