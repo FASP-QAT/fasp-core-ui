@@ -114,6 +114,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       }, () => {
         var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF', 'AG', 'AH', 'AI', 'AJ', 'AK', 'AL', 'AM', 'AN']
         var consumptionList = this.state.consumptionList;
+        console.log("consumptionList All--->",consumptionList)
         var consumptionUnit = {};
         var consumptionNotes = "";
         if (consumptionUnitId > 0) {
@@ -161,6 +162,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           }
         }
         consumptionList = consumptionList.filter(c => c.planningUnit.id == consumptionUnitId);
+        console.log("consumptionList---->",consumptionList);
         var monthArray = this.state.monthArray;
         var regionList = this.state.regionList;
         let dataArray = [];
@@ -809,7 +811,6 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
             var endMonthVal = endValList[0].month;
             notes += regionList[r].label + " " + moment(monthArray[j].date).format("YYYY-MM");
             //y=y1+(x-x1)*(y2-y1)/(x2-x1);
-            // missingActualConsumption = startValKaAmount +( currentMonthAndStartMonthKaDifference ((endValKaAmount - startValKaAmount)/ endMonthAndStartMonthKaDiffrence))
             const monthDifference = moment(new Date(monthArray[j].date)).diff(new Date(startMonthVal), 'months', true);
             const monthDiff = moment(new Date(endMonthVal)).diff(new Date(startMonthVal), 'months', true);
             var missingActualConsumption = Number(startVal) + (monthDifference * ((Number(endVal) - Number(startVal)) / monthDiff));
@@ -880,6 +881,8 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
           var curUser = AuthenticationService.getLoggedInUserId();
           var consumptionUnit = this.state.selectedConsumptionUnitObject;
+          var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF', 'AG', 'AH', 'AI', 'AJ', 'AK', 'AL', 'AM', 'AN']
+         console.log("this.state.consumptionList",this.state.consumptionList);
           var fullConsumptionList = this.state.consumptionList.filter(c => c.planningUnit.id != consumptionUnit.planningUnit.id);
           if (this.state.selectedConsumptionUnitId == 0) {
             var json = this.state.smallTableEl.getJson(null, false);
@@ -936,22 +939,27 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           var monthArray = this.state.monthArray;
           var regionList = this.state.regionList;
           for (var i = 0; i < monthArray.length; i++) {
+
             var columnData = elInstance.getColumnData([i + 1]);
             var actualConsumptionCount = 2;
             var reportingRateCount = 3;
             var daysOfStockOutCount = 4;
             for (var r = 0; r < regionList.length; r++) {
+              console.log("&&&&&&&&&&MonthList",monthArray[i]);
               var index = 0;
               index = fullConsumptionList.findIndex(c => c.planningUnit.id == consumptionUnit.planningUnit.id && c.region.id == regionList[r].regionId && moment(c.month).format("YYYY-MM") == moment(monthArray[i].date).format("YYYY-MM"));
-              
-              if (columnData[actualConsumptionCount] > 0) {
+              var actualConsumptionValue = elInstance.getValue(`${colArr[i+1]}${parseInt(actualConsumptionCount) + 1}`, true).replaceAll(",","");        
+              var reportingRateValue = elInstance.getValue(`${colArr[i+1]}${parseInt(reportingRateCount) + 1}`, true);        
+              var daysOfStockOutValue = elInstance.getValue(`${colArr[i+1]}${parseInt(daysOfStockOutCount) + 1}`, true);        
+              console.log("&&&&&&&&&&ActualConsumptionValue",actualConsumptionValue);
+              if (actualConsumptionValue !== "") {
                 if (index != -1) {
-                  fullConsumptionList[index].amount = columnData[actualConsumptionCount];
-                  fullConsumptionList[index].reportingRate = columnData[reportingRateCount];
-                  fullConsumptionList[index].daysOfStockOut = columnData[daysOfStockOutCount];
+                  fullConsumptionList[index].amount = actualConsumptionValue;
+                  fullConsumptionList[index].reportingRate = reportingRateValue;
+                  fullConsumptionList[index].daysOfStockOut = daysOfStockOutValue;
                 } else {
                   var json = {
-                    amount: columnData[actualConsumptionCount],
+                    amount: actualConsumptionValue,
                     planningUnit: {
                       id: consumptionUnit.planningUnit.id,
                       label: consumptionUnit.planningUnit.label
@@ -960,20 +968,20 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                       userId: curUser
                     },
                     createdDate: curDate,
-                    daysOfStockOut: columnData[daysOfStockOutCount],
+                    daysOfStockOut: daysOfStockOutValue,
                     exculde: false,
                     forecastConsumptionId: 0,
-                    month: moment(monthArray[i].date).format("YYYY-MM-DD"),
+                    month: moment(monthArray[i].date).startOf('month').format("YYYY-MM-DD"),
                     region: {
                       id: regionList[r].regionId,
                       label: regionList[r].label
                     },
-                    reportingRate: columnData[reportingRateCount]
+                    reportingRate: reportingRateValue
                   }
                   fullConsumptionList.push(json);
                 }
               }
-              console.log("fullConsumptionList---->",fullConsumptionList);
+              console.log("&&&&&&&&&&fullConsumptionList---->",fullConsumptionList);
               actualConsumptionCount += 8;
               reportingRateCount += 8;
               daysOfStockOutCount += 8
@@ -1456,7 +1464,10 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                     var reportingRate = "";
                     var actualConsumption = "";
                     var daysOfStockOut = ""
+                    console.log("consumptionDataForMonth--------->",consumptionDataForMonth)
                     if (consumptionDataForMonth.length > 0) {
+                      console.log("consumptionDataForMonth--------->",consumptionDataForMonth)
+                  
                       var c = consumptionDataForMonth[0];
                       reportingRate = c.reportingRate > 0 ? c.reportingRate : 100;
                       actualConsumption = c.amount;
@@ -1479,12 +1490,15 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                       qtyInPU = ""
                     }
                     planningUnitTotalListRegion.push({ planningUnitId: planningUnitList[cul].planningUnit.id, month: curDate, qty: qty != "" ? Math.round(qty) : "", qtyInPU: qtyInPU != "" ? Math.round(qtyInPU) : "", reportingRate: reportingRate, region: regionList[r], multiplier: multiplier, actualConsumption: actualConsumption, daysOfStockOut: daysOfStockOut, noOfDays: noOfDays })
-                    if (qty != "") {
+           console.log("planningUnitTotalListRegion-->",planningUnitTotalListRegion);
+                    if (qty !== "") {
                       totalQty = Number(totalQty) + Number(qty);
                       totalQtyPU = Number(totalQtyPU) + Number(qtyInPU);
                     }
                   }
-                  planningUnitTotalList.push({ planningUnitId: planningUnitList[cul].planningUnit.id, month: curDate, qty: totalQty != "" ? Math.round(totalQty) : "", qtyInPU: totalQtyPU != "" ? Math.round(totalQtyPU) : "" })
+                  console.log("&&totalQty--->",totalQty)
+                  planningUnitTotalList.push({ planningUnitId: planningUnitList[cul].planningUnit.id, month: curDate, qty: totalQty !== "" ? Math.round(totalQty) : "", qtyInPU: totalQtyPU != "" ? Math.round(totalQtyPU) : "" })
+                 console.log("&&planningUnitTotalList------>",planningUnitTotalList)
                   totalPlanningUnit += totalQty;
                   totalPlanningUnitPU += totalQtyPU;
                 }
