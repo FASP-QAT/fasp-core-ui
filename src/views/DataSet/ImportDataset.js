@@ -252,9 +252,9 @@ export default class ImportDataset extends Component {
                                                 delete json.regionList;
                                                 var budgetList = json.budgetList;
                                                 delete json.budgetList;
-                                                var usageTemplateList = json.usageTemplateList;
+                                                var usageTemplateList = json.usageTemplateList!=undefined?json.usageTemplateList:[];
                                                 delete json.usageList;
-                                                var equivalencyUnitList = json.equivalencyUnitList;
+                                                var equivalencyUnitList = json.equivalencyUnitList!=undefined?json.equivalencyUnitList:[];
                                                 delete json.equivalencyUnitList;
 
                                                 var countryTransaction = db1.transaction(['country'], 'readwrite');
