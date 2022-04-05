@@ -4832,7 +4832,7 @@ export default class BuildTree extends Component {
             cursorItem: nodeId
         }, () => {
             console.log("on add items-------", this.state.items);
-            this.calculateMOMData(newItem.id, 0);
+            this.calculateMOMData(newItem.id, 2);
             // this.calculateValuesForAggregateNode(this.state.items);
         });
     }
@@ -6397,7 +6397,7 @@ export default class BuildTree extends Component {
             }
             fuNode.usageType = usageType;
             (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode = fuNode;
-            console.log("currentItemConfig for repeat---",currentItemConfig);
+            console.log("currentItemConfig for repeat---", currentItemConfig);
         }
 
 
@@ -7833,8 +7833,23 @@ export default class BuildTree extends Component {
                                                 </Input>
                                                 <FormFeedback className="red">{errors.sharePlanningUnit}</FormFeedback>
                                             </FormGroup>
-                                            {/* {(this.state.currentItemConfig.context.payload.nodeType.id == 5) && */}
-                                            {/* <> */}
+                                            {this.state.currentItemConfig.context.payload.nodeType.id == 5 && <>
+                                                <FormGroup className="col-md-2" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 5 ? 'block' : 'none' }}>
+                                                    <Label htmlFor="currencyId">{this.state.currentItemConfig.parentItem != null && (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode != null && (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.usageType.id == 2 ? "QAT Calculated PU per interval per " : "QAT Calculated PU per usage per "}{this.state.currentItemConfig.parentItem != null && this.state.currentItemConfig.parentItem.parent != null && this.state.unitList.filter(c => c.unitId == this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id).length > 0 && this.state.unitList.filter(c => c.unitId == this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id)[0].label.label_en}?</Label>
+                                                </FormGroup>
+                                                <FormGroup className="col-md-10" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 5 ? 'block' : 'none' }}>
+                                                    <Input type="number"
+                                                        id="puPerVisitQATCalculated"
+                                                        name="puPerVisitQATCalculated"
+                                                        readOnly={true}
+                                                        bsSize="sm"
+                                                        value={this.state.currentItemConfig.parentItem != null && (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode != null ? (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.usageType.id == 2 ?
+                                                            addCommas(this.state.currentItemConfig.context.payload.nodeDataMap[0][0].puNode.puPerVisit) :
+                                                            (this.state.currentItemConfig.context.payload.nodeDataMap[0][0].puNode.sharePlanningUnit == "true" || this.state.currentItemConfig.context.payload.nodeDataMap[0][0].puNode.sharePlanningUnit == true ?
+                                                                addCommas(this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor) :
+                                                                this.round((this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor))) : ''}>
+                                                    </Input>
+                                                </FormGroup></>}
                                             <FormGroup className="col-md-2" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 5 ? 'block' : 'none' }}>
                                                 <Label htmlFor="currencyId">{this.state.currentItemConfig.parentItem != null && this.state.parentScenario.fuNode != null && this.state.parentScenario.fuNode.usageType.id == 2 ? "How many PU per interval per " : "How many PU per usage per "}{this.state.currentItemConfig.parentItem != null && this.state.currentItemConfig.parentItem.parent != null && this.state.unitList.filter(c => c.unitId == this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id).length > 0 && this.state.unitList.filter(c => c.unitId == this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id)[0].label.label_en}?</Label>
                                             </FormGroup>
@@ -8254,7 +8269,7 @@ export default class BuildTree extends Component {
                                                             id="repeatUsagePeriodId"
                                                             name="repeatUsagePeriodId"
                                                             bsSize="sm"
-                                                            valid={!errors.repeatUsagePeriodId && this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentScenario.fuNode.usageType.id == 1 && (this.state.currentScenario.fuNode.oneTimeUsage == "false" || this.state.currentScenario.fuNode.oneTimeUsage == false) ? (this.state.currentScenario.fuNode.repeatUsagePeriod != ''  && this.state.currentScenario.fuNode.repeatUsagePeriod != null && this.state.currentScenario.fuNode.repeatUsagePeriod.usagePeriodId != undefined && this.state.currentScenario.fuNode.repeatUsagePeriod.usagePeriodId != null && this.state.currentScenario.fuNode.repeatUsagePeriod.usagePeriodId != '') : !errors.repeatUsagePeriodId}
+                                                            valid={!errors.repeatUsagePeriodId && this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentScenario.fuNode.usageType.id == 1 && (this.state.currentScenario.fuNode.oneTimeUsage == "false" || this.state.currentScenario.fuNode.oneTimeUsage == false) ? (this.state.currentScenario.fuNode.repeatUsagePeriod != '' && this.state.currentScenario.fuNode.repeatUsagePeriod != null && this.state.currentScenario.fuNode.repeatUsagePeriod.usagePeriodId != undefined && this.state.currentScenario.fuNode.repeatUsagePeriod.usagePeriodId != null && this.state.currentScenario.fuNode.repeatUsagePeriod.usagePeriodId != '') : !errors.repeatUsagePeriodId}
                                                             invalid={touched.repeatUsagePeriodId && !!errors.repeatUsagePeriodId}
                                                             onBlur={handleBlur}
                                                             onChange={(e) => {
