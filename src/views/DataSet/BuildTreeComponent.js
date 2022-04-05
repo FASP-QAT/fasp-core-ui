@@ -891,7 +891,7 @@ export default class BuildTree extends Component {
         var levelNo = "";
         if (data != "") {
             console.log("Data@@@@###############", data.context.levels[0])
-            var treeLevelList = this.state.curTreeObj.levelList;
+            var treeLevelList = this.state.curTreeObj.levelList != undefined ? this.state.curTreeObj.levelList : [];
             var levelListFiltered = treeLevelList.filter(c => c.levelNo == data.context.levels[0]);
             levelNo = data.context.levels[0]
             if (levelListFiltered.length > 0) {
@@ -925,7 +925,7 @@ export default class BuildTree extends Component {
 
     levelDeatilsSaved() {
         const { curTreeObj } = this.state;
-        var treeLevelList = this.state.curTreeObj.levelList;
+        var treeLevelList = this.state.curTreeObj.levelList != undefined ? this.state.curTreeObj.levelList : [];
         var levelListFiltered = treeLevelList.findIndex(c => c.levelNo == this.state.levelNo);
         var items = this.state.items;
         if (levelListFiltered != -1) {
@@ -4242,7 +4242,7 @@ export default class BuildTree extends Component {
     exportPDF = () => {
         let treeLevel = this.state.items.length;
         var treeLevelItems = [];
-        var treeLevels = this.state.curTreeObj.forecastMethod.id != "" ? this.state.curTreeObj.levelList : [];
+        var treeLevels = this.state.curTreeObj.forecastMethod.id != "" && this.state.curTreeObj.levelList != undefined ? this.state.curTreeObj.levelList : [];
         for (var i = 0; i <= treeLevel; i++) {
             var treeLevelFiltered = treeLevels.filter(c => c.levelNo == i);
             if (i == 0) {
@@ -6458,7 +6458,7 @@ export default class BuildTree extends Component {
         newItem.parent = parent;
         newItem.id = nodeId;
         const { curTreeObj } = this.state;
-        var treeLevelList = curTreeObj.levelList;
+        var treeLevelList = curTreeObj.levelList != undefined ? curTreeObj.levelList : [];
         var levelListFiltered = treeLevelList.findIndex(c => c.levelNo == parseInt(itemConfig.context.level + 1));
         if (levelListFiltered == -1) {
             var label = {}
@@ -6564,7 +6564,7 @@ export default class BuildTree extends Component {
         newItem.parent = itemConfig.context.parent;
         newItem.id = nodeId;
         const { curTreeObj } = this.state;
-        var treeLevelList = curTreeObj.levelList;
+        var treeLevelList = curTreeObj.levelList != undefined ? curTreeObj.levelList : [];
         var levelListFiltered = treeLevelList.findIndex(c => c.levelNo == parseInt(itemConfig.context.level + 1));
         if (levelListFiltered == -1) {
             var label = {}
@@ -6924,7 +6924,7 @@ export default class BuildTree extends Component {
         const { curTreeObj } = this.state;
 
         var treeLevelList = curTreeObj.levelList;
-        if (currentItemConfig.context.level == 0) {
+        if (currentItemConfig.context.level == 0 && treeLevelList != undefined) {
             var levelListFiltered = treeLevelList.findIndex(c => c.levelNo == parseInt(currentItemConfig.context.level));
             if (levelListFiltered != -1) {
                 var unitId = currentItemConfig.context.payload.nodeType.id == 4 ? currentItemConfig.parentItem.payload.nodeUnit.id : currentItemConfig.context.payload.nodeUnit.id;
@@ -9478,7 +9478,7 @@ export default class BuildTree extends Component {
                                 tempArray.push(tempJson);
                                 nodeDataMap[this.state.selectedScenario] = tempArray;
                                 console.log("itemConfig.level@@@@@@@@@@@@#################@@@@@@@@@@@@", itemConfig.level);
-                                var getLevelUnit = this.state.curTreeObj.levelList.filter(c => c.levelNo == itemConfig.level + 1);
+                                var getLevelUnit = this.state.curTreeObj.levelList != undefined ? this.state.curTreeObj.levelList.filter(c => c.levelNo == itemConfig.level + 1) : [];
                                 var levelUnitId = ""
                                 if (getLevelUnit.length > 0) {
                                     levelUnitId = getLevelUnit[0].unit != null ? getLevelUnit[0].unit.id : "";
