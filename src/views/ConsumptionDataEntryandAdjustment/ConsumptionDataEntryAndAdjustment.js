@@ -948,6 +948,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
           var curUser = AuthenticationService.getLoggedInUserId();
           var consumptionUnit = this.state.selectedConsumptionUnitObject;
+          console.log("save consumptionUnit----", consumptionUnit)
           var fullConsumptionList = this.state.consumptionList.filter(c => c.planningUnit.id != consumptionUnit.planningUnit.id);
           if (this.state.selectedConsumptionUnitId == 0) {
             var json = this.state.smallTableEl.getJson(null, false);
@@ -2349,7 +2350,6 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                               bsSize="sm"
                               onChange={(e) => { this.setDataEnteredIn(e); }}
                             >
-                              <option value="0">-</option>
                               {
                                 this.state.dataEnteredInUnitList.map(c => <option value={c[1]} selected={c[0]}>{c[2]}</option>)
                               }
@@ -2508,16 +2508,13 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
   submitChangedUnit(consumptionUnitId) {
     var updatedSelectedConsumptionUnitId = "";
     this.state.dataEnteredInUnitList.map(c => {
-      console.log("dataEnteredInUnitList--")
-      if (c[1] == this.state.changedPlanningUnitId) {
-        updatedSelectedConsumptionUnitId = c[4]
+      if (c[1] == consumptionUnitId) {
+        updatedSelectedConsumptionUnitId = c[5]
       }
     })
-    console.log("check consumptionUnitId---", consumptionUnitId)
-    var consumptionList = this.state.consumptionList;
     var consumptionUnit = {};
     if (consumptionUnitId > 0) {
-      console.log("check palnninhhs---", this.state.planningUnitList)
+      console.log("$$$$$", this.state.planningUnitList)
       consumptionUnit = this.state.planningUnitList.filter(c => c.planningUnit.id == updatedSelectedConsumptionUnitId)[0];
     } else {
       consumptionUnit = {
@@ -2549,23 +2546,16 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         selectedForecastMap: {},
       }
     }
-    console.log("updatedSelectedConsumptionUnitId--", updatedSelectedConsumptionUnitId)
-    console.log("consumptionUnitId--", consumptionUnit)
-
+    console.log("submitChangedUnit consumptionUnit", consumptionUnit)
     this.setState({
-      // loading: false,
-      // dataEnteredInUnitList: dataArray1,
-      // showOtherUnitNameField: showHideOtherUnitNameField,
-      //   smallTableEl: smallTableEl,
       selectedConsumptionUnitId: updatedSelectedConsumptionUnitId,
       selectedPlanningUnitId: updatedSelectedConsumptionUnitId,
-      // selectedConsumptionUnitObject: consumptionUnit,
-      // selectedPlanningUnitDesc: getLabelText(consumptionUnit.planningUnit.label, this.state.lang),
+      selectedConsumptionUnitObject: consumptionUnit,
+      selectedPlanningUnitDesc: getLabelText(consumptionUnit.planningUnit.label, this.state.lang),
       selectedPlanningUnitMultiplier: this.state.changedPlanningUnitMultiplier,
       consumptionChanged: true,
       toggleDataChangeForSmallTable: false
     })
-    console.log("consumption changed", this.state.selectedConsumptionUnitId);
   }
 
   changeUnit(consumptionUnitId) {
@@ -2580,7 +2570,13 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           var consumptionList = this.state.consumptionList;
           var consumptionUnit = {};
           if (consumptionUnitId > 0) {
-            consumptionUnit = this.state.planningUnitList.filter(c => c.planningUnit.id == consumptionUnitId)[0];
+            if (consumptionUnit.consumptionDataType == 1) {
+              consumptionUnit = this.state.planningUnitList.filter(c => c.planningUnit.forecastingUnit.id == consumptionUnitId)[0];
+            } else if (consumptionUnit.consumptionDataType == 2) {
+              consumptionUnit = this.state.planningUnitList.filter(c => c.planningUnit.id == consumptionUnitId)[0];
+            } else if (consumptionUnit.consumptionDataType == 3) {
+              consumptionUnit = this.state.planningUnitList.filter(c => c.otherUnit.id == consumptionUnitId)[0];
+            }
           } else {
             consumptionUnit = {
               programPlanningUnitId: 0,
@@ -2622,7 +2618,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
               multiplier = consumptionUnit.planningUnit.multiplier;
               showHideOtherUnitNameField = false;
               document.getElementById("otherUnitMultiplier").readOnly = true;
-            } else {
+            } else if (consumptionUnit.consumptionDataType == 3) {
               multiplier = consumptionUnit.otherUnit.multiplier;
               showHideOtherUnitNameField = true;
               document.getElementById("otherUnitMultiplier").readOnly = false;
@@ -2638,6 +2634,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
             data[2] = getLabelText(consumptionUnit.planningUnit.forecastingUnit.label, this.state.lang);
             data[3] = 1;
             data[4] = consumptionUnit.planningUnit.forecastingUnit.id;
+            data[5] = consumptionUnit.planningUnit.id;
             dataArray1.push(data);
             data = [];
             data[0] = consumptionUnit.consumptionDataType == 2 ? true : false;
@@ -2645,6 +2642,8 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
             data[2] = getLabelText(consumptionUnit.planningUnit.label, this.state.lang);
             data[3] = parseInt(consumptionUnit.planningUnit.multiplier);
             data[4] = consumptionUnit.planningUnit.id;
+            data[5] = consumptionUnit.planningUnit.id;
+
             dataArray1.push(data);
             data = [];
             data[0] = consumptionUnit.consumptionDataType == 3 ? true : false;
@@ -2652,30 +2651,10 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
             data[2] = consumptionUnit.consumptionDataType == 3 ? getLabelText(consumptionUnit.otherUnit.label, this.state.lang) : `${i18n.t('static.common.otherUnit')}`;
             data[3] = consumptionUnit.consumptionDataType == 3 ? parseInt(consumptionUnit.otherUnit.multiplier) : "";
             data[4] = consumptionUnit.consumptionDataType == 3 ? consumptionUnit.otherUnit.id : "";
-            dataArray1.push(data);
-          } else {
-            data = [];
-            data[0] = false;
-            data[1] = 1;
-            data[2] = "";
-            data[3] = "";
-            data[4] = "";
-            dataArray1.push(data);
-            data = [];
-            data[0] = true;
-            data[1] = 2;
-            data[2] = "";
-            data[3] = "";
-            data[4] = "";
-            dataArray1.push(data);
-            data = [];
-            data[0] = false;
-            data[1] = 3;
-            data[2] = "";
-            data[3] = "";
-            data[4] = "";
+            data[5] = consumptionUnit.planningUnit.id;
             dataArray1.push(data);
           }
+          console.log(dataArray1)
           this.setState({
             //   dataEl: dataEl, 
             loading: false,
@@ -2697,14 +2676,14 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
 
   setDataEnteredIn(e) {
     var multiplier = "";
-    var planningUnitId = "";
+    var arrayid = "";
     this.state.dataEnteredInUnitList.map(c => {
-      if (c[1] == event.target.value) {
+      if (c[1] == e.target.value) {
         multiplier = c[3]
-        planningUnitId = c[4]
+        arrayid = c[1]
       }
     })
-    if (event.target.value == 3) {
+    if (e.target.value == 3) {
       document.getElementById('otherUnitNameDiv').style.display = 'block';
       document.getElementById("otherUnitMultiplier").readOnly = false;
     } else {
@@ -2713,7 +2692,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     }
     this.setState({
       changedPlanningUnitMultiplier: multiplier,
-      changedPlanningUnitId: planningUnitId
+      changedPlanningUnitId: arrayid
     })
   }
 }
