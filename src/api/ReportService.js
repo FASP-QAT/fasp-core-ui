@@ -110,5 +110,12 @@ class ReportService {
         return axios.post(`${API_URL}/api/report/warehouseByCountry`, json, {}
         );
     }
+    forecastOutput(inputjson) {
+        return axios.post(`${API_URL}/api/report/monthlyForecast`, inputjson, {});
+    }
+
+    forecastSummary(inputjson) {
+        return axios.post(`${API_URL}/api/report/forecastSummary`, inputjson, {});
+    }
 }
 export default new ReportService();
