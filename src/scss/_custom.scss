@@ -5845,7 +5845,7 @@ font-style: italic!important;
   // left:53px;
   // z-index: 999;
   width: 150px;
-    left: 54px;
+    left: 53px;
     z-index: 3;
     min-width:150px;
     max-width: 150px;
@@ -5855,7 +5855,7 @@ font-style: italic!important;
   // left: 128px;
   // z-index: 999;
 
-  left: 204px;
+  left: 202px;
   z-index: 4;
   /* z-index: 999; */
   width: 200px;
@@ -6302,8 +6302,12 @@ font-style: italic!important;
      min-height: calc(100vh - 427px) !important;
      
   }
+  .CreateTreeTemplateHeight{
+    min-height: calc(100vh - 427px) !important;
+    
+ }
 }
-.addtreebg option[value="0"]{
-  font-family: 'FontAwesome';
-  content: "\f067";
+.CreateTreeTemplateHeight{
+  min-height: calc(100vh - 645px) !important;
+  
 }
