@@ -33,6 +33,7 @@ import jexcel from 'jexcel-pro';
 import "../../../node_modules/jexcel-pro/dist/jexcel.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { Prompt } from 'react-router';
+import ReportService from '../../api/ReportService';
 import { DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_DATE_FORMAT_SM, JEXCEL_PRO_KEY } from '../../Constants.js';
 
 
@@ -1465,16 +1466,340 @@ class ForecastSummary extends Component {
 
 
             } else if (versionId > 0) {//api call
-                // alert("Hi");
-                console.log("2------------------------");
-                this.setState({ message: '', summeryData: [], dataArray: [] });
-                try {
-                    this.el = jexcel(document.getElementById("tableDiv"), '');
-                    this.el.destroy();
+
+                displayId = (displayId == 1 ? 2 : 1);
+
+
+                let inputJson = {
+                    "programId": programId,
+                    "versionId": versionId,
+                    "reportView": displayId//2-National 1-Regional
                 }
-                catch (err) {
-                    // document.getElementById("demo").innerHTML = err.message;
-                }
+
+                console.log("OnlineInputJson---------------->reportView", displayId);
+
+                console.log("OnlineInputJson---------------->", inputJson);
+
+                ReportService.forecastSummary(inputJson)
+                    .then(response => {
+                        console.log("RESP---------->forecastSummary", response.data);
+                        let primaryOutputData = response.data;
+                        let totalProductCost = 0;
+
+
+                        if (displayId == 2) {//National
+                            let duplicateTracerCategoryId = primaryOutputData.map(c => c.tracerCategory.id);
+                            let filteredTracercategoryId = [...new Set(duplicateTracerCategoryId)];
+                            console.log("Test------------>Online---2", filteredTracercategoryId);
+
+                            let tempData = [];
+                            for (let j = 0; j < primaryOutputData.length; j++) {
+                                let tracerCategory = primaryOutputData[j].tracerCategory;
+                                let forecastingUnit = primaryOutputData[j].planningUnit;
+                                let planningUnit = primaryOutputData[j].planningUnit;
+                                let totalForecastedQuantity = primaryOutputData[j].totalForecast;
+                                let stock1 = primaryOutputData[j].stock;
+                                let existingShipments = primaryOutputData[j].existingShipments;
+                                let stock2 = (primaryOutputData[j].stock + primaryOutputData[j].existingShipments) - primaryOutputData[j].totalForecast;
+                                let isStock2Red = (stock2 < 0 ? true : false);
+                                let desiredMonthOfStock1 = primaryOutputData[j].monthsOfStock;
+                                let desiredMonthOfStock2 = primaryOutputData[j].monthsOfStock * primaryOutputData[j].totalForecast / total_months;
+                                let tempProcurementGap = ((primaryOutputData[j].stock + primaryOutputData[j].existingShipments) - primaryOutputData[j].totalForecast) - (primaryOutputData[j].monthsOfStock * primaryOutputData[j].totalForecast / total_months);
+                                let procurementGap = (tempProcurementGap < 0 ? tempProcurementGap : tempProcurementGap);
+                                let isProcurementGapRed = (tempProcurementGap < 0 ? true : false)
+                                let priceType = (primaryOutputData[j].procurementAgent == null && primaryOutputData[j].price == null ? i18n.t('static.forecastReport.NoPriceTypeAvailable') : (primaryOutputData[j].procurementAgent != null ? primaryOutputData[j].procurementAgent.code : i18n.t('static.forecastReport.custom')));
+                                let isPriceTypeRed = (primaryOutputData[j].procurementAgent == null && primaryOutputData[j].price == null ? true : false);
+                                let unitPrice = primaryOutputData[j].price;
+                                // let procurementNeeded = (isProcurementGapRed == true ? '$ ' + (tempProcurementGap * unitPrice).toFixed(2) : '');
+                                let procurementNeeded = (isProcurementGapRed == true ? '$ ' + (Math.abs(tempProcurementGap) * unitPrice).toFixed(2) : '');
+                                let notes = primaryOutputData[j].notes;
+
+                                let obj = { id: 1, tempTracerCategoryId: tracerCategory.id, display: false, tracerCategory: tracerCategory, forecastingUnit: forecastingUnit, planningUnit: planningUnit, totalForecastedQuantity: totalForecastedQuantity, stock1: stock1, existingShipments: existingShipments, stock2: stock2, isStock2Red: isStock2Red, desiredMonthOfStock1: desiredMonthOfStock1, desiredMonthOfStock2: desiredMonthOfStock2, procurementGap: procurementGap, isProcurementGapRed: isProcurementGapRed, priceType: priceType, isPriceTypeRed: isPriceTypeRed, unitPrice: unitPrice, procurementNeeded: procurementNeeded, notes: notes }
+                                tempData.push(obj);
+
+                                if (isProcurementGapRed == true) {
+                                    totalProductCost = totalProductCost + (Math.abs(tempProcurementGap) * unitPrice);
+                                    totalProductCost = parseFloat(totalProductCost).toFixed(2);
+                                }
+                            }
+
+
+                            let summeryData = [];
+                            for (var i = 0; i < filteredTracercategoryId.length; i++) {
+                                let filteredTracerCategoryList = tempData.filter(c => c.tracerCategory.id == filteredTracercategoryId[i]);
+                                // console.log("Test------------>3333", filteredTracerCategoryList);
+                                if (filteredTracerCategoryList.length > 0) {
+                                    let obj = { id: 0, tempTracerCategoryId: filteredTracerCategoryList[0].tracerCategory.id, display: false, tracerCategory: filteredTracerCategoryList[0].tracerCategory, forecastingUnit: '', planningUnit: '', totalForecastedQuantity: '', stock1: '', existingShipments: '', stock2: '', isStock2Red: '', desiredMonthOfStock1: '', desiredMonthOfStock2: '', procurementGap: '', priceType: '', unitPrice: '', procurementNeeded: '', notes: '' }
+                                    summeryData.push(obj);
+                                    summeryData = summeryData.concat(filteredTracerCategoryList);
+                                }
+                            }
+                            console.log("Test------------>Online---301", summeryData);
+
+
+                            this.setState({
+                                loading: (displayId == 1 ? true : false),
+                                summeryData: summeryData,
+                                totalProductCost: totalProductCost,
+                                // displayId: 1
+                            })
+
+                        } else {//Regional
+
+                            let duplicateRegionList = primaryOutputData.map(c => c.region.id);
+                            let uniqueRegionList = [...new Set(duplicateRegionList)];
+                            let summeryData = [];
+
+
+                            let duplicateTracerCategoryList = primaryOutputData.map(c => c.tracerCategory.id);
+                            let uniqueTracerCategoryList = [...new Set(duplicateTracerCategoryList)];
+
+                            for (var i = 0; i < uniqueTracerCategoryList.length; i++) {
+
+                                let filterByTracerCategoryList = primaryOutputData.filter(c => c.tracerCategory.id == uniqueTracerCategoryList[i]);
+
+                                summeryData.push({ "id": 1, "planningUnit": filterByTracerCategoryList[0].tracerCategory.label.label_en, "regionListForSinglePlanningUnit": [], "totalForecastQuantity": '' })
+
+                                let duplicatePlanningUnitIdList = filterByTracerCategoryList.map(c => c.planningUnit.id);
+                                let uniquePlanningUnitIdList = [...new Set(duplicatePlanningUnitIdList)];
+
+                                for (var j = 0; j < uniquePlanningUnitIdList.length; j++) {
+
+                                    let filterByPlanningUnitList = filterByTracerCategoryList.filter(c => c.planningUnit.id == uniquePlanningUnitIdList[j]);
+
+
+                                    let regionListForSinglePlanningUnit = [];
+                                    let totalForecastQuantity = '';
+                                    for (var k = 0; k < uniqueRegionList.length; k++) {
+                                        let filterByRegionList = filterByPlanningUnitList.filter(c => c.region.id == uniqueRegionList[k]);
+
+                                        if (filterByRegionList.length > 0) {
+                                            regionListForSinglePlanningUnit.push({
+                                                "regionId": filterByRegionList[0].region.id,
+                                                "selectedForecast": filterByRegionList[0].selectedForecast.label.label_en,
+                                                "forecastQuantity": filterByRegionList[0].totalForecast,
+                                                "notes": filterByRegionList[0].notes
+                                            })
+
+                                            if (filterByRegionList[0].totalForecast != '' && filterByRegionList[0].totalForecast != null) {
+                                                totalForecastQuantity = totalForecastQuantity + parseFloat(filterByRegionList[0].totalForecast)
+                                            }
+
+                                        } else {
+                                            regionListForSinglePlanningUnit.push({
+                                                "regionId": 0,
+                                                "selectedForecast": '',
+                                                "forecastQuantity": '',
+                                                "notes": ''
+                                            })
+
+                                        }
+
+                                    }
+
+                                    summeryData.push({ "id": 0, "planningUnit": filterByPlanningUnitList[0].planningUnit.label.label_en + ' | ' + filterByPlanningUnitList[0].planningUnit.id, "regionListForSinglePlanningUnit": regionListForSinglePlanningUnit, "totalForecastQuantity": totalForecastQuantity })
+
+                                }
+
+                            }
+
+                            console.log("summeryData--------------->", summeryData);
+
+                            var data = [];
+                            let tempListArray = [];
+                            let count = 0;
+                            let dataArray = [];
+
+                            for (var j = 0; j < summeryData.length; j++) {
+                                data = [];
+                                data[0] = summeryData[j].id;
+                                data[1] = summeryData[j].id;
+                                data[2] = summeryData[j].planningUnit;
+                                let regionList = summeryData[j].regionListForSinglePlanningUnit;
+                                for (var k = 0; k < regionList.length; k++) {
+                                    data[(k + 1) * 3] = regionList[k].selectedForecast;
+                                    data[((k + 1) * 3) + 1] = regionList[k].forecastQuantity;
+                                    data[((k + 1) * 3) + 2] = regionList[k].notes;
+                                }
+                                data[(regionList.length * 3) + 3] = summeryData[j].totalForecastQuantity;
+
+
+                                dataArray.push(data);
+
+                            }
+
+                            var columns = [];
+                            columns.push({ title: i18n.t('static.product.unit1'), type: 'hidden', width: 100, readOnly: true });//A0
+                            columns.push({ title: i18n.t('static.product.unit1'), type: 'hidden', width: 100, readOnly: true });//A0
+                            columns.push({ title: i18n.t('static.product.product'), type: 'text', width: 100, readOnly: true });//C2
+
+                            for (var k = 0; k < uniqueRegionList.length; k++) {
+                                columns.push({ title: i18n.t('static.compareVersion.selectedForecast'), type: 'text', width: 100, readOnly: true });//D3
+                                columns.push({ title: i18n.t('static.forecastReport.forecastQuantity'), type: 'numeric', textEditor: true, mask: '#,##.00', decimal: '.', width: 100, readOnly: true });//E4
+                                columns.push({ title: i18n.t('static.program.notes'), type: 'text', width: 100, readOnly: true });//F5
+                            }
+                            columns.push({ title: i18n.t('static.forecastReport.totalForecastQuantity'), type: 'numeric', textEditor: true, mask: '#,##.00', decimal: '.', width: 100, readOnly: true });//H7
+
+                            let nestedHeaders = [];
+                            nestedHeaders.push(
+                                {
+                                    title: '',
+                                    colspan: '1'
+                                },
+                            );
+                            for (var k = 0; k < uniqueRegionList.length; k++) {
+                                nestedHeaders.push(
+                                    {
+                                        title: primaryOutputData.filter(c => c.region.id == uniqueRegionList[k])[0].region.label.label_en,
+                                        colspan: '3'
+                                    },
+
+                                );
+
+                            }
+                            nestedHeaders.push(
+                                {
+                                    title: i18n.t('static.forecastReport.allRegions'),
+                                    colspan: '1'
+                                },
+                            );
+
+                            try {
+                                this.el = jexcel(document.getElementById("tableDiv"), '');
+                                this.el.destroy();
+                            }
+                            catch (err) {
+                                // document.getElementById("demo").innerHTML = err.message;
+                            }
+                            console.log("DataArray+++", dataArray);
+                            this.setState({
+                                dataArray: dataArray
+                            }, () => {
+                            })
+
+
+                            var options = {
+                                data: dataArray,
+                                columnDrag: true,
+                                columns: columns,
+                                nestedHeaders: [nestedHeaders],
+                                updateTable: function (el, cell, x, y, source, value, id) {
+                                    if (y != null) {
+                                        var elInstance = el.jexcel;
+                                        var rowData = elInstance.getRowData(y);
+                                        elInstance.setStyle(`B${parseInt(y) + 1}`, 'text-align', 'left');
+                                    }
+                                }.bind(this),
+                                text: {
+                                    // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                                    showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
+                                    show: '',
+                                    entries: '',
+                                },
+                                pagination: false,
+                                search: false,
+                                columnSorting: true,
+                                tableOverflow: true,
+                                wordWrap: true,
+                                allowInsertColumn: false,
+                                allowManualInsertColumn: false,
+                                allowDeleteRow: false,
+                                onselection: this.selected,
+                                oneditionend: this.onedit,
+                                copyCompatibility: true,
+                                allowExport: false,
+                                paginationOptions: JEXCEL_PAGINATION_OPTION,
+                                position: 'top',
+                                filters: true,
+                                // onchange: this.forecastChanged,
+                                onload: function (instance, cell, x, y, value) {
+                                    jExcelLoadedFunctionOnlyHideRow(instance);
+                                    var elInstance = instance.jexcel;
+                                    var json = elInstance.getJson(null, false);
+                                    var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF']
+                                    for (var y = 0; y < json.length; y++) {
+                                        var rowData = elInstance.getRowData(y);
+                                        console.log("RowData--------->1", rowData);
+                                        let rowDataSecondLast = rowData[0];
+                                        // console.log("RowData--------->2", rowDataSecondLast);
+                                        if (rowDataSecondLast == 1) {
+                                            for (var r = 0; r < rowData.length; r++) {
+                                                var cell = elInstance.getCell((colArr[r]).concat(parseInt(y) + 1))
+                                                cell.classList.add('readonly');
+                                                cell.classList.add('regionBold');
+                                            }
+                                        }
+                                    }
+                                },
+                                license: JEXCEL_PRO_KEY,
+                                contextMenu: function (obj, x, y, e) {
+                                    return false;
+                                }.bind(this),
+                            };
+                            var dataEl = jexcel(document.getElementById("tableDiv"), options);
+                            this.el = dataEl;
+                            this.setState({
+                                dataEl: dataEl,
+                                loading: false,
+                                displayId: 2
+                            })
+
+
+
+                        }
+
+                        // alert("Hi");
+                        // console.log("2------------------------");
+                        // this.setState({ message: '', summeryData: [], dataArray: [] });
+                        // try {
+                        //     this.el = jexcel(document.getElementById("tableDiv"), '');
+                        //     this.el.destroy();
+                        // }
+                        // catch (err) {
+                        //     // document.getElementById("demo").innerHTML = err.message;
+                        // }
+
+
+                    }).catch(
+                        error => {
+                            if (error.message === "Network Error") {
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                            } else {
+                                switch (error.response ? error.response.status : "") {
+
+                                    case 401:
+                                        this.props.history.push(`/login/static.message.sessionExpired`)
+                                        break;
+                                    case 403:
+                                        this.props.history.push(`/accessDenied`)
+                                        break;
+                                    case 500:
+                                    case 404:
+                                    case 406:
+                                        this.setState({
+                                            message: error.response.data.messageCode,
+                                            loading: false
+                                        });
+                                        break;
+                                    case 412:
+                                        this.setState({
+                                            message: error.response.data.messageCode,
+                                            loading: false
+                                        });
+                                        break;
+                                    default:
+                                        this.setState({
+                                            message: 'static.unkownError',
+                                            loading: false
+                                        });
+                                        break;
+                                }
+                            }
+                        }
+                    );
 
             }
         } else if (programId == -1) { //validation message
@@ -2798,7 +3123,8 @@ class ForecastSummary extends Component {
                                                         </Table>
                                                     </div>
                                                 }
-                                                {this.state.regPlanningUnitList.length > 0 && this.state.displayId == 2 &&
+                                                {/* {this.state.regPlanningUnitList.length > 0 && this.state.displayId == 2 && */}
+                                                {this.state.displayId == 2 &&
                                                     <div className='ForecastSummaryTable datdEntryRow'>
                                                         <div id="tableDiv" className="table-responsive consumptionDataEntryTable">
                                                         </div>
