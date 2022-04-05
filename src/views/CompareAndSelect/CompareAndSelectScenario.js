@@ -1727,7 +1727,7 @@ class CompareAndSelectScenario extends Component {
                     },
                     lineTension: 0.1,
                     pointStyle: 'line',
-                    pointRadius: this.state.actualConsumptionListForMonth.length == 1 ? 3 : 0,
+                    pointRadius: 3,
                     showInLegend: true,
                     data: this.state.actualConsumptionListForMonth
                 }
@@ -1748,7 +1748,7 @@ class CompareAndSelectScenario extends Component {
                         lineTension: 0.1,
                         borderWidth: (this.state.selectedTreeScenarioId == item.id) ? 5 : 3,
                         pointStyle: 'line',
-                        pointRadius: this.state.consumptionDataForTree.filter(c => c.id == item.id).length == 1 ? 3 : 0,
+                        pointRadius: 3,
                         showInLegend: true,
                         data: this.state.consumptionDataForTree.filter(c => c.id == item.id).map((ele, index) => (ele.value))
                     }
