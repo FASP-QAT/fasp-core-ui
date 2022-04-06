@@ -9233,16 +9233,16 @@ export default class BuildTree extends Component {
             {
                 beginDrag: ({ itemConfig }) => ({ id: itemConfig.id }),
                 endDrag(props, monitor) {
-                    const { onMoveItem } = props;
-                    const item = monitor.getItem()
-                    const dropResult = monitor.getDropResult()
-                    if (dropResult) {
-                        onMoveItem(dropResult.id, item.id);
-                        // treeCalculator(items);
-                        // *****************
-                        // console.log("anchal***************************************");
-                        // this.createOrUpdateTree();
-                    }
+                    // const { onMoveItem } = props;
+                    // const item = monitor.getItem()
+                    // const dropResult = monitor.getDropResult()
+                    // if (dropResult) {
+                    // onMoveItem(dropResult.id, item.id);
+                    // treeCalculator(items);
+                    // *****************
+                    // console.log("anchal***************************************");
+                    // this.createOrUpdateTree();
+                    // }
                 },
             },
             (connect, monitor) => ({
@@ -9253,11 +9253,11 @@ export default class BuildTree extends Component {
         const NodeDragDropSource = DropTarget(
             ItemTypes.NODE,
             {
-                drop: ({ itemConfig }) => ({ id: itemConfig.id }),
-                canDrop: ({ canDropItem, itemConfig }, monitor) => {
-                    const { id } = monitor.getItem();
-                    return canDropItem(itemConfig.id, id);
-                },
+                // drop: ({ itemConfig }) => ({ id: itemConfig.id }),
+                // canDrop: ({ canDropItem, itemConfig }, monitor) => {
+                //     const { id } = monitor.getItem();
+                //     return canDropItem(itemConfig.id, id);
+                // },
             },
             (connect, monitor) => ({
                 connectDropTarget: connect.dropTarget(),
@@ -9431,7 +9431,7 @@ export default class BuildTree extends Component {
                             <button key="2" type="button" className="StyledButton TreeIconStyle TreeIconStyleCopyPaddingTop" style={{ background: 'none' }}
                                 onClick={(event) => {
                                     event.stopPropagation();
-                                    this.duplicateNode(itemConfig);
+                                    this.duplicateNode(JSON.parse(JSON.stringify(itemConfig)));
                                 }}>
                                 <i class="fa fa-clone" aria-hidden="true"></i>
                             </button>
@@ -9699,8 +9699,8 @@ export default class BuildTree extends Component {
                     return <NodeDragDropSource
                         itemConfig={itemConfig}
                         onRemoveItem={this.onRemoveItem}
-                        canDropItem={this.canDropItem}
-                        onMoveItem={this.onMoveItem}
+                    // canDropItem={this.canDropItem}
+                    // onMoveItem={this.onMoveItem}
                     />;
                 }
             }]
