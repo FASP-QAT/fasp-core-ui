@@ -360,7 +360,7 @@ const validationSchemaNodeData = function (values) {
                     // var testNumber = (/^[1-9]\d*$/).test((document.getElementById("puPerVisit").value).replaceAll(",", ""));
                     // console.log("*****", testNumber);
                     var testNumber = (/^[1-9]\d*$/).test((document.getElementById("puPerVisit").value));
-                    if (document.getElementById("nodeTypeId").value == 5 && (document.getElementById("puPerVisit").value == "" || testNumber == false)) {
+                    if (document.getElementById("nodeTypeId").value == 5 && (document.getElementById("usageTypeIdPU").value == 2 || document.getElementById("sharePlanningUnit").value == false || document.getElementById("sharePlanningUnit").value == "false") && (document.getElementById("puPerVisit").value == "" || testNumber == false)) {
                         return false;
                     } else {
                         return true;
@@ -501,6 +501,7 @@ export default class BuildTree extends Component {
         this.pickAMonth4 = React.createRef()
         this.pickAMonth5 = React.createRef()
         this.state = {
+            qatCalculatedPUPerVisit: "",
             isChanged: false,
             levelModal: false,
             dropdownOpen: new Array(19).fill(false),
@@ -882,16 +883,48 @@ export default class BuildTree extends Component {
         this.calculatePUPerVisit = this.calculatePUPerVisit.bind(this);
         this.createPUNode = this.createPUNode.bind(this);
         this.levelClicked = this.levelClicked.bind(this);
-        this.levelDeatilsSaved = this.levelDeatilsSaved.bind(this)
+        this.levelDeatilsSaved = this.levelDeatilsSaved.bind(this);
+        this.qatCalculatedPUPerVisit = this.qatCalculatedPUPerVisit.bind(this);
     }
+    qatCalculatedPUPerVisit(type) {
+        var currentItemConfig = this.state.currentItemConfig;
+        var qatCalculatedPUPerVisit = "";
+        console.log("currentItemConfig qat cal---", currentItemConfig)
+        if (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.planningUnit.id != "") {
+            var pu = this.state.planningUnitList.filter(x => x.id == currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.planningUnit.id)[0];
+            console.log("pu qat cal 1---", pu.multiplier)
+            console.log("pu qat cal 2---", currentItemConfig.parentItem.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.noOfForecastingUnitsPerPerson);
+            // this.getNoOfMonthsInUsagePeriod();
+            if (currentItemConfig.parentItem.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.usageType.id == 2) {
+                var refillMonths = this.round(parseFloat(pu.multiplier / (currentItemConfig.parentItem.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod)).toFixed(4))
+                console.log("refillMonths qat cal---", refillMonths)
+                console.log("noOfmonths qat cal---", this.state.noOfMonthsInUsagePeriod);
+                qatCalculatedPUPerVisit = this.round(parseFloat(((currentItemConfig.parentItem.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod) * refillMonths) / pu.multiplier).toFixed(4));
+            } else {
+                if (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.sharePlanningUnit == "true" || currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.sharePlanningUnit == true) {
+                    qatCalculatedPUPerVisit = addCommas(this.state.noOfMonthsInUsagePeriod / pu.multiplier);
+                } else {
+                    qatCalculatedPUPerVisit = this.round(this.state.noOfMonthsInUsagePeriod / pu.multiplier);
+                }
+            }
+            console.log("inside qat cal val---", qatCalculatedPUPerVisit)
 
+            if (type == 1) {
+                if (currentItemConfig.parentItem.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.usageType.id == 2) {
+                    currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.refillMonths = refillMonths;
+                }
+                currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.puPerVisit = qatCalculatedPUPerVisit;
+            }
+        }
+        this.setState({ qatCalculatedPUPerVisit });
+    }
     levelClicked(data) {
         var name = "";
         var unit = "";
         var levelNo = "";
         if (data != "") {
             console.log("Data@@@@###############", data.context.levels[0])
-            var treeLevelList = this.state.curTreeObj.levelList;
+            var treeLevelList = this.state.curTreeObj.levelList != undefined ? this.state.curTreeObj.levelList : [];
             var levelListFiltered = treeLevelList.filter(c => c.levelNo == data.context.levels[0]);
             levelNo = data.context.levels[0]
             if (levelListFiltered.length > 0) {
@@ -925,7 +958,7 @@ export default class BuildTree extends Component {
 
     levelDeatilsSaved() {
         const { curTreeObj } = this.state;
-        var treeLevelList = this.state.curTreeObj.levelList;
+        var treeLevelList = this.state.curTreeObj.levelList != undefined ? this.state.curTreeObj.levelList : [];
         var levelListFiltered = treeLevelList.findIndex(c => c.levelNo == this.state.levelNo);
         var items = this.state.items;
         if (levelListFiltered != -1) {
@@ -1016,14 +1049,18 @@ export default class BuildTree extends Component {
         var parentScenario = this.state.parentScenario;
         var currentItemConfig = this.state.currentItemConfig;
         var conversionFactor = this.state.conversionFactor;
+        var puPerVisit = "";
         console.log("PUPERVISIT conversionFactor---", conversionFactor);
-        var refillMonths = isRefillMonth && currentScenario.puNode.refillMonths != "" ? currentScenario.puNode.refillMonths : this.round(parseFloat(conversionFactor / (parentScenario.fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod)).toFixed(4));
-        console.log("PUPERVISIT refillMonths---", refillMonths);
-        console.log("PUPERVISIT noOfForecastingUnitsPerPerson---", parentScenario.fuNode.noOfForecastingUnitsPerPerson);
-        console.log("PUPERVISIT noOfMonthsInUsagePeriod---", this.state.noOfMonthsInUsagePeriod);
-        var puPerVisit = this.round(parseFloat(((parentScenario.fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod) * refillMonths) / conversionFactor).toFixed(4));
-        console.log("PUPERVISIT puPerVisit---", puPerVisit);
-
+        if (parentScenario.fuNode.usageType.id == 2) {
+            var refillMonths = isRefillMonth && currentScenario.puNode.refillMonths != "" ? currentScenario.puNode.refillMonths : this.round(parseFloat(conversionFactor / (parentScenario.fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod)).toFixed(4));
+            console.log("PUPERVISIT refillMonths---", refillMonths);
+            console.log("PUPERVISIT noOfForecastingUnitsPerPerson---", parentScenario.fuNode.noOfForecastingUnitsPerPerson);
+            // console.log("PUPERVISIT noOfMonthsInUsagePeriod---", this.state.noOfMonthsInUsagePeriod);
+            puPerVisit = this.round(parseFloat(((parentScenario.fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod) * refillMonths) / conversionFactor).toFixed(4));
+            console.log("PUPERVISIT puPerVisit---", puPerVisit);
+        } else if (parentScenario.fuNode.usageType.id == 1) {
+            // puPerVisit = 
+        }
         currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.puPerVisit = puPerVisit;
         if (!isRefillMonth) {
             currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.refillMonths = refillMonths;
@@ -1506,6 +1543,7 @@ export default class BuildTree extends Component {
                         console.log("mom list ret---", this.state.nodeDataMomList.filter(x => x.nodeId == this.state.currentItemConfig.context.id));
                         this.setState({ momList: this.state.nodeDataMomList.filter(x => x.nodeId == this.state.currentItemConfig.context.id)[0].nodeDataMomList }, () => {
                             console.log("going to build mom jexcel");
+                            this.filterScalingDataByMonth(this.state.scalingMonth.year + "-" + this.state.scalingMonth.month + "-01", this.state.nodeDataMomList.filter(x => x.nodeId == this.state.currentItemConfig.context.id)[0].nodeDataMomList);
                             if (value == 1 || (value == 0 && this.state.showMomData)) {
                                 this.buildMomJexcel();
                             }
@@ -1513,6 +1551,7 @@ export default class BuildTree extends Component {
                     } else {
                         this.setState({ momListPer: this.state.nodeDataMomList.filter(x => x.nodeId == this.state.currentItemConfig.context.id)[0].nodeDataMomList }, () => {
                             console.log("going to build mom jexcel percent");
+                            this.filterScalingDataByMonth(this.state.scalingMonth.year + "-" + this.state.scalingMonth.month + "-01", this.state.nodeDataMomList.filter(x => x.nodeId == this.state.currentItemConfig.context.id)[0].nodeDataMomList);
                             if (value == 1 || (value == 0 && this.state.showMomDataPercent)) {
                                 this.buildMomJexcelPercent();
                             }
@@ -1813,11 +1852,12 @@ export default class BuildTree extends Component {
         }
     }
 
-    filterScalingDataByMonth(date) {
+    filterScalingDataByMonth(date, nodeDataMomListParam) {
         console.log("date--->>>>>>>", date);
         var json = this.state.modelingEl.getJson(null, false);
         console.log("modelingElData>>>", json);
         var scalingTotal = 0;
+        var nodeDataMomList = nodeDataMomListParam != undefined ? nodeDataMomListParam : this.state.currentScenario.nodeDataMomList;
         for (var i = 0; i < json.length; i++) {
             var calculatedChangeForMonth = 0;
             var map1 = new Map(Object.entries(json[i]));
@@ -1830,7 +1870,20 @@ export default class BuildTree extends Component {
             const result = moment(date).isBetween(startDate, stopDate, null, '[]');
             console.log("result---", result);
             if (result) {
-                var nodeValue = this.state.currentScenario.calculatedDataValue;
+                var nodeValue = 0;
+                let scalingDate = date;
+                if (modelingTypeId == 3 && moment(startDate).format("YYYY-MM") <= moment(scalingDate).format("YYYY-MM") && moment(stopDate).format("YYYY-MM") >= moment(scalingDate).format("YYYY-MM")) {
+                    var nodeDataMomListFilter = nodeDataMomList.filter(c => moment(c.month).format("YYYY-MM") == moment(startDate).format("YYYY-MM"));
+                    if (nodeDataMomListFilter.length > 0) {
+                        nodeValue = nodeDataMomListFilter[0].startValue;
+                    }
+                }
+                if (modelingTypeId == 4 && moment(startDate).format("YYYY-MM") <= moment(scalingDate).format("YYYY-MM") && moment(stopDate).format("YYYY-MM") >= moment(scalingDate).format("YYYY-MM")) {
+                    var nodeDataMomListFilter = nodeDataMomList.filter(c => moment(c.month).format("YYYY-MM") == moment(scalingDate).format("YYYY-MM"));
+                    if (nodeDataMomListFilter.length > 0) {
+                        nodeValue = nodeDataMomListFilter[0].startValue;
+                    }
+                }
 
                 if (modelingTypeId == 2 || modelingTypeId == 5) {
                     calculatedChangeForMonth = parseFloat(dataValue).toFixed(4);
@@ -1842,7 +1895,7 @@ export default class BuildTree extends Component {
             this.state.modelingEl.setValueFromCoords(8, i, calculatedChangeForMonth, true);
             // scalingTotal = parseFloat(scalingTotal) + parseFloat(calculatedChangeForMonth);
         }
-        var scalingDifference = this.state.currentScenario.nodeDataMomList.filter(c => moment(c.month).format("YYYY-MM") == moment(date).format("YYYY-MM"));
+        var scalingDifference = nodeDataMomList.filter(c => moment(c.month).format("YYYY-MM") == moment(date).format("YYYY-MM"));
         if (scalingDifference.length > 0) {
             scalingTotal += scalingDifference[0].difference;
         }
@@ -3753,15 +3806,15 @@ export default class BuildTree extends Component {
                 instance.jexcel.setComments(col, i18n.t('static.label.fieldRequired'));
                 this.state.modelingEl.setValueFromCoords(5, y, "", true);
                 this.state.modelingEl.setValueFromCoords(6, y, "", true);
-                this.state.modelingEl.setValueFromCoords(8, y, '', true);
+                // this.state.modelingEl.setValueFromCoords(8, y, '', true);
             } else {
                 if (value == 2) {
                     this.state.modelingEl.setValueFromCoords(5, y, "", true);
-                    this.state.modelingEl.setValueFromCoords(8, y, '', true);
+                    // this.state.modelingEl.setValueFromCoords(8, y, '', true);
                 }
                 else if (value == 3 || value == 4 || value == 5) {
                     this.state.modelingEl.setValueFromCoords(6, y, "", true);
-                    this.state.modelingEl.setValueFromCoords(8, y, '', true);
+                    // this.state.modelingEl.setValueFromCoords(8, y, '', true);
                 }
 
                 instance.jexcel.setStyle(col, "background-color", "transparent");
@@ -3845,7 +3898,7 @@ export default class BuildTree extends Component {
                     } else {
                         calculatedChangeForMonth = parseFloat(value).toFixed(4);
                     }
-                    this.state.modelingEl.setValueFromCoords(8, y, calculatedChangeForMonth, true);
+                    // this.state.modelingEl.setValueFromCoords(8, y, calculatedChangeForMonth, true);
                 }
             }
             if (x == 2 && rowData[2] != 2 && rowData[5] != "") {
@@ -3856,7 +3909,7 @@ export default class BuildTree extends Component {
                 } else {
                     calculatedChangeForMonth = parseFloat(rowData[5]).toFixed();
                 }
-                this.state.modelingEl.setValueFromCoords(8, y, calculatedChangeForMonth, true);
+                // this.state.modelingEl.setValueFromCoords(8, y, calculatedChangeForMonth, true);
             }
             // Monthly change #
             if (x == 6 && rowData[2] == 2) {
@@ -3877,7 +3930,7 @@ export default class BuildTree extends Component {
                 else {
                     instance.jexcel.setStyle(col, "background-color", "transparent");
                     instance.jexcel.setComments(col, "");
-                    this.state.modelingEl.setValueFromCoords(8, y, value, true);
+                    // this.state.modelingEl.setValueFromCoords(8, y, value, true);
                 }
             }
         }
@@ -3885,7 +3938,7 @@ export default class BuildTree extends Component {
             instance.jexcel.setValueFromCoords(10, y, 1, true);
             this.setState({ isChanged: true });
         }
-        this.calculateScalingTotal();
+        // this.calculateScalingTotal();
     }.bind(this);
     loadedMom = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance, 1);
@@ -4242,7 +4295,7 @@ export default class BuildTree extends Component {
     exportPDF = () => {
         let treeLevel = this.state.items.length;
         var treeLevelItems = [];
-        var treeLevels = this.state.curTreeObj.forecastMethod.id != "" ? this.state.curTreeObj.levelList : [];
+        var treeLevels = this.state.curTreeObj.forecastMethod.id != "" && this.state.curTreeObj.levelList != undefined ? this.state.curTreeObj.levelList : [];
         for (var i = 0; i <= treeLevel; i++) {
             var treeLevelFiltered = treeLevels.filter(c => c.levelNo == i);
             if (i == 0) {
@@ -4849,8 +4902,8 @@ export default class BuildTree extends Component {
             planningUnitList,
             tempPlanningUnitId: planningUnitList.length == 1 ? planningUnitList[0].id : "",
         }, () => {
-            console.log("filtered planning unit list---", this.state.planningUnitList);
-            console.log("filtered planning unit list tempPlanningUnitId---", this.state.tempPlanningUnitId);
+            // console.log("filtered planning unit list---", this.state.planningUnitList);
+            // console.log("filtered planning unit list tempPlanningUnitId---", this.state.tempPlanningUnitId);
             if (this.state.planningUnitList.length == 1) {
                 var { currentItemConfig } = this.state;
                 console.log("pl 1---");
@@ -4872,6 +4925,10 @@ export default class BuildTree extends Component {
                         conversionFactor: this.state.planningUnitList[0].multiplier,
                         currentItemConfig,
                         currentScenario: currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0]
+                    }, () => {
+                        if (this.state.addNodeFlag && currentItemConfig.context.payload.nodeType.id == 5) {
+                            this.qatCalculatedPUPerVisit(1);
+                        }
                     });
                 }
             }
@@ -4927,16 +4984,14 @@ export default class BuildTree extends Component {
 
     getNoOfFUPatient() {
         var scenarioId = this.state.selectedScenario;
-        console.log("no of fu------", (this.state.currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.noOfForecastingUnitsPerPerson);
-        console.log("no of person---", (this.state.currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.noOfPersons);
         var noOfFUPatient;
         if (this.state.currentItemConfig.context.payload.nodeType.id == 4) {
             noOfFUPatient = (this.state.currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.noOfForecastingUnitsPerPerson / (this.state.currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.noOfPersons;
         } else {
-            console.log("--->>>>>>>>>>>>>>>>>>>>>>>>>>", (this.state.currentItemConfig.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode);
+            // console.log("--->>>>>>>>>>>>>>>>>>>>>>>>>>", (this.state.currentItemConfig.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode);
             noOfFUPatient = (this.state.currentItemConfig.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode.noOfForecastingUnitsPerPerson / (this.state.currentItemConfig.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode.noOfPersons;
         }
-        console.log("noOfFUPatient---", noOfFUPatient);
+        // console.log("noOfFUPatient---", noOfFUPatient);
         this.setState({
             noOfFUPatient
         }, () => {
@@ -5097,30 +5152,30 @@ export default class BuildTree extends Component {
         var oneTimeUsage;
         if (nodeTypeId == 5) {
             usageTypeId = (this.state.currentItemConfig.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode.usageType.id;
-            console.log("usageTypeId---", usageTypeId);
+            // console.log("usageTypeId---", usageTypeId);
             if (usageTypeId == 1) {
                 oneTimeUsage = (this.state.currentItemConfig.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode.oneTimeUsage;
             }
 
             if (usageTypeId == 2 || (usageTypeId == 1 && oneTimeUsage != null && oneTimeUsage != "true" && oneTimeUsage != true)) {
                 usagePeriodId = (this.state.currentItemConfig.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode.usagePeriod.usagePeriodId;
-                console.log("usagePeriodId---", usagePeriodId);
+                // console.log("usagePeriodId---", usagePeriodId);
                 usageFrequency = (this.state.currentItemConfig.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode.usageFrequency.toString().replaceAll(",", "");
-                console.log("usageFrequency---", usageFrequency);
+                // console.log("usageFrequency---", usageFrequency);
             }
 
 
         } else {
             usageTypeId = (this.state.currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.usageType.id;
-            console.log("usageTypeId---", usageTypeId);
+            // console.log("usageTypeId---", usageTypeId);
             if (usageTypeId == 1) {
                 oneTimeUsage = (this.state.currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.oneTimeUsage;
             }
             if (usageTypeId == 2 || (usageTypeId == 1 && oneTimeUsage != null && oneTimeUsage != "true" && oneTimeUsage != true)) {
                 usagePeriodId = (this.state.currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.usagePeriod.usagePeriodId;
-                console.log("usagePeriodId---", usagePeriodId);
+                // console.log("usagePeriodId---", usagePeriodId);
                 usageFrequency = (this.state.currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.usageFrequency.toString().replaceAll(",", "");
-                console.log("usageFrequency---", usageFrequency);
+                // console.log("usageFrequency---", usageFrequency);
             }
 
         }
@@ -5128,20 +5183,21 @@ export default class BuildTree extends Component {
         if (usagePeriodId != null && usagePeriodId != "") {
             var convertToMonth = (this.state.usagePeriodList.filter(c => c.usagePeriodId == usagePeriodId))[0].convertToMonth;
             console.log("convertToMonth---", convertToMonth);
+            console.log("usageFrequency---", usageFrequency);
             if (usageTypeId == 2) {
                 var div = (convertToMonth * usageFrequency);
-                console.log("duv---", div);
+                // console.log("duv---", div);
                 if (div != 0) {
                     // noOfMonthsInUsagePeriod = 1 / (convertToMonth * usageFrequency);
                     noOfMonthsInUsagePeriod = usageFrequency / convertToMonth;
-                    console.log("noOfMonthsInUsagePeriod---", noOfMonthsInUsagePeriod);
+                    console.log("noOfMonthsInUsagePeriod continous---", noOfMonthsInUsagePeriod);
                 }
             } else {
                 // var noOfFUPatient = this.state.noOfFUPatient;
                 var noOfFUPatient;
                 if (this.state.currentItemConfig.context.payload.nodeType.id == 4) {
-                    console.log("no of persons---", (this.state.currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.noOfPersons);
-                    console.log("no of noOfForecastingUnitsPerPerson---", (this.state.currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.noOfForecastingUnitsPerPerson);
+                    // console.log("no of persons---", (this.state.currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.noOfPersons);
+                    // console.log("no of noOfForecastingUnitsPerPerson---", (this.state.currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.noOfForecastingUnitsPerPerson);
                     noOfFUPatient = (this.state.currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "") / (this.state.currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.noOfPersons.toString().replaceAll(",", "");
                     console.log("noOfFUPatient---", noOfFUPatient);
                 } else {
@@ -5164,7 +5220,7 @@ export default class BuildTree extends Component {
         this.setState({
             noOfMonthsInUsagePeriod: noOfMonthsInUsagePeriod
         }, () => {
-            console.log("noOfMonthsInUsagePeriod---", this.state.noOfMonthsInUsagePeriod);
+            console.log("noOfMonthsInUsagePeriod--->>>>", this.state.noOfMonthsInUsagePeriod);
         });
     }
     getUsageText() {
@@ -5210,7 +5266,6 @@ export default class BuildTree extends Component {
             }
             // FU
             if (this.state.currentItemConfig.context.payload.nodeType.id == 4) {
-
                 if (this.state.currentScenario.fuNode.usageType.id == 1) {
                     console.log("selected text 3 1---", this.state.currentScenario.fuNode.oneTimeUsage != "true" && this.state.currentScenario.fuNode.oneTimeUsage != true);
                     if (this.state.currentScenario.fuNode.oneTimeUsage != "true" && this.state.currentScenario.fuNode.oneTimeUsage != true) {
@@ -6151,6 +6206,7 @@ export default class BuildTree extends Component {
 
         if (event.target.name === "puPerVisit") {
             (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].puNode.puPerVisit = event.target.value;
+            console.log("event.target.value pu per visit---", event.target.value);
             this.getUsageText();
         }
 
@@ -6428,6 +6484,7 @@ export default class BuildTree extends Component {
                 conversionFactor: event.target.value != "" && pu != "" ? pu.multiplier : ''
             }, () => {
                 flag = true;
+                this.qatCalculatedPUPerVisit(0);
             });
         }
 
@@ -6458,7 +6515,7 @@ export default class BuildTree extends Component {
         newItem.parent = parent;
         newItem.id = nodeId;
         const { curTreeObj } = this.state;
-        var treeLevelList = curTreeObj.levelList;
+        var treeLevelList = curTreeObj.levelList != undefined ? curTreeObj.levelList : [];
         var levelListFiltered = treeLevelList.findIndex(c => c.levelNo == parseInt(itemConfig.context.level + 1));
         if (levelListFiltered == -1) {
             var label = {}
@@ -6564,7 +6621,7 @@ export default class BuildTree extends Component {
         newItem.parent = itemConfig.context.parent;
         newItem.id = nodeId;
         const { curTreeObj } = this.state;
-        var treeLevelList = curTreeObj.levelList;
+        var treeLevelList = curTreeObj.levelList != undefined ? curTreeObj.levelList : [];
         var levelListFiltered = treeLevelList.findIndex(c => c.levelNo == parseInt(itemConfig.context.level + 1));
         if (levelListFiltered == -1) {
             var label = {}
@@ -6898,6 +6955,7 @@ export default class BuildTree extends Component {
                     this.setState({
                         conversionFactor
                     }, () => {
+                        this.qatCalculatedPUPerVisit(0);
                         this.getUsageText();
                     });
                 }
@@ -6924,7 +6982,7 @@ export default class BuildTree extends Component {
         const { curTreeObj } = this.state;
 
         var treeLevelList = curTreeObj.levelList;
-        if (currentItemConfig.context.level == 0) {
+        if (currentItemConfig.context.level == 0 && treeLevelList != undefined) {
             var levelListFiltered = treeLevelList.findIndex(c => c.levelNo == parseInt(currentItemConfig.context.level));
             if (levelListFiltered != -1) {
                 var unitId = currentItemConfig.context.payload.nodeType.id == 4 ? currentItemConfig.parentItem.payload.nodeUnit.id : currentItemConfig.context.payload.nodeUnit.id;
@@ -7835,7 +7893,7 @@ export default class BuildTree extends Component {
                                             </FormGroup>
                                             {this.state.currentItemConfig.context.payload.nodeType.id == 5 && <>
                                                 <FormGroup className="col-md-2" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 5 ? 'block' : 'none' }}>
-                                                    <Label htmlFor="currencyId">{this.state.currentItemConfig.parentItem != null && (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode != null && (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.usageType.id == 2 ? "QAT Calculated PU per interval per " : "QAT Calculated PU per usage per "}{this.state.currentItemConfig.parentItem != null && this.state.currentItemConfig.parentItem.parent != null && this.state.unitList.filter(c => c.unitId == this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id).length > 0 && this.state.unitList.filter(c => c.unitId == this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id)[0].label.label_en}?</Label>
+                                                    <Label htmlFor="currencyId">{this.state.currentItemConfig.parentItem != null && this.state.parentScenario.fuNode != null && this.state.parentScenario.fuNode.usageType.id == 2 ? "QAT Calculated PU per interval per " : "QAT Calculated PU per usage per "}{this.state.currentItemConfig.parentItem != null && this.state.currentItemConfig.parentItem.parent != null && this.state.unitList.filter(c => c.unitId == this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id).length > 0 && this.state.unitList.filter(c => c.unitId == this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id)[0].label.label_en}?</Label>
                                                 </FormGroup>
                                                 <FormGroup className="col-md-10" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 5 ? 'block' : 'none' }}>
                                                     <Input type="number"
@@ -7843,11 +7901,8 @@ export default class BuildTree extends Component {
                                                         name="puPerVisitQATCalculated"
                                                         readOnly={true}
                                                         bsSize="sm"
-                                                        value={this.state.currentItemConfig.parentItem != null && (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode != null ? (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.usageType.id == 2 ?
-                                                            addCommas(this.state.currentItemConfig.context.payload.nodeDataMap[0][0].puNode.puPerVisit) :
-                                                            (this.state.currentItemConfig.context.payload.nodeDataMap[0][0].puNode.sharePlanningUnit == "true" || this.state.currentItemConfig.context.payload.nodeDataMap[0][0].puNode.sharePlanningUnit == true ?
-                                                                addCommas(this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor) :
-                                                                this.round((this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor))) : ''}>
+                                                        value={this.state.qatCalculatedPUPerVisit}
+                                                    >
                                                     </Input>
                                                 </FormGroup></>}
                                             <FormGroup className="col-md-2" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 5 ? 'block' : 'none' }}>
@@ -7857,7 +7912,7 @@ export default class BuildTree extends Component {
                                                 <Input type="number"
                                                     id="puPerVisit"
                                                     name="puPerVisit"
-                                                    readOnly={this.state.parentScenario.fuNode != null && this.state.parentScenario.fuNode.usageType.id == 2 ? false : true}
+                                                    readOnly={this.state.parentScenario.fuNode != null && (this.state.currentScenario.puNode.sharePlanningUnit == "false" || this.state.currentScenario.puNode.sharePlanningUnit == false || this.state.parentScenario.fuNode.usageType.id == 2) ? false : true}
                                                     bsSize="sm"
                                                     valid={!errors.puPerVisit && this.state.currentItemConfig.context.payload.nodeType.id == 5 ? this.state.currentScenario.puNode.puPerVisit != '' : !errors.puPerVisit}
                                                     invalid={touched.puPerVisit && !!errors.puPerVisit}
@@ -7866,7 +7921,7 @@ export default class BuildTree extends Component {
                                                         handleChange(e);
                                                         this.dataChange(e)
                                                     }}
-                                                    value={this.state.currentItemConfig.parentItem != null && this.state.parentScenario.fuNode != null ? this.state.parentScenario.fuNode.usageType.id == 2 ? addCommas(this.state.currentScenario.puNode.puPerVisit) : (this.state.currentScenario.puNode.sharePlanningUnit == "true" || this.state.currentScenario.puNode.sharePlanningUnit == true ? addCommas(this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor) : this.round((this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor))) : ""}
+                                                    value={this.state.currentItemConfig.parentItem != null && this.state.parentScenario.fuNode != null ? (this.state.currentScenario.puNode.sharePlanningUnit == "false" || this.state.currentScenario.puNode.sharePlanningUnit == false || this.state.parentScenario.fuNode.usageType.id == 2) ? addCommas(this.state.currentScenario.puNode.puPerVisit) : addCommas(this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor) : ""}
                                                 // value={addCommas(this.state.parentScenario.fuNode.usageType.id == 2 ? (((this.state.parentScenario.fuNode.noOfForecastingUnitsPerPerson /
                                                 //     this.state.noOfMonthsInUsagePeriod) / this.state.conversionFactor) * this.state.currentScenario.puNode.refillMonths) : (this.state.currentScenario.puNode.sharePlanningUnit == "true" || this.state.currentScenario.puNode.sharePlanningUnit == true ? (this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor) : Math.round((this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor))))}
                                                 >
@@ -9478,7 +9533,7 @@ export default class BuildTree extends Component {
                                 tempArray.push(tempJson);
                                 nodeDataMap[this.state.selectedScenario] = tempArray;
                                 console.log("itemConfig.level@@@@@@@@@@@@#################@@@@@@@@@@@@", itemConfig.level);
-                                var getLevelUnit = this.state.curTreeObj.levelList.filter(c => c.levelNo == itemConfig.level + 1);
+                                var getLevelUnit = this.state.curTreeObj.levelList != undefined ? this.state.curTreeObj.levelList.filter(c => c.levelNo == itemConfig.level + 1) : [];
                                 var levelUnitId = ""
                                 if (getLevelUnit.length > 0) {
                                     levelUnitId = getLevelUnit[0].unit != null ? getLevelUnit[0].unit.id : "";
@@ -9606,14 +9661,18 @@ export default class BuildTree extends Component {
                                         this.getForecastingUnitListByTracerCategoryId(0);
                                     }
                                     else if (itemConfig.payload.nodeType.id == 4) {
-                                        console.log("fu id---", itemConfig);
-                                        this.getPlanningUnitListByFUId((itemConfig.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.forecastingUnit.id);
-                                        // this.getPlanningUnitListByFUId((data.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode.forecastingUnit.id);
+                                        // console.log("fu id---", itemConfig);
                                         this.getNoOfFUPatient();
-                                        this.getNoOfMonthsInUsagePeriod();
-                                        console.log("my data 1--->", itemConfig.parent);
-                                        console.log("my data 2--->", this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload);
-                                        console.log("my data 3--->", this.state.items);
+                                        setTimeout(() => {
+                                            this.getNoOfMonthsInUsagePeriod();
+                                            this.getPlanningUnitListByFUId((itemConfig.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.forecastingUnit.id);
+                                        }, 0);
+
+                                        // this.getPlanningUnitListByFUId((data.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode.forecastingUnit.id);
+
+                                        // console.log("my data 1--->", itemConfig.parent);
+                                        // console.log("my data 2--->", this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload);
+                                        // console.log("my data 3--->", this.state.items);
                                         // this.state.unitList.filter(c => c.unitId == this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id)[0].label.label_en
                                         this.state.currentItemConfig.context.payload.nodeUnit.id = this.state.items.filter(x => x.id == itemConfig.parent)[0].payload.nodeUnit.id;
                                     } else {

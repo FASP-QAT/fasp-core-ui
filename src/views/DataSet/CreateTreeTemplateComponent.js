@@ -288,7 +288,7 @@ const validationSchemaNodeData = function (values) {
                     // var testNumber = (/^[1-9]\d*$/).test((document.getElementById("puPerVisit").value).replaceAll(",", ""));
                     // console.log("*****", testNumber);
                     var testNumber = (/^[1-9]\d*$/).test((document.getElementById("puPerVisit").value));
-                    if (document.getElementById("nodeTypeId").value == 5 && (document.getElementById("puPerVisit").value == "" || testNumber == false)) {
+                    if (document.getElementById("nodeTypeId").value == 5 && (document.getElementById("usageTypeIdPU").value == 2 || document.getElementById("sharePlanningUnit").value == false || document.getElementById("sharePlanningUnit").value == "false") && (document.getElementById("puPerVisit").value == "" || testNumber == false)) {
                         return false;
                     } else {
                         return true;
@@ -744,6 +744,43 @@ export default class CreateTreeTemplate extends Component {
         this.exportPDF = this.exportPDF.bind(this);
         this.round = this.round.bind(this);
         this.calculatePUPerVisit = this.calculatePUPerVisit.bind(this);
+        this.qatCalculatedPUPerVisit = this.qatCalculatedPUPerVisit.bind(this);
+    }
+
+    qatCalculatedPUPerVisit(type) {
+        var currentItemConfig = this.state.currentItemConfig;
+        var qatCalculatedPUPerVisit = "";
+        console.log("currentItemConfig qat cal---", currentItemConfig)
+        if (currentItemConfig.context.payload.nodeDataMap[0][0].puNode.planningUnit.id != "") {
+            console.log("5 1----------------->>>", currentItemConfig.context.payload.nodeDataMap[0][0].puNode.planningUnit.id);
+
+            var pu = this.state.planningUnitList.filter(x => x.planningUnitId == currentItemConfig.context.payload.nodeDataMap[0][0].puNode.planningUnit.id)[0];
+            console.log("5 2----------------->>>", this.state.planningUnitList);
+            console.log("5 3----------------->>>", pu);
+            console.log("pu qat cal 1---", pu.multiplier)
+            console.log("pu qat cal 2---", currentItemConfig.parentItem.payload.nodeDataMap[0][0].fuNode.noOfForecastingUnitsPerPerson);
+            // this.getNoOfMonthsInUsagePeriod();
+            if (currentItemConfig.parentItem.payload.nodeDataMap[0][0].fuNode.usageType.id == 2) {
+                var refillMonths = this.round(parseFloat(pu.multiplier / (currentItemConfig.parentItem.payload.nodeDataMap[0][0].fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod)).toFixed(4))
+                console.log("refillMonths qat cal---", refillMonths)
+                console.log("noOfmonths qat cal---", this.state.noOfMonthsInUsagePeriod);
+                qatCalculatedPUPerVisit = this.round(parseFloat(((currentItemConfig.parentItem.payload.nodeDataMap[0][0].fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod) * refillMonths) / pu.multiplier).toFixed(4));
+            } else {
+                if (currentItemConfig.context.payload.nodeDataMap[0][0].puNode.sharePlanningUnit == "true" || currentItemConfig.context.payload.nodeDataMap[0][0].puNode.sharePlanningUnit == true) {
+                    qatCalculatedPUPerVisit = addCommas(this.state.noOfMonthsInUsagePeriod / pu.multiplier);
+                } else {
+                    qatCalculatedPUPerVisit = this.round(this.state.noOfMonthsInUsagePeriod / pu.multiplier);
+                }
+            }
+            console.log("inside qat cal val---", qatCalculatedPUPerVisit)
+            if (type == 1) {
+                if (currentItemConfig.parentItem.payload.nodeDataMap[0][0].fuNode.usageType.id == 2) {
+                    currentItemConfig.context.payload.nodeDataMap[0][0].puNode.refillMonths = refillMonths;
+                }
+                currentItemConfig.context.payload.nodeDataMap[0][0].puNode.puPerVisit = qatCalculatedPUPerVisit;
+            }
+        }
+        this.setState({ qatCalculatedPUPerVisit });
     }
 
     calculatePUPerVisit(isRefillMonth) {
@@ -1110,6 +1147,7 @@ export default class CreateTreeTemplate extends Component {
                     console.log("mom list ret---", this.state.nodeDataMomList.filter(x => x.nodeId == this.state.currentItemConfig.context.id));
                     this.setState({ momList: this.state.nodeDataMomList.filter(x => x.nodeId == this.state.currentItemConfig.context.id)[0].nodeDataMomList }, () => {
                         console.log("going to build mom jexcel");
+                        this.filterScalingDataByMonth(this.state.scalingMonth.year+"-"+this.state.scalingMonth.month+"-01",this.state.nodeDataMomList.filter(x => x.nodeId == this.state.currentItemConfig.context.id)[0].nodeDataMomList);
                         if (value == 1 || (value == 0 && this.state.showMomData)) {
                             this.buildMomJexcel();
                         }
@@ -1121,6 +1159,7 @@ export default class CreateTreeTemplate extends Component {
                     var momList = this.state.nodeDataMomList.filter(x => x.nodeId == this.state.currentItemConfig.context.id);
                     this.setState({ momListPer: momList.length > 0 ? momList[0].nodeDataMomList : [] }, () => {
                         console.log("going to build mom jexcel percent");
+                        this.filterScalingDataByMonth(this.state.scalingMonth.year+"-"+this.state.scalingMonth.month+"-01",this.state.nodeDataMomList.filter(x => x.nodeId == this.state.currentItemConfig.context.id)[0].nodeDataMomList);
                         if (value == 1 || (value == 0 && this.state.showMomDataPercent)) {
                             this.buildMomJexcelPercent();
                         }
@@ -1195,11 +1234,12 @@ export default class CreateTreeTemplate extends Component {
 
     }
 
-    filterScalingDataByMonth(date) {
+    filterScalingDataByMonth(date,nodeDataMomListParam) {
         console.log("date--->>>>>>>", date);
         var json = this.state.modelingEl.getJson(null, false);
         // console.log("modelingElData>>>", json);
         var scalingTotal = 0;
+        var nodeDataMomList = nodeDataMomListParam!=undefined?nodeDataMomListParam:(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].nodeDataMomList;
         for (var i = 0; i < json.length; i++) {
             var calculatedChangeForMonth = 0;
             var map1 = new Map(Object.entries(json[i]));
@@ -1213,7 +1253,25 @@ export default class CreateTreeTemplate extends Component {
             console.log("result---", result);
             console.log("modelingTypeId---", modelingTypeId);
             if (result) {
-                var nodeValue = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].calculatedDataValue;
+                var nodeValue = 0;
+                let scalingDate = date;
+                console.log("@@@@@###########Scaling date",scalingDate);
+                console.log("@@@@@###########Start date",startDate);
+                console.log("@@@@@###########Start date",stopDate);
+                if (modelingTypeId == 3 && moment(startDate).format("YYYY-MM") <= moment(scalingDate).format("YYYY-MM") && moment(stopDate).format("YYYY-MM") >= moment(scalingDate).format("YYYY-MM")) {
+                    var nodeDataMomListFilter = nodeDataMomList.filter(c => moment(c.month).format("YYYY-MM") == moment(startDate).format("YYYY-MM"));
+                    console.log("@@@@@###########nodeDataMomListFilter",nodeDataMomListFilter);
+                    if (nodeDataMomListFilter.length > 0) {
+                        nodeValue = nodeDataMomListFilter[0].startValue;
+                    }
+                }
+                if (modelingTypeId == 4 && moment(startDate).format("YYYY-MM") <= moment(scalingDate).format("YYYY-MM") && moment(stopDate).format("YYYY-MM") >= moment(scalingDate).format("YYYY-MM")) {
+                    var nodeDataMomListFilter = nodeDataMomList.filter(c => moment(c.month).format("YYYY-MM") == moment(scalingDate).format("YYYY-MM"));
+                    console.log("@@@@@###########nodeDataMomListFilter",nodeDataMomListFilter);
+                    if (nodeDataMomListFilter.length > 0) {
+                        nodeValue = nodeDataMomListFilter[0].startValue;
+                    }
+                }
 
                 if (modelingTypeId == 2 || modelingTypeId == 5) {
                     calculatedChangeForMonth = parseFloat(dataValue).toFixed(4);
@@ -1224,7 +1282,7 @@ export default class CreateTreeTemplate extends Component {
             this.state.modelingEl.setValueFromCoords(8, i, calculatedChangeForMonth, true);
             // scalingTotal = parseFloat(scalingTotal) + parseFloat(calculatedChangeForMonth);
         }
-        var scalingDifference = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].nodeDataMomList.filter(c => moment(c.month).format("YYYY-MM") == moment(date).format("YYYY-MM"));
+        var scalingDifference = nodeDataMomList.filter(c => moment(c.month).format("YYYY-MM") == moment(date).format("YYYY-MM"));
         if (scalingDifference.length > 0) {
             scalingTotal += scalingDifference[0].difference;
         }
@@ -2900,15 +2958,15 @@ export default class CreateTreeTemplate extends Component {
                 instance.jexcel.setComments(col, i18n.t('static.label.fieldRequired'));
                 this.state.modelingEl.setValueFromCoords(5, y, "", true);
                 this.state.modelingEl.setValueFromCoords(6, y, "", true);
-                this.state.modelingEl.setValueFromCoords(8, y, '', true);
+                // this.state.modelingEl.setValueFromCoords(8, y, '', true);
             } else {
                 if (value == 2) {
                     this.state.modelingEl.setValueFromCoords(5, y, "", true);
-                    this.state.modelingEl.setValueFromCoords(8, y, '', true);
+                    // this.state.modelingEl.setValueFromCoords(8, y, '', true);
                 }
                 else if (value == 3 || value == 4 || value == 5) {
                     this.state.modelingEl.setValueFromCoords(6, y, "", true);
-                    this.state.modelingEl.setValueFromCoords(8, y, '', true);
+                    // this.state.modelingEl.setValueFromCoords(8, y, '', true);
                 }
                 instance.jexcel.setStyle(col, "background-color", "transparent");
                 instance.jexcel.setComments(col, "");
@@ -2989,7 +3047,7 @@ export default class CreateTreeTemplate extends Component {
                     } else {
                         calculatedChangeForMonth = parseFloat(value).toFixed();
                     }
-                    this.state.modelingEl.setValueFromCoords(8, y, calculatedChangeForMonth, true);
+                    // this.state.modelingEl.setValueFromCoords(8, y, calculatedChangeForMonth, true);
                 }
 
             }
@@ -3001,7 +3059,7 @@ export default class CreateTreeTemplate extends Component {
                 } else {
                     calculatedChangeForMonth = parseFloat(rowData[5]).toFixed();
                 }
-                this.state.modelingEl.setValueFromCoords(8, y, calculatedChangeForMonth, true);
+                // this.state.modelingEl.setValueFromCoords(8, y, calculatedChangeForMonth, true);
             }
             // Monthly change #
             if (x == 6 && rowData[2] == 2) {
@@ -3021,7 +3079,7 @@ export default class CreateTreeTemplate extends Component {
                 else {
                     instance.jexcel.setStyle(col, "background-color", "transparent");
                     instance.jexcel.setComments(col, "");
-                    this.state.modelingEl.setValueFromCoords(8, y, parseFloat(value).toFixed(4), true);
+                    // this.state.modelingEl.setValueFromCoords(8, y, parseFloat(value).toFixed(4), true);
                 }
 
             }
@@ -3030,7 +3088,7 @@ export default class CreateTreeTemplate extends Component {
             instance.jexcel.setValueFromCoords(10, y, 1, true);
             this.setState({ isChanged: true });
         }
-        this.calculateScalingTotal();
+        // this.calculateScalingTotal();
     }.bind(this);
     buildModelingJexcelPercent() {
         var scalingList = this.state.scalingList;
@@ -3256,7 +3314,7 @@ export default class CreateTreeTemplate extends Component {
             cursorItem: nodeId
         }, () => {
             console.log("on add items-------", this.state.items);
-            this.calculateMOMData(newItem.id, 0);
+            this.calculateMOMData(newItem.id, 2);
             // this.calculateValuesForAggregateNode(this.state.items);
         });
     }
@@ -3280,7 +3338,7 @@ export default class CreateTreeTemplate extends Component {
                 planningUnitList: response.data,
                 tempPlanningUnitId: response.data.length == 1 ? response.data[0].planningUnitId : "",
             }, () => {
-                console.log("planing unit list from api---", this.state.currentItemConfig.context.payload.nodeDataMap[0][0]);
+                console.log("planing unit list from api---", this.state.planningUnitList);
                 if (this.state.planningUnitList.length == 1) {
                     var { currentItemConfig } = this.state;
                     currentItemConfig.context.payload.nodeDataMap[0][0].puNode.planningUnit.id = this.state.planningUnitList[0].planningUnitId;
@@ -3292,8 +3350,11 @@ export default class CreateTreeTemplate extends Component {
                     }
                     this.setState({
                         conversionFactor: this.state.planningUnitList[0].multiplier,
-                        currentItemConfig,
-                        currentScenario: currentItemConfig.context.payload.nodeDataMap[0][0]
+                        currentItemConfig
+                    }, () => {
+                        if (this.state.addNodeFlag && currentItemConfig.context.payload.nodeType.id == 5) {
+                            this.qatCalculatedPUPerVisit(1);
+                        }
                     });
                 }
                 if (this.state.currentItemConfig.context.payload.nodeType.id == 5 && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].puNode != null && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].puNode.planningUnit.id != "") {
@@ -3302,6 +3363,9 @@ export default class CreateTreeTemplate extends Component {
                     this.setState({
                         conversionFactor
                     }, () => {
+                        if (!this.state.addNodeFlag) {
+                            this.qatCalculatedPUPerVisit(0);
+                        }
                         this.getUsageText();
                     });
                 } else {
@@ -3749,7 +3813,7 @@ export default class CreateTreeTemplate extends Component {
                     }
                     usageText = "For each " + nodeUnitTxt.trim() + "(s) we need " + addCommas(sharePu) + " " + planningUnit;
                 } else {
-                    var puPerInterval = (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].puNode.puPerVisit;
+                    var puPerInterval = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.puPerVisit != "" ? (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.puPerVisit : "";
                     usageText = "For each " + nodeUnitTxt.trim() + "(s) we need " + addCommas(this.round(puPerInterval)) + " " + planningUnit + " every " + (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].puNode.refillMonths + " months";
                 }
             } else {
@@ -5035,6 +5099,7 @@ export default class CreateTreeTemplate extends Component {
                 conversionFactor: event.target.value != "" && pu != "" ? pu.multiplier : ''
             }, () => {
                 flag = true;
+                this.qatCalculatedPUPerVisit(0);
             });
         }
 
@@ -5410,14 +5475,25 @@ export default class CreateTreeTemplate extends Component {
                     this.getUsageText();
                     this.state.currentItemConfig.context.payload.nodeUnit.id = this.state.currentItemConfig.parentItem.payload.nodeUnit.id;
                 } else if (data.context.payload.nodeType.id == 5) {
-                    this.getPlanningUnitListByFUId((data.parentItem.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.id);
-                    // (data.context.payload.nodeDataMap[0])[0].puNode.planningUnit.unit.id = (data.context.payload.nodeDataMap[0])[0].puNode.planningUnit.unit.id;
-                    // (data.context.payload.nodeDataMap[0])[0].puNode.planningUnit.id = (data.context.payload.nodeDataMap[0])[0].puNode.planningUnit.id;
-                    // this.setState({
-                    //     // conversionFactor: pu.multiplier
-                    //     // conversionFactor: 1
-                    // }, () => {
-                    this.getNoOfMonthsInUsagePeriod();
+
+                    console.log("hey 1---")
+                    setTimeout(() => {
+                        this.getPlanningUnitListByFUId((data.parentItem.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.id);
+
+                        console.log("hey 2---", this.state.planningUnitList);
+                        this.getNoOfMonthsInUsagePeriod();
+                        // (data.context.payload.nodeDataMap[0])[0].puNode.planningUnit.unit.id = (data.context.payload.nodeDataMap[0])[0].puNode.planningUnit.unit.id;
+                        // // (data.context.payload.nodeDataMap[0])[0].puNode.planningUnit.id = (data.context.payload.nodeDataMap[0])[0].puNode.planningUnit.id;
+                        // this.setState({
+                        //     // conversionFactor: pu.multiplier
+                        //     // conversionFactor: 1
+                        // }, () => {
+
+
+                        console.log("hey 3")
+
+                        console.log("hey 4")
+                    }, 0);
                     // });
 
                     // this.getUsageText();
@@ -5425,7 +5501,7 @@ export default class CreateTreeTemplate extends Component {
                     this.state.currentItemConfig.context.payload.nodeUnit.id = this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id;
                 }
                 if (data.context.payload.nodeType.id != 1) {
-                    this.getSameLevelNodeList(data.context.level, data.context.id, data.context.payload.nodeType.id,data.context.parent);
+                    this.getSameLevelNodeList(data.context.level, data.context.id, data.context.payload.nodeType.id, data.context.parent);
                 }
 
 
@@ -6251,23 +6327,19 @@ export default class CreateTreeTemplate extends Component {
                                             </FormGroup>
                                             {/* {(this.state.currentItemConfig.context.payload.nodeType.id == 5) && */}
                                             {/* <> */}
-
-                                            <FormGroup className="col-md-2" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 5 ? 'block' : 'none' }}>
-                                                <Label htmlFor="currencyId">{this.state.currentItemConfig.parentItem != null && (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode != null && (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.usageType.id == 2 ? "QAT Calculated PU per interval per " : "QAT Calculated PU per usage per "}{this.state.currentItemConfig.parentItem != null && this.state.currentItemConfig.parentItem.parent != null && this.state.unitList.filter(c => c.unitId == this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id).length > 0 && this.state.unitList.filter(c => c.unitId == this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id)[0].label.label_en}?</Label>
-                                            </FormGroup>
-                                            <FormGroup className="col-md-10" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 5 ? 'block' : 'none' }}>
-                                                <Input type="number"
-                                                    id="puPerVisitQATCalculated"
-                                                    name="puPerVisitQATCalculated"
-                                                    readOnly={true}
-                                                    bsSize="sm"
-                                                    value={this.state.currentItemConfig.parentItem != null && (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode != null ? (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.usageType.id == 2 ?
-                                                        addCommas(this.state.currentItemConfig.context.payload.nodeDataMap[0][0].puNode.puPerVisit) :
-                                                        (this.state.currentItemConfig.context.payload.nodeDataMap[0][0].puNode.sharePlanningUnit == "true" || this.state.currentItemConfig.context.payload.nodeDataMap[0][0].puNode.sharePlanningUnit == true ?
-                                                            addCommas(this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor) :
-                                                            this.round((this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor))) : ''}>
-                                                </Input>
-                                            </FormGroup>
+                                            {this.state.currentItemConfig.context.payload.nodeType.id == 5 && <>
+                                                <FormGroup className="col-md-2" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 5 ? 'block' : 'none' }}>
+                                                    <Label htmlFor="currencyId">{this.state.currentItemConfig.parentItem != null && (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode != null && (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.usageType.id == 2 ? "QAT Calculated PU per interval per " : "QAT Calculated PU per usage per "}{this.state.currentItemConfig.parentItem != null && this.state.currentItemConfig.parentItem.parent != null && this.state.unitList.filter(c => c.unitId == this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id).length > 0 && this.state.unitList.filter(c => c.unitId == this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id)[0].label.label_en}?</Label>
+                                                </FormGroup>
+                                                <FormGroup className="col-md-10" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 5 ? 'block' : 'none' }}>
+                                                    <Input type="number"
+                                                        id="puPerVisitQATCalculated"
+                                                        name="puPerVisitQATCalculated"
+                                                        readOnly={true}
+                                                        bsSize="sm"
+                                                        value={this.state.qatCalculatedPUPerVisit}>
+                                                    </Input>
+                                                </FormGroup></>}
 
                                             <FormGroup className="col-md-2" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 5 ? 'block' : 'none' }}>
                                                 <Label htmlFor="currencyId">{this.state.currentItemConfig.parentItem != null && (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode != null && (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.usageType.id == 2 ? "How many PU per interval per " : "How many PU per usage per "}{this.state.currentItemConfig.parentItem != null && this.state.currentItemConfig.parentItem.parent != null && this.state.unitList.filter(c => c.unitId == this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id).length > 0 && this.state.unitList.filter(c => c.unitId == this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id)[0].label.label_en}?</Label>
@@ -6276,7 +6348,7 @@ export default class CreateTreeTemplate extends Component {
                                                 <Input type="number"
                                                     id="puPerVisit"
                                                     name="puPerVisit"
-                                                    readOnly={this.state.currentItemConfig.parentItem != null && this.state.currentItemConfig.parentItem.payload.nodeDataMap[0][0].fuNode != null && this.state.currentItemConfig.parentItem.payload.nodeDataMap[0][0].fuNode.usageType.id == 2 ? false : true}
+                                                    readOnly={this.state.currentItemConfig.parentItem != null && this.state.currentItemConfig.parentItem.payload.nodeDataMap[0][0].fuNode != null && (this.state.currentItemConfig.context.payload.nodeDataMap[0][0].puNode.sharePlanningUnit == "false" || this.state.currentItemConfig.context.payload.nodeDataMap[0][0].puNode.sharePlanningUnit == false || this.state.currentItemConfig.parentItem.payload.nodeDataMap[0][0].fuNode.usageType.id == 2) ? false : true}
                                                     bsSize="sm"
                                                     valid={!errors.puPerVisit && this.state.currentItemConfig.context.payload.nodeType.id == 5 ? this.state.currentItemConfig.context.payload.nodeDataMap[0][0].puNode.puPerVisit != '' : !errors.puPerVisit}
                                                     invalid={touched.puPerVisit && !!errors.puPerVisit}
@@ -6285,11 +6357,10 @@ export default class CreateTreeTemplate extends Component {
                                                         handleChange(e);
                                                         this.dataChange(e)
                                                     }}
-                                                    value={this.state.currentItemConfig.parentItem != null && (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode != null ? (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.usageType.id == 2 ?
+                                                    value={this.state.currentItemConfig.parentItem != null && this.state.currentItemConfig.parentItem.payload.nodeDataMap[0][0].fuNode != null ? (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0][0].fuNode.usageType.id == 2 || this.state.currentItemConfig.context.payload.nodeDataMap[0][0].puNode.sharePlanningUnit == "false" || this.state.currentItemConfig.context.payload.nodeDataMap[0][0].puNode.sharePlanningUnit == false) ?
                                                         addCommas(this.state.currentItemConfig.context.payload.nodeDataMap[0][0].puNode.puPerVisit) :
-                                                        (this.state.currentItemConfig.context.payload.nodeDataMap[0][0].puNode.sharePlanningUnit == "true" || this.state.currentItemConfig.context.payload.nodeDataMap[0][0].puNode.sharePlanningUnit == true ?
-                                                            addCommas(this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor) :
-                                                            this.round((this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor))) : ''}>
+                                                        addCommas(this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor) : ''}>
+
                                                 </Input>
                                                 <FormFeedback className="red">{errors.puPerVisit}</FormFeedback>
                                             </FormGroup>
@@ -7493,7 +7564,7 @@ export default class CreateTreeTemplate extends Component {
                 spacing: {
                     after: 150,
                 },
-                indent: { left: convertInchesToTwip(0.5*level) },
+                indent: { left: convertInchesToTwip(0.5 * level) },
             }));
             if (i != 0) {
                 var filteredList = this.state.items.filter(c => c.sortOrder > items[i].sortOrder && c.parent == items[i].parent);
@@ -7529,7 +7600,7 @@ export default class CreateTreeTemplate extends Component {
                                 fill: "cfcdc9"
                             },
                             style: row != "NA " ? total != 100 ? "aside" : "" : "",
-                            indent: { left: convertInchesToTwip(0.5*items[i].level) },
+                            indent: { left: convertInchesToTwip(0.5 * items[i].level) },
                         }))
                     }
                 }
@@ -7894,9 +7965,11 @@ export default class CreateTreeTemplate extends Component {
                                     }
                                     else if (itemConfig.payload.nodeType.id == 4) {
                                         console.log("fu id---", (itemConfig.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.id);
-                                        this.getPlanningUnitListByFUId((itemConfig.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.id);
                                         this.getNoOfFUPatient();
-                                        this.getNoOfMonthsInUsagePeriod();
+                                        setTimeout(() => {
+                                            this.getNoOfMonthsInUsagePeriod();
+                                            this.getPlanningUnitListByFUId((itemConfig.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.id);
+                                        }, 0);
                                         this.state.currentItemConfig.context.payload.nodeUnit.id = this.state.items.filter(x => x.id == itemConfig.parent)[0].payload.nodeUnit.id;
                                     } else {
 

@@ -750,7 +750,7 @@ export default class PlanningUnitListComponent extends Component {
         for (var j = 0; j < planningUnitList.length; j++) {
             data = [];
             data[0] = planningUnitList[j].planningUnitId
-            data[1] = getLabelText(planningUnitList[j].label, this.state.lang)
+            data[1] = getLabelText(planningUnitList[j].label, this.state.lang) + " | " + planningUnitList[j].planningUnitId
             data[2] = getLabelText(planningUnitList[j].forecastingUnit.label, this.state.lang)
             data[3] = getLabelText(planningUnitList[j].unit.label, this.state.lang)
             data[4] = (planningUnitList[j].multiplier).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");;

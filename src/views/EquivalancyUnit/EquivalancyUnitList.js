@@ -2073,6 +2073,16 @@ class EquivalancyUnit extends Component {
                     }
                 }
             }
+            this.setState({
+                message: 'Duplicate equivalency unit, forecasting unit, program combination not allow',
+                color: "#BA0C2F", loading: false
+            },
+                () => {
+                    this.hideSecondComponent();
+                })
+            return true;
+        } else {
+            return false;
         }
 
 
@@ -2082,8 +2092,10 @@ class EquivalancyUnit extends Component {
 
         var validation = this.checkValidation();
         var elInstance = this.state.table1Instance;
-        if (validation == true) {
-            this.checkAndMarkDuplicate();
+        let duplicateValidationFlag = this.checkAndMarkDuplicate();
+        console.log("duplicateValidationFlag------->1", duplicateValidationFlag);
+        if (validation == true && duplicateValidationFlag == false) {
+
             this.setState({ loading: true })
             var tableJson = elInstance.getJson(null, false);
             console.log("tableJson---", tableJson);
