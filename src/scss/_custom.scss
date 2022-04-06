@@ -6306,6 +6306,25 @@ font-style: italic!important;
     min-height: calc(100vh - 427px) !important;
     
  }
+ .Secondcolum {
+  width: 150px;
+  left: 51px;
+  z-index: 3;
+  min-width: 150px;
+  max-width: 150px;
+}
+.Thirdcolum {
+  left: 200px;
+  z-index: 4;
+  /* z-index: 999; */
+  width: 200px;
+  /* position: sticky; */
+  /* left: 210px; */
+  /* z-index: 4; */
+  min-width: 200px;
+  max-width: 200px;
+  /* left: 200px; */
+}
 }
 .CreateTreeTemplateHeight{
   min-height: calc(100vh - 645px) !important;
