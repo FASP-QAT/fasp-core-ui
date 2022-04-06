@@ -1088,37 +1088,37 @@ export default class BuildTree extends Component {
     }
     getMaxNodeDataId() {
         var maxNodeDataId = 0;
-        if (this.state.maxNodeDataId != "" && this.state.maxNodeDataId != 0) {
-            maxNodeDataId = parseInt(this.state.maxNodeDataId + 1);
-            console.log("maxNodeDataId 1---", maxNodeDataId)
-            this.setState({
-                maxNodeDataId
-            })
-        } else {
-            var items = this.state.items;
-            var nodeDataMap = [];
-            var nodeDataMapIdArr = [];
-            console.log("items.length---", items)
-            for (let i = 0; i < items.length; i++) {
-                var scenarioList = this.state.scenarioList;
-                console.log("scenarioList length---", scenarioList.length);
-                for (let j = 0; j < scenarioList.length; j++) {
-                    console.log("array a---", i, "---", items[i]);
-                    if (items[i].payload.nodeDataMap.hasOwnProperty(scenarioList[j].id)) {
-                        nodeDataMap.push(items[i].payload.nodeDataMap[scenarioList[j].id][0]);
-                        nodeDataMapIdArr.push(items[i].payload.nodeDataMap[scenarioList[j].id][0].nodeDataId);
-                    }
+        // if (this.state.maxNodeDataId != "" && this.state.maxNodeDataId != 0) {
+        //     maxNodeDataId = parseInt(this.state.maxNodeDataId + 1);
+        //     console.log("maxNodeDataId 1---", maxNodeDataId)
+        //     this.setState({
+        //         maxNodeDataId
+        //     })
+        // } else {
+        var items = this.state.items;
+        var nodeDataMap = [];
+        var nodeDataMapIdArr = [];
+        console.log("items.length---", items)
+        for (let i = 0; i < items.length; i++) {
+            var scenarioList = this.state.scenarioList;
+            console.log("scenarioList length---", scenarioList.length);
+            for (let j = 0; j < scenarioList.length; j++) {
+                console.log("array a---", i, "---", items[i]);
+                if (items[i].payload.nodeDataMap.hasOwnProperty(scenarioList[j].id)) {
+                    nodeDataMap.push(items[i].payload.nodeDataMap[scenarioList[j].id][0]);
+                    nodeDataMapIdArr.push(items[i].payload.nodeDataMap[scenarioList[j].id][0].nodeDataId);
                 }
             }
-            maxNodeDataId = nodeDataMap.length > 0 ? Math.max(...nodeDataMap.map(o => o.nodeDataId)) : 0;
-            console.log("nodeDataMap array---", nodeDataMap);
-            console.log("nodeDataMapIdArr---", nodeDataMapIdArr);
-            console.log("maxNodeDataId 2---", maxNodeDataId)
-            maxNodeDataId = parseInt(maxNodeDataId + 1);
-            this.setState({
-                maxNodeDataId
-            })
         }
+        maxNodeDataId = nodeDataMap.length > 0 ? Math.max(...nodeDataMap.map(o => o.nodeDataId)) : 0;
+        console.log("nodeDataMap array---", nodeDataMap);
+        console.log("nodeDataMapIdArr---", nodeDataMapIdArr);
+        console.log("maxNodeDataId 2---", maxNodeDataId)
+        maxNodeDataId = parseInt(maxNodeDataId + 1);
+        // this.setState({
+        //     maxNodeDataId
+        // })
+        // }
         return maxNodeDataId;
     }
 
@@ -4846,21 +4846,24 @@ export default class BuildTree extends Component {
         var parentSortOrder = items.filter(c => c.id == itemConfig.parent)[0].sortOrder;
         var childList = items.filter(c => c.parent == itemConfig.parent);
         newItem.sortOrder = parentSortOrder.concat(".").concat(("0" + (Number(childList.length) + 1)).slice(-2));
-        // (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].nodeDataId = this.getMaxNodeDataId();
+        var maxNodeDataId = this.getMaxNodeDataId();
+        (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].nodeDataId = maxNodeDataId;
         var scenarioList = this.state.scenarioList;
         if (scenarioList.length > 0) {
             for (let i = 0; i < scenarioList.length; i++) {
-                (newItem.payload.nodeDataMap[scenarioList[i].id])[0].nodeDataId = this.getMaxNodeDataId();
-                // var tempArray = [];
-                // var nodeDataMap = {};
-                // tempArray.push(JSON.parse(JSON.stringify((newItem.payload.nodeDataMap[this.state.selectedScenario])[0])));
-                // console.log("tempArray---", tempArray);
-                // nodeDataMap = newItem.payload.nodeDataMap;
-                // tempArray[0].nodeDataId = this.getMaxNodeDataId();
-                // nodeDataMap[scenarioList[i].id] = tempArray;
-                // // nodeDataMap[scenarioList[i].id][0].nodeDataId = scenarioList[i].id;
-                // newItem.payload.nodeDataMap = nodeDataMap;
-                // (newItem.payload.nodeDataMap[scenarioList[i].id])[0] = (newItem.payload.nodeDataMap[this.state.selectedScenario]);
+                if (scenarioList[i].id != this.state.selectedScenario) {
+                    (newItem.payload.nodeDataMap[scenarioList[i].id])[0].nodeDataId = parseInt(maxNodeDataId + 1);
+                    // var tempArray = [];
+                    // var nodeDataMap = {};
+                    // tempArray.push(JSON.parse(JSON.stringify((newItem.payload.nodeDataMap[this.state.selectedScenario])[0])));
+                    // console.log("tempArray---", tempArray);
+                    // nodeDataMap = newItem.payload.nodeDataMap;
+                    // tempArray[0].nodeDataId = this.getMaxNodeDataId();
+                    // nodeDataMap[scenarioList[i].id] = tempArray;
+                    // // nodeDataMap[scenarioList[i].id][0].nodeDataId = scenarioList[i].id;
+                    // newItem.payload.nodeDataMap = nodeDataMap;
+                    // (newItem.payload.nodeDataMap[scenarioList[i].id])[0] = (newItem.payload.nodeDataMap[this.state.selectedScenario]);
+                }
             }
         }
         console.log("duplicate button clicked value after update---", newItem);
@@ -6635,7 +6638,8 @@ export default class BuildTree extends Component {
         var parentSortOrder = items.filter(c => c.id == itemConfig.context.parent)[0].sortOrder;
         var childList = items.filter(c => c.parent == itemConfig.context.parent);
         newItem.sortOrder = parentSortOrder.concat(".").concat(("0" + (Number(childList.length) + 1)).slice(-2));
-        (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].nodeDataId = this.getMaxNodeDataId();
+        var maxNodeDataId = this.getMaxNodeDataId();
+        (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].nodeDataId = maxNodeDataId;
         (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].displayDataValue = (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].dataValue;
         (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].displayCalculatedDataValue = (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].calculatedDataValue;
         (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].month = moment((newItem.payload.nodeDataMap[this.state.selectedScenario])[0].month).startOf('month').format("YYYY-MM-DD")
@@ -6645,16 +6649,18 @@ export default class BuildTree extends Component {
         var scenarioList = this.state.scenarioList.filter(x => x.id != this.state.selectedScenario);
         if (scenarioList.length > 0) {
             for (let i = 0; i < scenarioList.length; i++) {
-                var tempArray = [];
-                var nodeDataMap = {};
-                tempArray.push(JSON.parse(JSON.stringify((newItem.payload.nodeDataMap[this.state.selectedScenario])[0])));
-                console.log("tempArray---", tempArray);
-                nodeDataMap = newItem.payload.nodeDataMap;
-                tempArray[0].nodeDataId = this.getMaxNodeDataId();
-                nodeDataMap[scenarioList[i].id] = tempArray;
-                // nodeDataMap[scenarioList[i].id][0].nodeDataId = scenarioList[i].id;
-                newItem.payload.nodeDataMap = nodeDataMap;
-                // (newItem.payload.nodeDataMap[scenarioList[i].id])[0] = (newItem.payload.nodeDataMap[this.state.selectedScenario]);
+                if (scenarioList[i].id != this.state.selectedScenario) {
+                    var tempArray = [];
+                    var nodeDataMap = {};
+                    tempArray.push(JSON.parse(JSON.stringify((newItem.payload.nodeDataMap[this.state.selectedScenario])[0])));
+                    console.log("tempArray---", tempArray);
+                    nodeDataMap = newItem.payload.nodeDataMap;
+                    tempArray[0].nodeDataId = parseInt(maxNodeDataId + 1);
+                    nodeDataMap[scenarioList[i].id] = tempArray;
+                    // nodeDataMap[scenarioList[i].id][0].nodeDataId = scenarioList[i].id;
+                    newItem.payload.nodeDataMap = nodeDataMap;
+                    // (newItem.payload.nodeDataMap[scenarioList[i].id])[0] = (newItem.payload.nodeDataMap[this.state.selectedScenario]);
+                }
             }
         }
         console.log("add button clicked value after update---", newItem);
