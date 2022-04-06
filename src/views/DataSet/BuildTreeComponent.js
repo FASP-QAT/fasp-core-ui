@@ -1506,6 +1506,7 @@ export default class BuildTree extends Component {
                         console.log("mom list ret---", this.state.nodeDataMomList.filter(x => x.nodeId == this.state.currentItemConfig.context.id));
                         this.setState({ momList: this.state.nodeDataMomList.filter(x => x.nodeId == this.state.currentItemConfig.context.id)[0].nodeDataMomList }, () => {
                             console.log("going to build mom jexcel");
+                            this.filterScalingDataByMonth(this.state.scalingMonth.year + "-" + this.state.scalingMonth.month + "-01", this.state.nodeDataMomList.filter(x => x.nodeId == this.state.currentItemConfig.context.id)[0].nodeDataMomList);
                             if (value == 1 || (value == 0 && this.state.showMomData)) {
                                 this.buildMomJexcel();
                             }
@@ -1513,6 +1514,7 @@ export default class BuildTree extends Component {
                     } else {
                         this.setState({ momListPer: this.state.nodeDataMomList.filter(x => x.nodeId == this.state.currentItemConfig.context.id)[0].nodeDataMomList }, () => {
                             console.log("going to build mom jexcel percent");
+                            this.filterScalingDataByMonth(this.state.scalingMonth.year + "-" + this.state.scalingMonth.month + "-01", this.state.nodeDataMomList.filter(x => x.nodeId == this.state.currentItemConfig.context.id)[0].nodeDataMomList);
                             if (value == 1 || (value == 0 && this.state.showMomDataPercent)) {
                                 this.buildMomJexcelPercent();
                             }
@@ -1813,11 +1815,12 @@ export default class BuildTree extends Component {
         }
     }
 
-    filterScalingDataByMonth(date) {
+    filterScalingDataByMonth(date, nodeDataMomListParam) {
         console.log("date--->>>>>>>", date);
         var json = this.state.modelingEl.getJson(null, false);
         console.log("modelingElData>>>", json);
         var scalingTotal = 0;
+        var nodeDataMomList = nodeDataMomListParam != undefined ? nodeDataMomListParam : this.state.currentScenario.nodeDataMomList;
         for (var i = 0; i < json.length; i++) {
             var calculatedChangeForMonth = 0;
             var map1 = new Map(Object.entries(json[i]));
@@ -1830,7 +1833,20 @@ export default class BuildTree extends Component {
             const result = moment(date).isBetween(startDate, stopDate, null, '[]');
             console.log("result---", result);
             if (result) {
-                var nodeValue = this.state.currentScenario.calculatedDataValue;
+                var nodeValue = 0;
+                let scalingDate = date;
+                if (modelingTypeId == 3 && moment(startDate).format("YYYY-MM") <= moment(scalingDate).format("YYYY-MM") && moment(stopDate).format("YYYY-MM") >= moment(scalingDate).format("YYYY-MM")) {
+                    var nodeDataMomListFilter = nodeDataMomList.filter(c => moment(c.month).format("YYYY-MM") == moment(startDate).format("YYYY-MM"));
+                    if (nodeDataMomListFilter.length > 0) {
+                        nodeValue = nodeDataMomListFilter[0].startValue;
+                    }
+                }
+                if (modelingTypeId == 4 && moment(startDate).format("YYYY-MM") <= moment(scalingDate).format("YYYY-MM") && moment(stopDate).format("YYYY-MM") >= moment(scalingDate).format("YYYY-MM")) {
+                    var nodeDataMomListFilter = nodeDataMomList.filter(c => moment(c.month).format("YYYY-MM") == moment(scalingDate).format("YYYY-MM"));
+                    if (nodeDataMomListFilter.length > 0) {
+                        nodeValue = nodeDataMomListFilter[0].startValue;
+                    }
+                }
 
                 if (modelingTypeId == 2 || modelingTypeId == 5) {
                     calculatedChangeForMonth = parseFloat(dataValue).toFixed(4);
@@ -1842,7 +1858,7 @@ export default class BuildTree extends Component {
             this.state.modelingEl.setValueFromCoords(8, i, calculatedChangeForMonth, true);
             // scalingTotal = parseFloat(scalingTotal) + parseFloat(calculatedChangeForMonth);
         }
-        var scalingDifference = this.state.currentScenario.nodeDataMomList.filter(c => moment(c.month).format("YYYY-MM") == moment(date).format("YYYY-MM"));
+        var scalingDifference = nodeDataMomList.filter(c => moment(c.month).format("YYYY-MM") == moment(date).format("YYYY-MM"));
         if (scalingDifference.length > 0) {
             scalingTotal += scalingDifference[0].difference;
         }
@@ -3753,15 +3769,15 @@ export default class BuildTree extends Component {
                 instance.jexcel.setComments(col, i18n.t('static.label.fieldRequired'));
                 this.state.modelingEl.setValueFromCoords(5, y, "", true);
                 this.state.modelingEl.setValueFromCoords(6, y, "", true);
-                this.state.modelingEl.setValueFromCoords(8, y, '', true);
+                // this.state.modelingEl.setValueFromCoords(8, y, '', true);
             } else {
                 if (value == 2) {
                     this.state.modelingEl.setValueFromCoords(5, y, "", true);
-                    this.state.modelingEl.setValueFromCoords(8, y, '', true);
+                    // this.state.modelingEl.setValueFromCoords(8, y, '', true);
                 }
                 else if (value == 3 || value == 4 || value == 5) {
                     this.state.modelingEl.setValueFromCoords(6, y, "", true);
-                    this.state.modelingEl.setValueFromCoords(8, y, '', true);
+                    // this.state.modelingEl.setValueFromCoords(8, y, '', true);
                 }
 
                 instance.jexcel.setStyle(col, "background-color", "transparent");
@@ -3845,7 +3861,7 @@ export default class BuildTree extends Component {
                     } else {
                         calculatedChangeForMonth = parseFloat(value).toFixed(4);
                     }
-                    this.state.modelingEl.setValueFromCoords(8, y, calculatedChangeForMonth, true);
+                    // this.state.modelingEl.setValueFromCoords(8, y, calculatedChangeForMonth, true);
                 }
             }
             if (x == 2 && rowData[2] != 2 && rowData[5] != "") {
@@ -3856,7 +3872,7 @@ export default class BuildTree extends Component {
                 } else {
                     calculatedChangeForMonth = parseFloat(rowData[5]).toFixed();
                 }
-                this.state.modelingEl.setValueFromCoords(8, y, calculatedChangeForMonth, true);
+                // this.state.modelingEl.setValueFromCoords(8, y, calculatedChangeForMonth, true);
             }
             // Monthly change #
             if (x == 6 && rowData[2] == 2) {
@@ -3877,7 +3893,7 @@ export default class BuildTree extends Component {
                 else {
                     instance.jexcel.setStyle(col, "background-color", "transparent");
                     instance.jexcel.setComments(col, "");
-                    this.state.modelingEl.setValueFromCoords(8, y, value, true);
+                    // this.state.modelingEl.setValueFromCoords(8, y, value, true);
                 }
             }
         }
@@ -3885,7 +3901,7 @@ export default class BuildTree extends Component {
             instance.jexcel.setValueFromCoords(10, y, 1, true);
             this.setState({ isChanged: true });
         }
-        this.calculateScalingTotal();
+        // this.calculateScalingTotal();
     }.bind(this);
     loadedMom = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance, 1);
