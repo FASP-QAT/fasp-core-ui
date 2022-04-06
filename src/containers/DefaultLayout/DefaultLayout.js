@@ -773,12 +773,20 @@ class DefaultLayout extends Component {
     // this.getDownloadedPrograms = this.getDownloadedPrograms.bind(this);
     // this.checkIfLocalProgramVersionChanged = this.checkIfLocalProgramVersionChanged.bind(this);
   }
- 
+
   refreshPage() {
+    // setTimeout(()=>{
+    //     window.location.reload(false);
+    // }, 500);
+    // console.log('page to reload')
+    // this.componentDidMount()
+}
+ 
+  // refreshPage() {
     // setTimeout(() => {
     //   window.location.reload(false);
     // }, 0);
-  }
+  // }
 
   checkEvent = (e) => {
     // console.log("checkEvent called---", e);

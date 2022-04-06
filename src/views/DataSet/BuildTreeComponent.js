@@ -1853,53 +1853,53 @@ export default class BuildTree extends Component {
     }
 
     filterScalingDataByMonth(date, nodeDataMomListParam) {
-        console.log("date--->>>>>>>", date);
-        var json = this.state.modelingEl.getJson(null, false);
-        console.log("modelingElData>>>", json);
-        var scalingTotal = 0;
-        var nodeDataMomList = nodeDataMomListParam != undefined ? nodeDataMomListParam : this.state.currentScenario.nodeDataMomList;
-        for (var i = 0; i < json.length; i++) {
-            var calculatedChangeForMonth = 0;
-            var map1 = new Map(Object.entries(json[i]));
-            var startDate = map1.get("3");
-            var stopDate = map1.get("4");
-            var modelingTypeId = map1.get("2");
-            var dataValue = modelingTypeId == 2 ? map1.get("6") : map1.get("5");
-            console.log("startDate---", startDate);
-            console.log("stopDate---", stopDate);
-            const result = moment(date).isBetween(startDate, stopDate, null, '[]');
-            console.log("result---", result);
-            if (result) {
-                var nodeValue = 0;
-                let scalingDate = date;
-                if (modelingTypeId == 3 && moment(startDate).format("YYYY-MM") <= moment(scalingDate).format("YYYY-MM") && moment(stopDate).format("YYYY-MM") >= moment(scalingDate).format("YYYY-MM")) {
-                    var nodeDataMomListFilter = nodeDataMomList.filter(c => moment(c.month).format("YYYY-MM") == moment(startDate).format("YYYY-MM"));
-                    if (nodeDataMomListFilter.length > 0) {
-                        nodeValue = nodeDataMomListFilter[0].startValue;
-                    }
-                }
-                if (modelingTypeId == 4 && moment(startDate).format("YYYY-MM") <= moment(scalingDate).format("YYYY-MM") && moment(stopDate).format("YYYY-MM") >= moment(scalingDate).format("YYYY-MM")) {
-                    var nodeDataMomListFilter = nodeDataMomList.filter(c => moment(c.month).format("YYYY-MM") == moment(scalingDate).format("YYYY-MM"));
-                    if (nodeDataMomListFilter.length > 0) {
-                        nodeValue = nodeDataMomListFilter[0].startValue;
-                    }
-                }
+        // console.log("date--->>>>>>>", date);
+        // var json = this.state.modelingEl.getJson(null, false);
+        // console.log("modelingElData>>>", json);
+        // var scalingTotal = 0;
+        // var nodeDataMomList = nodeDataMomListParam != undefined ? nodeDataMomListParam : this.state.currentScenario.nodeDataMomList;
+        // for (var i = 0; i < json.length; i++) {
+        //     var calculatedChangeForMonth = 0;
+        //     var map1 = new Map(Object.entries(json[i]));
+        //     var startDate = map1.get("3");
+        //     var stopDate = map1.get("4");
+        //     var modelingTypeId = map1.get("2");
+        //     var dataValue = modelingTypeId == 2 ? map1.get("6") : map1.get("5");
+        //     console.log("startDate---", startDate);
+        //     console.log("stopDate---", stopDate);
+        //     const result = moment(date).isBetween(startDate, stopDate, null, '[]');
+        //     console.log("result---", result);
+        //     if (result) {
+        //         var nodeValue = 0;
+        //         let scalingDate = date;
+        //         if (modelingTypeId == 3 && moment(startDate).format("YYYY-MM") <= moment(scalingDate).format("YYYY-MM") && moment(stopDate).format("YYYY-MM") >= moment(scalingDate).format("YYYY-MM")) {
+        //             var nodeDataMomListFilter = nodeDataMomList.filter(c => moment(c.month).format("YYYY-MM") == moment(startDate).format("YYYY-MM"));
+        //             if (nodeDataMomListFilter.length > 0) {
+        //                 nodeValue = nodeDataMomListFilter[0].startValue;
+        //             }
+        //         }
+        //         if (modelingTypeId == 4 && moment(startDate).format("YYYY-MM") <= moment(scalingDate).format("YYYY-MM") && moment(stopDate).format("YYYY-MM") >= moment(scalingDate).format("YYYY-MM")) {
+        //             var nodeDataMomListFilter = nodeDataMomList.filter(c => moment(c.month).format("YYYY-MM") == moment(scalingDate).format("YYYY-MM"));
+        //             if (nodeDataMomListFilter.length > 0) {
+        //                 nodeValue = nodeDataMomListFilter[0].startValue;
+        //             }
+        //         }
 
-                if (modelingTypeId == 2 || modelingTypeId == 5) {
-                    calculatedChangeForMonth = parseFloat(dataValue).toFixed(4);
-                } else if (modelingTypeId == 3 || modelingTypeId == 4) {
-                    calculatedChangeForMonth = parseFloat((nodeValue * dataValue) / 100).toFixed(4);
-                }
-                console.log("calculatedChangeForMonth---", calculatedChangeForMonth);
-            }
-            this.state.modelingEl.setValueFromCoords(8, i, calculatedChangeForMonth, true);
-            // scalingTotal = parseFloat(scalingTotal) + parseFloat(calculatedChangeForMonth);
-        }
-        var scalingDifference = nodeDataMomList.filter(c => moment(c.month).format("YYYY-MM") == moment(date).format("YYYY-MM"));
-        if (scalingDifference.length > 0) {
-            scalingTotal += scalingDifference[0].difference;
-        }
-        this.setState({ scalingTotal });
+        //         if (modelingTypeId == 2 || modelingTypeId == 5) {
+        //             calculatedChangeForMonth = parseFloat(dataValue).toFixed(4);
+        //         } else if (modelingTypeId == 3 || modelingTypeId == 4) {
+        //             calculatedChangeForMonth = parseFloat((nodeValue * dataValue) / 100).toFixed(4);
+        //         }
+        //         console.log("calculatedChangeForMonth---", calculatedChangeForMonth);
+        //     }
+        //     this.state.modelingEl.setValueFromCoords(8, i, calculatedChangeForMonth, true);
+        //     // scalingTotal = parseFloat(scalingTotal) + parseFloat(calculatedChangeForMonth);
+        // }
+        // var scalingDifference = nodeDataMomList.filter(c => moment(c.month).format("YYYY-MM") == moment(date).format("YYYY-MM"));
+        // if (scalingDifference.length > 0) {
+        //     scalingTotal += scalingDifference[0].difference;
+        // }
+        // this.setState({ scalingTotal });
 
     }
 
