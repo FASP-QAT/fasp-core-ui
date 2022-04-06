@@ -1179,7 +1179,7 @@ export default class PlanningUnitSetting extends Component {
                         datasetList1: datasetList1,
                         forecastProgramId: localStorage.getItem("sesForecastProgramIdReport"),
                         forecastProgramVersionId: localStorage.getItem("sesForecastVersionIdReport"),
-                        datasetId: datasetList.filter(c => c.programId == localStorage.getItem("sesForecastProgramIdReport") && c.programVersion == localStorage.getItem("sesForecastVersionIdReport"))[0].id,
+                        datasetId: (datasetList.filter(c => c.programId == localStorage.getItem("sesForecastProgramIdReport") && c.programVersion == localStorage.getItem("sesForecastVersionIdReport")).length > 0 ? datasetList.filter(c => c.programId == localStorage.getItem("sesForecastProgramIdReport") && c.programVersion == localStorage.getItem("sesForecastVersionIdReport"))[0].id : ''),
                     }, () => {
                         // this.planningUnitList();
                         this.tracerCategoryList();

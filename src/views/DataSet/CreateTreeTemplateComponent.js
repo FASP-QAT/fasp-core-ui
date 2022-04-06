@@ -1147,7 +1147,9 @@ export default class CreateTreeTemplate extends Component {
                     console.log("mom list ret---", this.state.nodeDataMomList.filter(x => x.nodeId == this.state.currentItemConfig.context.id));
                     this.setState({ momList: this.state.nodeDataMomList.filter(x => x.nodeId == this.state.currentItemConfig.context.id)[0].nodeDataMomList }, () => {
                         console.log("going to build mom jexcel");
-                        this.filterScalingDataByMonth(this.state.scalingMonth.year+"-"+this.state.scalingMonth.month+"-01",this.state.nodeDataMomList.filter(x => x.nodeId == this.state.currentItemConfig.context.id)[0].nodeDataMomList);
+                        if (this.state.modelingEl != null && this.state.modelingEl != undefined && this.state.modelingEl != "") {
+                            this.filterScalingDataByMonth(this.state.scalingMonth.year + "-" + this.state.scalingMonth.month + "-01", this.state.nodeDataMomList.filter(x => x.nodeId == this.state.currentItemConfig.context.id)[0].nodeDataMomList);
+                        }
                         if (value == 1 || (value == 0 && this.state.showMomData)) {
                             this.buildMomJexcel();
                         }
@@ -1159,7 +1161,9 @@ export default class CreateTreeTemplate extends Component {
                     var momList = this.state.nodeDataMomList.filter(x => x.nodeId == this.state.currentItemConfig.context.id);
                     this.setState({ momListPer: momList.length > 0 ? momList[0].nodeDataMomList : [] }, () => {
                         console.log("going to build mom jexcel percent");
-                        this.filterScalingDataByMonth(this.state.scalingMonth.year+"-"+this.state.scalingMonth.month+"-01",this.state.nodeDataMomList.filter(x => x.nodeId == this.state.currentItemConfig.context.id)[0].nodeDataMomList);
+                        if (this.state.modelingEl != null && this.state.modelingEl != undefined && this.state.modelingEl != "") {
+                            this.filterScalingDataByMonth(this.state.scalingMonth.year + "-" + this.state.scalingMonth.month + "-01", this.state.nodeDataMomList.filter(x => x.nodeId == this.state.currentItemConfig.context.id)[0].nodeDataMomList);
+                        }
                         if (value == 1 || (value == 0 && this.state.showMomDataPercent)) {
                             this.buildMomJexcelPercent();
                         }
@@ -1234,12 +1238,12 @@ export default class CreateTreeTemplate extends Component {
 
     }
 
-    filterScalingDataByMonth(date,nodeDataMomListParam) {
+    filterScalingDataByMonth(date, nodeDataMomListParam) {
         console.log("date--->>>>>>>", date);
         var json = this.state.modelingEl.getJson(null, false);
         // console.log("modelingElData>>>", json);
         var scalingTotal = 0;
-        var nodeDataMomList = nodeDataMomListParam!=undefined?nodeDataMomListParam:(this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].nodeDataMomList;
+        var nodeDataMomList = nodeDataMomListParam != undefined ? nodeDataMomListParam : (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].nodeDataMomList;
         for (var i = 0; i < json.length; i++) {
             var calculatedChangeForMonth = 0;
             var map1 = new Map(Object.entries(json[i]));
@@ -1255,19 +1259,19 @@ export default class CreateTreeTemplate extends Component {
             if (result) {
                 var nodeValue = 0;
                 let scalingDate = date;
-                console.log("@@@@@###########Scaling date",scalingDate);
-                console.log("@@@@@###########Start date",startDate);
-                console.log("@@@@@###########Start date",stopDate);
+                console.log("@@@@@###########Scaling date", scalingDate);
+                console.log("@@@@@###########Start date", startDate);
+                console.log("@@@@@###########Start date", stopDate);
                 if (modelingTypeId == 3 && moment(startDate).format("YYYY-MM") <= moment(scalingDate).format("YYYY-MM") && moment(stopDate).format("YYYY-MM") >= moment(scalingDate).format("YYYY-MM")) {
                     var nodeDataMomListFilter = nodeDataMomList.filter(c => moment(c.month).format("YYYY-MM") == moment(startDate).format("YYYY-MM"));
-                    console.log("@@@@@###########nodeDataMomListFilter",nodeDataMomListFilter);
+                    console.log("@@@@@###########nodeDataMomListFilter", nodeDataMomListFilter);
                     if (nodeDataMomListFilter.length > 0) {
                         nodeValue = nodeDataMomListFilter[0].startValue;
                     }
                 }
                 if (modelingTypeId == 4 && moment(startDate).format("YYYY-MM") <= moment(scalingDate).format("YYYY-MM") && moment(stopDate).format("YYYY-MM") >= moment(scalingDate).format("YYYY-MM")) {
                     var nodeDataMomListFilter = nodeDataMomList.filter(c => moment(c.month).format("YYYY-MM") == moment(scalingDate).format("YYYY-MM"));
-                    console.log("@@@@@###########nodeDataMomListFilter",nodeDataMomListFilter);
+                    console.log("@@@@@###########nodeDataMomListFilter", nodeDataMomListFilter);
                     if (nodeDataMomListFilter.length > 0) {
                         nodeValue = nodeDataMomListFilter[0].startValue;
                     }
@@ -7666,12 +7670,12 @@ export default class CreateTreeTemplate extends Component {
             {
                 beginDrag: ({ itemConfig }) => ({ id: itemConfig.id }),
                 endDrag(props, monitor) {
-                    const { onMoveItem } = props;
-                    const item = monitor.getItem()
-                    const dropResult = monitor.getDropResult()
-                    if (dropResult) {
-                        onMoveItem(dropResult.id, item.id);
-                    }
+                    // const { onMoveItem } = props;
+                    // const item = monitor.getItem()
+                    // const dropResult = monitor.getDropResult()
+                    // if (dropResult) {
+                    //     onMoveItem(dropResult.id, item.id);
+                    // }
                 },
             },
             (connect, monitor) => ({
@@ -7682,11 +7686,11 @@ export default class CreateTreeTemplate extends Component {
         const NodeDragDropSource = DropTarget(
             ItemTypes.NODE,
             {
-                drop: ({ itemConfig }) => ({ id: itemConfig.id }),
-                canDrop: ({ canDropItem, itemConfig }, monitor) => {
-                    const { id } = monitor.getItem();
-                    return canDropItem(itemConfig.id, id);
-                },
+                // drop: ({ itemConfig }) => ({ id: itemConfig.id }),
+                // canDrop: ({ canDropItem, itemConfig }, monitor) => {
+                //     const { id } = monitor.getItem();
+                //     return canDropItem(itemConfig.id, id);
+                // },
             },
             (connect, monitor) => ({
                 connectDropTarget: connect.dropTarget(),
@@ -7779,7 +7783,7 @@ export default class CreateTreeTemplate extends Component {
                             <button key="2" type="button" className="StyledButton TreeIconStyle TreeIconStyleCopyPaddingTop" style={{ background: 'none' }}
                                 onClick={(event) => {
                                     event.stopPropagation();
-                                    this.duplicateNode(itemConfig);
+                                    this.duplicateNode(JSON.parse(JSON.stringify(itemConfig)));
                                 }}>
                                 <i class="fa fa-clone" aria-hidden="true"></i>
                             </button>
@@ -8005,8 +8009,6 @@ export default class CreateTreeTemplate extends Component {
                     return <NodeDragDropSource
                         itemConfig={itemConfig}
                         onRemoveItem={this.onRemoveItem}
-                        canDropItem={this.canDropItem}
-                        onMoveItem={this.onMoveItem}
                     />;
                 }
             }]
@@ -8493,9 +8495,9 @@ export default class CreateTreeTemplate extends Component {
                                                         </div>
                                                     </div>
                                                     {/* <CardFooter style={{ backgroundColor: 'transparent', borderTop: '0px solid #c8ced3' }}> */}
-                                                        {/* <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button> */}
-                                                        {/* <Button type="button" size="md" color="warning" className="float-right mr-1" onClick={this.resetTree}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button> */}
-                                                        {/* <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"> </i>{i18n.t('static.pipeline.save')}</Button> */}
+                                                    {/* <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button> */}
+                                                    {/* <Button type="button" size="md" color="warning" className="float-right mr-1" onClick={this.resetTree}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button> */}
+                                                    {/* <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"> </i>{i18n.t('static.pipeline.save')}</Button> */}
                                                     {/* </CardFooter> */}
                                                 </Form>
 
