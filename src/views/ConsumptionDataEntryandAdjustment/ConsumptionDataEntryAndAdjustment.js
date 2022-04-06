@@ -7,7 +7,7 @@ import {
   CardFooter, Button, Col, Form, InputGroup, Modal, ModalHeader, ModalBody, ModalFooter, FormFeedback
 } from 'reactstrap';
 import CryptoJS from 'crypto-js'
-import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, DATE_FORMAT_CAP_WITHOUT_DATE, DATE_FORMAT_CAP, TITLE_FONT, JEXCEL_DECIMAL_CATELOG_PRICE, SPECIAL_CHARECTER_WITH_NUM } from '../../Constants.js'
+import { SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, DATE_FORMAT_CAP_WITHOUT_DATE, DATE_FORMAT_CAP, TITLE_FONT, JEXCEL_DECIMAL_CATELOG_PRICE, SPECIAL_CHARECTER_WITH_NUM, TBD_PROCUREMENT_AGENT_ID } from '../../Constants.js'
 import getLabelText from '../../CommonComponent/getLabelText'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import i18n from '../../i18n';
@@ -40,16 +40,30 @@ const initialValues = {
 
 const validationSchema = function (values, t) {
   return Yup.object().shape({
+    needOtherUnitValidation: Yup.boolean(),
     otherUnitName: Yup.string()
-      // .matches(BUDGET_NAME_REGEX, i18n.t('static.message.budgetNameRegex'))
-      .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
-      .required(i18n.t('static.budget.budgetamountdesc')),
+      .when("needOtherUnitValidation", {
+        is: val => {
+          return (document.getElementById("needOtherUnitValidation").value === "true");
+        },
+        then: Yup.string()
+          .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
+          .required(i18n.t('static.budget.budgetamountdesc'))
+        ,
+        otherwise: Yup.string().notRequired()
+      }),
     otherUnitMultiplier: Yup.string()
-      // .matches(ALPHABET_NUMBER_REGEX, i18n.t('static.message.alphabetnumerallowed'))
-      // .matches(/^[a-zA-Z0-9_'\/-]*$/, i18n.t('static.common.alphabetNumericCharOnly'))
-      .matches(SPECIAL_CHARECTER_WITH_NUM, i18n.t('static.validNoSpace.string'))
-      .max(30, i18n.t('static.common.max30digittext'))
-      .required(i18n.t('static.budget.budgetDisplayNameText')),
+      .when("dataEnteredInUnitId", {
+        is: val => {
+          return (document.getElementById("dataEnteredInUnitId").value == 3);
+        },
+        then: Yup.string()
+          .matches(SPECIAL_CHARECTER_WITH_NUM, i18n.t('static.validNoSpace.string'))
+          .max(30, i18n.t('static.common.max30digittext'))
+          .required(i18n.t('static.budget.budgetDisplayNameText'))
+        ,
+        otherwise: Yup.string().notRequired()
+      })
   })
 }
 const validate = (getValidationSchema) => {
@@ -96,6 +110,9 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       selectedPlanningUnitDesc: "",
       selectedPlanningUnitMultiplier: "",
       changedPlanningUnitMultiplier: "",
+      changedConsumptionTypeId: "",
+      changedConsumptionDataDesc: "",
+      changedConsumptionDataMultiplier: "",
       changedPlanningUnitId: "",
       toggleDataCheck: false,
       toggleDataChangeForSmallTable: false,
@@ -170,7 +187,6 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
   }
 
   buildDataJexcel(consumptionUnitId) {
-
     var cont = false;
     if (this.state.consumptionChanged) {
       var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
@@ -190,48 +206,23 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         var consumptionList = this.state.consumptionList;
         var consumptionUnit = {};
         var consumptionNotes = "";
-        if (consumptionUnitId > 0) {
-          consumptionUnit = this.state.planningUnitList.filter(c => c.planningUnit.id == consumptionUnitId)[0];
-          consumptionNotes = consumptionUnit.consumptionNotes;
-        } else {
-          consumptionUnit = {
-            programPlanningUnitId: 0,
-            planningUnit: {
-              id: 0,
-              label: {
-
-              },
-              multiplier: 1,
-              forecastingUnit: {
-                id: 0,
-                label: {
-
-                }
-              }
-            },
-            consuptionForecast: true,
-            treeForecast: false,
-            consumptionNotes: "",
-            consumptionDataType: 1,
-            otherUnit: {
-              id: 0,
-              label: {
-
-              },
-              multiplier: 1,
-            },
-            selectedForecastMap: {},
-          }
-        }
+        consumptionUnit = this.state.planningUnitList.filter(c => c.planningUnit.id == consumptionUnitId)[0];
+        consumptionNotes = consumptionUnit.consumptionNotes;
         document.getElementById("consumptionNotes").value = consumptionNotes;
         var multiplier = 1;
+        var changedConsumptionDataDesc = "";
         if (consumptionUnitId != 0) {
           if (consumptionUnit.consumptionDataType == 1) {
             multiplier = 1;
+            changedConsumptionDataDesc = getLabelText(consumptionUnit.planningUnit.forecastingUnit.label, this.state.lang);
           } else if (consumptionUnit.consumptionDataType == 2) {
             multiplier = consumptionUnit.planningUnit.multiplier;
+            changedConsumptionDataDesc = getLabelText(consumptionUnit.planningUnit.label, this.state.lang);
+
           } else {
             multiplier = consumptionUnit.otherUnit.multiplier;
+            changedConsumptionDataDesc = getLabelText(consumptionUnit.otherUnit.label, this.state.lang);
+
           }
         }
         consumptionList = consumptionList.filter(c => c.planningUnit.id == consumptionUnitId);
@@ -588,7 +579,10 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           selectedPlanningUnitId: consumptionUnit.planningUnit.id,
           selectedPlanningUnitDesc: getLabelText(consumptionUnit.planningUnit.label, this.state.lang),
           selectedPlanningUnitMultiplier: multiplier,
-          showDetailTable: true
+          showDetailTable: TBD_PROCUREMENT_AGENT_ID,
+          changedConsumptionDataDesc: changedConsumptionDataDesc,
+          changedPlanningUnitMultiplier: multiplier,
+          changedConsumptionDataMultiplier: multiplier
         })
       })
     }
@@ -758,58 +752,58 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     var curUser = AuthenticationService.getLoggedInUserId();
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF', 'AG', 'AH', 'AI', 'AJ', 'AK', 'AL', 'AM', 'AN']
     var consumptionUnit = this.state.selectedConsumptionUnitObject;
-    if (this.state.selectedConsumptionUnitId == 0) {
-      var json = this.state.smallTableEl.getJson(null, false);
-      var dataType = 0;
-      if (json[0][0] == true) {
-        dataType = 1;
-      } else if (json[2][0] == true) {
-        dataType = 3;
-      } else {
-        dataType = 2
-      }
+    // if (this.state.selectedConsumptionUnitId == 0) {
+    //   var json = this.state.smallTableEl.getJson(null, false);
+    //   var dataType = 0;
+    //   if (json[0][0] == true) {
+    //     dataType = 1;
+    //   } else if (json[2][0] == true) {
+    //     dataType = 3;
+    //   } else {
+    //     dataType = 2
+    //   }
 
-      var fu = this.state.forecastingUnitList.filter(c => c.forecastingUnitId == (json[0])[4])[0];
-      var pu = this.state.allPlanningUnitList.filter(c => c.planningUnitId == this.state.selectedPlanningUnitId)[0];
-      var consumptionUnit = {
-        programPlanningUnitId: 0,
-        planningUnit: {
-          forecastingUnit: {
-            id: (json[0])[4],
-            label: fu.label
-          },
-          id: pu.planningUnitId,
-          label: pu.label,
-          multiplier: json[0][3]
-        },
-        consuptionForecast: true,
-        treeForecast: false,
-        stock: "",
-        existingShipments: "",
-        monthsOfStock: "",
-        procurementAgent: {
-          id: "",
-          label: {}
-        },
-        price: "",
-        higherThenConsumptionThreshold: "",
-        lowerThenConsumptionThreshold: "",
-        consumptionNotes: "",
-        consumptionDataType: dataType,
-        otherUnit: {
-          id: 0,
-          label: {
-            label_en: json[2][2]
-          },
-          multiplier: json[2][3]
-        },
-        selectedForecastMap: {},
-        createdBy: {
-          userId: curUser
-        },
-        createdDate: curDate
-      }
-    }
+    //   var fu = this.state.forecastingUnitList.filter(c => c.forecastingUnitId == (json[0])[4])[0];
+    //   var pu = this.state.allPlanningUnitList.filter(c => c.planningUnitId == this.state.selectedPlanningUnitId)[0];
+    //   var consumptionUnit = {
+    //     programPlanningUnitId: 0,
+    //     planningUnit: {
+    //       forecastingUnit: {
+    //         id: (json[0])[4],
+    //         label: fu.label
+    //       },
+    //       id: pu.planningUnitId,
+    //       label: pu.label,
+    //       multiplier: json[0][3]
+    //     },
+    //     consuptionForecast: true,
+    //     treeForecast: false,
+    //     stock: "",
+    //     existingShipments: "",
+    //     monthsOfStock: "",
+    //     procurementAgent: {
+    //       id: "",
+    //       label: {}
+    //     },
+    //     price: "",
+    //     higherThenConsumptionThreshold: "",
+    //     lowerThenConsumptionThreshold: "",
+    //     consumptionNotes: "",
+    //     consumptionDataType: dataType,
+    //     otherUnit: {
+    //       id: 0,
+    //       label: {
+    //         label_en: json[2][2]
+    //       },
+    //       multiplier: json[2][3]
+    //     },
+    //     selectedForecastMap: {},
+    //     createdBy: {
+    //       userId: curUser
+    //     },
+    //     createdDate: curDate
+    //   }
+    // }
     var fullConsumptionList = this.state.consumptionList.filter(c => c.planningUnit.id != consumptionUnit.planningUnit.id);
     var elInstance = this.state.dataEl;
     for (var i = 0; i < monthArray.length; i++) {
@@ -949,60 +943,63 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
           var curUser = AuthenticationService.getLoggedInUserId();
           var consumptionUnit = this.state.selectedConsumptionUnitObject;
-          console.log("save consumptionUnit----", consumptionUnit)
           var fullConsumptionList = this.state.consumptionList.filter(c => c.planningUnit.id != consumptionUnit.planningUnit.id);
-          if (this.state.selectedConsumptionUnitId == 0) {
-            var json = this.state.smallTableEl.getJson(null, false);
-            var dataType = 0;
-            if (json[0][0] == true) {
-              dataType = 1;
-            } else if (json[2][0] == true) {
-              dataType = 3;
-            } else {
-              dataType = 2
-            }
+          // if (this.state.selectedConsumptionUnitId == 0) {
+          //   var json = this.state.smallTableEl.getJson(null, false);
+          //   var dataType = 0;
+          //   if (json[0][0] == true) {
+          //     dataType = 1;
+          //   } else if (json[2][0] == true) {
+          //     dataType = 3;
+          //   } else {
+          //     dataType = 2
+          //   }
+          //   console.log("json----", json)
+          //   console.log("dataType----", dataType)
+          //   console.log("this.state.selectedPlanningUnitId----", this.state.selectedPlanningUnitId)
+          //   console.log("changedPlanningUnitMultiplier----", this.state.changedPlanningUnitMultiplier)
 
-            var fu = this.state.forecastingUnitList.filter(c => c.forecastingUnitId == (json[0])[4])[0];
-            var pu = this.state.allPlanningUnitList.filter(c => c.planningUnitId == this.state.selectedPlanningUnitId)[0];
-            var consumptionUnit = {
-              programPlanningUnitId: 0,
-              planningUnit: {
-                forecastingUnit: {
-                  id: (json[0])[4],
-                  label: fu.label
-                },
-                id: pu.planningUnitId,
-                label: pu.label,
-                multiplier: json[0][3]
-              },
-              consuptionForecast: true,
-              treeForecast: false,
-              stock: "",
-              existingShipments: "",
-              monthsOfStock: "",
-              procurementAgent: {
-                id: "",
-                label: {}
-              },
-              price: "",
-              higherThenConsumptionThreshold: "",
-              lowerThenConsumptionThreshold: "",
-              consumptionNotes: "",
-              consumptionDataType: dataType,
-              otherUnit: {
-                id: 0,
-                label: {
-                  label_en: json[2][2]
-                },
-                multiplier: json[2][3]
-              },
-              selectedForecastMap: {},
-              createdBy: {
-                userId: curUser
-              },
-              createdDate: curDate
-            }
-          }
+          //   var fu = this.state.forecastingUnitList.filter(c => c.forecastingUnitId == (json[0])[4])[0];
+          //   var pu = this.state.allPlanningUnitList.filter(c => c.planningUnitId == this.state.selectedPlanningUnitId)[0];
+          //   var consumptionUnit = {
+          //     programPlanningUnitId: 0,
+          //     planningUnit: {
+          //       forecastingUnit: {
+          //         id: (json[0])[4],
+          //         label: fu.label
+          //       },
+          //       id: pu.planningUnitId,
+          //       label: pu.label,
+          //       multiplier: json[0][3]
+          //     },
+          //     consuptionForecast: true,
+          //     treeForecast: false,
+          //     stock: "",
+          //     existingShipments: "",
+          //     monthsOfStock: "",
+          //     procurementAgent: {
+          //       id: "",
+          //       label: {}
+          //     },
+          //     price: "",
+          //     higherThenConsumptionThreshold: "",
+          //     lowerThenConsumptionThreshold: "",
+          //     consumptionNotes: "",
+          //     consumptionDataType: dataType,
+          //     otherUnit: {
+          //       id: 0,
+          //       label: {
+          //         label_en: json[2][2]
+          //       },
+          //       multiplier: json[2][3]
+          //     },
+          //     selectedForecastMap: {},
+          //     createdBy: {
+          //       userId: curUser
+          //     },
+          //     createdDate: curDate
+          //   }
+          // }
           var monthArray = this.state.monthArray;
           var regionList = this.state.regionList;
           for (var i = 0; i < monthArray.length; i++) {
@@ -1048,11 +1045,24 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
             }
           }
           var planningUnitList = datasetJson.planningUnitList;
-          if (this.state.selectedConsumptionUnitId == 0) {
-            planningUnitList.push(consumptionUnit);
-          }
+          // if (this.state.selectedConsumptionUnitId == 0) {
+          //   planningUnitList.push(consumptionUnit);
+          // }
+
           var planningUnitIndex = planningUnitList.findIndex(c => c.planningUnit.id == consumptionUnit.planningUnit.id);
           planningUnitList[planningUnitIndex].consumptionNotes = document.getElementById("consumptionNotes").value;
+          planningUnitList[planningUnitIndex].consumptionDataType = this.state.changedConsumptionTypeId;
+          if (this.state.changedConsumptionTypeId == 3) {
+            var otherUnitJson = {
+              id: null,
+              label: {
+                label_en: this.state.otherUnitName
+              },
+              multiplier: this.state.changedPlanningUnitMultiplier
+            }
+            planningUnitList[planningUnitIndex].otherUnit = otherUnitJson;
+          }
+
           datasetJson.actualConsumptionList = fullConsumptionList;
           datasetJson.planningUnitList = planningUnitList;
           datasetData = (CryptoJS.AES.encrypt(JSON.stringify(datasetJson), SECRET_KEY)).toString()
@@ -1492,7 +1502,6 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
               var consumptionList = datasetJson.actualConsumptionList;
               var planningUnitList = datasetJson.planningUnitList.filter(c => c.consuptionForecast);
               var regionList = datasetJson.regionList;
-
               regionList.sort((a, b) => {
                 var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
                 var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
@@ -1532,12 +1541,18 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                       qty = (Number(actualConsumption) / Number(reportingRate) / Number(1 - (Number(daysOfStockOut) / Number(noOfDays)))) * 100;
                       qty = qty.toFixed(2)
                       var multiplier = 0;
+                      var changedConsumptionDataDesc = "";
                       if (planningUnitList[cul].consumptionDataType == 1) {
-                        multiplier = planningUnitList[cul].planningUnit.multiplier
-                      } else if (planningUnitList[cul].consumptionDataType == 2) {
                         multiplier = 1
+                        changedConsumptionDataDesc = getLabelText(planningUnitList[cul].planningUnit.label, this.state.lang);
+                      } else if (planningUnitList[cul].consumptionDataType == 2) {
+                        multiplier = planningUnitList[cul].planningUnit.multiplier
+                        changedConsumptionDataDesc = getLabelText(planningUnitList[cul].planningUnit.label, this.state.lang);
+
                       } else {
                         multiplier = planningUnitList[cul].otherUnit.multiplier
+                        changedConsumptionDataDesc = getLabelText(planningUnitList[cul].otherUnit.label, this.state.lang);
+
                       }
                       qtyInPU = (Number(qty) / Number(multiplier)).toFixed(2)
                     } else {
@@ -1578,9 +1593,11 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                 loading: false,
                 planningUnitTotalList: planningUnitTotalList,
                 planningUnitTotalListRegion: planningUnitTotalListRegion,
-                allPlanningUnitList: allPlanningUnitList
+                allPlanningUnitList: allPlanningUnitList,
+                changedConsumptionDataDesc: changedConsumptionDataDesc,
+                changedConsumptionDataMultiplier: multiplier
               }, () => {
-                console.log("this.props.match.params.planningUnitId+++", this.props.match.params.planningUnitId)
+                console.log("this.props.match.params.planningUnitId+++", multiplier)
                 if (this.props.match.params.planningUnitId > 0) {
                   this.buildDataJexcel(this.props.match.params.planningUnitId)
                 }
@@ -2161,16 +2178,12 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                                     disabled={this.state.selectedConsumptionUnitId > 0 ? true : false}
                                     // onChange={this.filterVersion}
                                     // onChange={(e) => { this.getARUList(e); }}
-                                    value={this.state.selectedPlanningUnitDesc}
-
+                                    value={this.state.changedConsumptionDataDesc}
                                   >
-                                    {/* <option value="">{i18n.t('static.common.select')}</option> */}
-                                    {/* {planningUnits} */}
                                   </Input>
-
                                 </InputGroup>
                               </div>
-                              <Label htmlFor="appendedInputButton">Data entered in {this.state.selectedPlanningUnitDesc}, multiplier to FU = {this.state.selectedPlanningUnitMultiplier}
+                              <Label htmlFor="appendedInputButton">Data entered in {this.state.changedConsumptionDataDesc}, multiplier to FU = {this.state.changedConsumptionDataMultiplier}
                                 <a className="card-header-action">
                                   <span style={{ cursor: 'pointer' }} onClick={() => { this.changeUnit(this.state.selectedConsumptionUnitId) }}><small className="changeUnit">(change)</small></span>
                                 </a>
@@ -2361,45 +2374,51 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                       <FormGroup className="col-md-6" id="otherUnitNameDiv" style={{ display: this.state.showOtherUnitNameField ? 'block' : 'none' }}>
                         <Label htmlFor="appendedInputButton">{i18n.t('static.common.otherUnitName')}</Label>
                         {/* <div className="controls "> */}
-                          {/* <InputGroup> */}
-                            <Input
-                              type="text"
-                              name="otherUnitName"
-                              id="otherUnitName"
-                              bsSize="sm"
-                              valid={!errors.otherUnitName}
-                              invalid={touched.otherUnitName && !!errors.otherUnitName}
-                              onChange={(e) => { handleChange(e); }}
-                              onBlur={handleBlur}
-                              value={this.state.otherUnitName}
-                            // onChange={(e) => this.setState({ consumptionChanged: true })}
-                            >
-                            </Input>
-                          {/* </InputGroup> */}
+                        {/* <InputGroup> */}
+                        <Input
+                          type="text"
+                          name="otherUnitName"
+                          id="otherUnitName"
+                          bsSize="sm"
+                          valid={!errors.otherUnitName}
+                          invalid={touched.otherUnitName && !!errors.otherUnitName}
+                          onChange={(e) => { handleChange(e); }}
+                          onBlur={handleBlur}
+                          value={this.state.otherUnitName}
+                        // onChange={(e) => this.setState({ consumptionChanged: true })}
+                        >
+                        </Input>
+                        <Input
+                          type="text"
+                          name="needOtherUnitValidation"
+                          id="needOtherUnitValidation"
+                          value={(this.state.changedConsumptionTypeId == 3 ? true : false)}
+                        />
+                        {/* </InputGroup> */}
                         {/* </div> */}
                         <FormFeedback className="red">{errors.otherUnitName}</FormFeedback>
                       </FormGroup>
                       <FormGroup className="col-md-6" style={{ display: this.state.showDetailTable ? 'block' : 'none' }}>
                         <Label htmlFor="appendedInputButton">{i18n.t('static.importFromQATSupplyPlan.multiplierTo')}</Label>
                         {/* <InputGroup> */}
-                          <Input
-                            className="controls"
-                            type="number"
-                            name="otherUnitMultiplier"
-                            id="otherUnitMultiplier"
-                            bsSize="sm"
-                            valid={!errors.otherUnitMultiplier}
-                            invalid={touched.otherUnitMultiplier && !!errors.otherUnitMultiplier}
-                            // onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                            onBlur={handleBlur}
-                            // valid={!errors.otherUnitMultiplier && this.state.selectedPlanningUnitMultiplier != ''}
-                            // invalid={touched.otherUnitMultiplier && !!errors.otherUnitMultiplier}
-                            // step={0.01}
-                            value={this.state.changedPlanningUnitMultiplier}
-                            onChange={(e) => { this.setOtherUnitMultiplier(e); handleChange(e); }}
-                            required
-                          >
-                          </Input>
+                        <Input
+                          className="controls"
+                          type="number"
+                          name="otherUnitMultiplier"
+                          id="otherUnitMultiplier"
+                          bsSize="sm"
+                          valid={!errors.otherUnitMultiplier}
+                          invalid={touched.otherUnitMultiplier && !!errors.otherUnitMultiplier}
+                          // onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                          onBlur={handleBlur}
+                          // valid={!errors.otherUnitMultiplier && this.state.selectedPlanningUnitMultiplier != ''}
+                          // invalid={touched.otherUnitMultiplier && !!errors.otherUnitMultiplier}
+                          // step={0.01}
+                          value={this.state.changedPlanningUnitMultiplier}
+                          onChange={(e) => { this.setOtherUnitMultiplier(e); handleChange(e); }}
+                          required
+                        >
+                        </Input>
                         {/* </InputGroup> */}
                         <FormFeedback className="red">{errors.otherUnitMultiplier}</FormFeedback>
                       </FormGroup>
@@ -2507,55 +2526,18 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
   }
 
   submitChangedUnit(consumptionUnitId) {
-    var updatedSelectedConsumptionUnitId = "";
-    this.state.dataEnteredInUnitList.map(c => {
-      if (c[1] == consumptionUnitId) {
-        updatedSelectedConsumptionUnitId = c[5]
-      }
-    })
     var consumptionUnit = {};
-    if (consumptionUnitId > 0) {
-      console.log("$$$$$", this.state.planningUnitList)
-      consumptionUnit = this.state.planningUnitList.filter(c => c.planningUnit.id == updatedSelectedConsumptionUnitId)[0];
-    } else {
-      consumptionUnit = {
-        programPlanningUnitId: 0,
-        planningUnit: {
-          id: 0,
-          label: {
-
-          },
-          multiplier: 1,
-          forecastingUnit: {
-            id: 0,
-            label: {
-
-            }
-          }
-        },
-        consuptionForecast: true,
-        treeForecast: false,
-        consumptionNotes: "",
-        consumptionDataType: 1,
-        otherUnit: {
-          id: 0,
-          label: {
-
-          },
-          multiplier: 1,
-        },
-        selectedForecastMap: {},
-      }
-    }
-    console.log("submitChangedUnit consumptionUnit", consumptionUnit)
+    consumptionUnit = this.state.planningUnitList.filter(c => c.planningUnit.id == consumptionUnitId)[0];
+    var otherUnitNameText = document.getElementById("otherUnitName").value;
     this.setState({
-      selectedConsumptionUnitId: updatedSelectedConsumptionUnitId,
-      selectedPlanningUnitId: updatedSelectedConsumptionUnitId,
+      selectedConsumptionUnitId: consumptionUnitId,
+      selectedPlanningUnitId: consumptionUnit.planningUnit.id,
       selectedConsumptionUnitObject: consumptionUnit,
       selectedPlanningUnitDesc: getLabelText(consumptionUnit.planningUnit.label, this.state.lang),
-      selectedPlanningUnitMultiplier: this.state.changedPlanningUnitMultiplier,
+      selectedPlanningUnitMuutiplier: this.state.changedPlanningUnitMultiplier,
       consumptionChanged: true,
-      toggleDataChangeForSmallTable: false
+      toggleDataChangeForSmallTable: false,
+      otherUnitName: otherUnitNameText
     })
   }
 
@@ -2570,45 +2552,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           var showHideOtherUnitNameField = false;
           var consumptionList = this.state.consumptionList;
           var consumptionUnit = {};
-          if (consumptionUnitId > 0) {
-            if (consumptionUnit.consumptionDataType == 1) {
-              consumptionUnit = this.state.planningUnitList.filter(c => c.planningUnit.forecastingUnit.id == consumptionUnitId)[0];
-            } else if (consumptionUnit.consumptionDataType == 2) {
-              consumptionUnit = this.state.planningUnitList.filter(c => c.planningUnit.id == consumptionUnitId)[0];
-            } else if (consumptionUnit.consumptionDataType == 3) {
-              consumptionUnit = this.state.planningUnitList.filter(c => c.otherUnit.id == consumptionUnitId)[0];
-            }
-          } else {
-            consumptionUnit = {
-              programPlanningUnitId: 0,
-              planningUnit: {
-                id: 0,
-                label: {
-
-                },
-                multiplier: 1,
-                forecastingUnit: {
-                  id: 0,
-                  label: {
-
-                  }
-                }
-              },
-              consuptionForecast: true,
-              treeForecast: false,
-              consumptionNotes: "",
-              consumptionDataType: 1,
-              otherUnit: {
-                id: 0,
-                label: {
-
-                },
-                multiplier: 1,
-              },
-              selectedForecastMap: {},
-            }
-          }
-          // document.getElementById("consumptionNotes").value = consumptionNotes;
+          consumptionUnit = this.state.planningUnitList.filter(c => c.planningUnit.id == consumptionUnitId)[0];
           var multiplier = 1;
           if (consumptionUnitId != 0) {
             if (consumptionUnit.consumptionDataType == 1) {
@@ -2655,7 +2599,6 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
             data[5] = consumptionUnit.planningUnit.id;
             dataArray1.push(data);
           }
-          console.log(dataArray1)
           this.setState({
             //   dataEl: dataEl, 
             loading: false,
@@ -2678,10 +2621,16 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
   setDataEnteredIn(e) {
     var multiplier = "";
     var arrayid = "";
+    var arrayid1 = "";
+    var consumptionDataDesc = "";
+
+
     this.state.dataEnteredInUnitList.map(c => {
       if (c[1] == e.target.value) {
         multiplier = c[3]
-        arrayid = c[1]
+        arrayid = c[5]
+        arrayid1 = c[1]
+        consumptionDataDesc = c[2]
       }
     })
     if (e.target.value == 3) {
@@ -2693,7 +2642,9 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     }
     this.setState({
       changedPlanningUnitMultiplier: multiplier,
-      changedPlanningUnitId: arrayid
+      changedPlanningUnitId: arrayid,
+      changedConsumptionTypeId: arrayid1,
+      // changedConsumptionDataDesc: consumptionDataDesc
     })
   }
 }
