@@ -2247,5 +2247,13 @@
     "static.organisation.organisationheader": "Organisation",
     "static.supplyPlanFormula.maxMonthOfStockEx5": "Max = 7",
     "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18)",
-    "static.common.dataEnteredIn": "Données saisies dans"
+    "static.common.dataEnteredIn": "Données saisies dans",
+    "static.common.otherUnitName": "Autre nom d'unité",
+    "static.importFromQATSupplyPlan.multiplierTo": "Multiplicateur à",
+    "static.common.otherUnit": "Autre unité",
+    "static.dataentry.units": "Unités",
+    "static.dataentry.multiplierToFU": "multiplicateur en FU",
+    "static.dataentry.change": "changement",
+    "static.dataentry.otherUnitName": "Entrez le nom de l'autre unité",
+    "static.dataentry.otherUnitMultiplier": "Entrez Autre multiplicateur d'unité"
 }
