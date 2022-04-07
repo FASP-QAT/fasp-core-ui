@@ -1179,7 +1179,7 @@ export default class PlanningUnitSetting extends Component {
                         datasetList1: datasetList1,
                         forecastProgramId: localStorage.getItem("sesForecastProgramIdReport"),
                         forecastProgramVersionId: localStorage.getItem("sesForecastVersionIdReport"),
-                        datasetId: datasetList.filter(c => c.programId == localStorage.getItem("sesForecastProgramIdReport") && c.programVersion == localStorage.getItem("sesForecastVersionIdReport"))[0].id,
+                        datasetId: (datasetList.filter(c => c.programId == localStorage.getItem("sesForecastProgramIdReport") && c.programVersion == localStorage.getItem("sesForecastVersionIdReport")).length > 0 ? datasetList.filter(c => c.programId == localStorage.getItem("sesForecastProgramIdReport") && c.programVersion == localStorage.getItem("sesForecastVersionIdReport"))[0].id : ''),
                     }, () => {
                         // this.planningUnitList();
                         this.tracerCategoryList();
@@ -2427,7 +2427,8 @@ export default class PlanningUnitSetting extends Component {
                                     <div className="row">
                                         <div>
                                             <Popover placement="top" isOpen={this.state.popoverOpenProgramSetting} target="Popover2" trigger="hover" toggle={this.toggleProgramSetting}>
-                                                <PopoverBody>{i18n.t('static.tooltip.planningProgramSetting')} </PopoverBody>
+                                                {/* <PopoverBody>{i18n.t('static.tooltip.planningProgramSetting')} </PopoverBody> */}
+                                                <PopoverBody>If you dont see the desired program(s), please load them first.</PopoverBody>
                                             </Popover>
                                         </div>
                                         <FormGroup className="col-md-3">
