@@ -745,8 +745,48 @@ export default class CreateTreeTemplate extends Component {
         this.round = this.round.bind(this);
         this.calculatePUPerVisit = this.calculatePUPerVisit.bind(this);
         this.qatCalculatedPUPerVisit = this.qatCalculatedPUPerVisit.bind(this);
+        this.calculateParentValueFromMOM = this.calculateParentValueFromMOM.bind(this);
     }
-
+    calculateParentValueFromMOM(month) {
+        var parentValue = 0;
+        console.log("***month----", month);
+        var currentItemConfig = this.state.currentItemConfig;
+        console.log("***month cur item config----", currentItemConfig);
+        if (currentItemConfig.context.payload.nodeType.id != 1 && currentItemConfig.context.payload.nodeType.id != 2) {
+            var items = this.state.items;
+            var parentItem = items.filter(x => x.id == currentItemConfig.context.parent);
+            console.log("***month parentItem----", parentItem);
+            if (parentItem.length > 0) {
+                console.log("***month parentItem if----", parentItem);
+                var nodeDataMomList = parentItem[0].payload.nodeDataMap[0][0].nodeDataMomList;
+                console.log("***month nodeDataMomList----", nodeDataMomList);
+                if (nodeDataMomList.length) {
+                    console.log("***month nodeDataMomList if----", nodeDataMomList);
+                    var momDataForNode = nodeDataMomList.filter(x => moment(x.month).format("YYYY-MM-DD") == moment(month).format("YYYY-MM-DD"));
+                    console.log("***month momDataForNode----", momDataForNode);
+                    if (momDataForNode.length > 0) {
+                        console.log("***month momDataForNode if----", momDataForNode);
+                        if (currentItemConfig.context.payload.nodeType.id == 5) {
+                            parentValue = momDataForNode[0].calculatedMmdValue;
+                            console.log("***month parentValue 1----", parentValue);
+                        } else {
+                            parentValue = momDataForNode[0].calculatedValue;
+                            console.log("***month parentValue 2----", parentValue);
+                        }
+                    }
+                }
+            }
+            var percentageOfParent = currentItemConfig.context.payload.nodeDataMap[0][0].dataValue;
+            console.log("***month percentageOfParent---", percentageOfParent);
+            console.log("***month calculated value---", ((percentageOfParent * parentValue) / 100));
+            currentItemConfig.context.payload.nodeDataMap[0][0].calculatedDataValue = ((percentageOfParent * parentValue) / 100).toString();
+            currentItemConfig.context.payload.nodeDataMap[0][0].displayCalculatedDataValue = ((percentageOfParent * parentValue) / 100).toString();
+        }
+        console.log("***month parentValue before---", parentValue);
+        this.setState({ parentValue, currentItemConfig, currentScenario: currentItemConfig.context.payload.nodeDataMap[0][0] }, () => {
+            console.log("***month parentValue after---", this.state.parentValue);
+        });
+    }
     qatCalculatedPUPerVisit(type) {
         var currentItemConfig = this.state.currentItemConfig;
         var qatCalculatedPUPerVisit = "";
@@ -4814,8 +4854,10 @@ export default class CreateTreeTemplate extends Component {
         if ((nodeTypeId == 3 || nodeTypeId == 4 || nodeTypeId == 5) && this.state.addNodeFlag && currentItemConfig.context.payload.nodeDataMap[0][0].dataValue == "") {
             currentItemConfig.context.payload.nodeDataMap[0][0].dataValue = 100;
             console.log("parent value template---", currentItemConfig.parentItem.payload.nodeDataMap[0][0].calculatedDataValue);
-            currentItemConfig.context.payload.nodeDataMap[0][0].calculatedDataValue = ((100 * currentItemConfig.parentItem.payload.nodeDataMap[0][0].calculatedDataValue) / 100).toString()
-            this.setState({ currentItemConfig })
+            // currentItemConfig.context.payload.nodeDataMap[0][0].calculatedDataValue = ((100 * currentItemConfig.parentItem.payload.nodeDataMap[0][0].calculatedDataValue) / 100).toString()
+            this.setState({ currentItemConfig }, () => {
+                this.calculateParentValueFromMOM(currentItemConfig.context.payload.nodeDataMap[0][0].month);
+            })
         }
     }
 
@@ -4977,21 +5019,21 @@ export default class CreateTreeTemplate extends Component {
             var calculatedDataValue;
             var parentValue;
             var parentValue1;
-            if (this.state.addNodeFlag !== "true") {
-                parentValue1 = (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].calculatedDataValue;
-            } else {
-                parentValue1 = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].calculatedDataValue;
-            }
+            // if (this.state.addNodeFlag !== "true") {
+            //     parentValue1 = (this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].calculatedDataValue;
+            // } else {
+            //     parentValue1 = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].calculatedDataValue;
+            // }
 
-            console.log("parentValue---", parentValue);
-            parentValue = parentValue1;
-            (currentItemConfig.context.payload.nodeDataMap[0])[0].calculatedDataValue = (parseInt(parentValue * value) / 100).toString();
+            // console.log("parentValue---", parentValue);
+            // parentValue = parentValue1;
+            // (currentItemConfig.context.payload.nodeDataMap[0])[0].calculatedDataValue = (parseInt(parentValue * value) / 100).toString();
             (currentItemConfig.context.payload.nodeDataMap[0])[0].displayDataValue = value.toString();
-            (currentItemConfig.context.payload.nodeDataMap[0])[0].displayCalculatedDataValue = (parseInt(parentValue * value) / 100).toString();
-            console.log("calculatedDataValue---", currentItemConfig);
-            this.setState({
-                parentValue
-            })
+            this.calculateParentValueFromMOM((currentItemConfig.context.payload.nodeDataMap[0])[0].month);
+            // console.log("calculatedDataValue---", currentItemConfig);
+            // this.setState({
+            //     parentValue
+            // })
         }
         if (event.target.name === "nodeValue") {
             console.log("inside node value-------");
@@ -5463,9 +5505,10 @@ export default class CreateTreeTemplate extends Component {
                 console.log("highlighted item---", this.state.currentItemConfig.context)
                 this.getNodeTypeFollowUpList(data.context.level == 0 ? 0 : data.parentItem.payload.nodeType.id);
                 if (data.context.level != 0) {
-                    this.setState({
-                        parentValue: data.parentItem.payload.nodeDataMap[0][0].calculatedDataValue
-                    });
+                    this.calculateParentValueFromMOM(data.context.payload.nodeDataMap[0][0].month);
+                    // this.setState({
+                    //     parentValue: data.parentItem.payload.nodeDataMap[0][0].calculatedDataValue
+                    // });
                 }
                 if (data.context.payload.nodeType.id == 4) {
                     this.getForecastingUnitListByTracerCategoryId(1);
@@ -6041,7 +6084,7 @@ export default class CreateTreeTemplate extends Component {
                                             </Popover>
                                         </div>
                                         <FormGroup className="col-md-6" style={{ display: this.state.numberNode ? 'block' : 'none' }}>
-                                            <Label htmlFor="currencyId">{i18n.t('static.tree.parentValue')} {this.state.currentItemConfig.context.level != 0 && i18n.t('static.common.for')} {this.state.currentItemConfig.context.level != 0 && moment(this.state.currentItemConfig.parentItem.payload.nodeDataMap[0][0].month).format(`MMM-YYYY`)} <i class="fa fa-info-circle icons pl-lg-2" id="Popover6" onClick={this.toggleParentValue} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
+                                            <Label htmlFor="currencyId">{i18n.t('static.tree.parentValue')} {this.state.currentItemConfig.context.level != 0 && i18n.t('static.common.for')} {this.state.currentItemConfig.context.level != 0 && moment(this.state.currentItemConfig.context.payload.nodeDataMap[0][0].month).format(`MMM-YYYY`)} <i class="fa fa-info-circle icons pl-lg-2" id="Popover6" onClick={this.toggleParentValue} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                             <Input type="text"
                                                 id="parentValue"
                                                 name="parentValue"
@@ -7484,9 +7527,11 @@ export default class CreateTreeTemplate extends Component {
 
 
     handleAMonthDissmis1 = (value) => {
+        let month = value.year + '-' + value.month + '-01';
         // console.log("dismiss>>", value);
         this.setState({ singleValue2: value, }, () => {
             // this.fetchData();
+            this.calculateParentValueFromMOM(month);
         })
 
     }
@@ -7964,10 +8009,11 @@ export default class CreateTreeTemplate extends Component {
                                     console.log("parent value check---", itemConfig.payload.nodeDataMap[0][0].calculatedDataValue);
                                     this.setState({
                                         orgCurrentItemConfig: JSON.parse(JSON.stringify(this.state.currentItemConfig.context)),
-                                        parentValue: itemConfig.payload.nodeDataMap[0][0].calculatedDataValue != null ? itemConfig.payload.nodeDataMap[0][0].calculatedDataValue : 0
+                                        // parentValue: itemConfig.payload.nodeDataMap[0][0].calculatedDataValue != null ? itemConfig.payload.nodeDataMap[0][0].calculatedDataValue : 0
+                                    }, () => {
+                                        this.getNodeTypeFollowUpList(itemConfig.payload.nodeType.id);
+                                        this.calculateParentValueFromMOM(this.state.currentItemConfig.context.payload.nodeDataMap[0][0].month);
                                     });
-
-                                    this.getNodeTypeFollowUpList(itemConfig.payload.nodeType.id);
 
                                     if (itemConfig.payload.nodeType.id == 2 || itemConfig.payload.nodeType.id == 3) {
                                         this.getUsageTemplateList(0);
