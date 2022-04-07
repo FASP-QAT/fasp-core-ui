@@ -7008,7 +7008,9 @@ export default class CreateTreeTemplate extends Component {
 
                         <div className="col-md-12">
                             {this.state.showModelingJexcelNumber &&
-                                <> <div className="calculatorimg calculatorTable">
+                                <> 
+                                <span>{i18n.t('static.modelingTable.note')}</span>
+                                <div className="calculatorimg calculatorTable">
                                     <div id="modelingJexcel" className={"RowClickable ScalingTable"} style={{ display: this.state.modelingJexcelLoader ? "none" : "block" }}>
                                     </div>
                                     <div style={{ display: this.state.modelingJexcelLoader ? "block" : "none" }}>
