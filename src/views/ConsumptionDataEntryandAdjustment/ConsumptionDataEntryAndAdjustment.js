@@ -341,7 +341,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
             // this.setState({
             //   consumptionChanged: true
             // })
-            if (this.state.consumptionChangedFlag != true) { this.setState({ consumptionChangedFlag: true }) }
+            if (this.state.consumptionChanged != true) { this.setState({ consumptionChanged: true }) }
           }.bind(this),
 
           pagination: false,
@@ -570,6 +570,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           showDetailTable: TBD_PROCUREMENT_AGENT_ID,
           selectedPlanningUnitDesc: changedConsumptionDataDesc,
           changedPlanningUnitMultiplier: multiplier,
+          changedConsumptionTypeId:consumptionUnit.consumptionDataType
         })
       })
     }
@@ -1493,6 +1494,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
               var datasetDataBytes = CryptoJS.AES.decrypt(datasetData.programData, SECRET_KEY);
               var datasetData = datasetDataBytes.toString(CryptoJS.enc.Utf8);
               var datasetJson = JSON.parse(datasetData);
+              console.log("datasetJson@@@@@@@@@@@@@@",datasetJson);
               var consumptionList = datasetJson.actualConsumptionList;
               var planningUnitList = datasetJson.planningUnitList.filter(c => c.consuptionForecast);
               var regionList = datasetJson.regionList;
