@@ -3254,6 +3254,9 @@ export default class BuildTree extends Component {
         if (nodeTypeId == NUMBER_NODE_ID) {
             arr = this.state.items.filter(x => x.level == level && x.id != id && x.payload.nodeType.id == nodeTypeId);
         } else {
+            console.log("level1---",this.state.items.filter(x => x.level == level && x.id != id));
+            console.log("level2---",PU_NODE_ID);
+            console.log("level3---",parent);
             arr = this.state.items.filter(x => x.level == level && x.id != id && (x.payload.nodeType.id == PERCENTAGE_NODE_ID || x.payload.nodeType.id == FU_NODE_ID || x.payload.nodeType.id == PU_NODE_ID) && x.parent == parent);
         }
         console.log("arr---", arr);
@@ -3987,7 +3990,12 @@ export default class BuildTree extends Component {
                 if (itemConfig.payload.nodeDataMap[this.state.selectedScenario][0].nodeDataModelingList.length > 0) {
                     result = true;
                 } else {
-                    var arr = this.state.items.filter(x => x.level == itemConfig.level && x.id != itemConfig.id && x.id < itemConfig.id);
+                    var arr = [];
+                    if (itemConfig.payload.nodeType.id == NUMBER_NODE_ID) {
+                        arr = this.state.items.filter(x => x.level == itemConfig.level && x.id != itemConfig.id && x.payload.nodeType.id == itemConfig.payload.nodeType.id);
+                    }else {
+                        arr = this.state.items.filter(x => x.level == itemConfig.level && x.id != itemConfig.id && (x.payload.nodeType.id == PERCENTAGE_NODE_ID || x.payload.nodeType.id == FU_NODE_ID || x.payload.nodeType.id == PU_NODE_ID) && x.parent == itemConfig.parent);
+                    }
                     if (arr.length > 0) {
                         for (var i = 0; i <= arr.length; i++) {
                             if (arr[i] != null) {
@@ -6546,7 +6554,7 @@ export default class BuildTree extends Component {
             })
         }
         curTreeObj.levelList = treeLevelList;
-        newItem.level = parseInt(itemConfig.context.level + 2);
+        newItem.level = parseInt(itemConfig.context.level + 1);
         newItem.payload.nodeId = nodeId;
         var pu = this.state.planningUnitList.filter(x => x.id == this.state.tempPlanningUnitId)[0];
         newItem.payload.label = pu.label;
@@ -6906,7 +6914,7 @@ export default class BuildTree extends Component {
 
 
     onCursoChanged(event, data) {
-        console.log("Data@@@", data)
+        // console.log("Data@@@", data)
         const { context: item } = data;
         if (item != null) {
             this.setState({
@@ -6932,7 +6940,7 @@ export default class BuildTree extends Component {
                 console.log("555>>>", this.state.items);
                 const ids = this.state.items.map(o => o.id)
                 const filtered = this.state.items.filter(({ id }, index) => !ids.includes(id, index + 1))
-                console.log("edit unique items---", filtered)
+                // console.log("edit unique items---", filtered)
                 var scenarioId = this.state.selectedScenario;
                 console.log("cursor change current item config---", this.state.currentItemConfig);
                 if (data.context.level != 0) {
@@ -6942,8 +6950,8 @@ export default class BuildTree extends Component {
                 }
                 this.getNodeTypeFollowUpList(data.context.level == 0 ? 0 : data.parentItem.payload.nodeType.id);
                 if (data.context.payload.nodeType.id == 4) {
-                    console.log("on curso tracer category---", (data.context.payload.nodeDataMap[scenarioId])[0].fuNode.forecastingUnit.tracerCategory.id);
-                    console.log("on curso tracer category list---", this.state.tracerCategoryList);
+                    // console.log("on curso tracer category---", (data.context.payload.nodeDataMap[scenarioId])[0].fuNode.forecastingUnit.tracerCategory.id);
+                    // console.log("on curso tracer category list---", this.state.tracerCategoryList);
                     this.setState({
                         fuValues: { value: this.state.currentScenario.fuNode.forecastingUnit.id, label: getLabelText(this.state.currentScenario.fuNode.forecastingUnit.label, this.state.lang) + " | " + this.state.currentScenario.fuNode.forecastingUnit.id }
                     });

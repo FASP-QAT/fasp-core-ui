@@ -1778,7 +1778,12 @@ export default class CreateTreeTemplate extends Component {
                 if (itemConfig.payload.nodeDataMap[0][0].nodeDataModelingList != null && itemConfig.payload.nodeDataMap[0][0].nodeDataModelingList.length > 0) {
                     result = true;
                 } else {
-                    var arr = this.state.items.filter(x => x.level == itemConfig.level && x.id != itemConfig.id && x.id < itemConfig.id);
+                    var arr = [];
+                    if (itemConfig.payload.nodeType.id == NUMBER_NODE_ID) {
+                        arr = this.state.items.filter(x => x.level == itemConfig.level && x.id != itemConfig.id && x.payload.nodeType.id == itemConfig.payload.nodeType.id);
+                    } else {
+                        arr = this.state.items.filter(x => x.level == itemConfig.level && x.id != itemConfig.id && (x.payload.nodeType.id == PERCENTAGE_NODE_ID || x.payload.nodeType.id == FU_NODE_ID || x.payload.nodeType.id == PU_NODE_ID) && x.parent == itemConfig.parent);
+                    }
                     if (arr.length > 0) {
                         for (var i = 0; i <= arr.length; i++) {
                             if (arr[i] != null) {
