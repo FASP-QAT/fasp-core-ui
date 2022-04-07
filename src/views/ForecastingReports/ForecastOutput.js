@@ -31,6 +31,7 @@ import AuthenticationServiceComponent from '../Common/AuthenticationServiceCompo
 import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 import NumberFormat from 'react-number-format';
 import EquivalancyUnitService from "../../api/EquivalancyUnitService";
+import ReportService from '../../api/ReportService';
 const ref = React.createRef();
 const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
@@ -1600,6 +1601,8 @@ class ForecastOutput extends Component {
 
             } else {//api call
 
+                let consumptionData = [];
+
 
                 let inputJson = {
                     "programId": programId,
@@ -1612,6 +1615,96 @@ class ForecastOutput extends Component {
                 }
 
                 console.log("OnlineInputJson---------------->", inputJson);
+
+
+                ReportService.forecastOutput(inputJson)
+                    .then(response => {
+                        console.log("RESP---------->forecastOutput", response.data);
+                        let primaryConsumptionData = response.data;
+
+                        for (let i = 0; i < primaryConsumptionData.length; i++) {
+
+                            let consumptionList = primaryConsumptionData[i].monthlyForecastData.map(m => {
+                                return {
+                                    consumptionDate: m.month,
+                                    consumptionQty: Math.round(m.consumptionQty)
+                                }
+                            });
+
+                            let jsonTemp = { objUnit: (viewById == 1 ? primaryConsumptionData[i].planningUnit : primaryConsumptionData[i].forecastingUnit), scenario: { id: 1, label: ')' }, display: true, color: "#ba0c2f", consumptionList: consumptionList }
+                            consumptionData.push(jsonTemp);
+
+                        }
+
+
+                        var monthArrayList = [];
+                        let cursorDate = startDate;
+                        for (var i = 0; moment(cursorDate).format("YYYY-MM") <= moment(endDate).format("YYYY-MM"); i++) {
+                            var dt = moment(startDate).add(i, 'months').format("YYYY-MM-DD");
+                            cursorDate = moment(cursorDate).add(1, 'months').format("YYYY-MM-DD");
+                            monthArrayList.push(dt);
+                        }
+
+
+                        this.setState({
+                            consumptionData: consumptionData,
+                            monthArrayList: monthArrayList,
+                            message: ''
+                        }, () => {
+                            // if (yaxisEquUnitId > 0) {
+                            //     this.calculateEquivalencyUnitTotal();
+                            // }
+                        })
+
+
+                        // this.setState({
+                        //     consumptions: response.data,
+                        //     message: '',
+                        //     loading: false
+                        // },
+                        //     () => {
+
+                        //     })
+                    }).catch(
+                        error => {
+                            if (error.message === "Network Error") {
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                            } else {
+                                switch (error.response ? error.response.status : "") {
+
+                                    case 401:
+                                        this.props.history.push(`/login/static.message.sessionExpired`)
+                                        break;
+                                    case 403:
+                                        this.props.history.push(`/accessDenied`)
+                                        break;
+                                    case 500:
+                                    case 404:
+                                    case 406:
+                                        this.setState({
+                                            message: error.response.data.messageCode,
+                                            loading: false
+                                        });
+                                        break;
+                                    case 412:
+                                        this.setState({
+                                            message: error.response.data.messageCode,
+                                            loading: false
+                                        });
+                                        break;
+                                    default:
+                                        this.setState({
+                                            message: 'static.unkownError',
+                                            loading: false
+                                        });
+                                        break;
+                                }
+                            }
+                        }
+                    );
 
 
 

@@ -2481,7 +2481,7 @@ class ConsumptionForecastError extends Component {
                                                                 && forecastingUnits.map((item, i) => {
                                                                     return (
                                                                         <option key={i} value={item.id}>
-                                                                            {item.label.label_en}
+                                                                            {item.label.label_en + ' | ' + item.id}
                                                                         </option>
                                                                     )
                                                                 }, this)}
@@ -2511,7 +2511,7 @@ class ConsumptionForecastError extends Component {
                                                                 && planningUnits.map((item, i) => {
                                                                     return (
                                                                         <option key={i} value={item.id}>
-                                                                            {item.label.label_en}
+                                                                            {item.label.label_en + ' | ' + item.id}
                                                                         </option>
                                                                     )
                                                                 }, this)}

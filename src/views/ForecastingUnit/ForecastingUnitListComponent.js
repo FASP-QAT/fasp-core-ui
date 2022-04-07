@@ -574,7 +574,7 @@ export default class ForecastingUnitListComponent extends Component {
             data[3] = getLabelText(forecastingUnitList[j].tracerCategory.label, this.state.lang)
             data[4] = getLabelText(forecastingUnitList[j].unit.label, this.state.lang)
             data[5] = getLabelText(forecastingUnitList[j].genericLabel, this.state.lang)
-            data[6] = getLabelText(forecastingUnitList[j].label, this.state.lang)
+            data[6] = getLabelText(forecastingUnitList[j].label, this.state.lang) + " | " + forecastingUnitList[j].forecastingUnitId
             data[7] = forecastingUnitList[j].lastModifiedBy.username;
             data[8] = (forecastingUnitList[j].lastModifiedDate ? moment(forecastingUnitList[j].lastModifiedDate).format(`YYYY-MM-DD`) : null)
             data[9] = forecastingUnitList[j].active;

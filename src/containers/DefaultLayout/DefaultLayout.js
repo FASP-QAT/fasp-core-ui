@@ -773,7 +773,7 @@ class DefaultLayout extends Component {
     // this.getDownloadedPrograms = this.getDownloadedPrograms.bind(this);
     // this.checkIfLocalProgramVersionChanged = this.checkIfLocalProgramVersionChanged.bind(this);
   }
-
+ 
   refreshPage() {
     // setTimeout(() => {
     //   window.location.reload(false);

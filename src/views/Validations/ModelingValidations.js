@@ -631,7 +631,7 @@ class ModelingValidation extends Component {
 
             var flatData = flatDataForLevel[0];
             var nodeUnit = this.state.unitList.filter(c => c.unitId == flatData.payload.nodeUnit.id);
-            var levelListFilter = treeListFiltered.levelList.filter(c => c.levelNo == levelId)[0];
+            var levelListFilter = treeListFiltered.levelList != undefined ? treeListFiltered.levelList.filter(c => c.levelNo == levelId)[0] : undefined;
             levelUnit = levelListFilter != undefined && levelListFilter.unit != null ? getLabelText(levelListFilter.unit.label, this.state.lang) : "";
             var nodeList = [];
             var nodeVal = [];
@@ -1438,7 +1438,7 @@ class ModelingValidation extends Component {
             }, this);
 
         const { levelList } = this.state;
-        const levelListForNames = this.state.levelList.length > 0 ? this.state.treeListFiltered.levelList : [];
+        const levelListForNames = this.state.levelList.length > 0 && this.state.treeListFiltered.levelList != undefined ? this.state.treeListFiltered.levelList : [];
         let levels = levelList.length > 0
             && levelList.map((item, i) => {
                 if (item != -1 && item != -2) {

@@ -5171,7 +5171,7 @@ height: 0px;
       text-align: center!important;
   }
   .listtreetable .jexcelremoveReadonlybackground .jexcel>tbody>tr>td:nth-child(4).readonly {
-    text-align: left!important;
+    text-align: center!important;
 }
 .listtreetable .jexcelremoveReadonlybackground .jexcel>tbody>tr>td.readonly {
   cursor: pointer;
@@ -5845,7 +5845,7 @@ font-style: italic!important;
   // left:53px;
   // z-index: 999;
   width: 150px;
-    left: 54px;
+    left: 53px;
     z-index: 3;
     min-width:150px;
     max-width: 150px;
@@ -5855,7 +5855,7 @@ font-style: italic!important;
   // left: 128px;
   // z-index: 999;
 
-  left: 204px;
+  left: 202px;
   z-index: 4;
   /* z-index: 999; */
   width: 200px;
@@ -6179,8 +6179,8 @@ font-style: italic!important;
 }
 
 .TreeTemplateHeight{
-  min-height: 100vh;
-  // min-height: calc(100vh - 50px)!important;
+  // min-height: 100vh;
+  min-height: calc(100vh - 50px)!important;
     // overflow: scroll !important;
     // min-height: calc(100vh - 427px) !important;
     // overflow: scroll !important;
@@ -6302,4 +6302,31 @@ font-style: italic!important;
      min-height: calc(100vh - 427px) !important;
      
   }
+  .CreateTreeTemplateHeight{
+    min-height: calc(100vh - 427px) !important;
+    
+ }
+ .Secondcolum {
+  width: 150px;
+  left: 51px;
+  z-index: 3;
+  min-width: 150px;
+  max-width: 150px;
+}
+.Thirdcolum {
+  left: 200px;
+  z-index: 4;
+  /* z-index: 999; */
+  width: 200px;
+  /* position: sticky; */
+  /* left: 210px; */
+  /* z-index: 4; */
+  min-width: 200px;
+  max-width: 200px;
+  /* left: 200px; */
+}
+}
+.CreateTreeTemplateHeight{
+  min-height: calc(100vh - 645px) !important;
+  
 }
