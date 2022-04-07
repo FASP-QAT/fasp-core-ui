@@ -2260,5 +2260,7 @@
     "static.dataentry.units": "Units",
     "static.dataentry.multiplierToFU": "multiplier to FU",
     "static.dataentry.change": "change",
-    "static.modelingTable.note":"Note: If you make a change to the data in a pre-existing row, you will need to click `Update` before the change reflects in the `Calculated change for month` column and the `Total` value."
+    "static.modelingTable.note": "Note: If you make a change to the data in a pre-existing row, you will need to click `Update` before the change reflects in the `Calculated change for month` column and the `Total` value.",
+    "static.dataentry.otherUnitName": "Enter Other unit name",
+    "static.dataentry.otherUnitMultiplier": "Enter Other unit multiplier"
 }

@@ -48,13 +48,13 @@ const validationSchema = function (values, t) {
         },
         then: Yup.string()
           .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
-          .required(i18n.t('static.budget.budgetamountdesc'))
+          .required(i18n.t('static.dataentry.otherUnitName'))
         ,
         otherwise: Yup.string().notRequired()
       }),
     otherUnitMultiplier: Yup.string()
       .max(30, i18n.t('static.common.max30digittext'))
-      .required(i18n.t('static.budget.budgetDisplayNameText'))
+      .required(i18n.t('static.dataentry.otherUnitMultiplier'))
   })
 }
 const validate = (getValidationSchema) => {
@@ -203,10 +203,10 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         if (consumptionUnitId != 0) {
           if (consumptionUnit.consumptionDataType == 1) {
             multiplier = 1;
-            changedConsumptionDataDesc = getLabelText(consumptionUnit.planningUnit.forecastingUnit.label, this.state.lang);
+            changedConsumptionDataDesc = getLabelText(consumptionUnit.planningUnit.forecastingUnit.label, this.state.lang) + ' | ' + consumptionUnit.planningUnit.forecastingUnit.id;
           } else if (consumptionUnit.consumptionDataType == 2) {
             multiplier = consumptionUnit.planningUnit.multiplier;
-            changedConsumptionDataDesc = getLabelText(consumptionUnit.planningUnit.label, this.state.lang);
+            changedConsumptionDataDesc = getLabelText(consumptionUnit.planningUnit.label, this.state.lang) + ' | ' + consumptionUnit.planningUnit.id;;
 
           } else {
             multiplier = consumptionUnit.otherUnit.multiplier;

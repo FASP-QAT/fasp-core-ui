@@ -2256,5 +2256,7 @@
     "static.common.otherUnit": "Outra unidade",
     "static.dataentry.units": "Unidades",
     "static.dataentry.multiplierToFU": "multiplicador para FU",
-    "static.dataentry.change": "mudança"
+    "static.dataentry.change": "mudança",
+    "static.dataentry.otherUnitName": "Digite o nome de outra unidade",
+    "static.dataentry.otherUnitMultiplier": "Insira outro multiplicador de unidade"
 }
