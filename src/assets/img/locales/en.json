@@ -2254,5 +2254,8 @@
     "static.common.dataEnteredIn": "Data entered in",
     "static.common.otherUnitName": "Other Unit Name",
     "static.importFromQATSupplyPlan.multiplierTo": "Multiplier to",
-    "static.common.otherUnit": "Other Unit"
+    "static.common.otherUnit": "Other Unit",
+    "static.dataentry.units": "Units",
+    "static.dataentry.multiplierToFU": "multiplier to FU",
+    "static.dataentry.change": "change"
 }

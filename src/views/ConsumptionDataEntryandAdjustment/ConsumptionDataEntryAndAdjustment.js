@@ -53,17 +53,8 @@ const validationSchema = function (values, t) {
         otherwise: Yup.string().notRequired()
       }),
     otherUnitMultiplier: Yup.string()
-      .when("dataEnteredInUnitId", {
-        is: val => {
-          return (document.getElementById("dataEnteredInUnitId").value == 3);
-        },
-        then: Yup.string()
-          .matches(SPECIAL_CHARECTER_WITH_NUM, i18n.t('static.validNoSpace.string'))
-          .max(30, i18n.t('static.common.max30digittext'))
-          .required(i18n.t('static.budget.budgetDisplayNameText'))
-        ,
-        otherwise: Yup.string().notRequired()
-      })
+      .max(30, i18n.t('static.common.max30digittext'))
+      .required(i18n.t('static.budget.budgetDisplayNameText'))
   })
 }
 const validate = (getValidationSchema) => {
@@ -111,9 +102,6 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       selectedPlanningUnitMultiplier: "",
       changedPlanningUnitMultiplier: "",
       changedConsumptionTypeId: "",
-      changedConsumptionDataDesc: "",
-      changedConsumptionDataMultiplier: "",
-      changedPlanningUnitId: "",
       toggleDataCheck: false,
       toggleDataChangeForSmallTable: false,
       missingMonthList: [],
@@ -294,7 +282,6 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           dataArray.push(data);
 
           data = [];
-          // console.log("multiplier-->", multiplier)
           data[0] = i18n.t('static.dataentry.convertedToPlanningUnit')
           for (var j = 0; j < monthArray.length; j++) {
             // data[j + 1] = `=ROUND(${colArr[j + 1]}${parseInt(dataArray.length)}/${colArr[monthArray.length + 1] + "0"},0)`;
@@ -570,19 +557,16 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         // };
         // var smallTableEl = jexcel(document.getElementById("smallTableDiv"), options1);
         // this.el = smallTableEl;
-        // console.log("multiplier", consumptionUnit.planningUnit.multiplier)
         this.setState({
           dataEl: dataEl, loading: false,
           // smallTableEl: smallTableEl,
           selectedConsumptionUnitId: consumptionUnitId,
           selectedConsumptionUnitObject: consumptionUnit,
           selectedPlanningUnitId: consumptionUnit.planningUnit.id,
-          selectedPlanningUnitDesc: getLabelText(consumptionUnit.planningUnit.label, this.state.lang),
           selectedPlanningUnitMultiplier: multiplier,
           showDetailTable: TBD_PROCUREMENT_AGENT_ID,
-          changedConsumptionDataDesc: changedConsumptionDataDesc,
+          selectedPlanningUnitDesc: changedConsumptionDataDesc,
           changedPlanningUnitMultiplier: multiplier,
-          changedConsumptionDataMultiplier: multiplier
         })
       })
     }
@@ -1058,7 +1042,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
               label: {
                 label_en: this.state.otherUnitName
               },
-              multiplier: this.state.changedPlanningUnitMultiplier
+              multiplier: this.state.selectedPlanningUnitMultiplier
             }
             planningUnitList[planningUnitIndex].otherUnit = otherUnitJson;
           }
@@ -1541,18 +1525,12 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                       qty = (Number(actualConsumption) / Number(reportingRate) / Number(1 - (Number(daysOfStockOut) / Number(noOfDays)))) * 100;
                       qty = qty.toFixed(2)
                       var multiplier = 0;
-                      var changedConsumptionDataDesc = "";
                       if (planningUnitList[cul].consumptionDataType == 1) {
                         multiplier = 1
-                        changedConsumptionDataDesc = getLabelText(planningUnitList[cul].planningUnit.label, this.state.lang);
                       } else if (planningUnitList[cul].consumptionDataType == 2) {
                         multiplier = planningUnitList[cul].planningUnit.multiplier
-                        changedConsumptionDataDesc = getLabelText(planningUnitList[cul].planningUnit.label, this.state.lang);
-
                       } else {
                         multiplier = planningUnitList[cul].otherUnit.multiplier
-                        changedConsumptionDataDesc = getLabelText(planningUnitList[cul].otherUnit.label, this.state.lang);
-
                       }
                       qtyInPU = (Number(qty) / Number(multiplier)).toFixed(2)
                     } else {
@@ -1593,11 +1571,9 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                 loading: false,
                 planningUnitTotalList: planningUnitTotalList,
                 planningUnitTotalListRegion: planningUnitTotalListRegion,
-                allPlanningUnitList: allPlanningUnitList,
-                changedConsumptionDataDesc: changedConsumptionDataDesc,
-                changedConsumptionDataMultiplier: multiplier
+                allPlanningUnitList: allPlanningUnitList
               }, () => {
-                console.log("this.props.match.params.planningUnitId+++", multiplier)
+                console.log("this.props.match.params.planningUnitId+++", this.props.match.params.planningUnitId)
                 if (this.props.match.params.planningUnitId > 0) {
                   this.buildDataJexcel(this.props.match.params.planningUnitId)
                 }
@@ -2178,14 +2154,14 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                                     disabled={this.state.selectedConsumptionUnitId > 0 ? true : false}
                                     // onChange={this.filterVersion}
                                     // onChange={(e) => { this.getARUList(e); }}
-                                    value={this.state.changedConsumptionDataDesc}
+                                    value={this.state.selectedPlanningUnitDesc}
                                   >
                                   </Input>
                                 </InputGroup>
                               </div>
-                              <Label htmlFor="appendedInputButton">Data entered in {this.state.changedConsumptionDataDesc}, multiplier to FU = {this.state.changedConsumptionDataMultiplier}
+                              <Label htmlFor="appendedInputButton">{i18n.t('static.common.dataEnteredIn')} {this.state.selectedPlanningUnitDesc}, {i18n.t('static.dataentry.multiplierToFU')} = {this.state.changedPlanningUnitMultiplier}
                                 <a className="card-header-action">
-                                  <span style={{ cursor: 'pointer' }} onClick={() => { this.changeUnit(this.state.selectedConsumptionUnitId) }}><small className="changeUnit">(change)</small></span>
+                                  <span style={{ cursor: 'pointer' }} onClick={() => { this.changeUnit(this.state.selectedConsumptionUnitId) }}><small className="changeUnit">({i18n.t('static.dataentry.change')})</small></span>
                                 </a>
                               </Label>
 
@@ -2327,12 +2303,12 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
             // initialValues={initialValues}
             enableReinitialize={true}
             initialValues={{
-              otherUnitMultiplier: this.state.changedPlanningUnitMultiplier,
+              otherUnitMultiplier: this.state.selectedPlanningUnitMultiplier,
               otherUnitName: this.state.otherUnitName
             }}
             validate={validate(validationSchema)}
             onSubmit={(values, { setSubmitting, setErrors }) => {
-              this.submitChangedUnit(this.state.changedPlanningUnitId);
+              this.submitChangedUnit(this.state.changedConsumptionTypeId);
             }}
             render={
               ({
@@ -2354,7 +2330,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                   <CardBody style={{ display: this.state.loading ? "none" : "block" }}>
                     <ModalBody>
                       <FormGroup className="col-md-12">
-                        <Label htmlFor="appendedInputButton">{i18n.t('static.qpl.units')}</Label>
+                        <Label htmlFor="appendedInputButton">{i18n.t('static.dataentry.units')}</Label>
                         <div className="controls ">
                           <InputGroup>
                             <Input
@@ -2382,14 +2358,14 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                           bsSize="sm"
                           valid={!errors.otherUnitName}
                           invalid={touched.otherUnitName && !!errors.otherUnitName}
-                          onChange={(e) => { handleChange(e); }}
+                          onChange={(e) => { handleChange(e); this.setOtherUnitName(e); }}
                           onBlur={handleBlur}
                           value={this.state.otherUnitName}
                         // onChange={(e) => this.setState({ consumptionChanged: true })}
                         >
                         </Input>
                         <Input
-                          type="text"
+                          type="hidden"
                           name="needOtherUnitValidation"
                           id="needOtherUnitValidation"
                           value={(this.state.changedConsumptionTypeId == 3 ? true : false)}
@@ -2409,12 +2385,8 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                           bsSize="sm"
                           valid={!errors.otherUnitMultiplier}
                           invalid={touched.otherUnitMultiplier && !!errors.otherUnitMultiplier}
-                          // onChange={(e) => { handleChange(e); this.dataChange(e) }}
                           onBlur={handleBlur}
-                          // valid={!errors.otherUnitMultiplier && this.state.selectedPlanningUnitMultiplier != ''}
-                          // invalid={touched.otherUnitMultiplier && !!errors.otherUnitMultiplier}
-                          // step={0.01}
-                          value={this.state.changedPlanningUnitMultiplier}
+                          value={this.state.selectedPlanningUnitMultiplier}
                           onChange={(e) => { this.setOtherUnitMultiplier(e); handleChange(e); }}
                           required
                         >
@@ -2425,8 +2397,6 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                     </ModalBody>
                     <ModalFooter>
                       <Button type="submit" size="md" onClick={(e) => { this.touchAll(setTouched, errors) }} color="success" className="submitBtn float-right mr-1"> <i className="fa fa-check"></i>Submit</Button>
-                      {/* <Button type="submit" size="md" onClick={(e) => { this.submitChangedUnit(this.state.changedPlanningUnitId) }} color="success" className="submitBtn float-right mr-1"> <i className="fa fa-check"></i>Submit</Button> */}
-
                       <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setState({ toggleDataChangeForSmallTable: false })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                     </ModalFooter>
                   </CardBody>
@@ -2455,9 +2425,15 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     var testNumber = otherUnitMultiplier != "" ? !(JEXCEL_DECIMAL_CATELOG_PRICE).test(otherUnitMultiplier) : false;
     if (testNumber == false) {
       this.setState({
-        changedPlanningUnitMultiplier: otherUnitMultiplier,
+        selectedPlanningUnitMultiplier: otherUnitMultiplier,
       })
     }
+  }
+
+  setOtherUnitName(e) {
+    this.setState({
+      otherUnitName: e.target.value,
+    })
   }
 
   calculateData() {
@@ -2526,18 +2502,40 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
   }
 
   submitChangedUnit(consumptionUnitId) {
+    var planningUnitId = "";
+    var consumptionDataDesc = "";
+    var changedPlanningUnitMultiplierValue = "";
+    this.state.dataEnteredInUnitList.map(c => {
+      if (c[1] == consumptionUnitId) {
+        planningUnitId = c[5]
+        consumptionDataDesc = c[2]
+        changedPlanningUnitMultiplierValue = c[3]
+      }
+    })
+
+
     var consumptionUnit = {};
-    consumptionUnit = this.state.planningUnitList.filter(c => c.planningUnit.id == consumptionUnitId)[0];
+    consumptionUnit = this.state.planningUnitList.filter(c => c.planningUnit.id == planningUnitId)[0];
     var otherUnitNameText = document.getElementById("otherUnitName").value;
+    if (consumptionUnitId == 3) {
+      this.setState({
+        selectedPlanningUnitDesc: otherUnitNameText,
+        changedPlanningUnitMultiplier: document.getElementById('otherUnitMultiplier').value
+      })
+    } else {
+      this.setState({
+        selectedPlanningUnitDesc: consumptionDataDesc,
+        changedPlanningUnitMultiplier: changedPlanningUnitMultiplierValue
+      })
+    }
     this.setState({
-      selectedConsumptionUnitId: consumptionUnitId,
       selectedPlanningUnitId: consumptionUnit.planningUnit.id,
       selectedConsumptionUnitObject: consumptionUnit,
-      selectedPlanningUnitDesc: getLabelText(consumptionUnit.planningUnit.label, this.state.lang),
-      selectedPlanningUnitMuutiplier: this.state.changedPlanningUnitMultiplier,
       consumptionChanged: true,
       toggleDataChangeForSmallTable: false,
-      otherUnitName: otherUnitNameText
+      otherUnitName: otherUnitNameText,
+      // selectedPlanningUnitId: consumptionUnitId,
+      // changedConsumptionTypeId: consumptionUnitId,
     })
   }
 
@@ -2553,18 +2551,14 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           var consumptionList = this.state.consumptionList;
           var consumptionUnit = {};
           consumptionUnit = this.state.planningUnitList.filter(c => c.planningUnit.id == consumptionUnitId)[0];
-          var multiplier = 1;
           if (consumptionUnitId != 0) {
             if (consumptionUnit.consumptionDataType == 1) {
-              multiplier = 1;
               showHideOtherUnitNameField = false;
               document.getElementById("otherUnitMultiplier").readOnly = true;
             } else if (consumptionUnit.consumptionDataType == 2) {
-              multiplier = consumptionUnit.planningUnit.multiplier;
               showHideOtherUnitNameField = false;
               document.getElementById("otherUnitMultiplier").readOnly = true;
             } else if (consumptionUnit.consumptionDataType == 3) {
-              multiplier = consumptionUnit.otherUnit.multiplier;
               showHideOtherUnitNameField = true;
               document.getElementById("otherUnitMultiplier").readOnly = false;
             }
@@ -2574,7 +2568,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           let data = [];
           if (consumptionUnitId != 0) {
             data = [];
-            data[0] = consumptionUnit.consumptionDataType == 1 ? true : false;
+            data[0] = consumptionUnit.consumptionDataType == 1 && !this.state.consumptionChanged ? true : false;
             data[1] = 1;
             data[2] = getLabelText(consumptionUnit.planningUnit.forecastingUnit.label, this.state.lang);
             data[3] = 1;
@@ -2582,7 +2576,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
             data[5] = consumptionUnit.planningUnit.id;
             dataArray1.push(data);
             data = [];
-            data[0] = consumptionUnit.consumptionDataType == 2 ? true : false;
+            data[0] = consumptionUnit.consumptionDataType == 2 && !this.state.consumptionChanged ? true : false;
             data[1] = 2;
             data[2] = getLabelText(consumptionUnit.planningUnit.label, this.state.lang);
             data[3] = parseInt(consumptionUnit.planningUnit.multiplier);
@@ -2591,7 +2585,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
 
             dataArray1.push(data);
             data = [];
-            data[0] = consumptionUnit.consumptionDataType == 3 ? true : false;
+            data[0] = consumptionUnit.consumptionDataType == 3 && !this.state.consumptionChanged ? true : false;
             data[1] = 3;
             data[2] = consumptionUnit.consumptionDataType == 3 ? getLabelText(consumptionUnit.otherUnit.label, this.state.lang) : `${i18n.t('static.common.otherUnit')}`;
             data[3] = consumptionUnit.consumptionDataType == 3 ? parseInt(consumptionUnit.otherUnit.multiplier) : "";
@@ -2604,14 +2598,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
             loading: false,
             dataEnteredInUnitList: dataArray1,
             showOtherUnitNameField: showHideOtherUnitNameField,
-            //   smallTableEl: smallTableEl,
-            selectedConsumptionUnitId: consumptionUnitId,
-            selectedConsumptionUnitObject: consumptionUnit,
-            selectedPlanningUnitId: consumptionUnit.planningUnit.id,
-            selectedPlanningUnitDesc: getLabelText(consumptionUnit.planningUnit.label, this.state.lang),
-            selectedPlanningUnitMultiplier: multiplier,
-            changedPlanningUnitMultiplier: multiplier
-            //   showDetailTable: true
+            showDetailTable: true
           })
         })
       }
@@ -2620,17 +2607,17 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
 
   setDataEnteredIn(e) {
     var multiplier = "";
-    var arrayid = "";
+    // var arrayid = "";
     var arrayid1 = "";
-    var consumptionDataDesc = "";
+    // var consumptionDataDesc = "";
 
 
     this.state.dataEnteredInUnitList.map(c => {
       if (c[1] == e.target.value) {
         multiplier = c[3]
-        arrayid = c[5]
+        // arrayid = c[5]
         arrayid1 = c[1]
-        consumptionDataDesc = c[2]
+        // consumptionDataDesc = c[2]
       }
     })
     if (e.target.value == 3) {
@@ -2641,10 +2628,8 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       document.getElementById("otherUnitMultiplier").readOnly = true;
     }
     this.setState({
-      changedPlanningUnitMultiplier: multiplier,
-      changedPlanningUnitId: arrayid,
-      changedConsumptionTypeId: arrayid1,
-      // changedConsumptionDataDesc: consumptionDataDesc
+      selectedPlanningUnitMultiplier: multiplier,
+      changedConsumptionTypeId: arrayid1
     })
   }
 }
