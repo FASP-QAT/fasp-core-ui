@@ -48,13 +48,13 @@ const validationSchema = function (values, t) {
         },
         then: Yup.string()
           .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
-          .required(i18n.t('static.budget.budgetamountdesc'))
+          .required(i18n.t('static.dataentry.otherUnitName'))
         ,
         otherwise: Yup.string().notRequired()
       }),
     otherUnitMultiplier: Yup.string()
       .max(30, i18n.t('static.common.max30digittext'))
-      .required(i18n.t('static.budget.budgetDisplayNameText'))
+      .required(i18n.t('static.dataentry.otherUnitMultiplier'))
   })
 }
 const validate = (getValidationSchema) => {
