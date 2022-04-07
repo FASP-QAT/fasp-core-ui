@@ -45,10 +45,7 @@ const validationSchemaExtrapolation = function (values) {
         noOfMonthsId:
             Yup.string().test('noOfMonthsId', 'Please enter positive number.',
                 function (value) {
-                    console.log("***1**", document.getElementById("movingAvgId").value);
-                    console.log("***noOfMonthsId**", document.getElementById("noOfMonthsId").value);
                     var testNumber = JEXCEL_INTEGER_REGEX.test((document.getElementById("noOfMonthsId").value).replaceAll(",", ""));
-                    console.log("***testNumber***", testNumber)
                     if ((document.getElementById("movingAvgId").value) == "true" && (document.getElementById("noOfMonthsId").value == "" || testNumber == false)) {
                         return false;
                     } else {
@@ -59,9 +56,7 @@ const validationSchemaExtrapolation = function (values) {
             Yup.string().test('confidenceLevelId', 'Please select confidence level.',
                 function (value) {
                     console.log("***2**", document.getElementById("smoothingId").value);
-                    // var testNumber = document.getElementById("confidenceLevelId").value != "" ? (/^\d{0,3}(\.\d{1,2})?$/).test(document.getElementById("confidenceLevelId").value) : false;
-                    // console.log("*****", testNumber);
-                    if ((document.getElementById("smoothingId").value) == "true" && document.getElementById("confidenceLevelId").value == "") {
+                    if ((document.getElementById("smoothingId").value) == "on" && document.getElementById("confidenceLevelId").value == "") {
                         return false;
                     } else {
                         return true;
@@ -70,10 +65,8 @@ const validationSchemaExtrapolation = function (values) {
         seasonalityId:
             Yup.string().test('seasonalityId', 'Please enter a valid whole number between 1 & 24.',
                 function (value) {
-                    console.log("***3**", document.getElementById("smoothingId").value);
                     var testNumber = document.getElementById("seasonalityId").value != "" ? (/^(?:[1-9]|[1][0-9]|2[0-4])$/).test(document.getElementById("seasonalityId").value) : false;
-                    // console.log("*****", testNumber);
-                    if ((document.getElementById("smoothingId").value) == "true" && (document.getElementById("seasonalityId").value == "" || testNumber == false)) {
+                    if ((document.getElementById("smoothingId").value) == "on" && (document.getElementById("seasonalityId").value == "" || testNumber == false)) {
                         return false;
                     } else {
                         return true;
@@ -82,10 +75,8 @@ const validationSchemaExtrapolation = function (values) {
         gammaId:
             Yup.string().test('gammaId', 'Please enter correct gamma value.',
                 function (value) {
-                    console.log("***4**", document.getElementById("smoothingId").value);
                     var testNumber = document.getElementById("gammaId").value != "" ? (/^(?:(?:[0])(?:\.\d{1,2})?|1(?:\.0\d{0,1})?)$/).test(document.getElementById("gammaId").value) : false;
-                    // console.log("*****", testNumber);
-                    if ((document.getElementById("smoothingId").value) == "true" && (document.getElementById("gammaId").value == "" || testNumber == false)) {
+                    if ((document.getElementById("smoothingId").value) == "on" && (document.getElementById("gammaId").value == "" || testNumber == false)) {
                         return false;
                     } else {
                         return true;
@@ -94,10 +85,8 @@ const validationSchemaExtrapolation = function (values) {
         betaId:
             Yup.string().test('betaId', 'Please enter correct beta value.',
                 function (value) {
-                    console.log("***5**", document.getElementById("smoothingId").value);
                     var testNumber = document.getElementById("betaId").value != "" ? (/^(?:(?:[0])(?:\.\d{1,2})?|1(?:\.0\d{0,1})?)$/).test(document.getElementById("betaId").value) : false;
-                    // console.log("*****", testNumber);
-                    if ((document.getElementById("smoothingId").value) == "true" && (document.getElementById("betaId").value == "" || testNumber == false)) {
+                    if ((document.getElementById("smoothingId").value) == "on" && (document.getElementById("betaId").value == "" || testNumber == false)) {
                         return false;
                     } else {
                         return true;
@@ -105,22 +94,18 @@ const validationSchemaExtrapolation = function (values) {
                 }),
         alphaId:
             Yup.string().test('alphaId', 'Please enter correct alpha value.',
-                function (value) {
-                    console.log("***6**", document.getElementById("smoothingId").value);
-                    var testNumber = document.getElementById("alphaId").value != "" ? (/^(?:(?:[0])(?:\.\d{1,2})?|1(?:\.0\d{0,1})?)$/).test(document.getElementById("alphaId").value) : false;
-                    // console.log("*****", testNumber);
-                    if ((document.getElementById("smoothingId").value) == "true" && (document.getElementById("alphaId").value == "" || testNumber == false)) {
-                        return false;
-                    } else {
-                        return true;
-                    }
-                }),
+            function (value) {
+                var testNumber = document.getElementById("alphaId").value != "" ? (/^(?:(?:[0])(?:\.\d{1,2})?|1(?:\.0\d{0,1})?)$/).test(document.getElementById("alphaId").value) : false;
+                if ((document.getElementById("smoothingId").value) == "on" && (document.getElementById("alphaId").value == "" || testNumber == false)) {
+                    return false;
+                } else {
+                    return true;
+                }
+            }),
         pId:
             Yup.string().test('pId', 'Please enter correct p value.',
                 function (value) {
-                    console.log("***7**", document.getElementById("arimaId").value);
                     var testNumber = document.getElementById("pId").value != "" ? (/^\d{0,3}(\.\d{1,4})?$/).test(document.getElementById("pId").value) : false;
-                    // console.log("*****", testNumber);
                     if ((document.getElementById("arimaId").value) == "true" && (document.getElementById("pId").value == "" || testNumber == false)) {
                         return false;
                     } else {
@@ -132,8 +117,6 @@ const validationSchemaExtrapolation = function (values) {
                 function (value) {
                     console.log("***8**", document.getElementById("arimaId").value);
                     var testNumber = document.getElementById("dId").value != "" ? (/^\d{0,3}(\.\d{1,4})?$/).test(document.getElementById("dId").value) : false;
-                    // var testNumber = JEXCEL_INTEGER_REGEX.test((document.getElementById("dId").value).replaceAll(",", ""));
-                    // console.log("*****", testNumber);
                     if ((document.getElementById("arimaId").value) == "true" && (document.getElementById("dId").value == "" || testNumber == false)) {
                         return false;
                     } else {
@@ -143,9 +126,7 @@ const validationSchemaExtrapolation = function (values) {
         qId:
             Yup.string().test('qId', 'Please enter correct q value.',
                 function (value) {
-                    console.log("***4 arima**", document.getElementById("arimaId").value);
                     var testNumber = document.getElementById("qId").value != "" ? (/^\d{0,3}(\.\d{1,4})?$/).test(document.getElementById("qId").value) : false;
-                    console.log("*****", testNumber);
                     if ((document.getElementById("arimaId").value) == "true" && (document.getElementById("qId").value == "" || testNumber == false)) {
                         return false;
                     } else {
@@ -1416,7 +1397,6 @@ export default class ExtrapolateDataComponent extends React.Component {
                 var alpha = this.state.alpha;
                 var beta = this.state.beta;
                 var gamma = this.state.gamma;
-console.log("this.state.noOfMonthsForASeason",seasonality);
                 // if (smoothingId && consumptionExtrapolationTESL.length > 0) {
                 //     confidenceLevel = consumptionExtrapolationTESL[0].jsonProperties.confidenceLevel;
                 //     seasonality = consumptionExtrapolationTESL[0].jsonProperties.seasonality;
