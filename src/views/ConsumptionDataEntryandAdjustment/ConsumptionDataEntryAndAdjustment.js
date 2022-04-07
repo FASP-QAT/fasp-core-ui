@@ -203,10 +203,10 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         if (consumptionUnitId != 0) {
           if (consumptionUnit.consumptionDataType == 1) {
             multiplier = 1;
-            changedConsumptionDataDesc = getLabelText(consumptionUnit.planningUnit.forecastingUnit.label, this.state.lang);
+            changedConsumptionDataDesc = getLabelText(consumptionUnit.planningUnit.forecastingUnit.label, this.state.lang) + ' | ' + consumptionUnit.planningUnit.forecastingUnit.id;
           } else if (consumptionUnit.consumptionDataType == 2) {
             multiplier = consumptionUnit.planningUnit.multiplier;
-            changedConsumptionDataDesc = getLabelText(consumptionUnit.planningUnit.label, this.state.lang);
+            changedConsumptionDataDesc = getLabelText(consumptionUnit.planningUnit.label, this.state.lang) + ' | ' + consumptionUnit.planningUnit.id;;
 
           } else {
             multiplier = consumptionUnit.otherUnit.multiplier;
