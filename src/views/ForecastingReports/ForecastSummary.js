@@ -112,7 +112,8 @@ class ForecastSummary extends Component {
             downloadedProgramData: [],
             allProgramList: [],
             regRegionList: [],
-            isChanged1: false
+            isChanged1: false,
+            onlineVersion: true
 
         };
         this.getPrograms = this.getPrograms.bind(this);
@@ -1464,8 +1465,14 @@ class ForecastSummary extends Component {
                     }.bind(this);
                 }.bind(this);
 
-
+                this.setState({
+                    onlineVersion: false,
+                })
             } else if (versionId > 0) {//api call
+
+                this.setState({
+                    onlineVersion: true,
+                })
 
                 displayId = (displayId == 1 ? 2 : 1);
 
@@ -1576,7 +1583,7 @@ class ForecastSummary extends Component {
                                         if (filterByRegionList.length > 0) {
                                             regionListForSinglePlanningUnit.push({
                                                 "regionId": filterByRegionList[0].region.id,
-                                                "selectedForecast": filterByRegionList[0].selectedForecast.label.label_en,
+                                                "selectedForecast": filterByRegionList[0].selectedForecast.label_en,
                                                 "forecastQuantity": filterByRegionList[0].totalForecast,
                                                 "notes": filterByRegionList[0].notes
                                             })
@@ -3163,7 +3170,7 @@ class ForecastSummary extends Component {
                             </div>
                         </div>
                     </CardBody>
-                    {this.state.regPlanningUnitList.length > 0 && this.state.displayId == 2 && this.state.dataArray.length > 0 && < CardFooter >
+                    {this.state.regPlanningUnitList.length > 0 && this.state.displayId == 2 && this.state.dataArray.length > 0 && !this.state.onlineVersion && < CardFooter >
                         <FormGroup>
                             <FormGroup>
                                 <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
