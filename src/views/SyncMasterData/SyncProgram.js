@@ -182,7 +182,7 @@ export default class SyncProgram extends Component {
                         } else {
                             if (programList[i].changed) {
                                 var programCode = programList[i].programCode + "~v" + programList[i].version;
-                                var cf = window.confirm(i18n.t('static.syncProgram.loadAndDeleteWithUncommittedChanges', { programCode })+"\r\n\r\n"+i18n.t('static.sync.clickOkMsg')+"\r\n"+i18n.t("static.sync.clickCancelMsg"));
+                                var cf = window.confirm(i18n.t('static.module.forecastingModule') + "\r\n\r\n" + i18n.t('static.syncProgram.loadAndDeleteWithUncommittedChanges', { programCode }) + "\r\n\r\n" + i18n.t('static.sync.clickOkMsg') + "\r\n" + i18n.t("static.sync.clickCancelMsg"));
                                 if (cf == true) {
                                     var index = readonlyProgramToBeDeleted.findIndex(c => c.id == programList[i].id);
                                     if (index == -1) {
@@ -207,7 +207,7 @@ export default class SyncProgram extends Component {
                                 }
                             } else {
                                 var programCode = programList[i].programCode + "~v" + programList[i].version;
-                                var cf = window.confirm(i18n.t('static.syncProgram.loadAndDeleteWithoutUncommittedChanges', { programCode })+"\r\n\r\n"+i18n.t('static.sync.clickOkMsg')+"\r\n"+i18n.t("static.sync.clickCancelMsg"));
+                                var cf = window.confirm(i18n.t('static.module.forecastingModule') + "\r\n\r\n" + i18n.t('static.syncProgram.loadAndDeleteWithoutUncommittedChanges', { programCode }) + "\r\n\r\n" + i18n.t('static.sync.clickOkMsg') + "\r\n" + i18n.t("static.sync.clickCancelMsg"));
                                 if (cf == true) {
                                     var index = readonlyProgramToBeDeleted.findIndex(c => c.id == programList[i].id);
                                     if (index == -1) {
@@ -310,7 +310,7 @@ export default class SyncProgram extends Component {
                         } else {
                             if (programList[i].programModified) {
                                 var programCode = programList[i].programCode + "~v" + programList[i].version;
-                                var cf = window.confirm(i18n.t('static.syncProgram.loadAndDeleteWithUncommittedChanges', { programCode })+"\r\n\r\n"+i18n.t('static.sync.clickOkMsg')+"\r\n"+i18n.t("static.sync.clickCancelMsg"));
+                                var cf = window.confirm(i18n.t('static.module.supplyPlanningModule') + "\r\n\r\n" + i18n.t('static.syncProgram.loadAndDeleteWithUncommittedChanges', { programCode }) + "\r\n\r\n" + i18n.t('static.sync.clickOkMsg') + "\r\n" + i18n.t("static.sync.clickCancelMsg"));
                                 if (cf == true) {
                                     var index = readonlyProgramToBeDeleted.findIndex(c => c.id == programList[i].id);
                                     if (index == -1) {
@@ -335,7 +335,7 @@ export default class SyncProgram extends Component {
                                 }
                             } else {
                                 var programCode = programList[i].programCode + "~v" + programList[i].version;
-                                var cf = window.confirm(i18n.t('static.syncProgram.loadAndDeleteWithoutUncommittedChanges', { programCode })+"\r\n\r\n"+i18n.t('static.sync.clickOkMsg')+"\r\n"+i18n.t("static.sync.clickCancelMsg"));
+                                var cf = window.confirm(i18n.t('static.module.supplyPlanningModule') + "\r\n\r\n" + i18n.t('static.syncProgram.loadAndDeleteWithoutUncommittedChanges', { programCode }) + "\r\n\r\n" + i18n.t('static.sync.clickOkMsg') + "\r\n" + i18n.t("static.sync.clickCancelMsg"));
                                 if (cf == true) {
                                     var index = readonlyProgramToBeDeleted.findIndex(c => c.id == programList[i].id);
                                     if (index == -1) {
