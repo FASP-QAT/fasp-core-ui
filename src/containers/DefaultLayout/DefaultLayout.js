@@ -4069,7 +4069,7 @@ class DefaultLayout extends Component {
                       <i class="nav-icon fa fa-line-chart tabicon" style={{ fontSize: '18px', paddingTop: '5px', color: '#fff' }} ></i>
                       <h6 className="tabtext">{i18n.t('static.module.forecasting')}</h6>
                     </NavLink>
-                  </NavItem>
+                </NavItem>
                   <NavItem className="bgColourRemoveItem itemWhidth">
                     <NavLink
                       className="bgColourRemoveLink tab2"
@@ -4102,6 +4102,7 @@ class DefaultLayout extends Component {
                   {routes.map((route, idx) => {
                     return route.component ? (
                       <Route
+                      // key={idx+this.state.url!=""?(Date.now()).format("YYYY-MM-DD HH:mm:ss"):""}
                         key={idx}
                         path={route.path}
                         exact={route.exact}
