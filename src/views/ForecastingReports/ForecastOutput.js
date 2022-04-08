@@ -1631,7 +1631,7 @@ class ForecastOutput extends Component {
                                 }
                             });
 
-                            let jsonTemp = { objUnit: (viewById == 1 ? primaryConsumptionData[i].planningUnit : primaryConsumptionData[i].forecastingUnit), scenario: { id: 1, label: ')' }, display: true, color: "#ba0c2f", consumptionList: consumptionList }
+                            let jsonTemp = { objUnit: (viewById == 1 ? primaryConsumptionData[i].planningUnit : primaryConsumptionData[i].forecastingUnit), scenario: { id: 1, label: primaryConsumptionData[i].selectedForecast.label_en }, display: true, color: "#ba0c2f", consumptionList: consumptionList }
                             consumptionData.push(jsonTemp);
 
                         }
