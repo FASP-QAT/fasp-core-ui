@@ -615,9 +615,11 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     var possibleActualConsumptionY = [];
     var possibleReportRateY = [];
     var possibleStockDayY = [];
+    var adjustedConsumptionY = [];
     var actualConsumptionStart = 2;
     var reportRateStart = 3;
     var stockDayStart = 4;
+    var adjustedConsumption = 6;
 
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF', 'AG', 'AH', 'AI', 'AJ', 'AK', 'AL', 'AM', 'AN']
     var regionList = this.state.regionList;
@@ -625,9 +627,11 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       possibleActualConsumptionY.push(actualConsumptionStart.toString());
       possibleReportRateY.push(reportRateStart.toString());
       possibleStockDayY.push(stockDayStart.toString());
+      adjustedConsumptionY.push(adjustedConsumption.toString());
       actualConsumptionStart += 8;
       reportRateStart += 8;
       stockDayStart += 8;
+      adjustedConsumption += 8;
     }
     var elInstance = this.state.dataEl;
     if (possibleActualConsumptionY.includes(y.toString())) {
@@ -838,21 +842,25 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       var actualConsumptionCount = 6;
       var reportingRateCount = 3;
       var daysOfStockOutCount = 4;
+      var actualConsumptionCount1 = 2;
       for (var r = 0; r < regionList.length; r++) {
         var index = -1;
         //   index = fullConsumptionList.findIndex(c => c.planningUnit.id == consumptionUnit.planningUnit.id && c.region.id == regionList[r].regionId && moment(c.month).format("YYYY-MM") == moment(monthArray[i].date).format("YYYY-MM"));
         // index = fullConsumptionList.findIndex(con =>  con.region.id == regionList[r].regionId && moment(con.month).format("YYYY-MM") == moment(monthArray[i].date).format("YYYY-MM"));
         var value = elInstance.getValue(`${colArr[i + 1]}${parseInt(actualConsumptionCount) + 1}`, true);
-        console.log("value----->", value);
-        if (value !== "") {
-          console.log("columnData[actualConsumptionCount]", columnData[actualConsumptionCount])
+        var actualValue = elInstance.getValue(`${colArr[i + 1]}${parseInt(actualConsumptionCount1) + 1}`, true);
+        // console.log("value----->", value);
+        // console.log("Actual value----->", actualValue);
+        // console.log("Actual value----->", value === '');
+        if (actualValue !== "") {
+          // console.log("columnData[actualConsumptionCount]", columnData[actualConsumptionCount])
           if (index != -1) {
-            fullConsumptionList[index].amount = value.replaceAll(',', '');
+            fullConsumptionList[index].amount = (value === "" ? actualValue : value.replaceAll(',', ''));
             fullConsumptionList[index].daysOfStockOut = columnData[daysOfStockOutCount];
             fullConsumptionList[index].reportingRate = columnData[reportingRateCount];
           } else {
             var json = {
-              amount: value.replaceAll(',', ''),
+              amount: value === "" ? actualValue : value.replaceAll(',', ''),
               planningUnit: {
                 id: consumptionUnit.planningUnit.id,
                 label: consumptionUnit.planningUnit.label
@@ -875,6 +883,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           }
         }
         actualConsumptionCount += 8;
+        actualConsumptionCount1 += 8;
         reportingRateCount += 8;
         daysOfStockOutCount += 8
       }
@@ -2728,8 +2737,8 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     this.setState({
       dataEnteredIn: e.target.value,
       showOtherUnitNameField: e.target.value == 3 ? true : false,
-      selectedPlanningUnitMultiplier: e.target.value == 1 ? 1 : e.target.value == 2 ? this.state.tempConsumptionUnitObject.planningUnit.multiplier : this.state.tempConsumptionUnitObject.otherUnit!=null?this.state.tempConsumptionUnitObject.otherUnit.multiplier:"",
-      otherUnitName: e.target.value == 3 && this.state.tempConsumptionUnitObject.otherUnit!=null ? this.state.tempConsumptionUnitObject.otherUnit.label.label_en : ""
+      selectedPlanningUnitMultiplier: e.target.value == 1 ? 1 : e.target.value == 2 ? this.state.tempConsumptionUnitObject.planningUnit.multiplier : this.state.tempConsumptionUnitObject.otherUnit != null ? this.state.tempConsumptionUnitObject.otherUnit.multiplier : "",
+      otherUnitName: e.target.value == 3 && this.state.tempConsumptionUnitObject.otherUnit != null ? this.state.tempConsumptionUnitObject.otherUnit.label.label_en : ""
     })
     //   var multiplier = "";
     //   // var arrayid = "";
