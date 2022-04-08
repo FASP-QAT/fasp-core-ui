@@ -909,7 +909,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                     console.log("consumptionExtrapolationData", consumptionExtrapolationData);
                     console.log("inputDataFilter", inputDataFilter);
                     //Semi - averages
-                    var id = consumptionExtrapolationDataUnFiltered.length + 1;
+                    var id = consumptionExtrapolationDataUnFiltered.length>0?Math.max(...consumptionExtrapolationDataUnFiltered.map(o => o.consumptionExtrapolationId)) + 1:1;
                     var planningUnitObj = this.state.planningUnitList.filter(c => c.planningUnit.id == this.state.planningUnitId)[0].planningUnit;
                     var regionObj = this.state.regionList.filter(c => c.regionId == this.state.regionId)[0];
                     console.log("Planning Unit Obj****", planningUnitObj);

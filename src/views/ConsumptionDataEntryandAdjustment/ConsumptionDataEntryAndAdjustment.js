@@ -177,7 +177,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
 
   buildDataJexcel(consumptionUnitId, isInterpolate) {
     var cont = false;
-    if (this.state.consumptionChanged) {
+    if (this.state.consumptionChanged && !isInterpolate) {
       var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
       if (cf == true) {
         cont = true;
@@ -605,7 +605,8 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           dataEnteredIn: consumptionUnit.consumptionDataType,
           showOtherUnitNameField: consumptionUnit.consumptionDataType == 3 ? true : false,
           otherUnitName: consumptionUnit.consumptionDataType == 3 ? consumptionUnit.otherUnit.label.label_en : "",
-          selectedPlanningUnitMultiplier: consumptionUnit.consumptionDataType == 1 ? 1 : consumptionUnit.consumptionDataType == 2 ? consumptionUnit.planningUnit.multiplier : consumptionUnit.otherUnit.multiplier
+          selectedPlanningUnitMultiplier: consumptionUnit.consumptionDataType == 1 ? 1 : consumptionUnit.consumptionDataType == 2 ? consumptionUnit.planningUnit.multiplier : consumptionUnit.otherUnit.multiplier,
+          consumptionChanged: isInterpolate ? true : false
         })
       })
     }
