@@ -255,6 +255,7 @@ export default class ExtrapolateDataComponent extends React.Component {
             confidenceLevelId: 0.85,
             showGuidance: false,
             showData: false,
+            dataEl: "",
             consumptionListlessTwelve: [],
             missingMonthList: [],
             toggleDataCheck: false,
@@ -574,6 +575,7 @@ export default class ExtrapolateDataComponent extends React.Component {
             //position: 'top',
             filters: false,
             license: JEXCEL_PRO_KEY,
+            columnSorting: false,
             contextMenu: function (obj, x, y, e) {
                 return [];
             }.bind(this),
@@ -824,6 +826,8 @@ export default class ExtrapolateDataComponent extends React.Component {
                     this.getDateDifference()
                 })
             } else {
+                this.el = jexcel(document.getElementById("tableDiv"), '');
+                this.el.destroy();
                 this.setState({
                     forecastProgramId: forecastProgramId,
                     planningUnitList: [],
@@ -838,7 +842,8 @@ export default class ExtrapolateDataComponent extends React.Component {
                     monthsForMovingAverage: 6,
                     confidenceLevelId: 0.85,
                     loading: false,
-                    showData: false
+                    showData: false,
+                    dataEl: ""
                 })
             }
         }
@@ -909,7 +914,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                     console.log("consumptionExtrapolationData", consumptionExtrapolationData);
                     console.log("inputDataFilter", inputDataFilter);
                     //Semi - averages
-                    var id = consumptionExtrapolationDataUnFiltered.length>0?Math.max(...consumptionExtrapolationDataUnFiltered.map(o => o.consumptionExtrapolationId)) + 1:1;
+                    var id = consumptionExtrapolationDataUnFiltered.length > 0 ? Math.max(...consumptionExtrapolationDataUnFiltered.map(o => o.consumptionExtrapolationId)) + 1 : 1;
                     var planningUnitObj = this.state.planningUnitList.filter(c => c.planningUnit.id == this.state.planningUnitId)[0].planningUnit;
                     var regionObj = this.state.regionList.filter(c => c.regionId == this.state.regionId)[0];
                     console.log("Planning Unit Obj****", planningUnitObj);
@@ -1144,9 +1149,13 @@ export default class ExtrapolateDataComponent extends React.Component {
         if (cont == true) {
             var planningUnitId = e.target.value;
             localStorage.setItem("sesDatasetPlanningUnitId", e.target.value);
+            this.el = jexcel(document.getElementById("tableDiv"), '');
+            this.el.destroy();
             this.setState({
                 planningUnitId: planningUnitId,
-                showData: false
+                showData: false,
+                dataEl: "",
+                dataChanged: false
             }, () => {
                 // this.setExtrapolatedParameters();
                 this.showDataOnPlanningAndRegionChange();
@@ -1169,9 +1178,13 @@ export default class ExtrapolateDataComponent extends React.Component {
         if (cont == true) {
             var regionId = e.target.value;
             localStorage.setItem("sesDatasetRegionId", e.target.value);
+            this.el = jexcel(document.getElementById("tableDiv"), '');
+            this.el.destroy();
             this.setState({
                 regionId: regionId,
-                showData: false
+                showData: false,
+                dataEl: "",
+                dataChanged: false
             }, () => {
                 // this.setExtrapolatedParameters();
                 this.showDataOnPlanningAndRegionChange();
@@ -1272,24 +1285,28 @@ export default class ExtrapolateDataComponent extends React.Component {
                     console.log("monthArray", monthArray)
                     console.log("movingAvgId", movingAvgId)
                     var actualForMonth = actualConsumptionListForPlanningUnitAndRegion.filter(c => moment(c.month).format("YYYY-MM") == moment(curDate1).format("YYYY-MM"))
+                    console.log("CureDate@@@@@@@@@@##############", curDate1)
+                    console.log("Actual for month@@@@@@@@@@##############", actualForMonth);
+                    console.log("Actual for month@@@@@@@@@@@@@@@@", actualConsumptionListForPlanningUnitAndRegion);
                     if (movingAvgId) {
                         var extrapolationDataMovingAvg = consumptionExtrapolationMovingData[0].extrapolationDataList.filter(e => moment(e.month).format("YYYY-MM") == moment(curDate1).format("YYYY-MM"));
-                        inputDataMovingAvg.push({ "month": inputDataMovingAvg.length + 1, "forecast": extrapolationDataMovingAvg.length > 0 && extrapolationDataMovingAvg[0].amount != "" ? Number(extrapolationDataMovingAvg[0].amount) : null, "actual": actualForMonth.length > 0 ? actualForMonth[0].amount : null })
+                        inputDataMovingAvg.push({ "month": inputDataMovingAvg.length + 1, "forecast": extrapolationDataMovingAvg.length > 0 && extrapolationDataMovingAvg[0].amount != "" ? Number(extrapolationDataMovingAvg[0].amount) : null, "actual": actualForMonth.length > 0 ? Number(actualForMonth[0].amount) : null })
                     } if (semiAvgId) {
                         var extrapolationDataSemiAvg = consumptionExtrapolationSemiAvg[0].extrapolationDataList.filter(e => moment(e.month).format("YYYY-MM") == moment(curDate1).format("YYYY-MM"));
-                        inputDataSemiAverage.push({ "month": inputDataSemiAverage.length + 1, "forecast": extrapolationDataSemiAvg.length > 0 && extrapolationDataSemiAvg[0].amount != "" ? Number(extrapolationDataSemiAvg[0].amount) : null, "actual": actualForMonth.length > 0 ? actualForMonth[0].amount : null })
+                        inputDataSemiAverage.push({ "month": inputDataSemiAverage.length + 1, "forecast": (extrapolationDataSemiAvg.length > 0 && extrapolationDataSemiAvg[0].amount != "" ? Number(extrapolationDataSemiAvg[0].amount) : null), "actual": (actualForMonth.length > 0 ? Number(actualForMonth[0].amount) : null) })
                     } if (linearRegressionId) {
                         var extrapolationDataLinearRegression = consumptionExtrapolationRegression[0].extrapolationDataList.filter(e => moment(e.month).format("YYYY-MM") == moment(curDate1).format("YYYY-MM"));
-                        inputDataLinearRegression.push({ "month": inputDataLinearRegression.length + 1, "forecast": extrapolationDataLinearRegression.length > 0 && extrapolationDataLinearRegression[0].amount != "" ? Number(extrapolationDataLinearRegression[0].amount) : null, "actual": actualForMonth.length > 0 ? actualForMonth[0].amount : null })
+                        inputDataLinearRegression.push({ "month": inputDataLinearRegression.length + 1, "forecast": extrapolationDataLinearRegression.length > 0 && extrapolationDataLinearRegression[0].amount != "" ? Number(extrapolationDataLinearRegression[0].amount) : null, "actual": actualForMonth.length > 0 ? Number(actualForMonth[0].amount) : null })
                     } if (smoothingId) {
                         var extrapolationDataInputDataTes = consumptionExtrapolationTESM[0].extrapolationDataList.filter(e => moment(e.month).format("YYYY-MM") == moment(curDate1).format("YYYY-MM"));
-                        inputDataTes.push({ "month": inputDataTes.length + 1, "forecast": extrapolationDataInputDataTes.length > 0 && extrapolationDataInputDataTes[0].amount != "" ? Number(extrapolationDataInputDataTes[0].amount) : null, "actual": actualForMonth.length > 0 ? actualForMonth[0].amount : null })
+                        inputDataTes.push({ "month": inputDataTes.length + 1, "forecast": extrapolationDataInputDataTes.length > 0 && extrapolationDataInputDataTes[0].amount != "" ? Number(extrapolationDataInputDataTes[0].amount) : null, "actual": actualForMonth.length > 0 ? Number(actualForMonth[0].amount) : null })
                     }
                 }
+                console.log("@@@@@@@@@@##############", inputDataSemiAverage)
                 calculateError(inputDataSemiAverage, "semiAvgError", this);
                 calculateError(inputDataMovingAvg, "movingAvgError", this);
                 calculateError(inputDataLinearRegression, "linearRegressionError", this);
-                calculateError(inputDataTes, "tesError", this);
+                // calculateError(inputDataTes, "tesError", this);
                 this.setState({
                     actualConsumptionList: actualConsumptionList,
                     startDate: startDate,
@@ -1461,14 +1478,20 @@ export default class ExtrapolateDataComponent extends React.Component {
                     this.buildJxl();
                 })
             } else {
+                this.el = jexcel(document.getElementById("tableDiv"), '');
+                this.el.destroy();
                 this.setState({
                     showData: false,
+                    dataEl: "",
                     loading: false,
                     noDataMessage: i18n.t('static.extrapolate.noDataFound')
                 })
             }
         } else {
+            this.el = jexcel(document.getElementById("tableDiv"), '');
+            this.el.destroy();
             this.setState({
+                dataEl: "",
                 showData: false,
                 loading: false,
                 noDataMessage: ""
@@ -3316,10 +3339,10 @@ export default class ExtrapolateDataComponent extends React.Component {
                                             {/* {this.state.showData && <div id="tableDiv" className="extrapolateTable pt-lg-5"></div>} */}
                                             <div className="row" style={{ display: this.state.show ? "block" : "none" }}>
                                                 <div className="col-md-10 pt-4 pb-3">
-                                                    <ul className="legendcommitversion">
+                                                    {this.state.showData && <ul className="legendcommitversion">
                                                         <li><span className="legendcolor" style={{ backgroundColor: "purple", border: "1px solid #000" }}></span> <span className="legendcommitversionText">{i18n.t('static.common.forecastPeriod')}</span></li>
                                                         <li><span className="legendcolor" style={{ backgroundColor: "black", border: "1px solid #000" }}></span> <span className="legendcommitversionText">{i18n.t('static.consumption.actual')}</span></li>
-                                                    </ul>
+                                                    </ul>}
                                                 </div>
                                                 <div className="row  mt-lg-3">
                                                     <div className="pl-lg-4 pr-lg-4 ModelingValidationTable">
