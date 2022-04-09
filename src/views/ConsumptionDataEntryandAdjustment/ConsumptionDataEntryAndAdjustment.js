@@ -2239,7 +2239,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                               </div>
                               <Label htmlFor="appendedInputButton">{i18n.t('static.common.dataEnteredIn')} {this.state.tempConsumptionUnitObject.consumptionDataType == 1 ? (this.state.tempConsumptionUnitObject.planningUnit.forecastingUnit.label.label_en) : this.state.tempConsumptionUnitObject.consumptionDataType == 2 ? this.state.tempConsumptionUnitObject.planningUnit.label.label_en : this.state.tempConsumptionUnitObject.otherUnit.label.label_en}, {i18n.t('static.dataentry.multiplierToFU')} = {Number(this.state.tempConsumptionUnitObject.consumptionDataType == 1 ? 1 : this.state.tempConsumptionUnitObject.consumptionDataType == 2 ? this.state.tempConsumptionUnitObject.planningUnit.multiplier : this.state.tempConsumptionUnitObject.otherUnit.multiplier)}
                                 <a className="card-header-action">
-                                  <span style={{ cursor: 'pointer' }} onClick={() => { this.changeUnit(this.state.selectedConsumptionUnitId) }}><small className="changeUnit">({i18n.t('static.dataentry.change')})</small></span>
+                                  <span style={{ cursor: 'pointer' }} className="hoverDiv" onClick={() => { this.changeUnit(this.state.selectedConsumptionUnitId) }}>({i18n.t('static.dataentry.change')})</span>
                                 </a>
                               </Label>
 
@@ -2405,12 +2405,12 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                 setFieldError
               }) => (
                 <Form onSubmit={handleSubmit} noValidate name='dataEnteredInForm'>
-                  <CardBody style={{ display: this.state.loading ? "none" : "block" }}>
+                  {/* <CardBody style={{ display: this.state.loading ? "none" : "block" }}> */}
                     <ModalBody>
                       <FormGroup className="col-md-12">
                         <Label htmlFor="appendedInputButton">{i18n.t('static.dataentry.units')}</Label>
-                        <div className="controls ">
-                          <InputGroup>
+                        {/* <div className="controls "> */}
+                          {/* <InputGroup> */}
                             <Input
                               type="select"
                               name="dataEnteredInUnitId"
@@ -2423,8 +2423,8 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                               <option value={2}>{this.state.selectedConsumptionUnitObject.planningUnit.label.label_en}</option>
                               <option value={3}>{i18n.t('static.common.otherUnit')}</option>
                             </Input>
-                          </InputGroup>
-                        </div>
+                          {/* </InputGroup> */}
+                        {/* </div> */}
                       </FormGroup>
                       <FormGroup className="col-md-6" id="otherUnitNameDiv" style={{ display: this.state.showOtherUnitNameField ? 'block' : 'none' }}>
                         <Label htmlFor="appendedInputButton">{i18n.t('static.common.otherUnitName')}</Label>
@@ -2479,7 +2479,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                       <Button type="submit" size="md" onClick={(e) => { this.touchAll(setTouched, errors) }} color="success" className="submitBtn float-right mr-1"> <i className="fa fa-check"></i>Submit</Button>
                       <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setState({ toggleDataChangeForSmallTable: false })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                     </ModalFooter>
-                  </CardBody>
+                  {/* </CardBody> */}
                 </Form>
               )
             }
