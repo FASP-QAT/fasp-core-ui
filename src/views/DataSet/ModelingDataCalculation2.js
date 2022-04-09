@@ -230,7 +230,7 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                         endValueWMC = 0;
                                     }
                                 } else if (nodeDataModeling.transferNodeDataId == -1) {
-                                    var overallFilter = overallTransferList.filter(c => moment(c.month).format("YYYY-MM") == moment(curDate).format("YYYY-MM") && c.nodeDataModelingId == nodeDataModeling.nodeDataModelingId);
+                                    var overallFilter = overallTransferList.filter(c => moment(c.month).format("YYYY-MM") == moment(curDate).format("YYYY-MM") && c.nodeDataModelingId == nodeDataModeling.nodeDataModelingId && c.transferFromNodeDataId == nodeDataModeling.transferFromNodeDataId && c.transferToNodeDataId == nodeDataModeling.nodeDataId);
                                     if (overallFilter.length > 0) {
                                         difference += Number(0 - overallFilter[0].transfer);
                                         differenceWMC += Number(0 - overallFilter[0].transferWMC);
@@ -318,7 +318,7 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                 } else if (nodeDataModeling.transferNodeDataId == -1) {
                                     console.log("overallTransferList@@@@@@@@@@@@@@@@@###########", overallTransferList);
                                     // console.log("Transfer+++++++++++++@@@@@",overallTransferList)
-                                    var overallFilter = overallTransferList.filter(c => moment(c.month).format("YYYY-MM") == moment(curDate).format("YYYY-MM") && c.nodeDataModelingId == nodeDataModeling.nodeDataModelingId);
+                                    var overallFilter = overallTransferList.filter(c => moment(c.month).format("YYYY-MM") == moment(curDate).format("YYYY-MM") && c.nodeDataModelingId == nodeDataModeling.nodeDataModelingId && c.transferFromNodeDataId == nodeDataModeling.transferFromNodeDataId && c.transferToNodeDataId == nodeDataModeling.nodeDataId);
                                     console.log("overallFilter@@@@@@@@@@@@@@@@@###########", overallFilter);
                                     // console.log("Transfer+++++++++++++@@@@@",overallFilter)
                                     if (overallFilter.length > 0) {
@@ -374,7 +374,7 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                         endValueWMC = 0;
                                     }
                                 } else if (nodeDataModeling.transferNodeDataId == -1) {
-                                    var overallFilter = overallTransferList.filter(c => moment(c.month).format("YYYY-MM") == moment(curDate).format("YYYY-MM") && c.nodeDataModelingId == nodeDataModeling.nodeDataModelingId);
+                                    var overallFilter = overallTransferList.filter(c => moment(c.month).format("YYYY-MM") == moment(curDate).format("YYYY-MM") && c.nodeDataModelingId == nodeDataModeling.nodeDataModelingId && c.transferFromNodeDataId == nodeDataModeling.transferFromNodeDataId && c.transferToNodeDataId == nodeDataModeling.nodeDataId);
                                     if (overallFilter.length > 0) {
                                         difference += Number(0 - overallFilter[0].transfer);
                                         differenceWMC += Number(0 - overallFilter[0].transferWMC);
