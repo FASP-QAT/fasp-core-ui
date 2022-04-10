@@ -1514,7 +1514,7 @@ class ConsumptionForecastError extends Component {
                                                             consumptionList = consumptionExtrapolationObj[0].extrapolationDataList.map(m => {
                                                                 return {
                                                                     consumptionDate: m.month,
-                                                                    consumptionQty: Math.round(m.amount / convertToEu),
+                                                                    consumptionQty: Math.round(m.amount * planningUniObj.planningUnit.muliplier / convertToEu),
                                                                     region: { regionId: regionId },
                                                                     actualFlag: false
                                                                 }
