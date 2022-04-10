@@ -1318,7 +1318,7 @@ class ForecastOutput extends Component {
                                                             let consumptionList = consumptionExtrapolationObj[0].extrapolationDataList.map(m => {
                                                                 return {
                                                                     consumptionDate: m.month,
-                                                                    consumptionQty: Math.round(m.amount / convertToEu)
+                                                                    consumptionQty: Math.round(m.amount * forecastingUniObj[l].planningUnit.multiplier / convertToEu)
                                                                 }
                                                             });
                                                             // let jsonTemp = { objUnit: forecastingUniObj[l].planningUnit.forecastingUnit, scenario: { id: 1, label: "" }, display: true, color: "#ba0c2f", consumptionList: consumptionList }
@@ -1348,7 +1348,7 @@ class ForecastOutput extends Component {
                                                             let consumptionList = consumptionExtrapolationObj[0].extrapolationDataList.map(m => {
                                                                 return {
                                                                     consumptionDate: m.month,
-                                                                    consumptionQty: Math.round(m.amount)
+                                                                    consumptionQty: Math.round(m.amount * forecastingUniObj[l].planningUnit.multiplier)
                                                                 }
                                                             });
                                                             // let jsonTemp = { objUnit: forecastingUniObj[l].planningUnit.forecastingUnit, scenario: { id: 1, label: "" }, display: true, color: "#ba0c2f", consumptionList: consumptionList }
