@@ -318,7 +318,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           for (var j = 0; j < monthArray.length; j++) {
             // data[j + 1] = `=ROUND(${colArr[j + 1]}${parseInt(dataArray.length)}/${colArr[monthArray.length + 1] + "0"},0)`;
             console.log("Multiplier 1@@@@@@@@@@@@@@@", multiplier1);
-            data[j + 1] = `=ROUND(${colArr[j + 1]}${parseInt(dataArray.length)}/${colArr[monthArray.length + 1] + "1"},0)`;
+            data[j + 1] = `=IF(${colArr[j + 1]}${parseInt(dataArray.length - 4)}=='','',ROUND(${colArr[j + 1]}${parseInt(dataArray.length)}/${colArr[monthArray.length + 1] + "1"},0))`;
           }
           data[monthArray.length + 1] = multiplier;
 
