@@ -429,6 +429,8 @@ export default class CreateTreeTemplate extends Component {
         this.pickAMonth2 = React.createRef()
         this.pickAMonth1 = React.createRef()
         this.state = {
+            popoverOpenMonthInPast:false,
+            popoverOpenMonthInFuture:false,
             monthId: 1,
             monthList: [],
             isChanged: false,
@@ -650,6 +652,8 @@ export default class CreateTreeTemplate extends Component {
 
 
         }
+        this.toggleMonthInPast = this.toggleMonthInPast.bind(this);
+        this.toggleMonthInFuture = this.toggleMonthInFuture.bind(this);
         this.toggleHowManyPUperIntervalPer = this.toggleHowManyPUperIntervalPer.bind(this);
         this.toggleWillClientsShareOnePU = this.toggleWillClientsShareOnePU.bind(this);
         this.toggleConsumptionIntervalEveryXMonths = this.toggleConsumptionIntervalEveryXMonths.bind(this);
@@ -2149,6 +2153,16 @@ export default class CreateTreeTemplate extends Component {
             nodeTransferDataList
         });
 
+    }
+    toggleMonthInFuture(){
+        this.setState({
+            popoverOpenMonthInFuture: !this.state.popoverOpenMonthInFuture,
+        });
+    }
+    toggleMonthInPast(){
+        this.setState({
+            popoverOpenMonthInPast: !this.state.popoverOpenMonthInPast,
+        });
     }
 
     toggle() {
@@ -8857,8 +8871,13 @@ export default class CreateTreeTemplate extends Component {
                                                                         </div>
                                                                     </div>
                                                                 </FormGroup>
+                                                                <div>
+                                                <Popover placement="top" isOpen={this.state.popoverOpenMonthInPast} target="Popover26" trigger="hover" toggle={this.toggleMonthInPast}>
+                                                    <PopoverBody>Need to add info</PopoverBody>
+                                                </Popover>
+                                            </div>
                                                                 <FormGroup className="col-md-3 pl-lg-0">
-                                                                    <Label htmlFor="languageId">{'Months In Past'}<span class="red Reqasterisk">*</span></Label>
+                                                                    <Label htmlFor="languageId">{'Months In Past'}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover26" onClick={this.toggleMonthInPast} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                                                     <Input
                                                                         type="number"
                                                                         name="monthsInPast"
@@ -8874,8 +8893,13 @@ export default class CreateTreeTemplate extends Component {
                                                                     </Input>
                                                                     <FormFeedback>{errors.monthsInPast}</FormFeedback>
                                                                 </FormGroup>
+                                                                <div>
+                                                <Popover placement="top" isOpen={this.state.popoverOpenMonthInFuture} target="Popover27" trigger="hover" toggle={this.toggleMonthInFuture}>
+                                                    <PopoverBody>Need to add info</PopoverBody>
+                                                </Popover>
+                                            </div>
                                                                 <FormGroup className="col-md-3 pl-lg-0">
-                                                                    <Label htmlFor="languageId">{'Months In Future'}<span class="red Reqasterisk">*</span></Label>
+                                                                    <Label htmlFor="languageId">{'Months In Future'}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover27" onClick={this.toggleMonthInFuture} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                                                     <Input
                                                                         type="number"
                                                                         name="monthsInFuture"
