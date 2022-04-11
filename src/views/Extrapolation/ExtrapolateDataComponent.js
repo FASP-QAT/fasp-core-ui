@@ -716,12 +716,24 @@ export default class ExtrapolateDataComponent extends React.Component {
         this.setState({
             monthArray: monthArray
         })
-        calculateMovingAvg(inputDataMovingAvg, this.state.monthsForMovingAverage, noOfMonthsForProjection, this);
-        calculateSemiAverages(inputDataSemiAverage, noOfMonthsForProjection, this);
-        calculateLinearRegression(inputDataLinearRegression, noOfMonthsForProjection, this);
-        console.log("inputDataTes.length+++", inputDataTes.length);
-        // if (inputDataTes.length >= (this.state.noOfMonthsForASeason * 2)) {
-        calculateTES(inputDataTes, this.state.alpha, this.state.beta, this.state.gamma, this.state.confidenceLevelId, this.state.noOfMonthsForASeason, noOfMonthsForProjection, this);
+        try {
+            calculateMovingAvg(inputDataMovingAvg, this.state.monthsForMovingAverage, noOfMonthsForProjection, this);
+            calculateSemiAverages(inputDataSemiAverage, noOfMonthsForProjection, this);
+            calculateLinearRegression(inputDataLinearRegression, noOfMonthsForProjection, this);
+            console.log("inputDataTes.length+++", inputDataTes.length);
+            // if (inputDataTes.length >= (this.state.noOfMonthsForASeason * 2)) {
+            calculateTES(inputDataTes, this.state.alpha, this.state.beta, this.state.gamma, this.state.confidenceLevelId, this.state.noOfMonthsForASeason, noOfMonthsForProjection, this);
+        } catch (error) {
+            this.el = jexcel(document.getElementById("tableDiv"), '');
+            this.el.destroy();
+            this.setState({
+                showData: false,
+                dataEl: "",
+                loading: false,
+                noDataMessage: i18n.t('static.extrapolation.errorOccured'),
+                dataChanged: false
+            })
+        }
         // } else {
         //     this.setState({
         //         tesData: [],
