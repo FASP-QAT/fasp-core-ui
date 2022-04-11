@@ -48,13 +48,13 @@ const validationSchema = function (values, t) {
         },
         then: Yup.string()
           .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
-          .required(i18n.t('static.budget.budgetamountdesc'))
+          .required(i18n.t('static.dataentry.otherUnitName'))
         ,
         otherwise: Yup.string().notRequired()
       }),
     otherUnitMultiplier: Yup.string()
       .max(30, i18n.t('static.common.max30digittext'))
-      .required(i18n.t('static.budget.budgetDisplayNameText'))
+      .required(i18n.t('static.dataentry.otherUnitMultiplier'))
   })
 }
 const validate = (getValidationSchema) => {
@@ -114,6 +114,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       messageColor: "green",
       consumptionChanged: false,
       selectedConsumptionUnitObject: { "consumptionDataType": "" },
+      tempConsumptionUnitObject: { "consumptionDataType": "" },
       dataEnteredInUnitList: [],
     }
     this.loaded = this.loaded.bind(this);
@@ -174,9 +175,9 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     }
   }
 
-  buildDataJexcel(consumptionUnitId) {
+  buildDataJexcel(consumptionUnitId, isInterpolate) {
     var cont = false;
-    if (this.state.consumptionChanged) {
+    if (this.state.consumptionChanged && !isInterpolate) {
       var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
       if (cf == true) {
         cont = true;
@@ -191,25 +192,53 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         loading: true
       }, () => {
         var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF', 'AG', 'AH', 'AI', 'AJ', 'AK', 'AL', 'AM', 'AN']
-        var consumptionList = this.state.consumptionList;
+        var consumptionList = isInterpolate == 1 ? this.state.tempConsumptionList : this.state.consumptionList;
         console.log("consumptionList All--->", consumptionList)
         var consumptionUnit = {};
         var consumptionNotes = "";
-        consumptionUnit = this.state.planningUnitList.filter(c => c.planningUnit.id == consumptionUnitId)[0];
-        consumptionNotes = consumptionUnit.consumptionNotes;
+        if (consumptionUnitId > 0) {
+          consumptionUnit = this.state.planningUnitList.filter(c => c.planningUnit.id == consumptionUnitId)[0];
+          consumptionNotes = consumptionUnit.consumptionNotes;
+        } else {
+          consumptionUnit = {
+            programPlanningUnitId: 0,
+            planningUnit: {
+              id: 0,
+              label: {
+              },
+              multiplier: 1,
+              forecastingUnit: {
+                id: 0,
+                label: {
+                }
+              }
+            },
+            consuptionForecast: true,
+            treeForecast: false,
+            consumptionNotes: "",
+            consumptionDataType: 1,
+            otherUnit: {
+              id: 0,
+              label: {
+              },
+              multiplier: 1,
+            },
+            selectedForecastMap: {},
+          }
+        }
         document.getElementById("consumptionNotes").value = consumptionNotes;
         var multiplier = 1;
         var changedConsumptionDataDesc = "";
         if (consumptionUnitId != 0) {
           if (consumptionUnit.consumptionDataType == 1) {
-            multiplier = 1;
-            changedConsumptionDataDesc = getLabelText(consumptionUnit.planningUnit.forecastingUnit.label, this.state.lang);
-          } else if (consumptionUnit.consumptionDataType == 2) {
             multiplier = consumptionUnit.planningUnit.multiplier;
-            changedConsumptionDataDesc = getLabelText(consumptionUnit.planningUnit.label, this.state.lang);
+            changedConsumptionDataDesc = getLabelText(consumptionUnit.planningUnit.forecastingUnit.label, this.state.lang) + ' | ' + consumptionUnit.planningUnit.forecastingUnit.id;
+          } else if (consumptionUnit.consumptionDataType == 2) {
+            multiplier = 1;
+            changedConsumptionDataDesc = getLabelText(consumptionUnit.planningUnit.label, this.state.lang) + ' | ' + consumptionUnit.planningUnit.id;;
 
           } else {
-            multiplier = consumptionUnit.otherUnit.multiplier;
+            multiplier = 1 / (consumptionUnit.otherUnit.multiplier / consumptionUnit.planningUnit.multiplier);
             changedConsumptionDataDesc = getLabelText(consumptionUnit.otherUnit.label, this.state.lang);
 
           }
@@ -288,17 +317,8 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           data[0] = i18n.t('static.dataentry.convertedToPlanningUnit')
           for (var j = 0; j < monthArray.length; j++) {
             // data[j + 1] = `=ROUND(${colArr[j + 1]}${parseInt(dataArray.length)}/${colArr[monthArray.length + 1] + "0"},0)`;
-            var multiplier1 = 1;
-            if (consumptionUnitId != 0) {
-              if (consumptionUnit.consumptionDataType == 1) {
-                multiplier1 = consumptionUnit.planningUnit.multiplier;
-              } else if (consumptionUnit.consumptionDataType == 2) {
-                multiplier1 = 1;
-              } else {
-                multiplier1 = consumptionUnit.otherUnit.multiplier;
-              }
-            }
-            data[j + 1] = `=ROUND(${colArr[j + 1]}${parseInt(dataArray.length)}/${multiplier1},0)`;
+            console.log("Multiplier 1@@@@@@@@@@@@@@@", multiplier1);
+            data[j + 1] = `=ROUND(${colArr[j + 1]}${parseInt(dataArray.length)}/${colArr[monthArray.length + 1] + "1"},0)`;
           }
           data[monthArray.length + 1] = multiplier;
 
@@ -306,6 +326,16 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           if (r != regionList.length - 1) {
             data = [];
             dataArray.push([]);
+          }
+        }
+        var multiplier1 = 1;
+        if (consumptionUnitId != 0) {
+          if (consumptionUnit.consumptionDataType == 1) {
+            multiplier1 = 1;
+          } else if (consumptionUnit.consumptionDataType == 2) {
+            multiplier1 = consumptionUnit.planningUnit.multiplier;
+          } else {
+            multiplier1 = consumptionUnit.otherUnit.multiplier;
           }
         }
         // for (var j = 0; j < monthArray.length; j++) {
@@ -341,7 +371,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
             // this.setState({
             //   consumptionChanged: true
             // })
-            if (this.state.consumptionChangedFlag != true) { this.setState({ consumptionChangedFlag: true }) }
+            if (this.state.consumptionChanged != true) { this.setState({ consumptionChanged: true }) }
           }.bind(this),
 
           pagination: false,
@@ -565,11 +595,18 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           // smallTableEl: smallTableEl,
           selectedConsumptionUnitId: consumptionUnitId,
           selectedConsumptionUnitObject: consumptionUnit,
+          tempConsumptionUnitObject: consumptionUnit,
           selectedPlanningUnitId: consumptionUnit.planningUnit.id,
-          selectedPlanningUnitMultiplier: multiplier,
-          showDetailTable: TBD_PROCUREMENT_AGENT_ID,
+          selectedPlanningUnitMultiplier: multiplier1,
+          showDetailTable: true,
           selectedPlanningUnitDesc: changedConsumptionDataDesc,
-          changedPlanningUnitMultiplier: multiplier,
+          changedPlanningUnitMultiplier: multiplier1,
+          changedConsumptionTypeId: consumptionUnit.consumptionDataType,
+          dataEnteredIn: consumptionUnit.consumptionDataType,
+          showOtherUnitNameField: consumptionUnit.consumptionDataType == 3 ? true : false,
+          otherUnitName: consumptionUnit.consumptionDataType == 3 ? consumptionUnit.otherUnit.label.label_en : "",
+          selectedPlanningUnitMultiplier: consumptionUnit.consumptionDataType == 1 ? 1 : consumptionUnit.consumptionDataType == 2 ? consumptionUnit.planningUnit.multiplier : consumptionUnit.otherUnit.multiplier,
+          consumptionChanged: isInterpolate ? true : false
         })
       })
     }
@@ -579,9 +616,11 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     var possibleActualConsumptionY = [];
     var possibleReportRateY = [];
     var possibleStockDayY = [];
+    var adjustedConsumptionY = [];
     var actualConsumptionStart = 2;
     var reportRateStart = 3;
     var stockDayStart = 4;
+    var adjustedConsumption = 6;
 
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF', 'AG', 'AH', 'AI', 'AJ', 'AK', 'AL', 'AM', 'AN']
     var regionList = this.state.regionList;
@@ -589,13 +628,16 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       possibleActualConsumptionY.push(actualConsumptionStart.toString());
       possibleReportRateY.push(reportRateStart.toString());
       possibleStockDayY.push(stockDayStart.toString());
+      adjustedConsumptionY.push(adjustedConsumption.toString());
       actualConsumptionStart += 8;
       reportRateStart += 8;
       stockDayStart += 8;
+      adjustedConsumption += 8;
     }
     var elInstance = this.state.dataEl;
     if (possibleActualConsumptionY.includes(y.toString())) {
       value = elInstance.getValue(`${colArr[x]}${parseInt(y) + 1}`, true);
+      value = value.replaceAll(',', '');
       if (value == "") {
       } else if (value < 0) {
         var col = (colArr[x]).concat(parseInt(y) + 1);
@@ -612,6 +654,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     }
     if (possibleReportRateY.includes(y.toString())) {
       value = elInstance.getValue(`${colArr[x]}${parseInt(y) + 1}`, true);
+      value = value.replaceAll(',', '');
       if (value == "") {
       }
       else if (value < 0 || value > 100) {
@@ -629,6 +672,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     }
     if (possibleStockDayY.includes(y.toString())) {
       value = elInstance.getValue(`${colArr[x]}${parseInt(y) + 1}`, true);
+      value = value.replaceAll(',', '');
       var stockOutdays = elInstance.getColumnData(x)[0];
       if (value == "") {
       } else if (value < 0 || value > stockOutdays) {
@@ -670,6 +714,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       for (var x = 1; x < 37; x++) {
         // var rowData = elInstance.getRowData(y);
         var value = elInstance.getValue(`${colArr[x]}${parseInt(y) + 1}`, true);
+        value = value.replaceAll(',', '');
         if (possibleActualConsumptionY.includes(y.toString())) {
           if (value == "") {
           } else if (value < 0) {
@@ -791,27 +836,32 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     //     createdDate: curDate
     //   }
     // }
-    var fullConsumptionList = this.state.consumptionList.filter(c => c.planningUnit.id != consumptionUnit.planningUnit.id);
+    var fullConsumptionList = this.state.tempConsumptionList.filter(c => c.planningUnit.id != consumptionUnit.planningUnit.id);
     var elInstance = this.state.dataEl;
     for (var i = 0; i < monthArray.length; i++) {
       var columnData = elInstance.getColumnData([i + 1]);
       var actualConsumptionCount = 6;
       var reportingRateCount = 3;
       var daysOfStockOutCount = 4;
+      var actualConsumptionCount1 = 2;
       for (var r = 0; r < regionList.length; r++) {
         var index = -1;
         //   index = fullConsumptionList.findIndex(c => c.planningUnit.id == consumptionUnit.planningUnit.id && c.region.id == regionList[r].regionId && moment(c.month).format("YYYY-MM") == moment(monthArray[i].date).format("YYYY-MM"));
         // index = fullConsumptionList.findIndex(con =>  con.region.id == regionList[r].regionId && moment(con.month).format("YYYY-MM") == moment(monthArray[i].date).format("YYYY-MM"));
-
-        if (columnData[actualConsumptionCount] !== "") {
-          console.log("columnData[actualConsumptionCount]", columnData[actualConsumptionCount])
+        var value = elInstance.getValue(`${colArr[i + 1]}${parseInt(actualConsumptionCount) + 1}`, true);
+        var actualValue = elInstance.getValue(`${colArr[i + 1]}${parseInt(actualConsumptionCount1) + 1}`, true);
+        // console.log("value----->", value);
+        // console.log("Actual value----->", actualValue);
+        // console.log("Actual value----->", value === '');
+        if (actualValue !== "") {
+          // console.log("columnData[actualConsumptionCount]", columnData[actualConsumptionCount])
           if (index != -1) {
-            fullConsumptionList[index].actualConsumption = columnData[actualConsumptionCount];
+            fullConsumptionList[index].amount = (value === "" ? actualValue : value.replaceAll(',', ''));
             fullConsumptionList[index].daysOfStockOut = columnData[daysOfStockOutCount];
             fullConsumptionList[index].reportingRate = columnData[reportingRateCount];
           } else {
             var json = {
-              amount: columnData[actualConsumptionCount],
+              amount: value === "" ? actualValue : value.replaceAll(',', ''),
               planningUnit: {
                 id: consumptionUnit.planningUnit.id,
                 label: consumptionUnit.planningUnit.label
@@ -834,6 +884,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           }
         }
         actualConsumptionCount += 8;
+        actualConsumptionCount1 += 8;
         reportingRateCount += 8;
         daysOfStockOutCount += 8
       }
@@ -841,13 +892,13 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
 
     for (var r = 0; r < regionList.length; r++) {
       for (var j = 0; j < monthArray.length; j++) {
-        var consumptionData = fullConsumptionList.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArray[j].date).format("YYYY-MM") && c.planningUnit.id == consumptionUnit.planningUnit.id && c.region.id == regionList[r].regionId && c.amount >= 0);
+        var consumptionData = fullConsumptionList.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArray[j].date).format("YYYY-MM") && c.planningUnit.id == consumptionUnit.planningUnit.id && c.region.id == regionList[r].regionId && Number(c.amount) >= 0);
         if (consumptionData.length == 0) {
-          var startValList = fullConsumptionList.filter(c => moment(c.month).format("YYYY-MM") < moment(monthArray[j].date).format("YYYY-MM") && c.planningUnit.id == consumptionUnit.planningUnit.id && c.region.id == regionList[r].regionId && c.amount >= 0)
+          var startValList = fullConsumptionList.filter(c => moment(c.month).format("YYYY-MM") < moment(monthArray[j].date).format("YYYY-MM") && c.planningUnit.id == consumptionUnit.planningUnit.id && c.region.id == regionList[r].regionId && Number(c.amount) >= 0)
             .sort(function (a, b) {
               return new Date(a.month) - new Date(b.month);
             });
-          var endValList = fullConsumptionList.filter(c => moment(c.month).format("YYYY-MM") > moment(monthArray[j].date).format("YYYY-MM") && c.planningUnit.id == consumptionUnit.planningUnit.id && c.region.id == regionList[r].regionId && c.amount >= 0)
+          var endValList = fullConsumptionList.filter(c => moment(c.month).format("YYYY-MM") > moment(monthArray[j].date).format("YYYY-MM") && c.planningUnit.id == consumptionUnit.planningUnit.id && c.region.id == regionList[r].regionId && Number(c.amount) >= 0)
             .sort(function (a, b) {
               return new Date(a.month) - new Date(b.month);
             });
@@ -891,10 +942,10 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     document.getElementById("consumptionNotes").value = notes;
 
     this.setState({
-      consumptionList: fullConsumptionList,
+      tempConsumptionList: fullConsumptionList,
       consumptionChanged: true
     })
-    this.buildDataJexcel(this.state.selectedConsumptionUnitId);
+    this.buildDataJexcel(this.state.selectedConsumptionUnitId, 1);
   }
 
   saveConsumptionList() {
@@ -1045,8 +1096,8 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
 
           var planningUnitIndex = planningUnitList.findIndex(c => c.planningUnit.id == consumptionUnit.planningUnit.id);
           planningUnitList[planningUnitIndex].consumptionNotes = document.getElementById("consumptionNotes").value;
-          planningUnitList[planningUnitIndex].consumptionDataType = this.state.changedConsumptionTypeId;
-          if (this.state.changedConsumptionTypeId == 3) {
+          planningUnitList[planningUnitIndex].consumptionDataType = this.state.dataEnteredIn;
+          if (this.state.dataEnteredIn == 3) {
             var otherUnitJson = {
               id: null,
               label: {
@@ -1202,17 +1253,17 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + document.getElementById("datasetId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
     csvRow.push('')
     if (this.state.selectedConsumptionUnitId > 0) {
-      csvRow.push('"' + (i18n.t('static.dashboard.planningunitheader') + ' : ' + document.getElementById("planningUnitId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+      csvRow.push('"' + (i18n.t('static.dashboard.planningunitheader') + ' : ' + document.getElementById("planningUnitId").value).replaceAll(' ', '%20') + '"')
     }
     csvRow.push('')
     csvRow.push('')
     var columns = [];
-    columns.push(i18n.t('static.dashboard.Productmenu'));
+    columns.push(i18n.t('static.dashboard.Productmenu').replaceAll(' ', '%20'));
     this.state.monthArray.map(item => (
       columns.push(moment(item.date).format(DATE_FORMAT_CAP_WITHOUT_DATE))
     ))
-    columns.push(i18n.t('static.supplyPlan.total'));
-    columns.push(i18n.t('static.dataentry.regionalPer'));
+    columns.push(i18n.t('static.supplyPlan.total').replaceAll(' ', '%20'));
+    columns.push(i18n.t('static.dataentry.regionalPer').replaceAll(' ', '%20'));
 
     let headers = [];
     columns.map((item, idx) => { headers[idx] = (item).replaceAll(' ', '%20') });
@@ -1222,7 +1273,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       var total = 0;
       var totalPU = 0;
       var datacsv = [];
-      datacsv.push(item.consumptionDataType == 1 ? getLabelText(item.planningUnit.forecastingUnit.label, this.state.lang) : item.consumptionDataType == 2 ? getLabelText(item.planningUnit.label, this.state.lang) : getLabelText(item.otherUnit.label, this.state.lang));
+      datacsv.push((item.consumptionDataType == 1 ? getLabelText(item.planningUnit.forecastingUnit.label, this.state.lang) : item.consumptionDataType == 2 ? getLabelText(item.planningUnit.label, this.state.lang) : getLabelText(item.otherUnit.label, this.state.lang)).replaceAll(' ', '%20'));
       this.state.monthArray.map((item1, count) => {
         var data = this.state.planningUnitTotalList.filter(c => c.planningUnitId == item.planningUnit.id && moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM"));
         total += Number(data[0].qty);
@@ -1237,7 +1288,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         var datacsv = [];
         var totalRegion = 0;
         var totalRegionPU = 0;
-        datacsv.push(getLabelText(r.label, this.state.lang))
+        datacsv.push((getLabelText(r.label, this.state.lang)).replaceAll(' ', '%20'))
         {
           this.state.monthArray.map((item1, count) => {
             var data = this.state.planningUnitTotalListRegion.filter(c => c.planningUnitId == item.planningUnit.id && moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM") && c.region.regionId == r.regionId)
@@ -1259,7 +1310,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       csvRow.push('')
       headers = [];
       var columns = [];
-      columns.push(i18n.t('static.inventoryDate.inventoryReport'))
+      columns.push(i18n.t('static.inventoryDate.inventoryReport').replaceAll(' ', '%20'))
       this.state.monthArray.map(item => (
         columns.push(moment(item.date).format(DATE_FORMAT_CAP_WITHOUT_DATE))
       ))
@@ -1279,45 +1330,45 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
 
       for (var r = 0; r < regionList.length; r++) {
         B = [];
-        B.push(getLabelText(regionList[r].label))
+        B.push((getLabelText(regionList[r].label)).replaceAll(' ', '%20'))
         for (var j = 0; j < monthArray.length; j++) {
           B.push("")
         }
         C.push(this.addDoubleQuoteToRowContent(B));
         B = [];
-        B.push(i18n.t('static.supplyPlan.actualConsumption'))
+        B.push(i18n.t('static.supplyPlan.actualConsumption').replaceAll(' ', '%20'))
         for (var j = 0; j < monthArray.length; j++) {
           B.push(elInstance.getValue(`${colArr[j + 1]}${parseInt(actualConsumption)}`, true).toString().replaceAll("\,", ""))
         }
         C.push(this.addDoubleQuoteToRowContent(B));
         B = [];
-        B.push(i18n.t('static.dataentry.reportingRate'))
+        B.push(i18n.t('static.dataentry.reportingRate').replaceAll(' ', '%20'))
         for (var j = 0; j < monthArray.length; j++) {
           B.push(elInstance.getValue(`${colArr[j + 1]}${parseInt(reportingRateCount)}`, true).toString().replaceAll("\,", ""))
         }
         C.push(this.addDoubleQuoteToRowContent(B));
         B = [];
-        B.push(i18n.t('static.dataentry.stockedOut'))
+        B.push(i18n.t('static.dataentry.stockedOut').replaceAll(' ', '%20'))
         for (var j = 0; j < monthArray.length; j++) {
           B.push(elInstance.getValue(`${colArr[j + 1]}${parseInt(stockOutCount)}`, true).toString().replaceAll("\,", ""))
         }
         C.push(this.addDoubleQuoteToRowContent(B));
         B = [];
-        B.push(i18n.t('static.dataentry.stockedOutPer'))
+        B.push(i18n.t('static.dataentry.stockedOutPer').replaceAll(' ', '%20'))
         for (var j = 0; j < monthArray.length; j++) {
           B.push(elInstance.getValue(`${colArr[j + 1]}${parseInt(stockOutPercentCount)}`, true).toString().replaceAll("\,", ""))
         }
         C.push(this.addDoubleQuoteToRowContent(B));
         B = [];
 
-        B.push(i18n.t('static.dataentry.adjustedConsumption'))
+        B.push(i18n.t('static.dataentry.adjustedConsumption').replaceAll(' ', '%20'))
         for (var j = 0; j < monthArray.length; j++) {
           B.push((elInstance.getValue(`${colArr[j + 1]}${parseInt(adjustedConsumptionCount)}`, true).toString().replaceAll("\,", "")))
         }
         C.push(this.addDoubleQuoteToRowContent(B));
         B = [];
 
-        B.push(i18n.t('static.dataentry.convertedToPlanningUnit'))
+        B.push(i18n.t('static.dataentry.convertedToPlanningUnit').replaceAll(' ', '%20'))
         for (var j = 0; j < monthArray.length; j++) {
           B.push(elInstance.getValue(`${colArr[j + 1]}${parseInt(convertedToPlanningUnitCount)}`, true).toString().replaceAll("\,", ""))
         }
@@ -1342,7 +1393,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     a.href = 'data:attachment/csv,' + csvString
     a.target = "_Blank"
     a.download = i18n.t('static.dashboard.dataEntryAndAdjustment') + ".csv"
-    a.download = document.getElementById("datasetId").selectedOptions[0].text.toString().split("~")[0] + "-" + document.getElementById("datasetId").selectedOptions[0].text.toString().split("~")[1] + "-" + i18n.t('static.dashboard.dataEntryAndAdjustment') + "-" + (this.state.selectedConsumptionUnitId > 0 ? document.getElementById("planningUnitId").selectedOptions[0].text : "") + ".csv"
+    a.download = document.getElementById("datasetId").selectedOptions[0].text.toString().split("~")[0] + "-" + document.getElementById("datasetId").selectedOptions[0].text.toString().split("~")[1] + "-" + i18n.t('static.dashboard.dataEntryAndAdjustment') + "-" + (this.state.selectedConsumptionUnitId > 0 ? document.getElementById("planningUnitId").value : "") + ".csv"
     document.body.appendChild(a)
     a.click()
   }
@@ -1493,6 +1544,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
               var datasetDataBytes = CryptoJS.AES.decrypt(datasetData.programData, SECRET_KEY);
               var datasetData = datasetDataBytes.toString(CryptoJS.enc.Utf8);
               var datasetJson = JSON.parse(datasetData);
+              console.log("datasetJson@@@@@@@@@@@@@@", datasetJson);
               var consumptionList = datasetJson.actualConsumptionList;
               var planningUnitList = datasetJson.planningUnitList.filter(c => c.consuptionForecast);
               var regionList = datasetJson.regionList;
@@ -1545,7 +1597,13 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                       } else {
                         multiplier = planningUnitList[cul].otherUnit.multiplier
                       }
-                      qtyInPU = (Number(qty) / Number(multiplier)).toFixed(2)
+                      if (planningUnitList[cul].consumptionDataType == 1) {
+                        qtyInPU = (Number(qty) / Number(planningUnitList[cul].planningUnit.multiplier)).toFixed(2)
+                      } else if (planningUnitList[cul].consumptionDataType == 2) {
+                        qtyInPU = (Number(qty));
+                      } else if (planningUnitList[cul].consumptionDataType == 3) {
+                        qtyInPU = Number((Number(qty) * Number(planningUnitList[cul].otherUnit.multiplier)) / Number(planningUnitList[cul].planningUnit.multiplier)).toFixed(2)
+                      }
                     } else {
                       qty = "";
                       reportingRate = 100;
@@ -1575,6 +1633,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
 
               this.setState({
                 consumptionList: consumptionList,
+                tempConsumptionList: consumptionList,
                 regionList: regionList,
                 startDate: startDate,
                 stopDate: stopDate,
@@ -1591,7 +1650,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
               }, () => {
                 console.log("this.props.match.params.planningUnitId+++", this.props.match.params.planningUnitId)
                 if (this.props.match.params.planningUnitId > 0) {
-                  this.buildDataJexcel(this.props.match.params.planningUnitId)
+                  this.buildDataJexcel(this.props.match.params.planningUnitId, 0)
                 }
               })
             }.bind(this)
@@ -1869,7 +1928,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         yAxes: [{
           scaleLabel: {
             display: true,
-            labelString: getLabelText(this.state.selectedConsumptionUnitObject.consumptionDataType == "" ? "" : this.state.selectedConsumptionUnitObject.consumptionDataType == 1 ? this.state.selectedConsumptionUnitObject.planningUnit.forecastingUnit.label : this.state.selectedConsumptionUnitObject.consumptionDataType == 2 ? this.state.selectedConsumptionUnitObject.planningUnit.label : this.state.selectedConsumptionUnitObject.otherUnit.label, this.state.lang),
+            labelString: getLabelText(this.state.tempConsumptionUnitObject.consumptionDataType == "" ? "" : this.state.tempConsumptionUnitObject.consumptionDataType == 1 ? this.state.tempConsumptionUnitObject.planningUnit.forecastingUnit.label : this.state.tempConsumptionUnitObject.consumptionDataType == 2 ? this.state.tempConsumptionUnitObject.planningUnit.label : this.state.tempConsumptionUnitObject.otherUnit.label, this.state.lang),
             fontColor: 'black'
           },
           stacked: true,
@@ -1892,7 +1951,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           gridLines: {
             drawBorder: true, lineWidth: 0
           },
-          stacked: true
+          // stacked: true
         }]
       },
       tooltips: {
@@ -1936,19 +1995,21 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       if (elInstance != undefined) {
         var colourCount = 0;
         datasetListForGraph.push({
-          label: getLabelText(this.state.selectedConsumptionUnitObject.consumptionDataType == 1 ? this.state.selectedConsumptionUnitObject.planningUnit.forecastingUnit.label : this.state.selectedConsumptionUnitObject.consumptionDataType == 2 ? this.state.selectedConsumptionUnitObject.planningUnit.label : this.state.selectedConsumptionUnitObject.otherUnit.label, this.state.lang),
+          label: getLabelText(this.state.tempConsumptionUnitObject.consumptionDataType == 1 ? this.state.tempConsumptionUnitObject.planningUnit.forecastingUnit.label : this.state.tempConsumptionUnitObject.consumptionDataType == 2 ? this.state.tempConsumptionUnitObject.planningUnit.label : this.state.tempConsumptionUnitObject.otherUnit.label, this.state.lang),
           data: this.state.planningUnitTotalList.filter(c => c.planningUnitId == this.state.selectedConsumptionUnitObject.planningUnit.id).map(item => (item.qty > 0 ? item.qty : null)),
-          // type: 'line',
-          stack: 1,
-          // backgroundColor: 'transparent',
-          backgroundColor: "#002F6C",
+          type: 'line',
+          // stack: 1,
+          backgroundColor: 'transparent',
+          // backgroundColor: "#002F6C",
           borderStyle: 'dotted',
           ticks: {
             fontSize: 2,
             fontColor: 'transparent',
           },
           // lineTension: 0,
-          // pointStyle: 'line',
+          pointStyle: 'line',
+          pointBorderWidth: 5,
+          borderColor: '#000',
           // pointRadius: 0,
           showInLegend: true,
         })
@@ -2010,6 +2071,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         </li>
       )
     }, this);
+    console.log("PlanningUnitList@@@@@@@@@@@@@@", this.state.planningUnitList);
     return (
       <div className="animated fadeIn">
         <Prompt
@@ -2115,16 +2177,16 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                                     <td className="BorderNoneSupplyPlan sticky-col first-col clone1" onClick={() => this.toggleAccordion(item.planningUnit.id)}>
                                       {this.state.consumptionUnitShowArr.includes(item.planningUnit.id) ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i>}
                                     </td>
-                                    <td className="sticky-col first-col clone hoverTd" align="left" onClick={() => { this.buildDataJexcel(item.planningUnit.id) }}>
+                                    <td className="sticky-col first-col clone hoverTd" align="left" onClick={() => { this.buildDataJexcel(item.planningUnit.id, 0) }}>
                                       {
-                                        this.state.showInPlanningUnit ? getLabelText(item.planningUnit.label, this.state.lang) : getLabelText(item.planningUnit.forecastingUnit.label, this.state.lang)
+                                        this.state.showInPlanningUnit ? getLabelText(item.planningUnit.label, this.state.lang) : item.consumptionDataType == 1 ? getLabelText(item.planningUnit.forecastingUnit.label, this.state.lang) : item.consumptionDataType == 2 ? getLabelText(item.planningUnit.label, this.state.lang) : getLabelText(item.otherUnit.label, this.state.lang)
                                         // item.consumptionDataType == 1 ? getLabelText(item.planningUnit.forecastingUnit.label, this.state.lang) : item.consumptionDataType == 2 ? getLabelText(item.planningUnit.label, this.state.lang) : getLabelText(item.otherUnit.label, this.state.lang)
                                       }</td>
                                     {this.state.monthArray.map((item1, count) => {
                                       var data = this.state.planningUnitTotalList.filter(c => c.planningUnitId == item.planningUnit.id && moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM"))
                                       total += Number(data[0].qty);
                                       totalPU += Number(data[0].qtyInPU);
-                                      return (<td onClick={() => { this.buildDataJexcel(item.planningUnit.id) }}><NumberFormat displayType={'text'} thousandSeparator={true} value={this.state.showInPlanningUnit ? data[0].qtyInPU : data[0].qty} /></td>)
+                                      return (<td onClick={() => { this.buildDataJexcel(item.planningUnit.id, 0) }}><NumberFormat displayType={'text'} thousandSeparator={true} value={this.state.showInPlanningUnit ? data[0].qtyInPU : data[0].qty} /></td>)
                                     })}
                                     <td><NumberFormat displayType={'text'} thousandSeparator={true} value={this.state.showInPlanningUnit ? Math.round(totalPU) : Math.round(total)} /></td>
                                     <td>100</td>
@@ -2139,7 +2201,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                                         var data = this.state.planningUnitTotalListRegion.filter(c => c.planningUnitId == item.planningUnit.id && moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM") && c.region.regionId == r.regionId)
                                         totalRegion += Number(data[0].qty);
                                         totalRegionPU += Number(data[0].qtyInPU);
-                                        return (<td onClick={() => { this.buildDataJexcel(item.planningUnit.id) }}><NumberFormat displayType={'text'} thousandSeparator={true} value={this.state.showInPlanningUnit ? data[0].qtyInPU : data[0].qty} /></td>)
+                                        return (<td onClick={() => { this.buildDataJexcel(item.planningUnit.id, 0) }}><NumberFormat displayType={'text'} thousandSeparator={true} value={this.state.showInPlanningUnit ? data[0].qtyInPU : data[0].qty} /></td>)
                                       })}
                                       <td><NumberFormat displayType={'text'} thousandSeparator={true} value={this.state.showInPlanningUnit ? Math.round(totalRegionPU) : Math.round(totalRegion)} /></td>
                                       <td>{this.state.showInPlanningUnit ? Math.round((totalRegionPU / totalPU) * 100) : Math.round((totalRegion / total) * 100)}</td>
@@ -2170,14 +2232,14 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                                     disabled={this.state.selectedConsumptionUnitId > 0 ? true : false}
                                     // onChange={this.filterVersion}
                                     // onChange={(e) => { this.getARUList(e); }}
-                                    value={this.state.selectedPlanningUnitDesc}
+                                    value={getLabelText(this.state.selectedConsumptionUnitObject.planningUnit.label, this.state.lang)}
                                   >
                                   </Input>
                                 </InputGroup>
                               </div>
-                              <Label htmlFor="appendedInputButton">{i18n.t('static.common.dataEnteredIn')} {this.state.selectedPlanningUnitDesc}, {i18n.t('static.dataentry.multiplierToFU')} = {this.state.changedPlanningUnitMultiplier}
+                              <Label htmlFor="appendedInputButton">{i18n.t('static.common.dataEnteredIn')} {this.state.tempConsumptionUnitObject.consumptionDataType == 1 ? (this.state.tempConsumptionUnitObject.planningUnit.forecastingUnit.label.label_en) : this.state.tempConsumptionUnitObject.consumptionDataType == 2 ? this.state.tempConsumptionUnitObject.planningUnit.label.label_en : this.state.tempConsumptionUnitObject.otherUnit.label.label_en}, {i18n.t('static.dataentry.multiplierToFU')} = {Number(this.state.tempConsumptionUnitObject.consumptionDataType == 1 ? 1 : this.state.tempConsumptionUnitObject.consumptionDataType == 2 ? this.state.tempConsumptionUnitObject.planningUnit.multiplier : this.state.tempConsumptionUnitObject.otherUnit.multiplier)}
                                 <a className="card-header-action">
-                                  <span style={{ cursor: 'pointer' }} onClick={() => { this.changeUnit(this.state.selectedConsumptionUnitId) }}><small className="changeUnit">({i18n.t('static.dataentry.change')})</small></span>
+                                  <span style={{ cursor: 'pointer' }} className="hoverDiv" onClick={() => { this.changeUnit(this.state.selectedConsumptionUnitId) }}>({i18n.t('static.dataentry.change')})</span>
                                 </a>
                               </Label>
 
@@ -2343,25 +2405,26 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                 setFieldError
               }) => (
                 <Form onSubmit={handleSubmit} noValidate name='dataEnteredInForm'>
-                  <CardBody style={{ display: this.state.loading ? "none" : "block" }}>
+                  {/* <CardBody style={{ display: this.state.loading ? "none" : "block" }}> */}
                     <ModalBody>
                       <FormGroup className="col-md-12">
                         <Label htmlFor="appendedInputButton">{i18n.t('static.dataentry.units')}</Label>
-                        <div className="controls ">
-                          <InputGroup>
+                        {/* <div className="controls "> */}
+                          {/* <InputGroup> */}
                             <Input
                               type="select"
                               name="dataEnteredInUnitId"
                               id="dataEnteredInUnitId"
                               bsSize="sm"
+                              value={this.state.dataEnteredIn}
                               onChange={(e) => { this.setDataEnteredIn(e); }}
                             >
-                              {
-                                this.state.dataEnteredInUnitList.map(c => <option value={c[1]} selected={c[0]}>{c[2]}</option>)
-                              }
+                              <option value={1}>{this.state.selectedConsumptionUnitObject.planningUnit.forecastingUnit.label.label_en}</option>
+                              <option value={2}>{this.state.selectedConsumptionUnitObject.planningUnit.label.label_en}</option>
+                              <option value={3}>{i18n.t('static.common.otherUnit')}</option>
                             </Input>
-                          </InputGroup>
-                        </div>
+                          {/* </InputGroup> */}
+                        {/* </div> */}
                       </FormGroup>
                       <FormGroup className="col-md-6" id="otherUnitNameDiv" style={{ display: this.state.showOtherUnitNameField ? 'block' : 'none' }}>
                         <Label htmlFor="appendedInputButton">{i18n.t('static.common.otherUnitName')}</Label>
@@ -2384,13 +2447,13 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                           type="hidden"
                           name="needOtherUnitValidation"
                           id="needOtherUnitValidation"
-                          value={(this.state.changedConsumptionTypeId == 3 ? true : false)}
+                          value={(this.state.dataEnteredIn == 3 ? true : false)}
                         />
                         {/* </InputGroup> */}
                         {/* </div> */}
                         <FormFeedback className="red">{errors.otherUnitName}</FormFeedback>
                       </FormGroup>
-                      <FormGroup className="col-md-6" style={{ display: this.state.showDetailTable ? 'block' : 'none' }}>
+                      <FormGroup className="col-md-6">
                         <Label htmlFor="appendedInputButton">{i18n.t('static.importFromQATSupplyPlan.multiplierTo')}</Label>
                         {/* <InputGroup> */}
                         <Input
@@ -2399,6 +2462,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                           name="otherUnitMultiplier"
                           id="otherUnitMultiplier"
                           bsSize="sm"
+                          readOnly={this.state.dataEnteredIn != 3}
                           valid={!errors.otherUnitMultiplier}
                           invalid={touched.otherUnitMultiplier && !!errors.otherUnitMultiplier}
                           onBlur={handleBlur}
@@ -2415,7 +2479,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                       <Button type="submit" size="md" onClick={(e) => { this.touchAll(setTouched, errors) }} color="success" className="submitBtn float-right mr-1"> <i className="fa fa-check"></i>Submit</Button>
                       <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setState({ toggleDataChangeForSmallTable: false })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                     </ModalFooter>
-                  </CardBody>
+                  {/* </CardBody> */}
                 </Form>
               )
             }
@@ -2518,41 +2582,86 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
   }
 
   submitChangedUnit(consumptionUnitId) {
-    var planningUnitId = "";
-    var consumptionDataDesc = "";
-    var changedPlanningUnitMultiplierValue = "";
-    this.state.dataEnteredInUnitList.map(c => {
-      if (c[1] == consumptionUnitId) {
-        planningUnitId = c[5]
-        consumptionDataDesc = c[2]
-        changedPlanningUnitMultiplierValue = c[3]
-      }
-    })
+    var elInstance = this.state.dataEl;
+    // var planningUnitId = "";
+    // var consumptionDataDesc = "";
+    // var changedPlanningUnitMultiplierValue = "";
+    // this.state.dataEnteredInUnitList.map(c => {
+    //   if (c[1] == consumptionUnitId) {
+    //     planningUnitId = c[5]
+    //     consumptionDataDesc = c[2]
+    //     changedPlanningUnitMultiplierValue = c[3]
+    //   }
+    // })
 
 
-    var consumptionUnit = {};
-    consumptionUnit = this.state.planningUnitList.filter(c => c.planningUnit.id == planningUnitId)[0];
-    var otherUnitNameText = document.getElementById("otherUnitName").value;
-    if (consumptionUnitId == 3) {
-      this.setState({
-        selectedPlanningUnitDesc: otherUnitNameText,
-        changedPlanningUnitMultiplier: document.getElementById('otherUnitMultiplier').value
-      })
+    var consumptionUnitTemp = {};
+    consumptionUnitTemp = this.state.selectedConsumptionUnitObject;
+    // var otherUnitNameText = document.getElementById("otherUnitName").value;
+    // var multiplier1 = 1;
+    // if (consumptionUnitId == 3) {
+    //   this.setState({
+    //     selectedPlanningUnitDesc: otherUnitNameText,
+    //     changedPlanningUnitMultiplier: document.getElementById('otherUnitMultiplier').value
+    //   })
+    //   multiplier1 = document.getElementById('otherUnitMultiplier').value
+    //   // elInstance.setValueFromCoords(38, 0, document.getElementById('otherUnitMultiplier').value, true);
+    // } else {
+    //   this.setState({
+    //     selectedPlanningUnitDesc: consumptionDataDesc,
+    //     changedPlanningUnitMultiplier: changedPlanningUnitMultiplierValue
+    //   })
+    //   multiplier1 = changedPlanningUnitMultiplierValue
+    //   // elInstance.setValueFromCoords(38, 0, changedPlanningUnitMultiplierValue, true);
+    // }
+    var multiplier = 1;
+    if (this.state.dataEnteredIn == 1) {
+      multiplier = consumptionUnitTemp.planningUnit.multiplier;
+      // changedConsumptionDataDesc = getLabelText(consumptionUnit.planningUnit.forecastingUnit.label, this.state.lang) + ' | ' + consumptionUnit.planningUnit.forecastingUnit.id;
+    } else if (this.state.dataEnteredIn == 2) {
+      multiplier = 1;
+      // changedConsumptionDataDesc = getLabelText(consumptionUnit.planningUnit.label, this.state.lang) + ' | ' + consumptionUnit.planningUnit.id;;
     } else {
-      this.setState({
-        selectedPlanningUnitDesc: consumptionDataDesc,
-        changedPlanningUnitMultiplier: changedPlanningUnitMultiplierValue
-      })
+      multiplier = 1 / (document.getElementById('otherUnitMultiplier').value / consumptionUnitTemp.planningUnit.multiplier);
+      // changedConsumptionDataDesc = getLabelText(consumptionUnit.otherUnit.label, this.state.lang);
     }
+    var consumptionUnitForUpdate = {};
+    consumptionUnitForUpdate = {
+      consumptionDataType: this.state.dataEnteredIn,
+      planningUnit: consumptionUnitTemp.planningUnit,
+      otherUnit: this.state.dataEnteredIn == 3 ? {
+        label: {
+          labelId: null,
+          label_en: this.state.otherUnitName,
+          label_fr: "",
+          label_sp: "",
+          label_pr: ""
+        },
+        multiplier: this.state.selectedPlanningUnitMultiplier
+      } : null
+    }
+    // consumptionUnitForUpdate.consumptionDataType = this.state.dataEnteredIn;
+    // if (this.state.dataEnteredIn == 3) {
+    //   consumptionUnitForUpdate.otherUnit.label.label_en = this.state.otherUnitName;
+    //   consumptionUnitForUpdate.otherUnit.multiplier = this.state.selectedPlanningUnitMultiplier;
+    // }
     this.setState({
-      selectedPlanningUnitId: consumptionUnit.planningUnit.id,
-      selectedConsumptionUnitObject: consumptionUnit,
+      // selectedPlanningUnitId: consumptionUnit.planningUnit.id,
+      tempConsumptionUnitObject: consumptionUnitForUpdate,
       consumptionChanged: true,
       toggleDataChangeForSmallTable: false,
-      otherUnitName: otherUnitNameText,
+      // otherUnitName: otherUnitNameText,
+      // consumptionUnit:consumptionUnit
       // selectedPlanningUnitId: consumptionUnitId,
       // changedConsumptionTypeId: consumptionUnitId,
+    }, () => {
+      elInstance.setValueFromCoords(38, 0, multiplier, true);
     })
+    // this.setState({
+    //   toggleDataChangeForSmallTable: false
+    // }, () => {
+    //     elInstance.setValueFromCoords(38, 0, 1, true);
+    //   })
   }
 
   changeUnit(consumptionUnitId) {
@@ -2561,91 +2670,101 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     }, () => {
       if (this.state.toggleDataChangeForSmallTable) {
         this.setState({
-          loading: true
+          dataEnteredIn: this.state.tempConsumptionUnitObject.consumptionDataType,
+          showOtherUnitNameField: this.state.tempConsumptionUnitObject.consumptionDataType == 3 ? true : false,
+          otherUnitName: this.state.tempConsumptionUnitObject.consumptionDataType == 3 ? this.state.tempConsumptionUnitObject.otherUnit.label.label_en : "",
+          selectedPlanningUnitMultiplier: this.state.tempConsumptionUnitObject.consumptionDataType == 1 ? 1 : this.state.tempConsumptionUnitObject.consumptionDataType == 2 ? this.state.tempConsumptionUnitObject.planningUnit.multiplier : this.state.tempConsumptionUnitObject.otherUnit.multiplier
         }, () => {
-          var showHideOtherUnitNameField = false;
-          var consumptionList = this.state.consumptionList;
-          var consumptionUnit = {};
-          consumptionUnit = this.state.planningUnitList.filter(c => c.planningUnit.id == consumptionUnitId)[0];
-          if (consumptionUnitId != 0) {
-            if (consumptionUnit.consumptionDataType == 1) {
-              showHideOtherUnitNameField = false;
-              document.getElementById("otherUnitMultiplier").readOnly = true;
-            } else if (consumptionUnit.consumptionDataType == 2) {
-              showHideOtherUnitNameField = false;
-              document.getElementById("otherUnitMultiplier").readOnly = true;
-            } else if (consumptionUnit.consumptionDataType == 3) {
-              showHideOtherUnitNameField = true;
-              document.getElementById("otherUnitMultiplier").readOnly = false;
-            }
-          }
-          consumptionList = consumptionList.filter(c => c.planningUnit.id == consumptionUnitId);
-          let dataArray1 = [];
-          let data = [];
-          if (consumptionUnitId != 0) {
-            data = [];
-            data[0] = consumptionUnit.consumptionDataType == 1 && !this.state.consumptionChanged ? true : false;
-            data[1] = 1;
-            data[2] = getLabelText(consumptionUnit.planningUnit.forecastingUnit.label, this.state.lang);
-            data[3] = 1;
-            data[4] = consumptionUnit.planningUnit.forecastingUnit.id;
-            data[5] = consumptionUnit.planningUnit.id;
-            dataArray1.push(data);
-            data = [];
-            data[0] = consumptionUnit.consumptionDataType == 2 && !this.state.consumptionChanged ? true : false;
-            data[1] = 2;
-            data[2] = getLabelText(consumptionUnit.planningUnit.label, this.state.lang);
-            data[3] = parseInt(consumptionUnit.planningUnit.multiplier);
-            data[4] = consumptionUnit.planningUnit.id;
-            data[5] = consumptionUnit.planningUnit.id;
+          // var showHideOtherUnitNameField = false;
+          // var consumptionList = this.state.consumptionList;
+          // var consumptionUnit = {};
+          // consumptionUnit = this.state.planningUnitList.filter(c => c.planningUnit.id == consumptionUnitId)[0];
+          // if (consumptionUnitId != 0) {
+          //   if (consumptionUnit.consumptionDataType == 1) {
+          //     showHideOtherUnitNameField = false;
+          //     document.getElementById("otherUnitMultiplier").readOnly = true;
+          //   } else if (consumptionUnit.consumptionDataType == 2) {
+          //     showHideOtherUnitNameField = false;
+          //     document.getElementById("otherUnitMultiplier").readOnly = true;
+          //   } else if (consumptionUnit.consumptionDataType == 3) {
+          //     showHideOtherUnitNameField = true;
+          //     document.getElementById("otherUnitMultiplier").readOnly = false;
+          //   }
+          // }
+          // consumptionList = consumptionList.filter(c => c.planningUnit.id == consumptionUnitId);
+          // let dataArray1 = [];
+          // let data = [];
+          // if (consumptionUnitId != 0) {
+          //   data = [];
+          //   data[0] = consumptionUnit.consumptionDataType == 1 && !this.state.consumptionChanged ? true : false;
+          //   data[1] = 1;
+          //   data[2] = getLabelText(consumptionUnit.planningUnit.forecastingUnit.label, this.state.lang);
+          //   data[3] = 1;
+          //   data[4] = consumptionUnit.planningUnit.forecastingUnit.id;
+          //   data[5] = consumptionUnit.planningUnit.id;
+          //   dataArray1.push(data);
+          //   data = [];
+          //   data[0] = consumptionUnit.consumptionDataType == 2 && !this.state.consumptionChanged ? true : false;
+          //   data[1] = 2;
+          //   data[2] = getLabelText(consumptionUnit.planningUnit.label, this.state.lang);
+          //   data[3] = parseInt(consumptionUnit.planningUnit.multiplier);
+          //   data[4] = consumptionUnit.planningUnit.id;
+          //   data[5] = consumptionUnit.planningUnit.id;
 
-            dataArray1.push(data);
-            data = [];
-            data[0] = consumptionUnit.consumptionDataType == 3 && !this.state.consumptionChanged ? true : false;
-            data[1] = 3;
-            data[2] = consumptionUnit.consumptionDataType == 3 ? getLabelText(consumptionUnit.otherUnit.label, this.state.lang) : `${i18n.t('static.common.otherUnit')}`;
-            data[3] = consumptionUnit.consumptionDataType == 3 ? parseInt(consumptionUnit.otherUnit.multiplier) : "";
-            data[4] = consumptionUnit.consumptionDataType == 3 ? consumptionUnit.otherUnit.id : "";
-            data[5] = consumptionUnit.planningUnit.id;
-            dataArray1.push(data);
-          }
-          this.setState({
-            //   dataEl: dataEl, 
-            loading: false,
-            dataEnteredInUnitList: dataArray1,
-            showOtherUnitNameField: showHideOtherUnitNameField,
-            showDetailTable: true
-          })
+          //   dataArray1.push(data);
+          //   data = [];
+          //   data[0] = consumptionUnit.consumptionDataType == 3 && !this.state.consumptionChanged ? true : false;
+          //   data[1] = 3;
+          //   data[2] = consumptionUnit.consumptionDataType == 3 ? getLabelText(consumptionUnit.otherUnit.label, this.state.lang) : `${i18n.t('static.common.otherUnit')}`;
+          //   data[3] = consumptionUnit.consumptionDataType == 3 ? parseInt(consumptionUnit.otherUnit.multiplier) : "";
+          //   data[4] = consumptionUnit.consumptionDataType == 3 ? consumptionUnit.otherUnit.id : "";
+          //   data[5] = consumptionUnit.planningUnit.id;
+          //   dataArray1.push(data);
+          // }
+          // this.setState({
+          //   //   dataEl: dataEl, 
+          //   loading: false,
+          //   dataEnteredInUnitList: dataArray1,
+          //   showOtherUnitNameField: showHideOtherUnitNameField,
+          //   showDetailTable: true,
+          //   otherUnitName: consumptionUnit.consumptionDataType == 3 ? consumptionUnit.otherUnit.label.label_en : "",
+          // })
         })
       }
     })
   }
 
   setDataEnteredIn(e) {
-    var multiplier = "";
-    // var arrayid = "";
-    var arrayid1 = "";
-    // var consumptionDataDesc = "";
-
-
-    this.state.dataEnteredInUnitList.map(c => {
-      if (c[1] == e.target.value) {
-        multiplier = c[3]
-        // arrayid = c[5]
-        arrayid1 = c[1]
-        // consumptionDataDesc = c[2]
-      }
-    })
-    if (e.target.value == 3) {
-      document.getElementById('otherUnitNameDiv').style.display = 'block';
-      document.getElementById("otherUnitMultiplier").readOnly = false;
-    } else {
-      document.getElementById('otherUnitNameDiv').style.display = 'none';
-      document.getElementById("otherUnitMultiplier").readOnly = true;
-    }
     this.setState({
-      selectedPlanningUnitMultiplier: multiplier,
-      changedConsumptionTypeId: arrayid1
+      dataEnteredIn: e.target.value,
+      showOtherUnitNameField: e.target.value == 3 ? true : false,
+      selectedPlanningUnitMultiplier: e.target.value == 1 ? 1 : e.target.value == 2 ? this.state.tempConsumptionUnitObject.planningUnit.multiplier : this.state.tempConsumptionUnitObject.otherUnit != null ? this.state.tempConsumptionUnitObject.otherUnit.multiplier : "",
+      otherUnitName: e.target.value == 3 && this.state.tempConsumptionUnitObject.otherUnit != null ? this.state.tempConsumptionUnitObject.otherUnit.label.label_en : ""
     })
+    //   var multiplier = "";
+    //   // var arrayid = "";
+    //   var arrayid1 = "";
+    //   // var consumptionDataDesc = "";
+
+
+    //   this.state.dataEnteredInUnitList.map(c => {
+    //     if (c[1] == e.target.value) {
+    //       multiplier = c[3]
+    //       // arrayid = c[5]
+    //       arrayid1 = c[1]
+    //       // consumptionDataDesc = c[2]
+    //     }
+    //   })
+    //   if (e.target.value == 3) {
+    //     document.getElementById('otherUnitNameDiv').style.display = 'block';
+    //     document.getElementById("otherUnitMultiplier").readOnly = false;
+    //   } else {
+    //     document.getElementById('otherUnitNameDiv').style.display = 'none';
+    //     document.getElementById("otherUnitMultiplier").readOnly = true;
+    //   }
+    //   this.setState({
+    //     selectedPlanningUnitMultiplier: multiplier,
+    //     changedConsumptionTypeId: arrayid1
+    //   })
   }
 }

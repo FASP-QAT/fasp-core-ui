@@ -216,11 +216,21 @@ class CompareAndSelectScenario extends Component {
                     console.log("dataForPlanningUnit####", dataForPlanningUnit);
                     var data = [];
                     if (dataForPlanningUnit.length > 0) {
-                        if ((dataForPlanningUnit[0].payload.nodeDataMap[scenarioList[sl].id])[0].nodeDataMomList != undefined) {
-                            data = (dataForPlanningUnit[0].payload.nodeDataMap[scenarioList[sl].id])[0].nodeDataMomList;
+                        for (var dfpu = 0; dfpu < dataForPlanningUnit.length; dfpu++) {
+                            if ((dataForPlanningUnit[dfpu].payload.nodeDataMap[scenarioList[sl].id])[0].nodeDataMomList != undefined) {
+                                data = data.concat((dataForPlanningUnit[dfpu].payload.nodeDataMap[scenarioList[sl].id])[0].nodeDataMomList);
+                            }
                         }
                     }
-                    treeScenarioList.push({ id: treeList[tl].treeId + "~" + scenarioList[sl].id, tree: treeList[tl], scenario: scenarioList[sl], checked: readonly ? false : true, color: colourArray[colourArrayCount], type: "T", data: data, readonly: readonly });
+                    let resultTrue = Object.values(data.reduce((a, { month, calculatedMmdValue }) => {
+                        if (!a[month])
+                            a[month] = Object.assign({}, { month, calculatedMmdValue });
+                        else
+                            a[month].calculatedMmdValue += calculatedMmdValue;
+                        return a;
+                    }, {}));
+                    console.log("resultTrue@@@@@@@@@@@@@@", resultTrue);
+                    treeScenarioList.push({ id: treeList[tl].treeId + "~" + scenarioList[sl].id, tree: treeList[tl], scenario: scenarioList[sl], checked: readonly ? false : true, color: colourArray[colourArrayCount], type: "T", data: resultTrue, readonly: readonly });
                     colourArrayCount += 1;
                     count += 1;
                 }
@@ -1972,8 +1982,8 @@ class CompareAndSelectScenario extends Component {
                                                         <td align="center"></td>
                                                     </tr> */}
                                                     {this.state.treeScenarioList.map((item, idx) => (
-                                                        <tr id="addr0" style={{ backgroundColor: item.readonly ? "#CFCDC9" : this.state.selectedTreeScenarioId == item.id?"#d1e3f5":"" }}>
-                                                            <td align="center"><input style={{width:"100%",height:"1.5em"}}type="radio" id="selectAsForecast" name="selectAsForecast" checked={this.state.selectedTreeScenarioId == item.id ? true : false} onClick={() => this.scenarioOrderChanged(item.id)} disabled={item.readonly}></input></td>
+                                                        <tr id="addr0" style={{ backgroundColor: item.readonly ? "#CFCDC9" : this.state.selectedTreeScenarioId == item.id ? "#d1e3f5" : "" }}>
+                                                            <td align="center"><input style={{ width: "100%", height: "1.5em" }} type="radio" id="selectAsForecast" name="selectAsForecast" checked={this.state.selectedTreeScenarioId == item.id ? true : false} onClick={() => this.scenarioOrderChanged(item.id)} disabled={item.readonly}></input></td>
                                                             <td align="center"><input type="checkbox" id={"scenarioCheckbox" + item.id} checked={item.checked} onChange={() => this.scenarioCheckedChanged(item.id)} disabled={item.readonly} /></td>
                                                             <td align="center" >{item.type == "T" ? i18n.t('static.forecastMethod.tree') : i18n.t('static.compareAndSelect.cons')}</td>
                                                             <td><i class="fa fa-circle" style={{ color: item.color }} aria-hidden="true"></i> {" "}{item.type == "T" ? getLabelText(item.tree.label, this.state.lang) + " - " + getLabelText(item.scenario.label, this.state.lang) : getLabelText(item.scenario.extrapolationMethod.label, this.state.lang)}{"  "}{item.readonly && <i class="fa fa-exclamation-triangle"></i>}</td>
