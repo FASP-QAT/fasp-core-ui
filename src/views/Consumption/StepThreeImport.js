@@ -395,6 +395,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                                 this.setState({
                                     isChanged1: false
                                 })
+                                localStorage.setItem("sesDatasetId", program.id);
 
                                 // this.props.history.push(`/importFromQATSupplyPlan/listImportFromQATSupplyPlan/` + 'green/' + i18n.t('static.mt.dataUpdateSuccess'))
                                 // this.props.history.push(`/dataentry/consumptionDataEntryAndAdjustment`)
