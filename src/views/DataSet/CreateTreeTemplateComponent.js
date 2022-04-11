@@ -2055,6 +2055,43 @@ export default class CreateTreeTemplate extends Component {
         }
     }
 
+    // getSameLevelNodeList = function (instance, cell, c, r, source) {
+    //     var sameLevelNodeList = [];
+    //     var id = this.state.currentItemConfig.context.id;
+    //     var level = this.state.currentItemConfig.context.level;
+    //     var nodeTypeId = this.state.currentItemConfig.context.payload.nodeType.id;
+    //     var parent = this.state.currentItemConfig.context.parent;
+    //     var nodeDataId = this.state.currentItemConfig.context.payload.nodeDataMap[0][0].nodeDataId;
+    //     var isTransferRow = (instance.jexcel.getJson(null, false)[r])[12];
+    //     console.log("isTransferRow---",isTransferRow);
+    //     var arr = [];
+    //     if (nodeTypeId == NUMBER_NODE_ID) {
+    //         arr = this.state.items.filter(x => x.level == level && x.id != id && x.payload.nodeType.id == nodeTypeId);
+    //     } else {
+    //         arr = this.state.items.filter(x => x.level == level && x.id != id && (x.payload.nodeType.id == PERCENTAGE_NODE_ID || x.payload.nodeType.id == FU_NODE_ID || x.payload.nodeType.id == PU_NODE_ID) && x.parent == parent);
+    //     }
+    //     if (isTransferRow) {
+    //         for (let i = 0; i < arr.length; i++) {
+    //             var nodeDataModelingList = arr[i].payload.nodeDataMap[0][0].nodeDataModelingList;
+    //             console.log("nodeDataModelingList---", nodeDataModelingList);
+    //             if (nodeDataModelingList != undefined && nodeDataModelingList != null) {
+    //                 var transferList = nodeDataModelingList.filter(x => x.transferNodeDataId == nodeDataId);
+    //                 console.log("transferList---", transferList);
+    //                 if (transferList.length > 0) {
+    //                     sameLevelNodeList.push({ id: (arr[i].payload.nodeDataMap[0])[0].nodeDataId, name: getLabelText(arr[i].payload.label, this.state.lang) });
+    //                 }
+    //                 console.log("sameLevelNodeList transfer---", sameLevelNodeList);
+    //             }
+    //         }
+    //     } else {
+    //         for (var i = 0; i < arr.length; i++) {
+    //             sameLevelNodeList[i] = { id: (arr[i].payload.nodeDataMap[0])[0].nodeDataId, name: getLabelText(arr[i].payload.label, this.state.lang) }
+    //         }
+    //     }
+    //     console.log("sameLevelNodeList---", sameLevelNodeList);
+    //     return sameLevelNodeList;
+    // }.bind(this)
+
     getSameLevelNodeList(level, id, nodeTypeId, parent) {
         var sameLevelNodeList = [];
         var arr = [];
@@ -2083,20 +2120,23 @@ export default class CreateTreeTemplate extends Component {
         }
         console.log("arr---", arr);
         for (let i = 0; i < arr.length; i++) {
-            var nodeDataModelingList = arr[i].nodeDataModelingList;
+            var nodeDataModelingList = arr[i].payload.nodeDataMap[0][0].nodeDataModelingList;
             console.log("nodeDataModelingList---", nodeDataModelingList);
             if (nodeDataModelingList != undefined && nodeDataModelingList != null) {
                 var transferList = nodeDataModelingList.filter(x => x.transferNodeDataId == nodeDataId);
                 console.log("transferList---", transferList);
                 if (transferList.length > 0) {
+                    var tempTransferList = JSON.parse(JSON.stringify(transferList));
                     console.log("transferList.length > 0---", transferList.length);
                     if (transferList.length == 1) {
                         console.log("transferList.length == 1---", transferList.length);
-                        nodeTransferDataList.push(transferList[0]);
+                        tempTransferList[0].transferNodeDataId = arr[i].id;
+                        nodeTransferDataList.push(tempTransferList[0]);
                     } else {
                         console.log("transferList.length > 1---", transferList.length);
                         for (let i = 0; i < transferList.length; i++) {
-                            nodeTransferDataList.push(transferList[i]);
+                            tempTransferList[i].transferNodeDataId = arr[i].id;
+                            nodeTransferDataList.push(tempTransferList[i]);
                         }
                     }
 
@@ -2715,6 +2755,7 @@ export default class CreateTreeTemplate extends Component {
         data[9] = ''
         data[10] = ''
         data[11] = 1
+        data[12] = 0
         elInstance.insertRow(
             data, 0, 1
         );
@@ -2737,7 +2778,9 @@ export default class CreateTreeTemplate extends Component {
     }
     buildModelingJexcel() {
         var scalingList = this.state.scalingList;
+        var nodeTransferDataList = this.state.nodeTransferDataList;
         console.log("scalingList---", scalingList);
+        console.log("nodeTransferDataList---", nodeTransferDataList);
         console.log("this.state.maxMonth---", this.state.maxMonth);
         var dataArray = [];
         let count = 0;
@@ -2756,6 +2799,7 @@ export default class CreateTreeTemplate extends Component {
             data[9] = ''
             data[10] = ''
             data[11] = ''
+            data[12] = 0
             dataArray[count] = data;
             count++;
         }
@@ -2763,12 +2807,12 @@ export default class CreateTreeTemplate extends Component {
         for (var j = 0; j < scalingList.length; j++) {
             data = [];
             data[0] = scalingList[j].notes
-            data[1] = scalingList[j].startDate
-            data[2] = scalingList[j].stopDate
+            data[1] = scalingList[j].startDateNo
+            data[2] = scalingList[j].stopDateNo
             data[3] = scalingList[j].transferNodeDataId
             console.log("modeling type---", scalingList[j].modelingType.id);
             data[4] = scalingList[j].modelingType.id
-            data[5] = ""
+            data[5] = scalingList[j].increaseDecrease
             data[6] = scalingList[j].modelingType.id != 2 ? parseFloat(scalingList[j].dataValue).toFixed(4) : ''
             data[7] = scalingList[j].modelingType.id == 2 ? scalingList[j].dataValue : ''
             data[8] = cleanUp
@@ -2779,9 +2823,37 @@ export default class CreateTreeTemplate extends Component {
             } else if (scalingList[j].modelingType.id == 3 || scalingList[j].modelingType.id == 4) {
                 calculatedChangeForMonth = (nodeValue * scalingList[j].dataValue) / 100;
             }
-            data[9] = scalingList[j].modelingType.id == 2 ? calculatedChangeForMonth : calculatedChangeForMonth
+            data[9] = calculatedChangeForMonth
             data[10] = scalingList[j].nodeDataModelingId
             data[11] = 0
+            data[12] = 0
+            scalingTotal = parseFloat(scalingTotal) + parseFloat(calculatedChangeForMonth);
+            dataArray[count] = data;
+            count++;
+        }
+        for (var j = 0; j < nodeTransferDataList.length; j++) {
+            data = [];
+            data[0] = nodeTransferDataList[j].notes
+            data[1] = nodeTransferDataList[j].startDateNo
+            data[2] = nodeTransferDataList[j].stopDateNo
+            data[3] = nodeTransferDataList[j].transferNodeDataId
+            // console.log("modeling type---", scalingList[j].modelingType.id);
+            data[4] = nodeTransferDataList[j].modelingType.id
+            data[5] = 1
+            data[6] = nodeTransferDataList[j].modelingType.id != 2 ? parseFloat(nodeTransferDataList[j].dataValue * -1).toFixed(4) : ''
+            data[7] = nodeTransferDataList[j].modelingType.id == 2 ? (nodeTransferDataList[j].dataValue * -1) : ''
+            data[8] = ""
+            var nodeValue = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].calculatedDataValue;
+            var calculatedChangeForMonth;
+            if (nodeTransferDataList[j].modelingType.id == 2 || nodeTransferDataList[j].modelingType.id == 5) {
+                calculatedChangeForMonth = nodeTransferDataList[j].dataValue * -1;
+            } else if (nodeTransferDataList[j].modelingType.id == 3 || nodeTransferDataList[j].modelingType.id == 4) {
+                calculatedChangeForMonth = (nodeValue * (nodeTransferDataList[j].dataValue * -1)) / 100;
+            }
+            data[9] = calculatedChangeForMonth
+            data[10] = nodeTransferDataList[j].nodeDataModelingId
+            data[11] = 0
+            data[12] = 1
             scalingTotal = parseFloat(scalingTotal) + parseFloat(calculatedChangeForMonth);
             dataArray[count] = data;
             count++;
@@ -2824,7 +2896,8 @@ export default class CreateTreeTemplate extends Component {
                 {
                     title: i18n.t('static.tree.transferToNode'),
                     type: 'dropdown',
-                    source: this.state.sameLevelNodeList
+                    source: this.state.sameLevelNodeList,
+                    // filter: this.getSameLevelNodeList
                 },
 
                 //2 C
@@ -2838,7 +2911,7 @@ export default class CreateTreeTemplate extends Component {
                     type: 'dropdown',
                     source: [
                         { id: 1, name: "Increase" },
-                        { id: 2, name: "Decrease" }
+                        { id: -1, name: "Decrease" }
                     ]
                 },
                 //5 F
@@ -2875,6 +2948,10 @@ export default class CreateTreeTemplate extends Component {
                 //10 K
                 {
                     title: 'isChanged',
+                    type: 'hidden'
+                },
+                {
+                    title: 'isTransfer',
                     type: 'hidden'
                 },
 
@@ -2918,6 +2995,32 @@ export default class CreateTreeTemplate extends Component {
                         cell.classList.add('readonly');
                         cell = elInstance.getCell(("G").concat(parseInt(y) + 1))
                         cell.classList.add('readonly');
+                    }
+
+                    if (rowData[12] != "") {
+                        var cell = elInstance.getCell(("A").concat(parseInt(y) + 1))
+                        cell.classList.add('readonly');
+                        var cell = elInstance.getCell(("B").concat(parseInt(y) + 1))
+                        cell.classList.add('readonly');
+                        var cell = elInstance.getCell(("C").concat(parseInt(y) + 1))
+                        cell.classList.add('readonly');
+                        var cell = elInstance.getCell(("D").concat(parseInt(y) + 1))
+                        cell.classList.add('readonly');
+                        var cell = elInstance.getCell(("E").concat(parseInt(y) + 1))
+                        cell.classList.add('readonly');
+                        var cell = elInstance.getCell(("F").concat(parseInt(y) + 1))
+                        cell.classList.add('readonly');
+                        var cell = elInstance.getCell(("G").concat(parseInt(y) + 1))
+                        cell.classList.add('readonly');
+                        var cell = elInstance.getCell(("H").concat(parseInt(y) + 1))
+                        cell.classList.add('readonly');
+                    }
+                    if (rowData[3] != "") {
+                        var cell = elInstance.getCell(("F").concat(parseInt(y) + 1))
+                        cell.classList.add('readonly');
+                    } else {
+                        var cell = elInstance.getCell(("F").concat(parseInt(y) + 1))
+                        cell.classList.remove('readonly');
                     }
 
                 }
@@ -3201,7 +3304,15 @@ export default class CreateTreeTemplate extends Component {
                 instance.jexcel.setComments(col, "");
             }
         }
-
+        // Transfer to/from node
+        if (x == 3) {
+            if (value != "") {
+                this.state.modelingEl.setValueFromCoords(5, y, -1, true);
+            }
+            else {
+                this.state.modelingEl.setValueFromCoords(5, y, "", true);
+            }
+        }
         //+/-
         if (x == 5) {
             var col = ("F").concat(parseInt(y) + 1);
@@ -8913,3 +9024,4 @@ export default class CreateTreeTemplate extends Component {
         </div>
     }
 }
+
