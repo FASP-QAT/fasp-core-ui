@@ -373,7 +373,7 @@ export default class DataSourceTypeListComponent extends Component {
     hideFirstComponent() {
         this.timeout = setTimeout(function () {
             document.getElementById('div1').style.display = 'none';
-        }, 8000);
+        }, 30000);
     }
     componentWillUnmount() {
         clearTimeout(this.timeout);
@@ -383,7 +383,7 @@ export default class DataSourceTypeListComponent extends Component {
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
-        }, 8000);
+        }, 30000);
     }
 
     filterData() {

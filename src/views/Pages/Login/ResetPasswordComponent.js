@@ -84,7 +84,7 @@ class ResetPasswordComponent extends Component {
     hideFirstComponent() {
         setTimeout(function () {
             document.getElementById('div1').style.display = 'block';
-        }, 8000);
+        }, 30000);
 
         // setTimeout(function () {
         //     this.setState({
