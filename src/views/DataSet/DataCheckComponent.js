@@ -91,7 +91,8 @@ export function dataCheck(props, datasetJson) {
                     "treeId": treeId,
                     "treeLabel": PgmTreeList[tl].label,
                     "scenarioId": scenarioList[sc].id,
-                    "scenarioLabel": scenarioList[sc].label
+                    "scenarioLabel": scenarioList[sc].label,
+                    "checked": false
                 });
         }
     }
@@ -824,7 +825,7 @@ export function exportPDF(props) {
                     // if (item1.payload.nodeType.id == 4) {
                     //     doc.setTextColor("red")
                     // } else {
-                        doc.setTextColor("black")
+                    doc.setTextColor("black")
                     // }
 
                     planningText = doc.splitTextToSize(getLabelText(item1.payload.label, props.state.lang), doc.internal.pageSize.width * 3 / 4);
