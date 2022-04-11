@@ -827,35 +827,44 @@ export default class CreateTreeTemplate extends Component {
         var monthList = [];
         var json;
         var monthId;
+        var monthsInPast = 1;
+        var monthsInFuture = 36;
         var treeTemplate = this.state.treeTemplate;
-        var monthsInPast = this.state.treeTemplate.monthsInPast;
-        var monthsInFuture = this.state.treeTemplate.monthsInFuture;
-        console.log("monthsInPast---", monthsInPast);
-        console.log("monthsInFuture---", monthsInFuture);
-        // var count = 1;
-        for (let i = -monthsInPast; i <= monthsInFuture; i++) {
-            if (i != 0) {
-                json = {
-                    id: i,
-                    name: "Month " + i
-                };
-                if (i == 1) {
-                    monthId = i;
-                }
-                // count++;
-                monthList.push(json);
-            }
+        console.log("treeTemplate mom---", treeTemplate);
+        if (treeTemplate.hasOwnProperty('monthsInPast')) {
+            monthsInPast = treeTemplate.monthsInPast;
+            monthsInFuture = treeTemplate.monthsInFuture;
 
+
+            console.log("monthsInPast---", monthsInPast);
+            console.log("monthsInFuture---", monthsInFuture);
+            if (monthsInPast != undefined) {
+                for (let i = -monthsInPast; i <= monthsInFuture; i++) {
+                    console.log("i value---", i);
+                    if (i != 0) {
+                        json = {
+                            id: i,
+                            name: "Month " + i
+                        };
+                        if (i == 1) {
+                            monthId = i;
+                        }
+                        // count++;
+                        monthList.push(json);
+                    }
+
+                }
+                console.log("monthList---", monthList);
+                if (monthList.length > 0) {
+                    var minDate = monthList[0];
+                    var maxDate = JSON.parse(JSON.stringify(monthList)).sort((a, b) => b.id - a.id)[0].id;
+                    this.setState({
+                        minDate, maxDate
+                    })
+                }
+                this.setState({ monthList, monthId });
+            }
         }
-        console.log("monthList---", monthList);
-        if (monthList.length > 0) {
-            var minDate = monthList[0];
-            var maxDate = JSON.parse(JSON.stringify(monthList)).sort((a, b) => b.id - a.id)[0].id;
-            this.setState({
-                minDate, maxDate
-            })
-        }
-        this.setState({ monthList, monthId });
     }
     calculateParentValueFromMOM(month) {
         var parentValue = 0;
@@ -1517,7 +1526,7 @@ export default class CreateTreeTemplate extends Component {
                         for (var i = 0; i < tableJson.length; i++) {
                             var map1 = new Map(Object.entries(tableJson[i]));
                             console.log("11 map---" + map1.get("11"))
-                            if (parseInt(map1.get("11")) === 1) {
+                            if (parseInt(map1.get("11")) === 1 && parseInt(map1.get("12")) != 1) {
                                 var startDate = map1.get("3");
                                 var stopDate = map1.get("4");
                                 if (map1.get("10") != "" && map1.get("10") != 0) {
@@ -4846,114 +4855,196 @@ export default class CreateTreeTemplate extends Component {
         //             }
         //         }
         //     );
-        if (this.props.match.params.templateId != -1 || this.state.treeTemplate.treeTemplateId > 0) {
-            var treeTemplateId = this.props.match.params.templateId != -1 ? this.props.match.params.templateId : this.state.treeTemplate.treeTemplateId;
-            DatasetService.getTreeTemplateById(treeTemplateId).then(response => {
-                console.log("my tree---", response.data);
-                var items = response.data.flatList;
-                var arr = [];
-                for (let i = 0; i < items.length; i++) {
+        setTimeout(() => {
+            if (this.props.match.params.templateId != -1 || this.state.treeTemplate.treeTemplateId > 0) {
+                var treeTemplateId = this.props.match.params.templateId != -1 ? this.props.match.params.templateId : this.state.treeTemplate.treeTemplateId;
+                DatasetService.getTreeTemplateById(treeTemplateId).then(response => {
+                    console.log("my tree---", response.data);
+                    var items = response.data.flatList;
+                    var arr = [];
+                    for (let i = 0; i < items.length; i++) {
 
-                    if (items[i].payload.nodeType.id == 1 || items[i].payload.nodeType.id == 2) {
-                        (items[i].payload.nodeDataMap[0])[0].calculatedDataValue = (items[i].payload.nodeDataMap[0])[0].dataValue;
-                        (items[i].payload.nodeDataMap[0])[0].displayCalculatedDataValue = (items[i].payload.nodeDataMap[0])[0].dataValue.toString();
-                        (items[i].payload.nodeDataMap[0])[0].displayDataValue = (items[i].payload.nodeDataMap[0])[0].dataValue.toString();
-                    } else {
+                        if (items[i].payload.nodeType.id == 1 || items[i].payload.nodeType.id == 2) {
+                            (items[i].payload.nodeDataMap[0])[0].calculatedDataValue = (items[i].payload.nodeDataMap[0])[0].dataValue;
+                            (items[i].payload.nodeDataMap[0])[0].displayCalculatedDataValue = (items[i].payload.nodeDataMap[0])[0].dataValue.toString();
+                            (items[i].payload.nodeDataMap[0])[0].displayDataValue = (items[i].payload.nodeDataMap[0])[0].dataValue.toString();
+                        } else {
 
-                        var findNodeIndex = items.findIndex(n => n.id == items[i].parent);
-                        var parentValue = (items[findNodeIndex].payload.nodeDataMap[0])[0].calculatedDataValue;
-                        console.log("api parent value---", parentValue);
+                            var findNodeIndex = items.findIndex(n => n.id == items[i].parent);
+                            var parentValue = (items[findNodeIndex].payload.nodeDataMap[0])[0].calculatedDataValue;
+                            console.log("api parent value---", parentValue);
 
-                        (items[i].payload.nodeDataMap[0])[0].calculatedDataValue = (parentValue * (items[i].payload.nodeDataMap[0])[0].dataValue) / 100;
-                        (items[i].payload.nodeDataMap[0])[0].displayCalculatedDataValue = ((parentValue * (items[i].payload.nodeDataMap[0])[0].dataValue) / 100).toString();
-                        (items[i].payload.nodeDataMap[0])[0].displayDataValue = (items[i].payload.nodeDataMap[0])[0].dataValue.toString();
-                        if (this.state.hideFUPUNode) {
-                            if (items[i].payload.nodeType.id == 4 || items[i].payload.nodeType.id == 5) {
+                            (items[i].payload.nodeDataMap[0])[0].calculatedDataValue = (parentValue * (items[i].payload.nodeDataMap[0])[0].dataValue) / 100;
+                            (items[i].payload.nodeDataMap[0])[0].displayCalculatedDataValue = ((parentValue * (items[i].payload.nodeDataMap[0])[0].dataValue) / 100).toString();
+                            (items[i].payload.nodeDataMap[0])[0].displayDataValue = (items[i].payload.nodeDataMap[0])[0].dataValue.toString();
+                            if (this.state.hideFUPUNode) {
+                                if (items[i].payload.nodeType.id == 4 || items[i].payload.nodeType.id == 5) {
+                                    items[i].isVisible = false;
+                                }
+                            } else if (this.state.hidePUNode && items[i].payload.nodeType.id == 5) {
                                 items[i].isVisible = false;
+                            } else {
+                                items[i].isVisible = true;
                             }
-                        } else if (this.state.hidePUNode && items[i].payload.nodeType.id == 5) {
-                            items[i].isVisible = false;
-                        } else {
-                            items[i].isVisible = true;
                         }
+                        console.log("load---", items[i])
+                        // arr.push(items[i]);
                     }
-                    console.log("load---", items[i])
-                    // arr.push(items[i]);
-                }
-                var curDate = (moment(Date.now()).utcOffset('-0500').format('YYYY-MM-DD'));
-                var monthList = JSON.parse(JSON.stringify(this.state.monthList));
-                var minMonth = monthList[0].id;
-                var maxMonth = monthList.sort((a, b) => b.id - a.id)[0].id;
-                console.log("maxMonth on load---", maxMonth);
-                // var minDate = { year: new Date(minMonth).getFullYear(), month: new Date(minMonth).getMonth() + 1 };
-                // var maxDate = { year: new Date(maxMonth).getFullYear(), month: new Date(maxMonth).getMonth() + 1 };
-                this.setState({
-                    treeTemplate: response.data,
-                    items,
-                    tempItems: items,
-                    loading: true,
-                    minDate: minMonth,
-                    maxDate: maxMonth
-                }, () => {
-                    // console.log(">>>", new Date('2021-01-01').getFullYear(), "+", ("0" + (new Date('2021-12-01').getMonth() + 1)).slice(-2));
-                    console.log("Tree Template---", this.state.items);
-                    this.calculateMOMData(1, 0);
-                })
-            })
-                .catch(
-                    error => {
-                        if (error.message === "Network Error") {
-                            this.setState({
-                                message: 'static.unkownError',
-                                loading: false
-                            });
-                        } else {
-                            switch (error.response ? error.response.status : "") {
+                    // this.generateMonthList
 
-                                case 401:
-                                    this.props.history.push(`/login/static.message.sessionExpired`)
-                                    break;
-                                case 403:
-                                    this.props.history.push(`/accessDenied`)
-                                    break;
-                                case 500:
-                                case 404:
-                                case 406:
-                                    this.setState({
-                                        message: error.response.data.messageCode,
-                                        loading: false
-                                    });
-                                    break;
-                                case 412:
-                                    this.setState({
-                                        message: error.response.data.messageCode,
-                                        loading: false
-                                    });
-                                    break;
-                                default:
-                                    this.setState({
-                                        message: 'static.unkownError',
-                                        loading: false
-                                    });
-                                    break;
+                    this.setState({
+                        treeTemplate: response.data,
+                        items,
+                        tempItems: items,
+                        loading: true,
+                    }, () => {
+                        // console.log(">>>", new Date('2021-01-01').getFullYear(), "+", ("0" + (new Date('2021-12-01').getMonth() + 1)).slice(-2));
+                        console.log("Tree Template---", this.state.items);
+                        setTimeout(() => {
+                            this.generateMonthList();
+                            var curDate = (moment(Date.now()).utcOffset('-0500').format('YYYY-MM-DD'));
+                            var monthList = JSON.parse(JSON.stringify(this.state.monthList));
+                            var minMonth = monthList[0].id;
+                            var maxMonth = monthList.sort((a, b) => b.id - a.id)[0].id;
+                            console.log("maxMonth on load---", maxMonth);
+                            this.setState({
+                                minDate: minMonth,
+                                maxDate: maxMonth
+                            }, () => {
+                                this.calculateMOMData(1, 0);
+                            })
+                        }, 0)
+                    })
+                })
+                    .catch(
+                        error => {
+                            if (error.message === "Network Error") {
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                            } else {
+                                switch (error.response ? error.response.status : "") {
+
+                                    case 401:
+                                        this.props.history.push(`/login/static.message.sessionExpired`)
+                                        break;
+                                    case 403:
+                                        this.props.history.push(`/accessDenied`)
+                                        break;
+                                    case 500:
+                                    case 404:
+                                    case 406:
+                                        this.setState({
+                                            message: error.response.data.messageCode,
+                                            loading: false
+                                        });
+                                        break;
+                                    case 412:
+                                        this.setState({
+                                            message: error.response.data.messageCode,
+                                            loading: false
+                                        });
+                                        break;
+                                    default:
+                                        this.setState({
+                                            message: 'static.unkownError',
+                                            loading: false
+                                        });
+                                        break;
+                                }
                             }
                         }
-                    }
-                );
-        } else {
-            this.setState({
-                treeTemplate: {
-                    treeTemplateId: 0,
-                    active: true,
-                    label: {
-                        label_en: ""
-                    },
-                    forecastMethod: {
+                    );
+            } else {
+                this.setState({
+                    treeTemplate: {
+                        treeTemplateId: 0,
+                        active: true,
                         label: {
                             label_en: ""
-                        }
+                        },
+                        forecastMethod: {
+                            label: {
+                                label_en: ""
+                            }
+                        },
+                        flatList: [{
+                            id: 1,
+                            level: 0,
+                            parent: null,
+                            sortOrder: "00",
+                            payload: {
+                                label: {
+                                    label_en: ''
+                                },
+                                nodeType: {
+                                    id: 2
+                                },
+                                nodeUnit: {
+                                    id: ''
+                                },
+                                nodeDataMap: [
+                                    [{
+                                        nodeDataId: 1,
+                                        notes: '',
+                                        monthNo: "",
+                                        dataValue: '0',
+                                        calculatedDataValue: '0',
+                                        fuNode: {
+                                            forecastingUnit: {
+                                                tracerCategory: {
+
+                                                },
+                                                unit: {
+
+                                                }
+                                            },
+                                            usageType: {
+
+                                            },
+                                            usagePeriod: {
+
+                                            }
+                                        },
+                                        nodeDataModelingList: [],
+                                        nodeDataOverrideList: [],
+                                        nodeDataMomList: []
+                                    }]
+                                ]
+                            },
+                            parentItem: {
+                                payload: {
+                                    nodeUnit: {
+
+                                    },
+                                    nodeDataMap: [
+                                        [{
+                                            fuNode: {
+                                                forecastingUnit: {
+                                                    tracerCategory: {
+
+                                                    },
+                                                    unit: {
+
+                                                    }
+                                                },
+                                                usageType: {
+                                                    id: ""
+                                                },
+                                                usagePeriod: {
+
+                                                }
+                                            }
+                                        }]
+                                    ]
+                                }
+                            }
+                        }],
+                        monthsInPast: 1,
+                        monthsInFuture: 36
                     },
-                    flatList: [{
+                    items: [{
                         id: 1,
                         level: 0,
                         parent: null,
@@ -4972,6 +5063,9 @@ export default class CreateTreeTemplate extends Component {
                                 [{
                                     nodeDataId: 1,
                                     notes: '',
+                                    nodeDataModelingList: [],
+                                    nodeDataOverrideList: [],
+                                    nodeDataMomList: [],
                                     monthNo: "",
                                     dataValue: '0',
                                     calculatedDataValue: '0',
@@ -4990,10 +5084,7 @@ export default class CreateTreeTemplate extends Component {
                                         usagePeriod: {
 
                                         }
-                                    },
-                                    nodeDataModelingList: [],
-                                    nodeDataOverrideList: [],
-                                    nodeDataMomList: []
+                                    }
                                 }]
                             ]
                         },
@@ -5025,84 +5116,14 @@ export default class CreateTreeTemplate extends Component {
                             }
                         }
                     }]
-                },
-                items: [{
-                    id: 1,
-                    level: 0,
-                    parent: null,
-                    sortOrder: "00",
-                    payload: {
-                        label: {
-                            label_en: ''
-                        },
-                        nodeType: {
-                            id: 2
-                        },
-                        nodeUnit: {
-                            id: ''
-                        },
-                        nodeDataMap: [
-                            [{
-                                nodeDataId: 1,
-                                notes: '',
-                                nodeDataModelingList: [],
-                                nodeDataOverrideList: [],
-                                nodeDataMomList: [],
-                                monthNo: "",
-                                dataValue: '0',
-                                calculatedDataValue: '0',
-                                fuNode: {
-                                    forecastingUnit: {
-                                        tracerCategory: {
+                }, () => {
+                    console.log("Tree Template---", this.state.items);
+                    // this.generateMonthList();
+                })
+            }
 
-                                        },
-                                        unit: {
-
-                                        }
-                                    },
-                                    usageType: {
-
-                                    },
-                                    usagePeriod: {
-
-                                    }
-                                }
-                            }]
-                        ]
-                    },
-                    parentItem: {
-                        payload: {
-                            nodeUnit: {
-
-                            },
-                            nodeDataMap: [
-                                [{
-                                    fuNode: {
-                                        forecastingUnit: {
-                                            tracerCategory: {
-
-                                            },
-                                            unit: {
-
-                                            }
-                                        },
-                                        usageType: {
-                                            id: ""
-                                        },
-                                        usagePeriod: {
-
-                                        }
-                                    }
-                                }]
-                            ]
-                        }
-                    }
-                }]
-            }, () => {
-                console.log("Tree Template---", this.state.items);
-            })
-        }
-        this.generateMonthList();
+            // this.generateMonthList();
+        }, 0)
     }
     addScenario() {
         const { tabList } = this.state;
