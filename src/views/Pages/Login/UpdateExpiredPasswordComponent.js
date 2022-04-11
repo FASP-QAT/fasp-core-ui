@@ -87,7 +87,7 @@ class UpdateExpiredPasswordComponent extends Component {
     hideFirstComponent() {
         setTimeout(function () {
             document.getElementById('div1').style.display = 'none';
-        }, 8000);
+        }, 30000);
 
         // setTimeout(function () {
         //     this.setState({

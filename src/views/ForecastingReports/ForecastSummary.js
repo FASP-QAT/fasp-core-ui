@@ -148,7 +148,7 @@ class ForecastSummary extends Component {
         document.getElementById('div2').style.display = 'block';
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
-        }, 8000);
+        }, 30000);
     }
 
     cancelClicked() {
@@ -1360,6 +1360,7 @@ class ForecastSummary extends Component {
                                         }
                                         data[(regRegionList.length * 3) + 3] = 1
                                         data[(regRegionList.length * 3) + 4] = ""
+                                        data[(regRegionList.length * 3) + 5] = 0
 
                                         console.log("data------------------->3211", data);
                                         dataArray.push(data);
@@ -1387,6 +1388,7 @@ class ForecastSummary extends Component {
                                             data[(regRegionList.length * 3) + 3] = 2
                                             // data[(regRegionList.length * 3) + 4] = total;
                                             data[(regRegionList.length * 3) + 4] = (selectedForecastQty == "" ? "" : total);
+                                            data[(regRegionList.length * 3) + 5] = 0
                                             dataArray.push(data);
                                         }
                                     }
@@ -1401,6 +1403,7 @@ class ForecastSummary extends Component {
                                     }
                                     columns.push({ title: i18n.t('static.supplyPlan.type'), type: 'hidden', width: 100, readOnly: true });//G6
                                     columns.push({ title: i18n.t('static.forecastReport.totalForecastQuantity'), type: 'numeric', textEditor: true, mask: '#,##.00', decimal: '.', width: 100, readOnly: true });//H7
+                                    columns.push({ title: 'forecast Blank', type: 'hidden', width: 100, readOnly: true });//G6
                                     let nestedHeaders = [];
                                     // nestedHeaders.push(
                                     //     {
@@ -1491,7 +1494,7 @@ class ForecastSummary extends Component {
                                             for (var y = 0; y < json.length; y++) {
                                                 var rowData = elInstance.getRowData(y);
                                                 console.log("RowData--------->1", rowData);
-                                                let rowDataSecondLast = rowData[rowData.length - 2];
+                                                let rowDataSecondLast = rowData[rowData.length - 3];
                                                 // console.log("RowData--------->2", rowDataSecondLast);
                                                 if (rowDataSecondLast == 1) {
                                                     for (var r = 0; r < rowData.length; r++) {
@@ -1915,6 +1918,7 @@ class ForecastSummary extends Component {
         var index = possiblex.findIndex(c => c == x);
         if (index != -1) {
             if (value != "") {
+                // alert("If");
                 var tsListFilter = this.state.tsList.filter(c => c.id == value)[0]
                 var totalForecast = 0;
                 if (tsListFilter.type == "C") {
@@ -1936,7 +1940,27 @@ class ForecastSummary extends Component {
                     total = total + this.el.getValueFromCoords(loopVar, y);
                     loopVar = loopVar + 3;
                 }
-                elInstance.setValueFromCoords((Object.keys(tableJson[0]).length - 1), y, Math.round(total), true);
+                elInstance.setValueFromCoords((Object.keys(tableJson[0]).length - 2), y, Math.round(total), true);
+            } else {
+                // alert("Else");
+                elInstance.setValueFromCoords((Number(x) + 1), y, '', true);
+                elInstance.setValueFromCoords((Number(x) + 2), y, '', true);
+
+                let loopVar = 4;
+                let total = 0;
+
+                for (var r = 0; r < this.state.regRegionList.length; r++) {
+                    total = total + this.el.getValueFromCoords(loopVar, y);
+                    loopVar = loopVar + 3;
+
+                }
+
+                // console.log("total1------------>", total1);
+
+                elInstance.setValueFromCoords((Object.keys(tableJson[0]).length - 2), y, (total == 0 ? '' : Math.round(total)), true);
+                elInstance.setValueFromCoords((Object.keys(tableJson[0]).length - 1), y, 1, true);
+
+
             }
         }
     }
@@ -2688,6 +2712,19 @@ class ForecastSummary extends Component {
                         notes: json[j][((k + 1) * 3) + 2],
                         region: this.state.regRegionList[k]
                     })
+                } else {
+                    console.log("DataList+++1", json[j][Object.keys(json[j])[Object.keys(json[j]).length - 1]]);
+                    if (json[j][Object.keys(json[j])[Object.keys(json[j]).length - 1]] == 1) {
+                        dataList.push({
+                            planningUnit: json[j][1],
+                            scenarioId: null,
+                            treeId: null,
+                            consumptionExtrapolationId: null,
+                            totalForecast: '',
+                            notes: '',
+                            region: this.state.regRegionList[k]
+                        })
+                    }
                 }
             }
 
@@ -2725,8 +2762,14 @@ class ForecastSummary extends Component {
                     var pu = planningUnitList1[index];
                     // let treeId = pu.selectedForecastMap[dataList[dl].region.regionId].treeId;
                     // console.log("TreeId-----------> ", treeId);
-                    pu.selectedForecastMap[dataList[dl].region.regionId] = { "scenarioId": dataList[dl].scenarioId, "consumptionExtrapolationId": dataList[dl].consumptionExtrapolationId, "totalForecast": dataList[dl].totalForecast, notes: dataList[dl].notes, treeId: dataList[dl].treeId };
-                    planningUnitList1[index] = pu;
+                    if (dataList[dl].treeId == null && dataList[dl].consumptionExtrapolationId == null) {
+                        pu.selectedForecastMap[dataList[dl].region.regionId] = {};
+                        planningUnitList1[index] = pu;
+                    } else {
+                        pu.selectedForecastMap[dataList[dl].region.regionId] = { "scenarioId": dataList[dl].scenarioId, "consumptionExtrapolationId": dataList[dl].consumptionExtrapolationId, "totalForecast": dataList[dl].totalForecast, notes: dataList[dl].notes, treeId: dataList[dl].treeId };
+                        planningUnitList1[index] = pu;
+                    }
+
                 }
                 console.log("PlanningUnitList1+++", planningUnitList1);
                 datasetForEncryption.planningUnitList = planningUnitList1;
