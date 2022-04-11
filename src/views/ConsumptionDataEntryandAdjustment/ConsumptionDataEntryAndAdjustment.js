@@ -31,6 +31,7 @@ import { LOGO } from "../../CommonComponent/Logo";
 import { green } from "@material-ui/core/colors";
 import { red } from "@material-ui/core/colors";
 import * as Yup from 'yup';
+import { confirmAlert } from "react-confirm-alert";
 
 const entityname = i18n.t('static.dashboard.dataEntryAndAdjustment');
 const initialValues = {
@@ -228,7 +229,9 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
             selectedForecastMap: {},
           }
         }
-        document.getElementById("consumptionNotes").value = consumptionNotes;
+        if (!isInterpolate) {
+          document.getElementById("consumptionNotes").value = consumptionNotes;
+        }
         var multiplier = 1;
         var changedConsumptionDataDesc = "";
         if (consumptionUnitId != 0) {
@@ -779,7 +782,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
   }
 
   interpolationMissingActualConsumption() {
-    var notes = "";
+    var notes = document.getElementById("consumptionNotes").value;
     var monthArray = this.state.monthArray;
     var regionList = this.state.regionList;
     var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
@@ -891,7 +894,8 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         daysOfStockOutCount += 8
       }
     }
-
+    var interpolatedRegionsAndMonths = [];
+    // notes += " Interpolated data for: "
     for (var r = 0; r < regionList.length; r++) {
       for (var j = 0; j < monthArray.length; j++) {
         var consumptionData = fullConsumptionList.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArray[j].date).format("YYYY-MM") && c.planningUnit.id == consumptionUnit.planningUnit.id && c.region.id == regionList[r].regionId && Number(c.amount) >= 0);
@@ -910,7 +914,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
             var startMonthVal = startValList[startValList.length - 1].month;
             var endVal = endValList[0].amount;
             var endMonthVal = endValList[0].month;
-            notes += regionList[r].label + " " + moment(monthArray[j].date).format("YYYY-MM");
+            interpolatedRegionsAndMonths.push({ region: regionList[r], month: moment(monthArray[j].date).format("YYYY-MM") });
             //y=y1+(x-x1)*(y2-y1)/(x2-x1);
             const monthDifference = moment(new Date(monthArray[j].date)).diff(new Date(startMonthVal), 'months', true);
             const monthDiff = moment(new Date(endMonthVal)).diff(new Date(startMonthVal), 'months', true);
@@ -941,13 +945,31 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       }
     }
     // document.getElementById("consumptionNotes").value = document.getElementById("consumptionNotes").value.concat(notes).concat("filled in with interpolated");
-    document.getElementById("consumptionNotes").value = notes;
+    if (interpolatedRegionsAndMonths.length == 0) {
+      window.alert(i18n.t('static.consumptionDataEntryAndAdjustment.nothingToInterpolate'));
+    } else {
+      var interpolatedRegions = [...new Set(interpolatedRegionsAndMonths.map(ele => (ele.region.regionId)))];
+      var cont = false;
+      var cf = window.confirm(i18n.t('static.consumptionDataEntryAndAdjustment.interpolatedDataFor') + interpolatedRegions.map(item => (
+        "\r\n\r\n" + getLabelText(regionList.filter(c => c.regionId == item)[0].label, this.state.lang) + ": " + interpolatedRegionsAndMonths.filter(c => c.region.regionId == item).map(item1 => moment(item1.month).format(DATE_FORMAT_CAP_WITHOUT_DATE))
+      )));
+      if (cf == true) {
+        cont = true;
+      } else {
 
-    this.setState({
-      tempConsumptionList: fullConsumptionList,
-      consumptionChanged: true
-    })
-    this.buildDataJexcel(this.state.selectedConsumptionUnitId, 1);
+      }
+
+      if (cont == true) {
+        document.getElementById("consumptionNotes").value = notes+" Interpolated data for: " + interpolatedRegions.map(item => (
+          "\r\n" + getLabelText(regionList.filter(c => c.regionId == item)[0].label, this.state.lang) + ": " + interpolatedRegionsAndMonths.filter(c => c.region.regionId == item).map(item1 => moment(item1.month).format(DATE_FORMAT_CAP_WITHOUT_DATE))
+        ));
+        this.setState({
+          tempConsumptionList: fullConsumptionList,
+          consumptionChanged: true
+        })
+        this.buildDataJexcel(this.state.selectedConsumptionUnitId, 1);
+      }
+    }
   }
 
   saveConsumptionList() {
