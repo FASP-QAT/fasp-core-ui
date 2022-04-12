@@ -1585,7 +1585,7 @@ class ForecastSummary extends Component {
                                 let tempProcurementGap = ((primaryOutputData[j].stock + primaryOutputData[j].existingShipments) - primaryOutputData[j].totalForecast) - (primaryOutputData[j].monthsOfStock * primaryOutputData[j].totalForecast / total_months);
                                 let procurementGap = (tempProcurementGap < 0 ? tempProcurementGap : tempProcurementGap);
                                 let isProcurementGapRed = (tempProcurementGap < 0 ? true : false)
-                                let priceType = (primaryOutputData[j].procurementAgent == null && primaryOutputData[j].price == null ? i18n.t('static.forecastReport.NoPriceTypeAvailable') : (primaryOutputData[j].procurementAgent != null ? primaryOutputData[j].procurementAgent.code : i18n.t('static.forecastReport.custom')));
+                                let priceType = (primaryOutputData[j].procurementAgent == null && primaryOutputData[j].price == null ? i18n.t('static.forecastReport.NoPriceTypeAvailable') : (primaryOutputData[j].procurementAgent.id != 0 ? primaryOutputData[j].procurementAgent.code : i18n.t('static.forecastReport.custom')));
                                 let isPriceTypeRed = (primaryOutputData[j].procurementAgent == null && primaryOutputData[j].price == null ? true : false);
                                 let unitPrice = primaryOutputData[j].price;
                                 // let procurementNeeded = (isProcurementGapRed == true ? '$ ' + (tempProcurementGap * unitPrice).toFixed(2) : '');
