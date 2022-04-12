@@ -268,7 +268,9 @@ export default class ExtrapolateDataComponent extends React.Component {
             linearRegressionError: { "rmse": "", "mape": "", "mse": "", "wape": "", "rSqd": "" },
             tesError: { "rmse": "", "mape": "", "mse": "", "wape": "", "rSqd": "" },
             dataChanged: false,
-            noDataMessage: ""
+            noDataMessage: "",
+            showFits: false,
+            checkIfAnyMissingActualConsumption: false
         }
         // this.toggleD = this.toggleD.bind(this);
         this.toggle = this.toggle.bind(this)
@@ -440,12 +442,18 @@ export default class ExtrapolateDataComponent extends React.Component {
         var dataArray = [];
         var data = [];
         console.log("monthArray", monthArray)
-
+        var checkIfAnyMissingActualConsumption = false;
         var consumptionDataArr = [];
+        var rangeValue1 = this.state.rangeValue1;
+        let startDate = rangeValue1.from.year + '-' + rangeValue1.from.month + '-01';
+        let stopDate = rangeValue1.to.year + '-' + rangeValue1.to.month + '-' + new Date(rangeValue1.to.year, rangeValue1.to.month, 0).getDate();
         for (var j = 0; j < monthArray.length; j++) {
             data = [];
             data[0] = monthArray[j];
-            var consumptionData = actualConsumptionList.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArray[j]).format("YYYY-MM") && c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId)
+            var consumptionData = actualConsumptionList.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArray[j]).format("YYYY-MM") && c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId);
+            if (checkIfAnyMissingActualConsumption == false && consumptionData.length == 0 && moment(monthArray[j]).format("YYYY-MM") >= moment(startDate).format("YYYY-MM") && moment(monthArray[j]).format("YYYY-MM") <= moment(stopDate).format("YYYY-MM")) {
+                checkIfAnyMissingActualConsumption = true;
+            }
             // if (consumptionData.length > 0) {
             //     inputData.push({ "month": inputData.length + 1, "actual": consumptionData[0].amount, "forecast": null })
             // }
@@ -666,7 +674,8 @@ export default class ExtrapolateDataComponent extends React.Component {
             minRsqd: minRsqd,
             minWape: minWape,
             loading: false,
-            consumptionData: consumptionDataArr
+            consumptionData: consumptionDataArr,
+            checkIfAnyMissingActualConsumption: checkIfAnyMissingActualConsumption
         })
     }
 
@@ -731,7 +740,8 @@ export default class ExtrapolateDataComponent extends React.Component {
                 dataEl: "",
                 loading: false,
                 noDataMessage: i18n.t('static.extrapolation.errorOccured'),
-                dataChanged: false
+                dataChanged: false,
+                show: false
             })
         }
         // } else {
@@ -2055,6 +2065,12 @@ export default class ExtrapolateDataComponent extends React.Component {
             this.buildActualJxl()
         })
     }
+
+    setShowFits(e) {
+        this.setState({
+            showFits: e.target.checked
+        })
+    }
     // setShowAdvanceId(e) {
     //     var showAdvanceId = e.target.checked;
     //     this.setState({
@@ -2457,11 +2473,13 @@ export default class ExtrapolateDataComponent extends React.Component {
         console.log("json.map(item=>item[1])@@@@@@@@@@@@@@@", json.map(item => Number(item[1])))
         let datasets = [];
         var count = 0;
-        json.map((item, c) => {
-            if (item[1] !== "") {
-                count = c;
-            }
-        })
+        if (this.state.showFits == false) {
+            json.map((item, c) => {
+                if (item[1] !== "") {
+                    count = c;
+                }
+            })
+        }
         // count = count - 1;
         console.log("count@@@@@@@@@@@@@@", count)
         datasets.push({
@@ -3215,14 +3233,35 @@ export default class ExtrapolateDataComponent extends React.Component {
                                         <h5 className={"red"} id="div1">{this.state.noDataMessage}</h5>
                                         {/* Graph */}
                                         <div style={{ display: !this.state.loading ? "block" : "none" }}>
-                                            {this.state.showData && <div className="col-md-12">
-                                                <div className="chart-wrapper chart-graph-report">
-                                                    <Line id="cool-canvas" data={line} options={options} />
-                                                    <div>
-
+                                            {this.state.showData &&
+                                                <>
+                                                    {this.state.checkIfAnyMissingActualConsumption && <><span><i class="fa fa-exclamation-triangle"></i><span className="pl-lg-2">{i18n.t('static.extrapolation.missingDataNotePart1')}</span><a href="/#/dataentry/consumptionDataEntryAndAdjustment" target="_blank"><span>{i18n.t('static.dashboard.dataEntryAndAdjustment')+" "}</span></a><span>{i18n.t('static.extrapolation.missingDataNotePart2')}</span></span></>}
+                                                    <div className={this.state.checkIfAnyMissingActualConsumption?"check inline pt-lg-3 pl-lg-3":"check inline pl-lg-3"}>
+                                                        <div className="">
+                                                            <Input
+                                                                className="form-check-input"
+                                                                type="checkbox"
+                                                                id="showFits"
+                                                                name="showFits"
+                                                                checked={this.state.showFits}
+                                                                onClick={(e) => { this.setShowFits(e); }}
+                                                            />
+                                                            <Label
+                                                                className="form-check-label"
+                                                                check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                                <b>{i18n.t('static.extrapolations.showFits')}</b>
+                                                                {/* <i class="fa fa-info-circle icons pl-lg-2" id="Popover5" onClick={() => this.toggle('popoverOpenArima', !this.state.popoverOpenArima)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i> */}
+                                                            </Label>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            </div>}<br /><br />
+                                                    <div className="col-md-12">
+                                                        <div className="chart-wrapper chart-graph-report">
+                                                            <Line id="cool-canvas" data={line} options={options} />
+                                                            <div>
+
+                                                            </div>
+                                                        </div>
+                                                    </div></>}<br /><br />
                                             {this.state.showData &&
                                                 <div className="col-md-10 pt-4 pb-3">
                                                     <ul className="legendcommitversion">
