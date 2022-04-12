@@ -5590,7 +5590,8 @@ export default class CreateTreeTemplate extends Component {
     tabPane1() {
         var chartOptions = {
             title: {
-                display: false,
+                display: true,
+                text:this.state.showMomData?getLabelText(this.state.treeTemplate.label,this.state.lang)+" - "+getLabelText(this.state.currentItemConfig.context.payload.label,this.state.lang):""
             },
             scales: {
                 yAxes: [
@@ -5711,7 +5712,8 @@ export default class CreateTreeTemplate extends Component {
 
         var chartOptions1 = {
             title: {
-                display: false,
+                display: true,
+                text:this.state.showMomDataPercent?getLabelText(this.state.treeTemplate.label,this.state.lang)+" - "+getLabelText(this.state.currentItemConfig.context.payload.label,this.state.lang):""
             },
             scales: {
                 yAxes: [
