@@ -2222,6 +2222,10 @@ class ForecastOutput extends Component {
                                         let yaxisEquUnitId = document.getElementById("yaxisEquUnit").value;
 
 
+                                        console.log("CheckPU------------------>201", this.state.planningUnits);
+                                        console.log("CheckPU------------------>202", this.state.forecastingUnits);
+
+
                                         if (yaxisEquUnitId != -1) {//Yes
                                             let filteredProgramEQList = this.state.programEquivalencyUnitList.filter(c => c.equivalencyUnit.equivalencyUnitId == yaxisEquUnitId);
                                             let newPlanningUnitList = [];
