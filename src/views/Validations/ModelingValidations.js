@@ -1235,7 +1235,8 @@ class ModelingValidation extends Component {
     render() {
         var chartOptions = {
             title: {
-                display: false
+                display: true,
+                text: (this.state.monthList.length > 0 && this.state.dataEl != undefined && this.state.dataEl != "") ? i18n.t("static.dashboard.modelingValidation") + " - " + this.state.datasetData.programCode + "~" + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text) + " - " + (document.getElementById("levelId").selectedOptions[0].text) : ""
             },
             scales: {
                 yAxes: [{
