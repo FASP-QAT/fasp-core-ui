@@ -1071,6 +1071,9 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
             var actualConsumptionCount = 2;
             var reportingRateCount = 3;
             var daysOfStockOutCount = 4;
+            var adjustedAmountCount = 6;
+            var puAmountCount = 6;
+
             for (var r = 0; r < regionList.length; r++) {
               console.log("&&&&&&&&&&MonthList", monthArray[i]);
               var index = 0;
@@ -1078,15 +1081,21 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
               var actualConsumptionValue = elInstance.getValue(`${colArr[i + 1]}${parseInt(actualConsumptionCount) + 1}`, true).replaceAll(",", "");
               var reportingRateValue = elInstance.getValue(`${colArr[i + 1]}${parseInt(reportingRateCount) + 1}`, true);
               var daysOfStockOutValue = elInstance.getValue(`${colArr[i + 1]}${parseInt(daysOfStockOutCount) + 1}`, true);
+              var adjustedAmountValue = elInstance.getValue(`${colArr[i + 1]}${parseInt(adjustedAmountCount) + 1}`, true);
+              var puAmountValue = elInstance.getValue(`${colArr[i + 1]}${parseInt(puAmountCount) + 1}`, true);
               console.log("&&&&&&&&&&ActualConsumptionValue", actualConsumptionValue);
               if (actualConsumptionValue !== "") {
                 if (index != -1) {
                   fullConsumptionList[index].amount = actualConsumptionValue;
                   fullConsumptionList[index].reportingRate = reportingRateValue;
                   fullConsumptionList[index].daysOfStockOut = daysOfStockOutValue;
+                  fullConsumptionList[index].adjustedAmount = adjustedAmountValue;
+                  fullConsumptionList[index].puAmount = puAmountValue;
                 } else {
                   var json = {
                     amount: actualConsumptionValue,
+                    adjustedAmount: adjustedAmountValue,
+                    puAmount: puAmountValue,
                     planningUnit: {
                       id: consumptionUnit.planningUnit.id,
                       label: consumptionUnit.planningUnit.label
@@ -1110,7 +1119,9 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
               }
               actualConsumptionCount += 8;
               reportingRateCount += 8;
-              daysOfStockOutCount += 8
+              daysOfStockOutCount += 8;
+              adjustedAmountCount += 8;
+              puAmountCount += 8;
             }
           }
           var planningUnitList = datasetJson.planningUnitList;
@@ -1481,14 +1492,16 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
 
         B.push(i18n.t('static.dataentry.adjustedConsumption').replaceAll(' ', '%20'))
         for (var j = 0; j < monthArray.length; j++) {
-          B.push("".toString().replaceAll("\,", ""))
+          var consumptionData = consumptionList.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArray[j].date).format("YYYY-MM") && c.region.id == regionList[r].regionId);
+          B.push(consumptionData.length > 0 ? consumptionData[0].adjustedAmount.toString().replaceAll("\,", "") : "")
         }
         C.push(this.addDoubleQuoteToRowContent(B));
         B = [];
 
         B.push(i18n.t('static.dataentry.convertedToPlanningUnit').replaceAll(' ', '%20'))
         for (var j = 0; j < monthArray.length; j++) {
-          B.push("".toString().replaceAll("\,", ""))
+          var consumptionData = consumptionList.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArray[j].date).format("YYYY-MM") && c.region.id == regionList[r].regionId);
+          B.push(consumptionData.length > 0 ? consumptionData[0].puAmount.toString().replaceAll("\,", "") : "")
         }
         C.push(this.addDoubleQuoteToRowContent(B));
         B = [];
