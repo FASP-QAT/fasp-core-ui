@@ -1179,7 +1179,7 @@ export default class BuildTree extends Component {
         document.getElementById('div2').style.display = 'block';
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
-        }, 8000);
+        }, 30000);
     }
     calculateMOMData(nodeId, type) {
         let { curTreeObj } = this.state;
@@ -3667,7 +3667,7 @@ export default class BuildTree extends Component {
         this.setState({
             modelingEl: modelingEl
         }, () => {
-            var scalingMonth={year: new Date(this.state.currentScenario.month.replace(/-/g, '\/')).getFullYear(), month: ("0" + (new Date(this.state.currentScenario.month.replace(/-/g, '\/')).getMonth() + 1)).slice(-2)};
+            var scalingMonth = { year: new Date(this.state.currentScenario.month.replace(/-/g, '\/')).getFullYear(), month: ("0" + (new Date(this.state.currentScenario.month.replace(/-/g, '\/')).getMonth() + 1)).slice(-2) };
             this.filterScalingDataByMonth(scalingMonth.year + "-" + scalingMonth.month + "-01");
         }
         );
@@ -6076,7 +6076,7 @@ export default class BuildTree extends Component {
                     this.setState({
                         showModelingJexcelNumber: true,
                         minMonth, maxMonth, filteredModelingType: modelingTypeListNew,
-                        scalingMonth:{
+                        scalingMonth: {
                             year: new Date(this.state.currentScenario.month.replace(/-/g, '\/')).getFullYear(), month: ("0" + (new Date(this.state.currentScenario.month.replace(/-/g, '\/')).getMonth() + 1)).slice(-2)
                         },
                     }, () => {
@@ -6087,7 +6087,7 @@ export default class BuildTree extends Component {
                 else {
                     this.setState({
                         showModelingJexcelNumber: true,
-                        scalingMonth:{
+                        scalingMonth: {
                             year: new Date(this.state.currentScenario.month.replace(/-/g, '\/')).getFullYear(), month: ("0" + (new Date(this.state.currentScenario.month.replace(/-/g, '\/')).getMonth() + 1)).slice(-2)
                         },
                     }, () => {
@@ -7086,7 +7086,8 @@ export default class BuildTree extends Component {
     tabPane1() {
         var chartOptions = {
             title: {
-                display: false,
+                display: true,
+                text: this.state.showMomData ? this.state.dataSetObj.programData.programCode + "~" + i18n.t("static.supplyPlan.v") + this.state.dataSetObj.programData.currentVersion.versionId + " - " + document.getElementById("treeId").selectedOptions[0].text + " - " + document.getElementById("scenarioId").selectedOptions[0].text + " - " + getLabelText(this.state.currentItemConfig.context.payload.label, this.state.lang) : ""
             },
             scales: {
                 yAxes: [
@@ -7208,7 +7209,8 @@ export default class BuildTree extends Component {
         console.log("this.state.currentItemConfig.context.payload.nodeUnit@@@@####", this.state.currentItemConfig.context.payload.nodeUnit);
         var chartOptions1 = {
             title: {
-                display: false,
+                display: true,
+                text: this.state.showMomDataPercent ? this.state.dataSetObj.programData.programCode + "~" + i18n.t("static.supplyPlan.v") + this.state.dataSetObj.programData.currentVersion.versionId + " - " + document.getElementById("treeId").selectedOptions[0].text + " - " + document.getElementById("scenarioId").selectedOptions[0].text + " - " + getLabelText(this.state.currentItemConfig.context.payload.label, this.state.lang) : ""
             },
             scales: {
                 yAxes: [
@@ -8604,23 +8606,23 @@ export default class BuildTree extends Component {
 
                         <div className="col-md-12">
                             {this.state.showModelingJexcelNumber &&
-                                <> 
-                                <span>{i18n.t('static.modelingTable.note')}</span>
-                                <div className="calculatorimg calculatorTable">
-                                    <div id="modelingJexcel" className={"RowClickable ScalingTable"} style={{ display: this.state.modelingJexcelLoader ? "none" : "block" }}>
-                                    </div>
-                                    <div style={{ display: this.state.modelingJexcelLoader ? "block" : "none" }}>
-                                        <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                                            <div class="align-items-center">
-                                                <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+                                <>
+                                    <span>{i18n.t('static.modelingTable.note')}</span>
+                                    <div className="calculatorimg calculatorTable">
+                                        <div id="modelingJexcel" className={"RowClickable ScalingTable"} style={{ display: this.state.modelingJexcelLoader ? "none" : "block" }}>
+                                        </div>
+                                        <div style={{ display: this.state.modelingJexcelLoader ? "block" : "none" }}>
+                                            <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                                <div class="align-items-center">
+                                                    <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
-                                                <div class="spinner-border blue ml-4" role="status">
+                                                    <div class="spinner-border blue ml-4" role="status">
 
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
                                     <div style={{ 'float': 'right', 'fontSize': '18px' }}><b>{i18n.t('static.supplyPlan.total')} : {this.state.scalingTotal != "" && addCommas(parseFloat(this.state.scalingTotal).toFixed(4))}</b></div><br /><br />
 
                                 </>

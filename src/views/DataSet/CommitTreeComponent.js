@@ -242,9 +242,9 @@ export default class CommitTreeComponent extends React.Component {
                 let programData = myResult.filter(c => (c.id == programId));
                 this.setState({
                     programDataLocal: programData[0].datasetJson,
-                    programCode:programData[0].datasetJson.programCode,
-                    version:programData[0].version,
-                    pageName:i18n.t('static.button.commit'),
+                    programCode: programData[0].datasetJson.programCode,
+                    version: programData[0].version,
+                    pageName: i18n.t('static.button.commit'),
                     programDataDownloaded: datasetJson,
                     programName: programData[0].datasetJson.programCode + '~v' + programData[0].version + ' (local)',
                     programNameOriginal: getLabelText(datasetJson.label, this.state.lang),
@@ -355,7 +355,7 @@ export default class CommitTreeComponent extends React.Component {
                             var transaction1 = db1.transaction(['datasetDetails'], 'readwrite');
                             var program1 = transaction1.objectStore('datasetDetails');
                             var getRequest1 = program1.put(myResult);
-                            var message=i18n.t('static.commitTree.commitFailed').concat(" - ").concat(resp.data.failedReason).toString().replaceAll(":"," ");
+                            var message = i18n.t('static.commitTree.commitFailed').concat(" - ").concat(resp.data.failedReason).toString().replaceAll(":", " ");
                             getRequest1.onsuccess = function (e) {
                                 this.setState({
                                     message: message,
@@ -543,7 +543,7 @@ export default class CommitTreeComponent extends React.Component {
                             programJson.currentVersion.versionType = { id: document.getElementById("versionTypeId").value };
                             programJson.currentVersion.notes = document.getElementById("notes").value;;
                             console.log("ProgramJson+++", programJson);
-                            console.log("this.state.comparedLatestVersion----",this.state.comparedLatestVersion);
+                            console.log("this.state.comparedLatestVersion----", this.state.comparedLatestVersion);
                             //create saveDatasetData in ProgramService
                             DatasetService.saveDatasetData(programJson, this.state.comparedLatestVersion).then(response => {
                                 if (response.status == 200) {
@@ -684,7 +684,17 @@ export default class CommitTreeComponent extends React.Component {
         document.getElementById('div1').style.display = 'block';
         this.state.timeout = setTimeout(function () {
             document.getElementById('div1').style.display = 'none';
-        }, 8000);
+        }, 30000);
+    }
+
+    plusMinusClicked(treeId, scenarioId) {
+        var index = this.state.treeScenarioList.findIndex(c => c.treeId == treeId && c.scenarioId == scenarioId);
+        var treeScenarioList = this.state.treeScenarioList;
+        treeScenarioList[index].checked = !treeScenarioList[index].checked;
+        this.setState({
+            treeScenarioList: treeScenarioList
+        })
+
     }
 
     render() {
@@ -753,7 +763,7 @@ export default class CommitTreeComponent extends React.Component {
                             return (
                                 <ul>
                                     <li key={j}>
-                                        <div><span>{getLabelText(item1.payload.label, this.state.lang)==""?i18n.t('static.forecastValidation.editMe'):getLabelText(item1.payload.label, this.state.lang)}</span></div>
+                                        <div><span>{getLabelText(item1.payload.label, this.state.lang) == "" ? i18n.t('static.forecastValidation.editMe') : getLabelText(item1.payload.label, this.state.lang)}</span></div>
                                     </li>
                                 </ul>
                             )
@@ -768,8 +778,8 @@ export default class CommitTreeComponent extends React.Component {
             if (this.state.treeScenarioListNotHaving100PerChild.filter(c => c.treeId == item1.treeId && c.scenarioId == item1.scenarioId).length > 0) {
                 var nodeWithPercentageChildren = this.state.nodeWithPercentageChildren.filter(c => c.treeId == item1.treeId && c.scenarioId == item1.scenarioId);
                 if (nodeWithPercentageChildren.length > 0) {
-                    return (<><span className="hoverDiv" onClick={() => nodeWithPercentageChildrenClicked(item1.treeId, item1.scenarioId, this)}><span>{getLabelText(item1.treeLabel, this.state.lang) + " / " + getLabelText(item1.scenarioLabel, this.state.lang)}</span></span><div className="table-responsive">
-                        <div id={"tableDiv" + count} className="jexcelremoveReadonlybackground consumptionDataEntryTable" name='jxlTableData' />
+                    return (<><span className="hoverDiv" onClick={() => nodeWithPercentageChildrenClicked(item1.treeId, item1.scenarioId, this)}><span>{getLabelText(item1.treeLabel, this.state.lang) + " / " + getLabelText(item1.scenarioLabel, this.state.lang)}</span></span><span className="hoverDiv" onClick={() => this.plusMinusClicked(item1.treeId, item1.scenarioId)}>{item1.checked ? <i className="fa fa-minus treeValidation" ></i> : <i className="fa fa-plus  treeValidation" ></i>}</span><div className="table-responsive">
+                        <div id={"tableDiv" + count} className="jexcelremoveReadonlybackground consumptionDataEntryTable" name='jxlTableData' style={{ display: item1.checked ? "block" : "none" }} />
                     </div><br /></>)
                 }
             }
@@ -807,8 +817,8 @@ export default class CommitTreeComponent extends React.Component {
                     <td>{getLabelText(item.tree, this.state.lang)}</td>
                     <td>{getLabelText(item.node, this.state.lang)}</td>
                     <td>{getLabelText(item.scenario, this.state.lang)}</td>
-                    <td>{(item.notes != "" && item.notes != null) ? i18n.t('static.commitTree.main') + ": " + item.notes : ""}<br />
-                        {(item.madelingNotes != "" && item.madelingNotes != null) ? i18n.t('static.commitTree.modeling') + ": " + item.madelingNotes : ""}</td>
+                    <td><b>{(item.notes != "" && item.notes != null) ? i18n.t('static.commitTree.main') + ": " : ""}</b> {(item.notes != "" && item.notes != null) ? item.notes : ""}<br />
+                        <b>{(item.madelingNotes != "" && item.madelingNotes != null) ? i18n.t('static.commitTree.modeling') + ": " : ""}</b> {(item.madelingNotes != "" && item.madelingNotes != null) ? item.madelingNotes : ""}</td>
                 </tr>
             )
         }, this) : <span>&emsp;&emsp;&emsp;&ensp;{i18n.t('static.forecastValidation.noTreeNodesNotesFound')}</span>;
@@ -1111,9 +1121,9 @@ export default class CommitTreeComponent extends React.Component {
                             </div> */}
                         </ModalBody>
                         <div className="col-md-12 pb-lg-5 pt-lg-3">
-                                <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={() => { this.toggleShowValidation() }}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={this.synchronize}><i className="fa fa-check"></i>{i18n.t('static.report.ok')}</Button>
-                            </div>
+                            <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={() => { this.toggleShowValidation() }}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                            <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={this.synchronize}><i className="fa fa-check"></i>{i18n.t('static.report.ok')}</Button>
+                        </div>
                     </div>
                 </Modal >
             </div >

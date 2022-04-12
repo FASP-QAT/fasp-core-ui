@@ -109,7 +109,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
         // alert("HI");
         setTimeout(function () {
             document.getElementById('div12').style.display = 'none';
-        }, 8000);
+        }, 30000);
     }
 
     getPlanningUnitList() {

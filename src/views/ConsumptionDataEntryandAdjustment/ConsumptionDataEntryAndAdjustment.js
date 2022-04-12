@@ -31,6 +31,7 @@ import { LOGO } from "../../CommonComponent/Logo";
 import { green } from "@material-ui/core/colors";
 import { red } from "@material-ui/core/colors";
 import * as Yup from 'yup';
+import { confirmAlert } from "react-confirm-alert";
 
 const entityname = i18n.t('static.dashboard.dataEntryAndAdjustment');
 const initialValues = {
@@ -123,6 +124,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     this.consumptionDataChanged = this.consumptionDataChanged.bind(this);
     this.checkValidationConsumption = this.checkValidationConsumption.bind(this);
     this.filterList = this.filterList.bind(this)
+    this.resetClicked = this.resetClicked.bind(this)
   }
 
   filterList = function (instance, cell, c, r, source) {
@@ -176,6 +178,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
   }
 
   buildDataJexcel(consumptionUnitId, isInterpolate) {
+    localStorage.setItem("sesDatasetPlanningUnitId", consumptionUnitId);
     var cont = false;
     if (this.state.consumptionChanged && !isInterpolate) {
       var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
@@ -226,7 +229,9 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
             selectedForecastMap: {},
           }
         }
-        document.getElementById("consumptionNotes").value = consumptionNotes;
+        if (!isInterpolate) {
+          document.getElementById("consumptionNotes").value = consumptionNotes;
+        }
         var multiplier = 1;
         var changedConsumptionDataDesc = "";
         if (consumptionUnitId != 0) {
@@ -777,7 +782,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
   }
 
   interpolationMissingActualConsumption() {
-    var notes = "";
+    var notes = document.getElementById("consumptionNotes").value;
     var monthArray = this.state.monthArray;
     var regionList = this.state.regionList;
     var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
@@ -889,7 +894,8 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         daysOfStockOutCount += 8
       }
     }
-
+    var interpolatedRegionsAndMonths = [];
+    // notes += " Interpolated data for: "
     for (var r = 0; r < regionList.length; r++) {
       for (var j = 0; j < monthArray.length; j++) {
         var consumptionData = fullConsumptionList.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArray[j].date).format("YYYY-MM") && c.planningUnit.id == consumptionUnit.planningUnit.id && c.region.id == regionList[r].regionId && Number(c.amount) >= 0);
@@ -908,7 +914,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
             var startMonthVal = startValList[startValList.length - 1].month;
             var endVal = endValList[0].amount;
             var endMonthVal = endValList[0].month;
-            notes += regionList[r].label + " " + moment(monthArray[j].date).format("YYYY-MM");
+            interpolatedRegionsAndMonths.push({ region: regionList[r], month: moment(monthArray[j].date).format("YYYY-MM") });
             //y=y1+(x-x1)*(y2-y1)/(x2-x1);
             const monthDifference = moment(new Date(monthArray[j].date)).diff(new Date(startMonthVal), 'months', true);
             const monthDiff = moment(new Date(endMonthVal)).diff(new Date(startMonthVal), 'months', true);
@@ -939,13 +945,31 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       }
     }
     // document.getElementById("consumptionNotes").value = document.getElementById("consumptionNotes").value.concat(notes).concat("filled in with interpolated");
-    document.getElementById("consumptionNotes").value = notes;
+    if (interpolatedRegionsAndMonths.length == 0) {
+      window.alert(i18n.t('static.consumptionDataEntryAndAdjustment.nothingToInterpolate'));
+    } else {
+      var interpolatedRegions = [...new Set(interpolatedRegionsAndMonths.map(ele => (ele.region.regionId)))];
+      var cont = false;
+      var cf = window.confirm(i18n.t('static.consumptionDataEntryAndAdjustment.interpolatedDataFor') + interpolatedRegions.map(item => (
+        "\r\n\r\n" + getLabelText(regionList.filter(c => c.regionId == item)[0].label, this.state.lang) + ": " + interpolatedRegionsAndMonths.filter(c => c.region.regionId == item).map(item1 => moment(item1.month).format(DATE_FORMAT_CAP_WITHOUT_DATE))
+      )));
+      if (cf == true) {
+        cont = true;
+      } else {
 
-    this.setState({
-      tempConsumptionList: fullConsumptionList,
-      consumptionChanged: true
-    })
-    this.buildDataJexcel(this.state.selectedConsumptionUnitId, 1);
+      }
+
+      if (cont == true) {
+        document.getElementById("consumptionNotes").value = notes + " Interpolated data for: " + interpolatedRegions.map(item => (
+          "\r\n" + getLabelText(regionList.filter(c => c.regionId == item)[0].label, this.state.lang) + ": " + interpolatedRegionsAndMonths.filter(c => c.region.regionId == item).map(item1 => moment(item1.month).format(DATE_FORMAT_CAP_WITHOUT_DATE))
+        ));
+        this.setState({
+          tempConsumptionList: fullConsumptionList,
+          consumptionChanged: true
+        })
+        this.buildDataJexcel(this.state.selectedConsumptionUnitId, 1);
+      }
+    }
   }
 
   saveConsumptionList() {
@@ -1151,14 +1175,14 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     document.getElementById('div1').style.display = 'block';
     this.state.timeout = setTimeout(function () {
       document.getElementById('div1').style.display = 'none';
-    }, 8000);
+    }, 30000);
   }
 
   hideSecondComponent() {
     document.getElementById('div2').style.display = 'block';
     this.state.timeout = setTimeout(function () {
       document.getElementById('div2').style.display = 'none';
-    }, 8000);
+    }, 30000);
   }
 
   loaded = function (instance, cell, x, y, value) {
@@ -1652,6 +1676,9 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                 if (this.props.match.params.planningUnitId > 0) {
                   this.buildDataJexcel(this.props.match.params.planningUnitId, 0)
                 }
+                if (localStorage.getItem("sesDatasetPlanningUnitId") != "" && planningUnitList.filter(c => c.planningUnit.id == localStorage.getItem("sesDatasetPlanningUnitId")).length > 0) {
+                  this.buildDataJexcel(localStorage.getItem("sesDatasetPlanningUnitId"), 0)
+                }
               })
             }.bind(this)
           }.bind(this)
@@ -1922,7 +1949,8 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
 
     var chartOptions = {
       title: {
-        display: false
+        display: true,
+        text: this.state.selectedConsumptionUnitId > 0 ? i18n.t('static.dashboard.dataEntryAndAdjustments')+" - " + document.getElementById("datasetId").selectedOptions[0].text + " - " + getLabelText(this.state.selectedConsumptionUnitObject.planningUnit.label, this.state.lang) : ""
       },
       scales: {
         yAxes: [{
@@ -2332,6 +2360,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           <CardFooter>
             <FormGroup>
               <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+              <Button type="reset" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
               {this.state.consumptionChanged && <><Button type="button" id="formSubmitButton" size="md" color="success" className="float-right mr-1" onClick={() => this.saveConsumptionList()}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>&nbsp;</>}
               {this.state.showSmallTable && <> <Button type="button" id="dataCheck" size="md" color="info" className="float-right mr-1" onClick={() => this.openDataCheckModel()}><i className="fa fa-check"></i>{i18n.t('static.common.dataCheck')}</Button></>}
               &nbsp;
@@ -2406,79 +2435,79 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
               }) => (
                 <Form onSubmit={handleSubmit} noValidate name='dataEnteredInForm'>
                   {/* <CardBody style={{ display: this.state.loading ? "none" : "block" }}> */}
-                    <ModalBody>
-                      <FormGroup className="col-md-12">
-                        <Label htmlFor="appendedInputButton">{i18n.t('static.dataentry.units')}</Label>
-                        {/* <div className="controls "> */}
-                          {/* <InputGroup> */}
-                            <Input
-                              type="select"
-                              name="dataEnteredInUnitId"
-                              id="dataEnteredInUnitId"
-                              bsSize="sm"
-                              value={this.state.dataEnteredIn}
-                              onChange={(e) => { this.setDataEnteredIn(e); }}
-                            >
-                              <option value={1}>{this.state.selectedConsumptionUnitObject.planningUnit.forecastingUnit.label.label_en}</option>
-                              <option value={2}>{this.state.selectedConsumptionUnitObject.planningUnit.label.label_en}</option>
-                              <option value={3}>{i18n.t('static.common.otherUnit')}</option>
-                            </Input>
-                          {/* </InputGroup> */}
-                        {/* </div> */}
-                      </FormGroup>
-                      <FormGroup className="col-md-6" id="otherUnitNameDiv" style={{ display: this.state.showOtherUnitNameField ? 'block' : 'none' }}>
-                        <Label htmlFor="appendedInputButton">{i18n.t('static.common.otherUnitName')}</Label>
-                        {/* <div className="controls "> */}
-                        {/* <InputGroup> */}
-                        <Input
-                          type="text"
-                          name="otherUnitName"
-                          id="otherUnitName"
-                          bsSize="sm"
-                          valid={!errors.otherUnitName}
-                          invalid={touched.otherUnitName && !!errors.otherUnitName}
-                          onChange={(e) => { handleChange(e); this.setOtherUnitName(e); }}
-                          onBlur={handleBlur}
-                          value={this.state.otherUnitName}
-                        // onChange={(e) => this.setState({ consumptionChanged: true })}
-                        >
-                        </Input>
-                        <Input
-                          type="hidden"
-                          name="needOtherUnitValidation"
-                          id="needOtherUnitValidation"
-                          value={(this.state.dataEnteredIn == 3 ? true : false)}
-                        />
-                        {/* </InputGroup> */}
-                        {/* </div> */}
-                        <FormFeedback className="red">{errors.otherUnitName}</FormFeedback>
-                      </FormGroup>
-                      <FormGroup className="col-md-6">
-                        <Label htmlFor="appendedInputButton">{i18n.t('static.importFromQATSupplyPlan.multiplierTo')}</Label>
-                        {/* <InputGroup> */}
-                        <Input
-                          className="controls"
-                          type="number"
-                          name="otherUnitMultiplier"
-                          id="otherUnitMultiplier"
-                          bsSize="sm"
-                          readOnly={this.state.dataEnteredIn != 3}
-                          valid={!errors.otherUnitMultiplier}
-                          invalid={touched.otherUnitMultiplier && !!errors.otherUnitMultiplier}
-                          onBlur={handleBlur}
-                          value={this.state.selectedPlanningUnitMultiplier}
-                          onChange={(e) => { this.setOtherUnitMultiplier(e); handleChange(e); }}
-                          required
-                        >
-                        </Input>
-                        {/* </InputGroup> */}
-                        <FormFeedback className="red">{errors.otherUnitMultiplier}</FormFeedback>
-                      </FormGroup>
-                    </ModalBody>
-                    <ModalFooter>
-                      <Button type="submit" size="md" onClick={(e) => { this.touchAll(setTouched, errors) }} color="success" className="submitBtn float-right mr-1"> <i className="fa fa-check"></i>Submit</Button>
-                      <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setState({ toggleDataChangeForSmallTable: false })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                    </ModalFooter>
+                  <ModalBody>
+                    <FormGroup className="col-md-12">
+                      <Label htmlFor="appendedInputButton">{i18n.t('static.dataentry.units')}</Label>
+                      {/* <div className="controls "> */}
+                      {/* <InputGroup> */}
+                      <Input
+                        type="select"
+                        name="dataEnteredInUnitId"
+                        id="dataEnteredInUnitId"
+                        bsSize="sm"
+                        value={this.state.dataEnteredIn}
+                        onChange={(e) => { this.setDataEnteredIn(e); }}
+                      >
+                        <option value={1}>{this.state.selectedConsumptionUnitObject.planningUnit.forecastingUnit.label.label_en}</option>
+                        <option value={2}>{this.state.selectedConsumptionUnitObject.planningUnit.label.label_en}</option>
+                        <option value={3}>{i18n.t('static.common.otherUnit')}</option>
+                      </Input>
+                      {/* </InputGroup> */}
+                      {/* </div> */}
+                    </FormGroup>
+                    <FormGroup className="col-md-6" id="otherUnitNameDiv" style={{ display: this.state.showOtherUnitNameField ? 'block' : 'none' }}>
+                      <Label htmlFor="appendedInputButton">{i18n.t('static.common.otherUnitName')}</Label>
+                      {/* <div className="controls "> */}
+                      {/* <InputGroup> */}
+                      <Input
+                        type="text"
+                        name="otherUnitName"
+                        id="otherUnitName"
+                        bsSize="sm"
+                        valid={!errors.otherUnitName}
+                        invalid={touched.otherUnitName && !!errors.otherUnitName}
+                        onChange={(e) => { handleChange(e); this.setOtherUnitName(e); }}
+                        onBlur={handleBlur}
+                        value={this.state.otherUnitName}
+                      // onChange={(e) => this.setState({ consumptionChanged: true })}
+                      >
+                      </Input>
+                      <Input
+                        type="hidden"
+                        name="needOtherUnitValidation"
+                        id="needOtherUnitValidation"
+                        value={(this.state.dataEnteredIn == 3 ? true : false)}
+                      />
+                      {/* </InputGroup> */}
+                      {/* </div> */}
+                      <FormFeedback className="red">{errors.otherUnitName}</FormFeedback>
+                    </FormGroup>
+                    <FormGroup className="col-md-6">
+                      <Label htmlFor="appendedInputButton">{i18n.t('static.importFromQATSupplyPlan.multiplierTo')}</Label>
+                      {/* <InputGroup> */}
+                      <Input
+                        className="controls"
+                        type="number"
+                        name="otherUnitMultiplier"
+                        id="otherUnitMultiplier"
+                        bsSize="sm"
+                        readOnly={this.state.dataEnteredIn != 3}
+                        valid={!errors.otherUnitMultiplier}
+                        invalid={touched.otherUnitMultiplier && !!errors.otherUnitMultiplier}
+                        onBlur={handleBlur}
+                        value={this.state.selectedPlanningUnitMultiplier}
+                        onChange={(e) => { this.setOtherUnitMultiplier(e); handleChange(e); }}
+                        required
+                      >
+                      </Input>
+                      {/* </InputGroup> */}
+                      <FormFeedback className="red">{errors.otherUnitMultiplier}</FormFeedback>
+                    </FormGroup>
+                  </ModalBody>
+                  <ModalFooter>
+                    <Button type="submit" size="md" onClick={(e) => { this.touchAll(setTouched, errors) }} color="success" className="submitBtn float-right mr-1"> <i className="fa fa-check"></i>Submit</Button>
+                    <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setState({ toggleDataChangeForSmallTable: false })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                  </ModalFooter>
                   {/* </CardBody> */}
                 </Form>
               )
@@ -2766,5 +2795,9 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     //     selectedPlanningUnitMultiplier: multiplier,
     //     changedConsumptionTypeId: arrayid1
     //   })
+  }
+
+  resetClicked() {
+    this.buildDataJexcel(this.state.selectedConsumptionUnitId, 0)
   }
 }
