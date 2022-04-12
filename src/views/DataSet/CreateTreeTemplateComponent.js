@@ -3071,16 +3071,18 @@ export default class CreateTreeTemplate extends Component {
                             onclick: function () {
                                 var data = [];
                                 data[0] = 0;
-                                data[1] = "";
-                                data[2] = "";
-                                data[3] = "";
-                                data[4] = "";
-                                data[5] = "";
-                                data[6] = "";
-                                data[7] = cleanUp;
-                                data[8] = "";
-                                data[9] = "";
-                                data[10] = 1;
+                                data[1] = parseInt(this.state.currentItemConfig.context.payload.nodeDataMap[0][0].monthNo) + 1;
+                                data[2] = this.state.maxMonth
+                                data[3] = ''
+                                data[4] = this.state.currentItemConfig.context.payload.nodeType.id == PERCENTAGE_NODE_ID || this.state.currentItemConfig.context.payload.nodeType.id == FU_NODE_ID || this.state.currentItemConfig.context.payload.nodeType.id == PU_NODE_ID ? 5 : '';
+                                data[5] = '';
+                                data[6] = ''
+                                data[7] = ''
+                                data[8] = cleanUp
+                                data[9] = ''
+                                data[10] = ''
+                                data[11] = 1
+                                data[12] = 0
                                 obj.insertRow(data, 0, 1);
                             }.bind(this)
                         });
@@ -3095,16 +3097,18 @@ export default class CreateTreeTemplate extends Component {
                                 if (obj.getJson(null, false).length == 1) {
                                     var data = [];
                                     data[0] = 0;
-                                    data[1] = "";
-                                    data[2] = "";
-                                    data[3] = this.state.currentItemConfig.context.payload.nodeDataMap[0][0].month + 1
-                                    data[4] = this.state.maxMonth
-                                    data[5] = "";
-                                    data[6] = "";
-                                    data[7] = cleanUp;
-                                    data[8] = "";
-                                    data[9] = "";
-                                    data[10] = 1;
+                                    data[1] = parseInt(this.state.currentItemConfig.context.payload.nodeDataMap[0][0].monthNo) + 1;
+                                    data[2] = this.state.maxMonth
+                                    data[3] = ''
+                                    data[4] = this.state.currentItemConfig.context.payload.nodeType.id == PERCENTAGE_NODE_ID || this.state.currentItemConfig.context.payload.nodeType.id == FU_NODE_ID || this.state.currentItemConfig.context.payload.nodeType.id == PU_NODE_ID ? 5 : '';
+                                    data[5] = '';
+                                    data[6] = ''
+                                    data[7] = ''
+                                    data[8] = cleanUp
+                                    data[9] = ''
+                                    data[10] = ''
+                                    data[11] = 1
+                                    data[12] = 0
                                     obj.insertRow(data, 0, 1);
                                     obj.deleteRow(parseInt(y) + 1);
                                     var col = ("C").concat(parseInt(0) + 1);
@@ -3159,7 +3163,7 @@ export default class CreateTreeTemplate extends Component {
 
     }
     selected = function (instance, cell, x, y, value) {
-        if (y == 7) {
+        if (y == 8) {
             this.setState({
                 currentRowIndex: '',
                 // showCalculatorFields: '',
@@ -3174,9 +3178,9 @@ export default class CreateTreeTemplate extends Component {
                 this.setState({
                     currentRowIndex: x,
                     showCalculatorFields: this.state.aggregationNode ? !this.state.showCalculatorFields : false,
-                    currentModelingType: rowData[2],
-                    currentCalculatorStartDate: rowData[3],
-                    currentCalculatorStopDate: rowData[4],
+                    currentModelingType: rowData[4],
+                    currentCalculatorStartDate: rowData[1],
+                    currentCalculatorStopDate: rowData[2],
                     currentCalculatorStartValue: (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].calculatedDataValue,
 
                     currentCalculatedMomChange: '',
