@@ -130,7 +130,7 @@ export default class PlanningUnitSetting extends Component {
         document.getElementById('div2').style.display = 'block';
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
-        }, 8000);
+        }, 30000);
     }
 
     cancelClicked() {
@@ -388,7 +388,7 @@ export default class PlanningUnitSetting extends Component {
                 planningUnitArray.push(map1.get("1"));
             }
             console.log("mylist--------->31", planningUnitArray);
-            this.getProcurementAgentPlanningUnitByPlanningUnitIds(planningUnitArray);
+            // this.getProcurementAgentPlanningUnitByPlanningUnitIds(planningUnitArray);
         }
 
         if (x == 7) {
@@ -1399,8 +1399,9 @@ export default class PlanningUnitSetting extends Component {
                     selectedForecastProgram: selectedForecastProgram,
                 }, () => {
                     // this.buildJExcel();
-                    let planningUnitIds = this.state.selsource.map(ele => ele.planningUnit.id);
-                    // console.log("selectedForecastProgram---------->11", planningUnitIds);
+                    // let planningUnitIds = this.state.selsource.map(ele => ele.planningUnit.id);
+                    let planningUnitIds = this.state.allPlanningUnitList.map(ele => ele.id);
+                    console.log("selectedForecastProgram---------->11", planningUnitIds);
                     this.getProcurementAgentPlanningUnitByPlanningUnitIds(planningUnitIds);
                     this.buildJExcel();
 
@@ -2247,6 +2248,8 @@ export default class PlanningUnitSetting extends Component {
 
             let treeListForSelectedProgram = programData.treeList;
 
+            console.log("Test---------------->1.1", treeListForSelectedProgram);
+
             for (var j = 0; j < listOfDisablePuNode.length; j++) {
                 for (var k = 0; k < treeListForSelectedProgram.length; k++) {
                     let flatlist = treeListForSelectedProgram[k].tree.flatList;
@@ -2255,16 +2258,19 @@ export default class PlanningUnitSetting extends Component {
                     for (var l = 0; l < listContainNodeType5.length; l++) {
                         let nodeDataMap = listContainNodeType5[l].payload.nodeDataMap;
                         let nodeDataMapKeys = Object.keys(listContainNodeType5[l].payload.nodeDataMap);
-                        console.log("Test---------------->3", nodeDataMap + ' ----- ' + nodeDataMapKeys);
+                        console.log("Test---------------->3", listContainNodeType5[l].id + '-------' + nodeDataMap + ' ----- ' + nodeDataMapKeys);
                         for (var m = 0; m < nodeDataMapKeys.length; m++) {
                             let insideArrayOfNodeDataMap = nodeDataMap[nodeDataMapKeys[m]];
                             console.log("Test---------------->4", insideArrayOfNodeDataMap);
                             for (var n = 0; n < insideArrayOfNodeDataMap.length; n++) {
-                                if (insideArrayOfNodeDataMap[n].puNode.planningUnit.id == parseInt(listOfDisablePuNode[j])) {
-                                    console.log("Test---------------->5", insideArrayOfNodeDataMap[n]);
-                                    console.log("Test---------------->6", insideArrayOfNodeDataMap[n].puNode.planningUnit.id);
-                                    insideArrayOfNodeDataMap[n].puNode.planningUnit.id = null;
+                                if (insideArrayOfNodeDataMap[n].puNode != null) {
+                                    if (insideArrayOfNodeDataMap[n].puNode.planningUnit.id == parseInt(listOfDisablePuNode[j])) {
+                                        console.log("Test---------------->5", insideArrayOfNodeDataMap[n]);
+                                        console.log("Test---------------->6", insideArrayOfNodeDataMap[n].puNode.planningUnit.id);
+                                        insideArrayOfNodeDataMap[n].puNode.planningUnit.id = null;
+                                    }
                                 }
+
                             }
                         }
                     }

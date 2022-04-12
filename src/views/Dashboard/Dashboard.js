@@ -15,13 +15,13 @@ class Dashboard extends Component {
   hideFirstComponent() {
     setTimeout(function () {
         document.getElementById('div1').style.display = 'none';
-    }, 8000);
+    }, 30000);
 }
 
 hideSecondComponent() {
     setTimeout(function () {
         document.getElementById('div2').style.display = 'none';
-    }, 8000);
+    }, 30000);
 }
   componentDidMount() {
     console.log("COLOR===",this.props.match.params.color);

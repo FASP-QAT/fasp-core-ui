@@ -1318,7 +1318,7 @@ class ForecastOutput extends Component {
                                                             let consumptionList = consumptionExtrapolationObj[0].extrapolationDataList.map(m => {
                                                                 return {
                                                                     consumptionDate: m.month,
-                                                                    consumptionQty: Math.round(m.amount / convertToEu)
+                                                                    consumptionQty: Math.round(m.amount * forecastingUniObj[l].planningUnit.multiplier / convertToEu)
                                                                 }
                                                             });
                                                             // let jsonTemp = { objUnit: forecastingUniObj[l].planningUnit.forecastingUnit, scenario: { id: 1, label: "" }, display: true, color: "#ba0c2f", consumptionList: consumptionList }
@@ -1348,7 +1348,7 @@ class ForecastOutput extends Component {
                                                             let consumptionList = consumptionExtrapolationObj[0].extrapolationDataList.map(m => {
                                                                 return {
                                                                     consumptionDate: m.month,
-                                                                    consumptionQty: Math.round(m.amount)
+                                                                    consumptionQty: Math.round(m.amount * forecastingUniObj[l].planningUnit.multiplier)
                                                                 }
                                                             });
                                                             // let jsonTemp = { objUnit: forecastingUniObj[l].planningUnit.forecastingUnit, scenario: { id: 1, label: "" }, display: true, color: "#ba0c2f", consumptionList: consumptionList }
@@ -1631,7 +1631,7 @@ class ForecastOutput extends Component {
                                 }
                             });
 
-                            let jsonTemp = { objUnit: (viewById == 1 ? primaryConsumptionData[i].planningUnit : primaryConsumptionData[i].forecastingUnit), scenario: { id: 1, label: ')' }, display: true, color: "#ba0c2f", consumptionList: consumptionList }
+                            let jsonTemp = { objUnit: (viewById == 1 ? primaryConsumptionData[i].planningUnit : primaryConsumptionData[i].forecastingUnit), scenario: { id: 1, label: primaryConsumptionData[i].selectedForecast.label_en }, display: true, color: "#ba0c2f", consumptionList: consumptionList }
                             consumptionData.push(jsonTemp);
 
                         }
@@ -1646,25 +1646,76 @@ class ForecastOutput extends Component {
                         }
 
 
-                        this.setState({
-                            consumptionData: consumptionData,
-                            monthArrayList: monthArrayList,
-                            message: ''
-                        }, () => {
-                            // if (yaxisEquUnitId > 0) {
-                            //     this.calculateEquivalencyUnitTotal();
-                            // }
-                        })
+                        if (xaxisId == 1) {//yes
 
+                            let min = moment(startDate).format("YYYY");
+                            let max = moment(endDate).format("YYYY");
+                            let years = [];
+                            for (var i = min; i <= max; i++) {
+                                years.push("" + i)
+                            }
 
-                        // this.setState({
-                        //     consumptions: response.data,
-                        //     message: '',
-                        //     loading: false
-                        // },
-                        //     () => {
+                            let nextStartDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
+                            let nextEndDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-28';
 
-                        //     })
+                            console.log("TestFU------------>900online", nextStartDate);
+                            console.log("TestFU------------>901online", nextEndDate);
+                            console.log("TestFU------------>92online", consumptionData);
+
+                            for (let i = 0; i < consumptionData.length; i++) {
+
+                                console.log("consumptionData------------------->3002online", consumptionData[i].consumptionList);
+                                let nextConsumptionListData = consumptionData[i].consumptionList.filter(c => moment(c.consumptionDate).isBetween(nextStartDate, nextEndDate, null, '[)'))
+                                console.log("consumptionData------------------->3003online", nextConsumptionListData);
+
+                                let tempConsumptionListData = nextConsumptionListData.map(m => {
+                                    return {
+                                        consumptionDate: moment(m.consumptionDate).format("YYYY"),
+                                        // consumptionQty: m.consumptionQty
+                                        consumptionQty: parseInt(m.consumptionQty)
+                                    }
+                                });
+                                console.log("consumptionData------------------->33online", tempConsumptionListData);
+
+                                //logic for add same date data                            
+                                let resultTrue = Object.values(tempConsumptionListData.reduce((a, { consumptionDate, consumptionQty }) => {
+                                    if (!a[consumptionDate])
+                                        a[consumptionDate] = Object.assign({}, { consumptionDate, consumptionQty });
+                                    else
+                                        // a[consumptionDate].consumptionQty += consumptionQty;
+                                        // a[consumptionDate].consumptionQty = parseFloat(a[consumptionDate].consumptionQty) + parseFloat(consumptionQty);
+                                        a[consumptionDate].consumptionQty = parseInt(a[consumptionDate].consumptionQty) + parseInt(consumptionQty);
+                                    return a;
+                                }, {}));
+
+                                console.log("consumptionData------------------->3online", resultTrue);
+
+                                consumptionData[i].consumptionList = resultTrue;
+                            }
+                            console.log("consumptionData------------------->3online", years);
+                            console.log("consumptionData------------------->4online", consumptionData);
+                            this.setState({
+                                consumptionData: consumptionData,
+                                monthArrayList: years,
+                                message: ''
+                            }, () => {
+                                // if (yaxisEquUnitId > 0) {
+                                //     this.calculateEquivalencyUnitTotal();
+                                // }
+                            })
+
+                        } else {//no
+                            this.setState({
+                                consumptionData: consumptionData,
+                                monthArrayList: monthArrayList,
+                                message: ''
+                            }, () => {
+                                // if (yaxisEquUnitId > 0) {
+                                //     this.calculateEquivalencyUnitTotal();
+                                // }
+                            })
+                        }
+
                     }).catch(
                         error => {
                             if (error.message === "Network Error") {

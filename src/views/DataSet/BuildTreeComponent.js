@@ -1181,7 +1181,7 @@ export default class BuildTree extends Component {
         document.getElementById('div2').style.display = 'block';
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
-        }, 8000);
+        }, 30000);
     }
     calculateMOMData(nodeId, type) {
         let { curTreeObj } = this.state;
@@ -3783,9 +3783,8 @@ export default class BuildTree extends Component {
         this.setState({
             modelingEl: modelingEl
         }, () => {
-            var curDate = moment(Date.now()).utcOffset('-0500').startOf('month').format('YYYY-MM-DD');
-            console.log("curDate---", curDate)
-            this.filterScalingDataByMonth(curDate);
+            var scalingMonth={year: new Date(this.state.currentScenario.month.replace(/-/g, '\/')).getFullYear(), month: ("0" + (new Date(this.state.currentScenario.month.replace(/-/g, '\/')).getMonth() + 1)).slice(-2)};
+            this.filterScalingDataByMonth(scalingMonth.year + "-" + scalingMonth.month + "-01");
         }
         );
     }
@@ -6218,7 +6217,10 @@ export default class BuildTree extends Component {
                     }
                     this.setState({
                         showModelingJexcelNumber: true,
-                        minMonth, maxMonth, filteredModelingType: modelingTypeListNew
+                        minMonth, maxMonth, filteredModelingType: modelingTypeListNew,
+                        scalingMonth:{
+                            year: new Date(this.state.currentScenario.month.replace(/-/g, '\/')).getFullYear(), month: ("0" + (new Date(this.state.currentScenario.month.replace(/-/g, '\/')).getMonth() + 1)).slice(-2)
+                        },
                     }, () => {
                         this.buildModelingJexcel();
                     })
@@ -6226,7 +6228,10 @@ export default class BuildTree extends Component {
                 }
                 else {
                     this.setState({
-                        showModelingJexcelNumber: true
+                        showModelingJexcelNumber: true,
+                        scalingMonth:{
+                            year: new Date(this.state.currentScenario.month.replace(/-/g, '\/')).getFullYear(), month: ("0" + (new Date(this.state.currentScenario.month.replace(/-/g, '\/')).getMonth() + 1)).slice(-2)
+                        },
                     }, () => {
                         this.buildModelingJexcel();
                     })
@@ -8742,7 +8747,9 @@ export default class BuildTree extends Component {
 
                         <div className="col-md-12">
                             {this.state.showModelingJexcelNumber &&
-                                <> <div className="calculatorimg calculatorTable">
+                                <> 
+                                <span>{i18n.t('static.modelingTable.note')}</span>
+                                <div className="calculatorimg calculatorTable">
                                     <div id="modelingJexcel" className={"RowClickable ScalingTable"} style={{ display: this.state.modelingJexcelLoader ? "none" : "block" }}>
                                     </div>
                                     <div style={{ display: this.state.modelingJexcelLoader ? "block" : "none" }}>

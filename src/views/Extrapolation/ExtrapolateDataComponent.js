@@ -33,6 +33,7 @@ import { LOGO } from "../../CommonComponent/Logo";
 import { Formik } from "formik";
 import { i } from "mathjs";
 import { JEXCEL_INTEGER_REGEX } from '../../Constants.js'
+import { calculateError } from "./ErrorCalculations";
 
 
 const entityname = i18n.t('static.dashboard.extrapolation');
@@ -43,73 +44,69 @@ const pickerLang = {
 const validationSchemaExtrapolation = function (values) {
     return Yup.object().shape({
         noOfMonthsId:
-            Yup.string().test('noOfMonthsId', 'Please provide a positive integer.',
+            Yup.string().test('noOfMonthsId', 'Please enter positive number.',
                 function (value) {
-                    var testNumber = (/^[\d]*$/).test((document.getElementById("noOfMonthsId").value).replaceAll(",", ""));
-                    if ((document.getElementById("movingAvgId").value) == "on" && (document.getElementById("noOfMonthsId").value == "" || testNumber == false)) {
+                    var testNumber = JEXCEL_INTEGER_REGEX.test((document.getElementById("noOfMonthsId").value).replaceAll(",", ""));
+                    if ((document.getElementById("movingAvgId").value) == "true" && (document.getElementById("noOfMonthsId").value == "" || testNumber == false)) {
                         return false;
                     } else {
                         return true;
                     }
                 }),
         confidenceLevelId:
-            Yup.string().test('confidenceLevelId', 'Please provide valid input.',
+            Yup.string().test('confidenceLevelId', 'Please select confidence level.',
                 function (value) {
-                    var testNumber = document.getElementById("confidenceLevelId").value != "" ? (/^\d{0,3}(\.\d{1,2})?$/).test(document.getElementById("confidenceLevelId").value) : false;
-                    if ((document.getElementById("smoothingId").value) == "true" && (document.getElementById("confidenceLevelId").value == "" || testNumber == false)) {
+                    console.log("***2**", document.getElementById("smoothingId").value);
+                    if ((document.getElementById("smoothingId").value) == "on" && document.getElementById("confidenceLevelId").value == "") {
                         return false;
                     } else {
                         return true;
                     }
                 }),
         seasonalityId:
-            Yup.string().test('seasonalityId', 'Please provide a positive integer between 1 to 24.',
+            Yup.string().test('seasonalityId', 'Please enter a valid whole number between 1 & 24.',
                 function (value) {
-                    // var testNumber = document.getElementById("seasonalityId").value != "" ? JEXCEL_INTEGER_REGEX.test(document.getElementById("seasonalityId").value) : false;
                     var testNumber = document.getElementById("seasonalityId").value != "" ? (/^(?:[1-9]|[1][0-9]|2[0-4])$/).test(document.getElementById("seasonalityId").value) : false;
-                    if ((document.getElementById("smoothingId").value) == "true" && (document.getElementById("seasonalityId").value == "" || testNumber == false)) {
+                    if ((document.getElementById("smoothingId").value) == "on" && (document.getElementById("seasonalityId").value == "" || testNumber == false)) {
                         return false;
                     } else {
                         return true;
                     }
                 }),
         gammaId:
-            Yup.string().test('gammaId', 'Please provide a positive integer between 0 to 1.',
+            Yup.string().test('gammaId', 'Please enter correct gamma value.',
                 function (value) {
-                    // var testNumber = document.getElementById("gammaId").value != "" ? (/^\d{0,3}(\.\d{1,2})?$/).test(document.getElementById("gammaId").value) : false;
                     var testNumber = document.getElementById("gammaId").value != "" ? (/^(?:(?:[0])(?:\.\d{1,2})?|1(?:\.0\d{0,1})?)$/).test(document.getElementById("gammaId").value) : false;
-                    if ((document.getElementById("smoothingId").value) == "true" && (document.getElementById("gammaId").value == "" || testNumber == false)) {
+                    if ((document.getElementById("smoothingId").value) == "on" && (document.getElementById("gammaId").value == "" || testNumber == false)) {
                         return false;
                     } else {
                         return true;
                     }
                 }),
         betaId:
-            Yup.string().test('betaId', 'Please provide a positive integer between 0 to 1.',
+            Yup.string().test('betaId', 'Please enter correct beta value.',
                 function (value) {
-                    // var testNumber = document.getElementById("betaId").value != "" ? (/^\d{0,3}(\.\d{1,2})?$/).test(document.getElementById("betaId").value) : false;
                     var testNumber = document.getElementById("betaId").value != "" ? (/^(?:(?:[0])(?:\.\d{1,2})?|1(?:\.0\d{0,1})?)$/).test(document.getElementById("betaId").value) : false;
-                    if ((document.getElementById("smoothingId").value) == "true" && (document.getElementById("betaId").value == "" || testNumber == false)) {
+                    if ((document.getElementById("smoothingId").value) == "on" && (document.getElementById("betaId").value == "" || testNumber == false)) {
                         return false;
                     } else {
                         return true;
                     }
                 }),
         alphaId:
-            Yup.string().test('alphaId', 'Please provide a positive integer between 0 to 1.',
+            Yup.string().test('alphaId', 'Please enter correct alpha value.',
                 function (value) {
-                    // var testNumber = document.getElementById("alphaId").value != "" ? (/^\d{0,3}(\.\d{1,2})?$/).test(document.getElementById("alphaId").value) : false;
                     var testNumber = document.getElementById("alphaId").value != "" ? (/^(?:(?:[0])(?:\.\d{1,2})?|1(?:\.0\d{0,1})?)$/).test(document.getElementById("alphaId").value) : false;
-                    if ((document.getElementById("smoothingId").value) == "true" && (document.getElementById("alphaId").value == "" || testNumber == false)) {
+                    if ((document.getElementById("smoothingId").value) == "on" && (document.getElementById("alphaId").value == "" || testNumber == false)) {
                         return false;
                     } else {
                         return true;
                     }
                 }),
         pId:
-            Yup.string().test('pId', 'Please provide valid input.',
+            Yup.string().test('pId', 'Please enter correct p value.',
                 function (value) {
-                    var testNumber = document.getElementById("pId").value != "" ? (/^\d{0,3}(\.\d{1,2})?$/).test(document.getElementById("pId").value) : false;
+                    var testNumber = document.getElementById("pId").value != "" ? (/^\d{0,3}(\.\d{1,4})?$/).test(document.getElementById("pId").value) : false;
                     if ((document.getElementById("arimaId").value) == "true" && (document.getElementById("pId").value == "" || testNumber == false)) {
                         return false;
                     } else {
@@ -117,9 +114,10 @@ const validationSchemaExtrapolation = function (values) {
                     }
                 }),
         dId:
-            Yup.string().test('dId', 'Please provide valid input.',
+            Yup.string().test('dId', 'Please enter correct d value.',
                 function (value) {
-                    var testNumber = document.getElementById("dId").value != "" ? (/^\d{0,3}(\.\d{1,2})?$/).test(document.getElementById("dId").value) : false;
+                    console.log("***8**", document.getElementById("arimaId").value);
+                    var testNumber = document.getElementById("dId").value != "" ? (/^\d{0,3}(\.\d{1,4})?$/).test(document.getElementById("dId").value) : false;
                     if ((document.getElementById("arimaId").value) == "true" && (document.getElementById("dId").value == "" || testNumber == false)) {
                         return false;
                     } else {
@@ -127,9 +125,9 @@ const validationSchemaExtrapolation = function (values) {
                     }
                 }),
         qId:
-            Yup.string().test('qId', 'Please provide valid input.',
+            Yup.string().test('qId', 'Please enter correct q value.',
                 function (value) {
-                    var testNumber = document.getElementById("qId").value != "" ? (/^\d{0,3}(\.\d{1,2})?$/).test(document.getElementById("qId").value) : false;
+                    var testNumber = document.getElementById("qId").value != "" ? (/^\d{0,3}(\.\d{1,4})?$/).test(document.getElementById("qId").value) : false;
                     if ((document.getElementById("arimaId").value) == "true" && (document.getElementById("qId").value == "" || testNumber == false)) {
                         return false;
                     } else {
@@ -224,6 +222,7 @@ export default class ExtrapolateDataComponent extends React.Component {
             confidence: 0.95,
             monthsForMovingAverage: 6,
             alphaValidate: true,
+            buttonFalg: 1,
             betaValidate: true,
             gammaValidate: true,
             noOfMonthsForASeasonValidate: true,
@@ -251,10 +250,12 @@ export default class ExtrapolateDataComponent extends React.Component {
             popoverOpenSeaonality: false,
             popoverOpenConfidence: false,
             popoverOpenError: false,
+            loading: false,
             extrapolationMethodId: -1,
             confidenceLevelId: 0.85,
             showGuidance: false,
             showData: false,
+            dataEl: "",
             consumptionListlessTwelve: [],
             missingMonthList: [],
             toggleDataCheck: false,
@@ -392,7 +393,9 @@ export default class ExtrapolateDataComponent extends React.Component {
         })
     }
 
-    touchAllExtrapolation(setTouched, errors) {
+    touchAllExtrapolation(setTouched, errors, buttonFalg) {
+        this.setState({ buttonFalg: buttonFalg })
+        console.log("buttonFalg-----?", this.state.buttonFalg)
         setTouched({
             noOfMonthsId: true,
             confidenceLevelId: true,
@@ -403,9 +406,13 @@ export default class ExtrapolateDataComponent extends React.Component {
             pId: true,
             dId: true,
             qId: true
-        }
-        )
+        });
         this.validateFormExtrapolation(errors)
+        //   console.log("8888888888888",f)
+        //   if(f){
+
+        //       this.setExtrapolatedParameters()
+        //   }
     }
 
     validateFormExtrapolation(errors) {
@@ -426,14 +433,14 @@ export default class ExtrapolateDataComponent extends React.Component {
     buildActualJxl() {
         //Jexcel table
         var actualConsumptionList = this.state.actualConsumptionList;
-        console.log("actualConsumptionList",actualConsumptionList)
+        console.log("actualConsumptionList---->", actualConsumptionList)
         var monthArray = this.state.monthArray;
         let rangeValue = this.state.rangeValue1;
         var startMonth = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
         var dataArray = [];
         var data = [];
-        console.log("monthArray",monthArray)
-        
+        console.log("monthArray", monthArray)
+
         var consumptionDataArr = [];
         for (var j = 0; j < monthArray.length; j++) {
             data = [];
@@ -442,8 +449,9 @@ export default class ExtrapolateDataComponent extends React.Component {
             // if (consumptionData.length > 0) {
             //     inputData.push({ "month": inputData.length + 1, "actual": consumptionData[0].amount, "forecast": null })
             // }
+            console.log("consumptionData0000000", consumptionData)
             var movingAvgDataFilter = this.state.movingAvgData.filter(c => moment(startMonth).add(c.month - 1, 'months').format("YYYY-MM") == moment(monthArray[j]).format("YYYY-MM"))
-           console.log("movingAvgDataFilter",movingAvgDataFilter);
+            console.log("movingAvgDataFilter", movingAvgDataFilter);
             var semiAvgDataFilter = this.state.semiAvgData.filter(c => moment(startMonth).add(c.month - 1, 'months').format("YYYY-MM") == moment(monthArray[j]).format("YYYY-MM"))
             var linearRegressionDataFilter = this.state.linearRegressionData.filter(c => moment(startMonth).add(c.month - 1, 'months').format("YYYY-MM") == moment(monthArray[j]).format("YYYY-MM"))
             var tesDataFilter = this.state.tesData.filter(c => moment(startMonth).add(c.month - 1, 'months').format("YYYY-MM") == moment(monthArray[j]).format("YYYY-MM"))
@@ -454,9 +462,9 @@ export default class ExtrapolateDataComponent extends React.Component {
             data[2] = movingAvgDataFilter.length > 0 && movingAvgDataFilter[0].forecast != null ? movingAvgDataFilter[0].forecast.toFixed(2) : '';
             data[3] = semiAvgDataFilter.length > 0 && semiAvgDataFilter[0].forecast != null ? semiAvgDataFilter[0].forecast.toFixed(2) : '';
             data[4] = linearRegressionDataFilter.length > 0 && linearRegressionDataFilter[0].forecast != null ? linearRegressionDataFilter[0].forecast.toFixed(2) : '';
-            data[5] = tesDataFilter.length > 0 && tesDataFilter[0].forecast != null ? (Number(tesDataFilter[0].forecast) - CI)>0 ?(Number(tesDataFilter[0].forecast) - CI).toFixed(2) : 0 :'';
+            data[5] = tesDataFilter.length > 0 && tesDataFilter[0].forecast != null ? (Number(tesDataFilter[0].forecast)) - Number(CI) > 0 ? ((Number(tesDataFilter[0].forecast)) - Number(CI)).toFixed(2) : 0 : '';
             data[6] = tesDataFilter.length > 0 && tesDataFilter[0].forecast != null ? Number(tesDataFilter[0].forecast).toFixed(2) : '';
-            data[7] = tesDataFilter.length > 0 && tesDataFilter[0].forecast != null ? (Number(tesDataFilter[0].forecast) + CI).toFixed(2) : '';
+            data[7] = tesDataFilter.length > 0 && tesDataFilter[0].forecast != null ? ((Number(tesDataFilter[0].forecast)) + Number(CI)).toFixed(2) : '';
             // data[8] = '';
             dataArray.push(data)
         }
@@ -523,14 +531,12 @@ export default class ExtrapolateDataComponent extends React.Component {
                 if (y != null) {
                     var elInstance = el.jexcel;
                     var rowData = elInstance.getRowData(y);
-                    if (moment(rowData[0]).format("YYYY-MM") >= moment(this.state.datasetJson.currentVersion.forecastStartDate).format("YYYY-MM") && moment(rowData[0]).format("YYYY-MM") <= moment(this.state.datasetJson.currentVersion.forecastStopDate).format("YYYY-MM")) {
+                    if (rowData[1] !== "" && moment(rowData[0]).format("YYYY-MM") < moment(this.state.datasetJson.currentVersion.forecastStartDate).format("YYYY-MM")) {
                         var cell = elInstance.getCell(("A").concat(parseInt(y) + 1))
                         cell.classList.add('jexcelBoldCell');
-                    } if (rowData[1]) {
-                        var cell = elInstance.getCell(("B").concat(parseInt(y) + 1))
-                        cell.classList.add('jexcelBoldCell');
-                    }
-                    if (rowData[2] || rowData[3] || rowData[4] || rowData[5] || rowData[6] || rowData[7]) {
+                    } else if (moment(rowData[0]).format("YYYY-MM") >= moment(this.state.datasetJson.currentVersion.forecastStartDate).format("YYYY-MM") && moment(rowData[0]).format("YYYY-MM") <= moment(this.state.datasetJson.currentVersion.forecastStopDate).format("YYYY-MM")) {
+                        var cell = elInstance.getCell(("A").concat(parseInt(y) + 1))
+                        cell.classList.add('jexcelPurpleCell');
                         var cell = elInstance.getCell(("C").concat(parseInt(y) + 1))
                         cell.classList.add('jexcelPurpleCell');
                         var cell = elInstance.getCell(("D").concat(parseInt(y) + 1))
@@ -543,6 +549,10 @@ export default class ExtrapolateDataComponent extends React.Component {
                         cell.classList.add('jexcelPurpleCell');
                         var cell = elInstance.getCell(("H").concat(parseInt(y) + 1))
                         cell.classList.add('jexcelPurpleCell');
+                    }
+                    if (rowData[1] !== "") {
+                        var cell = elInstance.getCell(("B").concat(parseInt(y) + 1))
+                        cell.classList.add('jexcelBoldCell');
                     }
                 }
             }.bind(this),
@@ -565,6 +575,7 @@ export default class ExtrapolateDataComponent extends React.Component {
             //position: 'top',
             filters: false,
             license: JEXCEL_PRO_KEY,
+            columnSorting: false,
             contextMenu: function (obj, x, y, e) {
                 return [];
             }.bind(this),
@@ -690,12 +701,12 @@ export default class ExtrapolateDataComponent extends React.Component {
         var inputDataTes = [];
         for (var j = 0; moment(curDate).format("YYYY-MM") < moment(stopDate).format("YYYY-MM"); j++) {
             curDate = moment(startDate).startOf('month').add(j, 'months').format("YYYY-MM-DD");
-          console.log("actualConsumptionList",actualConsumptionList);
-        //   var consumptionData = actualConsumptionList.filter(c => moment(c.month).format("YYYY-MM") == moment(curDate).format("YYYY-MM") && c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId)
-       
-          var consumptionData = actualConsumptionList.filter(c => moment(c.month).format("YYYY-MM") == moment(curDate).format("YYYY-MM"))
-        //    && c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId)
-           console.log("consumptionData--->",consumptionData)
+            console.log("actualConsumptionList", actualConsumptionList);
+            var consumptionData = actualConsumptionList.filter(c => moment(c.month).format("YYYY-MM") == moment(curDate).format("YYYY-MM") && c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId)
+
+            //   var consumptionData = actualConsumptionList.filter(c => moment(c.month).format("YYYY-MM") == moment(curDate).format("YYYY-MM"))
+            //    && c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId)
+            console.log("consumptionData--->", consumptionData)
             inputDataMovingAvg.push({ "month": inputDataMovingAvg.length + 1, "actual": consumptionData.length > 0 ? Number(consumptionData[0].amount) : null, "forecast": null })
             inputDataSemiAverage.push({ "month": inputDataSemiAverage.length + 1, "actual": consumptionData.length > 0 ? Number(consumptionData[0].amount) : null, "forecast": null })
             inputDataLinearRegression.push({ "month": inputDataLinearRegression.length + 1, "actual": consumptionData.length > 0 ? Number(consumptionData[0].amount) : null, "forecast": null })
@@ -705,12 +716,24 @@ export default class ExtrapolateDataComponent extends React.Component {
         this.setState({
             monthArray: monthArray
         })
-        calculateMovingAvg(inputDataMovingAvg, this.state.monthsForMovingAverage, noOfMonthsForProjection, this);
-        calculateSemiAverages(inputDataSemiAverage, noOfMonthsForProjection, this);
-        calculateLinearRegression(inputDataLinearRegression, noOfMonthsForProjection, this);
-        console.log("inputDataTes.length+++", inputDataTes.length);
-        // if (inputDataTes.length >= (this.state.noOfMonthsForASeason * 2)) {
+        try {
+            calculateMovingAvg(inputDataMovingAvg, this.state.monthsForMovingAverage, noOfMonthsForProjection, this);
+            calculateSemiAverages(inputDataSemiAverage, noOfMonthsForProjection, this);
+            calculateLinearRegression(inputDataLinearRegression, noOfMonthsForProjection, this);
+            console.log("inputDataTes.length+++", inputDataTes.length);
+            // if (inputDataTes.length >= (this.state.noOfMonthsForASeason * 2)) {
             calculateTES(inputDataTes, this.state.alpha, this.state.beta, this.state.gamma, this.state.confidenceLevelId, this.state.noOfMonthsForASeason, noOfMonthsForProjection, this);
+        } catch (error) {
+            this.el = jexcel(document.getElementById("tableDiv"), '');
+            this.el.destroy();
+            this.setState({
+                showData: false,
+                dataEl: "",
+                loading: false,
+                noDataMessage: i18n.t('static.extrapolation.errorOccured'),
+                dataChanged: false
+            })
+        }
         // } else {
         //     this.setState({
         //         tesData: [],
@@ -815,6 +838,8 @@ export default class ExtrapolateDataComponent extends React.Component {
                     this.getDateDifference()
                 })
             } else {
+                this.el = jexcel(document.getElementById("tableDiv"), '');
+                this.el.destroy();
                 this.setState({
                     forecastProgramId: forecastProgramId,
                     planningUnitList: [],
@@ -829,7 +854,8 @@ export default class ExtrapolateDataComponent extends React.Component {
                     monthsForMovingAverage: 6,
                     confidenceLevelId: 0.85,
                     loading: false,
-                    showData: false
+                    showData: false,
+                    dataEl: ""
                 })
             }
         }
@@ -838,269 +864,286 @@ export default class ExtrapolateDataComponent extends React.Component {
 
 
     saveForecastConsumptionExtrapolation() {
-        if ((this.state.movingAvgId && !this.state.monthsForMovingAverageValidate) ||
-            (this.state.smoothingId && !this.state.noOfMonthsForASeasonValidate) ||
-            (this.state.confidenceLevelId && !this.state.confidenceValidate)) {
-            alert("Please provide the valid input");
-        } else {
-            this.setState({
-                loading: true
-            })
-            var db1;
-            var storeOS;
-            getDatabase();
-            var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-            openRequest.onerror = function (event) {
-                this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
-                this.props.updateState("color", "red");
-                this.props.hideFirstComponent();
+        // if ((this.state.movingAvgId && !this.state.monthsForMovingAverageValidate) ||
+        //     (this.state.smoothingId && !this.state.noOfMonthsForASeasonValidate) ||
+        //     (this.state.confidenceLevelId && !this.state.confidenceValidate)) {
+        //     alert("Please provide the valid input");
+        // } else {
+        this.setState({
+            loading: true
+        })
+        var db1;
+        var storeOS;
+        getDatabase();
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+        openRequest.onerror = function (event) {
+            this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
+            this.props.updateState("color", "red");
+            this.props.hideFirstComponent();
+        }.bind(this);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var extrapolationMethodTransaction = db1.transaction(['extrapolationMethod'], 'readwrite');
+            var extrapolationMethodObjectStore = extrapolationMethodTransaction.objectStore('extrapolationMethod');
+            var extrapolationMethodRequest = extrapolationMethodObjectStore.getAll();
+            extrapolationMethodRequest.onerror = function (event) {
             }.bind(this);
-            openRequest.onsuccess = function (e) {
-                db1 = e.target.result;
-                var extrapolationMethodTransaction = db1.transaction(['extrapolationMethod'], 'readwrite');
-                var extrapolationMethodObjectStore = extrapolationMethodTransaction.objectStore('extrapolationMethod');
-                var extrapolationMethodRequest = extrapolationMethodObjectStore.getAll();
-                extrapolationMethodRequest.onerror = function (event) {
+            extrapolationMethodRequest.onsuccess = function (event) {
+                var transaction = db1.transaction(['datasetData'], 'readwrite');
+                var datasetTransaction = transaction.objectStore('datasetData');
+                var datasetRequest = datasetTransaction.get(this.state.forecastProgramId);
+                datasetRequest.onerror = function (event) {
                 }.bind(this);
-                extrapolationMethodRequest.onsuccess = function (event) {
-                    var transaction = db1.transaction(['datasetData'], 'readwrite');
-                    var datasetTransaction = transaction.objectStore('datasetData');
-                    var datasetRequest = datasetTransaction.get(this.state.forecastProgramId);
-                    datasetRequest.onerror = function (event) {
-                    }.bind(this);
-                    datasetRequest.onsuccess = function (event) {
+                datasetRequest.onsuccess = function (event) {
 
 
-                        var extrapolationMethodList = extrapolationMethodRequest.result;
+                    var extrapolationMethodList = extrapolationMethodRequest.result;
 
-                        var myResult = datasetRequest.result;
-                        var datasetDataBytes = CryptoJS.AES.decrypt(myResult.programData, SECRET_KEY);
-                        var datasetData = datasetDataBytes.toString(CryptoJS.enc.Utf8);
-                        var datasetJson = JSON.parse(datasetData);
-                        var consumptionExtrapolationDataUnFiltered = (datasetJson.consumptionExtrapolation);
-                        var consumptionExtrapolationList = (datasetJson.consumptionExtrapolation).filter(c => c.planningUnit.id != this.state.planningUnitId && c.region.id != this.state.regionId);
-                        var consumptionExtrapolationData = -1//Semi Averages
-                        var consumptionExtrapolationMovingData = -1//Moving averages
-                        var consumptionExtrapolationRegression = -1//Linear Regression
-                        var consumptionExtrapolationTESL = -1//TES L
-                        console.log("consumptionExtrapolationTESL+++", consumptionExtrapolationTESL)
-                        var consumptionExtrapolationTESM = -1//TES M
-                        var consumptionExtrapolationTESH = -1//TES H
+                    var myResult = datasetRequest.result;
+                    var datasetDataBytes = CryptoJS.AES.decrypt(myResult.programData, SECRET_KEY);
+                    var datasetData = datasetDataBytes.toString(CryptoJS.enc.Utf8);
+                    var datasetJson = JSON.parse(datasetData);
+                    var consumptionExtrapolationDataUnFiltered = (datasetJson.consumptionExtrapolation);
+                    console.log("consumptionExtrapolationDataUnFiltered@@@@@@@@@@", consumptionExtrapolationDataUnFiltered);
+                    console.log("this.state.planningUnitId@@@@@@@@@@", this.state.planningUnitId);
+                    console.log("this.state.regionId@@@@@@@@@@", this.state.regionId);
+                    var consumptionExtrapolationList = (datasetJson.consumptionExtrapolation).filter(c => c.planningUnit.id != this.state.planningUnitId || (c.planningUnit.id == this.state.planningUnitId && c.region.id != this.state.regionId));
+                    console.log("consumptionExtrapolationList@@@@@@@@@@", consumptionExtrapolationList);
+                    var consumptionExtrapolationData = -1//Semi Averages
+                    var consumptionExtrapolationMovingData = -1//Moving averages
+                    var consumptionExtrapolationRegression = -1//Linear Regression
+                    var consumptionExtrapolationTESL = -1//TES L
+                    console.log("consumptionExtrapolationTESL+++", consumptionExtrapolationTESL)
+                    var consumptionExtrapolationTESM = -1//TES M
+                    var consumptionExtrapolationTESH = -1//TES H
 
-                        var tesData = this.state.tesData;
-                        var CI = this.state.CI;
+                    var tesData = this.state.tesData;
+                    var CI = this.state.CI;
 
-                        var inputDataFilter = this.state.semiAvgData;
-                        var inputDataAverageFilter = this.state.movingAvgData;
-                        var inputDataRegressionFilter = this.state.linearRegressionData;
-                        console.log("consumptionExtrapolationData", consumptionExtrapolationData);
-                        console.log("inputDataFilter", inputDataFilter);
-                        //Semi - averages
-                        var id = consumptionExtrapolationDataUnFiltered.length + 1;
-                        var planningUnitObj = this.state.planningUnitList.filter(c => c.planningUnit.id == this.state.planningUnitId)[0].planningUnit;
-                        var regionObj = this.state.regionList.filter(c => c.regionId == this.state.regionId)[0];
-                        console.log("Planning Unit Obj****", planningUnitObj);
-                        console.log("Region Obj****", regionObj);
-                        var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
-                        var curUser = AuthenticationService.getLoggedInUserId();
-                        if (this.state.semiAvgId) {
-                            var data = [];
-                            for (var i = 0; i < inputDataFilter.length; i++) {
-                                data.push({ month: moment(this.state.startDate).add(inputDataFilter[i].month - 1, 'months').format("YYYY-MM-DD"), amount: inputDataFilter[i].forecast })
-                            }
-                            consumptionExtrapolationList.push(
-                                {
-                                    "consumptionExtrapolationId": id,
-                                    "planningUnit": planningUnitObj,
-                                    "region": {
-                                        id: regionObj.regionId,
-                                        label: regionObj.label
-                                    },
-                                    "extrapolationMethod": extrapolationMethodList.filter(c => c.id == 6)[0],
-                                    "jsonProperties": {
-                                    },
-                                    "createdBy": {
-                                        "userId": curUser
-                                    },
-                                    "createdDate": curDate,
-                                    "extrapolationDataList": data
-                                })
-                            id += 1;
+                    var inputDataFilter = this.state.semiAvgData;
+                    var inputDataAverageFilter = this.state.movingAvgData;
+                    var inputDataRegressionFilter = this.state.linearRegressionData;
+                    console.log("consumptionExtrapolationData", consumptionExtrapolationData);
+                    console.log("inputDataFilter", inputDataFilter);
+                    //Semi - averages
+                    var id = consumptionExtrapolationDataUnFiltered.length > 0 ? Math.max(...consumptionExtrapolationDataUnFiltered.map(o => o.consumptionExtrapolationId)) + 1 : 1;
+                    var planningUnitObj = this.state.planningUnitList.filter(c => c.planningUnit.id == this.state.planningUnitId)[0].planningUnit;
+                    var regionObj = this.state.regionList.filter(c => c.regionId == this.state.regionId)[0];
+                    console.log("Planning Unit Obj****", planningUnitObj);
+                    console.log("Region Obj****", regionObj);
+                    var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
+                    var curUser = AuthenticationService.getLoggedInUserId();
+                    var json = this.state.dataEl.getJson(null, false);
+                    if (this.state.semiAvgId) {
+                        var data = [];
+                        for (var i = 0; i < json.length; i++) {
+                            data.push({ month: moment((json[i])[0]).format("YYYY-MM-DD"), amount: (json[i])[3] })
                         }
-                        console.log("this.state.monthsForMovingAverage+++", this.state.monthsForMovingAverage)
-                        console.log("consumptionExtrapolationMovingData+++", consumptionExtrapolationMovingData);
-                        //Moving Averages
-                        if (this.state.movingAvgId) {
-                            var data = [];
-                            for (var i = 0; i < inputDataAverageFilter.length; i++) {
-                                data.push({ month: moment(this.state.startDate).add(inputDataAverageFilter[i].month - 1, 'months').format("YYYY-MM-DD"), amount: inputDataAverageFilter[i].forecast })
-                            }
-                            consumptionExtrapolationList.push(
-                                {
-                                    "consumptionExtrapolationId": id,
-                                    "planningUnit": planningUnitObj,
-                                    "region": {
-                                        id: regionObj.regionId,
-                                        label: regionObj.label
-                                    },
-                                    "extrapolationMethod": extrapolationMethodList.filter(c => c.id == 7)[0],
-                                    "jsonProperties": {
-                                        months: this.state.monthsForMovingAverage
-                                    },
-                                    "createdBy": {
-                                        "userId": curUser
-                                    },
-                                    "createdDate": curDate,
-                                    "extrapolationDataList": data
-                                })
-                            id += 1;
-
-                        }
-                        if (this.state.linearRegressionId) {
-                            //Linear Regression
-                            var data = [];
-                            for (var i = 0; i < inputDataRegressionFilter.length; i++) {
-                                data.push({ month: moment(this.state.startDate).add(inputDataRegressionFilter[i].month - 1, 'months').format("YYYY-MM-DD"), amount: inputDataRegressionFilter[i].forecast })
-                            }
-                            consumptionExtrapolationList.push(
-                                {
-                                    "consumptionExtrapolationId": id,
-                                    "planningUnit": planningUnitObj,
-                                    "region": {
-                                        id: regionObj.regionId,
-                                        label: regionObj.label
-                                    },
-                                    "extrapolationMethod": extrapolationMethodList.filter(c => c.id == 5)[0],
-                                    "jsonProperties": {
-                                    },
-                                    "createdBy": {
-                                        "userId": curUser
-                                    },
-                                    "createdDate": curDate,
-                                    "extrapolationDataList": data
-                                })
-                            id += 1;
-                        }
-                        //TES L
-                        if (this.state.smoothingId) {
-                            console.log("consumptionExtrapolationTESL@@@", consumptionExtrapolationTESL)
-                            console.log("in if1")
-                            var data = [];
-                            for (var i = 0; i < tesData.length; i++) {
-                                data.push({ month: moment(this.state.startDate).add(tesData[i].month - 1, 'months').format("YYYY-MM-DD"), amount: (Number(tesData[i].forecast) - Number(CI)) })
-                            }
-                            consumptionExtrapolationList.push(
-                                {
-                                    "consumptionExtrapolationId": id,
-                                    "planningUnit": planningUnitObj,
-                                    "region": {
-                                        id: regionObj.regionId,
-                                        label: regionObj.label
-                                    },
-                                    "extrapolationMethod": extrapolationMethodList.filter(c => c.id == 1)[0],
-                                    "jsonProperties": {
-                                        confidenceLevel: this.state.confidenceLevelId,
-                                        seasonality: this.state.noOfMonthsForASeason,
-                                        alpha: this.state.alpha,
-                                        beta: this.state.beta,
-                                        gamma: this.state.gamma
-                                    },
-                                    "createdBy": {
-                                        "userId": curUser
-                                    },
-                                    "createdDate": curDate,
-                                    "extrapolationDataList": data
-                                })
-                            id += 1;
-                            //TES M
-                            console.log("in if2")
-                            var data = [];
-                            for (var i = 0; i < tesData.length; i++) {
-                                data.push({ month: moment(this.state.startDate).add(tesData[i].month - 1, 'months').format("YYYY-MM-DD"), amount: (Number(tesData[i].forecast)) })
-                            }
-                            consumptionExtrapolationList.push(
-                                {
-                                    "consumptionExtrapolationId": id,
-                                    "planningUnit": planningUnitObj,
-                                    "region": {
-                                        id: regionObj.regionId,
-                                        label: regionObj.label
-                                    },
-                                    "extrapolationMethod": extrapolationMethodList.filter(c => c.id == 2)[0],
-                                    "jsonProperties": {
-                                        confidenceLevel: this.state.confidenceLevelId,
-                                        seasonality: this.state.noOfMonthsForASeason,
-                                        alpha: this.state.alpha,
-                                        beta: this.state.beta,
-                                        gamma: this.state.gamma
-                                    },
-                                    "createdBy": {
-                                        "userId": curUser
-                                    },
-                                    "createdDate": curDate,
-                                    "extrapolationDataList": data
-                                })
-                            id += 1;
-                            //TES H
-                            console.log("in if3")
-                            var data = [];
-                            for (var i = 0; i < tesData.length; i++) {
-                                data.push({ month: moment(this.state.startDate).add(tesData[i].month - 1, 'months').format("YYYY-MM-DD"), amount: (Number(tesData[i].forecast) + Number(CI)) })
-                            }
-                            consumptionExtrapolationList.push(
-                                {
-                                    "consumptionExtrapolationId": id,
-                                    "planningUnit": planningUnitObj,
-                                    "region": {
-                                        id: regionObj.regionId,
-                                        label: regionObj.label
-                                    },
-                                    "extrapolationMethod": extrapolationMethodList.filter(c => c.id == 3)[0],
-                                    "jsonProperties": {
-                                        confidenceLevel: this.state.confidenceLevelId,
-                                        seasonality: this.state.noOfMonthsForASeason,
-                                        alpha: this.state.alpha,
-                                        beta: this.state.beta,
-                                        gamma: this.state.gamma
-                                    },
-                                    "createdBy": {
-                                        "userId": curUser
-                                    },
-                                    "createdDate": curDate,
-                                    "extrapolationDataList": data
-                                })
-                            id += 1;
-                        }
-                        console.log('consumptionExtrapolationRegression', consumptionExtrapolationRegression);
-                        datasetJson.consumptionExtrapolation = consumptionExtrapolationList;
-                        console.log("consumptionExtrapolationList+++", consumptionExtrapolationList)
-                        datasetData = (CryptoJS.AES.encrypt(JSON.stringify(datasetJson), SECRET_KEY)).toString()
-                        myResult.programData = datasetData;
-                        var putRequest = datasetTransaction.put(myResult);
-                        this.setState({
-                            dataChanged: false
-                        })
-                        putRequest.onerror = function (event) {
-                        }.bind(this);
-                        putRequest.onsuccess = function (event) {
-                            console.log("save");
-                            // let id = AuthenticationService.displayDashboardBasedOnRole();
-                            // this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/green/' + i18n.t('static.compareAndSelect.dataSaved'));
-                            this.setState({
-                                // dataEl: "",
-                                loading: false,
-                                dataChanged: false,
-                                message: i18n.t('static.compareAndSelect.dataSaved')
+                        consumptionExtrapolationList.push(
+                            {
+                                "consumptionExtrapolationId": id,
+                                "planningUnit": planningUnitObj,
+                                "region": {
+                                    id: regionObj.regionId,
+                                    label: regionObj.label
+                                },
+                                "extrapolationMethod": extrapolationMethodList.filter(c => c.id == 6)[0],
+                                "jsonProperties": {
+                                },
+                                "createdBy": {
+                                    "userId": curUser
+                                },
+                                "createdDate": curDate,
+                                "extrapolationDataList": data
                             })
-                            // , () => {
-                            //     this.componentDidMount();
-                            // })
+                        id += 1;
+                    }
+                    console.log("this.state.monthsForMovingAverage+++", this.state.monthsForMovingAverage)
+                    console.log("consumptionExtrapolationMovingData+++", consumptionExtrapolationMovingData);
+                    //Moving Averages
+                    if (this.state.movingAvgId) {
+                        var data = [];
+                        for (var i = 0; i < json.length; i++) {
+                            data.push({ month: moment((json[i])[0]).format("YYYY-MM-DD"), amount: (json[i])[2] })
+                        }
+                        consumptionExtrapolationList.push(
+                            {
+                                "consumptionExtrapolationId": id,
+                                "planningUnit": planningUnitObj,
+                                "region": {
+                                    id: regionObj.regionId,
+                                    label: regionObj.label
+                                },
+                                "extrapolationMethod": extrapolationMethodList.filter(c => c.id == 7)[0],
+                                "jsonProperties": {
+                                    months: this.state.monthsForMovingAverage
+                                },
+                                "createdBy": {
+                                    "userId": curUser
+                                },
+                                "createdDate": curDate,
+                                "extrapolationDataList": data
+                            })
+                        id += 1;
 
-                        }.bind(this);
+                    }
+                    if (this.state.linearRegressionId) {
+                        //Linear Regression
+                        var data = [];
+                        for (var i = 0; i < json.length; i++) {
+                            data.push({ month: moment((json[i])[0]).format("YYYY-MM-DD"), amount: (json[i])[4] })
+                        }
+                        consumptionExtrapolationList.push(
+                            {
+                                "consumptionExtrapolationId": id,
+                                "planningUnit": planningUnitObj,
+                                "region": {
+                                    id: regionObj.regionId,
+                                    label: regionObj.label
+                                },
+                                "extrapolationMethod": extrapolationMethodList.filter(c => c.id == 5)[0],
+                                "jsonProperties": {
+                                },
+                                "createdBy": {
+                                    "userId": curUser
+                                },
+                                "createdDate": curDate,
+                                "extrapolationDataList": data
+                            })
+                        id += 1;
+                    }
+                    //TES L
+                    if (this.state.smoothingId) {
+                        console.log("consumptionExtrapolationTESL@@@", tesData)
+                        console.log("in if1")
+                        var data = [];
+                        for (var i = 0; i < json.length; i++) {
+                            data.push({ month: moment((json[i])[0]).format("YYYY-MM-DD"), amount: (json[i])[5] })
+                        }
+                        consumptionExtrapolationList.push(
+                            {
+                                "consumptionExtrapolationId": id,
+                                "planningUnit": planningUnitObj,
+                                "region": {
+                                    id: regionObj.regionId,
+                                    label: regionObj.label
+                                },
+                                "extrapolationMethod": extrapolationMethodList.filter(c => c.id == 1)[0],
+                                "jsonProperties": {
+                                    confidenceLevel: this.state.confidenceLevelId,
+                                    seasonality: this.state.noOfMonthsForASeason,
+                                    alpha: this.state.alpha,
+                                    beta: this.state.beta,
+                                    gamma: this.state.gamma
+                                },
+                                "createdBy": {
+                                    "userId": curUser
+                                },
+                                "createdDate": curDate,
+                                "extrapolationDataList": data
+                            })
+                        id += 1;
+                        //TES M
+                        console.log("in if2")
+                        var data = [];
+                        for (var i = 0; i < json.length; i++) {
+                            data.push({ month: moment((json[i])[0]).format("YYYY-MM-DD"), amount: (json[i])[6] })
+                        }
+                        consumptionExtrapolationList.push(
+                            {
+                                "consumptionExtrapolationId": id,
+                                "planningUnit": planningUnitObj,
+                                "region": {
+                                    id: regionObj.regionId,
+                                    label: regionObj.label
+                                },
+                                "extrapolationMethod": extrapolationMethodList.filter(c => c.id == 2)[0],
+                                "jsonProperties": {
+                                    confidenceLevel: this.state.confidenceLevelId,
+                                    seasonality: this.state.noOfMonthsForASeason,
+                                    alpha: this.state.alpha,
+                                    beta: this.state.beta,
+                                    gamma: this.state.gamma
+                                },
+                                "createdBy": {
+                                    "userId": curUser
+                                },
+                                "createdDate": curDate,
+                                "extrapolationDataList": data
+                            })
+                        id += 1;
+                        //TES H
+                        console.log("in if3")
+                        var data = [];
+                        for (var i = 0; i < json.length; i++) {
+                            data.push({ month: moment((json[i])[0]).format("YYYY-MM-DD"), amount: (json[i])[7] })
+                        }
+                        consumptionExtrapolationList.push(
+                            {
+                                "consumptionExtrapolationId": id,
+                                "planningUnit": planningUnitObj,
+                                "region": {
+                                    id: regionObj.regionId,
+                                    label: regionObj.label
+                                },
+                                "extrapolationMethod": extrapolationMethodList.filter(c => c.id == 3)[0],
+                                "jsonProperties": {
+                                    confidenceLevel: this.state.confidenceLevelId,
+                                    seasonality: this.state.noOfMonthsForASeason,
+                                    alpha: this.state.alpha,
+                                    beta: this.state.beta,
+                                    gamma: this.state.gamma
+                                },
+                                "createdBy": {
+                                    "userId": curUser
+                                },
+                                "createdDate": curDate,
+                                "extrapolationDataList": data
+                            })
+                        id += 1;
+                    }
+                    console.log('consumptionExtrapolationRegression', consumptionExtrapolationRegression);
+                    datasetJson.consumptionExtrapolation = consumptionExtrapolationList;
+                    console.log("consumptionExtrapolationList@@@@@@@@@@", consumptionExtrapolationList)
+                    datasetData = (CryptoJS.AES.encrypt(JSON.stringify(datasetJson), SECRET_KEY)).toString()
+                    myResult.programData = datasetData;
+                    var putRequest = datasetTransaction.put(myResult);
+                    this.setState({
+                        dataChanged: false
+                    })
+                    putRequest.onerror = function (event) {
+                    }.bind(this);
+                    putRequest.onsuccess = function (event) {
+                        console.log("save");
+                        // let id = AuthenticationService.displayDashboardBasedOnRole();
+                        // this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/green/' + i18n.t('static.compareAndSelect.dataSaved'));
+                        this.setState({
+                            // dataEl: "",
+                            loading: false,
+                            dataChanged: false,
+                            message: i18n.t('static.compareAndSelect.dataSaved')
+                        }, () => {
+                            this.hideFirstComponent();
+                            this.componentDidMount()
+                        })
+
+
+                        // console.log(" after save",this.state.message);
+                        // , () => {
+                        //     this.componentDidMount();
+                        // })
+
                     }.bind(this);
                 }.bind(this);
             }.bind(this);
-        }
+        }.bind(this);
+        // }
+    }
+    hideFirstComponent() {
+        document.getElementById('div2').style.display = 'block';
+        this.state.timeout = setTimeout(function () {
+            document.getElementById('div2').style.display = 'none';
+        }, 30000);
     }
 
     setPlanningUnitId(e) {
@@ -1118,12 +1161,16 @@ export default class ExtrapolateDataComponent extends React.Component {
         if (cont == true) {
             var planningUnitId = e.target.value;
             localStorage.setItem("sesDatasetPlanningUnitId", e.target.value);
+            this.el = jexcel(document.getElementById("tableDiv"), '');
+            this.el.destroy();
             this.setState({
                 planningUnitId: planningUnitId,
-                showData: false
-                }, () => {
-                    this.setExtrapolatedParameters();
-                  //  this.showDataOnPlanningAndRegionChange();
+                showData: false,
+                dataEl: "",
+                dataChanged: false
+            }, () => {
+                // this.setExtrapolatedParameters();
+                this.showDataOnPlanningAndRegionChange();
             })
         }
     }
@@ -1143,280 +1190,333 @@ export default class ExtrapolateDataComponent extends React.Component {
         if (cont == true) {
             var regionId = e.target.value;
             localStorage.setItem("sesDatasetRegionId", e.target.value);
+            this.el = jexcel(document.getElementById("tableDiv"), '');
+            this.el.destroy();
             this.setState({
                 regionId: regionId,
-                showData: false
-                }, () => {
-                    this.setExtrapolatedParameters();
-                 //   this.showDataOnPlanningAndRegionChange();
+                showData: false,
+                dataEl: "",
+                dataChanged: false
+            }, () => {
+                // this.setExtrapolatedParameters();
+                this.showDataOnPlanningAndRegionChange();
             })
         }
     }
 
-    showDataOnPlanningAndRegionChange(){
-    if (this.state.planningUnitId > 0 && this.state.regionId > 0) {
-        var datasetJson = this.state.datasetJson;
-        var actualConsumptionListForPlanningUnitAndRegion = datasetJson.actualConsumptionList.filter(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId);
-        var consumptionExtrapolationList = datasetJson.consumptionExtrapolation;
-        console.log("consumptionExtrapolationList-->",consumptionExtrapolationList);    
-        if (consumptionExtrapolationList.length>1 && actualConsumptionListForPlanningUnitAndRegion.length > 1) {
-            this.setState({ loading: true })
-            let actualMin = moment.min(actualConsumptionListForPlanningUnitAndRegion.map(d => moment(d.month)));
-            let actualMax = moment.max(actualConsumptionListForPlanningUnitAndRegion.map(d => moment(d.month)));
-            var rangeValue1 = "";
-            // if (updateRangeValue == 0) {
+    showDataOnPlanningAndRegionChange() {
+        if (this.state.planningUnitId > 0 && this.state.regionId > 0) {
+            var datasetJson = this.state.datasetJson;
+            console.log("DatasetJson@@@@@@@@@@@@@@", datasetJson)
+            var actualConsumptionListForPlanningUnitAndRegion = datasetJson.actualConsumptionList.filter(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId);
+            var consumptionExtrapolationList = datasetJson.consumptionExtrapolation.filter(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId);
+            console.log("consumptionExtrapolationList-->", consumptionExtrapolationList);
+            if (consumptionExtrapolationList.length > 1 && actualConsumptionListForPlanningUnitAndRegion.length > 1) {
+                this.setState({ loading: true })
+                let actualMin = moment.min(consumptionExtrapolationList[0].extrapolationDataList.map(d => moment(d.month)));
+                let extrapolationMax = moment.max(consumptionExtrapolationList[0].extrapolationDataList.map(d => moment(d.month)));
+                let actualMax = moment.max(actualConsumptionListForPlanningUnitAndRegion.map(d => moment(d.month)));
+                console.log("ActualMin@@@@@@@@@@@@@@@", actualMin);
+                console.log("ActualMin@@@@@@@@@@@@@@@", actualMax);
+                var rangeValue1 = "";
+                // if (updateRangeValue == 0) {
                 // rangeValue1 = this.state.rangeValue1;
-            // } else {
+                // } else {
                 rangeValue1 = { from: { year: new Date(actualMin).getFullYear(), month: new Date(actualMin).getMonth() + 1 }, to: { year: new Date(actualMax).getFullYear(), month: new Date(actualMax).getMonth() + 1 } }
-            // }
-            var rangeValue = rangeValue1;
-            let startDate1 = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
-            let stopDate1 = rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
-            var actualConsumptionList = datasetJson.actualConsumptionList.filter(c => moment(c.month).format("YYYY-MM") >= moment(startDate1).format("YYYY-MM") && moment(c.month).format("YYYY-MM") <= moment(stopDate1).format("YYYY-MM"));
-            var startDate = moment(datasetJson.currentVersion.forecastStartDate).format("YYYY-MM-DD");
-            var stopDate = moment(datasetJson.currentVersion.forecastStopDate).format("YYYY-MM-DD");
-            var minStartDate = startDate1;
-            var maxStopDate = stopDate1;
-          
-            if (moment(startDate1).format("YYYY-MM") > moment(startDate).format("YYYY-MM")) {
-                minStartDate = startDate;
-            }
-            if (moment(stopDate1).format("YYYY-MM") < moment(stopDate).format("YYYY-MM")) {
-                maxStopDate = stopDate;
-            }
-            var monthArray = [];
-            var curDate1 = minStartDate;
-    
-        var monthsForMovingAverage = this.state.monthsForMovingAverage;
-        var consumptionExtrapolationFiltered = consumptionExtrapolationList.filter(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId);
-        var consumptionExtrapolationData = consumptionExtrapolationList.filter(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId && c.extrapolationMethod.id == 6)//Semi Averages
-        var consumptionExtrapolationMovingData = consumptionExtrapolationList.filter(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId && c.extrapolationMethod.id == 7)//Moving averages
-        var consumptionExtrapolationRegression = consumptionExtrapolationList.filter(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId && c.extrapolationMethod.id == 5)//Linear Regression
-        var consumptionExtrapolationTESL = consumptionExtrapolationList.filter(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId && c.extrapolationMethod.id == 1)//TES L            
-        var movingAvgId = consumptionExtrapolationFiltered.length > 0 ? false : true;
-        var semiAvgId = consumptionExtrapolationFiltered.length > 0 ? false : true;
-        var linearRegressionId = consumptionExtrapolationFiltered.length > 0 ? false : true;
-        var smoothingId = consumptionExtrapolationFiltered.length > 0 ? false : true;
-        var arimaId = consumptionExtrapolationFiltered.length > 0 ? false : true;
+                // }
+                var rangeValue = rangeValue1;
+                let startDate1 = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
+                let stopDate1 = rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
+                var actualConsumptionList = datasetJson.actualConsumptionList.filter(c => moment(c.month).format("YYYY-MM") >= moment(startDate1).format("YYYY-MM") && moment(c.month).format("YYYY-MM") <= moment(stopDate1).format("YYYY-MM"));
+                var startDate = startDate1;
+                var stopDate = stopDate1;
+                var minStartDate = startDate1;
+                var maxStopDate = stopDate1;
+                var monthArray = [];
+                var curDate1 = minStartDate;
 
-        if (consumptionExtrapolationMovingData.length > 0) {
-            monthsForMovingAverage = consumptionExtrapolationMovingData[0].jsonProperties.months;
-            movingAvgId = true;
-            }
-        if (consumptionExtrapolationData.length > 0) {
-            semiAvgId = true;
-            }
-        if (consumptionExtrapolationRegression.length > 0) {
-            linearRegressionId = true;
-            }
-        var confidenceLevel = this.state.confidenceLevelId;
-        var seasonality = this.state.noOfMonthsForASeason;
-        var alpha = this.state.alpha;
-        var beta = this.state.beta;
-        var gamma = this.state.gamma;
-        if (smoothingId && consumptionExtrapolationTESL.length > 0) {
-            confidenceLevel = consumptionExtrapolationTESL[0].jsonProperties.confidenceLevel;
-            seasonality = consumptionExtrapolationTESL[0].jsonProperties.seasonality;
-            alpha = consumptionExtrapolationTESL[0].jsonProperties.alpha;
-            beta = consumptionExtrapolationTESL[0].jsonProperties.beta;
-            gamma = consumptionExtrapolationTESL[0].jsonProperties.gamma;
-            smoothingId = true;
-        }
-        let curDate = startDate;
+                var monthsForMovingAverage = this.state.monthsForMovingAverage;
+                // var consumptionExtrapolationFiltered = consumptionExtrapolationList.filter(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId);
+                var consumptionExtrapolationSemiAvg = consumptionExtrapolationList.filter(c => c.extrapolationMethod.id == 6)//Semi Averages
+                var consumptionExtrapolationMovingData = consumptionExtrapolationList.filter(c => c.extrapolationMethod.id == 7)//Moving averages
+                var consumptionExtrapolationRegression = consumptionExtrapolationList.filter(c => c.extrapolationMethod.id == 5)//Linear Regression
+                var consumptionExtrapolationTESL = consumptionExtrapolationList.filter(c => c.extrapolationMethod.id == 1)//TES L           
+                var consumptionExtrapolationTESM = consumptionExtrapolationList.filter(c => c.extrapolationMethod.id == 2)//TES M
+                var consumptionExtrapolationTESH = consumptionExtrapolationList.filter(c => c.extrapolationMethod.id == 3)//TES H                      
 
-var inputDataMovingAvg = [];
-var inputDataSemiAverage = [];
-var inputDataLinearRegression = [];
-var inputDataTes = [];
-        for (var m = 0; curDate1 < moment(maxStopDate).add(-1, 'months').format("YYYY-MM-DD"); m++) {
-            curDate1 = moment(minStartDate).add(m, 'months').format("YYYY-MM-DD");
-            monthArray.push(curDate1);
-           var extrapolationDataMovingAvg= consumptionExtrapolationMovingData[0].extrapolationDataList.filter(e => moment(e.month).format("YYYY-MM") == moment(curDate).format("YYYY-MM"));
-            inputDataMovingAvg.push({ "month": inputDataMovingAvg.length + 1, "actual": extrapolationDataMovingAvg.length > 0 ? Number(extrapolationDataMovingAvg[0].amount) : null, "forecast": null })            
-        }
-        this.setState({
-            actualConsumptionList: actualConsumptionList,
-            startDate: startDate,
-            stopDate: stopDate,
-            rangeValue1: rangeValue1,
-            minDate: actualMin,
-          //  maxDate: actualMax,
-            monthsForMovingAverage: monthsForMovingAverage,
-            confidenceLevelId: confidenceLevel,
-            noOfMonthsForASeason: seasonality,
-            alpha: alpha,
-            beta: beta,
-            gamma: gamma,
-            showData: true,
-            movingAvgId: movingAvgId,
-            semiAvgId: semiAvgId,
-            linearRegressionId: linearRegressionId,
-            smoothingId: smoothingId,
-            arimaId: arimaId,
-            movingAvgData:inputDataMovingAvg,
-            semiAvgData:consumptionExtrapolationFiltered,
-            linearRegressionData:consumptionExtrapolationRegression,
-            tesData:consumptionExtrapolationTESL,
-            noDataMessage: "",
-            dataChanged: true,
-            loading: false,
-            monthArray:monthArray
-        }, () => {
-            this.buildActualJxl();
-        })
-    }
-}
-}
+                // var movingAvgId = consumptionExtrapolationFiltered.length > 0 ? false : true;
+                // var semiAvgId = consumptionExtrapolationFiltered.length > 0 ? false : true;
+                // var linearRegressionId = consumptionExtrapolationFiltered.length > 0 ? false : true;
+                // var smoothingId = consumptionExtrapolationFiltered.length > 0 ? false : true;
+                // var arimaId = consumptionExtrapolationFiltered.length > 0 ? false : true;
+                var movingAvgId = false;
+                var semiAvgId = false;
+                var linearRegressionId = false;
+                var smoothingId = false;
+                var arimaId = false;
+                console.log("consumptionExtrapolationMovingData--->", consumptionExtrapolationMovingData.length)
 
-    setExtrapolatedParameters(updateRangeValue) {
-        if (this.state.planningUnitId <= 0 || this.state.planningUnitId == "") {
-            alert("Please select the Planning Unit");
-        } else {
-            if (this.state.regionId <= 0 || this.state.regionId == "") {
-                alert("Please select the Region");
-            }
-            else {
-                if ((this.state.movingAvgId && !this.state.monthsForMovingAverageValidate) ||
-                    (this.state.smoothingId && !this.state.noOfMonthsForASeasonValidate) ||
-                    (this.state.confidenceLevelId && !this.state.confidenceValidate)) {
-                    alert("Please provide the valid input");
+                if (consumptionExtrapolationMovingData.length > 0) {
+                    console.log("Inside If consumptionExtrapolationMovingData--->", consumptionExtrapolationMovingData.length)
+                    monthsForMovingAverage = consumptionExtrapolationMovingData[0].jsonProperties.months;
+                    movingAvgId = true;
                 }
-                else {
-                    if (this.state.planningUnitId > 0 && this.state.regionId > 0) {
-                        this.setState({ loading: true })
-                        var datasetJson = this.state.datasetJson;
-                        // Need to filter
-                        var actualConsumptionListForPlanningUnitAndRegion = datasetJson.actualConsumptionList.filter(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId);
-                        if (actualConsumptionListForPlanningUnitAndRegion.length > 1) {
-                            let actualMin = moment.min(actualConsumptionListForPlanningUnitAndRegion.map(d => moment(d.month)));
-                            let actualMax = moment.max(actualConsumptionListForPlanningUnitAndRegion.map(d => moment(d.month)));
-                            var rangeValue1 = "";
-                            if (updateRangeValue == 0) {
-                                rangeValue1 = this.state.rangeValue1;
-                            } else {
-                                rangeValue1 = { from: { year: new Date(actualMin).getFullYear(), month: new Date(actualMin).getMonth() + 1 }, to: { year: new Date(actualMax).getFullYear(), month: new Date(actualMax).getMonth() + 1 } }
-                            }
+                if (consumptionExtrapolationSemiAvg.length > 0) {
+                    semiAvgId = true;
+                }
+                if (consumptionExtrapolationRegression.length > 0) {
+                    linearRegressionId = true;
+                }
+                var confidenceLevel = this.state.confidenceLevelId;
+                var seasonality = this.state.noOfMonthsForASeason;
+                var alpha = this.state.alpha;
+                var beta = this.state.beta;
+                var gamma = this.state.gamma;
+                console.log("smoothingId--->", smoothingId)
 
-                            var rangeValue = rangeValue1;
-                            let startDate1 = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
-                            let stopDate1 = rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
-                            var actualConsumptionList = datasetJson.actualConsumptionList.filter(c => moment(c.month).format("YYYY-MM") >= moment(startDate1).format("YYYY-MM") && moment(c.month).format("YYYY-MM") <= moment(stopDate1).format("YYYY-MM"));
-                            console.log("actualConsumptionList--->",actualConsumptionList)
-                            var startDate = moment(datasetJson.currentVersion.forecastStartDate).format("YYYY-MM-DD");
-                            var stopDate = moment(datasetJson.currentVersion.forecastStopDate).format("YYYY-MM-DD");
-                            var consumptionExtrapolationList = datasetJson.consumptionExtrapolation;
-                            var monthsForMovingAverage;
-                            if (this.state.monthsForMovingAverageValidate) { monthsForMovingAverage = this.state.monthsForMovingAverage; }
-                            else { monthsForMovingAverage = 6 }
-                            var consumptionExtrapolationFiltered = consumptionExtrapolationList.filter(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId);
-                            var consumptionExtrapolationData = consumptionExtrapolationList.filter(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId && c.extrapolationMethod.id == 6)//Semi Averages
-                            var consumptionExtrapolationMovingData = consumptionExtrapolationList.filter(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId && c.extrapolationMethod.id == 7)//Moving averages
-                            var consumptionExtrapolationRegression = consumptionExtrapolationList.filter(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId && c.extrapolationMethod.id == 5)//Linear Regression
-                            var consumptionExtrapolationTESL = consumptionExtrapolationList.filter(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId && c.extrapolationMethod.id == 1)//TES L            
-                            var movingAvgId = this.state.movingAvgId;
-                            var semiAvgId = this.state.semiAvgId;
-                            var linearRegressionId = this.state.linearRegressionId;
-                            var smoothingId = this.state.smoothingId;
-                            var arimaId = this.state.arimaId;
+                console.log("consumptionExtrapolationTESM--->", consumptionExtrapolationTESM.length)
+                if (consumptionExtrapolationTESM.length > 0) {
+                    confidenceLevel = consumptionExtrapolationTESM[0].jsonProperties.confidenceLevel;
+                    seasonality = consumptionExtrapolationTESM[0].jsonProperties.seasonality;
+                    alpha = consumptionExtrapolationTESM[0].jsonProperties.alpha;
+                    beta = consumptionExtrapolationTESM[0].jsonProperties.beta;
+                    gamma = consumptionExtrapolationTESM[0].jsonProperties.gamma;
+                    smoothingId = true;
+                }
+                // let curDate = startDate;
 
-                            // var movingAvgId = consumptionExtrapolationFiltered.length > 0 ? false : true;
-                            // var semiAvgId = consumptionExtrapolationFiltered.length > 0 ? false : true;
-                            // var linearRegressionId = consumptionExtrapolationFiltered.length > 0 ? false : true;
-                            // var smoothingId = consumptionExtrapolationFiltered.length > 0 ? false : true;
-                            // var arimaId = consumptionExtrapolationFiltered.length > 0 ? false : true;
-
-
-                            if (movingAvgId && consumptionExtrapolationMovingData.length > 0) {
-                                monthsForMovingAverage = consumptionExtrapolationMovingData[0].jsonProperties.months;
-                            }
-
-                            // if (consumptionExtrapolationMovingData.length > 0) {
-                            //     monthsForMovingAverage = consumptionExtrapolationMovingData[0].jsonProperties.months;
-                            //     movingAvgId = true;
-                            // }
-
-                            // if (consumptionExtrapolationData.length > 0) {
-                            //     semiAvgId = true;
-                            // }
-
-                            // if (consumptionExtrapolationRegression.length > 0) {
-                            //     linearRegressionId = true;
-                            // }
-
-                            var confidenceLevel;
-                            if (this.state.confidenceValidate) {
-                                confidenceLevel = this.state.confidenceLevelId;
-                            } else {
-                                confidenceLevel = 0.95
-                            }
-                            var seasonality;
-                            if (this.state.noOfMonthsForASeasonValidate) {
-                                seasonality = this.state.noOfMonthsForASeason;
-                            } else {
-                                seasonality = 4;
-                            }
-                            var alpha = this.state.alpha;
-                            var beta = this.state.beta;
-                            var gamma = this.state.gamma;
-                            if (smoothingId && consumptionExtrapolationTESL.length > 0) {
-                                confidenceLevel = consumptionExtrapolationTESL[0].jsonProperties.confidenceLevel;
-                                seasonality = consumptionExtrapolationTESL[0].jsonProperties.seasonality;
-                                alpha = consumptionExtrapolationTESL[0].jsonProperties.alpha;
-                                beta = consumptionExtrapolationTESL[0].jsonProperties.beta;
-                                gamma = consumptionExtrapolationTESL[0].jsonProperties.gamma;
-                            }
-                            // if (consumptionExtrapolationTESL.length > 0) {
-                            //     confidenceLevel = consumptionExtrapolationTESL[0].jsonProperties.confidenceLevel;
-                            //     seasonality = consumptionExtrapolationTESL[0].jsonProperties.seasonality;
-                            //     alpha = consumptionExtrapolationTESL[0].jsonProperties.alpha;
-                            //     beta = consumptionExtrapolationTESL[0].jsonProperties.beta;
-                            //     gamma = consumptionExtrapolationTESL[0].jsonProperties.gamma;
-                            //     smoothingId = true;
-                            // }
-
-                            this.setState({
-                                actualConsumptionList: actualConsumptionList,
-                                startDate: startDate,
-                                stopDate: stopDate,
-                                rangeValue1: rangeValue1,
-                                minDate: actualMin,
-                              //  maxDate: actualMax,
-                                monthsForMovingAverage: monthsForMovingAverage,
-                                confidenceLevelId: confidenceLevel,
-                                noOfMonthsForASeason: seasonality,
-                                alpha: alpha,
-                                beta: beta,
-                                gamma: gamma,
-                                showData: true,
-                                movingAvgId: movingAvgId,
-                                semiAvgId: semiAvgId,
-                                linearRegressionId: linearRegressionId,
-                                smoothingId: smoothingId,
-                                arimaId: arimaId,
-                                noDataMessage: "",
-                                dataChanged: true,
-                                loading: false
-                            }, () => {
-                                this.buildJxl();
-                            })
+                var inputDataMovingAvg = [];
+                var inputDataSemiAverage = [];
+                var inputDataLinearRegression = [];
+                var inputDataTes = [];
+                console.log("consumptionExtrapolationMovingData", consumptionExtrapolationMovingData)
+                console.log("actualConsumptionList", actualConsumptionList)
+                for (var m = 0; moment(curDate1).format("YYYY-MM") < moment(extrapolationMax).format("YYYY-MM"); m++) {
+                    curDate1 = moment(minStartDate).add(m, 'months').format("YYYY-MM-DD");
+                    monthArray.push(curDate1);
+                    console.log("monthArray", monthArray)
+                    console.log("movingAvgId", movingAvgId)
+                    var actualForMonth = actualConsumptionListForPlanningUnitAndRegion.filter(c => moment(c.month).format("YYYY-MM") == moment(curDate1).format("YYYY-MM"))
+                    console.log("CureDate@@@@@@@@@@##############", curDate1)
+                    console.log("Actual for month@@@@@@@@@@##############", actualForMonth);
+                    console.log("Actual for month@@@@@@@@@@@@@@@@", actualConsumptionListForPlanningUnitAndRegion);
+                    if (movingAvgId) {
+                        var extrapolationDataMovingAvg = consumptionExtrapolationMovingData[0].extrapolationDataList.filter(e => moment(e.month).format("YYYY-MM") == moment(curDate1).format("YYYY-MM"));
+                        inputDataMovingAvg.push({ "month": inputDataMovingAvg.length + 1, "forecast": extrapolationDataMovingAvg.length > 0 && extrapolationDataMovingAvg[0].amount != "" ? Number(Number(extrapolationDataMovingAvg[0].amount).toFixed(2)) : null, "actual": actualForMonth.length > 0 ? Number(actualForMonth[0].amount) : null })
+                    } if (semiAvgId) {
+                        var extrapolationDataSemiAvg = consumptionExtrapolationSemiAvg[0].extrapolationDataList.filter(e => moment(e.month).format("YYYY-MM") == moment(curDate1).format("YYYY-MM"));
+                        if (moment(curDate1).format("YYYY-MM") == moment(actualMax).format("YYYY-MM") && m % 2 == 0) {
+                            inputDataSemiAverage.push({ "month": inputDataSemiAverage.length + 1, "forecast": (extrapolationDataSemiAvg.length > 0 && extrapolationDataSemiAvg[0].amount != "" ? Number(Number(extrapolationDataSemiAvg[0].amount).toFixed(2)) : null), "actual": (actualForMonth.length > 0 ? null : null) })
                         } else {
-                            this.setState({
-                                showData: false,
-                                loading: false,
-                                noDataMessage: i18n.t('static.extrapolate.noDataFound')
-                            })
+                            inputDataSemiAverage.push({ "month": inputDataSemiAverage.length + 1, "forecast": (extrapolationDataSemiAvg.length > 0 && extrapolationDataSemiAvg[0].amount != "" ? Number(Number(extrapolationDataSemiAvg[0].amount).toFixed(2)) : null), "actual": (actualForMonth.length > 0 ? Number(actualForMonth[0].amount) : null) })
                         }
-                    } else {
-                        this.setState({
-                            showData: false,
-                            loading: false,
-                            noDataMessage: ""
-                        })
+                    } if (linearRegressionId) {
+                        var extrapolationDataLinearRegression = consumptionExtrapolationRegression[0].extrapolationDataList.filter(e => moment(e.month).format("YYYY-MM") == moment(curDate1).format("YYYY-MM"));
+                        inputDataLinearRegression.push({ "month": inputDataLinearRegression.length + 1, "forecast": extrapolationDataLinearRegression.length > 0 && extrapolationDataLinearRegression[0].amount != "" ? Number(Number(extrapolationDataLinearRegression[0].amount).toFixed(2)) : null, "actual": actualForMonth.length > 0 ? Number(actualForMonth[0].amount) : null })
+                    } if (smoothingId) {
+                        var extrapolationDataInputDataTes = consumptionExtrapolationTESM[0].extrapolationDataList.filter(e => moment(e.month).format("YYYY-MM") == moment(curDate1).format("YYYY-MM"));
+                        inputDataTes.push({ "month": inputDataTes.length + 1, "forecast": extrapolationDataInputDataTes.length > 0 && extrapolationDataInputDataTes[0].amount != "" ? Number(Number(extrapolationDataInputDataTes[0].amount).toFixed(2)) : null, "actual": actualForMonth.length > 0 ? Number(actualForMonth[0].amount) : null })
                     }
                 }
+                console.log("@@@@@@@@@@##############", inputDataSemiAverage)
+                calculateError(inputDataSemiAverage, "semiAvgError", this);
+                calculateError(inputDataMovingAvg, "movingAvgError", this);
+                calculateError(inputDataLinearRegression, "linearRegressionError", this);
+                calculateError(inputDataTes, "tesError", this);
+                this.setState({
+                    actualConsumptionList: actualConsumptionList,
+                    startDate: startDate,
+                    stopDate: stopDate,
+                    rangeValue1: rangeValue1,
+                    minDate: actualMin,
+                    //  maxDate: actualMax,
+                    monthsForMovingAverage: monthsForMovingAverage,
+                    confidenceLevelId: confidenceLevel,
+                    noOfMonthsForASeason: seasonality,
+                    alpha: alpha,
+                    beta: beta,
+                    gamma: gamma,
+                    showData: true,
+                    movingAvgId: movingAvgId,
+                    semiAvgId: semiAvgId,
+                    linearRegressionId: linearRegressionId,
+                    smoothingId: smoothingId,
+                    arimaId: arimaId,
+                    movingAvgData: inputDataMovingAvg,
+                    semiAvgData: inputDataSemiAverage,
+                    linearRegressionData: inputDataLinearRegression,
+                    tesData: inputDataTes,
+                    noDataMessage: "",
+                    // dataChanged: true,
+                    loading: false,
+                    monthArray: monthArray
+                }, () => {
+                    this.getDateDifference()
+                    this.buildActualJxl();
+                })
+            } else {
+                var startDate1 = moment(Date.now()).subtract(24, 'months').startOf('month').format("YYYY-MM-DD");
+                var endDate1 = moment(Date.now()).startOf('month').format("YYYY-MM-DD")
+                // var endDate1 = moment(Date.now()).startOf('month').format("YYYY-MM-DD")
+                // var startDate = moment("2021-05-01").format("YYYY-MM-DD");
+                // var endDate = moment("2022-02-01").format("YYYY-MM-DD");
+                this.setState({
+                    rangeValue1: { from: { year: Number(moment(startDate1).startOf('month').format("YYYY")), month: Number(moment(startDate1).startOf('month').format("M")) }, to: { year: Number(moment(endDate1).startOf('month').format("YYYY")), month: Number(moment(endDate1).startOf('month').format("M")) } },
+                })
             }
         }
     }
+
+    setExtrapolatedParameters(updateRangeValue) {
+        // if (this.state.planningUnitId <= 0 || this.state.planningUnitId == "") {
+        //     alert("Please select the Planning Unit");
+        // } else {
+        //     if (this.state.regionId <= 0 || this.state.regionId == "") {
+        //         alert("Please select the Region");
+        //     }
+        //     else {
+        //         if ((this.state.movingAvgId && !this.state.monthsForMovingAverageValidate) ||
+        //             (this.state.smoothingId && !this.state.noOfMonthsForASeasonValidate) ||
+        //             (this.state.confidenceLevelId && !this.state.confidenceValidate)) {
+        //             alert("Please provide the valid input");
+        //         }
+        //         else {
+        if (this.state.planningUnitId > 0 && this.state.regionId > 0) {
+
+            console.log("Inside if parameter", this.state.loading)
+            this.setState({ loading: true })
+            console.log("after Inside if parameter", this.state.loading)
+            var datasetJson = this.state.datasetJson;
+            // Need to filter
+            var actualConsumptionListForPlanningUnitAndRegion = datasetJson.actualConsumptionList.filter(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId);
+            console.log("actualConsumptionListForPlanningUnitAndRegion---->", actualConsumptionListForPlanningUnitAndRegion)
+            if (actualConsumptionListForPlanningUnitAndRegion.length > 1) {
+                let actualMin = moment.min(actualConsumptionListForPlanningUnitAndRegion.map(d => moment(d.month)));
+                let actualMax = moment.max(actualConsumptionListForPlanningUnitAndRegion.map(d => moment(d.month)));
+                var rangeValue1 = "";
+                if (updateRangeValue == 0) {
+                    rangeValue1 = this.state.rangeValue1;
+                } else {
+                    rangeValue1 = { from: { year: new Date(actualMin).getFullYear(), month: new Date(actualMin).getMonth() + 1 }, to: { year: new Date(actualMax).getFullYear(), month: new Date(actualMax).getMonth() + 1 } }
+                }
+
+                var rangeValue = rangeValue1;
+                let startDate1 = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
+                let stopDate1 = rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
+                var actualConsumptionList = datasetJson.actualConsumptionList.filter(c => moment(c.month).format("YYYY-MM") >= moment(startDate1).format("YYYY-MM") && moment(c.month).format("YYYY-MM") <= moment(stopDate1).format("YYYY-MM"));
+                console.log("actualConsumptionList--->", actualConsumptionList)
+                var startDate = moment(datasetJson.currentVersion.forecastStartDate).format("YYYY-MM-DD");
+                var stopDate = moment(datasetJson.currentVersion.forecastStopDate).format("YYYY-MM-DD");
+                // var consumptionExtrapolationList = datasetJson.consumptionExtrapolation;
+
+                var monthsForMovingAverage = this.state.monthsForMovingAverage;
+                console.log("monthsForMovingAverage after state update---***********", this.state.monthsForMovingAverage);
+
+                // var consumptionExtrapolationFiltered = consumptionExtrapolationList.filter(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId);
+                // var consumptionExtrapolationData = consumptionExtrapolationList.filter(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId && c.extrapolationMethod.id == 6)//Semi Averages
+                // var consumptionExtrapolationMovingData = consumptionExtrapolationList.filter(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId && c.extrapolationMethod.id == 7)//Moving averages
+                // var consumptionExtrapolationRegression = consumptionExtrapolationList.filter(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId && c.extrapolationMethod.id == 5)//Linear Regression
+                // var consumptionExtrapolationTESL = consumptionExtrapolationList.filter(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId && c.extrapolationMethod.id == 1)//TES L            
+                var movingAvgId = this.state.movingAvgId;
+                var semiAvgId = this.state.semiAvgId;
+                var linearRegressionId = this.state.linearRegressionId;
+                var smoothingId = this.state.smoothingId;
+                var arimaId = this.state.arimaId;
+
+                // var movingAvgId = consumptionExtrapolationFiltered.length > 0 ? false : true;
+                // var semiAvgId = consumptionExtrapolationFiltered.length > 0 ? false : true;
+                // var linearRegressionId = consumptionExtrapolationFiltered.length > 0 ? false : true;
+                // var smoothingId = consumptionExtrapolationFiltered.length > 0 ? false : true;
+                // var arimaId = consumptionExtrapolationFiltered.length > 0 ? false : true;
+
+
+                // if (movingAvgId && consumptionExtrapolationMovingData.length > 0) {
+                //     monthsForMovingAverage = consumptionExtrapolationMovingData[0].jsonProperties.months;
+                // }
+
+                // if (consumptionExtrapolationMovingData.length > 0) {
+                //     monthsForMovingAverage = consumptionExtrapolationMovingData[0].jsonProperties.months;
+                //     movingAvgId = true;
+                // }
+
+                // if (consumptionExtrapolationData.length > 0) {
+                //     semiAvgId = true;
+                // }
+
+                // if (consumptionExtrapolationRegression.length > 0) {
+                //     linearRegressionId = true;
+                // }
+
+                var confidenceLevel = this.state.confidenceLevelId;
+                var seasonality = this.state.noOfMonthsForASeason;
+                var alpha = this.state.alpha;
+                var beta = this.state.beta;
+                var gamma = this.state.gamma;
+                // if (smoothingId && consumptionExtrapolationTESL.length > 0) {
+                //     confidenceLevel = consumptionExtrapolationTESL[0].jsonProperties.confidenceLevel;
+                //     seasonality = consumptionExtrapolationTESL[0].jsonProperties.seasonality;
+                //     alpha = consumptionExtrapolationTESL[0].jsonProperties.alpha;
+                //     beta = consumptionExtrapolationTESL[0].jsonProperties.beta;
+                //     gamma = consumptionExtrapolationTESL[0].jsonProperties.gamma;
+                // }
+                // if (consumptionExtrapolationTESL.length > 0) {
+                //     confidenceLevel = consumptionExtrapolationTESL[0].jsonProperties.confidenceLevel;
+                //     seasonality = consumptionExtrapolationTESL[0].jsonProperties.seasonality;
+                //     alpha = consumptionExtrapolationTESL[0].jsonProperties.alpha;
+                //     beta = consumptionExtrapolationTESL[0].jsonProperties.beta;
+                //     gamma = consumptionExtrapolationTESL[0].jsonProperties.gamma;
+                //     smoothingId = true;
+                // }
+
+                this.setState({
+                    actualConsumptionList: actualConsumptionList,
+                    startDate: startDate,
+                    stopDate: stopDate,
+                    // rangeValue1: rangeValue1,
+                    minDate: actualMin,
+                    //  maxDate: actualMax,
+                    monthsForMovingAverage: monthsForMovingAverage,
+                    confidenceLevelId: confidenceLevel,
+                    noOfMonthsForASeason: seasonality,
+                    alpha: alpha,
+                    beta: beta,
+                    gamma: gamma,
+                    showData: true,
+                    movingAvgId: movingAvgId,
+                    semiAvgId: semiAvgId,
+                    linearRegressionId: linearRegressionId,
+                    smoothingId: smoothingId,
+                    arimaId: arimaId,
+                    noDataMessage: "",
+                    dataChanged: true,
+                    loading: false
+                }, () => {
+                    this.buildJxl();
+                })
+            } else {
+                this.el = jexcel(document.getElementById("tableDiv"), '');
+                this.el.destroy();
+                this.setState({
+                    showData: false,
+                    dataEl: "",
+                    loading: false,
+                    noDataMessage: i18n.t('static.extrapolate.noDataFound')
+                })
+            }
+        } else {
+            this.el = jexcel(document.getElementById("tableDiv"), '');
+            this.el.destroy();
+            this.setState({
+                dataEl: "",
+                showData: false,
+                loading: false,
+                noDataMessage: ""
+            })
+        }
+    }
+    //  }
+    // }
+    // }
     toggledata = () => this.setState((currentState) => ({ show: !currentState.show }));
 
     makeText = m => {
@@ -1608,7 +1708,7 @@ var inputDataTes = [];
             var semiAvgDataFilter = this.state.semiAvgData.filter(c => moment(startMonth).add(c.month - 1, 'months').format("YYYY-MM") == moment(monthArray[j]).format("YYYY-MM"))
             var linearRegressionDataFilter = this.state.linearRegressionData.filter(c => moment(startMonth).add(c.month - 1, 'months').format("YYYY-MM") == moment(monthArray[j]).format("YYYY-MM"))
             var tesDataFilter = this.state.tesData.filter(c => moment(startMonth).add(c.month - 1, 'months').format("YYYY-MM") == moment(monthArray[j]).format("YYYY-MM"))
-            console.log("consumptionData--->",consumptionData)
+            console.log("consumptionData--->", consumptionData)
             B.push(
                 moment(monthArray[j]).format(DATE_FORMAT_CAP_WITHOUT_DATE).toString().replaceAll(',', ' ').replaceAll(' ', '%20'),
                 consumptionData.length > 0 ? consumptionData[0].amount : "")
@@ -1620,9 +1720,9 @@ var inputDataTes = [];
                 B.push(linearRegressionDataFilter[0].forecast.toFixed(2))
             }
             if (this.state.smoothingId && tesDataFilter.length > 0 && tesDataFilter[0].forecast != null) {
-                B.push((Number(tesDataFilter[0].forecast) - CI)>0?(Number(tesDataFilter[0].forecast) - CI).toFixed(2):'',
+                B.push((Number(tesDataFilter[0].forecast) - CI) > 0 ? (Number(tesDataFilter[0].forecast)) - Number(CI).toFixed(2) : '',
                     Number(tesDataFilter[0].forecast).toFixed(2),
-                    (Number(tesDataFilter[0].forecast) + CI).toFixed(2))
+                    (Number(tesDataFilter[0].forecast)) + (Number(CI)).toFixed(2))
             } if (this.state.arimaId) {
                 B.push("")
             }
@@ -1653,161 +1753,263 @@ var inputDataTes = [];
         a.click()
     }
 
+    // setAlpha(e) {
+    //     var alpha = e.target.value;
+    //     var testNumber = alpha != "" ? (/^\d{0,3}(\.\d{1,2})?$/).test(alpha) : false;
+    //     if (this.state.smoothingId && testNumber == false) {
+    //         this.setState({
+    //             alpha: alpha,
+    //             loading: false,
+    //             show:false,
+    //             showData:false
+    //         })
+    //     }
+    //     else {
+    //         this.setState({
+    //             alpha: alpha,
+    //             show:false,
+    //             showData:false,
+    //             dataChanged: true
+    //         //     dataChanged: true
+    //         // }, () => {
+    //         //     this.buildJxl();
+    //         })
+    //     }
+    // }
+
+    // setBeta(e) {
+    //     var beta = e.target.value;
+    //     var testNumber = beta != "" ? (/^\d{0,3}(\.\d{1,2})?$/).test(beta) : false;
+    //     if (this.state.smoothingId && testNumber == false) {
+    //         this.setState({
+    //             beta: beta,
+    //             loading: false,
+    //             show:false,
+    //             showData:false
+    //         })
+    //     }
+    //     else {
+    //         this.setState({
+    //             beta: beta,
+    //             show:false,
+    //             showData:false,
+    //             dataChanged: true
+    //         // }, () => {
+    //         //     this.buildJxl();
+    //         })
+    //     }
+    // }
+
+    // setGamma(e) {
+    //     var gamma = e.target.value;
+    //     var testNumber = gamma != "" ? (/^\d{0,3}(\.\d{1,2})?$/).test(gamma) : false;
+    //     if (this.state.smoothingId && testNumber == false) {
+    //         this.setState({
+    //             gamma: gamma,
+    //             loading: false,
+    //             show:false,
+    //             showData:false,
+    //             dataChanged: true
+    //         })
+    //     }
+    //     else {
+    //         this.setState({
+    //             gamma: gamma,
+    //             show:false,
+    //             showData:false,
+    //             dataChanged: true
+    //         //     dataChanged: true
+    //         // }, () => {
+    //         //     this.buildJxl();
+    //         })
+    //     }
+    // }
+
+    // setSeasonals(e) {
+    //     var seasonals = e.target.value;
+    //     var testNumber = seasonals != "" ? (/^(?:[1-9]|[1][0-9]|2[0-4])$/).test(seasonals) : false;
+    //     console.log("testNumberS", testNumber);
+    //     if (this.state.smoothingId && testNumber == false) {
+
+    //         this.setState({
+    //             noOfMonthsForASeason: seasonals,
+    //             noOfMonthsForASeasonValidate: false,
+    //             loading: false,
+    //             show:false,
+    //             showData:false
+    //         })
+    //     }
+    //     else {
+    //         this.setState({
+    //             noOfMonthsForASeason: seasonals,
+    //             noOfMonthsForASeasonValidate: true,
+    //             show:false,
+    //             showData:false,
+    //             dataChanged: true
+    //         //     dataChanged: true
+    //         // }, () => {
+    //         //     this.buildJxl()
+    //         })
+    //     }
+    // }
+
+    // setConfidenceLevelId(e) {
+    //     var confidenceLevelId = e.target.value;
+    //     var testNumber = confidenceLevelId != "" ? (/^\d{0,3}(\.\d{1,2})?$/).test(confidenceLevelId) : false;
+    //     if (this.state.smoothingId && testNumber == false) {
+    //         this.setState({
+    //             confidenceLevelId: confidenceLevelId,
+    //             confidenceValidate: false,
+    //             loading: false,
+    //             show:false,
+    //             showData:false
+    //         })
+    //     }
+    //     else {
+    //         this.setState({
+    //             confidenceLevelId: confidenceLevelId,
+    //             confidenceValidate: true,
+    //             show:false,
+    //             showData:false,
+    //             dataChanged: true
+    //         // }, () => {
+    //         //     this.buildJxl()
+    //         })
+    //     }
+    // }
+
+    setMonthsForMovingAverage(e) {
+        this.setState({
+            // loading: true
+        })
+        var monthsForMovingAverage = e.target.value;
+        this.setState({
+            monthsForMovingAverage: monthsForMovingAverage,
+            dataChanged: true
+        }, () => {
+            console.log("monthsForMovingAverage after state update---", this.state.monthsForMovingAverage);
+            // if (this.state.dataExtrapolation != "") {
+            //     if (e.target.checked) {
+            //         this.state.dataExtrapolation.showColumn(4);
+            //     } else {
+            //         this.state.dataExtrapolation.hideColumn(4);
+            //     }
+            // }
+            // this.buildJxl()
+        })
+    }
+
     setAlpha(e) {
         var alpha = e.target.value;
-        var testNumber = alpha != "" ? (/^\d{0,3}(\.\d{1,2})?$/).test(alpha) : false;
-        if (this.state.smoothingId && testNumber == false) {
-            this.setState({
-                alpha: alpha,
-                loading: false,
-                show:false,
-                showData:false
-            })
-        }
-        else {
-            this.setState({
-                alpha: alpha,
-                show:false,
-                showData:false,
-                dataChanged: true
-            //     dataChanged: true
-            // }, () => {
-            //     this.buildJxl();
-            })
-        }
+        this.setState({
+            alpha: alpha,
+            dataChanged: true
+            // dataChanged: true
+        }, () => {
+            // this.buildJxl();
+        })
     }
 
     setBeta(e) {
         var beta = e.target.value;
-        var testNumber = beta != "" ? (/^\d{0,3}(\.\d{1,2})?$/).test(beta) : false;
-        if (this.state.smoothingId && testNumber == false) {
-            this.setState({
-                beta: beta,
-                loading: false,
-                show:false,
-                showData:false
-            })
-        }
-        else {
-            this.setState({
-                beta: beta,
-                show:false,
-                showData:false,
-                dataChanged: true
-            // }, () => {
-            //     this.buildJxl();
-            })
-        }
+        this.setState({
+            beta: beta,
+            dataChanged: true
+            // dataChanged: true
+        }, () => {
+            // this.buildJxl();
+        })
     }
 
     setGamma(e) {
         var gamma = e.target.value;
-        var testNumber = gamma != "" ? (/^\d{0,3}(\.\d{1,2})?$/).test(gamma) : false;
-        if (this.state.smoothingId && testNumber == false) {
-            this.setState({
-                gamma: gamma,
-                loading: false,
-                show:false,
-                showData:false,
-                dataChanged: true
-            })
-        }
-        else {
-            this.setState({
-                gamma: gamma,
-                show:false,
-                showData:false,
-                dataChanged: true
-            //     dataChanged: true
-            // }, () => {
-            //     this.buildJxl();
-            })
-        }
-    }
-
-    setSeasonals(e) {
-        var seasonals = e.target.value;
-        var testNumber = seasonals != "" ? (/^(?:[1-9]|[1][0-9]|2[0-4])$/).test(seasonals) : false;
-        console.log("testNumberS", testNumber);
-        if (this.state.smoothingId && testNumber == false) {
-
-            this.setState({
-                noOfMonthsForASeason: seasonals,
-                noOfMonthsForASeasonValidate: false,
-                loading: false,
-                show:false,
-                showData:false
-            })
-        }
-        else {
-            this.setState({
-                noOfMonthsForASeason: seasonals,
-                noOfMonthsForASeasonValidate: true,
-                show:false,
-                showData:false,
-                dataChanged: true
-            //     dataChanged: true
-            // }, () => {
-            //     this.buildJxl()
-            })
-        }
+        this.setState({
+            gamma: gamma,
+            dataChanged: true
+            // dataChanged: true
+        }, () => {
+            // this.buildJxl();
+        })
     }
 
     setConfidenceLevelId(e) {
         var confidenceLevelId = e.target.value;
-        var testNumber = confidenceLevelId != "" ? (/^\d{0,3}(\.\d{1,2})?$/).test(confidenceLevelId) : false;
-        if (this.state.smoothingId && testNumber == false) {
-            this.setState({
-                confidenceLevelId: confidenceLevelId,
-                confidenceValidate: false,
-                loading: false,
-                show:false,
-                showData:false
-            })
-        }
-        else {
-            this.setState({
-                confidenceLevelId: confidenceLevelId,
-                confidenceValidate: true,
-                show:false,
-                showData:false,
-                dataChanged: true
-            // }, () => {
-            //     this.buildJxl()
-            })
-        }
+        this.setState({
+            confidenceLevelId: confidenceLevelId,
+            dataChanged: true
+        }, () => {
+            // this.buildJxl()
+        })
     }
 
-    setMonthsForMovingAverage(e) {
-        var monthsForMovingAverage = e.target.value;
-        var testNumber = true;
-        testNumber = (/^[\d]*$/).test(monthsForMovingAverage.replaceAll(",", ""));
-        if (this.state.movingAvgId && (monthsForMovingAverage == "" || testNumber == false)) {
-            this.setState({
-                monthsForMovingAverage: monthsForMovingAverage,
-                monthsForMovingAverageValidate: false,
-                loading: false,
-                showData:false,
-                show:false
-            })
-        } else {
-            this.setState({
-                //loading: true,
-                monthsForMovingAverage: monthsForMovingAverage,
-                monthsForMovingAverageValidate: true,
-               dataChanged: true,
-                showData:false,
-                show:false
-            // }, () => {
-            //     this.buildJxl()
-            })
-        }
+    setSeasonals(e) {
+        var seasonals = e.target.value;
+        this.setState({
+            noOfMonthsForASeason: seasonals,
+            dataChanged: true
+            // dataChanged: true
+        }, () => {
+            // this.buildJxl()
+        })
     }
+
+    setPId(e) {
+        this.setState({
+            p: e.target.value,
+            dataChanged: true
+        }, () => {
+            // this.buildJxl()
+        })
+    }
+    setDId(e) {
+        this.setState({
+            d: e.target.value,
+            dataChanged: true
+        }, () => {
+            // this.buildJxl()
+        })
+    }
+
+    setQId(e) {
+        this.setState({
+            q: e.target.value,
+            dataChanged: true
+        }, () => {
+            // this.buildJxl()
+        })
+    }
+
+
+    // setMonthsForMovingAverage(e) {
+    //     var monthsForMovingAverage = e.target.value;
+    //     var testNumber = true;
+    //     testNumber = (/^[\d]*$/).test(monthsForMovingAverage.replaceAll(",", ""));
+    //     if (this.state.movingAvgId && (monthsForMovingAverage == "" || testNumber == false)) {
+    //         this.setState({
+    //             monthsForMovingAverage: monthsForMovingAverage,
+    //             monthsForMovingAverageValidate: false,
+    //             loading: false,
+    //             showData:false,
+    //             show:false
+    //         })
+    //     } else {
+    //         this.setState({
+    //             //loading: true,
+    //             monthsForMovingAverage: monthsForMovingAverage,
+    //             monthsForMovingAverageValidate: true,
+    //            dataChanged: true,
+    //             showData:false,
+    //             show:false
+    //         // }, () => {
+    //         //     this.buildJxl()
+    //         })
+    //     }
+    // }
     setMovingAvgId(e) {
         var movingAvgId = e.target.checked;
         this.setState({
             movingAvgId: movingAvgId,
-            show:false,
+            show: false,
             dataChanged: true
         }, () => {
             this.buildActualJxl()
@@ -1837,7 +2039,7 @@ var inputDataTes = [];
         var smoothingId = e.target.checked;
         this.setState({
             smoothingId: smoothingId,
-           // show:false,
+            // show:false,
             dataChanged: true
         }, () => {
             this.buildActualJxl()
@@ -1886,7 +2088,7 @@ var inputDataTes = [];
         const monthsDiff = moment(new Date(endDate)).diff(new Date(startDate), 'months', true);
         console.log("monthsDiff-->", monthsDiff);
         this.setState({
-            monthsDiff: Math.round(monthsDiff)+1
+            monthsDiff: Math.round(monthsDiff) + 1
         });
     }
 
@@ -2232,7 +2434,7 @@ var inputDataTes = [];
                         return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
                     }
                 },
-                intersect:false
+                intersect: false
 
             },
 
@@ -2246,8 +2448,22 @@ var inputDataTes = [];
                 }
             }
         }
-
+        let json = [];
+        try {
+            json = this.state.dataEl.getJson(null, false);
+        } catch (error) {
+            json = []
+        }
+        console.log("json.map(item=>item[1])@@@@@@@@@@@@@@@", json.map(item => Number(item[1])))
         let datasets = [];
+        var count = 0;
+        json.map((item, c) => {
+            if (item[1] !== "") {
+                count = c;
+            }
+        })
+        // count = count - 1;
+        console.log("count@@@@@@@@@@@@@@", count)
         datasets.push({
             type: "line",
             pointRadius: 0,
@@ -2263,13 +2479,14 @@ var inputDataTes = [];
             pointStyle: 'line',
             pointBorderWidth: 5,
             yValueFormatString: "###,###,###,###",
-            data: this.state.consumptionData
+            data: json.map(item => item[1] !== "" ? item[1] : null)
         })
 
         let stopDate = this.state.rangeValue1.to.year + '-' + (this.state.rangeValue1.to.month) + '-' + new Date(this.state.rangeValue1.to.year, this.state.rangeValue1.to.month, 0).getDate()
         stopDate = moment(stopDate).format("YYYY-MM-DD");
         let startDate = this.state.rangeValue1.from.year + '-' + (this.state.rangeValue1.from.month) + '-01'
         startDate = moment(startDate).format("YYYY-MM-DD");
+        console.log("this.state.movingAvgData@@@@@@@@@@@@", this.state.movingAvgData);
 
         if (this.state.movingAvgId) {
             datasets.push(
@@ -2288,7 +2505,7 @@ var inputDataTes = [];
                     pointStyle: 'line',
                     pointBorderWidth: 5,
                     yValueFormatString: "###,###,###,###",
-                    data: this.state.movingAvgData.map((item, index) => (item.forecast > 0 && moment(startDate).add(item.month, 'months').format("YYYY-MM") > moment(stopDate).format("YYYY-MM") ? item.forecast.toFixed(2) : null))
+                    data: json.map((item, c) => c >= count && item[2] !== "" ? item[2] : null)
                 })
         }
         if (this.state.semiAvgId) {
@@ -2307,7 +2524,7 @@ var inputDataTes = [];
                 pointStyle: 'line',
                 pointBorderWidth: 5,
                 yValueFormatString: "###,###,###,###",
-                data: this.state.semiAvgData.map((item, index) => (item.forecast > 0 && moment(startDate).add(item.month, 'months').format("YYYY-MM") > moment(stopDate).format("YYYY-MM") ? item.forecast.toFixed(2) : null))
+                data: json.map((item, c) => c >= count && item[3] !== "" ? item[3] : null)
             })
         }
         if (this.state.linearRegressionId) {
@@ -2327,7 +2544,7 @@ var inputDataTes = [];
                     pointStyle: 'line',
                     pointBorderWidth: 5,
                     yValueFormatString: "###,###,###,###",
-                    data: this.state.linearRegressionData.map((item, index) => (item.forecast > 0 && moment(startDate).add(item.month, 'months').format("YYYY-MM") > moment(stopDate).format("YYYY-MM") ? item.forecast.toFixed(2) : null))
+                    data: json.map((item, c) => c >= count && item[4] !== "" ? item[4] : null)
                 })
         }
         if (this.state.smoothingId) {
@@ -2348,7 +2565,7 @@ var inputDataTes = [];
                 pointStyle: 'line',
                 pointBorderWidth: 5,
                 yValueFormatString: "###,###,###,###",
-                data: this.state.tesData.map((item, index) => (item.forecast > 0 && moment(startDate).add(item.month, 'months').format("YYYY-MM") > moment(stopDate).format("YYYY-MM") ? (item.forecast - this.state.CI)?(item.forecast - this.state.CI).toFixed(2) :0: null))
+                data: json.map((item, c) => c >= count && item[5] !== "" ? item[5] : null)
             })
         }
         if (this.state.smoothingId) {
@@ -2367,7 +2584,7 @@ var inputDataTes = [];
                 pointStyle: 'line',
                 pointBorderWidth: 5,
                 yValueFormatString: "###,###,###,###",
-                data: this.state.tesData.map((item, index) => (item.forecast > 0 && moment(startDate).add(item.month, 'months').format("YYYY-MM") > moment(stopDate).format("YYYY-MM") ? item.forecast.toFixed(2) : null))
+                data: json.map((item, c) => c >= count && item[6] !== "" ? item[6] : null)
             })
         }
         if (this.state.smoothingId) {
@@ -2388,7 +2605,7 @@ var inputDataTes = [];
                 pointStyle: 'line',
                 pointBorderWidth: 5,
                 yValueFormatString: "###,###,###,###",
-                data: this.state.tesData.map((item, index) => (item.forecast > 0 && moment(startDate).add(item.month, 'months').format("YYYY-MM") > moment(stopDate).format("YYYY-MM") ? (item.forecast + this.state.CI).toFixed(2) : null))
+                data: json.map((item, c) => c >= count && item[7] !== "" ? item[7] : null)
             })
         }
         if (this.state.arimaId) {
@@ -2407,13 +2624,13 @@ var inputDataTes = [];
                 pointStyle: 'line',
                 pointBorderWidth: 5,
                 yValueFormatString: "###,###,###,###",
-                data: this.state.dataList.map((item, index) => (item.arimaForecast > 0 ? item.arimaForecast : null))
+                data: []
             })
         }
         let line = {};
         if (this.state.showData) {
             line = {
-                labels: this.state.monthArray.map(c => moment(c).format("MMM-YYYY")),
+                labels: json.map(c => moment(c[0]).format("MMM-YYYY")),
                 datasets: datasets
             }
         }
@@ -2425,6 +2642,8 @@ var inputDataTes = [];
                     when={this.state.dataChanged}
                     message={i18n.t("static.dataentry.confirmmsg")}
                 />
+                <h5 className={"green"} id="div2">{this.state.message}</h5>
+
                 <Card>
 
                     <div className="card-header-actions">
@@ -2549,7 +2768,7 @@ var inputDataTes = [];
                                         </h5>
                                     </FormGroup>
                                     <FormGroup className="col-md-4">
-                                        <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.dateRangeForHistoricData') + "    "}<i>(Forecast: {makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)})</i> </Label>
+                                        <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.dateRangeForHistoricData') + "    "}<i>(Forecast: {this.state.planningUnitId > 0 && makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)})</i> </Label>
                                         <div className="controls edit">
                                             <Picker
                                                 years={{ min: this.state.minDate, max: this.state.maxDate }}
@@ -2571,204 +2790,219 @@ var inputDataTes = [];
                                     </div>
 
                                 </div>
-                                <Formik
-                                    enableReinitialize={true}
-                                    initialValues={{
-                                        noOfMonthsId: this.state.monthsForMovingAverage,
-                                        confidenceLevelId: this.state.confidenceLevelId,
-                                        seasonalityId: this.state.noOfMonthsForASeason,
-                                        gammaId: this.state.gamma,
-                                        betaId: this.state.beta,
-                                        alphaId: this.state.alpha,
-                                        pId: this.state.p,
-                                        dId: this.state.d,
-                                        qId: this.state.q
-                                        // treeName: this.state.curTreeObj.label.label_en,
-                                        // regionArray: this.state.regionList,
-                                        // regionId: this.state.regionValues,
-                                    }}
-                                    validate={validateExtrapolation(validationSchemaExtrapolation)}
-                                    onSubmit={(values, { setSubmitting, setErrors }) => { }}
-                                    render={
-                                        ({
-                                            values,
-                                            errors,
-                                            touched,
-                                            handleChange,
-                                            handleBlur,
-                                            handleSubmit,
-                                            isSubmitting,
-                                            isValid,
-                                            setTouched,
-                                            handleReset,
-                                            setFieldValue,
-                                            setFieldTouched
-                                        }) => (
-                                            <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='userForm' autocomplete="off">
+                            </div>
+                        </Form>
+                        <Formik
+                            enableReinitialize={true}
+                            initialValues={{
+                                noOfMonthsId: this.state.monthsForMovingAverage,
+                                confidenceLevelId: this.state.confidenceLevelId,
+                                seasonalityId: this.state.noOfMonthsForASeason,
+                                gammaId: this.state.gamma,
+                                betaId: this.state.beta,
+                                alphaId: this.state.alpha,
+                                pId: this.state.p,
+                                dId: this.state.d,
+                                qId: this.state.q
+                            }}
+                            validate={validateExtrapolation(validationSchemaExtrapolation)}
+                            onSubmit={(values, { setSubmitting, setErrors }) => {
+                                var flag = this.state.buttonFalg;
+                                console.log("BUTTON^^^^^^^^^", flag)
+                                if (flag) {
+                                    this.saveForecastConsumptionExtrapolation();
+                                    console.log("BUTTON^^^^^^^^^save");
+                                } else {
+                                    this.setExtrapolatedParameters();
+                                    console.log("BUTTON^^^^^^^^^Extrapolate");
+                                }
+                            }}
+                            render={
+                                ({
+                                    values,
+                                    errors,
+                                    touched,
+                                    handleChange,
+                                    handleBlur,
+                                    handleSubmit,
+                                    isSubmitting,
+                                    isValid,
+                                    setTouched,
+                                    handleReset,
+                                    setFieldValue,
+                                    setFieldTouched,
+                                    setFieldError
+                                }) => (
+                                    <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='userForm' autocomplete="off">
 
-                                                <div className="col-md-12 pl-lg-0">
-                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.selectExtrapolationMethod')}</Label>
-                                                </div>
-                                                <div className="col-md-12 pl-lg-1">
-                                                    <FormGroup className="">
-                                                        <div className="check inline  pl-lg-3 pt-lg-3">
-                                                            <div>
-                                                                <Popover placement="top" isOpen={this.state.popoverOpenMa} target="Popover1" trigger="hover" toggle={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)}>
-                                                                    <PopoverBody>{i18n.t('static.tooltip.MovingAverages')}</PopoverBody>
-                                                                </Popover>
-                                                            </div>
-                                                            <div>
-                                                                <Input
-                                                                    className="form-check-input"
-                                                                    type="checkbox"
-                                                                    id="movingAvgId"
-                                                                    name="movingAvgId"
-                                                                    checked={this.state.movingAvgId}
-                                                                    onClick={(e) => { this.setMovingAvgId(e); }}
-                                                                />
-                                                                <Label
-                                                                    className="form-check-label"
-                                                                    check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                                                                    <b>{i18n.t('static.extrapolation.movingAverages')}</b>
-                                                                    <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
-                                                                </Label>
-                                                            </div>
-                                                            <div className="col-md-2 pt-lg-2" style={{ display: this.state.movingAvgId ? '' : 'none' }}>
-                                                                <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.noOfMonths')}</Label>
-                                                                <Input
-                                                                    className="controls"
-                                                                    type="number"
-                                                                    id="noOfMonthsId"
-                                                                    bsSize="sm"
-                                                                    name="noOfMonthsId"
-                                                                    value={this.state.monthsForMovingAverage}
-                                                                    valid={!errors.noOfMonthsId && this.state.monthsForMovingAverage != null ? this.state.monthsForMovingAverage : '' != ''}
-                                                                    invalid={touched.noOfMonthsId && !!errors.noOfMonthsId}
-                                                                    onBlur={handleBlur}
-                                                                    onChange={(e) => { handleChange(e); this.setMonthsForMovingAverage(e) }}
-                                                                />
-                                                                <FormFeedback>{errors.noOfMonthsId}</FormFeedback>
-                                                            </div>
+                                        <div className="col-md-12 pl-lg-0">
+                                            <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.selectExtrapolationMethod')}</Label>
+                                        </div>
+                                        <div className="col-md-12 pl-lg-1">
+                                            <FormGroup className="">
+                                                <div className="check inline  pl-lg-3 pt-lg-3">
+                                                    <div>
+                                                        <Popover placement="top" isOpen={this.state.popoverOpenMa} target="Popover1" trigger="hover" toggle={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)}>
+                                                            <PopoverBody>{i18n.t('static.tooltip.MovingAverages')}</PopoverBody>
+                                                        </Popover>
+                                                    </div>
+                                                    <div>
+                                                        <Input
+                                                            className="form-check-input"
+                                                            type="checkbox"
+                                                            id="movingAvgId"
+                                                            name="movingAvgId"
+                                                            checked={this.state.movingAvgId}
+                                                            value={this.state.movingAvgId}
+                                                            onClick={(e) => { this.setMovingAvgId(e); }}
+                                                        />
+                                                        <Label
+                                                            className="form-check-label"
+                                                            check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                            <b>{i18n.t('static.extrapolation.movingAverages')}</b>
+                                                            <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
+                                                        </Label>
+                                                    </div>
+                                                    <div className="col-md-2 pt-lg-2" style={{ display: this.state.movingAvgId ? '' : 'none' }}>
+                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.noOfMonths')}</Label>
+                                                        <Input
+                                                            className="controls"
+                                                            type="number"
+                                                            bsSize="sm"
+                                                            id="noOfMonthsId"
+                                                            name="noOfMonthsId"
+                                                            step={1}
+                                                            value={this.state.monthsForMovingAverage}
+                                                            valid={!errors.noOfMonthsId && this.state.monthsForMovingAverage != null ? this.state.monthsForMovingAverage : '' != ''}
+                                                            invalid={touched.noOfMonthsId && !!errors.noOfMonthsId}
+                                                            onBlur={handleBlur}
+                                                            onChange={(e) => { handleChange(e); this.setMonthsForMovingAverage(e) }}
+                                                        />
+                                                        <FormFeedback>{errors.noOfMonthsId}</FormFeedback>
+                                                    </div>
 
-                                                            <div>
-                                                                <Popover placement="top" isOpen={this.state.popoverOpenSa} target="Popover2" trigger="hover" toggle={() => this.toggle('popoverOpenSa', !this.state.popoverOpenSa)}>
-                                                                    <PopoverBody>{i18n.t('static.tooltip.SemiAverages')}</PopoverBody>
-                                                                </Popover>
-                                                            </div>
-                                                            <div className="pt-lg-2">
-                                                                <Input
-                                                                    className="form-check-input"
-                                                                    type="checkbox"
-                                                                    id="semiAvgId"
-                                                                    name="semiAvgId"
-                                                                    checked={this.state.semiAvgId}
-                                                                    onClick={(e) => { this.setSemiAvgId(e); }}
-                                                                />
-                                                                <Label
-                                                                    className="form-check-label"
-                                                                    check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                                                                    <b>{i18n.t('static.extrapolation.semiAverages')}</b>
-                                                                    <i class="fa fa-info-circle icons pl-lg-2" id="Popover2" onClick={() => this.toggle('popoverOpenSa', !this.state.popoverOpenSa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
-                                                                </Label>
-                                                            </div>
-                                                            <div>
-                                                                <Popover placement="top" isOpen={this.state.popoverOpenLr} target="Popover3" trigger="hover" toggle={() => this.toggle('popoverOpenLr', !this.state.popoverOpenLr)}>
-                                                                    <PopoverBody>{i18n.t('static.tooltip.LinearRegression')}</PopoverBody>
-                                                                </Popover>
-                                                            </div>
-                                                            <div className="pt-lg-2">
-                                                                <Input
-                                                                    className="form-check-input"
-                                                                    type="checkbox"
-                                                                    id="linearRegressionId"
-                                                                    name="linearRegressionId"
-                                                                    checked={this.state.linearRegressionId}
-                                                                    onClick={(e) => { this.setLinearRegressionId(e); }}
-                                                                />
-                                                                <Label
-                                                                    className="form-check-label"
-                                                                    check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                                                                    <b>{i18n.t('static.extrapolation.linearRegression')}</b>
-                                                                    <i class="fa fa-info-circle icons pl-lg-2" id="Popover3" onClick={() => this.toggle('popoverOpenLr', !this.state.popoverOpenLr)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
-                                                                </Label>
-                                                            </div>
-                                                            <div>
-                                                                <Popover placement="top" isOpen={this.state.popoverOpenTes} target="Popover4" trigger="hover" toggle={() => this.toggle('popoverOpenTes', !this.state.popoverOpenTes)}>
-                                                                    <PopoverBody>{i18n.t('static.tooltip.Tes')}</PopoverBody>
-                                                                </Popover>
-                                                            </div>
-                                                            <div className="pt-lg-2">
-                                                                <Input
-                                                                    className="form-check-input"
-                                                                    type="checkbox"
-                                                                    id="smoothingId"
-                                                                    name="smoothingId"
-                                                                    checked={this.state.smoothingId}
-                                                                    onClick={(e) => { this.setSmoothingId(e); }}
-                                                                />
-                                                                <Label
-                                                                    className="form-check-label"
-                                                                    check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                                                                    <b>{i18n.t('static.extrapolation.tripleExponential')}</b>
-                                                                    <i class="fa fa-info-circle icons pl-lg-2" id="Popover4" onClick={() => this.toggle('popoverOpenTes', !this.state.popoverOpenTes)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
-                                                                </Label>
-                                                            </div>
+                                                    <div>
+                                                        <Popover placement="top" isOpen={this.state.popoverOpenSa} target="Popover2" trigger="hover" toggle={() => this.toggle('popoverOpenSa', !this.state.popoverOpenSa)}>
+                                                            <PopoverBody>{i18n.t('static.tooltip.SemiAverages')}</PopoverBody>
+                                                        </Popover>
+                                                    </div>
+                                                    <div className="pt-lg-2">
+                                                        <Input
+                                                            className="form-check-input"
+                                                            type="checkbox"
+                                                            id="semiAvgId"
+                                                            name="semiAvgId"
+                                                            checked={this.state.semiAvgId}
+                                                            onClick={(e) => { this.setSemiAvgId(e); }}
+                                                        />
+                                                        <Label
+                                                            className="form-check-label"
+                                                            check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                            <b>{i18n.t('static.extrapolation.semiAverages')}</b>
+                                                            <i class="fa fa-info-circle icons pl-lg-2" id="Popover2" onClick={() => this.toggle('popoverOpenSa', !this.state.popoverOpenSa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
+                                                        </Label>
+                                                    </div>
+                                                    <div>
+                                                        <Popover placement="top" isOpen={this.state.popoverOpenLr} target="Popover3" trigger="hover" toggle={() => this.toggle('popoverOpenLr', !this.state.popoverOpenLr)}>
+                                                            <PopoverBody>{i18n.t('static.tooltip.LinearRegression')}</PopoverBody>
+                                                        </Popover>
+                                                    </div>
+                                                    <div className="pt-lg-2">
+                                                        <Input
+                                                            className="form-check-input"
+                                                            type="checkbox"
+                                                            id="linearRegressionId"
+                                                            name="linearRegressionId"
+                                                            checked={this.state.linearRegressionId}
+                                                            onClick={(e) => { this.setLinearRegressionId(e); }}
+                                                        />
+                                                        <Label
+                                                            className="form-check-label"
+                                                            check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                            <b>{i18n.t('static.extrapolation.linearRegression')}</b>
+                                                            <i class="fa fa-info-circle icons pl-lg-2" id="Popover3" onClick={() => this.toggle('popoverOpenLr', !this.state.popoverOpenLr)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
+                                                        </Label>
+                                                    </div>
+                                                    <div>
+                                                        <Popover placement="top" isOpen={this.state.popoverOpenTes} target="Popover4" trigger="hover" toggle={() => this.toggle('popoverOpenTes', !this.state.popoverOpenTes)}>
+                                                            <PopoverBody>{i18n.t('static.tooltip.Tes')}</PopoverBody>
+                                                        </Popover>
+                                                    </div>
+                                                    <div className="pt-lg-2">
+                                                        <Input
+                                                            className="form-check-input"
+                                                            type="checkbox"
+                                                            id="smoothingId"
+                                                            name="smoothingId"
+                                                            checked={this.state.smoothingId}
+                                                            onClick={(e) => { this.setSmoothingId(e); }}
+                                                        />
+                                                        <Label
+                                                            className="form-check-label"
+                                                            check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                            <b>{i18n.t('static.extrapolation.tripleExponential')}</b>
+                                                            <i class="fa fa-info-circle icons pl-lg-2" id="Popover4" onClick={() => this.toggle('popoverOpenTes', !this.state.popoverOpenTes)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
+                                                        </Label>
+                                                    </div>
 
-                                                            <div className="row col-md-12 pt-lg-2" style={{ display: this.state.smoothingId ? '' : 'none' }}>
-                                                                <div>
-                                                                    <Popover placement="top" isOpen={this.state.popoverOpenConfidence} target="Popover6" trigger="hover" toggle={() => this.toggle('popoverOpenConfidence', !this.state.popoverOpenConfidence)}>
-                                                                        <PopoverBody>{i18n.t('static.tooltip.confidenceLevel')}</PopoverBody>
-                                                                    </Popover>
-                                                                </div>
-                                                                <div className="col-md-2">
-                                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.confidenceLevel')}
-                                                                        <i class="fa fa-info-circle icons pl-lg-2" id="Popover6" onClick={() => this.toggle('popoverOpenConfidence', !this.state.popoverOpenConfidence)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
-                                                                    </Label>
-                                                                    <Input
-                                                                        type="select"
-                                                                        id="confidenceLevelId"
-                                                                        name="confidenceLevelId"
-                                                                        bsSize="sm"
-                                                                        value={this.state.confidenceLevelId}
-                                                                        valid={!errors.confidenceLevelId && this.state.confidenceLevelId != null ? this.state.confidenceLevelId : '' != ''}
-                                                                        invalid={touched.confidenceLevelId && !!errors.confidenceLevelId}
-                                                                        onBlur={handleBlur}
-                                                                        onChange={(e) => { this.setConfidenceLevelId(e); }}
-                                                                    >
-                                                                        <option value="0.85">85%</option>
-                                                                        <option value="0.90">90%</option>
-                                                                        <option value="0.95">95%</option>
-                                                                        <option value="0.99">99%</option>
-                                                                        <option value="0.995">99.5%</option>
-                                                                        <option value="0.999">99.9%</option>
-                                                                    </Input>
-                                                                    <FormFeedback>{errors.confidenceLevelId}</FormFeedback>
-                                                                </div>
-                                                                <div>
-                                                                    <Popover placement="top" isOpen={this.state.popoverOpenSeaonality} target="Popover7" trigger="hover" toggle={() => this.toggle('popoverOpenSeaonality', !this.state.popoverOpenSeaonality)}>
-                                                                        <PopoverBody>{i18n.t('static.tooltip.seasonality')}</PopoverBody>
-                                                                    </Popover>
-                                                                </div>
-                                                                <div className="col-md-2">
-                                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.seasonality')}
-                                                                        <i class="fa fa-info-circle icons pl-lg-2" id="Popover7" onClick={() => this.toggle('popoverOpenSeaonality', !this.state.popoverOpenSeaonality)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
-                                                                    </Label>
-
-                                                                    <Input
-                                                                        className="controls"
-                                                                        type="number"
-                                                                        bsSize="sm"
-                                                                        id="seasonalityId"
-                                                                        name="seasonalityId"
-                                                                        value={this.state.noOfMonthsForASeason}
-                                                                        valid={!errors.seasonalityId && this.state.noOfMonthsForASeason != null ? this.state.noOfMonthsForASeason : '' != ''}
-                                                                        invalid={touched.seasonalityId && !!errors.seasonalityId}
-                                                                        onBlur={handleBlur}
-                                                                        onChange={(e) => { this.setSeasonals(e); }}
-                                                                    />
-                                                                    <FormFeedback>{errors.seasonalityId}</FormFeedback>
-                                                                </div>
-                                                                {/* <div className="col-md-3">
+                                                    <div className="row col-md-12 pt-lg-2" style={{ display: this.state.smoothingId ? '' : 'none' }}>
+                                                        <div>
+                                                            <Popover placement="top" isOpen={this.state.popoverOpenConfidence} target="Popover6" trigger="hover" toggle={() => this.toggle('popoverOpenConfidence', !this.state.popoverOpenConfidence)}>
+                                                                <PopoverBody>{i18n.t('static.tooltip.confidenceLevel')}</PopoverBody>
+                                                            </Popover>
+                                                        </div>
+                                                        <div className="col-md-2">
+                                                            <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.confidenceLevel')}
+                                                                <i class="fa fa-info-circle icons pl-lg-2" id="Popover6" onClick={() => this.toggle('popoverOpenConfidence', !this.state.popoverOpenConfidence)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
+                                                            </Label>
+                                                            <Input
+                                                                className="controls"
+                                                                type="select"
+                                                                bsSize="sm"
+                                                                id="confidenceLevelId"
+                                                                name="confidenceLevelId"
+                                                                value={this.state.confidenceLevelId}
+                                                                valid={!errors.confidenceLevelId && this.state.confidenceLevelId != null ? this.state.confidenceLevelId : '' != ''}
+                                                                invalid={touched.confidenceLevelId && !!errors.confidenceLevelId}
+                                                                onBlur={handleBlur}
+                                                                onChange={(e) => { handleChange(e); this.setConfidenceLevelId(e) }}
+                                                            >
+                                                                <option value="0.85">85%</option>
+                                                                <option value="0.90">90%</option>
+                                                                <option value="0.95">95%</option>
+                                                                <option value="0.99">99%</option>
+                                                                <option value="0.995">99.5%</option>
+                                                                <option value="0.999">99.9%</option>
+                                                            </Input>
+                                                            <FormFeedback>{errors.confidenceLevelId}</FormFeedback>
+                                                        </div>
+                                                        <div>
+                                                            <Popover placement="top" isOpen={this.state.popoverOpenSeaonality} target="Popover7" trigger="hover" toggle={() => this.toggle('popoverOpenSeaonality', !this.state.popoverOpenSeaonality)}>
+                                                                <PopoverBody>{i18n.t('static.tooltip.seasonality')}</PopoverBody>
+                                                            </Popover>
+                                                        </div>
+                                                        <div className="col-md-2">
+                                                            <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.seasonality')}
+                                                                <i class="fa fa-info-circle icons pl-lg-2" id="Popover7" onClick={() => this.toggle('popoverOpenSeaonality', !this.state.popoverOpenSeaonality)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
+                                                            </Label>
+                                                            <Input
+                                                                className="controls"
+                                                                type="number"
+                                                                bsSize="sm"
+                                                                id="seasonalityId"
+                                                                name="seasonalityId"
+                                                                min={1}
+                                                                max={24}
+                                                                step={1}
+                                                                value={this.state.noOfMonthsForASeason}
+                                                                valid={!errors.seasonalityId && this.state.noOfMonthsForASeason != null ? this.state.noOfMonthsForASeason : '' != ''}
+                                                                invalid={touched.seasonalityId && !!errors.seasonalityId}
+                                                                onBlur={handleBlur}
+                                                                onChange={(e) => { handleChange(e); this.setSeasonals(e) }}
+                                                            />
+                                                            <FormFeedback>{errors.seasonalityId}</FormFeedback>
+                                                        </div>
+                                                        {/* <div className="col-md-3">
                                                         <Input
                                                             className="form-check-input"
                                                             type="checkbox"
@@ -2783,81 +3017,87 @@ var inputDataTes = [];
                                                             Show Advance
                                                         </Label>
                                                     </div> */}
-                                                                <div>
-                                                                    <Popover placement="top" isOpen={this.state.popoverOpenAlpha} target="Popover8" trigger="hover" toggle={() => this.toggle('popoverOpenAlpha', !this.state.popoverOpenAlpha)}>
-                                                                        <PopoverBody>{i18n.t('static.tooltip.alpha')}</PopoverBody>
-                                                                    </Popover>
-                                                                </div>
-                                                                <div className="col-md-2">
-                                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.alpha')}
-                                                                        <i class="fa fa-info-circle icons pl-lg-2" id="Popover8" onClick={() => this.toggle('popoverOpenAlpha', !this.state.popoverOpenAlpha)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
-                                                                    </Label>
-                                                                    <Input
-                                                                        className="controls"
-                                                                        type="number"
-                                                                        id="alphaId"
-                                                                        name="alphaId"
-                                                                        bsSize="sm"
-                                                                        value={this.state.alpha}
-                                                                        valid={!errors.alphaId && this.state.alpha != null ? this.state.alpha : '' != ''}
-                                                                        invalid={touched.alphaId && !!errors.alphaId}
-                                                                        onBlur={handleBlur}
-                                                                        onChange={(e) => { this.setAlpha(e); }}
-                                                                    />
-                                                                    <FormFeedback>{errors.alphaId}</FormFeedback>
-                                                                </div>
-                                                                <div>
-                                                                    <Popover placement="top" isOpen={this.state.popoverOpenBeta} target="Popover9" trigger="hover" toggle={() => this.toggle('popoverOpenBeta', !this.state.popoverOpenBeta)}>
-                                                                        <PopoverBody>{i18n.t('static.tooltip.beta')}</PopoverBody>
-                                                                    </Popover>
-                                                                </div>
+                                                        <div>
+                                                            <Popover placement="top" isOpen={this.state.popoverOpenAlpha} target="Popover8" trigger="hover" toggle={() => this.toggle('popoverOpenAlpha', !this.state.popoverOpenAlpha)}>
+                                                                <PopoverBody>{i18n.t('static.tooltip.alpha')}</PopoverBody>
+                                                            </Popover>
+                                                        </div>
+                                                        <div className="col-md-2">
+                                                            <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.alpha')}
+                                                                <i class="fa fa-info-circle icons pl-lg-2" id="Popover8" onClick={() => this.toggle('popoverOpenAlpha', !this.state.popoverOpenAlpha)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
+                                                            </Label>
+                                                            <Input
+                                                                className="controls"
+                                                                type="number"
+                                                                id="alphaId"
+                                                                bsSize="sm"
+                                                                name="alphaId"
+                                                                min={0}
+                                                                max={1}
+                                                                step={0.1}
+                                                                value={this.state.alpha}
+                                                                valid={!errors.alphaId && this.state.alpha != null ? this.state.alpha : '' != ''}
+                                                                invalid={touched.alphaId && !!errors.alphaId}
+                                                                onBlur={handleBlur}
+                                                                onChange={(e) => { handleChange(e); this.setAlpha(e) }}
+                                                            />
+                                                            <FormFeedback>{errors.alphaId}</FormFeedback>
+                                                        </div>
+                                                        <div>
+                                                            <Popover placement="top" isOpen={this.state.popoverOpenBeta} target="Popover9" trigger="hover" toggle={() => this.toggle('popoverOpenBeta', !this.state.popoverOpenBeta)}>
+                                                                <PopoverBody>{i18n.t('static.tooltip.beta')}</PopoverBody>
+                                                            </Popover>
+                                                        </div>
 
-                                                                <div className="col-md-2">
-                                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.beta')}
-                                                                        <i class="fa fa-info-circle icons pl-lg-2" id="Popover9" onClick={() => this.toggle('popoverOpenBeta', !this.state.popoverOpenBeta)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
-                                                                    </Label>
-                                                                    <Input
-                                                                        className="controls"
-                                                                        type="number"
-                                                                        id="betaId"
-                                                                        bsSize="sm"
-                                                                        name="betaId"
-                                                                        value={this.state.beta}
-                                                                        valid={!errors.betaId && this.state.beta != null ? this.state.beta : '' != ''}
-                                                                        invalid={touched.betaId && !!errors.betaId}
-                                                                        onBlur={handleBlur}
-                                                                        onChange={(e) => { this.setBeta(e); }}
-                                                                    />
-                                                                    <FormFeedback>{errors.betaId}</FormFeedback>
-                                                                </div>
+                                                        <div className="col-md-2">
+                                                            <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.beta')}
+                                                                <i class="fa fa-info-circle icons pl-lg-2" id="Popover9" onClick={() => this.toggle('popoverOpenBeta', !this.state.popoverOpenBeta)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
+                                                            </Label>
+                                                            <Input
+                                                                className="controls"
+                                                                type="number"
+                                                                id="betaId"
+                                                                bsSize="sm"
+                                                                name="betaId"
+                                                                min={0}
+                                                                max={1}
+                                                                step={0.1}
+                                                                value={this.state.beta}
+                                                                valid={!errors.betaId && this.state.beta != null ? this.state.beta : '' != ''}
+                                                                invalid={touched.betaId && !!errors.betaId}
+                                                                onBlur={handleBlur}
+                                                                onChange={(e) => { handleChange(e); this.setBeta(e) }}
+                                                            />
+                                                            <FormFeedback>{errors.betaId}</FormFeedback>
+                                                        </div>
 
-                                                                <div>
-                                                                    <Popover placement="top" isOpen={this.state.popoverOpenGamma} target="Popover10" trigger="hover" toggle={() => this.toggle('popoverOpenGamma', !this.state.popoverOpenGamma)}>
-                                                                        <PopoverBody>{i18n.t('static.tooltip.gamma')}</PopoverBody>
-                                                                    </Popover>
-                                                                </div>
-                                                                <div className="col-md-2">
-                                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.gamma')}
-                                                                        <i class="fa fa-info-circle icons pl-lg-2" id="Popover10" onClick={() => this.toggle('popoverOpenGamma', !this.state.popoverOpenGamma)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
-                                                                    </Label>
-                                                                    <Input
-                                                                        className="controls"
-                                                                        type="number"
-                                                                        id="gammaId"
-                                                                        bsSize="sm"
-                                                                        name="gammaId"
-                                                                        min={0}
-                                                                        max={1}
-                                                                        step={0.1}
-                                                                        value={this.state.gamma}
-                                                                        valid={!errors.gammaId && this.state.gamma != null ? this.state.gamma : '' != ''}
-                                                                        invalid={touched.gammaId && !!errors.gammaId}
-                                                                        onBlur={handleBlur}
-                                                                        onChange={(e) => { this.setGamma(e); }}
-                                                                    />
-                                                                    <FormFeedback>{errors.gammaId}</FormFeedback>
-                                                                </div>
-                                                                {/* <div className="col-md-2">
+                                                        <div>
+                                                            <Popover placement="top" isOpen={this.state.popoverOpenGamma} target="Popover10" trigger="hover" toggle={() => this.toggle('popoverOpenGamma', !this.state.popoverOpenGamma)}>
+                                                                <PopoverBody>{i18n.t('static.tooltip.gamma')}</PopoverBody>
+                                                            </Popover>
+                                                        </div>
+                                                        <div className="col-md-2">
+                                                            <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.gamma')}
+                                                                <i class="fa fa-info-circle icons pl-lg-2" id="Popover10" onClick={() => this.toggle('popoverOpenGamma', !this.state.popoverOpenGamma)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
+                                                            </Label>
+                                                            <Input
+                                                                className="controls"
+                                                                type="number"
+                                                                bsSize="sm"
+                                                                id="gammaId"
+                                                                name="gammaId"
+                                                                min={0}
+                                                                max={1}
+                                                                step={0.1}
+                                                                value={this.state.gamma}
+                                                                valid={!errors.gammaId && this.state.gamma != null ? this.state.gamma : '' != ''}
+                                                                invalid={touched.gammaId && !!errors.gammaId}
+                                                                onBlur={handleBlur}
+                                                                onChange={(e) => { handleChange(e); this.setGamma(e) }}
+                                                            />
+                                                            <FormFeedback>{errors.gammaId}</FormFeedback>
+                                                        </div>
+                                                        {/* <div className="col-md-2">
                                                         <Label htmlFor="appendedInputButton">Phi</Label>
                                                         <Input
                                                             className="controls"
@@ -2866,250 +3106,272 @@ var inputDataTes = [];
                                                             name="phiId"
                                                         />
                                                     </div> */}
-                                                            </div>
+                                                    </div>
 
-                                                            <div>
-                                                                <Popover placement="top" isOpen={this.state.popoverOpenArima} target="Popover5" trigger="hover" toggle={() => this.toggle('popoverOpenArima', !this.state.popoverOpenArima)}>
-                                                                    <PopoverBody>{i18n.t('static.tooltip.arima')}</PopoverBody>
-                                                                </Popover>
-                                                            </div>
-                                                            <div className="pt-lg-2">
-                                                                <Input
-                                                                    className="form-check-input"
-                                                                    type="checkbox"
-                                                                    id="arimaId"
-                                                                    name="arimaId"
-                                                                    checked={this.state.arimaId}
-                                                                    onClick={(e) => { this.setArimaId(e); }}
-                                                                />
-                                                                <Label
-                                                                    className="form-check-label"
-                                                                    check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                                                                    <b>{i18n.t('static.extrapolation.arimaFull')}</b>
-                                                                    <i class="fa fa-info-circle icons pl-lg-2" id="Popover5" onClick={() => this.toggle('popoverOpenArima', !this.state.popoverOpenArima)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
-                                                                </Label>
-                                                            </div>
+                                                    <div>
+                                                        <Popover placement="top" isOpen={this.state.popoverOpenArima} target="Popover5" trigger="hover" toggle={() => this.toggle('popoverOpenArima', !this.state.popoverOpenArima)}>
+                                                            <PopoverBody>{i18n.t('static.tooltip.arima')}</PopoverBody>
+                                                        </Popover>
+                                                    </div>
+                                                    <div className="pt-lg-2">
+                                                        <Input
+                                                            className="form-check-input"
+                                                            type="checkbox"
+                                                            id="arimaId"
+                                                            name="arimaId"
+                                                            checked={this.state.arimaId}
+                                                            onClick={(e) => { this.setArimaId(e); }}
+                                                        />
+                                                        <Label
+                                                            className="form-check-label"
+                                                            check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                            <b>{i18n.t('static.extrapolation.arimaFull')}</b>
+                                                            <i class="fa fa-info-circle icons pl-lg-2" id="Popover5" onClick={() => this.toggle('popoverOpenArima', !this.state.popoverOpenArima)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
+                                                        </Label>
+                                                    </div>
 
-                                                            <div className="row col-md-12 pt-lg-2" style={{ display: this.state.arimaId ? '' : 'none' }}>
-                                                                <div>
-                                                                    <Popover placement="top" isOpen={this.state.popoverOpenP} target="Popover11" trigger="hover" toggle={() => this.toggle('popoverOpenP', !this.state.popoverOpenP)}>
-                                                                        <PopoverBody>{i18n.t('static.tooltip.p')}</PopoverBody>
-                                                                    </Popover>
-                                                                </div>
-                                                                <div className="col-md-2">
-                                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.p')}
-                                                                        <i class="fa fa-info-circle icons pl-lg-2" id="Popover11" onClick={() => this.toggle('popoverOpenP', !this.state.popoverOpenP)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
-                                                                    </Label>
-                                                                    <Input
-                                                                        className="controls"
-                                                                        type="number"
-                                                                        id="pId"
-                                                                        name="pId"
-                                                                        bsSize="sm"
-                                                                    />
-                                                                </div>
-                                                                <div>
-                                                                <Popover placement="top" isOpen={this.state.popoverOpenD} target="Popover14" trigger="hover" toggle={() => this.toggle('popoverOpenD', !this.state.popoverOpenD)}>
-                                                                        <PopoverBody>{i18n.t('static.tooltip.d')}</PopoverBody>
-                                                                    </Popover>
-                                                                    </div>
-                                                                <div className="col-md-2">
-                                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.d')} <i class="fa fa-info-circle icons pl-lg-2" id="Popover14" onClick={() => this.toggle('popoverOpenD', !this.state.popoverOpenD)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
-                                                                    <Input
-                                                                        className="controls"
-                                                                        type="number"
-                                                                        id="dId"
-                                                                        name="dId"
-                                                                        bsSize="sm"
-                                                                    />
-                                                                </div>
-                                                                <div>
-                                                                    <Popover placement="top" isOpen={this.state.popoverOpenQ} target="Popover12" trigger="hover" toggle={() => this.toggle('popoverOpenQ', !this.state.popoverOpenQ)}>
-                                                                        <PopoverBody>{i18n.t('static.tooltip.q')}</PopoverBody>
-                                                                    </Popover>
-                                                                </div>
-                                                                <div className="col-md-2">
-                                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.q')}
-                                                                        <i class="fa fa-info-circle icons pl-lg-2" id="Popover12" onClick={() => this.toggle('popoverOpenQ', !this.state.popoverOpenQ)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
-                                                                    </Label>
-                                                                    <Input
-                                                                        className="controls"
-                                                                        type="number"
-                                                                        id="qId"
-                                                                        name="qId"
-                                                                        bsSize="sm"
-                                                                    />
-                                                                </div>
-                                                            </div>
+                                                    <div className="row col-md-12 pt-lg-2" style={{ display: this.state.arimaId ? '' : 'none' }}>
+                                                        <div>
+                                                            <Popover placement="top" isOpen={this.state.popoverOpenP} target="Popover11" trigger="hover" toggle={() => this.toggle('popoverOpenP', !this.state.popoverOpenP)}>
+                                                                <PopoverBody>{i18n.t('static.tooltip.p')}</PopoverBody>
+                                                            </Popover>
+                                                        </div>
+                                                        <div className="col-md-2">
+                                                            <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.p')}
+                                                                <i class="fa fa-info-circle icons pl-lg-2" id="Popover11" onClick={() => this.toggle('popoverOpenP', !this.state.popoverOpenP)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
+                                                            </Label>
+                                                            <Input
+                                                                className="controls"
+                                                                type="number"
+                                                                id="pId"
+                                                                bsSize="sm"
+                                                                name="pId"
+                                                                value={this.state.p}
+                                                                valid={!errors.pId && this.state.p != null ? this.state.p : '' != ''}
+                                                                invalid={touched.pId && !!errors.pId}
+                                                                onBlur={handleBlur}
+                                                                onChange={(e) => { handleChange(e); this.setPId(e) }}
+                                                            />
+                                                            <FormFeedback>{errors.pId}</FormFeedback>
+                                                        </div>
+                                                        <div>
+                                                            <Popover placement="top" isOpen={this.state.popoverOpenD} target="Popover14" trigger="hover" toggle={() => this.toggle('popoverOpenD', !this.state.popoverOpenD)}>
+                                                                <PopoverBody>{i18n.t('static.tooltip.d')}</PopoverBody>
+                                                            </Popover>
+                                                        </div>
+                                                        <div className="col-md-2">
+                                                            <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.d')} <i class="fa fa-info-circle icons pl-lg-2" id="Popover14" onClick={() => this.toggle('popoverOpenD', !this.state.popoverOpenD)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
+                                                            <Input
+                                                                className="controls"
+                                                                type="number"
+                                                                id="dId"
+                                                                bsSize="sm"
+                                                                name="dId"
+                                                                value={this.state.d}
+                                                                valid={!errors.dId && this.state.d != null ? this.state.d : '' != ''}
+                                                                invalid={touched.dId && !!errors.dId}
+                                                                onBlur={handleBlur}
+                                                                onChange={(e) => { handleChange(e); this.setDId(e) }}
+                                                            />
+                                                            <FormFeedback>{errors.dId}</FormFeedback>
 
                                                         </div>
-                                                    </FormGroup>
+                                                        <div>
+                                                            <Popover placement="top" isOpen={this.state.popoverOpenQ} target="Popover12" trigger="hover" toggle={() => this.toggle('popoverOpenQ', !this.state.popoverOpenQ)}>
+                                                                <PopoverBody>{i18n.t('static.tooltip.q')}</PopoverBody>
+                                                            </Popover>
+                                                        </div>
+                                                        <div className="col-md-2">
+                                                            <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.q')}
+                                                                <i class="fa fa-info-circle icons pl-lg-2" id="Popover12" onClick={() => this.toggle('popoverOpenQ', !this.state.popoverOpenQ)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
+                                                            </Label>
+                                                            <Input
+                                                                className="controls"
+                                                                type="number"
+                                                                id="qId"
+                                                                bsSize="sm"
+                                                                name="qId"
+                                                                value={this.state.q}
+                                                                valid={!errors.qId && this.state.q != null ? this.state.q : '' != ''}
+                                                                invalid={touched.qId && !!errors.qId}
+                                                                onBlur={handleBlur}
+                                                                onChange={(e) => { handleChange(e); this.setQId(e) }}
+                                                            />
+                                                            <FormFeedback>{errors.qId}</FormFeedback>
+
+                                                        </div>
+                                                    </div>
+
                                                 </div>
-                                            </Form>
-                                        )} />
-                            </div>
-                            {/* <div className="col-md-12">
+                                            </FormGroup>
+                                        </div>
+
+                                        {/* </div> */}
+                                        {/* <div className="col-md-12">
                                 <Button type="button" size="md" color="warning" className="float-right mr-1" onClick={this.reset}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                 <Button type="submit" color="success" className="mr-1 float-right" size="md" ><i className="fa fa-check"> </i>Submit</Button>
                             </div> */}
-                        </Form>
-                        <h5 className={"red"} id="div1">{this.state.noDataMessage}</h5>
-                        {/* Graph */}
-                        <div style={{ display: !this.state.loading ? "block" : "none" }}>
-                            {this.state.showData && <div className="col-md-12">
-                                <div className="chart-wrapper chart-graph-report">
-                                    <Line id="cool-canvas" data={line} options={options} />
-                                    <div>
+                                        {/* </Form> */}
+                                        <h5 className={"red"} id="div1">{this.state.noDataMessage}</h5>
+                                        {/* Graph */}
+                                        <div style={{ display: !this.state.loading ? "block" : "none" }}>
+                                            {this.state.showData && <div className="col-md-12">
+                                                <div className="chart-wrapper chart-graph-report">
+                                                    <Line id="cool-canvas" data={line} options={options} />
+                                                    <div>
 
-                                    </div>
-                                </div>
-                            </div>}<br /><br />
-                            {this.state.showData &&
-                                <div className="col-md-10 pt-4 pb-3">
-                                    <ul className="legendcommitversion">
-                                        <li><span className=" greenlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.extrapolation.lowestError')} </span></li>
-                                        {/* <li><span className=" redlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.label.noFundsAvailable')} </span></li> */}
-                                    </ul>
-                                </div>}
-                            {this.state.showData &&
-                                <div className="">
-                                    <div className="">
-                                        <Table className="table-bordered text-center mt-2 overflowhide main-table " bordered size="sm" style={{ width: 'unset' }}>
-                                            <thead>
-                                                <tr>
-                                                    <td width="160px" title={i18n.t('static.tooltip.errors')}><b>{i18n.t('static.common.errors')}</b>
-                                                        <i class="fa fa-info-circle icons pl-lg-2" id="Popover13" aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></td>
-                                                    {this.state.movingAvgId &&
-                                                        <td width="160px" title={i18n.t('static.tooltip.MovingAverages')}><b>{i18n.t('static.extrapolation.movingAverages')}</b> <i class="fa fa-info-circle icons pl-lg-2" id="Popover15" aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></td>
-                                                    }
-                                                    {this.state.semiAvgId &&
-                                                        <td width="160px" title={i18n.t('static.tooltip.SemiAverages')}><b>{i18n.t('static.extrapolation.semiAverages')}</b> <i class="fa fa-info-circle icons pl-lg-2" id="Popover16" aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></td>
-                                                    }
-                                                    {this.state.linearRegressionId &&
-                                                        <td width="160px" title={i18n.t('static.tooltip.LinearRegression')}><b>{i18n.t('static.extrapolation.linearRegression')}</b> <i class="fa fa-info-circle icons pl-lg-2" id="Popover17" aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></td>
-                                                    }
-                                                    {this.state.smoothingId &&
-                                                        <td width="160px" title={i18n.t('static.tooltip.Tes')}><b>{i18n.t('static.extrapolation.tes')}</b> <i class="fa fa-info-circle icons pl-lg-2" id="Popover18" aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></td>
-                                                    }
-                                                    {this.state.arimaId &&
-                                                        <td width="160px" title={i18n.t('static.tooltip.arima')}><b>{i18n.t('static.extrapolation.arima')}</b> <i class="fa fa-info-circle icons pl-lg-2" id="Popover19" aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></td>
-                                                    }
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr>
-                                                    <td>{i18n.t('static.extrapolation.rmse')}</td>
-                                                    {this.state.movingAvgId &&
-                                                        <td style={{ textAlign: "right", "fontWeight": this.state.minRmse == this.state.movingAvgError.rmse ? "bold" : "normal" }} bgcolor={this.state.minRmse == this.state.movingAvgError.rmse ? "#86cd99" : "#FFFFFF"}>{this.state.movingAvgError.rmse != "" ? this.state.movingAvgError.rmse.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
-                                                    }
-                                                    {this.state.semiAvgId &&
-                                                        <td style={{ textAlign: "right", "fontWeight": this.state.minRmse == this.state.semiAvgError.rmse ? "bold" : "normal" }} bgcolor={this.state.minRmse == this.state.semiAvgError.rmse ? "#86cd99" : "#FFFFFF"}>{this.state.semiAvgError.rmse != "" ? this.state.semiAvgError.rmse.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
-                                                    }
-                                                    {this.state.linearRegressionId &&
-                                                        <td style={{ textAlign: "right", "fontWeight": this.state.minRmse == this.state.linearRegressionError.rmse ? "bold" : "normal" }} bgcolor={this.state.minRmse == this.state.linearRegressionError.rmse ? "#86cd99" : "#FFFFFF"}>{this.state.linearRegressionError.rmse != "" ? this.state.linearRegressionError.rmse.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
-                                                    }
-                                                    {this.state.smoothingId &&
-                                                        <td style={{ textAlign: "right", "fontWeight": this.state.minRmse == this.state.tesError.rmse ? "bold" : "normal" }} bgcolor={this.state.minRmse == this.state.tesError.rmse ? "#86cd99" : "#FFFFFF"}>{this.state.tesError.rmse != "" ? this.state.tesError.rmse.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
-                                                    }
-                                                    {this.state.arimaId &&
-                                                        <td></td>
-                                                    }
-                                                </tr>
-                                                <tr>
-                                                    <td>{i18n.t('static.extrapolation.mape')}</td>
-                                                    {this.state.movingAvgId &&
-                                                        <td style={{ textAlign: "right", "fontWeight": this.state.minMape == this.state.movingAvgError.mape ? "bold" : "normal" }} bgcolor={this.state.minMape == this.state.movingAvgError.mape ? "#86cd99" : "#FFFFFF"}>{this.state.movingAvgError.mape != "" ? this.state.movingAvgError.mape.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
-                                                    }
-                                                    {this.state.semiAvgId &&
-                                                        <td style={{ textAlign: "right", "fontWeight": this.state.minMape == this.state.semiAvgError.mape ? "bold" : "normal" }} bgcolor={this.state.minMape == this.state.semiAvgError.mape ? "#86cd99" : "#FFFFFF"}>{this.state.semiAvgError.mape != "" ? this.state.semiAvgError.mape.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
-                                                    }
-                                                    {this.state.linearRegressionId &&
-                                                        <td style={{ textAlign: "right", "fontWeight": this.state.minMape == this.state.linearRegressionError.mape ? "bold" : "normal" }} bgcolor={this.state.minMape == this.state.linearRegressionError.mape ? "#86cd99" : "#FFFFFF"}>{this.state.linearRegressionError.mape != "" ? this.state.linearRegressionError.mape.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
-                                                    }
-                                                    {this.state.smoothingId &&
-                                                        <td style={{ textAlign: "right", "fontWeight": this.state.minMape == this.state.tesError.mape ? "bold" : "normal" }} bgcolor={this.state.minMape == this.state.tesError.mape ? "#86cd99" : "#FFFFFF"}>{this.state.tesError.mape != "" ? this.state.tesError.mape.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
-                                                    }
-                                                    {this.state.arimaId &&
-                                                        <td></td>
-                                                    }
-                                                </tr>
-                                                <tr>
-                                                    <td>{i18n.t('static.extrapolation.mse')}</td>
-                                                    {this.state.movingAvgId &&
-                                                        <td style={{ textAlign: "right", "fontWeight": this.state.minMse == this.state.movingAvgError.mse ? "bold" : "normal" }} bgcolor={this.state.minMse == this.state.movingAvgError.mse ? "#86cd99" : "#FFFFFF"}>{this.state.movingAvgError.mse != "" ? this.state.movingAvgError.mse.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
-                                                    }
-                                                    {this.state.semiAvgId &&
-                                                        <td style={{ textAlign: "right", "fontWeight": this.state.minMse == this.state.semiAvgError.mse ? "bold" : "normal" }} bgcolor={this.state.minMse == this.state.semiAvgError.mse ? "#86cd99" : "#FFFFFF"}>{this.state.semiAvgError.mse != "" ? this.state.semiAvgError.mse.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
-                                                    }
-                                                    {this.state.linearRegressionId &&
-                                                        <td style={{ textAlign: "right", "fontWeight": this.state.minMse == this.state.linearRegressionError.mse ? "bold" : "normal" }} bgcolor={this.state.minMse == this.state.linearRegressionError.mse ? "#86cd99" : "#FFFFFF"}>{this.state.linearRegressionError.mse != "" ? this.state.linearRegressionError.mse.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
-                                                    }
-                                                    {this.state.smoothingId &&
-                                                        <td style={{ textAlign: "right", "fontWeight": this.state.minMse == this.state.tesError.mse ? "bold" : "normal" }} bgcolor={this.state.minMse == this.state.tesError.mse ? "#86cd99" : "#FFFFFF"}>{this.state.tesError.mse != "" ? this.state.tesError.mse.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
-                                                    }
-                                                    {this.state.arimaId &&
-                                                        <td></td>
-                                                    }
-                                                </tr>
-                                                <tr>
-                                                    <td>{i18n.t('static.extrapolation.wape')}</td>
-                                                    {this.state.movingAvgId &&
-                                                        <td style={{ textAlign: "right", "fontWeight": this.state.minWape == this.state.movingAvgError.wape ? "bold" : "normal" }} bgcolor={this.state.minWape == this.state.movingAvgError.wape ? "#86cd99" : "#FFFFFF"}>{this.state.movingAvgError.wape != "" ? this.state.movingAvgError.wape.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
-                                                    }
-                                                    {this.state.semiAvgId &&
-                                                        <td style={{ textAlign: "right", "fontWeight": this.state.minWape == this.state.semiAvgError.wape ? "bold" : "normal" }} bgcolor={this.state.minWape == this.state.semiAvgError.wape ? "#86cd99" : "#FFFFFF"}>{this.state.semiAvgError.wape != "" ? this.state.semiAvgError.wape.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
-                                                    }
-                                                    {this.state.linearRegressionId &&
-                                                        <td style={{ textAlign: "right", "fontWeight": this.state.minWape == this.state.linearRegressionError.wape ? "bold" : "normal" }} bgcolor={this.state.minWape == this.state.linearRegressionError.wape ? "#86cd99" : "#FFFFFF"}>{this.state.linearRegressionError.wape != "" ? this.state.linearRegressionError.wape.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
-                                                    }
-                                                    {this.state.smoothingId &&
-                                                        <td style={{ textAlign: "right", "fontWeight": this.state.minWape == this.state.tesError.wape ? "bold" : "normal" }} bgcolor={this.state.minWape == this.state.tesError.wape ? "#86cd99" : "#FFFFFF"}>{this.state.tesError.wape != "" ? this.state.tesError.wape.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
-                                                    }
-                                                    {this.state.arimaId &&
-                                                        <td></td>
-                                                    }
-                                                </tr>
-                                                <tr>
-                                                    <td>{i18n.t('static.extrapolation.rSquare')}</td>
-                                                    {this.state.movingAvgId &&
-                                                        <td style={{ textAlign: "right", "fontWeight": this.state.minRsqd == this.state.movingAvgError.rSqd ? "bold" : "normal" }} bgcolor={this.state.minRsqd == this.state.movingAvgError.rSqd ? "#86cd99" : "#FFFFFF"}>{this.state.movingAvgError.rSqd != "" ? this.state.movingAvgError.rSqd.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
-                                                    }
-                                                    {this.state.semiAvgId &&
-                                                        <td style={{ textAlign: "right", "fontWeight": this.state.minRsqd == this.state.semiAvgError.rSqd ? "bold" : "normal" }} bgcolor={this.state.minRsqd == this.state.semiAvgError.rSqd ? "#86cd99" : "#FFFFFF"}>{this.state.semiAvgError.rSqd != "" ? this.state.semiAvgError.rSqd.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
-                                                    }
-                                                    {this.state.linearRegressionId &&
-                                                        <td style={{ textAlign: "right", "fontWeight": this.state.minRsqd == this.state.linearRegressionError.rSqd ? "bold" : "normal" }} bgcolor={this.state.minRsqd == this.state.linearRegressionError.rSqd ? "#86cd99" : "#FFFFFF"}>{this.state.linearRegressionError.rSqd != "" ? this.state.linearRegressionError.rSqd.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
-                                                    }
-                                                    {this.state.smoothingId &&
-                                                        <td style={{ textAlign: "right", "fontWeight": this.state.minRsqd == this.state.tesError.rSqd ? "bold" : "normal" }} bgcolor={this.state.minRsqd == this.state.tesError.rSqd ? "#86cd99" : "#FFFFFF"}>{this.state.tesError.rSqd != "" ? this.state.tesError.rSqd.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
-                                                    }
-                                                    {this.state.arimaId &&
-                                                        <td></td>
-                                                    }
-                                                </tr>
-                                            </tbody>
-                                        </Table>
-                                    </div>
-                                </div>}
-                            {this.state.dataChanged && <div className="row float-right mt-lg-3 mr-0 pb-2 pt-2 "> <Button type="button" id="formSubmitButton" size="md" color="success" className="float-right mr-0" onClick={() => this.saveForecastConsumptionExtrapolation()}><i className="fa fa-check"></i>{i18n.t('static.pipeline.save')}</Button>&nbsp;</div>}
-                            <div className="row float-right mt-lg-3 mr-3 pb-2 pt-2 "><Button type="button" id="extrapolateButton" size="md" color="info" className="float-right mr-1" onClick={() => this.setExtrapolatedParameters()}><i className="fa fa-check"></i>Extrapolate</Button></div>
-                            {/* {this.state.showData && <div id="tableDiv" className="extrapolateTable pt-lg-5"></div>} */}
-                            <div className="row" style={{ display: this.state.show ? "block" : "none" }}>
-                                <div className="col-md-10 pt-4 pb-3">
-                                    <ul className="legendcommitversion">
-                                        <li><span className="legendcolor" style={{ backgroundColor: "purple", border: "1px solid #000" }}></span> <span className="legendcommitversionText">{i18n.t('static.common.forecastPeriod')}</span></li>
-                                        <li><span className="legendcolor" style={{ backgroundColor: "black", border: "1px solid #000" }}></span> <span className="legendcommitversionText">{i18n.t('static.consumption.actual')}</span></li>
-                                    </ul>
-                                </div>
-                                <div className="row  mt-lg-3">
-                                    <div className="pl-lg-4 pr-lg-4 ModelingValidationTable">
-                                        <div id="tableDiv" className="jexcelremoveReadonlybackground" style={{ display: this.state.show && !this.state.loading ? "block" : "none" }}>
+                                                    </div>
+                                                </div>
+                                            </div>}<br /><br />
+                                            {this.state.showData &&
+                                                <div className="col-md-10 pt-4 pb-3">
+                                                    <ul className="legendcommitversion">
+                                                        <li><span className=" greenlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.extrapolation.lowestError')} </span></li>
+                                                        {/* <li><span className=" redlegend legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.label.noFundsAvailable')} </span></li> */}
+                                                    </ul>
+                                                </div>}
+                                            {this.state.showData &&
+                                                <div className="">
+                                                    <div className="">
+                                                        <Table className="table-bordered text-center mt-2 overflowhide main-table " bordered size="sm" style={{ width: 'unset' }}>
+                                                            <thead>
+                                                                <tr>
+                                                                    <td width="160px" title={i18n.t('static.tooltip.errors')}><b>{i18n.t('static.common.errors')}</b>
+                                                                        <i class="fa fa-info-circle icons pl-lg-2" id="Popover13" aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></td>
+                                                                    {this.state.movingAvgId &&
+                                                                        <td width="160px" title={i18n.t('static.tooltip.MovingAverages')}><b>{i18n.t('static.extrapolation.movingAverages')}</b> <i class="fa fa-info-circle icons pl-lg-2" id="Popover15" aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></td>
+                                                                    }
+                                                                    {this.state.semiAvgId &&
+                                                                        <td width="160px" title={i18n.t('static.tooltip.SemiAverages')}><b>{i18n.t('static.extrapolation.semiAverages')}</b> <i class="fa fa-info-circle icons pl-lg-2" id="Popover16" aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></td>
+                                                                    }
+                                                                    {this.state.linearRegressionId &&
+                                                                        <td width="160px" title={i18n.t('static.tooltip.LinearRegression')}><b>{i18n.t('static.extrapolation.linearRegression')}</b> <i class="fa fa-info-circle icons pl-lg-2" id="Popover17" aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></td>
+                                                                    }
+                                                                    {this.state.smoothingId &&
+                                                                        <td width="160px" title={i18n.t('static.tooltip.Tes')}><b>{i18n.t('static.extrapolation.tes')}</b> <i class="fa fa-info-circle icons pl-lg-2" id="Popover18" aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></td>
+                                                                    }
+                                                                    {this.state.arimaId &&
+                                                                        <td width="160px" title={i18n.t('static.tooltip.arima')}><b>{i18n.t('static.extrapolation.arima')}</b> <i class="fa fa-info-circle icons pl-lg-2" id="Popover19" aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></td>
+                                                                    }
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                <tr>
+                                                                    <td>{i18n.t('static.extrapolation.rmse')}</td>
+                                                                    {this.state.movingAvgId &&
+                                                                        <td style={{ textAlign: "right", "fontWeight": this.state.minRmse == this.state.movingAvgError.rmse ? "bold" : "normal" }} bgcolor={this.state.minRmse == this.state.movingAvgError.rmse ? "#86cd99" : "#FFFFFF"}>{this.state.movingAvgError.rmse != "" ? this.state.movingAvgError.rmse.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
+                                                                    }
+                                                                    {this.state.semiAvgId &&
+                                                                        <td style={{ textAlign: "right", "fontWeight": this.state.minRmse == this.state.semiAvgError.rmse ? "bold" : "normal" }} bgcolor={this.state.minRmse == this.state.semiAvgError.rmse ? "#86cd99" : "#FFFFFF"}>{this.state.semiAvgError.rmse != "" ? this.state.semiAvgError.rmse.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
+                                                                    }
+                                                                    {this.state.linearRegressionId &&
+                                                                        <td style={{ textAlign: "right", "fontWeight": this.state.minRmse == this.state.linearRegressionError.rmse ? "bold" : "normal" }} bgcolor={this.state.minRmse == this.state.linearRegressionError.rmse ? "#86cd99" : "#FFFFFF"}>{this.state.linearRegressionError.rmse != "" ? this.state.linearRegressionError.rmse.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
+                                                                    }
+                                                                    {this.state.smoothingId &&
+                                                                        <td style={{ textAlign: "right", "fontWeight": this.state.minRmse == this.state.tesError.rmse ? "bold" : "normal" }} bgcolor={this.state.minRmse == this.state.tesError.rmse ? "#86cd99" : "#FFFFFF"}>{this.state.tesError.rmse != "" ? this.state.tesError.rmse.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
+                                                                    }
+                                                                    {this.state.arimaId &&
+                                                                        <td></td>
+                                                                    }
+                                                                </tr>
+                                                                <tr>
+                                                                    <td>{i18n.t('static.extrapolation.mape')}</td>
+                                                                    {this.state.movingAvgId &&
+                                                                        <td style={{ textAlign: "right", "fontWeight": this.state.minMape == this.state.movingAvgError.mape ? "bold" : "normal" }} bgcolor={this.state.minMape == this.state.movingAvgError.mape ? "#86cd99" : "#FFFFFF"}>{this.state.movingAvgError.mape != "" ? this.state.movingAvgError.mape.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
+                                                                    }
+                                                                    {this.state.semiAvgId &&
+                                                                        <td style={{ textAlign: "right", "fontWeight": this.state.minMape == this.state.semiAvgError.mape ? "bold" : "normal" }} bgcolor={this.state.minMape == this.state.semiAvgError.mape ? "#86cd99" : "#FFFFFF"}>{this.state.semiAvgError.mape != "" ? this.state.semiAvgError.mape.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
+                                                                    }
+                                                                    {this.state.linearRegressionId &&
+                                                                        <td style={{ textAlign: "right", "fontWeight": this.state.minMape == this.state.linearRegressionError.mape ? "bold" : "normal" }} bgcolor={this.state.minMape == this.state.linearRegressionError.mape ? "#86cd99" : "#FFFFFF"}>{this.state.linearRegressionError.mape != "" ? this.state.linearRegressionError.mape.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
+                                                                    }
+                                                                    {this.state.smoothingId &&
+                                                                        <td style={{ textAlign: "right", "fontWeight": this.state.minMape == this.state.tesError.mape ? "bold" : "normal" }} bgcolor={this.state.minMape == this.state.tesError.mape ? "#86cd99" : "#FFFFFF"}>{this.state.tesError.mape != "" ? this.state.tesError.mape.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
+                                                                    }
+                                                                    {this.state.arimaId &&
+                                                                        <td></td>
+                                                                    }
+                                                                </tr>
+                                                                <tr>
+                                                                    <td>{i18n.t('static.extrapolation.mse')}</td>
+                                                                    {this.state.movingAvgId &&
+                                                                        <td style={{ textAlign: "right", "fontWeight": this.state.minMse == this.state.movingAvgError.mse ? "bold" : "normal" }} bgcolor={this.state.minMse == this.state.movingAvgError.mse ? "#86cd99" : "#FFFFFF"}>{this.state.movingAvgError.mse != "" ? this.state.movingAvgError.mse.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
+                                                                    }
+                                                                    {this.state.semiAvgId &&
+                                                                        <td style={{ textAlign: "right", "fontWeight": this.state.minMse == this.state.semiAvgError.mse ? "bold" : "normal" }} bgcolor={this.state.minMse == this.state.semiAvgError.mse ? "#86cd99" : "#FFFFFF"}>{this.state.semiAvgError.mse != "" ? this.state.semiAvgError.mse.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
+                                                                    }
+                                                                    {this.state.linearRegressionId &&
+                                                                        <td style={{ textAlign: "right", "fontWeight": this.state.minMse == this.state.linearRegressionError.mse ? "bold" : "normal" }} bgcolor={this.state.minMse == this.state.linearRegressionError.mse ? "#86cd99" : "#FFFFFF"}>{this.state.linearRegressionError.mse != "" ? this.state.linearRegressionError.mse.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
+                                                                    }
+                                                                    {this.state.smoothingId &&
+                                                                        <td style={{ textAlign: "right", "fontWeight": this.state.minMse == this.state.tesError.mse ? "bold" : "normal" }} bgcolor={this.state.minMse == this.state.tesError.mse ? "#86cd99" : "#FFFFFF"}>{this.state.tesError.mse != "" ? this.state.tesError.mse.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
+                                                                    }
+                                                                    {this.state.arimaId &&
+                                                                        <td></td>
+                                                                    }
+                                                                </tr>
+                                                                <tr>
+                                                                    <td>{i18n.t('static.extrapolation.wape')}</td>
+                                                                    {this.state.movingAvgId &&
+                                                                        <td style={{ textAlign: "right", "fontWeight": this.state.minWape == this.state.movingAvgError.wape ? "bold" : "normal" }} bgcolor={this.state.minWape == this.state.movingAvgError.wape ? "#86cd99" : "#FFFFFF"}>{this.state.movingAvgError.wape != "" ? this.state.movingAvgError.wape.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
+                                                                    }
+                                                                    {this.state.semiAvgId &&
+                                                                        <td style={{ textAlign: "right", "fontWeight": this.state.minWape == this.state.semiAvgError.wape ? "bold" : "normal" }} bgcolor={this.state.minWape == this.state.semiAvgError.wape ? "#86cd99" : "#FFFFFF"}>{this.state.semiAvgError.wape != "" ? this.state.semiAvgError.wape.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
+                                                                    }
+                                                                    {this.state.linearRegressionId &&
+                                                                        <td style={{ textAlign: "right", "fontWeight": this.state.minWape == this.state.linearRegressionError.wape ? "bold" : "normal" }} bgcolor={this.state.minWape == this.state.linearRegressionError.wape ? "#86cd99" : "#FFFFFF"}>{this.state.linearRegressionError.wape != "" ? this.state.linearRegressionError.wape.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
+                                                                    }
+                                                                    {this.state.smoothingId &&
+                                                                        <td style={{ textAlign: "right", "fontWeight": this.state.minWape == this.state.tesError.wape ? "bold" : "normal" }} bgcolor={this.state.minWape == this.state.tesError.wape ? "#86cd99" : "#FFFFFF"}>{this.state.tesError.wape != "" ? this.state.tesError.wape.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
+                                                                    }
+                                                                    {this.state.arimaId &&
+                                                                        <td></td>
+                                                                    }
+                                                                </tr>
+                                                                <tr>
+                                                                    <td>{i18n.t('static.extrapolation.rSquare')}</td>
+                                                                    {this.state.movingAvgId &&
+                                                                        <td style={{ textAlign: "right", "fontWeight": this.state.minRsqd == this.state.movingAvgError.rSqd ? "bold" : "normal" }} bgcolor={this.state.minRsqd == this.state.movingAvgError.rSqd ? "#86cd99" : "#FFFFFF"}>{this.state.movingAvgError.rSqd != "" ? this.state.movingAvgError.rSqd.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
+                                                                    }
+                                                                    {this.state.semiAvgId &&
+                                                                        <td style={{ textAlign: "right", "fontWeight": this.state.minRsqd == this.state.semiAvgError.rSqd ? "bold" : "normal" }} bgcolor={this.state.minRsqd == this.state.semiAvgError.rSqd ? "#86cd99" : "#FFFFFF"}>{this.state.semiAvgError.rSqd != "" ? this.state.semiAvgError.rSqd.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
+                                                                    }
+                                                                    {this.state.linearRegressionId &&
+                                                                        <td style={{ textAlign: "right", "fontWeight": this.state.minRsqd == this.state.linearRegressionError.rSqd ? "bold" : "normal" }} bgcolor={this.state.minRsqd == this.state.linearRegressionError.rSqd ? "#86cd99" : "#FFFFFF"}>{this.state.linearRegressionError.rSqd != "" ? this.state.linearRegressionError.rSqd.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
+                                                                    }
+                                                                    {this.state.smoothingId &&
+                                                                        <td style={{ textAlign: "right", "fontWeight": this.state.minRsqd == this.state.tesError.rSqd ? "bold" : "normal" }} bgcolor={this.state.minRsqd == this.state.tesError.rSqd ? "#86cd99" : "#FFFFFF"}>{this.state.tesError.rSqd != "" ? this.state.tesError.rSqd.toFixed(3).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}</td>
+                                                                    }
+                                                                    {this.state.arimaId &&
+                                                                        <td></td>
+                                                                    }
+                                                                </tr>
+                                                            </tbody>
+                                                        </Table>
+                                                    </div>
+                                                </div>}
+                                            {this.state.dataChanged && <div className="row float-right mt-lg-3 mr-0 pb-2 pt-2 "> <Button type="submit" id="formSubmitButton" size="md" color="success" className="float-right mr-0" onClick={() => this.touchAllExtrapolation(setTouched, errors, 1)}><i className="fa fa-check"></i>{i18n.t('static.pipeline.save')}</Button>&nbsp;</div>}
+                                            <div className="row float-right mt-lg-3 mr-3 pb-2 pt-2 "><Button type="submit" id="extrapolateButton" size="md" color="info" className="float-right mr-1" onClick={() => this.touchAllExtrapolation(setTouched, errors, 0)}><i className="fa fa-check"></i>Extrapolate</Button></div>
+                                            {/* {this.state.showData && <div id="tableDiv" className="extrapolateTable pt-lg-5"></div>} */}
+                                            <div className="row" style={{ display: this.state.show ? "block" : "none" }}>
+                                                <div className="col-md-10 pt-4 pb-3">
+                                                    {this.state.showData && <ul className="legendcommitversion">
+                                                        <li><span className="legendcolor" style={{ backgroundColor: "purple", border: "1px solid #000" }}></span> <span className="legendcommitversionText">{i18n.t('static.common.forecastPeriod')}</span></li>
+                                                        <li><span className="legendcolor" style={{ backgroundColor: "black", border: "1px solid #000" }}></span> <span className="legendcommitversionText">{i18n.t('static.consumption.actual')}</span></li>
+                                                    </ul>}
+                                                </div>
+                                                <div className="row  mt-lg-3">
+                                                    <div className="pl-lg-4 pr-lg-4 ModelingValidationTable">
+                                                        <div id="tableDiv" className="jexcelremoveReadonlybackground" style={{ display: this.state.show && !this.state.loading ? "block" : "none" }}>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
                                         </div>
-                                    </div>
-                                </div>
-                            </div>
+                                    </Form>
+                                )} />
 
-                        </div>
                         <div style={{ display: this.state.loading ? "block" : "none" }}>
                             <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                                 <div class="align-items-center">
