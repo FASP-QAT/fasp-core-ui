@@ -3164,6 +3164,8 @@ class ForecastOutput extends Component {
             if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
             return '?'
         }
+        let countVar = 0;
+        let countVar1 = 0;
 
         return (
             <div className="animated fadeIn" >
@@ -3517,14 +3519,15 @@ class ForecastOutput extends Component {
                                                                     </tr>
                                                                 </thead>
                                                                 <tbody>
-                                                                    {this.state.xaxis == 2 && this.state.consumptionData.map(item => (
+                                                                    {this.state.xaxis == 2 && this.state.consumptionData.map((item, index) => (
                                                                         <tr>
                                                                             <td className="sticky-col first-col clone Firstcolum" align="center"><input type="checkbox" id={"planningUnitCheckbox" + item.objUnit.id} checked={item.display} onChange={() => this.planningUnitCheckedChanged(item.objUnit.id)} /></td>
                                                                             <td className="sticky-col first-col clone Secondcolum" style={{ textAlign: 'left' }}>{item.objUnit.label.label_en}</td>
-                                                                            <td className='text-left sticky-col first-col clone Thirdcolum'>{item.scenario.label}</td>
+                                                                            <td className='text-left sticky-col first-col clone Thirdcolum'>{item.display && <i class="fa fa-circle" style={{ color: backgroundColor[countVar] }} aria-hidden="true"></i>} {" "} {item.scenario.label}</td>
                                                                             {this.state.monthArrayList.map(item1 => (
                                                                                 <td>{item.consumptionList.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(item1).format("YYYY-MM")).length > 0 ? <NumberFormat displayType={'text'} thousandSeparator={true} value={item.consumptionList.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(item1).format("YYYY-MM"))[0].consumptionQty} /> : ""}</td>
                                                                             ))}
+                                                                            {(item.display == true ? countVar++ : '')}
                                                                         </tr>
                                                                     ))}
                                                                     {this.state.yaxisEquUnit > 0 && this.state.xaxis == 2 &&
@@ -3539,14 +3542,15 @@ class ForecastOutput extends Component {
                                                                         </tr>
                                                                     }
 
-                                                                    {this.state.xaxis == 1 && this.state.consumptionData.map(item => (
+                                                                    {this.state.xaxis == 1 && this.state.consumptionData.map((item, index) => (
                                                                         <tr>
                                                                             <td className="sticky-col first-col clone Firstcolum" align="center"><input type="checkbox" id={"planningUnitCheckbox" + item.objUnit.id} checked={item.display} onChange={() => this.planningUnitCheckedChanged(item.objUnit.id)} /></td>
                                                                             <td className="sticky-col first-col clone Secondcolum" style={{ textAlign: 'left' }}>{item.objUnit.label.label_en}</td>
-                                                                            <td className='text-left sticky-col first-col clone Thirdcolum'>{item.scenario.label}</td>
+                                                                            <td className='text-left sticky-col first-col clone Thirdcolum'>{item.display && <i class="fa fa-circle" style={{ color: backgroundColor[countVar1] }} aria-hidden="true"></i>} {" "}{item.scenario.label}</td>
                                                                             {this.state.monthArrayList.map(item1 => (
                                                                                 <td>{item.consumptionList.filter(c => moment(c.consumptionDate).format("YYYY") == moment(item1).format("YYYY")).length > 0 ? <NumberFormat displayType={'text'} thousandSeparator={true} value={item.consumptionList.filter(c => moment(c.consumptionDate).format("YYYY") == moment(item1).format("YYYY"))[0].consumptionQty} /> : ""}</td>
                                                                             ))}
+                                                                            {(item.display == true ? countVar1++ : '')}
                                                                         </tr>
                                                                     ))}
                                                                     {this.state.yaxisEquUnit > 0 && this.state.xaxis == 1 &&
