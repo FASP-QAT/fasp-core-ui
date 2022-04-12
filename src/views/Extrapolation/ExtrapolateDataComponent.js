@@ -487,46 +487,46 @@ export default class ExtrapolateDataComponent extends React.Component {
                 [
                     {
                         title: i18n.t('static.inventoryDate.inventoryReport'),
-                        type: 'calendar', options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker' }, width: 100, readOnly: true
+                        type: 'calendar', options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker' }, width: 100
                     },
                     {
                         title: i18n.t('static.extrapolation.adjustedActuals'),
-                        type: 'numeric', mask: '#,##.00', decimal: '.', readOnly: false
+                        type: 'numeric', mask: '#,##.00', decimal: '.'
                     },
                     {
                         title: i18n.t('static.extrapolation.movingAverages'),
                         type: this.state.movingAvgId ? 'numeric' : 'hidden',
-                        mask: '#,##.00', decimal: '.', readOnly: false
+                        mask: '#,##.00', decimal: '.'
                     },
                     {
                         title: i18n.t('static.extrapolation.semiAverages'),
                         type: this.state.semiAvgId ? 'numeric' : 'hidden',
-                        mask: '#,##.00', decimal: '.', readOnly: false
+                        mask: '#,##.00', decimal: '.'
                     },
                     {
                         title: i18n.t('static.extrapolation.linearRegression'),
                         type: this.state.linearRegressionId ? 'numeric' : 'hidden',
-                        mask: '#,##.00', decimal: '.', readOnly: false
+                        mask: '#,##.00', decimal: '.'
                     },
                     {
                         title: i18n.t('static.extrapolation.tesLower'),
                         type: this.state.smoothingId ? 'numeric' : 'hidden',
-                        mask: '#,##.00', decimal: '.', readOnly: false
+                        mask: '#,##.00', decimal: '.'
                     },
                     {
                         title: i18n.t('static.extrapolation.tes'),
                         type: this.state.smoothingId ? 'numeric' : 'hidden',
-                        mask: '#,##.00', decimal: '.', readOnly: false
+                        mask: '#,##.00', decimal: '.'
                     },
                     {
                         title: i18n.t('static.extrapolation.tesUpper'),
                         type: this.state.smoothingId ? 'numeric' : 'hidden',
-                        mask: '#,##.00', decimal: '.', readOnly: false
+                        mask: '#,##.00', decimal: '.'
                     },
                     {
                         title: i18n.t('static.extrapolation.arima'),
                         type: this.state.arimaId ? 'numeric' : 'hidden',
-                        mask: '#,##.00', decimal: '.', readOnly: false
+                        mask: '#,##.00', decimal: '.'
                     }
                 ],
             text: {
@@ -543,8 +543,13 @@ export default class ExtrapolateDataComponent extends React.Component {
                         var cell = elInstance.getCell(("A").concat(parseInt(y) + 1))
                         cell.classList.add('jexcelBoldCell');
                     } else if (moment(rowData[0]).format("YYYY-MM") >= moment(this.state.datasetJson.currentVersion.forecastStartDate).format("YYYY-MM") && moment(rowData[0]).format("YYYY-MM") <= moment(this.state.datasetJson.currentVersion.forecastStopDate).format("YYYY-MM")) {
-                        var cell = elInstance.getCell(("A").concat(parseInt(y) + 1))
-                        cell.classList.add('jexcelPurpleCell');
+                        if (rowData[1] !== "") {
+                            var cell = elInstance.getCell(("A").concat(parseInt(y) + 1))
+                            cell.classList.add('jexcelBoldPurpleCell');
+                        } else {
+                            var cell = elInstance.getCell(("A").concat(parseInt(y) + 1))
+                            cell.classList.add('jexcelPurpleCell');
+                        }
                         var cell = elInstance.getCell(("C").concat(parseInt(y) + 1))
                         cell.classList.add('jexcelPurpleCell');
                         var cell = elInstance.getCell(("D").concat(parseInt(y) + 1))
@@ -799,7 +804,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                 var regionList = forecastProgramListFilter.regionList;
                 var startDate = forecastProgramListFilter.datasetData.currentVersion.forecastStartDate;
                 var stopDate = forecastProgramListFilter.datasetData.currentVersion.forecastStopDate;
-                var rangeValue = { from: { year: new Date(startDate).getFullYear(), month: new Date(startDate).getMonth() + 1 }, to: { year: new Date(stopDate).getFullYear(), month: new Date(stopDate).getMonth() + 1 } }
+                var rangeValue = { from: { year: Number(moment(startDate).startOf('month').format("YYYY")), month: Number(moment(startDate).startOf('month').format("M")) }, to: { year: Number(moment(stopDate).startOf('month').format("YYYY")), month: Number(moment(stopDate).startOf('month').format("M")) } }
 
                 var planningUnitList = forecastProgramListFilter.planningUnitList;
                 var planningUnitId = "";
