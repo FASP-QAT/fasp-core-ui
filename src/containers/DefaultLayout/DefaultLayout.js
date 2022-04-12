@@ -777,11 +777,11 @@ class DefaultLayout extends Component {
     // this.checkIfLocalProgramVersionChanged = this.checkIfLocalProgramVersionChanged.bind(this);
   }
  
-  refreshPage(url) {
+  refreshPage() {
 
     // event.preventDefault()
-    console.log("/url",url)
-    this.props.history.push(url);
+    // console.log("/url",url)
+    // this.props.history.push(url);
     // return <Redirect to="/" />;
     // return <Redirect to={{ pathname: url }} />
     // setTimeout(() => {
