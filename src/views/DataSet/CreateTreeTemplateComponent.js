@@ -1649,7 +1649,9 @@ export default class CreateTreeTemplate extends Component {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
                 }
-
+                var elInstance = this.state.modelingEl;
+                var rowData = elInstance.getRowData(y);
+                console.log("modelingTypeId-valid--", rowData[4]);
                 // Start date
                 var col = ("B").concat(parseInt(y) + 1);
                 var value = this.el.getValueFromCoords(1, y);
@@ -1662,9 +1664,10 @@ export default class CreateTreeTemplate extends Component {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
                 }
-                var startDate = this.el.getValue(`B${parseInt(y) + 1}`, true);
-                var stopDate = this.el.getValue(`C${parseInt(y) + 1}`, true);
-
+                var startDate = rowData[1];
+                var stopDate = rowData[2];
+                console.log("startDate---", startDate);
+                console.log("stopDate---", stopDate);
                 // Stop date
                 var col = ("C").concat(parseInt(y) + 1);
                 var value = this.el.getValueFromCoords(2, y);
@@ -1686,9 +1689,7 @@ export default class CreateTreeTemplate extends Component {
                     this.el.setComments(col, "");
                 }
 
-                var elInstance = this.state.modelingEl;
-                var rowData = elInstance.getRowData(y);
-                console.log("modelingTypeId-valid--", rowData[4])
+
                 if (rowData[4] != "") {
                     var reg = JEXCEL_DECIMAL_NO_REGEX_LONG;
 
@@ -2789,19 +2790,21 @@ export default class CreateTreeTemplate extends Component {
         var scalingList = this.state.scalingList;
         var nodeTransferDataList = this.state.nodeTransferDataList;
         console.log("scalingList---", scalingList);
+        console.log("scalingList length---", scalingList.length);
         console.log("nodeTransferDataList---", nodeTransferDataList);
         console.log("this.state.maxMonth---", this.state.maxMonth);
         var dataArray = [];
         let count = 0;
 
         if (scalingList.length == 0) {
+
             data = [];
             data[0] = ''
-            data[1] = parseInt(this.state.currentItemConfig.context.payload.nodeDataMap[0][0].monthNo) + 1;
+            data[1] = parseInt(this.state.currentItemConfig.context.payload.nodeDataMap[0][0].monthNo) + 1
             data[2] = this.state.maxMonth
             data[3] = ''
             data[4] = this.state.currentItemConfig.context.payload.nodeType.id == PERCENTAGE_NODE_ID || this.state.currentItemConfig.context.payload.nodeType.id == FU_NODE_ID || this.state.currentItemConfig.context.payload.nodeType.id == PU_NODE_ID ? 5 : '';
-            data[5] = '';
+            data[5] = ''
             data[6] = ''
             data[7] = ''
             data[8] = cleanUp
@@ -2876,7 +2879,7 @@ export default class CreateTreeTemplate extends Component {
         var options = {
             data: data,
             columnDrag: true,
-            colWidths: [90, 150, 80, 80, 90, 90, 90, 90, 90],
+            colWidths: [90, 150, 80, 80, 90, 90, 90, 90, 90,90],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 //1 B
@@ -2991,7 +2994,6 @@ export default class CreateTreeTemplate extends Component {
                             cell.classList.remove('readonly');
                             cell = elInstance.getCell(("G").concat(parseInt(y) + 1))
                             cell.classList.add('readonly');
-                            // elInstance.hideIndex(6);
                         } else {
                             var cell = elInstance.getCell(("H").concat(parseInt(y) + 1))
                             cell.classList.add('readonly');
@@ -5122,7 +5124,7 @@ export default class CreateTreeTemplate extends Component {
                     }]
                 }, () => {
                     console.log("Tree Template---", this.state.items);
-                    // this.generateMonthList();
+                    this.generateMonthList();
                 })
             }
 
