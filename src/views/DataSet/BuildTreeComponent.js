@@ -4200,8 +4200,6 @@ export default class BuildTree extends Component {
             } else {
                 if (itemConfig.payload.nodeType.id == 1 || itemConfig.payload.nodeType.id == 2) {
                     if (type == 1) {
-                        console.log("get payload 1--->", (itemConfig.payload.nodeDataMap[scenarioId])[0]);
-                        console.log("get payload 1--->>>", (itemConfig.payload.nodeDataMap[scenarioId])[0].displayDataValue);
                         return addCommasTwoDecimal((itemConfig.payload.nodeDataMap[scenarioId])[0].displayDataValue);
                     } else if (type == 3) {
                         console.log("get payload 2");

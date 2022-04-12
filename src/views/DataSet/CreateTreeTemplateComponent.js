@@ -750,6 +750,7 @@ export default class CreateTreeTemplate extends Component {
     }
     updateTreeData(monthId) {
         var items = this.state.items;
+        console.log("monthId filter>>>", monthId);
         console.log("items>>>", items);
         for (let i = 0; i < items.length; i++) {
             console.log("items[i]---", items[i]);
@@ -899,10 +900,10 @@ export default class CreateTreeTemplate extends Component {
             console.log("***month percentageOfParent---", percentageOfParent);
             console.log("***month calculated value---", ((percentageOfParent * parentValue) / 100));
             currentItemConfig.context.payload.nodeDataMap[0][0].calculatedDataValue = ((percentageOfParent * parentValue) / 100).toString();
-            currentItemConfig.context.payload.nodeDataMap[0][0].displayCalculatedDataValue = ((percentageOfParent * parentValue) / 100).toString();
+            // currentItemConfig.context.payload.nodeDataMap[0][0].displayCalculatedDataValue = ((percentageOfParent * parentValue) / 100).toString();
         }
         console.log("***month parentValue before---", parentValue);
-        this.setState({ parentValue, currentItemConfig, currentScenario: currentItemConfig.context.payload.nodeDataMap[0][0] }, () => {
+        this.setState({ parentValue, currentItemConfig }, () => {
             console.log("***month parentValue after---", this.state.parentValue);
         });
     }
@@ -1407,10 +1408,10 @@ export default class CreateTreeTemplate extends Component {
         for (var i = 0; i < json.length; i++) {
             var calculatedChangeForMonth = 0;
             var map1 = new Map(Object.entries(json[i]));
-            var startDate = map1.get("3");
-            var stopDate = map1.get("4");
-            var modelingTypeId = map1.get("2");
-            var dataValue = modelingTypeId == 2 ? map1.get("6") : map1.get("5");
+            var startDate = map1.get("1");
+            var stopDate = map1.get("2");
+            var modelingTypeId = map1.get("4");
+            var dataValue = modelingTypeId == 2 ? map1.get("7") : map1.get("6");
             console.log("startDate---", startDate);
             console.log("stopDate---", stopDate);
             const result = date >= startDate && date <= stopDate ? true : false;
@@ -1443,7 +1444,7 @@ export default class CreateTreeTemplate extends Component {
                     calculatedChangeForMonth = parseFloat((nodeValue * dataValue) / 100).toFixed(4);
                 }
             }
-            this.state.modelingEl.setValueFromCoords(8, i, calculatedChangeForMonth, true);
+            this.state.modelingEl.setValueFromCoords(9, i, calculatedChangeForMonth, true);
             // scalingTotal = parseFloat(scalingTotal) + parseFloat(calculatedChangeForMonth);
         }
         var scalingDifference = nodeDataMomList.filter(c => c.month == date);
@@ -1956,7 +1957,7 @@ export default class CreateTreeTemplate extends Component {
                             if (arr[i] != null) {
                                 var nodeDataModelingList = arr[i].payload.nodeDataMap[0][0].nodeDataModelingList;
                                 if (nodeDataModelingList.length > 0) {
-                                    var nodedata = nodeDataModelingList.filter(x => x.transferNodeDataId == itemConfig.id)[0];
+                                    var nodedata = nodeDataModelingList.filter(x => x.transferNodeDataId == itemConfig.payload.nodeDataMap[0][0].nodeDataId)[0];
                                     if (nodedata != null && nodedata != "") {
                                         result = true;
                                         break;
@@ -1970,18 +1971,13 @@ export default class CreateTreeTemplate extends Component {
             } else {
                 if (itemConfig.payload.nodeType.id == 1 || itemConfig.payload.nodeType.id == 2) {
                     if (type == 1) {
-                        if (itemConfig.payload.nodeType.id == 1) {
-                            (itemConfig.payload.nodeDataMap[0])[0].displayDataValue = (itemConfig.payload.nodeDataMap[0])[0].dataValue != "" ? (itemConfig.payload.nodeDataMap[0])[0].dataValue : "0";
-                            return addCommasTwoDecimal((itemConfig.payload.nodeDataMap[0])[0].displayDataValue.toString());
-                        } else {
-                            return addCommasTwoDecimal((itemConfig.payload.nodeDataMap[0])[0].dataValue.toString());
-                        }
+                        return addCommasTwoDecimal((itemConfig.payload.nodeDataMap[0])[0].displayDataValue.toString());
                     } else if (type == 3) {
                         var childList = this.state.items.filter(c => c.parent == itemConfig.id && (c.payload.nodeType.id == 3 || c.payload.nodeType.id == 4 || c.payload.nodeType.id == 5));
                         if (childList.length > 0) {
                             var sum = 0;
                             childList.map(c => {
-                                sum += Number((c.payload.nodeDataMap[0])[0].dataValue)
+                                sum += Number((c.payload.nodeDataMap[0])[0].displayDataValue)
                             })
                             console.log("sum if---", sum);
                             return sum.toFixed(2);
@@ -1995,48 +1991,44 @@ export default class CreateTreeTemplate extends Component {
                 } else {
                     if (type == 1) {
                         if (itemConfig.payload.nodeType.id == 4) {
-                            var fuPerMonth;
-                            var usageFrequency;
-                            var convertToMonth;
-                            var noOfForecastingUnitsPerPerson = (itemConfig.payload.nodeDataMap[0])[0].fuNode.noOfForecastingUnitsPerPerson;
-                            if ((itemConfig.payload.nodeDataMap[0])[0].fuNode.usageType.id == 2 || ((itemConfig.payload.nodeDataMap[0])[0].fuNode.oneTimeUsage != "true" && (itemConfig.payload.nodeDataMap[0])[0].fuNode.oneTimeUsage != true)) {
-                                usageFrequency = (itemConfig.payload.nodeDataMap[0])[0].fuNode.usageFrequency;
-                                convertToMonth = (this.state.usagePeriodList.filter(c => c.usagePeriodId == (itemConfig.payload.nodeDataMap[0])[0].fuNode.usagePeriod.usagePeriodId))[0].convertToMonth;
-                            }
-                            if ((itemConfig.payload.nodeDataMap[0])[0].fuNode.usageType.id == 2) {
-                                fuPerMonth = ((noOfForecastingUnitsPerPerson / usageFrequency) * convertToMonth);
-                                totalValue = fuPerMonth * (itemConfig.payload.nodeDataMap[0])[0].calculatedDataValue;
-                            } else {
-                                var noOfPersons = (itemConfig.payload.nodeDataMap[0])[0].fuNode.noOfPersons;
-                                if ((itemConfig.payload.nodeDataMap[0])[0].fuNode.oneTimeUsage == "true" || (itemConfig.payload.nodeDataMap[0])[0].fuNode.oneTimeUsage == true) {
-                                    fuPerMonth = noOfForecastingUnitsPerPerson / noOfPersons;
-                                    totalValue = fuPerMonth * (itemConfig.payload.nodeDataMap[0])[0].calculatedDataValue;
-                                } else {
-                                    fuPerMonth = ((noOfForecastingUnitsPerPerson / noOfPersons) * usageFrequency * convertToMonth);
-                                    totalValue = fuPerMonth * (itemConfig.payload.nodeDataMap[0])[0].calculatedDataValue;
-                                }
-                            }
-                            (itemConfig.payload.nodeDataMap[0])[0].totalValue = totalValue;
-                            (itemConfig.payload.nodeDataMap[0])[0].fuPerMonth = (fuPerMonth < 0.01 ? addCommasThreeDecimal(fuPerMonth) : addCommasTwoDecimal(fuPerMonth));
-                            // var items = this.state.items;
-                            // var tempItem = items.filter(x=>x.id == itemConfig.id);
-                            // tempItem.fuPerMonth = fuPerMonth;
-                            // tempItem.displayCalculatedDataValue = totalValue;
-                            // var findNodeIndex = items.findIndex(n => n.id == itemConfig.id);
-                            // items[findNodeIndex] = tempItem;
+                            // var fuPerMonth;
+                            // var usageFrequency;
+                            // var convertToMonth;
+                            // var noOfForecastingUnitsPerPerson = (itemConfig.payload.nodeDataMap[0])[0].fuNode.noOfForecastingUnitsPerPerson;
+                            // if ((itemConfig.payload.nodeDataMap[0])[0].fuNode.usageType.id == 2 || ((itemConfig.payload.nodeDataMap[0])[0].fuNode.oneTimeUsage != "true" && (itemConfig.payload.nodeDataMap[0])[0].fuNode.oneTimeUsage != true)) {
+                            //     usageFrequency = (itemConfig.payload.nodeDataMap[0])[0].fuNode.usageFrequency;
+                            //     convertToMonth = (this.state.usagePeriodList.filter(c => c.usagePeriodId == (itemConfig.payload.nodeDataMap[0])[0].fuNode.usagePeriod.usagePeriodId))[0].convertToMonth;
+                            // }
+                            // if ((itemConfig.payload.nodeDataMap[0])[0].fuNode.usageType.id == 2) {
+                            //     fuPerMonth = ((noOfForecastingUnitsPerPerson / usageFrequency) * convertToMonth);
+                            //     totalValue = fuPerMonth * (itemConfig.payload.nodeDataMap[0])[0].calculatedDataValue;
+                            // } else {
+                            //     var noOfPersons = (itemConfig.payload.nodeDataMap[0])[0].fuNode.noOfPersons;
+                            //     if ((itemConfig.payload.nodeDataMap[0])[0].fuNode.oneTimeUsage == "true" || (itemConfig.payload.nodeDataMap[0])[0].fuNode.oneTimeUsage == true) {
+                            //         fuPerMonth = noOfForecastingUnitsPerPerson / noOfPersons;
+                            //         totalValue = fuPerMonth * (itemConfig.payload.nodeDataMap[0])[0].calculatedDataValue;
+                            //     } else {
+                            //         fuPerMonth = ((noOfForecastingUnitsPerPerson / noOfPersons) * usageFrequency * convertToMonth);
+                            //         totalValue = fuPerMonth * (itemConfig.payload.nodeDataMap[0])[0].calculatedDataValue;
+                            //     }
+                            // }
+                            // (itemConfig.payload.nodeDataMap[0])[0].totalValue = totalValue;
+                            // (itemConfig.payload.nodeDataMap[0])[0].fuPerMonth = (fuPerMonth < 0.01 ? addCommasThreeDecimal(fuPerMonth) : addCommasTwoDecimal(fuPerMonth));
 
-                            return addCommasTwoDecimal((itemConfig.payload.nodeDataMap[0])[0].dataValue.toString()) + "% of parent, " + (fuPerMonth < 0.01 ? addCommasThreeDecimal(fuPerMonth) : addCommasTwoDecimal(fuPerMonth)) + "/" + 'Month';
+                            return addCommasTwoDecimal((itemConfig.payload.nodeDataMap[0])[0].displayDataValue) + "% of parent, " + ((itemConfig.payload.nodeDataMap[0])[0].fuPerMonth < 0.01 ? addCommasThreeDecimal((itemConfig.payload.nodeDataMap[0])[0].fuPerMonth) : addCommasTwoDecimal((itemConfig.payload.nodeDataMap[0])[0].fuPerMonth)) + "/" + 'Month';
                         } else if (itemConfig.payload.nodeType.id == 5) {
-                            return addCommasTwoDecimal((itemConfig.payload.nodeDataMap[0])[0].dataValue.toString()) + "% of parent, conversion = " + (itemConfig.payload.nodeDataMap[0])[0].puNode.planningUnit.multiplier;
+                            // return addCommasTwoDecimal((itemConfig.payload.nodeDataMap[0])[0].dataValue.toString()) + "% of parent, conversion = " + (itemConfig.payload.nodeDataMap[0])[0].puNode.planningUnit.multiplier;
+                            return addCommasTwoDecimal((itemConfig.payload.nodeDataMap[0])[0].displayDataValue) + "% of parent, conversion = " + (itemConfig.payload.nodeDataMap[0])[0].puNode.planningUnit.multiplier;
                         } else {
-                            return addCommasTwoDecimal((itemConfig.payload.nodeDataMap[0])[0].dataValue.toString()) + "% of parent";
+                            // return addCommasTwoDecimal((itemConfig.payload.nodeDataMap[0])[0].dataValue.toString()) + "% of parent";
+                            return addCommasTwoDecimal((itemConfig.payload.nodeDataMap[0])[0].displayDataValue) + "% of parent";
                         }
                     } else if (type == 3) {
                         var childList = this.state.items.filter(c => c.parent == itemConfig.id && (c.payload.nodeType.id == 3 || c.payload.nodeType.id == 4 || c.payload.nodeType.id == 5));
                         if (childList.length > 0) {
                             var sum = 0;
                             childList.map(c => {
-                                sum += Number((c.payload.nodeDataMap[0])[0].dataValue)
+                                sum += Number((c.payload.nodeDataMap[0])[0].displayDataValue)
                             })
                             console.log("sum if---", sum);
                             return sum.toFixed(2);
@@ -2045,18 +2037,19 @@ export default class CreateTreeTemplate extends Component {
                             return "";
                         }
                     } else {
-                        if (itemConfig.payload.nodeType.id == 4) {
-                            (itemConfig.payload.nodeDataMap[0])[0].displayCalculatedDataValue = ((itemConfig.payload.nodeDataMap[0])[0].totalValue != null ? addCommasTwoDecimal(((itemConfig.payload.nodeDataMap[0])[0].totalValue).toString()) : "0");
-                            return "= " + ((itemConfig.payload.nodeDataMap[0])[0].totalValue != null ? addCommasTwoDecimal(((itemConfig.payload.nodeDataMap[0])[0].totalValue).toString()) : "0");
-                        } else if (itemConfig.payload.nodeType.id == 5) {
-                            totalValue = ((this.state.items.filter(x => x.id == itemConfig.parent)[0].payload.nodeDataMap[0][0].totalValue * (itemConfig.payload.nodeDataMap[0])[0].dataValue) / 100) / (itemConfig.payload.nodeDataMap[0])[0].puNode.planningUnit.multiplier;
-                            // totalValue = (this.state.items.filter(x => x.id == itemConfig.parent)[0].payload.nodeDataMap[0][0].totalValue * (itemConfig.payload.nodeDataMap[0])[0].dataValue) / 100;
-                            (itemConfig.payload.nodeDataMap[0])[0].displayCalculatedDataValue = (totalValue != null ? addCommasTwoDecimal((totalValue).toString()) : "0");
-                            return "= " + (totalValue != null ? addCommasTwoDecimal((totalValue).toString()) : "0");
-                        }
-                        else {
-                            return "= " + ((itemConfig.payload.nodeDataMap[0])[0].calculatedDataValue != null ? addCommasTwoDecimal((itemConfig.payload.nodeDataMap[0])[0].calculatedDataValue.toString()) : "0");
-                        }
+                        return "= " + ((itemConfig.payload.nodeDataMap[0])[0].displayCalculatedDataValue != null ? addCommasTwoDecimal((itemConfig.payload.nodeDataMap[0])[0].displayCalculatedDataValue) : "");
+                        // if (itemConfig.payload.nodeType.id == 4) {
+                        //     (itemConfig.payload.nodeDataMap[0])[0].displayCalculatedDataValue = ((itemConfig.payload.nodeDataMap[0])[0].totalValue != null ? addCommasTwoDecimal(((itemConfig.payload.nodeDataMap[0])[0].totalValue).toString()) : "0");
+                        //     return "= " + ((itemConfig.payload.nodeDataMap[0])[0].totalValue != null ? addCommasTwoDecimal(((itemConfig.payload.nodeDataMap[0])[0].totalValue).toString()) : "0");
+                        // } else if (itemConfig.payload.nodeType.id == 5) {
+                        //     totalValue = ((this.state.items.filter(x => x.id == itemConfig.parent)[0].payload.nodeDataMap[0][0].totalValue * (itemConfig.payload.nodeDataMap[0])[0].dataValue) / 100) / (itemConfig.payload.nodeDataMap[0])[0].puNode.planningUnit.multiplier;
+                        //     // totalValue = (this.state.items.filter(x => x.id == itemConfig.parent)[0].payload.nodeDataMap[0][0].totalValue * (itemConfig.payload.nodeDataMap[0])[0].dataValue) / 100;
+                        //     (itemConfig.payload.nodeDataMap[0])[0].displayCalculatedDataValue = (totalValue != null ? addCommasTwoDecimal((totalValue).toString()) : "0");
+                        //     return "= " + (totalValue != null ? addCommasTwoDecimal((totalValue).toString()) : "0");
+                        // }
+                        // else {
+                        //     return "= " + ((itemConfig.payload.nodeDataMap[0])[0].calculatedDataValue != null ? addCommasTwoDecimal((itemConfig.payload.nodeDataMap[0])[0].calculatedDataValue.toString()) : "0");
+                        // }
                     }
                 }
             }
@@ -2456,7 +2449,8 @@ export default class CreateTreeTemplate extends Component {
                 {
                     title: i18n.t('static.common.month'),
                     type: 'dropdown',
-                    source: this.state.monthList
+                    source: this.state.monthList,
+                    readOnly: true
                     // type: 'calendar',
                     // options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker' }, width: 100
                 },
@@ -2624,7 +2618,8 @@ export default class CreateTreeTemplate extends Component {
                     // 0
                     title: i18n.t('static.common.month'),
                     type: 'dropdown',
-                    source: this.state.monthList
+                    source: this.state.monthList,
+                    readOnly: true
                     // type: 'calendar',
                     // options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker' }, width: 100
                 },
@@ -2879,7 +2874,7 @@ export default class CreateTreeTemplate extends Component {
         var options = {
             data: data,
             columnDrag: true,
-            colWidths: [90, 150, 80, 80, 90, 90, 90, 90, 90,90],
+            colWidths: [90, 150, 80, 80, 90, 90, 90, 90, 90, 90],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 //1 B
@@ -5282,7 +5277,12 @@ export default class CreateTreeTemplate extends Component {
 
         }
         if (event.target.name == "monthId") {
-            this.updateTreeData(event.target.value);
+            console.log("month id on change value---", event.target.value);
+            var monthId = event.target.value;
+            this.setState({ monthId }, () => {
+                this.updateTreeData(monthId);
+            })
+
         }
 
         if (event.target.name == "active") {
@@ -5456,6 +5456,7 @@ export default class CreateTreeTemplate extends Component {
 
         if (event.target.name === "monthNo") {
             (currentItemConfig.context.payload.nodeDataMap[0])[0].monthNo = event.target.value;
+            this.calculateParentValueFromMOM(event.target.value);
         }
 
         if (event.target.name === "usageFrequency") {
@@ -5948,7 +5949,7 @@ export default class CreateTreeTemplate extends Component {
         var chartOptions = {
             title: {
                 display: true,
-                text:this.state.showMomData?getLabelText(this.state.treeTemplate.label,this.state.lang)+" - "+getLabelText(this.state.currentItemConfig.context.payload.label,this.state.lang):""
+                text: this.state.showMomData ? getLabelText(this.state.treeTemplate.label, this.state.lang) + " - " + getLabelText(this.state.currentItemConfig.context.payload.label, this.state.lang) : ""
             },
             scales: {
                 yAxes: [
@@ -6061,7 +6062,7 @@ export default class CreateTreeTemplate extends Component {
             )
 
             bar = {
-                labels: [...new Set(this.state.momList.map(ele => (ele.month)))],
+                labels: [...new Set(this.state.momList.map(ele => ("Month " + ele.month)))],
                 datasets: datasetsArr
 
             };
@@ -6071,7 +6072,7 @@ export default class CreateTreeTemplate extends Component {
         var chartOptions1 = {
             title: {
                 display: true,
-                text:this.state.showMomDataPercent?getLabelText(this.state.treeTemplate.label,this.state.lang)+" - "+getLabelText(this.state.currentItemConfig.context.payload.label,this.state.lang):""
+                text: this.state.showMomDataPercent ? getLabelText(this.state.treeTemplate.label, this.state.lang) + " - " + getLabelText(this.state.currentItemConfig.context.payload.label, this.state.lang) : ""
             },
             scales: {
                 yAxes: [
@@ -6228,7 +6229,7 @@ export default class CreateTreeTemplate extends Component {
 
 
             bar1 = {
-                labels: [...new Set(this.state.momListPer.map(ele => (ele.month)))],
+                labels: [...new Set(this.state.momListPer.map(ele => ("Month " + ele.month)))],
                 datasets: datasetsArr
 
             };
