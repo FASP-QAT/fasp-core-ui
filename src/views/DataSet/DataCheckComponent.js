@@ -15,18 +15,31 @@ export function dataCheck(props, datasetJson) {
 
     var treeScenarioNotes = [];
     var missingBranchesList = [];
+    var datasetRegionList = datasetJson.regionList;
+    var datasetPlanningUnit = datasetJson.planningUnitList.filter(c => c.active.toString() == "true");
     for (var tl = 0; tl < PgmTreeList.length; tl++) {
         var treeList = PgmTreeList[tl];
         var scenarioList = treeList.scenarioList.filter(c => c.active.toString() == "true");
         for (var ndm = 0; ndm < scenarioList.length; ndm++) {
-            treeScenarioNotes.push({
-                tree: PgmTreeList[tl].label,
-                scenario: scenarioList[ndm].label,
-                treeId: PgmTreeList[tl].treeId,
-                scenarioId: scenarioList[ndm].id,
-                scenarioNotes: scenarioList[ndm].notes,
-                treeNotes: PgmTreeList[tl].notes
-            });
+            for (var dpu = 0; dpu < datasetPlanningUnit.length; dpu++) {
+                for (var drl = 0; drl < datasetRegionList.length; drl++) {
+                    var regionId = datasetRegionList[drl].regionId;
+                    console.log("props.state.includeOnlySelectedForecasts@@@@@@@@@@@@", props.state.includeOnlySelectedForecasts);
+                    console.log("props.state.includeOnlySelectedForecasts 1@@@@@@@@@@@@", datasetPlanningUnit[dpu].selectedForecastMap);
+                    if ((props.state.includeOnlySelectedForecasts && datasetPlanningUnit[dpu].selectedForecastMap != undefined && datasetPlanningUnit[dpu].selectedForecastMap[regionId] != undefined && datasetPlanningUnit[dpu].selectedForecastMap[regionId].scenarioId == scenarioList[ndm].id && datasetPlanningUnit[dpu].selectedForecastMap[regionId].treeId == PgmTreeList[tl].treeId) || (!props.state.includeOnlySelectedForecasts)) {
+                        if (treeScenarioNotes.findIndex(c => c.treeId == PgmTreeList[tl].treeId && c.scenarioId == scenarioList[ndm].id) == -1) {
+                            treeScenarioNotes.push({
+                                tree: PgmTreeList[tl].label,
+                                scenario: scenarioList[ndm].label,
+                                treeId: PgmTreeList[tl].treeId,
+                                scenarioId: scenarioList[ndm].id,
+                                scenarioNotes: scenarioList[ndm].notes,
+                                treeNotes: PgmTreeList[tl].notes
+                            });
+                        }
+                    }
+                }
+            }
         }
     }
     var treePlanningUnitList = [];
@@ -41,28 +54,38 @@ export function dataCheck(props, datasetJson) {
             var nodeDataMap = payload.nodeDataMap;
             var scenarioList = treeList.scenarioList.filter(c => c.active.toString() == "true");
             for (var ndm = 0; ndm < scenarioList.length; ndm++) {
-                if (payload.nodeType.id == 5) {
-                    var nodePlanningUnit = ((nodeDataMap[scenarioList[ndm].id])[0].puNode.planningUnit);
-                    treePlanningUnitList.push(nodePlanningUnit);
-                }
+                for (var dpu = 0; dpu < datasetPlanningUnit.length; dpu++) {
+                    for (var drl = 0; drl < datasetRegionList.length; drl++) {
+                        var regionId = datasetRegionList[drl].regionId;
+                        if ((props.state.includeOnlySelectedForecasts && datasetPlanningUnit[dpu].selectedForecastMap != undefined && datasetPlanningUnit[dpu].selectedForecastMap[regionId] != undefined && datasetPlanningUnit[dpu].selectedForecastMap[regionId].scenarioId == scenarioList[ndm].id && datasetPlanningUnit[dpu].selectedForecastMap[regionId].treeId == PgmTreeList[tl].treeId) || (!props.state.includeOnlySelectedForecasts)) {
+                            if (treeNodeList.findIndex(c => c.nodeDataId == (nodeDataMap[scenarioList[ndm].id])[0].nodeDataId) == -1) {
+                                if (payload.nodeType.id == 5) {
+                                    var nodePlanningUnit = ((nodeDataMap[scenarioList[ndm].id])[0].puNode.planningUnit);
+                                    treePlanningUnitList.push(nodePlanningUnit);
+                                }
 
-                //Tree scenario and node notes
-                var nodeNotes = ((nodeDataMap[scenarioList[ndm].id])[0].notes);
-                var modelingList = ((nodeDataMap[scenarioList[ndm].id])[0].nodeDataModelingList);
-                var madelingNotes = "";
-                for (var ml = 0; ml < modelingList.length; ml++) {
-                    madelingNotes = madelingNotes.concat(modelingList[ml].notes).concat(" | ")
+                                //Tree scenario and node notes
+                                var nodeNotes = ((nodeDataMap[scenarioList[ndm].id])[0].notes);
+                                var modelingList = ((nodeDataMap[scenarioList[ndm].id])[0].nodeDataModelingList);
+                                var madelingNotes = "";
+                                for (var ml = 0; ml < modelingList.length; ml++) {
+                                    madelingNotes = madelingNotes.concat(modelingList[ml].notes).concat(" | ")
+                                }
+                                treeNodeList.push({
+                                    tree: PgmTreeList[tl].label,
+                                    scenario: scenarioList[ndm].label,
+                                    treeId: PgmTreeList[tl].treeId,
+                                    scenarioId: scenarioList[ndm].id,
+                                    node: payload.label,
+                                    notes: nodeNotes,
+                                    madelingNotes: madelingNotes.slice(0, -2),
+                                    scenarioNotes: scenarioList[ndm].notes,
+                                    nodeDataId: (nodeDataMap[scenarioList[ndm].id])[0].nodeDataId
+                                });
+                            }
+                        }
+                    }
                 }
-                treeNodeList.push({
-                    tree: PgmTreeList[tl].label,
-                    scenario: scenarioList[ndm].label,
-                    treeId: PgmTreeList[tl].treeId,
-                    scenarioId: scenarioList[ndm].id,
-                    node: payload.label,
-                    notes: nodeNotes,
-                    madelingNotes: madelingNotes.slice(0, -2),
-                    scenarioNotes: scenarioList[ndm].notes
-                });
             }
             // Tree Forecast : branches missing PU
             var flatListFiltered = flatList.filter(c => flatList.filter(f => f.parent == c.id).length == 0);
@@ -202,48 +225,54 @@ export function dataCheck(props, datasetJson) {
     //Consumption : planning unit less 24 month
     var consumptionListlessTwelve = [];
     var noForecastSelectedList = [];
+    var datasetPlanningUnitNotes = [];
     for (var dpu = 0; dpu < datasetPlanningUnit.length; dpu++) {
         if (datasetPlanningUnit[dpu].consuptionForecast.toString() == "true") {
             for (var drl = 0; drl < datasetRegionList.length; drl++) {
-                var curDate = startDate;
-                var monthsArray = [];
-                var puId = datasetPlanningUnit[dpu].planningUnit.id;
                 var regionId = datasetRegionList[drl].regionId;
-                var consumptionListFiltered = consumptionList.filter(c => c.planningUnit.id == puId && c.region.id == regionId);
-                if (consumptionListFiltered.length < 24) {
-                    consumptionListlessTwelve.push({
-                        planningUnitId: datasetPlanningUnit[dpu].planningUnit.id,
-                        planningUnitLabel: datasetPlanningUnit[dpu].planningUnit.label,
-                        regionId: datasetRegionList[drl].regionId,
-                        regionLabel: datasetRegionList[drl].label,
-                        noOfMonths: consumptionListFiltered.length
-                    })
-                }
+                if ((props.state.includeOnlySelectedForecasts && datasetPlanningUnit[dpu].selectedForecastMap != undefined && datasetPlanningUnit[dpu].selectedForecastMap[regionId] != undefined && datasetPlanningUnit[dpu].selectedForecastMap[regionId].consumptionExtrapolationId > 0) || (!props.state.includeOnlySelectedForecasts)) {
+                    if (datasetPlanningUnitNotes.findIndex(c => c.planningUnit.id == datasetPlanningUnit[dpu].planningUnit.id) == -1) {
+                        datasetPlanningUnitNotes.push(datasetPlanningUnit[dpu])
+                    }
+                    var curDate = startDate;
+                    var monthsArray = [];
+                    var puId = datasetPlanningUnit[dpu].planningUnit.id;
+                    var consumptionListFiltered = consumptionList.filter(c => c.planningUnit.id == puId && c.region.id == regionId);
+                    if (consumptionListFiltered.length < 24) {
+                        consumptionListlessTwelve.push({
+                            planningUnitId: datasetPlanningUnit[dpu].planningUnit.id,
+                            planningUnitLabel: datasetPlanningUnit[dpu].planningUnit.label,
+                            regionId: datasetRegionList[drl].regionId,
+                            regionLabel: datasetRegionList[drl].label,
+                            noOfMonths: consumptionListFiltered.length
+                        })
+                    }
 
-                //Consumption : missing months
-                var consumptionListFilteredForMonth = consumptionList.filter(c => c.planningUnit.id == puId && c.region.id == regionId);
-                let actualMin = moment.min(consumptionListFilteredForMonth.map(d => moment(d.month)));
-                curDate = moment(actualMin).format("YYYY-MM-DD");
-                for (var i = 0; moment(curDate).format("YYYY-MM") < moment(Date.now()).format("YYYY-MM"); i++) {
+                    //Consumption : missing months
                     var consumptionListFilteredForMonth = consumptionList.filter(c => c.planningUnit.id == puId && c.region.id == regionId);
                     let actualMin = moment.min(consumptionListFilteredForMonth.map(d => moment(d.month)));
-                    curDate = moment(actualMin).add(i, 'months').format("YYYY-MM-DD");
-                    var consumptionListForCurrentMonth = consumptionListFilteredForMonth.filter(c => moment(c.month).format("YYYY-MM") == moment(curDate).format("YYYY-MM"));
-                    var checkIfPrevMonthConsumptionAva = consumptionListFilteredForMonth.filter(c => moment(c.month).format("YYYY-MM") < moment(curDate).format("YYYY-MM"));
-                    var checkIfNextMonthConsumptionAva = consumptionListFilteredForMonth.filter(c => moment(c.month).format("YYYY-MM") > moment(curDate).format("YYYY-MM"));
-                    if (consumptionListForCurrentMonth.length == 0 && checkIfPrevMonthConsumptionAva.length > 0 && checkIfNextMonthConsumptionAva.length > 0) {
-                        monthsArray.push(moment(curDate).format(DATE_FORMAT_CAP_WITHOUT_DATE));
+                    curDate = moment(actualMin).format("YYYY-MM-DD");
+                    for (var i = 0; moment(curDate).format("YYYY-MM") < moment(Date.now()).format("YYYY-MM"); i++) {
+                        var consumptionListFilteredForMonth = consumptionList.filter(c => c.planningUnit.id == puId && c.region.id == regionId);
+                        let actualMin = moment.min(consumptionListFilteredForMonth.map(d => moment(d.month)));
+                        curDate = moment(actualMin).add(i, 'months').format("YYYY-MM-DD");
+                        var consumptionListForCurrentMonth = consumptionListFilteredForMonth.filter(c => moment(c.month).format("YYYY-MM") == moment(curDate).format("YYYY-MM"));
+                        var checkIfPrevMonthConsumptionAva = consumptionListFilteredForMonth.filter(c => moment(c.month).format("YYYY-MM") < moment(curDate).format("YYYY-MM"));
+                        var checkIfNextMonthConsumptionAva = consumptionListFilteredForMonth.filter(c => moment(c.month).format("YYYY-MM") > moment(curDate).format("YYYY-MM"));
+                        if (consumptionListForCurrentMonth.length == 0 && checkIfPrevMonthConsumptionAva.length > 0 && checkIfNextMonthConsumptionAva.length > 0) {
+                            monthsArray.push(moment(curDate).format(DATE_FORMAT_CAP_WITHOUT_DATE));
+                        }
                     }
-                }
 
-                if (monthsArray.length > 0) {
-                    missingMonthList.push({
-                        planningUnitId: datasetPlanningUnit[dpu].planningUnit.id,
-                        planningUnitLabel: datasetPlanningUnit[dpu].planningUnit.label,
-                        regionId: datasetRegionList[drl].regionId,
-                        regionLabel: datasetRegionList[drl].label,
-                        monthsArray: monthsArray
-                    })
+                    if (monthsArray.length > 0) {
+                        missingMonthList.push({
+                            planningUnitId: datasetPlanningUnit[dpu].planningUnit.id,
+                            planningUnitLabel: datasetPlanningUnit[dpu].planningUnit.label,
+                            regionId: datasetRegionList[drl].regionId,
+                            regionLabel: datasetRegionList[drl].label,
+                            monthsArray: monthsArray
+                        })
+                    }
                 }
             }
         }
@@ -275,6 +304,7 @@ export function dataCheck(props, datasetJson) {
     props.updateState("stopDate", stopDate)
     props.updateState("progressPer", 25)
     props.updateState("treeScenarioList", treeScenarioList)
+    props.updateState("datasetPlanningUnitNotes", datasetPlanningUnitNotes)
     props.updateState("loading", false)
 }
 
@@ -995,7 +1025,7 @@ export function exportPDF(props) {
     columns.push(i18n.t('static.program.notes'));
     var headers = [columns]
     var dataArr2 = [];
-    props.state.datasetPlanningUnit.filter(c => c.consuptionForecast.toString() == "true").map((item5, i) => {
+    props.state.datasetPlanningUnitNotes.filter(c => c.consuptionForecast.toString() == "true").map((item5, i) => {
         dataArr2.push([
             getLabelText(item5.planningUnit.label, props.state.lang),
             item5.consumtionNotes])
@@ -1009,7 +1039,7 @@ export function exportPDF(props) {
 
     };
 
-    if (props.state.datasetPlanningUnit.length > 0 && props.state.datasetPlanningUnit.filter(c => c.consuptionForecast.toString() == "true").length > 0) {
+    if (props.state.datasetPlanningUnitNotes.length > 0 && props.state.datasetPlanningUnitNotes.filter(c => c.consuptionForecast.toString() == "true").length > 0) {
         doc.autoTable(content1);// doc.addPage()
         y = doc.lastAutoTable.finalY + 20
         if (y + 100 > height) {

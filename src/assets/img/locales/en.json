@@ -2270,5 +2270,6 @@
     "static.extrpolation.graphTitlePart2":" in ",
     "static.extrapolations.showFits":"Show Fits",
     "static.extrapolation.missingDataNotePart1":"You have months with no actual consumption data, which will cause unexpected results in the extrapolation. Return to the ",
-    "static.extrapolation.missingDataNotePart2":"screen to fill in or interpolate the missing data."
+    "static.extrapolation.missingDataNotePart2":"screen to fill in or interpolate the missing data.",
+    "static.validation.includeOnlySelectedForecast":"Include only Selected Forecasts"
 }
