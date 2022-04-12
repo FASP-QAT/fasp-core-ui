@@ -314,28 +314,28 @@ class CompareAndSelectScenario extends Component {
             monthArrayForError.push(moment(actualMax).add(-5, 'months').format("YYYY-MM-DD"));
         }
         var multiplier = 1;
-        var selectedPlanningUnit = this.state.planningUnitList.filter(c => c.planningUnit.id == this.state.planningUnitId);
-        if (this.state.viewById == 2) {
-            multiplier = selectedPlanningUnit.length > 0 ? selectedPlanningUnit[0].planningUnit.multiplier : 1;
-        }
-        if (this.state.viewById == 3) {
-            var selectedEquivalencyUnit = this.state.equivalencyUnitListAll.filter(c => c.equivalencyUnitMappingId == this.state.equivalencyUnitId);
-            multiplier = selectedEquivalencyUnit.length > 0 ? selectedEquivalencyUnit[0].convertToEu : 1;
-        }
-        var actualCalculationDataType = selectedPlanningUnit.consumptionDataType;
+        // var selectedPlanningUnit = this.state.planningUnitList.filter(c => c.planningUnit.id == this.state.planningUnitId);
+        // if (this.state.viewById == 2) {
+        //     multiplier = selectedPlanningUnit.length > 0 ? selectedPlanningUnit[0].planningUnit.multiplier : 1;
+        // }
+        // if (this.state.viewById == 3) {
+        //     var selectedEquivalencyUnit = this.state.equivalencyUnitListAll.filter(c => c.equivalencyUnitMappingId == this.state.equivalencyUnitId);
+        //     multiplier = selectedEquivalencyUnit.length > 0 ? selectedEquivalencyUnit[0].convertToEu : 1;
+        // }
+        // var actualCalculationDataType = selectedPlanningUnit.consumptionDataType;
         var actualMultiplier = 1;
-        if (actualCalculationDataType == 1) {
-            actualMultiplier = selectedPlanningUnit.planningUnit.multiplier;
-        } else if (selectedPlanningUnit.consumptionDataType == 2) {
-            actualMultiplier = 1;
-        } else if (selectedPlanningUnit.consumptionDataType == 3) {
-            actualMultiplier = selectedPlanningUnit.otherUnit.multiplier
-        }
+        // if (actualCalculationDataType == 1) {
+        //     actualMultiplier = selectedPlanningUnit.planningUnit.multiplier;
+        // } else if (selectedPlanningUnit.consumptionDataType == 2) {
+        //     actualMultiplier = 1;
+        // } else if (selectedPlanningUnit.consumptionDataType == 3) {
+        //     actualMultiplier = selectedPlanningUnit.otherUnit.multiplier
+        // }
         var totalActual = 0;
         for (var mo = 0; mo < monthArrayForError.length; mo++) {
             var actualFilter = consumptionData.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArrayForError[mo]).format("YYYY-MM"));
             if (actualFilter.length > 0) {
-                totalActual += Number(actualFilter.length > 0 ? (Number(actualFilter[0].amount) * Number(actualMultiplier) * Number(multiplier)).toFixed(2) : 0);
+                totalActual += Number(actualFilter.length > 0 ? (Number(actualFilter[0].puAmount) * Number(actualMultiplier) * Number(multiplier)).toFixed(2) : 0);
             }
         }
         var actualDiff = [];
@@ -351,12 +351,9 @@ class CompareAndSelectScenario extends Component {
 
             var actualFilter = consumptionData.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArrayListWithoutFormat[m]).format("YYYY-MM"));
 
-            data[1] = actualFilter.length > 0 ? (Number(actualFilter[0].amount) * Number(actualMultiplier) * Number(multiplier)).toFixed(2) : "";
-            actualConsumptionListForMonth.push(actualFilter.length > 0 ? (Number(actualFilter[0].amount) * Number(actualMultiplier) * Number(multiplier)) : null);
+            data[1] = actualFilter.length > 0 ? (Number(actualFilter[0].puAmount) * Number(actualMultiplier) * Number(multiplier)).toFixed(2) : "";
+            actualConsumptionListForMonth.push(actualFilter.length > 0 ? (Number(actualFilter[0].puAmount) * Number(actualMultiplier) * Number(multiplier)) : null);
             var monthArrayForErrorFilter = monthArrayForError.filter(c => moment(c).format("YYYY-MM") == moment(monthArrayListWithoutFormat[m]).format("YYYY-MM"));
-            if (monthArrayForErrorFilter.length > 0) {
-                // totalActual += actualFilter.length > 0 ? (Number(actualFilter[0].amount) * Number(multiplier)).toFixed(2) : 0;
-            }
             console.log("TreeScenarioList###", treeScenarioList)
             for (var tsl = 0; tsl < treeScenarioList.length; tsl++) {
                 // if (tsl == 0) {
@@ -370,7 +367,7 @@ class CompareAndSelectScenario extends Component {
                     totalArray[tsl] = Number(totalArray[tsl] != undefined ? totalArray[tsl] : 0) + Number(scenarioFilter.length > 0 ? Number(scenarioFilter[0].calculatedMmdValue).toFixed(2) * multiplier : 0);
 
                     if (monthArrayForErrorFilter.length > 0) {
-                        var diff = ((actualFilter.length > 0 ? (Number(actualFilter[0].amount) * Number(actualMultiplier) * Number(multiplier)).toFixed(2) : 0) - (scenarioFilter.length > 0 ? Number(scenarioFilter[0].calculatedMmdValue).toFixed(2) * multiplier : ""));
+                        var diff = ((actualFilter.length > 0 ? (Number(actualFilter[0].puAmount) * Number(actualMultiplier) * Number(multiplier)).toFixed(2) : 0) - (scenarioFilter.length > 0 ? Number(scenarioFilter[0].calculatedMmdValue).toFixed(2) * multiplier : ""));
                         if (diff < 0) {
                             diff = 0 - diff;
                         }
@@ -387,7 +384,7 @@ class CompareAndSelectScenario extends Component {
                     totalArray[tsl] = Number(totalArray[tsl] != undefined ? totalArray[tsl] : 0) + Number(scenarioFilter.length > 0 ? (Number(scenarioFilter[0].amount) * Number(actualMultiplier) * Number(multiplier)).toFixed(2) : 0);
 
                     if (monthArrayForErrorFilter.length > 0) {
-                        var diff = ((actualFilter.length > 0 ? (Number(actualFilter[0].amount) * Number(actualMultiplier) * Number(multiplier)).toFixed(2) : 0) - (scenarioFilter.length > 0 ? (Number(scenarioFilter[0].amount) * Number(actualMultiplier) * Number(multiplier)).toFixed(2) : ""));
+                        var diff = ((actualFilter.length > 0 ? (Number(actualFilter[0].puAmount) * Number(actualMultiplier) * Number(multiplier)).toFixed(2) : 0) - (scenarioFilter.length > 0 ? (Number(scenarioFilter[0].amount) * Number(actualMultiplier) * Number(multiplier)).toFixed(2) : ""));
                         if (diff < 0) {
                             diff = 0 - diff;
                         }
@@ -412,7 +409,7 @@ class CompareAndSelectScenario extends Component {
 
             var actualFilter = consumptionData.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArrayListWithoutFormat[m]).format("YYYY-MM"));
 
-            data[1] = actualFilter.length > 0 ? (Number(actualFilter[0].amount) * Number(actualMultiplier) * Number(multiplier)).toFixed(2) : "";
+            data[1] = actualFilter.length > 0 ? (Number(actualFilter[0].puAmount) * Number(actualMultiplier) * Number(multiplier)).toFixed(2) : "";
             for (var tsl = 0; tsl < treeScenarioList.length; tsl++) {
                 // if (tsl == 0) {
                 //     totalArray[tsl] = 0;

@@ -1072,7 +1072,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
             var reportingRateCount = 3;
             var daysOfStockOutCount = 4;
             var adjustedAmountCount = 6;
-            var puAmountCount = 6;
+            var puAmountCount = 7;
 
             for (var r = 0; r < regionList.length; r++) {
               console.log("&&&&&&&&&&MonthList", monthArray[i]);
