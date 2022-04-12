@@ -1765,35 +1765,35 @@ export default class CreateTreeTemplate extends Component {
         if (this.state.currentItemConfig.context.payload.nodeType.id > 2) {
             if (this.state.currentModelingType == 5) {
 
-                elInstance.setValueFromCoords(2, this.state.currentRowIndex, 5, true);
-                elInstance.setValueFromCoords(3, this.state.currentRowIndex, this.state.currentCalculatorStartDate, true);
-                elInstance.setValueFromCoords(4, this.state.currentRowIndex, this.state.currentCalculatorStopDate, true);
-                elInstance.setValueFromCoords(5, this.state.currentRowIndex, parseFloat(this.state.currentCalculatedMomChange).toFixed(4), true);
-                elInstance.setValueFromCoords(6, this.state.currentRowIndex, '', true);
-                elInstance.setValueFromCoords(8, this.state.currentRowIndex, parseFloat(this.state.currentCalculatedMomChange).toFixed(4), true);
+                elInstance.setValueFromCoords(4, this.state.currentRowIndex, 5, true);
+                elInstance.setValueFromCoords(1, this.state.currentRowIndex, this.state.currentCalculatorStartDate, true);
+                elInstance.setValueFromCoords(2, this.state.currentRowIndex, this.state.currentCalculatorStopDate, true);
+                elInstance.setValueFromCoords(6, this.state.currentRowIndex, parseFloat(this.state.currentCalculatedMomChange).toFixed(4), true);
+                elInstance.setValueFromCoords(7, this.state.currentRowIndex, '', true);
+                elInstance.setValueFromCoords(9, this.state.currentRowIndex, parseFloat(this.state.currentCalculatedMomChange).toFixed(4), true);
             }
         } else {
             if (this.state.currentModelingType == 2) {
-                elInstance.setValueFromCoords(2, this.state.currentRowIndex, this.state.currentModelingType, true);
-                elInstance.setValueFromCoords(3, this.state.currentRowIndex, this.state.currentCalculatorStartDate, true);
-                elInstance.setValueFromCoords(4, this.state.currentRowIndex, this.state.currentCalculatorStopDate, true);
-                elInstance.setValueFromCoords(5, this.state.currentRowIndex, '', true);
-                elInstance.setValueFromCoords(6, this.state.currentRowIndex, this.state.currentTargetChangeNumber, true);
-                elInstance.setValueFromCoords(8, this.state.currentRowIndex, parseFloat(this.state.currentCalculatedMomChange).toFixed(4), true);
+                elInstance.setValueFromCoords(4, this.state.currentRowIndex, this.state.currentModelingType, true);
+                elInstance.setValueFromCoords(1, this.state.currentRowIndex, this.state.currentCalculatorStartDate, true);
+                elInstance.setValueFromCoords(2, this.state.currentRowIndex, this.state.currentCalculatorStopDate, true);
+                elInstance.setValueFromCoords(6, this.state.currentRowIndex, '', true);
+                elInstance.setValueFromCoords(7, this.state.currentRowIndex, this.state.currentTargetChangeNumber, true);
+                elInstance.setValueFromCoords(9, this.state.currentRowIndex, parseFloat(this.state.currentCalculatedMomChange).toFixed(4), true);
             } else if (this.state.currentModelingType == 3) {
-                elInstance.setValueFromCoords(2, this.state.currentRowIndex, this.state.currentModelingType, true);
-                elInstance.setValueFromCoords(3, this.state.currentRowIndex, this.state.currentCalculatorStartDate, true);
-                elInstance.setValueFromCoords(4, this.state.currentRowIndex, this.state.currentCalculatorStopDate, true);
-                elInstance.setValueFromCoords(5, this.state.currentRowIndex, parseFloat(this.state.currentTargetChangePercentage).toFixed(4), true);
-                elInstance.setValueFromCoords(6, this.state.currentRowIndex, '', true);
-                elInstance.setValueFromCoords(8, this.state.currentRowIndex, parseFloat(this.state.currentCalculatedMomChange).toFixed(4), true);
+                elInstance.setValueFromCoords(4, this.state.currentRowIndex, this.state.currentModelingType, true);
+                elInstance.setValueFromCoords(1, this.state.currentRowIndex, this.state.currentCalculatorStartDate, true);
+                elInstance.setValueFromCoords(2, this.state.currentRowIndex, this.state.currentCalculatorStopDate, true);
+                elInstance.setValueFromCoords(6, this.state.currentRowIndex, parseFloat(this.state.currentTargetChangePercentage).toFixed(4), true);
+                elInstance.setValueFromCoords(7, this.state.currentRowIndex, '', true);
+                elInstance.setValueFromCoords(9, this.state.currentRowIndex, parseFloat(this.state.currentCalculatedMomChange).toFixed(4), true);
             } else if (this.state.currentModelingType == 4) {
-                elInstance.setValueFromCoords(2, this.state.currentRowIndex, this.state.currentModelingType, true);
-                elInstance.setValueFromCoords(3, this.state.currentRowIndex, this.state.currentCalculatorStartDate, true);
-                elInstance.setValueFromCoords(4, this.state.currentRowIndex, this.state.currentCalculatorStopDate, true);
-                elInstance.setValueFromCoords(5, this.state.currentRowIndex, parseFloat(this.state.currentTargetChangePercentage).toFixed(4), true);
-                elInstance.setValueFromCoords(6, this.state.currentRowIndex, '', true);
-                elInstance.setValueFromCoords(8, this.state.currentRowIndex, parseFloat(this.state.currentCalculatedMomChange).toFixed(4), true);
+                elInstance.setValueFromCoords(4, this.state.currentRowIndex, this.state.currentModelingType, true);
+                elInstance.setValueFromCoords(1, this.state.currentRowIndex, this.state.currentCalculatorStartDate, true);
+                elInstance.setValueFromCoords(2, this.state.currentRowIndex, this.state.currentCalculatorStopDate, true);
+                elInstance.setValueFromCoords(6, this.state.currentRowIndex, parseFloat(this.state.currentTargetChangePercentage).toFixed(4), true);
+                elInstance.setValueFromCoords(7, this.state.currentRowIndex, '', true);
+                elInstance.setValueFromCoords(9, this.state.currentRowIndex, parseFloat(this.state.currentCalculatedMomChange).toFixed(4), true);
             }
         }
         this.setState({ showCalculatorFields: false });
@@ -2139,13 +2139,13 @@ export default class CreateTreeTemplate extends Component {
                     console.log("transferList.length > 0---", transferList.length);
                     if (transferList.length == 1) {
                         console.log("transferList.length == 1---", transferList.length);
-                        tempTransferList[0].transferNodeDataId = arr[i].id;
+                        tempTransferList[0].transferNodeDataId = arr[i].payload.nodeDataMap[0][0].nodeDataId;
                         nodeTransferDataList.push(tempTransferList[0]);
                     } else {
                         console.log("transferList.length > 1---", transferList.length);
-                        for (let i = 0; i < transferList.length; i++) {
-                            tempTransferList[i].transferNodeDataId = arr[i].id;
-                            nodeTransferDataList.push(tempTransferList[i]);
+                        for (let j = 0; j < transferList.length; j++) {
+                            tempTransferList[j].transferNodeDataId = arr[i].payload.nodeDataMap[0][0].nodeDataId;
+                            nodeTransferDataList.push(tempTransferList[j]);
                         }
                     }
 
@@ -3024,7 +3024,7 @@ export default class CreateTreeTemplate extends Component {
                         var cell = elInstance.getCell(("H").concat(parseInt(y) + 1))
                         cell.classList.add('readonly');
                     }
-                    if (rowData[3] != "") {
+                    if (rowData[3] != "" || rowData[12] == 1) {
                         var cell = elInstance.getCell(("F").concat(parseInt(y) + 1))
                         cell.classList.add('readonly');
                     } else {
@@ -7395,23 +7395,23 @@ export default class CreateTreeTemplate extends Component {
 
                         <div className="col-md-12">
                             {this.state.showModelingJexcelNumber &&
-                                <> 
-                                <span>{i18n.t('static.modelingTable.note')}</span>
-                                <div className="calculatorimg calculatorTable">
-                                    <div id="modelingJexcel" className={"RowClickable ScalingTable"} style={{ display: this.state.modelingJexcelLoader ? "none" : "block" }}>
-                                    </div>
-                                    <div style={{ display: this.state.modelingJexcelLoader ? "block" : "none" }}>
-                                        <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                                            <div class="align-items-center">
-                                                <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+                                <>
+                                    <span>{i18n.t('static.modelingTable.note')}</span>
+                                    <div className="calculatorimg calculatorTable">
+                                        <div id="modelingJexcel" className={"RowClickable ScalingTable"} style={{ display: this.state.modelingJexcelLoader ? "none" : "block" }}>
+                                        </div>
+                                        <div style={{ display: this.state.modelingJexcelLoader ? "block" : "none" }}>
+                                            <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                                <div class="align-items-center">
+                                                    <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
 
-                                                <div class="spinner-border blue ml-4" role="status">
+                                                    <div class="spinner-border blue ml-4" role="status">
 
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
                                     <div style={{ 'float': 'right', 'fontSize': '18px' }}><b>{i18n.t('static.supplyPlan.total')} : {this.state.scalingTotal != "" && addCommas(parseFloat(this.state.scalingTotal).toFixed(4))}</b></div><br /><br />
 
                                 </>
