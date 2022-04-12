@@ -1527,8 +1527,8 @@ export default class CreateTreeTemplate extends Component {
                             var map1 = new Map(Object.entries(tableJson[i]));
                             console.log("11 map---" + map1.get("11"))
                             if (parseInt(map1.get("11")) === 1 && parseInt(map1.get("12")) != 1) {
-                                var startDate = map1.get("3");
-                                var stopDate = map1.get("4");
+                                var startDate = map1.get("1");
+                                var stopDate = map1.get("2");
                                 if (map1.get("10") != "" && map1.get("10") != 0) {
                                     const itemIndex = data.findIndex(o => o.nodeDataModelingId === map1.get("10"));
                                     console.log("data[itemIndex]---", data[itemIndex]);
@@ -1539,8 +1539,8 @@ export default class CreateTreeTemplate extends Component {
                                     obj.transferNodeDataId = transfer;
                                     obj.notes = map1.get("0");
                                     obj.modelingType.id = map1.get("4");
-                                    obj.startDate = startDate;
-                                    obj.stopDate = stopDate;
+                                    obj.startDateNo = startDate;
+                                    obj.stopDateNo = stopDate;
                                     obj.increaseDecrease = map1.get("5");
                                     obj.dataValue = map1.get("4") == 2 ? map1.get("7").toString().replaceAll(",", "") : map1.get("6").toString().replaceAll(",", "").split("%")[0];
                                     obj.nodeDataModelingId = map1.get("10")
@@ -1555,8 +1555,8 @@ export default class CreateTreeTemplate extends Component {
                                             id: map1.get("4")
                                         },
                                         increaseDecrease: map1.get("5"),
-                                        startDate: startDate,
-                                        stopDate: stopDate,
+                                        startDateNo: startDate,
+                                        stopDateNo: stopDate,
                                         dataValue: map1.get("4") == 2 ? map1.get("7").toString().replaceAll(",", "") : map1.get("6").toString().replaceAll(",", "").split("%")[0],
                                         nodeDataModelingId: parseInt(maxModelingId) + 1
                                     }
