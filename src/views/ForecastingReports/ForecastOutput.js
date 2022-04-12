@@ -3527,7 +3527,7 @@ class ForecastOutput extends Component {
                                                                             {this.state.monthArrayList.map(item1 => (
                                                                                 <td>{item.consumptionList.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(item1).format("YYYY-MM")).length > 0 ? <NumberFormat displayType={'text'} thousandSeparator={true} value={item.consumptionList.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(item1).format("YYYY-MM"))[0].consumptionQty} /> : ""}</td>
                                                                             ))}
-                                                                            {(item.display == true ? countVar++ : '')}
+                                                                            <td style={{ display: 'none' }}>{(item.display == true ? countVar++ : '')}</td>
                                                                         </tr>
                                                                     ))}
                                                                     {this.state.yaxisEquUnit > 0 && this.state.xaxis == 2 &&
@@ -3550,7 +3550,7 @@ class ForecastOutput extends Component {
                                                                             {this.state.monthArrayList.map(item1 => (
                                                                                 <td>{item.consumptionList.filter(c => moment(c.consumptionDate).format("YYYY") == moment(item1).format("YYYY")).length > 0 ? <NumberFormat displayType={'text'} thousandSeparator={true} value={item.consumptionList.filter(c => moment(c.consumptionDate).format("YYYY") == moment(item1).format("YYYY"))[0].consumptionQty} /> : ""}</td>
                                                                             ))}
-                                                                            {(item.display == true ? countVar1++ : '')}
+                                                                            <td style={{ display: 'none' }}>{(item.display == true ? countVar1++ : '')}</td>
                                                                         </tr>
                                                                     ))}
                                                                     {this.state.yaxisEquUnit > 0 && this.state.xaxis == 1 &&
