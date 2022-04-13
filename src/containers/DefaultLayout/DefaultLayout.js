@@ -778,12 +778,6 @@ class DefaultLayout extends Component {
   }
  
   refreshPage() {
-
-    // event.preventDefault()
-    // console.log("/url",url)
-    // this.props.history.push(url);
-    // return <Redirect to="/" />;
-    // return <Redirect to={{ pathname: url }} />
     // setTimeout(() => {
       // window.location.reload(false);
     // }, 0);

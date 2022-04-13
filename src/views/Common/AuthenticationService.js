@@ -10,7 +10,6 @@ import i18n from '../../i18n';
 import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions.js';
 let myDt;
 class AuthenticationService {
-
     isUserLoggedIn(emailId) {
         var decryptedPassword = "";
         for (var i = 0; i < localStorage.length; i++) {
