@@ -2808,7 +2808,8 @@ class ForecastSummary extends Component {
             && programs.map((item, i) => {
                 return (
                     <option key={i} value={item.programId}>
-                        {item.label.label_en}
+                        {/* {item.label.label_en} */}
+                        {item.programCode}
                     </option>
                 )
             }, this);
