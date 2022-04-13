@@ -429,8 +429,8 @@ export default class CreateTreeTemplate extends Component {
         this.pickAMonth2 = React.createRef()
         this.pickAMonth1 = React.createRef()
         this.state = {
-            popoverOpenMonthInPast:false,
-            popoverOpenMonthInFuture:false,
+            popoverOpenMonthInPast: false,
+            popoverOpenMonthInFuture: false,
             monthId: 1,
             monthList: [],
             isChanged: false,
@@ -648,7 +648,8 @@ export default class CreateTreeTemplate extends Component {
             currentTargetChangePercentageEdit: false,
             currentTargetChangeNumberEdit: false,
             currentRowIndex: '',
-            lastRowDeleted: false
+            lastRowDeleted: false,
+            modelingChanged: false
 
 
         }
@@ -1396,7 +1397,7 @@ export default class CreateTreeTemplate extends Component {
                     this.setState({
                         treeTemplate
                     }, () => {
-                        console.log("treeTemplate mom---",treeTemplate);
+                        console.log("treeTemplate mom---", treeTemplate);
                         calculateModelingData(treeTemplate, this, '', currentItemConfig.context.id, 0, 1, -1, true);
                     });
                 });
@@ -1593,6 +1594,7 @@ export default class CreateTreeTemplate extends Component {
                             items,
                             scalingList: dataArr,
                             lastRowDeleted: false,
+                            modelingChanged: false,
                             // openAddNodeModal: false,
                             activeTab1: new Array(2).fill('2')
                         }, () => {
@@ -2161,12 +2163,12 @@ export default class CreateTreeTemplate extends Component {
         });
 
     }
-    toggleMonthInFuture(){
+    toggleMonthInFuture() {
         this.setState({
             popoverOpenMonthInFuture: !this.state.popoverOpenMonthInFuture,
         });
     }
-    toggleMonthInPast(){
+    toggleMonthInPast() {
         this.setState({
             popoverOpenMonthInPast: !this.state.popoverOpenMonthInPast,
         });
@@ -2764,6 +2766,11 @@ export default class CreateTreeTemplate extends Component {
     }
 
     addRow = function () {
+        if (this.state.modelingChanged == false) {
+            this.setState({
+                modelingChanged: true
+            })
+        }
         var elInstance = this.state.modelingEl;
         var data = [];
         data[0] = ''
@@ -3304,6 +3311,11 @@ export default class CreateTreeTemplate extends Component {
         // });
     }.bind(this);
     changed = function (instance, cell, x, y, value) {
+        if (x != 9 && x != 11 && this.state.modelingChanged == false) {
+            this.setState({
+                modelingChanged: true
+            })
+        }
         if (this.state.lastRowDeleted != false) {
             this.setState({
                 lastRowDeleted: false
@@ -5378,7 +5390,10 @@ export default class CreateTreeTemplate extends Component {
             currentItemConfig.context.payload.nodeUnit.label = label;
         }
         if (event.target.name === "monthNoFilter") {
-            this.filterScalingDataByMonth(event.target.value);
+            console.log("this.state.modelingChanged@@@@@@@@@@@@", this.state.modelingChanged)
+            if (!this.state.modelingChanged) {
+                this.filterScalingDataByMonth(event.target.value);
+            }
             this.setState({ scalingMonth: event.target.value }, () => {
                 // console.log("after state update---", event.target.value);
             });
@@ -5420,7 +5435,7 @@ export default class CreateTreeTemplate extends Component {
         if (event.target.name === "templateNotes") {
             treeTemplate.notes = event.target.value;
         }
-        
+
         if (event.target.name === "tracerCategoryId") {
             (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.tracerCategory.id = event.target.value;
             this.getUsageTemplateList(event.target.value);
@@ -8589,7 +8604,7 @@ export default class CreateTreeTemplate extends Component {
                                         console.log("flatList---", flatList);
                                         var templateObj = {
                                             treeTemplateId: template.treeTemplateId,
-                                            notes : template.notes,
+                                            notes: template.notes,
                                             active: template.active,
                                             monthsInPast: template.monthsInPast,
                                             monthsInFuture: template.monthsInFuture,
@@ -8912,10 +8927,10 @@ export default class CreateTreeTemplate extends Component {
                                                                     </div>
                                                                 </FormGroup>
                                                                 <div>
-                                                <Popover placement="top" isOpen={this.state.popoverOpenMonthInPast} target="Popover26" trigger="hover" toggle={this.toggleMonthInPast}>
-                                                    <PopoverBody>Need to add info</PopoverBody>
-                                                </Popover>
-                                            </div>
+                                                                    <Popover placement="top" isOpen={this.state.popoverOpenMonthInPast} target="Popover26" trigger="hover" toggle={this.toggleMonthInPast}>
+                                                                        <PopoverBody>Need to add info</PopoverBody>
+                                                                    </Popover>
+                                                                </div>
                                                                 <FormGroup className="col-md-3 pl-lg-0">
                                                                     <Label htmlFor="languageId">{'Months In Past'}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover26" onClick={this.toggleMonthInPast} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                                                     <Input
@@ -8934,10 +8949,10 @@ export default class CreateTreeTemplate extends Component {
                                                                     <FormFeedback>{errors.monthsInPast}</FormFeedback>
                                                                 </FormGroup>
                                                                 <div>
-                                                <Popover placement="top" isOpen={this.state.popoverOpenMonthInFuture} target="Popover27" trigger="hover" toggle={this.toggleMonthInFuture}>
-                                                    <PopoverBody>Need to add info</PopoverBody>
-                                                </Popover>
-                                            </div>
+                                                                    <Popover placement="top" isOpen={this.state.popoverOpenMonthInFuture} target="Popover27" trigger="hover" toggle={this.toggleMonthInFuture}>
+                                                                        <PopoverBody>Need to add info</PopoverBody>
+                                                                    </Popover>
+                                                                </div>
                                                                 <FormGroup className="col-md-3 pl-lg-0">
                                                                     <Label htmlFor="languageId">{'Months In Future'}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover27" onClick={this.toggleMonthInFuture} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                                                     <Input
@@ -8956,7 +8971,7 @@ export default class CreateTreeTemplate extends Component {
                                                                     </Input>
                                                                     <FormFeedback>{errors.monthsInFuture}</FormFeedback>
                                                                 </FormGroup>
-                                                               
+
                                                                 <FormGroup className="col-md-6 pl-lg-0">
                                                                     <Label htmlFor="languageId">{'Notes'}</Label>
                                                                     <Input
