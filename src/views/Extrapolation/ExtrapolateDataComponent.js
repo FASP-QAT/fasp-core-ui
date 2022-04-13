@@ -270,7 +270,8 @@ export default class ExtrapolateDataComponent extends React.Component {
             dataChanged: false,
             noDataMessage: "",
             showFits: false,
-            checkIfAnyMissingActualConsumption: false
+            checkIfAnyMissingActualConsumption: false,
+            extrapolateClicked: false
         }
         // this.toggleD = this.toggleD.bind(this);
         this.toggle = this.toggle.bind(this)
@@ -737,6 +738,9 @@ export default class ExtrapolateDataComponent extends React.Component {
             console.log("inputDataTes.length+++", inputDataTes.length);
             // if (inputDataTes.length >= (this.state.noOfMonthsForASeason * 2)) {
             calculateTES(inputDataTes, this.state.alpha, this.state.beta, this.state.gamma, this.state.confidenceLevelId, this.state.noOfMonthsForASeason, noOfMonthsForProjection, this);
+            this.setState({
+                extrapolateClicked: true
+            })
         } catch (error) {
             this.el = jexcel(document.getElementById("tableDiv"), '');
             this.el.destroy();
@@ -1136,7 +1140,8 @@ export default class ExtrapolateDataComponent extends React.Component {
                             // dataEl: "",
                             loading: false,
                             dataChanged: false,
-                            message: i18n.t('static.compareAndSelect.dataSaved')
+                            message: i18n.t('static.compareAndSelect.dataSaved'),
+                            extrapolateClicked: false
                         }, () => {
                             this.hideFirstComponent();
                             this.componentDidMount()
@@ -2791,7 +2796,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                         </h5>
                                     </FormGroup>
                                     <FormGroup className="col-md-4">
-                                        <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.dateRangeForHistoricData') + "    "}<i>(Forecast: {this.state.forecastProgramId !="" && makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)})</i> </Label>
+                                        <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.dateRangeForHistoricData') + "    "}<i>(Forecast: {this.state.forecastProgramId != "" && makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)})</i> </Label>
                                         <div className="controls edit">
                                             <Picker
                                                 years={{ min: this.state.minDate, max: this.state.maxDate }}
@@ -3394,7 +3399,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                         </Table>
                                                     </div>
                                                 </div>}
-                                            {this.state.dataChanged && <div className="row float-right mt-lg-3 mr-0 pb-2 pt-2 "> <Button type="submit" id="formSubmitButton" size="md" color="success" className="float-right mr-0" onClick={() => this.touchAllExtrapolation(setTouched, errors, 1)}><i className="fa fa-check"></i>{i18n.t('static.pipeline.save')}</Button>&nbsp;</div>}
+                                            {this.state.dataChanged && this.state.extrapolateClicked && <div className="row float-right mt-lg-3 mr-0 pb-2 pt-2 "> <Button type="submit" id="formSubmitButton" size="md" color="success" className="float-right mr-0" onClick={() => this.touchAllExtrapolation(setTouched, errors, 1)}><i className="fa fa-check"></i>{i18n.t('static.pipeline.save')}</Button>&nbsp;</div>}
                                             <div className="row float-right mt-lg-3 mr-3 pb-2 pt-2 "><Button type="submit" id="extrapolateButton" size="md" color="info" className="float-right mr-1" onClick={() => this.touchAllExtrapolation(setTouched, errors, 0)}><i className="fa fa-check"></i>Extrapolate</Button></div>
                                             {/* {this.state.showData && <div id="tableDiv" className="extrapolateTable pt-lg-5"></div>} */}
                                             <div className="row" style={{ display: this.state.show ? "block" : "none" }}>
