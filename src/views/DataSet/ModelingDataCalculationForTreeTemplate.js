@@ -329,6 +329,8 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                     }
                                 }
                             }
+                            difference = endValue - startValue;
+                            differenceWMC = endValueWMC - startValue;
 
                             var totalManualChange = 0;
                             var seasonalityPercTotal = 0;
@@ -365,9 +367,6 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                     endValueWMC = 0;
                                 }
                             }
-
-                            difference = endValue - startValue;
-                            differenceWMC = endValueWMC - startValue;
 
                             var calculatedValue = 0;
                             if (payload.nodeType.id == 2) {
