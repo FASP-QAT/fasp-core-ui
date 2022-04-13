@@ -80,7 +80,9 @@ class VersionSettingsComponent extends Component {
             datasetPlanningUnit: [],
             notSelectedPlanningUnitList: [],
             treeScenarioListNotHaving100PerChild: [],
-            isChanged1: false
+            isChanged1: false,
+            includeOnlySelectedForecasts: true,
+            datasetPlanningUnitNotes: []
         }
         this.hideFirstComponent = this.hideFirstComponent.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
@@ -1131,7 +1133,8 @@ class VersionSettingsComponent extends Component {
 
     openModalPopup(programData) {
         this.setState({
-            showValidation: !this.state.showValidation
+            showValidation: !this.state.showValidation,
+            programData: programData != undefined ? programData : {}
         }, () => {
             if (this.state.showValidation) {
                 this.setState({
@@ -1226,6 +1229,14 @@ class VersionSettingsComponent extends Component {
             treeScenarioList: treeScenarioList
         })
 
+    }
+
+    setIncludeOnlySelectedForecasts(e) {
+        this.setState({
+            includeOnlySelectedForecasts: e.target.checked
+        }, () => {
+            dataCheck(this, this.state.programData, "versionSettings")
+        })
     }
 
     render() {
@@ -1339,8 +1350,8 @@ class VersionSettingsComponent extends Component {
         }, this) : <ul><span>{i18n.t('static.forecastValidation.noNodesHaveChildrenLessThanPerc')}</span><br /></ul>
 
         //Consumption Notes
-        const { datasetPlanningUnit } = this.state;
-        let consumtionNotes = (datasetPlanningUnit.length > 0 && datasetPlanningUnit.filter(c => c.consuptionForecast.toString() == "true").length > 0) ? datasetPlanningUnit.filter(c => c.consuptionForecast.toString() == "true").map((item, i) => {
+        const { datasetPlanningUnitNotes } = this.state;
+        let consumtionNotes = (datasetPlanningUnitNotes.length > 0 && datasetPlanningUnitNotes.filter(c => c.consuptionForecast.toString() == "true").length > 0) ? datasetPlanningUnitNotes.filter(c => c.consuptionForecast.toString() == "true").map((item, i) => {
             return (
                 <tr key={i} className="hoverTd" onClick={() => missingMonthsClicked(item.planningUnit.id, this)}>
                     <td>{getLabelText(item.planningUnit.label, this.state.lang)}</td>
@@ -1486,8 +1497,27 @@ class VersionSettingsComponent extends Component {
                     <div>
                         <ModalBody className="VersionSettingMode">
                             <span><b>{this.state.programName}</b></span><br />
-                            <span><b>{i18n.t('static.common.forecastPeriod')}: </b> {moment(this.state.forecastStartDate).format('MMM-YYYY')} to {moment(this.state.forecastStopDate).format('MMM-YYYY')} </span><br /><br />
-
+                            <span><b>{i18n.t('static.common.forecastPeriod')}: </b> {moment(this.state.forecastStartDate).format('MMM-YYYY')} to {moment(this.state.forecastStopDate).format('MMM-YYYY')} </span>
+                            <br />
+                            <div className={"check inline pl-lg-3"}>
+                                <div className="">
+                                    <Input
+                                        className="form-check-input"
+                                        type="checkbox"
+                                        id="includeOnlySelectedForecasts"
+                                        name="includeOnlySelectedForecasts"
+                                        checked={this.state.includeOnlySelectedForecasts}
+                                        onClick={(e) => { this.setIncludeOnlySelectedForecasts(e); }}
+                                    />
+                                    <Label
+                                        className="form-check-label"
+                                        check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                        <b>{i18n.t('static.validation.includeOnlySelectedForecast')}</b>
+                                        {/* <i class="fa fa-info-circle icons pl-lg-2" id="Popover5" onClick={() => this.toggle('popoverOpenArima', !this.state.popoverOpenArima)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i> */}
+                                    </Label>
+                                </div>
+                            </div>
+                            <br />
                             <span><b>1. {i18n.t('static.commitTree.noForecastSelected')}: </b>(<a href="/#/report/compareAndSelectScenario" target="_blank">{i18n.t('static.commitTree.compare&Select')}</a>, <a href={this.state.programId != -1 && this.state.programId != "" && this.state.programId != undefined ? "/#/forecastReport/forecastSummary/" + this.state.programId.toString().split("_")[0] + "/" + (this.state.programId.toString().split("_")[1]).toString().substring(1) : "/#/forecastReport/forecastSummary/"} target="_blank">{i18n.t('static.commitTree.forecastSummary')}</a>)</span><br />
                             <ul>{noForecastSelected}</ul>
 
@@ -1512,7 +1542,7 @@ class VersionSettingsComponent extends Component {
 
                             <span>a. {i18n.t('static.forecastMethod.historicalData')}:</span>
                             <div className="">
-                                {(datasetPlanningUnit.length > 0 && datasetPlanningUnit.filter(c => c.consuptionForecast.toString() == "true").length > 0) ? <div className="table-wrap table-responsive fixTableHead">
+                                {(datasetPlanningUnitNotes.length > 0 && datasetPlanningUnitNotes.filter(c => c.consuptionForecast.toString() == "true").length > 0) ? <div className="table-wrap table-responsive fixTableHead">
                                     <Table className="table-bordered text-center mt-2 overflowhide main-table table-striped1" bordered size="sm" >
                                         <thead>
                                             <tr>

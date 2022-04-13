@@ -2072,6 +2072,10 @@ class usageTemplate extends Component {
                 VLookUp = usagePeriodObj.convertToMonth;
             }
 
+            console.log("Checked----------->1.1", v14);
+            console.log("Checked----------->2.1", VLookUp);
+            console.log("Checked----------->3.1", t14);
+
             let string = (selectedOneTimeUsageID ? o14 : v14 / VLookUp * t14);
             if (v14 != null && v14 != '' && VLookUp != null && VLookUp != '') {
                 // this.el.setValueFromCoords(22, y, parseFloat(string).toFixed(2), true);

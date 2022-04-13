@@ -2265,5 +2265,11 @@
     "static.dataentry.otherUnitMultiplier": "Enter Other unit multiplier",
     "static.extrapolation.errorOccured":"An error occurred while trying to calculate extrapolation",
     "static.consumptionDataEntryAndAdjustment.nothingToInterpolate":"There is nothing to interpolate",
-    "static.consumptionDataEntryAndAdjustment.interpolatedDataFor":"Interpolated data for: "
+    "static.consumptionDataEntryAndAdjustment.interpolatedDataFor":"Interpolated data for: ",
+    "static.extrpolation.graphTitlePart1":"Forecast for ",
+    "static.extrpolation.graphTitlePart2":" in ",
+    "static.extrapolations.showFits":"Show Fits",
+    "static.extrapolation.missingDataNotePart1":"You have months with no actual consumption data, which will cause unexpected results in the extrapolation. Return to the ",
+    "static.extrapolation.missingDataNotePart2":"screen to fill in or interpolate the missing data.",
+    "static.validation.includeOnlySelectedForecast":"Include only Selected Forecasts"
 }

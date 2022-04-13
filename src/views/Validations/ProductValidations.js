@@ -731,6 +731,7 @@ class ProductValidation extends Component {
                     var json = {
                         id: responseData[rd].programId,
                         name: getLabelText(responseData[rd].label, this.state.lang),
+                        code: responseData[rd].programCode,
                         versionList: responseData[rd].versionList
                     }
                     datasetList.push(json);
@@ -824,6 +825,7 @@ class ProductValidation extends Component {
                                         var json = {
                                             id: myResult[mr].programId,
                                             name: getLabelText(programNameJson, this.state.lang),
+                                            code: myResult[mr].programCode,
                                             versionList: [{ versionId: myResult[mr].version + "  (Local)" }]
                                         }
                                         datasetList.push(json)
@@ -1063,7 +1065,7 @@ class ProductValidation extends Component {
         columns.push(i18n.t('static.supplyPlan.pricePerPlanningUnit'));
         columns.push(i18n.t('static.productValidation.cost'));
         const headers = [columns]
-        const data = this.state.dataEl.getJson(null, false).map(ele => [ele[0], ele[1], ele[2], ele[3], ele[4], ele[5], this.formatter(ele[6]), this.formatter(ele[7]), ele[8]!=""?this.formatter(Number(ele[8]).toFixed(2)):""]);
+        const data = this.state.dataEl.getJson(null, false).map(ele => [ele[0], ele[1], ele[2], ele[3], ele[4], ele[5], this.formatter(ele[6]), this.formatter(ele[7]), ele[8] != "" ? this.formatter(Number(ele[8]).toFixed(2)) : ""]);
         // doc.addPage()
         let content = {
             margin: { top: 80, bottom: 50 },
@@ -1083,7 +1085,7 @@ class ProductValidation extends Component {
         doc.autoTable(content);
         addHeaders(doc)
         addFooters(doc)
-        doc.save(this.state.datasetData.programCode+ "-" + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text)+"-"+i18n.t('static.dashboard.productValidation')+"-"+document.getElementById("treeId").selectedOptions[0].text+"-"+document.getElementById("scenarioId").selectedOptions[0].text + ".pdf")
+        doc.save(this.state.datasetData.programCode + "-" + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text) + "-" + i18n.t('static.dashboard.productValidation') + "-" + document.getElementById("treeId").selectedOptions[0].text + "-" + document.getElementById("scenarioId").selectedOptions[0].text + ".pdf")
         //creates PDF from img
         /*  var doc = new jsPDF('landscape');
           doc.setFontSize(20);
@@ -1104,7 +1106,7 @@ class ProductValidation extends Component {
         csvRow.push('')
         csvRow.push('"' + (document.getElementById("datasetId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
         csvRow.push('')
-        
+
         csvRow.push('"' + (i18n.t('static.dashboard.programheader') + ' : ' + document.getElementById("datasetId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
         csvRow.push('')
         csvRow.push('"' + (i18n.t('static.report.version') + ' : ' + document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
@@ -1143,7 +1145,7 @@ class ProductValidation extends Component {
         var a = document.createElement("a")
         a.href = 'data:attachment/csv,' + csvString
         a.target = "_Blank"
-        a.download = this.state.datasetData.programCode+ "-" + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text)+"-"+i18n.t('static.dashboard.productValidation')+"-"+document.getElementById("treeId").selectedOptions[0].text+"-"+document.getElementById("scenarioId").selectedOptions[0].text + ".csv"
+        a.download = this.state.datasetData.programCode + "-" + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text) + "-" + i18n.t('static.dashboard.productValidation') + "-" + document.getElementById("treeId").selectedOptions[0].text + "-" + document.getElementById("scenarioId").selectedOptions[0].text + ".csv"
         document.body.appendChild(a)
         a.click()
     }
@@ -1165,7 +1167,8 @@ class ProductValidation extends Component {
             && datasetList.map((item, i) => {
                 return (
                     <option key={i} value={item.id}>
-                        {item.name}
+                        {/* {item.name} */}
+                        {item.code}
                     </option>
                 )
             }, this);
