@@ -8956,7 +8956,20 @@ export default class CreateTreeTemplate extends Component {
                                                                     </Input>
                                                                     <FormFeedback>{errors.monthsInFuture}</FormFeedback>
                                                                 </FormGroup>
-                                                                <FormGroup className="col-md-3 pl-lg-0">
+                                                               
+                                                                <FormGroup className="col-md-6 pl-lg-0">
+                                                                    <Label htmlFor="languageId">{'Notes'}</Label>
+                                                                    <Input
+                                                                        type="textarea"
+                                                                        name="templateNotes"
+                                                                        id="templateNotes"
+                                                                        bsSize="sm"
+                                                                        onChange={(e) => { this.dataChange(e) }}
+                                                                        value={this.state.treeTemplate.notes}
+                                                                    >
+                                                                    </Input>
+                                                                </FormGroup>
+                                                                <FormGroup className="col-md-3 pl-lg-0 MarginTopMonthSelector">
                                                                     <Label htmlFor="languageId">{'Month Selector'}</Label>
                                                                     <Input
                                                                         type="select"
@@ -8976,23 +8989,11 @@ export default class CreateTreeTemplate extends Component {
                                                                             }, this)}
                                                                     </Input>
                                                                 </FormGroup>
-                                                                <FormGroup className="col-md-3 pl-lg-0">
-                                                                    <Label htmlFor="languageId">{'Notes'}</Label>
-                                                                    <Input
-                                                                        type="textarea"
-                                                                        name="templateNotes"
-                                                                        id="templateNotes"
-                                                                        bsSize="sm"
-                                                                        onChange={(e) => { this.dataChange(e) }}
-                                                                        value={this.state.treeTemplate.notes}
-                                                                    >
-                                                                    </Input>
-                                                                </FormGroup>
                                                             </Row>
                                                         </div>
 
                                                     </CardBody>
-                                                    <CardFooter className="pt-lg-0 pr-lg-0" style={{ backgroundColor: 'transparent', borderTop: '0px solid #c8ced3' }}>
+                                                    <CardFooter className="pt-lg-0 pr-lg-0 MarginTopCreateTreeBtn" style={{ backgroundColor: 'transparent', borderTop: '0px solid #c8ced3' }}>
                                                         {/* <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button> */}
                                                         <Button type="button" size="md" color="warning" className="float-right mr-1 mb-lg-2" onClick={this.resetTree}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                                         <Button type="submit" color="success" className="mr-1 mb-lg-2 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"> </i>{i18n.t('static.pipeline.save')}</Button>
