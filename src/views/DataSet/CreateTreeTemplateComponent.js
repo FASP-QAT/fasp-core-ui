@@ -5403,7 +5403,10 @@ export default class CreateTreeTemplate extends Component {
             (currentItemConfig.context.payload.nodeDataMap[0])[0].notes = event.target.value;
             this.getNotes();
         }
-
+        if (event.target.name === "templateNotes") {
+            treeTemplate.notes = event.target.value;
+        }
+        
         if (event.target.name === "tracerCategoryId") {
             (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.tracerCategory.id = event.target.value;
             this.getUsageTemplateList(event.target.value);
@@ -8572,6 +8575,7 @@ export default class CreateTreeTemplate extends Component {
                                         console.log("flatList---", flatList);
                                         var templateObj = {
                                             treeTemplateId: template.treeTemplateId,
+                                            notes : template.notes,
                                             active: template.active,
                                             monthsInPast: template.monthsInPast,
                                             monthsInFuture: template.monthsInFuture,
@@ -8952,8 +8956,8 @@ export default class CreateTreeTemplate extends Component {
                                                                     <Label htmlFor="languageId">{'Notes'}</Label>
                                                                     <Input
                                                                         type="textarea"
-                                                                        name="notes"
-                                                                        id="notes"
+                                                                        name="templateNotes"
+                                                                        id="templateNotes"
                                                                         bsSize="sm"
                                                                         onChange={(e) => { this.dataChange(e) }}
                                                                         value={this.state.treeTemplate.notes}
