@@ -755,7 +755,8 @@ export default class BuildTree extends Component {
             modelingJexcelLoader: false,
             momJexcelLoader: false,
             lastRowDeleted: false,
-            showDate: false
+            showDate: false,
+            modelingChanged: false
         }
         this.toggleDeropdownSetting = this.toggleDeropdownSetting.bind(this);
         // this.onClick1 = this.onClick1.bind(this);
@@ -2945,6 +2946,7 @@ export default class BuildTree extends Component {
                             items,
                             scalingList: dataArr,
                             lastRowDeleted: false,
+                            modelingChanged: false,
                             // openAddNodeModal: false,
                             activeTab1: new Array(2).fill('2')
                         }, () => {
@@ -3839,6 +3841,11 @@ export default class BuildTree extends Component {
     changed = function (instance, cell, x, y, value) {
         //Modeling type
         // instance.jexcel
+        if (x != 8 && x != 10 && this.state.modelingChanged == false) {
+            this.setState({
+                modelingChanged: true
+            })
+        }
         if (this.state.lastRowDeleted != false) {
             this.setState({
                 lastRowDeleted: false
@@ -3997,6 +4004,11 @@ export default class BuildTree extends Component {
     }
 
     addRow = function () {
+        if (this.state.modelingChanged == false) {
+            this.setState({
+                modelingChanged: true
+            })
+        }
         var elInstance = this.state.modelingEl;
         var data = [];
         data[0] = 0;
@@ -6077,7 +6089,7 @@ export default class BuildTree extends Component {
                         showModelingJexcelNumber: true,
                         minMonth, maxMonth, filteredModelingType: modelingTypeListNew,
                         scalingMonth: {
-                            year: new Date(this.state.currentScenario.month.replace(/-/g, '\/')).getFullYear(), month: ("0" + (new Date(this.state.currentScenario.month.replace(/-/g, '\/')).getMonth() + 1)).slice(-2)
+                            year: Number(new Date(this.state.currentScenario.month.replace(/-/g, '\/')).getFullYear()), month: Number(("0" + (new Date(this.state.currentScenario.month.replace(/-/g, '\/')).getMonth() + 1)).slice(-2))
                         },
                     }, () => {
                         this.buildModelingJexcel();
@@ -6088,7 +6100,7 @@ export default class BuildTree extends Component {
                     this.setState({
                         showModelingJexcelNumber: true,
                         scalingMonth: {
-                            year: new Date(this.state.currentScenario.month.replace(/-/g, '\/')).getFullYear(), month: ("0" + (new Date(this.state.currentScenario.month.replace(/-/g, '\/')).getMonth() + 1)).slice(-2)
+                            year: Number(new Date(this.state.currentScenario.month.replace(/-/g, '\/')).getFullYear()), month: Number(("0" + (new Date(this.state.currentScenario.month.replace(/-/g, '\/')).getMonth() + 1)).slice(-2))
                         },
                     }, () => {
                         this.buildModelingJexcel();
@@ -8595,6 +8607,7 @@ export default class BuildTree extends Component {
                                 ref={this.pickAMonth2}
                                 years={{ min: this.state.minDate, max: this.state.maxDate }}
                                 value={this.state.scalingMonth}
+                                key={JSON.stringify(this.state.scalingMonth)}
                                 lang={pickerLang.months}
                                 onChange={this.handleAMonthChange2}
                                 onDismiss={this.handleAMonthDissmis2}
@@ -9087,7 +9100,9 @@ export default class BuildTree extends Component {
     handleAMonthDissmis2 = (value) => {
         console.log("Value@@@@@@@@###################", value);
         let startDate = value.year + '-' + value.month + '-01';
-        this.filterScalingDataByMonth(moment(startDate).format("YYYY-MM-DD"));
+        if (!this.state.modelingChanged) {
+            this.filterScalingDataByMonth(moment(startDate).format("YYYY-MM-DD"));
+        }
         // let { currentItemConfig } = this.state;
         // (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].month = date;
         this.setState({ scalingMonth: value }, () => {
