@@ -268,7 +268,9 @@ export default class ExtrapolateDataComponent extends React.Component {
             linearRegressionError: { "rmse": "", "mape": "", "mse": "", "wape": "", "rSqd": "" },
             tesError: { "rmse": "", "mape": "", "mse": "", "wape": "", "rSqd": "" },
             dataChanged: false,
-            noDataMessage: ""
+            noDataMessage: "",
+            showFits: false,
+            checkIfAnyMissingActualConsumption: false
         }
         // this.toggleD = this.toggleD.bind(this);
         this.toggle = this.toggle.bind(this)
@@ -440,12 +442,18 @@ export default class ExtrapolateDataComponent extends React.Component {
         var dataArray = [];
         var data = [];
         console.log("monthArray", monthArray)
-
+        var checkIfAnyMissingActualConsumption = false;
         var consumptionDataArr = [];
+        var rangeValue1 = this.state.rangeValue1;
+        let startDate = rangeValue1.from.year + '-' + rangeValue1.from.month + '-01';
+        let stopDate = rangeValue1.to.year + '-' + rangeValue1.to.month + '-' + new Date(rangeValue1.to.year, rangeValue1.to.month, 0).getDate();
         for (var j = 0; j < monthArray.length; j++) {
             data = [];
             data[0] = monthArray[j];
-            var consumptionData = actualConsumptionList.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArray[j]).format("YYYY-MM") && c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId)
+            var consumptionData = actualConsumptionList.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArray[j]).format("YYYY-MM") && c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId);
+            if (checkIfAnyMissingActualConsumption == false && consumptionData.length == 0 && moment(monthArray[j]).format("YYYY-MM") >= moment(startDate).format("YYYY-MM") && moment(monthArray[j]).format("YYYY-MM") <= moment(stopDate).format("YYYY-MM")) {
+                checkIfAnyMissingActualConsumption = true;
+            }
             // if (consumptionData.length > 0) {
             //     inputData.push({ "month": inputData.length + 1, "actual": consumptionData[0].amount, "forecast": null })
             // }
@@ -457,8 +465,8 @@ export default class ExtrapolateDataComponent extends React.Component {
             var tesDataFilter = this.state.tesData.filter(c => moment(startMonth).add(c.month - 1, 'months').format("YYYY-MM") == moment(monthArray[j]).format("YYYY-MM"))
             var CI = this.state.CI;
             //var consumptionData = actualConsumptionList.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArray[j]).format("YYYY-MM") && c.planningUnit.id == this.state.planningUnitId);
-            data[1] = consumptionData.length > 0 ? consumptionData[0].amount : "";
-            consumptionDataArr.push(consumptionData.length > 0 ? consumptionData[0].amount : null);
+            data[1] = consumptionData.length > 0 ? consumptionData[0].puAmount : "";
+            consumptionDataArr.push(consumptionData.length > 0 ? consumptionData[0].puAmount : null);
             data[2] = movingAvgDataFilter.length > 0 && movingAvgDataFilter[0].forecast != null ? movingAvgDataFilter[0].forecast.toFixed(2) : '';
             data[3] = semiAvgDataFilter.length > 0 && semiAvgDataFilter[0].forecast != null ? semiAvgDataFilter[0].forecast.toFixed(2) : '';
             data[4] = linearRegressionDataFilter.length > 0 && linearRegressionDataFilter[0].forecast != null ? linearRegressionDataFilter[0].forecast.toFixed(2) : '';
@@ -479,46 +487,46 @@ export default class ExtrapolateDataComponent extends React.Component {
                 [
                     {
                         title: i18n.t('static.inventoryDate.inventoryReport'),
-                        type: 'calendar', options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker' }, width: 100, readOnly: true
+                        type: 'calendar', options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker' }, width: 100
                     },
                     {
                         title: i18n.t('static.extrapolation.adjustedActuals'),
-                        type: 'numeric', mask: '#,##.00', decimal: '.', readOnly: false
+                        type: 'numeric', mask: '#,##.00', decimal: '.'
                     },
                     {
                         title: i18n.t('static.extrapolation.movingAverages'),
                         type: this.state.movingAvgId ? 'numeric' : 'hidden',
-                        mask: '#,##.00', decimal: '.', readOnly: false
+                        mask: '#,##.00', decimal: '.'
                     },
                     {
                         title: i18n.t('static.extrapolation.semiAverages'),
                         type: this.state.semiAvgId ? 'numeric' : 'hidden',
-                        mask: '#,##.00', decimal: '.', readOnly: false
+                        mask: '#,##.00', decimal: '.'
                     },
                     {
                         title: i18n.t('static.extrapolation.linearRegression'),
                         type: this.state.linearRegressionId ? 'numeric' : 'hidden',
-                        mask: '#,##.00', decimal: '.', readOnly: false
+                        mask: '#,##.00', decimal: '.'
                     },
                     {
                         title: i18n.t('static.extrapolation.tesLower'),
                         type: this.state.smoothingId ? 'numeric' : 'hidden',
-                        mask: '#,##.00', decimal: '.', readOnly: false
+                        mask: '#,##.00', decimal: '.'
                     },
                     {
                         title: i18n.t('static.extrapolation.tes'),
                         type: this.state.smoothingId ? 'numeric' : 'hidden',
-                        mask: '#,##.00', decimal: '.', readOnly: false
+                        mask: '#,##.00', decimal: '.'
                     },
                     {
                         title: i18n.t('static.extrapolation.tesUpper'),
                         type: this.state.smoothingId ? 'numeric' : 'hidden',
-                        mask: '#,##.00', decimal: '.', readOnly: false
+                        mask: '#,##.00', decimal: '.'
                     },
                     {
                         title: i18n.t('static.extrapolation.arima'),
                         type: this.state.arimaId ? 'numeric' : 'hidden',
-                        mask: '#,##.00', decimal: '.', readOnly: false
+                        mask: '#,##.00', decimal: '.'
                     }
                 ],
             text: {
@@ -535,8 +543,13 @@ export default class ExtrapolateDataComponent extends React.Component {
                         var cell = elInstance.getCell(("A").concat(parseInt(y) + 1))
                         cell.classList.add('jexcelBoldCell');
                     } else if (moment(rowData[0]).format("YYYY-MM") >= moment(this.state.datasetJson.currentVersion.forecastStartDate).format("YYYY-MM") && moment(rowData[0]).format("YYYY-MM") <= moment(this.state.datasetJson.currentVersion.forecastStopDate).format("YYYY-MM")) {
-                        var cell = elInstance.getCell(("A").concat(parseInt(y) + 1))
-                        cell.classList.add('jexcelPurpleCell');
+                        if (rowData[1] !== "") {
+                            var cell = elInstance.getCell(("A").concat(parseInt(y) + 1))
+                            cell.classList.add('jexcelBoldPurpleCell');
+                        } else {
+                            var cell = elInstance.getCell(("A").concat(parseInt(y) + 1))
+                            cell.classList.add('jexcelPurpleCell');
+                        }
                         var cell = elInstance.getCell(("C").concat(parseInt(y) + 1))
                         cell.classList.add('jexcelPurpleCell');
                         var cell = elInstance.getCell(("D").concat(parseInt(y) + 1))
@@ -666,7 +679,8 @@ export default class ExtrapolateDataComponent extends React.Component {
             minRsqd: minRsqd,
             minWape: minWape,
             loading: false,
-            consumptionData: consumptionDataArr
+            consumptionData: consumptionDataArr,
+            checkIfAnyMissingActualConsumption: checkIfAnyMissingActualConsumption
         })
     }
 
@@ -707,10 +721,10 @@ export default class ExtrapolateDataComponent extends React.Component {
             //   var consumptionData = actualConsumptionList.filter(c => moment(c.month).format("YYYY-MM") == moment(curDate).format("YYYY-MM"))
             //    && c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId)
             console.log("consumptionData--->", consumptionData)
-            inputDataMovingAvg.push({ "month": inputDataMovingAvg.length + 1, "actual": consumptionData.length > 0 ? Number(consumptionData[0].amount) : null, "forecast": null })
-            inputDataSemiAverage.push({ "month": inputDataSemiAverage.length + 1, "actual": consumptionData.length > 0 ? Number(consumptionData[0].amount) : null, "forecast": null })
-            inputDataLinearRegression.push({ "month": inputDataLinearRegression.length + 1, "actual": consumptionData.length > 0 ? Number(consumptionData[0].amount) : null, "forecast": null })
-            inputDataTes.push({ "month": inputDataTes.length + 1, "actual": consumptionData.length > 0 ? Number(consumptionData[0].amount) : null, "forecast": null })
+            inputDataMovingAvg.push({ "month": inputDataMovingAvg.length + 1, "actual": consumptionData.length > 0 ? Number(consumptionData[0].puAmount) : null, "forecast": null })
+            inputDataSemiAverage.push({ "month": inputDataSemiAverage.length + 1, "actual": consumptionData.length > 0 ? Number(consumptionData[0].puAmount) : null, "forecast": null })
+            inputDataLinearRegression.push({ "month": inputDataLinearRegression.length + 1, "actual": consumptionData.length > 0 ? Number(consumptionData[0].puAmount) : null, "forecast": null })
+            inputDataTes.push({ "month": inputDataTes.length + 1, "actual": consumptionData.length > 0 ? Number(consumptionData[0].puAmount) : null, "forecast": null })
         }
         const noOfMonthsForProjection = monthArray.length - inputDataMovingAvg.length;
         this.setState({
@@ -731,7 +745,8 @@ export default class ExtrapolateDataComponent extends React.Component {
                 dataEl: "",
                 loading: false,
                 noDataMessage: i18n.t('static.extrapolation.errorOccured'),
-                dataChanged: false
+                dataChanged: false,
+                show: false
             })
         }
         // } else {
@@ -789,7 +804,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                 var regionList = forecastProgramListFilter.regionList;
                 var startDate = forecastProgramListFilter.datasetData.currentVersion.forecastStartDate;
                 var stopDate = forecastProgramListFilter.datasetData.currentVersion.forecastStopDate;
-                var rangeValue = { from: { year: new Date(startDate).getFullYear(), month: new Date(startDate).getMonth() + 1 }, to: { year: new Date(stopDate).getFullYear(), month: new Date(stopDate).getMonth() + 1 } }
+                var rangeValue = { from: { year: Number(moment(startDate).startOf('month').format("YYYY")), month: Number(moment(startDate).startOf('month').format("M")) }, to: { year: Number(moment(stopDate).startOf('month').format("YYYY")), month: Number(moment(stopDate).startOf('month').format("M")) } }
 
                 var planningUnitList = forecastProgramListFilter.planningUnitList;
                 var planningUnitId = "";
@@ -1302,20 +1317,20 @@ export default class ExtrapolateDataComponent extends React.Component {
                     console.log("Actual for month@@@@@@@@@@@@@@@@", actualConsumptionListForPlanningUnitAndRegion);
                     if (movingAvgId) {
                         var extrapolationDataMovingAvg = consumptionExtrapolationMovingData[0].extrapolationDataList.filter(e => moment(e.month).format("YYYY-MM") == moment(curDate1).format("YYYY-MM"));
-                        inputDataMovingAvg.push({ "month": inputDataMovingAvg.length + 1, "forecast": extrapolationDataMovingAvg.length > 0 && extrapolationDataMovingAvg[0].amount != "" ? Number(Number(extrapolationDataMovingAvg[0].amount).toFixed(2)) : null, "actual": actualForMonth.length > 0 ? Number(actualForMonth[0].amount) : null })
+                        inputDataMovingAvg.push({ "month": inputDataMovingAvg.length + 1, "forecast": extrapolationDataMovingAvg.length > 0 && extrapolationDataMovingAvg[0].amount != "" ? Number(Number(extrapolationDataMovingAvg[0].amount).toFixed(2)) : null, "actual": actualForMonth.length > 0 ? Number(actualForMonth[0].puAmount) : null })
                     } if (semiAvgId) {
                         var extrapolationDataSemiAvg = consumptionExtrapolationSemiAvg[0].extrapolationDataList.filter(e => moment(e.month).format("YYYY-MM") == moment(curDate1).format("YYYY-MM"));
                         if (moment(curDate1).format("YYYY-MM") == moment(actualMax).format("YYYY-MM") && m % 2 == 0) {
                             inputDataSemiAverage.push({ "month": inputDataSemiAverage.length + 1, "forecast": (extrapolationDataSemiAvg.length > 0 && extrapolationDataSemiAvg[0].amount != "" ? Number(Number(extrapolationDataSemiAvg[0].amount).toFixed(2)) : null), "actual": (actualForMonth.length > 0 ? null : null) })
                         } else {
-                            inputDataSemiAverage.push({ "month": inputDataSemiAverage.length + 1, "forecast": (extrapolationDataSemiAvg.length > 0 && extrapolationDataSemiAvg[0].amount != "" ? Number(Number(extrapolationDataSemiAvg[0].amount).toFixed(2)) : null), "actual": (actualForMonth.length > 0 ? Number(actualForMonth[0].amount) : null) })
+                            inputDataSemiAverage.push({ "month": inputDataSemiAverage.length + 1, "forecast": (extrapolationDataSemiAvg.length > 0 && extrapolationDataSemiAvg[0].amount != "" ? Number(Number(extrapolationDataSemiAvg[0].amount).toFixed(2)) : null), "actual": (actualForMonth.length > 0 ? Number(actualForMonth[0].puAmount) : null) })
                         }
                     } if (linearRegressionId) {
                         var extrapolationDataLinearRegression = consumptionExtrapolationRegression[0].extrapolationDataList.filter(e => moment(e.month).format("YYYY-MM") == moment(curDate1).format("YYYY-MM"));
-                        inputDataLinearRegression.push({ "month": inputDataLinearRegression.length + 1, "forecast": extrapolationDataLinearRegression.length > 0 && extrapolationDataLinearRegression[0].amount != "" ? Number(Number(extrapolationDataLinearRegression[0].amount).toFixed(2)) : null, "actual": actualForMonth.length > 0 ? Number(actualForMonth[0].amount) : null })
+                        inputDataLinearRegression.push({ "month": inputDataLinearRegression.length + 1, "forecast": extrapolationDataLinearRegression.length > 0 && extrapolationDataLinearRegression[0].amount != "" ? Number(Number(extrapolationDataLinearRegression[0].amount).toFixed(2)) : null, "actual": actualForMonth.length > 0 ? Number(actualForMonth[0].puAmount) : null })
                     } if (smoothingId) {
                         var extrapolationDataInputDataTes = consumptionExtrapolationTESM[0].extrapolationDataList.filter(e => moment(e.month).format("YYYY-MM") == moment(curDate1).format("YYYY-MM"));
-                        inputDataTes.push({ "month": inputDataTes.length + 1, "forecast": extrapolationDataInputDataTes.length > 0 && extrapolationDataInputDataTes[0].amount != "" ? Number(Number(extrapolationDataInputDataTes[0].amount).toFixed(2)) : null, "actual": actualForMonth.length > 0 ? Number(actualForMonth[0].amount) : null })
+                        inputDataTes.push({ "month": inputDataTes.length + 1, "forecast": extrapolationDataInputDataTes.length > 0 && extrapolationDataInputDataTes[0].amount != "" ? Number(Number(extrapolationDataInputDataTes[0].amount).toFixed(2)) : null, "actual": actualForMonth.length > 0 ? Number(actualForMonth[0].puAmount) : null })
                     }
                 }
                 console.log("@@@@@@@@@@##############", inputDataSemiAverage)
@@ -1711,7 +1726,7 @@ export default class ExtrapolateDataComponent extends React.Component {
             console.log("consumptionData--->", consumptionData)
             B.push(
                 moment(monthArray[j]).format(DATE_FORMAT_CAP_WITHOUT_DATE).toString().replaceAll(',', ' ').replaceAll(' ', '%20'),
-                consumptionData.length > 0 ? consumptionData[0].amount : "")
+                consumptionData.length > 0 ? consumptionData[0].puAmount : "")
             if (this.state.movingAvgId && movingAvgDataFilter.length > 0 && movingAvgDataFilter[0].forecast != null) {
                 B.push(movingAvgDataFilter[0].forecast.toFixed(2))
             } if (this.state.semiAvgId && semiAvgDataFilter.length > 0 && semiAvgDataFilter[0].forecast != null) {
@@ -2053,6 +2068,12 @@ export default class ExtrapolateDataComponent extends React.Component {
             dataChanged: true
         }, () => {
             this.buildActualJxl()
+        })
+    }
+
+    setShowFits(e) {
+        this.setState({
+            showFits: e.target.checked
         })
     }
     // setShowAdvanceId(e) {
@@ -2457,11 +2478,13 @@ export default class ExtrapolateDataComponent extends React.Component {
         console.log("json.map(item=>item[1])@@@@@@@@@@@@@@@", json.map(item => Number(item[1])))
         let datasets = [];
         var count = 0;
-        json.map((item, c) => {
-            if (item[1] !== "") {
-                count = c;
-            }
-        })
+        if (this.state.showFits == false) {
+            json.map((item, c) => {
+                if (item[1] !== "") {
+                    count = c;
+                }
+            })
+        }
         // count = count - 1;
         console.log("count@@@@@@@@@@@@@@", count)
         datasets.push({
@@ -3215,14 +3238,35 @@ export default class ExtrapolateDataComponent extends React.Component {
                                         <h5 className={"red"} id="div1">{this.state.noDataMessage}</h5>
                                         {/* Graph */}
                                         <div style={{ display: !this.state.loading ? "block" : "none" }}>
-                                            {this.state.showData && <div className="col-md-12">
-                                                <div className="chart-wrapper chart-graph-report">
-                                                    <Line id="cool-canvas" data={line} options={options} />
-                                                    <div>
-
+                                            {this.state.showData &&
+                                                <>
+                                                    {this.state.checkIfAnyMissingActualConsumption && <><span><i class="fa fa-exclamation-triangle"></i><span className="pl-lg-2">{i18n.t('static.extrapolation.missingDataNotePart1')}</span><a href="/#/dataentry/consumptionDataEntryAndAdjustment" target="_blank"><span>{i18n.t('static.dashboard.dataEntryAndAdjustment') + " "}</span></a><span>{i18n.t('static.extrapolation.missingDataNotePart2')}</span></span></>}
+                                                    <div className={this.state.checkIfAnyMissingActualConsumption ? "check inline pt-lg-3 pl-lg-3" : "check inline pl-lg-3"}>
+                                                        <div className="">
+                                                            <Input
+                                                                className="form-check-input"
+                                                                type="checkbox"
+                                                                id="showFits"
+                                                                name="showFits"
+                                                                checked={this.state.showFits}
+                                                                onClick={(e) => { this.setShowFits(e); }}
+                                                            />
+                                                            <Label
+                                                                className="form-check-label"
+                                                                check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                                <b>{i18n.t('static.extrapolations.showFits')}</b>
+                                                                {/* <i class="fa fa-info-circle icons pl-lg-2" id="Popover5" onClick={() => this.toggle('popoverOpenArima', !this.state.popoverOpenArima)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i> */}
+                                                            </Label>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            </div>}<br /><br />
+                                                    <div className="col-md-12">
+                                                        <div className="chart-wrapper chart-graph-report">
+                                                            <Line id="cool-canvas" data={line} options={options} />
+                                                            <div>
+
+                                                            </div>
+                                                        </div>
+                                                    </div></>}<br /><br />
                                             {this.state.showData &&
                                                 <div className="col-md-10 pt-4 pb-3">
                                                     <ul className="legendcommitversion">

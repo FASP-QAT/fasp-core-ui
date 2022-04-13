@@ -75,7 +75,7 @@ class DefaultHeader extends Component {
             <NavLink to="/dashboard" className="nav-link" >{i18n.t('static.common.dashboard')}</NavLink>
     </NavItem>*/}
           <NavItem className="px-3">
-            {console.log("Inside header called---", this)}
+            {console.log("Inside header called---", this.props.activeModule)}
             <NavLink to="#" onClick={this.refreshPage} className={this.props.activeModule == 2 ? "nav-link titleColorModule1" : "nav-link titleColorModule2"} ><b>{this.props.activeModule == 2 ? i18n.t('static.module.supplyPlanningModule') : i18n.t('static.module.forecastingModule')}</b><br></br><b>{this.props.title}</b></NavLink>
           </NavItem>
         </Nav>

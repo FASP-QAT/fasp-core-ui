@@ -360,7 +360,7 @@ class ForecastSummary extends Component {
                     '',
                     '',
                     (i18n.t('static.forecastReport.productCost')).replaceAll(' ', '%20'),
-                    '$ '+this.state.totalProductCost,
+                    '$ ' + this.state.totalProductCost,
                     ''
                 ]))
                 A.push(this.addDoubleQuoteToRowContent([
@@ -375,7 +375,7 @@ class ForecastSummary extends Component {
                     '',
                     '',
                     (i18n.t('static.forecastReport.freight')).replaceAll(' ', '%20') + '(7%)',
-                    '$ '+(parseFloat(0.07 * this.state.totalProductCost).toFixed(2)),
+                    '$ ' + (parseFloat(0.07 * this.state.totalProductCost).toFixed(2)),
                     ''
                 ]))
                 A.push(this.addDoubleQuoteToRowContent([
@@ -390,7 +390,7 @@ class ForecastSummary extends Component {
                     '',
                     '',
                     (i18n.t('static.shipment.totalCost')).replaceAll(' ', '%20'),
-                    '$ '+parseFloat(parseFloat(this.state.totalProductCost) + parseFloat(0.07 * this.state.totalProductCost)).toFixed(2),
+                    '$ ' + parseFloat(parseFloat(this.state.totalProductCost) + parseFloat(0.07 * this.state.totalProductCost)).toFixed(2),
                     ''
                 ]))
             } else {
@@ -399,7 +399,7 @@ class ForecastSummary extends Component {
                     '',
                     '',
                     (i18n.t('static.forecastReport.productCost')).replaceAll(' ', '%20'),
-                    '$ '+this.state.totalProductCost,
+                    '$ ' + this.state.totalProductCost,
                     ''
                 ]))
                 A.push(this.addDoubleQuoteToRowContent([
@@ -407,7 +407,7 @@ class ForecastSummary extends Component {
                     '',
                     '',
                     i18n.t('static.forecastReport.freight') + '(7%)',
-                    '$ '+(parseFloat(0.07 * this.state.totalProductCost).toFixed(2)),
+                    '$ ' + (parseFloat(0.07 * this.state.totalProductCost).toFixed(2)),
                     ''
                 ]))
                 A.push(this.addDoubleQuoteToRowContent([
@@ -415,7 +415,7 @@ class ForecastSummary extends Component {
                     '',
                     '',
                     (i18n.t('static.shipment.totalCost')).replaceAll(' ', '%20'),
-                    '$ '+parseFloat(parseFloat(this.state.totalProductCost) + parseFloat(0.07 * this.state.totalProductCost)).toFixed(2),
+                    '$ ' + parseFloat(parseFloat(this.state.totalProductCost) + parseFloat(0.07 * this.state.totalProductCost)).toFixed(2),
                     ''
                 ]))
             }
@@ -784,7 +784,7 @@ class ForecastSummary extends Component {
             let headers1 = ['', i18n.t('static.product.product'), i18n.t('static.forecastReport.totalForecastQuantity')];
             if (!this.state.hideColumn) {
                 // headers1 = headers1.concat([i18n.t('static.report.stock') + i18n.t('static.forecastReport.endOf') + this.state.beforeEndDateDisplay + ')', i18n.t('static.forecastReport.existingShipments') + '(' + this.state.startDateDisplay + ' - ' + this.state.endDateDisplay + ')', i18n.t('static.report.stock') + i18n.t('static.forecastReport.endOf') + this.state.endDateDisplay + ')', i18n.t('static.forecastReport.desiredMonthsOfStock') + i18n.t('static.forecastReport.endOf') + this.state.endDateDisplay + ')', i18n.t('static.forecastReport.desiredStock') + i18n.t('static.forecastReport.endOf') + this.state.endDateDisplay + ')']);
-                headers1 = headers1.concat([i18n.t('static.report.stock') + i18n.t('static.forecastReport.endOf') + this.state.beforeEndDateDisplay + ')', i18n.t('static.forecastReport.existingShipments') + '(' + this.state.startDateDisplay + ' - ' + this.state.endDateDisplay + ')', 'Stock or Unmet Demand' + i18n.t('static.forecastReport.endOf') + this.state.endDateDisplay + ')', i18n.t('static.forecastReport.desiredMonthsOfStock') + i18n.t('static.forecastReport.endOf') + this.state.endDateDisplay + ')', i18n.t('static.forecastReport.desiredStock') + i18n.t('static.forecastReport.endOf') + this.state.endDateDisplay + ')']);
+                headers1 = headers1.concat([i18n.t('static.report.stock') + i18n.t('static.forecastReport.endOf') + ' ' + this.state.beforeEndDateDisplay + ')', i18n.t('static.forecastReport.existingShipments') + '(' + this.state.startDateDisplay + ' - ' + this.state.endDateDisplay + ')', 'Stock or Unmet Demand' + i18n.t('static.forecastReport.endOf') + ' ' + this.state.endDateDisplay + ')', i18n.t('static.forecastReport.desiredMonthsOfStock') + i18n.t('static.forecastReport.endOf') + ' ' + this.state.endDateDisplay + ')', i18n.t('static.forecastReport.desiredStock') + i18n.t('static.forecastReport.endOf') + ' ' + this.state.endDateDisplay + ')']);
             }
             headers1 = headers1.concat([i18n.t('static.forecastReport.procurementSurplus')]);
             if (!this.state.hideColumn) {
@@ -839,7 +839,7 @@ class ForecastSummary extends Component {
                     '',
                     '',
                     i18n.t('static.forecastReport.productCost'),
-                    '$ '+this.state.totalProductCost.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","),
+                    '$ ' + this.state.totalProductCost.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","),
                     ''
                 ])
                 data.push([
@@ -854,7 +854,7 @@ class ForecastSummary extends Component {
                     '',
                     '',
                     i18n.t('static.forecastReport.freight') + '(7%)',
-                    '$ '+(0.07 * this.state.totalProductCost).toFixed(2).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","),
+                    '$ ' + (0.07 * this.state.totalProductCost).toFixed(2).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","),
                     ''
                 ])
                 data.push([
@@ -870,7 +870,7 @@ class ForecastSummary extends Component {
                     '',
                     i18n.t('static.shipment.totalCost'),
                     // (this.state.totalProductCost + 0.07 * this.state.totalProductCost),
-                    '$ '+(parseFloat(parseFloat(this.state.totalProductCost) + parseFloat(0.07 * this.state.totalProductCost)).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","),
+                    '$ ' + (parseFloat(parseFloat(this.state.totalProductCost) + parseFloat(0.07 * this.state.totalProductCost)).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","),
                     ''
                 ])
             } else {
@@ -879,7 +879,7 @@ class ForecastSummary extends Component {
                     '',
                     '',
                     i18n.t('static.forecastReport.productCost'),
-                    '$ '+(this.state.totalProductCost).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","),
+                    '$ ' + (this.state.totalProductCost).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","),
                     ''
                 ])
                 data.push([
@@ -887,7 +887,7 @@ class ForecastSummary extends Component {
                     '',
                     '',
                     i18n.t('static.forecastReport.freight') + '(7%)',
-                    '$ '+(parseFloat(0.07 * this.state.totalProductCost).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","),
+                    '$ ' + (parseFloat(0.07 * this.state.totalProductCost).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","),
                     ''
                 ])
                 data.push([
@@ -895,7 +895,7 @@ class ForecastSummary extends Component {
                     '',
                     '',
                     i18n.t('static.shipment.totalCost'),
-                    '$ '+(parseFloat(this.state.totalProductCost + 0.07 * this.state.totalProductCost).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","),
+                    '$ ' + (parseFloat(this.state.totalProductCost + 0.07 * this.state.totalProductCost).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","),
                     ''
                 ])
             }
@@ -1060,7 +1060,7 @@ class ForecastSummary extends Component {
                             let duplicateTracerCategoryId = planningUnitList.map(c => c.planningUnit.forecastingUnit.tracerCategory.id)
                             let filteredTracercategoryId = [...new Set(duplicateTracerCategoryId)];
                             console.log("Test------------>2", filteredTracercategoryId);
-                            let totalProductCost = 0;
+                            let totalProductCost = 0.0;
 
                             // planningUnitList = planningUnitList.filter(c => Object.keys(c.selectedForecastMap).length !== 0)
                             // planningUnitList = planningUnitList.filter(c => ((c.selectedForecastMap[(Object.keys(c.selectedForecastMap))].scenarioId != null) ? c : ((c.selectedForecastMap[(Object.keys(c.selectedForecastMap))].consumptionExtrapolationId != 0) ? c : '')));
@@ -1279,15 +1279,19 @@ class ForecastSummary extends Component {
                                     let obj = { id: 1, tempTracerCategoryId: tracerCategory.id, display: false, tracerCategory: tracerCategory, forecastingUnit: forecastingUnit, planningUnit: planningUnit, totalForecastedQuantity: totalForecastedQuantity, stock1: stock1, existingShipments: existingShipments, stock2: stock2, isStock2Red: isStock2Red, desiredMonthOfStock1: desiredMonthOfStock1, desiredMonthOfStock2: desiredMonthOfStock2, procurementGap: procurementGap, isProcurementGapRed: isProcurementGapRed, priceType: priceType, isPriceTypeRed: isPriceTypeRed, unitPrice: unitPrice, procurementNeeded: procurementNeeded, notes: notes }
                                     tempData.push(obj);
 
+
+
                                     if (isProcurementGapRed == true) {
-                                        totalProductCost = totalProductCost + (Math.abs(tempProcurementGap) * unitPrice);
-                                        totalProductCost = parseFloat(totalProductCost).toFixed(2);
+                                        totalProductCost = parseFloat(totalProductCost) + parseFloat(Math.abs(tempProcurementGap) * unitPrice);
+                                        console.log("totalProductCost----------->4", totalProductCost);
                                     }
 
                                 }
 
 
                             }
+                            totalProductCost = parseFloat(totalProductCost).toFixed(2);
+                            console.log("totalProductCost----------->5", totalProductCost);
                             // console.log("consumptionData----->", consumptionData);
                             // console.log("Test------------>3331", filteredTracercategoryId);
                             // console.log("Test------------>3332", tempData);
@@ -1577,11 +1581,12 @@ class ForecastSummary extends Component {
                                 let stock2 = (primaryOutputData[j].stock + primaryOutputData[j].existingShipments) - primaryOutputData[j].totalForecast;
                                 let isStock2Red = (stock2 < 0 ? true : false);
                                 let desiredMonthOfStock1 = primaryOutputData[j].monthsOfStock;
-                                let desiredMonthOfStock2 = primaryOutputData[j].monthsOfStock * primaryOutputData[j].totalForecast / total_months;
+                                let desiredMonthOfStock2 = parseFloat(primaryOutputData[j].monthsOfStock * primaryOutputData[j].totalForecast / total_months).toFixed(2);
                                 let tempProcurementGap = ((primaryOutputData[j].stock + primaryOutputData[j].existingShipments) - primaryOutputData[j].totalForecast) - (primaryOutputData[j].monthsOfStock * primaryOutputData[j].totalForecast / total_months);
                                 let procurementGap = (tempProcurementGap < 0 ? tempProcurementGap : tempProcurementGap);
+                                procurementGap = parseFloat(procurementGap).toFixed(2)
                                 let isProcurementGapRed = (tempProcurementGap < 0 ? true : false)
-                                let priceType = (primaryOutputData[j].procurementAgent == null && primaryOutputData[j].price == null ? i18n.t('static.forecastReport.NoPriceTypeAvailable') : (primaryOutputData[j].procurementAgent != null ? primaryOutputData[j].procurementAgent.code : i18n.t('static.forecastReport.custom')));
+                                let priceType = (primaryOutputData[j].procurementAgent == null && primaryOutputData[j].price == null ? i18n.t('static.forecastReport.NoPriceTypeAvailable') : (primaryOutputData[j].procurementAgent.id != 0 ? primaryOutputData[j].procurementAgent.code : i18n.t('static.forecastReport.custom')));
                                 let isPriceTypeRed = (primaryOutputData[j].procurementAgent == null && primaryOutputData[j].price == null ? true : false);
                                 let unitPrice = primaryOutputData[j].price;
                                 // let procurementNeeded = (isProcurementGapRed == true ? '$ ' + (tempProcurementGap * unitPrice).toFixed(2) : '');
@@ -1592,8 +1597,7 @@ class ForecastSummary extends Component {
                                 tempData.push(obj);
 
                                 if (isProcurementGapRed == true) {
-                                    totalProductCost = totalProductCost + (Math.abs(tempProcurementGap) * unitPrice);
-                                    totalProductCost = parseFloat(totalProductCost).toFixed(2);
+                                    totalProductCost = parseFloat(totalProductCost) + parseFloat(Math.abs(tempProcurementGap) * unitPrice);
                                 }
                             }
 
@@ -1610,7 +1614,7 @@ class ForecastSummary extends Component {
                             }
                             console.log("Test------------>Online---301", summeryData);
 
-
+                            totalProductCost = parseFloat(totalProductCost).toFixed(2);
                             this.setState({
                                 loading: (displayId == 1 ? true : false),
                                 summeryData: summeryData,
@@ -3169,7 +3173,7 @@ class ForecastSummary extends Component {
                                                                         <td></td>
                                                                         <td></td>
                                                                         <td><b>{i18n.t('static.forecastReport.productCost')}</b></td>
-                                                                        <td><b>{'$ '+(this.state.totalProductCost).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</b></td>
+                                                                        <td><b>{'$ ' + (this.state.totalProductCost).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</b></td>
                                                                         <td></td>
                                                                     </tr>
                                                                     <tr>
@@ -3185,7 +3189,7 @@ class ForecastSummary extends Component {
                                                                         <td></td>
                                                                         <td></td>
                                                                         <td><b>{i18n.t('static.forecastReport.freight')} (7%)</b></td>
-                                                                        <td><b>{'$ '+((0.07 * this.state.totalProductCost).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</b></td>
+                                                                        <td><b>{'$ ' + ((0.07 * this.state.totalProductCost).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</b></td>
                                                                         <td></td>
                                                                     </tr>
                                                                     <tr>
@@ -3201,7 +3205,7 @@ class ForecastSummary extends Component {
                                                                         <td></td>
                                                                         <td></td>
                                                                         <td><b>{i18n.t('static.shipment.totalCost')}</b></td>
-                                                                        <td><b>{'$ '+(parseFloat(parseFloat(this.state.totalProductCost) + parseFloat(0.07 * this.state.totalProductCost)).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</b></td>
+                                                                        <td><b>{'$ ' + (parseFloat(parseFloat(this.state.totalProductCost) + parseFloat(0.07 * this.state.totalProductCost)).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</b></td>
                                                                         <td></td>
                                                                     </tr>
                                                                 </tfoot>
@@ -3214,7 +3218,7 @@ class ForecastSummary extends Component {
                                                                         <td className='text-left sticky-col first-col clone'></td>
                                                                         <td></td>
                                                                         <td><b>{i18n.t('static.forecastReport.productCost')}</b></td>
-                                                                        <td><b>{'$ '+(this.state.totalProductCost).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</b></td>
+                                                                        <td><b>{'$ ' + (this.state.totalProductCost).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</b></td>
                                                                         <td></td>
                                                                     </tr>
                                                                     <tr>
@@ -3223,7 +3227,7 @@ class ForecastSummary extends Component {
                                                                         <td className='text-left sticky-col first-col clone'></td>
                                                                         <td></td>
                                                                         <td><b>{i18n.t('static.forecastReport.freight')} (7%)</b></td>
-                                                                        <td><b>{'$ '+(parseFloat(0.07 * this.state.totalProductCost).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</b></td>
+                                                                        <td><b>{'$ ' + (parseFloat(0.07 * this.state.totalProductCost).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</b></td>
                                                                         <td></td>
                                                                     </tr>
                                                                     <tr>
@@ -3232,7 +3236,7 @@ class ForecastSummary extends Component {
                                                                         <td className='text-left sticky-col first-col clone'></td>
                                                                         <td></td>
                                                                         <td><b>{i18n.t('static.shipment.totalCost')}</b></td>
-                                                                        <td><b>{'$ '+(parseFloat(this.state.totalProductCost + 0.07 * this.state.totalProductCost).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</b></td>
+                                                                        <td><b>{'$ ' + (parseFloat(this.state.totalProductCost + 0.07 * this.state.totalProductCost).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</b></td>
                                                                         <td></td>
                                                                     </tr>
                                                                 </tfoot>

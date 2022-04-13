@@ -1071,6 +1071,9 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
             var actualConsumptionCount = 2;
             var reportingRateCount = 3;
             var daysOfStockOutCount = 4;
+            var adjustedAmountCount = 6;
+            var puAmountCount = 7;
+
             for (var r = 0; r < regionList.length; r++) {
               console.log("&&&&&&&&&&MonthList", monthArray[i]);
               var index = 0;
@@ -1078,15 +1081,21 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
               var actualConsumptionValue = elInstance.getValue(`${colArr[i + 1]}${parseInt(actualConsumptionCount) + 1}`, true).replaceAll(",", "");
               var reportingRateValue = elInstance.getValue(`${colArr[i + 1]}${parseInt(reportingRateCount) + 1}`, true);
               var daysOfStockOutValue = elInstance.getValue(`${colArr[i + 1]}${parseInt(daysOfStockOutCount) + 1}`, true);
+              var adjustedAmountValue = elInstance.getValue(`${colArr[i + 1]}${parseInt(adjustedAmountCount) + 1}`, true);
+              var puAmountValue = elInstance.getValue(`${colArr[i + 1]}${parseInt(puAmountCount) + 1}`, true);
               console.log("&&&&&&&&&&ActualConsumptionValue", actualConsumptionValue);
               if (actualConsumptionValue !== "") {
                 if (index != -1) {
                   fullConsumptionList[index].amount = actualConsumptionValue;
                   fullConsumptionList[index].reportingRate = reportingRateValue;
                   fullConsumptionList[index].daysOfStockOut = daysOfStockOutValue;
+                  fullConsumptionList[index].adjustedAmount = adjustedAmountValue;
+                  fullConsumptionList[index].puAmount = puAmountValue;
                 } else {
                   var json = {
                     amount: actualConsumptionValue,
+                    adjustedAmount: adjustedAmountValue,
+                    puAmount: puAmountValue,
                     planningUnit: {
                       id: consumptionUnit.planningUnit.id,
                       label: consumptionUnit.planningUnit.label
@@ -1110,7 +1119,9 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
               }
               actualConsumptionCount += 8;
               reportingRateCount += 8;
-              daysOfStockOutCount += 8
+              daysOfStockOutCount += 8;
+              adjustedAmountCount += 8;
+              puAmountCount += 8;
             }
           }
           var planningUnitList = datasetJson.planningUnitList;
@@ -1276,9 +1287,6 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
 
     csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + document.getElementById("datasetId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
     csvRow.push('')
-    if (this.state.selectedConsumptionUnitId > 0) {
-      csvRow.push('"' + (i18n.t('static.dashboard.planningunitheader') + ' : ' + document.getElementById("planningUnitId").value).replaceAll(' ', '%20') + '"')
-    }
     csvRow.push('')
     csvRow.push('')
     var columns = [];
@@ -1329,8 +1337,11 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       csvRow.push(A[i].join(","))
     }
     if (this.state.selectedConsumptionUnitId > 0) {
-
       csvRow.push('')
+      csvRow.push('')
+      if (this.state.selectedConsumptionUnitId > 0) {
+        csvRow.push('"' + (i18n.t('static.dashboard.planningunitheader') + ' : ' + document.getElementById("planningUnitId").value).replaceAll(' ', '%20') + '"')
+      }
       csvRow.push('')
       headers = [];
       var columns = [];
@@ -1410,6 +1421,97 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         csvRow.push(C[i].join(","))
       }
     }
+    var planningUnitList = this.state.planningUnitList.filter(c => c.planningUnit.id != this.state.selectedConsumptionUnitId);
+    console.log("PlanningUnitList@@@@@@@@@@@", planningUnitList)
+    for (var pul = 0; pul < planningUnitList.length; pul++) {
+      console.log("In loop@@@@@@@@@")
+      // if (planningUnitList[i].planningUnit.id != this.state.selectedConsumptionUnitId) {
+      var consumptionList = this.state.consumptionList.filter(c => c.planningUnit.id == planningUnitList[pul].planningUnit.id);
+      csvRow.push('')
+      csvRow.push('')
+      csvRow.push('"' + (i18n.t('static.dashboard.planningunitheader') + ' : ' + getLabelText(planningUnitList[pul].planningUnit.label, this.state.lang)).replaceAll(' ', '%20') + '"')
+      csvRow.push('')
+      headers = [];
+      var columns = [];
+      columns.push(i18n.t('static.inventoryDate.inventoryReport').replaceAll(' ', '%20'))
+      this.state.monthArray.map(item => (
+        columns.push(moment(item.date).format(DATE_FORMAT_CAP_WITHOUT_DATE))
+      ))
+      columns.push('')
+      columns.map((item, idx) => { headers[idx] = (item).replaceAll(' ', '%20') });
+      var C = []
+      C.push([this.addDoubleQuoteToRowContent(headers)]);
+      var B = [];
+      var monthArray = this.state.monthArray;
+      var regionList = this.state.regionList;
+      var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF', 'AG', 'AH', 'AI', 'AJ', 'AK', 'AL', 'AM', 'AN']
+      B.push(i18n.t('static.program.noOfDaysInMonth').replaceAll('#', '%23').replaceAll(' ', '%20'))
+      for (var j = 0; j < monthArray.length; j++) {
+        B.push(monthArray[j].noOfDays)
+      }
+      C.push(this.addDoubleQuoteToRowContent(B));
+
+      for (var r = 0; r < regionList.length; r++) {
+        B = [];
+        B.push((getLabelText(regionList[r].label)).replaceAll(' ', '%20'))
+        for (var j = 0; j < monthArray.length; j++) {
+          B.push("")
+        }
+        C.push(this.addDoubleQuoteToRowContent(B));
+        B = [];
+        B.push(i18n.t('static.supplyPlan.actualConsumption').replaceAll(' ', '%20'))
+        for (var j = 0; j < monthArray.length; j++) {
+          var consumptionData = consumptionList.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArray[j].date).format("YYYY-MM") && c.region.id == regionList[r].regionId);
+          B.push(consumptionData.length > 0 ? consumptionData[0].amount.toString().replaceAll("\,", "") : "")
+        }
+        C.push(this.addDoubleQuoteToRowContent(B));
+        B = [];
+        B.push(i18n.t('static.dataentry.reportingRate').replaceAll(' ', '%20'))
+        for (var j = 0; j < monthArray.length; j++) {
+          var consumptionData = consumptionList.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArray[j].date).format("YYYY-MM") && c.region.id == regionList[r].regionId);
+          B.push(consumptionData.length > 0 && consumptionData[0].reportingRate > 0 ? consumptionData[0].reportingRate.toString().replaceAll("\,", "") : 100);
+        }
+        C.push(this.addDoubleQuoteToRowContent(B));
+        B = [];
+        B.push(i18n.t('static.dataentry.stockedOut').replaceAll(' ', '%20'))
+        for (var j = 0; j < monthArray.length; j++) {
+          var consumptionData = consumptionList.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArray[j].date).format("YYYY-MM") && c.region.id == regionList[r].regionId);
+          B.push(consumptionData.length > 0 && consumptionData[0].daysOfStockOut > 0 ? consumptionData[0].daysOfStockOut.toString().replaceAll("\,", "") : 0)
+        }
+        C.push(this.addDoubleQuoteToRowContent(B));
+        B = [];
+        B.push(i18n.t('static.dataentry.stockedOutPer').replaceAll(' ', '%20'))
+        for (var j = 0; j < monthArray.length; j++) {
+          var consumptionData = consumptionList.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArray[j].date).format("YYYY-MM") && c.region.id == regionList[r].regionId);
+          var percentage = consumptionData.length > 0 && consumptionData[0].daysOfStockOut > 0 ? Math.round((consumptionData[0].daysOfStockOut / monthArray[j].noOfDays) * 100) : 0;
+          console.log("Percentage@@@@@@@@@@@@@@@@@@@", percentage)
+          B.push(percentage.toString().replaceAll("\,", ""))
+        }
+        C.push(this.addDoubleQuoteToRowContent(B));
+        B = [];
+
+        B.push(i18n.t('static.dataentry.adjustedConsumption').replaceAll(' ', '%20'))
+        for (var j = 0; j < monthArray.length; j++) {
+          var consumptionData = consumptionList.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArray[j].date).format("YYYY-MM") && c.region.id == regionList[r].regionId);
+          B.push(consumptionData.length > 0 ? consumptionData[0].adjustedAmount.toString().replaceAll("\,", "") : "")
+        }
+        C.push(this.addDoubleQuoteToRowContent(B));
+        B = [];
+
+        B.push(i18n.t('static.dataentry.convertedToPlanningUnit').replaceAll(' ', '%20'))
+        for (var j = 0; j < monthArray.length; j++) {
+          var consumptionData = consumptionList.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArray[j].date).format("YYYY-MM") && c.region.id == regionList[r].regionId);
+          B.push(consumptionData.length > 0 ? consumptionData[0].puAmount.toString().replaceAll("\,", "") : "")
+        }
+        C.push(this.addDoubleQuoteToRowContent(B));
+        B = [];
+      }
+
+      for (var i = 0; i < C.length; i++) {
+        csvRow.push(C[i].join(","))
+      }
+      // }
+    }
 
 
     var csvString = csvRow.join("%0A")
@@ -1417,7 +1519,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     a.href = 'data:attachment/csv,' + csvString
     a.target = "_Blank"
     a.download = i18n.t('static.dashboard.dataEntryAndAdjustment') + ".csv"
-    a.download = document.getElementById("datasetId").selectedOptions[0].text.toString().split("~")[0] + "-" + document.getElementById("datasetId").selectedOptions[0].text.toString().split("~")[1] + "-" + i18n.t('static.dashboard.dataEntryAndAdjustment') + "-" + (this.state.selectedConsumptionUnitId > 0 ? document.getElementById("planningUnitId").value : "") + ".csv"
+    a.download = document.getElementById("datasetId").selectedOptions[0].text.toString().split("~")[0] + "-" + document.getElementById("datasetId").selectedOptions[0].text.toString().split("~")[1] + "-" + i18n.t('static.dashboard.dataEntryAndAdjustment') + ".csv"
     document.body.appendChild(a)
     a.click()
   }
@@ -1950,7 +2052,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     var chartOptions = {
       title: {
         display: true,
-        text: this.state.selectedConsumptionUnitId > 0 ? i18n.t('static.dashboard.dataEntryAndAdjustments')+" - " + document.getElementById("datasetId").selectedOptions[0].text + " - " + getLabelText(this.state.selectedConsumptionUnitObject.planningUnit.label, this.state.lang) : ""
+        text: this.state.selectedConsumptionUnitId > 0 ? i18n.t('static.dashboard.dataEntryAndAdjustments') + " - " + document.getElementById("datasetId").selectedOptions[0].text + " - " + getLabelText(this.state.selectedConsumptionUnitObject.planningUnit.label, this.state.lang) : ""
       },
       scales: {
         yAxes: [{
