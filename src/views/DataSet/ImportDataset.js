@@ -84,7 +84,7 @@ export default class ImportDataset extends Component {
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
-        }, 8000);
+        }, 30000);
     }
     getPrograms() {
         // console.log("T***get programs called");

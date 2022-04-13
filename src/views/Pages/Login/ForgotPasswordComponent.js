@@ -96,7 +96,7 @@ class ForgotPasswordComponent extends Component {
         }
     }
     hideMessage() {
-        setTimeout(function () { document.getElementById('hideDiv').style.display = 'none'; }, 8000);
+        setTimeout(function () { document.getElementById('hideDiv').style.display = 'none'; }, 30000);
     }
 
     render() {
