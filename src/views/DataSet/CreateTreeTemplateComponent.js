@@ -1305,15 +1305,18 @@ export default class CreateTreeTemplate extends Component {
             if (parameterName == 'type' && (value == 1 || value == 0)) {
                 if (this.state.currentItemConfig.context.payload.nodeType.id == 1 || this.state.currentItemConfig.context.payload.nodeType.id == 2) {
                     console.log("mom list ret---", this.state.nodeDataMomList.filter(x => x.nodeId == this.state.currentItemConfig.context.id));
-                    this.setState({ momList: this.state.nodeDataMomList.filter(x => x.nodeId == this.state.currentItemConfig.context.id)[0].nodeDataMomList }, () => {
-                        console.log("going to build mom jexcel");
-                        if (this.state.modelingEl != null && this.state.modelingEl != undefined && this.state.modelingEl != "") {
-                            this.filterScalingDataByMonth(this.state.scalingMonth, this.state.nodeDataMomList.filter(x => x.nodeId == this.state.currentItemConfig.context.id)[0].nodeDataMomList);
-                        }
-                        if (value == 1 || (value == 0 && this.state.showMomData)) {
-                            this.buildMomJexcel();
-                        }
-                    });
+                    var nodeDataMomList = this.state.nodeDataMomList.filter(x => x.nodeId == this.state.currentItemConfig.context.id);
+                    if (nodeDataMomList.length > 0) {
+                        this.setState({ momList: nodeDataMomList[0].nodeDataMomList }, () => {
+                            console.log("going to build mom jexcel");
+                            if (this.state.modelingEl != null && this.state.modelingEl != undefined && this.state.modelingEl != "") {
+                                this.filterScalingDataByMonth(this.state.scalingMonth, nodeDataMomList[0].nodeDataMomList);
+                            }
+                            if (value == 1 || (value == 0 && this.state.showMomData)) {
+                                this.buildMomJexcel();
+                            }
+                        });
+                    }
                 } else if (this.state.currentItemConfig.context.payload.nodeType.id == 3 || this.state.currentItemConfig.context.payload.nodeType.id == 4 || this.state.currentItemConfig.context.payload.nodeType.id == 5) {
                     console.log("id to filter---", this.state.currentItemConfig.context.id)
                     console.log("id to filter list---", this.state.nodeDataMomList)
@@ -1354,7 +1357,7 @@ export default class CreateTreeTemplate extends Component {
                     if (nodeTypeId == 2) {
                         if ((map1.get("4") != '' && map1.get("4") != 0.00) || (map1.get("5") != '' && map1.get("5") != 0.00)) {
                             var overrideData = {
-                                month: map1.get("0"),
+                                monthNo: map1.get("0"),
                                 seasonalityPerc: map1.get("4").toString().replaceAll(",", "").split("%")[0],
                                 manualChange: (map1.get("5") != '' && map1.get("5") != 0.00) ? map1.get("5").toString().replaceAll(",", "") : map1.get("5"),
                                 nodeDataId: map1.get("7"),
@@ -1366,7 +1369,7 @@ export default class CreateTreeTemplate extends Component {
                     } else if (nodeTypeId == 3 || nodeTypeId == 4 || nodeTypeId == 5) {
                         if (map1.get("3") != '' && map1.get("3") != 0.00) {
                             var overrideData = {
-                                month: map1.get("0"),
+                                monthNo: map1.get("0"),
                                 seasonalityPerc: 0,
                                 manualChange: map1.get("3").toString().replaceAll(",", "").split("%")[0],
                                 nodeDataId: map1.get("7"),
@@ -1389,6 +1392,7 @@ export default class CreateTreeTemplate extends Component {
                     this.setState({
                         treeTemplate
                     }, () => {
+                        console.log("treeTemplate mom---",treeTemplate);
                         calculateModelingData(treeTemplate, this, '', currentItemConfig.context.id, 0, 1, -1, true);
                     });
                 });
@@ -1971,7 +1975,7 @@ export default class CreateTreeTemplate extends Component {
             } else {
                 if (itemConfig.payload.nodeType.id == 1 || itemConfig.payload.nodeType.id == 2) {
                     if (type == 1) {
-                        return addCommasTwoDecimal((itemConfig.payload.nodeDataMap[0])[0].displayDataValue.toString());
+                        return addCommasTwoDecimal((itemConfig.payload.nodeDataMap[0])[0].displayDataValue);
                     } else if (type == 3) {
                         var childList = this.state.items.filter(c => c.parent == itemConfig.id && (c.payload.nodeType.id == 3 || c.payload.nodeType.id == 4 || c.payload.nodeType.id == 5));
                         if (childList.length > 0) {
