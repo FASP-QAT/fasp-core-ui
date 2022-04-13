@@ -22,7 +22,7 @@ import moment from 'moment';
 import Picker from 'react-month-picker';
 import SelectSearch from 'react-select-search';
 import MonthBox from '../../CommonComponent/MonthBox.js';
-import { NUMBER_NODE_ID, PERCENTAGE_NODE_ID, FU_NODE_ID, PU_NODE_ID, ROUNDING_NUMBER, INDEXED_DB_NAME, INDEXED_DB_VERSION, TREE_DIMENSION_ID, SECRET_KEY, JEXCEL_MONTH_PICKER_FORMAT, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, JEXCEL_DECIMAL_NO_REGEX_LONG, DATE_FORMAT_CAP_WITHOUT_DATE, JEXCEL_DECIMAL_MONTHLY_CHANGE_4_DECIMAL, JEXCEL_DECIMAL_MONTHLY_CHANGE, DATE_FORMAT_CAP, TITLE_FONT } from '../../Constants.js'
+import { NUMBER_NODE_ID,JEXCEL_DECIMAL_CATELOG_PRICE_SHIPMENT, PERCENTAGE_NODE_ID, FU_NODE_ID, PU_NODE_ID, ROUNDING_NUMBER, INDEXED_DB_NAME, INDEXED_DB_VERSION, TREE_DIMENSION_ID, SECRET_KEY, JEXCEL_MONTH_PICKER_FORMAT, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, JEXCEL_DECIMAL_NO_REGEX_LONG, DATE_FORMAT_CAP_WITHOUT_DATE, JEXCEL_DECIMAL_MONTHLY_CHANGE_4_DECIMAL_POSITIVE, JEXCEL_DECIMAL_MONTHLY_CHANGE, DATE_FORMAT_CAP, TITLE_FONT } from '../../Constants.js'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import jexcel from 'jexcel-pro';
 import "../../../node_modules/jexcel-pro/dist/jexcel.css";
@@ -4061,7 +4061,7 @@ export default class BuildTree extends Component {
         var rowData = elInstance.getRowData(y);
         console.log("modelingTypeId-3--", rowData[4])
         if (rowData[4] != "") {
-            var reg = JEXCEL_DECIMAL_MONTHLY_CHANGE_4_DECIMAL;
+            var reg = JEXCEL_DECIMAL_MONTHLY_CHANGE_4_DECIMAL_POSITIVE;
             var monthDifference = moment(stopDate).diff(startDate, 'months', true);
             var nodeValue = this.state.currentScenario.calculatedDataValue;
             var calculatedChangeForMonth;
@@ -4103,7 +4103,7 @@ export default class BuildTree extends Component {
             // Monthly change #
             if (x == 7 && rowData[4] == 2) {
                 var col = ("H").concat(parseInt(y) + 1);
-                var reg = JEXCEL_DECIMAL_MONTHLY_CHANGE_4_DECIMAL;
+                var reg = JEXCEL_DECIMAL_MONTHLY_CHANGE_4_DECIMAL_POSITIVE;
                 console.log("value monthly change #---", value);
                 value = value.toString().replaceAll(",", "");
                 if (value == "") {
@@ -4186,7 +4186,7 @@ export default class BuildTree extends Component {
                                 console.log("arr[i]---", arr[i])
                                 var nodeDataModelingList = arr[i].payload.nodeDataMap[this.state.selectedScenario][0].nodeDataModelingList;
                                 if (nodeDataModelingList.length > 0) {
-                                    var nodedata = nodeDataModelingList.filter(x => x.transferNodeDataId == itemConfig.id)[0];
+                                    var nodedata = nodeDataModelingList.filter(x => x.transferNodeDataId == itemConfig.payload.nodeDataMap[this.state.selectedScenario][0].nodeDataId)[0];
                                     if (nodedata != null && nodedata != "") {
                                         result = true;
                                         break;
