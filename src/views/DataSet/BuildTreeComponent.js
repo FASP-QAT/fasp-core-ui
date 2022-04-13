@@ -3960,7 +3960,7 @@ export default class BuildTree extends Component {
     changed = function (instance, cell, x, y, value) {
 
         // instance.jexcel
-        if (x != 8 && x != 10 && this.state.modelingChanged == false) {
+        if (x != 9 && x != 11 && this.state.modelingChanged == false) {
             this.setState({
                 modelingChanged: true
             })
