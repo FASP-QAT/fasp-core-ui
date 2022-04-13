@@ -563,19 +563,20 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                             })
                             // console.log("Node MOM List%%%", nodeDataList);
                         }
-
-                        // console.log("Node MOM List$$$", nodeDataList);
-
-                        allNodeDataList.push({
-                            nodeId: flatList[fl].id,
-                            nodeDataMomList: nodeDataList
-                        })
-
-                        nodeDataMapForScenario.nodeDataMomList = nodeDataList;
-                        nodeDataMap[scenarioList[ndm].id] = [nodeDataMapForScenario];
-                        // nodeDataMapForScenario.nodeDataMomList = nodeDataList;
-                        // nodeDataMap[scenarioList[ndm].id] = [nodeDataMapForScenario];
                     }
+
+                    // console.log("Node MOM List$$$", nodeDataList);
+                    console.log("Before node data list all push 1")
+                    allNodeDataList.push({
+                        nodeId: flatList[fl].id,
+                        nodeDataMomList: nodeDataList
+                    })
+
+                    nodeDataMapForScenario.nodeDataMomList = nodeDataList;
+                    nodeDataMap[scenarioList[ndm].id] = [nodeDataMapForScenario];
+                    // nodeDataMapForScenario.nodeDataMomList = nodeDataList;
+                    // nodeDataMap[scenarioList[ndm].id] = [nodeDataMapForScenario];
+                    // }
                 }
                 if (nodeId == -1) {
                     var findIndex = flatListUnsorted.findIndex(c => c.id == flatList[fl].id);
@@ -665,15 +666,16 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                 }
                             );
                         }
-                        // console.log("Nodedatalist&&&", nodeDataList);
-                        allNodeDataList.push({
-                            nodeId: aggregateNodeList[fl - 1].id,
-                            nodeDataMomList: nodeDataList
-                        })
-
-                        nodeDataMapForScenario.nodeDataMomList = nodeDataList;
-                        nodeDataMap[scenarioList[ndm].id] = [nodeDataMapForScenario];
                     }
+                    // console.log("Nodedatalist&&&", nodeDataList);
+                    console.log("Before node data list all push 2")
+                    allNodeDataList.push({
+                        nodeId: aggregateNodeList[fl - 1].id,
+                        nodeDataMomList: nodeDataList
+                    })
+
+                    nodeDataMapForScenario.nodeDataMomList = nodeDataList;
+                    nodeDataMap[scenarioList[ndm].id] = [nodeDataMapForScenario];
                 }
                 if (nodeId == -1) {
                     var findIndex = flatListUnsorted.findIndex(c => c.id == aggregateNodeList[fl - 1].id);
