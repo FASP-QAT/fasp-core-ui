@@ -3240,7 +3240,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                 <Button type="submit" color="success" className="mr-1 float-right" size="md" ><i className="fa fa-check"> </i>Submit</Button>
                             </div> */}
                                         {/* </Form> */}
-                                        <h5 className={"red"} id="div1">{this.state.noDataMessage}</h5>
+                                        <h5 className={"red"} id="div9">{this.state.noDataMessage}</h5>
                                         {/* Graph */}
                                         <div style={{ display: !this.state.loading ? "block" : "none" }}>
                                             {this.state.showData &&
@@ -3400,7 +3400,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                     </div>
                                                 </div>}
                                             {this.state.dataChanged && this.state.extrapolateClicked && <div className="row float-right mt-lg-3 mr-0 pb-2 pt-2 "> <Button type="submit" id="formSubmitButton" size="md" color="success" className="float-right mr-0" onClick={() => this.touchAllExtrapolation(setTouched, errors, 1)}><i className="fa fa-check"></i>{i18n.t('static.pipeline.save')}</Button>&nbsp;</div>}
-                                            <div className="row float-right mt-lg-3 mr-3 pb-2 pt-2 "><Button type="submit" id="extrapolateButton" size="md" color="info" className="float-right mr-1" onClick={() => this.touchAllExtrapolation(setTouched, errors, 0)}><i className="fa fa-check"></i>Extrapolate</Button></div>
+                                            {this.state.forecastProgramId!="" && this.state.planningUnitId>0 && this.state.regionId>0 && <div className="row float-right mt-lg-3 mr-3 pb-2 pt-2 "><Button type="submit" id="extrapolateButton" size="md" color="info" className="float-right mr-1" onClick={() => this.touchAllExtrapolation(setTouched, errors, 0)}><i className="fa fa-check"></i>Extrapolate</Button></div>}
                                             {/* {this.state.showData && <div id="tableDiv" className="extrapolateTable pt-lg-5"></div>} */}
                                             <div className="row" style={{ display: this.state.show ? "block" : "none" }}>
                                                 <div className="col-md-10 pt-4 pb-3">
@@ -3436,7 +3436,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                     <CardFooter>
                         <FormGroup>
                             <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                            <button className="mr-1 float-right btn btn-info btn-md" onClick={this.toggledata}>{this.state.show ? i18n.t('static.common.hideData') : i18n.t('static.common.showData')}</button>
+                            {this.state.forecastProgramId!="" && this.state.planningUnitId>0 && <button className="mr-1 float-right btn btn-info btn-md" onClick={this.toggledata}>{this.state.show ? i18n.t('static.common.hideData') : i18n.t('static.common.showData')}</button>}
                             {this.state.showData && <> <Button type="button" id="dataCheck" size="md" color="info" className="float-right mr-1" onClick={() => this.openDataCheckModel()}><i className="fa fa-check"></i>{i18n.t('static.common.dataCheck')}</Button></>}
                             &nbsp;
                         </FormGroup>
