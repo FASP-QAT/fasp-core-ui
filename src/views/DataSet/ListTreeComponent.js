@@ -445,6 +445,7 @@ export default class ListTreeComponent extends Component {
             var tempArray = [];
             var tempJson = {};
             var tempTree = {};
+            var curMonth = moment(new Date()).format('YYYY-MM-DD');
             var treeTemplateId = document.getElementById('templateId').value;
             console.log("treeTemplateId===", treeTemplateId);
             if (treeTemplateId != "" && treeTemplateId != 0) {
@@ -457,6 +458,11 @@ export default class ListTreeComponent extends Component {
                     // var nodeDataMap[1] = flatList.payload.nodeDataMap[0][0];
                     console.log("flatList[i]---", flatList[i]);
                     tempJson = flatList[i].payload.nodeDataMap[0][0];
+                    if (flatList[i].payload.nodeType.id != 1) {
+                        console.log("month from tree template---", flatList[i].payload.nodeDataMap[0][0].monthNo + " cur month---", curMonth + " final result---", moment(curMonth).startOf('month').add(flatList[i].payload.nodeDataMap[0][0].monthNo, 'months').format("YYYY-MM-DD"))
+                        var monthNo = flatList[i].payload.nodeDataMap[0][0].monthNo < 0 ? flatList[i].payload.nodeDataMap[0][0].monthNo : parseInt(flatList[i].payload.nodeDataMap[0][0].monthNo - 1)
+                        tempJson.month = moment(curMonth).startOf('month').add(monthNo, 'months').format("YYYY-MM-DD");
+                    }
                     tempArray.push(tempJson);
                     nodeDataMap[1] = tempArray;
                     flatList[i].payload.nodeDataMap = nodeDataMap;
@@ -836,7 +842,7 @@ export default class ListTreeComponent extends Component {
                 regionId: '',
                 regionList: [],
                 regionValues: [],
-                notes: '',
+                notes: treeTemplate.notes,
                 treeTemplate,
                 missingPUList: []
             }, () => {
@@ -1515,7 +1521,7 @@ export default class ListTreeComponent extends Component {
                                                     </div>
 
                                                     <div className="col-md-12" style={{ display: 'inline-block' }}>
-                                                        <div style={{ display: this.state.missingPUList.length > 0 ? 'block' : 'none' }}><div><b>Missing Planning Units:(<a href="/#/planningUnitSetting/listPlanningUnitSetting" className="supplyplanformulas">Update Planning Units</a>)</b></div><br />
+                                                        <div style={{ display: this.state.missingPUList.length > 0 ? 'block' : 'none' }}><div><b>Missing Planning Units : (<a href="/#/planningUnitSetting/listPlanningUnitSetting" className="supplyplanformulas">Update Planning Units</a>)</b></div><br />
                                                             <div id="missingPUJexcel" className="RowClickable">
                                                             </div>
                                                         </div>
