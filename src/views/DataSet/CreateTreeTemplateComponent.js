@@ -429,6 +429,7 @@ export default class CreateTreeTemplate extends Component {
         this.pickAMonth2 = React.createRef()
         this.pickAMonth1 = React.createRef()
         this.state = {
+            nodeUnitListPlural: [],
             popoverOpenMonthInPast: false,
             popoverOpenMonthInFuture: false,
             monthId: 1,
@@ -1951,10 +1952,17 @@ export default class CreateTreeTemplate extends Component {
         var totalValue = "";
         data = itemConfig.payload.nodeDataMap;
         if (data != null && data[0] != null && (data[0])[0] != null) {
-            if (type == 4) {
+            if (type == 4 || type == 5) {
                 var result = false;
                 if (itemConfig.payload.nodeDataMap[0][0].nodeDataModelingList != null && itemConfig.payload.nodeDataMap[0][0].nodeDataModelingList.length > 0) {
-                    result = true;
+                    if (type == 4) {
+                        result = true;
+                    } else if (type == 5) {
+                        var filteredData = itemConfig.payload.nodeDataMap[0][0].nodeDataModelingList.filter(x => x.transferNodeDataId != null && x.transferNodeDataId != "" && x.transferNodeDataId > 0);
+                        if (filteredData.length > 0) {
+                            result = true;
+                        }
+                    }
                 } else {
                     var arr = [];
                     if (itemConfig.payload.nodeType.id == NUMBER_NODE_ID) {
@@ -2872,15 +2880,15 @@ export default class CreateTreeTemplate extends Component {
             // console.log("modeling type---", scalingList[j].modelingType.id);
             data[4] = nodeTransferDataList[j].modelingType.id
             data[5] = 1
-            data[6] = nodeTransferDataList[j].modelingType.id != 2 ? parseFloat(nodeTransferDataList[j].dataValue * -1).toFixed(4) : ''
-            data[7] = nodeTransferDataList[j].modelingType.id == 2 ? (nodeTransferDataList[j].dataValue * -1) : ''
+            data[6] = nodeTransferDataList[j].modelingType.id != 2 ? parseFloat(nodeTransferDataList[j].dataValue).toFixed(4) : ''
+            data[7] = nodeTransferDataList[j].modelingType.id == 2 ? (nodeTransferDataList[j].dataValue) : ''
             data[8] = ""
             var nodeValue = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].calculatedDataValue;
             var calculatedChangeForMonth;
             if (nodeTransferDataList[j].modelingType.id == 2 || nodeTransferDataList[j].modelingType.id == 5) {
-                calculatedChangeForMonth = nodeTransferDataList[j].dataValue * -1;
+                calculatedChangeForMonth = nodeTransferDataList[j].dataValue;
             } else if (nodeTransferDataList[j].modelingType.id == 3 || nodeTransferDataList[j].modelingType.id == 4) {
-                calculatedChangeForMonth = (nodeValue * (nodeTransferDataList[j].dataValue * -1)) / 100;
+                calculatedChangeForMonth = (nodeValue * (nodeTransferDataList[j].dataValue)) / 100;
             }
             data[9] = calculatedChangeForMonth
             data[10] = nodeTransferDataList[j].nodeDataModelingId
@@ -4151,8 +4159,8 @@ export default class CreateTreeTemplate extends Component {
             usageFrequency = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageFrequency.toString().replaceAll(",", "");
 
             if (this.state.addNodeFlag) {
-                var usageTypeParent = document.getElementById("usageTypeParent");
-                selectedText = usageTypeParent.options[usageTypeParent.selectedIndex].text;
+                // var usageTypeParent = document.getElementById("usageTypeParent");
+                selectedText = this.state.nodeUnitList.filter(c => c.unitId == this.state.currentItemConfig.parentItem.payload.nodeUnit.id)[0].label.label_en
             } else {
                 selectedText = this.state.nodeUnitList.filter(c => c.unitId == this.state.currentItemConfig.parentItem.payload.nodeUnit.id)[0].label.label_en;
             }
@@ -4532,6 +4540,17 @@ export default class CreateTreeTemplate extends Component {
                 nodeUnitList: listArray
             }, () => {
                 console.log("nodeUnitList>>>", this.state.nodeUnitList);
+                var nodeUnitListPlural = [];
+                console.log("this.state.nodeUnitList---", this.state.nodeUnitList);
+                for (let i = 0; i < this.state.nodeUnitList.length; i++) {
+                    console.log("inside for---")
+                    var nodeUnit = JSON.parse(JSON.stringify(this.state.nodeUnitList[i]));
+                    console.log("nodeUnit---", nodeUnit)
+                    nodeUnit.label.label_en = nodeUnit.label.label_en + "(s)";
+                    nodeUnitListPlural.push(nodeUnit);
+                }
+                console.log("nodeUnitListPlural---", nodeUnitListPlural)
+                this.setState({ nodeUnitListPlural })
             })
         })
             .catch(
@@ -7104,8 +7123,8 @@ export default class CreateTreeTemplate extends Component {
                                                     value={this.state.usageTypeParent}>
 
                                                     <option value=""></option>
-                                                    {this.state.nodeUnitList.length > 0
-                                                        && this.state.nodeUnitList.map((item, i) => {
+                                                    {this.state.nodeUnitListPlural.length > 0
+                                                        && this.state.nodeUnitListPlural.map((item, i) => {
                                                             return (
                                                                 <option key={i} value={item.unitId}>
                                                                     {getLabelText(item.label, this.state.lang)}
@@ -7345,7 +7364,7 @@ export default class CreateTreeTemplate extends Component {
                                                 {(this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usageType.id == 1) &&
                                                     <table className="table table-bordered">
                                                         <tr>
-                                                            <td style={{ width: '50%' }}>{i18n.t('static.tree.#OfFU/')} {this.state.nodeUnitList.filter(c => c.unitId == this.state.usageTypeParent)[0].label.label_en}</td>
+                                                            <td style={{ width: '50%' }}>{i18n.t('static.tree.#OfFU/')} {this.state.nodeUnitList.filter(c => c.unitId == this.state.usageTypeParent)[0].label.label_en}{"/ Time"}</td>
                                                             <td style={{ width: '50%' }}>{addCommas(this.state.noOfFUPatient)}</td>
                                                         </tr>
                                                         <tr>
@@ -8147,6 +8166,7 @@ export default class CreateTreeTemplate extends Component {
                         <div className={itemConfig.payload.nodeType.id == 5 || itemConfig.payload.nodeType.id == 4 ? "ContactTitle TitleColorWhite" : "ContactTitle TitleColor"}>
                             <div title={itemConfig.payload.label.label_en} style={{ fontSize: '13px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', width: '157px', float: 'left', fontWeight: 'bold' }}>{itemConfig.payload.label.label_en}</div>
                             {this.getPayloadData(itemConfig, 4) == true && <i class="fa fa-exchange fa-rotate-90" style={{ fontSize: '11px', color: (itemConfig.payload.nodeType.id == 4 || itemConfig.payload.nodeType.id == 5 ? '#fff' : '#002f6c') }}></i>}
+                            {this.getPayloadData(itemConfig, 5) == true && <i class="fa fa-link" style={{ fontSize: '11px', color: (itemConfig.payload.nodeType.id == 4 || itemConfig.payload.nodeType.id == 5 ? '#fff' : '#002f6c') }}></i>}
                             <b style={{ color: '#212721', float: 'right' }}>{itemConfig.payload.nodeType.id == 2 ? <i class="fa fa-hashtag" style={{ fontSize: '11px', color: '#002f6c' }}></i> : (itemConfig.payload.nodeType.id == 3 ? <i class="fa fa-percent " style={{ fontSize: '11px', color: '#002f6c' }} ></i> : (itemConfig.payload.nodeType.id == 4 ? <i class="fa fa-cube" style={{ fontSize: '11px', color: '#fff' }} ></i> : (itemConfig.payload.nodeType.id == 5 ? <i class="fa fa-cubes" style={{ fontSize: '11px', color: '#fff' }} ></i> : (itemConfig.payload.nodeType.id == 1 ? <i><img src={AggregationNode} className="AggregationNodeSize" /></i> : ""))))}</b></div>
                     </div>
                     <div className="ContactPhone ContactPhoneValue">

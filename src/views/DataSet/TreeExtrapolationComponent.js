@@ -7,7 +7,7 @@ import { Row, Col, Card, CardFooter, Button, Table, CardBody, Form, Modal, Modal
 import getLabelText from '../../CommonComponent/getLabelText';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow, jExcelLoadedFunctionWithoutPagination } from '../../CommonComponent/JExcelCommonFunctions.js';
-import { SEASONALITY_REGEX, ALPHA_BETA_GAMMA_VALUE, INDEXED_DB_VERSION, INDEXED_DB_NAME, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, JEXCEL_MONTH_PICKER_FORMAT,JEXCEL_DECIMAL_MONTHLY_CHANGE_4_DECIMAL, JEXCEL_DECIMAL_MONTHLY_CHANGE, JEXCEL_DECIMAL_NO_REGEX_LONG_4_DECIMAL } from "../../Constants";
+import { SEASONALITY_REGEX, ALPHA_BETA_GAMMA_VALUE, INDEXED_DB_VERSION, INDEXED_DB_NAME, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, JEXCEL_MONTH_PICKER_FORMAT, JEXCEL_DECIMAL_MONTHLY_CHANGE_4_DECIMAL, JEXCEL_DECIMAL_MONTHLY_CHANGE, JEXCEL_DECIMAL_NO_REGEX_LONG_4_DECIMAL } from "../../Constants";
 import moment from "moment";
 import { Formik } from 'formik';
 import * as Yup from 'yup'
@@ -165,8 +165,16 @@ const validationSchemaExtrapolation = function (values) {
         //                 return true;
         //             }
         //         }),
-        extrapolationMethodId: Yup.string()
-            .required('Please select extrapolation method.'),
+        extrapolationMethodId:
+            Yup.string().test('extrapolationMethodId', 'Please select extrapolation method.',
+                function (value) {
+                    console.log("***4 buttonFalg**", document.getElementById("buttonFalg").value);
+                    if (document.getElementById("buttonFalg").value == 1 && document.getElementById("extrapolationMethodId").value == "") {
+                        return false;
+                    } else {
+                        return true;
+                    }
+                }),
 
     })
 }
@@ -217,7 +225,8 @@ export default class TreeExtrapolationComponent extends React.Component {
         var startDate = moment("2021-05-01").format("YYYY-MM-DD");
         var endDate = moment("2022-02-01").format("YYYY-MM-DD")
         this.state = {
-            showJexcelData: true,
+            buttonFalg: 1,
+            showJexcelData: false,
             maxMonth: '',
             extrapolationLoader: true,
             forecastNestedHeader: '5',
@@ -247,478 +256,7 @@ export default class TreeExtrapolationComponent extends React.Component {
             show: false,
             jexcelDataArr: [],
             jexcelData: [
-                {
-                    month: '2020-05-01',
-                    node: '155',
-                    reportingRate: '98%',
-                    adjustedActuals: '158',
-                    ma: '233',
-                    sa: '233',
-                    lr: '233',
-                    arima: '233',
-                    tesM: '233',
-                    selectedForecast: '233',
-                    manualChange: '0',
-                    monthEndFinal: '233'
-                },
-                {
-                    month: '2020-06-01',
-                    node: '180',
-                    reportingRate: '98%',
-                    adjustedActuals: '184',
-                    ma: '246',
-                    sa: '246',
-                    lr: '246',
-                    arima: '246',
-                    tesM: '246',
-                    selectedForecast: '246',
-                    manualChange: '0',
-                    monthEndFinal: '246'
-                },
-                {
-                    month: '2020-07-01',
-                    node: '',
-                    reportingRate: '98%',
-                    adjustedActuals: '0',
-                    ma: '260',
-                    sa: '260',
-                    lr: '260',
-                    arima: '260',
-                    tesM: '260',
-                    selectedForecast: '260',
-                    manualChange: '0',
-                    monthEndFinal: '260'
-                },
-                {
-                    month: '2020-08-01',
-                    node: '',
-                    reportingRate: '98%',
-                    adjustedActuals: '0',
-                    ma: '273',
-                    sa: '273',
-                    lr: '273',
-                    arima: '273',
-                    tesM: '273',
-                    selectedForecast: '273',
-                    manualChange: '0',
-                    monthEndFinal: '273'
-                },
-                {
-                    month: '2020-09-01',
-                    node: '',
-                    reportingRate: '98%',
-                    adjustedActuals: '0',
-                    ma: '287',
-                    sa: '287',
-                    lr: '287',
-                    arima: '287',
-                    tesM: '287',
-                    selectedForecast: '287',
-                    manualChange: '0',
-                    monthEndFinal: '287'
-                },
-                {
-                    month: '2020-10-01',
-                    node: '',
-                    reportingRate: '98%',
-                    adjustedActuals: '0',
-                    ma: '300',
-                    sa: '300',
-                    lr: '300',
-                    arima: '300',
-                    tesM: '300',
-                    selectedForecast: '300',
-                    manualChange: '0',
-                    monthEndFinal: '300'
-                },
-                {
-                    month: '2020-11-01',
-                    node: '',
-                    reportingRate: '70%',
-                    adjustedActuals: '0',
-                    ma: '314',
-                    sa: '314',
-                    lr: '314',
-                    arima: '314',
-                    tesM: '314',
-                    selectedForecast: '314',
-                    manualChange: '0',
-                    monthEndFinal: '314'
-                },
-                {
-                    month: '2020-12-01',
-                    node: '600',
-                    reportingRate: '98%',
-                    adjustedActuals: '612',
-                    ma: '327',
-                    sa: '327',
-                    lr: '327',
-                    arima: '327',
-                    tesM: '327',
-                    selectedForecast: '327',
-                    manualChange: '0',
-                    monthEndFinal: '327'
-                },
-                {
-                    month: '2021-01-01',
-                    node: '165',
-                    reportingRate: '98%',
-                    adjustedActuals: '168',
-                    ma: '340',
-                    sa: '340',
-                    lr: '340',
-                    arima: '340',
-                    tesM: '340',
-                    selectedForecast: '340',
-                    manualChange: '0',
-                    monthEndFinal: '340'
-                },
-                {
-                    month: '2021-02-01',
-                    node: '190',
-                    reportingRate: '98%',
-                    adjustedActuals: '194',
-                    ma: '354',
-                    sa: '354',
-                    lr: '354',
-                    arima: '354',
-                    tesM: '354',
-                    selectedForecast: '354',
-                    manualChange: '0',
-                    monthEndFinal: '354'
-                },
-                {
-                    month: '2021-03-01',
-                    node: '280',
-                    reportingRate: '98%',
-                    adjustedActuals: '286',
-                    ma: '367',
-                    sa: '367',
-                    lr: '367',
-                    arima: '367',
-                    tesM: '367',
-                    selectedForecast: '367',
-                    manualChange: '0',
-                    monthEndFinal: '367'
-                },
-                {
-                    month: '2021-04-01',
-                    node: '370',
-                    reportingRate: '',
-                    adjustedActuals: '',
-                    ma: '635',
-                    sa: '635',
-                    lr: '635',
-                    arima: '635',
-                    tesM: '635',
-                    selectedForecast: '635',
-                    manualChange: '0',
-                    monthEndFinal: '635'
-                },
-                {
-                    month: '2021-05-01',
-                    node: '460',
-                    reportingRate: '',
-                    adjustedActuals: '',
-                    ma: '172',
-                    sa: '172',
-                    lr: '172',
-                    arima: '172',
-                    tesM: '172',
-                    selectedForecast: '172',
-                    manualChange: '0',
-                    monthEndFinal: '172'
-                },
-                {
-                    month: '2021-06-01',
-                    node: '550',
-                    reportingRate: '',
-                    adjustedActuals: '',
-                    ma: '226',
-                    sa: '226',
-                    lr: '226',
-                    arima: '226',
-                    tesM: '226',
-                    selectedForecast: '226',
-                    manualChange: '0',
-                    monthEndFinal: '226'
-                },
-                {
-                    month: '2021-07-01',
-                    node: '640',
-                    reportingRate: '',
-                    adjustedActuals: '',
-                    ma: '329',
-                    sa: '329',
-                    lr: '329',
-                    arima: '329',
-                    tesM: '329',
-                    selectedForecast: '329',
-                    manualChange: '0',
-                    monthEndFinal: '329'
-                },
-                {
-                    month: '2021-08-01',
-                    node: '730',
-                    reportingRate: '',
-                    adjustedActuals: '',
-                    ma: '721',
-                    sa: '721',
-                    lr: '721',
-                    arima: '721',
-                    tesM: '721',
-                    selectedForecast: '721',
-                    manualChange: '0',
-                    monthEndFinal: '721'
-                },
-                {
-                    month: '2021-09-01',
-                    node: '820',
-                    reportingRate: '',
-                    adjustedActuals: '',
-                    ma: '439',
-                    sa: '439',
-                    lr: '439',
-                    arima: '439',
-                    tesM: '439',
-                    selectedForecast: '439',
-                    manualChange: '0',
-                    monthEndFinal: '439'
-                },
-                {
-                    month: '2021-10-01',
-                    node: '910',
-                    reportingRate: '',
-                    adjustedActuals: '',
-                    ma: '453',
-                    sa: '453',
-                    lr: '453',
-                    arima: '453',
-                    tesM: '453',
-                    selectedForecast: '453',
-                    manualChange: '0',
-                    monthEndFinal: '453'
-                },
-                {
-                    month: '2021-11-01',
-                    node: '',
-                    reportingRate: '',
-                    adjustedActuals: '',
-                    ma: '468',
-                    sa: '468',
-                    lr: '468',
-                    arima: '468',
-                    tesM: '468',
-                    selectedForecast: '468',
-                    manualChange: '0',
-                    monthEndFinal: '468'
-                },
-                {
-                    month: '2021-12-01',
-                    node: '',
-                    reportingRate: '',
-                    adjustedActuals: '',
-                    ma: '482',
-                    sa: '482',
-                    lr: '482',
-                    arima: '482',
-                    tesM: '482',
-                    selectedForecast: '482',
-                    manualChange: '0',
-                    monthEndFinal: '482'
-                },
-                {
-                    month: '2022-01-01',
-                    node: '',
-                    reportingRate: '',
-                    adjustedActuals: '',
-                    ma: '496',
-                    sa: '496',
-                    lr: '496',
-                    arima: '496',
-                    tesM: '496',
-                    selectedForecast: '496',
-                    manualChange: '0',
-                    monthEndFinal: '496'
-                },
-                {
-                    month: '2022-02-01',
-                    node: '',
-                    reportingRate: '',
-                    adjustedActuals: '',
-                    ma: '510',
-                    sa: '510',
-                    lr: '510',
-                    arima: '510',
-                    tesM: '510',
-                    selectedForecast: '510',
-                    manualChange: '0',
-                    monthEndFinal: '510'
-                },
-                {
-                    month: '2022-03-01',
-                    node: '',
-                    reportingRate: '',
-                    adjustedActuals: '',
-                    ma: '525',
-                    sa: '525',
-                    lr: '525',
-                    arima: '525',
-                    tesM: '525',
-                    selectedForecast: '525',
-                    manualChange: '0',
-                    monthEndFinal: '525'
-                },
-                {
-                    month: '2022-04-01',
-                    node: '',
-                    reportingRate: '',
-                    adjustedActuals: '',
-                    ma: '539',
-                    sa: '539',
-                    lr: '539',
-                    arima: '539',
-                    tesM: '539',
-                    selectedForecast: '539',
-                    manualChange: '0',
-                    monthEndFinal: '539'
-                },
-                {
-                    month: '2022-05-01',
-                    node: '',
-                    reportingRate: '',
-                    adjustedActuals: '',
-                    ma: '553',
-                    sa: '553',
-                    lr: '553',
-                    arima: '553',
-                    tesM: '553',
-                    selectedForecast: '553',
-                    manualChange: '0',
-                    monthEndFinal: '553'
-                },
-                {
-                    month: '2022-06-01',
-                    node: '',
-                    reportingRate: '',
-                    adjustedActuals: '',
-                    ma: '567',
-                    sa: '567',
-                    lr: '567',
-                    arima: '567',
-                    tesM: '567',
-                    selectedForecast: '567',
-                    manualChange: '0',
-                    monthEndFinal: '567'
-                },
-                {
-                    month: '2022-07-01',
-                    node: '',
-                    reportingRate: '',
-                    adjustedActuals: '',
-                    ma: '582',
-                    sa: '582',
-                    lr: '582',
-                    arima: '582',
-                    tesM: '582',
-                    selectedForecast: '582',
-                    manualChange: '0',
-                    monthEndFinal: '582'
-                },
-                {
-                    month: '2022-08-01',
-                    node: '',
-                    reportingRate: '',
-                    adjustedActuals: '',
-                    ma: '596',
-                    sa: '596',
-                    lr: '596',
-                    arima: '596',
-                    tesM: '596',
-                    selectedForecast: '596',
-                    manualChange: '0',
-                    monthEndFinal: '596'
-                },
-                {
-                    month: '2022-09-01',
-                    node: '',
-                    reportingRate: '',
-                    adjustedActuals: '',
-                    ma: '610',
-                    sa: '610',
-                    lr: '610',
-                    arima: '610',
-                    tesM: '610',
-                    selectedForecast: '610',
-                    manualChange: '0',
-                    monthEndFinal: '610'
-                },
-                {
-                    month: '2022-10-01',
-                    node: '',
-                    reportingRate: '',
-                    adjustedActuals: '',
-                    ma: '624',
-                    sa: '624',
-                    lr: '624',
-                    arima: '624',
-                    tesM: '624',
-                    selectedForecast: '624',
-                    manualChange: '0',
-                    monthEndFinal: '624'
-                },
-                {
-                    month: '2022-11-01',
-                    node: '',
-                    reportingRate: '',
-                    adjustedActuals: '',
-                    ma: '638',
-                    sa: '638',
-                    lr: '638',
-                    arima: '638',
-                    tesM: '638',
-                    selectedForecast: '638',
-                    manualChange: '0',
-                    monthEndFinal: '638'
-                },
-                {
-                    month: '2022-12-01',
-                    node: '',
-                    reportingRate: '',
-                    adjustedActuals: '',
-                    ma: '653',
-                    sa: '653',
-                    lr: '653',
-                    arima: '653',
-                    tesM: '653',
-                    selectedForecast: '653',
-                    manualChange: '0',
-                    monthEndFinal: '653'
-                }
-            ],
-            dataList: [
-                {
-                    months: '2022-01-01',
-                    actuals: '1000',
-                    movingAverages: '2000',
-                    semiAveragesForecast: '30000',
-                    linearRegression: '40000',
-                    tesLcb: '50000',
-                    arimaForecast: '60000',
-                    tesMedium: '80000',
-                    tesUcb: '97000'
-                },
-                {
-                    months: '2022-02-01',
-                    actuals: '10000',
-                    movingAverages: '20000',
-                    semiAveragesForecast: '30000',
-                    linearRegression: '400000',
-                    tesLcb: '500000',
-                    arimaForecast: '60000',
-                    tesMedium: '80000',
-                    tesUcb: '97000'
-                }
+
             ],
             minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
             maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
@@ -783,7 +321,7 @@ export default class TreeExtrapolationComponent extends React.Component {
         this.saveJexcelData = this.saveJexcelData.bind(this);
         this.toggleJexcelData = this.toggleJexcelData.bind(this);
     }
-    
+
     toggleJexcelData() {
         this.setState({ showJexcelData: !this.state.showJexcelData })
     }
@@ -803,7 +341,8 @@ export default class TreeExtrapolationComponent extends React.Component {
                 amount: map1.get("1") != "" ? map1.get("1").toString().replaceAll(",", "") : map1.get("1"),
                 reportingRate: map1.get("2") != "" ? map1.get("2").toString().replaceAll("%", "") : map1.get("2"),
                 monthNo: resultCount,
-                manualChange: map1.get("10")
+                manualChange: map1.get("10"),
+                adjustedActuals: map1.get("3") != "" ? map1.get("3").toString().replaceAll(",", "") : map1.get("3")
             }
             jexcelDataArr.push(json);
         }
@@ -821,7 +360,8 @@ export default class TreeExtrapolationComponent extends React.Component {
                     var json = {
                         month: map1.get("0"),
                         amount: map1.get("1") != "" ? map1.get("1").toString().replaceAll(",", "") : map1.get("1"),
-                        reportingRate: map1.get("2") != "" ? map1.get("2").toString().replaceAll("%", "") : map1.get("2")
+                        reportingRate: map1.get("2") != "" ? map1.get("2").toString().replaceAll("%", "") : map1.get("2"),
+                        adjustedActuals: map1.get("3") != "" ? map1.get("3").toString().replaceAll(",", "") : map1.get("3")
                     }
                     jexcelDataArr.push(json);
                 }
@@ -884,7 +424,8 @@ export default class TreeExtrapolationComponent extends React.Component {
             var json = {
                 month: map1.get("0"),
                 amount: map1.get("1"),
-                reportingRate: map1.get("2") != "" ? map1.get("2").toString().replaceAll("%", "") : map1.get("2")
+                reportingRate: map1.get("2") != "" ? map1.get("2").toString().replaceAll("%", "") : map1.get("2"),
+                adjustedActuals: map1.get("3") != "" ? map1.get("3").toString().replaceAll(",", "") : map1.get("3")
             };
             extrapolationDataList.push(json)
             // (this.state.dataExtrapolation.getValue(`F${parseInt(i) + 1}`, true)).toString().replaceAll(",", "");
@@ -983,7 +524,10 @@ export default class TreeExtrapolationComponent extends React.Component {
         });
     }
 
-    touchAllExtrapolation(setTouched, errors) {
+    touchAllExtrapolation(setTouched, errors, buttonFalg) {
+        this.setState({ buttonFalg }, () => {
+            console.log("buttonFalg-----?", this.state.buttonFalg)
+        })
         setTouched({
             extrapolationMethodId: true,
             noOfMonthsId: true,
@@ -1236,6 +780,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                     amount: extrapolationDataList[i].amount,
                     reportingRate: extrapolationDataList[i].reportingRate,
                     monthNo: resultCount
+                    // adjustedActuals:map1.get("3") != "" ? map1.get("3").toString().replaceAll(",", "") : map1.get("3")
                 }
                 jexcelDataArr.push(json);
             }
@@ -1251,7 +796,8 @@ export default class TreeExtrapolationComponent extends React.Component {
                     amount: map1.get("1") != "" ? map1.get("1").toString().replaceAll(",", "") : map1.get("1"),
                     reportingRate: map1.get("2") != "" ? map1.get("2").toString().replaceAll("%", "") : map1.get("2"),
                     monthNo: resultCount,
-                    manualChange: map1.get("10")
+                    manualChange: map1.get("10"),
+                    adjustedActuals: map1.get("3") != "" ? map1.get("3").toString().replaceAll(",", "") : map1.get("3")
                 }
                 jexcelDataArr.push(json);
             }
@@ -1381,7 +927,8 @@ export default class TreeExtrapolationComponent extends React.Component {
                         amount: map1.get("1") != "" ? map1.get("1").toString().replaceAll(",", "") : map1.get("1"),
                         reportingRate: map1.get("2") != "" ? map1.get("2").toString().replaceAll("%", "") : map1.get("2"),
                         monthNo: resultCount,
-                        manualChange: map1.get("10")
+                        manualChange: map1.get("10"),
+                        adjustedActuals: map1.get("3") != "" ? map1.get("3").toString().replaceAll(",", "") : map1.get("3")
                     }
                     jexcelDataArr.push(json);
                 }
@@ -1650,7 +1197,6 @@ export default class TreeExtrapolationComponent extends React.Component {
         console.log("jexcel called");
         let dataArray = [];
         let data = [];
-        var list = this.state.jexcelData;
 
         var month = this.props.items.currentScenario.month;
         var forecastStartDate = this.props.items.forecastStartDate;
@@ -2254,8 +1800,8 @@ export default class TreeExtrapolationComponent extends React.Component {
                     //     }
                     // }
                     json1 = this.state.extrapolationMethodList.filter(c => c.id == 5)[0];
-                    console.log("this.state.extrapolationMethodList---",this.state.extrapolationMethodList);
-                    console.log("filteredExtrapolationMethodList json1---",json1)
+                    console.log("this.state.extrapolationMethodList---", this.state.extrapolationMethodList);
+                    console.log("filteredExtrapolationMethodList json1---", json1)
                     // this.state.nodeDataExtrapolationOptionList.push(json);
                     filteredExtrapolationMethodList.push(json1);
                     if (this.state.dataExtrapolation != null) {
@@ -2265,7 +1811,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                     // const index = this.state.nodeDataExtrapolationOptionList.findIndex(c => c.extrapolationMethod.id == 5);
                     const index1 = filteredExtrapolationMethodList.findIndex(c => c.id == 5);
                     filteredExtrapolationMethodList.splice(index1, 1);
-                    console.log("filteredExtrapolationMethodList after update---",filteredExtrapolationMethodList)
+                    console.log("filteredExtrapolationMethodList after update---", filteredExtrapolationMethodList)
                     // this.state.nodeDataExtrapolationOptionList.splice(index, 1);
                     if (this.state.dataExtrapolation != null) {
                         this.state.dataExtrapolation.hideColumn(6);
@@ -2465,7 +2011,7 @@ export default class TreeExtrapolationComponent extends React.Component {
 
     render() {
         const { filteredExtrapolationMethodList } = this.state;
-        console.log("render filteredExtrapolationMethodList ---",filteredExtrapolationMethodList)
+        console.log("render filteredExtrapolationMethodList ---", filteredExtrapolationMethodList)
         let extrapolationMethods = filteredExtrapolationMethodList.length > 0
             && filteredExtrapolationMethodList.map((item, i) => {
                 return (
@@ -2799,7 +2345,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                 pointStyle: 'line',
                 pointBorderWidth: 5,
                 yValueFormatString: "###,###,###,###",
-                data: this.state.dataList.map((item, index) => (item.arimaForecast > 0 ? item.arimaForecast : null))
+                data: this.state.jexcelDataArr.map((item, index) => (this.state.tesData.filter(x => x.month == item.monthNo).length > 0 && (moment(this.state.maxMonth).format('YYYY-MM') == moment(item.month).format('YYYY-MM') || (moment(this.state.minMonth).format('YYYY-MM') < moment(item.month).format('YYYY-MM') && item.amount == "")) ? this.state.tesData.filter(x => x.month == item.monthNo)[0].forecast : null))
                 // data: this.state.jexcelDataArr.map((item, index) => (this.state.tesData.filter(x => x.month == item.monthNo).length > 0 ? this.state.tesData.filter(x => x.month == item.monthNo)[0].forecast- this.state.CI : null))
             })
         }
@@ -2834,7 +2380,11 @@ export default class TreeExtrapolationComponent extends React.Component {
                             validate={validateExtrapolation(validationSchemaExtrapolation)}
                             onSubmit={(values, { setSubmitting, setErrors }) => {
                                 if (this.checkValidationExtrapolation()) {
-                                    this.checkActualValuesGap(false);
+                                    if (this.state.buttonFalg) {
+                                        this.checkActualValuesGap(false);
+                                    } else {
+                                        this.checkActualValuesGap(true);
+                                    }
                                     console.log("tree extrapolation on submit called")
                                 } else {
                                     console.log("tree extrapolation on submit not called")
@@ -3272,21 +2822,22 @@ export default class TreeExtrapolationComponent extends React.Component {
                                             </div>
 
                                             <div className="col-md-12 row text-left pt-lg-0 pl-lg-0">
-                                                
+
                                                 <div className="col-md-6 pl-lg-0">
-                                                <Button type="button" color="success" className="float-left mr-1" size="md" onClick={this.interpolate}>Interpolate</Button>
-                                                <Button type="button" id="dataCheck" size="md" color="info" className="mr-1" onClick={() => this.checkActualValuesGap(true)}>Extrapolate</Button>
+                                                    <Button type="button" color="success" className="float-left mr-1" size="md" onClick={this.interpolate}>Interpolate</Button>
+                                                    {/* <Button type="button" id="dataCheck" size="md" color="info" className="mr-1" onClick={() => this.checkActualValuesGap(true)}>Extrapolate</Button> */}
+                                                    <Button type="submit" id="extrapolateButton" size="md" color="info" className="float-right mr-1" onClick={() => this.touchAllExtrapolation(setTouched, errors, 0)}><i className="fa fa-check"></i>Extrapolate</Button>
                                                 </div>
                                                 <div className="col-md-6 pr-lg-0">
-                                                <Button className="btn btn-info btn-md float-right" onClick={this.toggleJexcelData}>
-                                                <i className={this.state.showJexcelData ? "fa fa-eye" : "fa fa-eye-slash"} style={{ color: '#fff' }}></i> {this.state.showJexcelData ? i18n.t('static.common.hideData') : i18n.t('static.common.showData')}
-                                                </Button>
-                                                {/* <Button className="mr-1 btn btn-info btn-md " onClick={this.toggleJexcelData}>
+                                                    <Button className="btn btn-info btn-md float-right" onClick={this.toggleJexcelData}>
+                                                        <i className={this.state.showJexcelData ? "fa fa-eye-slash" : "fa fa-eye"} style={{ color: '#fff' }}></i> {this.state.showJexcelData ? i18n.t('static.common.hideData') : i18n.t('static.common.showData')}
+                                                    </Button>
+                                                    {/* <Button className="mr-1 btn btn-info btn-md " onClick={this.toggleJexcelData}>
                                                     {this.state.showJexcelData ? i18n.t('static.common.hideData') : i18n.t('static.common.showData')}
                                                 </Button> */}
                                                 </div>
                                             </div>
-                                         
+
                                         </div>
                                         {/* </Form> */}
                                         <div className="row pl-lg-0 pr-lg-0 pt-lg-3" style={{ display: this.state.showJexcelData ? 'block' : 'none' }}>
@@ -3458,6 +3009,7 @@ export default class TreeExtrapolationComponent extends React.Component {
 
                                             </ul>
                                         </div>
+                                        <Input type="hidden" id="buttonFalg" name="buttonFalg" value={this.state.buttonFalg} />
                                         <div className="col-md-12 pl-lg-0 pr-lg-0">
                                             <Row>
                                                 <FormGroup className="col-md-3 pl-lg-0">
@@ -3503,7 +3055,7 @@ export default class TreeExtrapolationComponent extends React.Component {
 
                                                 </FormGroup>
                                                 <FormGroup className="pl-lg-3 ExtrapolateSaveBtn">
-                                                    <Button type="submit" color="success" onClick={() => this.touchAllExtrapolation(setTouched, errors)} className="mr-1 float-right" size="md"><i className="fa fa-check"></i>{i18n.t('static.pipeline.save')}</Button>
+                                                    <Button type="submit" color="success" onClick={() => this.touchAllExtrapolation(setTouched, errors, 1)} className="mr-1 float-right" size="md"><i className="fa fa-check"></i>{i18n.t('static.pipeline.save')}</Button>
                                                 </FormGroup>
                                             </Row>
                                         </div>
