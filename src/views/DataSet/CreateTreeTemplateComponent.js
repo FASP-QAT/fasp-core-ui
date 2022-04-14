@@ -430,6 +430,8 @@ export default class CreateTreeTemplate extends Component {
         this.pickAMonth1 = React.createRef()
         this.state = {
             nodeUnitListPlural: [],
+            popoverOpenMonthInPast: false,
+            popoverOpenMonthInFuture: false,
             monthId: 1,
             monthList: [],
             isChanged: false,
@@ -647,10 +649,13 @@ export default class CreateTreeTemplate extends Component {
             currentTargetChangePercentageEdit: false,
             currentTargetChangeNumberEdit: false,
             currentRowIndex: '',
-            lastRowDeleted: false
+            lastRowDeleted: false,
+            modelingChanged: false
 
 
         }
+        this.toggleMonthInPast = this.toggleMonthInPast.bind(this);
+        this.toggleMonthInFuture = this.toggleMonthInFuture.bind(this);
         this.toggleHowManyPUperIntervalPer = this.toggleHowManyPUperIntervalPer.bind(this);
         this.toggleWillClientsShareOnePU = this.toggleWillClientsShareOnePU.bind(this);
         this.toggleConsumptionIntervalEveryXMonths = this.toggleConsumptionIntervalEveryXMonths.bind(this);
@@ -1590,6 +1595,7 @@ export default class CreateTreeTemplate extends Component {
                             items,
                             scalingList: dataArr,
                             lastRowDeleted: false,
+                            modelingChanged: false,
                             // openAddNodeModal: false,
                             activeTab1: new Array(2).fill('2')
                         }, () => {
@@ -1946,10 +1952,17 @@ export default class CreateTreeTemplate extends Component {
         var totalValue = "";
         data = itemConfig.payload.nodeDataMap;
         if (data != null && data[0] != null && (data[0])[0] != null) {
-            if (type == 4) {
+            if (type == 4 || type == 5) {
                 var result = false;
                 if (itemConfig.payload.nodeDataMap[0][0].nodeDataModelingList != null && itemConfig.payload.nodeDataMap[0][0].nodeDataModelingList.length > 0) {
-                    result = true;
+                    if (type == 4) {
+                        result = true;
+                    } else if (type == 5) {
+                        var filteredData = itemConfig.payload.nodeDataMap[0][0].nodeDataModelingList.filter(x => x.transferNodeDataId != null && x.transferNodeDataId != "" && x.transferNodeDataId > 0);
+                        if (filteredData.length > 0) {
+                            result = true;
+                        }
+                    }
                 } else {
                     var arr = [];
                     if (itemConfig.payload.nodeType.id == NUMBER_NODE_ID) {
@@ -2157,6 +2170,16 @@ export default class CreateTreeTemplate extends Component {
             nodeTransferDataList
         });
 
+    }
+    toggleMonthInFuture() {
+        this.setState({
+            popoverOpenMonthInFuture: !this.state.popoverOpenMonthInFuture,
+        });
+    }
+    toggleMonthInPast() {
+        this.setState({
+            popoverOpenMonthInPast: !this.state.popoverOpenMonthInPast,
+        });
     }
 
     toggle() {
@@ -2751,6 +2774,11 @@ export default class CreateTreeTemplate extends Component {
     }
 
     addRow = function () {
+        if (this.state.modelingChanged == false) {
+            this.setState({
+                modelingChanged: true
+            })
+        }
         var elInstance = this.state.modelingEl;
         var data = [];
         data[0] = ''
@@ -2852,15 +2880,15 @@ export default class CreateTreeTemplate extends Component {
             // console.log("modeling type---", scalingList[j].modelingType.id);
             data[4] = nodeTransferDataList[j].modelingType.id
             data[5] = 1
-            data[6] = nodeTransferDataList[j].modelingType.id != 2 ? parseFloat(nodeTransferDataList[j].dataValue * -1).toFixed(4) : ''
-            data[7] = nodeTransferDataList[j].modelingType.id == 2 ? (nodeTransferDataList[j].dataValue * -1) : ''
+            data[6] = nodeTransferDataList[j].modelingType.id != 2 ? parseFloat(nodeTransferDataList[j].dataValue).toFixed(4) : ''
+            data[7] = nodeTransferDataList[j].modelingType.id == 2 ? (nodeTransferDataList[j].dataValue) : ''
             data[8] = ""
             var nodeValue = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].calculatedDataValue;
             var calculatedChangeForMonth;
             if (nodeTransferDataList[j].modelingType.id == 2 || nodeTransferDataList[j].modelingType.id == 5) {
-                calculatedChangeForMonth = nodeTransferDataList[j].dataValue * -1;
+                calculatedChangeForMonth = nodeTransferDataList[j].dataValue;
             } else if (nodeTransferDataList[j].modelingType.id == 3 || nodeTransferDataList[j].modelingType.id == 4) {
-                calculatedChangeForMonth = (nodeValue * (nodeTransferDataList[j].dataValue * -1)) / 100;
+                calculatedChangeForMonth = (nodeValue * (nodeTransferDataList[j].dataValue)) / 100;
             }
             data[9] = calculatedChangeForMonth
             data[10] = nodeTransferDataList[j].nodeDataModelingId
@@ -3291,6 +3319,11 @@ export default class CreateTreeTemplate extends Component {
         // });
     }.bind(this);
     changed = function (instance, cell, x, y, value) {
+        if (x != 9 && x != 11 && this.state.modelingChanged == false) {
+            this.setState({
+                modelingChanged: true
+            })
+        }
         if (this.state.lastRowDeleted != false) {
             this.setState({
                 lastRowDeleted: false
@@ -5376,7 +5409,10 @@ export default class CreateTreeTemplate extends Component {
             currentItemConfig.context.payload.nodeUnit.label = label;
         }
         if (event.target.name === "monthNoFilter") {
-            this.filterScalingDataByMonth(event.target.value);
+            console.log("this.state.modelingChanged@@@@@@@@@@@@", this.state.modelingChanged)
+            if (!this.state.modelingChanged) {
+                this.filterScalingDataByMonth(event.target.value);
+            }
             this.setState({ scalingMonth: event.target.value }, () => {
                 // console.log("after state update---", event.target.value);
             });
@@ -8130,6 +8166,7 @@ export default class CreateTreeTemplate extends Component {
                         <div className={itemConfig.payload.nodeType.id == 5 || itemConfig.payload.nodeType.id == 4 ? "ContactTitle TitleColorWhite" : "ContactTitle TitleColor"}>
                             <div title={itemConfig.payload.label.label_en} style={{ fontSize: '13px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', width: '157px', float: 'left', fontWeight: 'bold' }}>{itemConfig.payload.label.label_en}</div>
                             {this.getPayloadData(itemConfig, 4) == true && <i class="fa fa-exchange fa-rotate-90" style={{ fontSize: '11px', color: (itemConfig.payload.nodeType.id == 4 || itemConfig.payload.nodeType.id == 5 ? '#fff' : '#002f6c') }}></i>}
+                            {this.getPayloadData(itemConfig, 5) == true && <i class="fa fa-link" style={{ fontSize: '11px', color: (itemConfig.payload.nodeType.id == 4 || itemConfig.payload.nodeType.id == 5 ? '#fff' : '#002f6c') }}></i>}
                             <b style={{ color: '#212721', float: 'right' }}>{itemConfig.payload.nodeType.id == 2 ? <i class="fa fa-hashtag" style={{ fontSize: '11px', color: '#002f6c' }}></i> : (itemConfig.payload.nodeType.id == 3 ? <i class="fa fa-percent " style={{ fontSize: '11px', color: '#002f6c' }} ></i> : (itemConfig.payload.nodeType.id == 4 ? <i class="fa fa-cube" style={{ fontSize: '11px', color: '#fff' }} ></i> : (itemConfig.payload.nodeType.id == 5 ? <i class="fa fa-cubes" style={{ fontSize: '11px', color: '#fff' }} ></i> : (itemConfig.payload.nodeType.id == 1 ? <i><img src={AggregationNode} className="AggregationNodeSize" /></i> : ""))))}</b></div>
                     </div>
                     <div className="ContactPhone ContactPhoneValue">
@@ -8909,8 +8946,13 @@ export default class CreateTreeTemplate extends Component {
                                                                         </div>
                                                                     </div>
                                                                 </FormGroup>
+                                                                <div>
+                                                                    <Popover placement="top" isOpen={this.state.popoverOpenMonthInPast} target="Popover26" trigger="hover" toggle={this.toggleMonthInPast}>
+                                                                        <PopoverBody>Need to add info</PopoverBody>
+                                                                    </Popover>
+                                                                </div>
                                                                 <FormGroup className="col-md-3 pl-lg-0">
-                                                                    <Label htmlFor="languageId">{'Months In Past'}<span class="red Reqasterisk">*</span></Label>
+                                                                    <Label htmlFor="languageId">{'Months In Past'}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover26" onClick={this.toggleMonthInPast} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                                                     <Input
                                                                         type="number"
                                                                         name="monthsInPast"
@@ -8926,8 +8968,13 @@ export default class CreateTreeTemplate extends Component {
                                                                     </Input>
                                                                     <FormFeedback>{errors.monthsInPast}</FormFeedback>
                                                                 </FormGroup>
+                                                                <div>
+                                                                    <Popover placement="top" isOpen={this.state.popoverOpenMonthInFuture} target="Popover27" trigger="hover" toggle={this.toggleMonthInFuture}>
+                                                                        <PopoverBody>Need to add info</PopoverBody>
+                                                                    </Popover>
+                                                                </div>
                                                                 <FormGroup className="col-md-3 pl-lg-0">
-                                                                    <Label htmlFor="languageId">{'Months In Future'}<span class="red Reqasterisk">*</span></Label>
+                                                                    <Label htmlFor="languageId">{'Months In Future'}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover27" onClick={this.toggleMonthInFuture} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                                                     <Input
                                                                         type="number"
                                                                         name="monthsInFuture"
@@ -8944,7 +8991,20 @@ export default class CreateTreeTemplate extends Component {
                                                                     </Input>
                                                                     <FormFeedback>{errors.monthsInFuture}</FormFeedback>
                                                                 </FormGroup>
-                                                                <FormGroup className="col-md-3 pl-lg-0">
+
+                                                                <FormGroup className="col-md-6 pl-lg-0">
+                                                                    <Label htmlFor="languageId">{'Notes'}</Label>
+                                                                    <Input
+                                                                        type="textarea"
+                                                                        name="templateNotes"
+                                                                        id="templateNotes"
+                                                                        bsSize="sm"
+                                                                        onChange={(e) => { this.dataChange(e) }}
+                                                                        value={this.state.treeTemplate.notes}
+                                                                    >
+                                                                    </Input>
+                                                                </FormGroup>
+                                                                <FormGroup className="col-md-3 pl-lg-0 MarginTopMonthSelector">
                                                                     <Label htmlFor="languageId">{'Month Selector'}</Label>
                                                                     <Input
                                                                         type="select"
@@ -8964,30 +9024,18 @@ export default class CreateTreeTemplate extends Component {
                                                                             }, this)}
                                                                     </Input>
                                                                 </FormGroup>
-                                                                <FormGroup className="col-md-3 pl-lg-0">
-                                                                    <Label htmlFor="languageId">{'Notes'}</Label>
-                                                                    <Input
-                                                                        type="textarea"
-                                                                        name="templateNotes"
-                                                                        id="templateNotes"
-                                                                        bsSize="sm"
-                                                                        onChange={(e) => { this.dataChange(e) }}
-                                                                        value={this.state.treeTemplate.notes}
-                                                                    >
-                                                                    </Input>
-                                                                </FormGroup>
                                                             </Row>
                                                         </div>
 
                                                     </CardBody>
-                                                    <CardFooter className="pt-lg-0 pr-lg-0" style={{ backgroundColor: 'transparent', borderTop: '0px solid #c8ced3' }}>
+                                                    <CardFooter className="pt-lg-0 pr-lg-0 MarginTopCreateTreeBtn" style={{ backgroundColor: 'transparent', borderTop: '0px solid #c8ced3' }}>
                                                         {/* <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button> */}
                                                         <Button type="button" size="md" color="warning" className="float-right mr-1 mb-lg-2" onClick={this.resetTree}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                                         <Button type="submit" color="success" className="mr-1 mb-lg-2 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"> </i>{i18n.t('static.pipeline.save')}</Button>
                                                     </CardFooter>
                                                     <div style={{ display: !this.state.loading ? "block" : "none" }} class="sample">
                                                         <Provider>
-                                                            <div className="placeholder CreateTreeTemplateHeight" style={{ clear: 'both', marginTop: '25px', border: '1px solid #a7c6ed' }} >
+                                                            <div className="placeholder TreeTemplateHeight" style={{ clear: 'both', marginTop: '25px', border: '1px solid #a7c6ed' }} >
                                                                 {/* <OrgDiagram centerOnCursor={true} config={config} onHighlightChanged={this.onHighlightChanged} /> */}
                                                                 <OrgDiagram centerOnCursor={true} config={config} onCursorChanged={this.onCursoChanged} />
                                                             </div>

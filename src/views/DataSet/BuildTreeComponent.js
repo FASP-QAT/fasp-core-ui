@@ -757,7 +757,8 @@ export default class BuildTree extends Component {
             modelingJexcelLoader: false,
             momJexcelLoader: false,
             lastRowDeleted: false,
-            showDate: false
+            showDate: false,
+            modelingChanged: false
         }
         this.toggleDeropdownSetting = this.toggleDeropdownSetting.bind(this);
         // this.onClick1 = this.onClick1.bind(this);
@@ -2952,6 +2953,7 @@ export default class BuildTree extends Component {
                             items,
                             scalingList: dataArr,
                             lastRowDeleted: false,
+                            modelingChanged: false,
                             // openAddNodeModal: false,
                             activeTab1: new Array(2).fill('2')
                         }, () => {
@@ -3500,15 +3502,15 @@ export default class BuildTree extends Component {
             // console.log("modeling type---", scalingList[j].modelingType.id);
             data[4] = nodeTransferDataList[j].modelingType.id
             data[5] = 1
-            data[6] = nodeTransferDataList[j].modelingType.id != 2 ? parseFloat(nodeTransferDataList[j].dataValue * -1).toFixed(4) : ''
-            data[7] = nodeTransferDataList[j].modelingType.id == 2 ? (nodeTransferDataList[j].dataValue * -1) : ''
+            data[6] = nodeTransferDataList[j].modelingType.id != 2 ? parseFloat(nodeTransferDataList[j].dataValue).toFixed(4) : ''
+            data[7] = nodeTransferDataList[j].modelingType.id == 2 ? (nodeTransferDataList[j].dataValue) : ''
             data[8] = ""
             var nodeValue = (this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].calculatedDataValue;
             var calculatedChangeForMonth;
             if (nodeTransferDataList[j].modelingType.id == 2 || nodeTransferDataList[j].modelingType.id == 5) {
-                calculatedChangeForMonth = nodeTransferDataList[j].dataValue * -1;
+                calculatedChangeForMonth = nodeTransferDataList[j].dataValue;
             } else if (nodeTransferDataList[j].modelingType.id == 3 || nodeTransferDataList[j].modelingType.id == 4) {
-                calculatedChangeForMonth = (nodeValue * (nodeTransferDataList[j].dataValue * -1)) / 100;
+                calculatedChangeForMonth = (nodeValue * (nodeTransferDataList[j].dataValue)) / 100;
             }
             data[9] = calculatedChangeForMonth
             data[10] = nodeTransferDataList[j].nodeDataModelingId
@@ -3961,6 +3963,11 @@ export default class BuildTree extends Component {
     changed = function (instance, cell, x, y, value) {
 
         // instance.jexcel
+        if (x != 9 && x != 11 && this.state.modelingChanged == false) {
+            this.setState({
+                modelingChanged: true
+            })
+        }
         if (this.state.lastRowDeleted != false) {
             this.setState({
                 lastRowDeleted: false
@@ -4143,6 +4150,11 @@ export default class BuildTree extends Component {
     }
 
     addRow = function () {
+        if (this.state.modelingChanged == false) {
+            this.setState({
+                modelingChanged: true
+            })
+        }
         var elInstance = this.state.modelingEl;
         var data = [];
         data[0] = ''
@@ -4172,10 +4184,17 @@ export default class BuildTree extends Component {
         var scenarioId = document.getElementById('scenarioId').value;
         // this.state.selectedScenario;
         if (data != null && data[scenarioId] != null && (data[scenarioId])[0] != null) {
-            if (type == 4) {
+            if (type == 4 || type == 5) {
                 var result = false;
                 if (itemConfig.payload.nodeDataMap[this.state.selectedScenario][0].nodeDataModelingList.length > 0) {
-                    result = true;
+                    if (type == 4) {
+                        result = true;
+                    } else if (type == 5) {
+                        var filteredData = itemConfig.payload.nodeDataMap[this.state.selectedScenario][0].nodeDataModelingList.filter(x => x.transferNodeDataId != null && x.transferNodeDataId != "" && x.transferNodeDataId > 0);
+                        if (filteredData.length > 0) {
+                            result = true;
+                        }
+                    }
                 } else {
                     var arr = [];
                     if (itemConfig.payload.nodeType.id == NUMBER_NODE_ID) {
@@ -4200,7 +4219,8 @@ export default class BuildTree extends Component {
                     }
                 }
                 return result;
-            } else {
+            }
+            else {
                 if (itemConfig.payload.nodeType.id == 1 || itemConfig.payload.nodeType.id == 2) {
                     if (type == 1) {
                         return addCommasTwoDecimal((itemConfig.payload.nodeDataMap[scenarioId])[0].displayDataValue);
@@ -6234,7 +6254,7 @@ export default class BuildTree extends Component {
                         showModelingJexcelNumber: true,
                         minMonth, maxMonth, filteredModelingType: modelingTypeListNew,
                         scalingMonth: {
-                            year: new Date(this.state.currentScenario.month.replace(/-/g, '\/')).getFullYear(), month: ("0" + (new Date(this.state.currentScenario.month.replace(/-/g, '\/')).getMonth() + 1)).slice(-2)
+                            year: Number(new Date(this.state.currentScenario.month.replace(/-/g, '\/')).getFullYear()), month: Number(("0" + (new Date(this.state.currentScenario.month.replace(/-/g, '\/')).getMonth() + 1)).slice(-2))
                         },
                     }, () => {
                         this.buildModelingJexcel();
@@ -6245,7 +6265,7 @@ export default class BuildTree extends Component {
                     this.setState({
                         showModelingJexcelNumber: true,
                         scalingMonth: {
-                            year: new Date(this.state.currentScenario.month.replace(/-/g, '\/')).getFullYear(), month: ("0" + (new Date(this.state.currentScenario.month.replace(/-/g, '\/')).getMonth() + 1)).slice(-2)
+                            year: Number(new Date(this.state.currentScenario.month.replace(/-/g, '\/')).getFullYear()), month: Number(("0" + (new Date(this.state.currentScenario.month.replace(/-/g, '\/')).getMonth() + 1)).slice(-2))
                         },
                     }, () => {
                         this.buildModelingJexcel();
@@ -8753,6 +8773,7 @@ export default class BuildTree extends Component {
                                 ref={this.pickAMonth2}
                                 years={{ min: this.state.minDate, max: this.state.maxDate }}
                                 value={this.state.scalingMonth}
+                                key={JSON.stringify(this.state.scalingMonth)}
                                 lang={pickerLang.months}
                                 onChange={this.handleAMonthChange2}
                                 onDismiss={this.handleAMonthDissmis2}
@@ -9245,7 +9266,9 @@ export default class BuildTree extends Component {
     handleAMonthDissmis2 = (value) => {
         console.log("Value@@@@@@@@###################", value);
         let startDate = value.year + '-' + value.month + '-01';
-        this.filterScalingDataByMonth(moment(startDate).format("YYYY-MM-DD"));
+        if (!this.state.modelingChanged) {
+            this.filterScalingDataByMonth(moment(startDate).format("YYYY-MM-DD"));
+        }
         // let { currentItemConfig } = this.state;
         // (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].month = date;
         this.setState({ scalingMonth: value }, () => {
@@ -9445,6 +9468,7 @@ export default class BuildTree extends Component {
                             <div style={{ float: 'right' }}>
                                 {itemConfig.payload.extrapolation == true && <i class="fa fa-line-chart" style={{ fontSize: '11px', color: (itemConfig.payload.nodeType.id == 4 || itemConfig.payload.nodeType.id == 5 ? '#fff' : '#002f6c') }}></i>}
                                 {this.getPayloadData(itemConfig, 4) == true && <i class="fa fa-exchange fa-rotate-90" style={{ fontSize: '11px', color: (itemConfig.payload.nodeType.id == 4 || itemConfig.payload.nodeType.id == 5 ? '#fff' : '#002f6c') }}></i>}
+                                {this.getPayloadData(itemConfig, 5) == true && <i class="fa fa-link" style={{ fontSize: '11px', color: (itemConfig.payload.nodeType.id == 4 || itemConfig.payload.nodeType.id == 5 ? '#fff' : '#002f6c') }}></i>}
                                 <b style={{ color: '#212721', float: 'right' }}>
                                     {itemConfig.payload.nodeType.id == 2 ?
                                         <i class="fa fa-hashtag" style={{ fontSize: '11px', color: '#002f6c' }}></i> :

@@ -201,21 +201,21 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                             // console.log("nodeDataModelingList****", nodeDataModelingList);
                             for (var ndml = 0; ndml < nodeDataModelingList.length; ndml++) {
                                 var nodeDataModeling = nodeDataModelingList[ndml];
+                                var nodeDataModelingValue = nodeDataModeling.increaseDecrease == 1 ? nodeDataModeling.dataValue : 0 - nodeDataModeling.dataValue;
                                 //Linear number
                                 if (nodeDataModeling.modelingType.id == 2 || nodeDataModeling.modelingType.id == 5) {
-                                    // console.log("modeling datavalue 2---", nodeDataModeling.dataValue)
                                     if (nodeDataModeling.transferNodeDataId > 0) {
-                                        transfer += Number(nodeDataModeling.dataValue);
-                                        transferWMC += Number(nodeDataModeling.dataValue);
-                                        if (endValue + Number(nodeDataModeling.dataValue) >= 0) {
-                                            endValue += Number(nodeDataModeling.dataValue);
-                                            endValueWMC += Number(nodeDataModeling.dataValue);
-                                            difference += Number(nodeDataModeling.dataValue);
-                                            differenceWMC += Number(nodeDataModeling.dataValue);
+                                        transfer += Number(nodeDataModelingValue);
+                                        transferWMC += Number(nodeDataModelingValue);
+                                        if (endValue + Number(nodeDataModelingValue) >= 0) {
+                                            endValue += Number(nodeDataModelingValue);
+                                            endValueWMC += Number(nodeDataModelingValue);
+                                            difference += Number(nodeDataModelingValue);
+                                            differenceWMC += Number(nodeDataModelingValue);
                                             overallTransferList.push({ month: i, transfer: Number(transfer), transferWMC: Number(transferWMC), transferFromNodeDataId: nodeDataMapForScenario.nodeDataId, transferToNodeDataId: nodeDataModeling.transferNodeDataId, nodeDataModelingId: nodeDataModeling.nodeDataModelingId });
                                         } else {
-                                            difference += Number(nodeDataModeling.dataValue);
-                                            differenceWMC += Number(nodeDataModeling.dataValue);
+                                            difference += Number(nodeDataModelingValue);
+                                            differenceWMC += Number(nodeDataModelingValue);
                                             overallTransferList.push({ month: i, transfer: Number(0 - Number(endValue)), transferWMC: Number(0 - Number(endValueWMC)), transferFromNodeDataId: nodeDataMapForScenario.nodeDataId, transferToNodeDataId: nodeDataModeling.transferNodeDataId, nodeDataModelingId: nodeDataModeling.nodeDataModelingId });
                                             endValue = 0;
                                             endValueWMC = 0;
@@ -229,10 +229,10 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                             endValueWMC += Number(0 - overallFilter[0].transferWMC);
                                         }
                                     } else {
-                                        difference += Number(nodeDataModeling.dataValue);
-                                        differenceWMC += Number(nodeDataModeling.dataValue);
-                                        endValue += Number(nodeDataModeling.dataValue);
-                                        endValueWMC += Number(nodeDataModeling.dataValue);
+                                        difference += Number(nodeDataModelingValue);
+                                        differenceWMC += Number(nodeDataModelingValue);
+                                        endValue += Number(nodeDataModelingValue);
+                                        endValueWMC += Number(nodeDataModelingValue);
                                     }
 
                                 }
@@ -260,19 +260,19 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                         }
                                     }
                                     if (nodeDataModeling.transferNodeDataId > 0) {
-                                        transfer += Number((Number(dv) * Number(nodeDataModeling.dataValue)) / 100);
-                                        transferWMC += Number((Number(dvWMC) * Number(nodeDataModeling.dataValue)) / 100);
+                                        transfer += Number((Number(dv) * Number(nodeDataModelingValue)) / 100);
+                                        transferWMC += Number((Number(dvWMC) * Number(nodeDataModelingValue)) / 100);
                                         console.log("Transfer+++++++++++++@@@@@", transfer);
-                                        if (endValue + Number((Number(dv) * Number(nodeDataModeling.dataValue)) / 100) >= 0) {
-                                            endValue += Number((Number(dv) * Number(nodeDataModeling.dataValue)) / 100);
-                                            endValueWMC += Number((Number(dvWMC) * Number(nodeDataModeling.dataValue)) / 100);
-                                            difference += Number((Number(dv) * Number(nodeDataModeling.dataValue)) / 100);
-                                            differenceWMC += Number((Number(dvWMC) * Number(nodeDataModeling.dataValue)) / 100);
+                                        if (endValue + Number((Number(dv) * Number(nodeDataModelingValue)) / 100) >= 0) {
+                                            endValue += Number((Number(dv) * Number(nodeDataModelingValue)) / 100);
+                                            endValueWMC += Number((Number(dvWMC) * Number(nodeDataModelingValue)) / 100);
+                                            difference += Number((Number(dv) * Number(nodeDataModelingValue)) / 100);
+                                            differenceWMC += Number((Number(dvWMC) * Number(nodeDataModelingValue)) / 100);
                                             overallTransferList.push({ month: i, transfer: Number(transfer), transferWMC: Number(transferWMC), transferFromNodeDataId: nodeDataMapForScenario.nodeDataId, transferToNodeDataId: nodeDataModeling.transferNodeDataId, nodeDataModelingId: nodeDataModeling.nodeDataModelingId });
                                         } else {
                                             console.log("EndValue+++++++++++++@@@@@", endValue);
-                                            difference += Number((Number(dv) * Number(nodeDataModeling.dataValue)) / 100);
-                                            differenceWMC += Number((Number(dvWMC) * Number(nodeDataModeling.dataValue)) / 100);
+                                            difference += Number((Number(dv) * Number(nodeDataModelingValue)) / 100);
+                                            differenceWMC += Number((Number(dvWMC) * Number(nodeDataModelingValue)) / 100);
                                             overallTransferList.push({ month: i, transfer: Number(0 - Number(endValue)), transferWMC: Number(0 - Number(endValueWMC)), transferFromNodeDataId: nodeDataMapForScenario.nodeDataId, transferToNodeDataId: nodeDataModeling.transferNodeDataId, nodeDataModelingId: nodeDataModeling.nodeDataModelingId });
                                             endValue = 0;
                                             endValueWMC = 0;
@@ -289,26 +289,26 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                             endValueWMC += Number(0 - overallFilter[0].transferWMC);
                                         }
                                     } else {
-                                        difference += Number((Number(dv) * Number(nodeDataModeling.dataValue)) / 100);
-                                        differenceWMC += Number((Number(dvWMC) * Number(nodeDataModeling.dataValue)) / 100);
-                                        endValue += Number((Number(dv) * Number(nodeDataModeling.dataValue)) / 100);
-                                        endValueWMC += Number((Number(dvWMC) * Number(nodeDataModeling.dataValue)) / 100);
+                                        difference += Number((Number(dv) * Number(nodeDataModelingValue)) / 100);
+                                        differenceWMC += Number((Number(dvWMC) * Number(nodeDataModelingValue)) / 100);
+                                        endValue += Number((Number(dv) * Number(nodeDataModelingValue)) / 100);
+                                        endValueWMC += Number((Number(dvWMC) * Number(nodeDataModelingValue)) / 100);
                                     }
                                 }
                                 //Exponential %
                                 else if (nodeDataModeling.modelingType.id == 4) {
                                     if (nodeDataModeling.transferNodeDataId > 0) {
-                                        transfer += Number((Number(startValue) * Number(nodeDataModeling.dataValue)) / 100);
-                                        transferWMC += Number((Number(startValue) * Number(nodeDataModeling.dataValue)) / 100);
-                                        if (endValue + Number((Number(startValue) * Number(nodeDataModeling.dataValue)) / 100) >= 0) {
-                                            endValue += Number((Number(startValue) * Number(nodeDataModeling.dataValue)) / 100);
-                                            endValueWMC += Number((Number(startValue) * Number(nodeDataModeling.dataValue)) / 100);
-                                            difference += Number((Number(startValue) * Number(nodeDataModeling.dataValue)) / 100);
-                                            differenceWMC += Number((Number(startValue) * Number(nodeDataModeling.dataValue)) / 100);
+                                        transfer += Number((Number(startValue) * Number(nodeDataModelingValue)) / 100);
+                                        transferWMC += Number((Number(startValue) * Number(nodeDataModelingValue)) / 100);
+                                        if (endValue + Number((Number(startValue) * Number(nodeDataModelingValue)) / 100) >= 0) {
+                                            endValue += Number((Number(startValue) * Number(nodeDataModelingValue)) / 100);
+                                            endValueWMC += Number((Number(startValue) * Number(nodeDataModelingValue)) / 100);
+                                            difference += Number((Number(startValue) * Number(nodeDataModelingValue)) / 100);
+                                            differenceWMC += Number((Number(startValue) * Number(nodeDataModelingValue)) / 100);
                                             overallTransferList.push({ month: i, transfer: Number(transfer), transferWMC: Number(transferWMC), transferFromNodeDataId: nodeDataMapForScenario.nodeDataId, transferToNodeDataId: nodeDataModeling.transferNodeDataId, nodeDataModelingId: nodeDataModeling.nodeDataModelingId });
                                         } else {
-                                            difference += Number((Number(startValue) * Number(nodeDataModeling.dataValue)) / 100);
-                                            differenceWMC += Number((Number(startValue) * Number(nodeDataModeling.dataValue)) / 100);
+                                            difference += Number((Number(startValue) * Number(nodeDataModelingValue)) / 100);
+                                            differenceWMC += Number((Number(startValue) * Number(nodeDataModelingValue)) / 100);
                                             overallTransferList.push({ month: i, transfer: Number(0 - Number(endValue)), transferWMC: Number(0 - Number(endValueWMC)), transferFromNodeDataId: nodeDataMapForScenario.nodeDataId, transferToNodeDataId: nodeDataModeling.transferNodeDataId, nodeDataModelingId: nodeDataModeling.nodeDataModelingId });
                                             endValue = 0;
                                             endValueWMC = 0;
@@ -322,13 +322,15 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                             endValueWMC += Number(0 - overallFilter[0].transferWMC);
                                         }
                                     } else {
-                                        difference += Number((Number(startValue) * Number(nodeDataModeling.dataValue)) / 100);
-                                        differenceWMC += Number((Number(startValue) * Number(nodeDataModeling.dataValue)) / 100);
-                                        endValue += Number((Number(startValue) * Number(nodeDataModeling.dataValue)) / 100);
-                                        endValueWMC += Number((Number(startValue) * Number(nodeDataModeling.dataValue)) / 100);
+                                        difference += Number((Number(startValue) * Number(nodeDataModelingValue)) / 100);
+                                        differenceWMC += Number((Number(startValue) * Number(nodeDataModelingValue)) / 100);
+                                        endValue += Number((Number(startValue) * Number(nodeDataModelingValue)) / 100);
+                                        endValueWMC += Number((Number(startValue) * Number(nodeDataModelingValue)) / 100);
                                     }
                                 }
                             }
+                            difference = endValue - startValue;
+                            differenceWMC = endValueWMC - startValue;
 
                             var totalManualChange = 0;
                             var seasonalityPercTotal = 0;
@@ -365,9 +367,6 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                     endValueWMC = 0;
                                 }
                             }
-
-                            difference = endValue - startValue;
-                            differenceWMC = endValueWMC - startValue;
 
                             var calculatedValue = 0;
                             if (payload.nodeType.id == 2) {
@@ -564,19 +563,20 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                             })
                             // console.log("Node MOM List%%%", nodeDataList);
                         }
-
-                        // console.log("Node MOM List$$$", nodeDataList);
-
-                        allNodeDataList.push({
-                            nodeId: flatList[fl].id,
-                            nodeDataMomList: nodeDataList
-                        })
-
-                        nodeDataMapForScenario.nodeDataMomList = nodeDataList;
-                        nodeDataMap[scenarioList[ndm].id] = [nodeDataMapForScenario];
-                        // nodeDataMapForScenario.nodeDataMomList = nodeDataList;
-                        // nodeDataMap[scenarioList[ndm].id] = [nodeDataMapForScenario];
                     }
+
+                    // console.log("Node MOM List$$$", nodeDataList);
+                    console.log("Before node data list all push 1")
+                    allNodeDataList.push({
+                        nodeId: flatList[fl].id,
+                        nodeDataMomList: nodeDataList
+                    })
+
+                    nodeDataMapForScenario.nodeDataMomList = nodeDataList;
+                    nodeDataMap[scenarioList[ndm].id] = [nodeDataMapForScenario];
+                    // nodeDataMapForScenario.nodeDataMomList = nodeDataList;
+                    // nodeDataMap[scenarioList[ndm].id] = [nodeDataMapForScenario];
+                    // }
                 }
                 if (nodeId == -1) {
                     var findIndex = flatListUnsorted.findIndex(c => c.id == flatList[fl].id);
@@ -666,15 +666,16 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                 }
                             );
                         }
-                        // console.log("Nodedatalist&&&", nodeDataList);
-                        allNodeDataList.push({
-                            nodeId: aggregateNodeList[fl - 1].id,
-                            nodeDataMomList: nodeDataList
-                        })
-
-                        nodeDataMapForScenario.nodeDataMomList = nodeDataList;
-                        nodeDataMap[scenarioList[ndm].id] = [nodeDataMapForScenario];
                     }
+                    // console.log("Nodedatalist&&&", nodeDataList);
+                    console.log("Before node data list all push 2")
+                    allNodeDataList.push({
+                        nodeId: aggregateNodeList[fl - 1].id,
+                        nodeDataMomList: nodeDataList
+                    })
+
+                    nodeDataMapForScenario.nodeDataMomList = nodeDataList;
+                    nodeDataMap[scenarioList[ndm].id] = [nodeDataMapForScenario];
                 }
                 if (nodeId == -1) {
                     var findIndex = flatListUnsorted.findIndex(c => c.id == aggregateNodeList[fl - 1].id);

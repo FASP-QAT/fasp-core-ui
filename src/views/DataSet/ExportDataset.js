@@ -99,11 +99,12 @@ export default class ExportDataset extends Component {
                     var programData = bytes1.toString(CryptoJS.enc.Utf8);
                     var programJson = JSON.parse(programData);
                     if (json[i].userId == userId) {
-                        if (programNameLabel != "") {
-                            prgList.push({ value: json[i].id, label: getLabelText(JSON.parse(programNameLabel), lan) + "~v" + json[i].version })
-                        } else {
-                            prgList.push({ value: json[i].id, label: programJson.programCode + "~v" + json[i].version })
-                        }
+                        // if (programNameLabel != "") {
+                        //     prgList.push({ value: json[i].id, label: getLabelText(JSON.parse(programNameLabel), lan) + "~v" + json[i].version })
+                        // } else {
+                        //     prgList.push({ value: json[i].id, label: programJson.programCode + "~v" + json[i].version })
+                        // }
+                        prgList.push({ value: json[i].id, label: programJson.programCode + "~v" + json[i].version })
                     }
                 }
             }.bind(this)
