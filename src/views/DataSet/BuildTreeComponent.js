@@ -6925,13 +6925,14 @@ export default class BuildTree extends Component {
             if (itemConfig.context.payload.nodeType.id == 4) {
                 this.createPUNode(JSON.parse(JSON.stringify(itemConfig)), nodeId);
             } else {
-                if (!itemConfig.context.payload.extrapolation) {
-                    this.calculateMOMData(newItem.id, 0);
-                } else {
-                    this.setState({
-                        loading: false
-                    })
-                }
+                // if (!itemConfig.context.payload.extrapolation) {
+                this.calculateMOMData(newItem.id, 0);
+                // }
+                //  else {
+                //     this.setState({
+                //         loading: false
+                //     })
+                // }
             }
             // this.calculateValuesForAggregateNode(this.state.items);
         });
@@ -7248,13 +7249,14 @@ export default class BuildTree extends Component {
         }, () => {
             console.log("updated tree data+++", this.state);
             // this.calculateValuesForAggregateNode(this.state.items);
-            if (!currentItemConfig.context.payload.extrapolation) {
-                this.calculateMOMData(0, 0);
-            } else {
-                this.setState({
-                    loading: false
-                })
-            }
+            // if (!currentItemConfig.context.payload.extrapolation) {
+            this.calculateMOMData(0, 0);
+            // } 
+            // else {
+            //     this.setState({
+            //         loading: false
+            //     })
+            // }
             // console.log("returmed list---", this.state.nodeDataMomList);
             // this.updateTreeData();
         });
