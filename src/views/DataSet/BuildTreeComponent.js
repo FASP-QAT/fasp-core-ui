@@ -4370,11 +4370,11 @@ export default class BuildTree extends Component {
                 // row = row.concat("\t");
             }
             if (items[i].payload.nodeType.id == 1 || items[i].payload.nodeType.id == 2) {
-                row = row.concat(addCommas((items[i].payload.nodeDataMap[this.state.selectedScenario])[0].dataValue))
+                row = row.concat(addCommas(this.getPayloadData(items[i], 1)))
                 row1 = row1.concat(" ").concat(items[i].payload.label.label_en)
             } else {
-                row = row.concat((items[i].payload.nodeDataMap[this.state.selectedScenario])[0].dataValue).concat("% ")
-                row1 = row1.concat(items[i].payload.label.label_en)
+                row = row.concat(this.getPayloadData(items[i], 1))
+                row1 = row1.concat(" ").concat(items[i].payload.label.label_en)
             }
             dataArray.push(new Paragraph({
                 children: [new TextRun({ "text": row, bold: true }), new TextRun({ "text": row1 })],
