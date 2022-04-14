@@ -1521,7 +1521,7 @@ export default class ListTreeComponent extends Component {
                                                     </div>
 
                                                     <div className="col-md-12" style={{ display: 'inline-block' }}>
-                                                        <div style={{ display: this.state.missingPUList.length > 0 ? 'block' : 'none' }}><div><b>Missing Planning Units:(<a href="/#/planningUnitSetting/listPlanningUnitSetting" className="supplyplanformulas">Update Planning Units</a>)</b></div><br />
+                                                        <div style={{ display: this.state.missingPUList.length > 0 ? 'block' : 'none' }}><div><b>Missing Planning Units : (<a href="/#/planningUnitSetting/listPlanningUnitSetting" className="supplyplanformulas">Update Planning Units</a>)</b></div><br />
                                                             <div id="missingPUJexcel" className="RowClickable">
                                                             </div>
                                                         </div>
