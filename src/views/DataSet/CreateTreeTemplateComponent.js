@@ -1421,7 +1421,7 @@ export default class CreateTreeTemplate extends Component {
             var startDate = map1.get("1");
             var stopDate = map1.get("2");
             var modelingTypeId = map1.get("4");
-            var dataValue = modelingTypeId == 2 ? map1.get("7") : map1.get("6");
+            var dataValue = modelingTypeId == 2 ? map1.get("7").toString().replaceAll(",","").replaceAll("%","") : map1.get("6").toString().replaceAll(",","").replaceAll("%","");
             console.log("startDate---", startDate);
             console.log("stopDate---", stopDate);
             const result = date >= startDate && date <= stopDate ? true : false;
@@ -1434,15 +1434,26 @@ export default class CreateTreeTemplate extends Component {
                 console.log("@@@@@###########Start date", startDate);
                 console.log("@@@@@###########Start date", stopDate);
                 if (modelingTypeId == 3) {
-                    var nodeDataMomListFilter = nodeDataMomList.filter(c => c.month == startDate);
+                    var nodeDataMomListFilter = [];
+                    if (map1.get("12") == 1) {
+                        var nodeDataMomListOfTransferNode = (this.state.items.filter(c => c.id == map1.get("3"))[0].payload.nodeDataMap[0])[0].nodeDataMomList;
+                        nodeDataMomListFilter = nodeDataMomListOfTransferNode.filter(c => c.month == startDate)
+                    } else {
+                        nodeDataMomListFilter = nodeDataMomList.filter(c => c.month == startDate)
+                    }
                     console.log("@@@@@###########nodeDataMomListFilter", nodeDataMomListFilter);
                     if (nodeDataMomListFilter.length > 0) {
                         nodeValue = nodeDataMomListFilter[0].startValue;
                     }
                 }
                 if (modelingTypeId == 4) {
-                    var nodeDataMomListFilter = nodeDataMomList.filter(c => c.month == scalingDate);
-                    console.log("@@@@@###########nodeDataMomListFilter", nodeDataMomListFilter);
+                    var nodeDataMomListFilter = [];
+                    if (map1.get("12") == 1) {
+                        var nodeDataMomListOfTransferNode = (this.state.items.filter(c => c.id == map1.get("3"))[0].payload.nodeDataMap[0])[0].nodeDataMomList;
+                        nodeDataMomListFilter = nodeDataMomListOfTransferNode.filter(c => c.month == scalingDate)
+                    } else {
+                        nodeDataMomListFilter = nodeDataMomList.filter(c => c.month == scalingDate)
+                    }
                     if (nodeDataMomListFilter.length > 0) {
                         nodeValue = nodeDataMomListFilter[0].startValue;
                     }
@@ -1451,7 +1462,7 @@ export default class CreateTreeTemplate extends Component {
                 if (modelingTypeId == 2 || modelingTypeId == 5) {
                     calculatedChangeForMonth = parseFloat(dataValue).toFixed(4);
                 } else if (modelingTypeId == 3 || modelingTypeId == 4) {
-                    calculatedChangeForMonth = parseFloat((nodeValue * dataValue) / 100).toFixed(4);
+                    calculatedChangeForMonth = parseFloat((Number(nodeValue) * Number(dataValue)) / 100).toFixed(4);
                 }
             }
             this.state.modelingEl.setValueFromCoords(9, i, calculatedChangeForMonth, true);
