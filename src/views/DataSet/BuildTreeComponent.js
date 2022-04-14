@@ -22,7 +22,7 @@ import moment from 'moment';
 import Picker from 'react-month-picker';
 import SelectSearch from 'react-select-search';
 import MonthBox from '../../CommonComponent/MonthBox.js';
-import { NUMBER_NODE_ID,JEXCEL_DECIMAL_CATELOG_PRICE_SHIPMENT, PERCENTAGE_NODE_ID, FU_NODE_ID, PU_NODE_ID, ROUNDING_NUMBER, INDEXED_DB_NAME, INDEXED_DB_VERSION, TREE_DIMENSION_ID, SECRET_KEY, JEXCEL_MONTH_PICKER_FORMAT, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, JEXCEL_DECIMAL_NO_REGEX_LONG, DATE_FORMAT_CAP_WITHOUT_DATE, JEXCEL_DECIMAL_MONTHLY_CHANGE_4_DECIMAL_POSITIVE, JEXCEL_DECIMAL_MONTHLY_CHANGE, DATE_FORMAT_CAP, TITLE_FONT } from '../../Constants.js'
+import { NUMBER_NODE_ID, JEXCEL_DECIMAL_CATELOG_PRICE_SHIPMENT, PERCENTAGE_NODE_ID, FU_NODE_ID, PU_NODE_ID, ROUNDING_NUMBER, INDEXED_DB_NAME, INDEXED_DB_VERSION, TREE_DIMENSION_ID, SECRET_KEY, JEXCEL_MONTH_PICKER_FORMAT, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, JEXCEL_DECIMAL_NO_REGEX_LONG, DATE_FORMAT_CAP_WITHOUT_DATE, JEXCEL_DECIMAL_MONTHLY_CHANGE_4_DECIMAL_POSITIVE, JEXCEL_DECIMAL_MONTHLY_CHANGE, DATE_FORMAT_CAP, TITLE_FONT } from '../../Constants.js'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import jexcel from 'jexcel-pro';
 import "../../../node_modules/jexcel-pro/dist/jexcel.css";
@@ -501,6 +501,7 @@ export default class BuildTree extends Component {
         this.pickAMonth4 = React.createRef()
         this.pickAMonth5 = React.createRef()
         this.state = {
+            nodeUnitListPlural: [],
             nodeTransferDataList: [],
             qatCalculatedPUPerVisit: "",
             isChanged: false,
@@ -1553,8 +1554,13 @@ export default class BuildTree extends Component {
         this.setState({
             [parameterName]: value
         }, () => {
+            var items = this.state.items;
+            if (parameterName == 'currentItemConfig') {
+                var findNodeIndex = items.findIndex(n => n.id == value.context.id);
+                console.log("findNodeIndex1---", findNodeIndex);
+                items[findNodeIndex] = value.context;
+            }
             if (parameterName == 'nodeId' && (value != null && value != 0)) {
-                var items = this.state.items;
                 var nodeDataMomList = this.state.nodeDataMomList;
                 console.log("nodeDataMomList---", nodeDataMomList);
                 if (nodeDataMomList.length > 0) {
@@ -1579,35 +1585,32 @@ export default class BuildTree extends Component {
                 console.log("items---***", items);
                 this.setState({ items })
             }
-            if (parameterName == 'type' && (value == 0 || value == 1 || value == 2)) {
-                if (value == 0 || value == 1) {
-                    if (this.state.currentItemConfig.context.payload.nodeType.id == 1 || this.state.currentItemConfig.context.payload.nodeType.id == 2) {
-                        console.log("mom list ret---", this.state.nodeDataMomList.filter(x => x.nodeId == this.state.currentItemConfig.context.id));
-                        this.setState({ momList: this.state.nodeDataMomList.filter(x => x.nodeId == this.state.currentItemConfig.context.id)[0].nodeDataMomList }, () => {
-                            console.log("going to build mom jexcel");
-                            if (this.state.modelingEl != null && this.state.modelingEl != undefined && this.state.modelingEl != "") {
-                                this.filterScalingDataByMonth(this.state.scalingMonth.year + "-" + this.state.scalingMonth.month + "-01", this.state.nodeDataMomList.filter(x => x.nodeId == this.state.currentItemConfig.context.id)[0].nodeDataMomList);
-                            }
-                            if (value == 1 || (value == 0 && this.state.showMomData)) {
-                                this.buildMomJexcel();
-                            }
-                        });
-                    } else {
-                        this.setState({ momListPer: this.state.nodeDataMomList.filter(x => x.nodeId == this.state.currentItemConfig.context.id)[0].nodeDataMomList }, () => {
-                            console.log("going to build mom jexcel percent");
-                            if (this.state.modelingEl != null && this.state.modelingEl != undefined && this.state.modelingEl != "") {
-                                this.filterScalingDataByMonth(this.state.scalingMonth.year + "-" + this.state.scalingMonth.month + "-01", this.state.nodeDataMomList.filter(x => x.nodeId == this.state.currentItemConfig.context.id)[0].nodeDataMomList);
-                            }
-                            if (value == 1 || (value == 0 && this.state.showMomDataPercent)) {
-                                this.buildMomJexcelPercent();
-                            }
-                        });
-                    }
+            if (parameterName == 'type' && (value == 0 || value == 1)) {
+                if (this.state.currentItemConfig.context.payload.nodeType.id == 1 || this.state.currentItemConfig.context.payload.nodeType.id == 2) {
+                    console.log("mom list ret---", this.state.nodeDataMomList.filter(x => x.nodeId == this.state.currentItemConfig.context.id));
+                    this.setState({ momList: this.state.nodeDataMomList.filter(x => x.nodeId == this.state.currentItemConfig.context.id)[0].nodeDataMomList }, () => {
+                        console.log("going to build mom jexcel");
+                        if (this.state.modelingEl != null && this.state.modelingEl != undefined && this.state.modelingEl != "") {
+                            this.filterScalingDataByMonth(this.state.scalingMonth.year + "-" + this.state.scalingMonth.month + "-01", this.state.nodeDataMomList.filter(x => x.nodeId == this.state.currentItemConfig.context.id)[0].nodeDataMomList);
+                        }
+                        if (value == 1 || (value == 0 && this.state.showMomData)) {
+                            this.buildMomJexcel();
+                        }
+                    });
+                } else {
+                    this.setState({ momListPer: this.state.nodeDataMomList.filter(x => x.nodeId == this.state.currentItemConfig.context.id)[0].nodeDataMomList }, () => {
+                        console.log("going to build mom jexcel percent");
+                        if (this.state.modelingEl != null && this.state.modelingEl != undefined && this.state.modelingEl != "") {
+                            this.filterScalingDataByMonth(this.state.scalingMonth.year + "-" + this.state.scalingMonth.month + "-01", this.state.nodeDataMomList.filter(x => x.nodeId == this.state.currentItemConfig.context.id)[0].nodeDataMomList);
+                        }
+                        if (value == 1 || (value == 0 && this.state.showMomDataPercent)) {
+                            this.buildMomJexcelPercent();
+                        }
+                    });
                 }
-                this.saveTreeData();
-
 
             }
+            this.saveTreeData();
             // if (parameterName == 'type' && value == 0) {
             //     this.saveTreeData();
             //     this.updateTreeData();
@@ -5435,8 +5438,8 @@ export default class BuildTree extends Component {
                 usageFrequency = this.state.currentScenario.fuNode.usageFrequency.toString().replaceAll(",", "");
 
                 if (this.state.addNodeFlag) {
-                    var usageTypeParent = document.getElementById("usageTypeParent");
-                    selectedText = usageTypeParent.options[usageTypeParent.selectedIndex].text;
+                    // var usageTypeParent = document.getElementById("usageTypeParent");
+                    selectedText = this.state.nodeUnitList.filter(c => c.unitId == this.state.currentItemConfig.parentItem.payload.nodeUnit.id)[0].label.label_en
                 } else {
                     // take everything from object
                     console.log(">>>>", this.state.currentItemConfig);
@@ -5463,16 +5466,17 @@ export default class BuildTree extends Component {
             }
             // FU
             if (this.state.currentItemConfig.context.payload.nodeType.id == 4) {
+                console.log("selectedText---", selectedText)
                 if (this.state.currentScenario.fuNode.usageType.id == 1) {
                     console.log("selected text 3 1---", this.state.currentScenario.fuNode.oneTimeUsage != "true" && this.state.currentScenario.fuNode.oneTimeUsage != true);
                     if (this.state.currentScenario.fuNode.oneTimeUsage != "true" && this.state.currentScenario.fuNode.oneTimeUsage != true) {
                         console.log("selected text 3 2---", this.state.currentScenario.fuNode.repeatUsagePeriod.usagePeriodId);
                         var selectedText3 = this.state.usagePeriodList.filter(c => c.usagePeriodId == this.state.currentScenario.fuNode.repeatUsagePeriod.usagePeriodId)[0].label.label_en;
 
-                        usageText = i18n.t('static.usageTemplate.every') + " " + addCommas(noOfPersons) + " " + selectedText.trim() + " " + i18n.t('static.usageTemplate.requires') + " " + addCommas(noOfForecastingUnitsPerPerson) + " " + selectedText1.trim() + "(s), " + " " + addCommas(usageFrequency) + " " + i18n.t('static.tree.timesPer') + " " + selectedText2.trim() + " " + i18n.t('static.tree.for') + " " + (this.state.currentScenario.fuNode.repeatCount != null ? this.state.currentScenario.fuNode.repeatCount : '') + " " + selectedText3.trim();
+                        usageText = i18n.t('static.usageTemplate.every') + " " + addCommas(noOfPersons) + " " + selectedText.trim() + "" + i18n.t('static.usageTemplate.requires') + " " + addCommas(noOfForecastingUnitsPerPerson) + " " + selectedText1.trim() + "(s), " + " " + addCommas(usageFrequency) + " " + i18n.t('static.tree.timesPer') + " " + selectedText2.trim() + " " + i18n.t('static.tree.for') + " " + (this.state.currentScenario.fuNode.repeatCount != null ? this.state.currentScenario.fuNode.repeatCount : '') + " " + selectedText3.trim();
                     } else {
                         console.log("selected text 3 1---");
-                        usageText = i18n.t('static.usageTemplate.every') + " " + addCommas(noOfPersons) + " " + selectedText.trim() + " " + i18n.t('static.usageTemplate.requires') + " " + addCommas(noOfForecastingUnitsPerPerson) + " " + selectedText1.trim() + "(s)";
+                        usageText = i18n.t('static.usageTemplate.every') + " " + addCommas(noOfPersons) + " " + selectedText.trim() + "" + i18n.t('static.usageTemplate.requires') + " " + addCommas(noOfForecastingUnitsPerPerson) + " " + selectedText1.trim() + "(s)";
                     }
                 } else {
                     usageText = i18n.t('static.usageTemplate.every') + " " + addCommas(noOfPersons) + " " + selectedText.trim() + "" + i18n.t('static.usageTemplate.requires') + " " + addCommas(noOfForecastingUnitsPerPerson) + " " + selectedText1.trim() + "(s) " + i18n.t('static.usageTemplate.every') + " " + addCommas(usageFrequency) + " " + selectedText2.trim() + " indefinitely";
@@ -5482,7 +5486,7 @@ export default class BuildTree extends Component {
                 console.log("pu>>>", this.state.currentItemConfig);
                 console.log("puList>>>", this.state.currentItemConfig.parentItem.parent);
                 if (this.state.currentScenario.puNode.planningUnit.id != null && this.state.currentScenario.puNode.planningUnit.id != "") {
-                    var nodeUnitTxt = this.state.unitList.filter(c => c.unitId == this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id)[0].label.label_en;
+                    var nodeUnitTxt = this.state.nodeUnitListPlural.filter(c => c.unitId == this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id)[0].label.label_en;
                     if (this.state.addNodeFlag) {
                         var planningUnitId = document.getElementById("planningUnitId");
                         var planningUnit = planningUnitId.options[planningUnitId.selectedIndex].text;
@@ -5497,12 +5501,12 @@ export default class BuildTree extends Component {
                             sharePu = this.round((this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor));
                         }
                         console.log("sharePu---", sharePu);
-                        usageText = i18n.t('static.tree.forEach') + " " + nodeUnitTxt.trim() + "(s) " + i18n.t('static.tree.weNeed') + " " + addCommas(sharePu) + " " + planningUnit;
+                        usageText = i18n.t('static.tree.forEach') + " " + nodeUnitTxt.trim() + " " + i18n.t('static.tree.weNeed') + " " + addCommas(sharePu) + " " + planningUnit;
                     } else {
 
                         var puPerInterval = (this.state.currentItemConfig.parentItem.payload.nodeDataMap[this.state.selectedScenario])[0].puNode.puPerVisit;
                         console.log("puPerInterval---", puPerInterval);
-                        usageText = i18n.t('static.tree.forEach') + " " + nodeUnitTxt.trim() + "(s) " + i18n.t('static.tree.weNeed') + " " + addCommas(this.round(puPerInterval)) + " " + planningUnit + " " + i18n.t('static.usageTemplate.every') + " " + this.state.currentScenario.puNode.refillMonths + " " + i18n.t('static.report.month');
+                        usageText = i18n.t('static.tree.forEach') + " " + nodeUnitTxt.trim() + " " + i18n.t('static.tree.weNeed') + " " + addCommas(this.round(puPerInterval)) + " " + planningUnit + " " + i18n.t('static.usageTemplate.every') + " " + this.state.currentScenario.puNode.refillMonths + " " + i18n.t('static.report.month');
                     }
                 } else {
                     usageText = "";
@@ -5844,7 +5848,17 @@ export default class BuildTree extends Component {
                     unitList: myResult,
                     nodeUnitList: myResult.filter(x => x.dimension.id == TREE_DIMENSION_ID)
                 }, () => {
-
+                    var nodeUnitListPlural = [];
+                    console.log("this.state.nodeUnitList---", this.state.nodeUnitList);
+                    for (let i = 0; i < this.state.nodeUnitList.length; i++) {
+                        console.log("inside for---")
+                        var nodeUnit = JSON.parse(JSON.stringify(this.state.nodeUnitList[i]));
+                        console.log("nodeUnit---", nodeUnit)
+                        nodeUnit.label.label_en = nodeUnit.label.label_en + "(s)";
+                        nodeUnitListPlural.push(nodeUnit);
+                    }
+                    console.log("nodeUnitListPlural---", nodeUnitListPlural)
+                    this.setState({ nodeUnitListPlural })
                 })
             }.bind(this);
         }.bind(this)
@@ -8374,8 +8388,8 @@ export default class BuildTree extends Component {
                                                     value={this.state.usageTypeParent}>
 
                                                     <option value=""></option>
-                                                    {this.state.nodeUnitList.length > 0
-                                                        && this.state.nodeUnitList.map((item, i) => {
+                                                    {this.state.nodeUnitListPlural.length > 0
+                                                        && this.state.nodeUnitListPlural.map((item, i) => {
                                                             return (
                                                                 <option key={i} value={item.unitId}>
                                                                     {getLabelText(item.label, this.state.lang)}
@@ -8637,7 +8651,7 @@ export default class BuildTree extends Component {
                                                 {(this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentScenario.fuNode.usageType.id == 1) &&
                                                     <table className="table table-bordered">
                                                         <tr>
-                                                            <td style={{ width: '50%' }}>{i18n.t('static.tree.#OfFU/')} {this.state.nodeUnitList.filter(c => c.unitId == this.state.usageTypeParent)[0].label.label_en}</td>
+                                                            <td style={{ width: '50%' }}>{i18n.t('static.tree.#OfFU/')} {this.state.nodeUnitList.filter(c => c.unitId == this.state.usageTypeParent)[0].label.label_en}{"/ Time"}</td>
                                                             <td style={{ width: '50%' }}>{addCommas(this.state.noOfFUPatient)}</td>
                                                         </tr>
                                                         <tr>

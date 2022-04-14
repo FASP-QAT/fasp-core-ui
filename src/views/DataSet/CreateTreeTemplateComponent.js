@@ -429,6 +429,7 @@ export default class CreateTreeTemplate extends Component {
         this.pickAMonth2 = React.createRef()
         this.pickAMonth1 = React.createRef()
         this.state = {
+            nodeUnitListPlural: [],
             monthId: 1,
             monthList: [],
             isChanged: false,
@@ -1392,7 +1393,7 @@ export default class CreateTreeTemplate extends Component {
                     this.setState({
                         treeTemplate
                     }, () => {
-                        console.log("treeTemplate mom---",treeTemplate);
+                        console.log("treeTemplate mom---", treeTemplate);
                         calculateModelingData(treeTemplate, this, '', currentItemConfig.context.id, 0, 1, -1, true);
                     });
                 });
@@ -4125,8 +4126,8 @@ export default class CreateTreeTemplate extends Component {
             usageFrequency = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageFrequency.toString().replaceAll(",", "");
 
             if (this.state.addNodeFlag) {
-                var usageTypeParent = document.getElementById("usageTypeParent");
-                selectedText = usageTypeParent.options[usageTypeParent.selectedIndex].text;
+                // var usageTypeParent = document.getElementById("usageTypeParent");
+                selectedText = this.state.nodeUnitList.filter(c => c.unitId == this.state.currentItemConfig.parentItem.payload.nodeUnit.id)[0].label.label_en
             } else {
                 selectedText = this.state.nodeUnitList.filter(c => c.unitId == this.state.currentItemConfig.parentItem.payload.nodeUnit.id)[0].label.label_en;
             }
@@ -4506,6 +4507,17 @@ export default class CreateTreeTemplate extends Component {
                 nodeUnitList: listArray
             }, () => {
                 console.log("nodeUnitList>>>", this.state.nodeUnitList);
+                var nodeUnitListPlural = [];
+                console.log("this.state.nodeUnitList---", this.state.nodeUnitList);
+                for (let i = 0; i < this.state.nodeUnitList.length; i++) {
+                    console.log("inside for---")
+                    var nodeUnit = JSON.parse(JSON.stringify(this.state.nodeUnitList[i]));
+                    console.log("nodeUnit---", nodeUnit)
+                    nodeUnit.label.label_en = nodeUnit.label.label_en + "(s)";
+                    nodeUnitListPlural.push(nodeUnit);
+                }
+                console.log("nodeUnitListPlural---", nodeUnitListPlural)
+                this.setState({ nodeUnitListPlural })
             })
         })
             .catch(
@@ -5406,7 +5418,7 @@ export default class CreateTreeTemplate extends Component {
         if (event.target.name === "templateNotes") {
             treeTemplate.notes = event.target.value;
         }
-        
+
         if (event.target.name === "tracerCategoryId") {
             (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.forecastingUnit.tracerCategory.id = event.target.value;
             this.getUsageTemplateList(event.target.value);
@@ -7075,8 +7087,8 @@ export default class CreateTreeTemplate extends Component {
                                                     value={this.state.usageTypeParent}>
 
                                                     <option value=""></option>
-                                                    {this.state.nodeUnitList.length > 0
-                                                        && this.state.nodeUnitList.map((item, i) => {
+                                                    {this.state.nodeUnitListPlural.length > 0
+                                                        && this.state.nodeUnitListPlural.map((item, i) => {
                                                             return (
                                                                 <option key={i} value={item.unitId}>
                                                                     {getLabelText(item.label, this.state.lang)}
@@ -7316,7 +7328,7 @@ export default class CreateTreeTemplate extends Component {
                                                 {(this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usageType.id == 1) &&
                                                     <table className="table table-bordered">
                                                         <tr>
-                                                            <td style={{ width: '50%' }}>{i18n.t('static.tree.#OfFU/')} {this.state.nodeUnitList.filter(c => c.unitId == this.state.usageTypeParent)[0].label.label_en}</td>
+                                                            <td style={{ width: '50%' }}>{i18n.t('static.tree.#OfFU/')} {this.state.nodeUnitList.filter(c => c.unitId == this.state.usageTypeParent)[0].label.label_en}{"/ Time"}</td>
                                                             <td style={{ width: '50%' }}>{addCommas(this.state.noOfFUPatient)}</td>
                                                         </tr>
                                                         <tr>
@@ -8575,7 +8587,7 @@ export default class CreateTreeTemplate extends Component {
                                         console.log("flatList---", flatList);
                                         var templateObj = {
                                             treeTemplateId: template.treeTemplateId,
-                                            notes : template.notes,
+                                            notes: template.notes,
                                             active: template.active,
                                             monthsInPast: template.monthsInPast,
                                             monthsInFuture: template.monthsInFuture,
