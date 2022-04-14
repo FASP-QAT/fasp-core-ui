@@ -336,7 +336,7 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                             var totalManualChange = 0;
                             var seasonalityPercTotal = 0;
                             var manualChangeTotal = 0;
-                            var nodeDataOverrideListFiltered = nodeDataOverrideList.length != null ? nodeDataOverrideList.filter(c => c.month == i) : [];
+                            var nodeDataOverrideListFiltered = nodeDataOverrideList.length != null ? nodeDataOverrideList.filter(c => c.monthNo == i) : [];
                             // console.log("nodeDataOverrideListFiltered---", nodeDataOverrideListFiltered)
                             if (nodeDataOverrideListFiltered.length > 0) {
                                 var seasonalityNumber = (Number(endValue) * Number(nodeDataOverrideListFiltered[0].seasonalityPerc)) / 100;
