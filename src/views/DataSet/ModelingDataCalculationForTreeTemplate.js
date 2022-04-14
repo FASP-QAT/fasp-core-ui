@@ -165,9 +165,10 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                     var nodeDataList = [];
                     var calculatedMMdPatients = [];
                     var calculatedValueForLag = [];
+                    var countOfI = -1;
                     for (var i = curDate; i <= datasetJson.monthsInFuture; i++) {
-
                         if (i != 0) {
+                            countOfI += 1;
                             var nodeDataModelingList = (nodeDataModelingListWithTransfer).filter(c => i >= c.startDateNo && i <= c.stopDateNo);
                             var nodeDataOverrideList = (nodeDataMapForScenario.nodeDataOverrideList);
                             var startValue = 0;
@@ -488,7 +489,7 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                     console.log("noOfBottlesInOneVisit$$$%%%", noOfBottlesInOneVisit);
                                     console.log("puPerBaseMonth$$$%%%", puPerBaseMonth);
                                     console.log("puPerMonthBalance$$$%%%", puPerMonthBalance);
-                                    var monthNo = i;
+                                    var monthNo = countOfI;
                                     console.log("monthNo$$$%%%", monthNo);
                                     var cycle = Math.floor(monthNo / monthsPerVisit);
                                     console.log("cycle$$$%%%", cycle);
@@ -521,7 +522,8 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                         console.log("noOfPatients@@@", noOfPatients);
                                         calculatedMMdPatients.push({ month: i, value: noOfPatients < 0 ? 0 : noOfPatients });
                                     } else {
-                                        var prevCycleValue = calculatedMMdPatients.filter(c => c.month == i - monthsPerVisit)[0].value;
+                                        console.log("MonthsPer visit@@@@@@@@@@@", monthsPerVisit);
+                                        var prevCycleValue = calculatedMMdPatients.filter(c => c.month == (i - monthsPerVisit))[0].value;
                                         noOfPatients = prevCycleValue + deltaPatients;
                                         calculatedMMdPatients.push({ month: i, value: noOfPatients < 0 ? 0 : noOfPatients });
                                     }
