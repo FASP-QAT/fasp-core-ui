@@ -635,28 +635,34 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     var elInstance = this.state.dataEl;
     for (var i = 0; i < monthArray.length; i++) {
       var columnData = elInstance.getColumnData([i + 1]);
-      var actualConsumptionCount = 6;
+      var actualConsumptionCount = 2;
       var reportingRateCount = 3;
       var daysOfStockOutCount = 4;
-      var actualConsumptionCount1 = 2;
+      var adjustedAmountCount = 6;
+      var puAmountCount = 7;
+
       for (var r = 0; r < regionList.length; r++) {
-        var index = -1;
-        //   index = fullConsumptionList.findIndex(c => c.planningUnit.id == consumptionUnit.planningUnit.id && c.region.id == regionList[r].regionId && moment(c.month).format("YYYY-MM") == moment(monthArray[i].date).format("YYYY-MM"));
-        // index = fullConsumptionList.findIndex(con =>  con.region.id == regionList[r].regionId && moment(con.month).format("YYYY-MM") == moment(monthArray[i].date).format("YYYY-MM"));
-        var value = elInstance.getValue(`${colArr[i + 1]}${parseInt(actualConsumptionCount) + 1}`, true);
-        var actualValue = elInstance.getValue(`${colArr[i + 1]}${parseInt(actualConsumptionCount1) + 1}`, true);
-        // console.log("value----->", value);
-        // console.log("Actual value----->", actualValue);
-        // console.log("Actual value----->", value === '');
-        if (actualValue !== "") {
-          // console.log("columnData[actualConsumptionCount]", columnData[actualConsumptionCount])
+        console.log("&&&&&&&&&&MonthList", monthArray[i]);
+        var index = 0;
+        index = fullConsumptionList.findIndex(c => c.planningUnit.id == consumptionUnit.planningUnit.id && c.region.id == regionList[r].regionId && moment(c.month).format("YYYY-MM") == moment(monthArray[i].date).format("YYYY-MM"));
+        var actualConsumptionValue = elInstance.getValue(`${colArr[i + 1]}${parseInt(actualConsumptionCount) + 1}`, true).replaceAll(",", "");
+        var reportingRateValue = elInstance.getValue(`${colArr[i + 1]}${parseInt(reportingRateCount) + 1}`, true);
+        var daysOfStockOutValue = elInstance.getValue(`${colArr[i + 1]}${parseInt(daysOfStockOutCount) + 1}`, true);
+        var adjustedAmountValue = elInstance.getValue(`${colArr[i + 1]}${parseInt(adjustedAmountCount) + 1}`, true);
+        var puAmountValue = elInstance.getValue(`${colArr[i + 1]}${parseInt(puAmountCount) + 1}`, true);
+        console.log("&&&&&&&&&&ActualConsumptionValue", actualConsumptionValue);
+        if (actualConsumptionValue !== "") {
           if (index != -1) {
-            fullConsumptionList[index].amount = (value === "" ? actualValue : value.replaceAll(',', ''));
-            fullConsumptionList[index].daysOfStockOut = columnData[daysOfStockOutCount];
-            fullConsumptionList[index].reportingRate = columnData[reportingRateCount];
+            fullConsumptionList[index].amount = actualConsumptionValue;
+            fullConsumptionList[index].reportingRate = reportingRateValue;
+            fullConsumptionList[index].daysOfStockOut = daysOfStockOutValue;
+            fullConsumptionList[index].adjustedAmount = adjustedAmountValue;
+            fullConsumptionList[index].puAmount = puAmountValue;
           } else {
             var json = {
-              amount: value === "" ? actualValue : value.replaceAll(',', ''),
+              amount: actualConsumptionValue,
+              adjustedAmount: adjustedAmountValue !== "" ? adjustedAmountValue : 0,
+              puAmount: puAmountValue !== "" ? puAmountValue : 0,
               planningUnit: {
                 id: consumptionUnit.planningUnit.id,
                 label: consumptionUnit.planningUnit.label
@@ -665,23 +671,24 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                 userId: curUser
               },
               createdDate: curDate,
-              daysOfStockOut: columnData[daysOfStockOutCount],
+              daysOfStockOut: daysOfStockOutValue,
               exculde: false,
               forecastConsumptionId: 0,
-              month: moment(monthArray[i].date).format("YYYY-MM-DD"),
+              month: moment(monthArray[i].date).startOf('month').format("YYYY-MM-DD"),
               region: {
                 id: regionList[r].regionId,
                 label: regionList[r].label
               },
-              reportingRate: columnData[reportingRateCount]
+              reportingRate: reportingRateValue
             }
             fullConsumptionList.push(json);
           }
         }
         actualConsumptionCount += 8;
-        actualConsumptionCount1 += 8;
         reportingRateCount += 8;
-        daysOfStockOutCount += 8
+        daysOfStockOutCount += 8;
+        adjustedAmountCount += 8;
+        puAmountCount += 8;
       }
     }
     var interpolatedRegionsAndMonths = [];
@@ -834,8 +841,8 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                 } else {
                   var json = {
                     amount: actualConsumptionValue,
-                    adjustedAmount: adjustedAmountValue,
-                    puAmount: puAmountValue,
+                    adjustedAmount: adjustedAmountValue !== "" ? adjustedAmountValue : 0,
+                    puAmount: puAmountValue !== "" ? puAmountValue : 0,
                     planningUnit: {
                       id: consumptionUnit.planningUnit.id,
                       label: consumptionUnit.planningUnit.label
