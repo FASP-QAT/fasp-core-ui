@@ -2060,7 +2060,7 @@ export default class BuildTree extends Component {
                     if (nodeTypeId == 2) {
                         if ((map1.get("4") != '' && map1.get("4") != 0.00) || (map1.get("5") != '' && map1.get("5") != 0.00)) {
                             var overrideData = {
-                                monthNo: map1.get("0"),
+                                month: map1.get("0"),
                                 seasonalityPerc: map1.get("4").toString().replaceAll(",", "").split("%")[0],
                                 manualChange: (map1.get("5") != '' && map1.get("5") != 0.00) ? map1.get("5").toString().replaceAll(",", "") : map1.get("5"),
                                 nodeDataId: map1.get("7"),
@@ -2072,7 +2072,7 @@ export default class BuildTree extends Component {
                     } else if (nodeTypeId == 3 || nodeTypeId == 4 || nodeTypeId == 5) {
                         if (map1.get("3") != '' && map1.get("3") != 0.00) {
                             var overrideData = {
-                                monthNo: map1.get("0"),
+                                month: map1.get("0"),
                                 seasonalityPerc: 0,
                                 manualChange: map1.get("3").toString().replaceAll(",", "").split("%")[0],
                                 nodeDataId: map1.get("7"),
