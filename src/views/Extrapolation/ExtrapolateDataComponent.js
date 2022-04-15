@@ -24,7 +24,7 @@ import AuthenticationService from "../Common/AuthenticationService";
 import { calculateMovingAvg } from '../Extrapolation/MovingAverages';
 import { calculateSemiAverages } from '../Extrapolation/SemiAverages';
 import { calculateLinearRegression } from '../Extrapolation/LinearRegression';
-import { calculateTES } from '../Extrapolation/TES';
+import { calculateTES } from '../Extrapolation/TESNew';
 import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
 import { Prompt } from "react-router";
 import pdfIcon from '../../assets/img/pdf.png';
@@ -58,6 +58,16 @@ const validationSchemaExtrapolation = function (values) {
                 function (value) {
                     console.log("***2**", document.getElementById("smoothingId").value);
                     if ((document.getElementById("smoothingId").value) == "on" && document.getElementById("confidenceLevelId").value == "") {
+                        return false;
+                    } else {
+                        return true;
+                    }
+                }),
+        confidenceLevelIdLinearRegression:
+            Yup.string().test('confidenceLevelIdLinearRegression', 'Please select confidence level.',
+                function (value) {
+                    console.log("***2**", document.getElementById("linearRegressionId").value);
+                    if ((document.getElementById("linearRegressionId").value) == "on" && document.getElementById("confidenceLevelIdLinearRegression").value == "") {
                         return false;
                     } else {
                         return true;
@@ -253,6 +263,7 @@ export default class ExtrapolateDataComponent extends React.Component {
             loading: false,
             extrapolationMethodId: -1,
             confidenceLevelId: 0.85,
+            confidenceLevelIdLinearRegression: 0.85,
             showGuidance: false,
             showData: false,
             dataEl: "",
@@ -402,6 +413,7 @@ export default class ExtrapolateDataComponent extends React.Component {
         setTouched({
             noOfMonthsId: true,
             confidenceLevelId: true,
+            confidenceLevelIdLinearRegression: true,
             seasonalityId: true,
             gammaId: true,
             betaId: true,
@@ -474,6 +486,9 @@ export default class ExtrapolateDataComponent extends React.Component {
             data[5] = tesDataFilter.length > 0 && tesDataFilter[0].forecast != null ? (Number(tesDataFilter[0].forecast)) - Number(CI) > 0 ? ((Number(tesDataFilter[0].forecast)) - Number(CI)).toFixed(2) : 0 : '';
             data[6] = tesDataFilter.length > 0 && tesDataFilter[0].forecast != null ? Number(tesDataFilter[0].forecast).toFixed(2) : '';
             data[7] = tesDataFilter.length > 0 && tesDataFilter[0].forecast != null ? ((Number(tesDataFilter[0].forecast)) + Number(CI)).toFixed(2) : '';
+            data[8] = '';
+            data[9] = linearRegressionDataFilter.length > 0 && linearRegressionDataFilter[0].forecast != null && linearRegressionDataFilter[0].ci != undefined && linearRegressionDataFilter[0] != null ? (linearRegressionDataFilter[0].forecast - linearRegressionDataFilter[0].ci).toFixed(2) : '';
+            data[10] = linearRegressionDataFilter.length > 0 && linearRegressionDataFilter[0].forecast != null && linearRegressionDataFilter[0].ci != undefined && linearRegressionDataFilter[0] != null ? (linearRegressionDataFilter[0].forecast + linearRegressionDataFilter[0].ci).toFixed(2) : '';
             // data[8] = '';
             dataArray.push(data)
         }
@@ -528,7 +543,17 @@ export default class ExtrapolateDataComponent extends React.Component {
                         title: i18n.t('static.extrapolation.arima'),
                         type: this.state.arimaId ? 'numeric' : 'hidden',
                         mask: '#,##.00', decimal: '.'
-                    }
+                    },
+                    {
+                        title: i18n.t('static.extrapolation.linearRegression') + " L",
+                        type: this.state.linearRegressionId ? 'numeric' : 'hidden',
+                        mask: '#,##.00', decimal: '.'
+                    },
+                    {
+                        title: i18n.t('static.extrapolation.linearRegression') + " H",
+                        type: this.state.linearRegressionId ? 'numeric' : 'hidden',
+                        mask: '#,##.00', decimal: '.'
+                    },
                 ],
             text: {
                 // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
@@ -560,8 +585,8 @@ export default class ExtrapolateDataComponent extends React.Component {
                         //     var cell = elInstance.getCell(("A").concat(parseInt(y) + 1))
                         //     cell.classList.add('jexcelBoldPurpleCell');
                         // } else {
-                            var cell = elInstance.getCell(("A").concat(parseInt(y) + 1))
-                            cell.classList.add('jexcelPurpleCell');
+                        var cell = elInstance.getCell(("A").concat(parseInt(y) + 1))
+                        cell.classList.add('jexcelPurpleCell');
                         // }
                         var cell = elInstance.getCell(("C").concat(parseInt(y) + 1))
                         cell.classList.add('jexcelBoldPurpleCell');
@@ -746,14 +771,15 @@ export default class ExtrapolateDataComponent extends React.Component {
         try {
             calculateMovingAvg(inputDataMovingAvg, this.state.monthsForMovingAverage, noOfMonthsForProjection, this);
             calculateSemiAverages(inputDataSemiAverage, noOfMonthsForProjection, this);
-            calculateLinearRegression(inputDataLinearRegression, noOfMonthsForProjection, this);
+            calculateLinearRegression(inputDataLinearRegression, this.state.confidenceLevelIdLinearRegression, noOfMonthsForProjection, this);
             console.log("inputDataTes.length+++", inputDataTes.length);
             // if (inputDataTes.length >= (this.state.noOfMonthsForASeason * 2)) {
-            calculateTES(inputDataTes, this.state.alpha, this.state.beta, this.state.gamma, this.state.confidenceLevelId, this.state.noOfMonthsForASeason, noOfMonthsForProjection, this);
+            calculateTES(inputDataTes, this.state.alpha, this.state.beta, this.state.gamma, this.state.confidenceLevelId, this.state.noOfMonthsForASeason, noOfMonthsForProjection, this,minStartDate);
             this.setState({
                 extrapolateClicked: true
             })
         } catch (error) {
+            console.log("Error@@@@@@",error)
             this.el = jexcel(document.getElementById("tableDiv"), '');
             this.el.destroy();
             this.setState({
@@ -884,6 +910,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                     confidence: 0.95,
                     monthsForMovingAverage: 6,
                     confidenceLevelId: 0.85,
+                    confidenceLevelIdLinearRegression: 0.85,
                     loading: false,
                     showData: false,
                     dataEl: ""
@@ -1480,6 +1507,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                 // }
 
                 var confidenceLevel = this.state.confidenceLevelId;
+                var confidenceLevelLinearRegression = this.state.confidenceLevelIdLinearRegression;
                 var seasonality = this.state.noOfMonthsForASeason;
                 var alpha = this.state.alpha;
                 var beta = this.state.beta;
@@ -1509,6 +1537,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                     //  maxDate: actualMax,
                     monthsForMovingAverage: monthsForMovingAverage,
                     confidenceLevelId: confidenceLevel,
+                    confidenceLevelIdLinearRegression: confidenceLevelLinearRegression,
                     noOfMonthsForASeason: seasonality,
                     alpha: alpha,
                     beta: beta,
@@ -1968,6 +1997,16 @@ export default class ExtrapolateDataComponent extends React.Component {
         var confidenceLevelId = e.target.value;
         this.setState({
             confidenceLevelId: confidenceLevelId,
+            dataChanged: true
+        }, () => {
+            // this.buildJxl()
+        })
+    }
+
+    setConfidenceLevelIdLinearRegression(e) {
+        var confidenceLevelIdLinearRegression = e.target.value;
+        this.setState({
+            confidenceLevelIdLinearRegression: confidenceLevelIdLinearRegression,
             dataChanged: true
         }, () => {
             // this.buildJxl()
@@ -2568,6 +2607,25 @@ export default class ExtrapolateDataComponent extends React.Component {
             })
         }
         if (this.state.linearRegressionId) {
+            datasets.push({
+                type: "line",
+                pointRadius: 0,
+                lineTension: 0,
+                label: "Linear Regression Lower",
+                backgroundColor: 'transparent',
+                borderColor: '#EDB944',
+                borderStyle: 'dotted',
+                borderDash: [10, 10],
+                ticks: {
+                    fontSize: 2,
+                    fontColor: 'transparent',
+                },
+                showInLegend: true,
+                pointStyle: 'line',
+                pointBorderWidth: 5,
+                yValueFormatString: "###,###,###,###",
+                data: json.map((item, c) => c >= count && item[9] !== "" ? item[9] : null)
+            })
             datasets.push(
                 {
                     type: "line",
@@ -2586,6 +2644,25 @@ export default class ExtrapolateDataComponent extends React.Component {
                     yValueFormatString: "###,###,###,###",
                     data: json.map((item, c) => c >= count && item[4] !== "" ? item[4] : null)
                 })
+            datasets.push({
+                type: "line",
+                pointRadius: 0,
+                lineTension: 0,
+                label: "Linear Regression Higher",
+                backgroundColor: 'transparent',
+                borderColor: '#EDB944',
+                borderStyle: 'dotted',
+                borderDash: [10, 10],
+                ticks: {
+                    fontSize: 2,
+                    fontColor: 'transparent',
+                },
+                showInLegend: true,
+                pointStyle: 'line',
+                pointBorderWidth: 5,
+                yValueFormatString: "###,###,###,###",
+                data: json.map((item, c) => c >= count && item[10] !== "" ? item[10] : null)
+            })
         }
         if (this.state.smoothingId) {
             datasets.push({
@@ -2837,6 +2914,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                             initialValues={{
                                 noOfMonthsId: this.state.monthsForMovingAverage,
                                 confidenceLevelId: this.state.confidenceLevelId,
+                                confidenceLevelIdLinearRegression: this.state.confidenceLevelIdLinearRegression,
                                 seasonalityId: this.state.noOfMonthsForASeason,
                                 gammaId: this.state.gamma,
                                 betaId: this.state.beta,
@@ -2962,6 +3040,33 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                             <b>{i18n.t('static.extrapolation.linearRegression')}</b>
                                                             <i class="fa fa-info-circle icons pl-lg-2" id="Popover3" onClick={() => this.toggle('popoverOpenLr', !this.state.popoverOpenLr)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
                                                         </Label>
+                                                    </div>
+                                                    <div className="row col-md-12 pt-lg-2" style={{ display: this.state.linearRegressionId ? '' : 'none' }}>
+                                                        <div className="col-md-2">
+                                                            <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.confidenceLevel')}
+                                                                <i class="fa fa-info-circle icons pl-lg-2" id="Popover6" onClick={() => this.toggle('popoverOpenConfidence', !this.state.popoverOpenConfidence)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
+                                                            </Label>
+                                                            <Input
+                                                                className="controls"
+                                                                type="select"
+                                                                bsSize="sm"
+                                                                id="confidenceLevelIdLinearRegression"
+                                                                name="confidenceLevelIdLinearRegression"
+                                                                value={this.state.confidenceLevelIdLinearRegression}
+                                                                valid={!errors.confidenceLevelIdLinearRegression && this.state.confidenceLevelIdLinearRegression != null ? this.state.confidenceLevelIdLinearRegression : '' != ''}
+                                                                invalid={touched.confidenceLevelIdLinearRegression && !!errors.confidenceLevelIdLinearRegression}
+                                                                onBlur={handleBlur}
+                                                                onChange={(e) => { handleChange(e); this.setConfidenceLevelIdLinearRegression(e) }}
+                                                            >
+                                                                <option value="0.85">85%</option>
+                                                                <option value="0.90">90%</option>
+                                                                <option value="0.95">95%</option>
+                                                                <option value="0.99">99%</option>
+                                                                <option value="0.995">99.5%</option>
+                                                                <option value="0.999">99.9%</option>
+                                                            </Input>
+                                                            <FormFeedback>{errors.confidenceLevelIdLinearRegression}</FormFeedback>
+                                                        </div>
                                                     </div>
                                                     <div>
                                                         <Popover placement="top" isOpen={this.state.popoverOpenTes} target="Popover4" trigger="hover" toggle={() => this.toggle('popoverOpenTes', !this.state.popoverOpenTes)}>
@@ -3412,7 +3517,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                     </div>
                                                 </div>}
                                             {this.state.dataChanged && this.state.extrapolateClicked && <div className="row float-right mt-lg-3 mr-0 pb-2 pt-2 "> <Button type="submit" id="formSubmitButton" size="md" color="success" className="float-right mr-0" onClick={() => this.touchAllExtrapolation(setTouched, errors, 1)}><i className="fa fa-check"></i>{i18n.t('static.pipeline.save')}</Button>&nbsp;</div>}
-                                            {this.state.forecastProgramId!="" && this.state.planningUnitId>0 && this.state.regionId>0 && <div className="row float-right mt-lg-3 mr-3 pb-2 pt-2 "><Button type="submit" id="extrapolateButton" size="md" color="info" className="float-right mr-1" onClick={() => this.touchAllExtrapolation(setTouched, errors, 0)}><i className="fa fa-check"></i>Extrapolate</Button></div>}
+                                            {this.state.forecastProgramId != "" && this.state.planningUnitId > 0 && this.state.regionId > 0 && <div className="row float-right mt-lg-3 mr-3 pb-2 pt-2 "><Button type="submit" id="extrapolateButton" size="md" color="info" className="float-right mr-1" onClick={() => this.touchAllExtrapolation(setTouched, errors, 0)}><i className="fa fa-check"></i>Extrapolate</Button></div>}
                                             {/* {this.state.showData && <div id="tableDiv" className="extrapolateTable pt-lg-5"></div>} */}
                                             <div className="row" style={{ display: this.state.show ? "block" : "none" }}>
                                                 <div className="col-md-10 pt-4 pb-3">
@@ -3448,7 +3553,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                     <CardFooter>
                         <FormGroup>
                             <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                            {this.state.forecastProgramId!="" && this.state.planningUnitId>0 && <button className="mr-1 float-right btn btn-info btn-md" onClick={this.toggledata}>{this.state.show ? i18n.t('static.common.hideData') : i18n.t('static.common.showData')}</button>}
+                            {this.state.forecastProgramId != "" && this.state.planningUnitId > 0 && <button className="mr-1 float-right btn btn-info btn-md" onClick={this.toggledata}>{this.state.show ? i18n.t('static.common.hideData') : i18n.t('static.common.showData')}</button>}
                             {this.state.showData && <> <Button type="button" id="dataCheck" size="md" color="info" className="float-right mr-1" onClick={() => this.openDataCheckModel()}><i className="fa fa-check"></i>{i18n.t('static.common.dataCheck')}</Button></>}
                             &nbsp;
                         </FormGroup>
