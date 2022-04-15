@@ -541,16 +541,8 @@ export default class ExtrapolateDataComponent extends React.Component {
                     var elInstance = el.jexcel;
                     var rowData = elInstance.getRowData(y);
                     if (rowData[1] !== "" && moment(rowData[0]).format("YYYY-MM") < moment(this.state.datasetJson.currentVersion.forecastStartDate).format("YYYY-MM")) {
-                        var cell = elInstance.getCell(("A").concat(parseInt(y) + 1))
-                        cell.classList.add('jexcelBoldCell');
-                    } else if (moment(rowData[0]).format("YYYY-MM") >= moment(this.state.datasetJson.currentVersion.forecastStartDate).format("YYYY-MM") && moment(rowData[0]).format("YYYY-MM") <= moment(this.state.datasetJson.currentVersion.forecastStopDate).format("YYYY-MM")) {
-                        if (rowData[1] !== "") {
-                            var cell = elInstance.getCell(("A").concat(parseInt(y) + 1))
-                            cell.classList.add('jexcelBoldPurpleCell');
-                        } else {
-                            var cell = elInstance.getCell(("A").concat(parseInt(y) + 1))
-                            cell.classList.add('jexcelPurpleCell');
-                        }
+                        // var cell = elInstance.getCell(("A").concat(parseInt(y) + 1))
+                        // cell.classList.add('jexcelBoldCell');
                         var cell = elInstance.getCell(("C").concat(parseInt(y) + 1))
                         cell.classList.add('jexcelPurpleCell');
                         var cell = elInstance.getCell(("D").concat(parseInt(y) + 1))
@@ -563,10 +555,30 @@ export default class ExtrapolateDataComponent extends React.Component {
                         cell.classList.add('jexcelPurpleCell');
                         var cell = elInstance.getCell(("H").concat(parseInt(y) + 1))
                         cell.classList.add('jexcelPurpleCell');
+                    } else if (moment(rowData[0]).format("YYYY-MM") >= moment(this.state.datasetJson.currentVersion.forecastStartDate).format("YYYY-MM") && moment(rowData[0]).format("YYYY-MM") <= moment(this.state.datasetJson.currentVersion.forecastStopDate).format("YYYY-MM")) {
+                        // if (rowData[1] !== "") {
+                        //     var cell = elInstance.getCell(("A").concat(parseInt(y) + 1))
+                        //     cell.classList.add('jexcelBoldPurpleCell');
+                        // } else {
+                            var cell = elInstance.getCell(("A").concat(parseInt(y) + 1))
+                            cell.classList.add('jexcelPurpleCell');
+                        // }
+                        var cell = elInstance.getCell(("C").concat(parseInt(y) + 1))
+                        cell.classList.add('jexcelBoldPurpleCell');
+                        var cell = elInstance.getCell(("D").concat(parseInt(y) + 1))
+                        cell.classList.add('jexcelBoldPurpleCell');
+                        var cell = elInstance.getCell(("E").concat(parseInt(y) + 1))
+                        cell.classList.add('jexcelBoldPurpleCell');
+                        var cell = elInstance.getCell(("F").concat(parseInt(y) + 1))
+                        cell.classList.add('jexcelBoldPurpleCell');
+                        var cell = elInstance.getCell(("G").concat(parseInt(y) + 1))
+                        cell.classList.add('jexcelBoldPurpleCell');
+                        var cell = elInstance.getCell(("H").concat(parseInt(y) + 1))
+                        cell.classList.add('jexcelBoldPurpleCell');
                     }
                     if (rowData[1] !== "") {
-                        var cell = elInstance.getCell(("B").concat(parseInt(y) + 1))
-                        cell.classList.add('jexcelBoldCell');
+                        // var cell = elInstance.getCell(("B").concat(parseInt(y) + 1))
+                        // cell.classList.add('jexcelBoldCell');
                     }
                 }
             }.bind(this),
