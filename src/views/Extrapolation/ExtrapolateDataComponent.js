@@ -474,6 +474,8 @@ export default class ExtrapolateDataComponent extends React.Component {
             data[5] = tesDataFilter.length > 0 && tesDataFilter[0].forecast != null ? (Number(tesDataFilter[0].forecast)) - Number(CI) > 0 ? ((Number(tesDataFilter[0].forecast)) - Number(CI)).toFixed(2) : 0 : '';
             data[6] = tesDataFilter.length > 0 && tesDataFilter[0].forecast != null ? Number(tesDataFilter[0].forecast).toFixed(2) : '';
             data[7] = tesDataFilter.length > 0 && tesDataFilter[0].forecast != null ? ((Number(tesDataFilter[0].forecast)) + Number(CI)).toFixed(2) : '';
+            data[8] = linearRegressionDataFilter.length > 0 && linearRegressionDataFilter[0].forecast != null && linearRegressionDataFilter[0].ci != undefined && linearRegressionDataFilter[0] != null ? (linearRegressionDataFilter[0].forecast - linearRegressionDataFilter[0].ci).toFixed(2) : '';
+            data[9] = linearRegressionDataFilter.length > 0 && linearRegressionDataFilter[0].forecast != null && linearRegressionDataFilter[0].ci != undefined && linearRegressionDataFilter[0] != null ? (linearRegressionDataFilter[0].forecast + linearRegressionDataFilter[0].ci).toFixed(2) : '';
             // data[8] = '';
             dataArray.push(data)
         }
@@ -528,7 +530,17 @@ export default class ExtrapolateDataComponent extends React.Component {
                         title: i18n.t('static.extrapolation.arima'),
                         type: this.state.arimaId ? 'numeric' : 'hidden',
                         mask: '#,##.00', decimal: '.'
-                    }
+                    },
+                    {
+                        title: i18n.t('static.extrapolation.linearRegression') + " L",
+                        type: this.state.linearRegressionId ? 'numeric' : 'hidden',
+                        mask: '#,##.00', decimal: '.'
+                    },
+                    {
+                        title: i18n.t('static.extrapolation.linearRegression') + " H",
+                        type: this.state.linearRegressionId ? 'numeric' : 'hidden',
+                        mask: '#,##.00', decimal: '.'
+                    },
                 ],
             text: {
                 // showingPage: `${i18n.t('static.jexcel.showing')} {0} ${i18n.t('static.jexcel.to')} {1} ${i18n.t('static.jexcel.of')} {1} ${i18n.t('static.jexcel.pages')}`,
@@ -560,8 +572,8 @@ export default class ExtrapolateDataComponent extends React.Component {
                         //     var cell = elInstance.getCell(("A").concat(parseInt(y) + 1))
                         //     cell.classList.add('jexcelBoldPurpleCell');
                         // } else {
-                            var cell = elInstance.getCell(("A").concat(parseInt(y) + 1))
-                            cell.classList.add('jexcelPurpleCell');
+                        var cell = elInstance.getCell(("A").concat(parseInt(y) + 1))
+                        cell.classList.add('jexcelPurpleCell');
                         // }
                         var cell = elInstance.getCell(("C").concat(parseInt(y) + 1))
                         cell.classList.add('jexcelBoldPurpleCell');
@@ -2568,6 +2580,25 @@ export default class ExtrapolateDataComponent extends React.Component {
             })
         }
         if (this.state.linearRegressionId) {
+            datasets.push({
+                type: "line",
+                pointRadius: 0,
+                lineTension: 0,
+                label: "Linear Regression Lower",
+                backgroundColor: 'transparent',
+                borderColor: '#EDB944',
+                borderStyle: 'dotted',
+                borderDash: [10, 10],
+                ticks: {
+                    fontSize: 2,
+                    fontColor: 'transparent',
+                },
+                showInLegend: true,
+                pointStyle: 'line',
+                pointBorderWidth: 5,
+                yValueFormatString: "###,###,###,###",
+                data: json.map((item, c) => c >= count && item[8] !== "" ? item[8] : null)
+            })
             datasets.push(
                 {
                     type: "line",
@@ -2586,6 +2617,25 @@ export default class ExtrapolateDataComponent extends React.Component {
                     yValueFormatString: "###,###,###,###",
                     data: json.map((item, c) => c >= count && item[4] !== "" ? item[4] : null)
                 })
+            datasets.push({
+                type: "line",
+                pointRadius: 0,
+                lineTension: 0,
+                label: "Linear Regression Higher",
+                backgroundColor: 'transparent',
+                borderColor: '#EDB944',
+                borderStyle: 'dotted',
+                borderDash: [10, 10],
+                ticks: {
+                    fontSize: 2,
+                    fontColor: 'transparent',
+                },
+                showInLegend: true,
+                pointStyle: 'line',
+                pointBorderWidth: 5,
+                yValueFormatString: "###,###,###,###",
+                data: json.map((item, c) => c >= count && item[9] !== "" ? item[9] : null)
+            })
         }
         if (this.state.smoothingId) {
             datasets.push({
@@ -3412,7 +3462,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                     </div>
                                                 </div>}
                                             {this.state.dataChanged && this.state.extrapolateClicked && <div className="row float-right mt-lg-3 mr-0 pb-2 pt-2 "> <Button type="submit" id="formSubmitButton" size="md" color="success" className="float-right mr-0" onClick={() => this.touchAllExtrapolation(setTouched, errors, 1)}><i className="fa fa-check"></i>{i18n.t('static.pipeline.save')}</Button>&nbsp;</div>}
-                                            {this.state.forecastProgramId!="" && this.state.planningUnitId>0 && this.state.regionId>0 && <div className="row float-right mt-lg-3 mr-3 pb-2 pt-2 "><Button type="submit" id="extrapolateButton" size="md" color="info" className="float-right mr-1" onClick={() => this.touchAllExtrapolation(setTouched, errors, 0)}><i className="fa fa-check"></i>Extrapolate</Button></div>}
+                                            {this.state.forecastProgramId != "" && this.state.planningUnitId > 0 && this.state.regionId > 0 && <div className="row float-right mt-lg-3 mr-3 pb-2 pt-2 "><Button type="submit" id="extrapolateButton" size="md" color="info" className="float-right mr-1" onClick={() => this.touchAllExtrapolation(setTouched, errors, 0)}><i className="fa fa-check"></i>Extrapolate</Button></div>}
                                             {/* {this.state.showData && <div id="tableDiv" className="extrapolateTable pt-lg-5"></div>} */}
                                             <div className="row" style={{ display: this.state.show ? "block" : "none" }}>
                                                 <div className="col-md-10 pt-4 pb-3">
@@ -3448,7 +3498,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                     <CardFooter>
                         <FormGroup>
                             <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                            {this.state.forecastProgramId!="" && this.state.planningUnitId>0 && <button className="mr-1 float-right btn btn-info btn-md" onClick={this.toggledata}>{this.state.show ? i18n.t('static.common.hideData') : i18n.t('static.common.showData')}</button>}
+                            {this.state.forecastProgramId != "" && this.state.planningUnitId > 0 && <button className="mr-1 float-right btn btn-info btn-md" onClick={this.toggledata}>{this.state.show ? i18n.t('static.common.hideData') : i18n.t('static.common.showData')}</button>}
                             {this.state.showData && <> <Button type="button" id="dataCheck" size="md" color="info" className="float-right mr-1" onClick={() => this.openDataCheckModel()}><i className="fa fa-check"></i>{i18n.t('static.common.dataCheck')}</Button></>}
                             &nbsp;
                         </FormGroup>
