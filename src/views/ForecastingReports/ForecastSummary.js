@@ -740,10 +740,10 @@ class ForecastSummary extends Component {
                     let regionList = summeryData[j].regionListForSinglePlanningUnit;
                     for (var k = 0; k < regionList.length; k++) {
                         tempData.push(regionList[k].selectedForecast);
-                        tempData.push(regionList[k].forecastQuantity);
+                        tempData.push((regionList[k].forecastQuantity == null || regionList[k].forecastQuantity == '' ? regionList[k].forecastQuantity : (regionList[k].forecastQuantity).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")));
                         tempData.push(regionList[k].notes);
                     }
-                    tempData.push(summeryData[j].totalForecastQuantity);
+                    tempData.push((summeryData[j].totalForecastQuantity).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","));
 
 
                     data.push(tempData);
@@ -1265,9 +1265,10 @@ class ForecastSummary extends Component {
                                     let stock2 = (planningUnitList[j].stock + planningUnitList[j].existingShipments) - totalForecastedQuantity0ri;
                                     let isStock2Red = (stock2 < 0 ? true : false);
                                     let desiredMonthOfStock1 = planningUnitList[j].monthsOfStock;
-                                    let desiredMonthOfStock2 = planningUnitList[j].monthsOfStock * totalForecastedQuantity0ri / total_months;
+                                    let desiredMonthOfStock2 = parseFloat(planningUnitList[j].monthsOfStock * totalForecastedQuantity0ri / total_months).toFixed(2);
                                     let tempProcurementGap = ((planningUnitList[j].stock + planningUnitList[j].existingShipments) - totalForecastedQuantity0ri) - (planningUnitList[j].monthsOfStock * totalForecastedQuantity0ri / total_months);
                                     let procurementGap = (tempProcurementGap < 0 ? tempProcurementGap : tempProcurementGap);
+                                    procurementGap = parseFloat(procurementGap).toFixed(2)
                                     let isProcurementGapRed = (tempProcurementGap < 0 ? true : false)
                                     let priceType = (planningUnitList[j].procurementAgent == null && planningUnitList[j].price == null ? i18n.t('static.forecastReport.NoPriceTypeAvailable') : (planningUnitList[j].procurementAgent != null ? planningUnitList[j].procurementAgent.code : i18n.t('static.forecastReport.custom')));
                                     let isPriceTypeRed = (planningUnitList[j].procurementAgent == null && planningUnitList[j].price == null ? true : false);

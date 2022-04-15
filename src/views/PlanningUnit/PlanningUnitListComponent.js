@@ -775,12 +775,13 @@ export default class PlanningUnitListComponent extends Component {
         var options = {
             data: data,
             columnDrag: true,
-            colWidths: [150, 150, 100],
+            colWidths: [70, 150, 150, 100],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
-                    title: 'planningUnitId',
-                    type: 'hidden',
+                    title: i18n.t('static.dataEntry.planningUnitId'),
+                    type: 'text',
+                    readOnly: true
                 },
                 {
                     title: i18n.t('static.product.productName'),
