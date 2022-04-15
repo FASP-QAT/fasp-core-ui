@@ -779,8 +779,8 @@ export default class TreeExtrapolationComponent extends React.Component {
                     month: extrapolationDataList[i].month,
                     amount: extrapolationDataList[i].amount,
                     reportingRate: extrapolationDataList[i].reportingRate,
-                    monthNo: resultCount
-                    // adjustedActuals:map1.get("3") != "" ? map1.get("3").toString().replaceAll(",", "") : map1.get("3")
+                    monthNo: resultCount,
+                    adjustedActuals: extrapolationDataList[i].amount / (extrapolationDataList[i].reportingRate / 100)
                 }
                 jexcelDataArr.push(json);
             }
@@ -962,11 +962,13 @@ export default class TreeExtrapolationComponent extends React.Component {
                                 console.log("month--->>>", monthArray[j]);
                                 console.log(moment(monthArray[j]).format("YYYY-MM") + " " + "missingActualData---", missingActualData);
                                 const index = jexcelDataArr.findIndex(c => c.month == monthArray[j]);
+                                var amount = missingActualData % 1 != 0 ? missingActualData.toFixed(4) : missingActualData;
                                 var json = {
                                     month: monthArray[j],
-                                    amount: missingActualData % 1 != 0 ? missingActualData.toFixed(4) : missingActualData,
+                                    amount: amount,
                                     reportingRate: dataArr.reportingRate,
-                                    manualChange: dataArr.manualChange
+                                    manualChange: dataArr.manualChange,
+                                    adjustedActuals: amount / (dataArr.reportingRate / 100)
                                 }
                                 jexcelDataArr.splice(index, 1, json);
                                 // interpolatedData.push(json);
@@ -2425,7 +2427,12 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                     </Popover>
                                                 </div>
                                                 <FormGroup className="col-md-3 pl-lg-0">
-                                                    <Label htmlFor="appendedInputButton">Start Month for Historical Data<span className="stock-box-icon fa fa-sort-desc ml-1"></span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover28" onClick={this.toggleStartMonth} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
+                                                    <Label htmlFor="appendedInputButton">Start Month for Historical Data<i class="fa fa-info-circle icons pl-lg-2" id="Popover28" onClick={this.toggleStartMonth} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
+                                                    {/* <input type="text" 
+                                                    bsize="md"
+                                                    readOnly="true"
+                                                    value={moment(this.props.items.currentScenario.month).format('MMM.YYYY')} 
+                                                    /> */}
                                                     <div className="controls edit disabledColor">
                                                         <Picker
 
@@ -2434,14 +2441,14 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                             ref={this.pickAMonth1}
                                                             years={{ min: this.props.items.minDate, max: this.props.items.maxDate }}
                                                             value={{
-                                                                year: new Date(this.props.items.currentScenario.month).getFullYear(), month: ("0" + (new Date(this.props.items.currentScenario.month).getMonth() + 1)).slice(-2)
+                                                                year: new Date(this.props.items.currentScenario.month.replace(/-/g, '\/')).getFullYear(), month: ("0" + (new Date(this.props.items.currentScenario.month.replace(/-/g, '\/')).getMonth() + 1)).slice(-2)
                                                             }}
-                                                            lang={pickerLang.months}
+                                                            lang={pickerLang}
                                                         // theme="dark"
                                                         // onChange={this.handleAMonthChange1}
                                                         // onDismiss={this.handleAMonthDissmis1}
                                                         >
-                                                            <MonthBox value={this.makeText({ year: new Date(this.props.items.currentScenario.month).getFullYear(), month: ("0" + (new Date(this.props.items.currentScenario.month).getMonth() + 1)).slice(-2) })}
+                                                            <MonthBox value={this.makeText({ year: new Date(this.props.items.currentScenario.month.replace(/-/g, '\/')).getFullYear(), month: ("0" + (new Date(this.props.items.currentScenario.month.replace(/-/g, '\/')).getMonth() + 1)).slice(-2) })}
                                                             />
                                                         </Picker>
                                                     </div>
