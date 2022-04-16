@@ -1,7 +1,7 @@
 import regression from 'regression';
 import { calculateError } from '../Extrapolation/ErrorCalculations.js';
 import { calculateCI } from './CalculateCI.js';
-export function calculateLinearRegression(inputData, noOfProjectionMonths, props) {
+export function calculateLinearRegression(inputData,confidence, noOfProjectionMonths, props) {
     console.log("InputData@@@", inputData)
     const data = inputData;
 
@@ -24,7 +24,7 @@ export function calculateLinearRegression(inputData, noOfProjectionMonths, props
         }
     }
     calculateError(data, "linearRegressionError", props);
-    calculateCI(data, 0.99, "linearRegressionData", props);
+    calculateCI(data, confidence, "linearRegressionData", props);
     // props.updateState("", data);
     // // Print the output
     // for (let y=1; y<=actualMonths+noOfMonthsForProjection; y++) {

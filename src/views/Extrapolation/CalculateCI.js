@@ -12,6 +12,8 @@ export function calculateCI(data, confidence, methodName, props) {
             data[x].ci = zValue * stdDev / sqrt(population.length)
         }
     }
+    console.log("confidence@@@@@@@@@@@&&&&&&&&&&&&&&&&&&&&&&",confidence)
+    console.log("Data@@@@@@@@@@@&&&&&&&&&&&&&&&&&&&&&",data)
     props.updateState(methodName, data);
 }
 
