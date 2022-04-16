@@ -2272,5 +2272,9 @@
     "static.extrapolation.missingDataNotePart1":"You have months with no actual consumption data, which will cause unexpected results in the extrapolation. Return to the ",
     "static.extrapolation.missingDataNotePart2":"screen to fill in or interpolate the missing data.",
     "static.validation.includeOnlySelectedForecast":"Include only Selected Forecasts",
-    "static.dataentry.maxRange":"Please select date range within 36 months"
+    "static.dataentry.maxRange":"Please select date range within 36 months",
+    "static.extrapolation.arimaLower":"Arima (Lower Confidence Bound)",
+    "static.extrapolation.arimaUpper":"Arima (Upper Confidence Bound)",
+    "static.extrapolation.lrLower":"Linear Regression (Lower Confidence Bound)",
+    "static.extrapolation.lrUpper":"Linear Regression (Upper Confidence Bound)"
 }
