@@ -4,7 +4,7 @@ import i18n from "../../i18n";
 import { calculateCI } from "./CalculateCI";
 import { calculateError } from "./ErrorCalculations";
 
-export function calculateArima(inputData, p, d, q, confidenceLevel, noOfProjectionMonths, props, minStartDate) {
+export function calculateArima(inputData, p, d, q, confidenceLevel, noOfProjectionMonths, props, minStartDate, isTreeExtrapolation) {
     console.log("inputData@@@@@@", inputData);
     console.log("@@@@@@@@noOfMonthsForProjection", noOfProjectionMonths)
     var startYear = moment(minStartDate).format("YYYY");
@@ -29,7 +29,7 @@ export function calculateArima(inputData, p, d, q, confidenceLevel, noOfProjecti
         "q": Number(q),
         "n": Number(noOfProjectionMonths)
     }
-    console.log("Json@@@@@@", json);
+    console.log("JsonArima@@@@@@", json);
     ExtrapolationService.arima(json)
         .then(response => {
             if (response.status == 200) {
@@ -53,14 +53,16 @@ export function calculateArima(inputData, p, d, q, confidenceLevel, noOfProjecti
             }
         }).catch(error => {
             console.log("Error@@@@@@", error)
-            props.updateState("showData",false);
-            props.updateState("dataEl","");
-            props.updateState("loading",false);
-            props.updateState("noDataMessage",i18n.t('static.extrapolation.errorOccured'));
-            props.updateState("dataChanged",false);
-            props.updateState("show",false);
-            props.el = jexcel(document.getElementById("tableDiv"), '');
-            props.el.destroy();
+            if (!isTreeExtrapolation) {
+                props.updateState("showData", false);
+                props.updateState("dataEl", "");
+                props.updateState("loading", false);
+                props.updateState("noDataMessage", i18n.t('static.extrapolation.errorOccured'));
+                props.updateState("dataChanged", false);
+                props.updateState("show", false);
+                // props.el = jexcel(document.getElementById("tableDiv"), '');
+                // props.el.destroy();
+            }
         })
 
 }
