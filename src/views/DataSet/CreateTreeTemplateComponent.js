@@ -1421,7 +1421,7 @@ export default class CreateTreeTemplate extends Component {
             var startDate = map1.get("1");
             var stopDate = map1.get("2");
             var modelingTypeId = map1.get("4");
-            var dataValue = modelingTypeId == 2 ? map1.get("7").toString().replaceAll(",","").replaceAll("%","") : map1.get("6").toString().replaceAll(",","").replaceAll("%","");
+            var dataValue = modelingTypeId == 2 ? map1.get("7").toString().replaceAll(",", "").replaceAll("%", "") : map1.get("6").toString().replaceAll(",", "").replaceAll("%", "");
             console.log("startDate---", startDate);
             console.log("stopDate---", stopDate);
             const result = date >= startDate && date <= stopDate ? true : false;
@@ -5769,7 +5769,7 @@ export default class CreateTreeTemplate extends Component {
     }
     onRemoveButtonClick(itemConfig) {
         this.setState({ loading: true }, () => {
-            const { items } = this.state;
+            var { items } = this.state;
             const ids = items.map(o => o.id)
             const filtered = items.filter(({ id }, index) => !ids.includes(id, index + 1))
             console.log("delete unique items---", filtered)
@@ -6538,14 +6538,14 @@ export default class CreateTreeTemplate extends Component {
                                             </Popover>
                                         </div>
                                         <FormGroup className="col-md-6" style={{ display: this.state.numberNode ? 'block' : 'none' }}>
-                                            <Label htmlFor="currencyId">{i18n.t('static.tree.parentValue')} {this.state.currentItemConfig.context.level != 0 && i18n.t('static.common.for')} {this.state.currentItemConfig.context.level != 0 && moment(this.state.currentItemConfig.context.payload.nodeDataMap[0][0].monthNo).format(`MMM-YYYY`)} <i class="fa fa-info-circle icons pl-lg-2" id="Popover6" onClick={this.toggleParentValue} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
+                                            <Label htmlFor="currencyId">{i18n.t('static.tree.parentValue')} {this.state.currentItemConfig.context.level != 0 && i18n.t('static.common.for')}{" Month "} {this.state.currentItemConfig.context.level != 0 && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].monthNo} <i class="fa fa-info-circle icons pl-lg-2" id="Popover6" onClick={this.toggleParentValue} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                             <Input type="text"
                                                 id="parentValue"
                                                 name="parentValue"
                                                 bsSize="sm"
                                                 readOnly={true}
                                                 onChange={(e) => { this.dataChange(e) }}
-                                                value={addCommas(this.state.parentValue.toString())}
+                                                value={addCommas(this.state.parentValue).toString()}
                                             ></Input>
                                         </FormGroup>
                                         {/* </> */}
@@ -8969,6 +8969,8 @@ export default class CreateTreeTemplate extends Component {
                                                                         name="monthsInPast"
                                                                         id="monthsInPast"
                                                                         bsSize="sm"
+                                                                        min={0}
+                                                                        step={1}
                                                                         valid={!errors.monthsInPast && this.state.treeTemplate.monthsInPast != ''}
                                                                         invalid={touched.monthsInPast && !!errors.monthsInPast}
                                                                         onChange={(e) => { handleChange(e); this.dataChange(e) }}
@@ -8991,7 +8993,8 @@ export default class CreateTreeTemplate extends Component {
                                                                         name="monthsInFuture"
                                                                         id="monthsInFuture"
                                                                         bsSize="sm"
-                                                                        min="0"
+                                                                        min={0}
+                                                                        step={1}
                                                                         valid={!errors.monthsInFuture && this.state.treeTemplate.monthsInFuture != ''}
                                                                         invalid={touched.monthsInFuture && !!errors.monthsInFuture}
                                                                         onChange={(e) => { handleChange(e); this.dataChange(e) }}
