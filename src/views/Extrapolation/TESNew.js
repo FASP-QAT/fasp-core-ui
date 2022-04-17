@@ -5,7 +5,7 @@ import { calculateCI } from "./CalculateCI";
 import { calculateError } from "./ErrorCalculations";
 import jexcel from 'jexcel-pro';
 
-export function calculateTES(inputData, alphaParam, betaParam, gammaParam, confidenceLevel, seasonality, noOfProjectionMonths, props, minStartDate) {
+export function calculateTES(inputData, alphaParam, betaParam, gammaParam, confidenceLevel, seasonality, noOfProjectionMonths, props, minStartDate, isTreeExtrapolation) {
     console.log("inputData@@@@@@", inputData);
     console.log("@@@@@@@@noOfMonthsForProjection", noOfProjectionMonths)
     var startYear = moment(minStartDate).format("YYYY");
@@ -54,14 +54,16 @@ export function calculateTES(inputData, alphaParam, betaParam, gammaParam, confi
             }
         }).catch(error => {
             console.log("Error@@@@@@", error)
-            props.updateState("showData",false);
-            props.updateState("dataEl","");
-            props.updateState("loading",false);
-            props.updateState("noDataMessage",i18n.t('static.extrapolation.errorOccured'));
-            props.updateState("dataChanged",false);
-            props.updateState("show",false);
-            props.el = jexcel(document.getElementById("tableDiv"), '');
-            props.el.destroy();
+            if (!isTreeExtrapolation) {
+                props.updateState("showData", false);
+                props.updateState("dataEl", "");
+                props.updateState("loading", false);
+                props.updateState("noDataMessage", i18n.t('static.extrapolation.errorOccured'));
+                props.updateState("dataChanged", false);
+                props.updateState("show", false);
+                // props.el = jexcel(document.getElementById("tableDiv"), '');
+                // props.el.destroy();
+            }
         })
 
 }
