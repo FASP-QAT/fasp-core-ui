@@ -3,6 +3,7 @@ import ExtrapolationService from "../../api/ExtrapolationService";
 import i18n from "../../i18n";
 import { calculateCI } from "./CalculateCI";
 import { calculateError } from "./ErrorCalculations";
+import jexcel from 'jexcel-pro';
 
 export function calculateTES(inputData, alphaParam, betaParam, gammaParam, confidenceLevel, seasonality, noOfProjectionMonths, props, minStartDate) {
     console.log("inputData@@@@@@", inputData);

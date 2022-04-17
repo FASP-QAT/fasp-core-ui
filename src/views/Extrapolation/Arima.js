@@ -3,6 +3,7 @@ import ExtrapolationService from "../../api/ExtrapolationService";
 import i18n from "../../i18n";
 import { calculateCI } from "./CalculateCI";
 import { calculateError } from "./ErrorCalculations";
+import jexcel from 'jexcel-pro';
 
 export function calculateArima(inputData, p, d, q, confidenceLevel, noOfProjectionMonths, props, minStartDate) {
     console.log("inputData@@@@@@", inputData);
