@@ -428,8 +428,8 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                 calculatedValueForLag.push(calculatedValue);
                                 var lag = nodeDataMapForScenario.fuNode.lagInMonths;
                                 console.log("Lag in months++++", lag);
-                                if (i >= lag) {
-                                    calculatedValue = calculatedValueForLag[i - lag];
+                                if (countOfI >= lag) {
+                                    calculatedValue = calculatedValueForLag[countOfI - lag];
                                 } else {
                                     calculatedValue = 0;
                                 }
@@ -538,13 +538,14 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
 
                                     var lag = parentNodeNodeData.fuNode.lagInMonths;
                                     var noOfFus = 0;
-                                    if (i >= lag) {
+                                    if (countOfI >= lag) {
                                         var nodeDataMomForParentPerc = parentNodeNodeData.nodeDataMomList.filter(c => c.month == i);
                                         var percentageToMultiply = 0;
                                         if (nodeDataMomForParentPerc.length > 0) {
                                             percentageToMultiply = nodeDataMomForParentPerc[0].endValue;
                                         }
-                                        noOfFus = (((calculatedMMdPatients.filter(c => c.month == i - lag)[0].value * percentageToMultiply / 100) * noOfBottlesInOneVisit) * fuPerPu).toFixed(2);
+                                        var diffForI=countOfI-lag==0?1:countOfI-lag;
+                                        noOfFus = (((calculatedMMdPatients.filter(c => c.month == diffForI)[0].value * percentageToMultiply / 100) * noOfBottlesInOneVisit) * fuPerPu).toFixed(2);
                                     } else {
                                         noOfFus = 0;
                                     }
