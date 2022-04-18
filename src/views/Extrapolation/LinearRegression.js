@@ -24,7 +24,7 @@ export function calculateLinearRegression(inputData,confidence, noOfProjectionMo
         }
     }
     calculateError(data, "linearRegressionError", props);
-    calculateCI(data, confidence, "linearRegressionData", props);
+    calculateCI(data, Number(confidence), "linearRegressionData", props);
     // props.updateState("", data);
     // // Print the output
     // for (let y=1; y<=actualMonths+noOfMonthsForProjection; y++) {
