@@ -833,15 +833,15 @@ export default class ExtrapolateDataComponent extends React.Component {
             })
         } catch (error) {
             console.log("Error@@@@@@", error)
-            this.el = jexcel(document.getElementById("tableDiv"), '');
-            this.el.destroy();
+            // this.el = jexcel(document.getElementById("tableDiv"), '');
+            // this.el.destroy();
             this.setState({
-                showData: false,
-                dataEl: "",
+                // showData: false,
+                // dataEl: "",
                 loading: false,
                 noDataMessage: i18n.t('static.extrapolation.errorOccured'),
-                dataChanged: false,
-                show: false
+                dataChanged: true,
+                // show: false
             })
         }
         // } else {
