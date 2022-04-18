@@ -313,7 +313,7 @@ export default class TreeExtrapolationComponent extends React.Component {
             semiAvgData: [],
             linearRegressionData: [],
             tesData: [],
-            arimaData:[],
+            arimaData: [],
             movingAvgError: { "rmse": "", "mape": "", "mse": "", "wape": "", "rSqd": "" },
             semiAvgError: { "rmse": "", "mape": "", "mse": "", "wape": "", "rSqd": "" },
             linearRegressionError: { "rmse": "", "mape": "", "mse": "", "wape": "", "rSqd": "" },
@@ -574,6 +574,7 @@ export default class TreeExtrapolationComponent extends React.Component {
             }
             console.log("extrapolation data----", currentItemConfig);
             this.props.updateState("currentItemConfig", currentItemConfig);
+
         });
     }
 
@@ -1302,9 +1303,15 @@ export default class TreeExtrapolationComponent extends React.Component {
         var curDate1 = minStartDate;
         // monthArray.push('2019-01-01');
 
-        for (var m = 0; curDate1 < moment(forecastStopDate).add(-1, 'months').format("YYYY-MM-DD"); m++) {
+        for (var m = 0; curDate1 < moment(forecastStopDate).format("YYYY-MM-DD"); m++) {
+            console.log("curDate1---", curDate1 + " stop date---", moment(forecastStopDate).format("YYYY-MM-DD") + " result---", curDate1 < moment(forecastStopDate).format("YYYY-MM-DD"));
+            console.log("");
             curDate1 = moment(minStartDate).add(m, 'months').format("YYYY-MM-DD");
-            monthArray.push(curDate1)
+            console.log("curDate1 only---", curDate1);
+            if (moment(forecastStopDate).format("YYYY-MM-DD") >= curDate1) {
+                monthArray.push(curDate1)
+            }
+
         }
         this.setState({ monthArray });
         // monthArray.push('2025-01-01');
@@ -1501,7 +1508,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                 if (y != null) {
                     var rowData = elInstance.getRowData(y);
                     // if (rowData[0] != "") {
-                    if (moment(rowData[0]).isBetween(this.props.items.forecastStartDate, this.props.items.forecastStopDate, undefined, '[)')) {
+                    if (moment(rowData[0]).isBetween(this.props.items.forecastStartDate, this.props.items.forecastStopDate, undefined, '[]')) {
                         var cell = elInstance.getCell(("A").concat(parseInt(y) + 1))
                         cell.classList.add('bold');
                     } else {
@@ -3176,7 +3183,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                                     <td style={{ textAlign: "right", "fontWeight": this.state.minRmse == this.state.tesError.rmse ? "bold" : "normal" }} bgcolor={this.state.minRmse == this.state.tesError.rmse ? "#86cd99" : "#FFFFFF"}>{this.state.tesError.rmse != "" ? addCommasExtrapolation(this.state.tesError.rmse.toFixed(4).toString()) : ""}</td>
                                                                 }
                                                                 {this.state.arimaId &&
-                                                                      <td style={{ textAlign: "right", "fontWeight": this.state.minRmse == this.state.arimaError.rmse ? "bold" : "normal" }} bgcolor={this.state.minRmse == this.state.arimaError.rmse ? "#86cd99" : "#FFFFFF"}>{this.state.arimaError.rmse != "" ? addCommasExtrapolation(this.state.arimaError.rmse.toFixed(4).toString()) : ""}</td>
+                                                                    <td style={{ textAlign: "right", "fontWeight": this.state.minRmse == this.state.arimaError.rmse ? "bold" : "normal" }} bgcolor={this.state.minRmse == this.state.arimaError.rmse ? "#86cd99" : "#FFFFFF"}>{this.state.arimaError.rmse != "" ? addCommasExtrapolation(this.state.arimaError.rmse.toFixed(4).toString()) : ""}</td>
                                                                 }
                                                             </tr>
                                                             <tr>
@@ -3194,7 +3201,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                                     <td style={{ textAlign: "right", "fontWeight": this.state.minMape == this.state.tesError.mape ? "bold" : "normal" }} bgcolor={this.state.minMape == this.state.tesError.mape ? "#86cd99" : "#FFFFFF"}>{this.state.tesError.mape != "" ? addCommasExtrapolation(this.state.tesError.mape.toFixed(4).toString()) : ""}</td>
                                                                 }
                                                                 {this.state.arimaId &&
-                                                                        <td style={{ textAlign: "right", "fontWeight": this.state.minMape == this.state.arimaError.mape ? "bold" : "normal" }} bgcolor={this.state.minMape == this.state.arimaError.mape ? "#86cd99" : "#FFFFFF"}>{this.state.arimaError.mape != "" ? addCommasExtrapolation(this.state.arimaError.mape.toFixed(4).toString()) : ""}</td>
+                                                                    <td style={{ textAlign: "right", "fontWeight": this.state.minMape == this.state.arimaError.mape ? "bold" : "normal" }} bgcolor={this.state.minMape == this.state.arimaError.mape ? "#86cd99" : "#FFFFFF"}>{this.state.arimaError.mape != "" ? addCommasExtrapolation(this.state.arimaError.mape.toFixed(4).toString()) : ""}</td>
                                                                 }
                                                             </tr>
                                                             <tr>
