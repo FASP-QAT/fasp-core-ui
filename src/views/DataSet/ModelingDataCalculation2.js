@@ -642,7 +642,7 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                 var lag = parentNodeNodeData.fuNode.lagInMonths;
                                 var noOfFus = 0;
                                 if (i >= lag) {
-                                    var nodeDataMomForParentPerc = parentNodeNodeData.nodeDataMomList.filter(c => moment(c.month).format("YYYY-MM") == moment(curDate).format("YYYY-MM"));
+                                    var nodeDataMomForParentPerc = parentNodeNodeData.nodeDataMomList.filter(c => moment(c.month).format("YYYY-MM") == moment(curDate).subtract(lag, 'months').format("YYYY-MM"));
                                     var percentageToMultiply = 0;
                                     if (nodeDataMomForParentPerc.length > 0) {
                                         percentageToMultiply = nodeDataMomForParentPerc[0].endValue;
@@ -653,8 +653,13 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                 }
 
                                 // if (parentNodeNodeData.fuNode.usageType.id == 2) {
+                                if (i >= lag) {
+                                    var percentageOfEndValue = nodeDataList.filter(c => moment(c.month).format("YYYY-MM") == moment(curDate).subtract(lag, 'months').format("YYYY-MM"))[0].endValue;
+                                    calculatedMmdValue = Math.round((noOfFus * percentageOfEndValue / 100) / fuPerPu);
+                                } else {
+                                    calculatedMmdValue = 0;
+                                }
 
-                                calculatedMmdValue = Math.round((noOfFus * endValue / 100) / fuPerPu);
                                 // }
                                 // var grandParent = parentFiltered.parent;
                                 // var grandParentFiltered = (flatListUnsorted.filter(c => c.id == grandParent))[0];
