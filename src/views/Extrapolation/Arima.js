@@ -61,8 +61,8 @@ export function calculateArima(inputData, p, d, q, confidenceLevel, noOfProjecti
                 props.updateState("noDataMessage", i18n.t('static.extrapolation.errorOccured'));
                 props.updateState("dataChanged", false);
                 props.updateState("show", false);
-                // props.el = jexcel(document.getElementById("tableDiv"), '');
-                // props.el.destroy();
+                props.el = jexcel(document.getElementById("tableDiv"), '');
+                props.el.destroy();
             }
         })
 
