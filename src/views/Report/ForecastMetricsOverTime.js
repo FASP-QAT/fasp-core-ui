@@ -144,7 +144,7 @@ class ForcastMatrixOverTime extends Component {
     document.getElementById('div2').style.display = 'block';
     setTimeout(function () {
       document.getElementById('div2').style.display = 'none';
-    }, 8000);
+    }, 30000);
   }
 
   formatter = value => {

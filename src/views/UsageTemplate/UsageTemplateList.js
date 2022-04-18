@@ -179,7 +179,7 @@ class usageTemplate extends Component {
         document.getElementById('div2').style.display = 'block';
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
-        }, 8000);
+        }, 30000);
     }
 
     getForcastingUnitById(forecastingUnitId) {
@@ -2072,6 +2072,10 @@ class usageTemplate extends Component {
                 VLookUp = usagePeriodObj.convertToMonth;
             }
 
+            console.log("Checked----------->1.1", v14);
+            console.log("Checked----------->2.1", VLookUp);
+            console.log("Checked----------->3.1", t14);
+
             let string = (selectedOneTimeUsageID ? o14 : v14 / VLookUp * t14);
             if (v14 != null && v14 != '' && VLookUp != null && VLookUp != '') {
                 // this.el.setValueFromCoords(22, y, parseFloat(string).toFixed(2), true);
@@ -2109,16 +2113,16 @@ class usageTemplate extends Component {
                 unitName1 = this.state.unitList.filter(c => c.id == unitId)[0].name;
             }
 
-            let string = 'Every ' + this.el.getValue(`I${parseInt(y) + 1}`, true) + ' ' + unitName + '(s) - requires ' + this.el.getValue(`L${parseInt(y) + 1}`, true) + " " + unitName1;
+            let string = 'Every ' + (this.el.getValue(`I${parseInt(y) + 1}`, true) == '' ? '_' : this.el.getValue(`I${parseInt(y) + 1}`, true)) + ' ' + (unitName == '' ? '_' : unitName) + '(s) - requires ' + (this.el.getValue(`L${parseInt(y) + 1}`, true) == '' ? '_' : this.el.getValue(`L${parseInt(y) + 1}`, true)) + " " + (unitName1 == '' ? '_' : unitName1);
 
             // let string = 'Every ' + this.el.getValue(`I${parseInt(y) + 1}`, true) + ' patient - requires ' + this.el.getValue(`L${parseInt(y) + 1}`, true) + " " + this.el.getValue(`M${parseInt(y) + 1}`, true);
 
             if (!this.el.getValueFromCoords(14, y)) {//one time usage false
-                string += " " + this.el.getValue(`P${parseInt(y) + 1}`, true) + " " + this.el.getValue(`Q${parseInt(y) + 1}`, true) + " " + this.el.getValue(`R${parseInt(y) + 1}`, true);
+                string += " " + (this.el.getValue(`P${parseInt(y) + 1}`, true) == '' ? '_' : this.el.getValue(`P${parseInt(y) + 1}`, true)) + " " + (this.el.getValue(`Q${parseInt(y) + 1}`, true) == '' ? '_' : this.el.getValue(`Q${parseInt(y) + 1}`, true)) + " " + (this.el.getValue(`R${parseInt(y) + 1}`, true) == '' ? '_' : this.el.getValue(`R${parseInt(y) + 1}`, true));
                 if (this.el.getValueFromCoords(6, y) == 2) {
-                    string += " " + this.el.getValue(`V${parseInt(y) + 1}`, true);
+                    string += " " + (this.el.getValue(`V${parseInt(y) + 1}`, true) == '' ? '_' : this.el.getValue(`V${parseInt(y) + 1}`, true));
                 } else {
-                    string += " " + this.el.getValue(`T${parseInt(y) + 1}`, true) + " " + this.el.getValue(`U${parseInt(y) + 1}`, true) + " " + this.el.getValue(`V${parseInt(y) + 1}`, true);
+                    string += " " + (this.el.getValue(`T${parseInt(y) + 1}`, true) == '' ? '_' : this.el.getValue(`T${parseInt(y) + 1}`, true)) + " " + (this.el.getValue(`U${parseInt(y) + 1}`, true) == '' ? '_' : this.el.getValue(`U${parseInt(y) + 1}`, true)) + " " + (this.el.getValue(`V${parseInt(y) + 1}`, true) == '' ? '_' : this.el.getValue(`V${parseInt(y) + 1}`, true));
                 }
             }
 
@@ -2131,7 +2135,7 @@ class usageTemplate extends Component {
         // if (x != 24) {
         //     this.el.setValueFromCoords(24, y, 1, true);
         // }
-        if (x == 14) {
+        if (x == 14 || x == 15 || x == 17) {
             this.el.setValueFromCoords(24, y, 1, true);
         }
 
@@ -2989,7 +2993,7 @@ class usageTemplate extends Component {
                             <h5>{i18n.t('static.usageTemplate.usageTemplateText')}</h5>
                             <span className=""><h5><i class="fa fa-calculator" aria-hidden="true"></i>  {i18n.t('static.usageTemplate.calculatorReminderText')}</h5></span>
                             <div className="UsageTemplateTable">
-                                <div id="paputableDiv" className="table-responsive consumptionDataEntryTable" style={{ display: this.state.loading ? "none" : "block" }}>
+                                <div id="paputableDiv" className="table-responsive consumptionDataEntryTable usageTemplateDataEntryTable" style={{ display: this.state.loading ? "none" : "block" }}>
                                 </div>
                             </div>
                             <div style={{ display: this.state.loading ? "block" : "none" }}>

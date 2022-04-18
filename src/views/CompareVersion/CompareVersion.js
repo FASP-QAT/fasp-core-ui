@@ -97,7 +97,7 @@ class CompareVersion extends Component {
             this.getVersionList();
         })
     }
-    
+
 
     // loaded = function (instance, cell, x, y, value) {
     //     jExcelLoadedFunctionOnlyHideRow(instance);
@@ -287,6 +287,7 @@ class CompareVersion extends Component {
                     var json = {
                         id: responseData[rd].programId,
                         name: getLabelText(responseData[rd].label, this.state.lang),
+                        code: responseData[rd].programCode,
                         versionList: responseData[rd].versionList
                     }
                     datasetList.push(json);
@@ -340,6 +341,7 @@ class CompareVersion extends Component {
                         var json = {
                             id: myResult[mr].programId,
                             name: getLabelText(programNameJson, this.state.lang),
+                            code: myResult[mr].programCode,
                             versionList: [{ versionId: myResult[mr].version + " (Local)" }]
                         }
                         datasetList.push(json)
@@ -539,7 +541,8 @@ class CompareVersion extends Component {
             && datasetList.map((item, i) => {
                 return (
                     <option key={i} value={item.id}>
-                        {item.name}
+                        {/* {item.name} */}
+                        {item.code}
                     </option>
                 )
             }, this);

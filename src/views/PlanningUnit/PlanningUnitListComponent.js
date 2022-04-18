@@ -435,7 +435,7 @@ export default class PlanningUnitListComponent extends Component {
     hideFirstComponent() {
         this.timeout = setTimeout(function () {
             document.getElementById('div1').style.display = 'none';
-        }, 8000);
+        }, 30000);
     }
     componentWillUnmount() {
         clearTimeout(this.timeout);
@@ -445,7 +445,7 @@ export default class PlanningUnitListComponent extends Component {
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
-        }, 8000);
+        }, 30000);
     }
 
     filterData() {
@@ -775,12 +775,13 @@ export default class PlanningUnitListComponent extends Component {
         var options = {
             data: data,
             columnDrag: true,
-            colWidths: [150, 150, 100],
+            colWidths: [70, 150, 150, 100],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
-                    title: 'planningUnitId',
-                    type: 'hidden',
+                    title: i18n.t('static.dataEntry.planningUnitId'),
+                    type: 'text',
+                    readOnly: true
                 },
                 {
                     title: i18n.t('static.product.productName'),

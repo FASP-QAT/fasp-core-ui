@@ -148,7 +148,7 @@ class ForecastSummary extends Component {
         document.getElementById('div2').style.display = 'block';
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
-        }, 8000);
+        }, 30000);
     }
 
     cancelClicked() {
@@ -360,7 +360,7 @@ class ForecastSummary extends Component {
                     '',
                     '',
                     (i18n.t('static.forecastReport.productCost')).replaceAll(' ', '%20'),
-                    this.state.totalProductCost,
+                    '$ ' + this.state.totalProductCost,
                     ''
                 ]))
                 A.push(this.addDoubleQuoteToRowContent([
@@ -375,7 +375,7 @@ class ForecastSummary extends Component {
                     '',
                     '',
                     (i18n.t('static.forecastReport.freight')).replaceAll(' ', '%20') + '(7%)',
-                    (parseFloat(0.07 * this.state.totalProductCost).toFixed(2)),
+                    '$ ' + (parseFloat(0.07 * this.state.totalProductCost).toFixed(2)),
                     ''
                 ]))
                 A.push(this.addDoubleQuoteToRowContent([
@@ -390,7 +390,7 @@ class ForecastSummary extends Component {
                     '',
                     '',
                     (i18n.t('static.shipment.totalCost')).replaceAll(' ', '%20'),
-                    parseFloat(parseFloat(this.state.totalProductCost) + parseFloat(0.07 * this.state.totalProductCost)).toFixed(2) ,
+                    '$ ' + parseFloat(parseFloat(this.state.totalProductCost) + parseFloat(0.07 * this.state.totalProductCost)).toFixed(2),
                     ''
                 ]))
             } else {
@@ -399,7 +399,7 @@ class ForecastSummary extends Component {
                     '',
                     '',
                     (i18n.t('static.forecastReport.productCost')).replaceAll(' ', '%20'),
-                    this.state.totalProductCost,
+                    '$ ' + this.state.totalProductCost,
                     ''
                 ]))
                 A.push(this.addDoubleQuoteToRowContent([
@@ -407,7 +407,7 @@ class ForecastSummary extends Component {
                     '',
                     '',
                     i18n.t('static.forecastReport.freight') + '(7%)',
-                    (parseFloat(0.07 * this.state.totalProductCost).toFixed(2)),
+                    '$ ' + (parseFloat(0.07 * this.state.totalProductCost).toFixed(2)),
                     ''
                 ]))
                 A.push(this.addDoubleQuoteToRowContent([
@@ -415,7 +415,7 @@ class ForecastSummary extends Component {
                     '',
                     '',
                     (i18n.t('static.shipment.totalCost')).replaceAll(' ', '%20'),
-                    parseFloat(parseFloat(this.state.totalProductCost) + parseFloat(0.07 * this.state.totalProductCost)).toFixed(2),
+                    '$ ' + parseFloat(parseFloat(this.state.totalProductCost) + parseFloat(0.07 * this.state.totalProductCost)).toFixed(2),
                     ''
                 ]))
             }
@@ -481,7 +481,8 @@ class ForecastSummary extends Component {
                         // (tsList.filter(c => c.id == )[0].label)
                         let nameTC = '';
                         try {
-                            let idTC = (((filterForecastSelected != undefined) ? (filterForecastSelected.scenarioId > 0) ? "T" + filterForecastSelected.scenarioId : (filterForecastSelected.consumptionExtrapolationId > 0) ? "C" + filterForecastSelected.consumptionExtrapolationId : "" : ""));
+                            // let idTC = (((filterForecastSelected != undefined) ? (filterForecastSelected.scenarioId > 0) ? "T" + filterForecastSelected.scenarioId : (filterForecastSelected.consumptionExtrapolationId > 0) ? "C" + filterForecastSelected.consumptionExtrapolationId : "" : ""));
+                            let idTC = (((filterForecastSelected != undefined) ? (filterForecastSelected.scenarioId > 0) ? "T" + filterForecastSelected.treeId + "~" + filterForecastSelected.scenarioId : (filterForecastSelected.consumptionExtrapolationId > 0) ? "C" + filterForecastSelected.consumptionExtrapolationId : "" : ""));
                             nameTC = (tsList.filter(c => c.id == idTC)[0].name);
 
                         }
@@ -664,7 +665,8 @@ class ForecastSummary extends Component {
 
                             let nameTC = '';
                             try {
-                                let idTC = (((filterForecastSelected != undefined) ? (filterForecastSelected.scenarioId > 0) ? "T" + filterForecastSelected.scenarioId : (filterForecastSelected.consumptionExtrapolationId > 0) ? "C" + filterForecastSelected.consumptionExtrapolationId : "" : ""));
+                                // let idTC = (((filterForecastSelected != undefined) ? (filterForecastSelected.scenarioId > 0) ? "T" + filterForecastSelected.scenarioId : (filterForecastSelected.consumptionExtrapolationId > 0) ? "C" + filterForecastSelected.consumptionExtrapolationId : "" : ""));
+                                let idTC = (((filterForecastSelected != undefined) ? (filterForecastSelected.scenarioId > 0) ? "T" + filterForecastSelected.treeId + "~" + filterForecastSelected.scenarioId : (filterForecastSelected.consumptionExtrapolationId > 0) ? "C" + filterForecastSelected.consumptionExtrapolationId : "" : ""));
                                 nameTC = (tsList.filter(c => c.id == idTC)[0].name);
 
                             }
@@ -738,10 +740,10 @@ class ForecastSummary extends Component {
                     let regionList = summeryData[j].regionListForSinglePlanningUnit;
                     for (var k = 0; k < regionList.length; k++) {
                         tempData.push(regionList[k].selectedForecast);
-                        tempData.push(regionList[k].forecastQuantity);
+                        tempData.push((regionList[k].forecastQuantity == null || regionList[k].forecastQuantity == '' ? regionList[k].forecastQuantity : (regionList[k].forecastQuantity).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")));
                         tempData.push(regionList[k].notes);
                     }
-                    tempData.push(summeryData[j].totalForecastQuantity);
+                    tempData.push((summeryData[j].totalForecastQuantity).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","));
 
 
                     data.push(tempData);
@@ -782,7 +784,7 @@ class ForecastSummary extends Component {
             let headers1 = ['', i18n.t('static.product.product'), i18n.t('static.forecastReport.totalForecastQuantity')];
             if (!this.state.hideColumn) {
                 // headers1 = headers1.concat([i18n.t('static.report.stock') + i18n.t('static.forecastReport.endOf') + this.state.beforeEndDateDisplay + ')', i18n.t('static.forecastReport.existingShipments') + '(' + this.state.startDateDisplay + ' - ' + this.state.endDateDisplay + ')', i18n.t('static.report.stock') + i18n.t('static.forecastReport.endOf') + this.state.endDateDisplay + ')', i18n.t('static.forecastReport.desiredMonthsOfStock') + i18n.t('static.forecastReport.endOf') + this.state.endDateDisplay + ')', i18n.t('static.forecastReport.desiredStock') + i18n.t('static.forecastReport.endOf') + this.state.endDateDisplay + ')']);
-                headers1 = headers1.concat([i18n.t('static.report.stock') + i18n.t('static.forecastReport.endOf') + this.state.beforeEndDateDisplay + ')', i18n.t('static.forecastReport.existingShipments') + '(' + this.state.startDateDisplay + ' - ' + this.state.endDateDisplay + ')', 'Stock or Unmet Demand' + i18n.t('static.forecastReport.endOf') + this.state.endDateDisplay + ')', i18n.t('static.forecastReport.desiredMonthsOfStock') + i18n.t('static.forecastReport.endOf') + this.state.endDateDisplay + ')', i18n.t('static.forecastReport.desiredStock') + i18n.t('static.forecastReport.endOf') + this.state.endDateDisplay + ')']);
+                headers1 = headers1.concat([i18n.t('static.report.stock') + i18n.t('static.forecastReport.endOf') + ' ' + this.state.beforeEndDateDisplay + ')', i18n.t('static.forecastReport.existingShipments') + '(' + this.state.startDateDisplay + ' - ' + this.state.endDateDisplay + ')', 'Stock or Unmet Demand' + i18n.t('static.forecastReport.endOf') + ' ' + this.state.endDateDisplay + ')', i18n.t('static.forecastReport.desiredMonthsOfStock') + i18n.t('static.forecastReport.endOf') + ' ' + this.state.endDateDisplay + ')', i18n.t('static.forecastReport.desiredStock') + i18n.t('static.forecastReport.endOf') + ' ' + this.state.endDateDisplay + ')']);
             }
             headers1 = headers1.concat([i18n.t('static.forecastReport.procurementSurplus')]);
             if (!this.state.hideColumn) {
@@ -837,7 +839,7 @@ class ForecastSummary extends Component {
                     '',
                     '',
                     i18n.t('static.forecastReport.productCost'),
-                    this.state.totalProductCost.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","),
+                    '$ ' + this.state.totalProductCost.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","),
                     ''
                 ])
                 data.push([
@@ -852,7 +854,7 @@ class ForecastSummary extends Component {
                     '',
                     '',
                     i18n.t('static.forecastReport.freight') + '(7%)',
-                    (0.07 * this.state.totalProductCost).toFixed(2).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","),
+                    '$ ' + (0.07 * this.state.totalProductCost).toFixed(2).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","),
                     ''
                 ])
                 data.push([
@@ -868,7 +870,7 @@ class ForecastSummary extends Component {
                     '',
                     i18n.t('static.shipment.totalCost'),
                     // (this.state.totalProductCost + 0.07 * this.state.totalProductCost),
-                    (parseFloat(parseFloat(this.state.totalProductCost) + parseFloat(0.07 * this.state.totalProductCost)).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","),
+                    '$ ' + (parseFloat(parseFloat(this.state.totalProductCost) + parseFloat(0.07 * this.state.totalProductCost)).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","),
                     ''
                 ])
             } else {
@@ -877,7 +879,7 @@ class ForecastSummary extends Component {
                     '',
                     '',
                     i18n.t('static.forecastReport.productCost'),
-                    (this.state.totalProductCost).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","),
+                    '$ ' + (this.state.totalProductCost).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","),
                     ''
                 ])
                 data.push([
@@ -885,7 +887,7 @@ class ForecastSummary extends Component {
                     '',
                     '',
                     i18n.t('static.forecastReport.freight') + '(7%)',
-                    (parseFloat(0.07 * this.state.totalProductCost).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","),
+                    '$ ' + (parseFloat(0.07 * this.state.totalProductCost).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","),
                     ''
                 ])
                 data.push([
@@ -893,7 +895,7 @@ class ForecastSummary extends Component {
                     '',
                     '',
                     i18n.t('static.shipment.totalCost'),
-                    (parseFloat(this.state.totalProductCost + 0.07 * this.state.totalProductCost).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","),
+                    '$ ' + (parseFloat(this.state.totalProductCost + 0.07 * this.state.totalProductCost).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","),
                     ''
                 ])
             }
@@ -1058,7 +1060,7 @@ class ForecastSummary extends Component {
                             let duplicateTracerCategoryId = planningUnitList.map(c => c.planningUnit.forecastingUnit.tracerCategory.id)
                             let filteredTracercategoryId = [...new Set(duplicateTracerCategoryId)];
                             console.log("Test------------>2", filteredTracercategoryId);
-                            let totalProductCost = 0;
+                            let totalProductCost = 0.0;
 
                             // planningUnitList = planningUnitList.filter(c => Object.keys(c.selectedForecastMap).length !== 0)
                             // planningUnitList = planningUnitList.filter(c => ((c.selectedForecastMap[(Object.keys(c.selectedForecastMap))].scenarioId != null) ? c : ((c.selectedForecastMap[(Object.keys(c.selectedForecastMap))].consumptionExtrapolationId != 0) ? c : '')));
@@ -1263,9 +1265,10 @@ class ForecastSummary extends Component {
                                     let stock2 = (planningUnitList[j].stock + planningUnitList[j].existingShipments) - totalForecastedQuantity0ri;
                                     let isStock2Red = (stock2 < 0 ? true : false);
                                     let desiredMonthOfStock1 = planningUnitList[j].monthsOfStock;
-                                    let desiredMonthOfStock2 = planningUnitList[j].monthsOfStock * totalForecastedQuantity0ri / total_months;
+                                    let desiredMonthOfStock2 = parseFloat(planningUnitList[j].monthsOfStock * totalForecastedQuantity0ri / total_months).toFixed(2);
                                     let tempProcurementGap = ((planningUnitList[j].stock + planningUnitList[j].existingShipments) - totalForecastedQuantity0ri) - (planningUnitList[j].monthsOfStock * totalForecastedQuantity0ri / total_months);
                                     let procurementGap = (tempProcurementGap < 0 ? tempProcurementGap : tempProcurementGap);
+                                    procurementGap = parseFloat(procurementGap).toFixed(2)
                                     let isProcurementGapRed = (tempProcurementGap < 0 ? true : false)
                                     let priceType = (planningUnitList[j].procurementAgent == null && planningUnitList[j].price == null ? i18n.t('static.forecastReport.NoPriceTypeAvailable') : (planningUnitList[j].procurementAgent != null ? planningUnitList[j].procurementAgent.code : i18n.t('static.forecastReport.custom')));
                                     let isPriceTypeRed = (planningUnitList[j].procurementAgent == null && planningUnitList[j].price == null ? true : false);
@@ -1277,15 +1280,19 @@ class ForecastSummary extends Component {
                                     let obj = { id: 1, tempTracerCategoryId: tracerCategory.id, display: false, tracerCategory: tracerCategory, forecastingUnit: forecastingUnit, planningUnit: planningUnit, totalForecastedQuantity: totalForecastedQuantity, stock1: stock1, existingShipments: existingShipments, stock2: stock2, isStock2Red: isStock2Red, desiredMonthOfStock1: desiredMonthOfStock1, desiredMonthOfStock2: desiredMonthOfStock2, procurementGap: procurementGap, isProcurementGapRed: isProcurementGapRed, priceType: priceType, isPriceTypeRed: isPriceTypeRed, unitPrice: unitPrice, procurementNeeded: procurementNeeded, notes: notes }
                                     tempData.push(obj);
 
+
+
                                     if (isProcurementGapRed == true) {
-                                        totalProductCost = totalProductCost + (Math.abs(tempProcurementGap) * unitPrice);
-                                        totalProductCost = parseFloat(totalProductCost).toFixed(2);
+                                        totalProductCost = parseFloat(totalProductCost) + parseFloat(Math.abs(tempProcurementGap) * unitPrice);
+                                        console.log("totalProductCost----------->4", totalProductCost);
                                     }
 
                                 }
 
 
                             }
+                            totalProductCost = parseFloat(totalProductCost).toFixed(2);
+                            console.log("totalProductCost----------->5", totalProductCost);
                             // console.log("consumptionData----->", consumptionData);
                             // console.log("Test------------>3331", filteredTracercategoryId);
                             // console.log("Test------------>3332", tempData);
@@ -1358,6 +1365,7 @@ class ForecastSummary extends Component {
                                         }
                                         data[(regRegionList.length * 3) + 3] = 1
                                         data[(regRegionList.length * 3) + 4] = ""
+                                        data[(regRegionList.length * 3) + 5] = 0
 
                                         console.log("data------------------->3211", data);
                                         dataArray.push(data);
@@ -1385,6 +1393,7 @@ class ForecastSummary extends Component {
                                             data[(regRegionList.length * 3) + 3] = 2
                                             // data[(regRegionList.length * 3) + 4] = total;
                                             data[(regRegionList.length * 3) + 4] = (selectedForecastQty == "" ? "" : total);
+                                            data[(regRegionList.length * 3) + 5] = 0
                                             dataArray.push(data);
                                         }
                                     }
@@ -1399,6 +1408,7 @@ class ForecastSummary extends Component {
                                     }
                                     columns.push({ title: i18n.t('static.supplyPlan.type'), type: 'hidden', width: 100, readOnly: true });//G6
                                     columns.push({ title: i18n.t('static.forecastReport.totalForecastQuantity'), type: 'numeric', textEditor: true, mask: '#,##.00', decimal: '.', width: 100, readOnly: true });//H7
+                                    columns.push({ title: 'forecast Blank', type: 'hidden', width: 100, readOnly: true });//G6
                                     let nestedHeaders = [];
                                     // nestedHeaders.push(
                                     //     {
@@ -1489,7 +1499,7 @@ class ForecastSummary extends Component {
                                             for (var y = 0; y < json.length; y++) {
                                                 var rowData = elInstance.getRowData(y);
                                                 console.log("RowData--------->1", rowData);
-                                                let rowDataSecondLast = rowData[rowData.length - 2];
+                                                let rowDataSecondLast = rowData[rowData.length - 3];
                                                 // console.log("RowData--------->2", rowDataSecondLast);
                                                 if (rowDataSecondLast == 1) {
                                                     for (var r = 0; r < rowData.length; r++) {
@@ -1572,11 +1582,12 @@ class ForecastSummary extends Component {
                                 let stock2 = (primaryOutputData[j].stock + primaryOutputData[j].existingShipments) - primaryOutputData[j].totalForecast;
                                 let isStock2Red = (stock2 < 0 ? true : false);
                                 let desiredMonthOfStock1 = primaryOutputData[j].monthsOfStock;
-                                let desiredMonthOfStock2 = primaryOutputData[j].monthsOfStock * primaryOutputData[j].totalForecast / total_months;
+                                let desiredMonthOfStock2 = parseFloat(primaryOutputData[j].monthsOfStock * primaryOutputData[j].totalForecast / total_months).toFixed(2);
                                 let tempProcurementGap = ((primaryOutputData[j].stock + primaryOutputData[j].existingShipments) - primaryOutputData[j].totalForecast) - (primaryOutputData[j].monthsOfStock * primaryOutputData[j].totalForecast / total_months);
                                 let procurementGap = (tempProcurementGap < 0 ? tempProcurementGap : tempProcurementGap);
+                                procurementGap = parseFloat(procurementGap).toFixed(2)
                                 let isProcurementGapRed = (tempProcurementGap < 0 ? true : false)
-                                let priceType = (primaryOutputData[j].procurementAgent == null && primaryOutputData[j].price == null ? i18n.t('static.forecastReport.NoPriceTypeAvailable') : (primaryOutputData[j].procurementAgent != null ? primaryOutputData[j].procurementAgent.code : i18n.t('static.forecastReport.custom')));
+                                let priceType = (primaryOutputData[j].procurementAgent == null && primaryOutputData[j].price == null ? i18n.t('static.forecastReport.NoPriceTypeAvailable') : (primaryOutputData[j].procurementAgent.id != 0 ? primaryOutputData[j].procurementAgent.code : i18n.t('static.forecastReport.custom')));
                                 let isPriceTypeRed = (primaryOutputData[j].procurementAgent == null && primaryOutputData[j].price == null ? true : false);
                                 let unitPrice = primaryOutputData[j].price;
                                 // let procurementNeeded = (isProcurementGapRed == true ? '$ ' + (tempProcurementGap * unitPrice).toFixed(2) : '');
@@ -1587,8 +1598,7 @@ class ForecastSummary extends Component {
                                 tempData.push(obj);
 
                                 if (isProcurementGapRed == true) {
-                                    totalProductCost = totalProductCost + (Math.abs(tempProcurementGap) * unitPrice);
-                                    totalProductCost = parseFloat(totalProductCost).toFixed(2);
+                                    totalProductCost = parseFloat(totalProductCost) + parseFloat(Math.abs(tempProcurementGap) * unitPrice);
                                 }
                             }
 
@@ -1605,7 +1615,7 @@ class ForecastSummary extends Component {
                             }
                             console.log("Test------------>Online---301", summeryData);
 
-
+                            totalProductCost = parseFloat(totalProductCost).toFixed(2);
                             this.setState({
                                 loading: (displayId == 1 ? true : false),
                                 summeryData: summeryData,
@@ -1913,6 +1923,7 @@ class ForecastSummary extends Component {
         var index = possiblex.findIndex(c => c == x);
         if (index != -1) {
             if (value != "") {
+                // alert("If");
                 var tsListFilter = this.state.tsList.filter(c => c.id == value)[0]
                 var totalForecast = 0;
                 if (tsListFilter.type == "C") {
@@ -1934,7 +1945,27 @@ class ForecastSummary extends Component {
                     total = total + this.el.getValueFromCoords(loopVar, y);
                     loopVar = loopVar + 3;
                 }
-                elInstance.setValueFromCoords((Object.keys(tableJson[0]).length - 1), y, Math.round(total), true);
+                elInstance.setValueFromCoords((Object.keys(tableJson[0]).length - 2), y, Math.round(total), true);
+            } else {
+                // alert("Else");
+                elInstance.setValueFromCoords((Number(x) + 1), y, '', true);
+                elInstance.setValueFromCoords((Number(x) + 2), y, '', true);
+
+                let loopVar = 4;
+                let total = 0;
+
+                for (var r = 0; r < this.state.regRegionList.length; r++) {
+                    total = total + this.el.getValueFromCoords(loopVar, y);
+                    loopVar = loopVar + 3;
+
+                }
+
+                // console.log("total1------------>", total1);
+
+                elInstance.setValueFromCoords((Object.keys(tableJson[0]).length - 2), y, (total == 0 ? '' : Math.round(total)), true);
+                elInstance.setValueFromCoords((Object.keys(tableJson[0]).length - 1), y, 1, true);
+
+
             }
         }
     }
@@ -2686,6 +2717,19 @@ class ForecastSummary extends Component {
                         notes: json[j][((k + 1) * 3) + 2],
                         region: this.state.regRegionList[k]
                     })
+                } else {
+                    console.log("DataList+++1", json[j][Object.keys(json[j])[Object.keys(json[j]).length - 1]]);
+                    if (json[j][Object.keys(json[j])[Object.keys(json[j]).length - 1]] == 1) {
+                        dataList.push({
+                            planningUnit: json[j][1],
+                            scenarioId: null,
+                            treeId: null,
+                            consumptionExtrapolationId: null,
+                            totalForecast: '',
+                            notes: '',
+                            region: this.state.regRegionList[k]
+                        })
+                    }
                 }
             }
 
@@ -2723,8 +2767,14 @@ class ForecastSummary extends Component {
                     var pu = planningUnitList1[index];
                     // let treeId = pu.selectedForecastMap[dataList[dl].region.regionId].treeId;
                     // console.log("TreeId-----------> ", treeId);
-                    pu.selectedForecastMap[dataList[dl].region.regionId] = { "scenarioId": dataList[dl].scenarioId, "consumptionExtrapolationId": dataList[dl].consumptionExtrapolationId, "totalForecast": dataList[dl].totalForecast, notes: dataList[dl].notes, treeId: dataList[dl].treeId };
-                    planningUnitList1[index] = pu;
+                    if (dataList[dl].treeId == null && dataList[dl].consumptionExtrapolationId == null) {
+                        pu.selectedForecastMap[dataList[dl].region.regionId] = {};
+                        planningUnitList1[index] = pu;
+                    } else {
+                        pu.selectedForecastMap[dataList[dl].region.regionId] = { "scenarioId": dataList[dl].scenarioId, "consumptionExtrapolationId": dataList[dl].consumptionExtrapolationId, "totalForecast": dataList[dl].totalForecast, notes: dataList[dl].notes, treeId: dataList[dl].treeId };
+                        planningUnitList1[index] = pu;
+                    }
+
                 }
                 console.log("PlanningUnitList1+++", planningUnitList1);
                 datasetForEncryption.planningUnitList = planningUnitList1;
@@ -2759,7 +2809,8 @@ class ForecastSummary extends Component {
             && programs.map((item, i) => {
                 return (
                     <option key={i} value={item.programId}>
-                        {item.label.label_en}
+                        {/* {item.label.label_en} */}
+                        {item.programCode}
                     </option>
                 )
             }, this);
@@ -3124,7 +3175,7 @@ class ForecastSummary extends Component {
                                                                         <td></td>
                                                                         <td></td>
                                                                         <td><b>{i18n.t('static.forecastReport.productCost')}</b></td>
-                                                                        <td><b>{(this.state.totalProductCost).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</b></td>
+                                                                        <td><b>{'$ ' + (this.state.totalProductCost).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</b></td>
                                                                         <td></td>
                                                                     </tr>
                                                                     <tr>
@@ -3140,7 +3191,7 @@ class ForecastSummary extends Component {
                                                                         <td></td>
                                                                         <td></td>
                                                                         <td><b>{i18n.t('static.forecastReport.freight')} (7%)</b></td>
-                                                                        <td><b>{((0.07 * this.state.totalProductCost).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</b></td>
+                                                                        <td><b>{'$ ' + ((0.07 * this.state.totalProductCost).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</b></td>
                                                                         <td></td>
                                                                     </tr>
                                                                     <tr>
@@ -3156,7 +3207,7 @@ class ForecastSummary extends Component {
                                                                         <td></td>
                                                                         <td></td>
                                                                         <td><b>{i18n.t('static.shipment.totalCost')}</b></td>
-                                                                        <td><b>{(parseFloat(parseFloat(this.state.totalProductCost) + parseFloat(0.07 * this.state.totalProductCost)).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</b></td>
+                                                                        <td><b>{'$ ' + (parseFloat(parseFloat(this.state.totalProductCost) + parseFloat(0.07 * this.state.totalProductCost)).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</b></td>
                                                                         <td></td>
                                                                     </tr>
                                                                 </tfoot>
@@ -3169,7 +3220,7 @@ class ForecastSummary extends Component {
                                                                         <td className='text-left sticky-col first-col clone'></td>
                                                                         <td></td>
                                                                         <td><b>{i18n.t('static.forecastReport.productCost')}</b></td>
-                                                                        <td><b>{(this.state.totalProductCost).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</b></td>
+                                                                        <td><b>{'$ ' + (this.state.totalProductCost).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</b></td>
                                                                         <td></td>
                                                                     </tr>
                                                                     <tr>
@@ -3178,7 +3229,7 @@ class ForecastSummary extends Component {
                                                                         <td className='text-left sticky-col first-col clone'></td>
                                                                         <td></td>
                                                                         <td><b>{i18n.t('static.forecastReport.freight')} (7%)</b></td>
-                                                                        <td><b>{(parseFloat(0.07 * this.state.totalProductCost).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</b></td>
+                                                                        <td><b>{'$ ' + (parseFloat(0.07 * this.state.totalProductCost).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</b></td>
                                                                         <td></td>
                                                                     </tr>
                                                                     <tr>
@@ -3187,7 +3238,7 @@ class ForecastSummary extends Component {
                                                                         <td className='text-left sticky-col first-col clone'></td>
                                                                         <td></td>
                                                                         <td><b>{i18n.t('static.shipment.totalCost')}</b></td>
-                                                                        <td><b>{(parseFloat(this.state.totalProductCost + 0.07 * this.state.totalProductCost).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</b></td>
+                                                                        <td><b>{'$ ' + (parseFloat(this.state.totalProductCost + 0.07 * this.state.totalProductCost).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</b></td>
                                                                         <td></td>
                                                                     </tr>
                                                                 </tfoot>
