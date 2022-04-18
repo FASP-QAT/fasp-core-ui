@@ -80,7 +80,9 @@ class VersionSettingsComponent extends Component {
             datasetPlanningUnit: [],
             notSelectedPlanningUnitList: [],
             treeScenarioListNotHaving100PerChild: [],
-            isChanged1: false
+            isChanged1: false,
+            includeOnlySelectedForecasts: true,
+            datasetPlanningUnitNotes: []
         }
         this.hideFirstComponent = this.hideFirstComponent.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
@@ -750,7 +752,7 @@ class VersionSettingsComponent extends Component {
     hideFirstComponent() {
         this.timeout = setTimeout(function () {
             document.getElementById('div1').style.display = 'none';
-        }, 8000);
+        }, 30000);
     }
     componentWillUnmount() {
         clearTimeout(this.timeout);
@@ -759,7 +761,7 @@ class VersionSettingsComponent extends Component {
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
-        }, 8000);
+        }, 30000);
     }
 
     oneditionend = function (instance, cell, x, y, value) {
@@ -1131,7 +1133,8 @@ class VersionSettingsComponent extends Component {
 
     openModalPopup(programData) {
         this.setState({
-            showValidation: !this.state.showValidation
+            showValidation: !this.state.showValidation,
+            programData: programData != undefined ? programData : {}
         }, () => {
             if (this.state.showValidation) {
                 this.setState({
@@ -1216,6 +1219,24 @@ class VersionSettingsComponent extends Component {
 
         })
 
+    }
+
+    plusMinusClicked(treeId, scenarioId) {
+        var index = this.state.treeScenarioList.findIndex(c => c.treeId == treeId && c.scenarioId == scenarioId);
+        var treeScenarioList = this.state.treeScenarioList;
+        treeScenarioList[index].checked = !treeScenarioList[index].checked;
+        this.setState({
+            treeScenarioList: treeScenarioList
+        })
+
+    }
+
+    setIncludeOnlySelectedForecasts(e) {
+        this.setState({
+            includeOnlySelectedForecasts: e.target.checked
+        }, () => {
+            dataCheck(this, this.state.programData, "versionSettings")
+        })
     }
 
     render() {
@@ -1321,16 +1342,16 @@ class VersionSettingsComponent extends Component {
             if (this.state.treeScenarioListNotHaving100PerChild.filter(c => c.treeId == item1.treeId && c.scenarioId == item1.scenarioId).length > 0) {
                 var nodeWithPercentageChildren = this.state.nodeWithPercentageChildren.filter(c => c.treeId == item1.treeId && c.scenarioId == item1.scenarioId);
                 if (nodeWithPercentageChildren.length > 0) {
-                    return (<><span className="hoverDiv" onClick={() => nodeWithPercentageChildrenClicked(item1.treeId, item1.scenarioId, this)}><span>{getLabelText(item1.treeLabel, this.state.lang) + " / " + getLabelText(item1.scenarioLabel, this.state.lang)}</span></span><div className="table-responsive">
-                        <div id={"tableDiv" + count} className="jexcelremoveReadonlybackground consumptionDataEntryTable" name='jxlTableData' />
+                    return (<><span className="hoverDiv" onClick={() => nodeWithPercentageChildrenClicked(item1.treeId, item1.scenarioId, this)}><span>{getLabelText(item1.treeLabel, this.state.lang) + " / " + getLabelText(item1.scenarioLabel, this.state.lang)}</span></span><span className="hoverDiv" onClick={() => this.plusMinusClicked(item1.treeId, item1.scenarioId)}>{item1.checked ? <i className="fa fa-minus treeValidation" ></i> : <i className="fa fa-plus  treeValidation" ></i>}</span><div className="table-responsive">
+                        <div id={"tableDiv" + count} className="jexcelremoveReadonlybackground consumptionDataEntryTable" name='jxlTableData' style={{ display: item1.checked ? "block" : "none" }} />
                     </div><br /></>)
                 }
             }
         }, this) : <ul><span>{i18n.t('static.forecastValidation.noNodesHaveChildrenLessThanPerc')}</span><br /></ul>
 
         //Consumption Notes
-        const { datasetPlanningUnit } = this.state;
-        let consumtionNotes = (datasetPlanningUnit.length > 0 && datasetPlanningUnit.filter(c => c.consuptionForecast.toString() == "true").length > 0) ? datasetPlanningUnit.filter(c => c.consuptionForecast.toString() == "true").map((item, i) => {
+        const { datasetPlanningUnitNotes } = this.state;
+        let consumtionNotes = (datasetPlanningUnitNotes.length > 0 && datasetPlanningUnitNotes.filter(c => c.consuptionForecast.toString() == "true").length > 0) ? datasetPlanningUnitNotes.filter(c => c.consuptionForecast.toString() == "true").map((item, i) => {
             return (
                 <tr key={i} className="hoverTd" onClick={() => missingMonthsClicked(item.planningUnit.id, this)}>
                     <td>{getLabelText(item.planningUnit.label, this.state.lang)}</td>
@@ -1360,8 +1381,8 @@ class VersionSettingsComponent extends Component {
                     <td>{getLabelText(item.tree, this.state.lang)}</td>
                     <td>{getLabelText(item.node, this.state.lang)}</td>
                     <td>{getLabelText(item.scenario, this.state.lang)}</td>
-                    <td>{(item.notes != "" && item.notes != null) ? i18n.t('static.commitTree.main') + ": " + item.notes : ""}<br />
-                        {(item.madelingNotes != "" && item.madelingNotes != null) ? i18n.t('static.commitTree.modeling') + ": " + item.madelingNotes : ""}</td>
+                    <td><b>{(item.notes != "" && item.notes != null) ? i18n.t('static.commitTree.main') + ": " : ""}</b> {(item.notes != "" && item.notes != null) ? item.notes : ""}
+                        <b>{(item.madelingNotes != "" && item.madelingNotes != null) ? i18n.t('static.commitTree.modeling') + ": " : ""}</b> {(item.madelingNotes != "" && item.madelingNotes != null) ? item.madelingNotes : ""}</td>
                 </tr>
             )
         }, this) : <span>&emsp;&emsp;&emsp;&ensp;{i18n.t('static.forecastValidation.noTreeNodesNotesFound')}</span>;
@@ -1476,8 +1497,27 @@ class VersionSettingsComponent extends Component {
                     <div>
                         <ModalBody className="VersionSettingMode">
                             <span><b>{this.state.programName}</b></span><br />
-                            <span><b>{i18n.t('static.common.forecastPeriod')}: </b> {moment(this.state.forecastStartDate).format('MMM-YYYY')} to {moment(this.state.forecastStopDate).format('MMM-YYYY')} </span><br /><br />
-
+                            <span><b>{i18n.t('static.common.forecastPeriod')}: </b> {moment(this.state.forecastStartDate).format('MMM-YYYY')} to {moment(this.state.forecastStopDate).format('MMM-YYYY')} </span>
+                            <br />
+                            <div className={"check inline pl-lg-3"}>
+                                <div className="">
+                                    <Input
+                                        className="form-check-input"
+                                        type="checkbox"
+                                        id="includeOnlySelectedForecasts"
+                                        name="includeOnlySelectedForecasts"
+                                        checked={this.state.includeOnlySelectedForecasts}
+                                        onClick={(e) => { this.setIncludeOnlySelectedForecasts(e); }}
+                                    />
+                                    <Label
+                                        className="form-check-label"
+                                        check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                        <b>{i18n.t('static.validation.includeOnlySelectedForecast')}</b>
+                                        {/* <i class="fa fa-info-circle icons pl-lg-2" id="Popover5" onClick={() => this.toggle('popoverOpenArima', !this.state.popoverOpenArima)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i> */}
+                                    </Label>
+                                </div>
+                            </div>
+                            <br />
                             <span><b>1. {i18n.t('static.commitTree.noForecastSelected')}: </b>(<a href="/#/report/compareAndSelectScenario" target="_blank">{i18n.t('static.commitTree.compare&Select')}</a>, <a href={this.state.programId != -1 && this.state.programId != "" && this.state.programId != undefined ? "/#/forecastReport/forecastSummary/" + this.state.programId.toString().split("_")[0] + "/" + (this.state.programId.toString().split("_")[1]).toString().substring(1) : "/#/forecastReport/forecastSummary/"} target="_blank">{i18n.t('static.commitTree.forecastSummary')}</a>)</span><br />
                             <ul>{noForecastSelected}</ul>
 
@@ -1502,7 +1542,7 @@ class VersionSettingsComponent extends Component {
 
                             <span>a. {i18n.t('static.forecastMethod.historicalData')}:</span>
                             <div className="">
-                                {(datasetPlanningUnit.length > 0 && datasetPlanningUnit.filter(c => c.consuptionForecast.toString() == "true").length > 0) ? <div className="table-wrap table-responsive fixTableHead">
+                                {(datasetPlanningUnitNotes.length > 0 && datasetPlanningUnitNotes.filter(c => c.consuptionForecast.toString() == "true").length > 0) ? <div className="table-wrap table-responsive fixTableHead">
                                     <Table className="table-bordered text-center mt-2 overflowhide main-table table-striped1" bordered size="sm" >
                                         <thead>
                                             <tr>

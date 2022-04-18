@@ -113,7 +113,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
         // alert("HI");
         setTimeout(function () {
             document.getElementById('div12').style.display = 'none';
-        }, 8000);
+        }, 30000);
     }
 
     componentWillUnmount() {
@@ -1400,7 +1400,8 @@ export default class StepOneImportMapPlanningUnits extends Component {
             && programs.map((item, i) => {
                 return (
                     <option key={i} value={item.programId}>
-                        {getLabelText(item.label, this.state.lang)}
+                        {/* {getLabelText(item.label, this.state.lang)} */}
+                        {item.programCode}
                     </option>
                 )
             }, this);

@@ -307,13 +307,13 @@ class Budgets extends Component {
     hideFirstComponent() {
         setTimeout(function () {
             document.getElementById('div1').style.display = 'none';
-        }, 8000);
+        }, 30000);
     }
 
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
-        }, 8000);
+        }, 30000);
     }
 
     addDoubleQuoteToRowContent = (arr) => {
