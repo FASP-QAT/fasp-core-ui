@@ -2135,7 +2135,7 @@ class usageTemplate extends Component {
         // if (x != 24) {
         //     this.el.setValueFromCoords(24, y, 1, true);
         // }
-        if (x == 14) {
+        if (x == 14 || x == 15 || x == 17) {
             this.el.setValueFromCoords(24, y, 1, true);
         }
 
