@@ -9994,11 +9994,11 @@ export default class BuildTree extends Component {
                 <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
                     <Card className="mb-lg-0">
                         <div className="pb-lg-0">
-                            <div className="Card-header-reporticon pb-1">
-                                <span className="compareAndSelect-larrow"> <i className="cui-arrow-left icons " > </i></span>
-                                <span className="compareAndSelect-rarrow"> <i className="cui-arrow-right icons " > </i></span>
-                                <span className="compareAndSelect-larrowText"> {i18n.t('static.common.continueTo')} <a href="/#/validation/modelingValidation" className="supplyplanformulas">{i18n.t('static.dashboard.modelingValidation')}</a> </span>
-                                <span className="compareAndSelect-rarrowText"> {i18n.t('static.common.continueTo')}  <a href="/#/validation/productValidation" className="supplyplanformulas">{i18n.t('static.dashboard.productValidation')}</a> </span><br />
+                            <div className="Card-header-reporticon pb-1" style={{display:'grid',float:'right'}}>
+                                {/* <span className="compareAndSelect-larrow"> <i className="cui-arrow-left icons " > </i></span> */}
+                                {/* <span className="compareAndSelect-rarrow"> <i className="cui-arrow-right icons " > </i></span> */}
+                                <span className="compareAndSelect-larrowText"> {i18n.t('static.common.continueTo')} <a href="/#/validation/modelingValidation" className="supplyplanformulas">{i18n.t('static.dashboard.modelingValidation')}</a>  <span className="compareAndSelect-rarrow"> <i className="cui-arrow-right icons " > </i></span></span>
+                                <span className="compareAndSelect-rarrowText"> {i18n.t('static.common.continueTo')}  <a href="/#/validation/productValidation" className="supplyplanformulas">{i18n.t('static.dashboard.productValidation')}</a> <span className="compareAndSelect-rarrow"><i className="cui-arrow-right icons " > </i></span></span>
                             </div>
                             {/* <div className="card-header-actions">
                                 <div className="card-header-action pr-4 pt-lg-0">
