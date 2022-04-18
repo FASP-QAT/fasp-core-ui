@@ -243,6 +243,9 @@ export default class ExtrapolateDataComponent extends React.Component {
             noOfMonthsForASeason: 4,
             confidence: 0.95,
             monthsForMovingAverage: 6,
+            p: 0,
+            d: 1,
+            q: 1,
             alphaValidate: true,
             buttonFalg: 1,
             betaValidate: true,
@@ -826,22 +829,22 @@ export default class ExtrapolateDataComponent extends React.Component {
             calculateLinearRegression(inputDataLinearRegression, this.state.confidenceLevelIdLinearRegression, noOfMonthsForProjection, this);
             console.log("inputDataTes.length+++", inputDataTes.length);
             // if (inputDataTes.length >= (this.state.noOfMonthsForASeason * 2)) {
-            calculateTES(inputDataTes, this.state.alpha, this.state.beta, this.state.gamma, this.state.confidenceLevelId, this.state.noOfMonthsForASeason, noOfMonthsForProjection, this, minStartDate,false);
-            calculateArima(inputDataArima, this.state.p, this.state.d, this.state.q, this.state.confidenceLevelIdArima, noOfMonthsForProjection, this, minStartDate,false);
+            calculateTES(inputDataTes, this.state.alpha, this.state.beta, this.state.gamma, this.state.confidenceLevelId, this.state.noOfMonthsForASeason, noOfMonthsForProjection, this, minStartDate, false);
+            calculateArima(inputDataArima, this.state.p, this.state.d, this.state.q, this.state.confidenceLevelIdArima, noOfMonthsForProjection, this, minStartDate, false);
             this.setState({
                 extrapolateClicked: true
             })
         } catch (error) {
             console.log("Error@@@@@@", error)
-            this.el = jexcel(document.getElementById("tableDiv"), '');
-            this.el.destroy();
+            // this.el = jexcel(document.getElementById("tableDiv"), '');
+            // this.el.destroy();
             this.setState({
-                showData: false,
-                dataEl: "",
+                // showData: false,
+                // dataEl: "",
                 loading: false,
                 noDataMessage: i18n.t('static.extrapolation.errorOccured'),
-                dataChanged: false,
-                show: false
+                dataChanged: true,
+                // show: false
             })
         }
         // } else {
