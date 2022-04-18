@@ -574,6 +574,7 @@ export default class TreeExtrapolationComponent extends React.Component {
             }
             console.log("extrapolation data----", currentItemConfig);
             this.props.updateState("currentItemConfig", currentItemConfig);
+            
         });
     }
 
@@ -1302,7 +1303,7 @@ export default class TreeExtrapolationComponent extends React.Component {
         var curDate1 = minStartDate;
         // monthArray.push('2019-01-01');
 
-        for (var m = 0; curDate1 < moment(forecastStopDate).add(-1, 'months').format("YYYY-MM-DD"); m++) {
+        for (var m = 0; curDate1 < moment(forecastStopDate).format("YYYY-MM-DD"); m++) {
             curDate1 = moment(minStartDate).add(m, 'months').format("YYYY-MM-DD");
             monthArray.push(curDate1)
         }
@@ -1501,7 +1502,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                 if (y != null) {
                     var rowData = elInstance.getRowData(y);
                     // if (rowData[0] != "") {
-                    if (moment(rowData[0]).isBetween(this.props.items.forecastStartDate, this.props.items.forecastStopDate, undefined, '[)')) {
+                    if (moment(rowData[0]).isBetween(this.props.items.forecastStartDate, this.props.items.forecastStopDate, undefined, '[]')) {
                         var cell = elInstance.getCell(("A").concat(parseInt(y) + 1))
                         cell.classList.add('bold');
                     } else {

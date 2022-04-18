@@ -1555,11 +1555,13 @@ export default class BuildTree extends Component {
         this.setState({
             [parameterName]: value
         }, () => {
+
             var items = this.state.items;
             if (parameterName == 'currentItemConfig') {
                 var findNodeIndex = items.findIndex(n => n.id == value.context.id);
                 console.log("findNodeIndex1---", findNodeIndex);
                 items[findNodeIndex] = value.context;
+                this.calculateMOMData(0, 2);
             }
             if (parameterName == 'nodeId' && (value != null && value != 0)) {
                 var nodeDataMomList = this.state.nodeDataMomList;
@@ -1924,7 +1926,7 @@ export default class BuildTree extends Component {
                 let scalingDate = date;
                 if (modelingTypeId == 3 && moment(startDate).format("YYYY-MM") <= moment(scalingDate).format("YYYY-MM") && moment(stopDate).format("YYYY-MM") >= moment(scalingDate).format("YYYY-MM")) {
                     var nodeDataMomListFilter = [];
-                    if (map1.get("12") ==1) {
+                    if (map1.get("12") == 1) {
                         var nodeDataMomListOfTransferNode = (this.state.items.filter(c => c.id == map1.get("3"))[0].payload.nodeDataMap[this.state.selectedScenario])[0].nodeDataMomList;
                         nodeDataMomListFilter = nodeDataMomListOfTransferNode.filter(c => moment(c.month).format("YYYY-MM") == moment(startDate).format("YYYY-MM"))
                     } else {
