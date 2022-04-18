@@ -2263,7 +2263,8 @@
     "static.modelingTable.note": "Note: If you make a change to the data in a pre-existing row, you will need to click `Update` before the change reflects in the `Calculated change for month` column and the `Total` value.",
     "static.dataentry.otherUnitName": "Enter Other unit name",
     "static.dataentry.otherUnitMultiplier": "Enter Other unit multiplier",
-    "static.extrapolation.errorOccured":"An error occurred while trying to calculate extrapolation",
-    "static.consumptionDataEntryAndAdjustment.nothingToInterpolate":"There is nothing to interpolate",
-    "static.consumptionDataEntryAndAdjustment.interpolatedDataFor":"Interpolated data for: "
+    "static.extrapolation.errorOccured": "An error occurred while trying to calculate extrapolation",
+    "static.consumptionDataEntryAndAdjustment.nothingToInterpolate": "There is nothing to interpolate",
+    "static.consumptionDataEntryAndAdjustment.interpolatedDataFor": "Interpolated data for: ",
+    "static.importIntoQATSupplyPlan.pleaseSelectForecastProgramVersion": "Please select forecast program version"
 }

@@ -2255,5 +2255,6 @@
     "static.dataentry.multiplierToFU": "multiplicateur en FU",
     "static.dataentry.change": "changement",
     "static.dataentry.otherUnitName": "Entrez le nom de l'autre unité",
-    "static.dataentry.otherUnitMultiplier": "Entrez Autre multiplicateur d'unité"
+    "static.dataentry.otherUnitMultiplier": "Entrez Autre multiplicateur d'unité",
+    "static.importIntoQATSupplyPlan.pleaseSelectForecastProgramVersion": "Veuillez sélectionner la version du programme de prévision"
 }
