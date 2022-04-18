@@ -48,7 +48,7 @@ export function calculateTES(inputData, alphaParam, betaParam, gammaParam, confi
                 }
                 
                 console.log("OutPut@@@@@@@@@@@@@@@@@@@@@@", output)
-                calculateCI(output, confidenceLevel, "tesData", props)
+                calculateCI(output, Number(confidenceLevel), "tesData", props)
                 calculateError(output, "tesError", props);
 
             }
