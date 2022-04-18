@@ -38,15 +38,15 @@ export function calculateTES(inputData, alphaParam, betaParam, gammaParam, confi
                 var responseData = response.data;
                 var output = [];
                 var count = 0;
-                for (var j = 0; j < responseData.forecasts.length; j++) {
-                    count += 1;
-                    output.push({ month: count, actual: inputData[j] != undefined && inputData[j].actual != undefined && inputData[j].actual != null && inputData[j].actual != '' ? inputData[j].actual : null, forecast: responseData.forecasts[j] == 'NA' ? null : responseData.forecasts[j] })
-                }
                 for (var k = 0; k < responseData.fits.length; k++) {
                     count += 1;
                     output.push({ month: count, actual: inputData[count - 1] != undefined && inputData[count - 1].actual != undefined && inputData[count - 1].actual != null && inputData[count - 1].actual != '' ? inputData[count - 1].actual : null, forecast: responseData.fits[k] == 'NA' ? null : responseData.fits[k] })
                 }
-
+                for (var j = 0; j < responseData.forecasts.length; j++) {
+                    count += 1;
+                    output.push({ month: count, actual: inputData[j] != undefined && inputData[j].actual != undefined && inputData[j].actual != null && inputData[j].actual != '' ? inputData[j].actual : null, forecast: responseData.forecasts[j] == 'NA' ? null : responseData.forecasts[j] })
+                }
+                
                 console.log("OutPut@@@@@@@@@@@@@@@@@@@@@@", output)
                 calculateCI(output, confidenceLevel, "tesData", props)
                 calculateError(output, "tesError", props);
