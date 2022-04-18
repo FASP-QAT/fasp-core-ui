@@ -23,7 +23,7 @@ export function calculateTES(inputData, alphaParam, betaParam, gammaParam, confi
     }
     var json = {
         "data": data,
-        "frequency": Number(seasonality),
+        "frequency": 12,
         "start": startParam,
         "alpha": Number(alphaParam),
         "beta": Number(betaParam),
