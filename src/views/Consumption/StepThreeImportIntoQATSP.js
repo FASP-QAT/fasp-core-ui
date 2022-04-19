@@ -7,6 +7,8 @@ import i18n from '../../i18n';
 import csvicon from '../../assets/img/csv.png';
 import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
+import ReportService from '../../api/ReportService';
+
 import {
     Badge,
     Button,
@@ -39,19 +41,28 @@ import getLabelText from '../../CommonComponent/getLabelText';
 import { contrast } from "../../CommonComponent/JavascriptCommonFunctions";
 import { jExcelLoadedFunctionOnlyHideRow, jExcelLoadedFunctionWithoutPagination, jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js'
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import { JEXCEL_INTEGER_REGEX, JEXCEL_DECIMAL_LEAD_TIME, JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_PRO_KEY, MONTHS_IN_FUTURE_FOR_AMC, MONTHS_IN_PAST_FOR_AMC, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, JEXCEL_PAGINATION_OPTION, JEXCEL_MONTH_PICKER_FORMAT, INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY } from '../../Constants.js';
+import { FORECAST_DATEPICKER_START_MONTH, JEXCEL_INTEGER_REGEX, JEXCEL_DECIMAL_LEAD_TIME, JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_PRO_KEY, MONTHS_IN_FUTURE_FOR_AMC, MONTHS_IN_PAST_FOR_AMC, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, JEXCEL_PAGINATION_OPTION, JEXCEL_MONTH_PICKER_FORMAT, INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY } from '../../Constants.js';
 import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import CryptoJS from 'crypto-js';
 
-
+const pickerLang = {
+    months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
+    from: 'From', to: 'To',
+}
 
 export default class StepThreeImportMapPlanningUnits extends Component {
     constructor(props) {
         super(props);
 
+        var dt = new Date();
+        dt.setMonth(dt.getMonth() - FORECAST_DATEPICKER_START_MONTH);
+
         this.state = {
             lang: localStorage.getItem('lang'),
+            rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
+            minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
+            maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
             // loading: false,
             selSource: [],
             actualConsumptionData: [],
@@ -63,9 +74,10 @@ export default class StepThreeImportMapPlanningUnits extends Component {
             stopDate: '',
             buildCSVTable: [],
             languageEl: '',
-
+            consumptionData: [],
+            monthArrayList: [],
         }
-
+        this.handleRangeChange = this.handleRangeChange.bind(this);
         this.buildJexcel = this.buildJexcel.bind(this);
         this.formSubmit = this.formSubmit.bind(this);
         this.exportCSV = this.exportCSV.bind(this);
@@ -415,102 +427,226 @@ export default class StepThreeImportMapPlanningUnits extends Component {
 
     }
 
+    handleRangeChange(value, text, listIndex) {
+        //
+    }
+
+    makeText = m => {
+        if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
+        return '?'
+    }
+
     filterData() {
+        console.log("Props items---------------->", this.props.items);
+
+        var unitIds = ""
+        unitIds = this.props.items.supplyPlanPlanningUnitIds.map(c => c.forecastPlanningUnitId);
+        var startDate = moment(this.props.items.startDate).format("YYYY-MM-DD HH:mm:ss")
+        var stopDate = moment(this.props.items.stopDate).format("YYYY-MM-DD HH:mm:ss")
+
+        let inputJson = {
+            "programId": Number(this.props.items.forecastProgramId),
+            "versionId": Number(this.props.items.versionId),
+            "startDate": startDate,
+            "stopDate": stopDate,
+            "reportView": 1,
+            "aggregateByYear": false,
+            "unitIds": unitIds
+        }
+
+        console.log("OnlineInputJson---------------->", inputJson);
+        // var unitDescArr = this.props.items.supplyPlanPlanningUnitIds.map(c);
+
+        // console.log("RESP---------->unitDesc", unitDescArr);
         let tempList = [];
-        tempList.push({ id: 1, v2: 'Male Condom (Latex) Lubricated, No Logo, 53 mm, 3000 Pieces [4182]', v1: 'Male Condom (Latex) Lubricated, No Logo, 53 mm, 4320 Pieces [6357]', v3: 'North', v4: 'Jan-21', v5: '5930', v6: '0.694444', v7: '4118.06', v8: '3500.00', v9: true });
-        tempList.push({ id: 2, v2: 'Male Condom (Latex) Lubricated, No Logo, 53 mm, 3000 Pieces [4182]', v1: 'Male Condom (Latex) Lubricated, No Logo, 53 mm, 4320 Pieces [6357]', v3: 'North', v4: 'Feb-21', v5: '4000', v6: '0.694444', v7: '2777.78', v8: '3000.00', v9: true });
-        tempList.push({ id: 3, v2: 'Male Condom (Latex) Lubricated, No Logo, 53 mm, 3000 Pieces [4182]', v1: 'Male Condom (Latex) Lubricated, No Logo, 53 mm, 4320 Pieces [6357]', v3: 'North', v4: 'Mar-21', v5: '3850', v6: '0.694444', v7: '2673.61', v8: '3100.00', v9: true });
-        tempList.push({ id: 4, v2: 'Male Condom (Latex) Lubricated, No Logo, 53 mm, 3000 Pieces [4182]', v1: 'Male Condom (Latex) Lubricated, No Logo, 53 mm, 4320 Pieces [6357]', v3: 'National', v4: 'Apr-21', v5: '4200', v6: '0.694444', v7: '2916.67', v8: '', v9: true });
-        tempList.push({ id: 5, v2: 'Male Condom (Latex) Lubricated, No Logo, 53 mm, 3000 Pieces [4182]', v1: 'Male Condom (Latex) Lubricated, No Logo, 53 mm, 4320 Pieces [6357]', v3: 'National', v4: 'May-21', v5: '4530', v6: '0.694444', v7: '3145.83', v8: '', v9: true });
-        tempList.push({ id: 6, v2: 'Male Condom (Latex) Lubricated, No Logo, 53 mm, 3000 Pieces [4182]', v1: 'Male Condom (Latex) Lubricated, No Logo, 53 mm, 4320 Pieces [6357]', v3: 'National', v4: 'Jun-21', v5: '4250', v6: '0.694444', v7: '2951.39', v8: '', v9: true });
-        tempList.push({ id: 7, v2: 'Male Condom (Latex) Lubricated, No Logo, 53 mm, 3000 Pieces [4182]', v1: 'Male Condom (Latex) Lubricated, No Logo, 53 mm, 4320 Pieces [6357]', v3: 'National', v4: 'Jul-21', v5: '4100', v6: '0.694444', v7: '2847.22', v8: '', v9: true });
-        tempList.push({ id: 8, v2: 'Male Condom (Latex) Lubricated, No Logo, 53 mm, 3000 Pieces [4182]', v1: 'Male Condom (Latex) Lubricated, No Logo, 53 mm, 4320 Pieces [6357]', v3: 'National', v4: 'Aug-21', v5: '3900', v6: '0.694444', v7: '2708.33', v8: '', v9: true });
+        let supplyPlanRegionList = this.props.items.regionList;
+        for (let i = 0; i < supplyPlanRegionList.length; i++) {
+            for (let j = 0; j < supplyPlanRegionList[i].supplyPlanRegionList.length; j++) {
 
-        this.setState({
-            selSource: tempList,
-            loading: true
-        },
-            () => {
-                this.buildJexcel();
-            })
+            }
+        }
 
-        // let forecastPlanningUnitList = this.props.items.stepOneData.filter(c => c.forecastPlanningUnitId != -1);
-        // let supplyPlanPlanningUnitId = forecastPlanningUnitList.map(ele => ele.supplyPlanPlanningUnitId);
+        ReportService.forecastOutput(inputJson)
+            .then(response => {
+                console.log("RESP---------->forecastOutput", response.data);
+                let primaryConsumptionData = response.data;
+                let selectedSupplyPlan = this.props.items.supplyPlanPlanningUnitIds;
+                var count1 = 1;
+                for (let i = 0; i < primaryConsumptionData.length; i++) {
+                    for (let j = 0; j < primaryConsumptionData[i].monthlyForecastData.length; j++) {
+                        for (let k = 0; k < selectedSupplyPlan.length; k++) {
+                            for (let l = 0; l < supplyPlanRegionList.length; l++) {
+                                for (let m = 0; m < supplyPlanRegionList[l].supplyPlanRegionList.length; m++) {
+                                    console.log("RESP---------->", supplyPlanRegionList[l].supplyPlanRegionList[m].forecastPercentage);
 
-        // let regionList = this.props.items.stepTwoData.filter(c => c.isRegionInForecastProgram == 1 && c.importRegion == 1);
-        // let regionIds = regionList.map(ele => ele.supplyPlanRegionId);
+                                    tempList.push({
+                                        id: count1,
+                                        v1: getLabelText(primaryConsumptionData[i].planningUnit.label, this.state.lang),
+                                        v2: selectedSupplyPlan[k].supplyPlanPlanningUnitDesc,
+                                        v3: supplyPlanRegionList[l].supplyPlanRegionList[m].name,
+                                        v4: primaryConsumptionData[i].monthlyForecastData[j].month,
+                                        v5: (Number(primaryConsumptionData[i].monthlyForecastData[j].consumptionQty) * Number(supplyPlanRegionList[l].supplyPlanRegionList[m].forecastPercentage) / 100),
+                                        v6: Number(selectedSupplyPlan[k].multiplier),
+                                        v7: Number(primaryConsumptionData[i].monthlyForecastData[j].consumptionQty * selectedSupplyPlan[k].multiplier),
+                                        v8: '3500.00',
+                                        v9: true
+                                    });
+                                    // let consumptionList = primaryConsumptionData[i].monthlyForecastData.map(m => {
+                                    //     return {
+                                    //         consumptionDate: m.month,
+                                    //         consumptionQty: Math.round(m.consumptionQty)
+                                    //     }
+                                    // });
 
-        // // let ActualConsumptionDataInput = { "programId": 2442, "versionId": 1, "planningUnitIds": ["1074", "1082", "2802"], "startDate": "2018-01-01", "stopDate": "2021-12-01", "regionIds": ["70", "73", "74"] }
+                                    // //             let jsonTemp = { objUnit: (viewById == 1 ? primaryConsumptionData[i].planningUnit : primaryConsumptionData[i].forecastingUnit), scenario: { id: 1, label: primaryConsumptionData[i].selectedForecast.label_en }, display: true, color: "#ba0c2f", consumptionList: consumptionList }
+                                    // consumptionData.push(consumptionList);
+                                    count1++;
+                                }
 
-        // let ActualConsumptionDataInput = {
-        //     programId: this.props.items.programId,
-        //     versionId: this.props.items.versionId,
-        //     planningUnitIds: supplyPlanPlanningUnitId,
-        //     startDate: this.props.items.startDate,
-        //     stopDate: this.props.items.stopDate,
-        //     regionIds: regionIds
-        // }
-
-        // console.log("ActualConsumptionDataInput-------------->", ActualConsumptionDataInput);
-
-
-        // ProgramService.getActualConsumptionData(ActualConsumptionDataInput)
-        //     .then(response => {
-        //         if (response.status == 200) {
-        //             console.log("getActualConsumptionData------>", response.data);
-        //             this.setState({
-        //                 actualConsumptionData: response.data,
-        //                 selSource: response.data
-        //             }, () => {
-        //                 this.buildJexcel();
-        //             })
-        //         } else {
-        //             this.setState({
-        //                 actualConsumptionData: []
-        //             });
-        //         }
-        //     }).catch(
-        //         error => {
-        //             if (error.message === "Network Error") {
-        //                 this.setState({
-        //                     message: 'static.unkownError',
-        //                     loading: false, color: 'red'
-        //                 });
-        //             } else {
-        //                 switch (error.response ? error.response.status : "") {
-
-        //                     case 401:
-        //                         this.props.history.push(`/login/static.message.sessionExpired`)
-        //                         break;
-        //                     case 403:
-        //                         this.props.history.push(`/accessDenied`)
-        //                         break;
-        //                     case 500:
-        //                     case 404:
-        //                     case 406:
-        //                         this.setState({
-        //                             message: error.response.data.messageCode,
-        //                             loading: false, color: 'red'
-        //                         });
-        //                         break;
-        //                     case 412:
-        //                         this.setState({
-        //                             message: error.response.data.messageCode,
-        //                             loading: false, color: 'red'
-        //                         });
-        //                         break;
-        //                     default:
-        //                         this.setState({
-        //                             message: 'static.unkownError',
-        //                             loading: false, color: 'red'
-        //                         });
-        //                         break;
-        //                 }
-        //             }
-        //         }
-        //     );
+                            }
+                        }
+                    }
+                }
 
 
+                // var monthArrayList = [];
+                // let cursorDate = startDate;
+                // for (var i = 0; moment(cursorDate).format("YYYY-MM") <= moment(stopDate).format("YYYY-MM"); i++) {
+                //     var dt = moment(startDate).add(i, 'months').format("YYYY-MM-DD");
+                //     cursorDate = moment(cursorDate).add(1, 'months').format("YYYY-MM-DD");
+                //     monthArrayList.push(dt);
+                // }
+
+                // console.log("consumptionData", consumptionData)
+                // console.log("monthArrayList", monthArrayList)
+
+                //         if (xaxisId == 1) {//yes
+
+                //             let min = moment(startDate).format("YYYY");
+                //             let max = moment(endDate).format("YYYY");
+                //             let years = [];
+                //             for (var i = min; i <= max; i++) {
+                //                 years.push("" + i)
+                //             }
+
+                //             let nextStartDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
+                //             let nextEndDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-28';
+
+                //             console.log("TestFU------------>900online", nextStartDate);
+                //             console.log("TestFU------------>901online", nextEndDate);
+                //             console.log("TestFU------------>92online", consumptionData);
+
+                //             for (let i = 0; i < consumptionData.length; i++) {
+
+                //                 console.log("consumptionData------------------->3002online", consumptionData[i].consumptionList);
+                //                 let nextConsumptionListData = consumptionData[i].consumptionList.filter(c => moment(c.consumptionDate).isBetween(nextStartDate, nextEndDate, null, '[)'))
+                //                 console.log("consumptionData------------------->3003online", nextConsumptionListData);
+
+                //                 let tempConsumptionListData = nextConsumptionListData.map(m => {
+                //                     return {
+                //                         consumptionDate: moment(m.consumptionDate).format("YYYY"),
+                //                         // consumptionQty: m.consumptionQty
+                //                         consumptionQty: parseInt(m.consumptionQty)
+                //                     }
+                //                 });
+                //                 console.log("consumptionData------------------->33online", tempConsumptionListData);
+
+                //                 //logic for add same date data                            
+                //                 let resultTrue = Object.values(tempConsumptionListData.reduce((a, { consumptionDate, consumptionQty }) => {
+                //                     if (!a[consumptionDate])
+                //                         a[consumptionDate] = Object.assign({}, { consumptionDate, consumptionQty });
+                //                     else
+                //                         // a[consumptionDate].consumptionQty += consumptionQty;
+                //                         // a[consumptionDate].consumptionQty = parseFloat(a[consumptionDate].consumptionQty) + parseFloat(consumptionQty);
+                //                         a[consumptionDate].consumptionQty = parseInt(a[consumptionDate].consumptionQty) + parseInt(consumptionQty);
+                //                     return a;
+                //                 }, {}));
+
+                //                 console.log("consumptionData------------------->3online", resultTrue);
+
+                //                 consumptionData[i].consumptionList = resultTrue;
+                //             }
+                //             console.log("consumptionData------------------->3online", years);
+                //             console.log("consumptionData------------------->4online", consumptionData);
+                //             this.setState({
+                //                 consumptionData: consumptionData,
+                //                 monthArrayList: years,
+                //                 message: ''
+                //             }, () => {
+                //                 // if (yaxisEquUnitId > 0) {
+                //                 //     this.calculateEquivalencyUnitTotal();
+                //                 // }
+                //             })
+
+                //         } else {//no
+                this.setState({
+                    selSource: tempList,
+                    loading: true
+                }, () => {
+                    this.buildJexcel();
+                })
+
+            }).catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: 'static.unkownError',
+                            loading: false
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                                break;
+                        }
+                    }
+                }
+            );
+
+
+
+
+        console.log("step 3-tempList--->", tempList)
+        // tempList.push({ id: 1, v2: 'Male Condom (Latex) Lubricated, No Logo, 53 mm, 3000 Pieces [4182]', v1: 'Male Condom (Latex) Lubricated, No Logo, 53 mm, 4320 Pieces [6357]', v3: 'North', v4: 'Jan-21', v5: '5930', v6: '0.694444', v7: '4118.06', v8: '3500.00', v9: true });
+        // tempList.push({ id: 2, v2: 'Male Condom (Latex) Lubricated, No Logo, 53 mm, 3000 Pieces [4182]', v1: 'Male Condom (Latex) Lubricated, No Logo, 53 mm, 4320 Pieces [6357]', v3: 'North', v4: 'Feb-21', v5: '4000', v6: '0.694444', v7: '2777.78', v8: '3000.00', v9: true });
+        // tempList.push({ id: 3, v2: 'Male Condom (Latex) Lubricated, No Logo, 53 mm, 3000 Pieces [4182]', v1: 'Male Condom (Latex) Lubricated, No Logo, 53 mm, 4320 Pieces [6357]', v3: 'North', v4: 'Mar-21', v5: '3850', v6: '0.694444', v7: '2673.61', v8: '3100.00', v9: true });
+        // tempList.push({ id: 4, v2: 'Male Condom (Latex) Lubricated, No Logo, 53 mm, 3000 Pieces [4182]', v1: 'Male Condom (Latex) Lubricated, No Logo, 53 mm, 4320 Pieces [6357]', v3: 'National', v4: 'Apr-21', v5: '4200', v6: '0.694444', v7: '2916.67', v8: '', v9: true });
+        // tempList.push({ id: 5, v2: 'Male Condom (Latex) Lubricated, No Logo, 53 mm, 3000 Pieces [4182]', v1: 'Male Condom (Latex) Lubricated, No Logo, 53 mm, 4320 Pieces [6357]', v3: 'National', v4: 'May-21', v5: '4530', v6: '0.694444', v7: '3145.83', v8: '', v9: true });
+        // tempList.push({ id: 6, v2: 'Male Condom (Latex) Lubricated, No Logo, 53 mm, 3000 Pieces [4182]', v1: 'Male Condom (Latex) Lubricated, No Logo, 53 mm, 4320 Pieces [6357]', v3: 'National', v4: 'Jun-21', v5: '4250', v6: '0.694444', v7: '2951.39', v8: '', v9: true });
+        // tempList.push({ id: 7, v2: 'Male Condom (Latex) Lubricated, No Logo, 53 mm, 3000 Pieces [4182]', v1: 'Male Condom (Latex) Lubricated, No Logo, 53 mm, 4320 Pieces [6357]', v3: 'National', v4: 'Jul-21', v5: '4100', v6: '0.694444', v7: '2847.22', v8: '', v9: true });
+        // tempList.push({ id: 8, v2: 'Male Condom (Latex) Lubricated, No Logo, 53 mm, 3000 Pieces [4182]', v1: 'Male Condom (Latex) Lubricated, No Logo, 53 mm, 4320 Pieces [6357]', v3: 'National', v4: 'Aug-21', v5: '3900', v6: '0.694444', v7: '2708.33', v8: '', v9: true });
+
+        // this.setState({
+        //     selSource: tempList,
+        //     loading: true
+        // },
+        //     () => {
+        //         this.buildJexcel();
+        //     })
     }
 
     buildJexcel() {
@@ -520,30 +656,12 @@ export default class StepThreeImportMapPlanningUnits extends Component {
         var buildCSVTable = [];
 
         var count = 0;
-        console.log("match------>-1", this.props.items.stepOneData);
-        console.log("match------>0", papuList);
+        // console.log("match------>-1", this.props.items.stepOneData);
+        // console.log("match------>0", papuList.length);
+
         if (papuList.length != 0) {
+
             for (var j = 0; j < papuList.length; j++) {
-
-                // let stepOneSelectedObject = this.props.items.stepOneData.filter(c => c.supplyPlanPlanningUnitId == papuList[j].planningUnit.id)[0];
-
-                // let selectedForecastProgram = this.props.items.datasetList.filter(c => c.programId == this.props.items.forecastProgramId && c.versionId == this.props.items.forecastProgramVersionId)[0];
-
-                // let match = selectedForecastProgram.actualConsumptionList.filter(c => new Date(c.month).getTime() == new Date(papuList[j].month).getTime() && c.region.id == papuList[j].region.id && c.planningUnit.id == stepOneSelectedObject.supplyPlanPlanningUnitId)
-
-                // data = [];
-                // data[0] = papuList[j].planningUnit.id
-                // data[1] = stepOneSelectedObject.forecastPlanningUnitId
-                // data[2] = getLabelText(papuList[j].region.label, this.state.lang)
-                // data[3] = papuList[j].month
-
-                // data[4] = papuList[j].actualConsumption
-                // data[5] = stepOneSelectedObject.multiplier
-                // data[6] = (stepOneSelectedObject.multiplier * papuList[j].actualConsumption).toFixed(2)
-                // data[7] = (match.length > 0 ? match[0].amount : '')
-                // data[8] = true
-                // data[9] = (match.length > 0 ? 1 : 0)
-                // data[10] = papuList[j].region.id
 
                 data = [];
                 data[0] = papuList[j].v1
@@ -561,32 +679,8 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                 papuDataArr[count] = data;
                 count++;
 
-                // buildCSVTable.push({
-                //     supplyPlanPlanningUnit: getLabelText(papuList[j].planningUnit.label, this.state.lang),
-                //     forecastPlanningUnit: this.props.items.planningUnitListJexcel.filter(c => c.id == stepOneSelectedObject.forecastPlanningUnitId)[0].name,
-                //     region: getLabelText(papuList[j].region.label, this.state.lang),
-                //     month: papuList[j].month,
-                //     supplyPlanConsumption: papuList[j].actualConsumption,
-                //     multiplier: stepOneSelectedObject.multiplier,
-                //     convertedConsumption: (stepOneSelectedObject.multiplier * papuList[j].actualConsumption).toFixed(2),
-                //     currentQATConsumption: (match.length > 0 ? match[0].amount : ''),
-                //     import: true
-
-                // })
             }
         }
-
-        // if (papuDataArr.length == 0) {
-        //     data = [];
-        //     data[0] = 0;
-        //     data[1] = "";
-        //     data[2] = true
-        //     data[3] = "";
-        //     data[4] = "";
-        //     data[5] = 1;
-        //     data[6] = 1;
-        //     papuDataArr[0] = data;
-        // }
 
         this.el = jexcel(document.getElementById("mapPlanningUnit"), '');
         this.el.destroy();
@@ -810,9 +904,104 @@ export default class StepThreeImportMapPlanningUnits extends Component {
     }
 
     render() {
-        const { rangeValue } = this.state
+
+        var { rangeValue } = this.state
+        if (this.props.items.startDate != "") {
+            var startDate1 = moment(this.props.items.startDate).format("YYYY-MM-DD");
+            var stopDate1 = moment(this.props.items.stopDate).format("YYYY-MM-DD");
+            // rangeValue = { from: { year: new Date(startDate1).getFullYear(), month: new Date(startDate1).getMonth() + 1 }, to: { year: new Date(stopDate1).getFullYear(), month: new Date(stopDate1).getMonth() + 1 } }
+            rangeValue = startDate1 + " ~ " + stopDate1
+        }
+
+        let datasetList = this.props.items.datasetList;
+        let datasets = null
+        datasets = datasetList.filter(c => c.programId == this.props.items.forecastProgramId)[0]
+
+        let supplyPlanList = this.props.items.programs;
+        let supplyPlan = null
+
+        supplyPlan = supplyPlanList.filter(c => c.id == this.props.items.programId)[0]
+
+
         return (
             <>
+                <AuthenticationServiceComponent history={this.props.history} />
+                <h5 className="red" id="div12">{this.state.message}</h5>
+
+                <div style={{ display: this.props.items.loading ? "none" : "block" }} >
+                    <div className="row ">
+                        <FormGroup className="col-md-4">
+                            <Label htmlFor="appendedInputButton">Supply Plan Program</Label>
+                            <div className="controls ">
+                                <InputGroup>
+                                    <Input
+                                        type="text"
+                                        name="supplyPlanProgramId"
+                                        id="supplyPlanProgramId"
+                                        bsSize="sm"
+                                        // onChange={(e) => { this.setForecastProgramId(e); }}
+                                        value={supplyPlan == null ? "" : supplyPlan.programCode}
+                                    >
+                                    </Input>
+                                </InputGroup>
+                            </div>
+                        </FormGroup>
+
+                        <FormGroup className="col-md-4">
+                            {/* <Label htmlFor="appendedInputButton">{i18n.t('static.importFromQATSupplyPlan.supplyPlanVersion')}</Label> */}
+                            <Label htmlFor="appendedInputButton">Supply Plan version</Label>
+                            <div className="controls">
+                                <InputGroup>
+                                    <Input
+                                        type="text"
+                                        name="supplyPlanVersionId"
+                                        id="supplyPlanVersionId"
+                                        bsSize="sm"
+                                        // onChange={(e) => { this.setVersionId(e); }}
+                                        // value={this.state.versionId}
+                                        value={supplyPlan == null ? "" : supplyPlan.programVersion}
+
+                                    >
+                                    </Input>
+                                </InputGroup>
+                            </div>
+                        </FormGroup>
+
+                        <FormGroup className="col-md-4">
+                            {/* <Label htmlFor="appendedInputButton">{i18n.t('static.importFromQATSupplyPlan.forecastProgram')}</Label> */}
+                            <Label htmlFor="appendedInputButton">Forecast program</Label>
+                            <div className="controls ">
+                                <InputGroup>
+                                    <Input
+                                        type="text"
+                                        name="forecastProgramId"
+                                        id="forecastProgramId"
+                                        bsSize="sm"
+                                        value={datasets == null ? "" : datasets.programCode}
+                                    >
+                                    </Input>
+                                </InputGroup>
+                            </div>
+                        </FormGroup>
+                        <FormGroup className="col-md-4">
+                            {/* <Label htmlFor="appendedInputButton">{i18n.t('static.importFromQATSupplyPlan.forecastProgram')}</Label> */}
+                            <Label htmlFor="appendedInputButton">{i18n.t('static.importFromQATSupplyPlan.Range')}<span className="stock-box-icon fa fa-sort-desc"></span></Label>
+                            <div className="controls ">
+                                <InputGroup>
+                                    <Input
+                                        type="text"
+                                        name="rangeValue"
+                                        id="rangeValue"
+                                        bsSize="sm"
+                                        value={rangeValue}
+                                    >
+                                    </Input>
+                                </InputGroup>
+                            </div>
+                        </FormGroup>
+                    </div>
+
+                </div>
                 <div className="pr-lg-0 Card-header-reporticon">
                     {/* <i className="icon-menu"></i><strong>{i18n.t('static.dashboard.globalconsumption')}</strong> */}
                     {this.state.buildCSVTable.length > 0 && <div className="card-header-actions">
