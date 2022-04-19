@@ -3298,9 +3298,15 @@ export default class BuildTree extends Component {
             var momValue = (parseFloat(getValue)).toFixed(4);
         }
 
+        var targetChangeNumber = '';
+        if (this.state.currentItemConfig.context.payload.nodeType.id < 3) {
+            targetChangeNumber = parseFloat(getEndValueFromPercentage / monthDifference).toFixed(4);
+        }
+
         this.setState({
             currentEndValue: (getValue != '' && this.state.currentModelingType != 3 && this.state.currentModelingType != 5) ? targetEndValue : '',
-            currentCalculatedMomChange: getValue != '' ? momValue : ''
+            currentCalculatedMomChange: getValue != '' ? momValue : '',
+            currentTargetChangeNumber: getValue != '' ? targetChangeNumber : '',
         });
     }
     calculateMomByChangeInNumber(e) {

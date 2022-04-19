@@ -762,11 +762,11 @@ export default class CreateTreeTemplate extends Component {
         var items = this.state.items;
         var item = items.filter(x => x.id == this.state.currentItemConfig.context.id);
         console.log("***MOM item---", item);
-        var momList = item[0].payload.nodeDataMap[this.state.selectedScenario][0].nodeDataMomList;
+        var momList = item[0].payload.nodeDataMap[0][0].nodeDataMomList;
         console.log("***MOM momList---", momList);
         if (momList.length > 0) {
             console.log("***MOM inside if---");
-            var mom = momList.filter(x => x.monthNo == startDate);
+            var mom = momList.filter(x => x.month == startDate);
             console.log("***MOM mom---", mom);
             if (mom.length > 0) {
                 console.log("***MOM mom inside if---");
@@ -1882,7 +1882,7 @@ export default class CreateTreeTemplate extends Component {
         }
 
         if (this.state.currentModelingType == 5) {
-            var momValue = (parseFloat(getValue - this.state.currentCalculatorStartValue.toString().replaceAll(",", "") / monthDifference).toFixed(4);
+            var momValue = parseFloat(getValue - this.state.currentCalculatorStartValue.toString().replaceAll(",", "") / monthDifference).toFixed(4);
         }
         // console.log("getmomValue>>>", momValue);
         var targetChangeNumber = '';
@@ -1905,6 +1905,8 @@ export default class CreateTreeTemplate extends Component {
         });
         var startDate = this.state.currentCalculatorStartDate;
         var endDate = this.state.currentCalculatorStopDate;
+        var monthArr = this.state.monthList.filter(x => x.id > startDate && x.id < endDate);
+        var monthDifference = monthArr.length > 0 ? parseInt(monthArr.length + 1) : 0;
         // var monthDifference = moment(endDate).diff(startDate, 'months', true);
         // var monthArr = this.state.monthList.filter(x => x.id > startDate && x.id < endDate);
         // var monthDifference = monthArr.length > 0 ? parseInt(monthArr.length + 1) : 0;
@@ -1915,7 +1917,7 @@ export default class CreateTreeTemplate extends Component {
         // if (this.state.currentItemConfig.context.payload.nodeType.id == 3) {
         //     var targetEndValue = (parseFloat(getEndValueFromPercentage) + parseFloat(this.state.currentCalculatorStartValue)) / this.state.currentCalculatorStartValue * 100;
         // } else {
-        var targetEndValue = parseFloat(this.state.currentCalculatorStartValue.toString().replaceAll(",", "") + getEndValueFromPercentage).toFixed(4);
+        var targetEndValue = (parseFloat(this.state.currentCalculatorStartValue.toString().replaceAll(",", "")) + parseFloat(getEndValueFromPercentage)).toFixed(4);
         // }
 
         var momValue = ''
@@ -1942,9 +1944,15 @@ export default class CreateTreeTemplate extends Component {
             var momValue = (parseFloat(getValue)).toFixed(4);
         }
 
+        var targetChangeNumber = '';
+        if (this.state.currentItemConfig.context.payload.nodeType.id < 3) {
+            targetChangeNumber = parseFloat(getEndValueFromPercentage / monthDifference).toFixed(4);
+        }
+
         this.setState({
             currentEndValue: (getValue != '' && this.state.currentModelingType != 3 && this.state.currentModelingType != 5) ? targetEndValue : '',
-            currentCalculatedMomChange: getValue != '' ? momValue : ''
+            currentCalculatedMomChange: getValue != '' ? momValue : '',
+            currentTargetChangeNumber: getValue != '' ? targetChangeNumber : ''
         });
     }
 
@@ -5338,8 +5346,8 @@ export default class CreateTreeTemplate extends Component {
 
 
         if (event.target.name == "calculatorStartDate") {
-            var  currentCalculatorStartValue = this.getMomValueForDateRange(event.target.value);
-            this.setState({ currentCalculatorStartDate: event.target.value,currentCalculatorStartValue });
+            var currentCalculatorStartValue = this.getMomValueForDateRange(event.target.value);
+            this.setState({ currentCalculatorStartDate: event.target.value, currentCalculatorStartValue });
         }
 
         if (event.target.name == "calculatorTargetDate") {
@@ -8202,11 +8210,11 @@ export default class CreateTreeTemplate extends Component {
                         <div className={itemConfig.payload.nodeType.id == 5 || itemConfig.payload.nodeType.id == 4 ? "ContactTitle TitleColorWhite" : "ContactTitle TitleColor"}>
                             <div title={itemConfig.payload.label.label_en} style={{ fontSize: '13px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', width: '141px', float: 'left', fontWeight: 'bold' }}>{itemConfig.payload.label.label_en}</div>
                             <div style={{ float: 'right' }}>
-                            {this.getPayloadData(itemConfig, 4) == true && <i class="fa fa-exchange fa-rotate-90" style={{ fontSize: '11px', color: (itemConfig.payload.nodeType.id == 4 || itemConfig.payload.nodeType.id == 5 ? '#fff' : '#002f6c') }}></i>}
-                            {this.getPayloadData(itemConfig, 5) == true && <i class="fa fa-link" style={{ fontSize: '11px', color: (itemConfig.payload.nodeType.id == 4 || itemConfig.payload.nodeType.id == 5 ? '#fff' : '#002f6c') }}></i>}
-                            <b style={{ color: '#212721', float: 'right' }}>{itemConfig.payload.nodeType.id == 2 ? <i class="fa fa-hashtag" style={{ fontSize: '11px', color: '#002f6c' }}></i> : (itemConfig.payload.nodeType.id == 3 ? <i class="fa fa-percent " style={{ fontSize: '11px', color: '#002f6c' }} ></i> : (itemConfig.payload.nodeType.id == 4 ? <i class="fa fa-cube" style={{ fontSize: '11px', color: '#fff' }} ></i> : (itemConfig.payload.nodeType.id == 5 ? <i class="fa fa-cubes" style={{ fontSize: '11px', color: '#fff' }} ></i> : (itemConfig.payload.nodeType.id == 1 ? <i><img src={AggregationNode} className="AggregationNodeSize" /></i> : ""))))}</b>
+                                {this.getPayloadData(itemConfig, 4) == true && <i class="fa fa-exchange fa-rotate-90" style={{ fontSize: '11px', color: (itemConfig.payload.nodeType.id == 4 || itemConfig.payload.nodeType.id == 5 ? '#fff' : '#002f6c') }}></i>}
+                                {this.getPayloadData(itemConfig, 5) == true && <i class="fa fa-link" style={{ fontSize: '11px', color: (itemConfig.payload.nodeType.id == 4 || itemConfig.payload.nodeType.id == 5 ? '#fff' : '#002f6c') }}></i>}
+                                <b style={{ color: '#212721', float: 'right' }}>{itemConfig.payload.nodeType.id == 2 ? <i class="fa fa-hashtag" style={{ fontSize: '11px', color: '#002f6c' }}></i> : (itemConfig.payload.nodeType.id == 3 ? <i class="fa fa-percent " style={{ fontSize: '11px', color: '#002f6c' }} ></i> : (itemConfig.payload.nodeType.id == 4 ? <i class="fa fa-cube" style={{ fontSize: '11px', color: '#fff' }} ></i> : (itemConfig.payload.nodeType.id == 5 ? <i class="fa fa-cubes" style={{ fontSize: '11px', color: '#fff' }} ></i> : (itemConfig.payload.nodeType.id == 1 ? <i><img src={AggregationNode} className="AggregationNodeSize" /></i> : ""))))}</b>
                             </div>
-                            </div>
+                        </div>
                     </div>
                     <div className="ContactPhone ContactPhoneValue">
                         <span style={{ textAlign: 'center', fontWeight: '500' }}>{this.getPayloadData(itemConfig, 1)}</span>
@@ -9068,25 +9076,25 @@ export default class CreateTreeTemplate extends Component {
                                                                 </FormGroup> */}
                                                             </Row>
                                                             <FormGroup className="row col-md-3 pl-lg-0 MarginTopMonthSelector">
-                                                                    <Label htmlFor="languageId">{'Month Selector'}</Label>
-                                                                    <Input
-                                                                        type="select"
-                                                                        name="monthId"
-                                                                        id="monthId"
-                                                                        bsSize="sm"
-                                                                        onChange={(e) => { this.dataChange(e) }}
-                                                                        value={this.state.monthId}
-                                                                    >
-                                                                        {this.state.monthList.length > 0
-                                                                            && this.state.monthList.map((item, i) => {
-                                                                                return (
-                                                                                    <option key={i} value={item.id}>
-                                                                                        {item.name}
-                                                                                    </option>
-                                                                                )
-                                                                            }, this)}
-                                                                    </Input>
-                                                                </FormGroup>
+                                                                <Label htmlFor="languageId">{'Month Selector'}</Label>
+                                                                <Input
+                                                                    type="select"
+                                                                    name="monthId"
+                                                                    id="monthId"
+                                                                    bsSize="sm"
+                                                                    onChange={(e) => { this.dataChange(e) }}
+                                                                    value={this.state.monthId}
+                                                                >
+                                                                    {this.state.monthList.length > 0
+                                                                        && this.state.monthList.map((item, i) => {
+                                                                            return (
+                                                                                <option key={i} value={item.id}>
+                                                                                    {item.name}
+                                                                                </option>
+                                                                            )
+                                                                        }, this)}
+                                                                </Input>
+                                                            </FormGroup>
                                                         </div>
 
                                                     </CardBody>
