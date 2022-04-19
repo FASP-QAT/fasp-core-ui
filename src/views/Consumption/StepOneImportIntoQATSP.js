@@ -139,70 +139,87 @@ export default class StepOneImportMapPlanningUnits extends Component {
                         this.hideFirstComponent()
                     }.bind(this);
                     planningunitRequest.onsuccess = function (e) {
-                        var myResult = [];
-                        var programId = (value != "" && value != undefined ? value : 0).split("_")[0];
-                        myResult = planningunitRequest.result.filter(c => c.program.id == programId && c.active == true);
-                        console.log("myResult----programId-->", programId)
-                        console.log("myResult----->", myResult)
 
-                        let dupPlanningUnitObj = myResult.map(ele => ele.planningUnit);
-                        console.log("dupPlanningUnitObj-------->2", dupPlanningUnitObj);
+                        var planningunitUnitTransaction = db1.transaction(['planningUnit'], 'readwrite');
+                        var planningunitUnitOs = planningunitUnitTransaction.objectStore('planningUnit');
+                        var planningunitUnitRequest = planningunitUnitOs.getAll();
+                        var planningUnitList = []
+                        // planningunitRequest.onerror = function (event) {
+                        //     this.setState({
+                        //         message: i18n.t('static.program.errortext'),
+                        //         color: '#BA0C2F'
+                        //     })
+                        //     this.hideFirstComponent()
+                        // }.bind(this);
+                        planningunitUnitRequest.onsuccess = function (e) {
+                            var planningUnitListFromtable = planningunitUnitRequest.result;
 
-                        const ids = dupPlanningUnitObj.map(o => o.id)
-                        const filtered = dupPlanningUnitObj.filter(({ id }, index) => !ids.includes(id, index + 1))
-                        console.log("programJson1-------->2", filtered);
+                            var myResult = [];
+                            var programId = (value != "" && value != undefined ? value : 0).split("_")[0];
+                            myResult = planningunitRequest.result.filter(c => c.program.id == programId && c.active == true);
+                            console.log("myResult----programId-->", programId)
+                            console.log("myResult----->", myResult)
 
-                        let tempList = [];
-                        if (myResult.length > 0) {
-                            for (var i = 0; i < myResult.length; i++) {
-                                var paJson = {
-                                    name: getLabelText(myResult[i].planningUnit.label, this.state.lang) + ' | ' + parseInt(myResult[i].planningUnit.id),
-                                    id: parseInt(myResult[i].planningUnit.id),
-                                    multiplier: myResult[i].multiplier,
-                                    active: myResult[i].active,
-                                    forecastingUnit: myResult[i].forecastingUnit
+                            let dupPlanningUnitObj = myResult.map(ele => ele.planningUnit);
+                            console.log("dupPlanningUnitObj-------->2", dupPlanningUnitObj);
+
+                            const ids = dupPlanningUnitObj.map(o => o.id)
+                            const filtered = dupPlanningUnitObj.filter(({ id }, index) => !ids.includes(id, index + 1))
+                            console.log("programJson1-------->2", filtered);
+
+                            let tempList = [];
+                            if (myResult.length > 0) {
+                                for (var i = 0; i < myResult.length; i++) {
+                                    var paJson = {
+                                        name: getLabelText(myResult[i].planningUnit.label, this.state.lang) + ' | ' + parseInt(myResult[i].planningUnit.id),
+                                        id: parseInt(myResult[i].planningUnit.id),
+                                        multiplier: myResult[i].multiplier,
+                                        active: myResult[i].active,
+                                        forecastingUnit: myResult[i].forecastingUnit,
+                                        tracerCategoryId: planningUnitListFromtable.filter(c => c.planningUnitId == myResult[i].planningUnit.id)[0].forecastingUnit.tracerCategory.id
+                                    }
+                                    tempList[i] = paJson
                                 }
-                                tempList[i] = paJson
                             }
-                        }
 
-                        tempList = tempList.sort(function (a, b) {
-                            a = a.name.toLowerCase();
-                            b = b.name.toLowerCase();
-                            return a < b ? -1 : a > b ? 1 : 0;
-                        })
-
-                        tempList.unshift({
-                            name: i18n.t('static.quantimed.doNotImport'),
-                            id: -1,
-                            multiplier: 1,
-                            active: true,
-                            forecastingUnit: []
-                        });
-                        console.log("tempList===>", tempList)
-
-                        this.setState({
-                            planningUnitList: myResult
-                            // .sort(function (a, b) {
-                            //     a = a.label.toLowerCase();
-                            //     b = b.label.toLowerCase();
-                            //     return a < b ? -1 : a > b ? 1 : 0;
-                            // })
-                            ,
-                            // filteredForecastingUnit: filtered,
-                            // supplyPlanPlanignUnitListForNotDuplicate: filtered,
-                            planningUnitListAll: myResult,
-                            generalProgramJson: programJson,
-                            supplyPlanRegionList: supplyPlanRegionList.sort(function (a, b) {
+                            tempList = tempList.sort(function (a, b) {
                                 a = a.name.toLowerCase();
                                 b = b.name.toLowerCase();
                                 return a < b ? -1 : a > b ? 1 : 0;
-                            }), loading: false,
-                            planningUnitListJexcel: tempList
-                        }, () => {
-                            this.filterData();
-                        })
+                            })
 
+                            tempList.unshift({
+                                name: i18n.t('static.quantimed.doNotImport'),
+                                id: -1,
+                                multiplier: 1,
+                                active: true,
+                                forecastingUnit: []
+                            });
+                            console.log("tempList===>", tempList)
+
+                            this.setState({
+                                planningUnitList: myResult
+                                // .sort(function (a, b) {
+                                //     a = a.label.toLowerCase();
+                                //     b = b.label.toLowerCase();
+                                //     return a < b ? -1 : a > b ? 1 : 0;
+                                // })
+                                ,
+                                // filteredForecastingUnit: filtered,
+                                // supplyPlanPlanignUnitListForNotDuplicate: filtered,
+                                planningUnitListAll: myResult,
+                                generalProgramJson: programJson,
+                                supplyPlanRegionList: supplyPlanRegionList.sort(function (a, b) {
+                                    a = a.name.toLowerCase();
+                                    b = b.name.toLowerCase();
+                                    return a < b ? -1 : a > b ? 1 : 0;
+                                }), loading: false,
+                                planningUnitListJexcel: tempList
+                            }, () => {
+                                this.filterData();
+                            })
+
+                        }.bind(this);
                     }.bind(this);
                 }.bind(this)
             }.bind(this)
@@ -751,13 +768,13 @@ export default class StepOneImportMapPlanningUnits extends Component {
             for (var j = 0; j < papuList.length; j++) {
 
                 let planningUnitObj = null;
-                planningUnitObj = this.state.planningUnitList.filter(c => c.planningUnit.id == papuList[j].forecastingUnit.id)[0];
+                planningUnitObj = this.state.planningUnitList.filter(c => c.planningUnit.id == papuList[j].id)[0];
                 data = [];
                 data[0] = getLabelText(papuList[j].forecastingUnit.tracerCategory.label, this.state.lang)
                 data[1] = getLabelText(papuList[j].label, this.state.lang) + ' | ' + papuList[j].id
                 data[2] = planningUnitObj == null ? "" : planningUnitObj.planningUnit.id
-                data[3] = planningUnitObj == null ? "" : papuList[j].multiplier
-                data[4] = planningUnitObj == null ? "" : planningUnitObj.forecastingUnit.tracerCategory.id
+                data[3] = planningUnitObj == null ? "" : planningUnitObj.multiplier / papuList[j].multiplier
+                data[4] = ""
                 data[5] = papuList[j].forecastingUnit.tracerCategory.id
                 data[6] = papuList[j].id
 
@@ -832,7 +849,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                     title: 'Supply Plan Planning Unit',
                     type: 'autocomplete',
                     source: this.state.planningUnitListJexcel,//2 C
-                    // filter: this.filterPlanningUnitBasedOnTracerCategory
+                    filter: this.filterPlanningUnitBasedOnTracerCategory
                 },
                 {
                     title: i18n.t('static.importFromQATSupplyPlan.conversionFactor'),
@@ -1028,7 +1045,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
         // console.log("mylist--------->1021", mylist);
 
         if (value > 0) {
-            mylist = mylist.filter(c => (c.id == -1 ? c : c.forecastingUnit.tracerCategory.id == value && c.active.toString() == "true"));
+            mylist = mylist.filter(c => (c.id == -1 ? c : c.tracerCategoryId == value && c.active.toString() == "true"));
         }
 
         // console.log("mylist--------->103", mylist);
