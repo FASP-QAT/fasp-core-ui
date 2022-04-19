@@ -8176,9 +8176,12 @@ export default class CreateTreeTemplate extends Component {
                     >
                         <div className={itemConfig.payload.nodeType.id == 5 || itemConfig.payload.nodeType.id == 4 ? "ContactTitle TitleColorWhite" : "ContactTitle TitleColor"}>
                             <div title={itemConfig.payload.label.label_en} style={{ fontSize: '13px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', width: '141px', float: 'left', fontWeight: 'bold' }}>{itemConfig.payload.label.label_en}</div>
+                            <div style={{ float: 'right' }}>
                             {this.getPayloadData(itemConfig, 4) == true && <i class="fa fa-exchange fa-rotate-90" style={{ fontSize: '11px', color: (itemConfig.payload.nodeType.id == 4 || itemConfig.payload.nodeType.id == 5 ? '#fff' : '#002f6c') }}></i>}
                             {this.getPayloadData(itemConfig, 5) == true && <i class="fa fa-link" style={{ fontSize: '11px', color: (itemConfig.payload.nodeType.id == 4 || itemConfig.payload.nodeType.id == 5 ? '#fff' : '#002f6c') }}></i>}
-                            <b style={{ color: '#212721', float: 'right' }}>{itemConfig.payload.nodeType.id == 2 ? <i class="fa fa-hashtag" style={{ fontSize: '11px', color: '#002f6c' }}></i> : (itemConfig.payload.nodeType.id == 3 ? <i class="fa fa-percent " style={{ fontSize: '11px', color: '#002f6c' }} ></i> : (itemConfig.payload.nodeType.id == 4 ? <i class="fa fa-cube" style={{ fontSize: '11px', color: '#fff' }} ></i> : (itemConfig.payload.nodeType.id == 5 ? <i class="fa fa-cubes" style={{ fontSize: '11px', color: '#fff' }} ></i> : (itemConfig.payload.nodeType.id == 1 ? <i><img src={AggregationNode} className="AggregationNodeSize" /></i> : ""))))}</b></div>
+                            <b style={{ color: '#212721', float: 'right' }}>{itemConfig.payload.nodeType.id == 2 ? <i class="fa fa-hashtag" style={{ fontSize: '11px', color: '#002f6c' }}></i> : (itemConfig.payload.nodeType.id == 3 ? <i class="fa fa-percent " style={{ fontSize: '11px', color: '#002f6c' }} ></i> : (itemConfig.payload.nodeType.id == 4 ? <i class="fa fa-cube" style={{ fontSize: '11px', color: '#fff' }} ></i> : (itemConfig.payload.nodeType.id == 5 ? <i class="fa fa-cubes" style={{ fontSize: '11px', color: '#fff' }} ></i> : (itemConfig.payload.nodeType.id == 1 ? <i><img src={AggregationNode} className="AggregationNodeSize" /></i> : ""))))}</b>
+                            </div>
+                            </div>
                     </div>
                     <div className="ContactPhone ContactPhoneValue">
                         <span style={{ textAlign: 'center', fontWeight: '500' }}>{this.getPayloadData(itemConfig, 1)}</span>
@@ -9006,7 +9009,7 @@ export default class CreateTreeTemplate extends Component {
                                                                     <FormFeedback>{errors.monthsInFuture}</FormFeedback>
                                                                 </FormGroup>
 
-                                                                <FormGroup className="col-md-3 pl-lg-0">
+                                                                <FormGroup className="col-md-6 pl-lg-0">
                                                                     <Label htmlFor="languageId">{'Notes'}</Label>
                                                                     <Input
                                                                         type="textarea"
@@ -9018,7 +9021,28 @@ export default class CreateTreeTemplate extends Component {
                                                                     >
                                                                     </Input>
                                                                 </FormGroup>
-                                                                <FormGroup className="col-md-3 pl-lg-0">
+                                                                {/* <FormGroup className="col-md-3 pl-lg-0 MarginTopMonthSelector">
+                                                                    <Label htmlFor="languageId">{'Month Selector'}</Label>
+                                                                    <Input
+                                                                        type="select"
+                                                                        name="monthId"
+                                                                        id="monthId"
+                                                                        bsSize="sm"
+                                                                        onChange={(e) => { this.dataChange(e) }}
+                                                                        value={this.state.monthId}
+                                                                    >
+                                                                        {this.state.monthList.length > 0
+                                                                            && this.state.monthList.map((item, i) => {
+                                                                                return (
+                                                                                    <option key={i} value={item.id}>
+                                                                                        {item.name}
+                                                                                    </option>
+                                                                                )
+                                                                            }, this)}
+                                                                    </Input>
+                                                                </FormGroup> */}
+                                                            </Row>
+                                                            <FormGroup className="row col-md-3 pl-lg-0 MarginTopMonthSelector">
                                                                     <Label htmlFor="languageId">{'Month Selector'}</Label>
                                                                     <Input
                                                                         type="select"
@@ -9038,11 +9062,10 @@ export default class CreateTreeTemplate extends Component {
                                                                             }, this)}
                                                                     </Input>
                                                                 </FormGroup>
-                                                            </Row>
                                                         </div>
 
                                                     </CardBody>
-                                                    <CardFooter className="pt-lg-0 pr-lg-0" style={{ backgroundColor: 'transparent', borderTop: '0px solid #c8ced3' }}>
+                                                    <CardFooter className="col-md-6 pt-lg-0 pr-lg-0 float-right MarginTopCreateTreeBtn" style={{ backgroundColor: 'transparent', borderTop: '0px solid #c8ced3' }}>
                                                         {/* <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button> */}
                                                         <Button type="button" size="md" color="warning" className="float-right mr-1 mb-lg-2" onClick={this.resetTree}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                                         <Button type="submit" color="success" className="mr-1 mb-lg-2 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"> </i>{i18n.t('static.pipeline.save')}</Button>

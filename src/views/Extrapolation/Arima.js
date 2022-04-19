@@ -48,7 +48,7 @@ export function calculateArima(inputData, p, d, q, confidenceLevel, noOfProjecti
                 }
                 
                 console.log("OutPut@@@@@@@@@@@@@@@@@@@@@@", output)
-                calculateCI(output, confidenceLevel, "arimaData", props)
+                calculateCI(output, Number(confidenceLevel), "arimaData", props)
                 calculateError(output, "arimaError", props)
 
             }
