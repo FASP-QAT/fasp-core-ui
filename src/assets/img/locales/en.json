@@ -1516,7 +1516,7 @@
     "static.report.avergeStock": "Average Stock",
     "static.tree.StartPercentage": "Start Percentage",
     "static.program.arrivedToDeliveredLeadTime": "Enter `Arrived to Delivered` lead time (in months)",
-    "static.tooltip.Transfercloumn": "Link the changes in this node to the changes in another node in the same level Transfers must occur from left to right",
+    "static.tooltip.Transfercloumn": "Link the changes in this node to the changes in another node in the same level Transfers must occur from both ways",
     "static.currency.currencycodetext": "Enter currency display name",
     "static.procurementagent.procurementAgentColorCode": "Color Code",
     "static.supplyPlan.suggestedShipments": "QAT Suggested Shipments",
