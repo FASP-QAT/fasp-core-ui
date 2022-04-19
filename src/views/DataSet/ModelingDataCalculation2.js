@@ -569,10 +569,11 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                 var grandParentNodeData = (grandParentFiltered.payload.nodeDataMap[scenarioList[ndm].id])[0];
                                 console.log("grandParentNodeData$$$%%%", grandParentNodeData)
                                 if (grandParentNodeData != undefined) {
-                                    patients = grandParentNodeData.calculatedDataValue != null ? grandParentNodeData.calculatedDataValue : grandParentNodeData.dataValue;
+                                    patients = grandParentNodeData.displayCalculatedDataValue != null ? grandParentNodeData.displayCalculatedDataValue : grandParentNodeData.calculatedDataValue != null ? grandParentNodeData.calculatedDataValue : grandParentNodeData.dataValue;
                                 } else {
                                     patients = 0;
                                 }
+                                console.log("Patients@@@@@@@@@@@", patients);
                                 // patients = 5432;
                                 // console.log("nodeDataMapForScenario$$$%%%", nodeDataMapForScenario)
                                 if (!isTemplate) {
@@ -654,7 +655,7 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
 
                                 // if (parentNodeNodeData.fuNode.usageType.id == 2) {
                                 if (i >= lag) {
-                                    var percentageOfEndValue = nodeDataList.filter(c => moment(c.month).format("YYYY-MM") == moment(curDate).subtract(lag, 'months').format("YYYY-MM"))[0].endValue;
+                                    var percentageOfEndValue = (lag == 0 ? endValue : nodeDataList.filter(c => moment(c.month).format("YYYY-MM") == moment(curDate).subtract(lag, 'months').format("YYYY-MM"))[0].endValue);
                                     calculatedMmdValue = Math.round((noOfFus * percentageOfEndValue / 100) / fuPerPu);
                                 } else {
                                     calculatedMmdValue = 0;
