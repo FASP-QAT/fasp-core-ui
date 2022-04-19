@@ -527,7 +527,8 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                         calculatedMMdPatients.push({ month: i, value: noOfPatients < 0 ? 0 : noOfPatients });
                                     } else {
                                         console.log("MonthsPer visit@@@@@@@@@@@", monthsPerVisit);
-                                        var prevCycleValue = calculatedMMdPatients.filter(c => c.month == (i - monthsPerVisit))[0].value;
+                                        console.log("I++++++++++@@@@@@@@@@@", i);
+                                        var prevCycleValue = calculatedMMdPatients[countOfI - monthsPerVisit].value;
                                         noOfPatients = prevCycleValue + deltaPatients;
                                         calculatedMMdPatients.push({ month: i, value: noOfPatients < 0 ? 0 : noOfPatients });
                                     }
@@ -539,18 +540,23 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                     var lag = parentNodeNodeData.fuNode.lagInMonths;
                                     var noOfFus = 0;
                                     if (countOfI >= lag) {
-                                        var nodeDataMomForParentPerc = parentNodeNodeData.nodeDataMomList.filter(c => c.month == i);
+                                        var nodeDataMomForParentPerc = parentNodeNodeData.nodeDataMomList[countOfI - lag];
                                         var percentageToMultiply = 0;
-                                        if (nodeDataMomForParentPerc.length > 0) {
-                                            percentageToMultiply = nodeDataMomForParentPerc[0].endValue;
+                                        if (nodeDataMomForParentPerc != undefined) {
+                                            percentageToMultiply = nodeDataMomForParentPerc.endValue;
                                         }
-                                        var diffForI=countOfI-lag==0?1:countOfI-lag;
-                                        noOfFus = (((calculatedMMdPatients.filter(c => c.month == diffForI)[0].value * percentageToMultiply / 100) * noOfBottlesInOneVisit) * fuPerPu).toFixed(2);
+                                        // var diffForI = countOfI - lag == 0 ? 1 : countOfI - lag;
+                                        noOfFus = (((calculatedMMdPatients[countOfI - lag].value * percentageToMultiply / 100) * noOfBottlesInOneVisit) * fuPerPu).toFixed(2);
                                     } else {
                                         noOfFus = 0;
                                     }
+                                    if (countOfI >= lag) {
+                                        var percentageOfEndValue = (lag == 0 ? endValue : nodeDataList[countOfI - lag].endValue);
+                                        calculatedMmdValue = Math.round((noOfFus * percentageOfEndValue / 100) / fuPerPu);
+                                    } else {
+                                        calculatedMmdValue = 0;
+                                    }
 
-                                    calculatedMmdValue = Math.round((noOfFus * endValue / 100) / fuPerPu);
                                     console.log("CalculatedMmdValueForPU$$$$###", calculatedMmdValue)
                                 }
                             }
