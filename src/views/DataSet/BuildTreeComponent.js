@@ -3567,7 +3567,7 @@ export default class BuildTree extends Component {
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
-                    title: i18n.t('static.tree.Note'),
+                    title: i18n.t('static.common.description'),
                     type: 'text',
 
                 },
@@ -3621,7 +3621,7 @@ export default class BuildTree extends Component {
                     readOnly: true
                 },
                 {
-                    title: i18n.t('static.tree.calculatedChangeForMonth'),
+                    title: i18n.t('static.tree.calculatedChangeForMonthTree') + " " + moment(this.state.currentScenario.month.replace(/-/g, '\/')).format('MMM.YYYY'),
                     type: 'numeric',
                     mask: '#,##0.0000',
                     decimal: '.',
@@ -9308,6 +9308,10 @@ export default class BuildTree extends Component {
         }
         // let { currentItemConfig } = this.state;
         // (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].month = date;
+        if (this.state.modelingEl != "") {
+            // console.log("this.state.modelingEl---", event.target.value)
+            this.state.modelingEl.setHeader(9, i18n.t('static.tree.calculatedChangeForMonthTree') + " " + moment(startDate).format('MMM.YYYY'));
+        }
         this.setState({ scalingMonth: value }, () => {
             console.log("after state update---", this.state.currentItemConfig);
         });

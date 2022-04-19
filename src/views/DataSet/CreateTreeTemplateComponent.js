@@ -2955,7 +2955,7 @@ export default class CreateTreeTemplate extends Component {
             columns: [
                 //1 B
                 {
-                    title: i18n.t('static.tree.Note'),
+                    title: i18n.t('static.common.description'),
                     type: 'text',
 
                 },
@@ -3017,7 +3017,7 @@ export default class CreateTreeTemplate extends Component {
                 },
                 //8 I
                 {
-                    title: i18n.t('static.tree.calculatedChangeForMonth'),
+                    title: i18n.t('static.tree.calculatedChangeForMonth') + " " + this.state.scalingMonth,
                     type: 'numeric',
                     mask: '#,##0.0000',
                     decimal: '.',
@@ -3224,6 +3224,7 @@ export default class CreateTreeTemplate extends Component {
 
         var asterisk = document.getElementsByClassName("resizable")[0];
         var tr = asterisk.firstChild;
+        console.log("tr.children[9]---", tr.children[9]);
         tr.children[4].classList.add('InfoTr');
         tr.children[5].classList.add('InfoTr');
         tr.children[9].classList.add('InfoTr');
@@ -3232,6 +3233,7 @@ export default class CreateTreeTemplate extends Component {
         tr.children[4].title = i18n.t('static.tooltip.Transfercloumn');
         tr.children[5].title = i18n.t('static.tooltip.ModelingType');
         tr.children[9].title = i18n.t('static.tooltip.ModelingCalculator');
+        // tr.children[9] = 'Anchal';
         tr.children[10].title = i18n.t('static.tooltip.CalculatorChangeforMonth');
 
     }
@@ -5324,6 +5326,11 @@ export default class CreateTreeTemplate extends Component {
                     this.buildModelingJexcel();
                 })
             }
+            this.setState({ scalingMonth: this.state.currentItemConfig.context.payload.nodeDataMap[0][0].monthNo });
+            // if (this.state.modelingEl != "") {
+            //     console.log("this.state.modelingEl---", this.state.modelingEl)
+            //     this.state.modelingEl.setHeader(9, i18n.t('static.tree.calculatedChangeForMonth') + " " + this.state.scalingMonth);
+            // }
             //  else if (this.state.currentItemConfig.context.payload.nodeType.id == 3) {
             //     this.setState({ showModelingJexcelPercent: true }, () => {
             //         this.buildModelingJexcelPercent()
@@ -5453,12 +5460,16 @@ export default class CreateTreeTemplate extends Component {
             currentItemConfig.context.payload.nodeUnit.label = label;
         }
         if (event.target.name === "monthNoFilter") {
-            console.log("this.state.modelingChanged@@@@@@@@@@@@", this.state.modelingChanged)
+            console.log("event.target.value", event.target.value)
             if (!this.state.modelingChanged) {
                 this.filterScalingDataByMonth(event.target.value);
             }
+            if (this.state.modelingEl != "") {
+                console.log("this.state.modelingEl---", event.target.value)
+                this.state.modelingEl.setHeader(9, i18n.t('static.tree.calculatedChangeForMonth') + " " + event.target.value);
+            }
             this.setState({ scalingMonth: event.target.value }, () => {
-                // console.log("after state update---", event.target.value);
+
             });
         }
         if (event.target.name === "percentageOfParent") {
