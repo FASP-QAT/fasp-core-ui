@@ -404,6 +404,8 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           wordWrap: true,
           allowInsertColumn: false,
           allowManualInsertColumn: false,
+          allowInsertRow: false,
+          allowManualInsertRow: false,
           allowDeleteRow: false,
           copyCompatibility: true,
           allowExport: false,
@@ -1253,7 +1255,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         B.push(i18n.t('static.dataentry.adjustedConsumption').replaceAll(' ', '%20'))
         for (var j = 0; j < monthArray.length; j++) {
           var consumptionData = consumptionList.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArray[j].date).format("YYYY-MM") && c.region.id == regionList[r].regionId);
-          B.push(consumptionData.length > 0 ? consumptionData[0].adjustedAmount.toString().replaceAll("\,", "") : "")
+          B.push(consumptionData.length > 0 ? consumptionData[0].adjustedAmount != undefined ? consumptionData[0].adjustedAmount.toString().replaceAll("\,", "") : consumptionData[0].amount.toString().replaceAll("\,", "") : "")
         }
         C.push(this.addDoubleQuoteToRowContent(B));
         B = [];
@@ -1261,7 +1263,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         B.push(i18n.t('static.dataentry.convertedToPlanningUnit').replaceAll(' ', '%20'))
         for (var j = 0; j < monthArray.length; j++) {
           var consumptionData = consumptionList.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArray[j].date).format("YYYY-MM") && c.region.id == regionList[r].regionId);
-          B.push(consumptionData.length > 0 ? consumptionData[0].puAmount.toString().replaceAll("\,", "") : "")
+          B.push(consumptionData.length > 0 ? consumptionData[0].puAmount != undefined ? consumptionData[0].puAmount.toString().replaceAll("\,", "") : consumptionData[0].amount : "")
         }
         C.push(this.addDoubleQuoteToRowContent(B));
         B = [];
