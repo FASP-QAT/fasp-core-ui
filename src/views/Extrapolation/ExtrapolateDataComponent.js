@@ -706,7 +706,7 @@ export default class ExtrapolateDataComponent extends React.Component {
             mapeArr.push(this.state.tesError.mape)
         }
         if (this.state.arimaId) {
-            rmseArr.push(this.state.arimaError.mape)
+            mapeArr.push(this.state.arimaError.mape)
         }
 
         if (this.state.movingAvgId) {
@@ -722,7 +722,7 @@ export default class ExtrapolateDataComponent extends React.Component {
             mseArr.push(this.state.tesError.mse)
         }
         if (this.state.arimaId) {
-            rmseArr.push(this.state.arimaError.mse)
+            mseArr.push(this.state.arimaError.mse)
         }
 
         if (this.state.movingAvgId) {
@@ -738,7 +738,7 @@ export default class ExtrapolateDataComponent extends React.Component {
             rSqdArr.push(this.state.tesError.rSqd)
         }
         if (this.state.arimaId) {
-            rmseArr.push(this.state.arimaError.rSqd)
+            rSqdArr.push(this.state.arimaError.rSqd)
         }
 
         if (this.state.movingAvgId) {
@@ -754,7 +754,7 @@ export default class ExtrapolateDataComponent extends React.Component {
             wapeArr.push(this.state.tesError.wape)
         }
         if (this.state.arimaId) {
-            rmseArr.push(this.state.arimaError.wape)
+            wapeArr.push(this.state.arimaError.wape)
         }
 
         var minRmse = Math.min(...rmseArr.filter(c => c !== ""));
@@ -3423,12 +3423,12 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                             </Input>
                                                             <FormFeedback>{errors.confidenceLevelId}</FormFeedback>
                                                         </div>
-                                                        <div>
+                                                        <div style={{ display: 'none' }}>
                                                             <Popover placement="top" isOpen={this.state.popoverOpenSeaonality} target="Popover7" trigger="hover" toggle={() => this.toggle('popoverOpenSeaonality', !this.state.popoverOpenSeaonality)}>
                                                                 <PopoverBody>{i18n.t('static.tooltip.seasonality')}</PopoverBody>
                                                             </Popover>
                                                         </div>
-                                                        <div className="col-md-2">
+                                                        <div className="col-md-2" style={{ display: 'none' }}>
                                                             <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.seasonality')}
                                                                 <i class="fa fa-info-circle icons pl-lg-2" id="Popover7" onClick={() => this.toggle('popoverOpenSeaonality', !this.state.popoverOpenSeaonality)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
                                                             </Label>
