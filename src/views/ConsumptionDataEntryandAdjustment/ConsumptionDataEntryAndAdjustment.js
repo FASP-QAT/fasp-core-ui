@@ -757,7 +757,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       }
 
       if (cont == true) {
-        document.getElementById("consumptionNotes").value = notes + " Interpolated data for: " + interpolatedRegions.map(item => (
+        document.getElementById("consumptionNotes").value = notes + (notes != "" ? "\r\n" : "") + "Interpolated data for: " + interpolatedRegions.map(item => (
           "\r\n" + getLabelText(regionList.filter(c => c.regionId == item)[0].label, this.state.lang) + ": " + interpolatedRegionsAndMonths.filter(c => c.region.regionId == item).map(item1 => moment(item1.month).format(DATE_FORMAT_CAP_WITHOUT_DATE))
         ));
         this.setState({
@@ -1369,13 +1369,23 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       localStorage.setItem("sesDatasetId", datasetId);
       this.setState({
         datasetId: datasetId,
+        dataEl: "",
+        showSmallTable: false,
+        showDetailTable: false,
       }, () => {
+        try {
+          this.el = jexcel(document.getElementById("tableDiv"), '');
+          this.el.destroy();
+        } catch (error) {
+
+        }
         if (datasetId != "") {
           this.getDatasetData();
         } else {
           this.setState({
             showSmallTable: false,
-            showDetailTable: false
+            showDetailTable: false,
+            dataEl: ""
           })
         }
       })
