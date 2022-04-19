@@ -105,7 +105,7 @@ class AddprogramPlanningUnit extends Component {
 
         for (var k = 0; k < puList.length; k++) {
             var planningUnitJson = {
-                name: puList[k].label.label_en,
+                name: puList[k].label.label_en + ' | ' + puList[k].planningUnitId,
                 id: puList[k].planningUnitId
             }
             mylist.push(planningUnitJson);
@@ -275,13 +275,14 @@ class AddprogramPlanningUnit extends Component {
                                 // PlanningUnitService.getAllPlanningUnitList()
                                 PlanningUnitService.getActivePlanningUnitList()
                                     .then(response => {
+                                        console.log("PlanningUnitResponse------->", response.data);
                                         if (response.status == 200) {
                                             this.setState({
                                                 planningUnitList: response.data
                                             });
                                             for (var k = 0; k < (response.data).length; k++) {
                                                 var planningUnitJson = {
-                                                    name: response.data[k].label.label_en,
+                                                    name: response.data[k].label.label_en + ' | ' + response.data[k].planningUnitId,
                                                     id: response.data[k].planningUnitId,
                                                     active: response.data[k].active
                                                 }
@@ -565,7 +566,7 @@ class AddprogramPlanningUnit extends Component {
                                                                             title: i18n.t('static.common.insertNewRowBefore'),
                                                                             onclick: function () {
                                                                                 var data = [];
-                                                                                data[0] = 0;
+                                                                                data[0] = -1;
                                                                                 data[1] = "";
                                                                                 data[2] = "";
                                                                                 data[3] = "";
@@ -588,7 +589,7 @@ class AddprogramPlanningUnit extends Component {
                                                                             title: i18n.t('static.common.insertNewRowAfter'),
                                                                             onclick: function () {
                                                                                 var data = [];
-                                                                                data[0] = 0;
+                                                                                data[0] = -1;
                                                                                 data[1] = "";
                                                                                 data[2] = "";
                                                                                 data[3] = "";
