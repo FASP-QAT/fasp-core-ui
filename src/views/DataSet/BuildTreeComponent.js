@@ -2298,7 +2298,7 @@ export default class BuildTree extends Component {
                 grandParentMomList = grandParentNodeData.nodeDataMomList;
                 console.log("grandParentNodeData$$$%%%", grandParentNodeData)
                 if (grandParentNodeData != undefined) {
-                    patients = grandParentNodeData.displayCalculatedDataValue != null ? grandParentNodeData.displayCalculatedDataValue : grandParentNodeData.calculatedDataValue != null ? grandParentNodeData.calculatedDataValue : grandParentNodeData.dataValue;
+                    patients = grandParentNodeData.calculatedDataValue != null ? grandParentNodeData.calculatedDataValue : grandParentNodeData.dataValue;
                 } else {
                     patients = 0;
                 }
