@@ -1588,7 +1588,7 @@ export default class BuildTree extends Component {
                 console.log("items---***", items);
                 this.setState({ items })
             }
-            console.log("this.state.currentItemConfig.context.payload.extrapolation----",this.state.currentItemConfig.context.payload.extrapolation);
+            console.log("this.state.currentItemConfig.context.payload.extrapolation----", this.state.currentItemConfig.context.payload.extrapolation);
             if (parameterName == 'type' && (value == 0 || value == 1) && this.state.currentItemConfig.context.payload.extrapolation != true && this.state.currentItemConfig.context.payload.extrapolation != "true") {
                 if (this.state.currentItemConfig.context.payload.nodeType.id == 1 || this.state.currentItemConfig.context.payload.nodeType.id == 2) {
                     console.log("mom list ret---", this.state.nodeDataMomList.filter(x => x.nodeId == this.state.currentItemConfig.context.id));
@@ -2298,7 +2298,7 @@ export default class BuildTree extends Component {
                 grandParentMomList = grandParentNodeData.nodeDataMomList;
                 console.log("grandParentNodeData$$$%%%", grandParentNodeData)
                 if (grandParentNodeData != undefined) {
-                    patients = grandParentNodeData.calculatedDataValue != null ? grandParentNodeData.calculatedDataValue : grandParentNodeData.dataValue;
+                    patients = grandParentNodeData.displayCalculatedDataValue != null ? grandParentNodeData.displayCalculatedDataValue : grandParentNodeData.calculatedDataValue != null ? grandParentNodeData.calculatedDataValue : grandParentNodeData.dataValue;
                 } else {
                     patients = 0;
                 }
@@ -9995,7 +9995,7 @@ export default class BuildTree extends Component {
                 <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
                     <Card className="mb-lg-0">
                         <div className="pb-lg-0">
-                            <div className="Card-header-reporticon pb-1" style={{display:'grid',float:'right'}}>
+                            <div className="Card-header-reporticon pb-1" style={{ display: 'grid', float: 'right' }}>
                                 {/* <span className="compareAndSelect-larrow"> <i className="cui-arrow-left icons " > </i></span> */}
                                 {/* <span className="compareAndSelect-rarrow"> <i className="cui-arrow-right icons " > </i></span> */}
                                 <span className="compareAndSelect-larrowText"> {i18n.t('static.common.continueTo')} <a href="/#/validation/modelingValidation" className="supplyplanformulas">{i18n.t('static.dashboard.modelingValidation')}</a>  <span className="compareAndSelect-rarrow"> <i className="cui-arrow-right icons " > </i></span></span>
