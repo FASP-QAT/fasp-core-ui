@@ -54,7 +54,8 @@ export default class StepOneImportMapPlanningUnits extends Component {
             supplyPlanPlanningUnitIds: [],
             forecastPlanignUnitListForNotDuplicate: [],
             supplyPlanPlanignUnitListForNotDuplicate: [],
-            programObj: []
+            programObj: [],
+            programListFilter: []
 
         }
         this.changed = this.changed.bind(this);
@@ -517,8 +518,8 @@ export default class StepOneImportMapPlanningUnits extends Component {
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
-            var transaction = db1.transaction(['programQPLDetails'], 'readwrite');
-            var program = transaction.objectStore('programQPLDetails');
+            var transaction = db1.transaction(['programData'], 'readwrite');
+            var program = transaction.objectStore('programData');
             var getRequest = program.getAll();
             var programs = [];
 
@@ -541,11 +542,15 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 var filteredGetRequestList = myResult.filter(c => c.userId == userId);
 
                 for (var i = 0; i < filteredGetRequestList.length; i++) {
+                    var programDataBytes = CryptoJS.AES.decrypt(filteredGetRequestList[i].programData.generalData, SECRET_KEY);
+                    var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                    var programJson = JSON.parse(programData);
                     programs.push({
                         programCode: filteredGetRequestList[i].programCode,
                         programVersion: filteredGetRequestList[i].version,
                         programId: filteredGetRequestList[i].programId,
                         id: filteredGetRequestList[i].id,
+                        generalProgramJson: programJson,
                         loading: false,
                     });
                 }
@@ -1125,17 +1130,24 @@ export default class StepOneImportMapPlanningUnits extends Component {
         // let forecastProgramVersionId = tempId.split('~')[1];
         console.log("forecastProgramVersionId-------->", e.target.value);
 
-        let selectedForecastProgram = this.state.datasetList.filter(c => c.programId == e.target.value)[0]
+        let selectedForecastProgram = this.state.datasetList.filter(c => c.programId == e.target.value)[0];
+        console.log("Selected Forecast Program@@@@@@@@@@@@@@@", selectedForecastProgram);
+        console.log("Programs@@@@@@@@@@@@@@@", this.state.programs);
         let startDateSplit = selectedForecastProgram.forecastStartDate.split('-');
+        var programListFilter = [];
+        if (e.target.value != "") {
+            programListFilter = this.state.programs.filter(c => c.generalProgramJson.realmCountry.realmCountryId == selectedForecastProgram.realmCountry.realmCountryId);
+        }
         // let stopDateSplit = selectedForecastProgram.forecastStopDate.split('-');
         let forecastStopDate = new Date(selectedForecastProgram.forecastStopDate);
         forecastStopDate.setMonth(forecastStopDate.getMonth() - 1);
-
         this.setState({
             forecastProgramId: e.target.value,
             rangeValue: { from: { year: startDateSplit[1] - 3, month: new Date(selectedForecastProgram.forecastStartDate).getMonth() + 1 }, to: { year: forecastStopDate.getFullYear(), month: forecastStopDate.getMonth() + 1 } },
             // forecastProgramVersionId: forecastProgramVersionId,
-            versionId: ''
+            versionId: '',
+            programListFilter: programListFilter
+
         }, () => {
             // this.props.updateStepOneData("forecastProgramVersionId", forecastProgramVersionId);
             this.filterVersion();
@@ -1278,9 +1290,9 @@ export default class StepOneImportMapPlanningUnits extends Component {
     render() {
         const { rangeValue } = this.state
 
-        const { programs } = this.state;
-        let programList = programs.length > 0
-            && programs.map((item, i) => {
+        const { programListFilter } = this.state;
+        let programList = programListFilter.length > 0
+            && programListFilter.map((item, i) => {
                 return (
                     <option key={i} value={item.id}>
                         {item.programCode + ' v' + item.programVersion}
