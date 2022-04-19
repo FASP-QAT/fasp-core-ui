@@ -193,7 +193,7 @@ export default class ExtrapolateDataComponent extends React.Component {
 
 
         this.state = {
-            forecastProgramId: -1,
+            forecastProgramId: "",
             forecastProgramList: [],
             planningUnitId: -1,
             planningUnitList: [],
