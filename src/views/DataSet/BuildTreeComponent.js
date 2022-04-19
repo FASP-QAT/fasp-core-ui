@@ -760,6 +760,7 @@ export default class BuildTree extends Component {
             showDate: false,
             modelingChanged: false
         }
+        this.getMomValueForDateRange = this.getMomValueForDateRange.bind(this);
         this.toggleDeropdownSetting = this.toggleDeropdownSetting.bind(this);
         // this.onClick1 = this.onClick1.bind(this);
         this.toggleHowManyPUperIntervalPer = this.toggleHowManyPUperIntervalPer.bind(this);
@@ -890,6 +891,29 @@ export default class BuildTree extends Component {
         this.qatCalculatedPUPerVisit = this.qatCalculatedPUPerVisit.bind(this);
         this.calculateParentValueFromMOM = this.calculateParentValueFromMOM.bind(this);
         this.getNodeTransferList = this.getNodeTransferList.bind(this);
+    }
+
+    getMomValueForDateRange(startDate) {
+        console.log("***MOM startDate---", startDate);
+        var startValue = 0;
+        var items = this.state.items;
+        var item = items.filter(x => x.id == this.state.currentItemConfig.context.id);
+        console.log("***MOM item---", item);
+        var momList = item[0].payload.nodeDataMap[this.state.selectedScenario][0].nodeDataMomList;
+        console.log("***MOM momList---", momList);
+        if (momList.length > 0) {
+            console.log("***MOM inside if---");
+            var mom = momList.filter(x => moment(x.month).format("YYYY-MM-DD") == moment(startDate).format("YYYY-MM-DD"));
+            console.log("***MOM mom---", mom);
+            if (mom.length > 0) {
+                console.log("***MOM mom inside if---");
+                startValue = mom[0].startValue;
+                console.log("***MOM startValue---", startValue);
+            }
+        }
+        console.log("***MOM startValue---", startValue);
+        return startValue;
+
     }
     calculateParentValueFromMOM(month) {
         var parentValue = 0;
@@ -3073,6 +3097,7 @@ export default class BuildTree extends Component {
                 }
 
                 var elInstance = this.state.modelingEl;
+                console.log("check validation elInstance---", elInstance)
                 var rowData = elInstance.getRowData(y);
                 console.log("modelingTypeId-valid--", rowData[4])
                 if (rowData[4] != "") {
@@ -3194,19 +3219,10 @@ export default class BuildTree extends Component {
         });
         var startDate = this.state.currentCalculatorStartDate;
         var endDate = this.state.currentCalculatorStopDate;
-        // moment(c.expectedDeliveryDate).add(parseInt(typeProblemList[prob].data1), 'days').format('YYYY-MM-DD') < moment(myDateShipment).format('YYYY-MM-DD')
         var monthDifference = moment(endDate).startOf('month').diff(startDate, 'months', true);
         console.log("month diff>>>", monthDifference);
         var momValue = ''
         var getValue = e.target.value.toString().replaceAll(",", "");
-        // console.log("hi>>",this.state.currentItemConfig.context.payload.nodeType.id,",",this.state.currentModelingType);
-        // if (this.state.currentItemConfig.context.payload.nodeType.id == 3) {
-        //     // var getPervalue = parseFloat(this.state.currentCalculatorStartValue * e.target.value / 100);
-        //     // getValue = getPervalue;
-        //     var momValue = e.target.value - this.state.currentScenario.dataValue;
-        // } else {
-        //     getValue = e.target.value
-        // }
         if (this.state.currentModelingType == 2) {
             var momValue = ((parseFloat(getValue - this.state.currentCalculatorStartValue.toString().replaceAll(",", ""))) / monthDifference).toFixed(4);
         }
@@ -3223,18 +3239,18 @@ export default class BuildTree extends Component {
         }
         if (this.state.currentModelingType == 4) {
             // var momValue = ((Math.pow(parseFloat(getValue / this.state.currentCalculatorStartValue), parseFloat(1 / monthDifference)) - 1) * 100).toFixed(4);
-            var momValue = ((parseFloat(getValue - this.state.currentCalculatorStartValue)) / monthDifference).toFixed(4);
+            var momValue = ((parseFloat(getValue - this.state.currentCalculatorStartValue.toString().replaceAll(",", ""))) / monthDifference).toFixed(4);
         }
 
         if (this.state.currentModelingType == 5) {
-            var momValue = (parseFloat(getValue - this.state.currentScenario.dataValue) / monthDifference).toFixed(4);
+            var momValue = (parseFloat(getValue - this.state.currentCalculatorStartValue.toString().replaceAll(",", "")) / monthDifference).toFixed(4);
         }
         // console.log("getmomValue>>>", momValue);
         var targetChangeNumber = '';
         var targetChangePer = '';
         if (this.state.currentItemConfig.context.payload.nodeType.id < 3) {
-            targetChangeNumber = (parseFloat(getValue - this.state.currentCalculatorStartValue) / monthDifference).toFixed(4);
-            targetChangePer = (parseFloat(targetChangeNumber / this.state.currentCalculatorStartValue) * 100).toFixed(4);
+            targetChangeNumber = (parseFloat(getValue - this.state.currentCalculatorStartValue.toString().replaceAll(",", "")) / monthDifference).toFixed(4);
+            targetChangePer = (parseFloat(targetChangeNumber / this.state.currentCalculatorStartValue.toString().replaceAll(",", "")) * 100).toFixed(4);
         }
         this.setState({
             currentTargetChangeNumber: e.target.value != '' ? targetChangeNumber : '',
@@ -3252,19 +3268,16 @@ export default class BuildTree extends Component {
         var endDate = this.state.currentCalculatorStopDate;
         var monthDifference = moment(endDate).diff(startDate, 'months', true);
         var getValue = e.target.value != "" ? e.target.value.toString().replaceAll(",", "").match(/^-?\d+(?:\.\d{0,2})?/)[0] : "";
-        var getEndValueFromPercentage = (this.state.currentCalculatorStartValue * getValue) / 100;
+        var getEndValueFromPercentage = (this.state.currentCalculatorStartValue.toString().replaceAll(",", "") * getValue) / 100;
 
-
-        // if (this.state.currentItemConfig.context.payload.nodeType.id == 3) {
-        //     var targetEndValue = (parseFloat(getEndValueFromPercentage) + parseFloat(this.state.currentCalculatorStartValue)) / this.state.currentCalculatorStartValue * 100;
-        // } else {
-        var targetEndValue = parseFloat(this.state.currentCalculatorStartValue + getEndValueFromPercentage).toFixed(4);
-        // }
+        console.log("***-----------------1-", this.state.currentCalculatorStartValue.toString().replaceAll(",", ""));
+        console.log("***-----------------2-", getEndValueFromPercentage);
+        var targetEndValue = (parseFloat(this.state.currentCalculatorStartValue.toString().replaceAll(",", "")) + parseFloat(getEndValueFromPercentage)).toFixed(4);
 
         var momValue = ''
         if (this.state.currentModelingType == 2) {
             // var momValue = ((parseFloat(targetEndValue - this.state.currentCalculatorStartValue)) / monthDifference).toFixed(4);
-            var momValue = ((parseFloat((this.state.currentCalculatorStartValue * getValue) / 100))).toFixed(4);
+            var momValue = ((parseFloat((this.state.currentCalculatorStartValue.toString().replaceAll(",", "") * getValue) / 100))).toFixed(4);
         }
         if (this.state.currentModelingType == 3) {
             if (this.state.currentItemConfig.context.payload.nodeType.id > 2) {
@@ -3272,22 +3285,28 @@ export default class BuildTree extends Component {
                 var momValue = (this.state.currentScenario.calculatedDataValue * getChangeInPercent / 100).toFixed(4);
             } else {
                 // var momValue = ((parseFloat(targetEndValue - this.state.currentCalculatorStartValue)) / monthDifference / this.state.currentCalculatorStartValue * 100).toFixed(4);
-                var momValue = ((parseFloat((this.state.currentCalculatorStartValue * getValue) / 100))).toFixed(4);
+                var momValue = ((parseFloat((this.state.currentCalculatorStartValue.toString().replaceAll(",", "") * getValue) / 100))).toFixed(4);
             }
 
         }
         if (this.state.currentModelingType == 4) {
             // var momValue = ((Math.pow(parseFloat(targetEndValue / this.state.currentCalculatorStartValue), parseFloat(1 / monthDifference)) - 1) * 100).toFixed(4);
-            var momValue = ((parseFloat((this.state.currentCalculatorStartValue * getValue) / 100))).toFixed(4);
+            var momValue = ((parseFloat((this.state.currentCalculatorStartValue.toString().replaceAll(",", "") * getValue) / 100))).toFixed(4);
 
         }
         if (this.state.currentModelingType == 5) {
             var momValue = (parseFloat(getValue)).toFixed(4);
         }
 
+        var targetChangeNumber = '';
+        if (this.state.currentItemConfig.context.payload.nodeType.id < 3) {
+            targetChangeNumber = parseFloat(getEndValueFromPercentage / monthDifference).toFixed(4);
+        }
+
         this.setState({
             currentEndValue: (getValue != '' && this.state.currentModelingType != 3 && this.state.currentModelingType != 5) ? targetEndValue : '',
-            currentCalculatedMomChange: getValue != '' ? momValue : ''
+            currentCalculatedMomChange: getValue != '' ? momValue : '',
+            currentTargetChangeNumber: getValue != '' ? targetChangeNumber : '',
         });
     }
     calculateMomByChangeInNumber(e) {
@@ -3301,7 +3320,7 @@ export default class BuildTree extends Component {
         var monthDifference = moment(endDate).diff(startDate, 'months', true);
         var getValue = e.target.value.toString().replaceAll(",", "");
         // var getEndValueFromNumber = parseFloat(this.state.currentCalculatorStartValue) + parseFloat(e.target.value);
-        var targetEndValue = parseFloat(this.state.currentCalculatorStartValue) + parseFloat(getValue);
+        var targetEndValue = parseFloat(this.state.currentCalculatorStartValue.toString().replaceAll(",", "")) + parseFloat(getValue);
 
         var momValue = ''
         if (this.state.currentModelingType == 2) {
@@ -3548,7 +3567,7 @@ export default class BuildTree extends Component {
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
-                    title: i18n.t('static.tree.Note'),
+                    title: i18n.t('static.common.description'),
                     type: 'text',
                     width:'130'
 
@@ -3604,7 +3623,7 @@ export default class BuildTree extends Component {
                     readOnly: true
                 },
                 {
-                    title: i18n.t('static.tree.calculatedChangeForMonth'),
+                    title: i18n.t('static.tree.calculatedChangeForMonthTree') + " " + moment(this.state.currentScenario.month.replace(/-/g, '\/')).format('MMM.YYYY'),
                     type: 'numeric',
                     mask: '#,##0.0000',
                     decimal: '.',
@@ -3844,14 +3863,15 @@ export default class BuildTree extends Component {
                 // console.log("x row data===>", this.el.getRowData(x));
                 var elInstance = this.state.modelingEl;
                 var rowData = elInstance.getRowData(x);
+                var startValue = this.getMomValueForDateRange(rowData[1]);
+                console.log("***MOM final start value---", startValue)
                 this.setState({
                     currentRowIndex: x,
                     showCalculatorFields: this.state.aggregationNode ? !this.state.showCalculatorFields : false,
                     currentModelingType: rowData[4],
                     currentCalculatorStartDate: rowData[1],
                     currentCalculatorStopDate: rowData[2],
-                    currentCalculatorStartValue: this.state.currentScenario.calculatedDataValue,
-
+                    currentCalculatorStartValue: startValue,
                     currentCalculatedMomChange: '',
                     currentTargetChangeNumber: '',
                     currentTargetChangeNumberEdit: false,
@@ -8871,7 +8891,7 @@ export default class BuildTree extends Component {
                                                 name="startValue"
                                                 bsSize="sm"
                                                 readOnly={true}
-                                                value={addCommas(this.state.currentScenario.calculatedDataValue)}
+                                                value={addCommas(this.state.currentCalculatorStartValue)}
 
                                             >
                                             </Input>
@@ -8885,7 +8905,7 @@ export default class BuildTree extends Component {
                                                 name="startPercentage"
                                                 bsSize="sm"
                                                 readOnly={true}
-                                                value={this.state.currentScenario.dataValue}
+                                                value={this.state.currentCalculatorStartValue}
 
                                             >
                                             </Input>
@@ -9293,6 +9313,10 @@ export default class BuildTree extends Component {
         }
         // let { currentItemConfig } = this.state;
         // (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].month = date;
+        if (this.state.modelingEl != "") {
+            // console.log("this.state.modelingEl---", event.target.value)
+            this.state.modelingEl.setHeader(9, i18n.t('static.tree.calculatedChangeForMonthTree') + " " + moment(startDate).format('MMM.YYYY'));
+        }
         this.setState({ scalingMonth: value }, () => {
             console.log("after state update---", this.state.currentItemConfig);
         });
@@ -9339,7 +9363,10 @@ export default class BuildTree extends Component {
     handleAMonthChange4 = (year, month) => {
         // console.log("value>>>", year);
         // console.log("text>>>", month)
-        this.setState({ currentCalculatorStartDate: year + "-" + month + "-01" }, () => {
+        var date = year + "-" + month + "-01";
+        var currentCalculatorStartValue = this.getMomValueForDateRange(date);
+        console.log("currentCalculatorStartValue---", currentCalculatorStartValue);
+        this.setState({ currentCalculatorStartDate: date, currentCalculatorStartValue }, () => {
 
         });
 

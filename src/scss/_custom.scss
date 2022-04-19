@@ -6346,8 +6346,13 @@ top: calc(20em + 3px);
 
 // .usageTemplateDataEntryTable .jtabs-content .jtabs-selected .jexcel_content .jexcel>tbody>tr>td:nth-child(17) {
 //   display:none !important;
+
+// .UsageTemplateTable .jexcelremoveReadonlybackground .jexcel > tbody > tr > td:nth-child(20) {
+//    display: none !important;
+//    text-align: left !important;
+// }
+// .UsageTemplateTable .jexcel > thead > tr > td:nth-child(20) {
+//   display: none !important; 
+//   text-align: left !important;
 // }
 
-// .usageTemplateDataEntryTable .jtabs-content .jtabs-selected .jexcel_content .jexcel>thead>tr>td:nth-child(17) {
-//   display:none !important;
-// }
