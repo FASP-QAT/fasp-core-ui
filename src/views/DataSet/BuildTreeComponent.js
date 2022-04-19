@@ -3569,7 +3569,7 @@ export default class BuildTree extends Component {
                 {
                     title: i18n.t('static.common.description'),
                     type: 'text',
-                    width:'130'
+                    width: '130'
 
                 },
                 {
@@ -3585,7 +3585,7 @@ export default class BuildTree extends Component {
                 {
                     title: i18n.t('static.tree.transferToNode'),
                     type: 'dropdown',
-                    width:'130',
+                    width: '130',
                     source: this.state.sameLevelNodeList
                 },
 
@@ -3629,9 +3629,9 @@ export default class BuildTree extends Component {
                     decimal: '.',
                     textEditor: true,
                     disabledMaskOnEdition: true,
-                    width:'130',
+                    width: '130',
                     readOnly: true
-                    
+
                 },
                 {
                     title: 'nodeDataModelingId',
@@ -8112,8 +8112,8 @@ export default class BuildTree extends Component {
                                                                     name="interval"
                                                                     bsSize="sm"
                                                                     readOnly={true}
-                                                                    // value={addCommas(this.state.conversionFactor / ((this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod))}>
-                                                                    value={addCommas(this.round(this.state.conversionFactor / (this.state.parentScenario.fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod)))}>
+                                                                    // value={addCommas(this.round(this.state.conversionFactor / (this.state.parentScenario.fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod)))}>
+                                                                    value={addCommas(this.state.currentItemConfig.context.payload.nodeType.id == 5 && this.state.parentScenario.fuNode.usageType.id == 2 ? this.state.currentScenario.puNode.refillMonths : "")}>
 
                                                                 </Input>
                                                             </FormGroup>
@@ -8185,7 +8185,8 @@ export default class BuildTree extends Component {
                                                         name="puPerVisitQATCalculated"
                                                         readOnly={true}
                                                         bsSize="sm"
-                                                        value={this.state.qatCalculatedPUPerVisit}
+                                                        // value={this.state.qatCalculatedPUPerVisit}
+                                                        value={this.state.currentItemConfig.parentItem != null && this.state.parentScenario.fuNode != null ? (this.state.currentScenario.puNode.sharePlanningUnit == "false" || this.state.currentScenario.puNode.sharePlanningUnit == false || this.state.parentScenario.fuNode.usageType.id == 2) ? addCommas(this.state.currentScenario.puNode.puPerVisit) : addCommas(this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor) : ""}
                                                     >
                                                     </Input>
                                                 </FormGroup></>}
@@ -10024,7 +10025,7 @@ export default class BuildTree extends Component {
             <h5 className={this.state.color} id="div2">
                 {i18n.t(this.state.message, { entityname })}</h5>
             <Row>
-                <Col sm={12} md={12} style={{ flexBasis: 'auto'}}>
+                <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
                     <Card className="mb-lg-0">
                         <div className="pb-lg-0">
                             <div className="Card-header-reporticon pb-1" style={{ display: 'grid', float: 'right' }}>
