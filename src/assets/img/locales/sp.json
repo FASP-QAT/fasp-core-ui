@@ -1513,7 +1513,7 @@
     "static.report.avergeStock": "Inventario promedio",
     "static.tree.StartPercentage": "Porcentaje de inicio",
     "static.program.arrivedToDeliveredLeadTime": "Ingrese el tiempo de entrega `Llegado a entregado` (en meses)",
-    "static.tooltip.Transfercloumn": "Vincule los cambios en este nodo a los cambios en otro nodo en el mismo nivel Las transferencias deben ocurrir de izquierda a derecha",
+    "static.tooltip.Transfercloumn": "Vincule los cambios en este nodo a los cambios en otro nodo en el mismo nivel Las transferencias deben ocurrir en ambos sentidos",
     "static.currency.currencycodetext": "Ingresar el código de la Divisa",
     "static.procurementagent.procurementAgentColorCode": "Codigo de color",
     "static.supplyPlan.suggestedShipments": "Pedidos sugeridos por QAT",

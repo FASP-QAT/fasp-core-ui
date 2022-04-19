@@ -193,6 +193,9 @@ export default class ExtrapolateDataComponent extends React.Component {
 
 
         this.state = {
+            popoverOpenConfidenceLevel: false,
+            popoverOpenConfidenceLevel1: false,
+            popoverOpenConfidenceLevel2: false,
             forecastProgramId: -1,
             forecastProgramList: [],
             planningUnitId: -1,
@@ -303,6 +306,9 @@ export default class ExtrapolateDataComponent extends React.Component {
             extrapolateClicked: false
         }
         // this.toggleD = this.toggleD.bind(this);
+        this.toggleConfidenceLevel = this.toggleConfidenceLevel.bind(this);
+        this.toggleConfidenceLevel1 = this.toggleConfidenceLevel1.bind(this);
+        this.toggleConfidenceLevel2 = this.toggleConfidenceLevel2.bind(this);
         this.toggle = this.toggle.bind(this)
         this.reset = this.reset.bind(this)
         this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
@@ -2417,6 +2423,21 @@ export default class ExtrapolateDataComponent extends React.Component {
             showGuidance: !this.state.showGuidance
         })
     }
+    toggleConfidenceLevel() {
+        this.setState({
+            popoverOpenConfidenceLevel: !this.state.popoverOpenConfidenceLevel,
+        });
+    }
+    toggleConfidenceLevel1() {
+        this.setState({
+            popoverOpenConfidenceLevel1: !this.state.popoverOpenConfidenceLevel1,
+        });
+    }
+    toggleConfidenceLevel2() {
+        this.setState({
+            popoverOpenConfidenceLevel2: !this.state.popoverOpenConfidenceLevel2,
+        });
+    }
 
     getDateDifference() {
         var rangeValue = this.state.rangeValue1;
@@ -3344,9 +3365,14 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                         </Label>
                                                     </div>
                                                     <div className="row col-md-12 pt-lg-2" style={{ display: this.state.linearRegressionId ? '' : 'none' }}>
+                                                    <div>
+                                                                <Popover placement="top" isOpen={this.state.popoverOpenConfidenceLevel} target="Popover60" trigger="hover" toggle={this.toggleConfidenceLevel}>
+                                                                    <PopoverBody>{i18n.t('static.tooltip.confidenceLevel')}</PopoverBody>
+                                                                </Popover>
+                                                            </div>
                                                         <div className="col-md-2">
                                                             <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.confidenceLevel')}
-                                                                <i class="fa fa-info-circle icons pl-lg-2" id="Popover6" onClick={() => this.toggle('popoverOpenConfidence', !this.state.popoverOpenConfidence)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
+                                                                <i class="fa fa-info-circle icons pl-lg-2" id="Popover60" onClick={this.toggleConfidenceLevel} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
                                                             </Label>
                                                             <Input
                                                                 className="controls"
@@ -3394,13 +3420,13 @@ export default class ExtrapolateDataComponent extends React.Component {
 
                                                     <div className="row col-md-12 pt-lg-2" style={{ display: this.state.smoothingId ? '' : 'none' }}>
                                                         <div>
-                                                            <Popover placement="top" isOpen={this.state.popoverOpenConfidence} target="Popover6" trigger="hover" toggle={() => this.toggle('popoverOpenConfidence', !this.state.popoverOpenConfidence)}>
+                                                            <Popover placement="top" isOpen={this.state.popoverOpenConfidenceLevel1} target="Popover61" trigger="hover" toggle={this.toggleConfidenceLevel1}>
                                                                 <PopoverBody>{i18n.t('static.tooltip.confidenceLevel')}</PopoverBody>
                                                             </Popover>
                                                         </div>
                                                         <div className="col-md-2">
                                                             <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.confidenceLevel')}
-                                                                <i class="fa fa-info-circle icons pl-lg-2" id="Popover6" onClick={() => this.toggle('popoverOpenConfidence', !this.state.popoverOpenConfidence)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
+                                                                <i class="fa fa-info-circle icons pl-lg-2" id="Popover61" onClick={this.toggleConfidenceLevel} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
                                                             </Label>
                                                             <Input
                                                                 className="controls"
@@ -3579,13 +3605,13 @@ export default class ExtrapolateDataComponent extends React.Component {
 
                                                     <div className="row col-md-12 pt-lg-2" style={{ display: this.state.arimaId ? '' : 'none' }}>
                                                         <div>
-                                                            <Popover placement="top" isOpen={this.state.popoverOpenConfidence} target="Popover6" trigger="hover" toggle={() => this.toggle('popoverOpenConfidence', !this.state.popoverOpenConfidence)}>
+                                                            <Popover placement="top" isOpen={this.state.popoverOpenConfidenceLevel2} target="Popover62" trigger="hover" toggle={this.toggleConfidenceLevel2}>
                                                                 <PopoverBody>{i18n.t('static.tooltip.confidenceLevel')}</PopoverBody>
                                                             </Popover>
                                                         </div>
                                                         <div className="col-md-2">
                                                             <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.confidenceLevel')}
-                                                                <i class="fa fa-info-circle icons pl-lg-2" id="Popover6" onClick={() => this.toggle('popoverOpenConfidence', !this.state.popoverOpenConfidence)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
+                                                                <i class="fa fa-info-circle icons pl-lg-2" id="Popover62" onClick={this.toggleConfidenceLevel2} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
                                                             </Label>
                                                             <Input
                                                                 className="controls"

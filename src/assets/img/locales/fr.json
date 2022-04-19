@@ -1511,7 +1511,7 @@
     "static.report.avergeStock": "Stock moyen",
     "static.tree.StartPercentage": "Pourcentage de départ",
     "static.program.arrivedToDeliveredLeadTime": "Entrez le délai «Arrivé à livré» (en mois)",
-    "static.tooltip.Transfercloumn": "Lier les modifications de ce nœud aux modifications dun autre nœud du même niveau Les transferts doivent se faire de gauche à droite",
+    "static.tooltip.Transfercloumn": "Liez les modifications de ce nœud aux modifications d'un autre nœud du même niveau Les transferts doivent se produire dans les deux sens",
     "static.currency.currencycodetext": "Entrez le nom d`affichage de la devise",
     "static.procurementagent.procurementAgentColorCode": "Code couleur",
     "static.supplyPlan.suggestedShipments": "Expéditions suggérées par QAT",

@@ -303,6 +303,7 @@ export default class TreeExtrapolationComponent extends React.Component {
             popoverOpenAlpha: false,
             popoverOpenSeasonality: false,
             popoverOpenConfidenceLevel: false,
+            popoverOpenConfidenceLeve1l: false,
             popoverOpenStartMonth: false,
             popoverOpenChooseMethod: false,
             popoverOpenMa: false,
@@ -329,6 +330,7 @@ export default class TreeExtrapolationComponent extends React.Component {
         this.toggleAlpha = this.toggleAlpha.bind(this);
         this.toggleSeasonality = this.toggleSeasonality.bind(this);
         this.toggleConfidenceLevel = this.toggleConfidenceLevel.bind(this);
+        this.toggleConfidenceLevel1 = this.toggleConfidenceLevel1.bind(this);
         this.toggleLr = this.toggleLr.bind(this);
         this.toggleTes = this.toggleTes.bind(this);
         this.toggleArima = this.toggleArima.bind(this);
@@ -2065,6 +2067,11 @@ export default class TreeExtrapolationComponent extends React.Component {
             popoverOpenConfidenceLevel: !this.state.popoverOpenConfidenceLevel,
         });
     }
+    toggleConfidenceLevel1() {
+        this.setState({
+            popoverOpenConfidenceLevel1: !this.state.popoverOpenConfidenceLevel1,
+        });
+    }
     toggleLr() {
         this.setState({
             popoverOpenLr: !this.state.popoverOpenLr,
@@ -2773,10 +2780,15 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                             </div>
                                                             <div className="row col-md-12 pt-lg-2">
                                                                 <div className="col-md-2 pl-lg-0 pt-lg-0" style={{ display: this.state.linearRegressionId ? '' : 'none' }}>
+                                                                <div>
+                                                                <Popover placement="top" isOpen={this.state.popoverOpenConfidenceLevel1} target="Popover60" trigger="hover" toggle={this.toggleConfidenceLevel1}>
+                                                                    <PopoverBody>{i18n.t('static.tooltip.confidenceLevel')}</PopoverBody>
+                                                                </Popover>
+                                                            </div>
                                                                     {/* <div className="row col-md-12 pt-lg-2" style={{ display: this.state.linearRegressionId ? '' : 'none' }}>
                                                                 <div className="col-md-2"> */}
                                                                     <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.confidenceLevel')}
-                                                                        <i class="fa fa-info-circle icons pl-lg-2" id="Popover6" onClick={() => this.toggle('popoverOpenConfidence', !this.state.popoverOpenConfidence)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
+                                                                        <i class="fa fa-info-circle icons pl-lg-2" id="Popover60" onClick={this.toggleConfidenceLevel1} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
                                                                     </Label>
                                                                     <Input
                                                                         className="controls"
