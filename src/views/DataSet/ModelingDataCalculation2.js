@@ -569,7 +569,7 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                 var grandParentNodeData = (grandParentFiltered.payload.nodeDataMap[scenarioList[ndm].id])[0];
                                 console.log("grandParentNodeData$$$%%%", grandParentNodeData)
                                 if (grandParentNodeData != undefined) {
-                                    patients = grandParentNodeData.displayCalculatedDataValue != null ? grandParentNodeData.displayCalculatedDataValue : grandParentNodeData.calculatedDataValue != null ? grandParentNodeData.calculatedDataValue : grandParentNodeData.dataValue;
+                                    patients = grandParentNodeData.calculatedDataValue != null ? grandParentNodeData.calculatedDataValue : grandParentNodeData.dataValue;
                                 } else {
                                     patients = 0;
                                 }
