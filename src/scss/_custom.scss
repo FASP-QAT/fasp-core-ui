@@ -6340,8 +6340,9 @@ font-style: italic!important;
 .MarginTopCreateTreeBtn{
   margin-top: -48px;
 }
-
-
+.topscroll{
+top: calc(20em + 3px);
+}
 
 // .usageTemplateDataEntryTable .jtabs-content .jtabs-selected .jexcel_content .jexcel>tbody>tr>td:nth-child(17) {
 //   display:none !important;

@@ -3550,6 +3550,7 @@ export default class BuildTree extends Component {
                 {
                     title: i18n.t('static.tree.Note'),
                     type: 'text',
+                    width:'130'
 
                 },
                 {
@@ -3565,6 +3566,7 @@ export default class BuildTree extends Component {
                 {
                     title: i18n.t('static.tree.transferToNode'),
                     type: 'dropdown',
+                    width:'130',
                     source: this.state.sameLevelNodeList
                 },
 
@@ -3608,7 +3610,9 @@ export default class BuildTree extends Component {
                     decimal: '.',
                     textEditor: true,
                     disabledMaskOnEdition: true,
+                    width:'130',
                     readOnly: true
+                    
                 },
                 {
                     title: 'nodeDataModelingId',
@@ -8711,6 +8715,7 @@ export default class BuildTree extends Component {
                                     }
                                     {/* disabled={!isValid} */}
                                     <FormGroup className="pb-lg-3">
+                                        {/* <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setState({ openAddNodeModal: false, cursorItem: 0, highlightItem: 0 })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button> */}
                                         <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setState({ openAddNodeModal: false, cursorItem: 0, highlightItem: 0 })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                         <Button type="button" size="md" color="warning" className="float-right mr-1" onClick={() => this.resetNodeData()} ><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                         <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAllNodeData(setTouched, errors)} disabled={isSubmitting}><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
@@ -9983,7 +9988,7 @@ export default class BuildTree extends Component {
                 }
             }]
         }
-        return <div className="animated fadeIn">
+        return <div className="">
             <Prompt
                 when={this.state.isChanged == true}
                 message={i18n.t("static.dataentry.confirmmsg")}
@@ -9992,7 +9997,7 @@ export default class BuildTree extends Component {
             <h5 className={this.state.color} id="div2">
                 {i18n.t(this.state.message, { entityname })}</h5>
             <Row>
-                <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
+                <Col sm={12} md={12} style={{ flexBasis: 'auto'}}>
                     <Card className="mb-lg-0">
                         <div className="pb-lg-0">
                             <div className="Card-header-reporticon pb-1" style={{ display: 'grid', float: 'right' }}>
@@ -10027,8 +10032,8 @@ export default class BuildTree extends Component {
                                 </div>
                             </div>  */}
                             <div className="row">
-                                <div className="col-md-12 pl-lg-3">
-                                    <div className='col-md-4 pt-lg-2'>
+                                <div className="col-md-12 pl-lg-0">
+                                    <div className='col-md-4 pt-lg-0'>
                                         <a className="pr-lg-0 pt-lg-1 float-left">
                                             <span style={{ cursor: 'pointer' }} onClick={this.cancelClicked}><i className="cui-arrow-left icons" style={{ color: '#002F6C', fontSize: '13px' }}></i> <small className="supplyplanformulas">{'Return To List'}</small></span>
                                         </a>

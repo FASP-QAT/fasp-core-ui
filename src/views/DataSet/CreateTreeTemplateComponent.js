@@ -8556,7 +8556,7 @@ export default class CreateTreeTemplate extends Component {
                             <div className="card-header-actions col-md-12 pl-lg-0 pr-lg-0 pt-lg-0">
                                 {/* <div className="card-header-actions pr-4 pt-1"> */}
                                 <a className="pr-lg-0 pt-lg-0 float-left">
-                                    <span style={{ cursor: 'pointer' }} onClick={this.cancelClicked}><i className="fa fa-long-arrow-left" style={{ color: '#20a8d8' }}></i> <small className="supplyplanformulas">{'Return To List'}</small></span>
+                                    <span style={{ cursor: 'pointer' }} onClick={this.cancelClicked}><i className="cui-arrow-left icons" style={{ color: '#002F6C', fontSize: '13px' }}></i> <small className="supplyplanformulas">{'Return To List'}</small></span>
                                     {/* <Link to='/supplyPlanFormulas' target="_blank"><small className="supplyplanformulas">{i18n.t('static.supplyplan.supplyplanformula')}</small></Link> */}
                                 </a>
                                 <a className="pr-lg-0 pt-lg-0 float-right">
