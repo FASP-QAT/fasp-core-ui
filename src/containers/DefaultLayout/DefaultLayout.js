@@ -2429,6 +2429,17 @@ class DefaultLayout extends Component {
                                 this.refreshPage();
                               }
                             }
+                          },
+                          {
+                            name: i18n.t('static.importIntoQATSupplyPlan.importIntoQATSupplyPlan'),
+                            url: '/importIntoQATSupplyPlan/listImportIntoQATSupplyPlan',
+                            icon: 'fa cui-cloud-download',
+                            attributes: {
+                              hidden: ((this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN_IMPORT') && this.state.activeTab == 2) ? false : true),
+                              onClick: e => {
+                                this.refreshPage();
+                              }
+                            }
                           }
 
                         ]

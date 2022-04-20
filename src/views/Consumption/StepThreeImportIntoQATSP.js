@@ -7,6 +7,10 @@ import i18n from '../../i18n';
 import csvicon from '../../assets/img/csv.png';
 import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
+import ReportService from '../../api/ReportService';
+import { calculateSupplyPlan } from '../SupplyPlan/SupplyPlanCalculations';
+
+
 import {
     Badge,
     Button,
@@ -39,19 +43,28 @@ import getLabelText from '../../CommonComponent/getLabelText';
 import { contrast } from "../../CommonComponent/JavascriptCommonFunctions";
 import { jExcelLoadedFunctionOnlyHideRow, jExcelLoadedFunctionWithoutPagination, jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js'
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import { JEXCEL_INTEGER_REGEX, JEXCEL_DECIMAL_LEAD_TIME, JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_PRO_KEY, MONTHS_IN_FUTURE_FOR_AMC, MONTHS_IN_PAST_FOR_AMC, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, JEXCEL_PAGINATION_OPTION, JEXCEL_MONTH_PICKER_FORMAT, INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY } from '../../Constants.js';
+import { FORECAST_DATEPICKER_START_MONTH, JEXCEL_INTEGER_REGEX, JEXCEL_DECIMAL_LEAD_TIME, JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_PRO_KEY, MONTHS_IN_FUTURE_FOR_AMC, MONTHS_IN_PAST_FOR_AMC, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, JEXCEL_PAGINATION_OPTION, JEXCEL_MONTH_PICKER_FORMAT, INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY, FORECASTED_CONSUMPTION_MODIFIED, QUANTIMED_DATA_SOURCE_ID } from '../../Constants.js';
 import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import CryptoJS from 'crypto-js';
 
-
+const pickerLang = {
+    months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
+    from: 'From', to: 'To',
+}
 
 export default class StepThreeImportMapPlanningUnits extends Component {
     constructor(props) {
         super(props);
 
+        var dt = new Date();
+        dt.setMonth(dt.getMonth() - FORECAST_DATEPICKER_START_MONTH);
+
         this.state = {
             lang: localStorage.getItem('lang'),
+            rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
+            minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
+            maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
             // loading: false,
             selSource: [],
             actualConsumptionData: [],
@@ -63,16 +76,30 @@ export default class StepThreeImportMapPlanningUnits extends Component {
             stopDate: '',
             buildCSVTable: [],
             languageEl: '',
-
+            consumptionData: [],
+            monthArrayList: [],
         }
-
+        this.handleRangeChange = this.handleRangeChange.bind(this);
         this.buildJexcel = this.buildJexcel.bind(this);
         this.formSubmit = this.formSubmit.bind(this);
         this.exportCSV = this.exportCSV.bind(this);
         this.changeColor = this.changeColor.bind(this);
+        this.updateState = this.updateState.bind(this);
+        this.redirectToDashbaord = this.redirectToDashbaord.bind(this);
+
+
 
     }
+    updateState(parameterName, value) {
 
+        this.setState({
+            [parameterName]: value
+        })
+    }
+
+    redirectToDashbaord() {
+        this.props.redirectToDashboard();
+    }
     changeColor() {
 
         var elInstance1 = this.el;
@@ -80,29 +107,11 @@ export default class StepThreeImportMapPlanningUnits extends Component {
 
         var json = elInstance.getJson();
 
-        // var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I']
-        // for (var j = 0; j < json.length; j++) {
-        //     var rowData = elInstance.getRowData(j);            
-        //     var id = rowData[9];
-        //     if (id == 1) {
-        //         for (var i = 0; i < colArr.length; i++) {
-        //             elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'background-color', 'transparent');
-        //             elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'background-color', 'yellow');
-        //             // let textColor = contrast('#f48282');
-        //             // elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'color', textColor);
-        //         }
-        //     } else {
-        //         for (var i = 0; i < colArr.length; i++) {
-        //             elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'background-color', 'transparent');
-        //         }
-        //     }
-        // }
-
         var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I']
         for (var j = 0; j < json.length; j++) {
             var rowData = elInstance.getRowData(j);
             var id = rowData[9];
-            if (id == 1 || id == 2 || id == 3) {
+            if (id == true) {
                 for (var i = 0; i < colArr.length; i++) {
                     elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'background-color', 'transparent');
                     elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'background-color', 'yellow');
@@ -123,10 +132,6 @@ export default class StepThreeImportMapPlanningUnits extends Component {
 
         var csvRow = [];
 
-        // this.state.countryLabels.map(ele =>
-        //     csvRow.push('"' + (i18n.t('static.dashboard.country') + ' : ' + ele.toString()).replaceAll(' ', '%20') + '"'))
-
-        // csvRow.push('"' + (i18n.t('static.region.country') + ' : ' + document.getElementById("realmCountryId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
         csvRow.push('')
         csvRow.push('')
 
@@ -166,6 +171,10 @@ export default class StepThreeImportMapPlanningUnits extends Component {
     }
 
     formSubmit() {
+        var minDate = moment(this.props.items.startDate).format("YYYY-MM-DD");
+        var curDate = ((moment(Date.now()).utcOffset('-0500').format('YYYY-MM-DD HH:mm:ss')));
+        var curUser = AuthenticationService.getLoggedInUserId();
+
         confirmAlert({
             title: i18n.t('static.program.confirmsubmit'),
             message: i18n.t('static.importFromQATSupplyPlan.confirmAlert'),
@@ -174,229 +183,198 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                     label: i18n.t('static.program.yes'),
                     onClick: () => {
                         this.props.updateStepOneData("loading", true);
-                        var tableJson = this.el.getJson(null, false);
-                        var programs = [];
-                        var ImportListNotPink = [];
-                        var ImportListPink = [];
-
-                        let datasetList = this.props.items.datasetList
-                        let forecastProgramVersionId = this.props.items.forecastProgramVersionId
-                        let forecastProgramId = this.props.items.forecastProgramId
-                        let selectedForecastProgramObj = datasetList.filter(c => c.programId == forecastProgramId && c.versionId == forecastProgramVersionId)[0];
-
-                        var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
-                        var userId = userBytes.toString(CryptoJS.enc.Utf8);
-                        let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
-                        let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
-                        let username = decryptedUser.username;
-
-                        for (var i = 0; i < tableJson.length; i++) {
-                            var map1 = new Map(Object.entries(tableJson[i]));
-
-                            let selectedPlanningUnitObj = this.props.items.planningUnitList.filter(c => c.planningUnitId == map1.get("0"))[0];
-                            var forecastingUnitObj = selectedPlanningUnitObj.forecastingUnit;
-                            forecastingUnitObj.multiplier = map1.get("5");
-                            if (map1.get("9") == 0 && map1.get("8") == true) { //not pink
-                                // let tempJson = {
-                                //     "forecastConsumptionId": '',
-                                //     "program": {
-                                //         "id": selectedForecastProgramObj.programId,
-                                //         "label": selectedForecastProgramObj.label,
-                                //         "code": selectedForecastProgramObj.programCode,
-                                //         "idString": "" + selectedForecastProgramObj.programId
-                                //     },
-                                //     "consumptionUnit": {
-                                //         "forecastConsumptionUnitId": '',
-                                //         "dataType": 1,
-                                //         "forecastingUnit": forecastingUnitObj,
-                                //         "planningUnit": {
-                                //             "id": selectedPlanningUnitObj.planningUnitId,
-                                //             "label": selectedPlanningUnitObj.label,
-                                //             "multiplier": selectedPlanningUnitObj.multiplier,
-                                //             "idString": '' + selectedPlanningUnitObj.planningUnitId,
-                                //         },
-                                //         "otherUnit": null
-                                //     },
-                                //     "region": {
-                                //         "id": map1.get("10"),
-                                //         "label": null,
-                                //         "idString": '' + map1.get("10")
-                                //     },
-                                //     "month": map1.get("3"),
-                                //     // "actualConsumption": map1.get("4"),
-                                //     "actualConsumption": this.el.getValue(`E${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
-                                //     "reportingRate": null,
-                                //     "daysOfStockOut": null,
-                                //     "exclude": false,
-                                //     "versionId": selectedForecastProgramObj.versionId,
-                                //     "createdBy": {
-                                //         "userId": userId,
-                                //         "username": username
-                                //     },
-                                //     "createdDate": new Date().toISOString().slice(0, 10) + " 19:43:38"
-                                // }
-
-                                let regionObj = selectedForecastProgramObj.regionList.filter(c => c.regionId == parseInt(map1.get("10")))[0];
-
-                                let tempJson = {
-                                    "actualConsumptionId": '',
-                                    "planningUnit": {
-                                        "id": selectedPlanningUnitObj.planningUnitId,
-                                        "label": selectedPlanningUnitObj.label,
-                                        "idString": '' + selectedPlanningUnitObj.planningUnitId,
-                                    },
-                                    "region": {
-                                        "id": map1.get("10"),
-                                        "label": regionObj.label,
-                                        "idString": '' + map1.get("10")
-                                    },
-                                    "month": map1.get("3"),
-                                    "amount": parseInt(this.el.getValue(`E${parseInt(i) + 1}`, true).toString().replaceAll(",", "")),
-                                    "reportingRate": null,
-                                    "daysOfStockOut": null,
-                                    "exclude": false,
-                                    "createdBy": {
-                                        "userId": userId,
-                                        "username": username
-                                    },
-                                    "createdDate": new Date().toISOString().slice(0, 10) + " 19:43:38"
-                                }
-
-
-                                ImportListNotPink.push(tempJson);
-                            }
-
-                            if (map1.get("9") == 1 && map1.get("8") == true) {
-                                let tempJsonPink = {
-                                    regionId: map1.get("10"),
-                                    planningUnitId: map1.get("0"),
-                                    month: map1.get("3"),
-                                    // actualConsumption: map1.get("4"),
-                                    amount: this.el.getValue(`E${parseInt(i) + 1}`, true).toString().replaceAll(",", ""),
-                                }
-                                ImportListPink.push(tempJsonPink);
-                            }
-
-                            // console.log("map1.get(3)---", map1.get("3"));
-                            // console.log("map1.get(12)---", map1.get("12"));
-                            // console.log("map1.get(7)---", map1.get("7"));
-                            // console.log("map1.get(8)---", map1.get("8"));
-                            // var notes = map1.get("4");
-                            // var startDate = map1.get("7");
-                            // var stopDate = map1.get("8");
-                            // var id = map1.get("10");
-                            // var noOfDaysInMonth = map1.get("12");
-                            // console.log("start date ---", startDate);
-                            // console.log("stop date ---", stopDate);
-                            // console.log("noOfDaysInMonth ---", noOfDaysInMonth);
-
-                        }
-
-                        var program = (this.props.items.datasetList1.filter(x => x.programId == this.props.items.forecastProgramId && x.version == this.props.items.forecastProgramVersionId)[0]);
-                        var databytes = CryptoJS.AES.decrypt(program.programData, SECRET_KEY);
-                        var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
-
-                        // programData.currentVersion.forecastStartDate = startDate;
-                        // programData.actionList = [1, 2]
-
-                        console.log("Final-------------->", programData.actualConsumptionList);
-                        let originalConsumptionList = programData.actualConsumptionList;
-                        for (var i = 0; i < ImportListPink.length; i++) {
-                            // let match = originalConsumptionList.filter(c => new Date(c.month).getTime() == new Date(papuList[j].month).getTime() && c.region.id == papuList[j].region.id && c.consumptionUnit.planningUnit.id == stepOneSelectedObject.forecastPlanningUnitId)
-                            let index = originalConsumptionList.findIndex(c => new Date(c.month).getTime() == new Date(ImportListPink[i].month).getTime() && c.region.id == ImportListPink[i].regionId && c.planningUnit.id == ImportListPink[i].planningUnitId)
-
-                            if (index != -1) {
-                                let indexObj = originalConsumptionList[index];
-                                indexObj.amount = ImportListPink[i].amount;
-                                originalConsumptionList[index] = indexObj;
-                            }
-                        }
-
-                        console.log("Final-------------->11", ImportListNotPink);
-                        console.log("Final-------------->12", ImportListPink);
-                        console.log("Final-------------->13", originalConsumptionList.concat(ImportListNotPink));
-                        programData.actualConsumptionList = originalConsumptionList.concat(ImportListNotPink);
-
-
-                        programData = (CryptoJS.AES.encrypt(JSON.stringify(programData), SECRET_KEY)).toString();
-                        program.programData = programData;
-                        // var db1;
-                        // getDatabase();
-                        // var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-                        // openRequest.onerror = function (event) {
-                        //     this.setState({
-                        //         message: i18n.t('static.program.errortext'),
-                        //         color: 'red'
-                        //     })
-                        //     this.hideFirstComponent()
-                        // }.bind(this);
-                        // openRequest.onsuccess = function (e) {
-                        //     db1 = e.target.result;
-                        //     var transaction = db1.transaction(['datasetData'], 'readwrite');
-                        //     var programTransaction = transaction.objectStore('datasetData');
-                        //     var programRequest = programTransaction.put(program);
-                        //     programRequest.onerror = function (e) {
-
-                        //     }.bind(this);
-                        //     programRequest.onsuccess = function (e) {
-
-                        //     }.bind(this);
-                        // }.bind(this);
-                        programs.push(program);
-
-
-                        console.log("programs to update---", programs);
-
                         var db1;
+                        var storeOS;
                         getDatabase();
                         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
                         openRequest.onerror = function (event) {
-                            this.setState({
-                                message: i18n.t('static.program.errortext'),
-                                color: 'red'
-                            })
-                            this.hideFirstComponent()
-                            this.props.updateStepOneData("loading", false);
+                            this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
+                            this.props.updateState("color", "#BA0C2F");
+                            this.props.hideFirstComponent();
                         }.bind(this);
                         openRequest.onsuccess = function (e) {
+
                             db1 = e.target.result;
-                            var transaction = db1.transaction(['datasetData'], 'readwrite');
-                            var programTransaction = transaction.objectStore('datasetData');
-                            programs.forEach(program => {
-                                var programRequest = programTransaction.put(program);
-                                console.log("---hurrey---");
-                            })
-                            transaction.oncomplete = function (event) {
-                                // this.props.updateStepOneData("message", i18n.t('static.mt.dataUpdateSuccess'));
-                                // this.props.updateStepOneData("color", "green");
-                                // this.setState({
-                                //     message: i18n.t('static.mt.dataUpdateSuccess'),
-                                //     color: "green",
-                                // }, () => {
-                                //     this.props.hideSecondComponent();
-                                //     this.props.finishedStepThree();
-                                //     // this.buildJExcel();
-                                // });
-                                console.log("Data update success");
+                            var transaction;
+                            var programTransaction;
 
-                                // this.props.history.push(`/importFromQATSupplyPlan/listImportFromQATSupplyPlan/` + 'green/' + i18n.t('static.mt.dataUpdateSuccess'))
-                                this.props.history.push(`/dataentry/consumptionDataEntryAndAdjustment`)
+                            transaction = db1.transaction(['programData'], 'readwrite');
+                            programTransaction = transaction.objectStore('programData');
 
 
+                            var programId = this.props.items.programId;
+                            console.log("programId in submit12", programId)
+
+                            var programRequest = programTransaction.get(programId);
+                            programRequest.onerror = function (event) {
+                                this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
+                                this.props.updateState("color", "#BA0C2F");
+                                this.props.hideFirstComponent();
                             }.bind(this);
-                            transaction.onerror = function (event) {
-                                this.setState({
-                                    loading: false,
-                                    // message: 'Error occured.',
-                                    color: "red",
-                                }, () => {
-                                    this.hideSecondComponent();
-                                    this.props.updateStepOneData("loading", false);
-                                });
-                                console.log("Data update errr");
+                            programRequest.onsuccess = function (event) {
+                                var programDataJson = programRequest.result.programData;
+                                var planningUnitDataList = programDataJson.planningUnitDataList;
+                                var generalProgramDataBytes = CryptoJS.AES.decrypt(programDataJson.generalData, SECRET_KEY);
+                                var generalProgramData = generalProgramDataBytes.toString(CryptoJS.enc.Utf8);
+                                var generalProgramJson = JSON.parse(generalProgramData);
+
+                                var rcpuTransaction = db1.transaction(['realmCountryPlanningUnit'], 'readwrite');
+                                var rcpuOs = rcpuTransaction.objectStore('realmCountryPlanningUnit');
+                                var rcpuRequest = rcpuOs.getAll();
+                                rcpuRequest.onerror = function (event) {
+                                    this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
+                                    this.props.updateState("color", "#BA0C2F");
+                                    this.props.hideFirstComponent();
+                                }.bind(this);
+
+                                rcpuRequest.onsuccess = function (event) {
+                                    var rcpuResult = [];
+                                    rcpuResult = rcpuRequest.result;
+                                    var actionList = (generalProgramJson.actionList);
+                                    if (actionList == undefined) {
+                                        actionList = []
+                                    }
+                                    // var qunatimedData = this.state.selSource;
+                                    var finalImportQATData = this.state.selSource;
+                                    console.log("finalImportQATData===>", finalImportQATData)
+
+                                    var finalPuList = []
+                                    for (var i = 0; i < finalImportQATData.length; i++) {
+                                        var index = finalPuList.findIndex(c => c == finalImportQATData[i].v10)
+                                        if (index == -1) {
+                                            finalPuList.push(parseInt(finalImportQATData[i].v10))
+                                            actionList.push({
+                                                planningUnitId: parseInt(finalImportQATData[i].v10),
+                                                type: FORECASTED_CONSUMPTION_MODIFIED,
+                                                date: moment(minDate).startOf('month').format("YYYY-MM-DD")
+                                            })
+                                        }
+                                    }
+
+
+                                    for (var pu = 0; pu < finalPuList.length; pu++) {
+
+                                        var planningUnitDataIndex = (planningUnitDataList).findIndex(c => c.planningUnitId == finalPuList[pu]);
+                                        var programJson = {}
+                                        if (planningUnitDataIndex != -1) {
+                                            var planningUnitData = ((planningUnitDataList).filter(c => c.planningUnitId == finalPuList[pu]))[0];
+                                            var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
+                                            var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                                            programJson = JSON.parse(programData);
+                                        } else {
+                                            programJson = {
+                                                consumptionList: [],
+                                                inventoryList: [],
+                                                shipmentList: [],
+                                                batchInfoList: [],
+                                                supplyPlan: []
+                                            }
+                                        }
+
+                                        var consumptionDataList = (programJson.consumptionList);
+                                        var elInstance = this.state.languageEl;
+
+                                        var json = elInstance.getJson();
+                                        var finalImportQATDataFilter = finalImportQATData.filter((c, indexFilter) => c.v10 == finalPuList[pu] && json[indexFilter][8] == true);
+                                        for (var i = 0; i < finalImportQATDataFilter.length; i++) {
+                                            var index = consumptionDataList.findIndex(c => moment(c.consumptionDate).format("YYYY-MM") == moment(finalImportQATDataFilter[i].v4).format("YYYY-MM")
+                                                && c.region.id == finalImportQATDataFilter[i].v11
+                                                && c.actualFlag.toString() == "false" && c.multiplier == 1);
+                                            console.log("FINAL-----2", index)
+
+                                            if (index != -1) {
+                                                consumptionDataList[index].consumptionQty = finalImportQATDataFilter[i].v7;
+                                                consumptionDataList[index].consumptionRcpuQty = finalImportQATDataFilter[i].v7;
+                                                consumptionDataList[index].dataSource.id = QUANTIMED_DATA_SOURCE_ID;
+
+                                                consumptionDataList[index].lastModifiedBy.userId = curUser;
+                                                consumptionDataList[index].lastModifiedDate = curDate;
+                                            } else {
+
+                                                var consumptionJson = {
+                                                    consumptionId: 0,
+                                                    dataSource: {
+                                                        id: QUANTIMED_DATA_SOURCE_ID
+                                                    },
+                                                    region: {
+                                                        id: finalImportQATDataFilter[i].v11
+                                                    },
+                                                    consumptionDate: moment(finalImportQATDataFilter[i].v4).startOf('month').format("YYYY-MM-DD"),
+                                                    consumptionRcpuQty: finalImportQATDataFilter[i].v7.toString().replaceAll("\,", ""),
+                                                    consumptionQty: finalImportQATDataFilter[i].v7.toString().replaceAll("\,", ""),
+                                                    dayOfStockOut: "",
+                                                    active: true,
+                                                    realmCountryPlanningUnit: {
+                                                        id: rcpuResult.filter(c => c.planningUnit.id == finalImportQATDataFilter[i].v10 && c.multiplier == 1)[0].realmCountryPlanningUnitId,
+                                                    },
+                                                    multiplier: 1,
+                                                    planningUnit: {
+                                                        id: finalImportQATDataFilter[i].v10
+                                                    },
+                                                    notes: "",
+                                                    batchInfoList: [],
+                                                    actualFlag: false,
+                                                    createdBy: {
+                                                        userId: curUser
+                                                    },
+                                                    createdDate: curDate,
+                                                    lastModifiedBy: {
+                                                        userId: curUser
+                                                    },
+                                                    lastModifiedDate: curDate
+                                                }
+                                                consumptionDataList.push(consumptionJson);
+                                            }
+                                        }
+
+                                        programJson.consumptionList = consumptionDataList;
+                                        console.log("FINAL--------------@@@@@@@@@", programJson.consumptionList)
+
+                                        if (planningUnitDataIndex != -1) {
+                                            planningUnitDataList[planningUnitDataIndex].planningUnitData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
+                                        } else {
+                                            planningUnitDataList.push({ planningUnitId: finalPuList[pu], planningUnitData: (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString() });
+                                        }
+                                    }
+                                    generalProgramJson.actionList = actionList;
+
+                                    programDataJson.planningUnitDataList = planningUnitDataList;
+                                    programDataJson.generalData = (CryptoJS.AES.encrypt(JSON.stringify(generalProgramJson), SECRET_KEY)).toString()
+                                    programRequest.result.programData = programDataJson;
+
+                                    var transaction1;
+                                    var programTransaction1;
+                                    var finalImportQATData = this.state.selSource;
+
+                                    transaction1 = db1.transaction(['programData'], 'readwrite');
+                                    programTransaction1 = transaction1.objectStore('programData');
+                                    var putRequest = programTransaction1.put(programRequest.result);
+
+                                    putRequest.onerror = function (event) {
+
+                                        this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
+                                        this.props.updateState("color", "#BA0C2F");
+                                        this.props.hideFirstComponent();
+                                    }.bind(this);
+                                    putRequest.onsuccess = function (event) {
+
+                                        var finalQATPlanningList = [];
+                                        for (var i = 0; i < finalImportQATData.length; i++) {
+
+                                            var index = finalQATPlanningList.findIndex(c => c == finalImportQATData[i].v10)
+                                            console.log("inside success", index)
+
+                                            if (index == -1) {
+                                                finalQATPlanningList.push(parseInt(finalImportQATData[i].v10))
+                                            }
+                                        }
+
+                                        calculateSupplyPlan(this.props.items.programId, 0, 'programData', 'quantimedImport', this, finalQATPlanningList, minDate);
+
+                                    }.bind(this);
+                                }.bind(this);
                             }.bind(this);
                         }.bind(this);
-
                     }
                 },
                 {
@@ -415,102 +393,194 @@ export default class StepThreeImportMapPlanningUnits extends Component {
 
     }
 
+    handleRangeChange(value, text, listIndex) {
+        //
+    }
+
+    makeText = m => {
+        if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
+        return '?'
+    }
+
     filterData() {
-        let tempList = [];
-        tempList.push({ id: 1, v2: 'Male Condom (Latex) Lubricated, No Logo, 53 mm, 3000 Pieces [4182]', v1: 'Male Condom (Latex) Lubricated, No Logo, 53 mm, 4320 Pieces [6357]', v3: 'North', v4: 'Jan-21', v5: '5930', v6: '0.694444', v7: '4118.06', v8: '3500.00', v9: true });
-        tempList.push({ id: 2, v2: 'Male Condom (Latex) Lubricated, No Logo, 53 mm, 3000 Pieces [4182]', v1: 'Male Condom (Latex) Lubricated, No Logo, 53 mm, 4320 Pieces [6357]', v3: 'North', v4: 'Feb-21', v5: '4000', v6: '0.694444', v7: '2777.78', v8: '3000.00', v9: true });
-        tempList.push({ id: 3, v2: 'Male Condom (Latex) Lubricated, No Logo, 53 mm, 3000 Pieces [4182]', v1: 'Male Condom (Latex) Lubricated, No Logo, 53 mm, 4320 Pieces [6357]', v3: 'North', v4: 'Mar-21', v5: '3850', v6: '0.694444', v7: '2673.61', v8: '3100.00', v9: true });
-        tempList.push({ id: 4, v2: 'Male Condom (Latex) Lubricated, No Logo, 53 mm, 3000 Pieces [4182]', v1: 'Male Condom (Latex) Lubricated, No Logo, 53 mm, 4320 Pieces [6357]', v3: 'National', v4: 'Apr-21', v5: '4200', v6: '0.694444', v7: '2916.67', v8: '', v9: true });
-        tempList.push({ id: 5, v2: 'Male Condom (Latex) Lubricated, No Logo, 53 mm, 3000 Pieces [4182]', v1: 'Male Condom (Latex) Lubricated, No Logo, 53 mm, 4320 Pieces [6357]', v3: 'National', v4: 'May-21', v5: '4530', v6: '0.694444', v7: '3145.83', v8: '', v9: true });
-        tempList.push({ id: 6, v2: 'Male Condom (Latex) Lubricated, No Logo, 53 mm, 3000 Pieces [4182]', v1: 'Male Condom (Latex) Lubricated, No Logo, 53 mm, 4320 Pieces [6357]', v3: 'National', v4: 'Jun-21', v5: '4250', v6: '0.694444', v7: '2951.39', v8: '', v9: true });
-        tempList.push({ id: 7, v2: 'Male Condom (Latex) Lubricated, No Logo, 53 mm, 3000 Pieces [4182]', v1: 'Male Condom (Latex) Lubricated, No Logo, 53 mm, 4320 Pieces [6357]', v3: 'National', v4: 'Jul-21', v5: '4100', v6: '0.694444', v7: '2847.22', v8: '', v9: true });
-        tempList.push({ id: 8, v2: 'Male Condom (Latex) Lubricated, No Logo, 53 mm, 3000 Pieces [4182]', v1: 'Male Condom (Latex) Lubricated, No Logo, 53 mm, 4320 Pieces [6357]', v3: 'National', v4: 'Aug-21', v5: '3900', v6: '0.694444', v7: '2708.33', v8: '', v9: true });
-
-        this.setState({
-            selSource: tempList,
-            loading: true
-        },
-            () => {
-                this.buildJexcel();
+        var db1;
+        var storeOS;
+        var supplyPlanRegionList = [];
+        getDatabase();
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+        openRequest.onerror = function (event) {
+            this.setState({
+                message: i18n.t('static.program.errortext'),
+                color: '#BA0C2F'
             })
+            this.hideFirstComponent()
+        }.bind(this);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var programDataTransaction = db1.transaction(['programData'], 'readwrite');
+            var programDataOs = programDataTransaction.objectStore('programData');
+            var programRequest = programDataOs.get(this.props.items.programId);
+            programRequest.onerror = function (event) {
+                this.setState({
+                    message: i18n.t('static.program.errortext'),
+                    color: '#BA0C2F'
+                })
+                this.hideFirstComponent()
+            }.bind(this);
+            programRequest.onsuccess = function (e) {
+                var fullConsumptionList = [];
+                var programData1 = programRequest.result.programData;
+                for (var pu = 0; pu < (programData1.planningUnitDataList).length; pu++) {
+                    var planningUnitDataIndex = programData1.planningUnitDataList[pu];
+                    var programJson = {}
+                    if (planningUnitDataIndex != -1) {
+                        var planningUnitData = programData1.planningUnitDataList[pu];
+                        var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
+                        var programData2 = programDataBytes.toString(CryptoJS.enc.Utf8);
+                        programJson = JSON.parse(programData2);
+                    } else {
+                        programJson = {
+                            consumptionList: [],
+                            inventoryList: [],
+                            shipmentList: [],
+                            batchInfoList: [],
+                            supplyPlan: []
+                        }
+                    }
+                    fullConsumptionList = fullConsumptionList.concat(programJson.consumptionList);
+                }
+                console.log("Props items---------------->", this.props.items);
 
-        // let forecastPlanningUnitList = this.props.items.stepOneData.filter(c => c.forecastPlanningUnitId != -1);
-        // let supplyPlanPlanningUnitId = forecastPlanningUnitList.map(ele => ele.supplyPlanPlanningUnitId);
+                var unitIds = ""
+                unitIds = this.props.items.supplyPlanPlanningUnitIds.map(c => c.forecastPlanningUnitId);
+                var startDate = moment(this.props.items.startDate).format("YYYY-MM-DD HH:mm:ss")
+                var stopDate = moment(this.props.items.stopDate).format("YYYY-MM-DD HH:mm:ss")
 
-        // let regionList = this.props.items.stepTwoData.filter(c => c.isRegionInForecastProgram == 1 && c.importRegion == 1);
-        // let regionIds = regionList.map(ele => ele.supplyPlanRegionId);
+                let inputJson = {
+                    "programId": Number(this.props.items.forecastProgramId),
+                    "versionId": Number(this.props.items.versionId),
+                    "startDate": startDate,
+                    "stopDate": stopDate,
+                    "reportView": 1,
+                    "aggregateByYear": false,
+                    "unitIds": unitIds
+                }
 
-        // // let ActualConsumptionDataInput = { "programId": 2442, "versionId": 1, "planningUnitIds": ["1074", "1082", "2802"], "startDate": "2018-01-01", "stopDate": "2021-12-01", "regionIds": ["70", "73", "74"] }
+                console.log("OnlineInputJson---------------->", inputJson);
+                // var unitDescArr = this.props.items.supplyPlanPlanningUnitIds.map(c);
 
-        // let ActualConsumptionDataInput = {
-        //     programId: this.props.items.programId,
-        //     versionId: this.props.items.versionId,
-        //     planningUnitIds: supplyPlanPlanningUnitId,
-        //     startDate: this.props.items.startDate,
-        //     stopDate: this.props.items.stopDate,
-        //     regionIds: regionIds
-        // }
+                // console.log("RESP---------->unitDesc", unitDescArr);
+                let tempList = [];
+                let supplyPlanPlanningUnitId = [];
+                let selectedSupplyPlan = this.props.items.supplyPlanPlanningUnitIds;
 
-        // console.log("ActualConsumptionDataInput-------------->", ActualConsumptionDataInput);
+                let supplyPlanRegionList = this.props.items.stepTwoData;
+                console.log("supplyPlanRegionList@@@@@@@@@@@@@", supplyPlanRegionList)
+                // for (let i = 0; i < supplyPlanRegionList.length; i++) {
+                for (let j = 0; j < selectedSupplyPlan.length; j++) {
+                    supplyPlanPlanningUnitId.push(selectedSupplyPlan[j].supplyPlanPlanningUnitId);
+                }
+                // }
 
+                ReportService.forecastOutput(inputJson)
+                    .then(response => {
+                        console.log("RESP---------->forecastOutput", response.data);
+                        let primaryConsumptionData = response.data;
+                        // var count1 = 1;
+                        for (let i = 0; i < primaryConsumptionData.length; i++) {
+                            for (let j = 0; j < primaryConsumptionData[i].monthlyForecastData.length; j++) {
+                                // for (let k = 0; k < selectedSupplyPlan.length; k++) {
+                                // for (let l = 0; l < supplyPlanRegionList.length; l++) {
+                                // for (let m = 0; m < supplyPlanRegionList[l].supplyPlanRegionList.length; m++) {
+                                // console.log("RESP---------->", supplyPlanRegionList[l].supplyPlanRegionList[m].forecastPercentage);
+                                var selectedSupplyPlanPlanningUnit = selectedSupplyPlan.filter(c => c.forecastPlanningUnitId == primaryConsumptionData[i].planningUnit.id);
+                                var regionFilter = supplyPlanRegionList.filter(c => c.forecastRegionId == primaryConsumptionData[i].region.id);
+                                if (primaryConsumptionData[i].monthlyForecastData[j].month != null && regionFilter.length > 0) {
+                                    var checkConsumptionData = fullConsumptionList.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(primaryConsumptionData[i].monthlyForecastData[j].month).format("YYYY-MM") && c.planningUnit.id == selectedSupplyPlanPlanningUnit[0].supplyPlanPlanningUnitId && c.actualFlag.toString() == "false" && c.region.id == regionFilter[0].supplyPlanRegionId && c.multiplier == 1);
+                                    tempList.push({
+                                        v1: getLabelText(primaryConsumptionData[i].planningUnit.label, this.state.lang),//Forecast planning unit
+                                        v2: selectedSupplyPlanPlanningUnit[0].supplyPlanPlanningUnitDesc,//Supply plan planning unit name
+                                        v3: regionFilter[0].supplyPlanRegionName,// Supply plan region name
+                                        v4: primaryConsumptionData[i].monthlyForecastData[j].month, // Month
+                                        v5: Math.round((Number(primaryConsumptionData[i].monthlyForecastData[j].consumptionQty) * Number(regionFilter[0].forecastPercentage) / 100)),//Forecasting module consumption qty
+                                        v6: Number(selectedSupplyPlanPlanningUnit[0].multiplier),//Multiplier
+                                        v7: Math.round((Number(primaryConsumptionData[i].monthlyForecastData[j].consumptionQty) * Number(regionFilter[0].forecastPercentage) / 100) * Number(selectedSupplyPlanPlanningUnit[0].multiplier)),// Multiplication
+                                        v8: checkConsumptionData.length > 0 ? checkConsumptionData[0].consumptionRcpuQty : "",//Supply plan module qty
+                                        v9: checkConsumptionData.length > 0 ? true : false,// Check
+                                        v10: selectedSupplyPlanPlanningUnit[0].supplyPlanPlanningUnitId,// Supply plan planning unit id
+                                        v11: regionFilter[0].supplyPlanRegionId, // Supply plan region Id
+                                        v12: primaryConsumptionData[i].planningUnit.id, // Forecast planning unit Id
+                                        v13: primaryConsumptionData[i].monthlyForecastData[j].month + "~" + selectedSupplyPlanPlanningUnit[0].supplyPlanPlanningUnitId + "~" + regionFilter[0].supplyPlanRegionId + "~" + primaryConsumptionData[i].planningUnit.id
+                                    });
+                                }
+                                // count1++;
+                                // }
+                                // }
+                            }
+                        }
 
-        // ProgramService.getActualConsumptionData(ActualConsumptionDataInput)
-        //     .then(response => {
-        //         if (response.status == 200) {
-        //             console.log("getActualConsumptionData------>", response.data);
-        //             this.setState({
-        //                 actualConsumptionData: response.data,
-        //                 selSource: response.data
-        //             }, () => {
-        //                 this.buildJexcel();
-        //             })
-        //         } else {
-        //             this.setState({
-        //                 actualConsumptionData: []
-        //             });
-        //         }
-        //     }).catch(
-        //         error => {
-        //             if (error.message === "Network Error") {
-        //                 this.setState({
-        //                     message: 'static.unkownError',
-        //                     loading: false, color: 'red'
-        //                 });
-        //             } else {
-        //                 switch (error.response ? error.response.status : "") {
+                        let resultTrue = Object.values(tempList.reduce((a, { v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13 }) => {
+                            if (!a[v13]) {
+                                a[v13] = Object.assign({}, { v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13 });
+                            } else {
+                                a[v13].v7 += v7;
+                                a[v13].v5 += v5;
+                            }
+                            return a;
+                        }, {}));
+                        console.log("Result True@@@@@@@@@@@@@@@@@@", resultTrue);
+                        this.setState({
+                            selSource: resultTrue,
+                            loading: true
+                        }, () => {
+                            this.buildJexcel();
+                        })
 
-        //                     case 401:
-        //                         this.props.history.push(`/login/static.message.sessionExpired`)
-        //                         break;
-        //                     case 403:
-        //                         this.props.history.push(`/accessDenied`)
-        //                         break;
-        //                     case 500:
-        //                     case 404:
-        //                     case 406:
-        //                         this.setState({
-        //                             message: error.response.data.messageCode,
-        //                             loading: false, color: 'red'
-        //                         });
-        //                         break;
-        //                     case 412:
-        //                         this.setState({
-        //                             message: error.response.data.messageCode,
-        //                             loading: false, color: 'red'
-        //                         });
-        //                         break;
-        //                     default:
-        //                         this.setState({
-        //                             message: 'static.unkownError',
-        //                             loading: false, color: 'red'
-        //                         });
-        //                         break;
-        //                 }
-        //             }
-        //         }
-        //     );
+                    }).catch(
+                        error => {
+                            console.log("Error @@@@@@@@@@", error)
+                            if (error.message === "Network Error") {
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                });
+                            } else {
+                                switch (error.response ? error.response.status : "") {
 
+                                    case 401:
+                                        this.props.history.push(`/login/static.message.sessionExpired`)
+                                        break;
+                                    case 403:
+                                        this.props.history.push(`/accessDenied`)
+                                        break;
+                                    case 500:
+                                    case 404:
+                                    case 406:
+                                        this.setState({
+                                            message: error.response.data.messageCode,
+                                            loading: false
+                                        });
+                                        break;
+                                    case 412:
+                                        this.setState({
+                                            message: error.response.data.messageCode,
+                                            loading: false
+                                        });
+                                        break;
+                                    default:
+                                        this.setState({
+                                            message: 'static.unkownError',
+                                            loading: false
+                                        });
+                                        break;
+                                }
+                            }
+                        }
+                    );
 
+                console.log("step 3-tempList--->", tempList)
+            }.bind(this)
+        }.bind(this)
     }
 
     buildJexcel() {
@@ -520,30 +590,9 @@ export default class StepThreeImportMapPlanningUnits extends Component {
         var buildCSVTable = [];
 
         var count = 0;
-        console.log("match------>-1", this.props.items.stepOneData);
-        console.log("match------>0", papuList);
         if (papuList.length != 0) {
+
             for (var j = 0; j < papuList.length; j++) {
-
-                // let stepOneSelectedObject = this.props.items.stepOneData.filter(c => c.supplyPlanPlanningUnitId == papuList[j].planningUnit.id)[0];
-
-                // let selectedForecastProgram = this.props.items.datasetList.filter(c => c.programId == this.props.items.forecastProgramId && c.versionId == this.props.items.forecastProgramVersionId)[0];
-
-                // let match = selectedForecastProgram.actualConsumptionList.filter(c => new Date(c.month).getTime() == new Date(papuList[j].month).getTime() && c.region.id == papuList[j].region.id && c.planningUnit.id == stepOneSelectedObject.supplyPlanPlanningUnitId)
-
-                // data = [];
-                // data[0] = papuList[j].planningUnit.id
-                // data[1] = stepOneSelectedObject.forecastPlanningUnitId
-                // data[2] = getLabelText(papuList[j].region.label, this.state.lang)
-                // data[3] = papuList[j].month
-
-                // data[4] = papuList[j].actualConsumption
-                // data[5] = stepOneSelectedObject.multiplier
-                // data[6] = (stepOneSelectedObject.multiplier * papuList[j].actualConsumption).toFixed(2)
-                // data[7] = (match.length > 0 ? match[0].amount : '')
-                // data[8] = true
-                // data[9] = (match.length > 0 ? 1 : 0)
-                // data[10] = papuList[j].region.id
 
                 data = [];
                 data[0] = papuList[j].v1
@@ -554,39 +603,17 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                 data[5] = papuList[j].v6
                 data[6] = papuList[j].v7
                 data[7] = papuList[j].v8
-                data[8] = papuList[j].v9
-                data[9] = papuList[j].id
-
+                data[8] = true;
+                data[9] = papuList[j].v9;
+                data[10] = papuList[j].v10;
+                data[11] = papuList[j].v11;
+                // data[9] = papuList[j].id
 
                 papuDataArr[count] = data;
                 count++;
 
-                // buildCSVTable.push({
-                //     supplyPlanPlanningUnit: getLabelText(papuList[j].planningUnit.label, this.state.lang),
-                //     forecastPlanningUnit: this.props.items.planningUnitListJexcel.filter(c => c.id == stepOneSelectedObject.forecastPlanningUnitId)[0].name,
-                //     region: getLabelText(papuList[j].region.label, this.state.lang),
-                //     month: papuList[j].month,
-                //     supplyPlanConsumption: papuList[j].actualConsumption,
-                //     multiplier: stepOneSelectedObject.multiplier,
-                //     convertedConsumption: (stepOneSelectedObject.multiplier * papuList[j].actualConsumption).toFixed(2),
-                //     currentQATConsumption: (match.length > 0 ? match[0].amount : ''),
-                //     import: true
-
-                // })
             }
         }
-
-        // if (papuDataArr.length == 0) {
-        //     data = [];
-        //     data[0] = 0;
-        //     data[1] = "";
-        //     data[2] = true
-        //     data[3] = "";
-        //     data[4] = "";
-        //     data[5] = 1;
-        //     data[6] = 1;
-        //     papuDataArr[0] = data;
-        // }
 
         this.el = jexcel(document.getElementById("mapPlanningUnit"), '');
         this.el.destroy();
@@ -599,7 +626,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
 
         var json = [];
         var data = papuDataArr;
-        console.log("data.length---------->", data.length);
+        // console.log("data.length---------->", data.length);
 
         let planningUnitListJexcel = this.props.items.planningUnitListJexcel
         planningUnitListJexcel.splice(0, 1);
@@ -609,75 +636,6 @@ export default class StepThreeImportMapPlanningUnits extends Component {
             columnDrag: true,
             colWidths: [100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
             columns: [
-
-                // {
-                //     title: i18n.t('static.importFromQATSupplyPlan.supplyPlanPlanningUnit'),
-                //     type: 'dropdown',
-                //     source: planningUnitListJexcel,//A0
-                //     readOnly: true
-                // },
-                // {
-                //     title: i18n.t('static.importFromQATSupplyPlan.forecastPlanningUnit'),
-                //     type: 'dropdown',
-                //     source: planningUnitListJexcel,//B1
-                //     readOnly: true
-                // },
-                // {
-                //     title: i18n.t('static.program.region'),
-                //     type: 'text',
-                //     textEditor: true,
-                //     readOnly: true//C2
-                // },
-                // {
-                //     title: i18n.t('static.inventoryDate.inventoryReport'),
-                //     type: 'calendar',
-                //     options: {
-                //         format: JEXCEL_MONTH_PICKER_FORMAT,
-                //         type: 'year-month-picker'
-                //     },
-                //     readOnly: true//D3
-                // },
-                // {
-                //     title: i18n.t('static.importFromQATSupplyPlan.actualConsumption(SupplyPlanModule)'),
-                //     type: 'numeric',
-                //     mask: '#,##',
-                //     textEditor: true,
-                //     readOnly: true//E4
-                // },
-                // {
-                //     title: i18n.t('static.importFromQATSupplyPlan.conversionFactor(SupplyPlantoForecast)'),
-                //     type: 'text',
-                //     textEditor: true,
-                //     readOnly: true//F5
-                // },
-                // {
-                //     title: i18n.t('static.importFromQATSupplyPlan.convertedActualConsumption(SupplyPlanModule)'),
-                //     type: 'numeric',
-                //     decimal: '.',
-                //     mask: '#,##.00',
-                //     textEditor: true,
-                //     readOnly: true//G6
-                // },
-                // {
-                //     title: i18n.t('static.importFromQATSupplyPlan.currentActualConsumption(ForecastModule)'),
-                //     type: 'numeric',
-                //     mask: '#,##',
-                //     textEditor: true,
-                //     readOnly: true//H7
-                // },
-                // {
-                //     title: i18n.t('static.quantimed.importData'),
-                //     type: 'checkbox'//I8
-                // },
-                // {
-                //     title: 'duplicate',
-                //     type: 'hidden'//J9
-                // },
-                // {
-                //     title: 'regionId',
-                //     type: 'hidden'//K10
-                // },
-
                 {
                     title: 'Forecast Planning Unit',
                     type: 'text',
@@ -731,36 +689,25 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                     type: 'checkbox'
                 },
                 {
-                    title: 'Id',
-                    type: 'hidden'
+                    type: 'hidden',
+                    title: "Already exists"
                 },
+                {
+                    type: 'hidden',
+                    title: "Supply Planning unit Id"
+                },
+                {
+                    type: 'hidden',
+                    title: "Supply Planning Region Id"
+                },
+
+                // {
+                //     title: 'Id',
+                //     type: 'hidden'
+                // },
 
 
             ],
-            // updateTable: function (el, cell, x, y, source, value, id) {
-            //     console.log("INSIDE UPDATE TABLE");
-            //     var elInstance = el.jexcel;
-            //     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
-            //     var rowData = elInstance.getRowData(y);
-            //     // console.log("elInstance---->", elInstance);
-            //     var id = rowData[9];
-
-            //     if (id == 1) {
-            //         for (var i = 0; i < colArr.length; i++) {
-            //             elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'background-color', 'transparent');
-            //             elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'background-color', '#f48282');
-            //             let textColor = contrast('#f48282');
-            //             elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'color', textColor);
-            //         }
-            //     } else {
-            //         for (var i = 0; i < colArr.length; i++) {
-            //             elInstance.setStyle(`${colArr[i]}${parseInt(y) + 1}`, 'background-color', 'transparent');
-            //         }
-            //     }
-
-            // }.bind(this),
-            // editable: false,
-            // pagination: localStorage.getItem("sesRecordCount"),
             pagination: 5000000,
             filters: true,
             search: true,
@@ -810,9 +757,104 @@ export default class StepThreeImportMapPlanningUnits extends Component {
     }
 
     render() {
-        const { rangeValue } = this.state
+
+        var { rangeValue } = this.state
+        if (this.props.items.startDate != "") {
+            var startDate1 = moment(this.props.items.startDate).format("YYYY-MM-DD");
+            var stopDate1 = moment(this.props.items.stopDate).format("YYYY-MM-DD");
+            // rangeValue = { from: { year: new Date(startDate1).getFullYear(), month: new Date(startDate1).getMonth() + 1 }, to: { year: new Date(stopDate1).getFullYear(), month: new Date(stopDate1).getMonth() + 1 } }
+            rangeValue = startDate1 + " ~ " + stopDate1
+        }
+
+        let datasetList = this.props.items.datasetList;
+        let datasets = null
+        datasets = datasetList.filter(c => c.programId == this.props.items.forecastProgramId)[0]
+
+        let supplyPlanList = this.props.items.programs;
+        let supplyPlan = null
+
+        supplyPlan = supplyPlanList.filter(c => c.id == this.props.items.programId)[0]
+
+
         return (
             <>
+                <AuthenticationServiceComponent history={this.props.history} />
+                <h5 className="red" id="div12">{this.state.message}</h5>
+
+                <div style={{ display: this.props.items.loading ? "none" : "block" }} >
+                    <div className="row ">
+                        <FormGroup className="col-md-4">
+                            <Label htmlFor="appendedInputButton">Supply Plan Program</Label>
+                            <div className="controls ">
+                                <InputGroup>
+                                    <Input
+                                        type="text"
+                                        name="supplyPlanProgramId"
+                                        id="supplyPlanProgramId"
+                                        bsSize="sm"
+                                        // onChange={(e) => { this.setForecastProgramId(e); }}
+                                        value={supplyPlan == null ? "" : supplyPlan.programCode}
+                                    >
+                                    </Input>
+                                </InputGroup>
+                            </div>
+                        </FormGroup>
+
+                        <FormGroup className="col-md-4">
+                            {/* <Label htmlFor="appendedInputButton">{i18n.t('static.importFromQATSupplyPlan.supplyPlanVersion')}</Label> */}
+                            <Label htmlFor="appendedInputButton">Supply Plan version</Label>
+                            <div className="controls">
+                                <InputGroup>
+                                    <Input
+                                        type="text"
+                                        name="supplyPlanVersionId"
+                                        id="supplyPlanVersionId"
+                                        bsSize="sm"
+                                        // onChange={(e) => { this.setVersionId(e); }}
+                                        // value={this.state.versionId}
+                                        value={supplyPlan == null ? "" : supplyPlan.programVersion}
+
+                                    >
+                                    </Input>
+                                </InputGroup>
+                            </div>
+                        </FormGroup>
+
+                        <FormGroup className="col-md-4">
+                            {/* <Label htmlFor="appendedInputButton">{i18n.t('static.importFromQATSupplyPlan.forecastProgram')}</Label> */}
+                            <Label htmlFor="appendedInputButton">Forecast program</Label>
+                            <div className="controls ">
+                                <InputGroup>
+                                    <Input
+                                        type="text"
+                                        name="forecastProgramId"
+                                        id="forecastProgramId"
+                                        bsSize="sm"
+                                        value={datasets == null ? "" : datasets.programCode}
+                                    >
+                                    </Input>
+                                </InputGroup>
+                            </div>
+                        </FormGroup>
+                        <FormGroup className="col-md-4">
+                            {/* <Label htmlFor="appendedInputButton">{i18n.t('static.importFromQATSupplyPlan.forecastProgram')}</Label> */}
+                            <Label htmlFor="appendedInputButton">{i18n.t('static.importFromQATSupplyPlan.Range')}<span className="stock-box-icon fa fa-sort-desc"></span></Label>
+                            <div className="controls ">
+                                <InputGroup>
+                                    <Input
+                                        type="text"
+                                        name="rangeValue"
+                                        id="rangeValue"
+                                        bsSize="sm"
+                                        value={rangeValue}
+                                    >
+                                    </Input>
+                                </InputGroup>
+                            </div>
+                        </FormGroup>
+                    </div>
+
+                </div>
                 <div className="pr-lg-0 Card-header-reporticon">
                     {/* <i className="icon-menu"></i><strong>{i18n.t('static.dashboard.globalconsumption')}</strong> */}
                     {this.state.buildCSVTable.length > 0 && <div className="card-header-actions">

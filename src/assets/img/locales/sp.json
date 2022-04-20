@@ -2280,5 +2280,7 @@
     "static.supplyPlanFormula.maxMonthOfStockEx2": "Max = MIN ([MAX (4,3) +3], 18)",
     "static.organisation.organisationheader": "Organización",
     "static.supplyPlanFormula.maxMonthOfStockEx5": "Max = 7",
-    "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18)"
+    "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18)",
+    "static.importIntoQATSupplyPlan.pleaseSelectForecastProgramVersion": "Seleccione la versión del programa de previsión",
+    "static.importIntoQATSupplyPlan.importIntoQATSupplyPlanSuccess": "Datos del Plan de Abastecimiento importados con éxito"
 }
