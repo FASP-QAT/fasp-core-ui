@@ -701,7 +701,7 @@ class ScaleUpType extends Component {
 
                         <Col xs="12" sm="12">
                             {/* <h5 className="red">{i18n.t('static.common.customWarningMessage')}</h5> */}
-                            <h5>{i18n.t("static.placeholder.placeholder")}</h5>
+                            <h5>{i18n.t("static.placeholder.modelingType")}</h5>
                             <div id="paputableDiv" style={{ display: this.state.loading ? "none" : "block", marginTop: '-13px' }} className={(AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_MODELING_TYPE') || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_MODELING_TYPE')) ? "RowClickable" : "jexcelremoveReadonlybackground"}>
                             </div>
                             <div style={{ display: this.state.loading ? "block" : "none" }}>
