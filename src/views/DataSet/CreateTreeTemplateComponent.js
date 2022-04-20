@@ -429,6 +429,7 @@ export default class CreateTreeTemplate extends Component {
         this.pickAMonth2 = React.createRef()
         this.pickAMonth1 = React.createRef()
         this.state = {
+            sameLevelNodeList1: [],
             nodeUnitListPlural: [],
             popoverOpenMonthInPast: false,
             popoverOpenMonthInFuture: false,
@@ -1583,7 +1584,7 @@ export default class CreateTreeTemplate extends Component {
                                     console.log("data[itemIndex]---", data[itemIndex]);
                                     obj = data.filter(x => x.nodeDataModelingId == map1.get("10"))[0];
                                     console.log("obj--->>>>>", obj);
-                                    var transfer = map1[3] != "" ? map1.get("3") : '';
+                                    var transfer = map1[3] != "" ? map1.get("3").split('_')[0] : '';
                                     console.log("transfer---", transfer);
                                     obj.transferNodeDataId = transfer;
                                     obj.notes = map1.get("0");
@@ -1598,7 +1599,7 @@ export default class CreateTreeTemplate extends Component {
                                 } else {
                                     console.log("maxModelingId---", maxModelingId);
                                     obj = {
-                                        transferNodeDataId: map1[3] != "" ? map1.get("3") : '',
+                                        transferNodeDataId: map1[3] != "" ? map1.get("3").split('_')[0] : '',
                                         notes: map1.get("0"),
                                         modelingType: {
                                             id: map1.get("4")
@@ -2224,6 +2225,7 @@ export default class CreateTreeTemplate extends Component {
 
     getSameLevelNodeList(level, id, nodeTypeId, parent) {
         var sameLevelNodeList = [];
+        var sameLevelNodeList1 = [];
         var arr = [];
         if (nodeTypeId == NUMBER_NODE_ID) {
             arr = this.state.items.filter(x => x.level == level && x.id != id && x.payload.nodeType.id == nodeTypeId);
@@ -2232,10 +2234,13 @@ export default class CreateTreeTemplate extends Component {
         }
 
         for (var i = 0; i < arr.length; i++) {
-            sameLevelNodeList[i] = { id: (arr[i].payload.nodeDataMap[0])[0].nodeDataId, name: getLabelText(arr[i].payload.label, this.state.lang) }
+            sameLevelNodeList.push({ id: arr[i].payload.nodeDataMap[0][0].nodeDataId + "_T", name: "To " + getLabelText(arr[i].payload.label, this.state.lang) });
+            sameLevelNodeList.push({ id: arr[i].payload.nodeDataMap[0][0].nodeDataId + "_F", name: "From " + getLabelText(arr[i].payload.label, this.state.lang) });
+            sameLevelNodeList1[i] = { id: arr[i].payload.nodeDataMap[0][0].nodeDataId + "_T", name: "To " + getLabelText(arr[i].payload.label, this.state.lang) };
         }
         this.setState({
-            sameLevelNodeList
+            sameLevelNodeList,
+            sameLevelNodeList1
         });
 
     }
@@ -2958,7 +2963,7 @@ export default class CreateTreeTemplate extends Component {
             data[0] = scalingList[j].notes
             data[1] = scalingList[j].startDateNo
             data[2] = scalingList[j].stopDateNo
-            data[3] = scalingList[j].transferNodeDataId
+            data[3] = scalingList[j].transferNodeDataId + "_T"
             console.log("modeling type---", scalingList[j].modelingType.id);
             data[4] = scalingList[j].modelingType.id
             data[5] = scalingList[j].increaseDecrease
@@ -2985,7 +2990,7 @@ export default class CreateTreeTemplate extends Component {
             data[0] = nodeTransferDataList[j].notes
             data[1] = nodeTransferDataList[j].startDateNo
             data[2] = nodeTransferDataList[j].stopDateNo
-            data[3] = nodeTransferDataList[j].transferNodeDataId
+            data[3] = nodeTransferDataList[j].transferNodeDataId + "_F"
             // console.log("modeling type---", scalingList[j].modelingType.id);
             data[4] = nodeTransferDataList[j].modelingType.id
             data[5] = 1
@@ -3046,6 +3051,7 @@ export default class CreateTreeTemplate extends Component {
                     title: i18n.t('static.tree.transferToNode'),
                     type: 'dropdown',
                     source: this.state.sameLevelNodeList,
+                    filter: this.filterSameLeveleUnitList,
                     // filter: this.getSameLevelNodeList
                 },
 
@@ -3303,6 +3309,14 @@ export default class CreateTreeTemplate extends Component {
         tr.children[10].title = i18n.t('static.tooltip.CalculatorChangeforMonth');
 
     }
+
+    filterSameLeveleUnitList = function (instance, cell, c, r, source) {
+        var sameLevelNodeList = this.state.sameLevelNodeList1;
+        console.log("mylist--------->32", sameLevelNodeList);
+        return sameLevelNodeList;
+
+    }.bind(this)
+
     selected = function (instance, cell, x, y, value) {
         if (y == 8) {
             this.setState({
