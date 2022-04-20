@@ -8,6 +8,8 @@ import csvicon from '../../assets/img/csv.png';
 import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 import ReportService from '../../api/ReportService';
+import { calculateSupplyPlan } from '../SupplyPlan/SupplyPlanCalculations';
+
 
 import {
     Badge,
@@ -246,15 +248,15 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                                     }
                                     // var qunatimedData = this.state.selSource;
                                     var finalImportQATData = this.state.selSource;
-                                    // console.log("programId in submit12", finalImportQATData)
+                                    console.log("programId in submit12", finalImportQATData)
 
                                     var finalPuList = []
                                     for (var i = 0; i < finalImportQATData.length; i++) {
-                                        var index = finalPuList.findIndex(c => c == finalImportQATData[i].id)
+                                        var index = finalPuList.findIndex(c => c == finalImportQATData[i].v10)
                                         if (index == -1) {
-                                            finalPuList.push(parseInt(finalImportQATData[i].id))
+                                            finalPuList.push(parseInt(finalImportQATData[i].v10))
                                             actionList.push({
-                                                planningUnitId: parseInt(finalImportQATData[i].id),
+                                                planningUnitId: parseInt(finalImportQATData[i].v10),
                                                 type: FORECASTED_CONSUMPTION_MODIFIED,
                                                 date: moment(minDate).startOf('month').format("YYYY-MM-DD")
                                             })
@@ -286,60 +288,64 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                                         // console.log("FINAL-----1", qunatimedData)
 
                                         for (var i = 0; i < finalImportQATData.length; i++) {
-                                            for (var j = 0; j < finalImportQATData[i].monthlyForecastData.length; j++) {
+                                            // if (finalImportQATData[i].monthlyForecastData != null) {
+                                            // for (var j = 0; j < finalImportQATData[i].monthlyForecastData.length; j++) {
 
-                                                var index = consumptionDataList.findIndex(c => moment(c.consumptionDate).format("YYYY-MM") == moment(finalImportQATData[i].monthlyForecastData[j].month).format("YYYY-MM")
-                                                    && c.region.id == this.props.items.program.regionId
-                                                    && c.actualFlag == false && c.multiplier == 1);
-                                                console.log("FINAL-----2", index)
+                                            var index = consumptionDataList.findIndex(c => moment(c.consumptionDate).format("YYYY-MM") == moment(finalImportQATData[i].v4).format("YYYY-MM")
+                                                && c.region.id == finalImportQATData[i].v11
+                                                && c.actualFlag == false && c.multiplier == 1);
+                                            console.log("FINAL-----2", index)
 
-                                                if (index != -1) {
-                                                    consumptionDataList[index].consumptionQty = finalImportQATData[i].monthlyForecastData[j].consumptionQty;
-                                                    consumptionDataList[index].consumptionRcpuQty = finalImportQATData[i].monthlyForecastData[j].consumptionQty;
-                                                    consumptionDataList[index].dataSource.id = QUANTIMED_DATA_SOURCE_ID;
+                                            if (index != -1) {
+                                                consumptionDataList[index].consumptionQty = finalImportQATData[i].v7;
+                                                consumptionDataList[index].consumptionRcpuQty = finalImportQATData[i].v7;
+                                                consumptionDataList[index].dataSource.id = QUANTIMED_DATA_SOURCE_ID;
 
-                                                    consumptionDataList[index].lastModifiedBy.userId = curUser;
-                                                    consumptionDataList[index].lastModifiedDate = curDate;
-                                                } else {
+                                                consumptionDataList[index].lastModifiedBy.userId = curUser;
+                                                consumptionDataList[index].lastModifiedDate = curDate;
+                                            } else {
 
-                                                    var consumptionJson = {
-                                                        consumptionId: 0,
-                                                        dataSource: {
-                                                            id: QUANTIMED_DATA_SOURCE_ID
-                                                        },
-                                                        region: {
-                                                            id: this.props.items.program.regionId
-                                                        },
-                                                        consumptionDate: moment(finalImportQATData[i].monthlyForecastData[j].month).startOf('month').format("YYYY-MM-DD"),
-                                                        consumptionRcpuQty: finalImportQATData[i].monthlyForecastData[j].consumptionQty.toString().replaceAll("\,", ""),
-                                                        consumptionQty: finalImportQATData[i].monthlyForecastData[j].consumptionQty.toString().replaceAll("\,", ""),
-                                                        dayOfStockOut: "",
-                                                        active: true,
-                                                        realmCountryPlanningUnit: {
-                                                            // id: rcpuResult.filter(c => c.planningUnit.id == finalImportQATData[i].product.programPlanningUnitId && c.multiplier == 1)[0].realmCountryPlanningUnitId,
-                                                        },
-                                                        multiplier: 1,
-                                                        planningUnit: {
-                                                            // id: finalImportQATData[i].product.programPlanningUnitId
-                                                        },
-                                                        notes: "",
-                                                        batchInfoList: [],
-                                                        actualFlag: false,
-                                                        createdBy: {
-                                                            userId: curUser
-                                                        },
-                                                        createdDate: curDate,
-                                                        lastModifiedBy: {
-                                                            userId: curUser
-                                                        },
-                                                        lastModifiedDate: curDate
-                                                    }
-                                                    consumptionDataList.push(consumptionJson);
+                                                var consumptionJson = {
+                                                    consumptionId: 0,
+                                                    dataSource: {
+                                                        id: QUANTIMED_DATA_SOURCE_ID
+                                                    },
+                                                    region: {
+                                                        id: this.props.items.program.regionId
+                                                    },
+                                                    consumptionDate: moment(finalImportQATData[i].v4).startOf('month').format("YYYY-MM-DD"),
+                                                    consumptionRcpuQty: finalImportQATData[i].v7.toString().replaceAll("\,", ""),
+                                                    consumptionQty: finalImportQATData[i].v7.toString().replaceAll("\,", ""),
+                                                    dayOfStockOut: "",
+                                                    active: true,
+                                                    realmCountryPlanningUnit: {
+                                                        // id: rcpuResult.filter(c => c.planningUnit.id == finalImportQATData[i].product.programPlanningUnitId && c.multiplier == 1)[0].realmCountryPlanningUnitId,
+                                                    },
+                                                    multiplier: 1,
+                                                    planningUnit: {
+                                                        // id: finalImportQATData[i].product.programPlanningUnitId
+                                                    },
+                                                    notes: "",
+                                                    batchInfoList: [],
+                                                    actualFlag: false,
+                                                    createdBy: {
+                                                        userId: curUser
+                                                    },
+                                                    createdDate: curDate,
+                                                    lastModifiedBy: {
+                                                        userId: curUser
+                                                    },
+                                                    lastModifiedDate: curDate
                                                 }
+                                                consumptionDataList.push(consumptionJson);
+                                                // }
+                                                // }
                                             }
 
-
                                         }
+                                        console.log("FINAL-----2", programJson.consumptionList)
+                                        console.log("FINAL-----2", generalProgramJson.actionList)
+
 
                                         programJson.consumptionList = consumptionDataList;
                                         generalProgramJson.actionList = actionList;
@@ -349,38 +355,40 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                                             planningUnitDataList.push({ planningUnitId: finalPuList[pu], planningUnitData: (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString() });
                                         }
                                     }
-                                    //         programDataJson.planningUnitDataList = planningUnitDataList;
-                                    //         programDataJson.generalData = (CryptoJS.AES.encrypt(JSON.stringify(generalProgramJson), SECRET_KEY)).toString()
-                                    //         programRequest.result.programData = programDataJson;
+                                    programDataJson.planningUnitDataList = planningUnitDataList;
+                                    programDataJson.generalData = (CryptoJS.AES.encrypt(JSON.stringify(generalProgramJson), SECRET_KEY)).toString()
+                                    programRequest.result.programData = programDataJson;
 
-                                    //         var transaction1;
-                                    //         var programTransaction1;
-                                    //         var finalImportQATData = this.state.finalImportData;
+                                    var transaction1;
+                                    var programTransaction1;
+                                    var finalImportQATData = this.state.selSource;
 
-                                    //         transaction1 = db1.transaction(['programData'], 'readwrite');
-                                    //         programTransaction1 = transaction1.objectStore('programData');
-                                    //         var putRequest = programTransaction1.put(programRequest.result);
+                                    transaction1 = db1.transaction(['programData'], 'readwrite');
+                                    programTransaction1 = transaction1.objectStore('programData');
+                                    var putRequest = programTransaction1.put(programRequest.result);
 
-                                    //         putRequest.onerror = function (event) {
+                                    putRequest.onerror = function (event) {
 
-                                    //             this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
-                                    //             this.props.updateState("color", "#BA0C2F");
-                                    //             this.props.hideFirstComponent();
-                                    //         }.bind(this);
-                                    //         putRequest.onsuccess = function (event) {
+                                        this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
+                                        this.props.updateState("color", "#BA0C2F");
+                                        this.props.hideFirstComponent();
+                                    }.bind(this);
+                                    putRequest.onsuccess = function (event) {
 
+                                        var finalQATPlanningList = [];
+                                        for (var i = 0; i < finalImportQATData.length; i++) {
 
-                                    //             var finalQATPlanningList = [];
-                                    //             for (var i = 0; i < finalImportQATData.length; i++) {
-                                    //                 var index = finalQATPlanningList.findIndex(c => c == finalImportQATData[i].product.programPlanningUnitId)
-                                    //                 if (index == -1) {
-                                    //                     finalQATPlanningList.push(parseInt(finalImportQATData[i].product.programPlanningUnitId))
-                                    //                 }
-                                    //             }
+                                            var index = finalQATPlanningList.findIndex(c => c == finalImportQATData[i].v10)
+                                            console.log("inside success", index)
 
-                                    //             calculateSupplyPlan(this.props.items.program.programId, 0, 'programData', 'quantimedImport', this, finalQATPlanningList, minDate);
+                                            if (index == -1) {
+                                                finalQATPlanningList.push(parseInt(finalImportQATData[i].v10))
+                                            }
+                                        }
 
-                                    // }.bind(this);
+                                        calculateSupplyPlan(this.props.items.programId, 0, 'programData', 'quantimedImport', this, finalQATPlanningList, minDate);
+
+                                    }.bind(this);
                                 }.bind(this);
                             }.bind(this);
                         }.bind(this);
