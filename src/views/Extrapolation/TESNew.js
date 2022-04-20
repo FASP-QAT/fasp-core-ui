@@ -5,7 +5,7 @@ import { calculateCI } from "./CalculateCI";
 import { calculateError } from "./ErrorCalculations";
 import jexcel from 'jexcel-pro';
 
-export function calculateTES(inputData, alphaParam, betaParam, gammaParam, confidenceLevel, seasonality, noOfProjectionMonths, props, minStartDate, isTreeExtrapolation) {
+export function calculateTES(inputData, alphaParam, betaParam, gammaParam, confidenceLevel, noOfProjectionMonths, props, minStartDate, isTreeExtrapolation) {
     console.log("inputData@@@@@@", inputData);
     console.log("@@@@@@@@noOfMonthsForProjection", noOfProjectionMonths)
     var startYear = moment(minStartDate).format("YYYY");
