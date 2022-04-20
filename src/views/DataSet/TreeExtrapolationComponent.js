@@ -573,10 +573,10 @@ export default class TreeExtrapolationComponent extends React.Component {
             currentItemConfig.context.payload.nodeDataMap[this.props.items.selectedScenario][0].nodeDataMomList = momList;
             currentItemConfig.context.payload.nodeDataMap[this.props.items.selectedScenario][0].nodeDataModelingList = [];
             currentItemConfig.context.payload.nodeDataMap[this.props.items.selectedScenario][0].nodeDataExtrapolationOptionList = this.state.nodeDataExtrapolationOptionList;
-            if (currentItemConfig.context.payload.nodeDataMap[this.props.items.selectedScenario][0].dataValue == "" || currentItemConfig.context.payload.nodeDataMap[this.props.items.selectedScenario][0].dataValue == 0) {
-                currentItemConfig.context.payload.nodeDataMap[this.props.items.selectedScenario][0].dataValue = mom.length > 0 ? mom[0].calculatedValue : '0';
-                currentItemConfig.context.payload.nodeDataMap[this.props.items.selectedScenario][0].calculatedDataValue = mom.length > 0 ? mom[0].calculatedValue : '0';
-            }
+            // if (currentItemConfig.context.payload.nodeDataMap[this.props.items.selectedScenario][0].dataValue == "" || currentItemConfig.context.payload.nodeDataMap[this.props.items.selectedScenario][0].dataValue == 0) {
+            currentItemConfig.context.payload.nodeDataMap[this.props.items.selectedScenario][0].dataValue = mom.length > 0 ? mom[0].calculatedValue : '0';
+            currentItemConfig.context.payload.nodeDataMap[this.props.items.selectedScenario][0].calculatedDataValue = mom.length > 0 ? mom[0].calculatedValue : '0';
+            // }
             console.log("extrapolation data----", currentItemConfig);
             this.props.updateState("currentItemConfig", currentItemConfig);
 
@@ -1027,13 +1027,13 @@ export default class TreeExtrapolationComponent extends React.Component {
                     for (var j = 0; j < monthArray.length; j++) {
                         var dataArr = jexcelDataArr.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArray[j]).format("YYYY-MM"))[0];
                         console.log(moment(monthArray[j]).format("YYYY-MM") + " " + "dataArr---", dataArr);
-                        if (dataArr.amount == 0) {
-                            var startValList = jexcelDataArr.filter(c => moment(c.month).format("YYYY-MM") < moment(monthArray[j]).format("YYYY-MM") && c.amount > 0)
+                        if (dataArr.amount == "") {
+                            var startValList = jexcelDataArr.filter(c => moment(c.month).format("YYYY-MM") < moment(monthArray[j]).format("YYYY-MM") && c.amount != "")
                                 .sort(function (a, b) {
                                     return new Date(a.month) - new Date(b.month);
                                 });
                             console.log(moment(monthArray[j]).format("YYYY-MM") + " " + "startValList---", startValList);
-                            var endValList = jexcelDataArr.filter(c => moment(c.month).format("YYYY-MM") > moment(monthArray[j]).format("YYYY-MM") && c.amount > 0)
+                            var endValList = jexcelDataArr.filter(c => moment(c.month).format("YYYY-MM") > moment(monthArray[j]).format("YYYY-MM") && c.amount != "")
                                 .sort(function (a, b) {
                                     return new Date(a.month) - new Date(b.month);
                                 });
