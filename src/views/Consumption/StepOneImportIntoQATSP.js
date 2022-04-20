@@ -1131,19 +1131,17 @@ export default class StepOneImportMapPlanningUnits extends Component {
         console.log("forecastProgramVersionId-------->", e.target.value);
 
         let selectedForecastProgram = this.state.datasetList.filter(c => c.programId == e.target.value)[0];
-        console.log("Selected Forecast Program@@@@@@@@@@@@@@@", selectedForecastProgram);
-        console.log("Programs@@@@@@@@@@@@@@@", this.state.programs);
-        let startDateSplit = selectedForecastProgram.forecastStartDate.split('-');
+        // let startDateSplit = selectedForecastProgram.forecastStartDate.split('-');
         var programListFilter = [];
         if (e.target.value != "") {
             programListFilter = this.state.programs.filter(c => c.generalProgramJson.realmCountry.realmCountryId == selectedForecastProgram.realmCountry.realmCountryId);
         }
         // let stopDateSplit = selectedForecastProgram.forecastStopDate.split('-');
         let forecastStopDate = new Date(selectedForecastProgram.forecastStopDate);
-        forecastStopDate.setMonth(forecastStopDate.getMonth() - 1);
+        // forecastStopDate.setMonth(forecastStopDate.getMonth() + 1);
         this.setState({
             forecastProgramId: e.target.value,
-            rangeValue: { from: { year: startDateSplit[1] - 3, month: new Date(selectedForecastProgram.forecastStartDate).getMonth() + 1 }, to: { year: forecastStopDate.getFullYear(), month: forecastStopDate.getMonth() + 1 } },
+            rangeValue: { from: { year: new Date(selectedForecastProgram.forecastStartDate).getFullYear(), month: new Date(selectedForecastProgram.forecastStartDate).getMonth() + 1 }, to: { year: forecastStopDate.getFullYear(), month: forecastStopDate.getMonth() + 1 } },
             // forecastProgramVersionId: forecastProgramVersionId,
             versionId: '',
             programListFilter: programListFilter
