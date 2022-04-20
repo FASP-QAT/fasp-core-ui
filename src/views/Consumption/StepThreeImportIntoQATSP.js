@@ -314,16 +314,16 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                                                         id: this.props.items.program.regionId
                                                     },
                                                     consumptionDate: moment(finalImportQATData[i].v4).startOf('month').format("YYYY-MM-DD"),
-                                                    consumptionRcpuQty: finalImportQATData[i].v7.toString().replaceAll("\,", ""),
-                                                    consumptionQty: finalImportQATData[i].v7.toString().replaceAll("\,", ""),
+                                                    consumptionRcpuQty: finalImportQATData[i].v5.toString().replaceAll("\,", ""),
+                                                    consumptionQty: finalImportQATData[i].v5.toString().replaceAll("\,", ""),
                                                     dayOfStockOut: "",
                                                     active: true,
                                                     realmCountryPlanningUnit: {
-                                                        // id: rcpuResult.filter(c => c.planningUnit.id == finalImportQATData[i].product.programPlanningUnitId && c.multiplier == 1)[0].realmCountryPlanningUnitId,
+                                                        id: rcpuResult.filter(c => c.planningUnit.id == finalImportQATData[i].id && c.multiplier == 1)[0].realmCountryPlanningUnitId,
                                                     },
                                                     multiplier: 1,
                                                     planningUnit: {
-                                                        // id: finalImportQATData[i].product.programPlanningUnitId
+                                                        id: finalImportQATData[i].id
                                                     },
                                                     notes: "",
                                                     batchInfoList: [],
@@ -341,6 +341,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                                                 // }
                                                 // }
                                             }
+                                            console.log("consumptionDataList===", consumptionDataList)
 
                                         }
                                         console.log("FINAL-----2", programJson.consumptionList)
