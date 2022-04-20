@@ -197,6 +197,7 @@ export default class ExtrapolateDataComponent extends React.Component {
             popoverOpenConfidenceLevel1: false,
             popoverOpenConfidenceLevel2: false,
             forecastProgramId: -1,
+            forecastProgramId: "",
             forecastProgramList: [],
             planningUnitId: -1,
             planningUnitList: [],

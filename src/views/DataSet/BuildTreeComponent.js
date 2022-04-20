@@ -1943,6 +1943,9 @@ export default class BuildTree extends Component {
             var stopDate = map1.get("2");
             var modelingTypeId = map1.get("4");
             var dataValue = modelingTypeId == 2 ? map1.get("7") : map1.get("6");
+            if (map1.get("5") == -1) {
+                dataValue = 0 - dataValue
+            }
             console.log("startDate---", startDate);
             console.log("stopDate---", stopDate);
             const result = moment(date).isBetween(startDate, stopDate, null, '[]');
@@ -2323,7 +2326,7 @@ export default class BuildTree extends Component {
                 grandParentMomList = grandParentNodeData.nodeDataMomList;
                 console.log("grandParentNodeData$$$%%%", grandParentNodeData)
                 if (grandParentNodeData != undefined) {
-                    patients = grandParentNodeData.displayCalculatedDataValue != null ? grandParentNodeData.displayCalculatedDataValue : grandParentNodeData.calculatedDataValue != null ? grandParentNodeData.calculatedDataValue : grandParentNodeData.dataValue;
+                    patients = grandParentNodeData.calculatedDataValue != null ? grandParentNodeData.calculatedDataValue : grandParentNodeData.dataValue;
                 } else {
                     patients = 0;
                 }
@@ -2914,6 +2917,10 @@ export default class BuildTree extends Component {
                     const itemIndex1 = items.findIndex(o => o.id === this.state.currentItemConfig.context.id);
                     console.log("itemIndex1--->>>", itemIndex1);
                     if (itemIndex1 != -1) {
+                        // var result1 = tableJson.length == 1 ? new Map(Object.entries(tableJson[0])).get("12") : 0;
+                        // if (result1 == 1) {
+
+                        // } else {
                         for (var i = 0; i < tableJson.length; i++) {
                             var map1 = new Map(Object.entries(tableJson[i]));
                             console.log("10 map---" + map1.get("10"));
@@ -2962,12 +2969,12 @@ export default class BuildTree extends Component {
 
                             }
                         }
-
+                        // }
                         console.log("dataArr--->>>", dataArr);
                         item.payload = this.state.currentItemConfig.context.payload;
-                        if (dataArr.length > 0) {
-                            (item.payload.nodeDataMap[this.state.selectedScenario])[0].nodeDataModelingList = dataArr;
-                        }
+                        // if (dataArr.length > 0) {
+                        (item.payload.nodeDataMap[this.state.selectedScenario])[0].nodeDataModelingList = dataArr;
+                        // }
                         if (this.state.lastRowDeleted == true) {
                             (item.payload.nodeDataMap[this.state.selectedScenario])[0].nodeDataModelingList = [];
                         }
@@ -3570,7 +3577,7 @@ export default class BuildTree extends Component {
                 {
                     title: i18n.t('static.common.description'),
                     type: 'text',
-                    width:'130'
+                    width: '130'
 
                 },
                 {
@@ -3586,7 +3593,7 @@ export default class BuildTree extends Component {
                 {
                     title: i18n.t('static.tree.transferToNode'),
                     type: 'dropdown',
-                    width:'130',
+                    width: '130',
                     source: this.state.sameLevelNodeList
                 },
 
@@ -3630,9 +3637,9 @@ export default class BuildTree extends Component {
                     decimal: '.',
                     textEditor: true,
                     disabledMaskOnEdition: true,
-                    width:'130',
+                    width: '130',
                     readOnly: true
-                    
+
                 },
                 {
                     title: 'nodeDataModelingId',
@@ -4224,34 +4231,101 @@ export default class BuildTree extends Component {
         var scenarioId = document.getElementById('scenarioId').value;
         // this.state.selectedScenario;
         if (data != null && data[scenarioId] != null && (data[scenarioId])[0] != null) {
-            if (type == 4 || type == 5) {
+            if (type == 4 || type == 5 || type == 6) {
                 var result = false;
+                // console.log("type 4---", itemConfig.payload.label.label_en, " data----", itemConfig)
                 if (itemConfig.payload.nodeDataMap[this.state.selectedScenario][0].nodeDataModelingList.length > 0) {
+                    var nodeDataModelingList = itemConfig.payload.nodeDataMap[this.state.selectedScenario][0].nodeDataModelingList;
                     if (type == 4) {
-                        result = true;
-                    } else if (type == 5) {
-                        var filteredData = itemConfig.payload.nodeDataMap[this.state.selectedScenario][0].nodeDataModelingList.filter(x => x.transferNodeDataId != null && x.transferNodeDataId != "" && x.transferNodeDataId > 0);
+                        if (nodeDataModelingList.filter(x => x.increaseDecrease == 1).length > 0) {
+                            result = true;
+                        } else {
+                            var arr = [];
+                            if (itemConfig.payload.nodeType.id == NUMBER_NODE_ID) {
+                                arr = this.state.items.filter(x => x.level == itemConfig.level && x.id != itemConfig.id && x.payload.nodeType.id == itemConfig.payload.nodeType.id);
+                            } else {
+                                arr = this.state.items.filter(x => x.level == itemConfig.level && x.id != itemConfig.id && (x.payload.nodeType.id == PERCENTAGE_NODE_ID || x.payload.nodeType.id == FU_NODE_ID || x.payload.nodeType.id == PU_NODE_ID) && x.parent == itemConfig.parent);
+                            }
+                            if (arr.length > 0) {
+                                for (var i = 0; i <= arr.length; i++) {
+                                    if (arr[i] != null) {
+                                        console.log("arr[i]---", arr[i], " ", itemConfig.payload.label.label_en)
+                                        var nodeDataModelingList = arr[i].payload.nodeDataMap[this.state.selectedScenario][0].nodeDataModelingList;
+                                        if (nodeDataModelingList.length > 0) {
+                                            console.log("current node data id---", itemConfig.payload.nodeDataMap[this.state.selectedScenario][0].nodeDataId);
+                                            var nodedata = nodeDataModelingList.filter(x => x.transferNodeDataId == itemConfig.payload.nodeDataMap[this.state.selectedScenario][0].nodeDataId)[0];
+                                            console.log("nodedata---", nodedata);
+                                            if (nodedata != null && nodedata != "") {
+                                                console.log("nodedata inside if---", itemConfig.payload.label.label_en);
+                                                result = true;
+                                                break;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                    } if (type == 6) {
+                        console.log("nodeDataModelingList 6---", nodeDataModelingList, " name", itemConfig.payload.label.label_en);
+                        if (nodeDataModelingList.filter(x => x.increaseDecrease == -1).length > 0) {
+                            result = true;
+                        }
+
+                    }
+                    else if (type == 5) {
+                        var filteredData = nodeDataModelingList.filter(x => x.transferNodeDataId != null && x.transferNodeDataId != "" && x.transferNodeDataId > 0);
                         if (filteredData.length > 0) {
                             result = true;
+                        } else {
+                            var arr = [];
+                            if (itemConfig.payload.nodeType.id == NUMBER_NODE_ID) {
+                                arr = this.state.items.filter(x => x.level == itemConfig.level && x.id != itemConfig.id && x.payload.nodeType.id == itemConfig.payload.nodeType.id);
+                            } else {
+                                arr = this.state.items.filter(x => x.level == itemConfig.level && x.id != itemConfig.id && (x.payload.nodeType.id == PERCENTAGE_NODE_ID || x.payload.nodeType.id == FU_NODE_ID || x.payload.nodeType.id == PU_NODE_ID) && x.parent == itemConfig.parent);
+                            }
+                            if (arr.length > 0) {
+                                for (var i = 0; i <= arr.length; i++) {
+                                    if (arr[i] != null) {
+                                        console.log("arr[i]---", arr[i], " ", itemConfig.payload.label.label_en)
+                                        var nodeDataModelingList = arr[i].payload.nodeDataMap[this.state.selectedScenario][0].nodeDataModelingList;
+                                        if (nodeDataModelingList.length > 0) {
+                                            console.log("current node data id---", itemConfig.payload.nodeDataMap[this.state.selectedScenario][0].nodeDataId);
+                                            var nodedata = nodeDataModelingList.filter(x => x.transferNodeDataId == itemConfig.payload.nodeDataMap[this.state.selectedScenario][0].nodeDataId)[0];
+                                            console.log("nodedata---", nodedata);
+                                            if (nodedata != null && nodedata != "") {
+                                                console.log("nodedata inside if---", itemConfig.payload.label.label_en);
+                                                result = true;
+                                                break;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
                 } else {
-                    var arr = [];
-                    if (itemConfig.payload.nodeType.id == NUMBER_NODE_ID) {
-                        arr = this.state.items.filter(x => x.level == itemConfig.level && x.id != itemConfig.id && x.payload.nodeType.id == itemConfig.payload.nodeType.id);
-                    } else {
-                        arr = this.state.items.filter(x => x.level == itemConfig.level && x.id != itemConfig.id && (x.payload.nodeType.id == PERCENTAGE_NODE_ID || x.payload.nodeType.id == FU_NODE_ID || x.payload.nodeType.id == PU_NODE_ID) && x.parent == itemConfig.parent);
-                    }
-                    if (arr.length > 0) {
-                        for (var i = 0; i <= arr.length; i++) {
-                            if (arr[i] != null) {
-                                console.log("arr[i]---", arr[i])
-                                var nodeDataModelingList = arr[i].payload.nodeDataMap[this.state.selectedScenario][0].nodeDataModelingList;
-                                if (nodeDataModelingList.length > 0) {
-                                    var nodedata = nodeDataModelingList.filter(x => x.transferNodeDataId == itemConfig.payload.nodeDataMap[this.state.selectedScenario][0].nodeDataId)[0];
-                                    if (nodedata != null && nodedata != "") {
-                                        result = true;
-                                        break;
+                    if (type == 4 || type == 5) {
+                        var arr = [];
+                        if (itemConfig.payload.nodeType.id == NUMBER_NODE_ID) {
+                            arr = this.state.items.filter(x => x.level == itemConfig.level && x.id != itemConfig.id && x.payload.nodeType.id == itemConfig.payload.nodeType.id);
+                        } else {
+                            arr = this.state.items.filter(x => x.level == itemConfig.level && x.id != itemConfig.id && (x.payload.nodeType.id == PERCENTAGE_NODE_ID || x.payload.nodeType.id == FU_NODE_ID || x.payload.nodeType.id == PU_NODE_ID) && x.parent == itemConfig.parent);
+                        }
+                        if (arr.length > 0) {
+                            for (var i = 0; i <= arr.length; i++) {
+                                if (arr[i] != null) {
+                                    console.log("arr[i]---", type, " ", arr[i], " ", itemConfig.payload.label.label_en)
+                                    var nodeDataModelingList = arr[i].payload.nodeDataMap[this.state.selectedScenario][0].nodeDataModelingList;
+                                    console.log("nodeDataModelingList---", type, " ", nodeDataModelingList, " ", itemConfig.payload.label.label_en)
+                                    if (nodeDataModelingList.length > 0) {
+                                        var nodedata = nodeDataModelingList.filter(x => x.transferNodeDataId == itemConfig.payload.nodeDataMap[this.state.selectedScenario][0].nodeDataId)[0];
+                                        console.log("nodedata---", type, " ", nodedata, " ", itemConfig.payload.label.label_en)
+                                        if (nodedata != null && nodedata != "") {
+                                            console.log("nodedata result---", type, " ", itemConfig.payload.label.label_en)
+                                            result = true;
+                                            break;
+                                        }
                                     }
                                 }
                             }
@@ -8113,8 +8187,8 @@ export default class BuildTree extends Component {
                                                                     name="interval"
                                                                     bsSize="sm"
                                                                     readOnly={true}
-                                                                    // value={addCommas(this.state.conversionFactor / ((this.state.currentItemConfig.parentItem.payload.nodeDataMap[0])[0].fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod))}>
-                                                                    value={addCommas(this.round(this.state.conversionFactor / (this.state.parentScenario.fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod)))}>
+                                                                    // value={addCommas(this.round(this.state.conversionFactor / (this.state.parentScenario.fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod)))}>
+                                                                    value={addCommas(this.state.currentItemConfig.context.payload.nodeType.id == 5 && this.state.parentScenario.fuNode.usageType.id == 2 ? this.state.currentScenario.puNode.refillMonths : "")}>
 
                                                                 </Input>
                                                             </FormGroup>
@@ -8186,7 +8260,8 @@ export default class BuildTree extends Component {
                                                         name="puPerVisitQATCalculated"
                                                         readOnly={true}
                                                         bsSize="sm"
-                                                        value={this.state.qatCalculatedPUPerVisit}
+                                                        // value={this.state.qatCalculatedPUPerVisit}
+                                                        value={this.state.currentItemConfig.parentItem != null && this.state.parentScenario.fuNode != null ? (this.state.currentScenario.puNode.sharePlanningUnit == "false" || this.state.currentScenario.puNode.sharePlanningUnit == false || this.state.parentScenario.fuNode.usageType.id == 2) ? addCommas(this.state.currentScenario.puNode.puPerVisit) : addCommas(this.state.noOfMonthsInUsagePeriod / this.state.conversionFactor) : ""}
                                                     >
                                                     </Input>
                                                 </FormGroup></>}
@@ -9513,11 +9588,12 @@ export default class BuildTree extends Component {
                         <div className={itemConfig.payload.nodeType.id == 5 ||
                             itemConfig.payload.nodeType.id == 4 ? "ContactTitle TitleColorWhite" :
                             "ContactTitle TitleColor"}>
-                            <div title={itemConfig.payload.label.label_en} style={{ fontSize: '13px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', width: '140px', float: 'left', fontWeight: 'bold', }}>
+                            <div title={itemConfig.payload.label.label_en} style={{ fontSize: '13px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', width: '137px', float: 'left', fontWeight: 'bold', }}>
                                 {itemConfig.payload.label.label_en}</div>
                             <div style={{ float: 'right' }}>
                                 {itemConfig.payload.extrapolation == true && <i class="fa fa-line-chart" style={{ fontSize: '11px', color: (itemConfig.payload.nodeType.id == 4 || itemConfig.payload.nodeType.id == 5 ? '#fff' : '#002f6c') }}></i>}
-                                {this.getPayloadData(itemConfig, 4) == true && <i class="fa fa-exchange fa-rotate-90" style={{ fontSize: '11px', color: (itemConfig.payload.nodeType.id == 4 || itemConfig.payload.nodeType.id == 5 ? '#fff' : '#002f6c') }}></i>}
+                                {this.getPayloadData(itemConfig, 4) == true && <i class="fa fa-long-arrow-up" style={{ fontSize: '11px', color: (itemConfig.payload.nodeType.id == 4 || itemConfig.payload.nodeType.id == 5 ? '#fff' : '#002f6c') }}></i>}
+                                {this.getPayloadData(itemConfig, 6) == true && <i class="fa fa-long-arrow-down" style={{ fontSize: '11px', color: (itemConfig.payload.nodeType.id == 4 || itemConfig.payload.nodeType.id == 5 ? '#fff' : '#002f6c') }}></i>}
                                 {this.getPayloadData(itemConfig, 5) == true && <i class="fa fa-link" style={{ fontSize: '11px', color: (itemConfig.payload.nodeType.id == 4 || itemConfig.payload.nodeType.id == 5 ? '#fff' : '#002f6c') }}></i>}
                                 <b style={{ color: '#212721', float: 'right' }}>
                                     {itemConfig.payload.nodeType.id == 2 ?
@@ -10026,7 +10102,7 @@ export default class BuildTree extends Component {
             <h5 className={this.state.color} id="div2">
                 {i18n.t(this.state.message, { entityname })}</h5>
             <Row>
-                <Col sm={12} md={12} style={{ flexBasis: 'auto'}}>
+                <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
                     <Card className="mb-lg-0">
                         <div className="pb-lg-0">
                             <div className="Card-header-reporticon pb-1" style={{ display: 'grid', float: 'right' }}>

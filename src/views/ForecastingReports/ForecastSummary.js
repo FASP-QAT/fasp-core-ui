@@ -113,7 +113,8 @@ class ForecastSummary extends Component {
             allProgramList: [],
             regRegionList: [],
             isChanged1: false,
-            onlineVersion: true
+            onlineVersion: true,
+            tracerCategoryList: [],
 
         };
         this.getPrograms = this.getPrograms.bind(this);
@@ -436,85 +437,194 @@ class ForecastSummary extends Component {
             a.click();
 
         } else {//Regional-------2
-            const nestedHeaders = [];
-            var tcList = this.state.tracerCategoryList;
-            var puList = this.state.regPlanningUnitList;
-            let regRegionList = this.state.regRegionList;
-            let tsList = this.state.tsList;
-            console.log("Array--------->31", tsList);
-            nestedHeaders.push('');
-            for (var k = 0; k < regRegionList.length; k++) {
+
+            if ((document.getElementById("versionId").selectedOptions[0].text).includes('Local')) {//local version
+                const nestedHeaders = [];
+                var tcList = this.state.tracerCategoryList;
+                var puList = this.state.regPlanningUnitList;
+                let regRegionList = this.state.regRegionList;
+                let tsList = this.state.tsList;
+                console.log("Array--------->31", tsList);
                 nestedHeaders.push('');
-                nestedHeaders.push(regRegionList[k].label.label_en);
-                nestedHeaders.push('');
-            }
-            nestedHeaders.push((i18n.t('static.forecastReport.allRegions')).replaceAll(' ', '%20'));
-            var A = [this.addDoubleQuoteToRowContent(nestedHeaders)]
-
-            const headers = [];
-            headers.push((i18n.t('static.product.product')).replaceAll(' ', '%20'));
-            for (var k = 0; k < regRegionList.length; k++) {
-                headers.push((i18n.t('static.compareVersion.selectedForecast')).replaceAll(' ', '%20'));
-                headers.push((i18n.t('static.forecastReport.forecastQuantity')).replaceAll(' ', '%20'));
-                headers.push((i18n.t('static.program.notes')).replaceAll(' ', '%20'));
-            }
-
-            headers.push((i18n.t('static.forecastReport.totalForecastQuantity')).replaceAll(' ', '%20'));
-            A.push([this.addDoubleQuoteToRowContent(headers)]);
-
-            for (var tc = 0; tc < tcList.length; tc++) {
-                A.push([this.addDoubleQuoteToRowContent([((puList.filter(c => c.planningUnit.forecastingUnit.tracerCategory.id == tcList[tc])[0].planningUnit.forecastingUnit.tracerCategory.label.label_en).replaceAll(',', ' ')).replaceAll(' ', '%20')])]);
-
-                var puListFiltered = puList.filter(c => c.planningUnit.forecastingUnit.tracerCategory.id == tcList[tc]);
-                for (var j = 0; j < puListFiltered.length; j++) {
-                    let regionArray = [];
-                    var total = 0;
-                    let total1 = '';
-
-
-                    for (var k = 0; k < regRegionList.length; k++) {
-                        var filterForecastSelected = puListFiltered[j].selectedForecastMap[regRegionList[k].regionId]
-                        // console.log("Array--------->2", filterForecastSelected);
-                        total += Number(filterForecastSelected != undefined ? filterForecastSelected.totalForecast : 0);
-                        total1 = total1 + (filterForecastSelected != undefined ? filterForecastSelected.totalForecast : '');
-
-                        // (tsList.filter(c => c.id == )[0].label)
-                        let nameTC = '';
-                        try {
-                            // let idTC = (((filterForecastSelected != undefined) ? (filterForecastSelected.scenarioId > 0) ? "T" + filterForecastSelected.scenarioId : (filterForecastSelected.consumptionExtrapolationId > 0) ? "C" + filterForecastSelected.consumptionExtrapolationId : "" : ""));
-                            let idTC = (((filterForecastSelected != undefined) ? (filterForecastSelected.scenarioId > 0) ? "T" + filterForecastSelected.treeId + "~" + filterForecastSelected.scenarioId : (filterForecastSelected.consumptionExtrapolationId > 0) ? "C" + filterForecastSelected.consumptionExtrapolationId : "" : ""));
-                            nameTC = (tsList.filter(c => c.id == idTC)[0].name);
-
-                        }
-                        catch (err) {
-                            // document.getElementById("demo").innerHTML = err.message;
-                        }
-
-                        // regionArray.push((((filterForecastSelected != undefined) ? (filterForecastSelected.scenarioId > 0) ? treeVar : (filterForecastSelected.consumptionExtrapolationId > 0) ? consumptionVar : "" : "")));
-                        regionArray.push(((nameTC).replaceAll(',', ' ')).replaceAll(' ', '%20'));
-                        regionArray.push((filterForecastSelected != undefined ? (filterForecastSelected.totalForecast == null ? "" : Math.round(filterForecastSelected.totalForecast)) : ""));
-                        regionArray.push((filterForecastSelected != undefined ? (filterForecastSelected.notes == null ? "" : ((filterForecastSelected.notes).replaceAll(',', ' ')).replaceAll(' ', '%20')) : ""));
-                    }
-                    // console.log("Array--------->", regionArray);
-
-                    A.push(this.addDoubleQuoteToRowContent([((puListFiltered[j].planningUnit.label.label_en).replaceAll(',', ' ')).replaceAll(' ', '%20')].concat(regionArray).concat([(total1 == '' ? '' : Math.round(total))])));
-                    // console.log("Array--------->2", [((puListFiltered[j].planningUnit.label.label_en).replaceAll(',', ' ')).replaceAll(' ', '%20')].concat(regionArray).concat([total]));
+                for (var k = 0; k < regRegionList.length; k++) {
+                    nestedHeaders.push('');
+                    nestedHeaders.push(regRegionList[k].label.label_en);
+                    nestedHeaders.push('');
                 }
+                nestedHeaders.push((i18n.t('static.forecastReport.allRegions')).replaceAll(' ', '%20'));
+                var A = [this.addDoubleQuoteToRowContent(nestedHeaders)]
+
+                const headers = [];
+                headers.push((i18n.t('static.product.product')).replaceAll(' ', '%20'));
+                for (var k = 0; k < regRegionList.length; k++) {
+                    headers.push((i18n.t('static.compareVersion.selectedForecast')).replaceAll(' ', '%20'));
+                    headers.push((i18n.t('static.forecastReport.forecastQuantity')).replaceAll(' ', '%20'));
+                    headers.push((i18n.t('static.program.notes')).replaceAll(' ', '%20'));
+                }
+
+                headers.push((i18n.t('static.forecastReport.totalForecastQuantity')).replaceAll(' ', '%20'));
+                A.push([this.addDoubleQuoteToRowContent(headers)]);
+
+                for (var tc = 0; tc < tcList.length; tc++) {
+                    A.push([this.addDoubleQuoteToRowContent([((puList.filter(c => c.planningUnit.forecastingUnit.tracerCategory.id == tcList[tc])[0].planningUnit.forecastingUnit.tracerCategory.label.label_en).replaceAll(',', ' ')).replaceAll(' ', '%20')])]);
+
+                    var puListFiltered = puList.filter(c => c.planningUnit.forecastingUnit.tracerCategory.id == tcList[tc]);
+                    for (var j = 0; j < puListFiltered.length; j++) {
+                        let regionArray = [];
+                        var total = 0;
+                        let total1 = '';
+
+
+                        for (var k = 0; k < regRegionList.length; k++) {
+                            var filterForecastSelected = puListFiltered[j].selectedForecastMap[regRegionList[k].regionId]
+                            // console.log("Array--------->2", filterForecastSelected);
+                            total += Number(filterForecastSelected != undefined ? filterForecastSelected.totalForecast : 0);
+                            total1 = total1 + (filterForecastSelected != undefined ? filterForecastSelected.totalForecast : '');
+
+                            // (tsList.filter(c => c.id == )[0].label)
+                            let nameTC = '';
+                            try {
+                                // let idTC = (((filterForecastSelected != undefined) ? (filterForecastSelected.scenarioId > 0) ? "T" + filterForecastSelected.scenarioId : (filterForecastSelected.consumptionExtrapolationId > 0) ? "C" + filterForecastSelected.consumptionExtrapolationId : "" : ""));
+                                let idTC = (((filterForecastSelected != undefined) ? (filterForecastSelected.scenarioId > 0) ? "T" + filterForecastSelected.treeId + "~" + filterForecastSelected.scenarioId : (filterForecastSelected.consumptionExtrapolationId > 0) ? "C" + filterForecastSelected.consumptionExtrapolationId : "" : ""));
+                                nameTC = (tsList.filter(c => c.id == idTC)[0].name);
+
+                            }
+                            catch (err) {
+                                // document.getElementById("demo").innerHTML = err.message;
+                            }
+
+                            // regionArray.push((((filterForecastSelected != undefined) ? (filterForecastSelected.scenarioId > 0) ? treeVar : (filterForecastSelected.consumptionExtrapolationId > 0) ? consumptionVar : "" : "")));
+                            regionArray.push(((nameTC).replaceAll(',', ' ')).replaceAll(' ', '%20'));
+                            regionArray.push((filterForecastSelected != undefined ? (filterForecastSelected.totalForecast == null ? "" : Math.round(filterForecastSelected.totalForecast)) : ""));
+                            regionArray.push((filterForecastSelected != undefined ? (filterForecastSelected.notes == null ? "" : ((filterForecastSelected.notes).replaceAll(',', ' ')).replaceAll(' ', '%20')) : ""));
+                        }
+                        // console.log("Array--------->", regionArray);
+
+                        A.push(this.addDoubleQuoteToRowContent([((puListFiltered[j].planningUnit.label.label_en).replaceAll(',', ' ')).replaceAll(' ', '%20')].concat(regionArray).concat([(total1 == '' ? '' : Math.round(total))])));
+                        // console.log("Array--------->2", [((puListFiltered[j].planningUnit.label.label_en).replaceAll(',', ' ')).replaceAll(' ', '%20')].concat(regionArray).concat([total]));
+                    }
+                }
+
+                for (var i = 0; i < A.length; i++) {
+                    // console.log(A[i])
+                    csvRow.push(A[i].join(","))
+                }
+
+                var csvString = csvRow.join("%0A")
+                // console.log('csvString' + csvString)
+                var a = document.createElement("a")
+                a.href = 'data:attachment/csv,' + csvString
+                a.target = "_Blank"
+                a.download = this.state.programs.filter(c => c.programId == this.state.programId)[0].programCode + "-" + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text) + "-" + i18n.t('static.forecastReport.forecastSummary') + "-" + document.getElementById("displayId").selectedOptions[0].text + ".csv"
+                document.body.appendChild(a)
+                a.click();
+
+            } else {//server version
+
+                const nestedHeaders = [];
+
+                let uniqueRegionList = this.state.uniqueRegionList;
+                let summeryData = this.state.summeryData;
+                let primaryOutputData = this.state.primaryOutputData;
+
+                nestedHeaders.push('');
+                for (var k = 0; k < uniqueRegionList.length; k++) {
+                    nestedHeaders.push('');
+                    nestedHeaders.push(primaryOutputData.filter(c => c.region.id == uniqueRegionList[k])[0].region.label.label_en);
+                    nestedHeaders.push('');
+                }
+                nestedHeaders.push((i18n.t('static.forecastReport.allRegions')).replaceAll(' ', '%20'));
+                var A = [this.addDoubleQuoteToRowContent(nestedHeaders)]
+
+                const headers = [];
+                headers.push((i18n.t('static.product.product')).replaceAll(' ', '%20'));
+                for (var k = 0; k < uniqueRegionList.length; k++) {
+                    headers.push((i18n.t('static.compareVersion.selectedForecast')).replaceAll(' ', '%20'));
+                    headers.push((i18n.t('static.forecastReport.forecastQuantity')).replaceAll(' ', '%20'));
+                    headers.push((i18n.t('static.program.notes')).replaceAll(' ', '%20'));
+                }
+
+                headers.push((i18n.t('static.forecastReport.totalForecastQuantity')).replaceAll(' ', '%20'));
+                A.push([this.addDoubleQuoteToRowContent(headers)]);
+
+
+
+                for (var j = 0; j < summeryData.length; j++) {
+                    let tempData = [];
+
+
+                    let regionList = summeryData[j].regionListForSinglePlanningUnit;
+                    for (var k = 0; k < regionList.length; k++) {
+                        tempData.push(regionList[k].selectedForecast == null ? '' : regionList[k].selectedForecast);
+                        tempData.push((regionList[k].forecastQuantity == null || regionList[k].forecastQuantity == '' ? '' : (regionList[k].forecastQuantity).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")));
+                        tempData.push(regionList[k].notes == null ? '' : regionList[k].notes);
+                    }
+                    tempData.push((summeryData[j].totalForecastQuantity).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","));
+
+                    A.push(this.addDoubleQuoteToRowContent([((summeryData[j].planningUnit).replaceAll(',', ' ')).replaceAll(' ', '%20')].concat(tempData)));
+
+                }
+
+                // for (var tc = 0; tc < tcList.length; tc++) {
+                //     A.push([this.addDoubleQuoteToRowContent([((puList.filter(c => c.planningUnit.forecastingUnit.tracerCategory.id == tcList[tc])[0].planningUnit.forecastingUnit.tracerCategory.label.label_en).replaceAll(',', ' ')).replaceAll(' ', '%20')])]);
+
+                //     var puListFiltered = puList.filter(c => c.planningUnit.forecastingUnit.tracerCategory.id == tcList[tc]);
+                //     for (var j = 0; j < puListFiltered.length; j++) {
+                //         let regionArray = [];
+                //         var total = 0;
+                //         let total1 = '';
+
+
+                //         for (var k = 0; k < regRegionList.length; k++) {
+                //             var filterForecastSelected = puListFiltered[j].selectedForecastMap[regRegionList[k].regionId]
+                //             // console.log("Array--------->2", filterForecastSelected);
+                //             total += Number(filterForecastSelected != undefined ? filterForecastSelected.totalForecast : 0);
+                //             total1 = total1 + (filterForecastSelected != undefined ? filterForecastSelected.totalForecast : '');
+
+                //             // (tsList.filter(c => c.id == )[0].label)
+                //             let nameTC = '';
+                //             try {
+                //                 // let idTC = (((filterForecastSelected != undefined) ? (filterForecastSelected.scenarioId > 0) ? "T" + filterForecastSelected.scenarioId : (filterForecastSelected.consumptionExtrapolationId > 0) ? "C" + filterForecastSelected.consumptionExtrapolationId : "" : ""));
+                //                 let idTC = (((filterForecastSelected != undefined) ? (filterForecastSelected.scenarioId > 0) ? "T" + filterForecastSelected.treeId + "~" + filterForecastSelected.scenarioId : (filterForecastSelected.consumptionExtrapolationId > 0) ? "C" + filterForecastSelected.consumptionExtrapolationId : "" : ""));
+                //                 nameTC = (tsList.filter(c => c.id == idTC)[0].name);
+
+                //             }
+                //             catch (err) {
+                //                 // document.getElementById("demo").innerHTML = err.message;
+                //             }
+
+                //             // regionArray.push((((filterForecastSelected != undefined) ? (filterForecastSelected.scenarioId > 0) ? treeVar : (filterForecastSelected.consumptionExtrapolationId > 0) ? consumptionVar : "" : "")));
+                //             regionArray.push(((nameTC).replaceAll(',', ' ')).replaceAll(' ', '%20'));
+                //             regionArray.push((filterForecastSelected != undefined ? (filterForecastSelected.totalForecast == null ? "" : Math.round(filterForecastSelected.totalForecast)) : ""));
+                //             regionArray.push((filterForecastSelected != undefined ? (filterForecastSelected.notes == null ? "" : ((filterForecastSelected.notes).replaceAll(',', ' ')).replaceAll(' ', '%20')) : ""));
+                //         }
+                //         // console.log("Array--------->", regionArray);
+
+                //         A.push(this.addDoubleQuoteToRowContent([((puListFiltered[j].planningUnit.label.label_en).replaceAll(',', ' ')).replaceAll(' ', '%20')].concat(regionArray).concat([(total1 == '' ? '' : Math.round(total))])));
+                //         // console.log("Array--------->2", [((puListFiltered[j].planningUnit.label.label_en).replaceAll(',', ' ')).replaceAll(' ', '%20')].concat(regionArray).concat([total]));
+                //     }
+                // }
+
+                for (var i = 0; i < A.length; i++) {
+                    // console.log(A[i])
+                    csvRow.push(A[i].join(","))
+                }
+
+                var csvString = csvRow.join("%0A")
+                // console.log('csvString' + csvString)
+                var a = document.createElement("a")
+                a.href = 'data:attachment/csv,' + csvString
+                a.target = "_Blank"
+                a.download = this.state.programs.filter(c => c.programId == this.state.programId)[0].programCode + "-" + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text) + "-" + i18n.t('static.forecastReport.forecastSummary') + "-" + document.getElementById("displayId").selectedOptions[0].text + ".csv"
+                document.body.appendChild(a)
+                a.click();
+
+
+
+
+
             }
 
-            for (var i = 0; i < A.length; i++) {
-                // console.log(A[i])
-                csvRow.push(A[i].join(","))
-            }
-
-            var csvString = csvRow.join("%0A")
-            // console.log('csvString' + csvString)
-            var a = document.createElement("a")
-            a.href = 'data:attachment/csv,' + csvString
-            a.target = "_Blank"
-            a.download = this.state.programs.filter(c => c.programId == this.state.programId)[0].programCode + "-" + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text) + "-" + i18n.t('static.forecastReport.forecastSummary') + "-" + document.getElementById("displayId").selectedOptions[0].text + ".csv"
-            document.body.appendChild(a)
-            a.click();
 
         }
 
@@ -3038,7 +3148,7 @@ class ForecastSummary extends Component {
                                 <Col md="12" className="pl-lg-0" style={{ display: this.state.loading ? "none" : "block" }}>
                                     <div>
                                         {/* <p>Some text here to explain users this is not a detailed supply plan, Just high level estimate.</p> */}
-                                        <p>{i18n.t("static.placeholder.placeholder")}</p>
+                                        <p>{i18n.t("static.placeholder.forecastSummary")}</p>
                                     </div>
                                 </Col>
                                 <Col md="12" className='pl-lg-0' style={{ display: this.state.loading ? "none" : "block" }}>
