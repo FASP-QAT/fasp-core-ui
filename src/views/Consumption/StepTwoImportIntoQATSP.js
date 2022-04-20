@@ -64,6 +64,7 @@ export default class StepTwoImportMapPlanningUnits extends Component {
                         forecastRegionId: parseInt(map1.get("0")),
                         forecastPercentage: parseInt(map1.get("2")),
                         supplyPlanRegionId: parseInt(map1.get("3")),
+                        supplyPlanRegionName:this.state.supplyPlanRegionListJExcel.filter(c=>c.id==parseInt(map1.get("3")))[0].name
                     }
                     changedpapuList.push(json);
                 }
