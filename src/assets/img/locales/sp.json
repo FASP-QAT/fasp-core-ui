@@ -2259,5 +2259,6 @@
     "static.dataentry.change": "cambio",
     "static.dataentry.otherUnitName": "Ingrese el nombre de otra unidad",
     "static.dataentry.otherUnitMultiplier": "Ingrese el multiplicador de otra unidad",
-    "static.importIntoQATSupplyPlan.pleaseSelectForecastProgramVersion": "Seleccione la versión del programa de previsión"
+    "static.importIntoQATSupplyPlan.pleaseSelectForecastProgramVersion": "Seleccione la versión del programa de previsión",
+    "static.importIntoQATSupplyPlan.importIntoQATSupplyPlanSuccess": "Datos del Plan de Abastecimiento importados con éxito"
 }

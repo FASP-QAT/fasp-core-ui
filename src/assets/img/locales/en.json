@@ -2267,6 +2267,6 @@
     "static.consumptionDataEntryAndAdjustment.nothingToInterpolate": "There is nothing to interpolate",
     "static.consumptionDataEntryAndAdjustment.interpolatedDataFor": "Interpolated data for: ",
     "static.importIntoQATSupplyPlan.pleaseSelectForecastProgramVersion": "Please select forecast program version",
-    "static.importIntoQATSupplyPlan.importIntoQATSupplyPlanSuccess": "Supply Plan data imported successfully"
-
+    "static.importIntoQATSupplyPlan.importIntoQATSupplyPlanSuccess": "Supply Plan data imported successfully",
+    "static.importIntoQATSupplyPlan.importIntoQATSupplyPlan": "QAT Forecast Import"
 }

@@ -64,7 +64,7 @@ export default class StepTwoImportMapPlanningUnits extends Component {
                         forecastRegionId: parseInt(map1.get("0")),
                         forecastPercentage: parseInt(map1.get("2")),
                         supplyPlanRegionId: parseInt(map1.get("3")),
-                        supplyPlanRegionName:this.state.supplyPlanRegionListJExcel.filter(c=>c.id==parseInt(map1.get("3")))[0].name
+                        supplyPlanRegionName: this.state.supplyPlanRegionListJExcel.filter(c => c.id == parseInt(map1.get("3")))[0].name
                     }
                     changedpapuList.push(json);
                 }
@@ -93,7 +93,7 @@ export default class StepTwoImportMapPlanningUnits extends Component {
 
             //ForecastPlanningUnit
             var budgetRegx = /^\S+(?: \S+)*$/;
-            var col = ("D").concat(parseInt(y) + 1);
+            var col = ("C").concat(parseInt(y) + 1);
             var value = this.el.getValueFromCoords(3, y);
             console.log("value-----", value);
             if (value == "") {
@@ -121,8 +121,13 @@ export default class StepTwoImportMapPlanningUnits extends Component {
 
     changed = function (instance, cell, x, y, value) {
         this.props.removeMessageText && this.props.removeMessageText();
-
         if (x == 3) {
+            let supplyPlanRegionId = this.el.getValueFromCoords(3, y);
+            if (supplyPlanRegionId != -1 && supplyPlanRegionId != null && supplyPlanRegionId != '') {
+            } else {
+                this.el.setValueFromCoords(2, y, '', true);
+            }
+
             var budgetRegx = /^\S+(?: \S+)*$/;
             var col = ("D").concat(parseInt(y) + 1);
             if (value == "") {
@@ -139,29 +144,49 @@ export default class StepTwoImportMapPlanningUnits extends Component {
                     this.el.setComments(col, "");
                 }
             }
-            // if (value == -1) {//do not import
-            // } else {
-            //     this.el.setStyle(col, "background-color", "transparent");
-            //     this.el.setComments(col, "");
-            // }
-
-            if (value == -1) {// grade out
-                this.el.setStyle(`D${parseInt(y) + 1}`, 'background-color', 'transparent');
-                this.el.setStyle(`D${parseInt(y) + 1}`, 'background-color', '#f48282');
-                let textColor = contrast('#f48282');
-                this.el.setStyle(`D${parseInt(y) + 1}`, 'color', textColor);
-                var cell1 = this.el.getCell(`C${parseInt(y) + 1}`)
-                cell1.classList.add('readonly');
-                this.el.setValueFromCoords(2, 0, "", true);
-            } else {
-                this.el.setStyle(`C${parseInt(y) + 1}`, 'background-color', 'transparent');
-                var cell1 = this.el.getCell(`C${parseInt(y) + 1}`)
-                cell1.classList.remove('readonly');
-                // this.el.setValueFromCoords(2, 0, "", true);
-                this.el.setStyle(`D${parseInt(y) + 1}`, 'background-color', 'transparent');
-            }
         }
 
+
+        //#Percentage
+        if (x == 2) {
+            let supplyPlanRegionId = this.el.getValueFromCoords(3, y);
+            var col = ("C").concat(parseInt(y) + 1);
+            value = this.el.getValue(`C${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+            // var reg = DECIMAL_NO_REGEX;
+            var reg = /^\d{1,6}(\.\d{1,6})?$/;
+            if (supplyPlanRegionId != -1) {
+                if (value == "") {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                } else {
+                    // if (isNaN(Number.parseInt(value)) || value < 0 || !(reg.test(value))) {
+                    if (!(reg.test(value))) {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setStyle(col, "background-color", "yellow");
+                        this.el.setComments(col, i18n.t('static.usagePeriod.conversionTOFUTest'));
+                    } else {
+                        if (isNaN(Number.parseInt(value)) || value <= 0) {
+                            this.el.setStyle(col, "background-color", "transparent");
+                            this.el.setStyle(col, "background-color", "yellow");
+                            this.el.setComments(col, i18n.t('static.program.validvaluetext'));
+                        } else {
+                            this.el.setStyle(col, "background-color", "transparent");
+                            this.el.setComments(col, "");
+                        }
+                    }
+                }
+            } else {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+            }
+
+        }
+        if (!this.state.isChanged1) {
+            this.setState({
+                isChanged1: true,
+            });
+        }
     }
 
     oneditionend = function (instance, cell, x, y, value) {
@@ -295,23 +320,25 @@ export default class StepTwoImportMapPlanningUnits extends Component {
             ],
             updateTable: function (el, cell, x, y, source, value, id) {
                 if (y != null) {
-                    // var elInstance = el.jexcel;
+                    var elInstance = el.jexcel;
                     //left align
-                    // elInstance.setStyle(`D${parseInt(y) + 1}`, 'text-align', 'left');
-                    // var rowData = elInstance.getRowData(y);
-                    // var doNotImport = rowData[3];
-                    // if (doNotImport == -1) {// grade out
-                    //     elInstance.setStyle(`D${parseInt(y) + 1}`, 'background-color', 'transparent');
-                    //     elInstance.setStyle(`D${parseInt(y) + 1}`, 'background-color', '#f48282');
-                    //     let textColor = contrast('#f48282');
-                    //     elInstance.setStyle(`D${parseInt(y) + 1}`, 'color', textColor);
-                    //     var cell1 = elInstance.getCell(`C${parseInt(y) + 1}`)
-                    //     cell1.classList.add('readonly');
-                    //     // elInstance.setValueFromCoords(3, parseInt(y) + 1, "", true);
+                    var rowData = elInstance.getRowData(y);
 
-                    // } else {
-                    //     elInstance.setStyle(`D${parseInt(y) + 1}`, 'background-color', 'transparent');
-                    // }
+                    var doNotImport = rowData[3];
+                    if (doNotImport == -1) {// grade out
+                        elInstance.setStyle(`D${parseInt(y) + 1}`, 'background-color', 'transparent');
+                        elInstance.setStyle(`D${parseInt(y) + 1}`, 'background-color', '#f48282');
+                        let textColor = contrast('#f48282');
+                        elInstance.setStyle(`D${parseInt(y) + 1}`, 'color', textColor);
+
+                        var cell1 = elInstance.getCell(`C${parseInt(y) + 1}`)
+                        cell1.classList.add('readonly');
+
+                    } else {
+                        var cell1 = elInstance.getCell(`C${parseInt(y) + 1}`)
+                        cell1.classList.remove('readonly');
+
+                    }
                 }
 
             }.bind(this),

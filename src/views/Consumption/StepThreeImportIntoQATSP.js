@@ -107,24 +107,6 @@ export default class StepThreeImportMapPlanningUnits extends Component {
 
         var json = elInstance.getJson();
 
-        // var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I']
-        // for (var j = 0; j < json.length; j++) {
-        //     var rowData = elInstance.getRowData(j);            
-        //     var id = rowData[9];
-        //     if (id == 1) {
-        //         for (var i = 0; i < colArr.length; i++) {
-        //             elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'background-color', 'transparent');
-        //             elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'background-color', 'yellow');
-        //             // let textColor = contrast('#f48282');
-        //             // elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'color', textColor);
-        //         }
-        //     } else {
-        //         for (var i = 0; i < colArr.length; i++) {
-        //             elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'background-color', 'transparent');
-        //         }
-        //     }
-        // }
-
         var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I']
         for (var j = 0; j < json.length; j++) {
             var rowData = elInstance.getRowData(j);
@@ -150,10 +132,6 @@ export default class StepThreeImportMapPlanningUnits extends Component {
 
         var csvRow = [];
 
-        // this.state.countryLabels.map(ele =>
-        //     csvRow.push('"' + (i18n.t('static.dashboard.country') + ' : ' + ele.toString()).replaceAll(' ', '%20') + '"'))
-
-        // csvRow.push('"' + (i18n.t('static.region.country') + ' : ' + document.getElementById("realmCountryId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
         csvRow.push('')
         csvRow.push('')
 
@@ -294,16 +272,11 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                                         }
 
                                         var consumptionDataList = (programJson.consumptionList);
-                                        // var qunatimedDataFiltered = qunatimedData.filter(c => c.product.programPlanningUnitId == finalPuList[pu]);
-                                        // console.log("FINAL-----1", qunatimedData)
                                         var elInstance = this.state.languageEl;
 
                                         var json = elInstance.getJson();
                                         var finalImportQATDataFilter = finalImportQATData.filter((c, indexFilter) => c.v10 == finalPuList[pu] && json[indexFilter][8] == true);
                                         for (var i = 0; i < finalImportQATDataFilter.length; i++) {
-                                            // if (finalImportQATData[i].monthlyForecastData != null) {
-                                            // for (var j = 0; j < finalImportQATData[i].monthlyForecastData.length; j++) {
-
                                             var index = consumptionDataList.findIndex(c => moment(c.consumptionDate).format("YYYY-MM") == moment(finalImportQATDataFilter[i].v4).format("YYYY-MM")
                                                 && c.region.id == finalImportQATDataFilter[i].v11
                                                 && c.actualFlag.toString() == "false" && c.multiplier == 1);
@@ -351,15 +324,8 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                                                     lastModifiedDate: curDate
                                                 }
                                                 consumptionDataList.push(consumptionJson);
-                                                // }
-                                                // }
                                             }
-                                            // console.log("consumptionDataList===", consumptionDataList)
-
                                         }
-                                        // console.log("FINAL-----2", programJson.consumptionList)
-                                        // console.log("FINAL-----2", generalProgramJson.actionList)
-
 
                                         programJson.consumptionList = consumptionDataList;
                                         console.log("FINAL--------------@@@@@@@@@", programJson.consumptionList)
@@ -464,7 +430,6 @@ export default class StepThreeImportMapPlanningUnits extends Component {
             programRequest.onsuccess = function (e) {
                 var fullConsumptionList = [];
                 var programData1 = programRequest.result.programData;
-                console.log("Program data@@@@@@@@@@@@@@@", programData1)
                 for (var pu = 0; pu < (programData1.planningUnitDataList).length; pu++) {
                     var planningUnitDataIndex = programData1.planningUnitDataList[pu];
                     var programJson = {}
