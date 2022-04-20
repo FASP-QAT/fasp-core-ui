@@ -1995,33 +1995,96 @@ export default class CreateTreeTemplate extends Component {
         var totalValue = "";
         data = itemConfig.payload.nodeDataMap;
         if (data != null && data[0] != null && (data[0])[0] != null) {
-            if (type == 4 || type == 5) {
+            if (type == 4 || type == 5 || type == 6) {
                 var result = false;
                 if (itemConfig.payload.nodeDataMap[0][0].nodeDataModelingList != null && itemConfig.payload.nodeDataMap[0][0].nodeDataModelingList.length > 0) {
+                    var nodeDataModelingList = itemConfig.payload.nodeDataMap[0][0].nodeDataModelingList;
                     if (type == 4) {
-                        result = true;
-                    } else if (type == 5) {
-                        var filteredData = itemConfig.payload.nodeDataMap[0][0].nodeDataModelingList.filter(x => x.transferNodeDataId != null && x.transferNodeDataId != "" && x.transferNodeDataId > 0);
+                        if (nodeDataModelingList.filter(x => x.increaseDecrease == 1).length > 0) {
+                            result = true;
+                        } else {
+                            var arr = [];
+                            if (itemConfig.payload.nodeType.id == NUMBER_NODE_ID) {
+                                arr = this.state.items.filter(x => x.level == itemConfig.level && x.id != itemConfig.id && x.payload.nodeType.id == itemConfig.payload.nodeType.id);
+                            } else {
+                                arr = this.state.items.filter(x => x.level == itemConfig.level && x.id != itemConfig.id && (x.payload.nodeType.id == PERCENTAGE_NODE_ID || x.payload.nodeType.id == FU_NODE_ID || x.payload.nodeType.id == PU_NODE_ID) && x.parent == itemConfig.parent);
+                            }
+                            if (arr.length > 0) {
+                                for (var i = 0; i <= arr.length; i++) {
+                                    if (arr[i] != null) {
+                                        console.log("arr[i]---", arr[i], " ", itemConfig.payload.label.label_en)
+                                        var nodeDataModelingList = arr[i].payload.nodeDataMap[0][0].nodeDataModelingList;
+                                        if (nodeDataModelingList.length > 0) {
+                                            console.log("current node data id---", itemConfig.payload.nodeDataMap[0][0].nodeDataId);
+                                            var nodedata = nodeDataModelingList.filter(x => x.transferNodeDataId == itemConfig.payload.nodeDataMap[0][0].nodeDataId)[0];
+                                            console.log("nodedata---", nodedata);
+                                            if (nodedata != null && nodedata != "") {
+                                                console.log("nodedata inside if---", itemConfig.payload.label.label_en);
+                                                result = true;
+                                                break;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    if (type == 6) {
+                        // console.log("nodeDataModelingList 6---", nodeDataModelingList, " name", itemConfig.payload.label.label_en);
+                        if (nodeDataModelingList.filter(x => x.increaseDecrease == -1).length > 0) {
+                            result = true;
+                        }
+
+                    }
+                    else if (type == 5) {
+                        var filteredData = nodeDataModelingList.filter(x => x.transferNodeDataId != null && x.transferNodeDataId != "" && x.transferNodeDataId > 0);
                         if (filteredData.length > 0) {
                             result = true;
+                        } else {
+                            var arr = [];
+                            if (itemConfig.payload.nodeType.id == NUMBER_NODE_ID) {
+                                arr = this.state.items.filter(x => x.level == itemConfig.level && x.id != itemConfig.id && x.payload.nodeType.id == itemConfig.payload.nodeType.id);
+                            } else {
+                                arr = this.state.items.filter(x => x.level == itemConfig.level && x.id != itemConfig.id && (x.payload.nodeType.id == PERCENTAGE_NODE_ID || x.payload.nodeType.id == FU_NODE_ID || x.payload.nodeType.id == PU_NODE_ID) && x.parent == itemConfig.parent);
+                            }
+                            if (arr.length > 0) {
+                                for (var i = 0; i <= arr.length; i++) {
+                                    if (arr[i] != null) {
+                                        console.log("arr[i]---", arr[i], " ", itemConfig.payload.label.label_en)
+                                        var nodeDataModelingList = arr[i].payload.nodeDataMap[0][0].nodeDataModelingList;
+                                        if (nodeDataModelingList.length > 0) {
+                                            console.log("current node data id---", itemConfig.payload.nodeDataMap[0][0].nodeDataId);
+                                            var nodedata = nodeDataModelingList.filter(x => x.transferNodeDataId == itemConfig.payload.nodeDataMap[0][0].nodeDataId)[0];
+                                            console.log("nodedata---", nodedata);
+                                            if (nodedata != null && nodedata != "") {
+                                                console.log("nodedata inside if---", itemConfig.payload.label.label_en);
+                                                result = true;
+                                                break;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
                 } else {
-                    var arr = [];
-                    if (itemConfig.payload.nodeType.id == NUMBER_NODE_ID) {
-                        arr = this.state.items.filter(x => x.level == itemConfig.level && x.id != itemConfig.id && x.payload.nodeType.id == itemConfig.payload.nodeType.id);
-                    } else {
-                        arr = this.state.items.filter(x => x.level == itemConfig.level && x.id != itemConfig.id && (x.payload.nodeType.id == PERCENTAGE_NODE_ID || x.payload.nodeType.id == FU_NODE_ID || x.payload.nodeType.id == PU_NODE_ID) && x.parent == itemConfig.parent);
-                    }
-                    if (arr.length > 0) {
-                        for (var i = 0; i <= arr.length; i++) {
-                            if (arr[i] != null) {
-                                var nodeDataModelingList = arr[i].payload.nodeDataMap[0][0].nodeDataModelingList;
-                                if (nodeDataModelingList.length > 0) {
-                                    var nodedata = nodeDataModelingList.filter(x => x.transferNodeDataId == itemConfig.payload.nodeDataMap[0][0].nodeDataId)[0];
-                                    if (nodedata != null && nodedata != "") {
-                                        result = true;
-                                        break;
+                    if (type == 4 || type == 5) {
+                        var arr = [];
+                        if (itemConfig.payload.nodeType.id == NUMBER_NODE_ID) {
+                            arr = this.state.items.filter(x => x.level == itemConfig.level && x.id != itemConfig.id && x.payload.nodeType.id == itemConfig.payload.nodeType.id);
+                        } else {
+                            arr = this.state.items.filter(x => x.level == itemConfig.level && x.id != itemConfig.id && (x.payload.nodeType.id == PERCENTAGE_NODE_ID || x.payload.nodeType.id == FU_NODE_ID || x.payload.nodeType.id == PU_NODE_ID) && x.parent == itemConfig.parent);
+                        }
+                        if (arr.length > 0) {
+                            for (var i = 0; i <= arr.length; i++) {
+                                if (arr[i] != null) {
+                                    var nodeDataModelingList = arr[i].payload.nodeDataMap[0][0].nodeDataModelingList;
+                                    if (nodeDataModelingList.length > 0) {
+                                        var nodedata = nodeDataModelingList.filter(x => x.transferNodeDataId == itemConfig.payload.nodeDataMap[0][0].nodeDataId)[0];
+                                        if (nodedata != null && nodedata != "") {
+                                            result = true;
+                                            break;
+                                        }
                                     }
                                 }
                             }
@@ -8225,7 +8288,8 @@ export default class CreateTreeTemplate extends Component {
                         <div className={itemConfig.payload.nodeType.id == 5 || itemConfig.payload.nodeType.id == 4 ? "ContactTitle TitleColorWhite" : "ContactTitle TitleColor"}>
                             <div title={itemConfig.payload.label.label_en} style={{ fontSize: '13px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', width: '141px', float: 'left', fontWeight: 'bold' }}>{itemConfig.payload.label.label_en}</div>
                             <div style={{ float: 'right' }}>
-                                {this.getPayloadData(itemConfig, 4) == true && <i class="fa fa-exchange fa-rotate-90" style={{ fontSize: '11px', color: (itemConfig.payload.nodeType.id == 4 || itemConfig.payload.nodeType.id == 5 ? '#fff' : '#002f6c') }}></i>}
+                                {this.getPayloadData(itemConfig, 4) == true && <i class="fa fa-long-arrow-up" style={{ fontSize: '11px', color: (itemConfig.payload.nodeType.id == 4 || itemConfig.payload.nodeType.id == 5 ? '#fff' : '#002f6c') }}></i>}
+                                {this.getPayloadData(itemConfig, 6) == true && <i class="fa fa-long-arrow-down" style={{ fontSize: '11px', color: (itemConfig.payload.nodeType.id == 4 || itemConfig.payload.nodeType.id == 5 ? '#fff' : '#002f6c') }}></i>}
                                 {this.getPayloadData(itemConfig, 5) == true && <i class="fa fa-link" style={{ fontSize: '11px', color: (itemConfig.payload.nodeType.id == 4 || itemConfig.payload.nodeType.id == 5 ? '#fff' : '#002f6c') }}></i>}
                                 <b style={{ color: '#212721', float: 'right' }}>{itemConfig.payload.nodeType.id == 2 ? <i class="fa fa-hashtag" style={{ fontSize: '11px', color: '#002f6c' }}></i> : (itemConfig.payload.nodeType.id == 3 ? <i class="fa fa-percent " style={{ fontSize: '11px', color: '#002f6c' }} ></i> : (itemConfig.payload.nodeType.id == 4 ? <i class="fa fa-cube" style={{ fontSize: '11px', color: '#fff' }} ></i> : (itemConfig.payload.nodeType.id == 5 ? <i class="fa fa-cubes" style={{ fontSize: '11px', color: '#fff' }} ></i> : (itemConfig.payload.nodeType.id == 1 ? <i><img src={AggregationNode} className="AggregationNodeSize" /></i> : ""))))}</b>
                             </div>
