@@ -1624,15 +1624,17 @@ class ForecastOutput extends Component {
 
                         for (let i = 0; i < primaryConsumptionData.length; i++) {
 
-                            let consumptionList = primaryConsumptionData[i].monthlyForecastData.map(m => {
-                                return {
-                                    consumptionDate: m.month,
-                                    consumptionQty: Math.round(m.consumptionQty)
-                                }
-                            });
+                            if (primaryConsumptionData[i].selectedForecast != null) {
+                                let consumptionList = primaryConsumptionData[i].monthlyForecastData.map(m => {
+                                    return {
+                                        consumptionDate: m.month,
+                                        consumptionQty: Math.round(m.consumptionQty)
+                                    }
+                                });
 
-                            let jsonTemp = { objUnit: (viewById == 1 ? primaryConsumptionData[i].planningUnit : primaryConsumptionData[i].forecastingUnit), scenario: { id: 1, label: primaryConsumptionData[i].selectedForecast.label_en }, display: true, color: "#ba0c2f", consumptionList: consumptionList }
-                            consumptionData.push(jsonTemp);
+                                let jsonTemp = { objUnit: (viewById == 1 ? primaryConsumptionData[i].planningUnit : primaryConsumptionData[i].forecastingUnit), scenario: { id: 1, label: primaryConsumptionData[i].selectedForecast.label_en }, display: true, color: "#ba0c2f", consumptionList: consumptionList }
+                                consumptionData.push(jsonTemp);
+                            }
 
                         }
 
@@ -2203,7 +2205,7 @@ class ForecastOutput extends Component {
                                 ForecastingUnitService.getForecastingUnitListByProgramVersionIdForSelectedForecastMap(programId, versionId).then(response => {
                                     console.log('**' + JSON.stringify(response.data))
                                     var listArray = response.data;
-                                    listArray = listArray.filter((v,i,a)=>a.findIndex(v2=>(v2.id===v.id))===i)
+                                    listArray = listArray.filter((v, i, a) => a.findIndex(v2 => (v2.id === v.id)) === i)
                                     listArray.sort((a, b) => {
                                         var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
                                         var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
@@ -3308,7 +3310,7 @@ class ForecastOutput extends Component {
                                                 </div>
                                             </FormGroup>
 
-                                            
+
 
                                             <FormGroup className="col-md-3">
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.forecastReport.yAxisInEquivalencyUnit')}  <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={this.toggleEu} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
