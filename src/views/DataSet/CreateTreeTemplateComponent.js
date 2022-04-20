@@ -1446,6 +1446,9 @@ export default class CreateTreeTemplate extends Component {
             var stopDate = map1.get("2");
             var modelingTypeId = map1.get("4");
             var dataValue = modelingTypeId == 2 ? map1.get("7").toString().replaceAll(",", "").replaceAll("%", "") : map1.get("6").toString().replaceAll(",", "").replaceAll("%", "");
+            if (map1.get("5") == -1) {
+                dataValue = 0 - dataValue
+            }
             console.log("startDate---", startDate);
             console.log("stopDate---", stopDate);
             const result = date >= startDate && date <= stopDate ? true : false;
