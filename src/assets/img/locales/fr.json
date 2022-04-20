@@ -1615,7 +1615,7 @@
     "static.compareAndSelect.typeTitle": "C indique une prévision de consommation, T indique une prévision d`arbre.",
     "static.extrapolation.beta": "Bêta",
     "static.productCategoryName.productCategoryNameRequired": "Le nom de la catégorie de produit est obligatoire.",
-    "static.tooltip.LagInMonth ": "0 indique une utilisation immédiate",
+    "static.tooltip.LagInMonth": "0 indique une utilisation immédiate",
     "static.planningunit.planningunit": "Unité de planification",
     "static.dataEntry.batchDetails": "Détails du lot",
     "static.versionSettings.committedDate": "Date d`engagement",

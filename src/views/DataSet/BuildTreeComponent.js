@@ -1209,6 +1209,7 @@ export default class BuildTree extends Component {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
+ 
     calculateMOMData(nodeId, type) {
         let { curTreeObj } = this.state;
         let { treeData } = this.state;
@@ -8395,7 +8396,7 @@ export default class BuildTree extends Component {
                                             </FormGroup>
                                             <div>
                                                 <Popover placement="top" isOpen={this.state.popoverOpenLagInMonth} target="Popover22" trigger="hover" toggle={this.toggleLagInMonth}>
-                                                    <PopoverBody>{i18n.t('static.tooltip.LagInMonth')}</PopoverBody>
+                                                    <PopoverBody>{i18n.t('static.tooltip.LagInMonthFUNode')}</PopoverBody>
                                                 </Popover>
                                             </div>
                                             <FormGroup className="col-md-6" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 4 ? 'block' : 'none' }}>
@@ -8736,7 +8737,7 @@ export default class BuildTree extends Component {
                                     {/* disabled={!isValid} */}
                                     <FormGroup className="pb-lg-3">
                                         {/* <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setState({ openAddNodeModal: false, cursorItem: 0, highlightItem: 0 })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button> */}
-                                        <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setState({ openAddNodeModal: false, cursorItem: 0, highlightItem: 0 })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                        <Button size="md" color="danger" className="submitBtn float-right mr-1"  onClick={() => this.setState({ openAddNodeModal: false, cursorItem: 0, highlightItem: 0 })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                         <Button type="button" size="md" color="warning" className="float-right mr-1" onClick={() => this.resetNodeData()} ><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                         <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAllNodeData(setTouched, errors)} disabled={isSubmitting}><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
                                     </FormGroup>
@@ -10021,6 +10022,7 @@ export default class BuildTree extends Component {
                 message={i18n.t("static.dataentry.confirmmsg")}
             />
             <AuthenticationServiceComponent history={this.props.history} />
+            
             <h5 className={this.state.color} id="div2">
                 {i18n.t(this.state.message, { entityname })}</h5>
             <Row>

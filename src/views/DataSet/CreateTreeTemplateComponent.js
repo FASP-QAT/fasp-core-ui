@@ -7124,7 +7124,7 @@ export default class CreateTreeTemplate extends Component {
                                             </FormGroup>
                                             <div>
                                                 <Popover placement="top" isOpen={this.state.popoverOpenLagInMonth} target="Popover18" trigger="hover" toggle={this.toggleLagInMonth}>
-                                                    <PopoverBody>{i18n.t('static.tooltip.LagInMonth')}</PopoverBody>
+                                                    <PopoverBody>{i18n.t('static.tooltip.LagInMonthFUNode')}</PopoverBody>
                                                 </Popover>
                                             </div>
                                             <FormGroup className="col-md-6" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 4 ? 'block' : 'none' }}>

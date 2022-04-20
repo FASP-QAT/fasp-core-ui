@@ -1621,7 +1621,7 @@
     "static.compareAndSelect.typeTitle": "C indicates a consumption forecast, T indicates a Tree Forecast.",
     "static.extrapolation.beta": "Beta",
     "static.productCategoryName.productCategoryNameRequired": "Planning Unit Category Name Is Required.",
-    "static.tooltip.LagInMonth ": "0 indicates immediate usage",
+    "static.tooltip.LagInMonth": "0 indicates immediate usage",
     "static.planningunit.planningunit": "Planning Unit",
     "static.dataEntry.batchDetails": "Batch Details",
     "static.versionSettings.committedDate": "Committed date",
