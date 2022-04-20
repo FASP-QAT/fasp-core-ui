@@ -286,57 +286,56 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                                         // console.log("FINAL-----1", qunatimedData)
 
                                         for (var i = 0; i < finalImportQATData.length; i++) {
-                                            for (var j = 0; j < finalImportQATData[i].monthlyForecastData.length; j++) {
 
-                                                var index = consumptionDataList.findIndex(c => moment(c.consumptionDate).format("YYYY-MM") == moment(finalImportQATData[i].monthlyForecastData[j].month).format("YYYY-MM")
-                                                    && c.region.id == this.props.items.program.regionId
-                                                    && c.actualFlag == false && c.multiplier == 1);
-                                                console.log("FINAL-----2", index)
+                                            var index = consumptionDataList.findIndex(c => moment(c.consumptionDate).format("YYYY-MM") == moment(finalImportQATData[i].v4).format("YYYY-MM")
+                                                && c.region.id == this.props.items.program.regionId
+                                                && c.actualFlag == false && c.multiplier == 1);
+                                            console.log("FINAL-----2", index)
 
-                                                if (index != -1) {
-                                                    consumptionDataList[index].consumptionQty = finalImportQATData[i].monthlyForecastData[j].consumptionQty;
-                                                    consumptionDataList[index].consumptionRcpuQty = finalImportQATData[i].monthlyForecastData[j].consumptionQty;
-                                                    consumptionDataList[index].dataSource.id = QUANTIMED_DATA_SOURCE_ID;
+                                            if (index != -1) {
+                                                consumptionDataList[index].consumptionQty = finalImportQATData[i].v5;
+                                                consumptionDataList[index].consumptionRcpuQty = finalImportQATData[i].v5;
+                                                consumptionDataList[index].dataSource.id = QUANTIMED_DATA_SOURCE_ID;
 
-                                                    consumptionDataList[index].lastModifiedBy.userId = curUser;
-                                                    consumptionDataList[index].lastModifiedDate = curDate;
-                                                } else {
+                                                consumptionDataList[index].lastModifiedBy.userId = curUser;
+                                                consumptionDataList[index].lastModifiedDate = curDate;
+                                            } else {
 
-                                                    var consumptionJson = {
-                                                        consumptionId: 0,
-                                                        dataSource: {
-                                                            id: QUANTIMED_DATA_SOURCE_ID
-                                                        },
-                                                        region: {
-                                                            id: this.props.items.program.regionId
-                                                        },
-                                                        consumptionDate: moment(finalImportQATData[i].monthlyForecastData[j].month).startOf('month').format("YYYY-MM-DD"),
-                                                        consumptionRcpuQty: finalImportQATData[i].monthlyForecastData[j].consumptionQty.toString().replaceAll("\,", ""),
-                                                        consumptionQty: finalImportQATData[i].monthlyForecastData[j].consumptionQty.toString().replaceAll("\,", ""),
-                                                        dayOfStockOut: "",
-                                                        active: true,
-                                                        realmCountryPlanningUnit: {
-                                                            // id: rcpuResult.filter(c => c.planningUnit.id == finalImportQATData[i].product.programPlanningUnitId && c.multiplier == 1)[0].realmCountryPlanningUnitId,
-                                                        },
-                                                        multiplier: 1,
-                                                        planningUnit: {
-                                                            // id: finalImportQATData[i].product.programPlanningUnitId
-                                                        },
-                                                        notes: "",
-                                                        batchInfoList: [],
-                                                        actualFlag: false,
-                                                        createdBy: {
-                                                            userId: curUser
-                                                        },
-                                                        createdDate: curDate,
-                                                        lastModifiedBy: {
-                                                            userId: curUser
-                                                        },
-                                                        lastModifiedDate: curDate
-                                                    }
-                                                    consumptionDataList.push(consumptionJson);
+                                                var consumptionJson = {
+                                                    consumptionId: 0,
+                                                    dataSource: {
+                                                        id: QUANTIMED_DATA_SOURCE_ID
+                                                    },
+                                                    region: {
+                                                        id: this.props.items.program.regionId
+                                                    },
+                                                    consumptionDate: moment(finalImportQATData[i].v4).startOf('month').format("YYYY-MM-DD"),
+                                                    consumptionRcpuQty: finalImportQATData[i].v5.toString().replaceAll("\,", ""),
+                                                    consumptionQty: finalImportQATData[i].v5.toString().replaceAll("\,", ""),
+                                                    dayOfStockOut: "",
+                                                    active: true,
+                                                    realmCountryPlanningUnit: {
+                                                        id: rcpuResult.filter(c => c.planningUnit.id == finalImportQATData[i].id && c.multiplier == 1)[0].realmCountryPlanningUnitId,
+                                                    },
+                                                    multiplier: 1,
+                                                    planningUnit: {
+                                                        id: finalImportQATData[i].id
+                                                    },
+                                                    notes: "",
+                                                    batchInfoList: [],
+                                                    actualFlag: false,
+                                                    createdBy: {
+                                                        userId: curUser
+                                                    },
+                                                    createdDate: curDate,
+                                                    lastModifiedBy: {
+                                                        userId: curUser
+                                                    },
+                                                    lastModifiedDate: curDate
                                                 }
+                                                .push(consumptionJson);
                                             }
+                                            console.log("consumptionDataList===", consumptionDataList)
 
 
                                         }
