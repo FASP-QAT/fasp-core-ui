@@ -1050,30 +1050,31 @@ export default class CommitTreeComponent extends React.Component {
                             {/* <i className="fa fa-print pull-right iconClassCommit cursor" onClick={() => this.print()}></i> */}
                             <h3><strong>{i18n.t('static.commitTree.forecastValidation')}</strong></h3>
                         </div>
+                        <div className={"check inline pl-lg-3"}>
+                            <div className="">
+                                <Input
+                                    style={{ width: '16px', height: '16px', marginTop: '3px' }}
+                                    className="form-check-input"
+                                    type="checkbox"
+                                    id="includeOnlySelectedForecasts"
+                                    name="includeOnlySelectedForecasts"
+                                    checked={this.state.includeOnlySelectedForecasts}
+                                    onClick={(e) => { this.setIncludeOnlySelectedForecasts(e); }}
+                                />
+                                <Label
+                                    className="form-check-label pl-lg-1"
+                                    check htmlFor="inline-radio2" style={{ fontSize: '16px' }}>
+                                    <b>{i18n.t('static.validation.includeOnlySelectedForecast')}</b>
+                                    {/* <i class="fa fa-info-circle icons pl-lg-2" id="Popover5" onClick={() => this.toggle('popoverOpenArima', !this.state.popoverOpenArima)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i> */}
+                                </Label>
+                            </div>
+                        </div>
                     </ModalHeader>
                     <div>
                         <ModalBody className="VersionSettingMode">
                             <span><b>{this.state.programName}</b></span><br />
                             <span><b>{i18n.t('static.common.forecastPeriod')}: </b> {moment(this.state.forecastStartDate).format('MMM-YYYY')} to {moment(this.state.forecastStopDate).format('MMM-YYYY')} </span>
                             <br />
-                            <div className={"check inline pl-lg-3"}>
-                                <div className="">
-                                    <Input
-                                        className="form-check-input"
-                                        type="checkbox"
-                                        id="includeOnlySelectedForecasts"
-                                        name="includeOnlySelectedForecasts"
-                                        checked={this.state.includeOnlySelectedForecasts}
-                                        onClick={(e) => { this.setIncludeOnlySelectedForecasts(e); }}
-                                    />
-                                    <Label
-                                        className="form-check-label"
-                                        check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                                        <b>{i18n.t('static.validation.includeOnlySelectedForecast')}</b>
-                                        {/* <i class="fa fa-info-circle icons pl-lg-2" id="Popover5" onClick={() => this.toggle('popoverOpenArima', !this.state.popoverOpenArima)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i> */}
-                                    </Label>
-                                </div>
-                            </div>
                             <br />
 
                             <span><b>1. {i18n.t('static.commitTree.noForecastSelected')}: </b>(<a href="/#/report/compareAndSelectScenario" target="_blank">{i18n.t('static.commitTree.compare&Select')}</a>, <a href={this.state.programId != -1 && this.state.programId != "" && this.state.programId != undefined ? "/#/forecastReport/forecastSummary/" + this.state.programId.toString().split("_")[0] + "/" + (this.state.programId.toString().split("_")[1]).toString().substring(1) : "/#/forecastReport/forecastSummary/"} target="_blank">{i18n.t('static.commitTree.forecastSummary')}</a>)</span><br />
