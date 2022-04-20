@@ -299,7 +299,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                                         var elInstance = this.state.languageEl;
 
                                         var json = elInstance.getJson();
-                                        var finalImportQATDataFilter = finalImportQATData.filter((c,indexFilter) => c.v10 == finalPuList[pu] && json[indexFilter][8]==true);
+                                        var finalImportQATDataFilter = finalImportQATData.filter((c, indexFilter) => c.v10 == finalPuList[pu] && json[indexFilter][8] == true);
                                         for (var i = 0; i < finalImportQATDataFilter.length; i++) {
                                             // if (finalImportQATData[i].monthlyForecastData != null) {
                                             // for (var j = 0; j < finalImportQATData[i].monthlyForecastData.length; j++) {
@@ -530,7 +530,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                                 // console.log("RESP---------->", supplyPlanRegionList[l].supplyPlanRegionList[m].forecastPercentage);
                                 var selectedSupplyPlanPlanningUnit = selectedSupplyPlan.filter(c => c.forecastPlanningUnitId == primaryConsumptionData[i].planningUnit.id);
                                 var regionFilter = supplyPlanRegionList.filter(c => c.forecastRegionId == primaryConsumptionData[i].region.id);
-                                if (primaryConsumptionData[i].monthlyForecastData[j].month != null) {
+                                if (primaryConsumptionData[i].monthlyForecastData[j].month != null && regionFilter.length > 0) {
                                     var checkConsumptionData = fullConsumptionList.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(primaryConsumptionData[i].monthlyForecastData[j].month).format("YYYY-MM") && c.planningUnit.id == selectedSupplyPlanPlanningUnit[0].supplyPlanPlanningUnitId && c.actualFlag.toString() == "false" && c.region.id == regionFilter[0].supplyPlanRegionId && c.multiplier == 1);
                                     tempList.push({
                                         v1: getLabelText(primaryConsumptionData[i].planningUnit.label, this.state.lang),//Forecast planning unit
@@ -543,7 +543,9 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                                         v8: checkConsumptionData.length > 0 ? checkConsumptionData[0].consumptionRcpuQty : "",//Supply plan module qty
                                         v9: checkConsumptionData.length > 0 ? true : false,// Check
                                         v10: selectedSupplyPlanPlanningUnit[0].supplyPlanPlanningUnitId,// Supply plan planning unit id
-                                        v11: regionFilter[0].supplyPlanRegionId // Supply plan region Id
+                                        v11: regionFilter[0].supplyPlanRegionId, // Supply plan region Id
+                                        v12: primaryConsumptionData[i].planningUnit.id, // Forecast planning unit Id
+                                        v13: primaryConsumptionData[i].monthlyForecastData[j].month + "~" + selectedSupplyPlanPlanningUnit[0].supplyPlanPlanningUnitId + "~" + regionFilter[0].supplyPlanRegionId + "~" + primaryConsumptionData[i].planningUnit.id
                                     });
                                 }
                                 // count1++;
@@ -551,8 +553,19 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                                 // }
                             }
                         }
+
+                        let resultTrue = Object.values(tempList.reduce((a, { v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13 }) => {
+                            if (!a[v13]) {
+                                a[v13] = Object.assign({}, { v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13 });
+                            } else {
+                                a[v13].v7 += v7;
+                                a[v13].v5 += v5;
+                            }
+                            return a;
+                        }, {}));
+                        console.log("Result True@@@@@@@@@@@@@@@@@@", resultTrue);
                         this.setState({
-                            selSource: tempList,
+                            selSource: resultTrue,
                             loading: true
                         }, () => {
                             this.buildJexcel();
@@ -560,6 +573,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
 
                     }).catch(
                         error => {
+                            console.log("Error @@@@@@@@@@", error)
                             if (error.message === "Network Error") {
                                 this.setState({
                                     message: 'static.unkownError',
