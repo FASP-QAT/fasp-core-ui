@@ -501,6 +501,7 @@ export default class BuildTree extends Component {
         this.pickAMonth4 = React.createRef()
         this.pickAMonth5 = React.createRef()
         this.state = {
+            sameLevelNodeList1: [],
             nodeUnitListPlural: [],
             nodeTransferDataList: [],
             qatCalculatedPUPerVisit: "",
@@ -1209,7 +1210,7 @@ export default class BuildTree extends Component {
             document.getElementById('div2').style.display = 'none';
         }, 30000);
     }
- 
+
     calculateMOMData(nodeId, type) {
         let { curTreeObj } = this.state;
         let { treeData } = this.state;
@@ -2938,7 +2939,7 @@ export default class BuildTree extends Component {
                                     const itemIndex = data.findIndex(o => o.nodeDataModelingId === map1.get("10"));
                                     obj = data.filter(x => x.nodeDataModelingId == map1.get("10"))[0];
                                     console.log("obj--->>>>>", obj);
-                                    var transfer = map1[0] != "" ? map1.get("3") : '';
+                                    var transfer = map1[3] != "" ? map1.get("3").split('_')[0] : '';
                                     console.log("transfer---", transfer);
                                     obj.transferNodeDataId = transfer;
                                     obj.notes = map1.get("0");
@@ -2952,7 +2953,7 @@ export default class BuildTree extends Component {
                                     // dataArr.push(obj);
                                 } else {
                                     obj = {
-                                        transferNodeDataId: map1[3] != "" ? map1.get("3") : '',
+                                        transferNodeDataId: map1[3] != "" ? map1.get("3").split('_')[0] : '',
                                         notes: map1.get("0"),
                                         modelingType: {
                                             id: map1.get("4")
@@ -3352,6 +3353,7 @@ export default class BuildTree extends Component {
 
     getSameLevelNodeList(level, id, nodeTypeId, parent) {
         var sameLevelNodeList = [];
+        var sameLevelNodeList1 = [];
         var arr = [];
         if (nodeTypeId == NUMBER_NODE_ID) {
             arr = this.state.items.filter(x => x.level == level && x.id != id && x.payload.nodeType.id == nodeTypeId);
@@ -3359,12 +3361,19 @@ export default class BuildTree extends Component {
             arr = this.state.items.filter(x => x.level == level && x.id != id && (x.payload.nodeType.id == PERCENTAGE_NODE_ID || x.payload.nodeType.id == FU_NODE_ID || x.payload.nodeType.id == PU_NODE_ID) && x.parent == parent);
         }
         console.log("arr---", arr);
+        // var count = 0;
         for (var i = 0; i < arr.length; i++) {
-            sameLevelNodeList[i] = { id: arr[i].payload.nodeDataMap[this.state.selectedScenario][0].nodeDataId, name: getLabelText(arr[i].payload.label, this.state.lang) }
+            sameLevelNodeList.push({ id: arr[i].payload.nodeDataMap[this.state.selectedScenario][0].nodeDataId + "_T", name: "To " + getLabelText(arr[i].payload.label, this.state.lang) });
+            sameLevelNodeList.push({ id: arr[i].payload.nodeDataMap[this.state.selectedScenario][0].nodeDataId + "_F", name: "From " + getLabelText(arr[i].payload.label, this.state.lang) });
+            sameLevelNodeList1[i] = { id: arr[i].payload.nodeDataMap[this.state.selectedScenario][0].nodeDataId + "_T", name: "To " + getLabelText(arr[i].payload.label, this.state.lang) };
+            // count++;
         }
+
         console.log("sameLevelNodeList---", sameLevelNodeList);
+        // console.log("sameLevelNodeList1---", sameLevelNodeList1);
         this.setState({
-            sameLevelNodeList
+            sameLevelNodeList,
+            sameLevelNodeList1
         });
     }
     getNodeTransferList(level, id, nodeTypeId, parent, nodeDataId) {
@@ -3512,7 +3521,7 @@ export default class BuildTree extends Component {
                 data[0] = scalingList[j].notes
                 data[1] = scalingList[j].startDate
                 data[2] = scalingList[j].stopDate
-                data[3] = scalingList[j].transferNodeDataId
+                data[3] = scalingList[j].transferNodeDataId + "_T"
                 data[4] = scalingList[j].modelingType.id
                 data[5] = scalingList[j].increaseDecrease
                 data[6] = scalingList[j].modelingType.id != 2 ? parseFloat(scalingList[j].dataValue).toFixed(4) : ''
@@ -3540,7 +3549,7 @@ export default class BuildTree extends Component {
             data[0] = nodeTransferDataList[j].notes
             data[1] = nodeTransferDataList[j].startDate
             data[2] = nodeTransferDataList[j].stopDate
-            data[3] = nodeTransferDataList[j].transferNodeDataId
+            data[3] = nodeTransferDataList[j].transferNodeDataId + "_F"
             // console.log("modeling type---", scalingList[j].modelingType.id);
             data[4] = nodeTransferDataList[j].modelingType.id
             data[5] = 1
@@ -3594,7 +3603,8 @@ export default class BuildTree extends Component {
                     title: i18n.t('static.tree.transferToNode'),
                     type: 'dropdown',
                     width: '130',
-                    source: this.state.sameLevelNodeList
+                    source: this.state.sameLevelNodeList,
+                    filter: this.filterSameLeveleUnitList,
                 },
 
                 {
@@ -3675,6 +3685,7 @@ export default class BuildTree extends Component {
                 var elInstance = el.jexcel;
                 if (y != null) {
                     var rowData = elInstance.getRowData(y);
+                    // console.log("my row data---",rowData);
                     if (rowData[4] != "") {
                         if (rowData[4] == 2) {
                             var cell = elInstance.getCell(("H").concat(parseInt(y) + 1))
@@ -3858,6 +3869,13 @@ export default class BuildTree extends Component {
         tr.children[10].title = i18n.t('static.tooltip.CalculatorChangeforMonth');
 
     }
+
+    filterSameLeveleUnitList = function (instance, cell, c, r, source) {
+        var sameLevelNodeList = this.state.sameLevelNodeList1;
+        console.log("mylist--------->32", sameLevelNodeList);
+        return sameLevelNodeList;
+
+    }.bind(this)
     selected = function (instance, cell, x, y, value) {
         if (y == 8) {
             this.setState({
@@ -6385,6 +6403,7 @@ export default class BuildTree extends Component {
                         this.buildModelingJexcel();
                     })
                 }
+                // console.log("get label method---",this.state.modelingEl.getLabel('3'))
                 //  else if (this.state.currentItemConfig.context.payload.nodeType.id == 3) {
                 //     this.setState({ showModelingJexcelPercent: true }, () => {
                 //         this.buildModelingJexcelPercent()
@@ -8827,7 +8846,7 @@ export default class BuildTree extends Component {
                                     {/* disabled={!isValid} */}
                                     <FormGroup className="pb-lg-3">
                                         {/* <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setState({ openAddNodeModal: false, cursorItem: 0, highlightItem: 0 })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button> */}
-                                        <Button size="md" color="danger" className="submitBtn float-right mr-1"  onClick={() => this.setState({ openAddNodeModal: false, cursorItem: 0, highlightItem: 0 })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                        <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.setState({ openAddNodeModal: false, cursorItem: 0, highlightItem: 0 })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                         <Button type="button" size="md" color="warning" className="float-right mr-1" onClick={() => this.resetNodeData()} ><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                         <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAllNodeData(setTouched, errors)} disabled={isSubmitting}><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
                                     </FormGroup>
@@ -10113,7 +10132,7 @@ export default class BuildTree extends Component {
                 message={i18n.t("static.dataentry.confirmmsg")}
             />
             <AuthenticationServiceComponent history={this.props.history} />
-            
+
             <h5 className={this.state.color} id="div2">
                 {i18n.t(this.state.message, { entityname })}</h5>
             <Row>
