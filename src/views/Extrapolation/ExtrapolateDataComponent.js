@@ -2688,7 +2688,7 @@ export default class ExtrapolateDataComponent extends React.Component {
         const options = {
             title: {
                 display: true,
-                text: this.state.planningUnitId > 0 && this.state.regionId > 0 ? i18n.t('static.extrpolation.graphTitlePart1') + document.getElementById("planningUnitId").selectedOptions[0].text + i18n.t("static.extrpolation.graphTitlePart2") + document.getElementById("regionId").selectedOptions[0].text : ""
+                text: this.state.planningUnitId > 0 && this.state.regionId > 0 ? document.getElementById("regionId").selectedOptions[0].text+" "+i18n.t('static.extrpolation.graphTitlePart1') + document.getElementById("planningUnitId").selectedOptions[0].text.split("|")[0]  : ""
             },
             scales: {
                 yAxes: [{
