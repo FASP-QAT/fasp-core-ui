@@ -114,7 +114,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
         for (var j = 0; j < json.length; j++) {
             var rowData = elInstance.getRowData(j);
             var id = rowData[9];
-            if (id == 1 || id == 2 || id == 3) {
+            if (id == true) {
                 for (var i = 0; i < colArr.length; i++) {
                     elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'background-color', 'transparent');
                     elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'background-color', 'yellow');
@@ -412,116 +412,171 @@ export default class StepThreeImportMapPlanningUnits extends Component {
     }
 
     filterData() {
-        console.log("Props items---------------->", this.props.items);
-
-        var unitIds = ""
-        unitIds = this.props.items.supplyPlanPlanningUnitIds.map(c => c.forecastPlanningUnitId);
-        var startDate = moment(this.props.items.startDate).format("YYYY-MM-DD HH:mm:ss")
-        var stopDate = moment(this.props.items.stopDate).format("YYYY-MM-DD HH:mm:ss")
-
-        let inputJson = {
-            "programId": Number(this.props.items.forecastProgramId),
-            "versionId": Number(this.props.items.versionId),
-            "startDate": startDate,
-            "stopDate": stopDate,
-            "reportView": 1,
-            "aggregateByYear": false,
-            "unitIds": unitIds
-        }
-
-        console.log("OnlineInputJson---------------->", inputJson);
-        // var unitDescArr = this.props.items.supplyPlanPlanningUnitIds.map(c);
-
-        // console.log("RESP---------->unitDesc", unitDescArr);
-        let tempList = [];
-        let supplyPlanPlanningUnitId = [];
-        let selectedSupplyPlan = this.props.items.supplyPlanPlanningUnitIds;
-
-        let supplyPlanRegionList = this.props.items.stepTwoData;
-        // for (let i = 0; i < supplyPlanRegionList.length; i++) {
-        for (let j = 0; j < selectedSupplyPlan.length; j++) {
-            supplyPlanPlanningUnitId.push(selectedSupplyPlan[j].supplyPlanPlanningUnitId);
-        }
-        // }
-
-        ReportService.forecastOutput(inputJson)
-            .then(response => {
-                console.log("RESP---------->forecastOutput", response.data);
-                let primaryConsumptionData = response.data;
-                // var count1 = 1;
-                for (let i = 0; i < primaryConsumptionData.length; i++) {
-                    for (let j = 0; j < primaryConsumptionData[i].monthlyForecastData.length; j++) {
-                        for (let k = 0; k < selectedSupplyPlan.length; k++) {
-                            for (let l = 0; l < supplyPlanRegionList.length; l++) {
-                                // for (let m = 0; m < supplyPlanRegionList[l].supplyPlanRegionList.length; m++) {
-                                // console.log("RESP---------->", supplyPlanRegionList[l].supplyPlanRegionList[m].forecastPercentage);
-
-                                tempList.push({
-                                    id: supplyPlanPlanningUnitId,
-                                    v1: getLabelText(primaryConsumptionData[i].planningUnit.label, this.state.lang),
-                                    v2: selectedSupplyPlan[k].supplyPlanPlanningUnitDesc,
-                                    v3: supplyPlanRegionList[l].forecastRegionId,
-                                    v4: primaryConsumptionData[i].monthlyForecastData[j].month,
-                                    v5: (Number(primaryConsumptionData[i].monthlyForecastData[j].consumptionQty) * Number(supplyPlanRegionList[l].forecastPercentage) / 100),
-                                    v6: Number(selectedSupplyPlan[k].multiplier),
-                                    v7: (Number(primaryConsumptionData[i].monthlyForecastData[j].consumptionQty) * Number(supplyPlanRegionList[l].forecastPercentage) / 100) * Number(selectedSupplyPlan[k].multiplier),
-                                    v8: '3500.00',
-                                    v9: true
-                                });
-                                // count1++;
-                            }
+        var db1;
+        var storeOS;
+        var supplyPlanRegionList = [];
+        getDatabase();
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+        openRequest.onerror = function (event) {
+            this.setState({
+                message: i18n.t('static.program.errortext'),
+                color: '#BA0C2F'
+            })
+            this.hideFirstComponent()
+        }.bind(this);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var programDataTransaction = db1.transaction(['programData'], 'readwrite');
+            var programDataOs = programDataTransaction.objectStore('programData');
+            var programRequest = programDataOs.get(this.props.items.programId);
+            programRequest.onerror = function (event) {
+                this.setState({
+                    message: i18n.t('static.program.errortext'),
+                    color: '#BA0C2F'
+                })
+                this.hideFirstComponent()
+            }.bind(this);
+            programRequest.onsuccess = function (e) {
+                var fullConsumptionList = [];
+                var programData1 = programRequest.result.programData;
+                console.log("Program data@@@@@@@@@@@@@@@", programData1)
+                for (var pu = 0; pu < (programData1.planningUnitDataList).length; pu++) {
+                    var planningUnitDataIndex = programData1.planningUnitDataList[pu];
+                    var programJson = {}
+                    if (planningUnitDataIndex != -1) {
+                        var planningUnitData = programData1.planningUnitDataList[pu];
+                        var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
+                        var programData2 = programDataBytes.toString(CryptoJS.enc.Utf8);
+                        programJson = JSON.parse(programData2);
+                    } else {
+                        programJson = {
+                            consumptionList: [],
+                            inventoryList: [],
+                            shipmentList: [],
+                            batchInfoList: [],
+                            supplyPlan: []
                         }
                     }
+                    fullConsumptionList = fullConsumptionList.concat(programJson.consumptionList);
                 }
-                this.setState({
-                    selSource: tempList,
-                    loading: true
-                }, () => {
-                    this.buildJexcel();
-                })
+                console.log("Props items---------------->", this.props.items);
 
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
+                var unitIds = ""
+                unitIds = this.props.items.supplyPlanPlanningUnitIds.map(c => c.forecastPlanningUnitId);
+                var startDate = moment(this.props.items.startDate).format("YYYY-MM-DD HH:mm:ss")
+                var stopDate = moment(this.props.items.stopDate).format("YYYY-MM-DD HH:mm:ss")
+
+                let inputJson = {
+                    "programId": Number(this.props.items.forecastProgramId),
+                    "versionId": Number(this.props.items.versionId),
+                    "startDate": startDate,
+                    "stopDate": stopDate,
+                    "reportView": 1,
+                    "aggregateByYear": false,
+                    "unitIds": unitIds
+                }
+
+                console.log("OnlineInputJson---------------->", inputJson);
+                // var unitDescArr = this.props.items.supplyPlanPlanningUnitIds.map(c);
+
+                // console.log("RESP---------->unitDesc", unitDescArr);
+                let tempList = [];
+                let supplyPlanPlanningUnitId = [];
+                let selectedSupplyPlan = this.props.items.supplyPlanPlanningUnitIds;
+
+                let supplyPlanRegionList = this.props.items.stepTwoData;
+                console.log("supplyPlanRegionList@@@@@@@@@@@@@", supplyPlanRegionList)
+                // for (let i = 0; i < supplyPlanRegionList.length; i++) {
+                for (let j = 0; j < selectedSupplyPlan.length; j++) {
+                    supplyPlanPlanningUnitId.push(selectedSupplyPlan[j].supplyPlanPlanningUnitId);
+                }
+                // }
+
+                ReportService.forecastOutput(inputJson)
+                    .then(response => {
+                        console.log("RESP---------->forecastOutput", response.data);
+                        let primaryConsumptionData = response.data;
+                        // var count1 = 1;
+                        for (let i = 0; i < primaryConsumptionData.length; i++) {
+                            for (let j = 0; j < primaryConsumptionData[i].monthlyForecastData.length; j++) {
+                                // for (let k = 0; k < selectedSupplyPlan.length; k++) {
+                                // for (let l = 0; l < supplyPlanRegionList.length; l++) {
+                                // for (let m = 0; m < supplyPlanRegionList[l].supplyPlanRegionList.length; m++) {
+                                // console.log("RESP---------->", supplyPlanRegionList[l].supplyPlanRegionList[m].forecastPercentage);
+                                var selectedSupplyPlanPlanningUnit = selectedSupplyPlan.filter(c => c.forecastPlanningUnitId == primaryConsumptionData[i].planningUnit.id);
+                                var regionFilter = supplyPlanRegionList.filter(c => c.forecastRegionId == primaryConsumptionData[i].region.id);
+                                if (primaryConsumptionData[i].monthlyForecastData[j].month != null) {
+                                    var checkConsumptionData = fullConsumptionList.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(primaryConsumptionData[i].monthlyForecastData[j].month).format("YYYY-MM") && c.planningUnit.id == selectedSupplyPlanPlanningUnit[0].supplyPlanPlanningUnitId && c.actualFlag.toString() == "false" && c.region.id == regionFilter[0].supplyPlanRegionId && c.multiplier == 1);
+                                    tempList.push({
+                                        v1: getLabelText(primaryConsumptionData[i].planningUnit.label, this.state.lang),//Forecast planning unit
+                                        v2: selectedSupplyPlanPlanningUnit[0].supplyPlanPlanningUnitDesc,//Supply plan planning unit name
+                                        v3: regionFilter[0].supplyPlanRegionName,// Supply plan region name
+                                        v4: primaryConsumptionData[i].monthlyForecastData[j].month, // Month
+                                        v5: (Number(primaryConsumptionData[i].monthlyForecastData[j].consumptionQty) * Number(regionFilter[0].forecastPercentage) / 100),//Forecasting module consumption qty
+                                        v6: Number(selectedSupplyPlanPlanningUnit[0].multiplier),//Multiplier
+                                        v7: (Number(primaryConsumptionData[i].monthlyForecastData[j].consumptionQty) * Number(regionFilter[0].forecastPercentage) / 100) * Number(selectedSupplyPlanPlanningUnit[0].multiplier),// Multiplication
+                                        v8: checkConsumptionData.length > 0 ? checkConsumptionData[0].consumptionRcpuQty : "",//Supply plan module qty
+                                        v9: checkConsumptionData.length > 0 ? true : false,// Check
+                                        v10: selectedSupplyPlanPlanningUnit[0].supplyPlanPlanningUnitId,// Supply plan planning unit id
+                                        v11: regionFilter[0].supplyPlanRegionId // Supply plan region Id
+                                    });
+                                }
+                                // count1++;
+                                // }
+                                // }
+                            }
+                        }
                         this.setState({
-                            message: 'static.unkownError',
-                            loading: false
-                        });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
+                            selSource: tempList,
+                            loading: true
+                        }, () => {
+                            this.buildJexcel();
+                        })
 
-                            case 401:
-                                this.props.history.push(`/login/static.message.sessionExpired`)
-                                break;
-                            case 403:
-                                this.props.history.push(`/accessDenied`)
-                                break;
-                            case 500:
-                            case 404:
-                            case 406:
-                                this.setState({
-                                    message: error.response.data.messageCode,
-                                    loading: false
-                                });
-                                break;
-                            case 412:
-                                this.setState({
-                                    message: error.response.data.messageCode,
-                                    loading: false
-                                });
-                                break;
-                            default:
+                    }).catch(
+                        error => {
+                            if (error.message === "Network Error") {
                                 this.setState({
                                     message: 'static.unkownError',
                                     loading: false
                                 });
-                                break;
-                        }
-                    }
-                }
-            );
+                            } else {
+                                switch (error.response ? error.response.status : "") {
 
-        console.log("step 3-tempList--->", tempList)
+                                    case 401:
+                                        this.props.history.push(`/login/static.message.sessionExpired`)
+                                        break;
+                                    case 403:
+                                        this.props.history.push(`/accessDenied`)
+                                        break;
+                                    case 500:
+                                    case 404:
+                                    case 406:
+                                        this.setState({
+                                            message: error.response.data.messageCode,
+                                            loading: false
+                                        });
+                                        break;
+                                    case 412:
+                                        this.setState({
+                                            message: error.response.data.messageCode,
+                                            loading: false
+                                        });
+                                        break;
+                                    default:
+                                        this.setState({
+                                            message: 'static.unkownError',
+                                            loading: false
+                                        });
+                                        break;
+                                }
+                            }
+                        }
+                    );
+
+                console.log("step 3-tempList--->", tempList)
+            }.bind(this)
+        }.bind(this)
     }
 
     buildJexcel() {
@@ -544,8 +599,11 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                 data[5] = papuList[j].v6
                 data[6] = papuList[j].v7
                 data[7] = papuList[j].v8
-                data[8] = papuList[j].v9
-                data[9] = papuList[j].id
+                data[8] = true;
+                data[9] = papuList[j].v9;
+                data[10] = papuList[j].v10;
+                data[11] = papuList[j].v11;
+                // data[9] = papuList[j].id
 
                 papuDataArr[count] = data;
                 count++;
@@ -627,9 +685,22 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                     type: 'checkbox'
                 },
                 {
-                    title: 'Id',
-                    type: 'hidden'
+                    type: 'hidden',
+                    title: "Already exists"
                 },
+                {
+                    type: 'hidden',
+                    title: "Supply Planning unit Id"
+                },
+                {
+                    type: 'hidden',
+                    title: "Supply Planning Region Id"
+                },
+
+                // {
+                //     title: 'Id',
+                //     type: 'hidden'
+                // },
 
 
             ],
