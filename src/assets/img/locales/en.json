@@ -730,7 +730,7 @@
     "static.tree.or": "or",
     "static.procurementAgentProcurementUnit.approvedToShippedLeadTimeText": "Enter `Approved to Shipped` lead time for this Procurement Agent (in months)",
     "static.manualTagging.currentEstimetedDeliveryDate": "Estimated Receive Date",
-    "static.extrapolations.showFits": "Show Fits",
+    "static.extrapolations.showFits": "Display forecasts in months with actual consumption.",
     "static.program.validstatus": "Select Status",
     "static.dashboard.applicationmaster": "Application masters",
     "static.shipment.linkingsuccess": "Shipment linked successfully",
@@ -1285,6 +1285,7 @@
     "static.usageTemplate.fuPerPersonPerMonth?": "# Of FU / Person / Month",
     "static.message.newPasswordNumber": "Password must contain at least one number",
     "static.usageTemplate.usageFrequency": "Usage Frequency",
+    "static.importIntoQATSupplyPlan.importIntoQATSupplyPlanSuccess": "Supply Plan data imported successfully",
     "static.common.fr": "FR",
     "static.report.adjustmentQty": "Adjustment Quantity",
     "static.shipmentDataEntry.expiryDateMustBeGreaterThanEDD": "Expiry date must be greater than received date",
@@ -1649,7 +1650,7 @@
     "static.report.forecastingtoPlanningUnitMultiplier": "Conversion Factor (Planning to Forecasting)",
     "static.region.country": "Country",
     "static.realm.monthInFutureForAmcText": "Enter # of months in the future (including current month) used for calculating AMC",
-    "static.supplyPlan.approved": "Ordered (Submitted, Approved)​",
+    "static.supplyPlan.approved": "Ordered (Submitted, Approved)",
     "static.manualTagging.searchBy": "Search By",
     "static.extrpolation.graphTitlePart2": " in ",
     "static.dataentry.regionalPer": "Regional%",
@@ -2283,6 +2284,5 @@
     "static.supplyPlanFormula.maxMonthOfStockEx5": "Max = 7",
     "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18 )",
     "static.importIntoQATSupplyPlan.pleaseSelectForecastProgramVersion": "Please select forecast program version",
-    "static.importIntoQATSupplyPlan.importIntoQATSupplyPlanSuccess": "Supply Plan data imported successfully",
     "static.importIntoQATSupplyPlan.importIntoQATSupplyPlan": "QAT Forecast Import"
 }

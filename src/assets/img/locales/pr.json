@@ -730,7 +730,7 @@
     "static.tree.or": "ou",
     "static.procurementAgentProcurementUnit.approvedToShippedLeadTimeText": "Insira o prazo de execução de aprovado até embarcado, para este agente de compras (em meses)",
     "static.manualTagging.currentEstimetedDeliveryDate": "Data estimada de recebimento",
-    "static.extrapolations.showFits": "Mostrar ajustes",
+    "static.extrapolations.showFits": "Exiba previsões em meses com consumo real.",
     "static.program.validstatus": "Selecione o status",
     "static.dashboard.applicationmaster": "Dados mestres do aplicativo",
     "static.shipment.linkingsuccess": "Embarque vinculado com sucesso",
@@ -1285,6 +1285,7 @@
     "static.usageTemplate.fuPerPersonPerMonth?": "Nº de FU / pessoa / mês",
     "static.message.newPasswordNumber": "A senha deve conter pelo menos um número",
     "static.usageTemplate.usageFrequency": "Freqüência de Uso",
+    "static.importIntoQATSupplyPlan.importIntoQATSupplyPlanSuccess": "Dados do plano de fornecimento importados com sucesso",
     "static.common.fr": "FR",
     "static.report.adjustmentQty": "Quantidade de ajuste",
     "static.shipmentDataEntry.expiryDateMustBeGreaterThanEDD": "A data de expiração deve ser maior do que a data de recebimento",
@@ -2281,6 +2282,5 @@
     "static.organisation.organisationheader": "Organização",
     "static.supplyPlanFormula.maxMonthOfStockEx5": "Máx = 7",
     "static.supplyPlanFormula.maxMonthOfStockEx4": "Máx = Menor entre (7,18)",
-    "static.importIntoQATSupplyPlan.pleaseSelectForecastProgramVersion": "Selecione a versão do programa de previsão",
-    "static.importIntoQATSupplyPlan.importIntoQATSupplyPlanSuccess": "Dados do plano de fornecimento importados com sucesso"
+    "static.importIntoQATSupplyPlan.pleaseSelectForecastProgramVersion": "Selecione a versão do programa de previsão"
 }
