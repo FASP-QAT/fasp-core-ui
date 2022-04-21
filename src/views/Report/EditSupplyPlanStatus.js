@@ -31,7 +31,7 @@ import { Link } from 'react-router-dom';
 // import { NavLink } from 'react-router-dom';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import AuthenticationService from '../Common/AuthenticationService';
-import MultiSelect from 'react-multi-select-component';
+import {MultiSelect} from 'react-multi-select-component';
 import ProblemListFormulas from '../Report/ProblemListFormulas.js'
 import DataSourceService from '../../api/DataSourceService';
 import RealmCountryService from '../../api/RealmCountryService';
@@ -2133,8 +2133,8 @@ class EditSupplyPlanStatus extends Component {
 
                 this.setState({
                     program,
-                    programQPLDetails:programQPLDetails,
-                    programId:program.programId,
+                    programQPLDetails: programQPLDetails,
+                    programId: program.programId,
                     regionList: regionList,
                     data: response.data.problemReportList,
                     editable: program.currentVersion.versionType.id == 2 && program.currentVersion.versionStatus.id == 1 && hasRole ? true : false
@@ -2840,9 +2840,17 @@ class EditSupplyPlanStatus extends Component {
                                                             {
                                                                 this.state.consumptionTotalData.map((item1, count) => {
                                                                     if (item1.consumptionType == 1) {
-                                                                        return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('Consumption', '', '', '', '', '', '', count)} style={{ color: item1.textColor }}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.consumptionQty} /></td>)
+                                                                        if (item1.consumptionQty != null) {
+                                                                            return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('Consumption', '', '', '', '', '', '', count)} style={{ color: item1.textColor }}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.consumptionQty} /></td>)
+                                                                        } else {
+                                                                            return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('Consumption', '', '', '', '', '', '', count)} style={{ color: item1.textColor }}>{""}</td>)
+                                                                        }
                                                                     } else {
-                                                                        return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('Consumption', '', '', '', '', '', '', count)} style={{ color: item1.textColor }}><i><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.consumptionQty} /></i></td>)
+                                                                        if (item1.consumptionQty != null) {
+                                                                            return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('Consumption', '', '', '', '', '', '', count)} style={{ color: item1.textColor }}><i><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.consumptionQty} /></i></td>)
+                                                                        } else {
+                                                                            return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('Consumption', '', '', '', '', '', '', count)} style={{ color: item1.textColor }}><i>{""}</i></td>)
+                                                                        }
                                                                     }
                                                                 })
                                                             }
@@ -3046,7 +3054,11 @@ class EditSupplyPlanStatus extends Component {
                                                             <td align="left" className="sticky-col first-col clone"><b>+/- {i18n.t('static.supplyPlan.adjustments')}</b></td>
                                                             {
                                                                 this.state.inventoryTotalData.map((item1, count) => {
-                                                                    return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('Adjustments', '', '', '', '', '', '', count)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>)
+                                                                    if (item1 != null) {
+                                                                        return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('Adjustments', '', '', '', '', '', '', count)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>)
+                                                                    } else {
+                                                                        return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('Adjustments', '', '', '', '', '', '', count)}>{""}</td>)
+                                                                    }
                                                                 })
                                                             }
                                                         </tr>
@@ -3116,9 +3128,13 @@ class EditSupplyPlanStatus extends Component {
                                                             <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                             <td align="left" className="sticky-col first-col clone">{i18n.t('static.supplyPlan.unmetDemandStr')}</td>
                                                             {
-                                                                this.state.unmetDemand.map(item1 => (
-                                                                    <td align="right"><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>
-                                                                ))
+                                                                this.state.unmetDemand.map(item1 => {
+                                                                    if (item1 != null) {
+                                                                        return (<td align="right"><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>)
+                                                                    } else {
+                                                                        return (<td align="right">{""}</td>)
+                                                                    }
+                                                                })
                                                             }
                                                         </tr>
                                                     </tbody>
