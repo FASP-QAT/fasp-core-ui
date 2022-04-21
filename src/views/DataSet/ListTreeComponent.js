@@ -833,7 +833,8 @@ export default class ListTreeComponent extends Component {
 
     onTemplateChange(event) {
         console.log("event.target.value", event.target.value)
-        if (event.target.value == 0) {
+        if (event.target.value == 0 && event.target.value != "") {
+            console.log("inside if----")
             this.setState({
                 treeTemplate: '',
                 treeFlag: false,
@@ -861,6 +862,7 @@ export default class ListTreeComponent extends Component {
             });
             // this.buildTree();
         } else if (event.target.value != 0 && event.target.value != "") {
+            console.log("inside else----")
             console.log("id--->>>", this.state.datasetIdModal);
             var treeTemplate = this.state.treeTemplateList.filter(x => x.treeTemplateId == event.target.value)[0];
             console.log("treeTemplate---", treeTemplate)
@@ -1281,7 +1283,7 @@ export default class ListTreeComponent extends Component {
                                                             className="addtreebg"
                                                             onChange={(e) => { this.onTemplateChange(e) }}
                                                         >
-                                                            <option value="" disabled selected hidden>Select</option>
+                                                            <option value="">Select</option>
                                                             {/* <option value="">{i18n.t('static.tree.+AddTree')}</option> */}
                                                             <option value="0">+ {i18n.t('static.tree.blank')}</option>
                                                             {treeTemplates}
