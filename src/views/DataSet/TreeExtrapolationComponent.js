@@ -405,7 +405,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                 //     .sort(function (a, b) {
                 //         return new Date(a.month) - new Date(b.month);
                 //     });
-                var result = jexcelDataArr.filter(c => moment(c.month).format("YYYY-MM") > moment(dataList[0].month).format("YYYY-MM") && moment(c.month).format("YYYY-MM") < moment(dataList[dataList.length - 1].month).format("YYYY-MM") && (c.amount == 0 || c.amount == ''))
+                var result = jexcelDataArr.filter(c => moment(c.month).format("YYYY-MM") > moment(dataList[0].month).format("YYYY-MM") && moment(c.month).format("YYYY-MM") < moment(dataList[dataList.length - 1].month).format("YYYY-MM") && (c.amount == ''))
                 console.log("dataList[0]---", dataList[0]);
                 console.log("dataList[dataList.length - 1]---", dataList[dataList.length - 1]);
                 console.log("gap3---", moment('2021-02-01').isBetween(dataList[0], dataList[dataList.length - 1]))
@@ -419,7 +419,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                 }
                 else {
                     if (type) {
-                        var dataForExtrapolation = jexcelDataArr.filter(c => c.amount > 0);
+                        var dataForExtrapolation = jexcelDataArr.filter(c => c.amount != "");
                         if (dataForExtrapolation.length >= 3) {
                             this.calculateExtrapolatedData(false);
                         } else {
@@ -1331,7 +1331,16 @@ export default class TreeExtrapolationComponent extends React.Component {
             data[0] = monthArray[j]
             data[1] = cellData != null && cellData != "" ? cellData.amount : (moment(monthArray[j]).isSame(this.props.items.currentItemConfig.context.payload.nodeDataMap[this.props.items.selectedScenario][0].month) ? this.props.items.currentItemConfig.context.payload.nodeDataMap[this.props.items.selectedScenario][0].calculatedDataValue : "");
             data[2] = cellData != null && cellData != "" ? cellData.reportingRate : 100
-            data[3] = `=IF(B${parseInt(j) + 1} != "",IF(B${parseInt(j) + 1} == 0,'0',ROUND((B${parseInt(j) + 1}/(C${parseInt(j) + 1}/100)),4)),'')`
+            // data[3] = `=IF(B${parseInt(j) + 1} != "",IF(B${parseInt(j) + 1} == 0,'0',ROUND((B${parseInt(j) + 1}/(C${parseInt(j) + 1}/100)),4)),'')`
+            var adjustedActuals;
+            if (data[1] === '') {
+                adjustedActuals = '';
+            } else if (data[1] == 0) {
+                adjustedActuals = 0;
+            } else {
+                adjustedActuals = `=IF(B${parseInt(j) + 1} == '','',IF(B${parseInt(j) + 1} == 0,0,ROUND((B${parseInt(j) + 1}/(C${parseInt(j) + 1}/100)),4)))`
+            }
+            data[3] = adjustedActuals
             count1 = moment(this.state.minMonth).format("YYYY-MM") == moment(monthArray[j]).format("YYYY-MM") ? 0 : moment(this.state.minMonth).format("YYYY-MM") < moment(monthArray[j]).format("YYYY-MM") ? count1 : '';
             data[4] = this.state.movingAvgData.length > 0 && count1 != '' ? this.state.movingAvgData[count1] != null ? this.state.movingAvgData[count1].forecast.toFixed(4) : '' : ''
             data[5] = this.state.semiAvgData.length > 0 && this.state.semiAvgData[count1] != null ? this.state.semiAvgData[count1].forecast.toFixed(4) : ''
@@ -1740,6 +1749,15 @@ export default class TreeExtrapolationComponent extends React.Component {
                     instance.jexcel.setStyle(col1, "background-color", "transparent");
                     instance.jexcel.setStyle(col1, "background-color", "yellow");
                     instance.jexcel.setComments(col1, i18n.t('static.message.invalidnumber'));
+                } else {
+                    // data[3] = `=IF(B${parseInt(j) + 1} == '','',IF(B${parseInt(j) + 1} == 0,0,ROUND((B${parseInt(j) + 1}/(C${parseInt(j) + 1}/100)),4)))`
+                    if (value === '') {
+                        instance.jexcel.setValueFromCoords(3, y, '', true);
+                    } else if (value == 0) {
+                        instance.jexcel.setValueFromCoords(3, y, 0, true);
+                    } else {
+                        instance.jexcel.setValueFromCoords(3, y, `=ROUND((B${parseInt(y) + 1}/(C${parseInt(y) + 1}/100)),4)`, true);
+                    }
                 }
                 var manualChange = instance.jexcel.getValue(`K${parseInt(y) + 1}`, true).toString().replaceAll(",", "").split("%")[0];
                 var col2 = ("K").concat(parseInt(y) + 1);
