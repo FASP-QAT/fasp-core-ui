@@ -2281,5 +2281,8 @@
     "static.supplyPlanFormula.maxMonthOfStockEx2": "Max = MIN ([ MAX(4,3)+3 ] ,18 )",
     "static.organisation.organisationheader": "Organization",
     "static.supplyPlanFormula.maxMonthOfStockEx5": "Max = 7",
-    "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18 )"
+    "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18 )",
+    "static.message.treeExtrapolationSave": "If you changed any inputs, please click the extrapolate button again to update calculations. Then click save.",
+    "static.tree.calculatedChangeForMonthTree": "Calculated change for",
+    "static.tree.minDataRequiredToExtrapolate": "NOTE: The minimum values needed to get correct graphs and reports for the various features are as under:\n1) ARIMA : This needs at least 14 months of data\n2) TES will need at least 24 months of data\n3) Other(including things like Moving averages etc) will need at least 3 months of data"
 }
