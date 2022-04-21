@@ -838,7 +838,7 @@ export default class ExtrapolateDataComponent extends React.Component {
             calculateLinearRegression(inputDataLinearRegression, this.state.confidenceLevelIdLinearRegression, noOfMonthsForProjection, this);
             console.log("inputDataTes.length+++", inputDataTes.length);
             // if (inputDataTes.length >= (this.state.noOfMonthsForASeason * 2)) {
-            calculateTES(inputDataTes, this.state.alpha, this.state.beta, this.state.gamma, this.state.confidenceLevelId, this.state.noOfMonthsForASeason, noOfMonthsForProjection, this, minStartDate, false);
+            calculateTES(inputDataTes, this.state.alpha, this.state.beta, this.state.gamma, this.state.confidenceLevelId, noOfMonthsForProjection, this, minStartDate, false);
             calculateArima(inputDataArima, this.state.p, this.state.d, this.state.q, this.state.confidenceLevelIdArima, noOfMonthsForProjection, this, minStartDate, false);
             this.setState({
                 extrapolateClicked: true
