@@ -93,9 +93,9 @@ export default class StepTwoImportMapPlanningUnits extends Component {
 
             //ForecastPlanningUnit
             var budgetRegx = /^\S+(?: \S+)*$/;
-            var col = ("C").concat(parseInt(y) + 1);
+            var col = ("D").concat(parseInt(y) + 1);
             var value = this.el.getValueFromCoords(3, y);
-            console.log("value-----", value);
+            // console.log("value-----", value);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");

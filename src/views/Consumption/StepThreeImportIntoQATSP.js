@@ -43,7 +43,7 @@ import getLabelText from '../../CommonComponent/getLabelText';
 import { contrast } from "../../CommonComponent/JavascriptCommonFunctions";
 import { jExcelLoadedFunctionOnlyHideRow, jExcelLoadedFunctionWithoutPagination, jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js'
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import { FORECAST_DATEPICKER_START_MONTH, JEXCEL_INTEGER_REGEX, JEXCEL_DECIMAL_LEAD_TIME, JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_PRO_KEY, MONTHS_IN_FUTURE_FOR_AMC, MONTHS_IN_PAST_FOR_AMC, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, JEXCEL_PAGINATION_OPTION, JEXCEL_MONTH_PICKER_FORMAT, INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY, FORECASTED_CONSUMPTION_MODIFIED, QUANTIMED_DATA_SOURCE_ID } from '../../Constants.js';
+import { FORECAST_DATEPICKER_START_MONTH, JEXCEL_INTEGER_REGEX, JEXCEL_DECIMAL_LEAD_TIME, JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_PRO_KEY, MONTHS_IN_FUTURE_FOR_AMC, MONTHS_IN_PAST_FOR_AMC, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, JEXCEL_PAGINATION_OPTION, JEXCEL_MONTH_PICKER_FORMAT, INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY, FORECASTED_CONSUMPTION_MODIFIED, QAT_DATASOURCE_ID } from '../../Constants.js';
 import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import CryptoJS from 'crypto-js';
@@ -285,7 +285,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                                             if (index != -1) {
                                                 consumptionDataList[index].consumptionQty = finalImportQATDataFilter[i].v7;
                                                 consumptionDataList[index].consumptionRcpuQty = finalImportQATDataFilter[i].v7;
-                                                consumptionDataList[index].dataSource.id = QUANTIMED_DATA_SOURCE_ID;
+                                                consumptionDataList[index].dataSource.id = QAT_DATASOURCE_ID;
 
                                                 consumptionDataList[index].lastModifiedBy.userId = curUser;
                                                 consumptionDataList[index].lastModifiedDate = curDate;
@@ -294,7 +294,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                                                 var consumptionJson = {
                                                     consumptionId: 0,
                                                     dataSource: {
-                                                        id: QUANTIMED_DATA_SOURCE_ID
+                                                        id: QAT_DATASOURCE_ID
                                                     },
                                                     region: {
                                                         id: finalImportQATDataFilter[i].v11
@@ -502,6 +502,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                                         v2: selectedSupplyPlanPlanningUnit[0].supplyPlanPlanningUnitDesc,//Supply plan planning unit name
                                         v3: regionFilter[0].supplyPlanRegionName,// Supply plan region name
                                         v4: primaryConsumptionData[i].monthlyForecastData[j].month, // Month
+                                        // v4: moment(primaryConsumptionData[i].monthlyForecastData[j].month).format("MMM-YY"), // Month
                                         v5: Math.round((Number(primaryConsumptionData[i].monthlyForecastData[j].consumptionQty) * Number(regionFilter[0].forecastPercentage) / 100)),//Forecasting module consumption qty
                                         v6: Number(selectedSupplyPlanPlanningUnit[0].multiplier),//Multiplier
                                         v7: Math.round((Number(primaryConsumptionData[i].monthlyForecastData[j].consumptionQty) * Number(regionFilter[0].forecastPercentage) / 100) * Number(selectedSupplyPlanPlanningUnit[0].multiplier)),// Multiplication
@@ -760,10 +761,9 @@ export default class StepThreeImportMapPlanningUnits extends Component {
 
         var { rangeValue } = this.state
         if (this.props.items.startDate != "") {
-            var startDate1 = moment(this.props.items.startDate).format("YYYY-MM-DD");
-            var stopDate1 = moment(this.props.items.stopDate).format("YYYY-MM-DD");
-            // rangeValue = { from: { year: new Date(startDate1).getFullYear(), month: new Date(startDate1).getMonth() + 1 }, to: { year: new Date(stopDate1).getFullYear(), month: new Date(stopDate1).getMonth() + 1 } }
-            rangeValue = startDate1 + " ~ " + stopDate1
+            var startDate1 = moment(this.props.items.startDate).format("MMM YYYY");
+            var stopDate1 = moment(this.props.items.stopDate).format("MMM YYYY");
+            rangeValue = startDate1 + " to " + stopDate1
         }
 
         let datasetList = this.props.items.datasetList;
@@ -774,7 +774,6 @@ export default class StepThreeImportMapPlanningUnits extends Component {
         let supplyPlan = null
 
         supplyPlan = supplyPlanList.filter(c => c.id == this.props.items.programId)[0]
-
 
         return (
             <>
@@ -794,6 +793,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                                         bsSize="sm"
                                         // onChange={(e) => { this.setForecastProgramId(e); }}
                                         value={supplyPlan == null ? "" : supplyPlan.programCode}
+                                        readOnly
                                     >
                                     </Input>
                                 </InputGroup>
@@ -813,7 +813,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                                         // onChange={(e) => { this.setVersionId(e); }}
                                         // value={this.state.versionId}
                                         value={supplyPlan == null ? "" : supplyPlan.programVersion}
-
+                                        readOnly
                                     >
                                     </Input>
                                 </InputGroup>
@@ -831,6 +831,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                                         id="forecastProgramId"
                                         bsSize="sm"
                                         value={datasets == null ? "" : datasets.programCode}
+                                        readOnly
                                     >
                                     </Input>
                                 </InputGroup>
@@ -847,6 +848,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                                         id="rangeValue"
                                         bsSize="sm"
                                         value={rangeValue}
+                                        readOnly
                                     >
                                     </Input>
                                 </InputGroup>
