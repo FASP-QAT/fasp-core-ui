@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import DatasetService from '../../api/DatasetService.js';
 import AuthenticationService from '../Common/AuthenticationService.js';
-import { Card, CardHeader, CardBody, Button, Col, FormGroup, Label, InputGroup, Input, Modal, ModalBody, ModalFooter, ModalHeader, CardFooter, FormFeedback, Form } from 'reactstrap';
+import { Card, CardHeader, CardBody, Button, Col, FormGroup, Label, InputGroup, Input, Modal, ModalBody, ModalFooter, ModalHeader, CardFooter, FormFeedback,ButtonDropdown, DropdownItem, DropdownMenu, DropdownToggle, Form } from 'reactstrap';
 import getLabelText from '../../CommonComponent/getLabelText'
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 import jexcel from 'jexcel-pro';
@@ -109,6 +109,7 @@ export default class ListTreeComponent extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            dropdownOpen: new Array(19).fill(false),
             isSubmitClicked: false,
             missingPUList: [],
             treeTemplate: '',
@@ -142,6 +143,7 @@ export default class ListTreeComponent extends Component {
             realmCountryId: '',
             datasetIdModal: ''
         }
+        this.toggleDeropdownSetting = this.toggleDeropdownSetting.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.buildJexcel = this.buildJexcel.bind(this);
         this.buildTree = this.buildTree.bind(this);
@@ -802,6 +804,7 @@ export default class ListTreeComponent extends Component {
     }
 
     onTemplateChange(event) {
+        console.log("event.target.value",event.target.value)
         if (event.target.value == 0) {
             this.setState({
                 treeTemplate: '',
@@ -1180,6 +1183,12 @@ export default class ListTreeComponent extends Component {
     //     }
 
     // }
+    toggleDeropdownSetting(i) {
+        const newArray = this.state.dropdownOpen.map((element, index) => { return (index === i ? !element : false); });
+        this.setState({
+            dropdownOpen: newArray,
+        });
+    }
 
     render() {
         const { datasetList } = this.state;
@@ -1253,6 +1262,15 @@ export default class ListTreeComponent extends Component {
                                                 </div>
                                             </FormGroup>
                                             // </Col>
+                                        //     <ButtonDropdown isOpen={this.state.dropdownOpen[0]} toggle={() => { this.toggleDeropdownSetting(0); }}>
+                                        //     <DropdownToggle caret >
+                                        //       Select
+                                        //     </DropdownToggle>
+                                        //     <DropdownMenu right>
+                                        //       <DropdownItem  onclick={(e) => { this.onTemplateChange(e) }}>+ {i18n.t('static.tree.blank')}</DropdownItem>
+                                        //     <DropdownItem  onclick={(e) => { this.onTemplateChange(e) }}> {treeTemplates}</DropdownItem>
+                                        //     </DropdownMenu>
+                                        //   </ButtonDropdown>
                                         }
                                         {/* {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_LIST_REALM_COUNTRY') &&
                                             <FormGroup className="tab-ml-1 mt-md-1 mb-md-0 ">

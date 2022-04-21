@@ -266,6 +266,8 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                                     },
                                     "month": map1.get("3"),
                                     "amount": parseInt(this.el.getValue(`E${parseInt(i) + 1}`, true).toString().replaceAll(",", "")),
+                                    "adjustedAmount": parseInt(this.el.getValue(`E${parseInt(i) + 1}`, true).toString().replaceAll(",", "")),
+                                    "puAmount": parseInt(this.el.getValue(`E${parseInt(i) + 1}`, true).toString().replaceAll(",", "")),
                                     "reportingRate": null,
                                     "daysOfStockOut": null,
                                     "exclude": false,

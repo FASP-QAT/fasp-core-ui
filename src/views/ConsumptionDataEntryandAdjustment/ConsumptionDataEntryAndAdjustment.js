@@ -404,6 +404,8 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           wordWrap: true,
           allowInsertColumn: false,
           allowManualInsertColumn: false,
+          allowInsertRow: false,
+          allowManualInsertRow: false,
           allowDeleteRow: false,
           copyCompatibility: true,
           allowExport: false,
@@ -757,7 +759,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       }
 
       if (cont == true) {
-        document.getElementById("consumptionNotes").value = notes + " Interpolated data for: " + interpolatedRegions.map(item => (
+        document.getElementById("consumptionNotes").value = notes + (notes != "" ? "\r\n" : "") + "Interpolated data for: " + interpolatedRegions.map(item => (
           "\r\n" + getLabelText(regionList.filter(c => c.regionId == item)[0].label, this.state.lang) + ": " + interpolatedRegionsAndMonths.filter(c => c.region.regionId == item).map(item1 => moment(item1.month).format(DATE_FORMAT_CAP_WITHOUT_DATE))
         ));
         this.setState({
@@ -1253,7 +1255,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         B.push(i18n.t('static.dataentry.adjustedConsumption').replaceAll(' ', '%20'))
         for (var j = 0; j < monthArray.length; j++) {
           var consumptionData = consumptionList.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArray[j].date).format("YYYY-MM") && c.region.id == regionList[r].regionId);
-          B.push(consumptionData.length > 0 ? consumptionData[0].adjustedAmount.toString().replaceAll("\,", "") : "")
+          B.push(consumptionData.length > 0 ? consumptionData[0].adjustedAmount != undefined ? consumptionData[0].adjustedAmount.toString().replaceAll("\,", "") : consumptionData[0].amount.toString().replaceAll("\,", "") : "")
         }
         C.push(this.addDoubleQuoteToRowContent(B));
         B = [];
@@ -1261,7 +1263,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         B.push(i18n.t('static.dataentry.convertedToPlanningUnit').replaceAll(' ', '%20'))
         for (var j = 0; j < monthArray.length; j++) {
           var consumptionData = consumptionList.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArray[j].date).format("YYYY-MM") && c.region.id == regionList[r].regionId);
-          B.push(consumptionData.length > 0 ? consumptionData[0].puAmount.toString().replaceAll("\,", "") : "")
+          B.push(consumptionData.length > 0 ? consumptionData[0].puAmount != undefined ? consumptionData[0].puAmount.toString().replaceAll("\,", "") : consumptionData[0].amount : "")
         }
         C.push(this.addDoubleQuoteToRowContent(B));
         B = [];
@@ -1369,13 +1371,23 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       localStorage.setItem("sesDatasetId", datasetId);
       this.setState({
         datasetId: datasetId,
+        dataEl: "",
+        showSmallTable: false,
+        showDetailTable: false,
       }, () => {
+        try {
+          this.el = jexcel(document.getElementById("tableDiv"), '');
+          this.el.destroy();
+        } catch (error) {
+
+        }
         if (datasetId != "") {
           this.getDatasetData();
         } else {
           this.setState({
             showSmallTable: false,
-            showDetailTable: false
+            showDetailTable: false,
+            dataEl: ""
           })
         }
       })

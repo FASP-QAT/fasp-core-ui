@@ -69,7 +69,7 @@ export function dataCheck(props, datasetJson) {
                                 var modelingList = ((nodeDataMap[scenarioList[ndm].id])[0].nodeDataModelingList);
                                 var madelingNotes = "";
                                 for (var ml = 0; ml < modelingList.length; ml++) {
-                                    madelingNotes = madelingNotes.concat(modelingList[ml].notes).concat(" | ")
+                                    madelingNotes = modelingList[ml].notes != "" && modelingList[ml].notes != null ? madelingNotes.concat(modelingList[ml].notes).concat(" | ") : ""
                                 }
                                 treeNodeList.push({
                                     tree: PgmTreeList[tl].label,

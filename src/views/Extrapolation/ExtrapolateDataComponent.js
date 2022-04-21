@@ -193,7 +193,11 @@ export default class ExtrapolateDataComponent extends React.Component {
 
 
         this.state = {
+            popoverOpenConfidenceLevel: false,
+            popoverOpenConfidenceLevel1: false,
+            popoverOpenConfidenceLevel2: false,
             forecastProgramId: -1,
+            forecastProgramId: "",
             forecastProgramList: [],
             planningUnitId: -1,
             planningUnitList: [],
@@ -305,6 +309,9 @@ export default class ExtrapolateDataComponent extends React.Component {
             extrapolateClicked: false
         }
         // this.toggleD = this.toggleD.bind(this);
+        this.toggleConfidenceLevel = this.toggleConfidenceLevel.bind(this);
+        this.toggleConfidenceLevel1 = this.toggleConfidenceLevel1.bind(this);
+        this.toggleConfidenceLevel2 = this.toggleConfidenceLevel2.bind(this);
         this.toggle = this.toggle.bind(this)
         this.reset = this.reset.bind(this)
         this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
@@ -2419,6 +2426,21 @@ export default class ExtrapolateDataComponent extends React.Component {
             showGuidance: !this.state.showGuidance
         })
     }
+    toggleConfidenceLevel() {
+        this.setState({
+            popoverOpenConfidenceLevel: !this.state.popoverOpenConfidenceLevel,
+        });
+    }
+    toggleConfidenceLevel1() {
+        this.setState({
+            popoverOpenConfidenceLevel1: !this.state.popoverOpenConfidenceLevel1,
+        });
+    }
+    toggleConfidenceLevel2() {
+        this.setState({
+            popoverOpenConfidenceLevel2: !this.state.popoverOpenConfidenceLevel2,
+        });
+    }
 
     getDateDifference() {
         var rangeValue = this.state.rangeValue1;
@@ -2688,7 +2710,7 @@ export default class ExtrapolateDataComponent extends React.Component {
         const options = {
             title: {
                 display: true,
-                text: this.state.planningUnitId > 0 && this.state.regionId > 0 ? i18n.t('static.extrpolation.graphTitlePart1') + document.getElementById("planningUnitId").selectedOptions[0].text + i18n.t("static.extrpolation.graphTitlePart2") + document.getElementById("regionId").selectedOptions[0].text : ""
+                text: this.state.planningUnitId > 0 && this.state.regionId > 0 ? document.getElementById("regionId").selectedOptions[0].text+" "+i18n.t('static.extrpolation.graphTitlePart1') + document.getElementById("planningUnitId").selectedOptions[0].text.split("|")[0]  : ""
             },
             scales: {
                 yAxes: [{
@@ -3346,14 +3368,14 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                         </Label>
                                                     </div>
                                                     <div className="row col-md-12 pt-lg-2" style={{ display: this.state.linearRegressionId ? '' : 'none' }}>
-                                                        <div>
-                                                            <Popover placement="top" isOpen={this.state.popoverOpenConfidenceLR} target="Popover30" trigger="hover" toggle={() => this.toggle('popoverOpenConfidenceLR', !this.state.popoverOpenConfidenceLR)}>
-                                                                <PopoverBody>{i18n.t('static.tooltip.confidenceLevel')}</PopoverBody>
-                                                            </Popover>
-                                                        </div>
+                                                    <div>
+                                                                <Popover placement="top" isOpen={this.state.popoverOpenConfidenceLevel} target="Popover60" trigger="hover" toggle={this.toggleConfidenceLevel}>
+                                                                    <PopoverBody>{i18n.t('static.tooltip.confidenceLevel')}</PopoverBody>
+                                                                </Popover>
+                                                            </div>
                                                         <div className="col-md-2">
                                                             <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.confidenceLevel')}
-                                                                <i class="fa fa-info-circle icons pl-lg-2" id="Popover30" onClick={() => this.toggle('popoverOpenConfidenceLR', !this.state.popoverOpenConfidenceLR)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
+                                                                <i class="fa fa-info-circle icons pl-lg-2" id="Popover60" onClick={this.toggleConfidenceLevel} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
                                                             </Label>
                                                             <Input
                                                                 className="controls"
@@ -3401,13 +3423,13 @@ export default class ExtrapolateDataComponent extends React.Component {
 
                                                     <div className="row col-md-12 pt-lg-2" style={{ display: this.state.smoothingId ? '' : 'none' }}>
                                                         <div>
-                                                            <Popover placement="top" isOpen={this.state.popoverOpenConfidence} target="Popover6" trigger="hover" toggle={() => this.toggle('popoverOpenConfidence', !this.state.popoverOpenConfidence)}>
+                                                            <Popover placement="top" isOpen={this.state.popoverOpenConfidenceLevel1} target="Popover61" trigger="hover" toggle={this.toggleConfidenceLevel1}>
                                                                 <PopoverBody>{i18n.t('static.tooltip.confidenceLevel')}</PopoverBody>
                                                             </Popover>
                                                         </div>
                                                         <div className="col-md-2">
                                                             <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.confidenceLevel')}
-                                                                <i class="fa fa-info-circle icons pl-lg-2" id="Popover6" onClick={() => this.toggle('popoverOpenConfidence', !this.state.popoverOpenConfidence)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
+                                                                <i class="fa fa-info-circle icons pl-lg-2" id="Popover61" onClick={this.toggleConfidenceLevel} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
                                                             </Label>
                                                             <Input
                                                                 className="controls"
@@ -3586,13 +3608,13 @@ export default class ExtrapolateDataComponent extends React.Component {
 
                                                     <div className="row col-md-12 pt-lg-2" style={{ display: this.state.arimaId ? '' : 'none' }}>
                                                         <div>
-                                                            <Popover placement="top" isOpen={this.state.popoverOpenConfidenceArima} target="Popover31" trigger="hover" toggle={() => this.toggle('popoverOpenConfidenceArima', !this.state.popoverOpenConfidenceArima)}>
+                                                            <Popover placement="top" isOpen={this.state.popoverOpenConfidenceLevel2} target="Popover62" trigger="hover" toggle={this.toggleConfidenceLevel2}>
                                                                 <PopoverBody>{i18n.t('static.tooltip.confidenceLevel')}</PopoverBody>
                                                             </Popover>
                                                         </div>
                                                         <div className="col-md-2">
                                                             <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.confidenceLevel')}
-                                                                <i class="fa fa-info-circle icons pl-lg-2" id="Popover31" onClick={() => this.toggle('popoverOpenConfidenceArima', !this.state.popoverOpenConfidenceArima)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
+                                                                <i class="fa fa-info-circle icons pl-lg-2" id="Popover62" onClick={this.toggleConfidenceLevel2} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
                                                             </Label>
                                                             <Input
                                                                 className="controls"
@@ -3701,7 +3723,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                         <div style={{ display: !this.state.loading ? "block" : "none" }}>
                                             {this.state.showData &&
                                                 <>
-                                                    {this.state.checkIfAnyMissingActualConsumption && <><span><i class="fa fa-exclamation-triangle"></i><span className="pl-lg-2">{i18n.t('static.extrapolation.missingDataNotePart1')}</span><a href="/#/dataentry/consumptionDataEntryAndAdjustment" target="_blank"><span>{i18n.t('static.dashboard.dataEntryAndAdjustment') + " "}</span></a><span>{i18n.t('static.extrapolation.missingDataNotePart2')}</span></span></>}
+                                                    {this.state.checkIfAnyMissingActualConsumption && <><span className="red"><i class="fa fa-exclamation-triangle"></i><span className="pl-lg-2">{i18n.t('static.extrapolation.missingDataNotePart1')}</span><a href="/#/dataentry/consumptionDataEntryAndAdjustment" target="_blank"><span>{i18n.t('static.dashboard.dataEntryAndAdjustment') + " "}</span></a><span>{i18n.t('static.extrapolation.missingDataNotePart2')}</span></span></>}
                                                     <div className={this.state.checkIfAnyMissingActualConsumption ? "check inline pt-lg-3 pl-lg-3" : "check inline pl-lg-3"}>
                                                         <div className="">
                                                             <Input

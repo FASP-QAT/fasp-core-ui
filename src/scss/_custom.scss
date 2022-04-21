@@ -6180,14 +6180,17 @@ font-style: italic!important;
 
 .TreeTemplateHeight{
   // min-height: 100vh;
-  min-height: calc(100vh - 50px)!important;
+  max-height: calc(100vh - 427px) !important;
+    min-height: calc(100vh - 245px) !important;
+    box-sizing: border-box;
+  // min-height: calc(100vh - 50px)!important;
     // overflow: scroll !important;
     // min-height: calc(100vh - 427px) !important;
     // overflow: scroll !important;
 }
 .VersionSettingMode{
   // height: 360px !important;
-  max-height: calc(100vh - 150px) !important;
+  max-height: calc(100vh - 175px) !important;
   overflow-y: scroll;
   overflow-x: hidden;
 }
@@ -6340,13 +6343,19 @@ font-style: italic!important;
 .MarginTopCreateTreeBtn{
   margin-top: -48px;
 }
-
-
+.topscroll{
+top: calc(20em + 3px);
+}
 
 // .usageTemplateDataEntryTable .jtabs-content .jtabs-selected .jexcel_content .jexcel>tbody>tr>td:nth-child(17) {
 //   display:none !important;
+
+// .UsageTemplateTable .jexcelremoveReadonlybackground .jexcel > tbody > tr > td:nth-child(20) {
+//    display: none !important;
+//    text-align: left !important;
+// }
+// .UsageTemplateTable .jexcel > thead > tr > td:nth-child(20) {
+//   display: none !important; 
+//   text-align: left !important;
 // }
 
-// .usageTemplateDataEntryTable .jtabs-content .jtabs-selected .jexcel_content .jexcel>thead>tr>td:nth-child(17) {
-//   display:none !important;
-// }

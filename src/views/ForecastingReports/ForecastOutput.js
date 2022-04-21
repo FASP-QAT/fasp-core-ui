@@ -748,7 +748,7 @@ class ForecastOutput extends Component {
         if (this.state.yaxisEquUnit > 0 && this.state.xaxis == 2) {
             A = [];
             let propertyName = this.state.monthArrayList.map(item1 => (
-                this.state.calculateEquivalencyUnitTotal.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(item1).format("YYYY-MM")).length > 0 ? this.state.calculateEquivalencyUnitTotal.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(item1).format("YYYY-MM"))[0].consumptionQty : ''
+                this.state.calculateEquivalencyUnitTotal.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(item1).format("YYYY-MM")).length > 0 ? (this.state.calculateEquivalencyUnitTotal.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(item1).format("YYYY-MM"))[0].consumptionQty).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : ''
             ));
             A.push(
                 ((i18n.t('static.supplyPlan.total') + this.state.equivalencyUnitLabel)),
@@ -763,7 +763,7 @@ class ForecastOutput extends Component {
 
         this.state.xaxis == 1 && this.state.consumptionData.map(ele => {
             let propertyName = this.state.monthArrayList.map(item1 => (
-                ele.consumptionList.filter(c => moment(c.consumptionDate).format("YYYY") == moment(item1).format("YYYY")).length > 0 ? ele.consumptionList.filter(c => moment(c.consumptionDate).format("YYYY") == moment(item1).format("YYYY"))[0].consumptionQty : ''
+                ele.consumptionList.filter(c => moment(c.consumptionDate).format("YYYY") == moment(item1).format("YYYY")).length > 0 ? (ele.consumptionList.filter(c => moment(c.consumptionDate).format("YYYY") == moment(item1).format("YYYY"))[0].consumptionQty).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : ''
             ));
             A = [];
             A.push(
@@ -781,7 +781,7 @@ class ForecastOutput extends Component {
         if (this.state.yaxisEquUnit > 0 && this.state.xaxis == 1) {
             A = [];
             let propertyName = this.state.monthArrayList.map(item1 => (
-                this.state.calculateEquivalencyUnitTotal.filter(c => moment(c.consumptionDate).format("YYYY") == moment(item1).format("YYYY")).length > 0 ? this.state.calculateEquivalencyUnitTotal.filter(c => moment(c.consumptionDate).format("YYYY") == moment(item1).format("YYYY"))[0].consumptionQty : ''
+                this.state.calculateEquivalencyUnitTotal.filter(c => moment(c.consumptionDate).format("YYYY") == moment(item1).format("YYYY")).length > 0 ? (this.state.calculateEquivalencyUnitTotal.filter(c => moment(c.consumptionDate).format("YYYY") == moment(item1).format("YYYY"))[0].consumptionQty).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : ''
             ));
             A.push(
                 ((i18n.t('static.supplyPlan.total') + this.state.equivalencyUnitLabel)),
@@ -1624,15 +1624,17 @@ class ForecastOutput extends Component {
 
                         for (let i = 0; i < primaryConsumptionData.length; i++) {
 
-                            let consumptionList = primaryConsumptionData[i].monthlyForecastData.map(m => {
-                                return {
-                                    consumptionDate: m.month,
-                                    consumptionQty: Math.round(m.consumptionQty)
-                                }
-                            });
+                            if (primaryConsumptionData[i].selectedForecast != null) {
+                                let consumptionList = primaryConsumptionData[i].monthlyForecastData.map(m => {
+                                    return {
+                                        consumptionDate: m.month,
+                                        consumptionQty: Math.round(m.consumptionQty)
+                                    }
+                                });
 
-                            let jsonTemp = { objUnit: (viewById == 1 ? primaryConsumptionData[i].planningUnit : primaryConsumptionData[i].forecastingUnit), scenario: { id: 1, label: primaryConsumptionData[i].selectedForecast.label_en }, display: true, color: "#ba0c2f", consumptionList: consumptionList }
-                            consumptionData.push(jsonTemp);
+                                let jsonTemp = { objUnit: (viewById == 1 ? primaryConsumptionData[i].planningUnit : primaryConsumptionData[i].forecastingUnit), scenario: { id: 1, label: primaryConsumptionData[i].selectedForecast.label_en }, display: true, color: "#ba0c2f", consumptionList: consumptionList }
+                                consumptionData.push(jsonTemp);
+                            }
 
                         }
 
@@ -1699,9 +1701,9 @@ class ForecastOutput extends Component {
                                 monthArrayList: years,
                                 message: ''
                             }, () => {
-                                // if (yaxisEquUnitId > 0) {
-                                //     this.calculateEquivalencyUnitTotal();
-                                // }
+                                if (yaxisEquUnitId > 0) {
+                                    this.calculateEquivalencyUnitTotal();
+                                }
                             })
 
                         } else {//no
@@ -1710,9 +1712,9 @@ class ForecastOutput extends Component {
                                 monthArrayList: monthArrayList,
                                 message: ''
                             }, () => {
-                                // if (yaxisEquUnitId > 0) {
-                                //     this.calculateEquivalencyUnitTotal();
-                                // }
+                                if (yaxisEquUnitId > 0) {
+                                    this.calculateEquivalencyUnitTotal();
+                                }
                             })
                         }
 
@@ -1756,12 +1758,6 @@ class ForecastOutput extends Component {
                             }
                         }
                     );
-
-
-
-
-
-
 
 
 
@@ -2209,6 +2205,7 @@ class ForecastOutput extends Component {
                                 ForecastingUnitService.getForecastingUnitListByProgramVersionIdForSelectedForecastMap(programId, versionId).then(response => {
                                     console.log('**' + JSON.stringify(response.data))
                                     var listArray = response.data;
+                                    listArray = listArray.filter((v, i, a) => a.findIndex(v2 => (v2.id === v.id)) === i)
                                     listArray.sort((a, b) => {
                                         var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
                                         var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase(); // ignore upper and lowercase                   
@@ -3313,7 +3310,7 @@ class ForecastOutput extends Component {
                                                 </div>
                                             </FormGroup>
 
-                                            
+
 
                                             <FormGroup className="col-md-3">
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.forecastReport.yAxisInEquivalencyUnit')}  <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={this.toggleEu} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
