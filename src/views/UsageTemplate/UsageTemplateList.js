@@ -2113,16 +2113,16 @@ class usageTemplate extends Component {
                 unitName1 = this.state.unitList.filter(c => c.id == unitId)[0].name;
             }
 
-            let string = 'Every ' + (this.el.getValue(`I${parseInt(y) + 1}`, true) == '' ? '_' : this.el.getValue(`I${parseInt(y) + 1}`, true)) + ' ' + (unitName == '' ? '_' : unitName) + '(s) - requires ' + (this.el.getValue(`L${parseInt(y) + 1}`, true) == '' ? '_' : this.el.getValue(`L${parseInt(y) + 1}`, true)) + " " + (unitName1 == '' ? '_' : unitName1);
+            let string = 'Every ' + (this.el.getValue(`I${parseInt(y) + 1}`, true) == '' ? '____' : this.el.getValue(`I${parseInt(y) + 1}`, true)) + ' ' + (unitName == '' ? '____' : unitName) + '(s) - requires ' + (this.el.getValue(`L${parseInt(y) + 1}`, true) == '' ? '____' : this.el.getValue(`L${parseInt(y) + 1}`, true)) + " " + (unitName1 == '' ? '____' : unitName1);
 
             // let string = 'Every ' + this.el.getValue(`I${parseInt(y) + 1}`, true) + ' patient - requires ' + this.el.getValue(`L${parseInt(y) + 1}`, true) + " " + this.el.getValue(`M${parseInt(y) + 1}`, true);
 
             if (!this.el.getValueFromCoords(14, y)) {//one time usage false
-                string += " " + (this.el.getValue(`P${parseInt(y) + 1}`, true) == '' ? '_' : this.el.getValue(`P${parseInt(y) + 1}`, true)) + " " + (this.el.getValue(`Q${parseInt(y) + 1}`, true) == '' ? '_' : this.el.getValue(`Q${parseInt(y) + 1}`, true)) + " " + (this.el.getValue(`R${parseInt(y) + 1}`, true) == '' ? '_' : this.el.getValue(`R${parseInt(y) + 1}`, true));
+                string += " " + (this.el.getValue(`P${parseInt(y) + 1}`, true) == '' ? '____' : this.el.getValue(`P${parseInt(y) + 1}`, true)) + " " + (this.el.getValue(`Q${parseInt(y) + 1}`, true) == '' ? '____' : this.el.getValue(`Q${parseInt(y) + 1}`, true)) + " " + (this.el.getValue(`R${parseInt(y) + 1}`, true) == '' ? '____' : this.el.getValue(`R${parseInt(y) + 1}`, true));
                 if (this.el.getValueFromCoords(6, y) == 2) {
-                    string += " " + (this.el.getValue(`V${parseInt(y) + 1}`, true) == '' ? '_' : this.el.getValue(`V${parseInt(y) + 1}`, true));
+                    string += " " + (this.el.getValue(`V${parseInt(y) + 1}`, true) == '' ? '____' : this.el.getValue(`V${parseInt(y) + 1}`, true));
                 } else {
-                    string += " " + (this.el.getValue(`T${parseInt(y) + 1}`, true) == '' ? '_' : this.el.getValue(`T${parseInt(y) + 1}`, true)) + " " + (this.el.getValue(`U${parseInt(y) + 1}`, true) == '' ? '_' : this.el.getValue(`U${parseInt(y) + 1}`, true)) + " " + (this.el.getValue(`V${parseInt(y) + 1}`, true) == '' ? '_' : this.el.getValue(`V${parseInt(y) + 1}`, true));
+                    string += " " + (this.el.getValue(`T${parseInt(y) + 1}`, true) == '' ? '____' : this.el.getValue(`T${parseInt(y) + 1}`, true)) + " " + (this.el.getValue(`U${parseInt(y) + 1}`, true) == '' ? '____' : this.el.getValue(`U${parseInt(y) + 1}`, true)) + " " + (this.el.getValue(`V${parseInt(y) + 1}`, true) == '' ? '____' : this.el.getValue(`V${parseInt(y) + 1}`, true));
                 }
             }
 
@@ -2989,7 +2989,7 @@ class usageTemplate extends Component {
 
                         <Col xs="12" sm="12">
                             {/* <h5>{i18n.t('static.common.customWarningMessage')}</h5> */}
-                            <h5>{i18n.t("static.placeholder.placeholder")}</h5>
+                            <h5>{i18n.t("static.placeholder.usageTemplate")}</h5>
                             <h5>{i18n.t('static.usageTemplate.usageTemplateText')}</h5>
                             <span className=""><h5><i class="fa fa-calculator" aria-hidden="true"></i>  {i18n.t('static.usageTemplate.calculatorReminderText')}</h5></span>
                             <div className="UsageTemplateTable">
