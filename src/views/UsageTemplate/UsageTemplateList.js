@@ -2075,6 +2075,9 @@ class usageTemplate extends Component {
             console.log("Checked----------->1.1", v14);
             console.log("Checked----------->2.1", VLookUp);
             console.log("Checked----------->3.1", t14);
+            console.log("Checked----------->4.1", this.el.getValue(`S${parseInt(y) + 1}`, true));
+            console.log("Checked----------->5.1", this.el.getValueFromCoords(18, y));
+            
 
             let string = (selectedOneTimeUsageID ? o14 : v14 / VLookUp * t14);
             if (v14 != null && v14 != '' && VLookUp != null && VLookUp != '') {
