@@ -277,7 +277,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                                         var json = elInstance.getJson();
                                         var finalImportQATDataFilter = finalImportQATData.filter((c, indexFilter) => c.v10 == finalPuList[pu] && json[indexFilter][8] == true);
                                         for (var i = 0; i < finalImportQATDataFilter.length; i++) {
-                                            var index = consumptionDataList.findIndex(c => moment(c.consumptionDate).format("YYYY-MM") == moment(finalImportQATDataFilter[i].v4).format("YYYY-MM")
+                                            var index = consumptionDataList.findIndex(c => moment(c.consumptionDate).format("YYYY-MM") == moment(finalImportQATDataFilter[i].v14).format("YYYY-MM")
                                                 && c.region.id == finalImportQATDataFilter[i].v11
                                                 && c.actualFlag.toString() == "false" && c.multiplier == 1);
                                             console.log("FINAL-----2", index)
@@ -299,7 +299,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                                                     region: {
                                                         id: finalImportQATDataFilter[i].v11
                                                     },
-                                                    consumptionDate: moment(finalImportQATDataFilter[i].v4).startOf('month').format("YYYY-MM-DD"),
+                                                    consumptionDate: moment(finalImportQATDataFilter[i].v14).startOf('month').format("YYYY-MM-DD"),
                                                     consumptionRcpuQty: finalImportQATDataFilter[i].v7.toString().replaceAll("\,", ""),
                                                     consumptionQty: finalImportQATDataFilter[i].v7.toString().replaceAll("\,", ""),
                                                     dayOfStockOut: "",
@@ -501,8 +501,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                                         v1: getLabelText(primaryConsumptionData[i].planningUnit.label, this.state.lang),//Forecast planning unit
                                         v2: selectedSupplyPlanPlanningUnit[0].supplyPlanPlanningUnitDesc,//Supply plan planning unit name
                                         v3: regionFilter[0].supplyPlanRegionName,// Supply plan region name
-                                        v4: primaryConsumptionData[i].monthlyForecastData[j].month, // Month
-                                        // v4: moment(primaryConsumptionData[i].monthlyForecastData[j].month).format("MMM-YY"), // Month
+                                        v4: moment(primaryConsumptionData[i].monthlyForecastData[j].month).format("MMM-YY"), // Month
                                         v5: Math.round((Number(primaryConsumptionData[i].monthlyForecastData[j].consumptionQty) * Number(regionFilter[0].forecastPercentage) / 100)),//Forecasting module consumption qty
                                         v6: Number(selectedSupplyPlanPlanningUnit[0].multiplier),//Multiplier
                                         v7: Math.round((Number(primaryConsumptionData[i].monthlyForecastData[j].consumptionQty) * Number(regionFilter[0].forecastPercentage) / 100) * Number(selectedSupplyPlanPlanningUnit[0].multiplier)),// Multiplication
@@ -511,7 +510,9 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                                         v10: selectedSupplyPlanPlanningUnit[0].supplyPlanPlanningUnitId,// Supply plan planning unit id
                                         v11: regionFilter[0].supplyPlanRegionId, // Supply plan region Id
                                         v12: primaryConsumptionData[i].planningUnit.id, // Forecast planning unit Id
-                                        v13: primaryConsumptionData[i].monthlyForecastData[j].month + "~" + selectedSupplyPlanPlanningUnit[0].supplyPlanPlanningUnitId + "~" + regionFilter[0].supplyPlanRegionId + "~" + primaryConsumptionData[i].planningUnit.id
+                                        v13: primaryConsumptionData[i].monthlyForecastData[j].month + "~" + selectedSupplyPlanPlanningUnit[0].supplyPlanPlanningUnitId + "~" + regionFilter[0].supplyPlanRegionId + "~" + primaryConsumptionData[i].planningUnit.id,
+                                        v14: primaryConsumptionData[i].monthlyForecastData[j].month, // Month
+
                                     });
                                 }
                                 // count1++;
@@ -520,9 +521,9 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                             }
                         }
 
-                        let resultTrue = Object.values(tempList.reduce((a, { v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13 }) => {
+                        let resultTrue = Object.values(tempList.reduce((a, { v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14 }) => {
                             if (!a[v13]) {
-                                a[v13] = Object.assign({}, { v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13 });
+                                a[v13] = Object.assign({}, { v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14 });
                             } else {
                                 a[v13].v7 += v7;
                                 a[v13].v5 += v5;
