@@ -662,7 +662,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                     readOnly: true
                 },
                 {
-                    title: 'Forecasted Consumption(Forecast Module)',
+                    title: 'Forecasted Consumption (Forecast Module)',
                     type: 'text',
                     textEditor: true,
                     readOnly: true
@@ -674,13 +674,13 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                     readOnly: true
                 },
                 {
-                    title: 'Converted Forecasted Consumption(to be imported)',
+                    title: 'Converted Forecasted Consumption (to be imported)',
                     type: 'text',
                     textEditor: true,
                     readOnly: true
                 },
                 {
-                    title: 'Current Forecasted Consumption(Supply Plan Module)',
+                    title: 'Current Forecasted Consumption (Supply Plan Module)',
                     type: 'text',
                     textEditor: true,
                     readOnly: true

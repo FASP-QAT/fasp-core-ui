@@ -1166,6 +1166,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                                     years={{ min: this.state.minDate, max: this.state.maxDate }}
                                     value={rangeValue}
                                     lang={pickerLang}
+                                    key={JSON.stringify(rangeValue)}
                                     //theme="light"
                                     onChange={this.handleRangeChange}
                                     onDismiss={this.handleRangeDissmis}
