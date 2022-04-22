@@ -56,7 +56,7 @@ import ProgramService from '../../api/ProgramService';
 import FundingSourceService from '../../api/FundingSourceService';
 import ProcurementAgentService from "../../api/ProcurementAgentService";
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import MultiSelect from 'react-multi-select-component';
+import {MultiSelect} from 'react-multi-select-component';
 // const { getToggledOptions } = utils;
 const Widget04 = lazy(() => import('../../views/Widgets/Widget04'));
 // const Widget03 = lazy(() => import('../../views/Widgets/Widget03'));
@@ -1801,7 +1801,8 @@ class ShipmentGlobalView extends Component {
             && programLst.map((item, i) => {
                 return (
 
-                    { label: getLabelText(item.label, this.state.lang), value: item.programId }
+                    // { label: getLabelText(item.label, this.state.lang), value: item.programId }
+                    { label: (item.programCode), value: item.programId }
 
                 )
             }, this);

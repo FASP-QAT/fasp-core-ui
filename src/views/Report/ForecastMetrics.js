@@ -58,7 +58,7 @@ import "jspdf-autotable";
 import ReportService from '../../api/ReportService';
 import ProgramService from '../../api/ProgramService';
 import TracerCategoryService from '../../api/TracerCategoryService';
-import MultiSelect from "react-multi-select-component";
+import {MultiSelect} from "react-multi-select-component";
 import jexcel from 'jexcel-pro';
 import "../../../node_modules/jexcel-pro/dist/jexcel.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
@@ -653,7 +653,8 @@ class ForecastMetrics extends Component {
 
     for (var j = 0; j < consumptions.length; j++) {
       data = [];
-      data[0] = getLabelText(consumptions[j].program.label, this.state.lang)
+      // data[0] = getLabelText(consumptions[j].program.label, this.state.lang)
+      data[0] = (consumptions[j].program.code)
       data[1] = getLabelText(consumptions[j].planningUnit.label, this.state.lang)
       data[2] = consumptions[j].message != null ? "" : this.roundN(consumptions[j].forecastError);
       data[3] = consumptions[j].monthCount;
@@ -1405,7 +1406,8 @@ class ForecastMetrics extends Component {
       && programLst.map((item, i) => {
         return (
 
-          { label: getLabelText(item.label, this.state.lang), value: item.programId }
+          // { label: getLabelText(item.label, this.state.lang), value: item.programId }
+          { label: item.programCode, value: item.programId }
 
         )
       }, this);

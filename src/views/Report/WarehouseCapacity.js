@@ -46,7 +46,7 @@ import AuthenticationServiceComponent from '../Common/AuthenticationServiceCompo
 import ReportService from '../../api/ReportService';
 import RealmCountryService from '../../api/RealmCountryService';
 import ReactMultiSelectCheckboxes from 'react-multiselect-checkboxes';
-import MultiSelect from 'react-multi-select-component';
+import { MultiSelect } from 'react-multi-select-component';
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
 import jexcel from 'jexcel-pro';
 import "../../../node_modules/jexcel-pro/dist/jexcel.css";
@@ -810,7 +810,8 @@ class warehouseCapacity extends Component {
 
             data[0] = getLabelText(regionList[j].realmCountry.label, this.state.lang)
             data[1] = getLabelText(regionList[j].region.label, this.state.lang)
-            data[2] = (regionList[j].programList.map((item, idx1) => { return (getLabelText(regionList[j].programList[idx1].label, this.state.lang)) })).join(' \n')
+            // data[2] = (regionList[j].programList.map((item, idx1) => { return (getLabelText(regionList[j].programList[idx1].label, this.state.lang)) })).join(' \n')
+            data[2] = (regionList[j].programList.map((item, idx1) => { return ((regionList[j].programList[idx1].code)) })).join(' \n')
             data[3] = regionList[j].gln
             data[4] = (regionList[j].capacityCbm);
 
@@ -914,7 +915,8 @@ class warehouseCapacity extends Component {
             && programLst.map((item, i) => {
                 return (
 
-                    { label: getLabelText(item.label, this.state.lang), value: item.programId }
+                    // { label: getLabelText(item.label, this.state.lang), value: item.programId }
+                    { label: (item.programCode), value: item.programId }
 
                 )
             }, this);
