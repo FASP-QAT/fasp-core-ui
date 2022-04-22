@@ -1374,7 +1374,7 @@ export default class ListTreeComponent extends Component {
                     </CardBody>
 
                     <Modal isOpen={this.state.isModalOpen}
-                        className={'modal-md ' + this.props.className}>
+                        className={'modal-lg ' + this.props.className}>
                         <ModalHeader>
                             <strong>Tree Details</strong>
                             <Button size="md" onClick={this.modelOpenClose} color="danger" style={{ paddingTop: '0px', paddingBottom: '0px', paddingLeft: '3px', paddingRight: '3px' }} className="submitBtn float-right mr-1"> <i className="fa fa-times"></i></Button>

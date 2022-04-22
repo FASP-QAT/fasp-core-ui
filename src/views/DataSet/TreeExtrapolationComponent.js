@@ -2039,6 +2039,11 @@ export default class TreeExtrapolationComponent extends React.Component {
     getDatasetData(e) {
 
     }
+    toggleShowGuidance() {
+        this.setState({
+            showGuidance: !this.state.showGuidance
+        })
+    }
     toggleQ() {
         this.setState({
             popoverOpenQ: !this.state.popoverOpenQ,
@@ -3331,7 +3336,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                             <div className="row pl-lg-0 pr-lg-0">
                                                 {/* <SupplyPlanFormulas ref="formulaeChild" /> */}
                                                 <a className="">
-                                                    <span style={{ cursor: 'pointer', color: '20a8d8' }} ><small className="supplyplanformulas">{i18n.t('Show Guidance')}</small></span>
+                                                    <span onClick={() => { this.toggleShowGuidance() }} style={{ cursor: 'pointer', color: '20a8d8' }} ><small className="supplyplanformulas">{i18n.t('Show Guidance')}</small></span>
 
                                                 </a>
                                             </div>
@@ -4061,6 +4066,25 @@ export default class TreeExtrapolationComponent extends React.Component {
                         </div>
                     </div>
                 </CardBody>
+                <Modal isOpen={this.state.showGuidance}
+                    className={'modal-lg ' + this.props.className} >
+                    <ModalHeader toggle={() => this.toggleShowGuidance()} className="ModalHead modal-info-Headher">
+                        <strong className="TextWhite">Show Guidance</strong>
+                    </ModalHeader>
+                    <div>
+                        <ModalBody>
+                        
+                            <p>
+                            <b>NOTE: The minimum values needed to get correct graphs and reports for the various features are as under: <br></br>
+                                <span className="ml-lg-5">1. ARIMA : This needs at least 14 months of data<br></br></span>
+                                <span className="ml-lg-5">2. TES will need at least 24 months of data<br></br></span>
+                                <span className="ml-lg-5">3. Other(including things like Moving averages etc) will need at least 3 months of data</span>
+                            </b>
+                            </p>
+                        </ModalBody>
+                    </div>
+                </Modal>
+
             </div>
         )
     }
