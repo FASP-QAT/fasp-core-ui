@@ -4,7 +4,7 @@ import i18n from '../../i18n';
 import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 import { Offline, Online } from "react-detect-offline";
-import { BrowserRouter as Router,Routes, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Link } from 'react-router-dom';
 import { Redirect, Route, Switch } from 'react-router-dom';
 import { Container, Col, Row, Nav, NavItem, TabPane, NavLink } from 'reactstrap';
 import imgforcastmoduletab from '../../assets/img/forcastmoduleicon.png';
@@ -429,7 +429,7 @@ const routes = [
   { path: '/subFundingSource/subFundingSourceList/:message', component: SubFundingSourceList },
   // { path: '/ApplicationDashboard/sp/:id', exact: true, name: 'static.dashboard.applicationdashboard', component: ApplicationDashboard },
   // {path: '/ApplicationDashboard/fm/:id', exact: true, name: 'static.dashboard.applicationdashboard', component: ApplicationDashboard },
-  {path: '/ApplicationDashboard/:id', exact: true, name: 'static.dashboard.applicationdashboard', component: ApplicationDashboard },
+  { path: '/ApplicationDashboard/:id', exact: true, name: 'static.dashboard.applicationdashboard', component: ApplicationDashboard },
   { path: '/ApplicationDashboard/:id/:color/:message', exact: true, name: 'static.dashboard.applicationdashboard', component: ApplicationDashboard },
   { path: '/ApplicationDashboard', exact: true, name: 'static.dashboard.applicationdashboard', component: ApplicationDashboard },
   // { path: '/ApplicationDashboard/:message', component: ApplicationDashboard },
@@ -776,10 +776,10 @@ class DefaultLayout extends Component {
     // this.getDownloadedPrograms = this.getDownloadedPrograms.bind(this);
     // this.checkIfLocalProgramVersionChanged = this.checkIfLocalProgramVersionChanged.bind(this);
   }
- 
+
   refreshPage() {
     // setTimeout(() => {
-      // window.location.reload(false);
+    // window.location.reload(false);
     // }, 0);
   }
 
@@ -816,8 +816,8 @@ class DefaultLayout extends Component {
   }
 
   displayHeaderTitle = (name, url) => {
-    console.log("displayHeaderTitle activeTab ",this.state.activeTab)
-    
+    console.log("displayHeaderTitle activeTab ", this.state.activeTab)
+
     if (this.state.name !== name) {
       // if (url=="/ApplicationDashboard/fm/:id"){
       //   this.setState({activeTab:1})
@@ -841,7 +841,7 @@ class DefaultLayout extends Component {
       // this.checkIfLocalProgramVersionChanged();
       // console.log("displayHeaderTitle Name ",name)
       // console.log("displayHeaderTitle url ",url)
-      
+
       this.setState({
         name
       });
@@ -1905,7 +1905,7 @@ class DefaultLayout extends Component {
                               onClick: e => {
                                 this.refreshPage();
                               }
-                          
+
                             }
                           },
                           {
@@ -2420,22 +2420,22 @@ class DefaultLayout extends Component {
                             }
                           },
                           {
-                            name: i18n.t('static.quantimed.quantimedImport'),
-                            url: '/quantimed/quantimedImport',
-                            icon: 'fa fa-database',
+                            name: i18n.t('static.importIntoQATSupplyPlan.importIntoQATSupplyPlan'),
+                            url: '/importIntoQATSupplyPlan/listImportIntoQATSupplyPlan',
+                            icon: 'fa cui-cloud-download',
                             attributes: {
-                              hidden: ((this.state.businessFunctions.includes('ROLE_BF_QUANTIMED_IMPORT') && this.state.activeTab == 2) ? false : true),
+                              hidden: ((this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN_IMPORT') && this.state.activeTab == 2) ? false : true),
                               onClick: e => {
                                 this.refreshPage();
                               }
                             }
                           },
                           {
-                            name: i18n.t('static.importIntoQATSupplyPlan.importIntoQATSupplyPlan'),
-                            url: '/importIntoQATSupplyPlan/listImportIntoQATSupplyPlan',
-                            icon: 'fa cui-cloud-download',
+                            name: i18n.t('static.quantimed.quantimedImport'),
+                            url: '/quantimed/quantimedImport',
+                            icon: 'fa fa-database',
                             attributes: {
-                              hidden: ((this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN_IMPORT') && this.state.activeTab == 2) ? false : true),
+                              hidden: ((this.state.businessFunctions.includes('ROLE_BF_QUANTIMED_IMPORT') && this.state.activeTab == 2) ? false : true),
                               onClick: e => {
                                 this.refreshPage();
                               }
@@ -4102,7 +4102,7 @@ class DefaultLayout extends Component {
                       <i class="nav-icon fa fa-line-chart tabicon" style={{ fontSize: '18px', paddingTop: '5px', color: '#fff' }} ></i>
                       <h6 className="tabtext">{i18n.t('static.module.forecasting')}</h6>
                     </NavLink>
-                </NavItem>
+                  </NavItem>
                   <NavItem className="bgColourRemoveItem itemWhidth">
                     <NavLink
                       className="bgColourRemoveLink tab2"

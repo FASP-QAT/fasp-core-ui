@@ -56,7 +56,9 @@ export default class StepOneImportMapPlanningUnits extends Component {
             forecastPlanignUnitListForNotDuplicate: [],
             supplyPlanPlanignUnitListForNotDuplicate: [],
             programObj: [],
-            programListFilter: []
+            programListFilter: [],
+            forecastPeriod: '',
+            selSource1: [],
 
         }
         this.changed = this.changed.bind(this);
@@ -701,7 +703,13 @@ export default class StepOneImportMapPlanningUnits extends Component {
         this.el.destroy();
 
         var json = [];
-        var data = papuDataArr;
+        var papuList11 = this.state.selSource1;
+        var data;
+        if (papuList11 != "") {
+            data = papuList11
+        } else {
+            data = papuDataArr
+        }
 
         var options = {
             data: data,
@@ -901,7 +909,8 @@ export default class StepOneImportMapPlanningUnits extends Component {
             forecastProgramId: e.target.value,
             rangeValue: { from: { year: new Date(selectedForecastProgram.forecastStartDate).getFullYear(), month: new Date(selectedForecastProgram.forecastStartDate).getMonth() + 1 }, to: { year: forecastStopDate.getFullYear(), month: forecastStopDate.getMonth() + 1 } },
             versionId: '',
-            programListFilter: programListFilter
+            programListFilter: programListFilter,
+            forecastPeriod: moment(selectedForecastProgram.forecastStartDate).format("MMM-YYYY") + " ~ " + moment(selectedForecastProgram.forecastStopDate).format("MMM-YYYY")
 
         }, () => {
             this.filterVersion();
@@ -1013,8 +1022,8 @@ export default class StepOneImportMapPlanningUnits extends Component {
             this.setState({
                 stepOneData: changedpapuList,
                 regionList: changedpapuList,
-                supplyPlanPlanningUnitIds: supplyPlanPlanningUnitIds
-
+                supplyPlanPlanningUnitIds: supplyPlanPlanningUnitIds,
+                selSource1: tableJson
             }, () => {
                 this.props.finishedStepOne();
             })
@@ -1022,6 +1031,8 @@ export default class StepOneImportMapPlanningUnits extends Component {
             this.props.updateStepOneData("stepOneData", changedpapuList);
             this.props.updateStepOneData("regionList", changedpapuList);
             this.props.updateStepOneData("supplyPlanPlanningUnitIds", supplyPlanPlanningUnitIds);
+            this.props.updateStepOneData("selSource1", tableJson);
+
 
             console.log("FINAL SUBMIT changedpapuList---", changedpapuList);
         } else {
@@ -1158,7 +1169,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                             </div>
                         </FormGroup>
                         <FormGroup className="col-md-4">
-                            <Label htmlFor="appendedInputButton">{i18n.t('static.importFromQATSupplyPlan.Range')}<span className="stock-box-icon fa fa-sort-desc"></span></Label>
+                            <Label htmlFor="appendedInputButton">{i18n.t('static.importFromQATSupplyPlan.Range')}<span className="stock-box-icon fa fa-sort-desc"></span> <i>(Forecast: {this.state.forecastPeriod})</i></Label>
                             <div className="controls  Regioncalender">
 
                                 <Picker
@@ -1166,6 +1177,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                                     years={{ min: this.state.minDate, max: this.state.maxDate }}
                                     value={rangeValue}
                                     lang={pickerLang}
+                                    key={JSON.stringify(rangeValue)}
                                     //theme="light"
                                     onChange={this.handleRangeChange}
                                     onDismiss={this.handleRangeDissmis}
