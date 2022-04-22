@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import DatasetService from '../../api/DatasetService.js';
 import AuthenticationService from '../Common/AuthenticationService.js';
-import { Card, CardHeader, CardBody, Button, Col, FormGroup, Label, InputGroup, Input, Modal, ModalBody, ModalFooter, ModalHeader, CardFooter, FormFeedback,ButtonDropdown, DropdownItem, DropdownMenu, DropdownToggle, Form } from 'reactstrap';
+import { Card, CardHeader, CardBody, Button, Col, FormGroup, Label, InputGroup, Input, Modal, ModalBody, ModalFooter, ModalHeader, CardFooter, FormFeedback, ButtonDropdown, DropdownItem, DropdownMenu, DropdownToggle, Form } from 'reactstrap';
 import getLabelText from '../../CommonComponent/getLabelText'
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 import jexcel from 'jexcel-pro';
@@ -447,7 +447,9 @@ export default class ListTreeComponent extends Component {
             var tempArray = [];
             var tempJson = {};
             var tempTree = {};
-            var curMonth = moment(new Date()).format('YYYY-MM-DD');
+            // var curMonth = moment(new Date()).format('YYYY-MM-DD');
+            // console
+            var curMonth = moment(program.programData.currentVersion.forecastStartDate).format('YYYY-MM-DD');
             var treeTemplateId = document.getElementById('templateId').value;
             console.log("treeTemplateId===", treeTemplateId);
             if (treeTemplateId != "" && treeTemplateId != 0) {
@@ -457,12 +459,38 @@ export default class ListTreeComponent extends Component {
                 for (let i = 0; i < flatList.length; i++) {
                     nodeDataMap = {};
                     tempArray = [];
+                    if (flatList[i].payload.nodeDataMap[0][0].nodeDataModelingList.length > 0) {
+                        for (let j = 0; j < flatList[i].payload.nodeDataMap[0][0].nodeDataModelingList.length; j++) {
+                            var modeling = (flatList[i].payload.nodeDataMap[0][0].nodeDataModelingList)[j];
+                            // var startMonthNoModeling = modeling.startDateNo < 0 ? modeling.startDateNo : parseInt(modeling.startDateNo - 1);
+                            // var stopMonthNoModeling = modeling.stopDateNo < 0 ? modeling.stopDateNo : parseInt(modeling.stopDateNo - 1)
+                            var startMonthNoModeling = modeling.startDateNo < 0 ? modeling.startDateNo : parseInt(modeling.startDateNo);
+                            console.log("startMonthNoModeling---", startMonthNoModeling);
+                            modeling.startDate = moment(curMonth).startOf('month').add(startMonthNoModeling, 'months').format("YYYY-MM-DD");
+                            var stopMonthNoModeling = modeling.stopDateNo < 0 ? modeling.stopDateNo : parseInt(modeling.stopDateNo)
+                            console.log("stopMonthNoModeling---", stopMonthNoModeling);
+                            modeling.stopDate = moment(curMonth).startOf('month').add(stopMonthNoModeling, 'months').format("YYYY-MM-DD");
+
+
+                            console.log("modeling---", modeling);
+                            (flatList[i].payload.nodeDataMap[0][0].nodeDataModelingList)[j] = modeling;
+                        }
+                    }
+                    // if (flatList[i].payload.nodeDataMap[0][0].nodeDataMomList.length > 0) {
+                    //     for (let j = 0; j < flatList[i].payload.nodeDataMap[0][0].nodeDataMomList.length; j++) {
+                    //         var mom = (flatList[i].payload.nodeDataMap[0][0].nodeDataMomList)[j];
+                    //         var stopMonthNoMom = mom.monthNo < 0 ? mom.monthNo : parseInt(mom.monthNo)
+                    //         console.log("stopMonthNoMom---", stopMonthNoMom);
+                    //         mom.month = moment(curMonth).startOf('month').add(stopMonthNoMom, 'months').format("YYYY-MM-DD");
+                    //         (flatList[i].payload.nodeDataMap[0][0].nodeDataMomList)[j] = mom;
+                    //     }
+                    // }
                     // var nodeDataMap[1] = flatList.payload.nodeDataMap[0][0];
                     console.log("flatList[i]---", flatList[i]);
                     tempJson = flatList[i].payload.nodeDataMap[0][0];
                     if (flatList[i].payload.nodeType.id != 1) {
                         console.log("month from tree template---", flatList[i].payload.nodeDataMap[0][0].monthNo + " cur month---", curMonth + " final result---", moment(curMonth).startOf('month').add(flatList[i].payload.nodeDataMap[0][0].monthNo, 'months').format("YYYY-MM-DD"))
-                        var monthNo = flatList[i].payload.nodeDataMap[0][0].monthNo < 0 ? flatList[i].payload.nodeDataMap[0][0].monthNo : parseInt(flatList[i].payload.nodeDataMap[0][0].monthNo - 1)
+                        var monthNo = flatList[i].payload.nodeDataMap[0][0].monthNo < 0 ? flatList[i].payload.nodeDataMap[0][0].monthNo : parseInt(flatList[i].payload.nodeDataMap[0][0].monthNo)
                         tempJson.month = moment(curMonth).startOf('month').add(monthNo, 'months').format("YYYY-MM-DD");
                     }
                     tempArray.push(tempJson);
@@ -804,8 +832,9 @@ export default class ListTreeComponent extends Component {
     }
 
     onTemplateChange(event) {
-        console.log("event.target.value",event.target.value)
-        if (event.target.value == 0) {
+        console.log("event.target.value", event.target.value)
+        if (event.target.value == 0 && event.target.value != "") {
+            console.log("inside if----")
             this.setState({
                 treeTemplate: '',
                 treeFlag: false,
@@ -833,6 +862,7 @@ export default class ListTreeComponent extends Component {
             });
             // this.buildTree();
         } else if (event.target.value != 0 && event.target.value != "") {
+            console.log("inside else----")
             console.log("id--->>>", this.state.datasetIdModal);
             var treeTemplate = this.state.treeTemplateList.filter(x => x.treeTemplateId == event.target.value)[0];
             console.log("treeTemplate---", treeTemplate)
@@ -1253,7 +1283,7 @@ export default class ListTreeComponent extends Component {
                                                             className="addtreebg"
                                                             onChange={(e) => { this.onTemplateChange(e) }}
                                                         >
-                                                            <option value="" disabled selected hidden>Select</option>
+                                                            <option value="">Select</option>
                                                             {/* <option value="">{i18n.t('static.tree.+AddTree')}</option> */}
                                                             <option value="0">+ {i18n.t('static.tree.blank')}</option>
                                                             {treeTemplates}
@@ -1262,15 +1292,15 @@ export default class ListTreeComponent extends Component {
                                                 </div>
                                             </FormGroup>
                                             // </Col>
-                                        //     <ButtonDropdown isOpen={this.state.dropdownOpen[0]} toggle={() => { this.toggleDeropdownSetting(0); }}>
-                                        //     <DropdownToggle caret >
-                                        //       Select
-                                        //     </DropdownToggle>
-                                        //     <DropdownMenu right>
-                                        //       <DropdownItem  onclick={(e) => { this.onTemplateChange(e) }}>+ {i18n.t('static.tree.blank')}</DropdownItem>
-                                        //     <DropdownItem  onclick={(e) => { this.onTemplateChange(e) }}> {treeTemplates}</DropdownItem>
-                                        //     </DropdownMenu>
-                                        //   </ButtonDropdown>
+                                            //     <ButtonDropdown isOpen={this.state.dropdownOpen[0]} toggle={() => { this.toggleDeropdownSetting(0); }}>
+                                            //     <DropdownToggle caret >
+                                            //       Select
+                                            //     </DropdownToggle>
+                                            //     <DropdownMenu right>
+                                            //       <DropdownItem  onclick={(e) => { this.onTemplateChange(e) }}>+ {i18n.t('static.tree.blank')}</DropdownItem>
+                                            //     <DropdownItem  onclick={(e) => { this.onTemplateChange(e) }}> {treeTemplates}</DropdownItem>
+                                            //     </DropdownMenu>
+                                            //   </ButtonDropdown>
                                         }
                                         {/* {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_LIST_REALM_COUNTRY') &&
                                             <FormGroup className="tab-ml-1 mt-md-1 mb-md-0 ">
