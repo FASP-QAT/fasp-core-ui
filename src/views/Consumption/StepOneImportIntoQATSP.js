@@ -56,7 +56,9 @@ export default class StepOneImportMapPlanningUnits extends Component {
             forecastPlanignUnitListForNotDuplicate: [],
             supplyPlanPlanignUnitListForNotDuplicate: [],
             programObj: [],
-            programListFilter: []
+            programListFilter: [],
+            forecastPeriod: ''
+
 
         }
         this.changed = this.changed.bind(this);
@@ -901,7 +903,8 @@ export default class StepOneImportMapPlanningUnits extends Component {
             forecastProgramId: e.target.value,
             rangeValue: { from: { year: new Date(selectedForecastProgram.forecastStartDate).getFullYear(), month: new Date(selectedForecastProgram.forecastStartDate).getMonth() + 1 }, to: { year: forecastStopDate.getFullYear(), month: forecastStopDate.getMonth() + 1 } },
             versionId: '',
-            programListFilter: programListFilter
+            programListFilter: programListFilter,
+            forecastPeriod: moment(selectedForecastProgram.forecastStartDate).format("MMM-YYYY") + " ~ " + moment(selectedForecastProgram.forecastStopDate).format("MMM-YYYY")
 
         }, () => {
             this.filterVersion();
@@ -1158,7 +1161,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                             </div>
                         </FormGroup>
                         <FormGroup className="col-md-4">
-                            <Label htmlFor="appendedInputButton">{i18n.t('static.importFromQATSupplyPlan.Range')}<span className="stock-box-icon fa fa-sort-desc"></span></Label>
+                            <Label htmlFor="appendedInputButton">{i18n.t('static.importFromQATSupplyPlan.Range')}<span className="stock-box-icon fa fa-sort-desc"></span> <i>(Forecast: {this.state.forecastPeriod})</i></Label>
                             <div className="controls  Regioncalender">
 
                                 <Picker
