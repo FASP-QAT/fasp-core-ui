@@ -1421,14 +1421,15 @@ export default class ListTreeComponent extends Component {
                                         }) => (
                                             <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='modalForm' autocomplete="off">
                                                 {/* <CardBody> */}
-                                                <div className="row">
+                                                <div className="col-md-12">
                                                     <Input type="hidden"
                                                         name="treeFlag"
                                                         id="treeFlag"
                                                         value={this.state.treeFlag}
                                                     />
-                                                    <div style={{ display: this.state.treeFlag ? "none" : "block" }} className="col-md-12">
-                                                        <FormGroup className="col-md-12">
+                                                    <div style={{ display: this.state.treeFlag ? "none" : "block" }} className="">
+                                                        <div className='row'>
+                                                        <FormGroup className="col-md-6">
                                                             <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}<span className="red Reqasterisk">*</span></Label>
                                                             <div className="controls">
 
@@ -1451,7 +1452,7 @@ export default class ListTreeComponent extends Component {
 
                                                         </FormGroup>
 
-                                                        <FormGroup className="col-md-12">
+                                                        <FormGroup className="col-md-6">
                                                             <Label htmlFor="currencyId">{i18n.t('static.forecastMethod.forecastMethod')}<span class="red Reqasterisk">*</span></Label>
                                                             <div className="controls">
 
@@ -1474,9 +1475,10 @@ export default class ListTreeComponent extends Component {
                                                             </div>
 
                                                         </FormGroup>
+                                                        </div>
                                                     </div>
-                                                    <div className="col-md-12">
-                                                        <FormGroup className="col-md-12">
+                                                    <div className="row">
+                                                        <FormGroup className="col-md-6">
                                                             <Label for="number1">Tree Name<span className="red Reqasterisk">*</span></Label>
                                                             <div className="controls">
                                                                 <Input type="text"
@@ -1495,8 +1497,9 @@ export default class ListTreeComponent extends Component {
 
                                                         </FormGroup>
                                                     </div>
-                                                    <div style={{ display: this.state.treeFlag ? "none" : "block" }} className="col-md-12">
-                                                        <FormGroup className="col-md-12">
+                                                    <div style={{ display: this.state.treeFlag ? "none" : "block" }} >
+                                                    <div className='row'>
+                                                        <FormGroup className="col-md-6">
                                                             <Label htmlFor="currencyId">{i18n.t('static.region.region')}<span class="red Reqasterisk">*</span></Label>
                                                             <div className="controls">
                                                                 <Select
@@ -1519,7 +1522,7 @@ export default class ListTreeComponent extends Component {
                                                             </div>
 
                                                         </FormGroup>
-                                                        <FormGroup className="col-md-12">
+                                                        <FormGroup className="col-md-6">
                                                             <Label htmlFor="currencyId">{i18n.t('static.common.note')}</Label>
                                                             <div className="controls">
                                                                 <Input type="textarea"
@@ -1531,7 +1534,7 @@ export default class ListTreeComponent extends Component {
                                                             </div>
 
                                                         </FormGroup>
-                                                        <FormGroup className="col-md-12">
+                                                        <FormGroup className="col-md-6">
                                                             <Label className="P-absltRadio">{i18n.t('static.common.status')}</Label>
                                                             <FormGroup check inline>
                                                                 <Input
@@ -1566,15 +1569,16 @@ export default class ListTreeComponent extends Component {
                                                                 </Label>
                                                             </FormGroup>
                                                         </FormGroup>
+                                                        </div>
                                                     </div>
 
-                                                    <div className="col-md-12" style={{ display: 'inline-block' }}>
+                                                    <div className="col-md-12 pl-lg-0 pr-lg-0" style={{ display: 'inline-block' }}>
                                                         <div style={{ display: this.state.missingPUList.length > 0 ? 'block' : 'none' }}><div><b>Missing Planning Units : (<a href="/#/planningUnitSetting/listPlanningUnitSetting" className="supplyplanformulas">Update Planning Units</a>)</b></div><br />
                                                             <div id="missingPUJexcel" className="RowClickable">
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <FormGroup className="col-md-12 float-right pt-lg-4">
+                                                    <FormGroup className="col-md-12 float-right pt-lg-4 pr-lg-0">
                                                         <Button type="button" color="danger" className="mr-1 float-right" size="md" onClick={this.modelOpenClose}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                                         <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                                         &nbsp;
