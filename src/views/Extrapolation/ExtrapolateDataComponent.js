@@ -488,23 +488,45 @@ export default class ExtrapolateDataComponent extends React.Component {
         var rangeValue1 = this.state.rangeValue1;
         let startDate = rangeValue1.from.year + '-' + rangeValue1.from.month + '-01';
         let stopDate = rangeValue1.to.year + '-' + rangeValue1.to.month + '-' + new Date(rangeValue1.to.year, rangeValue1.to.month, 0).getDate();
-        for (var j = 0; j < monthArray.length; j++) {
+        var minDateForActualConsumption = this.state.minDateForConsumption;
+        var monthArrayPart1 = monthArray.filter(c => moment(c).format("YYYY-MM") <= moment(minDateForActualConsumption).format("YYYY-MM"));
+        var monthArrayPart2 = monthArray.filter(c => moment(c).format("YYYY-MM") > moment(minDateForActualConsumption).format("YYYY-MM"));
+        console.log("MonthArrayPart1@@@@@@@@@@@@@@@", monthArrayPart1);
+        console.log("MonthArrayPart2@@@@@@@@@@@@@@@", monthArrayPart2);
+        for (var j = 0; j < monthArrayPart1.length; j++) {
             data = [];
-            data[0] = monthArray[j];
-            var consumptionData = actualConsumptionList.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArray[j]).format("YYYY-MM") && c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId);
-            if (checkIfAnyMissingActualConsumption == false && consumptionData.length == 0 && moment(monthArray[j]).format("YYYY-MM") >= moment(startDate).format("YYYY-MM") && moment(monthArray[j]).format("YYYY-MM") <= moment(stopDate).format("YYYY-MM")) {
+            data[0] = monthArrayPart1[j];
+            data[1] = "";
+            data[2] = "";
+            data[3] = "";
+            data[4] = "";
+            data[5] = "";
+            data[6] = "";
+            data[7] = "";
+            data[8] = "";
+            data[9] = "";
+            data[10] = "";
+            data[11] = "";
+            data[12] = "";
+            dataArray.push(data)
+        }
+        for (var j = 0; j < monthArrayPart2.length; j++) {
+            data = [];
+            data[0] = monthArrayPart2[j];
+            var consumptionData = actualConsumptionList.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArrayPart2[j]).format("YYYY-MM") && c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId);
+            if (checkIfAnyMissingActualConsumption == false && consumptionData.length == 0 && moment(monthArrayPart2[j]).format("YYYY-MM") >= moment(startDate).format("YYYY-MM") && moment(monthArrayPart2[j]).format("YYYY-MM") <= moment(stopDate).format("YYYY-MM")) {
                 checkIfAnyMissingActualConsumption = true;
             }
             // if (consumptionData.length > 0) {
             //     inputData.push({ "month": inputData.length + 1, "actual": consumptionData[0].amount, "forecast": null })
             // }
             console.log("consumptionData0000000", consumptionData)
-            var movingAvgDataFilter = this.state.movingAvgData.filter(c => moment(startMonth).add(c.month - 1, 'months').format("YYYY-MM") == moment(monthArray[j]).format("YYYY-MM"))
+            var movingAvgDataFilter = this.state.movingAvgData.filter(c => moment(startMonth).add(c.month - 1, 'months').format("YYYY-MM") == moment(monthArrayPart2[j]).format("YYYY-MM"))
             console.log("movingAvgDataFilter", movingAvgDataFilter);
-            var semiAvgDataFilter = this.state.semiAvgData.filter(c => moment(startMonth).add(c.month - 1, 'months').format("YYYY-MM") == moment(monthArray[j]).format("YYYY-MM"))
-            var linearRegressionDataFilter = this.state.linearRegressionData.filter(c => moment(startMonth).add(c.month - 1, 'months').format("YYYY-MM") == moment(monthArray[j]).format("YYYY-MM"))
-            var tesDataFilter = this.state.tesData.filter(c => moment(startMonth).add(c.month - 1, 'months').format("YYYY-MM") == moment(monthArray[j]).format("YYYY-MM"))
-            var arimaDataFilter = this.state.arimaData.filter(c => moment(startMonth).add(c.month - 1, 'months').format("YYYY-MM") == moment(monthArray[j]).format("YYYY-MM"))
+            var semiAvgDataFilter = this.state.semiAvgData.filter(c => moment(startMonth).add(c.month - 1, 'months').format("YYYY-MM") == moment(monthArrayPart2[j]).format("YYYY-MM"))
+            var linearRegressionDataFilter = this.state.linearRegressionData.filter(c => moment(startMonth).add(c.month - 1, 'months').format("YYYY-MM") == moment(monthArrayPart2[j]).format("YYYY-MM"))
+            var tesDataFilter = this.state.tesData.filter(c => moment(startMonth).add(c.month - 1, 'months').format("YYYY-MM") == moment(monthArrayPart2[j]).format("YYYY-MM"))
+            var arimaDataFilter = this.state.arimaData.filter(c => moment(startMonth).add(c.month - 1, 'months').format("YYYY-MM") == moment(monthArrayPart2[j]).format("YYYY-MM"))
 
             // var CI = this.state.CI;
             //var consumptionData = actualConsumptionList.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArray[j]).format("YYYY-MM") && c.planningUnit.id == this.state.planningUnitId);
@@ -814,23 +836,37 @@ export default class ExtrapolateDataComponent extends React.Component {
         var inputDataLinearRegression = [];
         var inputDataTes = [];
         var inputDataArima = [];
+        var minDateForConsumption = curDate;
+        var dataFound = false;
+        console.log("Data Found@@@@@@@@@@@", dataFound);
         for (var j = 0; moment(curDate).format("YYYY-MM") < moment(stopDate).format("YYYY-MM"); j++) {
             curDate = moment(startDate).startOf('month').add(j, 'months').format("YYYY-MM-DD");
             console.log("actualConsumptionList", actualConsumptionList);
             var consumptionData = actualConsumptionList.filter(c => moment(c.month).format("YYYY-MM") == moment(curDate).format("YYYY-MM") && c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId)
-
+            console.log("Data Found@@@@@@@@@@@", dataFound);
+            console.log("consumptionData.length@@@@@@@@@@@", consumptionData.length);
+            if (!dataFound && consumptionData.length == 0) {
+                minDateForConsumption = curDate;
+            }
+            if (!dataFound && consumptionData.length > 0) {
+                dataFound = true
+            }
+            console.log("minDateForConsumption@@@@@@@@@@@", minDateForConsumption);
             //   var consumptionData = actualConsumptionList.filter(c => moment(c.month).format("YYYY-MM") == moment(curDate).format("YYYY-MM"))
             //    && c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId)
             console.log("consumptionData--->", consumptionData)
-            inputDataMovingAvg.push({ "month": inputDataMovingAvg.length + 1, "actual": consumptionData.length > 0 ? Number(consumptionData[0].puAmount) : null, "forecast": null })
-            inputDataSemiAverage.push({ "month": inputDataSemiAverage.length + 1, "actual": consumptionData.length > 0 ? Number(consumptionData[0].puAmount) : null, "forecast": null })
-            inputDataLinearRegression.push({ "month": inputDataLinearRegression.length + 1, "actual": consumptionData.length > 0 ? Number(consumptionData[0].puAmount) : null, "forecast": null })
-            inputDataTes.push({ "month": inputDataTes.length + 1, "actual": consumptionData.length > 0 ? Number(consumptionData[0].puAmount) : null, "forecast": null })
-            inputDataArima.push({ "month": inputDataArima.length + 1, "actual": consumptionData.length > 0 ? Number(consumptionData[0].puAmount) : null, "forecast": null })
+            if (consumptionData.length > 0) {
+                inputDataMovingAvg.push({ "month": inputDataMovingAvg.length + 1, "actual": consumptionData.length > 0 ? Number(consumptionData[0].puAmount) : null, "forecast": null })
+                inputDataSemiAverage.push({ "month": inputDataSemiAverage.length + 1, "actual": consumptionData.length > 0 ? Number(consumptionData[0].puAmount) : null, "forecast": null })
+                inputDataLinearRegression.push({ "month": inputDataLinearRegression.length + 1, "actual": consumptionData.length > 0 ? Number(consumptionData[0].puAmount) : null, "forecast": null })
+                inputDataTes.push({ "month": inputDataTes.length + 1, "actual": consumptionData.length > 0 ? Number(consumptionData[0].puAmount) : null, "forecast": null })
+                inputDataArima.push({ "month": inputDataArima.length + 1, "actual": consumptionData.length > 0 ? Number(consumptionData[0].puAmount) : null, "forecast": null })
+            }
         }
         const noOfMonthsForProjection = monthArray.length - inputDataMovingAvg.length;
         this.setState({
-            monthArray: monthArray
+            monthArray: monthArray,
+            minDateForConsumption: minDateForConsumption
         })
         try {
             calculateMovingAvg(inputDataMovingAvg, this.state.monthsForMovingAverage, noOfMonthsForProjection, this);
@@ -1648,7 +1684,8 @@ export default class ExtrapolateDataComponent extends React.Component {
                     monthArray: monthArray,
                     p: p,
                     d: d,
-                    q: q
+                    q: q,
+                    minDateForConsumption: monthArray[0]
                 }, () => {
                     this.getDateDifference()
                     this.buildActualJxl();
@@ -2710,7 +2747,7 @@ export default class ExtrapolateDataComponent extends React.Component {
         const options = {
             title: {
                 display: true,
-                text: this.state.planningUnitId > 0 && this.state.regionId > 0 ? document.getElementById("regionId").selectedOptions[0].text+" "+i18n.t('static.extrpolation.graphTitlePart1') + document.getElementById("planningUnitId").selectedOptions[0].text.split("|")[0]  : ""
+                text: this.state.planningUnitId > 0 && this.state.regionId > 0 ? document.getElementById("regionId").selectedOptions[0].text + " " + i18n.t('static.extrpolation.graphTitlePart1') + document.getElementById("planningUnitId").selectedOptions[0].text.split("|")[0] : ""
             },
             scales: {
                 yAxes: [{
@@ -3368,11 +3405,11 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                         </Label>
                                                     </div>
                                                     <div className="row col-md-12 pt-lg-2" style={{ display: this.state.linearRegressionId ? '' : 'none' }}>
-                                                    <div>
-                                                                <Popover placement="top" isOpen={this.state.popoverOpenConfidenceLevel} target="Popover60" trigger="hover" toggle={this.toggleConfidenceLevel}>
-                                                                    <PopoverBody>{i18n.t('static.tooltip.confidenceLevel')}</PopoverBody>
-                                                                </Popover>
-                                                            </div>
+                                                        <div>
+                                                            <Popover placement="top" isOpen={this.state.popoverOpenConfidenceLevel} target="Popover60" trigger="hover" toggle={this.toggleConfidenceLevel}>
+                                                                <PopoverBody>{i18n.t('static.tooltip.confidenceLevel')}</PopoverBody>
+                                                            </Popover>
+                                                        </div>
                                                         <div className="col-md-2">
                                                             <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.confidenceLevel')}
                                                                 <i class="fa fa-info-circle icons pl-lg-2" id="Popover60" onClick={this.toggleConfidenceLevel} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
