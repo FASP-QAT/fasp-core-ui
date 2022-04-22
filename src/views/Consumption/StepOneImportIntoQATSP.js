@@ -57,8 +57,8 @@ export default class StepOneImportMapPlanningUnits extends Component {
             supplyPlanPlanignUnitListForNotDuplicate: [],
             programObj: [],
             programListFilter: [],
-            forecastPeriod: ''
-
+            forecastPeriod: '',
+            selSource1: [],
 
         }
         this.changed = this.changed.bind(this);
@@ -703,7 +703,13 @@ export default class StepOneImportMapPlanningUnits extends Component {
         this.el.destroy();
 
         var json = [];
-        var data = papuDataArr;
+        var papuList11 = this.state.selSource1;
+        var data;
+        if (papuList11 != "") {
+            data = papuList11
+        } else {
+            data = papuDataArr
+        }
 
         var options = {
             data: data,
@@ -1016,8 +1022,8 @@ export default class StepOneImportMapPlanningUnits extends Component {
             this.setState({
                 stepOneData: changedpapuList,
                 regionList: changedpapuList,
-                supplyPlanPlanningUnitIds: supplyPlanPlanningUnitIds
-
+                supplyPlanPlanningUnitIds: supplyPlanPlanningUnitIds,
+                selSource1: tableJson
             }, () => {
                 this.props.finishedStepOne();
             })
@@ -1025,6 +1031,8 @@ export default class StepOneImportMapPlanningUnits extends Component {
             this.props.updateStepOneData("stepOneData", changedpapuList);
             this.props.updateStepOneData("regionList", changedpapuList);
             this.props.updateStepOneData("supplyPlanPlanningUnitIds", supplyPlanPlanningUnitIds);
+            this.props.updateStepOneData("selSource1", tableJson);
+
 
             console.log("FINAL SUBMIT changedpapuList---", changedpapuList);
         } else {
