@@ -654,6 +654,7 @@ export default class PlanningUnitSetting extends Component {
 
     onPaste(instance, data) {
         var z = -1;
+        console.log("-----------------onPaste---------------------0", data);
         for (var i = 0; i < data.length; i++) {
             console.log("-----------------onPaste---------------------1", data[i]);
             if (z != data[i].y) {
@@ -1891,7 +1892,7 @@ export default class PlanningUnitSetting extends Component {
                 //     // readOnly: true// 0A
                 // },
                 {
-                    title: 'Product Category',
+                    title: 'Planning Unit Category',
                     type: 'autocomplete',
                     source: this.state.productCategoryListNew,
                     // readOnly: true// 0A
@@ -2063,7 +2064,7 @@ export default class PlanningUnitSetting extends Component {
             allowDeleteRow: true,
             // onselection: this.selected,
             onchange: this.changed,
-            // onpaste: this.onPaste,
+            onpaste: this.onPaste,
             contextMenu: function (obj, x, y, e) {
                 var items = [];
                 //Add consumption batch info

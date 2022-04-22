@@ -1410,6 +1410,13 @@ class ForecastOutput extends Component {
                             }
 
                             console.log("TestFU------------>91", consumptionData);
+
+                            consumptionData.sort(function (a, b) {
+                                a = a.objUnit.label.label_en.toLowerCase();
+                                b = b.objUnit.label.label_en.toLowerCase();
+                                return a < b ? -1 : a > b ? 1 : 0;
+                            })
+
                             // logic for add same date data
                             // let resultTrue = Object.values(tempConsumptionListData.reduce((a, { consumptionDate, consumptionQty }) => {
                             //     if (!a[consumptionDate])
@@ -1646,6 +1653,14 @@ class ForecastOutput extends Component {
                             cursorDate = moment(cursorDate).add(1, 'months').format("YYYY-MM-DD");
                             monthArrayList.push(dt);
                         }
+
+                        console.log('consumptionData-------->', consumptionData);
+
+                        consumptionData.sort(function (a, b) {
+                            a = a.objUnit.label.label_en.toLowerCase();
+                            b = b.objUnit.label.label_en.toLowerCase();
+                            return a < b ? -1 : a > b ? 1 : 0;
+                        })
 
 
                         if (xaxisId == 1) {//yes
@@ -2907,7 +2922,7 @@ class ForecastOutput extends Component {
             title: {
                 display: true,
                 // text: (this.state.yaxisEquUnit > 0 ? this.state.equivalencyUnitLabel : 'Monthly Forecast ' + (this.state.viewById == 1 ? '(' + i18n.t('static.product.product') + ')' : '(' + i18n.t('static.forecastingunit.forecastingunit') + ')'))
-                text: 'Monthly Forecast'
+                text: 'Monthly Forecast - ' + (this.state.programs.filter(c => c.programId == this.state.programId).length > 0 ? this.state.programs.filter(c => c.programId == this.state.programId)[0].programCode : '')
             },
             scales: {
                 yAxes: [
@@ -3030,7 +3045,7 @@ class ForecastOutput extends Component {
                             // backgroundColor: item.color,//stacked
                             borderColor: backgroundColor[index],
                             borderStyle: 'dotted',
-                            // borderWidth: 1,
+                            borderWidth: 5,
                             ticks: {
                                 fontSize: 2,
                                 fontColor: 'transparent',
@@ -3080,6 +3095,7 @@ class ForecastOutput extends Component {
                             // backgroundColor: item.color,//stacked
                             borderColor: backgroundColor[index],
                             borderStyle: 'dotted',
+                            borderWidth: 5,
                             ticks: {
                                 fontSize: 2,
                                 fontColor: 'transparent',
