@@ -1892,7 +1892,7 @@ export default class PlanningUnitSetting extends Component {
                 //     // readOnly: true// 0A
                 // },
                 {
-                    title: 'Product Category',
+                    title: 'Planning Unit Category',
                     type: 'autocomplete',
                     source: this.state.productCategoryListNew,
                     // readOnly: true// 0A
