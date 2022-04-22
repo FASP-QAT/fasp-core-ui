@@ -275,7 +275,9 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                                         var elInstance = this.state.languageEl;
 
                                         var json = elInstance.getJson();
-                                        var finalImportQATDataFilter = finalImportQATData.filter((c, indexFilter) => c.v10 == finalPuList[pu] && json[indexFilter][8] == true);
+                                        var finalImportQATDataFilter = finalImportQATData.filter((c, indexFilter) => c.v10 == finalPuList[pu] && json[indexFilter][9] == true);
+                                        // console.log("finalImportQATDataFilter-----2", finalImportQATDataFilter)
+
                                         for (var i = 0; i < finalImportQATDataFilter.length; i++) {
                                             var index = consumptionDataList.findIndex(c => moment(c.consumptionDate).format("YYYY-MM") == moment(finalImportQATDataFilter[i].v14).format("YYYY-MM")
                                                 && c.region.id == finalImportQATDataFilter[i].v11
@@ -502,7 +504,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                                         v2: selectedSupplyPlanPlanningUnit[0].supplyPlanPlanningUnitDesc,//Supply plan planning unit name
                                         v3: regionFilter[0].supplyPlanRegionName,// Supply plan region name
                                         v4: moment(primaryConsumptionData[i].monthlyForecastData[j].month).format("MMM-YY"), // Month
-                                        v5: Math.round((Number(primaryConsumptionData[i].monthlyForecastData[j].consumptionQty) * Number(regionFilter[0].forecastPercentage) / 100)),//Forecasting module consumption qty
+                                        v5: Math.round(Number(primaryConsumptionData[i].monthlyForecastData[j].consumptionQty)),//Forecasting module consumption qty
                                         v6: Number(selectedSupplyPlanPlanningUnit[0].multiplier),//Multiplier
                                         v7: Math.round((Number(primaryConsumptionData[i].monthlyForecastData[j].consumptionQty) * Number(regionFilter[0].forecastPercentage) / 100) * Number(selectedSupplyPlanPlanningUnit[0].multiplier)),// Multiplication
                                         v8: checkConsumptionData.length > 0 ? checkConsumptionData[0].consumptionRcpuQty : "",//Supply plan module qty
@@ -511,7 +513,8 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                                         v11: regionFilter[0].supplyPlanRegionId, // Supply plan region Id
                                         v12: primaryConsumptionData[i].planningUnit.id, // Forecast planning unit Id
                                         v13: primaryConsumptionData[i].monthlyForecastData[j].month + "~" + selectedSupplyPlanPlanningUnit[0].supplyPlanPlanningUnitId + "~" + regionFilter[0].supplyPlanRegionId + "~" + primaryConsumptionData[i].planningUnit.id,
-                                        v14: primaryConsumptionData[i].monthlyForecastData[j].month, // Month
+                                        v14: primaryConsumptionData[i].monthlyForecastData[j].month, // Month without format
+                                        v15: regionFilter[0].forecastPercentage,// % of forecast
 
                                     });
                                 }
@@ -521,9 +524,9 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                             }
                         }
 
-                        let resultTrue = Object.values(tempList.reduce((a, { v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14 }) => {
+                        let resultTrue = Object.values(tempList.reduce((a, { v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15 }) => {
                             if (!a[v13]) {
-                                a[v13] = Object.assign({}, { v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14 });
+                                a[v13] = Object.assign({}, { v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15 });
                             } else {
                                 a[v13].v7 += v7;
                                 a[v13].v5 += v5;
@@ -601,14 +604,15 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                 data[1] = papuList[j].v2
                 data[2] = papuList[j].v3
                 data[3] = papuList[j].v4
-                data[4] = papuList[j].v5
-                data[5] = papuList[j].v6
-                data[6] = papuList[j].v7
-                data[7] = papuList[j].v8
-                data[8] = true;
-                data[9] = papuList[j].v9;
-                data[10] = papuList[j].v10;
-                data[11] = papuList[j].v11;
+                data[4] = papuList[j].v15
+                data[5] = papuList[j].v5
+                data[6] = papuList[j].v6
+                data[7] = papuList[j].v7
+                data[8] = papuList[j].v8
+                data[9] = true;
+                data[10] = papuList[j].v9;
+                data[11] = papuList[j].v10;
+                data[12] = papuList[j].v11;
                 // data[9] = papuList[j].id
 
                 papuDataArr[count] = data;
@@ -659,6 +663,15 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                 {
                     title: 'Month',
                     type: 'text',
+                    textEditor: true,
+                    readOnly: true
+                },
+                {
+                    title: '% of Forecast',
+                    // type: 'text',
+                    type: 'numeric',
+                    decimal: '.',
+                    mask: '#,##.00',
                     textEditor: true,
                     readOnly: true
                 },

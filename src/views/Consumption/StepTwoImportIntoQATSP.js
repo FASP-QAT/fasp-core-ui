@@ -318,7 +318,10 @@ export default class StepTwoImportMapPlanningUnits extends Component {
                 },
                 {
                     title: "% of Forecast",
-                    type: 'text',
+                    // type: 'text',
+                    type: 'numeric',
+                    decimal: '.',
+                    mask: '#,##.00',
                     // readOnly: true,
                     textEditor: true,//2 C
                 },
