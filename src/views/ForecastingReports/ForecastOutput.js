@@ -3030,7 +3030,7 @@ class ForecastOutput extends Component {
                             // backgroundColor: item.color,//stacked
                             borderColor: backgroundColor[index],
                             borderStyle: 'dotted',
-                            // borderWidth: 1,
+                            borderWidth: 5,
                             ticks: {
                                 fontSize: 2,
                                 fontColor: 'transparent',
@@ -3080,6 +3080,7 @@ class ForecastOutput extends Component {
                             // backgroundColor: item.color,//stacked
                             borderColor: backgroundColor[index],
                             borderStyle: 'dotted',
+                            borderWidth: 5,
                             ticks: {
                                 fontSize: 2,
                                 fontColor: 'transparent',
