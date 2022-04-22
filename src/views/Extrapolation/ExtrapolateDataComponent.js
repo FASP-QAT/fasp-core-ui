@@ -869,16 +869,36 @@ export default class ExtrapolateDataComponent extends React.Component {
             minDateForConsumption: minDateForConsumption
         })
         try {
-            calculateMovingAvg(inputDataMovingAvg, this.state.monthsForMovingAverage, noOfMonthsForProjection, this);
-            calculateSemiAverages(inputDataSemiAverage, noOfMonthsForProjection, this);
-            calculateLinearRegression(inputDataLinearRegression, this.state.confidenceLevelIdLinearRegression, noOfMonthsForProjection, this);
-            console.log("inputDataTes.length+++", inputDataTes.length);
-            // if (inputDataTes.length >= (this.state.noOfMonthsForASeason * 2)) {
-            calculateTES(inputDataTes, this.state.alpha, this.state.beta, this.state.gamma, this.state.confidenceLevelId, noOfMonthsForProjection, this, minStartDate, false);
-            calculateArima(inputDataArima, this.state.p, this.state.d, this.state.q, this.state.confidenceLevelIdArima, noOfMonthsForProjection, this, minStartDate, false);
-            this.setState({
-                extrapolateClicked: true
-            })
+            if (inputDataMovingAvg.filter(c => c.actual != null).length < 3 || (this.state.smoothingId && inputDataMovingAvg.filter(c => c.actual != null).length < 24) || (this.state.arimaId && inputDataMovingAvg.filter(c => c.actual != null).length < 14)) {
+                this.setState({
+                    loading: false,
+                    showData: false,
+                    dataChanged: false,
+                    extrapolateClicked: false
+                })
+                alert(i18n.t('static.tree.minDataRequiredToExtrapolate'))
+            } else {
+                if (this.state.movingAvgId) {
+                    calculateMovingAvg(inputDataMovingAvg, this.state.monthsForMovingAverage, noOfMonthsForProjection, this);
+                }
+                if (this.state.semiAvgId) {
+                    calculateSemiAverages(inputDataSemiAverage, noOfMonthsForProjection, this);
+                }
+                if (this.state.linearRegressionId) {
+                    calculateLinearRegression(inputDataLinearRegression, this.state.confidenceLevelIdLinearRegression, noOfMonthsForProjection, this);
+                }
+                console.log("inputDataTes.length+++", inputDataTes.length);
+                // if (inputDataTes.length >= (this.state.noOfMonthsForASeason * 2)) {
+                if (this.state.smoothingId) {
+                    calculateTES(inputDataTes, this.state.alpha, this.state.beta, this.state.gamma, this.state.confidenceLevelId, noOfMonthsForProjection, this, minStartDate, false);
+                }
+                if (this.state.arimaId) {
+                    calculateArima(inputDataArima, this.state.p, this.state.d, this.state.q, this.state.confidenceLevelIdArima, noOfMonthsForProjection, this, minStartDate, false);
+                }
+                this.setState({
+                    extrapolateClicked: true
+                })
+            }
         } catch (error) {
             console.log("Error@@@@@@", error)
             // this.el = jexcel(document.getElementById("tableDiv"), '');
@@ -1647,11 +1667,21 @@ export default class ExtrapolateDataComponent extends React.Component {
                     }
                 }
                 console.log("@@@@@@@@@@##############", inputDataSemiAverage)
-                calculateError(inputDataSemiAverage, "semiAvgError", this);
-                calculateError(inputDataMovingAvg, "movingAvgError", this);
-                calculateError(inputDataLinearRegression, "linearRegressionError", this);
-                calculateError(inputDataTes, "tesError", this);
-                calculateError(inputDataArima, "arimaError", this);
+                if (this.state.semiAvgId) {
+                    calculateError(inputDataSemiAverage, "semiAvgError", this);
+                }
+                if (this.state.movingAvgId) {
+                    calculateError(inputDataMovingAvg, "movingAvgError", this);
+                }
+                if (this.state.linearRegressionId) {
+                    calculateError(inputDataLinearRegression, "linearRegressionError", this);
+                }
+                if (this.state.smoothingId) {
+                    calculateError(inputDataTes, "tesError", this);
+                }
+                if (this.state.arimaId) {
+                    calculateError(inputDataArima, "arimaError", this);
+                }
                 this.setState({
                     actualConsumptionList: actualConsumptionList,
                     startDate: startDate,
@@ -3971,11 +4001,11 @@ export default class ExtrapolateDataComponent extends React.Component {
                                 If you have poorer data (missing data points, variable reporting rates, less than 12 months of data), use simpler forecast methods
                             </p>
                             <p>
-                            <b>NOTE: The minimum values needed to get correct graphs and reports for the various features are as under: <br></br>
-                                <span className="ml-lg-5">1. ARIMA : This needs at least 14 months of data<br></br></span>
-                                <span className="ml-lg-5">2. TES will need at least 24 months of data<br></br></span>
-                                <span className="ml-lg-5">3. Other(including things like Moving averages etc) will need at least 3 months of data</span>
-                            </b>
+                                <b>NOTE: The minimum values needed to get correct graphs and reports for the various features are as under: <br></br>
+                                    <span className="ml-lg-5">1. ARIMA : This needs at least 14 months of data<br></br></span>
+                                    <span className="ml-lg-5">2. TES will need at least 24 months of data<br></br></span>
+                                    <span className="ml-lg-5">3. Other(including things like Moving averages etc) will need at least 3 months of data</span>
+                                </b>
                             </p>
                         </ModalBody>
                     </div>
