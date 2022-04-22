@@ -664,25 +664,37 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                 },
                 {
                     title: 'Forecasted Consumption (Forecast Module)',
-                    type: 'text',
+                    // type: 'text',
+                    type: 'numeric',
+                    decimal: '.',
+                    mask: '#,##.00',
                     textEditor: true,
                     readOnly: true
                 },
                 {
                     title: 'Conversion Factor (Forecast to Supply Plan)',
-                    type: 'text',
+                    // type: 'text',
+                    type: 'numeric',
+                    decimal: '.',
+                    mask: '#,##.00',
                     textEditor: true,
                     readOnly: true
                 },
                 {
                     title: 'Converted Forecasted Consumption (to be imported)',
-                    type: 'text',
+                    // type: 'text',
+                    type: 'numeric',
+                    decimal: '.',
+                    mask: '#,##.00',
                     textEditor: true,
                     readOnly: true
                 },
                 {
                     title: 'Current Forecasted Consumption (Supply Plan Module)',
-                    type: 'text',
+                    // type: 'text',
+                    type: 'numeric',
+                    decimal: '.',
+                    mask: '#,##.00',
                     textEditor: true,
                     readOnly: true
                 },
