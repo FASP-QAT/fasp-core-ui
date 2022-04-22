@@ -1596,6 +1596,9 @@ export default class TreeExtrapolationComponent extends React.Component {
         if (this.state.smoothingId) {
             rmseArr.push(this.state.tesError.rmse)
         }
+        if (this.state.arimaId) {
+            rmseArr.push(this.state.arimaError.rmse)
+        }
 
         if (this.state.movingAvgId) {
             mapeArr.push(this.state.movingAvgError.mape)
@@ -1608,6 +1611,10 @@ export default class TreeExtrapolationComponent extends React.Component {
         }
         if (this.state.smoothingId) {
             mapeArr.push(this.state.tesError.mape)
+        }
+
+        if (this.state.arimaId) {
+            mapeArr.push(this.state.arimaError.mape)
         }
 
         if (this.state.movingAvgId) {
@@ -1623,6 +1630,10 @@ export default class TreeExtrapolationComponent extends React.Component {
             mseArr.push(this.state.tesError.mse)
         }
 
+        if (this.state.arimaId) {
+            mseArr.push(this.state.arimaError.mse)
+        }
+
         if (this.state.movingAvgId) {
             rSqdArr.push(this.state.movingAvgError.rSqd)
         }
@@ -1636,6 +1647,10 @@ export default class TreeExtrapolationComponent extends React.Component {
             rSqdArr.push(this.state.tesError.rSqd)
         }
 
+        if (this.state.arimaId) {
+            rSqdArr.push(this.state.arimaError.rSqd)
+        }
+
         if (this.state.movingAvgId) {
             wapeArr.push(this.state.movingAvgError.wape)
         }
@@ -1647,6 +1662,10 @@ export default class TreeExtrapolationComponent extends React.Component {
         }
         if (this.state.smoothingId) {
             wapeArr.push(this.state.tesError.wape)
+        }
+
+        if (this.state.arimaId) {
+            wapeArr.push(this.state.arimaError.wape)
         }
 
         var minRmse = Math.min(...rmseArr.filter(c => c != ""));
@@ -3811,7 +3830,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                 <div className="col-md-6 pl-lg-0">
                                                     <Button type="button" color="success" className="float-left mr-1" size="md" onClick={this.interpolate}>Interpolate</Button>
                                                     {/* <Button type="button" id="dataCheck" size="md" color="info" className="mr-1" onClick={() => this.checkActualValuesGap(true)}>Extrapolate</Button> */}
-                                                    <Button type="submit" id="extrapolateButton" size="md" color="info" className="float-left mr-1" onClick={() => this.touchAllExtrapolation(setTouched, errors, 0)}><i className="fa fa-check"></i>Extrapolate</Button>
+                                                    <Button type="submit" id="extrapolateButton" size="md" color="info" className="float-left mr-1" onClick={() => this.touchAllExtrapolation(setTouched, errors, 0)}><i className="fa fa-calculator"></i>Extrapolate</Button>
                                                 </div>
                                                 <div className="col-md-6 pr-lg-0">
                                                     <Button className="btn btn-info btn-md float-right" onClick={this.toggleJexcelData}>
