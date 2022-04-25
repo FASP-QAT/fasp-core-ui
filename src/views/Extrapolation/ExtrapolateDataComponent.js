@@ -489,10 +489,8 @@ export default class ExtrapolateDataComponent extends React.Component {
         let startDate = rangeValue1.from.year + '-' + rangeValue1.from.month + '-01';
         let stopDate = rangeValue1.to.year + '-' + rangeValue1.to.month + '-' + new Date(rangeValue1.to.year, rangeValue1.to.month, 0).getDate();
         var minDateForActualConsumption = this.state.minDateForConsumption;
-        var monthArrayPart1 = monthArray.filter(c => moment(c).format("YYYY-MM") <= moment(minDateForActualConsumption).format("YYYY-MM"));
-        var monthArrayPart2 = monthArray.filter(c => moment(c).format("YYYY-MM") > moment(minDateForActualConsumption).format("YYYY-MM"));
-        console.log("MonthArrayPart1@@@@@@@@@@@@@@@", monthArrayPart1);
-        console.log("MonthArrayPart2@@@@@@@@@@@@@@@", monthArrayPart2);
+        var monthArrayPart1 = monthArray.filter(c => moment(c).format("YYYY-MM") < moment(minDateForActualConsumption).format("YYYY-MM"));
+        var monthArrayPart2 = monthArray.filter(c => moment(c).format("YYYY-MM") >= moment(minDateForActualConsumption).format("YYYY-MM"));
         for (var j = 0; j < monthArrayPart1.length; j++) {
             data = [];
             data[0] = monthArrayPart1[j];
@@ -855,7 +853,7 @@ export default class ExtrapolateDataComponent extends React.Component {
             //   var consumptionData = actualConsumptionList.filter(c => moment(c.month).format("YYYY-MM") == moment(curDate).format("YYYY-MM"))
             //    && c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId)
             console.log("consumptionData--->", consumptionData)
-            if (consumptionData.length > 0) {
+            if (dataFound) {
                 inputDataMovingAvg.push({ "month": inputDataMovingAvg.length + 1, "actual": consumptionData.length > 0 ? Number(consumptionData[0].puAmount) : null, "forecast": null })
                 inputDataSemiAverage.push({ "month": inputDataSemiAverage.length + 1, "actual": consumptionData.length > 0 ? Number(consumptionData[0].puAmount) : null, "forecast": null })
                 inputDataLinearRegression.push({ "month": inputDataLinearRegression.length + 1, "actual": consumptionData.length > 0 ? Number(consumptionData[0].puAmount) : null, "forecast": null })
@@ -870,11 +868,15 @@ export default class ExtrapolateDataComponent extends React.Component {
         })
         try {
             if (inputDataMovingAvg.filter(c => c.actual != null).length < 3 || (this.state.smoothingId && inputDataMovingAvg.filter(c => c.actual != null).length < 24) || (this.state.arimaId && inputDataMovingAvg.filter(c => c.actual != null).length < 14)) {
+                this.el = jexcel(document.getElementById("tableDiv"), '');
+                this.el.destroy();
                 this.setState({
                     loading: false,
                     showData: false,
                     dataChanged: false,
-                    extrapolateClicked: false
+                    extrapolateClicked: false,
+                    show: false,
+                    dataEl: ""
                 })
                 alert(i18n.t('static.tree.minDataRequiredToExtrapolate'))
             } else {
