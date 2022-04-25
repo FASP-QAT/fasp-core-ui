@@ -3548,9 +3548,9 @@ class ForecastOutput extends Component {
                                                                     ))}
                                                                     {this.state.yaxisEquUnit > 0 && this.state.xaxis == 2 &&
                                                                         <tr>
-                                                                            <td></td>
-                                                                            <td style={{ textAlign: 'left' }}><b>{i18n.t('static.supplyPlan.total')} {" " + this.state.equivalencyUnitLabel}</b></td>
-                                                                            <td></td>
+                                                                            <td className="sticky-col first-col clone Firstcolum"></td>
+                                                                            <td style={{ textAlign: 'left' }}  className="sticky-col first-col clone Secondcolum"><b>{i18n.t('static.supplyPlan.total')} {" " + this.state.equivalencyUnitLabel}</b></td>
+                                                                            <td className='text-left sticky-col first-col clone Thirdcolum'></td>
                                                                             {this.state.monthArrayList.map(item1 => (
                                                                                 <td><b>{this.state.calculateEquivalencyUnitTotal.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(item1).format("YYYY-MM")).length > 0 ? <NumberFormat displayType={'text'} thousandSeparator={true} value={this.state.calculateEquivalencyUnitTotal.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(item1).format("YYYY-MM"))[0].consumptionQty} /> : ""}</b></td>
                                                                             ))}
@@ -3571,9 +3571,9 @@ class ForecastOutput extends Component {
                                                                     ))}
                                                                     {this.state.yaxisEquUnit > 0 && this.state.xaxis == 1 &&
                                                                         <tr>
-                                                                            <td></td>
-                                                                            <td style={{ textAlign: 'left' }}><b>Total {" " + this.state.equivalencyUnitLabel}</b></td>
-                                                                            <td></td>
+                                                                            <td className="sticky-col first-col clone Firstcolum"></td>
+                                                                            <td className="sticky-col first-col clone Secondcolum" style={{ textAlign: 'left' }}><b>Total {" " + this.state.equivalencyUnitLabel}</b></td>
+                                                                            <td className='text-left sticky-col first-col clone Thirdcolum'></td>
                                                                             {this.state.monthArrayList.map(item1 => (
                                                                                 <td>{this.state.calculateEquivalencyUnitTotal.filter(c => moment(c.consumptionDate).format("YYYY") == moment(item1).format("YYYY")).length > 0 ? <NumberFormat displayType={'text'} thousandSeparator={true} value={this.state.calculateEquivalencyUnitTotal.filter(c => moment(c.consumptionDate).format("YYYY") == moment(item1).format("YYYY"))[0].consumptionQty} /> : ""}</td>
                                                                             ))}
