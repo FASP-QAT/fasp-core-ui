@@ -567,8 +567,14 @@ class warehouseCapacity extends Component {
                     if (myResult[i].userId == userId) {
                         var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
                         var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
+
+                        var bytes1 = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
+                        var programData = bytes1.toString(CryptoJS.enc.Utf8);
+                        var programJson1 = JSON.parse(programData);
+
                         var programJson = {
-                            name: getLabelText(JSON.parse(programNameLabel), lan) + "~v" + myResult[i].version,
+                            // name: getLabelText(JSON.parse(programNameLabel), lan) + "~v" + myResult[i].version,
+                            name: (programJson1.programCode) + "~v" + myResult[i].version,
                             id: myResult[i].id
                         }
                         proList[i] = programJson
