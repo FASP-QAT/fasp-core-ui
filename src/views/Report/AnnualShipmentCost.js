@@ -29,7 +29,7 @@ import {
 } from 'reactstrap';
 import ReportService from '../../api/ReportService';
 
-import {MultiSelect} from 'react-multi-select-component';
+import MultiSelect from 'react-multi-select-component';
 import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 const ref = React.createRef();
 const pickerLang = {

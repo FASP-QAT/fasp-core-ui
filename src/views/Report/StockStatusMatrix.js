@@ -28,7 +28,7 @@ import AuthenticationServiceComponent from '../Common/AuthenticationServiceCompo
 import ReactMultiSelectCheckboxes from 'react-multiselect-checkboxes';
 import { DatePicker } from 'antd';
 import 'antd/dist/antd.css';
-import {MultiSelect} from "react-multi-select-component";
+import MultiSelect from "react-multi-select-component";
 import SupplyPlanFormulas from "../SupplyPlan/SupplyPlanFormulas";
 import { isSiteOnline } from "../../CommonComponent/JavascriptCommonFunctions";
 import TracerCategoryService from '../../api/TracerCategoryService';
