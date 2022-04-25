@@ -1536,7 +1536,7 @@ export default class ListTreeComponent extends Component {
                                                                 </div>
 
                                                             </FormGroup>
-                                                            <FormGroup className="col-md-6">
+                                                            <FormGroup className="col-md-6 mt-lg-4">
                                                                 <Label className="P-absltRadio">{i18n.t('static.common.status')}</Label>
                                                                 <FormGroup check inline>
                                                                     <Input
