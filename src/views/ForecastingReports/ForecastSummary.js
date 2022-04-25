@@ -3001,6 +3001,12 @@ class ForecastSummary extends Component {
                     <CardBody className="pb-lg-2 pt-lg-1 ">
                         <div>
                             <div ref={ref}>
+                                <Col md="12" className="pl-lg-0">
+                                    <div>
+                                        {/* <p>Some text here to explain users this is not a detailed supply plan, Just high level estimate.</p> */}
+                                        <p>{i18n.t("static.placeholder.forecastSummary")}</p>
+                                    </div>
+                                </Col>
                                 <Form >
                                     <div className="pl-0">
                                         <div className="row">
@@ -3145,12 +3151,7 @@ class ForecastSummary extends Component {
                                         </div>
                                     </div>
                                 </Form>
-                                <Col md="12" className="pl-lg-0" style={{ display: this.state.loading ? "none" : "block" }}>
-                                    <div>
-                                        {/* <p>Some text here to explain users this is not a detailed supply plan, Just high level estimate.</p> */}
-                                        <p>{i18n.t("static.placeholder.forecastSummary")}</p>
-                                    </div>
-                                </Col>
+
                                 <Col md="12" className='pl-lg-0' style={{ display: this.state.loading ? "none" : "block" }}>
                                     <div className="row">
                                         <div className="col-md-12 pl-0 pr-0">
