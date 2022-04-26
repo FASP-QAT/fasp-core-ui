@@ -734,7 +734,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                     filter: this.filterPlanningUnitBasedOnTracerCategory
                 },
                 {
-                    title: i18n.t('static.importFromQATSupplyPlan.conversionFactor'),
+                    title: i18n.t('static.importIntoQATSupplyPlan.conversionFactor'),
                     type: 'numeric',
                     decimal: '.',
                     // readOnly: true,
