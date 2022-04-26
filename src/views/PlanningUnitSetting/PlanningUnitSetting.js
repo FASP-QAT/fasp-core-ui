@@ -954,27 +954,21 @@ export default class PlanningUnitSetting extends Component {
             isChanged1: true,
         });
 
-        var elInstance = instance.jexcel;
-        var json = elInstance.getJson(null, false);
-        
-        var colArr = ['A', 'B'];
-        for (var j = 0; j < json.length; j++) {
-            var rowData = elInstance.getRowData(j);
-            var programPlanningUnitId = rowData[11];
-
+        if (x == 11) {
+            console.log("Value@@@@@@@@@@@@@",value)
             //left align
-            elInstance.setStyle(`A${parseInt(j) + 1}`, 'text-align', 'left');
-            elInstance.setStyle(`B${parseInt(j) + 1}`, 'text-align', 'left');
+            this.el.setStyle(`A${parseInt(y) + 1}`, 'text-align', 'left');
+            this.el.setStyle(`B${parseInt(y) + 1}`, 'text-align', 'left');
 
-            if (programPlanningUnitId == 1) {
-                var cell = elInstance.getCell(("B").concat(parseInt(j) + 1))
+            if (value == 1 || value=="") {
+                var cell = this.el.getCell(("B").concat(parseInt(y) + 1))
                 cell.classList.remove('readonly');
-                var cell = elInstance.getCell(("A").concat(parseInt(j) + 1))
+                var cell = this.el.getCell(("A").concat(parseInt(y) + 1))
                 cell.classList.remove('readonly');
             } else {
-                var cell = elInstance.getCell(("B").concat(parseInt(j) + 1))
+                var cell = this.el.getCell(("B").concat(parseInt(y) + 1))
                 cell.classList.add('readonly');
-                var cell = elInstance.getCell(("A").concat(parseInt(j) + 1))
+                var cell = this.el.getCell(("A").concat(parseInt(y) + 1))
                 cell.classList.add('readonly');
             }
         }
@@ -2291,7 +2285,7 @@ export default class PlanningUnitSetting extends Component {
     onchangepage(el, pageNo, oldPageNo) {
         var elInstance = el.jexcel;
         var json = elInstance.getJson(null, false);
-        
+
         var colArr = ['A', 'B'];
         for (var j = 0; j < json.length; j++) {
             var rowData = elInstance.getRowData(j);
