@@ -2084,7 +2084,7 @@ export default class PlanningUnitSetting extends Component {
             // onselection: this.selected,
             onchange: this.changed,
             onpaste: this.onPaste,
-            // onchangepage: this.onchangepage,
+            onchangepage: this.onchangepage,
             contextMenu: function (obj, x, y, e) {
                 var items = [];
                 //Add consumption batch info
