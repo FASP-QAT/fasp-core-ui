@@ -464,7 +464,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                 manualChange: (this.state.dataExtrapolation.getValue(`K${parseInt(i) + 1}`, true)).toString().replaceAll(",", ""),
                 month: map1.get("0"),
                 seasonalityPerc: 0,
-                startValue: map1.get("1")
+                startValue: this.state.dataExtrapolation.getValue(`D${parseInt(i) + 1}`, true) != "" ? (this.state.dataExtrapolation.getValue(`D${parseInt(i) + 1}`, true)).toString().replaceAll(",", "") : 0
             };
             momList.push(json2);
         }
@@ -1814,7 +1814,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                 instance.jexcel.setComments(col, "");
             }
         }
-        if (x != 10) {
+        if (x != 10 && this.state.nodeDataExtrapolation.extrapolationMethod.id == "") {
             this.setState({ dataChanged: true })
         }
         this.setState({ isChanged: true })
@@ -4092,13 +4092,13 @@ export default class TreeExtrapolationComponent extends React.Component {
                     </ModalHeader>
                     <div>
                         <ModalBody>
-                        
+
                             <p>
-                            <b>NOTE: The minimum values needed to get correct graphs and reports for the various features are as under: <br></br>
-                                <span className="ml-lg-5">1. ARIMA : This needs at least 14 months of data<br></br></span>
-                                <span className="ml-lg-5">2. TES will need at least 24 months of data<br></br></span>
-                                <span className="ml-lg-5">3. Other(including things like Moving averages etc) will need at least 3 months of data</span>
-                            </b>
+                                <b>NOTE: The minimum values needed to get correct graphs and reports for the various features are as under: <br></br>
+                                    <span className="ml-lg-5">1. ARIMA : This needs at least 14 months of data<br></br></span>
+                                    <span className="ml-lg-5">2. TES will need at least 24 months of data<br></br></span>
+                                    <span className="ml-lg-5">3. Other(including things like Moving averages etc) will need at least 3 months of data</span>
+                                </b>
                             </p>
                         </ModalBody>
                     </div>
