@@ -127,12 +127,12 @@ class SupplyPlanVersionAndReview extends Component {
     hideFirstComponent() {
         this.timeout = setTimeout(function () {
             document.getElementById('div1').style.display = 'none';
-        }, 8000);
+        }, 30000);
     }
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
-        }, 8000);
+        }, 30000);
     }
 
     componentWillUnmount() {

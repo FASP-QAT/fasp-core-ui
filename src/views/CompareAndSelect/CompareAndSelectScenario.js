@@ -103,7 +103,7 @@ class CompareAndSelectScenario extends Component {
         document.getElementById('div1').style.display = 'block';
         this.state.timeout = setTimeout(function () {
             document.getElementById('div1').style.display = 'none';
-        }, 8000);
+        }, 30000);
     }
 
     handleClickMonthBox2 = (e) => {
@@ -193,7 +193,7 @@ class CompareAndSelectScenario extends Component {
             var colourArrayCount = 0;
             // var compareToConsumptionForecast = ["","","","22.7% above the highest consumption forecast.","7.9% below the lowest consumption forecast.","In between the highest and lowest consumption forecast."];
             var count = 0;
-            var consumptionExtrapolation = datasetJson.consumptionExtrapolation.filter(c => c.planningUnit.id == this.state.planningUnitId);
+            var consumptionExtrapolation = datasetJson.consumptionExtrapolation.filter(c => c.planningUnit.id == this.state.planningUnitId && c.extrapolationMethod.active);
             for (var ce = 0; ce < consumptionExtrapolation.length; ce++) {
                 if (colourArrayCount > 10) {
                     colourArrayCount = 0;
@@ -216,11 +216,21 @@ class CompareAndSelectScenario extends Component {
                     console.log("dataForPlanningUnit####", dataForPlanningUnit);
                     var data = [];
                     if (dataForPlanningUnit.length > 0) {
-                        if ((dataForPlanningUnit[0].payload.nodeDataMap[scenarioList[sl].id])[0].nodeDataMomList != undefined) {
-                            data = (dataForPlanningUnit[0].payload.nodeDataMap[scenarioList[sl].id])[0].nodeDataMomList;
+                        for (var dfpu = 0; dfpu < dataForPlanningUnit.length; dfpu++) {
+                            if ((dataForPlanningUnit[dfpu].payload.nodeDataMap[scenarioList[sl].id])[0].nodeDataMomList != undefined) {
+                                data = data.concat((dataForPlanningUnit[dfpu].payload.nodeDataMap[scenarioList[sl].id])[0].nodeDataMomList);
+                            }
                         }
                     }
-                    treeScenarioList.push({ id: treeList[tl].treeId + "~" + scenarioList[sl].id, tree: treeList[tl], scenario: scenarioList[sl], checked: readonly ? false : true, color: colourArray[colourArrayCount], type: "T", data: data, readonly: readonly });
+                    let resultTrue = Object.values(data.reduce((a, { month, calculatedMmdValue }) => {
+                        if (!a[month])
+                            a[month] = Object.assign({}, { month, calculatedMmdValue });
+                        else
+                            a[month].calculatedMmdValue += calculatedMmdValue;
+                        return a;
+                    }, {}));
+                    console.log("resultTrue@@@@@@@@@@@@@@", resultTrue);
+                    treeScenarioList.push({ id: treeList[tl].treeId + "~" + scenarioList[sl].id, tree: treeList[tl], scenario: scenarioList[sl], checked: readonly ? false : true, color: colourArray[colourArrayCount], type: "T", data: resultTrue, readonly: readonly });
                     colourArrayCount += 1;
                     count += 1;
                 }
@@ -304,28 +314,28 @@ class CompareAndSelectScenario extends Component {
             monthArrayForError.push(moment(actualMax).add(-5, 'months').format("YYYY-MM-DD"));
         }
         var multiplier = 1;
-        var selectedPlanningUnit = this.state.planningUnitList.filter(c => c.planningUnit.id == this.state.planningUnitId);
-        if (this.state.viewById == 2) {
-            multiplier = selectedPlanningUnit.length > 0 ? selectedPlanningUnit[0].planningUnit.multiplier : 1;
-        }
-        if (this.state.viewById == 3) {
-            var selectedEquivalencyUnit = this.state.equivalencyUnitListAll.filter(c => c.equivalencyUnitMappingId == this.state.equivalencyUnitId);
-            multiplier = selectedEquivalencyUnit.length > 0 ? selectedEquivalencyUnit[0].convertToEu : 1;
-        }
-        var actualCalculationDataType = selectedPlanningUnit.consumptionDataType;
+        // var selectedPlanningUnit = this.state.planningUnitList.filter(c => c.planningUnit.id == this.state.planningUnitId);
+        // if (this.state.viewById == 2) {
+        //     multiplier = selectedPlanningUnit.length > 0 ? selectedPlanningUnit[0].planningUnit.multiplier : 1;
+        // }
+        // if (this.state.viewById == 3) {
+        //     var selectedEquivalencyUnit = this.state.equivalencyUnitListAll.filter(c => c.equivalencyUnitMappingId == this.state.equivalencyUnitId);
+        //     multiplier = selectedEquivalencyUnit.length > 0 ? selectedEquivalencyUnit[0].convertToEu : 1;
+        // }
+        // var actualCalculationDataType = selectedPlanningUnit.consumptionDataType;
         var actualMultiplier = 1;
-        if (actualCalculationDataType == 1) {
-            actualMultiplier = selectedPlanningUnit.planningUnit.multiplier;
-        } else if (selectedPlanningUnit.consumptionDataType == 2) {
-            actualMultiplier = 1;
-        } else if (selectedPlanningUnit.consumptionDataType == 3) {
-            actualMultiplier = selectedPlanningUnit.otherUnit.multiplier
-        }
+        // if (actualCalculationDataType == 1) {
+        //     actualMultiplier = selectedPlanningUnit.planningUnit.multiplier;
+        // } else if (selectedPlanningUnit.consumptionDataType == 2) {
+        //     actualMultiplier = 1;
+        // } else if (selectedPlanningUnit.consumptionDataType == 3) {
+        //     actualMultiplier = selectedPlanningUnit.otherUnit.multiplier
+        // }
         var totalActual = 0;
         for (var mo = 0; mo < monthArrayForError.length; mo++) {
             var actualFilter = consumptionData.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArrayForError[mo]).format("YYYY-MM"));
             if (actualFilter.length > 0) {
-                totalActual += Number(actualFilter.length > 0 ? (Number(actualFilter[0].amount) * Number(actualMultiplier) * Number(multiplier)).toFixed(2) : 0);
+                totalActual += Number(actualFilter.length > 0 ? (Number(actualFilter[0].puAmount) * Number(actualMultiplier) * Number(multiplier)).toFixed(2) : 0);
             }
         }
         var actualDiff = [];
@@ -341,12 +351,9 @@ class CompareAndSelectScenario extends Component {
 
             var actualFilter = consumptionData.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArrayListWithoutFormat[m]).format("YYYY-MM"));
 
-            data[1] = actualFilter.length > 0 ? (Number(actualFilter[0].amount) * Number(actualMultiplier) * Number(multiplier)).toFixed(2) : "";
-            actualConsumptionListForMonth.push(actualFilter.length > 0 ? (Number(actualFilter[0].amount) * Number(actualMultiplier) * Number(multiplier)) : null);
+            data[1] = actualFilter.length > 0 ? (Number(actualFilter[0].puAmount) * Number(actualMultiplier) * Number(multiplier)).toFixed(2) : "";
+            actualConsumptionListForMonth.push(actualFilter.length > 0 ? (Number(actualFilter[0].puAmount) * Number(actualMultiplier) * Number(multiplier)) : null);
             var monthArrayForErrorFilter = monthArrayForError.filter(c => moment(c).format("YYYY-MM") == moment(monthArrayListWithoutFormat[m]).format("YYYY-MM"));
-            if (monthArrayForErrorFilter.length > 0) {
-                // totalActual += actualFilter.length > 0 ? (Number(actualFilter[0].amount) * Number(multiplier)).toFixed(2) : 0;
-            }
             console.log("TreeScenarioList###", treeScenarioList)
             for (var tsl = 0; tsl < treeScenarioList.length; tsl++) {
                 // if (tsl == 0) {
@@ -360,7 +367,7 @@ class CompareAndSelectScenario extends Component {
                     totalArray[tsl] = Number(totalArray[tsl] != undefined ? totalArray[tsl] : 0) + Number(scenarioFilter.length > 0 ? Number(scenarioFilter[0].calculatedMmdValue).toFixed(2) * multiplier : 0);
 
                     if (monthArrayForErrorFilter.length > 0) {
-                        var diff = ((actualFilter.length > 0 ? (Number(actualFilter[0].amount) * Number(actualMultiplier) * Number(multiplier)).toFixed(2) : 0) - (scenarioFilter.length > 0 ? Number(scenarioFilter[0].calculatedMmdValue).toFixed(2) * multiplier : ""));
+                        var diff = ((actualFilter.length > 0 ? (Number(actualFilter[0].puAmount) * Number(actualMultiplier) * Number(multiplier)).toFixed(2) : 0) - (scenarioFilter.length > 0 ? Number(scenarioFilter[0].calculatedMmdValue).toFixed(2) * multiplier : ""));
                         if (diff < 0) {
                             diff = 0 - diff;
                         }
@@ -377,7 +384,7 @@ class CompareAndSelectScenario extends Component {
                     totalArray[tsl] = Number(totalArray[tsl] != undefined ? totalArray[tsl] : 0) + Number(scenarioFilter.length > 0 ? (Number(scenarioFilter[0].amount) * Number(actualMultiplier) * Number(multiplier)).toFixed(2) : 0);
 
                     if (monthArrayForErrorFilter.length > 0) {
-                        var diff = ((actualFilter.length > 0 ? (Number(actualFilter[0].amount) * Number(actualMultiplier) * Number(multiplier)).toFixed(2) : 0) - (scenarioFilter.length > 0 ? (Number(scenarioFilter[0].amount) * Number(actualMultiplier) * Number(multiplier)).toFixed(2) : ""));
+                        var diff = ((actualFilter.length > 0 ? (Number(actualFilter[0].puAmount) * Number(actualMultiplier) * Number(multiplier)).toFixed(2) : 0) - (scenarioFilter.length > 0 ? (Number(scenarioFilter[0].amount) * Number(actualMultiplier) * Number(multiplier)).toFixed(2) : ""));
                         if (diff < 0) {
                             diff = 0 - diff;
                         }
@@ -402,7 +409,7 @@ class CompareAndSelectScenario extends Component {
 
             var actualFilter = consumptionData.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArrayListWithoutFormat[m]).format("YYYY-MM"));
 
-            data[1] = actualFilter.length > 0 ? (Number(actualFilter[0].amount) * Number(actualMultiplier) * Number(multiplier)).toFixed(2) : "";
+            data[1] = actualFilter.length > 0 ? (Number(actualFilter[0].puAmount) * Number(actualMultiplier) * Number(multiplier)).toFixed(2) : "";
             for (var tsl = 0; tsl < treeScenarioList.length; tsl++) {
                 // if (tsl == 0) {
                 //     totalArray[tsl] = 0;
@@ -1136,6 +1143,9 @@ class CompareAndSelectScenario extends Component {
                     if (datasetList.length == 1) {
                         datasetId = datasetList[0].id;
                         event.target.value = datasetList[0].id;
+                    } else if (this.props.match.params.programId != "" && datasetList.filter(c => c.id == this.props.match.params.programId).length > 0) {
+                        datasetId = this.props.match.params.programId;
+                        event.target.value = this.props.match.params.programId;
                     } else if (localStorage.getItem("sesDatasetId") != "" && datasetList.filter(c => c.id == localStorage.getItem("sesDatasetId")).length > 0) {
                         datasetId = localStorage.getItem("sesDatasetId");
                         event.target.value = localStorage.getItem("sesDatasetId");
@@ -1319,6 +1329,9 @@ class CompareAndSelectScenario extends Component {
                 if (planningUnitList.length == 1) {
                     planningUnitId = planningUnitList[0].planningUnit.id;
                     event.target.value = planningUnitList[0].planningUnit.id;
+                } else if (this.props.match.params.planningUnitId != "" && planningUnitList.filter(c => c.planningUnit.id == this.props.match.params.planningUnitId).length > 0) {
+                    planningUnitId = this.props.match.params.planningUnitId;
+                    event.target.value = this.props.match.params.planningUnitId;
                 } else if (localStorage.getItem("sesDatasetPlanningUnitId") != "" && planningUnitList.filter(c => c.planningUnit.id == localStorage.getItem("sesDatasetPlanningUnitId")).length > 0) {
                     planningUnitId = localStorage.getItem("sesDatasetPlanningUnitId");
                     event.target.value = localStorage.getItem("sesDatasetPlanningUnitId");
@@ -1333,6 +1346,9 @@ class CompareAndSelectScenario extends Component {
                 if (regionList.length == 1) {
                     regionId = regionList[0].regionId;
                     regionEvent.target.value = regionList[0].regionId;
+                } else if (this.props.match.params.regionId != "" && regionList.filter(c => c.regionId == this.props.match.params.regionId).length > 0) {
+                    regionId = this.props.match.params.regionId;
+                    regionEvent.target.value = this.props.match.params.regionId;
                 } else if (localStorage.getItem("sesDatasetRegionId") != "" && regionList.filter(c => c.regionId == localStorage.getItem("sesDatasetRegionId")).length > 0) {
                     regionId = localStorage.getItem("sesDatasetRegionId");
                     regionEvent.target.value = localStorage.getItem("sesDatasetRegionId");
@@ -1972,8 +1988,8 @@ class CompareAndSelectScenario extends Component {
                                                         <td align="center"></td>
                                                     </tr> */}
                                                     {this.state.treeScenarioList.map((item, idx) => (
-                                                        <tr id="addr0" style={{ backgroundColor: item.readonly ? "#CFCDC9" : this.state.selectedTreeScenarioId == item.id?"#d1e3f5":"" }}>
-                                                            <td align="center"><input style={{width:"100%",height:"1.5em"}}type="radio" id="selectAsForecast" name="selectAsForecast" checked={this.state.selectedTreeScenarioId == item.id ? true : false} onClick={() => this.scenarioOrderChanged(item.id)} disabled={item.readonly}></input></td>
+                                                        <tr id="addr0" style={{ backgroundColor: item.readonly ? "#CFCDC9" : this.state.selectedTreeScenarioId == item.id ? "#d1e3f5" : "" }}>
+                                                            <td align="center"><input style={{ width: "100%", height: "1.5em" }} type="radio" id="selectAsForecast" name="selectAsForecast" checked={this.state.selectedTreeScenarioId == item.id ? true : false} onClick={() => this.scenarioOrderChanged(item.id)} disabled={item.readonly}></input></td>
                                                             <td align="center"><input type="checkbox" id={"scenarioCheckbox" + item.id} checked={item.checked} onChange={() => this.scenarioCheckedChanged(item.id)} disabled={item.readonly} /></td>
                                                             <td align="center" >{item.type == "T" ? i18n.t('static.forecastMethod.tree') : i18n.t('static.compareAndSelect.cons')}</td>
                                                             <td><i class="fa fa-circle" style={{ color: item.color }} aria-hidden="true"></i> {" "}{item.type == "T" ? getLabelText(item.tree.label, this.state.lang) + " - " + getLabelText(item.scenario.label, this.state.lang) : getLabelText(item.scenario.extrapolationMethod.label, this.state.lang)}{"  "}{item.readonly && <i class="fa fa-exclamation-triangle"></i>}</td>

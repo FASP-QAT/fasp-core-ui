@@ -105,7 +105,7 @@ export default class RealmCountryPlanningUnitList extends Component {
         document.getElementById('div2').style.display = 'block';
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
-        }, 8000);
+        }, 30000);
     }
 
     addRow = function () {
@@ -778,7 +778,7 @@ export default class RealmCountryPlanningUnitList extends Component {
                     type: 'numeric',
                     textEditor: true,
                     decimal: '.',
-                    mask: '#,##.000000',
+                    mask: '#,##0.000000',
                     disabledMaskOnEdition: true
 
                 },

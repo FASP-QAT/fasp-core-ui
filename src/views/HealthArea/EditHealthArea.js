@@ -127,7 +127,7 @@ export default class EditHealthAreaComponent extends Component {
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
-        }, 8000);
+        }, 30000);
     }
 
 

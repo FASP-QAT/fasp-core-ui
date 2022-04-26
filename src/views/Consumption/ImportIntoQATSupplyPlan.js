@@ -86,6 +86,8 @@ export default class ImportIntoQATSupplyPlan extends Component {
             planningUnitListJexcel: [],
             forecastProgramVersionId: '',
             planningUnitList: [],
+            selSource1: [],
+            selSource2: [],
 
             // step2
             stepTwoData: [],
@@ -101,12 +103,20 @@ export default class ImportIntoQATSupplyPlan extends Component {
         this.removeMessageText = this.removeMessageText.bind(this);
         this.updateStepOneData = this.updateStepOneData.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
+
+        this.redirectToDashboard = this.redirectToDashboard.bind(this);
+
+    }
+
+    redirectToDashboard() {
+        let id = AuthenticationService.displayDashboardBasedOnRole();
+        this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/green/' + i18n.t('static.importIntoQATSupplyPlan.importIntoQATSupplyPlanSuccess'))
     }
 
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
-        }, 8000);
+        }, 30000);
     }
 
     updateStepOneData(key, value) {
@@ -257,7 +267,7 @@ export default class ImportIntoQATSupplyPlan extends Component {
                                         <StepTwoImport ref='countryChild' finishedStepTwo={this.finishedStepTwo} updateStepOneData={this.updateStepOneData} previousToStepOne={this.previousToStepOne} items={this.state}></StepTwoImport>
                                     </div>
                                     <div id="stepThreeImport">
-                                        <StepThreeImport ref="child" message={i18n.t(this.state.message)} updateStepOneData={this.updateStepOneData} previousToStepTwo={this.previousToStepTwo} finishedStepThree={this.finishedStepThree} removeMessageText={this.removeMessageText} hideSecondComponent={this.hideSecondComponent} items={this.state} {...this.props}></StepThreeImport>
+                                        <StepThreeImport ref="child" message={i18n.t(this.state.message)} updateStepOneData={this.updateStepOneData} previousToStepTwo={this.previousToStepTwo} finishedStepThree={this.finishedStepThree} removeMessageText={this.removeMessageText} hideSecondComponent={this.hideSecondComponent} redirectToDashboard={this.redirectToDashboard} items={this.state} {...this.props}></StepThreeImport>
                                         {/* <FormGroup className="mt-2">
                                             <Button color="success" size="md" className="float-right mr-1" type="button" onClick={this.finishedStepThree}> <i className="fa fa-check"></i>Import</Button>
                                             &nbsp;

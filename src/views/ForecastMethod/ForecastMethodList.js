@@ -64,7 +64,7 @@ class forecastMethod extends Component {
         document.getElementById('div2').style.display = 'block';
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
-        }, 8000);
+        }, 30000);
     }
 
     componentWillUnmount() {
@@ -1030,7 +1030,7 @@ class forecastMethod extends Component {
                         <Col xs="12" sm="12">
                             {/* <h5 className="red" >{i18n.t('static.common.customWarningMessage')}</h5> */}
                             {/* <h5>{i18n.t('static.common.customWarningMessage')}</h5> */}
-                            <h5>{i18n.t("static.placeholder.placeholder")}</h5>
+                            <h5>{i18n.t("static.placeholder.forecastMethod")}</h5>
                             <div id="paputableDiv" style={{ display: this.state.loading ? "none" : "block", marginTop: '-13px' }} className={(AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_FORECAST_METHOD') || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_FORECAST_METHOD')) ? "RowClickable" : "jexcelremoveReadonlybackground"}>
                             </div>
                             <div style={{ display: this.state.loading ? "block" : "none" }}>

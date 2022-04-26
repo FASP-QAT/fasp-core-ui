@@ -266,6 +266,8 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                                     },
                                     "month": map1.get("3"),
                                     "amount": parseInt(this.el.getValue(`E${parseInt(i) + 1}`, true).toString().replaceAll(",", "")),
+                                    "adjustedAmount": parseInt(this.el.getValue(`E${parseInt(i) + 1}`, true).toString().replaceAll(",", "")),
+                                    "puAmount": parseInt(this.el.getValue(`E${parseInt(i) + 1}`, true).toString().replaceAll(",", "")),
                                     "reportingRate": null,
                                     "daysOfStockOut": null,
                                     "exclude": false,
@@ -395,6 +397,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                                 this.setState({
                                     isChanged1: false
                                 })
+                                localStorage.setItem("sesDatasetId", program.id);
 
                                 // this.props.history.push(`/importFromQATSupplyPlan/listImportFromQATSupplyPlan/` + 'green/' + i18n.t('static.mt.dataUpdateSuccess'))
                                 // this.props.history.push(`/dataentry/consumptionDataEntryAndAdjustment`)

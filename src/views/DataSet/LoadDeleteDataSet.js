@@ -175,7 +175,7 @@ class LoadDeleteDataSet extends Component {
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
-        }, 8000);
+        }, 30000);
     }
 
     hideFirstComponent() {
@@ -183,7 +183,7 @@ class LoadDeleteDataSet extends Component {
         clearTimeout(this.state.timeout);
         this.state.timeout = setTimeout(function () {
             document.getElementById('div1').style.display = 'none';
-        }, 8000);
+        }, 30000);
 
     }
 
@@ -712,7 +712,8 @@ class LoadDeleteDataSet extends Component {
                                                                                     <span className="">
                                                                                         <div className="checkbox m-0">
                                                                                             <input type="checkbox" name="programCheckBox" value={item2.program.id} id={"checkbox_".concat(item.realmCountry.id).concat(item2.program.id).concat(".0")} onChange={() => this.programCheckboxChecked(item2.program.id)} />
-                                                                                            <label className={this.state.programList.filter(c => c.programId == item2.program.id && c.versionId == Math.max.apply(Math, item2.versionList.map(function (o) { return o.versionId; }))).length > 0 ? "greenColor" : this.state.programList.filter(c => c.programId == item2.program.id).length > 0 ? "redColor" : ""} htmlFor={"checkbox_".concat(item.realmCountry.id).concat(item2.program.id).concat(".0")}>{getLabelText(item2.program.label, this.state.lang)}</label>
+                                                                                            <label className={this.state.programList.filter(c => c.programId == item2.program.id && c.versionId == Math.max.apply(Math, item2.versionList.map(function (o) { return o.versionId; }))).length > 0 ? "greenColor" : this.state.programList.filter(c => c.programId == item2.program.id).length > 0 ? "redColor" : ""} htmlFor={"checkbox_".concat(item.realmCountry.id).concat(item2.program.id).concat(".0")}>{getLabelText(item2.program.label, this.state.lang) + ' - ('}{item2.program.code+')'}</label>
+                                                                                            {/* <label className={this.state.programList.filter(c => c.programId == item2.program.id && c.versionId == Math.max.apply(Math, item2.versionList.map(function (o) { return o.versionId; }))).length > 0 ? "greenColor" : this.state.programList.filter(c => c.programId == item2.program.id).length > 0 ? "redColor" : ""} htmlFor={"checkbox_".concat(item.realmCountry.id).concat(item2.program.id).concat(".0")}>{item2.program.code}</label> */}
                                                                                             {/* /{this.state.programList.filter(c => c.programId == item2.program.id).length > 1 && <img width="15" title="Clean up" src={cleanUp} onClick={() => this.deleteLocalVersionUsingProgramId(item2.program.id)} className="ml-1 CleanUpIcon"></img>} */}
                                                                                         </div>
                                                                                     </span>

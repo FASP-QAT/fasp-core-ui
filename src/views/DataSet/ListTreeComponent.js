@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import DatasetService from '../../api/DatasetService.js';
 import AuthenticationService from '../Common/AuthenticationService.js';
-import { Card, CardHeader, CardBody, Button, Col, FormGroup, Label, InputGroup, Input, Modal, ModalBody, ModalFooter, ModalHeader, CardFooter, FormFeedback, Form } from 'reactstrap';
+import { Card, CardHeader, CardBody, Button, Col, FormGroup, Label, InputGroup, Input, Modal, ModalBody, ModalFooter, ModalHeader, CardFooter, FormFeedback, ButtonDropdown, DropdownItem, DropdownMenu, DropdownToggle, Form } from 'reactstrap';
 import getLabelText from '../../CommonComponent/getLabelText'
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 import jexcel from 'jexcel-pro';
@@ -109,6 +109,8 @@ export default class ListTreeComponent extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            treeEl: '',
+            dropdownOpen: new Array(19).fill(false),
             isSubmitClicked: false,
             missingPUList: [],
             treeTemplate: '',
@@ -142,6 +144,7 @@ export default class ListTreeComponent extends Component {
             realmCountryId: '',
             datasetIdModal: ''
         }
+        this.toggleDeropdownSetting = this.toggleDeropdownSetting.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
         this.buildJexcel = this.buildJexcel.bind(this);
         this.buildTree = this.buildTree.bind(this);
@@ -445,6 +448,9 @@ export default class ListTreeComponent extends Component {
             var tempArray = [];
             var tempJson = {};
             var tempTree = {};
+            // var curMonth = moment(new Date()).format('YYYY-MM-DD');
+            // console
+            var curMonth = moment(program.programData.currentVersion.forecastStartDate).format('YYYY-MM-DD');
             var treeTemplateId = document.getElementById('templateId').value;
             console.log("treeTemplateId===", treeTemplateId);
             if (treeTemplateId != "" && treeTemplateId != 0) {
@@ -454,9 +460,40 @@ export default class ListTreeComponent extends Component {
                 for (let i = 0; i < flatList.length; i++) {
                     nodeDataMap = {};
                     tempArray = [];
+                    if (flatList[i].payload.nodeDataMap[0][0].nodeDataModelingList.length > 0) {
+                        for (let j = 0; j < flatList[i].payload.nodeDataMap[0][0].nodeDataModelingList.length; j++) {
+                            var modeling = (flatList[i].payload.nodeDataMap[0][0].nodeDataModelingList)[j];
+                            // var startMonthNoModeling = modeling.startDateNo < 0 ? modeling.startDateNo : parseInt(modeling.startDateNo - 1);
+                            // var stopMonthNoModeling = modeling.stopDateNo < 0 ? modeling.stopDateNo : parseInt(modeling.stopDateNo - 1)
+                            var startMonthNoModeling = modeling.startDateNo < 0 ? modeling.startDateNo : parseInt(modeling.startDateNo);
+                            console.log("startMonthNoModeling---", startMonthNoModeling);
+                            modeling.startDate = moment(curMonth).startOf('month').add(startMonthNoModeling, 'months').format("YYYY-MM-DD");
+                            var stopMonthNoModeling = modeling.stopDateNo < 0 ? modeling.stopDateNo : parseInt(modeling.stopDateNo)
+                            console.log("stopMonthNoModeling---", stopMonthNoModeling);
+                            modeling.stopDate = moment(curMonth).startOf('month').add(stopMonthNoModeling, 'months').format("YYYY-MM-DD");
+
+
+                            console.log("modeling---", modeling);
+                            (flatList[i].payload.nodeDataMap[0][0].nodeDataModelingList)[j] = modeling;
+                        }
+                    }
+                    // if (flatList[i].payload.nodeDataMap[0][0].nodeDataMomList.length > 0) {
+                    //     for (let j = 0; j < flatList[i].payload.nodeDataMap[0][0].nodeDataMomList.length; j++) {
+                    //         var mom = (flatList[i].payload.nodeDataMap[0][0].nodeDataMomList)[j];
+                    //         var stopMonthNoMom = mom.monthNo < 0 ? mom.monthNo : parseInt(mom.monthNo)
+                    //         console.log("stopMonthNoMom---", stopMonthNoMom);
+                    //         mom.month = moment(curMonth).startOf('month').add(stopMonthNoMom, 'months').format("YYYY-MM-DD");
+                    //         (flatList[i].payload.nodeDataMap[0][0].nodeDataMomList)[j] = mom;
+                    //     }
+                    // }
                     // var nodeDataMap[1] = flatList.payload.nodeDataMap[0][0];
                     console.log("flatList[i]---", flatList[i]);
                     tempJson = flatList[i].payload.nodeDataMap[0][0];
+                    if (flatList[i].payload.nodeType.id != 1) {
+                        console.log("month from tree template---", flatList[i].payload.nodeDataMap[0][0].monthNo + " cur month---", curMonth + " final result---", moment(curMonth).startOf('month').add(flatList[i].payload.nodeDataMap[0][0].monthNo, 'months').format("YYYY-MM-DD"))
+                        var monthNo = flatList[i].payload.nodeDataMap[0][0].monthNo < 0 ? flatList[i].payload.nodeDataMap[0][0].monthNo : parseInt(flatList[i].payload.nodeDataMap[0][0].monthNo)
+                        tempJson.month = moment(curMonth).startOf('month').add(monthNo, 'months').format("YYYY-MM-DD");
+                    }
                     tempArray.push(tempJson);
                     nodeDataMap[1] = tempArray;
                     flatList[i].payload.nodeDataMap = nodeDataMap;
@@ -796,7 +833,9 @@ export default class ListTreeComponent extends Component {
     }
 
     onTemplateChange(event) {
-        if (event.target.value == 0) {
+        console.log("event.target.value", event.target.value)
+        if (event.target.value == 0 && event.target.value != "") {
+            console.log("inside if----")
             this.setState({
                 treeTemplate: '',
                 treeFlag: false,
@@ -824,6 +863,7 @@ export default class ListTreeComponent extends Component {
             });
             // this.buildTree();
         } else if (event.target.value != 0 && event.target.value != "") {
+            console.log("inside else----")
             console.log("id--->>>", this.state.datasetIdModal);
             var treeTemplate = this.state.treeTemplateList.filter(x => x.treeTemplateId == event.target.value)[0];
             console.log("treeTemplate---", treeTemplate)
@@ -836,7 +876,7 @@ export default class ListTreeComponent extends Component {
                 regionId: '',
                 regionList: [],
                 regionValues: [],
-                notes: '',
+                notes: treeTemplate.notes,
                 treeTemplate,
                 missingPUList: []
             }, () => {
@@ -1043,12 +1083,13 @@ export default class ListTreeComponent extends Component {
                         items.push({
                             title: i18n.t('static.common.duplicateTree'),
                             onclick: function () {
+                                console.log("tree name---", this.el.getValueFromCoords(2, y))
                                 this.setState({
-                                    programId: this.el.getValueFromCoords(7, y),
-                                    versionId: this.el.getValueFromCoords(9, y),
-                                    treeId: this.el.getValueFromCoords(0, y),
+                                    programId: this.state.treeEl.getValueFromCoords(7, y),
+                                    versionId: this.state.treeEl.getValueFromCoords(9, y),
+                                    treeId: this.state.treeEl.getValueFromCoords(0, y),
                                     isModalOpen: !this.state.isModalOpen,
-                                    treeName: this.el.getValueFromCoords(2, y) + " (copy)",
+                                    treeName: this.state.treeEl.getValueFromCoords(2, y) + " (copy)",
                                     treeFlag: true,
                                     treeTemplate: ''
                                 })
@@ -1069,12 +1110,12 @@ export default class ListTreeComponent extends Component {
     hideSecondComponent() {
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
-        }, 8000);
+        }, 30000);
     }
     hideFirstComponent() {
         this.timeout = setTimeout(function () {
             document.getElementById('div1').style.display = 'none';
-        }, 8000);
+        }, 30000);
     }
     componentWillUnmount() {
         clearTimeout(this.timeout);
@@ -1174,6 +1215,12 @@ export default class ListTreeComponent extends Component {
     //     }
 
     // }
+    toggleDeropdownSetting(i) {
+        const newArray = this.state.dropdownOpen.map((element, index) => { return (index === i ? !element : false); });
+        this.setState({
+            dropdownOpen: newArray,
+        });
+    }
 
     render() {
         const { datasetList } = this.state;
@@ -1238,7 +1285,7 @@ export default class ListTreeComponent extends Component {
                                                             className="addtreebg"
                                                             onChange={(e) => { this.onTemplateChange(e) }}
                                                         >
-                                                            <option value="" disabled selected hidden>Select</option>
+                                                            <option value="">Select</option>
                                                             {/* <option value="">{i18n.t('static.tree.+AddTree')}</option> */}
                                                             <option value="0">+ {i18n.t('static.tree.blank')}</option>
                                                             {treeTemplates}
@@ -1247,6 +1294,15 @@ export default class ListTreeComponent extends Component {
                                                 </div>
                                             </FormGroup>
                                             // </Col>
+                                            //     <ButtonDropdown isOpen={this.state.dropdownOpen[0]} toggle={() => { this.toggleDeropdownSetting(0); }}>
+                                            //     <DropdownToggle caret >
+                                            //       Select
+                                            //     </DropdownToggle>
+                                            //     <DropdownMenu right>
+                                            //       <DropdownItem  onclick={(e) => { this.onTemplateChange(e) }}>+ {i18n.t('static.tree.blank')}</DropdownItem>
+                                            //     <DropdownItem  onclick={(e) => { this.onTemplateChange(e) }}> {treeTemplates}</DropdownItem>
+                                            //     </DropdownMenu>
+                                            //   </ButtonDropdown>
                                         }
                                         {/* {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_LIST_REALM_COUNTRY') &&
                                             <FormGroup className="tab-ml-1 mt-md-1 mb-md-0 ">
@@ -1320,7 +1376,7 @@ export default class ListTreeComponent extends Component {
                     </CardBody>
 
                     <Modal isOpen={this.state.isModalOpen}
-                        className={'modal-md ' + this.props.className}>
+                        className={'modal-lg ' + this.props.className}>
                         <ModalHeader>
                             <strong>Tree Details</strong>
                             <Button size="md" onClick={this.modelOpenClose} color="danger" style={{ paddingTop: '0px', paddingBottom: '0px', paddingLeft: '3px', paddingRight: '3px' }} className="submitBtn float-right mr-1"> <i className="fa fa-times"></i></Button>
@@ -1367,62 +1423,64 @@ export default class ListTreeComponent extends Component {
                                         }) => (
                                             <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='modalForm' autocomplete="off">
                                                 {/* <CardBody> */}
-                                                <div className="row">
+                                                <div className="col-md-12">
                                                     <Input type="hidden"
                                                         name="treeFlag"
                                                         id="treeFlag"
                                                         value={this.state.treeFlag}
                                                     />
-                                                    <div style={{ display: this.state.treeFlag ? "none" : "block" }} className="col-md-12">
-                                                        <FormGroup className="col-md-12">
-                                                            <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}<span className="red Reqasterisk">*</span></Label>
-                                                            <div className="controls">
+                                                    <div style={{ display: this.state.treeFlag ? "none" : "block" }} className="">
+                                                        <div className='row'>
+                                                            <FormGroup className="col-md-6">
+                                                                <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}<span className="red Reqasterisk">*</span></Label>
+                                                                <div className="controls">
 
-                                                                <Input
-                                                                    type="select"
-                                                                    name="datasetIdModal"
-                                                                    id="datasetIdModal"
-                                                                    bsSize="sm"
-                                                                    valid={!errors.datasetIdModal && this.state.datasetIdModal != null ? this.state.datasetIdModal : '' != ''}
-                                                                    invalid={touched.datasetIdModal && !!errors.datasetIdModal}
-                                                                    onBlur={handleBlur}
-                                                                    onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                                    value={this.state.datasetIdModal}
-                                                                >
-                                                                    <option value="">{"Please select program"}</option>
-                                                                    {datasets}
-                                                                </Input>
-                                                                <FormFeedback>{errors.datasetIdModal}</FormFeedback>
-                                                            </div>
+                                                                    <Input
+                                                                        type="select"
+                                                                        name="datasetIdModal"
+                                                                        id="datasetIdModal"
+                                                                        bsSize="sm"
+                                                                        valid={!errors.datasetIdModal && this.state.datasetIdModal != null ? this.state.datasetIdModal : '' != ''}
+                                                                        invalid={touched.datasetIdModal && !!errors.datasetIdModal}
+                                                                        onBlur={handleBlur}
+                                                                        onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                                        value={this.state.datasetIdModal}
+                                                                    >
+                                                                        <option value="">{"Please select program"}</option>
+                                                                        {datasets}
+                                                                    </Input>
+                                                                    <FormFeedback>{errors.datasetIdModal}</FormFeedback>
+                                                                </div>
 
-                                                        </FormGroup>
+                                                            </FormGroup>
 
-                                                        <FormGroup className="col-md-12">
-                                                            <Label htmlFor="currencyId">{i18n.t('static.forecastMethod.forecastMethod')}<span class="red Reqasterisk">*</span></Label>
-                                                            <div className="controls">
+                                                            <FormGroup className="col-md-6">
+                                                                <Label htmlFor="currencyId">{i18n.t('static.forecastMethod.forecastMethod')}<span class="red Reqasterisk">*</span></Label>
+                                                                <div className="controls">
 
-                                                                <Input
-                                                                    type="select"
-                                                                    name="forecastMethodId"
-                                                                    id="forecastMethodId"
-                                                                    bsSize="sm"
-                                                                    valid={!errors.forecastMethodId && this.state.forecastMethod.id != null ? this.state.forecastMethod.id : '' != ''}
-                                                                    invalid={touched.forecastMethodId && !!errors.forecastMethodId}
-                                                                    onBlur={handleBlur}
-                                                                    onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                                    required
-                                                                    value={this.state.forecastMethod.id}
-                                                                >
-                                                                    <option value="">{i18n.t('static.common.forecastmethod')}</option>
-                                                                    {forecastMethods}
-                                                                </Input>
-                                                                <FormFeedback>{errors.forecastMethodId}</FormFeedback>
-                                                            </div>
+                                                                    <Input
+                                                                        type="select"
+                                                                        name="forecastMethodId"
+                                                                        id="forecastMethodId"
+                                                                        bsSize="sm"
+                                                                        valid={!errors.forecastMethodId && this.state.forecastMethod.id != null ? this.state.forecastMethod.id : '' != ''}
+                                                                        invalid={touched.forecastMethodId && !!errors.forecastMethodId}
+                                                                        onBlur={handleBlur}
+                                                                        onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                                        required
+                                                                        value={this.state.forecastMethod.id}
+                                                                    >
+                                                                        <option value="">{i18n.t('static.common.forecastmethod')}</option>
+                                                                        {forecastMethods}
+                                                                    </Input>
+                                                                    <FormFeedback>{errors.forecastMethodId}</FormFeedback>
+                                                                </div>
 
-                                                        </FormGroup>
+                                                            </FormGroup>
+                                                        </div>
                                                     </div>
-                                                    <div className="col-md-12">
-                                                        <FormGroup className="col-md-12">
+                                                    <div className="row">
+                                                        <FormGroup className={this.state.treeFlag ? "col-md-12" : "col-md-6"}>
                                                             <Label for="number1">Tree Name<span className="red Reqasterisk">*</span></Label>
                                                             <div className="controls">
                                                                 <Input type="text"
@@ -1440,9 +1498,7 @@ export default class ListTreeComponent extends Component {
                                                             </div>
 
                                                         </FormGroup>
-                                                    </div>
-                                                    <div style={{ display: this.state.treeFlag ? "none" : "block" }} className="col-md-12">
-                                                        <FormGroup className="col-md-12">
+                                                        <FormGroup className="col-md-6" style={{ display: this.state.treeFlag ? "none" : "block" }} >
                                                             <Label htmlFor="currencyId">{i18n.t('static.region.region')}<span class="red Reqasterisk">*</span></Label>
                                                             <div className="controls">
                                                                 <Select
@@ -1465,62 +1521,66 @@ export default class ListTreeComponent extends Component {
                                                             </div>
 
                                                         </FormGroup>
-                                                        <FormGroup className="col-md-12">
-                                                            <Label htmlFor="currencyId">{i18n.t('static.common.note')}</Label>
-                                                            <div className="controls">
-                                                                <Input type="textarea"
-                                                                    id="notes"
-                                                                    name="notes"
-                                                                    onChange={(e) => { this.dataChange(e) }}
-                                                                    value={this.state.notes}
-                                                                ></Input>
-                                                            </div>
+                                                    </div>
+                                                    <div style={{ display: this.state.treeFlag ? "none" : "block" }} >
+                                                        <div className='row'>
+                                                            <FormGroup className="col-md-6">
+                                                                <Label htmlFor="currencyId">{i18n.t('static.common.note')}</Label>
+                                                                <div className="controls">
+                                                                    <Input type="textarea"
+                                                                        id="notes"
+                                                                        name="notes"
+                                                                        onChange={(e) => { this.dataChange(e) }}
+                                                                        value={this.state.notes}
+                                                                    ></Input>
+                                                                </div>
 
-                                                        </FormGroup>
-                                                        <FormGroup className="col-md-12">
-                                                            <Label className="P-absltRadio">{i18n.t('static.common.status')}</Label>
-                                                            <FormGroup check inline>
-                                                                <Input
-                                                                    className="form-check-input"
-                                                                    type="radio"
-                                                                    id="active10"
-                                                                    name="active"
-                                                                    value={true}
-                                                                    checked={this.state.active === true}
-                                                                    onChange={(e) => { this.dataChange(e) }}
-                                                                />
-                                                                <Label
-                                                                    className="form-check-label"
-                                                                    check htmlFor="inline-radio1">
-                                                                    {i18n.t('static.common.active')}
-                                                                </Label>
                                                             </FormGroup>
-                                                            <FormGroup check inline>
-                                                                <Input
-                                                                    className="form-check-input"
-                                                                    type="radio"
-                                                                    id="active11"
-                                                                    name="active"
-                                                                    value={false}
-                                                                    checked={this.state.active === false}
-                                                                    onChange={(e) => { this.dataChange(e) }}
-                                                                />
-                                                                <Label
-                                                                    className="form-check-label"
-                                                                    check htmlFor="inline-radio2">
-                                                                    {i18n.t('static.common.disabled')}
-                                                                </Label>
+                                                            <FormGroup className="col-md-6 mt-lg-4">
+                                                                <Label className="P-absltRadio">{i18n.t('static.common.status')}</Label>
+                                                                <FormGroup check inline>
+                                                                    <Input
+                                                                        className="form-check-input"
+                                                                        type="radio"
+                                                                        id="active10"
+                                                                        name="active"
+                                                                        value={true}
+                                                                        checked={this.state.active === true}
+                                                                        onChange={(e) => { this.dataChange(e) }}
+                                                                    />
+                                                                    <Label
+                                                                        className="form-check-label"
+                                                                        check htmlFor="inline-radio1">
+                                                                        {i18n.t('static.common.active')}
+                                                                    </Label>
+                                                                </FormGroup>
+                                                                <FormGroup check inline>
+                                                                    <Input
+                                                                        className="form-check-input"
+                                                                        type="radio"
+                                                                        id="active11"
+                                                                        name="active"
+                                                                        value={false}
+                                                                        checked={this.state.active === false}
+                                                                        onChange={(e) => { this.dataChange(e) }}
+                                                                    />
+                                                                    <Label
+                                                                        className="form-check-label"
+                                                                        check htmlFor="inline-radio2">
+                                                                        {i18n.t('static.common.disabled')}
+                                                                    </Label>
+                                                                </FormGroup>
                                                             </FormGroup>
-                                                        </FormGroup>
+                                                        </div>
                                                     </div>
 
-                                                    <div className="col-md-12" style={{ display: 'inline-block' }}>
-                                                        <div style={{ display: this.state.missingPUList.length > 0 ? 'block' : 'none' }}><div><b>Missing Planning Units:(<a href="/#/planningUnitSetting/listPlanningUnitSetting" className="supplyplanformulas">Update Planning Units</a>)</b></div><br />
+                                                    <div className="col-md-12 pl-lg-0 pr-lg-0" style={{ display: 'inline-block' }}>
+                                                        <div style={{ display: this.state.missingPUList.length > 0 && !this.state.treeFlag ? 'block' : 'none' }}><div><b>Missing Planning Units : (<a href="/#/planningUnitSetting/listPlanningUnitSetting" className="supplyplanformulas">Update Planning Units</a>)</b></div><br />
                                                             <div id="missingPUJexcel" className="RowClickable">
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <FormGroup className="col-md-12 float-right pt-lg-4">
+                                                    <FormGroup className="col-md-12 float-right pt-lg-4 pr-lg-0">
                                                         <Button type="button" color="danger" className="mr-1 float-right" size="md" onClick={this.modelOpenClose}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                                         <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                                         &nbsp;

@@ -96,7 +96,8 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                             stopDateNo: hasTransferNodeIdList[tnl].stopDateNo,
                             transferNodeDataId: -1,
                             nodeDataId: hasTransferNodeIdList[tnl].transferNodeDataId,
-                            transferFromNodeDataId: flatList[fl].id
+                            transferFromNodeDataId: flatList[fl].id,
+                            increaseDecrease: 1
                         })
                     }
 
@@ -149,6 +150,7 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                 }
             }
         }
+        var overallTransferList = [];
         // console.log("sortedFlatList###", sortedFlatList);
         flatList = sortedFlatList.concat(flatList.filter(c => c.payload.nodeType.id == 1)).concat(flatList.filter(c => c.payload.nodeType.id != 1 && !sortedFlatListId.includes(c.id)));
         console.log("FlatList$$$###", flatList);
@@ -202,119 +204,219 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                         var difference = 0;
                         var differenceWMC = 0;
                         var transferNodeValue = 0;
+                        var endValue = Number(startValue);
+                        var endValueWMC = Number(startValue);
+                        var transfer = 0;
+                        var transferWMC = 0;
                         // console.log("nodeDataModelingList****", nodeDataModelingList);
                         for (var ndml = 0; ndml < nodeDataModelingList.length; ndml++) {
                             var nodeDataModeling = nodeDataModelingList[ndml];
+                            var nodeDataModelingValue = nodeDataModeling.increaseDecrease == 1 ? nodeDataModeling.dataValue : 0 - nodeDataModeling.dataValue;
                             //Linear number
-                            if (nodeDataModeling.modelingType.id == 2) {
-                                // console.log("modeling datavalue 2---", nodeDataModeling.dataValue)
-                                difference += Number(nodeDataModeling.dataValue);
-                                differenceWMC += Number(nodeDataModeling.dataValue);
+                            if (nodeDataModeling.modelingType.id == 2 || nodeDataModeling.modelingType.id == 5) {
+                                if (nodeDataModeling.transferNodeDataId > 0) {
+                                    transfer += Number(nodeDataModelingValue);
+                                    transferWMC += Number(nodeDataModelingValue);
+                                    if (endValue + Number(nodeDataModelingValue) >= 0) {
+                                        endValue += Number(nodeDataModelingValue);
+                                        endValueWMC += Number(nodeDataModelingValue);
+                                        difference += Number(nodeDataModelingValue);
+                                        differenceWMC += Number(nodeDataModelingValue);
+                                        overallTransferList.push({ month: moment(curDate).format("YYYY-MM-DD"), transfer: Number(transfer), transferWMC: Number(transferWMC), transferFromNodeDataId: flatList[fl].id, transferToNodeDataId: nodeDataModeling.transferNodeDataId, nodeDataModelingId: nodeDataModeling.nodeDataModelingId });
+                                    } else {
+                                        difference += Number(nodeDataModelingValue);
+                                        differenceWMC += Number(nodeDataModelingValue);
+                                        overallTransferList.push({ month: moment(curDate).format("YYYY-MM-DD"), transfer: Number(0 - Number(endValue)), transferWMC: Number(0 - Number(endValueWMC)), transferFromNodeDataId: flatList[fl].id, transferToNodeDataId: nodeDataModeling.transferNodeDataId, nodeDataModelingId: nodeDataModeling.nodeDataModelingId });
+                                        endValue = 0;
+                                        endValueWMC = 0;
+                                    }
+                                } else if (nodeDataModeling.transferNodeDataId == -1) {
+                                    var overallFilter = overallTransferList.filter(c => moment(c.month).format("YYYY-MM") == moment(curDate).format("YYYY-MM") && c.nodeDataModelingId == nodeDataModeling.nodeDataModelingId && c.transferFromNodeDataId == nodeDataModeling.transferFromNodeDataId && c.transferToNodeDataId == nodeDataModeling.nodeDataId);
+                                    if (overallFilter.length > 0) {
+                                        difference += Number(0 - overallFilter[0].transfer);
+                                        differenceWMC += Number(0 - overallFilter[0].transferWMC);
+                                        endValue += Number(0 - overallFilter[0].transfer);
+                                        endValueWMC += Number(0 - overallFilter[0].transferWMC);
+                                    }
+                                } else {
+                                    difference += Number(nodeDataModelingValue);
+                                    differenceWMC += Number(nodeDataModelingValue);
+                                    endValue += Number(nodeDataModelingValue);
+                                    endValueWMC += Number(nodeDataModelingValue);
+                                }
+
                             }
                             //Linear %
                             else if (nodeDataModeling.modelingType.id == 3) {
-                                if (nodeDataModeling.transferFromNodeDataId != undefined && nodeDataModeling.transferFromNodeDataId != null && nodeDataModeling.transferFromNodeDataId != "") {
-                                    var transferFromNodeData = flatList.filter(c => c.id == nodeDataModeling.transferFromNodeDataId);
-                                    var transferFromNodeDataMapForScenario = (transferFromNodeData[0].payload.nodeDataMap[scenarioList[ndm].id])[0];
-                                    var transferFromNodeMomList = transferFromNodeDataMapForScenario.nodeDataModelingList;
-                                    var dv = 0;
-                                    var dvWMC = 0;
-                                    if (moment(transferFromNodeDataMapForScenario.month).format("YYYY-MM-DD") == moment(nodeDataModeling.startDate).format("YYYY-MM-DD")) {
-                                        if (transferFromNodeDataMapForScenario.calculatedDataValue == null || payload.nodeType.id != 2) {
-                                            // console.log("modeling datavalue 3---", transferFromNodeDataMapForScenario.dataValue)
-                                            dv = transferFromNodeDataMapForScenario.dataValue;
-                                            dvWMC = transferFromNodeDataMapForScenario.dataValue;
-                                        } else {
-                                            dv = transferFromNodeDataMapForScenario.calculatedDataValue;
-                                            dvWMC = transferFromNodeDataMapForScenario.calculatedDataValue;
-                                        }
+                                // if (nodeDataModeling.transferFromNodeDataId != undefined && nodeDataModeling.transferFromNodeDataId != null && nodeDataModeling.transferFromNodeDataId != "") {
+                                //     var transferFromNodeData = flatList.filter(c => c.id == nodeDataModeling.transferFromNodeDataId);
+                                //     var transferFromNodeDataMapForScenario = (transferFromNodeData[0].payload.nodeDataMap[scenarioList[ndm].id])[0];
+                                //     var transferFromNodeMomList = transferFromNodeDataMapForScenario.nodeDataModelingList;
+                                //     var dv = 0;
+                                //     var dvWMC = 0;
+                                //     if (moment(transferFromNodeDataMapForScenario.month).format("YYYY-MM-DD") == moment(nodeDataModeling.startDate).format("YYYY-MM-DD")) {
+                                //         if (transferFromNodeDataMapForScenario.calculatedDataValue == null || payload.nodeType.id != 2) {
+                                //             // console.log("modeling datavalue 3---", transferFromNodeDataMapForScenario.dataValue)
+                                //             dv = transferFromNodeDataMapForScenario.dataValue;
+                                //             dvWMC = transferFromNodeDataMapForScenario.dataValue;
+                                //         } else {
+                                //             dv = transferFromNodeDataMapForScenario.calculatedDataValue;
+                                //             dvWMC = transferFromNodeDataMapForScenario.calculatedDataValue;
+                                //         }
+                                //     } else {
+                                //         var dataLstFiltered = transferFromNodeMomList.filter(c => moment(c.month).format("YYYY-MM-DD") == moment(nodeDataModeling.startDate).add(-1, 'months').format("YYYY-MM-DD"));
+                                //         if (dataLstFiltered.length > 0) {
+                                //             dv = (dataLstFiltered[0]).endValue;
+                                //             dvWMC = (dataLstFiltered[0]).endValueWMC;
+                                //         } else {
+                                //             dv = 0;
+                                //             dvWMC = 0;
+                                //         }
+                                //     }
+                                //     difference += Number((Number(dv) * Number(nodeDataModelingValue)) / 100);
+                                //     differenceWMC += Number((Number(dvWMC) * Number(nodeDataModelingValue)) / 100);
+                                // } else {
+                                var dv = 0;
+                                var dvWMC = 0;
+                                if (moment(nodeDataMapForScenario.month).format("YYYY-MM-DD") == moment(nodeDataModeling.startDate).format("YYYY-MM-DD")) {
+                                    if (nodeDataMapForScenario.calculatedDataValue == null || payload.nodeType.id != 2) {
+                                        // console.log("modeling datavalue 3---", nodeDataMapForScenario.dataValue)
+                                        dv = nodeDataMapForScenario.dataValue;
+                                        dvWMC = nodeDataMapForScenario.dataValue;
                                     } else {
-                                        var dataLstFiltered = transferFromNodeMomList.filter(c => moment(c.month).format("YYYY-MM-DD") == moment(nodeDataModeling.startDate).add(-1, 'months').format("YYYY-MM-DD"));
-                                        if (dataLstFiltered.length > 0) {
-                                            dv = (dataLstFiltered[0]).endValue;
-                                            dvWMC = (dataLstFiltered[0]).endValueWMC;
-                                        } else {
-                                            dv = 0;
-                                            dvWMC = 0;
-                                        }
+                                        dv = nodeDataMapForScenario.calculatedDataValue;
+                                        dvWMC = nodeDataMapForScenario.calculatedDataValue;
                                     }
-                                    difference += Number((Number(dv) * Number(nodeDataModeling.dataValue)) / 100);
-                                    differenceWMC += Number((Number(dvWMC) * Number(nodeDataModeling.dataValue)) / 100);
                                 } else {
-                                    var dv = 0;
-                                    var dvWMC = 0;
-                                    if (moment(nodeDataMapForScenario.month).format("YYYY-MM-DD") == moment(nodeDataModeling.startDate).format("YYYY-MM-DD")) {
-                                        if (nodeDataMapForScenario.calculatedDataValue == null || payload.nodeType.id != 2) {
-                                            // console.log("modeling datavalue 3---", nodeDataMapForScenario.dataValue)
-                                            dv = nodeDataMapForScenario.dataValue;
-                                            dvWMC = nodeDataMapForScenario.dataValue;
-                                        } else {
-                                            dv = nodeDataMapForScenario.calculatedDataValue;
-                                            dvWMC = nodeDataMapForScenario.calculatedDataValue;
-                                        }
+                                    var dataLstFiltered = nodeDataList.filter(c => moment(c.month).format("YYYY-MM-DD") == moment(nodeDataModeling.startDate).add(-1, 'months').format("YYYY-MM-DD"));
+                                    if (dataLstFiltered.length > 0) {
+                                        dv = (dataLstFiltered[0]).endValue;
+                                        dvWMC = (dataLstFiltered[0]).endValueWMC;
                                     } else {
-                                        var dataLstFiltered = nodeDataList.filter(c => moment(c.month).format("YYYY-MM-DD") == moment(nodeDataModeling.startDate).add(-1, 'months').format("YYYY-MM-DD"));
-                                        if (dataLstFiltered.length > 0) {
-                                            dv = (dataLstFiltered[0]).endValue;
-                                            dvWMC = (dataLstFiltered[0]).endValueWMC;
-                                        } else {
-                                            dv = 0;
-                                            dvWMC = 0;
-                                        }
+                                        dv = 0;
+                                        dvWMC = 0;
                                     }
-                                    difference += Number((Number(dv) * Number(nodeDataModeling.dataValue)) / 100);
-                                    differenceWMC += Number((Number(dvWMC) * Number(nodeDataModeling.dataValue)) / 100);
                                 }
+                                if (nodeDataModeling.transferNodeDataId > 0) {
+                                    transfer += Number((Number(dv) * Number(nodeDataModelingValue)) / 100);
+                                    transferWMC += Number((Number(dvWMC) * Number(nodeDataModelingValue)) / 100);
+                                    console.log("CurDate+++++++++++++@@@@@", curDate);
+                                    console.log("Transfer+++++++++++++@@@@@", transfer);
+                                    if (endValue + Number((Number(dv) * Number(nodeDataModelingValue)) / 100) >= 0) {
+                                        endValue += Number((Number(dv) * Number(nodeDataModelingValue)) / 100);
+                                        endValueWMC += Number((Number(dvWMC) * Number(nodeDataModelingValue)) / 100);
+                                        difference += Number((Number(dv) * Number(nodeDataModelingValue)) / 100);
+                                        differenceWMC += Number((Number(dvWMC) * Number(nodeDataModelingValue)) / 100);
+                                        overallTransferList.push({ month: moment(curDate).format("YYYY-MM-DD"), transfer: Number(transfer), transferWMC: Number(transferWMC), transferFromNodeDataId: flatList[fl].id, transferToNodeDataId: nodeDataModeling.transferNodeDataId, nodeDataModelingId: nodeDataModeling.nodeDataModelingId });
+                                    } else {
+                                        console.log("EndValue+++++++++++++@@@@@", endValue);
+                                        difference += Number((Number(dv) * Number(nodeDataModelingValue)) / 100);
+                                        differenceWMC += Number((Number(dvWMC) * Number(nodeDataModelingValue)) / 100);
+                                        overallTransferList.push({ month: moment(curDate).format("YYYY-MM-DD"), transfer: Number(0 - Number(endValue)), transferWMC: Number(0 - Number(endValueWMC)), transferFromNodeDataId: flatList[fl].id, transferToNodeDataId: nodeDataModeling.transferNodeDataId, nodeDataModelingId: nodeDataModeling.nodeDataModelingId });
+                                        endValue = 0;
+                                        endValueWMC = 0;
+                                    }
+                                } else if (nodeDataModeling.transferNodeDataId == -1) {
+                                    console.log("overallTransferList@@@@@@@@@@@@@@@@@###########", overallTransferList);
+                                    // console.log("Transfer+++++++++++++@@@@@",overallTransferList)
+                                    var overallFilter = overallTransferList.filter(c => moment(c.month).format("YYYY-MM") == moment(curDate).format("YYYY-MM") && c.nodeDataModelingId == nodeDataModeling.nodeDataModelingId && c.transferFromNodeDataId == nodeDataModeling.transferFromNodeDataId && c.transferToNodeDataId == nodeDataModeling.nodeDataId);
+                                    console.log("overallFilter@@@@@@@@@@@@@@@@@###########", overallFilter);
+                                    // console.log("Transfer+++++++++++++@@@@@",overallFilter)
+                                    if (overallFilter.length > 0) {
+                                        console.log("endValue@@@@@@@@@@@@@@@@@###########", endValue);
+                                        difference += Number(0 - overallFilter[0].transfer);
+                                        differenceWMC += Number(0 - overallFilter[0].transferWMC);
+                                        endValue += Number(0 - overallFilter[0].transfer);
+                                        endValueWMC += Number(0 - overallFilter[0].transferWMC);
+                                    }
+                                } else {
+                                    difference += Number((Number(dv) * Number(nodeDataModelingValue)) / 100);
+                                    differenceWMC += Number((Number(dvWMC) * Number(nodeDataModelingValue)) / 100);
+                                    endValue += Number((Number(dv) * Number(nodeDataModelingValue)) / 100);
+                                    endValueWMC += Number((Number(dvWMC) * Number(nodeDataModelingValue)) / 100);
+                                }
+
+                                // difference += Number((Number(dv) * Number(nodeDataModelingValue)) / 100);
+                                // differenceWMC += Number((Number(dvWMC) * Number(nodeDataModelingValue)) / 100);
+                                // }
                             }
                             //Exponential %
                             else if (nodeDataModeling.modelingType.id == 4) {
                                 // console.log("nodeDataModeling##+", nodeDataModeling);
-                                if (nodeDataModeling.transferFromNodeDataId != undefined && nodeDataModeling.transferFromNodeDataId != null && nodeDataModeling.transferFromNodeDataId != "") {
-                                    var transferFromNodeData = flatList.filter(c => c.id == nodeDataModeling.transferFromNodeDataId);
-                                    var transferFromNodeDataMapForScenario = (transferFromNodeData[0].payload.nodeDataMap[scenarioList[ndm].id])[0];
-                                    var transferFromNodeMomList = transferFromNodeDataMapForScenario.nodeDataMomList;
-                                    // console.log("TransferFromNodeMomList##+", transferFromNodeMomList);
-                                    var transferStartValueFilter = transferFromNodeMomList.filter(c => moment(c.month).format("YYYY-MM-DD") == moment(curDate).add(0, 'months').format("YYYY-MM-DD"));
-                                    if (transferStartValueFilter.length > 0) {
-                                        var transferStartValue = (transferStartValueFilter[0]).startValue;
-                                        difference += Number((Number(transferStartValue) * Number(nodeDataModeling.dataValue)) / 100);
-                                        differenceWMC += Number((Number(transferStartValue) * Number(nodeDataModeling.dataValue)) / 100);
+                                // if (nodeDataModeling.transferFromNodeDataId != undefined && nodeDataModeling.transferFromNodeDataId != null && nodeDataModeling.transferFromNodeDataId != "") {
+                                //     var transferFromNodeData = flatList.filter(c => c.id == nodeDataModeling.transferFromNodeDataId);
+                                //     var transferFromNodeDataMapForScenario = (transferFromNodeData[0].payload.nodeDataMap[scenarioList[ndm].id])[0];
+                                //     var transferFromNodeMomList = transferFromNodeDataMapForScenario.nodeDataMomList;
+                                //     // console.log("TransferFromNodeMomList##+", transferFromNodeMomList);
+                                //     var transferStartValueFilter = transferFromNodeMomList.filter(c => moment(c.month).format("YYYY-MM-DD") == moment(curDate).add(0, 'months').format("YYYY-MM-DD"));
+                                //     if (transferStartValueFilter.length > 0) {
+                                //         var transferStartValue = (transferStartValueFilter[0]).startValue;
+                                //         difference += Number((Number(transferStartValue) * Number(nodeDataModelingValue)) / 100);
+                                //         differenceWMC += Number((Number(transferStartValue) * Number(nodeDataModelingValue)) / 100);
+                                //     } else {
+                                //         difference = 0;
+                                //         differenceWMC = 0;
+                                //     }
+                                // } else {
+                                if (nodeDataModeling.transferNodeDataId > 0) {
+                                    transfer += Number((Number(startValue) * Number(nodeDataModelingValue)) / 100);
+                                    transferWMC += Number((Number(startValue) * Number(nodeDataModelingValue)) / 100);
+                                    if (endValue + Number((Number(startValue) * Number(nodeDataModelingValue)) / 100) >= 0) {
+                                        endValue += Number((Number(startValue) * Number(nodeDataModelingValue)) / 100);
+                                        endValueWMC += Number((Number(startValue) * Number(nodeDataModelingValue)) / 100);
+                                        difference += Number((Number(startValue) * Number(nodeDataModelingValue)) / 100);
+                                        differenceWMC += Number((Number(startValue) * Number(nodeDataModelingValue)) / 100);
+                                        overallTransferList.push({ month: moment(curDate).format("YYYY-MM-DD"), transfer: Number(transfer), transferWMC: Number(transferWMC), transferFromNodeDataId: flatList[fl].id, transferToNodeDataId: nodeDataModeling.transferNodeDataId, nodeDataModelingId: nodeDataModeling.nodeDataModelingId });
                                     } else {
-                                        difference = 0;
-                                        differenceWMC = 0;
+                                        difference += Number((Number(startValue) * Number(nodeDataModelingValue)) / 100);
+                                        differenceWMC += Number((Number(startValue) * Number(nodeDataModelingValue)) / 100);
+                                        overallTransferList.push({ month: moment(curDate).format("YYYY-MM-DD"), transfer: Number(0 - Number(endValue)), transferWMC: Number(0 - Number(endValueWMC)), transferFromNodeDataId: flatList[fl].id, transferToNodeDataId: nodeDataModeling.transferNodeDataId, nodeDataModelingId: nodeDataModeling.nodeDataModelingId });
+                                        endValue = 0;
+                                        endValueWMC = 0;
+                                    }
+                                } else if (nodeDataModeling.transferNodeDataId == -1) {
+                                    var overallFilter = overallTransferList.filter(c => moment(c.month).format("YYYY-MM") == moment(curDate).format("YYYY-MM") && c.nodeDataModelingId == nodeDataModeling.nodeDataModelingId && c.transferFromNodeDataId == nodeDataModeling.transferFromNodeDataId && c.transferToNodeDataId == nodeDataModeling.nodeDataId);
+                                    if (overallFilter.length > 0) {
+                                        difference += Number(0 - overallFilter[0].transfer);
+                                        differenceWMC += Number(0 - overallFilter[0].transferWMC);
+                                        endValue += Number(0 - overallFilter[0].transfer);
+                                        endValueWMC += Number(0 - overallFilter[0].transferWMC);
                                     }
                                 } else {
-                                    difference += Number((Number(startValue) * Number(nodeDataModeling.dataValue)) / 100);
-                                    differenceWMC += Number((Number(startValue) * Number(nodeDataModeling.dataValue)) / 100);
+                                    difference += Number((Number(startValue) * Number(nodeDataModelingValue)) / 100);
+                                    differenceWMC += Number((Number(startValue) * Number(nodeDataModelingValue)) / 100);
+                                    endValue += Number((Number(startValue) * Number(nodeDataModelingValue)) / 100);
+                                    endValueWMC += Number((Number(startValue) * Number(nodeDataModelingValue)) / 100);
                                 }
+
+                                // difference += Number((Number(startValue) * Number(nodeDataModelingValue)) / 100);
+                                // differenceWMC += Number((Number(startValue) * Number(nodeDataModelingValue)) / 100);
+                                // }
                             }
                             //Linear % point
 
-                            else if (nodeDataModeling.modelingType.id == 5) {
-                                // console.log("nodeDataModeling---", nodeDataModeling);
-                                difference += Number(nodeDataModeling.dataValue);
-                                differenceWMC += Number(nodeDataModeling.dataValue);
-                            }
+                            // else if (nodeDataModeling.modelingType.id == 5) {
+                            //     // console.log("nodeDataModeling---", nodeDataModeling);
+                            //     difference += Number(nodeDataModelingValue);
+                            //     differenceWMC += Number(nodeDataModelingValue);
+                            // }
                             // console.log("nodeDataModeling 1---", nodeDataModeling);
 
                             // //Linear # transfer
                             // if (nodeDataModeling.modelingType.id == 2 && nodeDataModeling.transferNodeDataId != null && moment(curDate).format("YYYY-MM-DD") > moment(nodeDataMapForScenario.month).format("YYYY-MM-DD")) {
-                            //     transferNodeValue += Number(nodeDataModeling.dataValue);
+                            //     transferNodeValue += Number(nodeDataModelingValue);
                             // }
                             // if (nodeDataModeling.modelingType.id == 5 && nodeDataModeling.transferNodeDataId != null && moment(curDate).format("YYYY-MM-DD") > moment(nodeDataMapForScenario.month).format("YYYY-MM-DD")) {
-                            //     transferNodeValue += Number(nodeDataModeling.dataValue);
+                            //     transferNodeValue += Number(nodeDataModelingValue);
                             // }
 
                         }
-                        var endValue = 0;
-                        var endValueWMC = 0;
-                        endValue = Number(startValue) + Number(difference) + Number(transferNodeValue);
-                        endValueWMC = Number(startValue) + Number(differenceWMC) + Number(transferNodeValue);
+                        difference = endValue - startValue;
+                        differenceWMC = endValueWMC - startValue;
                         var totalManualChange = 0;
                         var seasonalityPercTotal = 0;
                         var manualChangeTotal = 0;
-                        var nodeDataOverrideListFiltered = nodeDataOverrideList.length != null ? nodeDataOverrideList.filter(c => moment(c.month).format("YYYY-MM-DD") == moment(curDate).format("YYYY-MM-DD")) : [];
-                        // console.log("nodeDataOverrideListFiltered---", nodeDataOverrideListFiltered)
+                        var nodeDataOverrideListFiltered = nodeDataOverrideList.length != null ? nodeDataOverrideList.filter(c => moment(c.month).format("YYYY-MM") == moment(curDate).format("YYYY-MM")) : [];
                         if (nodeDataOverrideListFiltered.length > 0) {
                             var seasonalityNumber = (Number(endValue) * Number(nodeDataOverrideListFiltered[0].seasonalityPerc)) / 100;
                             seasonalityPercTotal += Number(nodeDataOverrideListFiltered[0].seasonalityPerc);
@@ -471,6 +573,7 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                 } else {
                                     patients = 0;
                                 }
+                                console.log("Patients@@@@@@@@@@@", patients);
                                 // patients = 5432;
                                 // console.log("nodeDataMapForScenario$$$%%%", nodeDataMapForScenario)
                                 if (!isTemplate) {
@@ -540,7 +643,7 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                 var lag = parentNodeNodeData.fuNode.lagInMonths;
                                 var noOfFus = 0;
                                 if (i >= lag) {
-                                    var nodeDataMomForParentPerc = parentNodeNodeData.nodeDataMomList.filter(c => moment(c.month).format("YYYY-MM") == moment(curDate).format("YYYY-MM"));
+                                    var nodeDataMomForParentPerc = parentNodeNodeData.nodeDataMomList.filter(c => moment(c.month).format("YYYY-MM") == moment(curDate).subtract(lag, 'months').format("YYYY-MM"));
                                     var percentageToMultiply = 0;
                                     if (nodeDataMomForParentPerc.length > 0) {
                                         percentageToMultiply = nodeDataMomForParentPerc[0].endValue;
@@ -551,8 +654,13 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                 }
 
                                 // if (parentNodeNodeData.fuNode.usageType.id == 2) {
+                                if (i >= lag) {
+                                    var percentageOfEndValue = (lag == 0 ? endValue : nodeDataList.filter(c => moment(c.month).format("YYYY-MM") == moment(curDate).subtract(lag, 'months').format("YYYY-MM"))[0].endValue);
+                                    calculatedMmdValue = Math.round((noOfFus * percentageOfEndValue / 100) / fuPerPu);
+                                } else {
+                                    calculatedMmdValue = 0;
+                                }
 
-                                calculatedMmdValue = Math.round((noOfFus * endValue / 100) / fuPerPu);
                                 // }
                                 // var grandParent = parentFiltered.parent;
                                 // var grandParentFiltered = (flatListUnsorted.filter(c => c.id == grandParent))[0];

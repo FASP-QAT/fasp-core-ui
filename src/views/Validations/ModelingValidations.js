@@ -751,11 +751,13 @@ class ModelingValidation extends Component {
         ProgramService.getDataSetList().then(response => {
             if (response.status == 200) {
                 var responseData = response.data;
+                console.log("responseData------->", responseData);
                 var datasetList = [];
                 for (var rd = 0; rd < responseData.length; rd++) {
                     var json = {
                         id: responseData[rd].programId,
                         name: getLabelText(responseData[rd].label, this.state.lang),
+                        code: responseData[rd].programCode,
                         versionList: responseData[rd].versionList
                     }
                     datasetList.push(json);
@@ -818,6 +820,7 @@ class ModelingValidation extends Component {
                             var json = {
                                 id: myResult[mr].programId,
                                 name: getLabelText(programNameJson, this.state.lang),
+                                code: myResult[mr].programCode,
                                 versionList: [{ versionId: myResult[mr].version + "  (Local)" }]
                             }
                             datasetList.push(json)
@@ -1235,7 +1238,8 @@ class ModelingValidation extends Component {
     render() {
         var chartOptions = {
             title: {
-                display: false
+                display: true,
+                text: (this.state.monthList.length > 0 && this.state.dataEl != undefined && this.state.dataEl != "") ? i18n.t("static.dashboard.modelingValidation") + " - " + this.state.datasetData.programCode + "~" + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text) + " - " + (document.getElementById("levelId").selectedOptions[0].text) : ""
             },
             scales: {
                 yAxes: [{
@@ -1402,7 +1406,8 @@ class ModelingValidation extends Component {
             && datasetList.map((item, i) => {
                 return (
                     <option key={i} value={item.id}>
-                        {item.name}
+                        {/* {item.name} */}
+                        {item.code}
                     </option>
                 )
             }, this);

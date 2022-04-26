@@ -4,6 +4,7 @@ import i18n from '../../i18n';
 import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 import { Offline, Online } from "react-detect-offline";
+import { BrowserRouter as Router, Routes, Link } from 'react-router-dom';
 import { Redirect, Route, Switch } from 'react-router-dom';
 import { Container, Col, Row, Nav, NavItem, TabPane, NavLink } from 'reactstrap';
 import imgforcastmoduletab from '../../assets/img/forcastmoduleicon.png';
@@ -324,6 +325,7 @@ const routes = [
   { path: '/report/compareVersion', exact: true, name: 'static.dashboard.Versioncomarition', component: CompareVersion },
   { path: '/validation/productValidation', exact: true, name: 'static.dashboard.productValidation', component: ProductValidation },
   { path: '/report/compareAndSelectScenario', exact: true, name: 'static.dashboard.compareAndSelect', component: CompareAndSelectScenario },
+  { path: '/report/compareAndSelectScenario/:programId/:planningUnitId/:regionId', exact: true, name: 'static.dashboard.compareAndSelect', component: CompareAndSelectScenario },
   { path: '/dataentry/consumptionDataEntryAndAdjustment', exact: true, name: 'static.dashboard.dataEntryAndAdjustments', component: ConsumptionDataEntryAndAdjustment },
   { path: '/dataentry/consumptionDataEntryAndAdjustment/:color/:message', exact: true, name: 'static.dashboard.dataEntryAndAdjustments', component: ConsumptionDataEntryAndAdjustment },
   { path: '/dataentry/consumptionDataEntryAndAdjustment/:planningUnitId', exact: true, name: 'static.dashboard.dataEntryAndAdjustments', component: ConsumptionDataEntryAndAdjustment },
@@ -426,6 +428,8 @@ const routes = [
   { path: '/subFundingSource/listSubFundingSource', exact: true, name: 'static.breadcrum.list', entityname: 'static.dashboard.subfundingsource', component: ListSubFundingSource },
   { path: '/subFundingSource/editSubFundingSource/:subFundingSourceId', name: 'static.breadcrum.edit', entityname: 'static.dashboard.subfundingsource', component: EditSubFundingSource },
   { path: '/subFundingSource/subFundingSourceList/:message', component: SubFundingSourceList },
+  // { path: '/ApplicationDashboard/sp/:id', exact: true, name: 'static.dashboard.applicationdashboard', component: ApplicationDashboard },
+  // {path: '/ApplicationDashboard/fm/:id', exact: true, name: 'static.dashboard.applicationdashboard', component: ApplicationDashboard },
   { path: '/ApplicationDashboard/:id', exact: true, name: 'static.dashboard.applicationdashboard', component: ApplicationDashboard },
   { path: '/ApplicationDashboard/:id/:color/:message', exact: true, name: 'static.dashboard.applicationdashboard', component: ApplicationDashboard },
   { path: '/ApplicationDashboard', exact: true, name: 'static.dashboard.applicationdashboard', component: ApplicationDashboard },
@@ -784,7 +788,7 @@ class DefaultLayout extends Component {
  
   // refreshPage() {
     // setTimeout(() => {
-    //   window.location.reload(false);
+    // window.location.reload(false);
     // }, 0);
   // }
 
@@ -821,7 +825,15 @@ class DefaultLayout extends Component {
   }
 
   displayHeaderTitle = (name, url) => {
+    console.log("displayHeaderTitle activeTab ", this.state.activeTab)
+
     if (this.state.name !== name) {
+      // if (url=="/ApplicationDashboard/fm/:id"){
+      //   this.setState({activeTab:1})
+      // }
+      // else if (url=="/ApplicationDashboard/sp/:id"){
+      //   this.setState({activeTab:2})
+      // }
       if (AuthenticationService.checkTypeOfSession(url)) {
         this.setState({
           url: ""
@@ -836,6 +848,9 @@ class DefaultLayout extends Component {
       this.getNotificationCount();
       // this.getDownloadedPrograms();
       // this.checkIfLocalProgramVersionChanged();
+      // console.log("displayHeaderTitle Name ",name)
+      // console.log("displayHeaderTitle url ",url)
+
       this.setState({
         name
       });
@@ -1132,6 +1147,7 @@ class DefaultLayout extends Component {
   // }
 
   toggle(tabPane, tab) {
+    // console.log("inside toggle function")
     // const newArray = this.state.activeTab.slice()
     // newArray[tabPane] = tab
     // this.setState({
@@ -1159,6 +1175,12 @@ class DefaultLayout extends Component {
     this.setState({
       activeTab: decryptedUser1.defaultModuleId,
     }, () => {
+      // if (decryptedUser1.defaultModuleId==1){
+      //   this.props.history.push(`/ApplicationDashboard/fm/1`);
+      // }
+      // else if (decryptedUser1.defaultModuleId==2){
+      //   this.props.history.push(`/ApplicationDashboard/sp/2`);
+      // }
       let id = AuthenticationService.displayDashboardBasedOnRole();
       this.props.history.push(`/ApplicationDashboard/` + `${id}`);
     });
@@ -1240,7 +1262,7 @@ class DefaultLayout extends Component {
                             attributes: {
                               hidden: (this.state.businessFunctions.includes('ROLE_BF_LABEL_TRANSLATIONS') ? false : true),
                               onClick: e => {
-                                this.refreshPage();
+                                this.refreshPage('/translations/labelTranslations');
                               }
                             }
                           },
@@ -1280,9 +1302,9 @@ class DefaultLayout extends Component {
                             icon: 'fa fa-globe',
                             attributes: {
                               hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_COUNTRY') ? false : true),
-                              onClick: e => {
-                                this.refreshPage();
-                              }
+                              // onClick: e => {
+                              //   this.refreshPage();
+                              // }
                             }
                           },
                           {
@@ -1355,7 +1377,7 @@ class DefaultLayout extends Component {
                             attributes: {
                               hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_USER') ? false : true),
                               onClick: e => {
-                                this.refreshPage();
+                                // this.refreshPage('/user/listUser');
                               }
                             }
                           },
@@ -1892,6 +1914,7 @@ class DefaultLayout extends Component {
                               onClick: e => {
                                 this.refreshPage();
                               }
+
                             }
                           },
                           {
@@ -2400,6 +2423,17 @@ class DefaultLayout extends Component {
                             icon: 'fa fa-bell',
                             attributes: {
                               hidden: ((this.state.businessFunctions.includes('ROLE_BF_MANUAL_TAGGING') && this.state.activeTab == 2) ? false : true),
+                              onClick: e => {
+                                this.refreshPage();
+                              }
+                            }
+                          },
+                          {
+                            name: i18n.t('static.importIntoQATSupplyPlan.importIntoQATSupplyPlan'),
+                            url: '/importIntoQATSupplyPlan/listImportIntoQATSupplyPlan',
+                            icon: 'fa cui-cloud-download',
+                            attributes: {
+                              hidden: ((this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN_IMPORT') && this.state.activeTab == 2) ? false : true),
                               onClick: e => {
                                 this.refreshPage();
                               }
@@ -4070,7 +4104,7 @@ class DefaultLayout extends Component {
                       className="bgColourRemoveLink tab1"
                       active={this.state.activeTab === '1'}
                       onClick={() => { this.toggle(0, '1'); }}
-                      href={`/#/ApplicationDashboard/${AuthenticationService.displayDashboardBasedOnRole()}`}
+                      href={`/#/ApplicationDashboard/1`}
                       style={{ border: "none" }}
                       title={i18n.t('static.module.forecasting')}
                     >
@@ -4083,7 +4117,8 @@ class DefaultLayout extends Component {
                       className="bgColourRemoveLink tab2"
                       active={this.state.activeTab === '2'}
                       onClick={() => { this.toggle(0, '2'); }}
-                      href={`/#/ApplicationDashboard/${AuthenticationService.displayDashboardBasedOnRole()}`}
+                      href={`/#/ApplicationDashboard/2`}
+                      // href={`/#/ApplicationDashboard/${AuthenticationService.displayDashboardBasedOnRole()}`}
                       style={{ border: "none", padding: "0.75rem 0.2rem" }}
                       title={i18n.t('static.module.supplyPlanningMod')}
                     >
@@ -4110,6 +4145,7 @@ class DefaultLayout extends Component {
                   {routes.map((route, idx) => {
                     return route.component ? (
                       <Route
+                        // key={idx+this.state.url!=""?moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"):""}
                         key={idx}
                         path={route.path}
                         exact={route.exact}

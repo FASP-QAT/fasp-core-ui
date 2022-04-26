@@ -103,7 +103,7 @@ export default class AddProcurementAgentProcurementUnit extends Component {
         document.getElementById('div2').style.display = 'block';
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
-        }, 8000);
+        }, 30000);
     }
     capitalize(event) {
         if (event.target.name === "skuCode") {

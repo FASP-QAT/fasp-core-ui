@@ -1215,7 +1215,7 @@ class AccessControlComponent extends Component {
 
         setTimeout(function () {
             document.getElementById('div2').style.display = 'none';
-        }, 8000);
+        }, 30000);
     }
     filterProgram() {
         let realmId = this.state.user.realm.realmId;
