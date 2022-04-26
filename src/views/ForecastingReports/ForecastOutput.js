@@ -452,38 +452,38 @@ class ForecastOutput extends Component {
     exportCSV() {
         var csvRow = [];
         csvRow.push('"' + (i18n.t('static.supplyPlan.runDate') + ' : ' + moment(new Date()).format(`${DATE_FORMAT_CAP}`)).replaceAll(' ', '%20') + '"')
-        csvRow.push('')
+        // csvRow.push('')
         csvRow.push('"' + (i18n.t('static.supplyPlan.runTime') + ' : ' + moment(new Date()).format('hh:mm A')).replaceAll(' ', '%20') + '"')
-        csvRow.push('')
+        // csvRow.push('')
         csvRow.push('"' + (i18n.t('static.user.user') + ' : ' + AuthenticationService.getLoggedInUsername()).replaceAll(' ', '%20') + '"')
-        csvRow.push('')
+        // csvRow.push('')
         csvRow.push('"' + (this.state.programs.filter(c => c.programId == this.state.programId)[0].programCode + " " + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text)).replaceAll(' ', '%20') + '"')
-        csvRow.push('')
+        // csvRow.push('')
         // csvRow.push('"' + (document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
         // csvRow.push('')
         // csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
         // csvRow.push('')
         csvRow.push('"' + (i18n.t('static.report.version*') + ' : ' + document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
-        csvRow.push('')
+        // csvRow.push('')
         csvRow.push('"' + (i18n.t('static.common.forecastPeriod') + ' : ' + document.getElementById("forecastPeriod").value).replaceAll(' ', '%20') + '"')
-        csvRow.push('')
+        // csvRow.push('')
         csvRow.push('"' + (i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ', '%20') + '"')
-        csvRow.push('')
+        // csvRow.push('')
         csvRow.push('"' + (i18n.t('static.forecastReport.yAxisInEquivalencyUnit') + ' : ' + document.getElementById("yaxisEquUnit").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
-        csvRow.push('')
+        // csvRow.push('')
         csvRow.push('"' + (i18n.t('static.common.display') + ' : ' + document.getElementById("viewById").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
-        csvRow.push('')
-        if (document.getElementById("viewById").value == 1) {//planning unit
-            this.state.planningUnitLabels.map(ele =>
-                csvRow.push('"' + (i18n.t('static.report.planningUnit') + ' : ' + ele.toString()).replaceAll(' ', '%20') + '"'))
-        } else {//forecasting unit
-            this.state.forecastingUnitLabels.map(ele =>
-                csvRow.push('"' + (i18n.t('static.product.unit1') + ' : ' + ele.toString()).replaceAll(' ', '%20') + '"'))
-        }
-        csvRow.push('')
+        // csvRow.push('')
+        // if (document.getElementById("viewById").value == 1) {//planning unit
+        //     this.state.planningUnitLabels.map(ele =>
+        //         csvRow.push('"' + (i18n.t('static.report.planningUnit') + ' : ' + ele.toString()).replaceAll(' ', '%20') + '"'))
+        // } else {//forecasting unit
+        //     this.state.forecastingUnitLabels.map(ele =>
+        //         csvRow.push('"' + (i18n.t('static.product.unit1') + ' : ' + ele.toString()).replaceAll(' ', '%20') + '"'))
+        // }
+        // csvRow.push('')
         csvRow.push('"' + (i18n.t('static.forecastReport.xAxisAggregateByYear') + ' : ' + document.getElementById("xaxis").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
 
-        csvRow.push('')
+        // csvRow.push('')
         csvRow.push('')
 
         const headers = [];
@@ -636,9 +636,9 @@ class ForecastOutput extends Component {
                 doc.text(this.state.programs.filter(c => c.programId == this.state.programId)[0].programCode + " " + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text), doc.internal.pageSize.width - 40, 50, {
                     align: 'right'
                 })
-                doc.text(document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width - 40, 60, {
-                    align: 'right'
-                })
+                // doc.text(document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width - 40, 60, {
+                //     align: 'right'
+                // })
                 doc.setFontSize(TITLE_FONT)
                 doc.setTextColor("#002f6c");
                 doc.text(i18n.t('static.dashboard.monthlyForecast'), doc.internal.pageSize.width / 2, 60, {
@@ -647,37 +647,39 @@ class ForecastOutput extends Component {
                 if (i == 1) {
                     doc.setFont('helvetica', 'normal')
                     doc.setFontSize(8)
-                    doc.text(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
+                    // doc.text(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
+                    //     align: 'left'
+                    // })
+                    // doc.text(i18n.t('static.report.version*') + ' : ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 120, {
+                    //     align: 'left'
+                    // })
+                    doc.text(i18n.t('static.common.forecastPeriod') + ' : ' + document.getElementById("forecastPeriod").value, doc.internal.pageSize.width / 8, 100, {
                         align: 'left'
                     })
-                    doc.text(i18n.t('static.report.version*') + ' : ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130, {
+                    doc.text(i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to), doc.internal.pageSize.width / 8, 110, {
                         align: 'left'
                     })
-                    doc.text(i18n.t('static.common.forecastPeriod') + ' : ' + document.getElementById("forecastPeriod").value, doc.internal.pageSize.width / 8, 150, {
+                    doc.text(i18n.t('static.forecastReport.yAxisInEquivalencyUnit') + ' : ' + document.getElementById("yaxisEquUnit").selectedOptions[0].text, doc.internal.pageSize.width / 8, 120, {
                         align: 'left'
                     })
-                    doc.text(i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to), doc.internal.pageSize.width / 8, 170, {
+                    doc.text(i18n.t('static.common.display') + ' : ' + document.getElementById("viewById").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130, {
                         align: 'left'
                     })
-                    doc.text(i18n.t('static.forecastReport.yAxisInEquivalencyUnit') + ' : ' + document.getElementById("yaxisEquUnit").selectedOptions[0].text, doc.internal.pageSize.width / 8, 190, {
-                        align: 'left'
-                    })
-                    doc.text(i18n.t('static.common.display') + ' : ' + document.getElementById("viewById").selectedOptions[0].text, doc.internal.pageSize.width / 8, 210, {
-                        align: 'left'
-                    })
-                    let startY1 = 0;
-                    if (document.getElementById("viewById").value == 1) {
-                        var planningText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
-                        doc.text(doc.internal.pageSize.width / 8, 230, planningText)
-                        startY1 = 230 + (doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4).length * 10)
-                    } else {
-                        var planningText = doc.splitTextToSize((i18n.t('static.product.unit1') + ' : ' + this.state.forecastingUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
-                        doc.text(doc.internal.pageSize.width / 8, 230, planningText)
-                        startY1 = 250 + (doc.splitTextToSize((i18n.t('static.product.unit1') + ' : ' + this.state.forecastingUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4).length * 10)
-                    }
+                    // let startY1 = 0;
+                    // if (document.getElementById("viewById").value == 1) {
+                    //     var planningText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
+                    //     doc.text(doc.internal.pageSize.width / 8, 230, planningText)
+                    //     startY1 = 230 + (doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4).length * 10)
+                    // } else {
+                    //     var planningText = doc.splitTextToSize((i18n.t('static.product.unit1') + ' : ' + this.state.forecastingUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
+                    //     doc.text(doc.internal.pageSize.width / 8, 230, planningText)
+                    //     startY1 = 250 + (doc.splitTextToSize((i18n.t('static.product.unit1') + ' : ' + this.state.forecastingUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4).length * 10)
+                    // }
+                    // doc.text(i18n.t('static.forecastReport.xAxisAggregateByYear') + ' : ' + document.getElementById("xaxis").selectedOptions[0].text, doc.internal.pageSize.width / 8, startY1, {
+                    //     align: 'left'
+                    // })
 
-
-                    doc.text(i18n.t('static.forecastReport.xAxisAggregateByYear') + ' : ' + document.getElementById("xaxis").selectedOptions[0].text, doc.internal.pageSize.width / 8, startY1, {
+                    doc.text(i18n.t('static.forecastReport.xAxisAggregateByYear') + ' : ' + document.getElementById("xaxis").selectedOptions[0].text, doc.internal.pageSize.width / 8, 140, {
                         align: 'left'
                     })
 
@@ -704,7 +706,7 @@ class ForecastOutput extends Component {
         var h1 = 100;
         var aspectwidth1 = (width - h1);
 
-        doc.addImage(canvasImg, 'png', 50, 280, 750, 260, 'CANVAS');
+        doc.addImage(canvasImg, 'png', 50, 170, 750, 260, 'CANVAS');
 
         //table start
         const headers = [];
@@ -1922,8 +1924,8 @@ class ForecastOutput extends Component {
                 if (proList.length == 1) {
                     this.setState({
                         programs: proList.sort(function (a, b) {
-                            a = getLabelText(a.label, lang).toLowerCase();
-                            b = getLabelText(b.label, lang).toLowerCase();
+                            a = (a.programCode).toLowerCase();
+                            b = (b.programCode).toLowerCase();
                             return a < b ? -1 : a > b ? 1 : 0;
                         }),
                         downloadedProgramData: downloadedProgramData,
@@ -1936,8 +1938,8 @@ class ForecastOutput extends Component {
                     if (this.props.match.params.programId != "" && this.props.match.params.programId != undefined) {
                         this.setState({
                             programs: proList.sort(function (a, b) {
-                                a = getLabelText(a.label, lang).toLowerCase();
-                                b = getLabelText(b.label, lang).toLowerCase();
+                                a = (a.programCode).toLowerCase();
+                                b = (b.programCode).toLowerCase();
                                 return a < b ? -1 : a > b ? 1 : 0;
                             }),
                             programId: this.props.match.params.programId,
@@ -1951,8 +1953,8 @@ class ForecastOutput extends Component {
                     else if (localStorage.getItem("sesForecastProgramIdReport") != '' && localStorage.getItem("sesForecastProgramIdReport") != undefined) {
                         this.setState({
                             programs: proList.sort(function (a, b) {
-                                a = getLabelText(a.label, lang).toLowerCase();
-                                b = getLabelText(b.label, lang).toLowerCase();
+                                a = (a.programCode).toLowerCase();
+                                b = (b.programCode).toLowerCase();
                                 return a < b ? -1 : a > b ? 1 : 0;
                             }),
                             downloadedProgramData: downloadedProgramData,
@@ -1964,8 +1966,8 @@ class ForecastOutput extends Component {
                     } else {
                         this.setState({
                             programs: proList.sort(function (a, b) {
-                                a = getLabelText(a.label, lang).toLowerCase();
-                                b = getLabelText(b.label, lang).toLowerCase();
+                                a = (a.programCode).toLowerCase();
+                                b = (b.programCode).toLowerCase();
                                 return a < b ? -1 : a > b ? 1 : 0;
                             }),
                             downloadedProgramData: downloadedProgramData
@@ -2163,6 +2165,13 @@ class ForecastOutput extends Component {
                                 planningUnitLabels: newPlanningUnitList.map((item, i) => {
                                     return (getLabelText(item.label, this.state.lang))
                                 }, this),
+                                forecastingUnitValues: newForecastingUnitList.map((item, i) => {
+                                    return ({ label: getLabelText(item.label, this.state.lang), value: item.id })
+
+                                }, this),
+                                forecastingUnitLabels: newForecastingUnitList.map((item, i) => {
+                                    return (getLabelText(item.label, this.state.lang))
+                                }, this),
                                 equivalencyUnitLabel: selectedText,
                                 filteredProgramEQList: filteredProgramEQList
                             }, () => {
@@ -2189,6 +2198,13 @@ class ForecastOutput extends Component {
 
                                 }, this),
                                 planningUnitLabels: planningUnitList.map((item, i) => {
+                                    return (getLabelText(item.label, this.state.lang))
+                                }, this),
+                                forecastingUnitValues: forecastingUnitList.map((item, i) => {
+                                    return ({ label: getLabelText(item.label, this.state.lang), value: item.id })
+
+                                }, this),
+                                forecastingUnitLabels: forecastingUnitList.map((item, i) => {
                                     return (getLabelText(item.label, this.state.lang))
                                 }, this),
                                 equivalencyUnitLabel: ''
@@ -2285,6 +2301,13 @@ class ForecastOutput extends Component {
                                                 planningUnitLabels: newPlanningUnitList.map((item, i) => {
                                                     return (getLabelText(item.label, this.state.lang))
                                                 }, this),
+                                                forecastingUnitValues: newForecastingUnitList.map((item, i) => {
+                                                    return ({ label: getLabelText(item.label, this.state.lang), value: item.id })
+                
+                                                }, this),
+                                                forecastingUnitLabels: newForecastingUnitList.map((item, i) => {
+                                                    return (getLabelText(item.label, this.state.lang))
+                                                }, this),
                                                 equivalencyUnitLabel: selectedText,
                                                 filteredProgramEQList: filteredProgramEQList
                                             }, () => {
@@ -2299,6 +2322,13 @@ class ForecastOutput extends Component {
 
                                                 }, this),
                                                 planningUnitLabels: this.state.planningUnits.map((item, i) => {
+                                                    return (getLabelText(item.label, this.state.lang))
+                                                }, this),
+                                                forecastingUnitValues: this.state.forecastingUnits.map((item, i) => {
+                                                    return ({ label: getLabelText(item.label, this.state.lang), value: item.id })
+                
+                                                }, this),
+                                                forecastingUnitLabels: this.state.forecastingUnits.map((item, i) => {
                                                     return (getLabelText(item.label, this.state.lang))
                                                 }, this),
                                                 equivalencyUnitLabel: ''
@@ -2859,10 +2889,12 @@ class ForecastOutput extends Component {
             if (viewById == 2) {
                 document.getElementById("planningUnitDiv").style.display = "none";
                 document.getElementById("forecastingUnitDiv").style.display = "block";
+                this.getPlanningUnitForecastingUnit();
                 this.filterData();
             } else if (viewById == 1) {
                 document.getElementById("planningUnitDiv").style.display = "block";
                 document.getElementById("forecastingUnitDiv").style.display = "none";
+                this.getPlanningUnitForecastingUnit();
                 this.filterData();
             }
         })
@@ -3302,7 +3334,9 @@ class ForecastOutput extends Component {
                                             </FormGroup>
 
                                             <FormGroup className="col-md-3">
-                                                <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon fa fa-sort-desc ml-1"></span></Label>
+                                                <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon fa fa-sort-desc ml-1"></span>
+                                                <i> (Forecast: {this.state.forecastPeriod})</i>
+                                                </Label>
                                                 <div className="controls edit">
 
                                                     <Picker

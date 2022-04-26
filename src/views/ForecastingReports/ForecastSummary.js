@@ -261,24 +261,24 @@ class ForecastSummary extends Component {
         var csvRow = [];
 
         csvRow.push('"' + (i18n.t('static.supplyPlan.runDate') + ' : ' + moment(new Date()).format(`${DATE_FORMAT_CAP}`)).replaceAll(' ', '%20') + '"')
-        csvRow.push('')
+        // csvRow.push('')
         csvRow.push('"' + (i18n.t('static.supplyPlan.runTime') + ' : ' + moment(new Date()).format('hh:mm A')).replaceAll(' ', '%20') + '"')
-        csvRow.push('')
+        // csvRow.push('')
         csvRow.push('"' + (i18n.t('static.user.user') + ' : ' + AuthenticationService.getLoggedInUsername()).replaceAll(' ', '%20') + '"')
-        csvRow.push('')
+        // csvRow.push('')
         csvRow.push('"' + (this.state.programs.filter(c => c.programId == this.state.programId)[0].programCode + " " + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text)).replaceAll(' ', '%20') + '"')
-        csvRow.push('')
+        // csvRow.push('')
         // csvRow.push('"' + (document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
         // csvRow.push('')
 
         // csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
         // csvRow.push('')
         csvRow.push('"' + (i18n.t('static.report.version*') + ' : ' + document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
-        csvRow.push('')
+        // csvRow.push('')
         csvRow.push('"' + (i18n.t('static.common.forecastPeriod') + ' : ' + document.getElementById("forecastPeriod").value).replaceAll(' ', '%20') + '"')
-        csvRow.push('')
+        // csvRow.push('')
         csvRow.push('"' + (i18n.t('static.forecastReport.display') + ' : ' + document.getElementById("displayId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
-        csvRow.push('')
+        // csvRow.push('')
 
         let viewById = document.getElementById("displayId").value;
 
@@ -343,7 +343,7 @@ class ForecastSummary extends Component {
                         ((ele.tracerCategory.label.label_en).replaceAll(',', ' ')).replaceAll(' ', '%20'),
                         ((ele.planningUnit.label.label_en).replaceAll(',', ' ')).replaceAll(' ', '%20'),
                         (ele.totalForecastedQuantity == null ? '' : ele.totalForecastedQuantity)
-                    ].concat(propertyName).concat([(ele.procurementGap == null ? '' : ele.procurementGap)].concat(propertyName1).concat([(ele.procurementNeeded == null ? '' : ele.procurementNeeded), (ele.notes == null ? '' : ele.notes)]))))
+                    ].concat(propertyName).concat([(ele.procurementGap == null ? '' : ele.procurementGap)].concat(propertyName1).concat([(ele.procurementNeeded == null ? '' : ele.procurementNeeded), (ele.notes == null ? '' : (ele.notes).replaceAll(' ', '%20'))]))))
                 )
             }
             );
@@ -680,9 +680,9 @@ class ForecastSummary extends Component {
                 doc.text(this.state.programs.filter(c => c.programId == this.state.programId)[0].programCode + " " + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text), doc.internal.pageSize.width - 40, 50, {
                     align: 'right'
                 })
-                doc.text(document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width - 40, 60, {
-                    align: 'right'
-                })
+                // doc.text(document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width - 40, 60, {
+                //     align: 'right'
+                // })
                 doc.setFontSize(TITLE_FONT)
                 doc.setTextColor("#002f6c");
                 doc.text(i18n.t('static.forecastReport.forecastSummary'), doc.internal.pageSize.width / 2, 60, {
@@ -2222,8 +2222,8 @@ class ForecastSummary extends Component {
                 if (proList.length == 1) {
                     this.setState({
                         programs: proList.sort(function (a, b) {
-                            a = getLabelText(a.label, lang).toLowerCase();
-                            b = getLabelText(b.label, lang).toLowerCase();
+                            a = (a.programCode).toLowerCase();
+                            b = (b.programCode).toLowerCase();
                             return a < b ? -1 : a > b ? 1 : 0;
                         }),
                         programId: proList[0].programId,
@@ -2238,8 +2238,8 @@ class ForecastSummary extends Component {
                     if (this.props.match.params.programId != "" && this.props.match.params.programId != undefined) {
                         this.setState({
                             programs: proList.sort(function (a, b) {
-                                a = getLabelText(a.label, lang).toLowerCase();
-                                b = getLabelText(b.label, lang).toLowerCase();
+                                a = (a.programCode).toLowerCase();
+                                b = (b.programCode).toLowerCase();
                                 return a < b ? -1 : a > b ? 1 : 0;
                             }),
                             programId: this.props.match.params.programId,
@@ -2252,8 +2252,8 @@ class ForecastSummary extends Component {
                     else if (localStorage.getItem("sesForecastProgramIdReport") != '' && localStorage.getItem("sesForecastProgramIdReport") != undefined) {
                         this.setState({
                             programs: proList.sort(function (a, b) {
-                                a = getLabelText(a.label, lang).toLowerCase();
-                                b = getLabelText(b.label, lang).toLowerCase();
+                                a = (a.programCode).toLowerCase();
+                                b = (b.programCode).toLowerCase();
                                 return a < b ? -1 : a > b ? 1 : 0;
                             }),
                             programId: localStorage.getItem("sesForecastProgramIdReport"),
@@ -2266,8 +2266,8 @@ class ForecastSummary extends Component {
                     } else {
                         this.setState({
                             programs: proList.sort(function (a, b) {
-                                a = getLabelText(a.label, lang).toLowerCase();
-                                b = getLabelText(b.label, lang).toLowerCase();
+                                a = (a.programCode).toLowerCase();
+                                b = (b.programCode).toLowerCase();
                                 return a < b ? -1 : a > b ? 1 : 0;
                             }),
                             loading: false,
