@@ -942,21 +942,21 @@ export default class StepOneImportMapPlanningUnits extends Component {
                     this.el.setComments(col, i18n.t('static.message.spacetext'));
                     valid = false;
                 } else {
-                    for (var i = (json.length - 1); i >= 0; i--) {
-                        var map = new Map(Object.entries(json[i]));
+                    // for (var i = (json.length - 1); i >= 0; i--) {
+                    // var map = new Map(Object.entries(json[i]));
 
-                        var planningUnitValue = map.get("2");
-                        if (planningUnitValue == value && y != i && i > y) {
-                            this.el.setStyle(col, "background-color", "transparent");
-                            this.el.setStyle(col, "background-color", "yellow");
-                            this.el.setComments(col, i18n.t('static.message.planningUnitAlreadyExists'));
-                            i = -1;
-                            valid = false;
-                        } else {
-                            this.el.setStyle(col, "background-color", "transparent");
-                            this.el.setComments(col, "");
-                        }
-                    }
+                    // var planningUnitValue = map.get("2");
+                    // if (planningUnitValue == value && y != i && i > y) {
+                    //     this.el.setStyle(col, "background-color", "transparent");
+                    //     this.el.setStyle(col, "background-color", "yellow");
+                    //     this.el.setComments(col, i18n.t('static.message.planningUnitAlreadyExists'));
+                    //     i = -1;
+                    //     valid = false;
+                    // } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                    // }
+                    // }
                 }
 
                 // multiplier
