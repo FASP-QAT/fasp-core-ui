@@ -293,7 +293,7 @@ class ForecastSummary extends Component {
             const headers = [];
             headers.push('');
             headers.push((i18n.t('static.product.product')).replaceAll(' ', '%20'));
-            headers.push((i18n.t('static.forecastReport.totalForecastQuantity').replaceAll(' ', '%20')));
+            headers.push((('Total Forecasted Quantity').replaceAll(' ', '%20')));
             if (!this.state.hideColumn) {
                 headers.push((i18n.t('static.report.stock')).replaceAll(' ', '%20') + (i18n.t('static.forecastReport.endOf')).replaceAll(' ', '%20') + this.state.beforeEndDateDisplay + ')');
                 headers.push((i18n.t('static.forecastReport.existingShipments')).replaceAll(' ', '%20') + '(' + this.state.startDateDisplay + ' - ' + this.state.endDateDisplay + ')');
@@ -375,7 +375,7 @@ class ForecastSummary extends Component {
                     '',
                     '',
                     '',
-                    (i18n.t('static.forecastReport.freight')).replaceAll(' ', '%20') + '(7%)',
+                    (i18n.t('static.forecastReport.freight')).replaceAll(' ', '%20') + ' (7%)'.replaceAll(' ', '%20'),
                     '$ ' + (parseFloat(0.07 * this.state.totalProductCost).toFixed(2)),
                     ''
                 ]))
@@ -407,7 +407,7 @@ class ForecastSummary extends Component {
                     '',
                     '',
                     '',
-                    i18n.t('static.forecastReport.freight') + '(7%)',
+                    i18n.t('static.forecastReport.freight') + ' (7%)'.replaceAll(' ', '%20'),
                     '$ ' + (parseFloat(0.07 * this.state.totalProductCost).toFixed(2)),
                     ''
                 ]))
@@ -462,7 +462,7 @@ class ForecastSummary extends Component {
                     headers.push((i18n.t('static.program.notes')).replaceAll(' ', '%20'));
                 }
 
-                headers.push((i18n.t('static.forecastReport.totalForecastQuantity')).replaceAll(' ', '%20'));
+                headers.push(('Total Forecasted Quantity').replaceAll(' ', '%20'));
                 A.push([this.addDoubleQuoteToRowContent(headers)]);
 
                 for (var tc = 0; tc < tcList.length; tc++) {
@@ -544,7 +544,7 @@ class ForecastSummary extends Component {
                     headers.push((i18n.t('static.program.notes')).replaceAll(' ', '%20'));
                 }
 
-                headers.push((i18n.t('static.forecastReport.totalForecastQuantity')).replaceAll(' ', '%20'));
+                headers.push(('Total Forecasted Quantity').replaceAll(' ', '%20'));
                 A.push([this.addDoubleQuoteToRowContent(headers)]);
 
 
@@ -751,7 +751,7 @@ class ForecastSummary extends Component {
                 }
 
                 header1.push({ content: i18n.t('static.forecastReport.allRegions'), rowSpan: 1, styles: { halign: 'center' } });
-                header2.push({ content: i18n.t('static.forecastReport.totalForecastQuantity'), styles: { halign: 'center' } },)
+                header2.push({ content: 'Total Forecasted Quantity', styles: { halign: 'center' } },)
 
                 let header = [header1, header2];
                 let data = [];
@@ -838,7 +838,7 @@ class ForecastSummary extends Component {
                 }
 
                 header1.push({ content: i18n.t('static.forecastReport.allRegions'), rowSpan: 1, styles: { halign: 'center' } });
-                header2.push({ content: i18n.t('static.forecastReport.totalForecastQuantity'), styles: { halign: 'center' } },)
+                header2.push({ content: 'Total Forecasted Quantity', styles: { halign: 'center' } },)
 
                 let header = [header1, header2];
                 let data = [];
@@ -891,7 +891,7 @@ class ForecastSummary extends Component {
         } else {//National
 
             let headers = [];
-            let headers1 = ['', i18n.t('static.product.product'), i18n.t('static.forecastReport.totalForecastQuantity')];
+            let headers1 = ['', i18n.t('static.product.product'), 'Total Forecasted Quantity'];
             if (!this.state.hideColumn) {
                 // headers1 = headers1.concat([i18n.t('static.report.stock') + i18n.t('static.forecastReport.endOf') + this.state.beforeEndDateDisplay + ')', i18n.t('static.forecastReport.existingShipments') + '(' + this.state.startDateDisplay + ' - ' + this.state.endDateDisplay + ')', i18n.t('static.report.stock') + i18n.t('static.forecastReport.endOf') + this.state.endDateDisplay + ')', i18n.t('static.forecastReport.desiredMonthsOfStock') + i18n.t('static.forecastReport.endOf') + this.state.endDateDisplay + ')', i18n.t('static.forecastReport.desiredStock') + i18n.t('static.forecastReport.endOf') + this.state.endDateDisplay + ')']);
                 headers1 = headers1.concat([i18n.t('static.report.stock') + i18n.t('static.forecastReport.endOf') + ' ' + this.state.beforeEndDateDisplay + ')', i18n.t('static.forecastReport.existingShipments') + '(' + this.state.startDateDisplay + ' - ' + this.state.endDateDisplay + ')', 'Stock or Unmet Demand' + i18n.t('static.forecastReport.endOf') + ' ' + this.state.endDateDisplay + ')', i18n.t('static.forecastReport.desiredMonthsOfStock') + i18n.t('static.forecastReport.endOf') + ' ' + this.state.endDateDisplay + ')', i18n.t('static.forecastReport.desiredStock') + i18n.t('static.forecastReport.endOf') + ' ' + this.state.endDateDisplay + ')']);
@@ -1363,8 +1363,6 @@ class ForecastSummary extends Component {
 
 
 
-
-
                                     //obj parameter decleration
                                     let tracerCategory = planningUnitList[j].planningUnit.forecastingUnit.tracerCategory;
                                     let forecastingUnit = planningUnitList[j].planningUnit.forecastingUnit;
@@ -1372,11 +1370,11 @@ class ForecastSummary extends Component {
                                     let totalForecastedQuantity = totalForecastedQuantity0ri;
                                     let stock1 = planningUnitList[j].stock;
                                     let existingShipments = planningUnitList[j].existingShipments;
-                                    let stock2 = (planningUnitList[j].stock + planningUnitList[j].existingShipments) - totalForecastedQuantity0ri;
+                                    let stock2 = (Math.round(planningUnitList[j].stock) + Math.round(planningUnitList[j].existingShipments)) - Math.round(totalForecastedQuantity0ri);
                                     let isStock2Red = (stock2 < 0 ? true : false);
                                     let desiredMonthOfStock1 = planningUnitList[j].monthsOfStock;
-                                    let desiredMonthOfStock2 = Math.round(planningUnitList[j].monthsOfStock * totalForecastedQuantity0ri / total_months);
-                                    let tempProcurementGap = ((planningUnitList[j].stock + planningUnitList[j].existingShipments) - totalForecastedQuantity0ri) - (planningUnitList[j].monthsOfStock * totalForecastedQuantity0ri / total_months);
+                                    let desiredMonthOfStock2 = Math.round(Math.round(planningUnitList[j].monthsOfStock) * Math.round(totalForecastedQuantity0ri) / Math.round(total_months));
+                                    let tempProcurementGap = ((Math.round(planningUnitList[j].stock) + Math.round(planningUnitList[j].existingShipments)) - Math.round(totalForecastedQuantity0ri)) - (Math.round(planningUnitList[j].monthsOfStock) * Math.round(totalForecastedQuantity0ri) / Math.round(total_months));
                                     let procurementGap = (tempProcurementGap < 0 ? tempProcurementGap : tempProcurementGap);
                                     procurementGap = Math.round(procurementGap)
                                     let isProcurementGapRed = (tempProcurementGap < 0 ? true : false)
@@ -1517,7 +1515,7 @@ class ForecastSummary extends Component {
                                         columns.push({ title: i18n.t('static.program.notes'), type: 'text', width: 100 });//F5
                                     }
                                     columns.push({ title: i18n.t('static.supplyPlan.type'), type: 'hidden', width: 100, readOnly: true });//G6
-                                    columns.push({ title: i18n.t('static.forecastReport.totalForecastQuantity'), type: 'numeric', textEditor: true, mask: '#,##.00', decimal: '.', width: 100, readOnly: true });//H7
+                                    columns.push({ title: 'Total Forecasted Quantity', type: 'numeric', textEditor: true, mask: '#,##.00', decimal: '.', width: 100, readOnly: true });//H7
                                     columns.push({ title: 'forecast Blank', type: 'hidden', width: 100, readOnly: true });//G6
                                     let nestedHeaders = [];
                                     // nestedHeaders.push(
@@ -1689,7 +1687,7 @@ class ForecastSummary extends Component {
                                 let totalForecastedQuantity = primaryOutputData[j].totalForecast;
                                 let stock1 = primaryOutputData[j].stock;
                                 let existingShipments = primaryOutputData[j].existingShipments;
-                                let stock2 = (primaryOutputData[j].stock + primaryOutputData[j].existingShipments) - primaryOutputData[j].totalForecast;
+                                let stock2 = (Math.round(primaryOutputData[j].stock) + Math.round(primaryOutputData[j].existingShipments)) - Math.round(primaryOutputData[j].totalForecast);
                                 let isStock2Red = (stock2 < 0 ? true : false);
                                 let desiredMonthOfStock1 = primaryOutputData[j].monthsOfStock;
                                 let desiredMonthOfStock2 = Math.round(primaryOutputData[j].monthsOfStock * primaryOutputData[j].totalForecast / total_months);
@@ -1827,7 +1825,7 @@ class ForecastSummary extends Component {
                                 columns.push({ title: i18n.t('static.forecastReport.forecastQuantity'), type: 'numeric', textEditor: true, mask: '#,##.00', decimal: '.', width: 100, readOnly: true });//E4
                                 columns.push({ title: i18n.t('static.program.notes'), type: 'text', width: 100, readOnly: true });//F5
                             }
-                            columns.push({ title: i18n.t('static.forecastReport.totalForecastQuantity'), type: 'numeric', textEditor: true, mask: '#,##.00', decimal: '.', width: 100, readOnly: true });//H7
+                            columns.push({ title: 'Total Forecasted Quantity', type: 'numeric', textEditor: true, mask: '#,##.00', decimal: '.', width: 100, readOnly: true });//H7
 
                             let nestedHeaders = [];
                             nestedHeaders.push(
@@ -3171,15 +3169,15 @@ class ForecastSummary extends Component {
                                                                     <th className="BorderNoneSupplyPlan sticky-col first-col clone1"></th>
                                                                     {/* <th className="text-center" style={{}}> Forecasting Unit </th> */}
                                                                     <th className="text-center ForecastSumarydWidth sticky-col first-col clone" style={{ width: '19%' }}>{i18n.t('static.product.product')}</th>
-                                                                    <th className="text-center" style={{ width: '' }}>{i18n.t('static.forecastReport.totalForecastQuantity')} </th>
+                                                                    <th className="text-center" style={{ width: '' }}>{'Total Forecasted Quantity'} </th>
                                                                     {!this.state.hideColumn &&
                                                                         <>
                                                                             <th className="text-center" style={{ width: '7%' }}>{i18n.t('static.report.stock')} <span className="FontWeightNormal">{i18n.t('static.forecastReport.endOf')} {this.state.beforeEndDateDisplay})</span> </th>
                                                                             <th className="text-center" style={{ width: '' }}>{i18n.t('static.forecastReport.existingShipments')} <span className="FontWeightNormal">({this.state.startDateDisplay + ' - ' + this.state.endDateDisplay})</span> </th>
                                                                             {/* <th className="text-center" title={(i18n.t('static.report.stock') + ' ' + i18n.t('static.forecastReport.endOf') + ' ' + this.state.beforeEndDateDisplay) + ' + ' + (i18n.t('static.forecastReport.existingShipments') + '( ' + this.state.startDateDisplay + ' - ' + this.state.endDateDisplay + ' )') + ' - ' + (i18n.t('static.forecastReport.totalForecastQuantity'))} style={{ width: '8%' }}>{i18n.t('static.report.stock')} <span className="FontWeightNormal">{i18n.t('static.forecastReport.endOf')} {this.state.endDateDisplay})</span> <i className="fa fa-info-circle icons ToltipInfoicon"></i></th> */}
-                                                                            <th className="text-center" title={(i18n.t('static.report.stock') + ' ' + i18n.t('static.forecastReport.endOf') + ' ' + this.state.beforeEndDateDisplay) + ' + ' + (i18n.t('static.forecastReport.existingShipments') + '( ' + this.state.startDateDisplay + ' - ' + this.state.endDateDisplay + ' )') + ' - ' + (i18n.t('static.forecastReport.totalForecastQuantity'))} style={{ width: '8%' }}>{'Stock or Unmet Demand'} <span className="FontWeightNormal">{i18n.t('static.forecastReport.endOf')} {this.state.endDateDisplay})</span> <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
+                                                                            <th className="text-center" title={(i18n.t('static.report.stock') + ' ' + i18n.t('static.forecastReport.endOf') + ' ' + this.state.beforeEndDateDisplay) + ' + ' + (i18n.t('static.forecastReport.existingShipments') + '( ' + this.state.startDateDisplay + ' - ' + this.state.endDateDisplay + ' )') + ' - ' + ('Total Forecasted Quantity')} style={{ width: '8%' }}>{'Stock or Unmet Demand'} <span className="FontWeightNormal">{i18n.t('static.forecastReport.endOf')} {this.state.endDateDisplay})</span> <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
                                                                             <th className="text-center" style={{ width: '7%' }}>{i18n.t('static.forecastReport.desiredMonthsOfStock')} <span className="FontWeightNormal">{i18n.t('static.forecastReport.endOf')} {this.state.endDateDisplay})</span> </th>
-                                                                            <th className="text-center" title={(i18n.t('static.forecastReport.desiredMonthsOfStock') + ' ' + i18n.t('static.forecastReport.endOf') + ' ' + this.state.endDateDisplay) + ') * ' + i18n.t('static.forecastReport.totalForecastQuantity') + ' / ' + 'Difference between months'} style={{ width: '8%' }}>{i18n.t('static.forecastReport.desiredStock')} <span className="FontWeightNormal">{i18n.t('static.forecastReport.endOf')} {this.state.endDateDisplay})</span> <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
+                                                                            <th className="text-center" title={(i18n.t('static.forecastReport.desiredMonthsOfStock') + ' ' + i18n.t('static.forecastReport.endOf') + ' ' + this.state.endDateDisplay) + ') * ' + 'Total Forecasted Quantity' + ' / ' + 'Difference between months'} style={{ width: '8%' }}>{i18n.t('static.forecastReport.desiredStock')} <span className="FontWeightNormal">{i18n.t('static.forecastReport.endOf')} {this.state.endDateDisplay})</span> <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
                                                                         </>
                                                                     }
                                                                     <th className="text-center" title={i18n.t('static.report.stock') + ' ' + i18n.t('static.forecastReport.endOf') + ' ' + this.state.endDateDisplay + ') - ' + i18n.t('static.forecastReport.desiredStock') + ' ' + i18n.t('static.forecastReport.endOf') + ' ' + this.state.endDateDisplay + ')'} style={{ width: '' }}>{i18n.t('static.forecastReport.procurementSurplus')} <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
@@ -3349,7 +3347,8 @@ class ForecastSummary extends Component {
                                                                         <td className='text-left sticky-col first-col clone'></td>
                                                                         <td></td>
                                                                         <td><b>{i18n.t('static.shipment.totalCost')}</b></td>
-                                                                        <td><b>{'$ ' + (parseFloat(this.state.totalProductCost + 0.07 * this.state.totalProductCost).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</b></td>
+                                                                        <td><b>{'$ ' + (parseFloat(parseFloat(this.state.totalProductCost) + parseFloat(0.07 * this.state.totalProductCost)).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</b></td>
+                                                                        {/* <td><b>{'$ ' + (parseFloat(this.state.totalProductCost + 0.07 * this.state.totalProductCost).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</b></td> */}
                                                                         <td></td>
                                                                     </tr>
                                                                 </tfoot>
