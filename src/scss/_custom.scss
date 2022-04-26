@@ -523,7 +523,7 @@ label.arrow_label:after {
   background-color: #e5edf5;
 }
 
-.jexcel_selectall {
+.jss_selectall {
   background: #fff !important;
 }
 .jexcel > thead > tr > td {
@@ -544,22 +544,22 @@ label.arrow_label:after {
   z-index: 0 !important;
 }
 
-.jexcel_page {
+.jss_page {
   z-index: 1;
   color: 002f6c !important;
 }
 
-:first-child.jexcel_page {
+:first-child.jss_page {
   margin-left: 0;
   border-top-left-radius: 0.25rem;
   border-bottom-left-radius: 0.25rem;
 }
-.jexcel_page_selected {
+.jss_page_selected {
   color: #fff;
   background-color: #002f6c !important;
   border-color: #002f6c !important;
 }
-.jexcel_pagination > div > div {
+.jss_pagination > div > div {
   text-align: center;
   width: 30px !important;
   height: 22px !important;
@@ -570,7 +570,7 @@ label.arrow_label:after {
   cursor: pointer !important;
 }
 
-.jexcel_pagination_dropdown {
+.jss_pagination_dropdown {
   color: #fff !important;
   background-color: #20a8d8 !important;
   border-color: #20a8d8 !important;
@@ -583,7 +583,7 @@ label.arrow_label:after {
   border-radius: 0.2rem;
 }
 
-.jexcel_search {
+.jss_search {
   height: calc(1.5em + 0.5rem + 2px);
   padding: 0.25rem 0.5rem;
   font-size: 0.76562rem;
@@ -600,7 +600,7 @@ label.arrow_label:after {
   width:100%!important;
 }
 // :first-child.jexcel_filter{position: absolute; bottom: 0px;}
-.jexcel_pagination_dropdown option {
+.jss_pagination_dropdown option {
   position: absolute;
   top: 100%;
   left: 0;
@@ -646,7 +646,7 @@ label.arrow_label:after {
 .updateTextwhitebtn .btn-info {
   color: #fff !important;
 }
-.jexcel_filter div {
+.jss_search_container div {
   margin-left: auto;
 }
 .f-End {
@@ -794,7 +794,7 @@ label.arrow_label:after {
     .jexcel_clear_btn {
   
        margin-left: 0px !important; 
-  }   .jexcel_pagination_dropdown {
+  }   .jss_pagination_dropdown {
           
     margin-left: 0px !important;}
 
@@ -802,7 +802,7 @@ label.arrow_label:after {
 .react-bs-table-sizePerPage-dropdown .dropdown-item {
     border-bottom: none;
 }.react-bs-table-sizePerPage-dropdown .dropdown-menu {border-radius: 0px !important;}
-.jexcel_pagination_dropdown option {
+.jss_pagination_dropdown option {
   color: #205493 !important;}
 .react-bs-table-sizePerPage-dropdown .dropdown-menu {
   text-align: center !important;
@@ -904,19 +904,19 @@ label.arrow_label:after {
 }
 
 
-.Consumptionsearchinline .jexcel_filter{
+.Consumptionsearchinline .jss_search_container{
   position: absolute;
   top: -53px;
   right: 0%;
 
 }
-.AddInventorysearchinline .jexcel_filter{
+.AddInventorysearchinline .jss_search_container{
   position: absolute;
   top: -53px;
   right: 0%;
 
 }
-.Shipmentsearchinline .jexcel_filter{
+.Shipmentsearchinline .jss_search_container{
   position: absolute;
   top: -53px;
   right: 0%;
@@ -3732,8 +3732,32 @@ margin-left: -45px;
     background-position: top right,top left;
 }
 
+// .jss>thead>tr>td.jss_filters_icon{
+//   background-image:url('/src/assets/img/filter.png')!important;
+// }
+
+.jss_search_container {
+  display: flex;
+  justify-content: space-between;
+  background-color: transparent!important;
+  margin-left: 1px;
+  margin-right: 2px;
+  border: none!important;
+  border-bottom: 0;
+}
+
 .jss>thead>tr>td.jss_filters_icon::before{
-  background-image:url('/src/assets/img/filter.png')!important;
+  // font-family: "F";
+  // background-image:url('/src/assets/img/filter.png')!important;
+  // content: "\f0b0"!important;
+  font-family: 'FontAwesome'!important;
+  content: '\f0b0'!important;
+  position: absolute;
+  right: 0;
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+  color: #ccc;
 }
 
 .localProcurementAgent{
@@ -3944,7 +3968,7 @@ background-color: yellow;
   color: #BA0C2F;
 }
 
-.jexcel_filter{
+.jss_search_container{
   border-top: 0px!important;
 }
 
@@ -5150,7 +5174,7 @@ height: 0px;
           font-size: 25px;
           color: #4AB7DE;
       }
-      .jexcel_pagination_dropdown:hover {
+      .jss_pagination_dropdown:hover {
         color: #fff !important;
         background-color: #4AB7DE !important;
         border-color: #4AB7DE !important;
@@ -5463,7 +5487,7 @@ fieldset.scheduler-border {
   line-height: 1.5;
   border-radius: 0.2rem;
 }
-.jexcel_pagination_dropdown:hover {
+.jss_pagination_dropdown:hover {
   color: #fff !important;
   background-color: #4AB7DE !important;
   border-color: #4AB7DE !important;
@@ -6030,7 +6054,7 @@ font-style: italic!important;
 //     bottom: 0px;
 //     left:1px;
 // }
-.modelingTransferTable .jexcel_container.with-tabs .jexcel_filter{
+.modelingTransferTable .jexcel_container.with-tabs .jss_search_container{
   margin-top: 0px!important;
     padding-top: 0px!important;
 }

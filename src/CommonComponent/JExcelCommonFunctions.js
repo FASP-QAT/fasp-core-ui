@@ -23,7 +23,7 @@ export function jExcelLoadedFunction(instance, number) {
     clearBtn.type = "button";
     clearBtn.classList.add('btn-default');
     clearBtn.classList.add('btn');
-    clearBtn.classList.add('jss_clear_btn');
+    clearBtn.classList.add('jexcel_clear_btn');
 
     var clarText = document.createTextNode(i18n.t('static.jexcel.clear'));
     clearBtn.setAttribute("id", "clearBtnID");
