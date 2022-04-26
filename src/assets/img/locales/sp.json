@@ -2282,5 +2282,6 @@
     "static.organisation.organisationheader": "Organización",
     "static.supplyPlanFormula.maxMonthOfStockEx5": "Max = 7",
     "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18)",
-    "static.importIntoQATSupplyPlan.pleaseSelectForecastProgramVersion": "Seleccione la versión del programa de previsión"
+    "static.importIntoQATSupplyPlan.pleaseSelectForecastProgramVersion": "Seleccione la versión del programa de previsión",
+    "static.importIntoQATSupplyPlan.conversionFactor": "Factor de conversión (pronóstico a plan de suministro)"
 }
