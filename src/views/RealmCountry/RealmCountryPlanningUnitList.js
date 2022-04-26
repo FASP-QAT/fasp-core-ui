@@ -1357,7 +1357,8 @@ export default class RealmCountryPlanningUnitList extends Component {
 
         const { programs } = this.state;
         let programList = programs.length > 0 && programs.map((item, i) => {
-            return ({ label: getLabelText(item.label, this.state.lang), value: item.programId })
+            // return ({ label: getLabelText(item.label, this.state.lang), value: item.programId })
+            return ({ label: item.programCode, value: item.programId })
         }, this);
 
         // const { programLst } = this.state;
