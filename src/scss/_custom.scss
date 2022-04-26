@@ -3732,7 +3732,7 @@ margin-left: -45px;
     background-position: top right,top left;
 }
 
-.jexcel>thead>tr>td.jexcel_filters_icon_active{
+.jss>thead>tr>td.jss_filters_icon::before{
   background-image:url('/src/assets/img/filter.png')!important;
 }
 
