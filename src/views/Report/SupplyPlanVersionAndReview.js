@@ -148,7 +148,8 @@ class SupplyPlanVersionAndReview extends Component {
         let count = 0;
         for (var j = 0; j < matricsList.length; j++) {
             data = [];
-            data[0] = getLabelText(matricsList[j].program.label, this.state.lang)
+            // data[0] = getLabelText(matricsList[j].program.label, this.state.lang)
+            data[0] = matricsList[j].program.code
             data[1] = matricsList[j].versionId
             data[2] = getLabelText(matricsList[j].versionType.label, this.state.lang)
             data[3] = (matricsList[j].createdDate ? moment(matricsList[j].createdDate).format(`YYYY-MM-DD`) : null)
@@ -974,7 +975,8 @@ class SupplyPlanVersionAndReview extends Component {
             && programLst.map((item, i) => {
                 return (
                     <option key={i} value={item.programId}>
-                        {getLabelText(item.label, this.state.lang)}
+                        {/* {getLabelText(item.label, this.state.lang)} */}
+                        {item.programCode}
                     </option>
                 )
             }, this);

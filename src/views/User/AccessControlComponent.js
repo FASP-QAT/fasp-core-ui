@@ -1237,7 +1237,7 @@ class AccessControlComponent extends Component {
         } else {
             selHealthArea = this.state.healthAreas
         }
-        
+
         this.setState({
             selHealthArea
         });
@@ -1281,13 +1281,15 @@ class AccessControlComponent extends Component {
         if (selProgram.length > 0) {
             for (var i = 0; i < selProgram.length; i++) {
                 var paJson = {
-                    name: getLabelText(selProgram[i].label, this.state.lang),
+                    // name: getLabelText(selProgram[i].label, this.state.lang),
+                    name: selProgram[i].programCode,
                     id: parseInt(selProgram[i].programId),
                     active: selProgram[i].active
                 }
                 programList[i] = paJson
             }
             var paJson = {
+                // name: "All",
                 name: "All",
                 id: -1,
                 active: true

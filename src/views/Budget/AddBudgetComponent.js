@@ -492,7 +492,8 @@ class AddBudgetComponent extends Component {
         let programList = programs.length > 0 && programs.map((item, i) => {
             return (
                 <option key={i} value={item.programId}>
-                    {getLabelText(item.label, this.state.lang)}
+                    {/* {getLabelText(item.label, this.state.lang)} */}
+                    {item.programCode}
                 </option>
             )
         }, this);

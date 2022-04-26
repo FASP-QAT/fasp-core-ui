@@ -2699,7 +2699,8 @@ export default class ManualTagging extends Component {
         let programList = programs.length > 0 && programs.map((item, i) => {
             return (
                 <option key={i} value={item.programId}>
-                    {getLabelText(item.label, this.state.lang)}
+                    {/* {getLabelText(item.label, this.state.lang)} */}
+                    {item.programCode}
                 </option>
             )
         }, this);
@@ -2708,7 +2709,8 @@ export default class ManualTagging extends Component {
         let filteredProgramList = countryWisePrograms.length > 0 && countryWisePrograms.map((item, i) => {
             return (
                 <option key={i} value={item.programId}>
-                    {getLabelText(item.label, this.state.lang)}
+                    {/* {getLabelText(item.label, this.state.lang)} */}
+                    {item.programCode}
                 </option>
             )
         }, this);
