@@ -1443,11 +1443,16 @@ class ForecastSummary extends Component {
                                         var total = 0;
                                         console.log("consumptionExtrapolation[ce].extrapolationDataList+++", consumptionExtrapolation[ce].extrapolationDataList)
                                         consumptionExtrapolation[ce].extrapolationDataList.filter(c => moment(c.month).format("YYYY-MM-DD") >= moment(startDate).format("YYYY-MM-DD") && moment(c.month).format("YYYY-MM-DD") <= moment(endDate).format("YYYY-MM-DD")).map(ele => {
-                                            total += ele.amount;
+                                            total += Number(ele.amount);
                                         });
                                         console.log("total+++", total);
                                         tsList.push({ id: "C" + consumptionExtrapolation[ce].consumptionExtrapolationId, name: consumptionExtrapolation[ce].extrapolationMethod.label.label_en, planningUnitId: consumptionExtrapolation[ce].planningUnit.id, type: "C", id1: consumptionExtrapolation[ce].consumptionExtrapolationId, totalForecast: total });
                                     }
+                                    tsList = tsList.sort(function (a, b) {
+                                        a = (a.name).toLowerCase();
+                                        b = (b.name).toLowerCase();
+                                        return a < b ? -1 : a > b ? 1 : 0;
+                                    })
                                     this.setState({
                                         tsList: tsList
                                     })
@@ -2033,6 +2038,7 @@ class ForecastSummary extends Component {
             if (value != "") {
                 // alert("If");
                 var tsListFilter = this.state.tsList.filter(c => c.id == value)[0]
+                console.log("totalForecast---------->0", tsListFilter);
                 var totalForecast = 0;
                 if (tsListFilter.type == "C") {
                     totalForecast = tsListFilter.totalForecast;
@@ -2046,6 +2052,7 @@ class ForecastSummary extends Component {
                     });
                 }
                 // elInstance.setValueFromCoords((Number(x) + 1), y, totalForecast.toFixed(2), true);
+                console.log("totalForecast---------->1", totalForecast);
                 elInstance.setValueFromCoords((Number(x) + 1), y, Math.round(totalForecast), true);
                 let loopVar = 4;
                 let total = 0;
