@@ -1330,7 +1330,8 @@ export default class TreeExtrapolationComponent extends React.Component {
             }
             data[9] = `=IF(D${parseInt(j) + 1} != "",ROUND(D${parseInt(j) + 1},4),IF(N1 == 4,I${parseInt(j) + 1},IF(N1 == 2,H${parseInt(j) + 1},IF(N1 == 7,E${parseInt(j) + 1},IF(N1==5,G${parseInt(j) + 1},IF(N1 == 6,F${parseInt(j) + 1},''))))))` // J
             data[10] = cellData != null && cellData != "" ? cellData.manualChange : ""
-            data[11] = `=IF(M1 == true,ROUND(J${parseInt(j)} + K${parseInt(j)},4),ROUND(J${parseInt(j) + 1} + K${parseInt(j) + 1},4))`
+            // data[11] = `=IF(M1 == true,ROUND(J${parseInt(j)} + K${parseInt(j)},4),ROUND(J${parseInt(j) + 1} + K${parseInt(j) + 1},4))`
+            data[11] = `=IF(M1 == true,IF(J${parseInt(j)} + K${parseInt(j)} == "",'',ROUND(J${parseInt(j)} + K${parseInt(j)},4)),IF(J${parseInt(j) + 1} + K${parseInt(j) + 1} == "",'',ROUND(J${parseInt(j) + 1} + K${parseInt(j) + 1},4)))`
             data[12] = this.props.items.currentItemConfig.context.payload.nodeDataMap[this.props.items.selectedScenario][0].manualChangesEffectFuture
             data[13] = this.state.nodeDataExtrapolation.extrapolationMethod.id
             // data[0] = list[j].month
@@ -1723,6 +1724,7 @@ export default class TreeExtrapolationComponent extends React.Component {
             var col = ("B").concat(parseInt(y) + 1);
             var reg = JEXCEL_DECIMAL_NO_REGEX_LONG_4_DECIMAL;
             console.log("population value---", value)
+            this.setState({ dataChanged: true })
             if (value != "" && !(reg.test(value.toString().replaceAll(",", "")))) {
                 instance.jexcel.setStyle(col, "background-color", "transparent");
                 instance.jexcel.setStyle(col, "background-color", "yellow");
@@ -1776,6 +1778,7 @@ export default class TreeExtrapolationComponent extends React.Component {
             var col = ("C").concat(parseInt(y) + 1);
             var reg = JEXCEL_DECIMAL_NO_REGEX_LONG_4_DECIMAL;
             console.log("reporting rate value---", value)
+            this.setState({ dataChanged: true })
             var actualValue = instance.jexcel.getValue(`B${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             // value.split("%")[0];
             value = value.toString().replaceAll(",", "").split("%")[0];
@@ -1814,9 +1817,10 @@ export default class TreeExtrapolationComponent extends React.Component {
                 instance.jexcel.setComments(col, "");
             }
         }
-        if (x != 10 && this.state.nodeDataExtrapolation.extrapolationMethod.id == "") {
-            this.setState({ dataChanged: true })
-        }
+        console.log("x value for data change---",x);
+        // if (x != 10 && (x == 1 || x > 2)) {
+        //     this.setState({ dataChanged: true })
+        // }
         this.setState({ isChanged: true })
     }.bind(this);
 
