@@ -954,6 +954,31 @@ export default class PlanningUnitSetting extends Component {
             isChanged1: true,
         });
 
+        var elInstance = instance.jexcel;
+        var json = elInstance.getJson(null, false);
+        
+        var colArr = ['A', 'B'];
+        for (var j = 0; j < json.length; j++) {
+            var rowData = elInstance.getRowData(j);
+            var programPlanningUnitId = rowData[11];
+
+            //left align
+            elInstance.setStyle(`A${parseInt(j) + 1}`, 'text-align', 'left');
+            elInstance.setStyle(`B${parseInt(j) + 1}`, 'text-align', 'left');
+
+            if (programPlanningUnitId == 1) {
+                var cell = elInstance.getCell(("B").concat(parseInt(j) + 1))
+                cell.classList.remove('readonly');
+                var cell = elInstance.getCell(("A").concat(parseInt(j) + 1))
+                cell.classList.remove('readonly');
+            } else {
+                var cell = elInstance.getCell(("B").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("A").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+            }
+        }
+
     }
 
     getPlanningUnitByTracerCategoryId(tracerCategoryId) {
@@ -2013,25 +2038,25 @@ export default class PlanningUnitSetting extends Component {
                 },
             ],
             updateTable: function (el, cell, x, y, source, value, id) {
-                var elInstance = el.jexcel;
+                // var elInstance = el.jexcel;
 
-                //left align
-                elInstance.setStyle(`A${parseInt(y) + 1}`, 'text-align', 'left');
-                elInstance.setStyle(`B${parseInt(y) + 1}`, 'text-align', 'left');
+                // //left align
+                // elInstance.setStyle(`A${parseInt(y) + 1}`, 'text-align', 'left');
+                // elInstance.setStyle(`B${parseInt(y) + 1}`, 'text-align', 'left');
 
-                var rowData = elInstance.getRowData(y);
-                var programPlanningUnitId = rowData[11];
-                if (programPlanningUnitId == 1) {
-                    var cell = elInstance.getCell(`B${parseInt(y) + 1}`)
-                    var cellA = elInstance.getCell(`A${parseInt(y) + 1}`)
-                    cell.classList.remove('readonly');
-                    cellA.classList.remove('readonly');
-                } else {
-                    var cell = elInstance.getCell(`B${parseInt(y) + 1}`)
-                    var cellA = elInstance.getCell(`A${parseInt(y) + 1}`)
-                    cell.classList.add('readonly');
-                    cellA.classList.add('readonly');
-                }
+                // var rowData = elInstance.getRowData(y);
+                // var programPlanningUnitId = rowData[11];
+                // if (programPlanningUnitId == 1) {
+                //     var cell = elInstance.getCell(`B${parseInt(y) + 1}`)
+                //     var cellA = elInstance.getCell(`A${parseInt(y) + 1}`)
+                //     cell.classList.remove('readonly');
+                //     cellA.classList.remove('readonly');
+                // } else {
+                //     var cell = elInstance.getCell(`B${parseInt(y) + 1}`)
+                //     var cellA = elInstance.getCell(`A${parseInt(y) + 1}`)
+                //     cell.classList.add('readonly');
+                //     cellA.classList.add('readonly');
+                // }
 
                 // var procurementAgentId = rowData[7];
                 // if (procurementAgentId == -1) {
@@ -2065,6 +2090,7 @@ export default class PlanningUnitSetting extends Component {
             // onselection: this.selected,
             onchange: this.changed,
             onpaste: this.onPaste,
+            // onchangepage: this.onchangepage,
             contextMenu: function (obj, x, y, e) {
                 var items = [];
                 //Add consumption batch info
@@ -2192,6 +2218,7 @@ export default class PlanningUnitSetting extends Component {
     filterPlanningUnitListByProductCategoryId = function (instance, cell, c, r, source) {
         var mylist = [];
         var value = (instance.jexcel.getJson(null, false)[r])[0];
+        console.log("mylist--------->3.2", value);
 
         // if (productCategoryId == -1) {
         //     mylist = this.state.allPlanningUnitList
@@ -2215,6 +2242,8 @@ export default class PlanningUnitSetting extends Component {
             console.log("in else=====>2");
             puList = this.state.planningUnitList;
         }
+
+        console.log("in else=====>3", puList);
 
         for (var k = 0; k < puList.length; k++) {
             var planningUnitJson = {
@@ -2259,6 +2288,34 @@ export default class PlanningUnitSetting extends Component {
 
     }.bind(this)
 
+    onchangepage(el, pageNo, oldPageNo) {
+        var elInstance = el.jexcel;
+        var json = elInstance.getJson(null, false);
+        
+        var colArr = ['A', 'B'];
+        for (var j = 0; j < json.length; j++) {
+            var rowData = elInstance.getRowData(j);
+            var programPlanningUnitId = rowData[11];
+
+            //left align
+            elInstance.setStyle(`A${parseInt(j) + 1}`, 'text-align', 'left');
+            elInstance.setStyle(`B${parseInt(j) + 1}`, 'text-align', 'left');
+
+            if (programPlanningUnitId == 1) {
+                var cell = elInstance.getCell(("B").concat(parseInt(j) + 1))
+                cell.classList.remove('readonly');
+                var cell = elInstance.getCell(("A").concat(parseInt(j) + 1))
+                cell.classList.remove('readonly');
+            } else {
+                var cell = elInstance.getCell(("B").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("A").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+            }
+        }
+
+    }
+
     loaded = function (instance, cell, x, y, value) {
         jExcelLoadedFunction(instance);
         var asterisk = document.getElementsByClassName("resizable")[0];
@@ -2281,6 +2338,35 @@ export default class PlanningUnitSetting extends Component {
         tr.children[8].title = i18n.t('static.tooltip.PriceType');
 
 
+        var elInstance = instance.jexcel;
+        var json = elInstance.getJson();
+        var colArr = ['A', 'B'];
+        for (var j = 0; j < json.length; j++) {
+            var rowData = elInstance.getRowData(j);
+            var programPlanningUnitId = rowData[11];
+
+            //left align
+            elInstance.setStyle(`A${parseInt(j) + 1}`, 'text-align', 'left');
+            elInstance.setStyle(`B${parseInt(j) + 1}`, 'text-align', 'left');
+
+            if (programPlanningUnitId == 1) {
+                // for (var i = 0; i < colArr.length; i++) {
+                //     var cell = elInstance.getCell((colArr[i]).concat(parseInt(y) + 1))
+                //     cell.classList.remove('readonly');
+                // }
+                var cell = elInstance.getCell(("B").concat(parseInt(j) + 1))
+                cell.classList.remove('readonly');
+                var cell = elInstance.getCell(("A").concat(parseInt(j) + 1))
+                cell.classList.remove('readonly');
+            } else {
+                var cell = elInstance.getCell(("B").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("A").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+            }
+
+
+        }
     }
 
     formSubmit = function () {
