@@ -109,6 +109,7 @@ export default class ListTreeComponent extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            treeEl: '',
             dropdownOpen: new Array(19).fill(false),
             isSubmitClicked: false,
             missingPUList: [],
@@ -1082,12 +1083,13 @@ export default class ListTreeComponent extends Component {
                         items.push({
                             title: i18n.t('static.common.duplicateTree'),
                             onclick: function () {
+                                console.log("tree name---", this.el.getValueFromCoords(2, y))
                                 this.setState({
-                                    programId: this.el.getValueFromCoords(7, y),
-                                    versionId: this.el.getValueFromCoords(9, y),
-                                    treeId: this.el.getValueFromCoords(0, y),
+                                    programId: this.state.treeEl.getValueFromCoords(7, y),
+                                    versionId: this.state.treeEl.getValueFromCoords(9, y),
+                                    treeId: this.state.treeEl.getValueFromCoords(0, y),
                                     isModalOpen: !this.state.isModalOpen,
-                                    treeName: this.el.getValueFromCoords(2, y) + " (copy)",
+                                    treeName: this.state.treeEl.getValueFromCoords(2, y) + " (copy)",
                                     treeFlag: true,
                                     treeTemplate: ''
                                 })
@@ -1421,62 +1423,64 @@ export default class ListTreeComponent extends Component {
                                         }) => (
                                             <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='modalForm' autocomplete="off">
                                                 {/* <CardBody> */}
-                                                <div className="row">
+                                                <div className="col-md-12">
                                                     <Input type="hidden"
                                                         name="treeFlag"
                                                         id="treeFlag"
                                                         value={this.state.treeFlag}
                                                     />
-                                                    <div style={{ display: this.state.treeFlag ? "none" : "block" }} className="col-md-12">
-                                                        <FormGroup className="col-md-12">
-                                                            <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}<span className="red Reqasterisk">*</span></Label>
-                                                            <div className="controls">
+                                                    <div style={{ display: this.state.treeFlag ? "none" : "block" }} className="">
+                                                        <div className='row'>
+                                                            <FormGroup className="col-md-6">
+                                                                <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}<span className="red Reqasterisk">*</span></Label>
+                                                                <div className="controls">
 
-                                                                <Input
-                                                                    type="select"
-                                                                    name="datasetIdModal"
-                                                                    id="datasetIdModal"
-                                                                    bsSize="sm"
-                                                                    valid={!errors.datasetIdModal && this.state.datasetIdModal != null ? this.state.datasetIdModal : '' != ''}
-                                                                    invalid={touched.datasetIdModal && !!errors.datasetIdModal}
-                                                                    onBlur={handleBlur}
-                                                                    onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                                    value={this.state.datasetIdModal}
-                                                                >
-                                                                    <option value="">{"Please select program"}</option>
-                                                                    {datasets}
-                                                                </Input>
-                                                                <FormFeedback>{errors.datasetIdModal}</FormFeedback>
-                                                            </div>
+                                                                    <Input
+                                                                        type="select"
+                                                                        name="datasetIdModal"
+                                                                        id="datasetIdModal"
+                                                                        bsSize="sm"
+                                                                        valid={!errors.datasetIdModal && this.state.datasetIdModal != null ? this.state.datasetIdModal : '' != ''}
+                                                                        invalid={touched.datasetIdModal && !!errors.datasetIdModal}
+                                                                        onBlur={handleBlur}
+                                                                        onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                                        value={this.state.datasetIdModal}
+                                                                    >
+                                                                        <option value="">{"Please select program"}</option>
+                                                                        {datasets}
+                                                                    </Input>
+                                                                    <FormFeedback>{errors.datasetIdModal}</FormFeedback>
+                                                                </div>
 
-                                                        </FormGroup>
+                                                            </FormGroup>
 
-                                                        <FormGroup className="col-md-12">
-                                                            <Label htmlFor="currencyId">{i18n.t('static.forecastMethod.forecastMethod')}<span class="red Reqasterisk">*</span></Label>
-                                                            <div className="controls">
+                                                            <FormGroup className="col-md-6">
+                                                                <Label htmlFor="currencyId">{i18n.t('static.forecastMethod.forecastMethod')}<span class="red Reqasterisk">*</span></Label>
+                                                                <div className="controls">
 
-                                                                <Input
-                                                                    type="select"
-                                                                    name="forecastMethodId"
-                                                                    id="forecastMethodId"
-                                                                    bsSize="sm"
-                                                                    valid={!errors.forecastMethodId && this.state.forecastMethod.id != null ? this.state.forecastMethod.id : '' != ''}
-                                                                    invalid={touched.forecastMethodId && !!errors.forecastMethodId}
-                                                                    onBlur={handleBlur}
-                                                                    onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                                    required
-                                                                    value={this.state.forecastMethod.id}
-                                                                >
-                                                                    <option value="">{i18n.t('static.common.forecastmethod')}</option>
-                                                                    {forecastMethods}
-                                                                </Input>
-                                                                <FormFeedback>{errors.forecastMethodId}</FormFeedback>
-                                                            </div>
+                                                                    <Input
+                                                                        type="select"
+                                                                        name="forecastMethodId"
+                                                                        id="forecastMethodId"
+                                                                        bsSize="sm"
+                                                                        valid={!errors.forecastMethodId && this.state.forecastMethod.id != null ? this.state.forecastMethod.id : '' != ''}
+                                                                        invalid={touched.forecastMethodId && !!errors.forecastMethodId}
+                                                                        onBlur={handleBlur}
+                                                                        onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                                        required
+                                                                        value={this.state.forecastMethod.id}
+                                                                    >
+                                                                        <option value="">{i18n.t('static.common.forecastmethod')}</option>
+                                                                        {forecastMethods}
+                                                                    </Input>
+                                                                    <FormFeedback>{errors.forecastMethodId}</FormFeedback>
+                                                                </div>
 
-                                                        </FormGroup>
+                                                            </FormGroup>
+                                                        </div>
                                                     </div>
-                                                    <div className="col-md-12">
-                                                        <FormGroup className="col-md-12">
+                                                    <div className="row">
+                                                        <FormGroup className={this.state.treeFlag ? "col-md-12" : "col-md-6"}>
                                                             <Label for="number1">Tree Name<span className="red Reqasterisk">*</span></Label>
                                                             <div className="controls">
                                                                 <Input type="text"
@@ -1494,9 +1498,7 @@ export default class ListTreeComponent extends Component {
                                                             </div>
 
                                                         </FormGroup>
-                                                    </div>
-                                                    <div style={{ display: this.state.treeFlag ? "none" : "block" }} className="col-md-12">
-                                                        <FormGroup className="col-md-12">
+                                                        <FormGroup className="col-md-6" style={{ display: this.state.treeFlag ? "none" : "block" }} >
                                                             <Label htmlFor="currencyId">{i18n.t('static.region.region')}<span class="red Reqasterisk">*</span></Label>
                                                             <div className="controls">
                                                                 <Select
@@ -1519,62 +1521,66 @@ export default class ListTreeComponent extends Component {
                                                             </div>
 
                                                         </FormGroup>
-                                                        <FormGroup className="col-md-12">
-                                                            <Label htmlFor="currencyId">{i18n.t('static.common.note')}</Label>
-                                                            <div className="controls">
-                                                                <Input type="textarea"
-                                                                    id="notes"
-                                                                    name="notes"
-                                                                    onChange={(e) => { this.dataChange(e) }}
-                                                                    value={this.state.notes}
-                                                                ></Input>
-                                                            </div>
+                                                    </div>
+                                                    <div style={{ display: this.state.treeFlag ? "none" : "block" }} >
+                                                        <div className='row'>
+                                                            <FormGroup className="col-md-6">
+                                                                <Label htmlFor="currencyId">{i18n.t('static.common.note')}</Label>
+                                                                <div className="controls">
+                                                                    <Input type="textarea"
+                                                                        id="notes"
+                                                                        name="notes"
+                                                                        onChange={(e) => { this.dataChange(e) }}
+                                                                        value={this.state.notes}
+                                                                    ></Input>
+                                                                </div>
 
-                                                        </FormGroup>
-                                                        <FormGroup className="col-md-12">
-                                                            <Label className="P-absltRadio">{i18n.t('static.common.status')}</Label>
-                                                            <FormGroup check inline>
-                                                                <Input
-                                                                    className="form-check-input"
-                                                                    type="radio"
-                                                                    id="active10"
-                                                                    name="active"
-                                                                    value={true}
-                                                                    checked={this.state.active === true}
-                                                                    onChange={(e) => { this.dataChange(e) }}
-                                                                />
-                                                                <Label
-                                                                    className="form-check-label"
-                                                                    check htmlFor="inline-radio1">
-                                                                    {i18n.t('static.common.active')}
-                                                                </Label>
                                                             </FormGroup>
-                                                            <FormGroup check inline>
-                                                                <Input
-                                                                    className="form-check-input"
-                                                                    type="radio"
-                                                                    id="active11"
-                                                                    name="active"
-                                                                    value={false}
-                                                                    checked={this.state.active === false}
-                                                                    onChange={(e) => { this.dataChange(e) }}
-                                                                />
-                                                                <Label
-                                                                    className="form-check-label"
-                                                                    check htmlFor="inline-radio2">
-                                                                    {i18n.t('static.common.disabled')}
-                                                                </Label>
+                                                            <FormGroup className="col-md-6 mt-lg-4">
+                                                                <Label className="P-absltRadio">{i18n.t('static.common.status')}</Label>
+                                                                <FormGroup check inline>
+                                                                    <Input
+                                                                        className="form-check-input"
+                                                                        type="radio"
+                                                                        id="active10"
+                                                                        name="active"
+                                                                        value={true}
+                                                                        checked={this.state.active === true}
+                                                                        onChange={(e) => { this.dataChange(e) }}
+                                                                    />
+                                                                    <Label
+                                                                        className="form-check-label"
+                                                                        check htmlFor="inline-radio1">
+                                                                        {i18n.t('static.common.active')}
+                                                                    </Label>
+                                                                </FormGroup>
+                                                                <FormGroup check inline>
+                                                                    <Input
+                                                                        className="form-check-input"
+                                                                        type="radio"
+                                                                        id="active11"
+                                                                        name="active"
+                                                                        value={false}
+                                                                        checked={this.state.active === false}
+                                                                        onChange={(e) => { this.dataChange(e) }}
+                                                                    />
+                                                                    <Label
+                                                                        className="form-check-label"
+                                                                        check htmlFor="inline-radio2">
+                                                                        {i18n.t('static.common.disabled')}
+                                                                    </Label>
+                                                                </FormGroup>
                                                             </FormGroup>
-                                                        </FormGroup>
+                                                        </div>
                                                     </div>
 
-                                                    <div className="col-md-12" style={{ display: 'inline-block' }}>
-                                                        <div style={{ display: this.state.missingPUList.length > 0 ? 'block' : 'none' }}><div><b>Missing Planning Units : (<a href="/#/planningUnitSetting/listPlanningUnitSetting" className="supplyplanformulas">Update Planning Units</a>)</b></div><br />
+                                                    <div className="col-md-12 pl-lg-0 pr-lg-0" style={{ display: 'inline-block' }}>
+                                                        <div style={{ display: this.state.missingPUList.length > 0 && !this.state.treeFlag ? 'block' : 'none' }}><div><b>Missing Planning Units : (<a href="/#/planningUnitSetting/listPlanningUnitSetting" className="supplyplanformulas">Update Planning Units</a>)</b></div><br />
                                                             <div id="missingPUJexcel" className="RowClickable">
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <FormGroup className="col-md-12 float-right pt-lg-4">
+                                                    <FormGroup className="col-md-12 float-right pt-lg-4 pr-lg-0">
                                                         <Button type="button" color="danger" className="mr-1 float-right" size="md" onClick={this.modelOpenClose}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                                         <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                                         &nbsp;

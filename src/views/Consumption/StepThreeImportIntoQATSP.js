@@ -533,7 +533,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                             }
                             return a;
                         }, {}));
-                        console.log("Result True@@@@@@@@@@@@@@@@@@", resultTrue);
+                        // console.log("Result True@@@@@@@@@@@@@@@@@@", resultTrue);
                         this.setState({
                             selSource: resultTrue,
                             loading: true
@@ -543,7 +543,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
 
                     }).catch(
                         error => {
-                            console.log("Error @@@@@@@@@@", error)
+                            // console.log("Error @@@@@@@@@@", error)
                             if (error.message === "Network Error") {
                                 this.setState({
                                     message: 'static.unkownError',
@@ -604,8 +604,8 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                 data[1] = papuList[j].v2
                 data[2] = papuList[j].v3
                 data[3] = papuList[j].v4
-                data[4] = papuList[j].v15
-                data[5] = papuList[j].v5
+                data[4] = papuList[j].v5
+                data[5] = papuList[j].v15
                 data[6] = papuList[j].v6
                 data[7] = papuList[j].v7
                 data[8] = papuList[j].v8
@@ -667,7 +667,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                     readOnly: true
                 },
                 {
-                    title: '% of Forecast',
+                    title: 'Forecasted Consumption (Forecast Module)',
                     // type: 'text',
                     type: 'numeric',
                     decimal: '.',
@@ -676,7 +676,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                     readOnly: true
                 },
                 {
-                    title: 'Forecasted Consumption (Forecast Module)',
+                    title: '% of Forecast',
                     // type: 'text',
                     type: 'numeric',
                     decimal: '.',

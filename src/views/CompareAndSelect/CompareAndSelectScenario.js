@@ -1143,6 +1143,9 @@ class CompareAndSelectScenario extends Component {
                     if (datasetList.length == 1) {
                         datasetId = datasetList[0].id;
                         event.target.value = datasetList[0].id;
+                    } else if (this.props.match.params.programId != "" && datasetList.filter(c => c.id == this.props.match.params.programId).length > 0) {
+                        datasetId = this.props.match.params.programId;
+                        event.target.value = this.props.match.params.programId;
                     } else if (localStorage.getItem("sesDatasetId") != "" && datasetList.filter(c => c.id == localStorage.getItem("sesDatasetId")).length > 0) {
                         datasetId = localStorage.getItem("sesDatasetId");
                         event.target.value = localStorage.getItem("sesDatasetId");
@@ -1326,6 +1329,9 @@ class CompareAndSelectScenario extends Component {
                 if (planningUnitList.length == 1) {
                     planningUnitId = planningUnitList[0].planningUnit.id;
                     event.target.value = planningUnitList[0].planningUnit.id;
+                } else if (this.props.match.params.planningUnitId != "" && planningUnitList.filter(c => c.planningUnit.id == this.props.match.params.planningUnitId).length > 0) {
+                    planningUnitId = this.props.match.params.planningUnitId;
+                    event.target.value = this.props.match.params.planningUnitId;
                 } else if (localStorage.getItem("sesDatasetPlanningUnitId") != "" && planningUnitList.filter(c => c.planningUnit.id == localStorage.getItem("sesDatasetPlanningUnitId")).length > 0) {
                     planningUnitId = localStorage.getItem("sesDatasetPlanningUnitId");
                     event.target.value = localStorage.getItem("sesDatasetPlanningUnitId");
@@ -1340,6 +1346,9 @@ class CompareAndSelectScenario extends Component {
                 if (regionList.length == 1) {
                     regionId = regionList[0].regionId;
                     regionEvent.target.value = regionList[0].regionId;
+                } else if (this.props.match.params.regionId != "" && regionList.filter(c => c.regionId == this.props.match.params.regionId).length > 0) {
+                    regionId = this.props.match.params.regionId;
+                    regionEvent.target.value = this.props.match.params.regionId;
                 } else if (localStorage.getItem("sesDatasetRegionId") != "" && regionList.filter(c => c.regionId == localStorage.getItem("sesDatasetRegionId")).length > 0) {
                     regionId = localStorage.getItem("sesDatasetRegionId");
                     regionEvent.target.value = localStorage.getItem("sesDatasetRegionId");

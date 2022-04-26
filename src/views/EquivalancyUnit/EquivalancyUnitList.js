@@ -157,7 +157,7 @@ class EquivalancyUnit extends Component {
                 if (!(budgetRegx.test(value))) {
                     elInstance.setStyle(col, "background-color", "transparent");
                     elInstance.setStyle(col, "background-color", "yellow");
-                    elInstance.setComments(col, i18n.t('static.message.spacetext'));
+                    elInstance.setComments(col, i18n.t('static.validSpace.string'));
                 } else {
                     elInstance.setStyle(col, "background-color", "transparent");
                     elInstance.setComments(col, "");
@@ -2470,7 +2470,7 @@ class EquivalancyUnit extends Component {
                     if (!(budgetRegx.test(value))) {
                         elInstance.setStyle(col, "background-color", "transparent");
                         elInstance.setStyle(col, "background-color", "yellow");
-                        elInstance.setComments(col, i18n.t('static.message.spacetext'));
+                        elInstance.setComments(col, i18n.t('static.validSpace.string'));
                         valid = false;
                         this.setState({
                             message: i18n.t('static.supplyPlan.validationFailed'),
