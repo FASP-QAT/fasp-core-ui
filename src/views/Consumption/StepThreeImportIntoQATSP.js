@@ -234,8 +234,22 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                                     if (actionList == undefined) {
                                         actionList = []
                                     }
+                                    var elInstance = this.state.languageEl;
+
+                                    var json = elInstance.getJson();
                                     // var qunatimedData = this.state.selSource;
-                                    var finalImportQATData = this.state.selSource;
+                                    var finalImportQATDataSelSource = this.state.selSource;
+                                    var finalImportQATDataSelSourceFilter = finalImportQATDataSelSource.filter((c, indexFilter) => json[indexFilter][9] == true);
+
+                                    var finalImportQATData = Object.values(finalImportQATDataSelSourceFilter.reduce((a, { v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16 }) => {
+                                        if (!a[v16]) {
+                                            a[v16] = Object.assign({}, { v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16 });
+                                        } else {
+                                            a[v16].v7 += v7;
+                                        }
+                                        return a;
+                                    }, {}));
+
                                     console.log("finalImportQATData===>", finalImportQATData)
 
                                     var finalPuList = []
@@ -272,9 +286,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                                         }
 
                                         var consumptionDataList = (programJson.consumptionList);
-                                        var elInstance = this.state.languageEl;
 
-                                        var json = elInstance.getJson();
                                         var finalImportQATDataFilter = finalImportQATData.filter((c, indexFilter) => c.v10 == finalPuList[pu] && json[indexFilter][9] == true);
                                         // console.log("finalImportQATDataFilter-----2", finalImportQATDataFilter)
 
@@ -515,6 +527,8 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                                         v13: primaryConsumptionData[i].monthlyForecastData[j].month + "~" + selectedSupplyPlanPlanningUnit[0].supplyPlanPlanningUnitId + "~" + regionFilter[0].supplyPlanRegionId + "~" + primaryConsumptionData[i].planningUnit.id,
                                         v14: primaryConsumptionData[i].monthlyForecastData[j].month, // Month without format
                                         v15: regionFilter[0].forecastPercentage,// % of forecast
+                                        v16: primaryConsumptionData[i].monthlyForecastData[j].month + "~" + selectedSupplyPlanPlanningUnit[0].supplyPlanPlanningUnitId + "~" + regionFilter[0].supplyPlanRegionId,
+
 
                                     });
                                 }
@@ -524,9 +538,9 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                             }
                         }
 
-                        let resultTrue = Object.values(tempList.reduce((a, { v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15 }) => {
+                        let resultTrue = Object.values(tempList.reduce((a, { v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16 }) => {
                             if (!a[v13]) {
-                                a[v13] = Object.assign({}, { v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15 });
+                                a[v13] = Object.assign({}, { v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16 });
                             } else {
                                 a[v13].v7 += v7;
                                 a[v13].v5 += v5;
