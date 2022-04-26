@@ -489,10 +489,8 @@ export default class ExtrapolateDataComponent extends React.Component {
         let startDate = rangeValue1.from.year + '-' + rangeValue1.from.month + '-01';
         let stopDate = rangeValue1.to.year + '-' + rangeValue1.to.month + '-' + new Date(rangeValue1.to.year, rangeValue1.to.month, 0).getDate();
         var minDateForActualConsumption = this.state.minDateForConsumption;
-        var monthArrayPart1 = monthArray.filter(c => moment(c).format("YYYY-MM") <= moment(minDateForActualConsumption).format("YYYY-MM"));
-        var monthArrayPart2 = monthArray.filter(c => moment(c).format("YYYY-MM") > moment(minDateForActualConsumption).format("YYYY-MM"));
-        console.log("MonthArrayPart1@@@@@@@@@@@@@@@", monthArrayPart1);
-        console.log("MonthArrayPart2@@@@@@@@@@@@@@@", monthArrayPart2);
+        var monthArrayPart1 = monthArray.filter(c => moment(c).format("YYYY-MM") < moment(minDateForActualConsumption).format("YYYY-MM"));
+        var monthArrayPart2 = monthArray.filter(c => moment(c).format("YYYY-MM") >= moment(minDateForActualConsumption).format("YYYY-MM"));
         for (var j = 0; j < monthArrayPart1.length; j++) {
             data = [];
             data[0] = monthArrayPart1[j];
@@ -652,7 +650,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                         //     cell.classList.add('jexcelBoldPurpleCell');
                         // } else {
                         var cell = elInstance.getCell(("A").concat(parseInt(y) + 1))
-                        cell.classList.add('jexcelPurpleCell');
+                        cell.classList.add('jexcelBoldPurpleCell');
                         // }
                         var cell = elInstance.getCell(("C").concat(parseInt(y) + 1))
                         cell.classList.add('jexcelBoldPurpleCell');
@@ -855,7 +853,7 @@ export default class ExtrapolateDataComponent extends React.Component {
             //   var consumptionData = actualConsumptionList.filter(c => moment(c.month).format("YYYY-MM") == moment(curDate).format("YYYY-MM"))
             //    && c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId)
             console.log("consumptionData--->", consumptionData)
-            if (consumptionData.length > 0) {
+            if (dataFound) {
                 inputDataMovingAvg.push({ "month": inputDataMovingAvg.length + 1, "actual": consumptionData.length > 0 ? Number(consumptionData[0].puAmount) : null, "forecast": null })
                 inputDataSemiAverage.push({ "month": inputDataSemiAverage.length + 1, "actual": consumptionData.length > 0 ? Number(consumptionData[0].puAmount) : null, "forecast": null })
                 inputDataLinearRegression.push({ "month": inputDataLinearRegression.length + 1, "actual": consumptionData.length > 0 ? Number(consumptionData[0].puAmount) : null, "forecast": null })
@@ -869,16 +867,40 @@ export default class ExtrapolateDataComponent extends React.Component {
             minDateForConsumption: minDateForConsumption
         })
         try {
-            calculateMovingAvg(inputDataMovingAvg, this.state.monthsForMovingAverage, noOfMonthsForProjection, this);
-            calculateSemiAverages(inputDataSemiAverage, noOfMonthsForProjection, this);
-            calculateLinearRegression(inputDataLinearRegression, this.state.confidenceLevelIdLinearRegression, noOfMonthsForProjection, this);
-            console.log("inputDataTes.length+++", inputDataTes.length);
-            // if (inputDataTes.length >= (this.state.noOfMonthsForASeason * 2)) {
-            calculateTES(inputDataTes, this.state.alpha, this.state.beta, this.state.gamma, this.state.confidenceLevelId, noOfMonthsForProjection, this, minStartDate, false);
-            calculateArima(inputDataArima, this.state.p, this.state.d, this.state.q, this.state.confidenceLevelIdArima, noOfMonthsForProjection, this, minStartDate, false);
-            this.setState({
-                extrapolateClicked: true
-            })
+            if (inputDataMovingAvg.filter(c => c.actual != null).length < 3 || (this.state.smoothingId && inputDataMovingAvg.filter(c => c.actual != null).length < 24) || (this.state.arimaId && inputDataMovingAvg.filter(c => c.actual != null).length < 14)) {
+                this.el = jexcel(document.getElementById("tableDiv"), '');
+                this.el.destroy();
+                this.setState({
+                    loading: false,
+                    showData: false,
+                    dataChanged: false,
+                    extrapolateClicked: false,
+                    show: false,
+                    dataEl: ""
+                })
+                alert(i18n.t('static.tree.minDataRequiredToExtrapolate'))
+            } else {
+                if (this.state.movingAvgId) {
+                    calculateMovingAvg(inputDataMovingAvg, this.state.monthsForMovingAverage, noOfMonthsForProjection, this);
+                }
+                if (this.state.semiAvgId) {
+                    calculateSemiAverages(inputDataSemiAverage, noOfMonthsForProjection, this);
+                }
+                if (this.state.linearRegressionId) {
+                    calculateLinearRegression(inputDataLinearRegression, this.state.confidenceLevelIdLinearRegression, noOfMonthsForProjection, this);
+                }
+                console.log("inputDataTes.length+++", inputDataTes.length);
+                // if (inputDataTes.length >= (this.state.noOfMonthsForASeason * 2)) {
+                if (this.state.smoothingId) {
+                    calculateTES(inputDataTes, this.state.alpha, this.state.beta, this.state.gamma, this.state.confidenceLevelId, noOfMonthsForProjection, this, minStartDate, false);
+                }
+                if (this.state.arimaId) {
+                    calculateArima(inputDataArima, this.state.p, this.state.d, this.state.q, this.state.confidenceLevelIdArima, noOfMonthsForProjection, this, minStartDate, false);
+                }
+                this.setState({
+                    extrapolateClicked: true
+                })
+            }
         } catch (error) {
             console.log("Error@@@@@@", error)
             // this.el = jexcel(document.getElementById("tableDiv"), '');
@@ -1647,11 +1669,21 @@ export default class ExtrapolateDataComponent extends React.Component {
                     }
                 }
                 console.log("@@@@@@@@@@##############", inputDataSemiAverage)
-                calculateError(inputDataSemiAverage, "semiAvgError", this);
-                calculateError(inputDataMovingAvg, "movingAvgError", this);
-                calculateError(inputDataLinearRegression, "linearRegressionError", this);
-                calculateError(inputDataTes, "tesError", this);
-                calculateError(inputDataArima, "arimaError", this);
+                if (this.state.semiAvgId) {
+                    calculateError(inputDataSemiAverage, "semiAvgError", this);
+                }
+                if (this.state.movingAvgId) {
+                    calculateError(inputDataMovingAvg, "movingAvgError", this);
+                }
+                if (this.state.linearRegressionId) {
+                    calculateError(inputDataLinearRegression, "linearRegressionError", this);
+                }
+                if (this.state.smoothingId) {
+                    calculateError(inputDataTes, "tesError", this);
+                }
+                if (this.state.arimaId) {
+                    calculateError(inputDataArima, "arimaError", this);
+                }
                 this.setState({
                     actualConsumptionList: actualConsumptionList,
                     startDate: startDate,
@@ -3920,7 +3952,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                             <div className="row" style={{ display: this.state.show ? "block" : "none" }}>
                                                 <div className="col-md-10 pt-4 pb-3">
                                                     {this.state.showData && <ul className="legendcommitversion">
-                                                        <li><span className="legendcolor" style={{ backgroundColor: "purple", border: "1px solid #000" }}></span> <span className="legendcommitversionText">{i18n.t('static.common.forecastPeriod')}</span></li>
+                                                        <li><span className="purplelegend legendcolor"></span> <span className="legendcommitversionText" style={{ color: "rgb(170, 85, 161)" }}><i>{i18n.t('static.common.forecastPeriod')}{" "}<b>{"("}{i18n.t('static.supplyPlan.forecastedConsumption')}{")"}</b></i></span></li>
                                                         <li><span className="legendcolor" style={{ backgroundColor: "black", border: "1px solid #000" }}></span> <span className="legendcommitversionText">{i18n.t('static.consumption.actual')}</span></li>
                                                     </ul>}
                                                 </div>
@@ -3971,11 +4003,11 @@ export default class ExtrapolateDataComponent extends React.Component {
                                 If you have poorer data (missing data points, variable reporting rates, less than 12 months of data), use simpler forecast methods
                             </p>
                             <p>
-                            <b>NOTE: The minimum values needed to get correct graphs and reports for the various features are as under: <br></br>
-                                <span className="ml-lg-5">1. ARIMA : This needs at least 14 months of data<br></br></span>
-                                <span className="ml-lg-5">2. TES will need at least 24 months of data<br></br></span>
-                                <span className="ml-lg-5">3. Other(including things like Moving averages etc) will need at least 3 months of data</span>
-                            </b>
+                                <b>NOTE:  The minimum values needed to get correct graphs and reports for the various features are below: <br></br>
+                                    <span className="ml-lg-5">* TES, Holt-Winters:  Needs at least 24 months of actual consumption data<br></br></span>
+                                    <span className="ml-lg-5">* ARIMA:  Needs at least 14 months of actual consumption data<br></br></span>
+                                    <span className="ml-lg-5">* Moving Average, Semi-Averages, and Linear Regression:  Needs at least 3 months of actual consumption data</span>
+                                </b>
                             </p>
                         </ModalBody>
                     </div>

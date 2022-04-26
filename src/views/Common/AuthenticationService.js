@@ -1332,6 +1332,7 @@ class AuthenticationService {
                         }
                         break;
                     case "/report/compareAndSelectScenario":
+                    case "/report/compareAndSelectScenario/:programId/:planningUnitId/:regionId":
                         if (bfunction.includes("ROLE_BF_COMPARE_AND_SELECT")) {
                             return true;
                         }

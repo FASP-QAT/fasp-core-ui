@@ -709,9 +709,9 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
             });
 
           if (startValList.length > 0 && endValList.length > 0) {
-            var startVal = startValList[startValList.length - 1].amount;
+            var startVal = startValList[startValList.length - 1].adjustedAmount != undefined ? startValList[startValList.length - 1].adjustedAmount : startValList[startValList.length - 1].amount;
             var startMonthVal = startValList[startValList.length - 1].month;
-            var endVal = endValList[0].amount;
+            var endVal = endValList[0].adjustedAmount != undefined ? endValList[0].adjustedAmount : endValList[0].amount;
             var endMonthVal = endValList[0].month;
             interpolatedRegionsAndMonths.push({ region: regionList[r], month: moment(monthArray[j].date).format("YYYY-MM") });
             //y=y1+(x-x1)*(y2-y1)/(x2-x1);

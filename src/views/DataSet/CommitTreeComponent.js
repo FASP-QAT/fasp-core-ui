@@ -725,7 +725,7 @@ export default class CommitTreeComponent extends React.Component {
                     item.regionList.map(item1 => {
                         return (
                             <li key={i}>
-                                <div className="hoverDiv" onClick={() => noForecastSelectedClicked(item.planningUnit.planningUnit.id, item1.id, this)}><span>{getLabelText(item.planningUnit.planningUnit.label, this.state.lang) + " - " + item1.label}</span></div>
+                                <a href={"/#/report/compareAndSelectScenario/" + this.state.programId + "/" + item.planningUnit.planningUnit.id + "/" + item1.id} target="_blank"><div className="hoverDiv"><span>{getLabelText(item.planningUnit.planningUnit.label, this.state.lang) + " - " + item1.label}</span></div></a>
                             </li>
                         )
                     }, this)
@@ -737,7 +737,7 @@ export default class CommitTreeComponent extends React.Component {
         let missingMonths = missingMonthList.length > 0 ? missingMonthList.map((item, i) => {
             return (
                 <li key={i}>
-                    <div className="hoverDiv" onClick={() => missingMonthsClicked(item.planningUnitId, this)}><span>{getLabelText(item.planningUnitLabel, this.state.lang) + " - " + getLabelText(item.regionLabel, this.state.lang) + ": "}</span></div>{"" + item.monthsArray}
+                    <a href={"/#/dataentry/consumptionDataEntryAndAdjustment/" + item.planningUnitId} target="_blank"><div className="hoverDiv" ><span>{getLabelText(item.planningUnitLabel, this.state.lang) + " - " + getLabelText(item.regionLabel, this.state.lang) + ": "}</span></div></a>{"" + item.monthsArray}
                 </li>
             )
         }, this) : <span>{i18n.t('static.forecastValidation.noMissingGaps')}</span>;
@@ -747,7 +747,7 @@ export default class CommitTreeComponent extends React.Component {
         let consumption = consumptionListlessTwelve.length > 0 ? consumptionListlessTwelve.map((item, i) => {
             return (
                 <li key={i}>
-                    <div className="hoverDiv" onClick={() => missingMonthsClicked(item.planningUnitId, this)}><span>{getLabelText(item.planningUnitLabel, this.state.lang) + " - " + getLabelText(item.regionLabel, this.state.lang) + ": "}</span></div><span>{item.noOfMonths + " month(s)"}</span>
+                    <a href={"/#/dataentry/consumptionDataEntryAndAdjustment/" + item.planningUnitId} target="_blank"><div className="hoverDiv"><span>{getLabelText(item.planningUnitLabel, this.state.lang) + " - " + getLabelText(item.regionLabel, this.state.lang) + ": "}</span></div></a><span>{item.noOfMonths + " month(s)"}</span>
                 </li>
             )
         }, this) : <span>{i18n.t('static.forecastValidation.noMonthsHaveLessData')}</span>;
@@ -768,7 +768,7 @@ export default class CommitTreeComponent extends React.Component {
             return (
                 <ul>
                     <li key={i}>
-                        <div className="hoverDiv" onClick={() => missingBranchesClicked(item.treeId, this)}><span>{getLabelText(item.treeLabel, this.state.lang)}</span></div>
+                        <a href={`/#/dataSet/buildTree/tree/${item.treeId}/${this.state.programId}`} target="_blank"><div className="hoverDiv"><span>{getLabelText(item.treeLabel, this.state.lang)}</span></div></a>
                         {item.flatList.length > 0 && item.flatList.map((item1, j) => {
                             return (
                                 <ul>
@@ -788,7 +788,7 @@ export default class CommitTreeComponent extends React.Component {
             if (this.state.treeScenarioListNotHaving100PerChild.filter(c => c.treeId == item1.treeId && c.scenarioId == item1.scenarioId).length > 0) {
                 var nodeWithPercentageChildren = this.state.nodeWithPercentageChildren.filter(c => c.treeId == item1.treeId && c.scenarioId == item1.scenarioId);
                 if (nodeWithPercentageChildren.length > 0) {
-                    return (<><span className="hoverDiv" onClick={() => nodeWithPercentageChildrenClicked(item1.treeId, item1.scenarioId, this)}><span>{getLabelText(item1.treeLabel, this.state.lang) + " / " + getLabelText(item1.scenarioLabel, this.state.lang)}</span></span><span className="hoverDiv" onClick={() => this.plusMinusClicked(item1.treeId, item1.scenarioId)}>{item1.checked ? <i className="fa fa-minus treeValidation" ></i> : <i className="fa fa-plus  treeValidation" ></i>}</span><div className="table-responsive">
+                    return (<><a href={`/#/dataSet/buildTree/tree/${item1.treeId}/${this.state.programId}/${item1.scenarioId}`} target="_blank"><span className="hoverDiv"><span>{getLabelText(item1.treeLabel, this.state.lang) + " / " + getLabelText(item1.scenarioLabel, this.state.lang)}</span></span></a><span className="hoverDiv" onClick={() => this.plusMinusClicked(item1.treeId, item1.scenarioId)}>{item1.checked ? <i className="fa fa-minus treeValidation" ></i> : <i className="fa fa-plus  treeValidation" ></i>}</span><div className="table-responsive">
                         <div id={"tableDiv" + count} className="jexcelremoveReadonlybackground consumptionDataEntryTable" name='jxlTableData' style={{ display: item1.checked ? "block" : "none" }} />
                     </div><br /></>)
                 }

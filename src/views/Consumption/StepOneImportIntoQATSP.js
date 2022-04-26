@@ -870,7 +870,9 @@ export default class StepOneImportMapPlanningUnits extends Component {
                     selectedForecastProgram: forecastProgram,
 
                     versions: (forecastProgram[0].versionList.filter(function (x, i, a) {
-                        return a.indexOf(x) === i;
+                        if (x.versionType.id == 2) {
+                            return a.indexOf(x) === i;
+                        }
                     })).reverse()
                 }, () => { });
             });
@@ -1061,7 +1063,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 return (
                     <option key={i} value={item.versionId}>
                         {/* {item.versionId} */}
-                        {((item.versionStatus.id == 2 && item.versionType.id == 2) ? item.versionId + '*' : item.versionId)} ({(moment(item.createdDate).format(`MMM DD YYYY`))})
+                        {(item.versionId + '*')} ({(moment(item.createdDate).format(`MMM DD YYYY`))})
                     </option>
                 )
             }, this);
