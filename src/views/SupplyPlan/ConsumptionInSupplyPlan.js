@@ -209,7 +209,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                         this.props.updateState("dataSourceList", dataSourceList);
                     })
                     if (this.state.consumptionEl != "" && this.state.consumptionEl != undefined) {
-                        this.state.consumptionEl.destroy();
+                        jexcel.destroy(document.getElementById("consumptionTable"),true);
                     }
                     if (this.state.consumptionBatchInfoTableEl != "" && this.state.consumptionBatchInfoTableEl != undefined) {
                         this.state.consumptionBatchInfoTableEl.destroy();
