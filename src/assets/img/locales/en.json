@@ -2286,5 +2286,6 @@
     "static.tree.calculatedChangeForMonthTree": "Calculated change for",
     "static.importIntoQATSupplyPlan.conversionFactor": "Conversion Factor (Forecast to Supply Plan)",
     "static.report.versionFinal*": "Version (* indicates Final)",
-    "static.importIntoQATSupplyPlan.forecastFinalVersion": "Forecast version (Final Versions Only)"
+    "static.importIntoQATSupplyPlan.forecastFinalVersion": "Forecast version (Final Versions Only)",
+    "static.common.person":"Person"
 }
