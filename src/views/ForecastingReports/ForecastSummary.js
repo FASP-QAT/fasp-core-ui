@@ -273,7 +273,7 @@ class ForecastSummary extends Component {
 
         // csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
         // csvRow.push('')
-        csvRow.push('"' + (i18n.t('static.report.versionFinal*') + ' : ' + document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+        // csvRow.push('"' + (i18n.t('static.report.versionFinal*') + ' : ' + document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
         // csvRow.push('')
         csvRow.push('"' + (i18n.t('static.common.forecastPeriod') + ' : ' + document.getElementById("forecastPeriod").value).replaceAll(' ', '%20') + '"')
         // csvRow.push('')
@@ -691,22 +691,22 @@ class ForecastSummary extends Component {
                 if (i == 1) {
                     doc.setFontSize(8)
                     doc.setFont('helvetica', 'normal')
-                    doc.text(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 90, {
+                    // doc.text(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 90, {
+                    //     align: 'left'
+                    // })
+                    // doc.text(i18n.t('static.report.versionFinal*') + ' : ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
+                    //     align: 'left'
+                    // })
+                    doc.text(i18n.t('static.report.dateRange') + ' : ' + document.getElementById("forecastPeriod").value, doc.internal.pageSize.width / 8, 90, {
                         align: 'left'
                     })
-                    doc.text(i18n.t('static.report.versionFinal*') + ' : ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
-                        align: 'left'
-                    })
-                    doc.text(i18n.t('static.report.dateRange') + ' : ' + document.getElementById("forecastPeriod").value, doc.internal.pageSize.width / 8, 130, {
-                        align: 'left'
-                    })
-                    doc.text(i18n.t('static.forecastReport.display') + ' : ' + document.getElementById("displayId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 150, {
+                    doc.text(i18n.t('static.forecastReport.display') + ' : ' + document.getElementById("displayId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 100, {
                         align: 'left'
                     })
 
                     let viewById = document.getElementById("displayId").value;
                     if (viewById == 1) {//National
-                        doc.text(i18n.t('static.forecastReport.hideCalculations') + ' : ' + document.getElementById("calculationId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 170, {
+                        doc.text(i18n.t('static.forecastReport.hideCalculations') + ' : ' + document.getElementById("calculationId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
                             align: 'left'
                         })
                     }
@@ -799,7 +799,7 @@ class ForecastSummary extends Component {
 
                 console.log("data------------------>12345 ", data);
 
-                var startY = 230;
+                var startY = 130;
                 let content = {
                     margin: { top: 80, bottom: 90 },
                     startY: startY,
@@ -862,7 +862,7 @@ class ForecastSummary extends Component {
 
                 console.log("data------------------>123456 ", data);
 
-                var startY = 230;
+                var startY = 130;
                 let content = {
                     margin: { top: 80, bottom: 90 },
                     startY: startY,
@@ -1010,7 +1010,7 @@ class ForecastSummary extends Component {
                 ])
             }
 
-            var startY = 230;
+            var startY = 130;
             let content = {
                 margin: { top: 80, bottom: 90 },
                 startY: startY,
