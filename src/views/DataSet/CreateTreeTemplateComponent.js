@@ -1899,7 +1899,7 @@ export default class CreateTreeTemplate extends Component {
             targetChangeNumber = (parseFloat(getValue - this.state.currentCalculatorStartValue.toString().replaceAll(",", "")) / monthDifference).toFixed(4);
             targetChangePer = (parseFloat(targetChangeNumber / this.state.currentCalculatorStartValue.toString().replaceAll(",", "")) * 100).toFixed(4);
         }
-        console.log("targetChangeNumber 1---",targetChangeNumber);
+        console.log("targetChangeNumber 1---", targetChangeNumber);
         this.setState({
             currentTargetChangeNumber: e.target.value != '' ? targetChangeNumber : '',
             currentTargetChangePercentage: e.target.value != '' ? targetChangePer : '',
@@ -1957,7 +1957,7 @@ export default class CreateTreeTemplate extends Component {
         if (this.state.currentItemConfig.context.payload.nodeType.id < 3) {
             targetChangeNumber = parseFloat(getEndValueFromPercentage / monthDifference).toFixed(4);
         }
-        console.log("targetChangeNumber 2---",targetChangeNumber);
+        console.log("targetChangeNumber 2---", targetChangeNumber);
 
         this.setState({
             currentEndValue: (getValue != '' && this.state.currentModelingType != 3 && this.state.currentModelingType != 5) ? targetEndValue : '',
@@ -3175,7 +3175,8 @@ export default class CreateTreeTemplate extends Component {
                         var cell = elInstance.getCell(("H").concat(parseInt(y) + 1))
                         cell.classList.add('readonly');
                     }
-                    if (rowData[3] != "" || rowData[12] == 1) {
+                    // if (rowData[3] != "" || rowData[12] == 1) {
+                    if ((rowData[3] != "" && rowData[3] != "_T" && rowData[3] != "null_T") || rowData[12] == 1) {
                         var cell = elInstance.getCell(("F").concat(parseInt(y) + 1))
                         cell.classList.add('readonly');
                     } else {
