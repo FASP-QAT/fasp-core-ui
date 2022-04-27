@@ -214,13 +214,13 @@ class ForecastOutput extends Component {
         let programId = document.getElementById("programId").value;
         let versionId = document.getElementById("versionId").value;
         this.setState({
-            planningUnits: [],
-            planningUnitValues: [],
-            planningUnitLabels: [],
+            // planningUnits: [],
+            // planningUnitValues: [],
+            // planningUnitLabels: [],
 
-            forecastingUnits: [],
-            forecastingUnitValues: [],
-            forecastingUnitLabels: [],
+            // forecastingUnits: [],
+            // forecastingUnitValues: [],
+            // forecastingUnitLabels: [],
         }, () => {
             if (programId > 0 && versionId != 0) {
                 if (versionId.includes('Local')) {
@@ -255,6 +255,17 @@ class ForecastOutput extends Component {
                                 }
                             }
                             console.log("EquivalencyUnitList---------->1", filteredEquList);
+
+                            let fuList = this.state.forecastingUnits;
+                            let newList = [];
+                            for (var i = 0; i < filteredEquList.length; i++) {
+                                let temp = fuList.filter(c => c.id == filteredEquList[i].forecastingUnit.id);
+                                if (temp.length > 0) {
+                                    newList.push(filteredEquList[i]);
+                                }
+                            }
+
+                            filteredEquList = newList;
 
                             let duplicateEquiUnit = filteredEquList.map(c => c.equivalencyUnit);
                             const ids = duplicateEquiUnit.map(o => o.equivalencyUnitId)
@@ -299,6 +310,17 @@ class ForecastOutput extends Component {
                                 }
                             }
                             console.log("EquivalencyUnitList---------->1", filteredEquList);
+
+                            let fuList = this.state.forecastingUnits;
+                            let newList = [];
+                            for (var i = 0; i < filteredEquList.length; i++) {
+                                let temp = fuList.filter(c => c.id == filteredEquList[i].forecastingUnit.id);
+                                if (temp.length > 0) {
+                                    newList.push(filteredEquList[i]);
+                                }
+                            }
+
+                            filteredEquList = newList;
 
                             let duplicateEquiUnit = filteredEquList.map(c => c.equivalencyUnit);
                             const ids = duplicateEquiUnit.map(o => o.equivalencyUnitId)
@@ -2175,6 +2197,7 @@ class ForecastOutput extends Component {
                                 equivalencyUnitLabel: selectedText,
                                 filteredProgramEQList: filteredProgramEQList
                             }, () => {
+                                this.getEquivalencyUnitData();
                                 this.filterData();
                             })
                         } else {//NO
@@ -2211,6 +2234,7 @@ class ForecastOutput extends Component {
                                 // planningUnits: filteredPU,
                                 // forecastingUnits: filtered
                             }, () => {
+                                this.getEquivalencyUnitData();
                                 this.filterData();
                             })
                         }
@@ -2303,7 +2327,7 @@ class ForecastOutput extends Component {
                                                 }, this),
                                                 forecastingUnitValues: newForecastingUnitList.map((item, i) => {
                                                     return ({ label: getLabelText(item.label, this.state.lang), value: item.id })
-                
+
                                                 }, this),
                                                 forecastingUnitLabels: newForecastingUnitList.map((item, i) => {
                                                     return (getLabelText(item.label, this.state.lang))
@@ -2311,6 +2335,7 @@ class ForecastOutput extends Component {
                                                 equivalencyUnitLabel: selectedText,
                                                 filteredProgramEQList: filteredProgramEQList
                                             }, () => {
+                                                this.getEquivalencyUnitData();
                                                 this.filterData();
                                             })
 
@@ -2326,13 +2351,14 @@ class ForecastOutput extends Component {
                                                 }, this),
                                                 forecastingUnitValues: this.state.forecastingUnits.map((item, i) => {
                                                     return ({ label: getLabelText(item.label, this.state.lang), value: item.id })
-                
+
                                                 }, this),
                                                 forecastingUnitLabels: this.state.forecastingUnits.map((item, i) => {
                                                     return (getLabelText(item.label, this.state.lang))
                                                 }, this),
                                                 equivalencyUnitLabel: ''
                                             }, () => {
+                                                this.getEquivalencyUnitData();
                                                 this.filterData();
                                             })
 
@@ -2641,7 +2667,7 @@ class ForecastOutput extends Component {
                 localStorage.setItem("sesDatasetVersionId", document.getElementById("versionId").value);
                 this.setForecastPeriod();
                 this.filterData();
-                this.getEquivalencyUnitData();
+                // this.getEquivalencyUnitData();
                 this.getPlanningUnitForecastingUnit();
 
             })
@@ -2652,7 +2678,7 @@ class ForecastOutput extends Component {
                 // (viewById == 1 ? this.getPlanningUnitForecastingUnit() : this.getForecastingUnit());
                 this.setForecastPeriod();
                 this.filterData();
-                this.getEquivalencyUnitData();
+                // this.getEquivalencyUnitData();
                 this.getPlanningUnitForecastingUnit()
             })
         }
@@ -3336,7 +3362,7 @@ class ForecastOutput extends Component {
 
                                             <FormGroup className="col-md-3">
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon fa fa-sort-desc ml-1"></span>
-                                                <i> (Forecast: {this.state.forecastPeriod})</i>
+                                                    <i> (Forecast: {this.state.forecastPeriod})</i>
                                                 </Label>
                                                 <div className="controls edit">
 
@@ -3597,7 +3623,7 @@ class ForecastOutput extends Component {
                                                                     {this.state.yaxisEquUnit > 0 && this.state.xaxis == 2 &&
                                                                         <tr>
                                                                             <td className="sticky-col first-col clone Firstcolum"></td>
-                                                                            <td style={{ textAlign: 'left' }}  className="sticky-col first-col clone Secondcolum"><b>{i18n.t('static.supplyPlan.total')} {" " + this.state.equivalencyUnitLabel}</b></td>
+                                                                            <td style={{ textAlign: 'left' }} className="sticky-col first-col clone Secondcolum"><b>{i18n.t('static.supplyPlan.total')} {" " + this.state.equivalencyUnitLabel}</b></td>
                                                                             <td className='text-left sticky-col first-col clone Thirdcolum'></td>
                                                                             {this.state.monthArrayList.map(item1 => (
                                                                                 <td><b>{this.state.calculateEquivalencyUnitTotal.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(item1).format("YYYY-MM")).length > 0 ? <NumberFormat displayType={'text'} thousandSeparator={true} value={this.state.calculateEquivalencyUnitTotal.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(item1).format("YYYY-MM"))[0].consumptionQty} /> : ""}</b></td>
