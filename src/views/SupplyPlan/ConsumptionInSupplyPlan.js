@@ -319,7 +319,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                                 { title: i18n.t('static.pipeline.consumptionDate'), type: 'calendar', options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker', validRange: [moment(MIN_DATE_RESTRICTION_IN_DATA_ENTRY).startOf('month').format("YYYY-MM-DD"), moment(Date.now()).add(MAX_DATE_RESTRICTION_IN_DATA_ENTRY, 'years').endOf('month').format("YYYY-MM-DD")] }, width: 100, readOnly: readonlyRegionAndMonth },
                                 { title: i18n.t('static.region.region'), type: 'dropdown', readOnly: readonlyRegionAndMonth, source: this.props.items.regionList, width: 100 },
                                 { type: 'dropdown', title: i18n.t('static.consumption.consumptionType'), source: [{ id: 1, name: i18n.t('static.consumption.actual') }, { id: 2, name: i18n.t('static.consumption.forcast') }], width: 100 },
-                                { title: i18n.t('static.inventory.dataSource'), type: 'dropdown', source: dataSourceList, width: 120,  },
+                                { title: i18n.t('static.inventory.dataSource'), type: 'dropdown', source: dataSourceList, width: 120, filter:this.filterDataSourceBasedOnConsumptionType },
                                 { title: i18n.t('static.supplyPlan.alternatePlanningUnit'), type: 'dropdown', source: realmCountryPlanningUnitList, filter: this.filterRealmCountryPlanningUnit, width: 150 },
                                 { title: i18n.t('static.supplyPlan.quantityCountryProduct'), type: 'numeric', textEditor: true, mask: '#,##.00', decimal: '.', textEditor: true, disabledMaskOnEdition: true, width: 120, },
                                 { title: i18n.t('static.unit.multiplierFromARUTOPU'), type: 'numeric', mask: '#,##.000000', decimal: '.', width: 90, readOnly: true },
@@ -362,10 +362,10 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                             updateTable: function (el, cell, x, y, source, value, id) {
                             }.bind(this),
                             onsearch: function (el) {
-                                el.jexcel.updateTable();
+                                // el.jexcel.updateTable();
                             },
                             onfilter: function (el) {
-                                el.jexcel.updateTable();
+                                // el.jexcel.updateTable();
                             },
                             contextMenu: function (obj, x, y, e) {
                                 var items = [];
@@ -630,7 +630,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
         data[15] = 0;
         obj.insertRow(data);
         if (this.props.consumptionPage == "consumptionDataEntry") {
-            var showOption = (document.getElementsByClassName("jexcel_pagination_dropdown")[0]).value;
+            var showOption = (document.getElementsByClassName("jss_pagination_dropdown")[0]).value;
             if (showOption != 5000000) {
                 var pageNo = parseInt(parseInt(json.length - 1) / parseInt(showOption));
                 obj.page(pageNo);
@@ -658,20 +658,20 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
         } else {
             jExcelLoadedFunction(instance);
         }
-        // var asterisk = document.getElementsByClassName("resizable")[0];
-        // var tr = asterisk.firstChild;
-        // tr.children[1].classList.add('AsteriskTheadtrTd');
-        // tr.children[2].classList.add('AsteriskTheadtrTd');
-        // tr.children[3].classList.add('AsteriskTheadtrTd');
-        // tr.children[4].classList.add('AsteriskTheadtrTd');
-        // tr.children[5].classList.add('AsteriskTheadtrTd');
-        // tr.children[6].classList.add('AsteriskTheadtrTd');
+        var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
+        var tr = asterisk.firstChild;
+        tr.children[1].classList.add('AsteriskTheadtrTd');
+        tr.children[2].classList.add('AsteriskTheadtrTd');
+        tr.children[3].classList.add('AsteriskTheadtrTd');
+        tr.children[4].classList.add('AsteriskTheadtrTd');
+        tr.children[5].classList.add('AsteriskTheadtrTd');
+        tr.children[6].classList.add('AsteriskTheadtrTd');
         var elInstance = instance.worksheets[0];
         var json = elInstance.getJson(null, false);
         var jsonLength;
         if (this.props.consumptionPage == "consumptionDataEntry") {
-            if ((document.getElementsByClassName("jexcel_pagination_dropdown")[0] != undefined)) {
-                jsonLength = 1 * (document.getElementsByClassName("jexcel_pagination_dropdown")[0]).value;
+            if ((document.getElementsByClassName("jss_pagination_dropdown")[0] != undefined)) {
+                jsonLength = 1 * (document.getElementsByClassName("jss_pagination_dropdown")[0]).value;
             }
         } else {
             jsonLength = json.length;
@@ -758,17 +758,17 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
     }
 
     onchangepage(el, pageNo, oldPageNo) {
-        var elInstance = el.jexcel;
+        var elInstance = el;
         var json = elInstance.getJson(null, false);
         var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q']
-        var jsonLength = (pageNo + 1) * (document.getElementsByClassName("jexcel_pagination_dropdown")[0]).value;
+        var jsonLength = (pageNo + 1) * (document.getElementsByClassName("jss_pagination_dropdown")[0]).value;
         if (jsonLength == undefined) {
             jsonLength = 15
         }
         if (json.length < jsonLength) {
             jsonLength = json.length;
         }
-        var start = pageNo * (document.getElementsByClassName("jexcel_pagination_dropdown")[0]).value;
+        var start = pageNo * (document.getElementsByClassName("jss_pagination_dropdown")[0]).value;
         for (var y = start; y < jsonLength; y++) {
             var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O']
             var rowData = elInstance.getRowData(y);
@@ -843,10 +843,10 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
         }
     }
 
-    filterDataSourceBasedOnConsumptionType = function (instance, cell, c, r, source) {
+    filterDataSourceBasedOnConsumptionType = function (instance, cell, c, r, source,conf) {
         console.log("instance@@@@@@@@@@@############",instance)
         var mylist = [];
-        var value = (instance.getJson(null, false)[r])[2];
+        var value = (this.state.consumptionEl.getJson(null, false)[r])[2];
         if (value == 1) {
             mylist = this.state.dataSourceList.filter(c => c.dataSourceTypeId == ACTUAL_CONSUMPTION_DATA_SOURCE_TYPE && c.active.toString() == "true");
         } else {

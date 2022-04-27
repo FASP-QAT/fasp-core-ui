@@ -526,20 +526,20 @@ label.arrow_label:after {
 .jss_selectall {
   background: #fff !important;
 }
-.jexcel > thead > tr > td {
+.jss > thead > tr > td {
   background-color: #fff !important;
   color: #212721 !important;
   font-weight: bold;
   font-style: normal !important;
 }
-.jexcel > tbody > tr > td:first-child {
+.jss > tbody > tr > td:first-child {
   background-color: #fff !important;
 }
-.jexcel > tbody > tr > td {
+.jss > tbody > tr > td {
   padding: 6px !important;
   line-height: 15px;
 }
-.jexcel > thead > tr > td {
+.jss > thead > tr > td {
   padding: 6px !important;
   z-index: 0 !important;
 }
@@ -595,7 +595,7 @@ label.arrow_label:after {
   border: 1px solid #e4e7ea;
 }
 
-.jexcel
+.jss
 {
   width:100%!important;
 }
@@ -621,7 +621,7 @@ label.arrow_label:after {
 }
 
 
-.RemoveStriped .jexcel_content .jexcel .draggable {
+.RemoveStriped .jss_content .jss .draggable {
   tr:nth-of-type(odd) {
     background-color: #fff !important;
   }
@@ -653,49 +653,49 @@ label.arrow_label:after {
   padding-right: 18px !important;
 }
 
-.jexcel_content {
+.jss_content {
   overflow-y: auto !important;
   max-height: 100% !important;
   height: 100%;
   // max-height: 540px !important;
   min-height: 70px !important;
 }
-.jexcel > tbody > tr > td.readonly {
+.jss > tbody > tr > td.readonly {
   color: #212721 !important;
 }
 
-.jexcel > tbody > tr > td.readonly.shipmentEntryEmergency {
+.jss > tbody > tr > td.readonly.shipmentEntryEmergency {
   color: #BA0C2F !important;
 }
 
-.jexcel > tbody > tr > td.readonly.shipmentEntryActive {
+.jss > tbody > tr > td.readonly.shipmentEntryActive {
   color: #808080 !important;
   background-color: #808080 !important;
 }
 
-.jexcel > tbody > tr > td.readonly.shipmentEntryDoNotInclude {
+.jss > tbody > tr > td.readonly.shipmentEntryDoNotInclude {
   background-color: #D3D3D3 !important;
 }
 
-.jexcel > tbody > tr > td.readonly.shipmentEntryDelete {
+.jss > tbody > tr > td.readonly.shipmentEntryDelete {
   color: #808080 !important;
   background-color: #808080 !important;
 }
 
-.jexcel > tbody > tr > td.shipmentEntryEmergency {
+.jss > tbody > tr > td.shipmentEntryEmergency {
   color: #BA0C2F !important;
 }
 
-.jexcel > tbody > tr > td.shipmentEntryActive {
+.jss > tbody > tr > td.shipmentEntryActive {
   color: #808080 !important;
   background-color: #808080 !important;
 }
 
-.jexcel > tbody > tr > td.shipmentEntryDoNotInclude {
+.jss > tbody > tr > td.shipmentEntryDoNotInclude {
   background-color: #D3D3D3 !important;
 }
 
-.jexcel > tbody > tr > td.shipmentEntryDelete {
+.jss > tbody > tr > td.shipmentEntryDelete {
   color: #808080 !important;
   background-color: #808080 !important;
 }
@@ -929,18 +929,18 @@ label.arrow_label:after {
     padding: 0.25rem 0.5rem!important;
 }
 // Readonly background transperant made after conversion
-.jexcelremoveReadonlybackground .jexcel_content .draggable tr .readonly{
+.jexcelremoveReadonlybackground .jss_content .draggable tr .readonly{
   background: transparent!important;
 }
 // supplyplan consumption add new batch tr row height  in table for add batch
-.AddListbatchtrHeight .jexcel_content .jexcel tbody.draggable tr{
+.AddListbatchtrHeight .jss_content .jss tbody.draggable tr{
   height: 30px;
 }
-.RowheightForjexceladdRow .jexcel_content .jexcel tbody.draggable tr{ 
+.RowheightForjexceladdRow .jss_content .jss tbody.draggable tr{ 
   height: 30px;
 }
 
-.RowClickable .jexcel_content .jexcel tbody.draggable tr{ 
+.RowClickable .jss_content .jss tbody.draggable tr{ 
   cursor: pointer;
 }
 
@@ -948,15 +948,15 @@ label.arrow_label:after {
   cursor: pointer;
 }
  
-.RowClickableExpiredInventory  .jexcel_content .jexcel tbody.draggable tr td:nth-child(3){
+.RowClickableExpiredInventory  .jss_content .jss tbody.draggable tr td:nth-child(3){
   cursor: pointer;
 }
 
-.RowClickableExpiredInventory  .jexcel_content .jexcel tbody.draggable tr td:nth-child(4){
+.RowClickableExpiredInventory  .jss_content .jss tbody.draggable tr td:nth-child(4){
   cursor: pointer;
 }
 
-.RowheightForaddprogaddRow .jexcel_content .jexcel tbody.draggable tr{ 
+.RowheightForaddprogaddRow .jss_content .jss tbody.draggable tr{ 
   height: 30px;
 }
 // Multiselect z-index going behind table 
@@ -966,14 +966,14 @@ label.arrow_label:after {
 
 
 // scroller size
-.jexcel_content::-webkit-scrollbar {
+.jss_content::-webkit-scrollbar {
   width: 10px !important;
   height: 10px !important;
 }
 
 // .realmcountrypUnitTd{text-align: right !important;}
 
-.jexcel > thead.resizable > tr > .AsteriskTheadtrTd::after {
+.jss > thead > tr > .AsteriskTheadtrTd::after {
  position: relative;
   width: 3px;
   height: 100%;
@@ -985,7 +985,7 @@ label.arrow_label:after {
 font-size: 14px;
 }
 
-.jexcel > thead.resizable > tr > .CalculatorTheadtr::after {
+.jss > thead.resizable > tr > .CalculatorTheadtr::after {
 //   position: relative;
 //    width: 3px;
 //    height: 100%;
@@ -1690,13 +1690,13 @@ h5,
   padding-right: calc(1.5em + 1.75rem);
 }
 
-.RemoveStriped .jexcel_content .jexcel .draggable {
+.RemoveStriped .jss_content .jss .draggable {
   tr:nth-of-type(odd) {
     background-color: #fff !important;
   }
 }
 
-.jexcel {
+.jss {
   white-space: pre-wrap !important;
 }
 
@@ -3972,7 +3972,7 @@ background-color: yellow;
   border-top: 0px!important;
 }
 
-.jexcel_content{
+.jss_content{
   box-shadow: none!important;
 }
 
@@ -4107,7 +4107,7 @@ color: #000000!important;
   overflow-x: hidden!important;  
 }
 
-.jexcel_content::-webkit-scrollbar-thumb {
+.jss_content::-webkit-scrollbar-thumb {
   background: #c1c1c1!important;
 }
 
@@ -4169,7 +4169,7 @@ z-index:999;
   overflow: scroll !important;
 }
 
-.jexcel > tbody > tr > td.readonly > input[type="checkbox"], .jexcel > tbody > tr > td.readonly > input[type="radio"] {
+.jss > tbody > tr > td.readonly > input[type="checkbox"], .jss > tbody > tr > td.readonly > input[type="radio"] {
   pointer-events: none;
   opacity: unset !important;
 }
@@ -5565,7 +5565,7 @@ border: 1px solid #eee;
   color: #212721;
   font-style: italic;
 }
-.jexcel > thead.resizable > tr > .InfoTr::after {
+.jss > thead.resizable > tr > .InfoTr::after {
   font-family: 'FontAwesome';
   content: '\f05a';
     position: relative;
@@ -5608,7 +5608,7 @@ border: 1px solid #eee;
   margin-top: -25px;
 }
 
-  .jexcel_contextmenu>.header{
+  .jss_contextmenu>.header{
     display:none
   }
 
