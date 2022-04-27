@@ -4003,10 +4003,10 @@ export default class ExtrapolateDataComponent extends React.Component {
                                 If you have poorer data (missing data points, variable reporting rates, less than 12 months of data), use simpler forecast methods
                             </p>
                             <p>
-                                <b>NOTE:  The minimum values needed to get correct graphs and reports for the various features are below: <br></br>
-                                    <span className="ml-lg-5">* TES, Holt-Winters:  Needs at least 24 months of actual consumption data<br></br></span>
-                                    <span className="ml-lg-5">* ARIMA:  Needs at least 14 months of actual consumption data<br></br></span>
-                                    <span className="ml-lg-5">* Moving Average, Semi-Averages, and Linear Regression:  Needs at least 3 months of actual consumption data</span>
+                                <b>NOTE:  You have ____ months of acutal consumption data. The minimum values needed for the various features are below: <br></br>
+                                    <span className="ml-lg-5">* TES, Holt-Winters: At least 24 months of actual consumption data<br></br></span>
+                                    <span className="ml-lg-5">* ARIMA:  At least 14 months of actual consumption data<br></br></span>
+                                    <span className="ml-lg-5">* Moving Average, Semi-Averages, and Linear Regression: At least 3 months of actual consumption data</span>
                                 </b>
                             </p>
                         </ModalBody>

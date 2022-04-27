@@ -3839,7 +3839,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                 <div className="col-md-6 pl-lg-0">
                                                     <Button type="button" color="success" className="float-left mr-1" size="md" onClick={this.interpolate}>Interpolate</Button>
                                                     {/* <Button type="button" id="dataCheck" size="md" color="info" className="mr-1" onClick={() => this.checkActualValuesGap(true)}>Extrapolate</Button> */}
-                                                    <Button type="submit" id="extrapolateButton" size="md" color="info" className="float-left mr-1" onClick={() => this.touchAllExtrapolation(setTouched, errors, 0)}><i className="fa fa-calculator"></i>Extrapolate</Button>
+                                                    <Button type="submit" id="extrapolateButton" size="md" color="info" className="float-left mr-1" onClick={() => this.touchAllExtrapolation(setTouched, errors, 0)}><i className="fa fa-calculator"></i> Extrapolate</Button>
                                                 </div>
                                                 <div className="col-md-6 pr-lg-0">
                                                     <Button className="btn btn-info btn-md float-right" onClick={this.toggleJexcelData}>
