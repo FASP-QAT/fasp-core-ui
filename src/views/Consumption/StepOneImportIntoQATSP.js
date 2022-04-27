@@ -1128,8 +1128,8 @@ export default class StepOneImportMapPlanningUnits extends Component {
                         </FormGroup>
 
                         <FormGroup className="col-md-4">
-                            {/* <Label htmlFor="appendedInputButton">{i18n.t('static.importFromQATSupplyPlan.supplyPlanVersion')}</Label> */}
-                            <Label htmlFor="appendedInputButton">Forecast version</Label>
+                            <Label htmlFor="appendedInputButton">{i18n.t('static.importIntoQATSupplyPlan.forecastFinalVersion')}</Label>
+                            {/* <Label htmlFor="appendedInputButton">Forecast version (Final Versions Only)</Label> */}
                             <div className="controls">
                                 <InputGroup>
                                     <Input
