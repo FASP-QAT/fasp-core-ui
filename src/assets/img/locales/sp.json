@@ -2282,5 +2282,7 @@
     "static.supplyPlanFormula.maxMonthOfStockEx5": "Max = 7",
     "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18)",
     "static.importIntoQATSupplyPlan.conversionFactor": "Factor de conversión (pronóstico a plan de suministro)",
-    "static.importIntoQATSupplyPlan.forecastFinalVersion": "Versión de previsión (solo versiones finales)"
+    "static.importIntoQATSupplyPlan.forecastFinalVersion": "Versión de previsión (solo versiones finales)",
+    "static.importIntoQATSupplyPlan.importIntoQATSupplyPlan": "Importación de pronóstico QAT"
+
 }
