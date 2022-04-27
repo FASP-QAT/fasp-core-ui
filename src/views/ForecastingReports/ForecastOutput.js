@@ -463,7 +463,7 @@ class ForecastOutput extends Component {
         // csvRow.push('')
         // csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
         // csvRow.push('')
-        csvRow.push('"' + (i18n.t('static.report.versionFinal*') + ' : ' + document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+        // csvRow.push('"' + (i18n.t('static.report.versionFinal*') + ' : ' + document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
         // csvRow.push('')
         csvRow.push('"' + (i18n.t('static.common.forecastPeriod') + ' : ' + document.getElementById("forecastPeriod").value).replaceAll(' ', '%20') + '"')
         // csvRow.push('')
@@ -3093,7 +3093,8 @@ class ForecastOutput extends Component {
                             pointRadius: 0,
                             showInLegend: true,
                             // data: consumptionValue
-                            data: (consumptionValue.filter(c => c != "").length > 0 ? consumptionValue : [])
+                            data: (consumptionValue.filter(c => c != "").length > 0 ? consumptionValue : []),
+                            pointRadius: 4,
                         }
                     )
 
