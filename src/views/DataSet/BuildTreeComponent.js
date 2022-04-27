@@ -3735,7 +3735,7 @@ export default class BuildTree extends Component {
                         var cell = elInstance.getCell(("H").concat(parseInt(y) + 1))
                         cell.classList.add('readonly');
                     }
-                    console.log("rowData table---",rowData)
+                    console.log("rowData table---", rowData)
                     if ((rowData[3] != "" && rowData[3] != "_T" && rowData[3] != "null_T") || rowData[12] == 1) {
                         var cell = elInstance.getCell(("F").concat(parseInt(y) + 1))
                         cell.classList.add('readonly');
@@ -5695,7 +5695,7 @@ export default class BuildTree extends Component {
         console.log("my tracerCategoryId for test1---", tracerCategoryId)
         var forecastingUnitList = this.state.forecastingUnitList;
         console.log("my tracerCategoryId for test2---", forecastingUnitList)
-        var filteredForecastingUnitList = tracerCategoryId != "" ? this.state.forecastingUnitList.filter(x => x.tracerCategory.id == tracerCategoryId) : forecastingUnitList;
+        var filteredForecastingUnitList = tracerCategoryId != "" && tracerCategoryId != undefined ? this.state.forecastingUnitList.filter(x => x.tracerCategory.id == tracerCategoryId) : forecastingUnitList;
         console.log("my tracerCategoryId for test3---", filteredForecastingUnitList)
         // var autocompleteData = [];
         // for (var i = 0; i < forecastingUnitList.length; i++) {
@@ -5708,13 +5708,23 @@ export default class BuildTree extends Component {
 
             }, this);
 
+        // Check fu values
+        // tracerCategoryId == "" || tracerCategoryId == undefined ? [] :
+        // (this.state.currentScenario.fuNode.forecastingUnit.id != undefined && 
+        // this.state.currentScenario.fuNode.forecastingUnit.id != "" && 
+        // filteredForecastingUnitList.filter(x => x.id == this.state.currentScenario.fuNode.forecastingUnit.id).length > 0 ?
+        //  { value: this.state.currentScenario.fuNode.forecastingUnit.id, label: getLabelText(this.state.currentScenario.fuNode.forecastingUnit.label, this.state.lang) + " | " + this.state.currentScenario.fuNode.forecastingUnit.id }
+        //   : [])
+
+
         this.setState({
             forecastingUnitMultiList,
             fuValues: tracerCategoryId == "" || tracerCategoryId == undefined ? [] : (this.state.currentScenario.fuNode.forecastingUnit.id != undefined && this.state.currentScenario.fuNode.forecastingUnit.id != "" && filteredForecastingUnitList.filter(x => x.id == this.state.currentScenario.fuNode.forecastingUnit.id).length > 0 ? { value: this.state.currentScenario.fuNode.forecastingUnit.id, label: getLabelText(this.state.currentScenario.fuNode.forecastingUnit.label, this.state.lang) + " | " + this.state.currentScenario.fuNode.forecastingUnit.id } : []),
             tempPlanningUnitId: tracerCategoryId == "" || tracerCategoryId == undefined ? '' : this.state.tempPlanningUnitId,
             planningUnitList: tracerCategoryId == "" || tracerCategoryId == undefined ? [] : this.state.planningUnitList
         }, () => {
-            console.log("my autocomplete data fuValues---", filteredForecastingUnitList);
+            console.log("my autocomplete data fuValues 1---", filteredForecastingUnitList);
+            console.log("my autocomplete data fuValues 2---", this.state.fuValues);
             if (filteredForecastingUnitList.length == 1) {
                 console.log("fu list 1---", forecastingUnitList[0]);
                 const currentItemConfig = this.state.currentItemConfig;
@@ -7046,6 +7056,18 @@ export default class BuildTree extends Component {
         (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].displayCalculatedDataValue = (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].calculatedDataValue;
         (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].month = moment((newItem.payload.nodeDataMap[this.state.selectedScenario])[0].month).startOf('month').format("YYYY-MM-DD")
         if (itemConfig.context.payload.nodeType.id == 4) {
+            var tracerCategoryId = newItem.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.forecastingUnit.tracerCategory.id;
+            console.log("add tracerCategoryId---", tracerCategoryId);
+            if (tracerCategoryId == "" || tracerCategoryId == undefined || tracerCategoryId == null) {
+                console.log("add inside if");
+                var fu = this.state.forecastingUnitList.filter(x => x.id == newItem.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.forecastingUnit.id);
+                console.log("add fu---", fu);
+                if (fu.length > 0) {
+                    console.log("add fu[0]---", fu[0]);
+                    (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.forecastingUnit.tracerCategory.id = fu[0].tracerCategory.id;
+                }
+
+            }
             (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.forecastingUnit.label.label_en = (itemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.forecastingUnit.label.label_en;
         }
         var scenarioList = this.state.scenarioList.filter(x => x.id != this.state.selectedScenario);
@@ -7370,6 +7392,20 @@ export default class BuildTree extends Component {
         console.log("update tree node called 2------------", this.state.currentItemConfig);
         var nodes = this.state.items;
         console.log("update tree node called 3------------", nodes);
+        if (currentItemConfig.context.payload.nodeType.id == 4) {
+            var tracerCategoryId = currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.forecastingUnit.tracerCategory.id;
+            console.log("edit tracerCategoryId---", tracerCategoryId);
+            if (tracerCategoryId == "" || tracerCategoryId == undefined || tracerCategoryId == null) {
+                console.log("edit inside if");
+                var fu = this.state.forecastingUnitList.filter(x => x.id == currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.forecastingUnit.id);
+                console.log("edit fu---", fu);
+                if (fu.length > 0) {
+                    console.log("edit fu[0]---", fu[0]);
+                    (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.forecastingUnit.tracerCategory.id = fu[0].tracerCategory.id;
+                }
+
+            }
+        }
         var findNodeIndex = nodes.findIndex(n => n.id == currentItemConfig.context.id);
         console.log("findNodeIndex---", findNodeIndex);
         nodes[findNodeIndex] = currentItemConfig.context;
