@@ -3238,7 +3238,7 @@ export default class BuildTree extends Component {
         });
         var startDate = this.state.currentCalculatorStartDate;
         var endDate = this.state.currentCalculatorStopDate;
-        var monthDifference = moment(endDate).startOf('month').diff(startDate, 'months', true);
+        var monthDifference = parseInt(moment(endDate).startOf('month').diff(startDate, 'months', true) + 1);
         console.log("month diff>>>", monthDifference);
         var momValue = ''
         var getValue = e.target.value.toString().replaceAll(",", "");
@@ -3285,7 +3285,7 @@ export default class BuildTree extends Component {
         });
         var startDate = this.state.currentCalculatorStartDate;
         var endDate = this.state.currentCalculatorStopDate;
-        var monthDifference = moment(endDate).diff(startDate, 'months', true);
+        var monthDifference = parseInt(moment(endDate).diff(startDate, 'months', true) + 1);
         var getValue = e.target.value != "" ? e.target.value.toString().replaceAll(",", "").match(/^-?\d+(?:\.\d{0,4})?/)[0] : "";
         var getEndValueFromPercentage = (this.state.currentCalculatorStartValue.toString().replaceAll(",", "") * getValue) / 100;
 
@@ -3336,7 +3336,7 @@ export default class BuildTree extends Component {
         });
         var startDate = this.state.currentCalculatorStartDate;
         var endDate = this.state.currentCalculatorStopDate;
-        var monthDifference = moment(endDate).diff(startDate, 'months', true);
+        var monthDifference = parseInt(moment(endDate).diff(startDate, 'months', true) + 1);
         var getValue = e.target.value.toString().replaceAll(",", "");
         // var getEndValueFromNumber = parseFloat(this.state.currentCalculatorStartValue) + parseFloat(e.target.value);
         var targetEndValue = parseFloat(this.state.currentCalculatorStartValue.toString().replaceAll(",", "")) + parseFloat(getValue);
