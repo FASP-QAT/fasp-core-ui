@@ -251,7 +251,7 @@ export default class ListTreeComponent extends Component {
         var puNodeList = treeTemplate.flatList.filter(x => x.payload.nodeType.id == 5);
         console.log("puNodeList---", puNodeList);
         console.log("planningUnitIdListTemplate---", puNodeList.map((x) => x.payload.nodeDataMap[0][0].puNode.planningUnit.id).join(', '));
-        var planningUnitList = dataset.programData.planningUnitList.filter(x => x.treeForecast == true);
+        var planningUnitList = dataset.programData.planningUnitList.filter(x => x.treeForecast == true && x.active == true);
         console.log("planningUnitList---", planningUnitList);
         console.log("planningUnitIdListPUSettings---", planningUnitList.map((x) => x.planningUnit.id).join(', '));
         for (let i = 0; i < puNodeList.length; i++) {
@@ -465,10 +465,10 @@ export default class ListTreeComponent extends Component {
                             var modeling = (flatList[i].payload.nodeDataMap[0][0].nodeDataModelingList)[j];
                             // var startMonthNoModeling = modeling.startDateNo < 0 ? modeling.startDateNo : parseInt(modeling.startDateNo - 1);
                             // var stopMonthNoModeling = modeling.stopDateNo < 0 ? modeling.stopDateNo : parseInt(modeling.stopDateNo - 1)
-                            var startMonthNoModeling = modeling.startDateNo < 0 ? modeling.startDateNo : parseInt(modeling.startDateNo);
+                            var startMonthNoModeling = modeling.startDateNo < 0 ? modeling.startDateNo : parseInt(modeling.startDateNo -1);
                             console.log("startMonthNoModeling---", startMonthNoModeling);
                             modeling.startDate = moment(curMonth).startOf('month').add(startMonthNoModeling, 'months').format("YYYY-MM-DD");
-                            var stopMonthNoModeling = modeling.stopDateNo < 0 ? modeling.stopDateNo : parseInt(modeling.stopDateNo)
+                            var stopMonthNoModeling = modeling.stopDateNo < 0 ? modeling.stopDateNo : parseInt(modeling.stopDateNo - 1)
                             console.log("stopMonthNoModeling---", stopMonthNoModeling);
                             modeling.stopDate = moment(curMonth).startOf('month').add(stopMonthNoModeling, 'months').format("YYYY-MM-DD");
 
@@ -491,7 +491,7 @@ export default class ListTreeComponent extends Component {
                     tempJson = flatList[i].payload.nodeDataMap[0][0];
                     if (flatList[i].payload.nodeType.id != 1) {
                         console.log("month from tree template---", flatList[i].payload.nodeDataMap[0][0].monthNo + " cur month---", curMonth + " final result---", moment(curMonth).startOf('month').add(flatList[i].payload.nodeDataMap[0][0].monthNo, 'months').format("YYYY-MM-DD"))
-                        var monthNo = flatList[i].payload.nodeDataMap[0][0].monthNo < 0 ? flatList[i].payload.nodeDataMap[0][0].monthNo : parseInt(flatList[i].payload.nodeDataMap[0][0].monthNo)
+                        var monthNo = flatList[i].payload.nodeDataMap[0][0].monthNo < 0 ? flatList[i].payload.nodeDataMap[0][0].monthNo : parseInt(flatList[i].payload.nodeDataMap[0][0].monthNo - 1)
                         tempJson.month = moment(curMonth).startOf('month').add(monthNo, 'months').format("YYYY-MM-DD");
                     }
                     tempArray.push(tempJson);
