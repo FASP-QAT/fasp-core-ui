@@ -320,12 +320,21 @@ export default class CompareVersion extends Component {
         var datasetData = this.props.datasetData;// local working copy
         var datasetData1 = this.props.datasetData1;//server latest version
         var datasetData2 = this.props.datasetData2;// local downloaded data
-
-        var planningUnitList = (datasetData.planningUnitList.filter(c => c.active.toString() == "true")).sort(function (a, b) {
-            a = getLabelText(a.planningUnit.label, this.state.lang).toLowerCase();
-            b = getLabelText(b.planningUnit.label, this.state.lang).toLowerCase();
-            return a < b ? -1 : a > b ? 1 : 0;
-        }.bind(this));
+        var page = this.props.page;
+        var planningUnitList = []
+        if (page != "compareVersion") {
+            planningUnitList = (datasetData.planningUnitList.filter(c => c.active.toString() == "true")).sort(function (a, b) {
+                a = getLabelText(a.planningUnit.label, this.state.lang).toLowerCase();
+                b = getLabelText(b.planningUnit.label, this.state.lang).toLowerCase();
+                return a < b ? -1 : a > b ? 1 : 0;
+            }.bind(this));
+        } else {
+            planningUnitList = (datasetData.planningUnitList).concat(datasetData1.planningUnitList).concat(datasetData2.planningUnitList).sort(function (a, b) {
+                a = getLabelText(a.planningUnit.label, this.state.lang).toLowerCase();
+                b = getLabelText(b.planningUnit.label, this.state.lang).toLowerCase();
+                return a < b ? -1 : a > b ? 1 : 0;
+            }.bind(this));
+        }
 
         var planningUnitSet = [...new Set(planningUnitList.map(ele => (ele.planningUnit.id)))]
         let dataArray = [];
@@ -335,12 +344,20 @@ export default class CompareVersion extends Component {
         var regionList = datasetData.regionList;
         var regionList1 = datasetData1.regionList;
         var regionList2 = datasetData2.regionList;
-
-        var combineRegionList = (regionList).sort(function (a, b) {
-            a = getLabelText(a.label, this.state.lang).toLowerCase();
-            b = getLabelText(b.label, this.state.lang).toLowerCase();
-            return a < b ? -1 : a > b ? 1 : 0;
-        }.bind(this));
+        var combineRegionList = [];
+        if (page != "compareVersion") {
+            combineRegionList = (regionList).sort(function (a, b) {
+                a = getLabelText(a.label, this.state.lang).toLowerCase();
+                b = getLabelText(b.label, this.state.lang).toLowerCase();
+                return a < b ? -1 : a > b ? 1 : 0;
+            }.bind(this));
+        } else {
+            combineRegionList = (regionList).concat(regionList1).concat(regionList2).sort(function (a, b) {
+                a = getLabelText(a.label, this.state.lang).toLowerCase();
+                b = getLabelText(b.label, this.state.lang).toLowerCase();
+                return a < b ? -1 : a > b ? 1 : 0;
+            }.bind(this));
+        }
 
         var regionSet = [...new Set(combineRegionList.map(ele => (ele.regionId)))]
         this.setState({
