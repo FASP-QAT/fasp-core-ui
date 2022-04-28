@@ -107,7 +107,7 @@ export default class CompareVersion extends Component {
                 doc.text(this.props.datasetData.programCode, doc.internal.pageSize.width - 40, 50, {
                     align: 'right'
                 })
-                doc.text(getLabelText(this.props.datasetData.label,this.state.lang), doc.internal.pageSize.width - 40, 60, {
+                doc.text(getLabelText(this.props.datasetData.label, this.state.lang), doc.internal.pageSize.width - 40, 60, {
                     align: 'right'
                 })
 
@@ -231,7 +231,7 @@ export default class CompareVersion extends Component {
         doc.autoTable(content);
         addHeaders(doc)
         addFooters(doc)
-        doc.save(this.props.datasetData.programCode+"-"+i18n.t('static.dashboard.compareVersion').concat('.pdf'));
+        doc.save(this.props.datasetData.programCode + "-" + i18n.t('static.dashboard.compareVersion').concat('.pdf'));
         //creates PDF from img
         /*  var doc = new jsPDF('landscape');
           doc.setFontSize(20);
@@ -249,9 +249,9 @@ export default class CompareVersion extends Component {
         // csvRow.push('')
         csvRow.push('"' + (this.props.datasetData.programCode).replaceAll(' ', '%20') + '"')
         // csvRow.push('')
-        csvRow.push('"' + (getLabelText(this.props.datasetData.label,this.state.lang)).replaceAll(' ', '%20') + '"')
+        csvRow.push('"' + (getLabelText(this.props.datasetData.label, this.state.lang)).replaceAll(' ', '%20') + '"')
         // csvRow.push('')
-        
+
 
         // csvRow.push('"' + (i18n.t('static.dashboard.programheader') + ' : ' + document.getElementById("datasetId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
         // csvRow.push('')
@@ -321,7 +321,7 @@ export default class CompareVersion extends Component {
         var datasetData1 = this.props.datasetData1;//server latest version
         var datasetData2 = this.props.datasetData2;// local downloaded data
 
-        var planningUnitList = (datasetData.planningUnitList).concat(datasetData1.planningUnitList).concat(datasetData2.planningUnitList).sort(function (a, b) {
+        var planningUnitList = (datasetData.planningUnitList.filter(c => c.active.toString() == "true")).sort(function (a, b) {
             a = getLabelText(a.planningUnit.label, this.state.lang).toLowerCase();
             b = getLabelText(b.planningUnit.label, this.state.lang).toLowerCase();
             return a < b ? -1 : a > b ? 1 : 0;
@@ -336,7 +336,7 @@ export default class CompareVersion extends Component {
         var regionList1 = datasetData1.regionList;
         var regionList2 = datasetData2.regionList;
 
-        var combineRegionList = (regionList).concat(regionList1).concat(regionList2).sort(function (a, b) {
+        var combineRegionList = (regionList).sort(function (a, b) {
             a = getLabelText(a.label, this.state.lang).toLowerCase();
             b = getLabelText(b.label, this.state.lang).toLowerCase();
             return a < b ? -1 : a > b ? 1 : 0;
@@ -621,7 +621,7 @@ export default class CompareVersion extends Component {
                 {
                     title: "Forecast Qty",
                     type: 'text',
-                   
+
                 },
                 {
                     title: "Notes",
@@ -759,12 +759,12 @@ export default class CompareVersion extends Component {
                 }
             }
         }
-        else{
+        else {
             var asterisk = document.getElementsByClassName("resizable")[0];
             // var tr = asterisk.firstChild;
             var tr = asterisk.firstChild.nextSibling;
             console.log("asterisk", asterisk.firstChild.nextSibling)
-    
+
             tr.children[3].classList.add('InfoTr');
             tr.children[4].classList.add('InfoTr');
             tr.children[6].classList.add('InfoTr');
