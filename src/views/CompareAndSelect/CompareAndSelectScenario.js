@@ -193,7 +193,7 @@ class CompareAndSelectScenario extends Component {
             var colourArrayCount = 0;
             // var compareToConsumptionForecast = ["","","","22.7% above the highest consumption forecast.","7.9% below the lowest consumption forecast.","In between the highest and lowest consumption forecast."];
             var count = 0;
-            var consumptionExtrapolation = datasetJson.consumptionExtrapolation.filter(c => c.planningUnit.id == this.state.planningUnitId && c.extrapolationMethod.active);
+            var consumptionExtrapolation = datasetJson.consumptionExtrapolation.filter(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId && c.extrapolationMethod.active);
             for (var ce = 0; ce < consumptionExtrapolation.length; ce++) {
                 if (colourArrayCount > 10) {
                     colourArrayCount = 0;
@@ -203,9 +203,8 @@ class CompareAndSelectScenario extends Component {
             }
             for (var tl = 0; tl < treeList.length; tl++) {
                 var tree = treeList[tl];
-
-
-                var scenarioList = treeList[tl].scenarioList;
+                var regionList = tree.regionList.filter(c => c.id == this.state.regionId);
+                var scenarioList = regionList.length > 0 ? treeList[tl].scenarioList : [];
                 for (var sl = 0; sl < scenarioList.length; sl++) {
                     var flatList = tree.tree.flatList.filter(c => c.payload.nodeDataMap[scenarioList[sl].id][0].puNode != null && c.payload.nodeDataMap[scenarioList[sl].id][0].puNode.planningUnit.id == this.state.planningUnitId);
                     if (colourArrayCount > 10) {
@@ -826,7 +825,7 @@ class CompareAndSelectScenario extends Component {
                     // doc.text(i18n.t('static.dashboard.programheader') + ' : ' + document.getElementById("datasetId").selectedOptions[0].text, doc.internal.pageSize.width / 20, 90, {
                     //     align: 'left'
                     // })
-                    
+
 
                 }
 
