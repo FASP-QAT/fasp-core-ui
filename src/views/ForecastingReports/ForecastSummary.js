@@ -3288,15 +3288,15 @@ class ForecastSummary extends Component {
                                                                     <tr>
                                                                         <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                                         {/* <td></td> */}
-                                                                        <td className='text-left sticky-col first-col clone'></td>
-                                                                        <td></td>
-                                                                        <td></td>
-                                                                        <td></td>
-                                                                        <td></td>
-                                                                        <td></td>
-                                                                        <td></td>
-                                                                        <td></td>
-                                                                        <td></td>
+                                                                        <td className='text-left sticky-col first-col clone' style={{border:'none'}}></td>
+                                                                        <td style={{border:'none'}}></td>
+                                                                        <td style={{border:'none'}}></td>
+                                                                        <td style={{border:'none'}}></td>
+                                                                        <td style={{border:'none'}}></td>
+                                                                        <td style={{border:'none'}}></td>
+                                                                        <td style={{border:'none'}}></td>
+                                                                        <td style={{border:'none'}}></td>
+                                                                        <td style={{border:'none'}}></td>
                                                                         <td><b>{i18n.t('static.forecastReport.productCost')}</b></td>
                                                                         <td><b>{'$ ' + (this.state.totalProductCost).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</b></td>
                                                                         <td></td>
@@ -3304,15 +3304,15 @@ class ForecastSummary extends Component {
                                                                     <tr>
                                                                         <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                                         {/* <td></td> */}
-                                                                        <td className='text-left sticky-col first-col clone'></td>
-                                                                        <td></td>
-                                                                        <td></td>
-                                                                        <td></td>
-                                                                        <td></td>
-                                                                        <td></td>
-                                                                        <td></td>
-                                                                        <td></td>
-                                                                        <td></td>
+                                                                        <td className='text-left sticky-col first-col clone' style={{border:'none'}}></td>
+                                                                        <td style={{border:'none'}}></td>
+                                                                        <td style={{border:'none'}}></td>
+                                                                        <td style={{border:'none'}}></td>
+                                                                        <td style={{border:'none'}}></td>
+                                                                        <td style={{border:'none'}}></td>
+                                                                        <td style={{border:'none'}}></td>
+                                                                        <td style={{border:'none'}}></td>
+                                                                        <td style={{border:'none'}}></td>
                                                                         <td><b>{i18n.t('static.forecastReport.freight')} (7%)</b></td>
                                                                         <td><b>{'$ ' + ((0.07 * this.state.totalProductCost).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</b></td>
                                                                         <td></td>
@@ -3320,15 +3320,15 @@ class ForecastSummary extends Component {
                                                                     <tr>
                                                                         <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                                         {/* <td></td> */}
-                                                                        <td className='text-left sticky-col first-col clone'></td>
-                                                                        <td></td>
-                                                                        <td></td>
-                                                                        <td></td>
-                                                                        <td></td>
-                                                                        <td></td>
-                                                                        <td></td>
-                                                                        <td></td>
-                                                                        <td></td>
+                                                                        <td className='text-left sticky-col first-col clone' style={{border:'none'}}></td>
+                                                                        <td style={{border:'none'}}></td>
+                                                                        <td style={{border:'none'}}></td>
+                                                                        <td style={{border:'none'}}></td>
+                                                                        <td style={{border:'none'}}></td>
+                                                                        <td style={{border:'none'}}></td>
+                                                                        <td style={{border:'none'}}></td>
+                                                                        <td style={{border:'none'}}></td>
+                                                                        <td style={{border:'none'}}></td>
                                                                         <td><b>{i18n.t('static.shipment.totalCost')}</b></td>
                                                                         <td><b>{'$ ' + (parseFloat(parseFloat(this.state.totalProductCost) + parseFloat(0.07 * this.state.totalProductCost)).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</b></td>
                                                                         <td></td>
