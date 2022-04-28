@@ -12,35 +12,38 @@ import { calculateSupplyPlan } from '../SupplyPlan/SupplyPlanCalculations';
 
 
 import {
-    Badge,
+    // Badge,
     Button,
-    ButtonDropdown,
-    ButtonGroup,
-    ButtonToolbar,
-    Card,
-    CardBody,
-    CardFooter,
-    CardHeader,
-    CardTitle,
-    Col,
-    Widgets,
-    Dropdown,
-    DropdownItem,
-    DropdownMenu,
-    DropdownToggle,
-    Progress,
-    Pagination,
-    PaginationItem,
-    PaginationLink,
-    Row,
-    CardColumns,
-    Table, FormGroup, Input, InputGroup, InputGroupAddon, Label, Form
+    // ButtonDropdown,
+    // ButtonGroup,
+    // ButtonToolbar,
+    // Card,
+    // CardBody,
+    // CardFooter,
+    // CardHeader,
+    // CardTitle,
+    // Col,
+    // Widgets,
+    // Dropdown,
+    // DropdownItem,
+    // DropdownMenu,
+    // DropdownToggle,
+    // Progress,
+    // Pagination,
+    // PaginationItem,
+    // PaginationLink,
+    // Row,
+    // CardColumns,
+    // Table,
+    FormGroup, Input, InputGroup,
+    // InputGroupAddon, 
+    Label,
+    // Form
 } from 'reactstrap';
-import Picker from 'react-month-picker'
-import MonthBox from '../../CommonComponent/MonthBox.js';
-import ProgramService from '../../api/ProgramService';
+// import MonthBox from '../../CommonComponent/MonthBox.js';
+// import ProgramService from '../../api/ProgramService';
 import getLabelText from '../../CommonComponent/getLabelText';
-import { contrast } from "../../CommonComponent/JavascriptCommonFunctions";
+// import { contrast } from "../../CommonComponent/JavascriptCommonFunctions";
 import { jExcelLoadedFunctionOnlyHideRow, jExcelLoadedFunctionWithoutPagination, jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js'
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import { FORECAST_DATEPICKER_START_MONTH, JEXCEL_INTEGER_REGEX, JEXCEL_DECIMAL_LEAD_TIME, JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_PRO_KEY, MONTHS_IN_FUTURE_FOR_AMC, MONTHS_IN_PAST_FOR_AMC, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH, JEXCEL_PAGINATION_OPTION, JEXCEL_MONTH_PICKER_FORMAT, INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY, FORECASTED_CONSUMPTION_MODIFIED, QAT_DATASOURCE_ID } from '../../Constants.js';
@@ -124,36 +127,26 @@ export default class StepThreeImportMapPlanningUnits extends Component {
         }
     }
 
-    dateFormatter = value => {
-        return moment(value).format('MMM YY')
-    }
-
     exportCSV() {
-
         var csvRow = [];
 
-        csvRow.push('')
-        csvRow.push('')
-
         const headers = [];
-        // columns.map((item, idx) => { headers[idx] = ((item.text).replaceAll(' ', '%20')) });
-        headers.push(i18n.t('static.importFromQATSupplyPlan.supplyPlanPlanningUnit'));
-        headers.push(i18n.t('static.importFromQATSupplyPlan.forecastPlanningUnit'));
-        headers.push(i18n.t('static.program.region'));
-        headers.push(i18n.t('static.inventoryDate.inventoryReport'));
-        headers.push(i18n.t('static.importFromQATSupplyPlan.supplyPlanConsumption'));
-        headers.push(i18n.t('static.importFromQATSupplyPlan.conversionFactor(SupplyPlantoForecast)'));
-        headers.push(i18n.t('static.importFromQATSupplyPlan.convertedConsumption'));
-        headers.push(i18n.t('static.importFromQATSupplyPlan.currentQATConsumption'));
+        headers.push("Forecast Planning Unit");
+        headers.push("Supply Plan Planning Unit");
+        headers.push("Supply Plan Region");
+        headers.push("Month");
+        headers.push("Forecasted Consumption (Forecast Module)");
+        headers.push("% of Forecast");
+        headers.push("Conversion Factor (Forecast to Supply Plan)");
+        headers.push("Converted Forecasted Consumption (to be imported)");
+        headers.push("Current Forecasted Consumption (Supply Plan Module)");
         headers.push(i18n.t('static.quantimed.importData'));
 
-
         var A = [this.addDoubleQuoteToRowContent(headers)]
-        this.state.buildCSVTable.map(ele => A.push(this.addDoubleQuoteToRowContent([((ele.supplyPlanPlanningUnit).replaceAll(',', ' ')).replaceAll(' ', '%20'), ((ele.forecastPlanningUnit).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.region, this.dateFormatter(ele.month).replaceAll(' ', '%20'), ele.supplyPlanConsumption, ele.multiplier, ele.convertedConsumption, ele.currentQATConsumption, ele.import == true ? 'Yes' : 'No'])));
+        this.state.buildCSVTable.map(ele => A.push(this.addDoubleQuoteToRowContent([((ele.v1).replaceAll(',', ' ')).replaceAll(' ', '%20'), ((ele.v2).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.v3, ele.v4.replaceAll(' ', '%20'), ele.v5, ele.v6, ele.v7, ele.v8, ele.v9, ele.v10 == true ? 'Yes' : 'No'])));
         for (var i = 0; i < A.length; i++) {
             // console.log(A[i])
             csvRow.push(A[i].join(","))
-
         }
 
         var csvString = csvRow.join("%0A")
@@ -161,7 +154,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
         var a = document.createElement("a")
         a.href = 'data:attachment/csv,' + csvString
         a.target = "_Blank"
-        a.download = i18n.t('static.importFromQATSupplyPlan.importFromQATSupplyPlan') + ".csv"
+        a.download = i18n.t('static.importIntoQATSupplyPlan.importIntoQATSupplyPlan') + ".csv"
         document.body.appendChild(a)
         a.click()
     }
@@ -203,7 +196,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
 
 
                             var programId = this.props.items.programId;
-                            console.log("programId in submit12", programId)
+                            // console.log("programId in submit12", programId)
 
                             var programRequest = programTransaction.get(programId);
                             programRequest.onerror = function (event) {
@@ -234,9 +227,23 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                                     if (actionList == undefined) {
                                         actionList = []
                                     }
+                                    var elInstance = this.state.languageEl;
+
+                                    var json = elInstance.getJson();
                                     // var qunatimedData = this.state.selSource;
-                                    var finalImportQATData = this.state.selSource;
-                                    console.log("finalImportQATData===>", finalImportQATData)
+                                    var finalImportQATDataSelSource = this.state.selSource;
+                                    var finalImportQATDataSelSourceFilter = finalImportQATDataSelSource.filter((c, indexFilter) => json[indexFilter][9] == true);
+
+                                    var finalImportQATData = Object.values(finalImportQATDataSelSourceFilter.reduce((a, { v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16 }) => {
+                                        if (!a[v16]) {
+                                            a[v16] = Object.assign({}, { v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16 });
+                                        } else {
+                                            a[v16].v7 += v7;
+                                        }
+                                        return a;
+                                    }, {}));
+
+                                    // console.log("finalImportQATData===>", finalImportQATData)
 
                                     var finalPuList = []
                                     for (var i = 0; i < finalImportQATData.length; i++) {
@@ -272,17 +279,14 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                                         }
 
                                         var consumptionDataList = (programJson.consumptionList);
-                                        var elInstance = this.state.languageEl;
 
-                                        var json = elInstance.getJson();
                                         var finalImportQATDataFilter = finalImportQATData.filter((c, indexFilter) => c.v10 == finalPuList[pu] && json[indexFilter][9] == true);
-                                        // console.log("finalImportQATDataFilter-----2", finalImportQATDataFilter)
 
                                         for (var i = 0; i < finalImportQATDataFilter.length; i++) {
                                             var index = consumptionDataList.findIndex(c => moment(c.consumptionDate).format("YYYY-MM") == moment(finalImportQATDataFilter[i].v14).format("YYYY-MM")
                                                 && c.region.id == finalImportQATDataFilter[i].v11
                                                 && c.actualFlag.toString() == "false" && c.multiplier == 1);
-                                            console.log("FINAL-----2", index)
+                                            // console.log("FINAL-----2", index)
 
                                             if (index != -1) {
                                                 consumptionDataList[index].consumptionQty = finalImportQATDataFilter[i].v7;
@@ -330,7 +334,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                                         }
 
                                         programJson.consumptionList = consumptionDataList;
-                                        console.log("FINAL--------------@@@@@@@@@", programJson.consumptionList)
+                                        // console.log("FINAL--------------@@@@@@@@@", programJson.consumptionList)
 
                                         if (planningUnitDataIndex != -1) {
                                             planningUnitDataList[planningUnitDataIndex].planningUnitData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
@@ -364,7 +368,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                                         for (var i = 0; i < finalImportQATData.length; i++) {
 
                                             var index = finalQATPlanningList.findIndex(c => c == finalImportQATData[i].v10)
-                                            console.log("inside success", index)
+                                            // console.log("inside success", index)
 
                                             if (index == -1) {
                                                 finalQATPlanningList.push(parseInt(finalImportQATData[i].v10))
@@ -451,7 +455,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                     }
                     fullConsumptionList = fullConsumptionList.concat(programJson.consumptionList);
                 }
-                console.log("Props items---------------->", this.props.items);
+                // console.log("Props items---------------->", this.props.items);
 
                 var unitIds = ""
                 unitIds = this.props.items.supplyPlanPlanningUnitIds.map(c => c.forecastPlanningUnitId);
@@ -468,7 +472,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                     "unitIds": unitIds
                 }
 
-                console.log("OnlineInputJson---------------->", inputJson);
+                // console.log("OnlineInputJson---------------->", inputJson);
                 // var unitDescArr = this.props.items.supplyPlanPlanningUnitIds.map(c);
 
                 // console.log("RESP---------->unitDesc", unitDescArr);
@@ -477,7 +481,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                 let selectedSupplyPlan = this.props.items.supplyPlanPlanningUnitIds;
 
                 let supplyPlanRegionList = this.props.items.stepTwoData;
-                console.log("supplyPlanRegionList@@@@@@@@@@@@@", supplyPlanRegionList)
+                // console.log("supplyPlanRegionList@@@@@@@@@@@@@", supplyPlanRegionList)
                 // for (let i = 0; i < supplyPlanRegionList.length; i++) {
                 for (let j = 0; j < selectedSupplyPlan.length; j++) {
                     supplyPlanPlanningUnitId.push(selectedSupplyPlan[j].supplyPlanPlanningUnitId);
@@ -486,7 +490,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
 
                 ReportService.forecastOutput(inputJson)
                     .then(response => {
-                        console.log("RESP---------->forecastOutput", response.data);
+                        // console.log("RESP---------->forecastOutput", response.data);
                         let primaryConsumptionData = response.data;
                         // var count1 = 1;
                         for (let i = 0; i < primaryConsumptionData.length; i++) {
@@ -515,6 +519,8 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                                         v13: primaryConsumptionData[i].monthlyForecastData[j].month + "~" + selectedSupplyPlanPlanningUnit[0].supplyPlanPlanningUnitId + "~" + regionFilter[0].supplyPlanRegionId + "~" + primaryConsumptionData[i].planningUnit.id,
                                         v14: primaryConsumptionData[i].monthlyForecastData[j].month, // Month without format
                                         v15: regionFilter[0].forecastPercentage,// % of forecast
+                                        v16: primaryConsumptionData[i].monthlyForecastData[j].month + "~" + selectedSupplyPlanPlanningUnit[0].supplyPlanPlanningUnitId + "~" + regionFilter[0].supplyPlanRegionId,
+
 
                                     });
                                 }
@@ -524,16 +530,16 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                             }
                         }
 
-                        let resultTrue = Object.values(tempList.reduce((a, { v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15 }) => {
+                        let resultTrue = Object.values(tempList.reduce((a, { v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16 }) => {
                             if (!a[v13]) {
-                                a[v13] = Object.assign({}, { v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15 });
+                                a[v13] = Object.assign({}, { v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16 });
                             } else {
                                 a[v13].v7 += v7;
                                 a[v13].v5 += v5;
                             }
                             return a;
                         }, {}));
-                        console.log("Result True@@@@@@@@@@@@@@@@@@", resultTrue);
+                        // console.log("Result True@@@@@@@@@@@@@@@@@@", resultTrue);
                         this.setState({
                             selSource: resultTrue,
                             loading: true
@@ -543,7 +549,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
 
                     }).catch(
                         error => {
-                            console.log("Error @@@@@@@@@@", error)
+                            // console.log("Error @@@@@@@@@@", error)
                             if (error.message === "Network Error") {
                                 this.setState({
                                     message: 'static.unkownError',
@@ -583,7 +589,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                         }
                     );
 
-                console.log("step 3-tempList--->", tempList)
+                // console.log("step 3-tempList--->", tempList)
             }.bind(this)
         }.bind(this)
     }
@@ -604,8 +610,8 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                 data[1] = papuList[j].v2
                 data[2] = papuList[j].v3
                 data[3] = papuList[j].v4
-                data[4] = papuList[j].v15
-                data[5] = papuList[j].v5
+                data[4] = papuList[j].v5
+                data[5] = papuList[j].v15
                 data[6] = papuList[j].v6
                 data[7] = papuList[j].v7
                 data[8] = papuList[j].v8
@@ -617,6 +623,19 @@ export default class StepThreeImportMapPlanningUnits extends Component {
 
                 papuDataArr[count] = data;
                 count++;
+
+                buildCSVTable.push({
+                    v1: papuList[j].v1,//Forecast planning unit
+                    v2: papuList[j].v2,//Supply plan planning unit name
+                    v3: papuList[j].v3,// Supply plan region name
+                    v4: papuList[j].v4, // Month
+                    v5: papuList[j].v5,//Forecasting module consumption qty
+                    v6: papuList[j].v15,//Multiplier
+                    v7: papuList[j].v6,// Multiplication
+                    v8: papuList[j].v7,//Supply plan module qty
+                    v9: papuList[j].v8,// Check
+                    v10: true,// Supply plan planning unit id
+                })
 
             }
         }
@@ -667,15 +686,6 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                     readOnly: true
                 },
                 {
-                    title: '% of Forecast',
-                    // type: 'text',
-                    type: 'numeric',
-                    decimal: '.',
-                    mask: '#,##.00',
-                    textEditor: true,
-                    readOnly: true
-                },
-                {
                     title: 'Forecasted Consumption (Forecast Module)',
                     // type: 'text',
                     type: 'numeric',
@@ -685,7 +695,16 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                     readOnly: true
                 },
                 {
-                    title: 'Conversion Factor (Forecast to Supply Plan)',
+                    title: '% of Forecast',
+                    // type: 'text',
+                    type: 'numeric',
+                    decimal: '.',
+                    mask: '#,##.00',
+                    textEditor: true,
+                    readOnly: true
+                },
+                {
+                    title: i18n.t('static.importIntoQATSupplyPlan.conversionFactor'),
                     // type: 'text',
                     type: 'numeric',
                     decimal: '.',
@@ -904,6 +923,14 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                         </li>
                     </ul>
                 </div>
+                <FormGroup>
+                    {/* <Button color="info" size="md" className="float-right mr-1" type="submit" onClick={() => this.formSubmit()}>{i18n.t('static.common.next')} <i className="fa fa-angle-double-right"></i></Button> */}
+                    <Button color="success" size="md" className="float-right mr-1" type="button" onClick={this.formSubmit}> <i className="fa fa-check"></i>{i18n.t('static.importFromQATSupplyPlan.Import')}</Button>
+                    &nbsp;
+                    {/* <Button color="info" size="md" className="float-right mr-1" type="button" onClick={this.props.previousToStepOne} > <i className="fa fa-angle-double-left"></i> {i18n.t('static.common.back')}</Button> */}
+                    <Button color="info" size="md" className="float-left mr-1 px-4" type="button" onClick={this.props.previousToStepTwo} > <i className="fa fa-angle-double-left "></i>  {i18n.t('static.common.back')}</Button>
+                    &nbsp;
+                </FormGroup>
                 {/* <h5 className="red">{i18n.t('static.importFromQATSupplyPlan.allValuesBelowAreInSupplyPlanningUnits.')}</h5> */}
                 {/* <p><span className="legendcolor" style={{ backgroundColor: "yellow" }}></span> <span className="legendcommitversionText">abccsvsvsn vrsvw</span></p> */}
                 <div className="table-responsive" style={{ display: this.props.items.loading ? "none" : "block" }} >
@@ -922,14 +949,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                         </div>
                     </div>
                 </div>
-                <FormGroup>
-                    {/* <Button color="info" size="md" className="float-right mr-1" type="submit" onClick={() => this.formSubmit()}>{i18n.t('static.common.next')} <i className="fa fa-angle-double-right"></i></Button> */}
-                    <Button color="success" size="md" className="float-right mr-1" type="button" onClick={this.formSubmit}> <i className="fa fa-check"></i>{i18n.t('static.importFromQATSupplyPlan.Import')}</Button>
-                    &nbsp;
-                    {/* <Button color="info" size="md" className="float-right mr-1" type="button" onClick={this.props.previousToStepOne} > <i className="fa fa-angle-double-left"></i> {i18n.t('static.common.back')}</Button> */}
-                    <Button color="info" size="md" className="float-left mr-1 px-4" type="button" onClick={this.props.previousToStepTwo} > <i className="fa fa-angle-double-left "></i>  {i18n.t('static.common.back')}</Button>
-                    &nbsp;
-                </FormGroup>
+
             </>
         );
     }

@@ -214,13 +214,13 @@ class ForecastOutput extends Component {
         let programId = document.getElementById("programId").value;
         let versionId = document.getElementById("versionId").value;
         this.setState({
-            planningUnits: [],
-            planningUnitValues: [],
-            planningUnitLabels: [],
+            // planningUnits: [],
+            // planningUnitValues: [],
+            // planningUnitLabels: [],
 
-            forecastingUnits: [],
-            forecastingUnitValues: [],
-            forecastingUnitLabels: [],
+            // forecastingUnits: [],
+            // forecastingUnitValues: [],
+            // forecastingUnitLabels: [],
         }, () => {
             if (programId > 0 && versionId != 0) {
                 if (versionId.includes('Local')) {
@@ -255,6 +255,17 @@ class ForecastOutput extends Component {
                                 }
                             }
                             console.log("EquivalencyUnitList---------->1", filteredEquList);
+
+                            let fuList = this.state.forecastingUnits;
+                            let newList = [];
+                            for (var i = 0; i < filteredEquList.length; i++) {
+                                let temp = fuList.filter(c => c.id == filteredEquList[i].forecastingUnit.id);
+                                if (temp.length > 0) {
+                                    newList.push(filteredEquList[i]);
+                                }
+                            }
+
+                            filteredEquList = newList;
 
                             let duplicateEquiUnit = filteredEquList.map(c => c.equivalencyUnit);
                             const ids = duplicateEquiUnit.map(o => o.equivalencyUnitId)
@@ -299,6 +310,17 @@ class ForecastOutput extends Component {
                                 }
                             }
                             console.log("EquivalencyUnitList---------->1", filteredEquList);
+
+                            let fuList = this.state.forecastingUnits;
+                            let newList = [];
+                            for (var i = 0; i < filteredEquList.length; i++) {
+                                let temp = fuList.filter(c => c.id == filteredEquList[i].forecastingUnit.id);
+                                if (temp.length > 0) {
+                                    newList.push(filteredEquList[i]);
+                                }
+                            }
+
+                            filteredEquList = newList;
 
                             let duplicateEquiUnit = filteredEquList.map(c => c.equivalencyUnit);
                             const ids = duplicateEquiUnit.map(o => o.equivalencyUnitId)
@@ -452,38 +474,38 @@ class ForecastOutput extends Component {
     exportCSV() {
         var csvRow = [];
         csvRow.push('"' + (i18n.t('static.supplyPlan.runDate') + ' : ' + moment(new Date()).format(`${DATE_FORMAT_CAP}`)).replaceAll(' ', '%20') + '"')
-        csvRow.push('')
+        // csvRow.push('')
         csvRow.push('"' + (i18n.t('static.supplyPlan.runTime') + ' : ' + moment(new Date()).format('hh:mm A')).replaceAll(' ', '%20') + '"')
-        csvRow.push('')
+        // csvRow.push('')
         csvRow.push('"' + (i18n.t('static.user.user') + ' : ' + AuthenticationService.getLoggedInUsername()).replaceAll(' ', '%20') + '"')
-        csvRow.push('')
+        // csvRow.push('')
         csvRow.push('"' + (this.state.programs.filter(c => c.programId == this.state.programId)[0].programCode + " " + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text)).replaceAll(' ', '%20') + '"')
-        csvRow.push('')
+        // csvRow.push('')
         // csvRow.push('"' + (document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
         // csvRow.push('')
         // csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
         // csvRow.push('')
-        csvRow.push('"' + (i18n.t('static.report.version*') + ' : ' + document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
-        csvRow.push('')
+        // csvRow.push('"' + (i18n.t('static.report.versionFinal*') + ' : ' + document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+        // csvRow.push('')
         csvRow.push('"' + (i18n.t('static.common.forecastPeriod') + ' : ' + document.getElementById("forecastPeriod").value).replaceAll(' ', '%20') + '"')
-        csvRow.push('')
+        // csvRow.push('')
         csvRow.push('"' + (i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ', '%20') + '"')
-        csvRow.push('')
+        // csvRow.push('')
         csvRow.push('"' + (i18n.t('static.forecastReport.yAxisInEquivalencyUnit') + ' : ' + document.getElementById("yaxisEquUnit").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
-        csvRow.push('')
+        // csvRow.push('')
         csvRow.push('"' + (i18n.t('static.common.display') + ' : ' + document.getElementById("viewById").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
-        csvRow.push('')
-        if (document.getElementById("viewById").value == 1) {//planning unit
-            this.state.planningUnitLabels.map(ele =>
-                csvRow.push('"' + (i18n.t('static.report.planningUnit') + ' : ' + ele.toString()).replaceAll(' ', '%20') + '"'))
-        } else {//forecasting unit
-            this.state.forecastingUnitLabels.map(ele =>
-                csvRow.push('"' + (i18n.t('static.product.unit1') + ' : ' + ele.toString()).replaceAll(' ', '%20') + '"'))
-        }
-        csvRow.push('')
+        // csvRow.push('')
+        // if (document.getElementById("viewById").value == 1) {//planning unit
+        //     this.state.planningUnitLabels.map(ele =>
+        //         csvRow.push('"' + (i18n.t('static.report.planningUnit') + ' : ' + ele.toString()).replaceAll(' ', '%20') + '"'))
+        // } else {//forecasting unit
+        //     this.state.forecastingUnitLabels.map(ele =>
+        //         csvRow.push('"' + (i18n.t('static.product.unit1') + ' : ' + ele.toString()).replaceAll(' ', '%20') + '"'))
+        // }
+        // csvRow.push('')
         csvRow.push('"' + (i18n.t('static.forecastReport.xAxisAggregateByYear') + ' : ' + document.getElementById("xaxis").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
 
-        csvRow.push('')
+        // csvRow.push('')
         csvRow.push('')
 
         const headers = [];
@@ -636,9 +658,9 @@ class ForecastOutput extends Component {
                 doc.text(this.state.programs.filter(c => c.programId == this.state.programId)[0].programCode + " " + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text), doc.internal.pageSize.width - 40, 50, {
                     align: 'right'
                 })
-                doc.text(document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width - 40, 60, {
-                    align: 'right'
-                })
+                // doc.text(document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width - 40, 60, {
+                //     align: 'right'
+                // })
                 doc.setFontSize(TITLE_FONT)
                 doc.setTextColor("#002f6c");
                 doc.text(i18n.t('static.dashboard.monthlyForecast'), doc.internal.pageSize.width / 2, 60, {
@@ -647,37 +669,39 @@ class ForecastOutput extends Component {
                 if (i == 1) {
                     doc.setFont('helvetica', 'normal')
                     doc.setFontSize(8)
-                    doc.text(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
+                    // doc.text(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
+                    //     align: 'left'
+                    // })
+                    // doc.text(i18n.t('static.report.version*') + ' : ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 120, {
+                    //     align: 'left'
+                    // })
+                    doc.text(i18n.t('static.common.forecastPeriod') + ' : ' + document.getElementById("forecastPeriod").value, doc.internal.pageSize.width / 8, 100, {
                         align: 'left'
                     })
-                    doc.text(i18n.t('static.report.version*') + ' : ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130, {
+                    doc.text(i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to), doc.internal.pageSize.width / 8, 110, {
                         align: 'left'
                     })
-                    doc.text(i18n.t('static.common.forecastPeriod') + ' : ' + document.getElementById("forecastPeriod").value, doc.internal.pageSize.width / 8, 150, {
+                    doc.text(i18n.t('static.forecastReport.yAxisInEquivalencyUnit') + ' : ' + document.getElementById("yaxisEquUnit").selectedOptions[0].text, doc.internal.pageSize.width / 8, 120, {
                         align: 'left'
                     })
-                    doc.text(i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to), doc.internal.pageSize.width / 8, 170, {
+                    doc.text(i18n.t('static.common.display') + ' : ' + document.getElementById("viewById").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130, {
                         align: 'left'
                     })
-                    doc.text(i18n.t('static.forecastReport.yAxisInEquivalencyUnit') + ' : ' + document.getElementById("yaxisEquUnit").selectedOptions[0].text, doc.internal.pageSize.width / 8, 190, {
-                        align: 'left'
-                    })
-                    doc.text(i18n.t('static.common.display') + ' : ' + document.getElementById("viewById").selectedOptions[0].text, doc.internal.pageSize.width / 8, 210, {
-                        align: 'left'
-                    })
-                    let startY1 = 0;
-                    if (document.getElementById("viewById").value == 1) {
-                        var planningText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
-                        doc.text(doc.internal.pageSize.width / 8, 230, planningText)
-                        startY1 = 230 + (doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4).length * 10)
-                    } else {
-                        var planningText = doc.splitTextToSize((i18n.t('static.product.unit1') + ' : ' + this.state.forecastingUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
-                        doc.text(doc.internal.pageSize.width / 8, 230, planningText)
-                        startY1 = 250 + (doc.splitTextToSize((i18n.t('static.product.unit1') + ' : ' + this.state.forecastingUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4).length * 10)
-                    }
+                    // let startY1 = 0;
+                    // if (document.getElementById("viewById").value == 1) {
+                    //     var planningText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
+                    //     doc.text(doc.internal.pageSize.width / 8, 230, planningText)
+                    //     startY1 = 230 + (doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4).length * 10)
+                    // } else {
+                    //     var planningText = doc.splitTextToSize((i18n.t('static.product.unit1') + ' : ' + this.state.forecastingUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
+                    //     doc.text(doc.internal.pageSize.width / 8, 230, planningText)
+                    //     startY1 = 250 + (doc.splitTextToSize((i18n.t('static.product.unit1') + ' : ' + this.state.forecastingUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4).length * 10)
+                    // }
+                    // doc.text(i18n.t('static.forecastReport.xAxisAggregateByYear') + ' : ' + document.getElementById("xaxis").selectedOptions[0].text, doc.internal.pageSize.width / 8, startY1, {
+                    //     align: 'left'
+                    // })
 
-
-                    doc.text(i18n.t('static.forecastReport.xAxisAggregateByYear') + ' : ' + document.getElementById("xaxis").selectedOptions[0].text, doc.internal.pageSize.width / 8, startY1, {
+                    doc.text(i18n.t('static.forecastReport.xAxisAggregateByYear') + ' : ' + document.getElementById("xaxis").selectedOptions[0].text, doc.internal.pageSize.width / 8, 140, {
                         align: 'left'
                     })
 
@@ -704,7 +728,7 @@ class ForecastOutput extends Component {
         var h1 = 100;
         var aspectwidth1 = (width - h1);
 
-        doc.addImage(canvasImg, 'png', 50, 280, 750, 260, 'CANVAS');
+        doc.addImage(canvasImg, 'png', 50, 170, 750, 260, 'CANVAS');
 
         //table start
         const headers = [];
@@ -751,7 +775,7 @@ class ForecastOutput extends Component {
                 this.state.calculateEquivalencyUnitTotal.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(item1).format("YYYY-MM")).length > 0 ? (this.state.calculateEquivalencyUnitTotal.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(item1).format("YYYY-MM"))[0].consumptionQty).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : ''
             ));
             A.push(
-                ((i18n.t('static.supplyPlan.total') + ' ' +this.state.equivalencyUnitLabel)),
+                ((i18n.t('static.supplyPlan.total') + ' ' + this.state.equivalencyUnitLabel)),
                 ''
             );
             A = A.concat(propertyName);
@@ -784,7 +808,7 @@ class ForecastOutput extends Component {
                 this.state.calculateEquivalencyUnitTotal.filter(c => moment(c.consumptionDate).format("YYYY") == moment(item1).format("YYYY")).length > 0 ? (this.state.calculateEquivalencyUnitTotal.filter(c => moment(c.consumptionDate).format("YYYY") == moment(item1).format("YYYY"))[0].consumptionQty).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : ''
             ));
             A.push(
-                ((i18n.t('static.supplyPlan.total') +' '+ this.state.equivalencyUnitLabel)),
+                ((i18n.t('static.supplyPlan.total') + ' ' + this.state.equivalencyUnitLabel)),
                 ''
             );
             A = A.concat(propertyName);
@@ -1922,8 +1946,8 @@ class ForecastOutput extends Component {
                 if (proList.length == 1) {
                     this.setState({
                         programs: proList.sort(function (a, b) {
-                            a = getLabelText(a.label, lang).toLowerCase();
-                            b = getLabelText(b.label, lang).toLowerCase();
+                            a = (a.programCode).toLowerCase();
+                            b = (b.programCode).toLowerCase();
                             return a < b ? -1 : a > b ? 1 : 0;
                         }),
                         downloadedProgramData: downloadedProgramData,
@@ -1936,8 +1960,8 @@ class ForecastOutput extends Component {
                     if (this.props.match.params.programId != "" && this.props.match.params.programId != undefined) {
                         this.setState({
                             programs: proList.sort(function (a, b) {
-                                a = getLabelText(a.label, lang).toLowerCase();
-                                b = getLabelText(b.label, lang).toLowerCase();
+                                a = (a.programCode).toLowerCase();
+                                b = (b.programCode).toLowerCase();
                                 return a < b ? -1 : a > b ? 1 : 0;
                             }),
                             programId: this.props.match.params.programId,
@@ -1951,8 +1975,8 @@ class ForecastOutput extends Component {
                     else if (localStorage.getItem("sesForecastProgramIdReport") != '' && localStorage.getItem("sesForecastProgramIdReport") != undefined) {
                         this.setState({
                             programs: proList.sort(function (a, b) {
-                                a = getLabelText(a.label, lang).toLowerCase();
-                                b = getLabelText(b.label, lang).toLowerCase();
+                                a = (a.programCode).toLowerCase();
+                                b = (b.programCode).toLowerCase();
                                 return a < b ? -1 : a > b ? 1 : 0;
                             }),
                             downloadedProgramData: downloadedProgramData,
@@ -1964,8 +1988,8 @@ class ForecastOutput extends Component {
                     } else {
                         this.setState({
                             programs: proList.sort(function (a, b) {
-                                a = getLabelText(a.label, lang).toLowerCase();
-                                b = getLabelText(b.label, lang).toLowerCase();
+                                a = (a.programCode).toLowerCase();
+                                b = (b.programCode).toLowerCase();
                                 return a < b ? -1 : a > b ? 1 : 0;
                             }),
                             downloadedProgramData: downloadedProgramData
@@ -2163,9 +2187,17 @@ class ForecastOutput extends Component {
                                 planningUnitLabels: newPlanningUnitList.map((item, i) => {
                                     return (getLabelText(item.label, this.state.lang))
                                 }, this),
+                                forecastingUnitValues: newForecastingUnitList.map((item, i) => {
+                                    return ({ label: getLabelText(item.label, this.state.lang), value: item.id })
+
+                                }, this),
+                                forecastingUnitLabels: newForecastingUnitList.map((item, i) => {
+                                    return (getLabelText(item.label, this.state.lang))
+                                }, this),
                                 equivalencyUnitLabel: selectedText,
                                 filteredProgramEQList: filteredProgramEQList
                             }, () => {
+                                this.getEquivalencyUnitData();
                                 this.filterData();
                             })
                         } else {//NO
@@ -2191,10 +2223,18 @@ class ForecastOutput extends Component {
                                 planningUnitLabels: planningUnitList.map((item, i) => {
                                     return (getLabelText(item.label, this.state.lang))
                                 }, this),
+                                forecastingUnitValues: forecastingUnitList.map((item, i) => {
+                                    return ({ label: getLabelText(item.label, this.state.lang), value: item.id })
+
+                                }, this),
+                                forecastingUnitLabels: forecastingUnitList.map((item, i) => {
+                                    return (getLabelText(item.label, this.state.lang))
+                                }, this),
                                 equivalencyUnitLabel: ''
                                 // planningUnits: filteredPU,
                                 // forecastingUnits: filtered
                             }, () => {
+                                this.getEquivalencyUnitData();
                                 this.filterData();
                             })
                         }
@@ -2285,9 +2325,17 @@ class ForecastOutput extends Component {
                                                 planningUnitLabels: newPlanningUnitList.map((item, i) => {
                                                     return (getLabelText(item.label, this.state.lang))
                                                 }, this),
+                                                forecastingUnitValues: newForecastingUnitList.map((item, i) => {
+                                                    return ({ label: getLabelText(item.label, this.state.lang), value: item.id })
+
+                                                }, this),
+                                                forecastingUnitLabels: newForecastingUnitList.map((item, i) => {
+                                                    return (getLabelText(item.label, this.state.lang))
+                                                }, this),
                                                 equivalencyUnitLabel: selectedText,
                                                 filteredProgramEQList: filteredProgramEQList
                                             }, () => {
+                                                this.getEquivalencyUnitData();
                                                 this.filterData();
                                             })
 
@@ -2301,8 +2349,16 @@ class ForecastOutput extends Component {
                                                 planningUnitLabels: this.state.planningUnits.map((item, i) => {
                                                     return (getLabelText(item.label, this.state.lang))
                                                 }, this),
+                                                forecastingUnitValues: this.state.forecastingUnits.map((item, i) => {
+                                                    return ({ label: getLabelText(item.label, this.state.lang), value: item.id })
+
+                                                }, this),
+                                                forecastingUnitLabels: this.state.forecastingUnits.map((item, i) => {
+                                                    return (getLabelText(item.label, this.state.lang))
+                                                }, this),
                                                 equivalencyUnitLabel: ''
                                             }, () => {
+                                                this.getEquivalencyUnitData();
                                                 this.filterData();
                                             })
 
@@ -2462,6 +2518,10 @@ class ForecastOutput extends Component {
                     // forecastPeriod: (month[new Date((month[d1.getMonth()] + '-' + d1.getFullYear())).getMonth()]) + ' ' + (startDateSplit[1] - 3) + ' ~ ' + month[forecastStopDate.getMonth()] + ' ' + forecastStopDate.getFullYear(),
                     // rangeValue: { from: { year: new Date(forecastStartDateNew).getFullYear(), month: new Date(forecastStartDateNew).getMonth() + 1 }, to: { year: new Date(forecastStopDateNew).getFullYear(), month: new Date(forecastStopDateNew).getMonth() + 1 } },
                     rangeValue: { from: { year: Number(moment(forecastStartDateNew).startOf('month').format("YYYY")), month: Number(moment(forecastStartDateNew).startOf('month').format("M")) }, to: { year: Number(moment(forecastStopDateNew).startOf('month').format("YYYY")), month: Number(moment(forecastStopDateNew).startOf('month').format("M")) } },
+
+                    minDate: { year: Number(moment(forecastStartDateNew).startOf('month').format("YYYY")), month: Number(moment(forecastStartDateNew).startOf('month').format("M")) },
+                    maxDate: { year: Number(moment(forecastStopDateNew).startOf('month').format("YYYY")), month: Number(moment(forecastStopDateNew).startOf('month').format("M")) },
+
                     // forecastPeriod: month[new Date(forecastStartDateNew).getMonth()] + ' ' + new Date(forecastStartDateNew).getFullYear() + ' ~ ' + month[new Date(forecastStopDateNew).getMonth()] + ' ' + new Date(forecastStopDateNew).getFullYear(),
                     forecastPeriod: month[Number(moment(forecastStartDateNew).startOf('month').format("M")) - 1] + ' ' + Number(moment(forecastStartDateNew).startOf('month').format("YYYY")) + ' ~ ' + month[Number(moment(forecastStopDateNew).startOf('month').format("M")) - 1] + ' ' + Number(moment(forecastStopDateNew).startOf('month').format("YYYY")),
                 }, () => { })
@@ -2501,6 +2561,8 @@ class ForecastOutput extends Component {
 
                 this.setState({
                     rangeValue: { from: { year: Number(moment(forecastStartDateNew).startOf('month').format("YYYY")), month: Number(moment(forecastStartDateNew).startOf('month').format("M")) }, to: { year: Number(moment(forecastStopDateNew).startOf('month').format("YYYY")), month: Number(moment(forecastStopDateNew).startOf('month').format("M")) } },
+                    minDate: { year: Number(moment(forecastStartDateNew).startOf('month').format("YYYY")), month: Number(moment(forecastStartDateNew).startOf('month').format("M")) },
+                    maxDate: { year: Number(moment(forecastStopDateNew).startOf('month').format("YYYY")), month: Number(moment(forecastStopDateNew).startOf('month').format("M")) },
                     forecastPeriod: month[Number(moment(forecastStartDateNew).startOf('month').format("M")) - 1] + ' ' + Number(moment(forecastStartDateNew).startOf('month').format("YYYY")) + ' ~ ' + month[Number(moment(forecastStopDateNew).startOf('month').format("M")) - 1] + ' ' + Number(moment(forecastStopDateNew).startOf('month').format("YYYY")),
                 }, () => { })
 
@@ -2605,7 +2667,7 @@ class ForecastOutput extends Component {
                 localStorage.setItem("sesDatasetVersionId", document.getElementById("versionId").value);
                 this.setForecastPeriod();
                 this.filterData();
-                this.getEquivalencyUnitData();
+                // this.getEquivalencyUnitData();
                 this.getPlanningUnitForecastingUnit();
 
             })
@@ -2616,7 +2678,7 @@ class ForecastOutput extends Component {
                 // (viewById == 1 ? this.getPlanningUnitForecastingUnit() : this.getForecastingUnit());
                 this.setForecastPeriod();
                 this.filterData();
-                this.getEquivalencyUnitData();
+                // this.getEquivalencyUnitData();
                 this.getPlanningUnitForecastingUnit()
             })
         }
@@ -2853,10 +2915,12 @@ class ForecastOutput extends Component {
             if (viewById == 2) {
                 document.getElementById("planningUnitDiv").style.display = "none";
                 document.getElementById("forecastingUnitDiv").style.display = "block";
+                this.getPlanningUnitForecastingUnit();
                 this.filterData();
             } else if (viewById == 1) {
                 document.getElementById("planningUnitDiv").style.display = "block";
                 document.getElementById("forecastingUnitDiv").style.display = "none";
+                this.getPlanningUnitForecastingUnit();
                 this.filterData();
             }
         })
@@ -2922,7 +2986,7 @@ class ForecastOutput extends Component {
             title: {
                 display: true,
                 // text: (this.state.yaxisEquUnit > 0 ? this.state.equivalencyUnitLabel : 'Monthly Forecast ' + (this.state.viewById == 1 ? '(' + i18n.t('static.product.product') + ')' : '(' + i18n.t('static.forecastingunit.forecastingunit') + ')'))
-                text: 'Monthly Forecast - ' + (this.state.programs.filter(c => c.programId == this.state.programId).length > 0 ? this.state.programs.filter(c => c.programId == this.state.programId)[0].programCode : '')
+                text: 'Monthly Forecast - ' + (this.state.programs.filter(c => c.programId == this.state.programId).length > 0 ? this.state.programs.filter(c => c.programId == this.state.programId)[0].programCode : '') + ' - ' + (this.state.versions.filter(c => c.versionId == this.state.versionId).length > 0 ? this.state.versions.filter(c => c.versionId == this.state.versionId)[0].versionId : '')
             },
             scales: {
                 yAxes: [
@@ -3055,7 +3119,8 @@ class ForecastOutput extends Component {
                             pointRadius: 0,
                             showInLegend: true,
                             // data: consumptionValue
-                            data: (consumptionValue.filter(c => c != "").length > 0 ? consumptionValue : [])
+                            data: (consumptionValue.filter(c => c != "").length > 0 ? consumptionValue : []),
+                            pointRadius: 4,
                         }
                     )
 
@@ -3104,7 +3169,14 @@ class ForecastOutput extends Component {
                             pointStyle: 'line',
                             pointRadius: 0,
                             showInLegend: true,
-                            data: consumptionValue
+                            data: consumptionValue,
+                            // borderDash: [5, 5],
+                            pointRadius: 4,
+                            // pointHoverRadius: 6,
+                            // pointBackgroundColor: "#55bae7",
+                            // pointBorderColor: "#55bae7",
+                            // pointHoverBackgroundColor: "#55bae7",
+                            // pointHoverBorderColor: "#55bae7",
                         }
                     )
 
@@ -3267,7 +3339,7 @@ class ForecastOutput extends Component {
                                             </FormGroup>
 
                                             <FormGroup className="col-md-3">
-                                                <Label htmlFor="appendedInputButton">{i18n.t('static.report.version*')}</Label>
+                                                <Label htmlFor="appendedInputButton">{i18n.t('static.report.versionFinal*')}</Label>
                                                 <div className="controls ">
                                                     <InputGroup>
                                                         <Input
@@ -3289,7 +3361,9 @@ class ForecastOutput extends Component {
                                             </FormGroup>
 
                                             <FormGroup className="col-md-3">
-                                                <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon fa fa-sort-desc ml-1"></span></Label>
+                                                <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon fa fa-sort-desc ml-1"></span>
+                                                    <i> (Forecast: {this.state.forecastPeriod})</i>
+                                                </Label>
                                                 <div className="controls edit">
 
                                                     <Picker
@@ -3549,7 +3623,7 @@ class ForecastOutput extends Component {
                                                                     {this.state.yaxisEquUnit > 0 && this.state.xaxis == 2 &&
                                                                         <tr>
                                                                             <td className="sticky-col first-col clone Firstcolum"></td>
-                                                                            <td style={{ textAlign: 'left' }}  className="sticky-col first-col clone Secondcolum"><b>{i18n.t('static.supplyPlan.total')} {" " + this.state.equivalencyUnitLabel}</b></td>
+                                                                            <td style={{ textAlign: 'left' }} className="sticky-col first-col clone Secondcolum"><b>{i18n.t('static.supplyPlan.total')} {" " + this.state.equivalencyUnitLabel}</b></td>
                                                                             <td className='text-left sticky-col first-col clone Thirdcolum'></td>
                                                                             {this.state.monthArrayList.map(item1 => (
                                                                                 <td><b>{this.state.calculateEquivalencyUnitTotal.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(item1).format("YYYY-MM")).length > 0 ? <NumberFormat displayType={'text'} thousandSeparator={true} value={this.state.calculateEquivalencyUnitTotal.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(item1).format("YYYY-MM"))[0].consumptionQty} /> : ""}</b></td>

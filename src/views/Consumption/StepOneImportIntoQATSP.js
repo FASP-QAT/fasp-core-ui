@@ -734,7 +734,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                     filter: this.filterPlanningUnitBasedOnTracerCategory
                 },
                 {
-                    title: i18n.t('static.importFromQATSupplyPlan.conversionFactor'),
+                    title: i18n.t('static.importIntoQATSupplyPlan.conversionFactor'),
                     type: 'numeric',
                     decimal: '.',
                     // readOnly: true,
@@ -870,7 +870,9 @@ export default class StepOneImportMapPlanningUnits extends Component {
                     selectedForecastProgram: forecastProgram,
 
                     versions: (forecastProgram[0].versionList.filter(function (x, i, a) {
-                        return a.indexOf(x) === i;
+                        if (x.versionType.id == 2) {
+                            return a.indexOf(x) === i;
+                        }
                     })).reverse()
                 }, () => { });
             });
@@ -940,21 +942,21 @@ export default class StepOneImportMapPlanningUnits extends Component {
                     this.el.setComments(col, i18n.t('static.message.spacetext'));
                     valid = false;
                 } else {
-                    for (var i = (json.length - 1); i >= 0; i--) {
-                        var map = new Map(Object.entries(json[i]));
+                    // for (var i = (json.length - 1); i >= 0; i--) {
+                    // var map = new Map(Object.entries(json[i]));
 
-                        var planningUnitValue = map.get("2");
-                        if (planningUnitValue == value && y != i && i > y) {
-                            this.el.setStyle(col, "background-color", "transparent");
-                            this.el.setStyle(col, "background-color", "yellow");
-                            this.el.setComments(col, i18n.t('static.message.planningUnitAlreadyExists'));
-                            i = -1;
-                            valid = false;
-                        } else {
-                            this.el.setStyle(col, "background-color", "transparent");
-                            this.el.setComments(col, "");
-                        }
-                    }
+                    // var planningUnitValue = map.get("2");
+                    // if (planningUnitValue == value && y != i && i > y) {
+                    //     this.el.setStyle(col, "background-color", "transparent");
+                    //     this.el.setStyle(col, "background-color", "yellow");
+                    //     this.el.setComments(col, i18n.t('static.message.planningUnitAlreadyExists'));
+                    //     i = -1;
+                    //     valid = false;
+                    // } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                    // }
+                    // }
                 }
 
                 // multiplier
@@ -1061,7 +1063,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 return (
                     <option key={i} value={item.versionId}>
                         {/* {item.versionId} */}
-                        {((item.versionStatus.id == 2 && item.versionType.id == 2) ? item.versionId + '*' : item.versionId)} ({(moment(item.createdDate).format(`MMM DD YYYY`))})
+                        {(item.versionId + '*')} ({(moment(item.createdDate).format(`MMM DD YYYY`))})
                     </option>
                 )
             }, this);
@@ -1126,8 +1128,8 @@ export default class StepOneImportMapPlanningUnits extends Component {
                         </FormGroup>
 
                         <FormGroup className="col-md-4">
-                            {/* <Label htmlFor="appendedInputButton">{i18n.t('static.importFromQATSupplyPlan.supplyPlanVersion')}</Label> */}
-                            <Label htmlFor="appendedInputButton">Forecast version</Label>
+                            <Label htmlFor="appendedInputButton">{i18n.t('static.importIntoQATSupplyPlan.forecastFinalVersion')}</Label>
+                            {/* <Label htmlFor="appendedInputButton">Forecast version (Final Versions Only)</Label> */}
                             <div className="controls">
                                 <InputGroup>
                                     <Input

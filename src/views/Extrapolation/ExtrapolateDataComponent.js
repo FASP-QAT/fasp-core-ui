@@ -533,14 +533,14 @@ export default class ExtrapolateDataComponent extends React.Component {
             data[2] = movingAvgDataFilter.length > 0 && movingAvgDataFilter[0].forecast != null ? movingAvgDataFilter[0].forecast.toFixed(2) : '';
             data[3] = semiAvgDataFilter.length > 0 && semiAvgDataFilter[0].forecast != null ? semiAvgDataFilter[0].forecast.toFixed(2) : '';
             data[4] = linearRegressionDataFilter.length > 0 && linearRegressionDataFilter[0].forecast != null ? linearRegressionDataFilter[0].forecast.toFixed(2) : '';
-            data[5] = tesDataFilter.length > 0 && tesDataFilter[0].forecast != null && tesDataFilter[0].ci != undefined && tesDataFilter[0] != null ? (tesDataFilter[0].forecast - tesDataFilter[0].ci).toFixed(2) : '';
+            data[5] = tesDataFilter.length > 0 && tesDataFilter[0].forecast != null && tesDataFilter[0].ci != undefined && tesDataFilter[0] != null ? (tesDataFilter[0].forecast - tesDataFilter[0].ci).toFixed(2) < 0 ? 0 : (tesDataFilter[0].forecast - tesDataFilter[0].ci).toFixed(2) : '';
             data[6] = tesDataFilter.length > 0 && tesDataFilter[0].forecast != null ? Number(tesDataFilter[0].forecast).toFixed(2) : '';
-            data[7] = tesDataFilter.length > 0 && tesDataFilter[0].forecast != null && tesDataFilter[0].ci != undefined && tesDataFilter[0] != null ? (tesDataFilter[0].forecast + tesDataFilter[0].ci).toFixed(2) : '';
+            data[7] = tesDataFilter.length > 0 && tesDataFilter[0].forecast != null && tesDataFilter[0].ci != undefined && tesDataFilter[0] != null ? (tesDataFilter[0].forecast + tesDataFilter[0].ci).toFixed(2) < 0 ? 0 : (tesDataFilter[0].forecast + tesDataFilter[0].ci).toFixed(2) : '';
             data[8] = arimaDataFilter.length > 0 && arimaDataFilter[0].forecast != null ? arimaDataFilter[0].forecast.toFixed(2) : '';;
-            data[9] = linearRegressionDataFilter.length > 0 && linearRegressionDataFilter[0].forecast != null && linearRegressionDataFilter[0].ci != undefined && linearRegressionDataFilter[0] != null ? (linearRegressionDataFilter[0].forecast - linearRegressionDataFilter[0].ci).toFixed(2) : '';
-            data[10] = linearRegressionDataFilter.length > 0 && linearRegressionDataFilter[0].forecast != null && linearRegressionDataFilter[0].ci != undefined && linearRegressionDataFilter[0] != null ? (linearRegressionDataFilter[0].forecast + linearRegressionDataFilter[0].ci).toFixed(2) : '';
-            data[11] = arimaDataFilter.length > 0 && arimaDataFilter[0].forecast != null && arimaDataFilter[0].ci != undefined && arimaDataFilter[0] != null ? (arimaDataFilter[0].forecast - arimaDataFilter[0].ci).toFixed(2) : '';
-            data[12] = arimaDataFilter.length > 0 && arimaDataFilter[0].forecast != null && arimaDataFilter[0].ci != undefined && arimaDataFilter[0] != null ? (arimaDataFilter[0].forecast + arimaDataFilter[0].ci).toFixed(2) : '';
+            data[9] = linearRegressionDataFilter.length > 0 && linearRegressionDataFilter[0].forecast != null && linearRegressionDataFilter[0].ci != undefined && linearRegressionDataFilter[0] != null ? (linearRegressionDataFilter[0].forecast - linearRegressionDataFilter[0].ci).toFixed(2) < 0 ? 0 : (linearRegressionDataFilter[0].forecast - linearRegressionDataFilter[0].ci).toFixed(2) : '';
+            data[10] = linearRegressionDataFilter.length > 0 && linearRegressionDataFilter[0].forecast != null && linearRegressionDataFilter[0].ci != undefined && linearRegressionDataFilter[0] != null ? (linearRegressionDataFilter[0].forecast + linearRegressionDataFilter[0].ci).toFixed(2) < 0 ? 0 : (linearRegressionDataFilter[0].forecast + linearRegressionDataFilter[0].ci).toFixed(2) : '';
+            data[11] = arimaDataFilter.length > 0 && arimaDataFilter[0].forecast != null && arimaDataFilter[0].ci != undefined && arimaDataFilter[0] != null ? (arimaDataFilter[0].forecast - arimaDataFilter[0].ci).toFixed(2) < 0 ? 0 : (arimaDataFilter[0].forecast - arimaDataFilter[0].ci).toFixed(2) : '';
+            data[12] = arimaDataFilter.length > 0 && arimaDataFilter[0].forecast != null && arimaDataFilter[0].ci != undefined && arimaDataFilter[0] != null ? (arimaDataFilter[0].forecast + arimaDataFilter[0].ci).toFixed(2) < 0 ? 0 : (arimaDataFilter[0].forecast + arimaDataFilter[0].ci).toFixed(2) : '';
             // data[8] = '';
             dataArray.push(data)
         }
@@ -4004,10 +4004,10 @@ export default class ExtrapolateDataComponent extends React.Component {
                                 If you have poorer data (missing data points, variable reporting rates, less than 12 months of data), use simpler forecast methods
                             </p>
                             <p>
-                                <b>NOTE: The minimum values needed to get correct graphs and reports for the various features are as under: <br></br>
-                                    <span className="ml-lg-5">1. ARIMA : This needs at least 14 months of data<br></br></span>
-                                    <span className="ml-lg-5">2. TES will need at least 24 months of data<br></br></span>
-                                    <span className="ml-lg-5">3. Other(including things like Moving averages etc) will need at least 3 months of data</span>
+                                <b>NOTE:  You have ____ months of acutal consumption data. The minimum values needed for the various features are below: <br></br>
+                                    <span className="ml-lg-5">* TES, Holt-Winters: At least 24 months of actual consumption data<br></br></span>
+                                    <span className="ml-lg-5">* ARIMA:  At least 14 months of actual consumption data<br></br></span>
+                                    <span className="ml-lg-5">* Moving Average, Semi-Averages, and Linear Regression: At least 3 months of actual consumption data</span>
                                 </b>
                             </p>
                         </ModalBody>

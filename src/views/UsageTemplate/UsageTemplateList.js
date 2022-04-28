@@ -2158,7 +2158,7 @@ class usageTemplate extends Component {
                 if (!(budgetRegx.test(value))) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.message.spacetext'));
+                    this.el.setComments(col, i18n.t('static.validSpace.string'));
                 } else {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
@@ -2992,7 +2992,7 @@ class usageTemplate extends Component {
 
                         <Col xs="12" sm="12">
                             {/* <h5>{i18n.t('static.common.customWarningMessage')}</h5> */}
-                            <h5>{i18n.t("static.placeholder.usageTemplate")}</h5>
+                            {/* <h5>{i18n.t("static.placeholder.usageTemplate")}</h5> */}
                             <h5>{i18n.t('static.usageTemplate.usageTemplateText')}</h5>
                             <span className=""><h5><i class="fa fa-calculator" aria-hidden="true"></i>  {i18n.t('static.usageTemplate.calculatorReminderText')}</h5></span>
                             <div className="UsageTemplateTable">
