@@ -2794,12 +2794,23 @@ export default class BuildTree extends Component {
         const { currentItemConfig } = this.state;
         // const newArray = this.state.activeTab1.slice()
         currentItemConfig.context.payload.extrapolation = e.target.checked == true ? true : false;
-        console.log("this.state.activeTab1---", this.state.activeTab1);
+        if (e.target.checked) {
+            console.log("extrapolate outside",currentItemConfig);
+            if (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].calculatedDataValue == "" || currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].calculatedDataValue == null || currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].calculatedDataValue == "0") {
+                currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].calculatedDataValue = "0";
+                currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].dataValue = "0";
+                console.log("extrapolate inside",currentItemConfig);
+            }
+        }
+        console.log("this.state.activeTab1---", currentItemConfig);
 
         this.setState({
             currentItemConfig,
+            currentScenario : currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0],
             activeTab1: e.target.checked == true ? new Array(2).fill('3') : new Array(2).fill('2')
         }, () => {
+            console.log("extrapolate current item config---",this.state.currentItemConfig);
+            console.log("extrapolate current scenario---",this.state.currentScenario);
             if (this.state.activeTab1[0] == '3') {
                 if (this.state.modelingEl != "") {
                     this.state.modelingEl.destroy();
@@ -8049,7 +8060,7 @@ export default class BuildTree extends Component {
                                                 valid={!errors.nodeValue && (this.state.currentItemConfig.context.payload.nodeType.id != 1 && this.state.currentItemConfig.context.payload.nodeType.id != 2) ? addCommas(this.state.currentScenario.calculatedDataValue) : addCommas(this.state.currentScenario.dataValue) != ''}
                                                 invalid={touched.nodeValue && !!errors.nodeValue}
                                                 onBlur={handleBlur}
-                                                readOnly={this.state.numberNode ? true : false}
+                                                readOnly={this.state.numberNode || this.state.currentItemConfig.context.payload.extrapolation ? true : false}
                                                 onChange={(e) => {
                                                     handleChange(e);
                                                     this.dataChange(e)

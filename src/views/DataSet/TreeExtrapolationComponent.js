@@ -1493,9 +1493,14 @@ export default class TreeExtrapolationComponent extends React.Component {
                     if (moment(rowData[0]).isBetween(this.props.items.forecastStartDate, this.props.items.forecastStopDate, undefined, '[]')) {
                         var cell = elInstance.getCell(("A").concat(parseInt(y) + 1))
                         cell.classList.add('bold');
+                        cell = elInstance.getCell(("K").concat(parseInt(y) + 1))
+                        cell.classList.remove('readonly');
+                        
                     } else {
                         var cell = elInstance.getCell(("A").concat(parseInt(y) + 1))
                         cell.classList.remove('bold');
+                        cell = elInstance.getCell(("K").concat(parseInt(y) + 1))
+                        cell.classList.add('readonly');
                         // elInstance.showIndex(6);
                     }
                     var cell;
