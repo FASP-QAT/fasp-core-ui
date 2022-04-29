@@ -1239,7 +1239,7 @@ export default class BuildTree extends Component {
     }
     fetchTracerCategoryList(programData) {
         console.log("programData---%%%%%%%", programData);
-        var planningUnitList = programData.planningUnitList.filter(x => x.treeForecast == true);
+        var planningUnitList = programData.planningUnitList.filter(x => x.treeForecast == true && x.active == true);
         var updatedPlanningUnitList = [];
         var forecastingUnitList = [];
         var tracerCategoryList = [];
@@ -3458,12 +3458,13 @@ export default class BuildTree extends Component {
                 if (this.state.realmCountryId != null && this.state.realmCountryId != "") {
                     regionList = myResult.filter(x => x.realmCountry.realmCountryId == this.state.realmCountryId);
                     console.log("filter if regionList---", regionList);
-                } else {
-                    regionList = myResult;
+                } 
+                else {
+                    // regionList = myResult;
                     this.setState({
                         regionValues: []
                     });
-                    console.log("filter else regionList---", regionList);
+                    // console.log("filter else regionList---", regionList);
                 }
                 var regionMultiList = []
                 regionList.map(c => {
