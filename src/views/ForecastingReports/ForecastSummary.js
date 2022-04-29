@@ -3145,7 +3145,7 @@ class ForecastSummary extends Component {
                                             </FormGroup>
                                             <FormGroup className="col-md-3">
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.forecastReport.display')}</Label>
-                                                <div className="controls ">
+                                                <div className="controls " style={{marginLeft:'-51px'}}>
                                                     {/* <InputGroup>
                                                         <Input
                                                             type="select"
@@ -3160,7 +3160,7 @@ class ForecastSummary extends Component {
                                                         </Input>
                                                     </InputGroup> */}
 
-                                                    <FormGroup check inline>
+                                                    <FormGroup check inline style={{marginRight:'-36px'}}>
                                                         <Input
                                                             className="form-check-input"
                                                             type="radio"
@@ -3196,7 +3196,7 @@ class ForecastSummary extends Component {
                                             </FormGroup>
                                             <FormGroup className="col-md-3" id="hideCalculationDiv">
                                                 {/* <Label htmlFor="appendedInputButton">{i18n.t('static.forecastReport.hideCalculations')}</Label> */}
-                                                <div className="controls ">
+                                                <div className="controls pl-lg-4 pt-lg-0">
                                                     {/* <InputGroup>
                                                         <Input
                                                             type="select"
@@ -3215,6 +3215,7 @@ class ForecastSummary extends Component {
                                                         type="checkbox"
                                                         id="calculationId"
                                                         name="calculationId"
+                                                        style={{marginTop:'3'}}
                                                         checked={this.state.hideCalculation}
                                                         onClick={(e) => { this.hideCalculation(e); }}
                                                     />
