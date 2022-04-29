@@ -1239,7 +1239,7 @@ export default class BuildTree extends Component {
     }
     fetchTracerCategoryList(programData) {
         console.log("programData---%%%%%%%", programData);
-        var planningUnitList = programData.planningUnitList.filter(x => x.treeForecast == true);
+        var planningUnitList = programData.planningUnitList.filter(x => x.treeForecast == true && x.active == true);
         var updatedPlanningUnitList = [];
         var forecastingUnitList = [];
         var tracerCategoryList = [];
@@ -2794,12 +2794,23 @@ export default class BuildTree extends Component {
         const { currentItemConfig } = this.state;
         // const newArray = this.state.activeTab1.slice()
         currentItemConfig.context.payload.extrapolation = e.target.checked == true ? true : false;
-        console.log("this.state.activeTab1---", this.state.activeTab1);
+        if (e.target.checked) {
+            console.log("extrapolate outside",currentItemConfig);
+            if (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].calculatedDataValue == "" || currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].calculatedDataValue == null || currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].calculatedDataValue == "0") {
+                currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].calculatedDataValue = "0";
+                currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].dataValue = "0";
+                console.log("extrapolate inside",currentItemConfig);
+            }
+        }
+        console.log("this.state.activeTab1---", currentItemConfig);
 
         this.setState({
             currentItemConfig,
+            currentScenario : currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0],
             activeTab1: e.target.checked == true ? new Array(2).fill('3') : new Array(2).fill('2')
         }, () => {
+            console.log("extrapolate current item config---",this.state.currentItemConfig);
+            console.log("extrapolate current scenario---",this.state.currentScenario);
             if (this.state.activeTab1[0] == '3') {
                 if (this.state.modelingEl != "") {
                     this.state.modelingEl.destroy();
@@ -3238,7 +3249,7 @@ export default class BuildTree extends Component {
         });
         var startDate = this.state.currentCalculatorStartDate;
         var endDate = this.state.currentCalculatorStopDate;
-        var monthDifference = moment(endDate).startOf('month').diff(startDate, 'months', true);
+        var monthDifference = parseInt(moment(endDate).startOf('month').diff(startDate, 'months', true) + 1);
         console.log("month diff>>>", monthDifference);
         var momValue = ''
         var getValue = e.target.value.toString().replaceAll(",", "");
@@ -3285,8 +3296,8 @@ export default class BuildTree extends Component {
         });
         var startDate = this.state.currentCalculatorStartDate;
         var endDate = this.state.currentCalculatorStopDate;
-        var monthDifference = moment(endDate).diff(startDate, 'months', true);
-        var getValue = e.target.value != "" ? e.target.value.toString().replaceAll(",", "").match(/^-?\d+(?:\.\d{0,2})?/)[0] : "";
+        var monthDifference = parseInt(moment(endDate).diff(startDate, 'months', true) + 1);
+        var getValue = e.target.value != "" ? e.target.value.toString().replaceAll(",", "").match(/^-?\d+(?:\.\d{0,4})?/)[0] : "";
         var getEndValueFromPercentage = (this.state.currentCalculatorStartValue.toString().replaceAll(",", "") * getValue) / 100;
 
         console.log("***-----------------1-", this.state.currentCalculatorStartValue.toString().replaceAll(",", ""));
@@ -3336,7 +3347,7 @@ export default class BuildTree extends Component {
         });
         var startDate = this.state.currentCalculatorStartDate;
         var endDate = this.state.currentCalculatorStopDate;
-        var monthDifference = moment(endDate).diff(startDate, 'months', true);
+        var monthDifference = parseInt(moment(endDate).diff(startDate, 'months', true) + 1);
         var getValue = e.target.value.toString().replaceAll(",", "");
         // var getEndValueFromNumber = parseFloat(this.state.currentCalculatorStartValue) + parseFloat(e.target.value);
         var targetEndValue = parseFloat(this.state.currentCalculatorStartValue.toString().replaceAll(",", "")) + parseFloat(getValue);
@@ -3447,12 +3458,13 @@ export default class BuildTree extends Component {
                 if (this.state.realmCountryId != null && this.state.realmCountryId != "") {
                     regionList = myResult.filter(x => x.realmCountry.realmCountryId == this.state.realmCountryId);
                     console.log("filter if regionList---", regionList);
-                } else {
-                    regionList = myResult;
+                } 
+                else {
+                    // regionList = myResult;
                     this.setState({
                         regionValues: []
                     });
-                    console.log("filter else regionList---", regionList);
+                    // console.log("filter else regionList---", regionList);
                 }
                 var regionMultiList = []
                 regionList.map(c => {
@@ -5709,14 +5721,14 @@ export default class BuildTree extends Component {
             }, this);
 
         // Check fu values
-        // tracerCategoryId == "" || tracerCategoryId == undefined ? [] :
-        // (this.state.currentScenario.fuNode.forecastingUnit.id != undefined && 
-        // this.state.currentScenario.fuNode.forecastingUnit.id != "" && 
-        // filteredForecastingUnitList.filter(x => x.id == this.state.currentScenario.fuNode.forecastingUnit.id).length > 0 ?
-        //  { value: this.state.currentScenario.fuNode.forecastingUnit.id, label: getLabelText(this.state.currentScenario.fuNode.forecastingUnit.label, this.state.lang) + " | " + this.state.currentScenario.fuNode.forecastingUnit.id }
-        //   : [])
+        var result = tracerCategoryId == "" || tracerCategoryId == undefined ? [] :
+            (this.state.currentScenario.fuNode.forecastingUnit.id != undefined &&
+                this.state.currentScenario.fuNode.forecastingUnit.id != "" &&
+                filteredForecastingUnitList.filter(x => x.id == this.state.currentScenario.fuNode.forecastingUnit.id).length > 0 ?
+                { value: this.state.currentScenario.fuNode.forecastingUnit.id, label: getLabelText(this.state.currentScenario.fuNode.forecastingUnit.label, this.state.lang) + " | " + this.state.currentScenario.fuNode.forecastingUnit.id }
+                : []);
 
-
+        console.log("tracer category result---", result);
         this.setState({
             forecastingUnitMultiList,
             fuValues: tracerCategoryId == "" || tracerCategoryId == undefined ? [] : (this.state.currentScenario.fuNode.forecastingUnit.id != undefined && this.state.currentScenario.fuNode.forecastingUnit.id != "" && filteredForecastingUnitList.filter(x => x.id == this.state.currentScenario.fuNode.forecastingUnit.id).length > 0 ? { value: this.state.currentScenario.fuNode.forecastingUnit.id, label: getLabelText(this.state.currentScenario.fuNode.forecastingUnit.label, this.state.lang) + " | " + this.state.currentScenario.fuNode.forecastingUnit.id } : []),
@@ -8049,7 +8061,7 @@ export default class BuildTree extends Component {
                                                 valid={!errors.nodeValue && (this.state.currentItemConfig.context.payload.nodeType.id != 1 && this.state.currentItemConfig.context.payload.nodeType.id != 2) ? addCommas(this.state.currentScenario.calculatedDataValue) : addCommas(this.state.currentScenario.dataValue) != ''}
                                                 invalid={touched.nodeValue && !!errors.nodeValue}
                                                 onBlur={handleBlur}
-                                                readOnly={this.state.numberNode ? true : false}
+                                                readOnly={this.state.numberNode || this.state.currentItemConfig.context.payload.extrapolation ? true : false}
                                                 onChange={(e) => {
                                                     handleChange(e);
                                                     this.dataChange(e)
