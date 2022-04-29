@@ -682,7 +682,6 @@ export default class BuildTree extends Component {
                         nodeUnit: {
 
                         },
-                        extrapolation: false,
                         nodeDataMap: [
                             // [
                             //     {
@@ -1618,8 +1617,8 @@ export default class BuildTree extends Component {
                 console.log("items---***", items);
                 this.setState({ items })
             }
-            console.log("this.state.currentItemConfig.context.payload.extrapolation----", this.state.currentItemConfig.context.payload.extrapolation);
-            if (parameterName == 'type' && (value == 0 || value == 1) && this.state.currentItemConfig.context.payload.extrapolation != true && this.state.currentItemConfig.context.payload.extrapolation != "true") {
+            console.log("this.state.currentItemConfig.context.payload.extrapolation----", this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].extrapolation);
+            if (parameterName == 'type' && (value == 0 || value == 1) && this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].extrapolation != true && this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].extrapolation != "true") {
                 if (this.state.currentItemConfig.context.payload.nodeType.id == 1 || this.state.currentItemConfig.context.payload.nodeType.id == 2) {
                     console.log("mom list ret---", this.state.nodeDataMomList.filter(x => x.nodeId == this.state.currentItemConfig.context.id));
                     this.setState({ momList: this.state.nodeDataMomList.filter(x => x.nodeId == this.state.currentItemConfig.context.id)[0].nodeDataMomList }, () => {
@@ -2793,7 +2792,7 @@ export default class BuildTree extends Component {
     extrapolate(e) {
         const { currentItemConfig } = this.state;
         // const newArray = this.state.activeTab1.slice()
-        currentItemConfig.context.payload.extrapolation = e.target.checked == true ? true : false;
+        currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].extrapolation = e.target.checked == true ? true : false;
         if (e.target.checked) {
             console.log("extrapolate outside",currentItemConfig);
             if (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].calculatedDataValue == "" || currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].calculatedDataValue == null || currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].calculatedDataValue == "0") {
@@ -7012,7 +7011,7 @@ export default class BuildTree extends Component {
         }, () => {
 
             console.log("on add items-------", this.state.items);
-            if (!itemConfig.context.payload.extrapolation) {
+            if (!itemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].extrapolation) {
                 this.calculateMOMData(newItem.id, 0);
             } else {
                 this.setState({
@@ -8061,7 +8060,7 @@ export default class BuildTree extends Component {
                                                 valid={!errors.nodeValue && (this.state.currentItemConfig.context.payload.nodeType.id != 1 && this.state.currentItemConfig.context.payload.nodeType.id != 2) ? addCommas(this.state.currentScenario.calculatedDataValue) : addCommas(this.state.currentScenario.dataValue) != ''}
                                                 invalid={touched.nodeValue && !!errors.nodeValue}
                                                 onBlur={handleBlur}
-                                                readOnly={this.state.numberNode || this.state.currentItemConfig.context.payload.extrapolation ? true : false}
+                                                readOnly={this.state.numberNode || this.state.currentScenario.extrapolation ? true : false}
                                                 onChange={(e) => {
                                                     handleChange(e);
                                                     this.dataChange(e)
@@ -9693,7 +9692,7 @@ export default class BuildTree extends Component {
                             <div title={itemConfig.payload.label.label_en} style={{ fontSize: '13px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', width: '137px', float: 'left', fontWeight: 'bold', }}>
                                 {itemConfig.payload.label.label_en}</div>
                             <div style={{ float: 'right' }}>
-                                {itemConfig.payload.extrapolation == true && <i class="fa fa-line-chart" style={{ fontSize: '11px', color: (itemConfig.payload.nodeType.id == 4 || itemConfig.payload.nodeType.id == 5 ? '#fff' : '#002f6c') }}></i>}
+                                {itemConfig.payload.nodeDataMap[this.state.selectedScenario][0].extrapolation == true && <i class="fa fa-line-chart" style={{ fontSize: '11px', color: (itemConfig.payload.nodeType.id == 4 || itemConfig.payload.nodeType.id == 5 ? '#fff' : '#002f6c') }}></i>}
                                 {this.getPayloadData(itemConfig, 4) == true && <i class="fa fa-long-arrow-up" style={{ fontSize: '11px', color: (itemConfig.payload.nodeType.id == 4 || itemConfig.payload.nodeType.id == 5 ? '#fff' : '#002f6c') }}></i>}
                                 {this.getPayloadData(itemConfig, 6) == true && <i class="fa fa-long-arrow-down" style={{ fontSize: '11px', color: (itemConfig.payload.nodeType.id == 4 || itemConfig.payload.nodeType.id == 5 ? '#fff' : '#002f6c') }}></i>}
                                 {this.getPayloadData(itemConfig, 5) == true && <i class="fa fa-link" style={{ fontSize: '11px', color: (itemConfig.payload.nodeType.id == 4 || itemConfig.payload.nodeType.id == 5 ? '#fff' : '#002f6c') }}></i>}
@@ -10033,6 +10032,7 @@ export default class BuildTree extends Component {
                                     usageText: '',
                                     currentScenario: {
                                         notes: '',
+                                        extrapolation: false,
                                         dataValue: '',
                                         month: moment(this.state.forecastStartDate).startOf('month').format("YYYY-MM-DD"),
                                         fuNode: {
@@ -10096,7 +10096,6 @@ export default class BuildTree extends Component {
                                                 nodeUnit: {
                                                     id: levelUnitId
                                                 },
-                                                extrapolation: false,
                                                 nodeDataMap: nodeDataMap
                                             }
                                         },
@@ -10940,7 +10939,7 @@ export default class BuildTree extends Component {
                                         {i18n.t('static.tree.nodeData')}
                                     </NavLink>
                                 </NavItem>
-                                <NavItem style={{ display: !this.state.currentItemConfig.context.payload.extrapolation || this.state.currentItemConfig.context.payload.nodeType.id != 2 ? 'block' : 'none' }}>
+                                <NavItem style={{ display: !this.state.currentScenario.extrapolation || this.state.currentItemConfig.context.payload.nodeType.id != 2 ? 'block' : 'none' }}>
                                     {/* {this.state.currentItemConfig.context.payload.extrapolation == false || this.state.currentItemConfig.context.payload.nodeType.id != 2 && */}
                                     {/* <NavItem> */}
                                     <NavLink
@@ -10952,7 +10951,7 @@ export default class BuildTree extends Component {
                                 </NavItem>
                                 {/* } */}
 
-                                <NavItem style={{ display: this.state.currentItemConfig.context.payload.extrapolation && this.state.currentItemConfig.context.payload.nodeType.id == 2 ? 'block' : 'none' }}>
+                                <NavItem style={{ display: this.state.currentScenario.extrapolation && this.state.currentItemConfig.context.payload.nodeType.id == 2 ? 'block' : 'none' }}>
                                     <NavLink
                                         active={this.state.activeTab1[0] === '3'}
                                         onClick={() => { this.toggleModal(0, '3'); }}
@@ -10970,7 +10969,7 @@ export default class BuildTree extends Component {
                                             id="extrapolate"
                                             name="extrapolate"
                                             // checked={true}
-                                            checked={this.state.currentItemConfig.context.payload.extrapolation}
+                                            checked={this.state.currentScenario.extrapolation}
                                             onClick={(e) => { this.extrapolate(e); }}
                                         />
                                         <Label
