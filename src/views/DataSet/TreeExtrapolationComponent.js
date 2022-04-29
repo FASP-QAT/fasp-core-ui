@@ -4092,13 +4092,44 @@ export default class TreeExtrapolationComponent extends React.Component {
                     </ModalHeader>
                     <div>
                         <ModalBody>
-
+                        <div>
+                               <h3 className='ShowGuidanceHeading'>Build Tree – Add/Edit Node - Extrapolation Node</h3>
+                           </div>
                             <p>
-                                <b>NOTE:  The minimum values needed to get correct graphs and reports for the various features are below: <br></br>
+                                <p style={{fontSize:'14px'}}><span className="UnderLineText">Purpose :</span>The extrapolation tab allows users to forecast future
+                                 node values by extrapolating from past values. This functionality only available on
+                                  number nodes, and is similar to the <a href="/#/Extrapolation/extrapolateData" target="_blank">'Extrapolation'</a> screen, but is conducted at a
+                                   tree node instead. View the guidance on that page for more details on extrapolation 
+                                   methods.
+                            </p>
+                               
+                            </p>
+                            <p>
+                                <p style={{fontSize:'14px'}}><span className="UnderLineText">Using this tab:  </span></p>
+                                <p className='pl-lg-4'>
+                                <ul style={{listStyle:'none'}}>
+                                    <li>1. In the table, enter any actual values and reporting rates for your past data. From this input, QAT will calculate adjusted &nbsp;&nbsp;&nbsp;&nbsp;historical values.</li>
+                                    <li>2. If there is missing data, use the green Interpolate button to fill in missing data.</li>
+                                    <li>3. (optional) At the top of the screen, select which forecast methods you wish to display and update the extrapolation &nbsp;&nbsp;&nbsp;&nbsp;parameters.</li>
+                                    <li>4. Click "Extrapolate." All selected forecasts will display in the main table and the graphs. </li>
+                                
+                                <p className="pl-lg-4"><b>NOTE:</b>  The minimum values needed to get correct graphs and reports for the various features are below: <br></br>
                                     <span className="ml-lg-5">* TES, Holt-Winters:  Needs at least 24 months of actual consumption data<br></br></span>
                                     <span className="ml-lg-5">* ARIMA:  Needs at least 14 months of actual consumption data<br></br></span>
                                     <span className="ml-lg-5">* Moving Average, Semi-Averages, and Linear Regression:  Needs at least 3 months of actual consumption data</span>
-                                </b>
+                                 </p>
+                                    <li>5. (optional) In the table, add any manual changes (+/-). These changes are added or subtracted on top of the extrapolated &nbsp;&nbsp;&nbsp;&nbsp;values.</li>
+                                    <li>6. After reviewing the main table, the error table, and the graphs, select the desired forecast method at the bottom of the screen &nbsp;&nbsp;&nbsp;&nbsp;and click “Save.”
+</li>
+                                 </ul>
+                                </p>
+                            </p>
+                            <p>
+                                {/* <b>NOTE:  The minimum values needed to get correct graphs and reports for the various features are below: <br></br>
+                                    <span className="ml-lg-5">* TES, Holt-Winters:  Needs at least 24 months of actual consumption data<br></br></span>
+                                    <span className="ml-lg-5">* ARIMA:  Needs at least 14 months of actual consumption data<br></br></span>
+                                    <span className="ml-lg-5">* Moving Average, Semi-Averages, and Linear Regression:  Needs at least 3 months of actual consumption data</span>
+                                </b> */}
                             </p>
                         </ModalBody>
                     </div>
