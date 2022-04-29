@@ -74,7 +74,7 @@ class ForecastSummary extends Component {
             showTotalDifference: true,
             monthArrayList: [],
             planningUnitId: "",
-            hideCalculation: 2,
+            hideCalculation: false,
             scenarioList: [{ id: 1, name: "A. Consumption High", checked: true, color: "#4f81bd" },
             { id: 2, name: "B. Consumption Med", checked: true, color: "#f79646" },
             { id: 3, name: "C. Consumption Low", checked: true, color: "#000000" },
@@ -115,7 +115,9 @@ class ForecastSummary extends Component {
             isChanged1: false,
             onlineVersion: true,
             tracerCategoryList: [],
-            freightPerc: ''
+            freightPerc: '',
+            displayId: 2,
+            displayName: i18n.t('static.forecastReport.regionalView'),
 
         };
         this.getPrograms = this.getPrograms.bind(this);
@@ -143,6 +145,7 @@ class ForecastSummary extends Component {
         this.cancelClicked = this.cancelClicked.bind(this);
         this.setForecastPeriod = this.setForecastPeriod.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
+        this.radioChange = this.radioChange.bind(this);
 
     }
 
@@ -163,9 +166,9 @@ class ForecastSummary extends Component {
     }
 
     hideCalculation(e) {
-        console.log("E++++++++", e.target.value);
+        console.log("E++++++++", e.target.checked);
         this.setState({
-            hideCalculation: e.target.value,
+            hideCalculation: e.target.checked,
             hideColumn: !this.state.hideColumn
         })
 
@@ -278,13 +281,13 @@ class ForecastSummary extends Component {
         // csvRow.push('')
         csvRow.push('"' + (i18n.t('static.common.forecastPeriod') + ' : ' + document.getElementById("forecastPeriod").value).replaceAll(' ', '%20') + '"')
         // csvRow.push('')
-        csvRow.push('"' + (i18n.t('static.forecastReport.display') + ' : ' + document.getElementById("displayId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+        csvRow.push('"' + (i18n.t('static.forecastReport.display') + ' : ' + this.state.displayName).replaceAll(' ', '%20') + '"')
         // csvRow.push('')
 
-        let viewById = document.getElementById("displayId").value;
+        let viewById = this.state.displayId;
 
         if (viewById == 1) {//National
-            csvRow.push('"' + (i18n.t('static.forecastReport.hideCalculations') + ' : ' + document.getElementById("calculationId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+            csvRow.push('"' + (i18n.t('static.forecastReport.hideCalculations') + ' : ' + (this.state.hideCalculation == true ? i18n.t('static.realm.yes') : i18n.t('static.program.no'))).replaceAll(' ', '%20') + '"')
             csvRow.push('')
         }
 
@@ -433,7 +436,7 @@ class ForecastSummary extends Component {
             var a = document.createElement("a")
             a.href = 'data:attachment/csv,' + csvString
             a.target = "_Blank"
-            a.download = this.state.programs.filter(c => c.programId == this.state.programId)[0].programCode + "-" + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text) + "-" + i18n.t('static.forecastReport.forecastSummary') + "-" + document.getElementById("displayId").selectedOptions[0].text + ".csv"
+            a.download = this.state.programs.filter(c => c.programId == this.state.programId)[0].programCode + "-" + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text) + "-" + i18n.t('static.forecastReport.forecastSummary') + "-" + this.state.displayName + ".csv"
             document.body.appendChild(a)
             a.click();
 
@@ -516,7 +519,7 @@ class ForecastSummary extends Component {
                 var a = document.createElement("a")
                 a.href = 'data:attachment/csv,' + csvString
                 a.target = "_Blank"
-                a.download = this.state.programs.filter(c => c.programId == this.state.programId)[0].programCode + "-" + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text) + "-" + i18n.t('static.forecastReport.forecastSummary') + "-" + document.getElementById("displayId").selectedOptions[0].text + ".csv"
+                a.download = this.state.programs.filter(c => c.programId == this.state.programId)[0].programCode + "-" + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text) + "-" + i18n.t('static.forecastReport.forecastSummary') + "-" + this.state.displayName + ".csv"
                 document.body.appendChild(a)
                 a.click();
 
@@ -616,7 +619,7 @@ class ForecastSummary extends Component {
                 var a = document.createElement("a")
                 a.href = 'data:attachment/csv,' + csvString
                 a.target = "_Blank"
-                a.download = this.state.programs.filter(c => c.programId == this.state.programId)[0].programCode + "-" + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text) + "-" + i18n.t('static.forecastReport.forecastSummary') + "-" + document.getElementById("displayId").selectedOptions[0].text + ".csv"
+                a.download = this.state.programs.filter(c => c.programId == this.state.programId)[0].programCode + "-" + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text) + "-" + i18n.t('static.forecastReport.forecastSummary') + "-" + this.state.displayName + ".csv"
                 document.body.appendChild(a)
                 a.click();
 
@@ -701,13 +704,13 @@ class ForecastSummary extends Component {
                     doc.text(i18n.t('static.report.dateRange') + ' : ' + document.getElementById("forecastPeriod").value, doc.internal.pageSize.width / 8, 90, {
                         align: 'left'
                     })
-                    doc.text(i18n.t('static.forecastReport.display') + ' : ' + document.getElementById("displayId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 100, {
+                    doc.text(i18n.t('static.forecastReport.display') + ' : ' + this.state.displayName, doc.internal.pageSize.width / 8, 100, {
                         align: 'left'
                     })
 
-                    let viewById = document.getElementById("displayId").value;
+                    let viewById = this.state.displayId;
                     if (viewById == 1) {//National
-                        doc.text(i18n.t('static.forecastReport.hideCalculations') + ' : ' + document.getElementById("calculationId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
+                        doc.text(i18n.t('static.forecastReport.hideCalculations') + ' : ' + (this.state.hideCalculation == true ? i18n.t('static.realm.yes') : i18n.t('static.program.no')), doc.internal.pageSize.width / 8, 110, {
                             align: 'left'
                         })
                     }
@@ -728,7 +731,7 @@ class ForecastSummary extends Component {
 
 
         // const title = i18n.t('static.dashboard.stockstatusmatrix');
-        let viewById = document.getElementById("displayId").value;
+        let viewById = this.state.displayId;
         if (viewById == 2) {//Regional
 
             if ((document.getElementById("versionId").selectedOptions[0].text).includes('Local')) {//local version
@@ -817,7 +820,7 @@ class ForecastSummary extends Component {
                 doc.autoTable(content);
                 addHeaders(doc)
                 addFooters(doc)
-                doc.save(this.state.programs.filter(c => c.programId == this.state.programId)[0].programCode + "-" + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text) + "-" + i18n.t('static.forecastReport.forecastSummary') + "-" + document.getElementById("displayId").selectedOptions[0].text + ".pdf")
+                doc.save(this.state.programs.filter(c => c.programId == this.state.programId)[0].programCode + "-" + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text) + "-" + i18n.t('static.forecastReport.forecastSummary') + "-" + this.state.displayName + ".pdf")
 
             } else {//server version
 
@@ -880,7 +883,7 @@ class ForecastSummary extends Component {
                 doc.autoTable(content);
                 addHeaders(doc)
                 addFooters(doc)
-                doc.save(this.state.programs.filter(c => c.programId == this.state.programId)[0].programCode + "-" + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text) + "-" + i18n.t('static.forecastReport.forecastSummary') + "-" + document.getElementById("displayId").selectedOptions[0].text + ".pdf")
+                doc.save(this.state.programs.filter(c => c.programId == this.state.programId)[0].programCode + "-" + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text) + "-" + i18n.t('static.forecastReport.forecastSummary') + "-" + this.state.displayName + ".pdf")
 
 
 
@@ -1028,7 +1031,7 @@ class ForecastSummary extends Component {
             doc.autoTable(content);
             addHeaders(doc)
             addFooters(doc)
-            doc.save(this.state.programs.filter(c => c.programId == this.state.programId)[0].programCode + "-" + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text) + "-" + i18n.t('static.forecastReport.forecastSummary') + "-" + document.getElementById("displayId").selectedOptions[0].text + ".pdf")
+            doc.save(this.state.programs.filter(c => c.programId == this.state.programId)[0].programCode + "-" + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text) + "-" + i18n.t('static.forecastReport.forecastSummary') + "-" + this.state.displayName + ".pdf")
 
         }
     }
@@ -1039,12 +1042,12 @@ class ForecastSummary extends Component {
         let versionId = document.getElementById("versionId").value;
         console.log("programId----------->", programId);
         console.log("versionId----------->", versionId);
-        let displayId = document.getElementById("displayId").value;
+        let displayId = this.state.displayId;
         (displayId == 1 ? document.getElementById("hideCalculationDiv").style.display = "block" : document.getElementById("hideCalculationDiv").style.display = "none");
         // (displayId == 1 ? document.getElementById("hideCurrencyDiv").style.display = "block" : document.getElementById("hideCurrencyDiv").style.display = "none");
-        this.setState({
-            displayId: displayId
-        })
+        // this.setState({
+        //     displayId: displayId
+        // })
         let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
         let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate();
 
@@ -1949,7 +1952,8 @@ class ForecastSummary extends Component {
                             this.setState({
                                 dataEl: dataEl,
                                 loading: false,
-                                displayId: 2
+                                displayId: 2,
+                                displayName: i18n.t('static.forecastReport.regionalView')
                             })
 
 
@@ -2099,9 +2103,20 @@ class ForecastSummary extends Component {
     }
 
     filterTsList(instance, cell, c, r, source) {
+        // console.log("x---------------->1 1", c);
+        // console.log("x---------------->2 2", r);
         var tsList = this.state.tsList;
         var mylist = [];
         var value = (instance.jexcel.getJson(null, false)[r])[1].id;
+
+        // var regionList = this.state.regRegionList;
+        // var planningUniObj = this.state.regPlanningUnitList.filter(c => c.planningUnit.id == value);
+        // var regionId = regionList[c/3].regionId;
+        // console.log("x---------------->2 3", planningUniObj);
+        // console.log("x---------------->2 4", regionId);
+        // console.log("x---------------->2 5", planningUniObj.selectedForecastMap);
+        // console.log("x---------------->2 6", selectedForecastMapObj);
+        // let selectedForecastMapObj = planningUniObj.selectedForecastMap[regionId];
         mylist = tsList.filter(e => (e.type == "T" && e.flatList.filter(c => c.payload.nodeDataMap[e.id1][0].puNode != null && c.payload.nodeDataMap[e.id1][0].puNode.planningUnit.id == value).length > 0) || (e.type == "C" && e.planningUnitId == value));
         return mylist;
     }
@@ -2940,6 +2955,18 @@ class ForecastSummary extends Component {
         }.bind(this)
     }
 
+    radioChange(event) {
+        this.setState({
+            displayId: event.target.id === "displayId2" ? parseInt(2) : parseInt(1),
+            displayName: event.target.id === "displayId2" ? i18n.t('static.forecastReport.regionalView') : i18n.t('static.forecastReport.nationalView'),
+            summeryData: []
+        },
+            () => {
+                console.log("displayId----------->", this.state.displayId + ' - ' + this.state.displayName);
+                this.filterData();
+            })
+    }
+
     render() {
         const { programs } = this.state;
         let programList = programs.length > 0
@@ -3119,7 +3146,7 @@ class ForecastSummary extends Component {
                                             <FormGroup className="col-md-3">
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.forecastReport.display')}</Label>
                                                 <div className="controls ">
-                                                    <InputGroup>
+                                                    {/* <InputGroup>
                                                         <Input
                                                             type="select"
                                                             name="displayId"
@@ -3131,14 +3158,46 @@ class ForecastSummary extends Component {
                                                             <option value="2">{i18n.t('static.forecastReport.regionalView')}</option>
                                                             <option value="1">{i18n.t('static.forecastReport.nationalView')}</option>
                                                         </Input>
+                                                    </InputGroup> */}
 
-                                                    </InputGroup>
+                                                    <FormGroup check inline>
+                                                        <Input
+                                                            className="form-check-input"
+                                                            type="radio"
+                                                            id="displayId2"
+                                                            name="displayId"
+                                                            value={2}
+                                                            checked={this.state.displayId == 2}
+                                                            onChange={(e) => { this.radioChange(e) }}
+                                                        />
+                                                        <Label
+                                                            className="form-check-label"
+                                                            check htmlFor="inline-radio1">
+                                                            {i18n.t('static.forecastReport.regionalView')}
+                                                        </Label>
+                                                    </FormGroup>
+                                                    <FormGroup check inline>
+                                                        <Input
+                                                            className="form-check-input"
+                                                            type="radio"
+                                                            id="displayId1"
+                                                            name="displayId"
+                                                            value={1}
+                                                            checked={this.state.displayId == 1}
+                                                            onChange={(e) => { this.radioChange(e) }}
+                                                        />
+                                                        <Label
+                                                            className="form-check-label"
+                                                            check htmlFor="inline-radio2">
+                                                            {i18n.t('static.forecastReport.nationalView')}
+                                                        </Label>
+                                                    </FormGroup>
                                                 </div>
                                             </FormGroup>
                                             <FormGroup className="col-md-3" id="hideCalculationDiv">
-                                                <Label htmlFor="appendedInputButton">{i18n.t('static.forecastReport.hideCalculations')}</Label>
+                                                {/* <Label htmlFor="appendedInputButton">{i18n.t('static.forecastReport.hideCalculations')}</Label> */}
                                                 <div className="controls ">
-                                                    <InputGroup>
+                                                    {/* <InputGroup>
                                                         <Input
                                                             type="select"
                                                             name="calculationId"
@@ -3150,8 +3209,20 @@ class ForecastSummary extends Component {
                                                             <option value="1">{i18n.t('static.realm.yes')}</option>
                                                             <option value="2">{i18n.t('static.program.no')}</option>
                                                         </Input>
-
-                                                    </InputGroup>
+                                                    </InputGroup> */}
+                                                    <Input
+                                                        className="form-check-input"
+                                                        type="checkbox"
+                                                        id="calculationId"
+                                                        name="calculationId"
+                                                        checked={this.state.hideCalculation}
+                                                        onClick={(e) => { this.hideCalculation(e); }}
+                                                    />
+                                                    <Label
+                                                        className="form-check-label"
+                                                        check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                        {i18n.t('static.forecastReport.hideCalculations')}
+                                                    </Label>
                                                 </div>
                                             </FormGroup>
                                             <FormGroup className="col-md-3" id="hideCurrencyDiv" style={{ display: 'none' }}>
