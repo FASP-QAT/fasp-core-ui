@@ -1,3 +1,5 @@
+
+
 import CryptoJS from 'crypto-js';
 import jexcel from 'jexcel-pro';
 import moment from "moment";
@@ -16,7 +18,7 @@ import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { contrast } from "../../CommonComponent/JavascriptCommonFunctions";
 import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
 import MonthBox from '../../CommonComponent/MonthBox.js';
-import { FORECAST_DATEPICKER_START_MONTH, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, SECRET_KEY } from '../../Constants.js';
+import { FORECAST_DATEPICKER_START_MONTH, FORECAST_DATEPICKER_MONTH_DIFF, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, SECRET_KEY } from '../../Constants.js';
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import csvicon from '../../assets/img/csv.png';
@@ -521,8 +523,10 @@ export default class StepOneImportMapPlanningUnits extends Component {
         //
     }
     handleRangeDissmis(value) {
-        this.setState({ rangeValue: value })
-        this.filterData();
+        this.setState({ rangeValue: value },
+            () => {
+                this.filterData();
+            })
     }
 
     _handleClickRangeBox(e) {
@@ -866,11 +870,28 @@ export default class StepOneImportMapPlanningUnits extends Component {
             this.setState({
                 versions: [],
             }, () => {
+                var isForecastOver = false;
+                const getDaysInMonth = (year, month) => new Date(year, month, 0).getDate()
+
+                const addMonths = (input, months) => {
+                    const date = new Date(input)
+                    date.setDate(1)
+                    date.setMonth(date.getMonth() + months)
+                    date.setDate(Math.min(input.getDate(), getDaysInMonth(date.getFullYear(), date.getMonth() + 1)))
+                    return date
+                }
+                var formattedDate = addMonths(new Date(), -5);
                 this.setState({
                     selectedForecastProgram: forecastProgram,
 
                     versions: (forecastProgram[0].versionList.filter(function (x, i, a) {
-                        if (x.versionType.id == 2) {
+                        let forecastStartDate = x.forecastStartDate;
+                        let forecastStopDate = x.forecastStopDate;
+                        if (!(formattedDate > forecastStartDate && formattedDate < forecastStopDate)) {
+                            isForecastOver = true;
+                        }
+
+                        if (x.versionType.id == 2 && isForecastOver) {
                             return a.indexOf(x) === i;
                         }
                     })).reverse()
@@ -888,9 +909,119 @@ export default class StepOneImportMapPlanningUnits extends Component {
     }
 
     setVersionId(event) {
+        const forecastProgramVerisonList = this.state.versions.filter(c => c.versionId == event.target.value)
+        let forecastStartDate = new Date(moment(forecastProgramVerisonList[0].forecastStartDate).format("MMM-YYYY"));
+        let forecastStopDate = new Date(moment(forecastProgramVerisonList[0].forecastStopDate).format("MMM-YYYY"));
+        // console.log("forecastProgramVerisonList===>", forecastStartDate)
+        // console.log("forecastProgramVerisonList===>", forecastStopDate)
 
+
+        let defaultForecastStartYear = forecastStartDate.getFullYear();
+        let defaultForecastStartMonth = forecastStartDate.getMonth() + 1;
+
+        let updatedForecastStartYear = forecastStartDate.getFullYear();
+        let updatedForecastStartMonth = forecastStartDate.getMonth() + 1;
+
+        let updatedForecastStopYear = forecastStopDate.getFullYear();
+        let updatedForecastStopMonth = forecastStopDate.getMonth() + 1;
+
+        var isWithinLast6Months = false;
+        var isForecastAlreadyStarted = false;
+        var isForecastOver = false;
+        var isFutureForecast = false;
+
+        const monthsDiff = Math.round(moment(new Date()).diff(new Date(forecastStartDate), 'months', true) + 1);
+
+        const getDaysInMonth = (year, month) => new Date(year, month, 0).getDate()
+
+        const addMonths = (input, months) => {
+            const date = new Date(input)
+            date.setDate(1)
+            date.setMonth(date.getMonth() + months)
+            date.setDate(Math.min(input.getDate(), getDaysInMonth(date.getFullYear(), date.getMonth() + 1)))
+            return date
+        }
+        var formattedDate = addMonths(new Date(), -5);
+
+        if ((new Date() > forecastStartDate && new Date() < forecastStopDate)) {
+            console.log('✅ date is between the 2 dates');
+            isForecastAlreadyStarted = true;
+            isForecastOver = false;
+            isWithinLast6Months = false;
+            isFutureForecast = false;
+
+        } else {
+            if ((formattedDate > forecastStartDate && formattedDate < forecastStopDate)) {
+                console.log('✅ formattedDate is between the 2 dates');
+                isForecastAlreadyStarted = false;
+                isForecastOver = false;
+                isWithinLast6Months = true;
+                isFutureForecast = false;
+            } else if (monthsDiff < FORECAST_DATEPICKER_MONTH_DIFF) {
+                console.log('✅ future forecast is between the 2 dates');
+                isForecastAlreadyStarted = false;
+                isForecastOver = false;
+                isWithinLast6Months = false;
+                isFutureForecast = true;
+            }
+            else {
+                console.log('⛔️ date is not in the range');
+                isForecastAlreadyStarted = false;
+                isForecastOver = true;
+                isWithinLast6Months = false;
+                isFutureForecast = false;
+            }
+        }
+
+        // console.log("selectedForecastProgram.forecastStartDate-1->", forecastProgram[0].forecastStartDate);
+
+        // console.log("isWithinLast6Months-1->", isWithinLast6Months);
+        // console.log("isForecastOver-1->", isForecastOver);
+        // console.log("isForecastAlreadyStarted-1->", isForecastAlreadyStarted);
+        // console.log("isFutureForecast-1->", isFutureForecast);
+
+        if (isWithinLast6Months) {
+
+            defaultForecastStartYear = "";
+            defaultForecastStartMonth = "";
+
+            updatedForecastStartYear = formattedDate.getFullYear();
+            updatedForecastStartMonth = formattedDate.getMonth() + 1;
+        }
+        if (isForecastOver) {
+            defaultForecastStartYear = "";
+            defaultForecastStartMonth = "";
+
+            updatedForecastStartYear = "";
+            updatedForecastStartMonth = "";
+
+            updatedForecastStopYear = "";
+            updatedForecastStopMonth = "";
+        }
+        if (isForecastAlreadyStarted) {
+
+            defaultForecastStartYear = new Date().getFullYear();
+            defaultForecastStartMonth = new Date().getMonth() + 1;
+
+            updatedForecastStartYear = formattedDate.getFullYear();
+            updatedForecastStartMonth = formattedDate.getMonth() + 1;
+            // console.log("defaultForecastStartYear-1->", defaultForecastStartYear);
+            // console.log("defaultForecastStartMonth-1->", defaultForecastStartMonth);
+
+
+        }
+        if (isFutureForecast) {
+            updatedForecastStartYear = forecastStartDate.getFullYear();
+            updatedForecastStartMonth = forecastStartDate.getMonth() + 1;
+        }
+
+        // console.log("forecast period already started", updatedForecastStopYear)
         this.setState({
-            versionId: event.target.value
+            versionId: event.target.value,
+            minDate: { year: updatedForecastStartYear, month: updatedForecastStartMonth },
+            maxDate: { year: updatedForecastStopYear, month: updatedForecastStopMonth },
+            rangeValue: { from: { year: defaultForecastStartYear, month: defaultForecastStartMonth }, to: { year: forecastStopDate.getFullYear(), month: forecastStopDate.getMonth() + 1 } },
+            forecastPeriod: moment(forecastStartDate).format("MMM-YYYY") + " ~ " + moment(forecastStopDate).format("MMM-YYYY")
         }, () => {
             this.filterData();
         })
@@ -898,21 +1029,16 @@ export default class StepOneImportMapPlanningUnits extends Component {
     }
 
     setForecastProgramId(e) {
-        var sel = document.getElementById("forecastProgramId");
-        console.log("forecastProgramVersionId-------->", e.target.value);
 
         let selectedForecastProgram = this.state.datasetList.filter(c => c.programId == e.target.value)[0];
         var programListFilter = [];
         if (e.target.value != "") {
             programListFilter = this.state.programs.filter(c => c.generalProgramJson.realmCountry.realmCountryId == selectedForecastProgram.realmCountry.realmCountryId);
         }
-        let forecastStopDate = new Date(selectedForecastProgram.forecastStopDate);
         this.setState({
             forecastProgramId: e.target.value,
-            rangeValue: { from: { year: new Date(selectedForecastProgram.forecastStartDate).getFullYear(), month: new Date(selectedForecastProgram.forecastStartDate).getMonth() + 1 }, to: { year: forecastStopDate.getFullYear(), month: forecastStopDate.getMonth() + 1 } },
             versionId: '',
             programListFilter: programListFilter,
-            forecastPeriod: moment(selectedForecastProgram.forecastStartDate).format("MMM-YYYY") + " ~ " + moment(selectedForecastProgram.forecastStopDate).format("MMM-YYYY")
 
         }, () => {
             this.filterVersion();
