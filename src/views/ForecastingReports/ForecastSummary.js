@@ -379,8 +379,8 @@ class ForecastSummary extends Component {
                     '',
                     '',
                     '',
-                    (i18n.t('static.forecastReport.freight')).replaceAll(' ', '%20') + ' (7%)'.replaceAll(' ', '%20'),
-                    '$ ' + (parseFloat(0.07 * this.state.totalProductCost).toFixed(2)),
+                    (i18n.t('static.forecastReport.freight')).replaceAll(' ', '%20') + ' (' + this.state.freightPerc + '%)'.replaceAll(' ', '%20'),
+                    '$ ' + (parseFloat((this.state.freightPerc / 100) * this.state.totalProductCost).toFixed(2)),
                     ''
                 ]))
                 A.push(this.addDoubleQuoteToRowContent([
@@ -395,7 +395,7 @@ class ForecastSummary extends Component {
                     '',
                     '',
                     (i18n.t('static.shipment.totalCost')).replaceAll(' ', '%20'),
-                    '$ ' + parseFloat(parseFloat(this.state.totalProductCost) + parseFloat(0.07 * this.state.totalProductCost)).toFixed(2),
+                    '$ ' + parseFloat(parseFloat(this.state.totalProductCost) + parseFloat((this.state.freightPerc / 100) * this.state.totalProductCost)).toFixed(2),
                     ''
                 ]))
             } else {
@@ -411,8 +411,8 @@ class ForecastSummary extends Component {
                     '',
                     '',
                     '',
-                    i18n.t('static.forecastReport.freight') + ' (7%)'.replaceAll(' ', '%20'),
-                    '$ ' + (parseFloat(0.07 * this.state.totalProductCost).toFixed(2)),
+                    i18n.t('static.forecastReport.freight') + ' (' + this.state.freightPerc + '%)'.replaceAll(' ', '%20'),
+                    '$ ' + (parseFloat((this.state.freightPerc / 100) * this.state.totalProductCost).toFixed(2)),
                     ''
                 ]))
                 A.push(this.addDoubleQuoteToRowContent([
@@ -420,7 +420,7 @@ class ForecastSummary extends Component {
                     '',
                     '',
                     (i18n.t('static.shipment.totalCost')).replaceAll(' ', '%20'),
-                    '$ ' + parseFloat(parseFloat(this.state.totalProductCost) + parseFloat(0.07 * this.state.totalProductCost)).toFixed(2),
+                    '$ ' + parseFloat(parseFloat(this.state.totalProductCost) + parseFloat((this.state.freightPerc / 100) * this.state.totalProductCost)).toFixed(2),
                     ''
                 ]))
             }
@@ -967,8 +967,8 @@ class ForecastSummary extends Component {
                     '',
                     '',
                     '',
-                    i18n.t('static.forecastReport.freight') + '(7%)',
-                    '$ ' + (0.07 * this.state.totalProductCost).toFixed(2).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","),
+                    i18n.t('static.forecastReport.freight') + '(' + this.state.freightPerc + '%)',
+                    '$ ' + ((this.state.freightPerc / 100) * this.state.totalProductCost).toFixed(2).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","),
                     ''
                 ])
                 data.push([
@@ -984,7 +984,7 @@ class ForecastSummary extends Component {
                     '',
                     i18n.t('static.shipment.totalCost'),
                     // (this.state.totalProductCost + 0.07 * this.state.totalProductCost),
-                    '$ ' + (parseFloat(parseFloat(this.state.totalProductCost) + parseFloat(0.07 * this.state.totalProductCost)).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","),
+                    '$ ' + (parseFloat(parseFloat(this.state.totalProductCost) + parseFloat((this.state.freightPerc / 100) * this.state.totalProductCost)).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","),
                     ''
                 ])
             } else {
@@ -1000,8 +1000,8 @@ class ForecastSummary extends Component {
                     '',
                     '',
                     '',
-                    i18n.t('static.forecastReport.freight') + '(7%)',
-                    '$ ' + (parseFloat(0.07 * this.state.totalProductCost).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","),
+                    i18n.t('static.forecastReport.freight') + '(' + this.state.freightPerc + '%)',
+                    '$ ' + (parseFloat((this.state.freightPerc / 100) * this.state.totalProductCost).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","),
                     ''
                 ])
                 data.push([
@@ -1009,7 +1009,7 @@ class ForecastSummary extends Component {
                     '',
                     '',
                     i18n.t('static.shipment.totalCost'),
-                    '$ ' + (parseFloat(this.state.totalProductCost + 0.07 * this.state.totalProductCost).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","),
+                    '$ ' + (parseFloat(this.state.totalProductCost + (this.state.freightPerc / 100) * this.state.totalProductCost).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","),
                     ''
                 ])
             }
@@ -1462,7 +1462,10 @@ class ForecastSummary extends Component {
                                             total += Number(ele.amount);
                                         });
                                         console.log("total+++", total);
-                                        tsList.push({ id: "C" + consumptionExtrapolation[ce].consumptionExtrapolationId, name: consumptionExtrapolation[ce].extrapolationMethod.label.label_en, planningUnitId: consumptionExtrapolation[ce].planningUnit.id, type: "C", id1: consumptionExtrapolation[ce].consumptionExtrapolationId, totalForecast: total, region: [consumptionExtrapolation[ce].region] });
+                                        if (consumptionExtrapolation[ce].extrapolationMethod.active == true) {
+                                            tsList.push({ id: "C" + consumptionExtrapolation[ce].consumptionExtrapolationId, name: consumptionExtrapolation[ce].extrapolationMethod.label.label_en, planningUnitId: consumptionExtrapolation[ce].planningUnit.id, type: "C", id1: consumptionExtrapolation[ce].consumptionExtrapolationId, totalForecast: total, region: [consumptionExtrapolation[ce].region] });
+                                        }
+
                                     }
                                     tsList = tsList.sort(function (a, b) {
                                         a = (a.name).toLowerCase();
@@ -3411,7 +3414,7 @@ class ForecastSummary extends Component {
                                                                         <td style={{ border: 'none' }}></td>
                                                                         <td style={{ border: 'none' }}></td>
                                                                         <td><b>{i18n.t('static.forecastReport.freight')} ({this.state.freightPerc}%)</b></td>
-                                                                        <td><b>{'$ ' + (((this.state.freightPerc/100) * this.state.totalProductCost).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</b></td>
+                                                                        <td><b>{'$ ' + (((this.state.freightPerc / 100) * this.state.totalProductCost).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</b></td>
                                                                         <td></td>
                                                                     </tr>
                                                                     <tr>
@@ -3427,7 +3430,7 @@ class ForecastSummary extends Component {
                                                                         <td style={{ border: 'none' }}></td>
                                                                         <td style={{ border: 'none' }}></td>
                                                                         <td><b>{i18n.t('static.shipment.totalCost')}</b></td>
-                                                                        <td><b>{'$ ' + (parseFloat(parseFloat(this.state.totalProductCost) + parseFloat((this.state.freightPerc/100) * this.state.totalProductCost)).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</b></td>
+                                                                        <td><b>{'$ ' + (parseFloat(parseFloat(this.state.totalProductCost) + parseFloat((this.state.freightPerc / 100) * this.state.totalProductCost)).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</b></td>
                                                                         <td></td>
                                                                     </tr>
                                                                 </tfoot>
@@ -3458,7 +3461,7 @@ class ForecastSummary extends Component {
                                                                         <td className='text-left sticky-col first-col clone'></td>
                                                                         <td></td>
                                                                         <td><b>{i18n.t('static.shipment.totalCost')}</b></td>
-                                                                        <td><b>{'$ ' + (parseFloat(parseFloat(this.state.totalProductCost) + parseFloat((this.state.freightPerc/100) * this.state.totalProductCost)).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</b></td>
+                                                                        <td><b>{'$ ' + (parseFloat(parseFloat(this.state.totalProductCost) + parseFloat((this.state.freightPerc / 100) * this.state.totalProductCost)).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</b></td>
                                                                         {/* <td><b>{'$ ' + (parseFloat(this.state.totalProductCost + 0.07 * this.state.totalProductCost).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</b></td> */}
                                                                         <td></td>
                                                                     </tr>

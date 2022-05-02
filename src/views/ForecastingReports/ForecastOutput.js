@@ -201,13 +201,14 @@ class ForecastOutput extends Component {
 
     }
 
-    planningUnitCheckedChanged(id) {
+    planningUnitCheckedChanged(id, regionId) {
         var consumptionData = this.state.consumptionData;
-        var index = this.state.consumptionData.findIndex(c => c.objUnit.id == id);
+        var index = this.state.consumptionData.findIndex(c => c.objUnit.id == id && c.region.regionId == regionId);
         consumptionData[index].display = !consumptionData[index].display;
         this.setState({
             consumptionData
         }, () => {
+            this.addGraphConsumptionData();
             this.calculateEquivalencyUnitTotal();
         })
     }
@@ -847,31 +848,24 @@ class ForecastOutput extends Component {
 
     addGraphConsumptionData() {
         // alert("Hi");
-        let consumptionData = this.state.consumptionData;
-        console.log("graphConsumptionData--------->0.0", consumptionData);
-        if (consumptionData.length > 0) {
+        let consumptionData1 = this.state.consumptionData;
+        consumptionData1 = consumptionData1.filter(c => c.display == true);
+        if (consumptionData1.length > 0) {
 
-            let planningUnitIdList = consumptionData.map(c => c.objUnit.id);
+            let planningUnitIdList = consumptionData1.map(c => c.objUnit.id);
             let uniquePlanningUnitIdList = [...new Set(planningUnitIdList)];
             let graphConsumptionData = [];
-            console.log("graphConsumptionData--------->0", uniquePlanningUnitIdList);
 
             for (var i = 0; i < uniquePlanningUnitIdList.length; i++) {
-                let tempData = consumptionData.filter(c => c.objUnit.id == uniquePlanningUnitIdList[i]);
-
-                console.log("graphConsumptionData--------->1", tempData);
-                console.log("graphConsumptionData--------->1-", tempData.map(c => c.consumptionList));
+                let tempData = consumptionData1.filter(c => c.objUnit.id == uniquePlanningUnitIdList[i]);
 
                 let localConsumptionList = [];
                 for (var j = 0; j < tempData.length; j++) {
-                    console.log("graphConsumptionData--------->1.1", j);
-                    console.log("graphConsumptionData--------->1.12", tempData[j].consumptionList);
                     localConsumptionList = localConsumptionList.concat(tempData[j].consumptionList);
                 }
-                console.log("graphConsumptionData--------->2", localConsumptionList);
 
                 // logic for add same date data
-                let resultTrue = Object.values(localConsumptionList.reduce((a, { consumptionDate, consumptionQty }) => {
+                let resultTrue1 = Object.values(localConsumptionList.reduce((a, { consumptionDate, consumptionQty }) => {
                     if (!a[consumptionDate])
                         a[consumptionDate] = Object.assign({}, { consumptionDate, consumptionQty });
                     else
@@ -879,17 +873,15 @@ class ForecastOutput extends Component {
                     return a;
                 }, {}));
 
-                console.log("graphConsumptionData--------->3", resultTrue);
-
-                let localObj = tempData[0];
-                localObj.consumptionList = resultTrue;
-                graphConsumptionData.push(localObj);
+                // let localObj = tempData[0];
+                let jsonTemp = { objUnit: tempData[0].objUnit, scenario: tempData[0].scenario, display: tempData[0].display, color: tempData[0].color, consumptionList: resultTrue1, region: tempData[0].region }
+                graphConsumptionData.push(jsonTemp);
             }
 
             this.setState({
                 graphConsumptionData: graphConsumptionData
             }, () => {
-                console.log("graphConsumptionData--------->", this.state.graphConsumptionData);
+                // console.log("graphConsumptionData--------->", this.state.graphConsumptionData);
             })
 
 
@@ -1083,7 +1075,6 @@ class ForecastOutput extends Component {
                                                             return a;
                                                         }, {}));
 
-                                                        console.log("Test------------>IMP", resultTrue);
 
                                                         if (resultTrue.length > 0) {
                                                             let jsonTemp = { objUnit: planningUniObj.planningUnit, scenario: { id: 1, label: '(' + treeList[m].label.label_en + ' - ' + filteredScenario[0].label.label_en + ')' }, display: true, color: "#ba0c2f", consumptionList: resultTrue, region: filteredProgram.regionList.filter(c => c.regionId == keys[j])[0] }
@@ -3675,14 +3666,15 @@ class ForecastOutput extends Component {
                                                                 <tbody>
                                                                     {this.state.xaxis == 2 && this.state.consumptionData.map((item, index) => (
                                                                         <tr>
-                                                                            <td className="sticky-col first-col clone Firstcolum" align="center"><input type="checkbox" id={"planningUnitCheckbox" + item.objUnit.id} checked={item.display} onChange={() => this.planningUnitCheckedChanged(item.objUnit.id)} /></td>
+                                                                            <td className="sticky-col first-col clone Firstcolum" align="center"><input type="checkbox" id={"planningUnitCheckbox" + item.objUnit.id} checked={item.display} onChange={() => this.planningUnitCheckedChanged(item.objUnit.id, item.region.regionId)} /></td>
                                                                             <td className="" style={{ textAlign: 'left' }}>{item.region.label.label_en}</td>
                                                                             <td className="sticky-col first-col clone Secondcolum" style={{ textAlign: 'left' }}>{item.display && <i class="fa fa-circle" style={{ color: backgroundColor[countVar] }} aria-hidden="true"></i>} {" "} {item.objUnit.label.label_en}</td>
                                                                             <td className='text-left sticky-col first-col clone Thirdcolum'>{item.scenario.label}</td>
                                                                             {this.state.monthArrayList.map(item1 => (
                                                                                 <td>{item.consumptionList.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(item1).format("YYYY-MM")).length > 0 ? <NumberFormat displayType={'text'} thousandSeparator={true} value={item.consumptionList.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(item1).format("YYYY-MM"))[0].consumptionQty} /> : ""}</td>
                                                                             ))}
-                                                                            <td style={{ display: 'none' }}>{(item.display == true ? countVar++ : '')}</td>
+                                                                            {/* <td style={{ display: 'none' }}>{(item.display == true ? countVar++ : '')}</td> */}
+                                                                            <td style={{ display: 'none' }}>{(this.state.consumptionData[index + 1] != undefined ? (this.state.consumptionData[index + 1].objUnit.id == item.objUnit.id || item.display == false ? '' : countVar++) : '')}{(item.display == false ? (this.state.consumptionData[index - 1] != undefined ? (this.state.consumptionData[index - 1].objUnit.id == item.objUnit.id ? countVar++ : '') : '') : '')}</td>
                                                                         </tr>
                                                                     ))}
                                                                     {this.state.yaxisEquUnit > 0 && this.state.xaxis == 2 &&
@@ -3699,14 +3691,16 @@ class ForecastOutput extends Component {
 
                                                                     {this.state.xaxis == 1 && this.state.consumptionData.map((item, index) => (
                                                                         <tr>
-                                                                            <td className="sticky-col first-col clone Firstcolum" align="center"><input type="checkbox" id={"planningUnitCheckbox" + item.objUnit.id} checked={item.display} onChange={() => this.planningUnitCheckedChanged(item.objUnit.id)} /></td>
+                                                                            <td className="sticky-col first-col clone Firstcolum" align="center"><input type="checkbox" id={"planningUnitCheckbox" + item.objUnit.id} checked={item.display} onChange={() => this.planningUnitCheckedChanged(item.objUnit.id, item.region.regionId)} /></td>
                                                                             <td className="" style={{ textAlign: 'left' }}>{item.region.label.label_en}</td>
                                                                             <td className="sticky-col first-col clone Secondcolum" style={{ textAlign: 'left' }}>{item.display && <i class="fa fa-circle" style={{ color: backgroundColor[countVar1] }} aria-hidden="true"></i>} {" "} {item.objUnit.label.label_en}</td>
                                                                             <td className='text-left sticky-col first-col clone Thirdcolum'>{item.scenario.label}</td>
                                                                             {this.state.monthArrayList.map(item1 => (
                                                                                 <td>{item.consumptionList.filter(c => moment(c.consumptionDate).format("YYYY") == moment(item1).format("YYYY")).length > 0 ? <NumberFormat displayType={'text'} thousandSeparator={true} value={item.consumptionList.filter(c => moment(c.consumptionDate).format("YYYY") == moment(item1).format("YYYY"))[0].consumptionQty} /> : ""}</td>
                                                                             ))}
-                                                                            <td style={{ display: 'none' }}>{(item.display == true ? countVar1++ : '')}</td>
+                                                                            {/* <td style={{ display: 'none' }}>{(item.display == true ? countVar1++ : '')}</td> */}
+                                                                            {/* <td style={{ display: 'none' }}>{(this.state.consumptionData[index + 1] != undefined ? (this.state.consumptionData[index + 1].objUnit.id == item.objUnit.id ? '' : countVar1++) : '')}</td> */}
+                                                                            <td style={{ display: 'none' }}>{(this.state.consumptionData[index + 1] != undefined ? (this.state.consumptionData[index + 1].objUnit.id == item.objUnit.id || item.display == false ? '' : countVar1++) : '')}{(item.display == false ? (this.state.consumptionData[index - 1] != undefined ? (this.state.consumptionData[index - 1].objUnit.id == item.objUnit.id ? countVar1++ : '') : '') : '')}</td>
                                                                         </tr>
                                                                     ))}
                                                                     {this.state.yaxisEquUnit > 0 && this.state.xaxis == 1 &&
