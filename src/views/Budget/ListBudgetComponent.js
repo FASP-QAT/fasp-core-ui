@@ -724,7 +724,8 @@ class ListBudgetComponent extends Component {
     for (var j = 0; j < budgetList.length; j++) {
       data = [];
       data[0] = budgetList[j].budgetId
-      data[1] = getLabelText(budgetList[j].program.label, this.state.lang)
+      // data[1] = getLabelText(budgetList[j].program.label, this.state.lang)
+      data[1] = budgetList[j].program.code
       data[2] = getLabelText(budgetList[j].label, this.state.lang)
       data[3] = budgetList[j].budgetCode;
       data[4] = getLabelText(budgetList[j].fundingSource.label, this.state.lang)
@@ -1225,7 +1226,8 @@ class ListBudgetComponent extends Component {
       && programs.map((item, i) => {
         return (
           <option key={i} value={item.programId}>
-            {getLabelText(item.label, this.state.lang)}
+            {/* {getLabelText(item.label, this.state.lang)} */}
+            {item.programCode}
           </option>
         )
       }, this);

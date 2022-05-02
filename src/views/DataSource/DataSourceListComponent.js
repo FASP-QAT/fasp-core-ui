@@ -651,7 +651,8 @@ export default class DataSourceListComponent extends Component {
             data[1] = getLabelText(dataSourceList[j].realm.label, this.state.lang)
             data[2] = getLabelText(dataSourceList[j].dataSourceType.label, this.state.lang)
             data[3] = getLabelText(dataSourceList[j].label, this.state.lang)
-            data[4] = getLabelText(dataSourceList[j].program.label, this.state.lang)
+            // data[4] = getLabelText(dataSourceList[j].program.label, this.state.lang)
+            data[4] = dataSourceList[j].program.code;
             data[5] = dataSourceList[j].lastModifiedBy.username;
             data[6] = (dataSourceList[j].lastModifiedDate ? moment(dataSourceList[j].lastModifiedDate).format(`YYYY-MM-DD`) : null)
             data[7] = dataSourceList[j].active;
@@ -942,6 +943,7 @@ export default class DataSourceListComponent extends Component {
             //     dataSourceList: response.data,
             //     selSource: response.data
             // })
+            console.log("Datasource----------->", response.data);
             this.setState({
                 dataSourceList: response.data, selSource: response.data, loading: false
             }, () => { this.buildJexcel() })
@@ -1057,7 +1059,8 @@ export default class DataSourceListComponent extends Component {
             && programs.map((item, i) => {
                 return (
                     <option key={i} value={item.programId}>
-                        {getLabelText(item.label, this.state.lang)}
+                        {/* {getLabelText(item.label, this.state.lang)} */}
+                        {item.programCode}
                     </option>
                 )
             }, this);
