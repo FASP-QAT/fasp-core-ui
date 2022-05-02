@@ -631,7 +631,7 @@ export default class InventoryTurns extends Component {
             data = [];
             data[0] = getLabelText(costOfInventory[j].planningUnit.label, this.state.lang);
             data[1] = (costOfInventory[j].totalConsumption);
-            data[2] = (costOfInventory[j].avergeStock);
+            data[2] = Number(costOfInventory[j].avergeStock).toFixed(2);
             data[3] = (costOfInventory[j].noOfMonths);
             data[4] = (costOfInventory[j].inventoryTurns);
 
@@ -976,7 +976,8 @@ export default class InventoryTurns extends Component {
             && programs.map((item, i) => {
                 return (
                     <option key={i} value={item.programId}>
-                        {getLabelText(item.label, this.state.lang)}
+                        {/* {getLabelText(item.label, this.state.lang)} */}
+                        {(item.programCode)}
                     </option>
                 )
             }, this);

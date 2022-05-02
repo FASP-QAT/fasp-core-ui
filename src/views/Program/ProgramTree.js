@@ -342,7 +342,7 @@ class Program extends Component {
                             // getProgramList()
                             .then(response => {
                                 if (response.status == 200) {
-                                    // console.log("Program List", response.data);
+                                    console.log("Program List", response.data);
                                     this.setState({
                                         prgList: response.data.programList,
                                         loading: false
@@ -681,53 +681,54 @@ class Program extends Component {
                                                                             <li>
                                                                                 <input type="checkbox" id={"c1-".concat(item.realmCountry.id).concat(item1.id)} />
                                                                                 <label htmlFor={"c1-".concat(item.realmCountry.id).concat(item1.id)} className="tree_label">{getLabelText(item1.label, this.state.lang)}</label> */}
-                                                                                <ul>
-                                                                                    {
-                                                                                        this.state.prgList.filter(c => c.realmCountry.id == item.realmCountry.id).sort(function (a, b) {
-                                                                                                a = getLabelText(a.program.label, this.state.lang).toLowerCase();
-                                                                                                b = getLabelText(b.program.label, this.state.lang).toLowerCase();
-                                                                                                return a < b ? -1 : a > b ? 1 : 0;
-                                                                                            }.bind(this))
-                                                                                            .map(item2 => (
+                                                                <ul>
+                                                                    {
+                                                                        this.state.prgList.filter(c => c.realmCountry.id == item.realmCountry.id).sort(function (a, b) {
+                                                                            a = getLabelText(a.program.label, this.state.lang).toLowerCase();
+                                                                            b = getLabelText(b.program.label, this.state.lang).toLowerCase();
+                                                                            return a < b ? -1 : a > b ? 1 : 0;
+                                                                        }.bind(this))
+                                                                            .map(item2 => (
 
-                                                                                                <li>
-                                                                                                    {/* {item2} */}
-                                                                                                    <span className="tree_label">
-                                                                                                        <span className="">
-                                                                                                            <div className="checkbox m-0">
-                                                                                                                <input type="checkbox" name="programCheckBox" value={item2.program.id} id={"checkbox_".concat(item.realmCountry.id).concat(item2.program.id).concat(".0")} />
-                                                                                                                {console.log("D------------>this.state.programList", this.state.programList, "Condition------->", this.state.programList.filter(c => c.programId == item2.program.id && c.versionId == Math.max.apply(Math, item2.versionList.map(function (o) { return o.versionId; }))).length)}
-                                                                                                                <label className={this.state.programList.filter(c => c.programId == item2.program.id && c.versionId == Math.max.apply(Math, item2.versionList.map(function (o) { return o.versionId; }))).length > 0 ? "greenColor" : this.state.programList.filter(c => c.programId == item2.program.id).length > 0 ? "redColor" : ""} htmlFor={"checkbox_".concat(item.realmCountry.id).concat(item2.program.id).concat(".0")}>{getLabelText(item2.program.label, this.state.lang)}<i className="ml-1 fa fa-eye"></i></label>
-                                                                                                            </div>
+                                                                                <li>
+                                                                                    {/* {item2} */}
+                                                                                    <span className="tree_label">
+                                                                                        <span className="">
+                                                                                            <div className="checkbox m-0">
+                                                                                                <input type="checkbox" name="programCheckBox" value={item2.program.id} id={"checkbox_".concat(item.realmCountry.id).concat(item2.program.id).concat(".0")} />
+                                                                                                {console.log("D------------>this.state.programList", this.state.programList, "Condition------->", this.state.programList.filter(c => c.programId == item2.program.id && c.versionId == Math.max.apply(Math, item2.versionList.map(function (o) { return o.versionId; }))).length)}
+                                                                                                {/* <label className={this.state.programList.filter(c => c.programId == item2.program.id && c.versionId == Math.max.apply(Math, item2.versionList.map(function (o) { return o.versionId; }))).length > 0 ? "greenColor" : this.state.programList.filter(c => c.programId == item2.program.id).length > 0 ? "redColor" : ""} htmlFor={"checkbox_".concat(item.realmCountry.id).concat(item2.program.id).concat(".0")}>{getLabelText(item2.program.label, this.state.lang)}<i className="ml-1 fa fa-eye"></i></label> */}
+                                                                                                <label className={this.state.programList.filter(c => c.programId == item2.program.id && c.versionId == Math.max.apply(Math, item2.versionList.map(function (o) { return o.versionId; }))).length > 0 ? "greenColor" : this.state.programList.filter(c => c.programId == item2.program.id).length > 0 ? "redColor" : ""} htmlFor={"checkbox_".concat(item.realmCountry.id).concat(item2.program.id).concat(".0")}>{getLabelText(item2.program.label, this.state.lang) + ' - (' + item2.program.code +')'}<i className="ml-1 fa fa-eye"></i></label>
+                                                                                            </div>
+                                                                                        </span>
+                                                                                    </span>
+                                                                                    {/* {console.log("Item1------------>", item1), console.log("Item1------------>", item.realmCountry.id, "---------", "fpm".concat(item.realmCountry.id).concat(item1.id))} */}
+                                                                                    <input type="checkbox" defaultChecked id={"fpm".concat(item.realmCountry.id).concat(item2.program.id)} />
+                                                                                    <label className="arrow_label" htmlFor={"fpm".concat(item.realmCountry.id).concat(item2.program.id)}></label>
+                                                                                    <ul>
+                                                                                        {
+                                                                                            this.state.prgList.filter(c => c.program.id == item2.program.id).map(item3 => (
+                                                                                                (item3.versionList).map((item4, count) => (
+                                                                                                    <>
+                                                                                                        <li><span className="tree_label">
+                                                                                                            <span className="">
+                                                                                                                <div className="checkbox m-0">
+                                                                                                                    <input type="checkbox" data-program-id={item2.program.id} value={item4.versionId} className="versionCheckBox" name={"versionCheckBox".concat(item2.program.id)} id={"kf-v".concat(item.realmCountry.id).concat(item2.program.id).concat(item4.versionId)} />
+                                                                                                                    <label htmlFor={"kf-v".concat(item.realmCountry.id).concat(item2.program.id).concat(item4.versionId)}>{i18n.t('static.program.version').concat(" ")}<b>{(item4.versionId)}</b>{(" ").concat(i18n.t('static.program.savedOn')).concat(" ")}<b>{(moment(item4.createdDate).format(DATE_FORMAT_CAP))}</b>{(" ").concat(i18n.t("static.program.savedBy")).concat(" ")}<b>{(item4.createdBy.username)}</b>{(" ").concat(i18n.t("static.program.as")).concat(" ")}<b>{getLabelText(item4.versionType.label)}</b></label>
+                                                                                                                </div>
+                                                                                                            </span>
                                                                                                         </span>
-                                                                                                    </span>
-                                                                                                    {/* {console.log("Item1------------>", item1), console.log("Item1------------>", item.realmCountry.id, "---------", "fpm".concat(item.realmCountry.id).concat(item1.id))} */}
-                                                                                                    <input type="checkbox" defaultChecked id={"fpm".concat(item.realmCountry.id).concat(item2.program.id)} />
-                                                                                                    <label className="arrow_label" htmlFor={"fpm".concat(item.realmCountry.id).concat(item2.program.id)}></label>
-                                                                                                    <ul>
-                                                                                                        {
-                                                                                                            this.state.prgList.filter(c => c.program.id == item2.program.id).map(item3 => (
-                                                                                                                (item3.versionList).map((item4, count) => (
-                                                                                                                    <>
-                                                                                                                        <li><span className="tree_label">
-                                                                                                                            <span className="">
-                                                                                                                                <div className="checkbox m-0">
-                                                                                                                                    <input type="checkbox" data-program-id={item2.program.id} value={item4.versionId} className="versionCheckBox" name={"versionCheckBox".concat(item2.program.id)} id={"kf-v".concat(item.realmCountry.id).concat(item2.program.id).concat(item4.versionId)} />
-                                                                                                                                    <label htmlFor={"kf-v".concat(item.realmCountry.id).concat(item2.program.id).concat(item4.versionId)}>{i18n.t('static.program.version').concat(" ")}<b>{(item4.versionId)}</b>{(" ").concat(i18n.t('static.program.savedOn')).concat(" ")}<b>{(moment(item4.createdDate).format(DATE_FORMAT_CAP))}</b>{(" ").concat(i18n.t("static.program.savedBy")).concat(" ")}<b>{(item4.createdBy.username)}</b>{(" ").concat(i18n.t("static.program.as")).concat(" ")}<b>{getLabelText(item4.versionType.label)}</b></label>
-                                                                                                                                </div>
-                                                                                                                            </span>
-                                                                                                                        </span>
-                                                                                                                        </li>
+                                                                                                        </li>
 
-                                                                                                                        {count == item3.versionList.length - 1 && item3.maxPages != item3.currentPage && <div style={{ color: '#205493', cursor: 'pointer' }} onClick={() => this.getMoreVersions(item2.program.id, parseInt(item3.versionList.length / 5))}>{i18n.t('static.program.seemoreprogram')}</div>}
-                                                                                                                    </>
+                                                                                                        {count == item3.versionList.length - 1 && item3.maxPages != item3.currentPage && <div style={{ color: '#205493', cursor: 'pointer' }} onClick={() => this.getMoreVersions(item2.program.id, parseInt(item3.versionList.length / 5))}>{i18n.t('static.program.seemoreprogram')}</div>}
+                                                                                                    </>
 
-                                                                                                                ))
-                                                                                                            ))
-                                                                                                        }
+                                                                                                ))
+                                                                                            ))
+                                                                                        }
 
-                                                                                                    </ul>
-                                                                                                    {/* <ul>
+                                                                                    </ul>
+                                                                                    {/* <ul>
 
                                                                                                 {
                                                                                                     this.state.prgList.filter(c => c.programId == item2.programId).map(item3 => (
@@ -736,14 +737,14 @@ class Program extends Component {
                                                                                                         ))
                                                                                                     ))}
                                                                                             </ul> */}
-                                                                                                </li>
+                                                                                </li>
 
-                                                                                            ))}
-                                                                                </ul>
-                                                                            </li>
+                                                                            ))}
+                                                                </ul>
+                                                            </li>
 
-                                                                        ))}
-                                                                {/* </ul>
+                                                        ))}
+                                                    {/* </ul>
                                                             </li>
                                                         ))} */}
                                                 </ul>
@@ -890,12 +891,12 @@ class Program extends Component {
                         var updatedJson = [];
                         for (var r = 0; r < json.length; r++) {
                             var planningUnitList = json[r].planningUnitList;
-                            var consumptionList=json[r].consumptionList;
-                            var inventoryList=json[r].inventoryList;
-                            var shipmentList=json[r].shipmentList;
-                            var batchInfoList=json[r].batchInfoList;
-                            var problemReportList=json[r].problemReportList;
-                            var supplyPlan=json[r].supplyPlan;
+                            var consumptionList = json[r].consumptionList;
+                            var inventoryList = json[r].inventoryList;
+                            var shipmentList = json[r].shipmentList;
+                            var batchInfoList = json[r].batchInfoList;
+                            var problemReportList = json[r].problemReportList;
+                            var supplyPlan = json[r].supplyPlan;
                             var generalData = json[r];
                             delete generalData.consumptionList;
                             delete generalData.inventoryList;
@@ -903,7 +904,7 @@ class Program extends Component {
                             delete generalData.batchInfoList;
                             delete generalData.supplyPlan;
                             delete generalData.planningUnitList;
-                            generalData.actionList=[];
+                            generalData.actionList = [];
                             var generalEncryptedData = CryptoJS.AES.encrypt(JSON.stringify(generalData), SECRET_KEY).toString();
                             var planningUnitDataList = [];
                             for (var pu = 0; pu < planningUnitList.length; pu++) {
@@ -917,11 +918,11 @@ class Program extends Component {
                                     supplyPlan: supplyPlan.filter(c => c.planningUnitId == planningUnitList[pu].id)
                                 }
                                 var encryptedPlanningUnitDataText = CryptoJS.AES.encrypt(JSON.stringify(planningUnitDataJson), SECRET_KEY).toString();
-                                planningUnitDataList.push({planningUnitId:planningUnitList[pu].id,planningUnitData:encryptedPlanningUnitDataText})
+                                planningUnitDataList.push({ planningUnitId: planningUnitList[pu].id, planningUnitData: encryptedPlanningUnitDataText })
                             }
                             var programDataJson = {
-                                generalData:generalEncryptedData,
-                                planningUnitDataList:planningUnitDataList
+                                generalData: generalEncryptedData,
+                                planningUnitDataList: planningUnitDataList
                             };
                             updatedJson.push(programDataJson);
                         }
@@ -1050,7 +1051,7 @@ class Program extends Component {
                                                                     openCount: 0,
                                                                     addressedCount: 0,
                                                                     programModified: 0,
-                                                                    readonly:0
+                                                                    readonly: 0
                                                                 };
                                                                 programIds.push(json[r].programId + "_v" + json[r].currentVersion.versionId + "_uId_" + userId);
                                                                 var programQPLDetailsRequest = programQPLDetailsOs.put(programQPLDetailsJson);
@@ -1158,7 +1159,7 @@ class Program extends Component {
                                                     openCount: 0,
                                                     addressedCount: 0,
                                                     programModified: 0,
-                                                    readonly:0
+                                                    readonly: 0
                                                 };
                                                 programIds.push(json[r].programId + "_v" + json[r].currentVersion.versionId + "_uId_" + userId);
                                                 var programQPLDetailsRequest = programQPLDetailsOs.put(programQPLDetailsJson);

@@ -4112,6 +4112,7 @@ export default class syncPage extends Component {
         // window.visible=true;
 
       } catch (err) {
+        this.redirectToDashbaord(commitRequestId);
         // Handle Error Here
         console.error("Error+++", err);
       }
