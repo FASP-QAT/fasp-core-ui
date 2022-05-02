@@ -2529,7 +2529,7 @@ export default class SupplyPlanComponent extends React.Component {
                                 var dataSourceResult = [];
                                 dataSourceResult = dataSourceRequest.result;
                                 for (var k = 0; k < dataSourceResult.length; k++) {
-                                    if (dataSourceResult[k].program.id == programJson.programId || dataSourceResult[k].program.id == 0 && dataSourceResult[k].active == true) {
+                                    if (dataSourceResult[k].program == null || dataSourceResult[k].program.id == programJson.programId || dataSourceResult[k].program.id == 0 && dataSourceResult[k].active == true) {
                                         if (dataSourceResult[k].realm.id == programJson.realmCountry.realm.realmId) {
                                             dataSourceListAll.push(dataSourceResult[k]);
 
@@ -2809,7 +2809,7 @@ export default class SupplyPlanComponent extends React.Component {
 
                         for (var n = 0; n < m.length; n++) {
                             var jsonList = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM-DD") == moment(m[n].startDate).format("YYYY-MM-DD"));
-                            console.log("jsonList@@@@@@@@@@@@",jsonList);
+                            console.log("jsonList@@@@@@@@@@@@", jsonList);
                             var prevMonthJsonList = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM-DD") == moment(m[n].startDate).subtract(1, 'months').format("YYYY-MM-DD"));
                             if (jsonList.length > 0) {
                                 openingBalanceArray.push({ isActual: prevMonthJsonList.length > 0 && prevMonthJsonList[0].regionCountForStock == prevMonthJsonList[0].regionCount ? 1 : 0, balance: jsonList[0].openingBalance });
