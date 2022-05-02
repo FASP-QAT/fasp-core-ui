@@ -6346,6 +6346,10 @@ font-style: italic!important;
 .topscroll{
 top: calc(20em + 3px);
 }
+.extrapolateTable .jtabs {
+  position: relative!important;
+  max-width: none !important;
+}
 
 // .usageTemplateDataEntryTable .jtabs-content .jtabs-selected .jexcel_content .jexcel>tbody>tr>td:nth-child(17) {
 //   display:none !important;

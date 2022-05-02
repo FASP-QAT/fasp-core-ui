@@ -1906,7 +1906,7 @@
     "static.common.viewDashBoard": "View Dashboard",
     "static.common.tracerCategoryInvalidSelection": "Selected Forcasting unit`s Tracer category does not match",
     "static.manualTagging.OrderType": "Order Type",
-    "static.compareVersion.compareWithVersion": "Compare With Version",
+    "static.compareVersion.compareWithVersion": "Compare With Version (* indicates Final)",
     "static.message.syncExpiresOn": "You have exceeded the maximum number of days that you can work offline. Go online to continue using QAT",
     "static.common.prevPage": "Previous page",
     "static.commitTree.NodesWithChildrenThatDoNotAddUpTo100Prcnt": "Nodes with children that don’t add up to 100%",

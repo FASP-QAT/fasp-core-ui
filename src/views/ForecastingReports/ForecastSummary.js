@@ -1462,7 +1462,7 @@ class ForecastSummary extends Component {
                                             total += Number(ele.amount);
                                         });
                                         console.log("total+++", total);
-                                        tsList.push({ id: "C" + consumptionExtrapolation[ce].consumptionExtrapolationId, name: consumptionExtrapolation[ce].extrapolationMethod.label.label_en, planningUnitId: consumptionExtrapolation[ce].planningUnit.id, type: "C", id1: consumptionExtrapolation[ce].consumptionExtrapolationId, totalForecast: total,region: [consumptionExtrapolation[ce].region] });
+                                        tsList.push({ id: "C" + consumptionExtrapolation[ce].consumptionExtrapolationId, name: consumptionExtrapolation[ce].extrapolationMethod.label.label_en, planningUnitId: consumptionExtrapolation[ce].planningUnit.id, type: "C", id1: consumptionExtrapolation[ce].consumptionExtrapolationId, totalForecast: total, region: [consumptionExtrapolation[ce].region] });
                                     }
                                     tsList = tsList.sort(function (a, b) {
                                         a = (a.name).toLowerCase();
@@ -1721,7 +1721,7 @@ class ForecastSummary extends Component {
                                 let unitPrice = primaryOutputData[j].price;
                                 // let procurementNeeded = (isProcurementGapRed == true ? '$ ' + (tempProcurementGap * unitPrice).toFixed(2) : '');
                                 let procurementNeeded = (isProcurementGapRed == true ? '$ ' + Math.round(Math.abs(tempProcurementGap) * unitPrice) : '');
-                                let notes = primaryOutputData[j].notes;
+                                let notes = (primaryOutputData[j].notes != null ? primaryOutputData[j].notes.label_en : '');
 
                                 let obj = { id: 1, tempTracerCategoryId: tracerCategory.id, display: true, tracerCategory: tracerCategory, forecastingUnit: forecastingUnit, planningUnit: planningUnit, totalForecastedQuantity: totalForecastedQuantity, stock1: stock1, existingShipments: existingShipments, stock2: stock2, isStock2Red: isStock2Red, desiredMonthOfStock1: desiredMonthOfStock1, desiredMonthOfStock2: desiredMonthOfStock2, procurementGap: procurementGap, isProcurementGapRed: isProcurementGapRed, priceType: priceType, isPriceTypeRed: isPriceTypeRed, unitPrice: unitPrice, procurementNeeded: procurementNeeded, notes: notes }
                                 tempData.push(obj);
@@ -1749,6 +1749,7 @@ class ForecastSummary extends Component {
                                 loading: (displayId == 1 ? true : false),
                                 summeryData: summeryData,
                                 totalProductCost: totalProductCost,
+                                freightPerc: (primaryOutputData.length > 0 ? (primaryOutputData[0].freightPerc != null ? Number(primaryOutputData[0].freightPerc) : '') : '')
                                 // displayId: 1
                             })
 
@@ -1786,7 +1787,7 @@ class ForecastSummary extends Component {
                                                 "regionId": filterByRegionList[0].region.id,
                                                 "selectedForecast": filterByRegionList[0].selectedForecast.label_en,
                                                 "forecastQuantity": filterByRegionList[0].totalForecast,
-                                                "notes": filterByRegionList[0].notes
+                                                "notes": (filterByRegionList[0].notes != null ? filterByRegionList[0].notes.label_en : '')
                                             })
 
                                             if (filterByRegionList[0].totalForecast != '' && filterByRegionList[0].totalForecast != null) {
@@ -2111,7 +2112,7 @@ class ForecastSummary extends Component {
 
         var regionList = this.state.regRegionList;
         // var planningUniObj = this.state.regPlanningUnitList.filter(c => c.planningUnit.id == value);
-        var regionId = regionList[(c/3)-1].regionId;
+        var regionId = regionList[(c / 3) - 1].regionId;
         // console.log("x---------------->2 3", planningUniObj);
         // console.log("x---------------->2 4", regionId);
         // console.log("x---------------->2 5", planningUniObj.selectedForecastMap);
@@ -2122,11 +2123,11 @@ class ForecastSummary extends Component {
         for (var i = 0; i < mylist.length; i++) {
             let regionList = mylist[i].region;
             let region = regionList.filter(c => c.id == regionId);
-            if(region.length > 0){
+            if (region.length > 0) {
                 mylist1.push(mylist[i]);
             }
         }
-        
+
         return mylist1;
     }
 
@@ -3384,15 +3385,15 @@ class ForecastSummary extends Component {
                                                                     <tr>
                                                                         <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                                         {/* <td></td> */}
-                                                                        <td className='text-left sticky-col first-col clone'></td>
-                                                                        <td></td>
-                                                                        <td></td>
-                                                                        <td></td>
-                                                                        <td></td>
-                                                                        <td></td>
-                                                                        <td></td>
-                                                                        <td></td>
-                                                                        <td></td>
+                                                                        <td className='text-left sticky-col first-col clone' style={{ border: 'none' }}></td>
+                                                                        <td style={{ border: 'none' }}></td>
+                                                                        <td style={{ border: 'none' }}></td>
+                                                                        <td style={{ border: 'none' }}></td>
+                                                                        <td style={{ border: 'none' }}></td>
+                                                                        <td style={{ border: 'none' }}></td>
+                                                                        <td style={{ border: 'none' }}></td>
+                                                                        <td style={{ border: 'none' }}></td>
+                                                                        <td style={{ border: 'none' }}></td>
                                                                         <td><b>{i18n.t('static.forecastReport.productCost')}</b></td>
                                                                         <td><b>{'$ ' + (this.state.totalProductCost).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</b></td>
                                                                         <td></td>
@@ -3400,33 +3401,33 @@ class ForecastSummary extends Component {
                                                                     <tr>
                                                                         <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                                         {/* <td></td> */}
-                                                                        <td className='text-left sticky-col first-col clone'></td>
-                                                                        <td></td>
-                                                                        <td></td>
-                                                                        <td></td>
-                                                                        <td></td>
-                                                                        <td></td>
-                                                                        <td></td>
-                                                                        <td></td>
-                                                                        <td></td>
+                                                                        <td className='text-left sticky-col first-col clone' style={{ border: 'none' }}></td>
+                                                                        <td style={{ border: 'none' }}></td>
+                                                                        <td style={{ border: 'none' }}></td>
+                                                                        <td style={{ border: 'none' }}></td>
+                                                                        <td style={{ border: 'none' }}></td>
+                                                                        <td style={{ border: 'none' }}></td>
+                                                                        <td style={{ border: 'none' }}></td>
+                                                                        <td style={{ border: 'none' }}></td>
+                                                                        <td style={{ border: 'none' }}></td>
                                                                         <td><b>{i18n.t('static.forecastReport.freight')} ({this.state.freightPerc}%)</b></td>
-                                                                        <td><b>{'$ ' + (((this.state.freightPerc / 100) * this.state.totalProductCost).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</b></td>
+                                                                        <td><b>{'$ ' + (((this.state.freightPerc/100) * this.state.totalProductCost).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</b></td>
                                                                         <td></td>
                                                                     </tr>
                                                                     <tr>
                                                                         <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                                         {/* <td></td> */}
-                                                                        <td className='text-left sticky-col first-col clone'></td>
-                                                                        <td></td>
-                                                                        <td></td>
-                                                                        <td></td>
-                                                                        <td></td>
-                                                                        <td></td>
-                                                                        <td></td>
-                                                                        <td></td>
-                                                                        <td></td>
+                                                                        <td className='text-left sticky-col first-col clone' style={{ border: 'none' }}></td>
+                                                                        <td style={{ border: 'none' }}></td>
+                                                                        <td style={{ border: 'none' }}></td>
+                                                                        <td style={{ border: 'none' }}></td>
+                                                                        <td style={{ border: 'none' }}></td>
+                                                                        <td style={{ border: 'none' }}></td>
+                                                                        <td style={{ border: 'none' }}></td>
+                                                                        <td style={{ border: 'none' }}></td>
+                                                                        <td style={{ border: 'none' }}></td>
                                                                         <td><b>{i18n.t('static.shipment.totalCost')}</b></td>
-                                                                        <td><b>{'$ ' + (parseFloat(parseFloat(this.state.totalProductCost) + parseFloat(0.07 * this.state.totalProductCost)).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</b></td>
+                                                                        <td><b>{'$ ' + (parseFloat(parseFloat(this.state.totalProductCost) + parseFloat((this.state.freightPerc/100) * this.state.totalProductCost)).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</b></td>
                                                                         <td></td>
                                                                     </tr>
                                                                 </tfoot>
@@ -3457,7 +3458,7 @@ class ForecastSummary extends Component {
                                                                         <td className='text-left sticky-col first-col clone'></td>
                                                                         <td></td>
                                                                         <td><b>{i18n.t('static.shipment.totalCost')}</b></td>
-                                                                        <td><b>{'$ ' + (parseFloat(parseFloat(this.state.totalProductCost) + parseFloat(0.07 * this.state.totalProductCost)).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</b></td>
+                                                                        <td><b>{'$ ' + (parseFloat(parseFloat(this.state.totalProductCost) + parseFloat((this.state.freightPerc/100) * this.state.totalProductCost)).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</b></td>
                                                                         {/* <td><b>{'$ ' + (parseFloat(this.state.totalProductCost + 0.07 * this.state.totalProductCost).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</b></td> */}
                                                                         <td></td>
                                                                     </tr>
