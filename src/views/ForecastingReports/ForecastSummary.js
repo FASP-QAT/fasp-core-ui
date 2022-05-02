@@ -1452,7 +1452,7 @@ class ForecastSummary extends Component {
                                     for (var tl = 0; tl < treeList.length; tl++) {
                                         var scenarioList = treeList[tl].scenarioList;
                                         for (var sl = 0; sl < scenarioList.length; sl++) {
-                                            tsList.push({ id: "T" + treeList[tl].treeId + '~' + scenarioList[sl].id, name: treeList[tl].label.label_en + " - " + scenarioList[sl].label.label_en, flatList: treeList[tl].tree.flatList, planningUnitId: "", type: "T", id1: scenarioList[sl].id, treeId: treeList[tl].treeId, totalForecast: 0 });
+                                            tsList.push({ id: "T" + treeList[tl].treeId + '~' + scenarioList[sl].id, name: treeList[tl].label.label_en + " - " + scenarioList[sl].label.label_en, flatList: treeList[tl].tree.flatList, planningUnitId: "", type: "T", id1: scenarioList[sl].id, treeId: treeList[tl].treeId, totalForecast: 0, region: treeList[tl].regionList });
                                         }
                                     }
                                     for (var ce = 0; ce < consumptionExtrapolation.length; ce++) {
@@ -1462,7 +1462,7 @@ class ForecastSummary extends Component {
                                             total += Number(ele.amount);
                                         });
                                         console.log("total+++", total);
-                                        tsList.push({ id: "C" + consumptionExtrapolation[ce].consumptionExtrapolationId, name: consumptionExtrapolation[ce].extrapolationMethod.label.label_en, planningUnitId: consumptionExtrapolation[ce].planningUnit.id, type: "C", id1: consumptionExtrapolation[ce].consumptionExtrapolationId, totalForecast: total });
+                                        tsList.push({ id: "C" + consumptionExtrapolation[ce].consumptionExtrapolationId, name: consumptionExtrapolation[ce].extrapolationMethod.label.label_en, planningUnitId: consumptionExtrapolation[ce].planningUnit.id, type: "C", id1: consumptionExtrapolation[ce].consumptionExtrapolationId, totalForecast: total,region: [consumptionExtrapolation[ce].region] });
                                     }
                                     tsList = tsList.sort(function (a, b) {
                                         a = (a.name).toLowerCase();
@@ -2109,16 +2109,25 @@ class ForecastSummary extends Component {
         var mylist = [];
         var value = (instance.jexcel.getJson(null, false)[r])[1].id;
 
-        // var regionList = this.state.regRegionList;
+        var regionList = this.state.regRegionList;
         // var planningUniObj = this.state.regPlanningUnitList.filter(c => c.planningUnit.id == value);
-        // var regionId = regionList[c/3].regionId;
+        var regionId = regionList[(c/3)-1].regionId;
         // console.log("x---------------->2 3", planningUniObj);
         // console.log("x---------------->2 4", regionId);
         // console.log("x---------------->2 5", planningUniObj.selectedForecastMap);
         // console.log("x---------------->2 6", selectedForecastMapObj);
         // let selectedForecastMapObj = planningUniObj.selectedForecastMap[regionId];
         mylist = tsList.filter(e => (e.type == "T" && e.flatList.filter(c => c.payload.nodeDataMap[e.id1][0].puNode != null && c.payload.nodeDataMap[e.id1][0].puNode.planningUnit.id == value).length > 0) || (e.type == "C" && e.planningUnitId == value));
-        return mylist;
+        let mylist1 = [];
+        for (var i = 0; i < mylist.length; i++) {
+            let regionList = mylist[i].region;
+            let region = regionList.filter(c => c.id == regionId);
+            if(region.length > 0){
+                mylist1.push(mylist[i]);
+            }
+        }
+        
+        return mylist1;
     }
 
     checkedChanged(tempTracerCategoryId) {
@@ -3145,7 +3154,7 @@ class ForecastSummary extends Component {
                                             </FormGroup>
                                             <FormGroup className="col-md-3">
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.forecastReport.display')}</Label>
-                                                <div className="controls " style={{marginLeft:'-51px'}}>
+                                                <div className="controls " style={{ marginLeft: '-51px' }}>
                                                     {/* <InputGroup>
                                                         <Input
                                                             type="select"
@@ -3160,7 +3169,7 @@ class ForecastSummary extends Component {
                                                         </Input>
                                                     </InputGroup> */}
 
-                                                    <FormGroup check inline style={{marginRight:'-36px'}}>
+                                                    <FormGroup check inline style={{ marginRight: '-36px' }}>
                                                         <Input
                                                             className="form-check-input"
                                                             type="radio"
@@ -3215,7 +3224,7 @@ class ForecastSummary extends Component {
                                                         type="checkbox"
                                                         id="calculationId"
                                                         name="calculationId"
-                                                        style={{marginTop:'3'}}
+                                                        style={{ marginTop: '3' }}
                                                         checked={this.state.hideCalculation}
                                                         onClick={(e) => { this.hideCalculation(e); }}
                                                     />
