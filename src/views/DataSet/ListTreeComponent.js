@@ -535,6 +535,7 @@ export default class ListTreeComponent extends Component {
                     notes: '',
                     month: moment(program.programData.currentVersion.forecastStartDate).startOf('month').subtract(1, 'months').format("YYYY-MM-DD"),
                     dataValue: "0",
+                    extrapolation: false,
                     calculatedDataValue: '0',
                     displayDataValue: '',
                     nodeDataModelingList: [],
@@ -629,7 +630,6 @@ export default class ListTreeComponent extends Component {
                                 nodeUnit: {
                                     id: ''
                                 },
-                                extrapolation: false,
                                 nodeDataMap: nodeDataMap
                             },
                             parentItem: {
