@@ -844,23 +844,23 @@ class ForcastMatrixOverTime extends Component {
             // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
             // var programJson = JSON.parse(programData);
             // console.log('programJson', programJson)
-            var planningUnitDataList=programRequest.result.programData.planningUnitDataList;
+            var planningUnitDataList = programRequest.result.programData.planningUnitDataList;
             var planningUnitDataIndex = (planningUnitDataList).findIndex(c => c.planningUnitId == planningUnitId);
-                        var programJson = {}
-                        if (planningUnitDataIndex != -1) {
-                            var planningUnitData = ((planningUnitDataList).filter(c => c.planningUnitId == planningUnitId))[0];
-                            var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
-                            var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                            programJson = JSON.parse(programData);
-                        } else {
-                            programJson = {
-                                consumptionList: [],
-                                inventoryList: [],
-                                shipmentList: [],
-                                batchInfoList: [],
-                                supplyPlan: []
-                            }
-                        }
+            var programJson = {}
+            if (planningUnitDataIndex != -1) {
+              var planningUnitData = ((planningUnitDataList).filter(c => c.planningUnitId == planningUnitId))[0];
+              var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
+              var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+              programJson = JSON.parse(programData);
+            } else {
+              programJson = {
+                consumptionList: [],
+                inventoryList: [],
+                shipmentList: [],
+                batchInfoList: [],
+                supplyPlan: []
+              }
+            }
             var pu = (this.state.planningUnits.filter(c => c.planningUnit.id == planningUnitId))[0]
 
             var consumptionList = (programJson.consumptionList).filter(c => c.planningUnit.id == planningUnitId && c.active == true);
@@ -884,30 +884,30 @@ class ForcastMatrixOverTime extends Component {
                   var dt = year + "-" + String(i).padStart(2, '0') + "-01"
                   var conlist = consumptionList.filter(c => c.consumptionDate === dt)
                   console.log(dt, conlist)
-                  var actconsumption = 0;
-                  var forConsumption = 0;
+                  var actconsumption = null;
+                  var forConsumption = null;
                   if (conlist.length == 2) {
                     montcnt = montcnt + 1
                   }
                   for (var l = 0; l < conlist.length; l++) {
                     if (conlist[l].actualFlag.toString() == 'true') {
-                      actconsumption = actconsumption + Math.round(Number(conlist[l].consumptionQty))
+                      actconsumption = (actconsumption == null ? 0 : actconsumption) + Math.round(Number(conlist[l].consumptionQty))
                     } else {
-                      forConsumption = forConsumption + Math.round(Number(conlist[l].consumptionQty))
+                      forConsumption = (forConsumption == null ? 0 : forConsumption) + Math.round(Number(conlist[l].consumptionQty))
                     }
                   }
                   actualconsumption = actualconsumption + actconsumption
                   forcastConsumption = forcastConsumption + forConsumption
                   if (j == 0) {
                     console.log(currentActualconsumption, ' ', actconsumption)
-                    if (currentActualconsumption == null && actconsumption > 0) {
+                    if (currentActualconsumption == null && actconsumption != null) {
                       currentActualconsumption = actconsumption
                     } else if (currentActualconsumption != null) {
                       currentActualconsumption = currentActualconsumption + actconsumption
                     }
-                    currentForcastConsumption = currentForcastConsumption + forConsumption
+                    currentForcastConsumption = forConsumption == null ? null : currentForcastConsumption + forConsumption
                   }
-                  if (actconsumption > 0 && forConsumption > 0)
+                  if (actconsumption != null && forConsumption != null)
                     absvalue = absvalue + (Math.abs(actconsumption - forConsumption))
 
 
@@ -920,8 +920,8 @@ class ForcastMatrixOverTime extends Component {
                   month: new Date(from, month - 1),
                   actualConsumption: currentActualconsumption,
                   forecastedConsumption: currentForcastConsumption,
-                  forecastError: currentActualconsumption > 0 && actualconsumption > 0 ? (((absvalue * 100) / actualconsumption)) : '',
-                  message: montcnt == 0 ? "static.reports.forecastMetrics.noConsumptionAcrossPeriod" : currentActualconsumption == null || currentForcastConsumption == null ? "static.reports.forecastMetrics.noConsumption" : (actualconsumption == null || actualconsumption == 0) ? "static.reports.forecastMetrics.totalConsumptionIs0" : null
+                  forecastError: currentActualconsumption != null && actualconsumption != null ? (((absvalue * 100) / actualconsumption)) : '',
+                  message: montcnt == 0 ? "static.reports.forecastMetrics.noConsumptionAcrossPeriod" : currentActualconsumption == null || currentForcastConsumption == null ? "static.reports.forecastMetrics.noConsumption" : (actualconsumption == null) ? "static.reports.forecastMetrics.totalConsumptionIs0" : null
                 }
                 data.push(json)
                 console.log("Json------------->", json);
