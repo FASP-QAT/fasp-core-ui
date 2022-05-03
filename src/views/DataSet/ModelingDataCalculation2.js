@@ -1,6 +1,6 @@
 import moment from 'moment';
 
-export function calculateModelingData(dataset, props, page, nodeId, scenarioId, type, treeId, isTemplate) {
+export function calculateModelingData(dataset, props, page, nodeId, scenarioId, type, treeId, isTemplate, listPage) {
     console.log("modelling dataset---", dataset);
     // console.log("modeling nodeId---", nodeId);
     // console.log("modelling scenarioId---", scenarioId);
@@ -832,6 +832,10 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
     props.updateState("modelingJexcelLoader", false);
     props.updateState("momJexcelLoader", false);
     props.updateState("message1", "Data updated successfully");
+    if (listPage) {
+        props.updateState("programId", page);
+        props.updateState("tempTreeId", treeId);
+    }
     // treeList = treeList;
     // datasetJson.treeList = treeList;
     // var encryptedDatasetJson = (CryptoJS.AES.encrypt(JSON.stringify(datasetJson), SECRET_KEY)).toString();
