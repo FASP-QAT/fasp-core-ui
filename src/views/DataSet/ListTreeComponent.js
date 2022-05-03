@@ -22,6 +22,7 @@ import classNames from 'classnames';
 import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
 import moment from 'moment';
+import { calculateModelingData } from '../../views/DataSet/ModelingDataCalculation2';
 const entityname = i18n.t('static.common.listtree');
 
 const validationSchema = function (values) {
@@ -142,7 +143,8 @@ export default class ListTreeComponent extends Component {
             treeFlag: true,
             forecastMethodList: [],
             realmCountryId: '',
-            datasetIdModal: ''
+            datasetIdModal: '',
+            tempTreeId: ''
         }
         this.toggleDeropdownSetting = this.toggleDeropdownSetting.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
@@ -158,6 +160,136 @@ export default class ListTreeComponent extends Component {
         this.getRegionList = this.getRegionList.bind(this);
         this.findMissingPUs = this.findMissingPUs.bind(this);
         this.buildMissingPUJexcel = this.buildMissingPUJexcel.bind(this);
+        this.updateState = this.updateState.bind(this);
+        this.saveTreeData = this.saveTreeData.bind(this);
+    }
+    saveTreeData(operationId, tempProgram, treeTemplateId, programId, treeId, programCopy) {
+        var db1;
+        getDatabase();
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+        openRequest.onerror = function (event) {
+            this.setState({
+                message: i18n.t('static.program.errortext'),
+                color: 'red'
+            })
+            this.hideFirstComponent()
+        }.bind(this);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var transaction = db1.transaction(['datasetData'], 'readwrite');
+            var programTransaction = transaction.objectStore('datasetData');
+
+            var programRequest = programTransaction.put(tempProgram);
+            console.log("---hurrey---");
+
+            transaction.oncomplete = function (event) {
+
+                this.setState({
+                    // loading: false,
+                    message: i18n.t('static.mt.dataUpdateSuccess'),
+                    color: "green",
+                    isSubmitClicked: false
+                }, () => {
+
+                    if (operationId == 3) {
+                        // if (treeTemplateId != "" && treeTemplateId != null) {
+                        //     console.log("programId 1---", programId);
+                        //     calculateModelingData(programCopy, this, programId, 0, 1, 1, treeId, false);
+                        // } else {
+                        confirmAlert({
+                            message: "Do you want to move to manage tree page?",
+                            buttons: [
+                                {
+                                    label: i18n.t('static.program.yes'),
+                                    onClick: () => {
+                                        this.props.history.push({
+                                            pathname: `/dataSet/buildTree/tree/${treeId}/${programId}`,
+                                            // state: { role }
+                                        });
+
+                                    }
+                                },
+                                {
+                                    label: i18n.t('static.program.no'),
+                                    onClick: () => {
+                                        this.getDatasetList();
+                                    }
+                                }
+                            ]
+                        });
+                        // }
+                    } else {
+                        this.getDatasetList();
+                    }
+
+                });
+                console.log("Data update success1");
+                // alert("success");
+
+
+            }.bind(this);
+            transaction.onerror = function (event) {
+                this.setState({
+                    loading: false,
+                    color: "red",
+                }, () => {
+                    this.hideSecondComponent();
+                });
+                console.log("Data update errr");
+            }.bind(this);
+        }.bind(this);
+
+    }
+    updateState(parameterName, value) {
+        console.log("parameterName---", parameterName + " value---", value);
+        // console.log("value---", value);
+        if (parameterName != "loading") {
+            this.setState({
+                [parameterName]: value
+            }, () => {
+                if (parameterName == 'programId' && value != "") {
+                    // console.log("programId---", this.state.datasetList)
+                    var programId = this.state.programId;
+                    var program = this.state.datasetList.filter(x => x.id == programId)[0];
+                    // console.log("my program---", program);
+                    let tempProgram = JSON.parse(JSON.stringify(program))
+                    let treeList = tempProgram.programData.treeList;
+                    var tree = treeList.filter(x => x.treeId == this.state.tempTreeId)[0];
+                    // console.log("my tree---",tree)
+                    var items = tree.tree.flatList;
+                    var nodeDataMomList = this.state.nodeDataMomList;
+                    // console.log("nodeDataMomList---", nodeDataMomList);
+                    if (nodeDataMomList.length > 0) {
+                        for (let i = 0; i < nodeDataMomList.length; i++) {
+                            // console.log("nodeDataMomList[i]---", nodeDataMomList[i])
+                            var nodeId = nodeDataMomList[i].nodeId;
+                            var nodeDataMomListForNode = nodeDataMomList[i].nodeDataMomList;
+                            // console.log("this.state.nodeDataMomList---", this.state.nodeDataMomList);
+                            // console.log("my items---", items);
+                            // console.log("my nodeId---", nodeId);
+                            var node = items.filter(n => n.id == nodeId)[0];
+                            // console.log("node---", node);
+                            (node.payload.nodeDataMap[1])[0].nodeDataMomList = nodeDataMomListForNode;
+                            var findNodeIndex = items.findIndex(n => n.id == nodeId);
+                            // console.log("findNodeIndex---", findNodeIndex);
+                            items[findNodeIndex] = node;
+                        }
+                    }
+                    tree.flatList = items;
+                    var findTreeIndex = treeList.findIndex(n => n.treeId == this.state.tempTreeId);
+                    console.log("findTreeIndex---", findTreeIndex);
+                    treeList[findTreeIndex] = tree;
+                    tempProgram.programData.treeList = treeList;
+                    var programCopy = JSON.parse(JSON.stringify(tempProgram));
+                    var programData = (CryptoJS.AES.encrypt(JSON.stringify(tempProgram.programData), SECRET_KEY)).toString();
+                    tempProgram.programData = programData;
+                    var treeTemplateId = document.getElementById('templateId').value;
+                    this.saveTreeData(3, tempProgram, treeTemplateId, programId, this.state.tempTreeId, programCopy);
+                }
+                console.log("returmed list---", this.state.nodeDataMomList);
+
+            })
+        }
     }
     buildMissingPUJexcel() {
         var missingPUList = this.state.missingPUList;
@@ -411,6 +543,7 @@ export default class ListTreeComponent extends Component {
         var program = this.state.treeFlag ? (this.state.datasetList.filter(x => x.programId == programId && x.version == versionId)[0]) : (this.state.datasetList.filter(x => x.id == programId)[0]);
         let tempProgram = JSON.parse(JSON.stringify(program))
         let treeList = program.programData.treeList;
+        var treeTemplateId = '';
         if (operationId == 1) {//delete
             const index = treeList.findIndex(c => c.treeId == treeId);
             if (index > 0) {
@@ -454,7 +587,7 @@ export default class ListTreeComponent extends Component {
             // var curMonth = moment(new Date()).format('YYYY-MM-DD');
             // console
             var curMonth = moment(program.programData.currentVersion.forecastStartDate).format('YYYY-MM-DD');
-            var treeTemplateId = document.getElementById('templateId').value;
+            treeTemplateId = document.getElementById('templateId').value;
             console.log("treeTemplateId===", treeTemplateId);
             if (treeTemplateId != "" && treeTemplateId != 0) {
                 var treeTemplate = this.state.treeTemplateList.filter(x => x.treeTemplateId == treeTemplateId)[0];
@@ -652,78 +785,16 @@ export default class ListTreeComponent extends Component {
         }
 
         tempProgram.programData.treeList = treeList;
+        var programCopy = JSON.parse(JSON.stringify(tempProgram));
         var programData = (CryptoJS.AES.encrypt(JSON.stringify(tempProgram.programData), SECRET_KEY)).toString();
         tempProgram.programData = programData;
-
-        var db1;
-        getDatabase();
-        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-        openRequest.onerror = function (event) {
-            this.setState({
-                message: i18n.t('static.program.errortext'),
-                color: 'red'
-            })
-            this.hideFirstComponent()
-        }.bind(this);
-        openRequest.onsuccess = function (e) {
-            db1 = e.target.result;
-            var transaction = db1.transaction(['datasetData'], 'readwrite');
-            var programTransaction = transaction.objectStore('datasetData');
-
-            var programRequest = programTransaction.put(tempProgram);
-            console.log("---hurrey---");
-
-            transaction.oncomplete = function (event) {
-
-                this.setState({
-                    // loading: false,
-                    message: i18n.t('static.mt.dataUpdateSuccess'),
-                    color: "green",
-                    isSubmitClicked: false
-                }, () => {
-                    if (operationId == 3) {
-                        confirmAlert({
-                            message: "Do you want to move to manage tree page?",
-                            buttons: [
-                                {
-                                    label: i18n.t('static.program.yes'),
-                                    onClick: () => {
-                                        this.props.history.push({
-                                            pathname: `/dataSet/buildTree/tree/${treeId}/${programId}`,
-                                            // state: { role }
-                                        });
-
-                                    }
-                                },
-                                {
-                                    label: i18n.t('static.program.no'),
-                                    onClick: () => {
-                                        this.getDatasetList();
-                                    }
-                                }
-                            ]
-                        });
-                    } else {
-                        this.getDatasetList();
-                    }
-
-                });
-                console.log("Data update success1");
-                // alert("success");
-
-
-            }.bind(this);
-            transaction.onerror = function (event) {
-                this.setState({
-                    loading: false,
-                    color: "red",
-                }, () => {
-                    this.hideSecondComponent();
-                });
-                console.log("Data update errr");
-            }.bind(this);
-        }.bind(this);
-
+        // if (operationId == 3) {
+        if (operationId == 3 && treeTemplateId != "" && treeTemplateId != null) {
+            console.log("programId 1---", programId);
+            calculateModelingData(programCopy, this, programId, 0, 1, 1, treeId, false,true);
+        } else {
+            this.saveTreeData(operationId, tempProgram, treeTemplateId, programId, treeId, programCopy);
+        }
 
     }
 
