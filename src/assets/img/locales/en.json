@@ -617,7 +617,7 @@
     "static.mt.addressed": "Addressed",
     "static.procurementagent.procurementagent": "Procurement agent",
     "static.common.remove": "Remove",
-    "static.shipment.orderedShipment": "Submitted Shipment",
+    "static.shipment.orderedShipment": "Submitted, Shipped, Arrived, Received Shipments",
     "static.common.alphabetsOnly": "Only letters allowed",
     "static.program.approvetoshipleadtime": "`Approved to Shipped` Lead Time (months)",
     "static.supplyPlan.shipmentStatus": "Shipment Status",
