@@ -107,7 +107,7 @@ export default class CompareVersion extends Component {
                 doc.text(this.props.datasetData.programCode, doc.internal.pageSize.width - 40, 50, {
                     align: 'right'
                 })
-                doc.text(document.getElementById("datasetId").selectedOptions[0].text, doc.internal.pageSize.width - 40, 60, {
+                doc.text(getLabelText(this.props.datasetData.label, this.state.lang), doc.internal.pageSize.width - 40, 60, {
                     align: 'right'
                 })
 
@@ -120,11 +120,11 @@ export default class CompareVersion extends Component {
                     align: 'center'
                 })
                 if (i == 1) {
-                    doc.setFont('helvetica', 'normal')
-                    doc.setFontSize(8)
-                    doc.text(i18n.t('static.dashboard.programheader') + ' : ' + document.getElementById("datasetId").selectedOptions[0].text, doc.internal.pageSize.width / 20, 90, {
-                        align: 'left'
-                    })
+                    // doc.setFont('helvetica', 'normal')
+                    // doc.setFontSize(8)
+                    // doc.text(i18n.t('static.dashboard.programheader') + ' : ' + document.getElementById("datasetId").selectedOptions[0].text, doc.internal.pageSize.width / 20, 90, {
+                    //     align: 'left'
+                    // })
 
                 }
 
@@ -144,24 +144,24 @@ export default class CompareVersion extends Component {
         doc.setTextColor("#002f6c");
 
 
-        var y = 110;
-        doc.text(i18n.t('static.report.version') + ' : ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width / 20, y, {
+        var y = 80;
+        doc.text(i18n.t('static.report.versionFinal*') + ' : ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width / 20, y, {
             align: 'left'
         })
-        doc.text(i18n.t('static.common.forecastPeriod') + ' : ' + moment(this.props.datasetData.currentVersion.forecastStartDate).format(DATE_FORMAT_CAP_WITHOUT_DATE) + " - " + moment(this.props.datasetData.currentVersion.forecastStopDate).format(DATE_FORMAT_CAP_WITHOUT_DATE), doc.internal.pageSize.width / 5, y, {
+        doc.text(i18n.t('static.common.forecastPeriod') + ' : ' + moment(this.props.datasetData.currentVersion.forecastStartDate).format(DATE_FORMAT_CAP_WITHOUT_DATE) + " - " + moment(this.props.datasetData.currentVersion.forecastStopDate).format(DATE_FORMAT_CAP_WITHOUT_DATE), doc.internal.pageSize.width / 3, y, {
             align: 'left'
         })
-        doc.text(i18n.t('static.common.note') + ' : ' + this.props.datasetData.currentVersion.notes, doc.internal.pageSize.width / 2.8, y, {
+        doc.text(i18n.t('static.common.note') + ' : ' + this.props.datasetData.currentVersion.notes, doc.internal.pageSize.width / 2, y, {
             align: 'left'
         })
         y = y + 10;
         doc.text(i18n.t('static.compareVersion.compareWithVersion') + ' : ' + document.getElementById("versionId1").selectedOptions[0].text, doc.internal.pageSize.width / 20, y, {
             align: 'left'
         })
-        doc.text(i18n.t('static.common.forecastPeriod') + ' : ' + moment(this.props.datasetData1.currentVersion.forecastStartDate).format(DATE_FORMAT_CAP_WITHOUT_DATE) + " - " + moment(this.props.datasetData1.currentVersion.forecastStopDate).format(DATE_FORMAT_CAP_WITHOUT_DATE), doc.internal.pageSize.width / 5, y, {
+        doc.text(i18n.t('static.common.forecastPeriod') + ' : ' + moment(this.props.datasetData1.currentVersion.forecastStartDate).format(DATE_FORMAT_CAP_WITHOUT_DATE) + " - " + moment(this.props.datasetData1.currentVersion.forecastStopDate).format(DATE_FORMAT_CAP_WITHOUT_DATE), doc.internal.pageSize.width / 3, y, {
             align: 'left'
         })
-        doc.text(i18n.t('static.common.note') + ' : ' + this.props.datasetData1.currentVersion.notes, doc.internal.pageSize.width / 2.8, y, {
+        doc.text(i18n.t('static.common.note') + ' : ' + this.props.datasetData1.currentVersion.notes, doc.internal.pageSize.width / 2, y, {
             align: 'left'
         })
         y = y + 10;
@@ -231,7 +231,7 @@ export default class CompareVersion extends Component {
         doc.autoTable(content);
         addHeaders(doc)
         addFooters(doc)
-        doc.save(this.props.datasetData.programCode+"-"+i18n.t('static.dashboard.compareVersion').concat('.pdf'));
+        doc.save(this.props.datasetData.programCode + "-" + i18n.t('static.dashboard.compareVersion').concat('.pdf'));
         //creates PDF from img
         /*  var doc = new jsPDF('landscape');
           doc.setFontSize(20);
@@ -242,31 +242,31 @@ export default class CompareVersion extends Component {
     exportCSV() {
         var csvRow = [];
         csvRow.push('"' + (i18n.t('static.supplyPlan.runDate') + ' : ' + moment(new Date()).format(`${DATE_FORMAT_CAP}`)).replaceAll(' ', '%20') + '"')
-        csvRow.push('')
+        // csvRow.push('')
         csvRow.push('"' + (i18n.t('static.supplyPlan.runTime') + ' : ' + moment(new Date()).format('hh:mm A')).replaceAll(' ', '%20') + '"')
-        csvRow.push('')
+        // csvRow.push('')
         csvRow.push('"' + (i18n.t('static.user.user') + ' : ' + AuthenticationService.getLoggedInUsername()).replaceAll(' ', '%20') + '"')
-        csvRow.push('')
+        // csvRow.push('')
         csvRow.push('"' + (this.props.datasetData.programCode).replaceAll(' ', '%20') + '"')
-        csvRow.push('')
-        csvRow.push('"' + (document.getElementById("datasetId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
-        csvRow.push('')
-        
+        // csvRow.push('')
+        csvRow.push('"' + (getLabelText(this.props.datasetData.label, this.state.lang)).replaceAll(' ', '%20') + '"')
+        // csvRow.push('')
 
-        csvRow.push('"' + (i18n.t('static.dashboard.programheader') + ' : ' + document.getElementById("datasetId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
-        csvRow.push('')
-        csvRow.push('"' + (i18n.t('static.report.version') + ' : ' + document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
-        csvRow.push('')
+
+        // csvRow.push('"' + (i18n.t('static.dashboard.programheader') + ' : ' + document.getElementById("datasetId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+        // csvRow.push('')
+        csvRow.push('"' + (i18n.t('static.report.versionFinal*') + ' : ' + document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+        // csvRow.push('')
         csvRow.push('"' + (i18n.t('static.common.forecastPeriod') + ' : ' + moment(this.props.datasetData.currentVersion.forecastStartDate).format(DATE_FORMAT_CAP_WITHOUT_DATE) + " - " + moment(this.props.datasetData.currentVersion.forecastStopDate).format(DATE_FORMAT_CAP_WITHOUT_DATE)).replaceAll(" ", '%20') + '"')
-        csvRow.push('')
+        // csvRow.push('')
         csvRow.push('"' + (i18n.t('static.common.note') + ' : ' + this.props.datasetData.currentVersion.notes).replaceAll(' ', '%20').replaceAll('#', '%23') + '"')
-        csvRow.push('')
+        // csvRow.push('')
         csvRow.push('"' + (i18n.t('static.compareVersion.compareWithVersion') + ' : ' + document.getElementById("versionId1").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
-        csvRow.push('')
+        // csvRow.push('')
         csvRow.push('"' + (i18n.t('static.common.forecastPeriod') + ' : ' + moment(this.props.datasetData1.currentVersion.forecastStartDate).format(DATE_FORMAT_CAP_WITHOUT_DATE) + " - " + moment(this.props.datasetData1.currentVersion.forecastStopDate).format(DATE_FORMAT_CAP_WITHOUT_DATE)).replaceAll(" ", '%20') + '"')
-        csvRow.push('')
+        // csvRow.push('')
         csvRow.push('"' + (i18n.t('static.common.note') + ' : ' + this.props.datasetData1.currentVersion.notes).replaceAll(' ', '%20').replaceAll('#', '%23') + '"')
-        csvRow.push('')
+        // csvRow.push('')
 
 
         csvRow.push('')
@@ -320,12 +320,21 @@ export default class CompareVersion extends Component {
         var datasetData = this.props.datasetData;// local working copy
         var datasetData1 = this.props.datasetData1;//server latest version
         var datasetData2 = this.props.datasetData2;// local downloaded data
-
-        var planningUnitList = (datasetData.planningUnitList).concat(datasetData1.planningUnitList).concat(datasetData2.planningUnitList).sort(function (a, b) {
-            a = getLabelText(a.planningUnit.label, this.state.lang).toLowerCase();
-            b = getLabelText(b.planningUnit.label, this.state.lang).toLowerCase();
-            return a < b ? -1 : a > b ? 1 : 0;
-        }.bind(this));
+        var page = this.props.page;
+        var planningUnitList = []
+        if (page != "compareVersion") {
+            planningUnitList = (datasetData.planningUnitList.filter(c => c.active.toString() == "true")).sort(function (a, b) {
+                a = getLabelText(a.planningUnit.label, this.state.lang).toLowerCase();
+                b = getLabelText(b.planningUnit.label, this.state.lang).toLowerCase();
+                return a < b ? -1 : a > b ? 1 : 0;
+            }.bind(this));
+        } else {
+            planningUnitList = (datasetData.planningUnitList).concat(datasetData1.planningUnitList).concat(datasetData2.planningUnitList).sort(function (a, b) {
+                a = getLabelText(a.planningUnit.label, this.state.lang).toLowerCase();
+                b = getLabelText(b.planningUnit.label, this.state.lang).toLowerCase();
+                return a < b ? -1 : a > b ? 1 : 0;
+            }.bind(this));
+        }
 
         var planningUnitSet = [...new Set(planningUnitList.map(ele => (ele.planningUnit.id)))]
         let dataArray = [];
@@ -335,12 +344,20 @@ export default class CompareVersion extends Component {
         var regionList = datasetData.regionList;
         var regionList1 = datasetData1.regionList;
         var regionList2 = datasetData2.regionList;
-
-        var combineRegionList = (regionList).concat(regionList1).concat(regionList2).sort(function (a, b) {
-            a = getLabelText(a.label, this.state.lang).toLowerCase();
-            b = getLabelText(b.label, this.state.lang).toLowerCase();
-            return a < b ? -1 : a > b ? 1 : 0;
-        }.bind(this));
+        var combineRegionList = [];
+        if (page != "compareVersion") {
+            combineRegionList = (regionList).sort(function (a, b) {
+                a = getLabelText(a.label, this.state.lang).toLowerCase();
+                b = getLabelText(b.label, this.state.lang).toLowerCase();
+                return a < b ? -1 : a > b ? 1 : 0;
+            }.bind(this));
+        } else {
+            combineRegionList = (regionList).concat(regionList1).concat(regionList2).sort(function (a, b) {
+                a = getLabelText(a.label, this.state.lang).toLowerCase();
+                b = getLabelText(b.label, this.state.lang).toLowerCase();
+                return a < b ? -1 : a > b ? 1 : 0;
+            }.bind(this));
+        }
 
         var regionSet = [...new Set(combineRegionList.map(ele => (ele.regionId)))]
         this.setState({
@@ -621,7 +638,7 @@ export default class CompareVersion extends Component {
                 {
                     title: "Forecast Qty",
                     type: 'text',
-                   
+
                 },
                 {
                     title: "Notes",
@@ -759,12 +776,12 @@ export default class CompareVersion extends Component {
                 }
             }
         }
-        else{
+        else {
             var asterisk = document.getElementsByClassName("resizable")[0];
             // var tr = asterisk.firstChild;
             var tr = asterisk.firstChild.nextSibling;
             console.log("asterisk", asterisk.firstChild.nextSibling)
-    
+
             tr.children[3].classList.add('InfoTr');
             tr.children[4].classList.add('InfoTr');
             tr.children[6].classList.add('InfoTr');

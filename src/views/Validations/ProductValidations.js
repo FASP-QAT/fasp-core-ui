@@ -11,7 +11,7 @@ import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
 import i18n from '../../i18n'
 import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
-import { DATE_FORMAT_CAP_WITHOUT_DATE, SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, JEXCEL_PRO_KEY, JEXCEL_PAGINATION_OPTION, JEXCEL_MONTH_PICKER_FORMAT, DATE_FORMAT_CAP, TITLE_FONT } from '../../Constants.js'
+import { DATE_FORMAT_CAP_WITHOUT_DATE, SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, JEXCEL_PRO_KEY, JEXCEL_PAGINATION_OPTION, JEXCEL_MONTH_PICKER_FORMAT, DATE_FORMAT_CAP, TITLE_FONT, ROUNDING_NUMBER } from '../../Constants.js'
 import moment from "moment";
 import pdfIcon from '../../assets/img/pdf.png';
 import csvicon from '../../assets/img/csv.png'
@@ -318,6 +318,24 @@ class ProductValidation extends Component {
         }
     }
 
+    round(value) {
+        console.log("Round input value---", value);
+        var result = (value - Math.floor(value)).toFixed(4);
+        console.log("Round result---", result);
+        console.log("Round condition---", `${ROUNDING_NUMBER}`);
+        if (result > `${ROUNDING_NUMBER}`) {
+            console.log("Round ceiling---", Math.ceil(value));
+            return Math.ceil(value);
+        } else {
+            console.log("Round floor---", Math.floor(value));
+            if (Math.floor(value) == 0) {
+                return Math.ceil(value);
+            } else {
+                return Math.floor(value);
+            }
+        }
+    }
+
     getData() {
         if (this.state.scenarioId > 0) {
             this.setState({
@@ -491,7 +509,7 @@ class ProductValidation extends Component {
                         console.log("finalData[i].nodeDataMap.puNode.refillMonths+++", finalData[i].nodeDataMap.puNode.refillMonths);
                         var puPerInterval = (((finalData[i].parentNodeNodeDataMap.fuNode.noOfForecastingUnitsPerPerson / noOfMonthsInUsagePeriod) / finalData[i].nodeDataMap.puNode.planningUnit.multiplier) / finalData[i].nodeDataMap.puNode.refillMonths);
                         console.log("puPerInterval###", puPerInterval);
-                        usageTextPU = i18n.t('static.tree.forEach') + " " + selectedText + " " + i18n.t('static.tree.weNeed') + " " + this.addCommas(puPerInterval) + " " + planningUnit + " " + i18n.t('static.usageTemplate.every') + " " + finalData[i].nodeDataMap.puNode.refillMonths + " " + i18n.t('static.report.month');
+                        usageTextPU = i18n.t('static.tree.forEach') + " " + selectedText + " " + i18n.t('static.tree.weNeed') + " " + this.addCommas(this.round(puPerInterval)) + " " + planningUnit + " " + i18n.t('static.usageTemplate.every') + " " + finalData[i].nodeDataMap.puNode.refillMonths + " " + i18n.t('static.report.month');
                     }
                     var currency = this.state.currencyList.filter(c => c.id == this.state.currencyId)[0];
                     var cost = 0;
@@ -510,11 +528,11 @@ class ProductValidation extends Component {
                             console.log("puPerInterval+++", puPerInterval)
                             console.log("REfill+++", finalData[i].nodeDataMap.puNode.refillMonths);
                             console.log("currency.conversionRateToUsd+++", currency.conversionRateToUsd)
-                            cost = ((puPerInterval * (12 / finalData[i].nodeDataMap.puNode.refillMonths)) * price) / currency.conversionRateToUsd;
-                            qty = (puPerInterval * (12 / finalData[i].nodeDataMap.puNode.refillMonths));
+                            cost = ((puPerInterval * (finalData[i].nodeDataMap.puNode.refillMonths)) * price) / currency.conversionRateToUsd;
+                            qty = (puPerInterval * (finalData[i].nodeDataMap.puNode.refillMonths));
                         } else {
-                            cost = ((12 / finalData[i].nodeDataMap.puNode.refillMonths) * puPerInterval * price) / currency.conversionRateToUsd;
-                            qty = (12 / finalData[i].nodeDataMap.puNode.refillMonths) * puPerInterval;
+                            cost = ((finalData[i].nodeDataMap.puNode.refillMonths) * puPerInterval * price) / currency.conversionRateToUsd;
+                            qty = (finalData[i].nodeDataMap.puNode.refillMonths) * puPerInterval;
                         }
                     }
                     totalCost += cost;
@@ -584,7 +602,7 @@ class ProductValidation extends Component {
                         type: 'text'
                     },
                     {
-                        title: i18n.t('static.report.qty'),
+                        title: i18n.t('static.report.qty')+"/"+i18n.t('static.common.person'),
                         type: 'numeric', mask: '#,##.00', decimal: '.'
                     },
                     {
@@ -592,7 +610,7 @@ class ProductValidation extends Component {
                         type: 'text'
                     },
                     {
-                        title: i18n.t('static.productValidation.cost'),
+                        title: i18n.t('static.productValidation.cost')+"/"+i18n.t("static.common.person"),
                         type: 'numeric', mask: '#,##.00', decimal: '.'
                     },
                     {

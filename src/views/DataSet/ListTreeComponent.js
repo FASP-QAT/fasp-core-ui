@@ -245,25 +245,27 @@ export default class ListTreeComponent extends Component {
         var json;
         var treeTemplate = this.state.treeTemplate;
         console.log("dataset Id template---", this.state.datasetIdModal);
-        var dataset = this.state.datasetList.filter(x => x.id == this.state.datasetIdModal)[0];
-        console.log("dataset---", dataset);
-        console.log("treeTemplate---", treeTemplate);
-        var puNodeList = treeTemplate.flatList.filter(x => x.payload.nodeType.id == 5);
-        console.log("puNodeList---", puNodeList);
-        console.log("planningUnitIdListTemplate---", puNodeList.map((x) => x.payload.nodeDataMap[0][0].puNode.planningUnit.id).join(', '));
-        var planningUnitList = dataset.programData.planningUnitList.filter(x => x.treeForecast == true);
-        console.log("planningUnitList---", planningUnitList);
-        console.log("planningUnitIdListPUSettings---", planningUnitList.map((x) => x.planningUnit.id).join(', '));
-        for (let i = 0; i < puNodeList.length; i++) {
-            console.log("pu Id---", puNodeList[i].payload.nodeDataMap[0][0].puNode.planningUnit.id);
-            if (planningUnitList.filter(x => x.planningUnit.id == puNodeList[i].payload.nodeDataMap[0][0].puNode.planningUnit.id).length == 0) {
-                var parentNodeData = treeTemplate.flatList.filter(x => x.id == puNodeList[i].parent)[0];
-                console.log("parentNodeData---", parentNodeData);
-                json = {
-                    tracerCategory: parentNodeData.payload.nodeDataMap[0][0].fuNode.forecastingUnit.tracerCategory,
-                    planningUnit: puNodeList[i].payload.nodeDataMap[0][0].puNode.planningUnit
-                };
-                missingPUList.push(json);
+        if (this.state.datasetIdModal != "" && this.state.datasetIdModal != null) {
+            var dataset = this.state.datasetList.filter(x => x.id == this.state.datasetIdModal)[0];
+            console.log("dataset---", dataset);
+            console.log("treeTemplate---", treeTemplate);
+            var puNodeList = treeTemplate.flatList.filter(x => x.payload.nodeType.id == 5);
+            console.log("puNodeList---", puNodeList);
+            console.log("planningUnitIdListTemplate---", puNodeList.map((x) => x.payload.nodeDataMap[0][0].puNode.planningUnit.id).join(', '));
+            var planningUnitList = dataset.programData.planningUnitList.filter(x => x.treeForecast == true && x.active == true);
+            console.log("planningUnitList---", planningUnitList);
+            console.log("planningUnitIdListPUSettings---", planningUnitList.map((x) => x.planningUnit.id).join(', '));
+            for (let i = 0; i < puNodeList.length; i++) {
+                console.log("pu Id---", puNodeList[i].payload.nodeDataMap[0][0].puNode.planningUnit.id);
+                if (planningUnitList.filter(x => x.planningUnit.id == puNodeList[i].payload.nodeDataMap[0][0].puNode.planningUnit.id).length == 0) {
+                    var parentNodeData = treeTemplate.flatList.filter(x => x.id == puNodeList[i].parent)[0];
+                    console.log("parentNodeData---", parentNodeData);
+                    json = {
+                        tracerCategory: parentNodeData.payload.nodeDataMap[0][0].fuNode.forecastingUnit.tracerCategory,
+                        planningUnit: puNodeList[i].payload.nodeDataMap[0][0].puNode.planningUnit
+                    };
+                    missingPUList.push(json);
+                }
             }
         }
         console.log("missingPUList---", missingPUList);
@@ -322,13 +324,14 @@ export default class ListTreeComponent extends Component {
                 if (this.state.realmCountryId != null && this.state.realmCountryId != "") {
                     regionList = myResult.filter(x => x.realmCountry.realmCountryId == this.state.realmCountryId);
                     console.log("filter if regionList---", regionList);
-                } else {
-                    regionList = myResult;
-                    this.setState({
-                        regionValues: []
-                    });
-                    console.log("filter else regionList---", regionList);
                 }
+                // else {
+                //     regionList = myResult;
+                //     this.setState({
+                //         regionValues: []
+                //     });
+                //     console.log("filter else regionList---", regionList);
+                // }
                 var regionMultiList = []
                 regionList.map(c => {
                     regionMultiList.push({ label: getLabelText(c.label, this.state.lang), value: c.regionId })
@@ -465,10 +468,10 @@ export default class ListTreeComponent extends Component {
                             var modeling = (flatList[i].payload.nodeDataMap[0][0].nodeDataModelingList)[j];
                             // var startMonthNoModeling = modeling.startDateNo < 0 ? modeling.startDateNo : parseInt(modeling.startDateNo - 1);
                             // var stopMonthNoModeling = modeling.stopDateNo < 0 ? modeling.stopDateNo : parseInt(modeling.stopDateNo - 1)
-                            var startMonthNoModeling = modeling.startDateNo < 0 ? modeling.startDateNo : parseInt(modeling.startDateNo);
+                            var startMonthNoModeling = modeling.startDateNo < 0 ? modeling.startDateNo : parseInt(modeling.startDateNo - 1);
                             console.log("startMonthNoModeling---", startMonthNoModeling);
                             modeling.startDate = moment(curMonth).startOf('month').add(startMonthNoModeling, 'months').format("YYYY-MM-DD");
-                            var stopMonthNoModeling = modeling.stopDateNo < 0 ? modeling.stopDateNo : parseInt(modeling.stopDateNo)
+                            var stopMonthNoModeling = modeling.stopDateNo < 0 ? modeling.stopDateNo : parseInt(modeling.stopDateNo - 1)
                             console.log("stopMonthNoModeling---", stopMonthNoModeling);
                             modeling.stopDate = moment(curMonth).startOf('month').add(stopMonthNoModeling, 'months').format("YYYY-MM-DD");
 
@@ -491,7 +494,7 @@ export default class ListTreeComponent extends Component {
                     tempJson = flatList[i].payload.nodeDataMap[0][0];
                     if (flatList[i].payload.nodeType.id != 1) {
                         console.log("month from tree template---", flatList[i].payload.nodeDataMap[0][0].monthNo + " cur month---", curMonth + " final result---", moment(curMonth).startOf('month').add(flatList[i].payload.nodeDataMap[0][0].monthNo, 'months').format("YYYY-MM-DD"))
-                        var monthNo = flatList[i].payload.nodeDataMap[0][0].monthNo < 0 ? flatList[i].payload.nodeDataMap[0][0].monthNo : parseInt(flatList[i].payload.nodeDataMap[0][0].monthNo)
+                        var monthNo = flatList[i].payload.nodeDataMap[0][0].monthNo < 0 ? flatList[i].payload.nodeDataMap[0][0].monthNo : parseInt(flatList[i].payload.nodeDataMap[0][0].monthNo - 1)
                         tempJson.month = moment(curMonth).startOf('month').add(monthNo, 'months').format("YYYY-MM-DD");
                     }
                     tempArray.push(tempJson);
@@ -532,6 +535,7 @@ export default class ListTreeComponent extends Component {
                     notes: '',
                     month: moment(program.programData.currentVersion.forecastStartDate).startOf('month').subtract(1, 'months').format("YYYY-MM-DD"),
                     dataValue: "0",
+                    extrapolation: false,
                     calculatedDataValue: '0',
                     displayDataValue: '',
                     nodeDataModelingList: [],
@@ -626,7 +630,6 @@ export default class ListTreeComponent extends Component {
                                 nodeUnit: {
                                     id: ''
                                 },
-                                extrapolation: false,
                                 nodeDataMap: nodeDataMap
                             },
                             parentItem: {
