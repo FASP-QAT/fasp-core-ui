@@ -11,7 +11,7 @@ import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
 import i18n from '../../i18n'
 import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
-import { DATE_FORMAT_CAP_WITHOUT_DATE, SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, JEXCEL_PRO_KEY, JEXCEL_PAGINATION_OPTION, JEXCEL_MONTH_PICKER_FORMAT } from '../../Constants.js'
+import { DATE_FORMAT_CAP_WITHOUT_DATE, SECRET_KEY, INDEXED_DB_VERSION, INDEXED_DB_NAME, JEXCEL_PRO_KEY, JEXCEL_PAGINATION_OPTION, JEXCEL_MONTH_PICKER_FORMAT, DATE_FORMAT_CAP } from '../../Constants.js'
 import moment from "moment";
 import pdfIcon from '../../assets/img/pdf.png';
 import csvicon from '../../assets/img/csv.png'
@@ -135,7 +135,7 @@ class CompareVersion extends Component {
             });
             var newVList = offlineVersionList.concat(onlineVersionList)
             for (var v = 0; v < newVList.length; v++) {
-                versionList.push(newVList[v].versionId)
+                versionList.push({ id: newVList[v].versionId, name: newVList[v].versionId.toString().includes("Local") ? newVList[v].versionId : (newVList[v].versionId + (newVList[v].versionType.id == 2 ? "*" : "") + " (" + moment(newVList[v].createdDate).format(`MMM DD YYYY`) + ")") })
             }
             var versionId = "";
             var event = {
@@ -144,9 +144,9 @@ class CompareVersion extends Component {
                 }
             };
             if (versionList.length == 1) {
-                versionId = versionList[0];
-                event.target.value = versionList[0];
-            } else if (localStorage.getItem("sesDatasetVersionId") != "" && versionList.filter(c => c == localStorage.getItem("sesDatasetVersionId")).length > 0) {
+                versionId = versionList[0].id;
+                event.target.value = versionList[0].id;
+            } else if (localStorage.getItem("sesDatasetVersionId") != "" && versionList.filter(c => c.id == localStorage.getItem("sesDatasetVersionId")).length > 0) {
                 versionId = localStorage.getItem("sesDatasetVersionId");
                 event.target.value = localStorage.getItem("sesDatasetVersionId");
             }
@@ -219,9 +219,9 @@ class CompareVersion extends Component {
             });
             var newVList = offlineVersionList.concat(onlineVersionList)
             for (var v = 0; v < newVList.length; v++) {
-                versionList.push(newVList[v].versionId)
+                versionList.push({ id: newVList[v].versionId, name: newVList[v].versionId.toString().includes("Local") ? newVList[v].versionId : (newVList[v].versionId + (newVList[v].versionType.id == 2 ? "*" : "") + " (" + moment(newVList[v].createdDate).format(`MMM DD YYYY`) + ")") })
             }
-            versionList = versionList.filter(c => c != this.state.versionId);
+            versionList = versionList.filter(c => c.id != this.state.versionId);
 
             var versionId1 = "";
             var event1 = {
@@ -230,9 +230,9 @@ class CompareVersion extends Component {
                 }
             };
             if (versionList.length == 1) {
-                versionId1 = versionList[0];
-                event1.target.value = versionList[0];
-            } else if (localStorage.getItem("sesDatasetCompareVersionId") != "" && versionList.filter(c => c == localStorage.getItem("sesDatasetCompareVersionId")).length > 0) {
+                versionId1 = versionList[0].id;
+                event1.target.value = versionList[0].id;
+            } else if (localStorage.getItem("sesDatasetCompareVersionId") != "" && versionList.filter(c => c.id == localStorage.getItem("sesDatasetCompareVersionId")).length > 0) {
                 versionId1 = localStorage.getItem("sesDatasetCompareVersionId");
                 event1.target.value = localStorage.getItem("sesDatasetCompareVersionId");
             }
@@ -551,8 +551,8 @@ class CompareVersion extends Component {
         let versions = versionList.length > 0
             && versionList.map((item, i) => {
                 return (
-                    <option key={i} value={item}>
-                        {item}
+                    <option key={i} value={item.id}>
+                        {item.name}
                     </option>
                 )
             }, this);
@@ -561,8 +561,8 @@ class CompareVersion extends Component {
         let versions1 = versionList1.length > 0
             && versionList1.map((item, i) => {
                 return (
-                    <option key={i} value={item}>
-                        {item}
+                    <option key={i} value={item.id}>
+                        {item.name}
                     </option>
                 )
             }, this);
@@ -614,8 +614,8 @@ class CompareVersion extends Component {
                                                 </InputGroup>
                                             </div>
                                         </FormGroup>
-                                        <FormGroup className="col-md-2">
-                                            <Label htmlFor="appendedInputButton">{i18n.t('static.report.version')}</Label>
+                                        <FormGroup className="col-md-3">
+                                            <Label htmlFor="appendedInputButton">{i18n.t('static.report.versionFinal*')}</Label>
                                             <div className="controls ">
                                                 <InputGroup>
                                                     <Input
@@ -673,7 +673,7 @@ class CompareVersion extends Component {
                                             </div>
                                         </FormGroup>}
 
-                                        <FormGroup className="col-md-2">
+                                        <FormGroup className="col-md-3">
                                             <Label htmlFor="appendedInputButton">{i18n.t('static.compareVersion.compareWithVersion')}</Label>
                                             <div className="controls ">
                                                 <InputGroup>
@@ -736,7 +736,7 @@ class CompareVersion extends Component {
                             <div style={{ display: !this.state.loading ? "block" : "none" }}>
                                 {(this.state.firstDataSet == 1 && this.state.secondDataSet == 1) &&
                                     <>
-                                        <CompareVersionTable ref="compareVersionTable" datasetData={this.state.datasetData} datasetData1={this.state.datasetData1} datasetData2={this.state.datasetData} page="compareVersion" versionLabel={"V" + this.state.versionId} versionLabel1={"V" + this.state.versionId1} updateState={this.updateState} />
+                                        <CompareVersionTable ref="compareVersionTable" datasetData={this.state.datasetData} datasetData1={this.state.datasetData1} datasetData2={this.state.datasetData} page="compareVersion" versionLabel={"V" + document.getElementById("versionId").selectedOptions[0].text} versionLabel1={"V" + document.getElementById("versionId1").selectedOptions[0].text} updateState={this.updateState} />
                                         <div className="table-responsive">
                                             <div id="tableDiv" className="compareVersion" />
                                         </div>

@@ -567,7 +567,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
             elInstance.setStyle(col, "background-color", "transparent");
             elInstance.setStyle(col, "background-color", "yellow");
             // elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
-            elInstance.setComments(col, "Please enter a positive number')");
+            elInstance.setComments(col, "Please enter a positive number)");
             valid = false;
           } else {
             var col = (colArr[x]).concat(parseInt(y) + 1);
@@ -1962,7 +1962,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         var colourCount = 0;
         datasetListForGraph.push({
           label: getLabelText(this.state.tempConsumptionUnitObject.consumptionDataType == 1 ? this.state.tempConsumptionUnitObject.planningUnit.forecastingUnit.label : this.state.tempConsumptionUnitObject.consumptionDataType == 2 ? this.state.tempConsumptionUnitObject.planningUnit.label : this.state.tempConsumptionUnitObject.otherUnit.label, this.state.lang),
-          data: this.state.planningUnitTotalList.filter(c => c.planningUnitId == this.state.selectedConsumptionUnitObject.planningUnit.id).map(item => (item.qty > 0 ? item.qty : null)),
+          data: this.state.planningUnitTotalList.filter(c => c.planningUnitId == this.state.selectedConsumptionUnitObject.planningUnit.id).map(item => (item.qty !== "" ? item.qty : null)),
           type: 'line',
           // stack: 1,
           backgroundColor: 'transparent',

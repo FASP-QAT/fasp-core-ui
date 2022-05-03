@@ -5,7 +5,7 @@ import {
     Card,
     CardBody,
     Col,
-    Table, FormGroup, Input, InputGroup, Label, Form
+    Table, FormGroup, Input, InputGroup,PopoverBody, Popover, Label, Form
 } from 'reactstrap';
 import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
 import i18n from '../../i18n'
@@ -43,6 +43,7 @@ class ModelingValidation extends Component {
         var dt = new Date();
         dt.setMonth(dt.getMonth() - 10);
         this.state = {
+            popoverOpenLevelFeild: false,
             datasetId: "",
             datasetList: [],
             lang: localStorage.getItem("lang"),
@@ -69,6 +70,7 @@ class ModelingValidation extends Component {
             monthList: [],
             show: false
         };
+        this.toggleLevelFeild = this.toggleLevelFeild.bind(this);
         this.setDatasetId = this.setDatasetId.bind(this);
         this.getOfflineDatasetList = this.getOfflineDatasetList.bind(this);
         this.getVersionList = this.getVersionList.bind(this);
@@ -120,6 +122,11 @@ class ModelingValidation extends Component {
         this.setState({
             show: !show
         })
+    }
+    toggleLevelFeild() {
+        this.setState({
+            popoverOpenLevelFeild: !this.state.popoverOpenLevelFeild,
+        });
     }
 
     setVersionId(e) {
@@ -1592,8 +1599,13 @@ class ModelingValidation extends Component {
                                                     </Picker>
                                                 </div>
                                             </FormGroup>
+                                            <div>
+                                            <Popover placement="top" isOpen={this.state.popoverOpenLevelFeild} target="Popover5" trigger="hover" toggle={this.toggleLevelFeild}>
+                                                <PopoverBody>Need to add info</PopoverBody>
+                                            </Popover>
+                                        </div>
                                             <FormGroup className="col-md-3">
-                                                <Label htmlFor="appendedInputButton">{i18n.t('static.common.level')}</Label>
+                                                <Label htmlFor="appendedInputButton">{i18n.t('static.common.level')}<i class="fa fa-info-circle icons pl-lg-2" id="Popover5" onClick={this.toggleLevelFeild} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                                 <div className="controls ">
                                                     <InputGroup>
                                                         <Input

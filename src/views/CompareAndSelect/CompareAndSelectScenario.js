@@ -193,7 +193,7 @@ class CompareAndSelectScenario extends Component {
             var colourArrayCount = 0;
             // var compareToConsumptionForecast = ["","","","22.7% above the highest consumption forecast.","7.9% below the lowest consumption forecast.","In between the highest and lowest consumption forecast."];
             var count = 0;
-            var consumptionExtrapolation = datasetJson.consumptionExtrapolation.filter(c => c.planningUnit.id == this.state.planningUnitId && c.extrapolationMethod.active);
+            var consumptionExtrapolation = datasetJson.consumptionExtrapolation.filter(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId && c.extrapolationMethod.active);
             for (var ce = 0; ce < consumptionExtrapolation.length; ce++) {
                 if (colourArrayCount > 10) {
                     colourArrayCount = 0;
@@ -203,9 +203,8 @@ class CompareAndSelectScenario extends Component {
             }
             for (var tl = 0; tl < treeList.length; tl++) {
                 var tree = treeList[tl];
-
-
-                var scenarioList = treeList[tl].scenarioList;
+                var regionList = tree.regionList.filter(c => c.id == this.state.regionId);
+                var scenarioList = regionList.length > 0 ? treeList[tl].scenarioList : [];
                 for (var sl = 0; sl < scenarioList.length; sl++) {
                     var flatList = tree.tree.flatList.filter(c => c.payload.nodeDataMap[scenarioList[sl].id][0].puNode != null && c.payload.nodeDataMap[scenarioList[sl].id][0].puNode.planningUnit.id == this.state.planningUnitId);
                     if (colourArrayCount > 10) {
@@ -624,39 +623,39 @@ class CompareAndSelectScenario extends Component {
         var csvRow = [];
 
         csvRow.push('"' + (i18n.t('static.supplyPlan.runDate') + ' : ' + moment(new Date()).format(`${DATE_FORMAT_CAP}`)).replaceAll(' ', '%20') + '"')
-        csvRow.push('')
+        // csvRow.push('')
         csvRow.push('"' + (i18n.t('static.supplyPlan.runTime') + ' : ' + moment(new Date()).format('hh:mm A')).replaceAll(' ', '%20') + '"')
-        csvRow.push('')
+        // csvRow.push('')
         csvRow.push('"' + (i18n.t('static.user.user') + ' : ' + AuthenticationService.getLoggedInUsername()).replaceAll(' ', '%20') + '"')
-        csvRow.push('')
+        // csvRow.push('')
         csvRow.push('"' + (document.getElementById("datasetId").selectedOptions[0].text.toString().split("~")[0] + " " + (document.getElementById("datasetId").selectedOptions[0].text.toString().split("~")[1])).replaceAll(' ', '%20') + '"')
-        csvRow.push('')
+        // csvRow.push('')
         csvRow.push('"' + (getLabelText(this.state.datasetJson.label, this.state.lang)).replaceAll(' ', '%20') + '"')
-        csvRow.push('')
+        // csvRow.push('')
 
-        csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + document.getElementById("datasetId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
-        csvRow.push('')
+        // csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + document.getElementById("datasetId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+        // csvRow.push('')
         csvRow.push('"' + (i18n.t('static.common.forecastPeriod') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ', '%20') + '"')
-        csvRow.push('')
+        // csvRow.push('')
         csvRow.push('"' + (i18n.t('static.program.region') + ' : ' + document.getElementById("regionId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
-        csvRow.push('')
+        // csvRow.push('')
         csvRow.push('"' + (i18n.t('static.report.planningUnit') + ' : ' + document.getElementById("planningUnitId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
-        csvRow.push('')
+        // csvRow.push('')
         csvRow.push(('"' + (i18n.t('static.compareAndSelect.yAxisIn') + ' : ' + (this.state.viewById == 1 ? i18n.t('static.report.planningUnit') : this.state.viewById == 2 ? i18n.t('static.dashboard.forecastingunit') : i18n.t('static.equivalancyUnit.equivalancyUnit')) + '"')).replaceAll(' ', '%20'))
-        csvRow.push('')
+        // csvRow.push('')
         if (this.state.viewById == 2) {
             csvRow.push('"' + (i18n.t('static.product.unit1') + ' : ' + document.getElementById("forecastingUnitId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
-            csvRow.push('')
+            // csvRow.push('')
         } else if (this.state.viewById == 3) {
             csvRow.push('"' + (i18n.t('static.equivalancyUnit.equivalancyUnit') + ' : ' + document.getElementById("equivalencyUnitId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
-            csvRow.push('')
+            // csvRow.push('')
         }
         csvRow.push('"' + (i18n.t('static.compareAndSelect.showOnlyForecastPeriod') + ' : ' + (this.state.showForecastPeriod == 1 ? i18n.t('static.dataEntry.True') : i18n.t('static.dataEntry.False'))).replaceAll(' ', '%20') + '"')
-        csvRow.push('')
+        // csvRow.push('')
 
         if (!this.state.showForecastPeriod) {
             csvRow.push('"' + (i18n.t('static.compareAndSelect.startMonthForGraph') + ' : ' + this.makeText(this.state.singleValue2.from) + ' ~ ' + this.makeText(this.state.singleValue2.to)).replaceAll(' ', '%20') + '"')
-            csvRow.push('')
+            // csvRow.push('')
         }
 
         csvRow.push('')
@@ -691,8 +690,8 @@ class CompareAndSelectScenario extends Component {
             ele.noOfMonths.toString().replaceAll(',', ' ').replaceAll(' ', '%20'),
             ele.compareToConsumptionForecast.toString().replaceAll(',', ' ').replaceAll(' ', '%20')])));
 
-        csvRow.push('')
-        csvRow.push('')
+        // csvRow.push('')
+        // csvRow.push('')
 
         headers = [];
         this.state.columns.filter(c => c.type != 'hidden').map((item, idx) => { headers[idx] = (item.title).replaceAll(' ', '%20') });
@@ -821,11 +820,12 @@ class CompareAndSelectScenario extends Component {
                     align: 'center'
                 })
                 if (i == 1) {
-                    doc.setFont('helvetica', 'normal')
-                    doc.setFontSize(8)
-                    doc.text(i18n.t('static.dashboard.programheader') + ' : ' + document.getElementById("datasetId").selectedOptions[0].text, doc.internal.pageSize.width / 20, 90, {
-                        align: 'left'
-                    })
+                    // doc.setFont('helvetica', 'normal')
+                    // doc.setFontSize(8)
+                    // doc.text(i18n.t('static.dashboard.programheader') + ' : ' + document.getElementById("datasetId").selectedOptions[0].text, doc.internal.pageSize.width / 20, 90, {
+                    //     align: 'left'
+                    // })
+
 
                 }
 
@@ -845,7 +845,7 @@ class CompareAndSelectScenario extends Component {
         doc.setTextColor("#002f6c");
 
 
-        var y = 110;
+        var y = 80;
         var planningText = doc.splitTextToSize(i18n.t('static.common.forecastPeriod') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to), doc.internal.pageSize.width * 3 / 4);
         // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
         for (var i = 0; i < planningText.length; i++) {
@@ -855,12 +855,12 @@ class CompareAndSelectScenario extends Component {
 
             }
             doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
-            y = y + 10;
+            y = y + 5;
         }
 
         planningText = doc.splitTextToSize(i18n.t('static.program.region') + ' : ' + document.getElementById("regionId").selectedOptions[0].text, doc.internal.pageSize.width * 3 / 4);
         // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
-        y = y + 10;
+        y = y + 5;
         for (var i = 0; i < planningText.length; i++) {
             if (y > doc.internal.pageSize.height - 100) {
                 doc.addPage();
@@ -868,12 +868,12 @@ class CompareAndSelectScenario extends Component {
 
             }
             doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
-            y = y + 10;
+            y = y + 5;
         }
 
         planningText = doc.splitTextToSize(i18n.t('static.report.planningUnit') + ' : ' + document.getElementById("planningUnitId").selectedOptions[0].text, doc.internal.pageSize.width * 3 / 4);
         // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
-        y = y + 10;
+        y = y + 5;
         for (var i = 0; i < planningText.length; i++) {
             if (y > doc.internal.pageSize.height - 100) {
                 doc.addPage();
@@ -881,12 +881,12 @@ class CompareAndSelectScenario extends Component {
 
             }
             doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
-            y = y + 10;
+            y = y + 5;
         }
 
         planningText = doc.splitTextToSize(i18n.t('static.compareAndSelect.yAxisIn') + ' : ' + (this.state.viewById == 1 ? i18n.t('static.report.planningUnit') : this.state.viewById == 2 ? i18n.t('static.dashboard.forecastingunit') : i18n.t('static.equivalancyUnit.equivalancyUnit')), doc.internal.pageSize.width * 3 / 4);
         // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
-        y = y + 10;
+        y = y + 5;
         for (var i = 0; i < planningText.length; i++) {
             if (y > doc.internal.pageSize.height - 100) {
                 doc.addPage();
@@ -894,13 +894,13 @@ class CompareAndSelectScenario extends Component {
 
             }
             doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
-            y = y + 10;
+            y = y + 5;
         }
 
         if (this.state.viewById == 2) {
             planningText = doc.splitTextToSize(i18n.t('static.product.unit1') + ' : ' + document.getElementById("forecastingUnitId").selectedOptions[0].text, doc.internal.pageSize.width * 3 / 4);
             // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
-            y = y + 10;
+            y = y + 5;
             for (var i = 0; i < planningText.length; i++) {
                 if (y > doc.internal.pageSize.height - 100) {
                     doc.addPage();
@@ -908,12 +908,12 @@ class CompareAndSelectScenario extends Component {
 
                 }
                 doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
-                y = y + 10;
+                y = y + 5;
             }
         } else if (this.state.viewById == 3 && document.getElementById("equivalancyUnitId") != null) {
             planningText = doc.splitTextToSize(i18n.t('static.equivalancyUnit.equivalancyUnit') + ' : ' + document.getElementById("equivalancyUnitId").selectedOptions[0].text, doc.internal.pageSize.width * 3 / 4);
             // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
-            y = y + 10;
+            y = y + 5;
             for (var i = 0; i < planningText.length; i++) {
                 if (y > doc.internal.pageSize.height - 100) {
                     doc.addPage();
@@ -921,13 +921,13 @@ class CompareAndSelectScenario extends Component {
 
                 }
                 doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
-                y = y + 10;
+                y = y + 5;
             }
         }
 
         planningText = doc.splitTextToSize(i18n.t('static.compareAndSelect.showOnlyForecastPeriod') + ' : ' + (this.state.showForecastPeriod == 1 ? i18n.t('static.dataEntry.True') : i18n.t('static.dataEntry.False')), doc.internal.pageSize.width * 3 / 4);
         // doc.text(doc.internal.pageSize.width / 8, 110, planningText)
-        y = y + 10;
+        y = y + 5;
         for (var i = 0; i < planningText.length; i++) {
             if (y > doc.internal.pageSize.height - 100) {
                 doc.addPage();
@@ -935,15 +935,15 @@ class CompareAndSelectScenario extends Component {
 
             }
             doc.text(doc.internal.pageSize.width / 20, y, planningText[i]);
-            y = y + 10;
+            y = y + 5;
         }
         if (!this.state.showForecastPeriod) {
-            y = y + 10;
+            y = y + 5;
             doc.text(i18n.t('static.compareAndSelect.startMonthForGraph') + ' : ' + this.makeText(this.state.singleValue2.from) + ' ~ ' + this.makeText(this.state.singleValue2.to), doc.internal.pageSize.width / 20, y, {
                 align: 'left'
             })
         }
-        y = y + 10;
+        y = y + 5;
 
 
 

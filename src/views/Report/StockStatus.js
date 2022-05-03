@@ -227,7 +227,7 @@ class StockStatus extends Component {
     csvRow.push('')
     csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
     csvRow.push('')
-    csvRow.push('"' + (i18n.t('static.report.version*') + ' : ' + document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+    csvRow.push('"' + (i18n.t('static.report.versionFinal*') + ' : ' + document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
     csvRow.push('')
     csvRow.push('"' + (i18n.t('static.planningunit.planningunit').replaceAll(' ', '%20') + ' : ' + document.getElementById("planningUnitId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
     csvRow.push('"' + (i18n.t('static.supplyPlan.minStockMos').replaceAll(' ', '%20') + ' : ' + this.state.stockStatusList[0].minMos + '"'))
@@ -3523,7 +3523,7 @@ class StockStatus extends Component {
                       </FormGroup>
 
                       <FormGroup className="col-md-3">
-                        <Label htmlFor="appendedInputButton">{i18n.t('static.report.version*')}</Label>
+                        <Label htmlFor="appendedInputButton">{i18n.t('static.report.versionFinal*')}</Label>
                         <div className="controls">
                           <InputGroup>
                             <Input
