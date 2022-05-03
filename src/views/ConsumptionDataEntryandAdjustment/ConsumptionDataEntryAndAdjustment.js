@@ -2288,7 +2288,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                       <br></br>
                       {this.state.showDetailTable &&
                         <div className="col-md-12">
-                          <div className="chart-wrapper">
+                          <div className="chart-wrapper chart-graph-report">
                             <Bar id="cool-canvas" data={bar} options={chartOptions} />
                             <div>
 
