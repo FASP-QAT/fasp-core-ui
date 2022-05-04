@@ -485,14 +485,15 @@ class ProductValidation extends Component {
                             var div = (convertToMonth * usageFrequency);
                             console.log("duv---", div);
                             if (div != 0) {
-                                noOfMonthsInUsagePeriod = 1 / (convertToMonth * usageFrequency);
+                                noOfMonthsInUsagePeriod = usageFrequency / convertToMonth;
                                 console.log("noOfMonthsInUsagePeriod---", noOfMonthsInUsagePeriod);
                             }
                         } else {
                             // var noOfFUPatient = this.state.noOfFUPatient;
                             var noOfFUPatient;
                             noOfFUPatient = (finalData[i].parentNodeNodeDataMap.fuNode.noOfForecastingUnitsPerPerson / finalData[i].parentNodeNodeDataMap.fuNode.noOfPersons);
-                            noOfMonthsInUsagePeriod = convertToMonth * usageFrequency * noOfFUPatient;
+                            // noOfMonthsInUsagePeriod = convertToMonth * usageFrequency * noOfFUPatient;
+                            noOfMonthsInUsagePeriod = finalData[i].parentNodeNodeDataMap.fuNode.oneTimeUsage != "true" ? convertToMonth * usageFrequency * noOfFUPatient : noOfFUPatient;
                         }
                     }
                     if (finalData[i].parentNodeNodeDataMap.fuNode.usageType.id == 1) {
@@ -518,23 +519,23 @@ class ProductValidation extends Component {
                     if (selectedPlanningUnit.length > 0) {
                         price = Number(selectedPlanningUnit[0].price);
                     }
-                    var qty = "";
+                    var qty = Number(finalData[i].nodeDataMap.puNode.puPerVisit);
 
-                    if (finalData[i].parentNodeNodeDataMap.fuNode.usageType.id == 1) {
-                        cost = (sharePu * price) / currency.conversionRateToUsd;
-                        qty = sharePu;
-                    } else {
-                        if (finalData[i].nodeDataMap.puNode.sharePlanningUnit == "true") {
-                            console.log("puPerInterval+++", puPerInterval)
-                            console.log("REfill+++", finalData[i].nodeDataMap.puNode.refillMonths);
-                            console.log("currency.conversionRateToUsd+++", currency.conversionRateToUsd)
-                            cost = ((puPerInterval * (finalData[i].nodeDataMap.puNode.refillMonths)) * price) / currency.conversionRateToUsd;
-                            qty = (puPerInterval * (finalData[i].nodeDataMap.puNode.refillMonths));
-                        } else {
-                            cost = ((finalData[i].nodeDataMap.puNode.refillMonths) * puPerInterval * price) / currency.conversionRateToUsd;
-                            qty = (finalData[i].nodeDataMap.puNode.refillMonths) * puPerInterval;
-                        }
-                    }
+                    // if (finalData[i].parentNodeNodeDataMap.fuNode.usageType.id == 1) {
+                    //     cost = (sharePu * price) / currency.conversionRateToUsd;
+                    //     qty = sharePu;
+                    // } else {
+                    //     if (finalData[i].nodeDataMap.puNode.sharePlanningUnit == "true") {
+                    //         console.log("puPerInterval+++", puPerInterval)
+                    //         console.log("REfill+++", finalData[i].nodeDataMap.puNode.refillMonths);
+                    //         console.log("currency.conversionRateToUsd+++", currency.conversionRateToUsd)
+                            cost = (Number(qty) * price) / currency.conversionRateToUsd;
+                    //         qty = (puPerInterval * (finalData[i].nodeDataMap.puNode.refillMonths));
+                    //     } else {
+                    //         cost = ((finalData[i].nodeDataMap.puNode.refillMonths) * puPerInterval * price) / currency.conversionRateToUsd;
+                    //         qty = (finalData[i].nodeDataMap.puNode.refillMonths) * puPerInterval;
+                    //     }
+                    // }
                     totalCost += cost;
                 }
                 console.log("selectedPlanningUnit@@@", selectedPlanningUnit);
