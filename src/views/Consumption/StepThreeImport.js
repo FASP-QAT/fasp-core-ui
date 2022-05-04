@@ -196,8 +196,12 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                         for (var i = 0; i < tableJson.length; i++) {
                             var map1 = new Map(Object.entries(tableJson[i]));
 
-                            let selectedPlanningUnitObj = this.props.items.planningUnitList.filter(c => c.planningUnitId == map1.get("1"))[0];
-                            var forecastingUnitObj = selectedPlanningUnitObj.forecastingUnit;
+                            let selectedPlanningUnitObj = this.props.items.planningUnitList.filter(c => c.planningUnit.id == map1.get("1"))[0];
+                            console.log("selectedPlanningUnitObj!!!!", selectedPlanningUnitObj);
+
+                            var forecastingUnitObj = selectedPlanningUnitObj.planningUnit;
+                            console.log("selectedPlanningUnitObj!!!!", forecastingUnitObj)
+
                             forecastingUnitObj.multiplier = map1.get("5");
                             if (map1.get("9") == 0 && map1.get("8") == true) { //not pink
                                 // let tempJson = {
@@ -244,21 +248,21 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                                 let tempJson = {
                                     "actualConsumptionId": null,
                                     "planningUnit": {
-                                        "id": selectedPlanningUnitObj.planningUnitId,
-                                        "label": selectedPlanningUnitObj.label,
+                                        "id": forecastingUnitObj.id,
+                                        "label": forecastingUnitObj.label,
                                         "forecastingUnit": {
-                                            "id": forecastingUnitObj.forecastingUnitId,
-                                            "label": forecastingUnitObj.label,
+                                            "id": forecastingUnitObj.forecastingUnit.id,
+                                            "label": forecastingUnitObj.forecastingUnit.label,
                                             "productCategory": {
-                                                "id": forecastingUnitObj.productCategory.id,
-                                                "label": forecastingUnitObj.productCategory.label,
-                                                "idString": '' + forecastingUnitObj.productCategory.id
+                                                "id": forecastingUnitObj.forecastingUnit.productCategory.id,
+                                                "label": forecastingUnitObj.forecastingUnit.productCategory.label,
+                                                "idString": '' + forecastingUnitObj.forecastingUnit.productCategory.id
                                             },
-                                            "idString": '' + forecastingUnitObj.forecastingUnitId
+                                            "idString": '' + forecastingUnitObj.forecastingUnit.id
                                         },
-                                        "idString": '' + selectedPlanningUnitObj.planningUnitId,
+                                        "idString": '' + forecastingUnitObj.id,
                                     },
-                                    "puMultiplier": selectedPlanningUnitObj.multiplier,
+                                    "puMultiplier": forecastingUnitObj.multiplier,
                                     "region": {
                                         "id": map1.get("10"),
                                         "label": regionObj.label,
