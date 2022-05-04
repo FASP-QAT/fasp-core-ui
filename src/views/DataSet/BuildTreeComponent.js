@@ -1233,7 +1233,7 @@ export default class BuildTree extends Component {
         programData.treeList = treeData;
         dataSetObj.programData = programData;
         console.log("dataSetDecrypt>>>", dataSetObj);
-        calculateModelingData(dataSetObj, this, '', (nodeId != 0 ? nodeId : this.state.currentItemConfig.context.id), this.state.selectedScenario, type, this.state.treeId, false);
+        calculateModelingData(dataSetObj, this, '', (nodeId != 0 ? nodeId : this.state.currentItemConfig.context.id), this.state.selectedScenario, type, this.state.treeId, false,false);
         // }
     }
     fetchTracerCategoryList(programData) {
@@ -1407,7 +1407,11 @@ export default class BuildTree extends Component {
     //     )
 
     //     };
-
+    toggleShowGuidance() {
+        this.setState({
+            showGuidance: !this.state.showGuidance
+        })
+    }
     toggleDeropdownSetting(i) {
         const newArray = this.state.dropdownOpen.map((element, index) => { return (index === i ? !element : false); });
         this.setState({
@@ -1741,6 +1745,7 @@ export default class BuildTree extends Component {
                     var datasetDetailsTransaction = detailTransaction.objectStore('datasetDetails');
                     console.log("this.props.match.params.programId---", this.state.programId);
                     var datasetDetailsRequest = datasetDetailsTransaction.get(this.state.programId);
+                    console.log("datasetDetailsRequest----", datasetDetailsRequest);
                     datasetDetailsRequest.onsuccess = function (e) {
                         console.log("all good >>>>");
                         console.log("Data update success");
@@ -2155,7 +2160,7 @@ export default class BuildTree extends Component {
                     // dataSetObjCopy.programData = programData;
                     // dataSetObj.programData = programData;
                     console.log("dataSetDecrypt>>>", programData);
-                    calculateModelingData(dataSetObjCopy, this, '', currentItemConfig.context.id, this.state.selectedScenario, 1, this.state.treeId, false);
+                    calculateModelingData(dataSetObjCopy, this, '', currentItemConfig.context.id, this.state.selectedScenario, 1, this.state.treeId, false,false);
                     // store update object in indexdb
                     //     var db1;
                     //     getDatabase();
@@ -2794,22 +2799,22 @@ export default class BuildTree extends Component {
         // const newArray = this.state.activeTab1.slice()
         currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].extrapolation = e.target.checked == true ? true : false;
         if (e.target.checked) {
-            console.log("extrapolate outside",currentItemConfig);
+            console.log("extrapolate outside", currentItemConfig);
             if (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].calculatedDataValue == "" || currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].calculatedDataValue == null || currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].calculatedDataValue == "0") {
                 currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].calculatedDataValue = "0";
                 currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].dataValue = "0";
-                console.log("extrapolate inside",currentItemConfig);
+                console.log("extrapolate inside", currentItemConfig);
             }
         }
         console.log("this.state.activeTab1---", currentItemConfig);
 
         this.setState({
             currentItemConfig,
-            currentScenario : currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0],
+            currentScenario: currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0],
             activeTab1: e.target.checked == true ? new Array(2).fill('3') : new Array(2).fill('2')
         }, () => {
-            console.log("extrapolate current item config---",this.state.currentItemConfig);
-            console.log("extrapolate current scenario---",this.state.currentScenario);
+            console.log("extrapolate current item config---", this.state.currentItemConfig);
+            console.log("extrapolate current scenario---", this.state.currentScenario);
             if (this.state.activeTab1[0] == '3') {
                 if (this.state.modelingEl != "") {
                     this.state.modelingEl.destroy();
@@ -3457,7 +3462,7 @@ export default class BuildTree extends Component {
                 if (this.state.realmCountryId != null && this.state.realmCountryId != "") {
                     regionList = myResult.filter(x => x.realmCountry.realmCountryId == this.state.realmCountryId);
                     console.log("filter if regionList---", regionList);
-                } 
+                }
                 else {
                     // regionList = myResult;
                     this.setState({
@@ -6210,10 +6215,12 @@ export default class BuildTree extends Component {
     }
 
     componentDidMount() {
+        
         this.setState({
             treeId: this.props.match.params.treeId,
             templateId: this.props.match.params.templateId
         }, () => {
+            console.log("on mount ---",this.state.programId);
             this.getUsagePeriodList();
             this.getTreeList();
             this.getForecastMethodList();
@@ -10207,6 +10214,9 @@ export default class BuildTree extends Component {
                     <Card className="mb-lg-0">
                         <div className="pb-lg-0">
                             <div className="Card-header-reporticon pb-1" style={{ display: 'grid', float: 'right' }}>
+                            <a style={{marginLeft:'106px'}}>
+                                <span style={{ cursor: 'pointer' }} onClick={() => { this.toggleShowGuidance() }}><small className="supplyplanformulas">{i18n.t('static.common.showGuidance')}</small></span>
+                            </a>
                                 {/* <span className="compareAndSelect-larrow"> <i className="cui-arrow-left icons " > </i></span> */}
                                 {/* <span className="compareAndSelect-rarrow"> <i className="cui-arrow-right icons " > </i></span> */}
                                 <span className="compareAndSelect-larrowText"> {i18n.t('static.common.continueTo')} <a href="/#/validation/modelingValidation" className="supplyplanformulas">{i18n.t('static.dashboard.modelingValidation')}</a>  <span className="compareAndSelect-rarrow"> <i className="cui-arrow-right icons " > </i></span></span>
@@ -10756,6 +10766,148 @@ export default class BuildTree extends Component {
                         </CardBody>
 
                     </Card></Col></Row>
+                    <Modal isOpen={this.state.showGuidance}
+                    className={'modal-lg ' + this.props.className} >
+                    <ModalHeader toggle={() => this.toggleShowGuidance()} className="ModalHead modal-info-Headher">
+                        <strong className="TextWhite">Show Guidance</strong>
+                    </ModalHeader>
+                    <div>
+                        <ModalBody>
+                           <div>
+                               <h3 className='ShowGuidanceHeading'>Manage Tree – Tree list</h3>
+                           </div>
+                            <p>
+                                <p style={{fontSize:'14px'}}><span className="UnderLineText">Purpose :</span>Enable users to manage and build forecast tree and scenarios, for any non-consumption forecasts (demographic, morbidity, services, etc). Note that more guidance is available after clicking into any specific node.</p>
+                           </p>
+                            <p>
+                                <p style={{fontSize:'14px'}}><span className="UnderLineText">Using this screen :</span><br></br>
+                               <span style={{fontWeight:'bold'}}>Manage the Tree:</span> Click on the gear icon <i class="fa fa-cog" aria-hidden="true"></i> to show and edit or hide the forecast method, tree name, and region.
+                                </p>
+                                <p><span style={{fontWeight:'bold',fontSize:'14px'}}>Building the Tree:</span> The forecast tree is built from the top down, using different types of “nodes”.  See the Node Types and Node Actions below. Each forecast tree must include one or more Planning Unit Nodes, which form the forecast output, for that tree to be available in the 'Compare and Select' screen. Each Planning Unit Node must stem from a Forecasting Unit Node. </p>
+                                
+                            </p>
+                            <p>
+                                <p style={{fontSize:'14px',fontWeight:'bold'}}><span className="">Node Actions :</span></p>
+                               
+                                <ul className='pl-lg-4'>
+                                    <li><i class="fa fa-trash-o" aria-hidden="true" style={{color:'#002f6c'}}></i> Delete: Deletes the selected node</li>
+                                    <li><i class="fa fa-clone" aria-hidden="true" style={{color:'#002f6c'}}></i> Duplicate: Duplicates the selected node under the same parent</li>
+                                    <li><i class="fa fa-plus-square-o" aria-hidden="true" style={{color:'#002f6c'}}></i> Add: Adds a child to the selected node.</li>
+                                   
+                                </ul>
+                               
+                            </p>
+                            <p>
+                            <p style={{fontSize:'14px',fontWeight:'bold'}}><span className="">Node Type :</span></p>
+                            <div className='pl-lg-4 pr-lg-4'>
+                            <table className="table table-bordered ">
+                                <thead>
+                                <tr>
+                                    <th style={{width:'130px'}}>Node Type</th>
+                                    <th>Value</th>
+                                    <th>Potential Children</th>
+                                    <th>Advanced Functionality</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td className='BgLightBlue'><b>Aggregation ∑</b></td>
+                                    <td>Sum of children</td>
+                                    <td><b style={{color:'#002f6c'}}>∑</b> or Number</td>
+                                    <td>-</td>
+                                </tr>
+                                <tr>
+                                    <td className='BgLightBlue'><b>Number #</b></td>
+                                    <td>Defined at this node</td>
+                                    <td>% or <b style={{background: '#002f6c',color: '#fff',padding: '3px'}}><i class="fa fa-cube" aria-hidden="true"></i></b></td>
+                                    <td><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i>,<i className='fa fa-link'></i>, <i className='fa fa-line-chart'></i></td>
+                                </tr>
+                                <tr>
+                                    <td className='BgLightBlue'><b>Percentage %</b></td>
+                                    <td>Defined as a percentage of the parent</td>
+                                    <td>% or <b style={{background: '#002f6c',color: '#fff',padding: '3px'}}><i class="fa fa-cube" aria-hidden="true"></i></b></td>
+                                    <td><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i>,<i className='fa fa-link'></i></td>
+                                </tr>
+                                <tr>
+                                    <td className='BgDarkBlue'><b>Forecasting Unit <i class="fa fa-cube" aria-hidden="true"></i></b></td>
+                                    <td>Defined as a percentage of the parent and forecasting unit parameters</td>
+                                    <td><b style={{background: '#002f6c',color: '#fff',padding: '3px'}}><i class="fa fa-cubes" aria-hidden="true"></i></b></td>
+                                    <td><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i>,<i className='fa fa-link'></i></td>
+                                </tr>
+                                <tr>
+                                    <td className='BgDarkBlue'><b>Planning Unit <i class="fa fa-cubes" aria-hidden="true"></i></b></td>
+                                    <td>Defined as a percentage of the parent and planning unit parameters</td>
+                                    <td>-</td>
+                                    <td><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i>,<i className='fa fa-link'></i></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                            </div>
+                             </p>
+                            
+                             <p><span  style={{fontSize:'14px',fontWeight:'bold'}}>Changes Over Time</span><br></br>
+                             While the tree structure stays constant throughout time, node percentages and values can change over time. Use the date dropdown to view the tree at any month. The three functionalities below are available in each node and allow the user to control how nodes change over time:
+                             <ul>
+                                 <li><b><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i> Modeling:</b> Allows user to specify the exact rate of change</li>
+                                 <li><b><i className='fa fa-link'></i> Transfer:</b> Allows users to link two nodes together – so the decrease from the source node is linked to the increase of the destination node. Useful for transitions.</li>
+                                 <li><b><i className='fa fa-line-chart'></i> Extrapolation:</b> Allows users to use historical data to extrapolate future change</li>
+                             </ul>
+                             </p>
+                            
+                             <p><span  style={{fontSize:'14px',fontWeight:'bold'}}>Using Scenarios :</span><br></br>
+                             Scenarios are used to model different values for the same tree. To add, edit or delete a scenario, use the <i class="fa fa-cog" aria-hidden="true"></i> icon next to the scenario dropdown. Use the scenario dropdown to select which scenario to view and edit.
+                             <div className='pl-lg-4 pr-lg-4 pt-lg-4'>
+                            <table className="table table-bordered ">
+                            <thead>
+                                <tr>
+                                    <th style={{width:'130px'}}>Fixed for All Scenarios</th>
+                                    <th style={{width:'230px'}}>Unique to each Scenario</th>
+                                   
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td>Tree structure</td>
+                                    <td>Node value</td>
+                                   
+                                  
+                                </tr>
+                                <tr>
+                                <td>Node Title</td>
+                                <td>Month</td>
+                                
+                                  
+                                </tr>
+                                <tr>
+                                <td>Node Type</td>
+                                <td>Notes</td>
+                                </tr>
+                                <tr>
+                                <td></td>
+                                <td>Modeling/Transfer/Extrapolation</td>
+                                </tr>
+                                </tbody>
+                                </table>
+                                </div>
+                             </p>
+                             <p><span  style={{fontSize:'14px'}} classNames="UnderLineText">Tips for specific use cases:</span>
+                             <ul>
+                                 <li><b> Forecasting Node Type :</b> Select "discrete" if this product will be used for limited time, and "continuous" if it will be used indefinitely.</li>
+                                 <li><b> Delayed or phased product usage?</b> Sometimes, the product consumption is delayed in relation the other higher levels of the tree. In the relevant 
+                                 <b>Forecasting Unit </b>node, use the <b>Lag</b> field to indicate this delay.
+                                 <ul>
+                                     <li>For example, if the product usage will begin 2 months after the parent node dates, enter "2" in this field.  </li>
+                                     <li>This field can also be used where the product switches over time for example, if forecasting units A, B, and C are used in secession for two months at a time, you can set up your tree with Forecasting Unit A (discrete for 2 months, lag=0), Forecasting Unit B (discrete for 2 months, lag=2), Forecasting Unit C (discrete for 2 months, lag = 4).</li>
+                                 </ul>
+                                 </li>
+                                 <li><b> Multi-month Consumption Patterns?</b> How often is the product actually "consumed"? is it monthly or every three months? Consumption can be defined at different levels depending on your supply chain. In the <b>Planning Unit Node</b>, use the <b>Consumption Interval</b> field to indicate. For example, if the end user uses a product daily, but only picks up or buys the product every 2 months, enter "2" in the Consumption Interval field to account for a multi-month consumption pattern.  Note that this is only available for Continuous nodes, as product is assumed to be “consumed” at the beginning of the usage period.</li>
+                                 <li><b>Repeating Forecasting Usages?</b> If multiple Forecasting Unit nodes share the same settings, consider using the <a href='/#/usageTemplate/listUsageTemplate'>Usage Template </a>screen to save your common usages, and then using the “Copy from Template”  field to populate the  fields in the forecasting unit nodes. </li>
+                             </ul>
+                             </p>
+                        </ModalBody>
+                    </div>
+                </Modal> 
+
             {/* tree fields Modal start------------------- */}
             <Draggable handle=".modal-title">
                 <Modal isOpen={this.state.openTreeDataModal}

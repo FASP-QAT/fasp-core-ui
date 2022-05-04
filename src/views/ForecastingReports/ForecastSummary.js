@@ -3287,26 +3287,26 @@ class ForecastSummary extends Component {
                                                                     <th className="BorderNoneSupplyPlan sticky-col first-col clone1"></th>
                                                                     {/* <th className="text-center" style={{}}> Forecasting Unit </th> */}
                                                                     <th className="text-center ForecastSumarydWidth sticky-col first-col clone" style={{ minWidth: '200px' }}>{i18n.t('static.product.product')}</th>
-                                                                    <th className="text-center" title="Need to add info" style={{ minWidth: '120px' }}>{'Total Forecasted Quantity'} <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
+                                                                    <th className="text-center" title={i18n.t('static.Tooltip.TotalForecastedQuantity')} style={{ minWidth: '120px' }}>{'Total Forecasted Quantity'} <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
                                                                     {!this.state.hideColumn &&
                                                                         <>
-                                                                            <th className="text-center" title="Need to add info" style={{ minWidth: '120px' }}>{i18n.t('static.report.stock')} <span className="FontWeightNormal">{i18n.t('static.forecastReport.endOf')} {this.state.beforeEndDateDisplay})</span> <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
-                                                                            <th className="text-center" title="Need to add info" style={{ minWidth: '120px' }}>{i18n.t('static.forecastReport.existingShipments')} <span className="FontWeightNormal">({this.state.startDateDisplay + ' - ' + this.state.endDateDisplay})</span> <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
+                                                                            <th className="text-center" title={i18n.t('static.Tooltip.StockEndOfDec')} style={{ minWidth: '120px' }}>{i18n.t('static.report.stock')} <span className="FontWeightNormal">{i18n.t('static.forecastReport.endOf')} {this.state.beforeEndDateDisplay})</span> <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
+                                                                            <th className="text-center" title={i18n.t('static.Tooltip.ExistingShipments')} style={{ minWidth: '120px' }}>{i18n.t('static.forecastReport.existingShipments')} <span className="FontWeightNormal">({this.state.startDateDisplay + ' - ' + this.state.endDateDisplay})</span> <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
                                                                             {/* <th className="text-center" title={(i18n.t('static.report.stock') + ' ' + i18n.t('static.forecastReport.endOf') + ' ' + this.state.beforeEndDateDisplay) + ' + ' + (i18n.t('static.forecastReport.existingShipments') + '( ' + this.state.startDateDisplay + ' - ' + this.state.endDateDisplay + ' )') + ' - ' + (i18n.t('static.forecastReport.totalForecastQuantity'))} style={{ width: '8%' }}>{i18n.t('static.report.stock')} <span className="FontWeightNormal">{i18n.t('static.forecastReport.endOf')} {this.state.endDateDisplay})</span> <i className="fa fa-info-circle icons ToltipInfoicon"></i></th> */}
                                                                             <th className="text-center" style={{ minWidth: '120px' }} title={(i18n.t('static.report.stock') + ' ' + i18n.t('static.forecastReport.endOf') + ' ' + this.state.beforeEndDateDisplay) + ' + ' + (i18n.t('static.forecastReport.existingShipments') + '( ' + this.state.startDateDisplay + ' - ' + this.state.endDateDisplay + ' )') + ' - ' + (i18n.t('static.forecastReport.totalForecastQuantity'))} >{'Stock or Unmet Demand'} <span className="FontWeightNormal">{i18n.t('static.forecastReport.endOf')} {this.state.endDateDisplay})</span> <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
-                                                                            <th className="text-center" title="Need to add info" style={{ minWidth: '120px' }}>{i18n.t('static.forecastReport.desiredMonthsOfStock')} <span className="FontWeightNormal">{i18n.t('static.forecastReport.endOf')} {this.state.endDateDisplay})</span> <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
+                                                                            <th className="text-center" title={i18n.t('static.Tooltip.desiredMonthsOfStock')} style={{ minWidth: '120px' }}>{i18n.t('static.forecastReport.desiredMonthsOfStock')} <span className="FontWeightNormal">{i18n.t('static.forecastReport.endOf')} {this.state.endDateDisplay})</span> <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
                                                                             <th className="text-center" style={{ minWidth: '120px' }} title={(i18n.t('static.forecastReport.desiredMonthsOfStock') + ' ' + i18n.t('static.forecastReport.endOf') + ' ' + this.state.endDateDisplay) + ') * ' + i18n.t('static.forecastReport.totalForecastQuantity') + ' / ' + 'Difference between months'} >{i18n.t('static.forecastReport.desiredStock')} <span className="FontWeightNormal">{i18n.t('static.forecastReport.endOf')} {this.state.endDateDisplay})</span> <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
                                                                         </>
                                                                     }
                                                                     <th className="text-center" style={{ minWidth: '120px' }} title={i18n.t('static.report.stock') + ' ' + i18n.t('static.forecastReport.endOf') + ' ' + this.state.endDateDisplay + ') - ' + i18n.t('static.forecastReport.desiredStock') + ' ' + i18n.t('static.forecastReport.endOf') + ' ' + this.state.endDateDisplay + ')'} >{i18n.t('static.forecastReport.procurementSurplus')} <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
                                                                     {!this.state.hideColumn &&
                                                                         <>
-                                                                            <th className="text-center" title="Need to add info" style={{ minWidth: '120px' }}>{i18n.t('static.forecastReport.priceType')} <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
-                                                                            <th className="text-center" title="Need to add info" style={{ minWidth: '120px' }}>{i18n.t('static.forecastReport.unitPrice')} <span className="FontWeightNormal">(USD)</span> <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
+                                                                            <th className="text-center" title={i18n.t('static.Tooltip.forecastReportpriceType')} style={{ minWidth: '120px' }}>{i18n.t('static.forecastReport.priceType')} <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
+                                                                            <th className="text-center" title={i18n.t('static.Tooltip.forecastReportUnitPrice')} style={{ minWidth: '120px' }}>{i18n.t('static.forecastReport.unitPrice')} <span className="FontWeightNormal">(USD)</span> <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
                                                                         </>
                                                                     }
-                                                                    <th className="text-center" title="Need to add info" style={{ minWidth: '120px' }}>{i18n.t('static.forecastReport.ProcurementsNeeded')} <span className="FontWeightNormal">(USD)</span> <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
-                                                                    <th className="text-center" title="Need to add info" style={{ minWidth: '140px' }}>{i18n.t('static.program.notes')} <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
+                                                                    <th className="text-center" title={i18n.t('static.Tooltip.ProcurementsNeeded')} style={{ minWidth: '120px' }}>{i18n.t('static.forecastReport.ProcurementsNeeded')} <span className="FontWeightNormal">(USD)</span> <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
+                                                                    <th className="text-center"  style={{ minWidth: '140px' }}>{i18n.t('static.program.notes')} </th>
 
                                                                 </tr>
                                                             </thead>
@@ -3403,7 +3403,7 @@ class ForecastSummary extends Component {
                                                                         <td style={{ border: 'none' }}></td>
                                                                         <td><b>{i18n.t('static.forecastReport.productCost')}</b></td>
                                                                         <td><b>{'$ ' + (this.state.totalProductCost).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</b></td>
-                                                                        <td></td>
+                                                                        <td style={{ border: 'none' }}></td>
                                                                     </tr>
                                                                     <tr>
                                                                         <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
@@ -3419,7 +3419,7 @@ class ForecastSummary extends Component {
                                                                         <td style={{ border: 'none' }}></td>
                                                                         <td><b>{i18n.t('static.forecastReport.freight')} ({this.state.freightPerc}%)</b></td>
                                                                         <td><b>{'$ ' + (((this.state.freightPerc / 100) * this.state.totalProductCost).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</b></td>
-                                                                        <td></td>
+                                                                        <td style={{ border: 'none' }}></td>
                                                                     </tr>
                                                                     <tr>
                                                                         <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
@@ -3435,7 +3435,7 @@ class ForecastSummary extends Component {
                                                                         <td style={{ border: 'none' }}></td>
                                                                         <td><b>{i18n.t('static.shipment.totalCost')}</b></td>
                                                                         <td><b>{'$ ' + (parseFloat(parseFloat(this.state.totalProductCost) + parseFloat((this.state.freightPerc / 100) * this.state.totalProductCost)).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</b></td>
-                                                                        <td></td>
+                                                                        <td style={{ border: 'none' }}></td>
                                                                     </tr>
                                                                 </tfoot>
                                                             }
