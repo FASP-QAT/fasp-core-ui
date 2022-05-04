@@ -301,7 +301,7 @@ export default class ListTreeComponent extends Component {
                 data = [];
                 // data[0] = missingPUList[j].month
                 // data[1] = missingPUList[j].startValue
-                data[0] = getLabelText(missingPUList[j].tracerCategory.label, this.state.lang)
+                data[0] = getLabelText(missingPUList[j].productCategory.label, this.state.lang)
                 data[1] = getLabelText(missingPUList[j].planningUnit.label, this.state.lang) + " | " + missingPUList[j].planningUnit.id
                 dataArray[count] = data;
                 count++;
@@ -320,7 +320,7 @@ export default class ListTreeComponent extends Component {
             columns: [
                 {
                     // 0
-                    title: i18n.t('static.tracercategory.tracercategory'),
+                    title: i18n.t('static.productCategory.productCategory'),
                     type: 'test',
                     readOnly: true
                 },
@@ -393,7 +393,7 @@ export default class ListTreeComponent extends Component {
                     var parentNodeData = treeTemplate.flatList.filter(x => x.id == puNodeList[i].parent)[0];
                     console.log("parentNodeData---", parentNodeData);
                     json = {
-                        tracerCategory: parentNodeData.payload.nodeDataMap[0][0].fuNode.forecastingUnit.tracerCategory,
+                        productCategory: parentNodeData.payload.nodeDataMap[0][0].fuNode.forecastingUnit.productCategory,
                         planningUnit: puNodeList[i].payload.nodeDataMap[0][0].puNode.planningUnit
                     };
                     missingPUList.push(json);

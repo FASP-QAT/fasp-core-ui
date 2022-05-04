@@ -425,15 +425,13 @@ export default class TreeExtrapolationComponent extends React.Component {
                     if (type) {
                         var dataForExtrapolation = jexcelDataArr.filter(c => c.amount != "");
                         if (dataForExtrapolation.length < 3 || (this.state.smoothingId && dataForExtrapolation.length < 24) || (this.state.arimaId && dataForExtrapolation.length < 14)) {
-                            this.setState({ extrapolationLoader: false }, () => {
+                            // this.setState({ extrapolationLoader: false }, () => {
                                 setTimeout(() => {
                                     alert(i18n.t('static.tree.minDataRequiredToExtrapolate'))
                                 }, 0);
-                            });
+                            // });
                         }
-                        else {
-                            this.calculateExtrapolatedData(false);
-                        }
+                        this.calculateExtrapolatedData(false);
                     } else {
                         this.buildExtrapolationMom();
                     }
