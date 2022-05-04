@@ -248,6 +248,7 @@ export default class TreeExtrapolationComponent extends React.Component {
         var startDate = moment("2021-05-01").format("YYYY-MM-DD");
         var endDate = moment("2022-02-01").format("YYYY-MM-DD")
         this.state = {
+            seasonality: 1,
             dataChanged: false,
             buttonFalg: 1,
             showJexcelData: false,
@@ -350,8 +351,13 @@ export default class TreeExtrapolationComponent extends React.Component {
         this.checkActualValuesGap = this.checkActualValuesGap.bind(this);
         this.saveJexcelData = this.saveJexcelData.bind(this);
         this.toggleJexcelData = this.toggleJexcelData.bind(this);
+        this.seasonalityCheckbox = this.seasonalityCheckbox.bind(this);
     }
-
+    seasonalityCheckbox(event) {
+        this.setState({
+            seasonality: event.target.checked ? 1 : 0
+        });
+    }
     toggleJexcelData() {
         this.setState({ showJexcelData: !this.state.showJexcelData })
     }
@@ -620,7 +626,8 @@ export default class TreeExtrapolationComponent extends React.Component {
                         p: this.state.p,
                         d: this.state.d,
                         q: this.state.q,
-                        confidenceLevelIdArima: this.state.confidenceLevelIdArima
+                        confidenceLevelIdArima: this.state.confidenceLevelIdArima,
+                        seasonality: this.state.seasonality
                     },
                     extrapolationOptionDataList: arimaDataLower
                 }
@@ -632,7 +639,8 @@ export default class TreeExtrapolationComponent extends React.Component {
                         p: this.state.p,
                         d: this.state.d,
                         q: this.state.q,
-                        confidenceLevelIdArima: this.state.confidenceLevelIdArima
+                        confidenceLevelIdArima: this.state.confidenceLevelIdArima,
+                        seasonality: this.state.seasonality
                     },
                     extrapolationOptionDataList: arimaData
                 }
@@ -644,7 +652,8 @@ export default class TreeExtrapolationComponent extends React.Component {
                         p: this.state.p,
                         d: this.state.d,
                         q: this.state.q,
-                        confidenceLevelIdArima: this.state.confidenceLevelIdArima
+                        confidenceLevelIdArima: this.state.confidenceLevelIdArima,
+                        seasonality: this.state.seasonality
                     },
                     extrapolationOptionDataList: arimaDataUpper
                 }
@@ -1118,7 +1127,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                             })
                         }
                         if (this.state.arimaId) {
-                            calculateArima(JSON.parse(JSON.stringify(inputDataArima)), this.state.p, this.state.d, this.state.q, this.state.confidenceLevelIdArima, Math.trunc(noOfMonthsForProjection), this, jexcelDataArr[0].month, 1);
+                            calculateArima(JSON.parse(JSON.stringify(inputDataArima)), this.state.p, this.state.d, this.state.q, this.state.confidenceLevelIdArima, Math.trunc(noOfMonthsForProjection), this, jexcelDataArr[0].month, 1, this.state.seasonality);
                         } else {
                             this.setState({
                                 arimaData: [],
@@ -1347,6 +1356,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                             var p = this.state.p;
                             var d = this.state.d;
                             var q = this.state.q;
+                            var seasonality = this.state.seasonality;
                             var movingAvgData = [];
                             var semiAvgData = [];
                             var arimaData = [];
@@ -1379,6 +1389,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                     d = nodeDataExtrapolationOptionList[i].jsonProperties.d;
                                     q = nodeDataExtrapolationOptionList[i].jsonProperties.q;
                                     confidenceLevelIdArima = nodeDataExtrapolationOptionList[i].jsonProperties.confidenceLevelIdArima;
+                                    seasonality = nodeDataExtrapolationOptionList[i].jsonProperties.seasonality;
                                     arimaId = true;
                                     arimaData = nodeDataExtrapolationOptionList[i].extrapolationOptionDataList;
                                 }
@@ -4030,6 +4041,22 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                                                 onChange={(e) => { handleChange(e); this.setQId(e) }}
                                                                             />
                                                                             <FormFeedback>{errors.qId}</FormFeedback>
+                                                                        </div>
+                                                                        <div className="tab-ml-1 mt-md-2 mb-md-0 ExtraCheckboxFieldWidth">
+                                                                            <Input
+                                                                                className="form-check-input checkboxMargin"
+                                                                                type="checkbox"
+                                                                                id="seasonality"
+                                                                                name="seasonality"
+                                                                                // checked={true}
+                                                                                checked={this.state.seasonality}
+                                                                                onClick={(e) => { this.seasonalityCheckbox(e); }}
+                                                                            />
+                                                                            <Label
+                                                                                className="form-check-label"
+                                                                                check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                                                <b>{i18n.t('static.extrapolation.seasonality')}</b>
+                                                                            </Label>
                                                                         </div>
                                                                     </div>
                                                                 </div>
