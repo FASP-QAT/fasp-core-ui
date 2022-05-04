@@ -4303,7 +4303,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                     <div>
                         <ModalBody>
                         <div>
-                               <h3 className='ShowGuidanceHeading'>Build Tree – Add/Edit Node - Extrapolation Node</h3>
+                               <h3 className='ShowGuidanceHeading'>Add/Edit Node - Extrapolation Node</h3>
                            </div>
                             <p>
                                 <p style={{fontSize:'14px'}}><span className="UnderLineText">Purpose :</span>The extrapolation tab allows users to forecast future

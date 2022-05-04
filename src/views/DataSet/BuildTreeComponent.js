@@ -501,7 +501,9 @@ export default class BuildTree extends Component {
         this.pickAMonth4 = React.createRef()
         this.pickAMonth5 = React.createRef()
         this.state = {
-            showGuidanceNodaData: false,
+            showGuidanceModelingTransfer:false,
+            showGuidanceNodeData: false,
+            showGuidance:false,
             sameLevelNodeList1: [],
             nodeUnitListPlural: [],
             nodeTransferDataList: [],
@@ -1410,10 +1412,14 @@ export default class BuildTree extends Component {
 
     //     };
     toggleShowGuidanceNodeData() {
-        console.log("befor this.state.showGuidanceNodeData",this.state.showGuidanceNodeData);
+       this.setState({
+            showGuidanceNodeData: !this.state.showGuidanceNodeData
+        })
+    }
+    toggleShowGuidanceModelingTransfer() {
         this.setState({
-            showGuidanceNodaData: !this.state.showGuidanceNodeData
-        },()=>{console.log("after this.state.showGuidanceNodeData",this.state.showGuidanceNodeData)})
+            showGuidanceModelingTransfer: !this.state.showGuidanceModelingTransfer
+        })
     }
     toggleShowGuidance() {
         this.setState({
@@ -8988,7 +8994,7 @@ export default class BuildTree extends Component {
                         <div className="row pl-lg-0 pr-lg-3">
                             {/* <SupplyPlanFormulas ref="formulaeChild" /> */}
                             <a className="">
-                                <span style={{ cursor: 'pointer', color: '20a8d8' }} ><small className="supplyplanformulas">{i18n.t('Show Guidance')}</small></span>
+                                <span style={{ cursor: 'pointer', color: '20a8d8' }} onClick={() => { this.toggleShowGuidanceModelingTransfer() }}><small className="supplyplanformulas">{i18n.t('Show Guidance')}</small></span>
 
                             </a>
                         </div>
@@ -10774,7 +10780,99 @@ export default class BuildTree extends Component {
                         </CardBody>
 
                     </Card></Col></Row>
-                    <Modal isOpen={this.state.showGuidanceNodaData}
+                    <Modal isOpen={this.state.showGuidanceModelingTransfer}
+                    className={'modal-lg ' + this.props.className} >
+                    <ModalHeader toggle={() => this.toggleShowGuidanceModelingTransfer()} className="ModalHead modal-info-Headher">
+                        <strong className="TextWhite">Show Guidance</strong>
+                    </ModalHeader>
+                    <div>
+                        <ModalBody>
+                           <div>
+                               <h3 className='ShowGuidanceHeading'>Add/Edit Node - Modeling/Transfer </h3>
+                           </div>
+                            <p>
+                                <p style={{fontSize:'14px'}}><span className="UnderLineText">Purpose :</span>If a node changes over time, a user can utilize the Modeling/Transfer tab to model growth/loss within a single node or a transfer from one node to another. Note that this functionality is only available for Number (#) Nodes and Percentage (%) Nodes (including Forecasting Units and Planning Units). </p>
+                           </p>
+
+                           <p>
+                                <p style={{fontSize:'14px'}}><span className="UnderLineText">Using this tab :</span>
+                                <br></br>Modeling and transfer can have four different modeling types: </p>
+                           </p>
+  
+                            <p>
+                        
+                            <div className='pl-lg-4 pr-lg-4'>
+                            <table className="table table-bordered ">
+                                <thead>
+                                <tr>
+                                    <th style={{width:'130px'}}>Modeling Type</th>
+                                    <th># Node Calculation</th>
+                                    <th>% Node Calculation</th>
+                                   
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td>Linear (#)</td>
+                                    <td>+/- a static number each month</td>
+                                    <td>N/A</td>
+                                   
+                                </tr>
+                                <tr>
+                                    <td>Linear (%)</td>
+                                    <td>+/- a static percentage each month, calculated based on the starting month</td>
+                                    <td>N/A</td>
+                                    
+                                </tr>
+                                <tr>
+                                    <td>Exponential (%)</td>
+                                    <td>+/- a percentage each month, calculated on the previous month as a rolling percentage</td>
+                                    <td>N/A</td>
+                                    
+                                </tr>
+                                <tr>
+                                    <td>Linear (% point)</td>
+                                    <td>N/A</td>
+                                    <td>+/- a static percentage each month (e.g. if the starting month is 30% and the change is +1% each month, next month is 31%, the next is 32%, and so on)</td>
+                                   
+                                </tr>
+                               
+                                </tbody>
+                            </table>
+                            </div>
+                             </p>
+                            
+                             <p><b><i class="fa fa-calculator" aria-hidden="true"></i></b> QAT has a modeling calculator tool for users should they need assistance in calculating the month-on-month change over time based on an ending target date & percentage or total percentage change over time. The modelling calculator is only available for a # node and a % node.<br>
+                             </br>Additionally, by clicking on “Show Monthly Data,” users can see how their modelling and transfer inputs have affected the monthly data in both a graphical and tabular form. In the tabular data, users may add a manual change for a specific month or input a seasonality index percentage (only available for % nodes), as needed. If a user checks “Manual Change affects future month,” the manual amount added to the end of the month will carry over to the beginning of the next month. If neither of these fields are relevant, users can uncheck “Show (seasonality &) manual change” to hide these columns. 
+                             </p>
+                            
+                             <p><span  style={{fontSize:'14px'}} className="UnderLineText">Rules for Transfer Nodes:</span>
+                             <ul>
+                                 <li>Transfers must occur between nodes be on the same level</li>
+                                 <li>Users can only transfer to nodes that are of the same type (i.e. a forecasting unit may transfer node data to another forecasting unit, but not a planning unit as they are not the same node type).</li>
+                                 <li>The order of operations for calculating a transfer occurs from the left to the right in the forecast tree. A transfer cannot be made from right to left, thus a user should be careful when designing their tree and determining where each node should be placed. </li>
+                                 <li>Transfers are always negative from the source node and positive to the destination node.</li>
+                             </ul>
+                             </p>
+                             <p><span  style={{fontSize:'14px'}} className="UnderLineText">Examples :</span>
+                             <ul>
+                                 <li><b>Simple Growth</b> (linear #) -the example below shows a population growth each month by XXX/month from January 2022 to December 2024. </li>
+                                 <li><b>Simple Growth</b> (linear %) - the example below shows a steady population growth each month by 0.1% from January 2022 to December 2024. QAT has calculated this change to be increasing the population by XXX each month.</li>
+                                 <li><b>Simple Growth</b> (exponential %) -the example below shows a population growth each month by 0.1% from January 2022 to December 2024. Because the growth is exponential, the change differs each month. 
+                                 <ul>
+                                     <li>QAT calculates this change to be XXX in XXX month</li>
+                                     <li>QAT calculates this change to be XXX in XXX month</li>
+                                 </ul>
+                                 </li>
+                                 <li><b>Multi-year Loss</b> -the example below shows a different rate of attrition (loss) each year. Year 1 (January 2022 to December 2022) decreases the population by 0.01% or XXX each month, Year 2 (January 2023 to December 2023) decreases the population by 0.02% or XXX  each month, etc. QAT utilizes a negative number to denote a decrease or loss.</li>
+                                 <li><b>Transfer </b>- the example below shows a transfer of XXX patients each month for one year, January 2022 to December 2022, from the current node (Adults 1st Line) to another node (Adults 2nd Line). This transfer will also appear on the other node (Adults 2nd Line) greyed-out to signify an non-editable change.</li>
+                             </ul>
+                             </p>
+                       
+                        </ModalBody>
+                    </div>
+                </Modal>
+                    <Modal isOpen={this.state.showGuidanceNodeData}
                     className={'modal-lg ' + this.props.className} >
                     <ModalHeader toggle={() => this.toggleShowGuidanceNodeData()} className="ModalHead modal-info-Headher">
                         <strong className="TextWhite">Show Guidance</strong>
@@ -10888,6 +10986,20 @@ export default class BuildTree extends Component {
                                 </table>
                                 </div>
                              </p>
+                             <p><span  style={{fontSize:'14px'}} classNames="UnderLineText"><b>Tips for specific use cases:</b></span>
+                             <ul>
+                                 <li><b> Forecasting Node Type :</b> Select "discrete" if this product will be used for limited time, and "continuous" if it will be used indefinitely.</li>
+                                 <li><b> Delayed or phased product usage?</b> Sometimes, the product consumption is delayed in relation the other higher levels of the tree. In the relevant 
+                                 <b>Forecasting Unit </b>node, use the <b>Lag</b> field to indicate this delay.
+                                 <ul>
+                                     <li>For example, if the product usage will begin 2 months after the parent node dates, enter "2" in this field.  </li>
+                                     <li>This field can also be used where the product switches over time for example, if forecasting units A, B, and C are used in secession for two months at a time, you can set up your tree with Forecasting Unit A (discrete for 2 months, lag=0), Forecasting Unit B (discrete for 2 months, lag=2), Forecasting Unit C (discrete for 2 months, lag = 4).</li>
+                                 </ul>
+                                 </li>
+                                 <li><b> Multi-month Consumption Patterns?</b> How often is the product actually "consumed"? is it monthly or every three months? Consumption can be defined at different levels depending on your supply chain. In the <b>Planning Unit Node</b>, use the <b>Consumption Interval</b> field to indicate. For example, if the end user uses a product daily, but only picks up or buys the product every 2 months, enter "2" in the Consumption Interval field to account for a multi-month consumption pattern.  Note that this is only available for Continuous nodes, as product is assumed to be “consumed” at the beginning of the usage period.</li>
+                                 <li><b>Repeating Forecasting Usages?</b> If multiple Forecasting Unit nodes share the same settings, consider using the <a href='/#/usageTemplate/listUsageTemplate'>Usage Template </a>screen to save your common usages, and then using the “Copy from Template”  field to populate the  fields in the forecasting unit nodes. </li>
+                             </ul>
+                             </p>
                        
                         </ModalBody>
                     </div>
@@ -10900,7 +11012,7 @@ export default class BuildTree extends Component {
                     <div>
                         <ModalBody>
                            <div>
-                               <h3 className='ShowGuidanceHeading'>Manage Tree – Tree list</h3>
+                               <h3 className='ShowGuidanceHeading'>Manage Tree – Build Trees</h3>
                            </div>
                             <p>
                                 <p style={{fontSize:'14px'}}><span className="UnderLineText">Purpose :</span>Enable users to manage and build forecast tree and scenarios, for any non-consumption forecasts (demographic, morbidity, services, etc). Note that more guidance is available after clicking into any specific node.</p>
@@ -11016,20 +11128,7 @@ export default class BuildTree extends Component {
                                 </table>
                                 </div>
                              </p>
-                             <p><span  style={{fontSize:'14px'}} classNames="UnderLineText"><b>Tips for specific use cases:</b></span>
-                             <ul>
-                                 <li><b> Forecasting Node Type :</b> Select "discrete" if this product will be used for limited time, and "continuous" if it will be used indefinitely.</li>
-                                 <li><b> Delayed or phased product usage?</b> Sometimes, the product consumption is delayed in relation the other higher levels of the tree. In the relevant 
-                                 <b>Forecasting Unit </b>node, use the <b>Lag</b> field to indicate this delay.
-                                 <ul>
-                                     <li>For example, if the product usage will begin 2 months after the parent node dates, enter "2" in this field.  </li>
-                                     <li>This field can also be used where the product switches over time for example, if forecasting units A, B, and C are used in secession for two months at a time, you can set up your tree with Forecasting Unit A (discrete for 2 months, lag=0), Forecasting Unit B (discrete for 2 months, lag=2), Forecasting Unit C (discrete for 2 months, lag = 4).</li>
-                                 </ul>
-                                 </li>
-                                 <li><b> Multi-month Consumption Patterns?</b> How often is the product actually "consumed"? is it monthly or every three months? Consumption can be defined at different levels depending on your supply chain. In the <b>Planning Unit Node</b>, use the <b>Consumption Interval</b> field to indicate. For example, if the end user uses a product daily, but only picks up or buys the product every 2 months, enter "2" in the Consumption Interval field to account for a multi-month consumption pattern.  Note that this is only available for Continuous nodes, as product is assumed to be “consumed” at the beginning of the usage period.</li>
-                                 <li><b>Repeating Forecasting Usages?</b> If multiple Forecasting Unit nodes share the same settings, consider using the <a href='/#/usageTemplate/listUsageTemplate'>Usage Template </a>screen to save your common usages, and then using the “Copy from Template”  field to populate the  fields in the forecasting unit nodes. </li>
-                             </ul>
-                             </p>
+                             
                         </ModalBody>
                     </div>
                 </Modal> 
