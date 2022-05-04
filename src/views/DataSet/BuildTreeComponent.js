@@ -1233,7 +1233,7 @@ export default class BuildTree extends Component {
         programData.treeList = treeData;
         dataSetObj.programData = programData;
         console.log("dataSetDecrypt>>>", dataSetObj);
-        calculateModelingData(dataSetObj, this, '', (nodeId != 0 ? nodeId : this.state.currentItemConfig.context.id), this.state.selectedScenario, type, this.state.treeId, false);
+        calculateModelingData(dataSetObj, this, '', (nodeId != 0 ? nodeId : this.state.currentItemConfig.context.id), this.state.selectedScenario, type, this.state.treeId, false,false);
         // }
     }
     fetchTracerCategoryList(programData) {
@@ -1745,6 +1745,7 @@ export default class BuildTree extends Component {
                     var datasetDetailsTransaction = detailTransaction.objectStore('datasetDetails');
                     console.log("this.props.match.params.programId---", this.state.programId);
                     var datasetDetailsRequest = datasetDetailsTransaction.get(this.state.programId);
+                    console.log("datasetDetailsRequest----", datasetDetailsRequest);
                     datasetDetailsRequest.onsuccess = function (e) {
                         console.log("all good >>>>");
                         console.log("Data update success");
@@ -2159,7 +2160,7 @@ export default class BuildTree extends Component {
                     // dataSetObjCopy.programData = programData;
                     // dataSetObj.programData = programData;
                     console.log("dataSetDecrypt>>>", programData);
-                    calculateModelingData(dataSetObjCopy, this, '', currentItemConfig.context.id, this.state.selectedScenario, 1, this.state.treeId, false);
+                    calculateModelingData(dataSetObjCopy, this, '', currentItemConfig.context.id, this.state.selectedScenario, 1, this.state.treeId, false,false);
                     // store update object in indexdb
                     //     var db1;
                     //     getDatabase();
@@ -2798,22 +2799,22 @@ export default class BuildTree extends Component {
         // const newArray = this.state.activeTab1.slice()
         currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].extrapolation = e.target.checked == true ? true : false;
         if (e.target.checked) {
-            console.log("extrapolate outside",currentItemConfig);
+            console.log("extrapolate outside", currentItemConfig);
             if (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].calculatedDataValue == "" || currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].calculatedDataValue == null || currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].calculatedDataValue == "0") {
                 currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].calculatedDataValue = "0";
                 currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].dataValue = "0";
-                console.log("extrapolate inside",currentItemConfig);
+                console.log("extrapolate inside", currentItemConfig);
             }
         }
         console.log("this.state.activeTab1---", currentItemConfig);
 
         this.setState({
             currentItemConfig,
-            currentScenario : currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0],
+            currentScenario: currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0],
             activeTab1: e.target.checked == true ? new Array(2).fill('3') : new Array(2).fill('2')
         }, () => {
-            console.log("extrapolate current item config---",this.state.currentItemConfig);
-            console.log("extrapolate current scenario---",this.state.currentScenario);
+            console.log("extrapolate current item config---", this.state.currentItemConfig);
+            console.log("extrapolate current scenario---", this.state.currentScenario);
             if (this.state.activeTab1[0] == '3') {
                 if (this.state.modelingEl != "") {
                     this.state.modelingEl.destroy();
@@ -3461,7 +3462,7 @@ export default class BuildTree extends Component {
                 if (this.state.realmCountryId != null && this.state.realmCountryId != "") {
                     regionList = myResult.filter(x => x.realmCountry.realmCountryId == this.state.realmCountryId);
                     console.log("filter if regionList---", regionList);
-                } 
+                }
                 else {
                     // regionList = myResult;
                     this.setState({
@@ -6214,10 +6215,12 @@ export default class BuildTree extends Component {
     }
 
     componentDidMount() {
+        
         this.setState({
             treeId: this.props.match.params.treeId,
             templateId: this.props.match.params.templateId
         }, () => {
+            console.log("on mount ---",this.state.programId);
             this.getUsagePeriodList();
             this.getTreeList();
             this.getForecastMethodList();
