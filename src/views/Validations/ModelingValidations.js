@@ -1601,7 +1601,7 @@ class ModelingValidation extends Component {
                                             </FormGroup>
                                             <div>
                                             <Popover placement="top" isOpen={this.state.popoverOpenLevelFeild} target="Popover5" trigger="hover" toggle={this.toggleLevelFeild}>
-                                                <PopoverBody>Need to add info</PopoverBody>
+                                                <PopoverBody>{i18n.t('static.Tooltip.levelModelingValdation')}</PopoverBody>
                                             </Popover>
                                         </div>
                                             <FormGroup className="col-md-3">
