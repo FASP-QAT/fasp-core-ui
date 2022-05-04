@@ -160,8 +160,8 @@ export default class StepOneImportMapPlanningUnits extends Component {
                             var myResult = [];
                             var programId = (value != "" && value != undefined ? value : 0).split("_")[0];
                             myResult = planningunitRequest.result.filter(c => c.program.id == programId && c.active == true);
+                            
                             // console.log("myResult----programId-->", programId)
-                            // console.log("myResult----->", myResult)
 
                             // let dupPlanningUnitObj = myResult.map(ele => ele.planningUnit);
                             // console.log("dupPlanningUnitObj-------->2", dupPlanningUnitObj);
@@ -194,6 +194,20 @@ export default class StepOneImportMapPlanningUnits extends Component {
                             tempList.unshift({
                                 name: i18n.t('static.quantimed.doNotImport'),
                                 id: -1,
+                                multiplier: 1,
+                                active: true,
+                                forecastingUnit: []
+                            });
+                            tempList.unshift({
+                                name: "No Forecast Selected",
+                                id: -2,
+                                multiplier: 1,
+                                active: true,
+                                forecastingUnit: []
+                            });
+                            tempList.unshift({
+                                name: "Forecast is blank",
+                                id: -3,
                                 multiplier: 1,
                                 active: true,
                                 forecastingUnit: []
@@ -576,7 +590,6 @@ export default class StepOneImportMapPlanningUnits extends Component {
                                     document.getElementById("stepOneBtn").disabled = true;
                                 }
                                 this.buildJexcel();
-                                console.log("response.data,,,,", response.data)
                             })
                         } else {
                             this.setState({
@@ -675,6 +688,8 @@ export default class StepOneImportMapPlanningUnits extends Component {
 
     buildJexcel() {
         var papuList = this.state.selSource;
+        console.log("response.data,,,,", papuList)
+
         var data = [];
         var papuDataArr = [];
         var count = 0;
@@ -682,15 +697,22 @@ export default class StepOneImportMapPlanningUnits extends Component {
             for (var j = 0; j < papuList.length; j++) {
 
                 let planningUnitObj = null;
-                planningUnitObj = this.state.planningUnitList.filter(c => c.planningUnit.id == papuList[j].id)[0];
+                planningUnitObj = this.state.planningUnitList.filter(c => c.planningUnit.id == papuList[j].planningUnit.id)[0];
+                // Object.keys(papuList[j].selectedForecastMap).length == 0
+                let check = (Object.keys(papuList[j].selectedForecastMap).length == 0)
+                let isForecastBlank = (!check && papuList[j].selectedForecastMap.totalForecast == 0)
+
+                console.log("response.data,check,", isForecastBlank)
+
                 data = [];
-                data[0] = getLabelText(papuList[j].forecastingUnit.tracerCategory.label, this.state.lang)
-                data[1] = getLabelText(papuList[j].label, this.state.lang) + ' | ' + papuList[j].id
-                data[2] = planningUnitObj == null ? "" : planningUnitObj.planningUnit.id
-                data[3] = planningUnitObj == null ? "" : planningUnitObj.multiplier / papuList[j].multiplier
+                data[0] = getLabelText(papuList[j].planningUnit.forecastingUnit.tracerCategory.label, this.state.lang)
+                data[1] = getLabelText(papuList[j].planningUnit.forecastingUnit.label, this.state.lang) + ' | ' + papuList[j].planningUnit.id
+                data[2] = planningUnitObj != undefined ? (check ? "-2" : (isForecastBlank ? "-3" : planningUnitObj.planningUnit.id)) : ""
+                data[3] = planningUnitObj != undefined ? (check ? "" : (isForecastBlank ? "" : (planningUnitObj.multiplier / papuList[j].planningUnit.multiplier))) : ""
                 data[4] = ""
-                data[5] = papuList[j].forecastingUnit.tracerCategory.id
-                data[6] = papuList[j].id
+                data[5] = papuList[j].planningUnit.forecastingUnit.tracerCategory.id
+                data[6] = papuList[j].planningUnit.id
+                data[7] = Object.keys(papuList[j].selectedForecastMap).length == 0 ? true : false
 
                 papuDataArr[count] = data;
                 count++;
@@ -758,6 +780,11 @@ export default class StepOneImportMapPlanningUnits extends Component {
                     title: 'Forcast planning unit id',
                     type: 'hidden',
                     readOnly: true//6 G
+                },
+                {
+                    title: 'Selected Forecast Map',
+                    type: 'hidden',
+                    readOnly: true//7 H
                 }
 
             ],
@@ -784,6 +811,20 @@ export default class StepOneImportMapPlanningUnits extends Component {
                         let textColor = contrast('#f48282');
                         elInstance.setStyle(`C${parseInt(y) + 1}`, 'color', textColor);
 
+                        var cell1 = elInstance.getCell(`D${parseInt(y) + 1}`)
+                        cell1.classList.add('readonly');
+
+                    } else {
+                    }
+
+                    var noForecastSelected = rowData[7];
+                    if (noForecastSelected) {// grade out
+                        elInstance.setStyle(`C${parseInt(y) + 1}`, 'background-color', 'transparent');
+                        elInstance.setStyle(`C${parseInt(y) + 1}`, 'background-color', '#f48282');
+                        let textColor = contrast('#f48282');
+                        elInstance.setStyle(`C${parseInt(y) + 1}`, 'color', textColor);
+                        var cell11 = elInstance.getCell(`C${parseInt(y) + 1}`)
+                        cell11.classList.add('readonly');
                         var cell1 = elInstance.getCell(`D${parseInt(y) + 1}`)
                         cell1.classList.add('readonly');
 
@@ -839,6 +880,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
     filterPlanningUnitBasedOnTracerCategory = function (instance, cell, c, r, source) {
         var mylist = [];
         var value = (instance.jexcel.getJson(null, false)[r])[5];
+        console.log("value--------->100", value);
 
         var mylist = this.state.planningUnitListJexcel;
         console.log("mylist--------->100", mylist);
@@ -1051,7 +1093,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
         var json = this.el.getJson(null, false);
         for (var y = 0; y < json.length; y++) {
             var value = this.el.getValueFromCoords(2, y);
-            if (value != -1) {
+            if (value != -1 && value != -2 && value != -3) {
                 //ForecastPlanningUnit
                 var budgetRegx = /^\S+(?: \S+)*$/;
                 var col = ("C").concat(parseInt(y) + 1);
@@ -1130,7 +1172,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
 
             for (var i = 0; i < tableJson.length; i++) {
                 var map1 = new Map(Object.entries(tableJson[i]));
-                if (parseInt(map1.get("2")) != -1) {
+                if (parseInt(map1.get("2")) != -1 && parseInt(map1.get("2")) != -2 && parseInt(map1.get("2")) != -3) {
                     let json = {
                         supplyPlanPlanningUnitId: parseInt(map1.get("2")),
                         forecastPlanningUnitId: parseInt(map1.get("6")),
