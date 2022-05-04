@@ -4040,7 +4040,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                                             />
                                                                             <FormFeedback>{errors.qId}</FormFeedback>
                                                                         </div>
-                                                                        <div className="tab-ml-1 mt-md-2 mb-md-0 ExtraCheckboxFieldWidth">
+                                                                        <div className="tab-ml-1 ml-lg-5 ExtraCheckboxFieldWidth" style={{marginTop:'38px'}}>
                                                                             <Input
                                                                                 className="form-check-input checkboxMargin"
                                                                                 type="checkbox"
