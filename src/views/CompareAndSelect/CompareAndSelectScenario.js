@@ -334,14 +334,6 @@ class CompareAndSelectScenario extends Component {
         // } else if (selectedPlanningUnit.consumptionDataType == 3) {
         //     actualMultiplier = selectedPlanningUnit.otherUnit.multiplier
         // }
-        var totalActual = 0;
-        for (var mo = 0; mo < monthArrayForError.length; mo++) {
-            var actualFilter = consumptionData.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArrayForError[mo]).format("YYYY-MM"));
-            console.log("ActualFilter@@@@@@@@@@", actualFilter)
-            if (actualFilter.length > 0) {
-                totalActual += Number(actualFilter.length > 0 ? (Number(actualFilter[0].puAmount) * Number(actualMultiplier) * Number(multiplier)).toFixed(2) : 0);
-            }
-        }
         console.log("Total Actual@@@@@@@@@", totalActual);
         var actualDiff = [];
         var countArray = [];
@@ -349,6 +341,40 @@ class CompareAndSelectScenario extends Component {
         for (var tsl = 0; tsl < treeScenarioList.length; tsl++) {
             totalArray.push(0);
             actualDiff.push(0);
+        }
+        var totalActual = 0;
+        for (var mo = 0; mo < monthArrayForError.length; mo++) {
+            var actualFilter = consumptionData.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArrayForError[mo]).format("YYYY-MM"));
+            console.log("ActualFilter@@@@@@@@@@", actualFilter)
+            if (actualFilter.length > 0) {
+                totalActual += Number(actualFilter.length > 0 ? (Number(actualFilter[0].puAmount) * Number(actualMultiplier) * Number(multiplier)).toFixed(2) : 0);
+            }
+            console.log("MOnth@@@@@@@@@@@@@@@@", monthArrayForError)
+            for (var tsl = 0; tsl < treeScenarioList.length; tsl++) {
+                console.log("treeScenarioList[tsl]@@@@", treeScenarioList[tsl])
+                if (treeScenarioList[tsl].type == "T") {
+                    var scenarioFilter = treeScenarioList[tsl].data.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArrayForError[mo]).format("YYYY-MM"));
+                    var diff = scenarioFilter.length > 0 ? ((actualFilter.length > 0 ? (Number(actualFilter[0].puAmount) * Number(actualMultiplier) * Number(multiplier)).toFixed(2) : 0) - (scenarioFilter.length > 0 ? Number(scenarioFilter[0].calculatedMmdValue).toFixed(2) * multiplier : "")) : 0;
+                    if (diff < 0) {
+                        diff = 0 - diff;
+                    }
+                    console.log("Difference@@@@@@@@@@@@@@@@", diff);
+                    actualDiff[tsl] = scenarioFilter.length > 0 ? (actualDiff[tsl] != undefined ? Number(actualDiff[tsl]) : 0) + diff : (actualDiff[tsl] != undefined ? Number(actualDiff[tsl]) : 0);
+                    if (scenarioFilter.length > 0) {
+                        countArray[tsl] = countArray[tsl] != undefined ? countArray[tsl] + 1 : 0;
+                    }
+                } else {
+                    var scenarioFilter = treeScenarioList[tsl].data.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArrayForError[mo]).format("YYYY-MM"));
+                    var diff = scenarioFilter.length > 0 ? ((actualFilter.length > 0 ? (Number(actualFilter[0].puAmount) * Number(actualMultiplier) * Number(multiplier)).toFixed(2) : 0) - (scenarioFilter.length > 0 ? (Number(scenarioFilter[0].amount) * Number(actualMultiplier) * Number(multiplier)).toFixed(2) : "")) : 0;
+                    if (diff < 0) {
+                        diff = 0 - diff;
+                    }
+                    actualDiff[tsl] = scenarioFilter.length > 0 ? (actualDiff[tsl] != undefined ? Number(actualDiff[tsl]) : 0) + diff : (actualDiff[tsl] != undefined ? Number(actualDiff[tsl]) : 0);
+                    if (scenarioFilter.length > 0) {
+                        countArray[tsl] = countArray[tsl] != undefined ? countArray[tsl] + 1 : 0;
+                    }
+                }
+            }
         }
         for (var m = 0; m < monthArrayListWithoutFormat.length; m++) {
             data = [];
@@ -371,16 +397,16 @@ class CompareAndSelectScenario extends Component {
                     data[tsl + 2] = scenarioFilter.length > 0 ? Number(scenarioFilter[0].calculatedMmdValue).toFixed(2) * multiplier : "";
                     totalArray[tsl] = Number(totalArray[tsl] != undefined ? totalArray[tsl] : 0) + Number(scenarioFilter.length > 0 ? Number(scenarioFilter[0].calculatedMmdValue).toFixed(2) * multiplier : 0);
 
-                    if (monthArrayForErrorFilter.length > 0) {
-                        var diff = ((actualFilter.length > 0 ? (Number(actualFilter[0].puAmount) * Number(actualMultiplier) * Number(multiplier)).toFixed(2) : 0) - (scenarioFilter.length > 0 ? Number(scenarioFilter[0].calculatedMmdValue).toFixed(2) * multiplier : ""));
-                        if (diff < 0) {
-                            diff = 0 - diff;
-                        }
-                        actualDiff[tsl] = scenarioFilter.length > 0 ? (actualDiff[tsl] != undefined ? Number(actualDiff[tsl]) : 0) + diff : (actualDiff[tsl] != undefined ? Number(actualDiff[tsl]) : 0);
-                        if (scenarioFilter.length > 0) {
-                            countArray[tsl] = countArray[tsl] != undefined ? countArray[tsl] + 1 : 0;
-                        }
-                    }
+                    // if (monthArrayForErrorFilter.length > 0) {
+                    //     var diff = ((actualFilter.length > 0 ? (Number(actualFilter[0].puAmount) * Number(actualMultiplier) * Number(multiplier)).toFixed(2) : 0) - (scenarioFilter.length > 0 ? Number(scenarioFilter[0].calculatedMmdValue).toFixed(2) * multiplier : ""));
+                    //     if (diff < 0) {
+                    //         diff = 0 - diff;
+                    //     }
+                    //     actualDiff[tsl] = scenarioFilter.length > 0 ? (actualDiff[tsl] != undefined ? Number(actualDiff[tsl]) : 0) + diff : (actualDiff[tsl] != undefined ? Number(actualDiff[tsl]) : 0);
+                    //     if (scenarioFilter.length > 0) {
+                    //         countArray[tsl] = countArray[tsl] != undefined ? countArray[tsl] + 1 : 0;
+                    //     }
+                    // }
 
                     // consumptionDataForTree.push({ id: treeScenarioList[tsl].id, value: scenarioFilter.length > 0 ? Number(scenarioFilter[0].calculatedValue).toFixed(2) * multiplier : null });
                 } else {
@@ -388,17 +414,17 @@ class CompareAndSelectScenario extends Component {
                     data[tsl + 2] = scenarioFilter.length > 0 ? (Number(scenarioFilter[0].amount) * Number(actualMultiplier) * Number(multiplier)).toFixed(2) : "";
                     totalArray[tsl] = Number(totalArray[tsl] != undefined ? totalArray[tsl] : 0) + Number(scenarioFilter.length > 0 ? (Number(scenarioFilter[0].amount) * Number(actualMultiplier) * Number(multiplier)).toFixed(2) : 0);
 
-                    if (monthArrayForErrorFilter.length > 0) {
-                        var diff = ((actualFilter.length > 0 ? (Number(actualFilter[0].puAmount) * Number(actualMultiplier) * Number(multiplier)).toFixed(2) : 0) - (scenarioFilter.length > 0 ? (Number(scenarioFilter[0].amount) * Number(actualMultiplier) * Number(multiplier)).toFixed(2) : ""));
-                        if (diff < 0) {
-                            diff = 0 - diff;
-                        }
-                        actualDiff[tsl] = scenarioFilter.length > 0 ? (actualDiff[tsl] != undefined ? Number(actualDiff[tsl]) : 0) + diff : (actualDiff[tsl] != undefined ? Number(actualDiff[tsl]) : 0);
+                    // if (monthArrayForErrorFilter.length > 0) {
+                    //     var diff = ((actualFilter.length > 0 ? (Number(actualFilter[0].puAmount) * Number(actualMultiplier) * Number(multiplier)).toFixed(2) : 0) - (scenarioFilter.length > 0 ? (Number(scenarioFilter[0].amount) * Number(actualMultiplier) * Number(multiplier)).toFixed(2) : ""));
+                    //     if (diff < 0) {
+                    //         diff = 0 - diff;
+                    //     }
+                    //     actualDiff[tsl] = scenarioFilter.length > 0 ? (actualDiff[tsl] != undefined ? Number(actualDiff[tsl]) : 0) + diff : (actualDiff[tsl] != undefined ? Number(actualDiff[tsl]) : 0);
 
-                        if (scenarioFilter.length > 0) {
-                            countArray[tsl] = countArray[tsl] != undefined ? countArray[tsl] + 1 : 0;
-                        }
-                    }
+                    //     if (scenarioFilter.length > 0) {
+                    //         countArray[tsl] = countArray[tsl] != undefined ? countArray[tsl] + 1 : 0;
+                    //     }
+                    // }
 
                     // consumptionDataForTree.push({ id: treeScenarioList[tsl].id, value: scenarioFilter.length > 0 ? Number(scenarioFilter[0].amount).toFixed(2) * multiplier : null });
                 }
