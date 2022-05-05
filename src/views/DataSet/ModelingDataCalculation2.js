@@ -841,8 +841,10 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
             props.updateState("momJexcelLoader", false);
             props.updateState("message1", "Data updated successfully");
             if (listPage) {
-                props.updateState("programId", page);
-                props.updateState("tempTreeId", treeId);
+                console.log("tempTreeId modeling----",treeId);
+                props.updateState("tempTreeId",treeId);
+                props.updateState("programId",page);
+                
             }
         }.bind(this)
     }.bind(this)

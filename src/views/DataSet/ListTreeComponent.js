@@ -248,17 +248,18 @@ export default class ListTreeComponent extends Component {
                 [parameterName]: value
             }, () => {
                 if (parameterName == 'programId' && value != "") {
-                    // console.log("programId---", this.state.datasetList)
+                    console.log("tempTreeId---",this.state.tempTreeId)
                     var programId = this.state.programId;
                     var program = this.state.datasetList.filter(x => x.id == programId)[0];
-                    // console.log("my program---", program);
+                    console.log("my program---", program);
                     let tempProgram = JSON.parse(JSON.stringify(program))
                     let treeList = tempProgram.programData.treeList;
                     var tree = treeList.filter(x => x.treeId == this.state.tempTreeId)[0];
-                    // console.log("my tree---",tree)
+                    console.log("my tree---",tree);
                     var items = tree.tree.flatList;
+                    console.log("my items---",items);
                     var nodeDataMomList = this.state.nodeDataMomList;
-                    // console.log("nodeDataMomList---", nodeDataMomList);
+                    console.log("nodeDataMomList---", nodeDataMomList);
                     if (nodeDataMomList.length > 0) {
                         for (let i = 0; i < nodeDataMomList.length; i++) {
                             // console.log("nodeDataMomList[i]---", nodeDataMomList[i])
