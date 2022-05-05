@@ -650,8 +650,8 @@ export default class ExtrapolateDataComponent extends React.Component {
                         cell.classList.add('jexcelPurpleCell');
                         var cell = elInstance.getCell(("I").concat(parseInt(y) + 1))
                         cell.classList.add('jexcelPurpleCell');
-                    } else if (moment(rowData[0]).format("YYYY-MM") >= moment(this.state.datasetJson.currentVersion.forecastStartDate).format("YYYY-MM") && 
-                               moment(rowData[0]).format("YYYY-MM") <= moment(this.state.datasetJson.currentVersion.forecastStopDate).format("YYYY-MM")) {
+                    } else if (moment(rowData[0]).format("YYYY-MM") >= moment(this.state.datasetJson.currentVersion.forecastStartDate).format("YYYY-MM") &&
+                        moment(rowData[0]).format("YYYY-MM") <= moment(this.state.datasetJson.currentVersion.forecastStopDate).format("YYYY-MM")) {
                         // if (rowData[1] !== "") {
                         //     var cell = elInstance.getCell(("A").concat(parseInt(y) + 1))
                         //     cell.classList.add('jexcelBoldPurpleCell');
@@ -1813,21 +1813,33 @@ export default class ExtrapolateDataComponent extends React.Component {
                 if (actualConsumptionListForPlanningUnitAndRegion.length > 1) {
                     startDate1 = moment.min((actualConsumptionListForPlanningUnitAndRegion).map(d => moment(d.month)));
                     endDate1 = moment.max((actualConsumptionListForPlanningUnitAndRegion).map(d => moment(d.month)));
+                    this.setState({
+                        rangeValue1: { from: { year: Number(moment(startDate1).startOf('month').format("YYYY")), month: Number(moment(startDate1).startOf('month').format("M")) }, to: { year: Number(moment(endDate1).startOf('month').format("YYYY")), month: Number(moment(endDate1).startOf('month').format("M")) } },
+                        minDate: { year: Number(moment(startDate1).startOf('month').format("YYYY")), month: Number(moment(startDate1).startOf('month').format("M")) },
+                        maxDate: { year: Number(moment(endDate1).startOf('month').format("YYYY")), month: Number(moment(endDate1).startOf('month').format("M")) },
+                        showDate: true
+                    }, () => {
+                        this.getDateDifference()
+                    })
                 } else {
                     startDate1 = moment(Date.now()).subtract(24, 'months').startOf('month').format("YYYY-MM-DD");
                     endDate1 = moment(Date.now()).startOf('month').format("YYYY-MM-DD")
+                    this.setState({
+                        rangeValue1: { from: { year: Number(moment(startDate1).startOf('month').format("YYYY")), month: Number(moment(startDate1).startOf('month').format("M")) }, to: { year: Number(moment(endDate1).startOf('month').format("YYYY")), month: Number(moment(endDate1).startOf('month').format("M")) } },
+                        minDate: { year: Number(moment(startDate1).startOf('month').format("YYYY")), month: Number(moment(startDate1).startOf('month').format("M")) },
+                        maxDate: { year: Number(moment(endDate1).startOf('month').format("YYYY")), month: Number(moment(endDate1).startOf('month').format("M")) },
+                        showDate: false,
+                        dataEl: "",
+                        loading: false,
+                        noDataMessage: i18n.t('static.extrapolate.noDataFound')
+                    }, () => {
+                        this.getDateDifference()
+                    })
                 }
                 // var endDate1 = moment(Date.now()).startOf('month').format("YYYY-MM-DD")
                 // var startDate = moment("2021-05-01").format("YYYY-MM-DD");
                 // var endDate = moment("2022-02-01").format("YYYY-MM-DD");
-                this.setState({
-                    rangeValue1: { from: { year: Number(moment(startDate1).startOf('month').format("YYYY")), month: Number(moment(startDate1).startOf('month').format("M")) }, to: { year: Number(moment(endDate1).startOf('month').format("YYYY")), month: Number(moment(endDate1).startOf('month').format("M")) } },
-                    minDate: { year: Number(moment(startDate1).startOf('month').format("YYYY")), month: Number(moment(startDate1).startOf('month').format("M")) },
-                    maxDate: { year: Number(moment(endDate1).startOf('month').format("YYYY")), month: Number(moment(endDate1).startOf('month').format("M")) },
-                    showDate: true
-                }, () => {
-                    this.getDateDifference()
-                })
+
             }
         }
     }

@@ -6382,3 +6382,10 @@ top: calc(20em + 3px);
   background:#002f6c;
   color:#fff;
 }
+
+@media screen and (min-width: 768px){
+  .compareAndSelectDatePicker .month-picker > .rmp-container .rmp-popup.range {
+      width: unset !important;
+      padding: 0.6rem;
+  }
+  }
