@@ -541,14 +541,18 @@ export default class ListTreeComponent extends Component {
 
         console.log("TreeId--------------->", treeId, programId, versionId, operationId);
         var program = this.state.treeFlag ? (this.state.datasetList.filter(x => x.programId == programId && x.version == versionId)[0]) : (this.state.datasetList.filter(x => x.id == programId)[0]);
+        console.log("delete program---", program);
         let tempProgram = JSON.parse(JSON.stringify(program))
         let treeList = program.programData.treeList;
+        console.log("delete treeList---", treeList);
         var treeTemplateId = '';
         if (operationId == 1) {//delete
+            console.log("delete treeId---", treeId);
             const index = treeList.findIndex(c => c.treeId == treeId);
-            if (index > 0) {
+            console.log("delete index---", index);
+            // if (index > 0) {
                 const result = treeList.splice(index, 1);
-            }
+            // }
         } else if (operationId == 2) {//copy
             let treeName = this.state.treeName;
 
@@ -791,7 +795,7 @@ export default class ListTreeComponent extends Component {
         // if (operationId == 3) {
         if (operationId == 3 && treeTemplateId != "" && treeTemplateId != null) {
             console.log("programId 1---", programId);
-            calculateModelingData(programCopy, this, programId, 0, 1, 1, treeId, false,true);
+            calculateModelingData(programCopy, this, programId, 0, 1, 1, treeId, false, true);
         } else {
             this.saveTreeData(operationId, tempProgram, treeTemplateId, programId, treeId, programCopy);
         }

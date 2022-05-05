@@ -248,7 +248,7 @@ export default class TreeExtrapolationComponent extends React.Component {
         var startDate = moment("2021-05-01").format("YYYY-MM-DD");
         var endDate = moment("2022-02-01").format("YYYY-MM-DD")
         this.state = {
-            seasonality: 1,
+            seasonality: 0,
             dataChanged: false,
             buttonFalg: 1,
             showJexcelData: false,
@@ -426,9 +426,9 @@ export default class TreeExtrapolationComponent extends React.Component {
                         var dataForExtrapolation = jexcelDataArr.filter(c => c.amount != "");
                         if (dataForExtrapolation.length < 3 || (this.state.smoothingId && dataForExtrapolation.length < 24) || (this.state.arimaId && dataForExtrapolation.length < 14)) {
                             // this.setState({ extrapolationLoader: false }, () => {
-                                setTimeout(() => {
-                                    alert(i18n.t('static.tree.minDataRequiredToExtrapolate'))
-                                }, 0);
+                            setTimeout(() => {
+                                alert(i18n.t('static.tree.minDataRequiredToExtrapolate'))
+                            }, 0);
                             // });
                         }
                         this.calculateExtrapolatedData(false);
@@ -447,17 +447,17 @@ export default class TreeExtrapolationComponent extends React.Component {
         })
     }
     buildExtrapolationMom() {
-        var movingAveragesData = this.state.movingAvgData;
-        var semiAveragesData = this.state.semiAvgData;
-        var linearRegressionDataLower = this.state.linearRegressionData;
-        var linearRegressionData = this.state.linearRegressionData;
-        var linearRegressionDataUpper = this.state.linearRegressionData;
-        var tesDataLower = this.state.tesData;
-        var tesData = this.state.tesData;
-        var tesDataUpper = this.state.tesData;
-        var arimaDataLower = this.state.arimaData;
-        var arimaData = this.state.arimaData;
-        var arimaDataUpper = this.state.arimaData;
+        var movingAveragesData = [];
+        var semiAveragesData = [];
+        var linearRegressionDataLower = [];
+        var linearRegressionData = [];
+        var linearRegressionDataUpper = [];
+        var tesDataLower = [];
+        var tesData = [];
+        var tesDataUpper = [];
+        var arimaDataLower = [];
+        var arimaData = [];
+        var arimaDataUpper = [];
         var extrapolationDataList = [];
         var momList = [];
         var tableJson = this.state.dataExtrapolation.getJson(null, false);
@@ -484,71 +484,71 @@ export default class TreeExtrapolationComponent extends React.Component {
             };
             momList.push(json2);
             // Moving averages
-            // var movingAveragesJson = {
-            //     month: map1.get("0"),
-            //     forecast: map1.get("4") != "" && map1.get("4") != null ? map1.get("4").toString().replaceAll("%", "") : null,
-            // }
-            // movingAveragesData.push(movingAveragesJson);
+            var movingAveragesJson = {
+                month: map1.get("0"),
+                amount: map1.get("4") != "" && map1.get("4") != null ? map1.get("4").toString().replaceAll("%", "") : null,
+            }
+            movingAveragesData.push(movingAveragesJson);
             // Semi averages
-            // var semiAveragesJson = {
-            //     month: map1.get("0"),
-            //     forecast: map1.get("5") != "" && map1.get("5") != null ? map1.get("5").toString().replaceAll("%", "") : null,
-            // }
-            // semiAveragesData.push(semiAveragesJson);
+            var semiAveragesJson = {
+                month: map1.get("0"),
+                amount: map1.get("5") != "" && map1.get("5") != null ? map1.get("5").toString().replaceAll("%", "") : null,
+            }
+            semiAveragesData.push(semiAveragesJson);
             // Linear Regression
-            // var linearRegressionLowerJson = {
-            //     month: map1.get("0"),
-            //     forecast: map1.get("18") != "" && map1.get("18") != null ? map1.get("18").toString().replaceAll("%", "") : null,
-            // }
-            // linearRegressionDataLower.push(linearRegressionLowerJson);
+            var linearRegressionLowerJson = {
+                month: map1.get("0"),
+                amount: map1.get("18") != "" && map1.get("18") != null ? map1.get("18").toString().replaceAll("%", "") : null,
+            }
+            linearRegressionDataLower.push(linearRegressionLowerJson);
 
-            // var linearRegressionJson = {
-            //     month: map1.get("0"),
-            //     forecast: map1.get("6") != "" && map1.get("6") != null ? map1.get("6").toString().replaceAll("%", "") : null,
-            // }
-            // linearRegressionData.push(linearRegressionJson);
+            var linearRegressionJson = {
+                month: map1.get("0"),
+                amount: map1.get("6") != "" && map1.get("6") != null ? map1.get("6").toString().replaceAll("%", "") : null,
+            }
+            linearRegressionData.push(linearRegressionJson);
 
-            // var linearRegressionUpperJson = {
-            //     month: map1.get("0"),
-            //     forecast: map1.get("19") != "" && map1.get("19") != null ? map1.get("19").toString().replaceAll("%", "") : null,
-            // }
-            // linearRegressionDataUpper.push(linearRegressionUpperJson);
+            var linearRegressionUpperJson = {
+                month: map1.get("0"),
+                amount: map1.get("19") != "" && map1.get("19") != null ? map1.get("19").toString().replaceAll("%", "") : null,
+            }
+            linearRegressionDataUpper.push(linearRegressionUpperJson);
             // TES Data
-            // var tesLowerJson = {
-            //     month: map1.get("0"),
-            //     forecast: map1.get("14") != "" && map1.get("14") != null ? map1.get("14").toString().replaceAll("%", "") : null,
-            // }
-            // tesDataLower.push(tesLowerJson);
+            var tesLowerJson = {
+                month: map1.get("0"),
+                amount: map1.get("14") != "" && map1.get("14") != null ? map1.get("14").toString().replaceAll("%", "") : null,
+            }
+            tesDataLower.push(tesLowerJson);
 
-            // var tesJson = {
-            //     month: map1.get("0"),
-            //     forecast: map1.get("7") != "" && map1.get("7") != null ? map1.get("7").toString().replaceAll("%", "") : null,
-            // }
-            // tesData.push(tesJson);
+            var tesJson = {
+                month: map1.get("0"),
+                amount: map1.get("7") != "" && map1.get("7") != null ? map1.get("7").toString().replaceAll("%", "") : null,
+            }
+            tesData.push(tesJson);
 
-            // var tesUpperJson = {
-            //     month: map1.get("0"),
-            //     forecast: map1.get("15") != "" && map1.get("15") != null ? map1.get("15").toString().replaceAll("%", "") : null,
-            // }
-            // tesDataUpper.push(tesUpperJson);
+            var tesUpperJson = {
+                month: map1.get("0"),
+                amount: map1.get("15") != "" && map1.get("15") != null ? map1.get("15").toString().replaceAll("%", "") : null,
+            }
+            tesDataUpper.push(tesUpperJson);
             //Arima
-            // var arimaLowerJson = {
-            //     month: map1.get("0"),
-            //     forecast: map1.get("16") != "" && map1.get("16") != null ? map1.get("16").toString().replaceAll("%", "") : null,
-            // }
-            // arimaDataLower.push(arimaLowerJson);
+            var arimaLowerJson = {
+                month: map1.get("0"),
+                amount: map1.get("16") != "" && map1.get("16") != null ? map1.get("16").toString().replaceAll("%", "") : null,
+            }
+            arimaDataLower.push(arimaLowerJson);
 
-            // var arimaJson = {
-            //     month: map1.get("0"),
-            //     forecast: map1.get("8") != "" && map1.get("8") != null ? map1.get("8").toString().replaceAll("%", "") : null,
-            // }
-            // arimaData.push(arimaJson);
+            var arimaJson = {
+                month: map1.get("0"),
+                amount: map1.get("8") != "" && map1.get("8") != null ? map1.get("8").toString().replaceAll("%", "") : null,
+            }
+            arimaData.push(arimaJson);
 
-            // var arimaUpperJson = {
-            //     month: map1.get("0"),
-            //     forecast: map1.get("17") != "" && map1.get("17") != null ? map1.get("17").toString().replaceAll("%", "") : null,
-            // }
-            // arimaDataUpper.push(arimaUpperJson);
+            var arimaUpperJson = {
+                month: map1.get("0"),
+                amount: map1.get("17") != "" && map1.get("17") != null ? map1.get("17").toString().replaceAll("%", "") : null,
+            }
+            arimaDataUpper.push(arimaUpperJson);
         }
         // console.log("TES lower---", tesLowerJson);
         // console.log("TES ---", tesJson);
@@ -618,6 +618,7 @@ export default class TreeExtrapolationComponent extends React.Component {
             }
             //ARIMA
             if (filteredExtrapolationMethodList[i].id == 4) {
+                console.log("seasonality for arima---", this.state.seasonality);
                 json = {
                     extrapolationMethod: { id: 8 },
                     jsonProperties: {
@@ -1360,6 +1361,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                             var arimaData = [];
                             var tesData = [];
                             var linearRegressionData = [];
+                            var json;
 
                             for (let i = 0; i < nodeDataExtrapolationOptionList.length; i++) {
                                 var id = nodeDataExtrapolationOptionList[i].extrapolationMethod.id;
@@ -1373,14 +1375,43 @@ export default class TreeExtrapolationComponent extends React.Component {
                                     console.log("nodeDataExtrapolationOptionList[i] inside ---", nodeDataExtrapolationOptionList[i])
                                     monthsForMovingAverage = nodeDataExtrapolationOptionList[i].jsonProperties.months;
                                     console.log("monthsForMovingAverage from json properties---", monthsForMovingAverage)
-                                    movingAvgData = nodeDataExtrapolationOptionList[i].extrapolationOptionDataList;
+                                    var movingAvgDataTemp = JSON.parse(JSON.stringify(nodeDataExtrapolationOptionList[i].extrapolationOptionDataList));
+                                    console.log("movingAvgDataTemp---", movingAvgDataTemp)
+                                    if (movingAvgDataTemp.length > 0) {
+                                        for (let i = 0; i < movingAvgDataTemp.length; i++) {
+                                            json = {
+                                                month: i + 1,
+                                                forecast: movingAvgDataTemp[i].amount
+                                            }
+                                            movingAvgData.push(json);
+                                        }
+                                        console.log("movingAvgData after temp---", movingAvgData);
+                                    }
                                 } else if (id == 6) {
                                     semiAvgId = true;
-                                    semiAvgData = nodeDataExtrapolationOptionList[i].extrapolationOptionDataList;
+                                    var semiAvgDataTemp = JSON.parse(JSON.stringify(nodeDataExtrapolationOptionList[i].extrapolationOptionDataList));
+                                    if (semiAvgDataTemp.length > 0) {
+                                        for (let i = 0; i < semiAvgDataTemp.length; i++) {
+                                            json = {
+                                                month: i + 1,
+                                                forecast: semiAvgDataTemp[i].amount
+                                            }
+                                            semiAvgData.push(json);
+                                        }
+                                    }
                                 } else if (id == 5) {
                                     linearRegressionId = true;
                                     confidenceLevelIdLinearRegression = nodeDataExtrapolationOptionList[i].jsonProperties.confidenceLevelIdLinearRegression;
-                                    linearRegressionData = nodeDataExtrapolationOptionList[i].extrapolationOptionDataList;
+                                    var linearRegressionDataTemp = JSON.parse(JSON.stringify(nodeDataExtrapolationOptionList[i].extrapolationOptionDataList));
+                                    if (linearRegressionDataTemp.length > 0) {
+                                        for (let i = 0; i < linearRegressionDataTemp.length; i++) {
+                                            json = {
+                                                month: i + 1,
+                                                forecast: linearRegressionDataTemp[i].amount
+                                            }
+                                            linearRegressionData.push(json);
+                                        }
+                                    }
                                 }
                                 else if (id == 4) {
                                     p = nodeDataExtrapolationOptionList[i].jsonProperties.p;
@@ -1388,8 +1419,18 @@ export default class TreeExtrapolationComponent extends React.Component {
                                     q = nodeDataExtrapolationOptionList[i].jsonProperties.q;
                                     confidenceLevelIdArima = nodeDataExtrapolationOptionList[i].jsonProperties.confidenceLevelIdArima;
                                     seasonality = nodeDataExtrapolationOptionList[i].jsonProperties.seasonality;
+                                    console.log("seasonality for arima on load---", seasonality);
                                     arimaId = true;
-                                    arimaData = nodeDataExtrapolationOptionList[i].extrapolationOptionDataList;
+                                    var arimaDataTemp = JSON.parse(JSON.stringify(nodeDataExtrapolationOptionList[i].extrapolationOptionDataList));
+                                    if (arimaDataTemp.length > 0) {
+                                        for (let i = 0; i < arimaDataTemp.length; i++) {
+                                            json = {
+                                                month: i + 1,
+                                                forecast: arimaDataTemp[i].amount
+                                            }
+                                            arimaData.push(json);
+                                        }
+                                    }
                                 }
                                 else if (id == 2) {
                                     confidenceLevelId = nodeDataExtrapolationOptionList[i].jsonProperties.confidenceLevel;
@@ -1398,7 +1439,16 @@ export default class TreeExtrapolationComponent extends React.Component {
                                     beta = nodeDataExtrapolationOptionList[i].jsonProperties.beta;
                                     gamma = nodeDataExtrapolationOptionList[i].jsonProperties.gamma;
                                     smoothingId = true;
-                                    tesData = nodeDataExtrapolationOptionList[i].extrapolationOptionDataList;
+                                    var tesDataTemp = JSON.parse(JSON.stringify(nodeDataExtrapolationOptionList[i].extrapolationOptionDataList));
+                                    if (tesDataTemp.length > 0) {
+                                        for (let i = 0; i < tesDataTemp.length; i++) {
+                                            json = {
+                                                month: i + 1,
+                                                forecast: tesDataTemp[i].amount
+                                            }
+                                            tesData.push(json);
+                                        }
+                                    }
                                 }
 
                             }
@@ -1409,7 +1459,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                 confidenceLevelIdArima, alpha, beta, gamma, movingAvgId,
                                 semiAvgId, linearRegressionId, smoothingId, arimaId,
                                 filteredExtrapolationMethodList, forecastNestedHeader: filteredExtrapolationMethodList.length,
-                                nodeDataExtrapolationOptionList, movingAvgId, monthsForMovingAverage,
+                                nodeDataExtrapolationOptionList, movingAvgId, monthsForMovingAverage, seasonality,
                                 movingAvgData, semiAvgData, linearRegressionData, tesData, arimaData,
                                 // extrapolationLoader: false
                             }, () => {
@@ -4040,7 +4090,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                                                             />
                                                                             <FormFeedback>{errors.qId}</FormFeedback>
                                                                         </div>
-                                                                        <div className="tab-ml-1 ml-lg-5 ExtraCheckboxFieldWidth" style={{marginTop:'38px'}}>
+                                                                        <div className="tab-ml-1 ml-lg-5 ExtraCheckboxFieldWidth" style={{ marginTop: '38px' }}>
                                                                             <Input
                                                                                 className="form-check-input checkboxMargin"
                                                                                 type="checkbox"
