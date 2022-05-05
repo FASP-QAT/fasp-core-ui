@@ -307,7 +307,8 @@ export default class ExtrapolateDataComponent extends React.Component {
             showFits: false,
             checkIfAnyMissingActualConsumption: false,
             extrapolateClicked: false,
-            showDate: false
+            showDate: false,
+            seasonality:""
         }
         // this.toggleD = this.toggleD.bind(this);
         this.toggleConfidenceLevel = this.toggleConfidenceLevel.bind(this);
@@ -323,7 +324,15 @@ export default class ExtrapolateDataComponent extends React.Component {
         this.cancelClicked = this.cancelClicked.bind(this);
         this.handleRangeDissmis1 = this.handleRangeDissmis1.bind(this);
         this.pickRange1 = React.createRef();
+        this.seasonalityCheckbox = this.seasonalityCheckbox.bind(this);
     }
+
+    seasonalityCheckbox(event) {
+        this.setState({
+            seasonality: event.target.checked ? 1 : 0
+        });
+    }
+
     componentDidMount = function () {
         this.setState({ loading: true })
         var db1;
@@ -3871,6 +3880,22 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                             />
                                                             <FormFeedback>{errors.qId}</FormFeedback>
 
+                                                        </div>
+                                                        <div className="tab-ml-1 ml-lg-5 ExtraCheckboxFieldWidth" style={{marginTop:'38px'}}>
+                                                            <Input
+                                                                className="form-check-input checkboxMargin"
+                                                                type="checkbox"
+                                                                id="seasonality"
+                                                                name="seasonality"
+                                                                // checked={true}
+                                                                checked={this.state.seasonality}
+                                                                onClick={(e) => { this.seasonalityCheckbox(e); }}
+                                                            />
+                                                            <Label
+                                                                className="form-check-label"
+                                                                check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                                <b>{i18n.t('static.extrapolation.seasonality')}</b>
+                                                            </Label>
                                                         </div>
                                                     </div>
 
