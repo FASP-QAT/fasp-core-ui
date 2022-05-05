@@ -4090,8 +4090,8 @@ class DefaultLayout extends Component {
             </Suspense>
             <Row>
               <Col xs="12" md="12">
-                <Nav tabs className="marginTopTabs" style={{ flexDirection: "row", borderBottom: "none" }} >
-                  <NavItem className="bgColourRemoveItem itemWhidth">
+              {(AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_FORECASTING_MODULE') && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SUPPLY_PLANNING_MODULE')) &&  <Nav tabs className="marginTopTabs" style={{ flexDirection: "row", borderBottom: "none" }} >
+                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_FORECASTING_MODULE') && <NavItem className="bgColourRemoveItem itemWhidth">
                     <NavLink
                       className="bgColourRemoveLink tab1"
                       active={this.state.activeTab === '1'}
@@ -4103,8 +4103,8 @@ class DefaultLayout extends Component {
                       <i class="nav-icon fa fa-line-chart tabicon" style={{ fontSize: '18px', paddingTop: '5px', color: '#fff' }} ></i>
                       <h6 className="tabtext">{i18n.t('static.module.forecasting')}</h6>
                     </NavLink>
-                  </NavItem>
-                  <NavItem className="bgColourRemoveItem itemWhidth">
+                  </NavItem>}
+                  {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SUPPLY_PLANNING_MODULE') && <NavItem className="bgColourRemoveItem itemWhidth">
                     <NavLink
                       className="bgColourRemoveLink tab2"
                       active={this.state.activeTab === '2'}
@@ -4118,8 +4118,8 @@ class DefaultLayout extends Component {
                       <i class="nav-icon blueicon"><img className="" src={imgforcastmoduletabblue} style={{ width: '25px', height: '25px', paddingTop: '0px' }} /></i>
                       <h6 className="tabtext">{i18n.t('static.module.supplyPlanningMod')}</h6>
                     </NavLink>
-                  </NavItem>
-                </Nav>
+                  </NavItem>}
+                </Nav>}
                 {/* <TabContent activeTab={this.state.activeTab[0]}>
                           {this.tabPane()}
                         </TabContent> */}
