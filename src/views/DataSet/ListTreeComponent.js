@@ -1293,6 +1293,11 @@ export default class ListTreeComponent extends Component {
     //     }
 
     // }
+    toggleShowGuidance() {
+        this.setState({
+            showGuidance: !this.state.showGuidance
+        })
+    }
     toggleDeropdownSetting(i) {
         const newArray = this.state.dropdownOpen.map((element, index) => { return (index === i ? !element : false); });
         this.setState({
@@ -1346,6 +1351,9 @@ export default class ListTreeComponent extends Component {
                         {/* <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong> */}
                         <div className="card-header-actions">
                             <div className="card-header-action">
+                            <a style={{marginLeft:'106px'}}>
+                                <span style={{ cursor: 'pointer' }} onClick={() => { this.toggleShowGuidance() }}><small className="supplyplanformulas">{i18n.t('static.common.showGuidance')}</small></span>
+                            </a>
                                 <Col md="12 pl-0 pr-lg-0">
                                     <div className="d-md-flex">
                                         {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_TREE') &&
@@ -1452,6 +1460,44 @@ export default class ListTreeComponent extends Component {
                             </div>
                         </div>
                     </CardBody>
+                    <Modal isOpen={this.state.showGuidance}
+                    className={'modal-lg ' + this.props.className} >
+                    <ModalHeader toggle={() => this.toggleShowGuidance()} className="ModalHead modal-info-Headher">
+                        <strong className="TextWhite">Show Guidance</strong>
+                    </ModalHeader>
+                    <div>
+                        <ModalBody>
+                           <div>
+                               <h3 className='ShowGuidanceHeading'>Manage Tree – Tree list</h3>
+                           </div>
+                            <p>
+                                <p style={{fontSize:'14px'}}><span className="UnderLineText">Purpose :</span> Enable users to :</p>
+                                <p className='pl-lg-4'>
+                                1) View a list of their existing trees<br></br>
+                                2) Edit an existing tree by clicking any row <br></br>
+                                3) Delete or duplicate existing trees by right clicking on a row<br></br>
+                                4) Add a new tree to a loaded program by clicking on the 'Add Tree' dropdown in the top right corner of the screen. New trees can be built:<br></br> 
+                                <ul>
+                                    <li>manually - select 'Add Tree'</li>
+                                    <li>from a tree template - select the name of the desired template.</li>
+                                </ul>
+                                </p>
+                            </p>
+                            <p>
+                                <p style={{fontSize:'14px'}}><span className="UnderLineText">Using this screen :</span></p>
+                                <p className='pl-lg-4'>
+                                <ul>
+                                    <li>A forecast program must first be loaded in order to build a tree (either manually or from a tree template.)</li>
+                                    <li>Before building and editing a tree, first add the forecast program's planning units in the <a href='/#/planningUnitSetting/listPlanningUnitSetting'>'Update Planning Units'</a> screen before building</li>
+                                    <li>Building a tree similar to an existing tree? Duplicate an existing tree by right clicking on a row and selecting “duplicate” edit. If you want to keep the structure of the tree constant and only change the numbers, build only one tree and use the scenario feature instead. </li>
+                                    <li>Submit a HelpDesk ticket if there is a missing template that would benefit the QAT community. </li>
+                                </ul>
+                                </p>
+                            </p>
+                        </ModalBody>
+                    </div>
+                </Modal>
+
 
                     <Modal isOpen={this.state.isModalOpen}
                         className={'modal-lg ' + this.props.className}>

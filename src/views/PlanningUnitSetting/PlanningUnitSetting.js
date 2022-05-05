@@ -663,6 +663,8 @@ export default class PlanningUnitSetting extends Component {
                 if (index == "" || index == null || index == undefined) {
                     console.log("-----------------onPaste---------------------3");
                     // (instance.jexcel).setValueFromCoords(8, data[i].y, true, true);
+                    (instance.jexcel).setValueFromCoords(2, data[i].y, true, true);
+                    (instance.jexcel).setValueFromCoords(3, data[i].y, true, true);
                     (instance.jexcel).setValueFromCoords(9, data[i].y, true, true);
                     (instance.jexcel).setValueFromCoords(10, data[i].y, 1, true);
                     (instance.jexcel).setValueFromCoords(11, data[i].y, 1, true);
@@ -670,6 +672,7 @@ export default class PlanningUnitSetting extends Component {
                     (instance.jexcel).setValueFromCoords(13, data[i].y, 0, true);
                     (instance.jexcel).setValueFromCoords(14, data[i].y, true, true);
                     // (instance.jexcel).setValueFromCoords(15, data[i].y, "", true);
+                    (instance.jexcel).setValueFromCoords(16, data[i].y, true, true);
                     z = data[i].y;
                 }
             }

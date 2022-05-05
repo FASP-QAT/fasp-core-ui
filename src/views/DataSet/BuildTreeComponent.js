@@ -501,6 +501,9 @@ export default class BuildTree extends Component {
         this.pickAMonth4 = React.createRef()
         this.pickAMonth5 = React.createRef()
         this.state = {
+            showGuidanceModelingTransfer:false,
+            showGuidanceNodeData: false,
+            showGuidance:false,
             sameLevelNodeList1: [],
             nodeUnitListPlural: [],
             nodeTransferDataList: [],
@@ -760,6 +763,7 @@ export default class BuildTree extends Component {
             showDate: false,
             modelingChanged: false
         }
+        // this.showGuidanceNodaData = this.showGuidanceNodaData.bind(this);
         this.getMomValueForDateRange = this.getMomValueForDateRange.bind(this);
         this.toggleDeropdownSetting = this.toggleDeropdownSetting.bind(this);
         // this.onClick1 = this.onClick1.bind(this);
@@ -1407,7 +1411,21 @@ export default class BuildTree extends Component {
     //     )
 
     //     };
-
+    toggleShowGuidanceNodeData() {
+       this.setState({
+            showGuidanceNodeData: !this.state.showGuidanceNodeData
+        })
+    }
+    toggleShowGuidanceModelingTransfer() {
+        this.setState({
+            showGuidanceModelingTransfer: !this.state.showGuidanceModelingTransfer
+        })
+    }
+    toggleShowGuidance() {
+        this.setState({
+            showGuidance: !this.state.showGuidance
+        })
+    }
     toggleDeropdownSetting(i) {
         const newArray = this.state.dropdownOpen.map((element, index) => { return (index === i ? !element : false); });
         this.setState({
@@ -7830,7 +7848,7 @@ export default class BuildTree extends Component {
                                         <div className="row pl-lg-0 pr-lg-3">
                                             {/* <SupplyPlanFormulas ref="formulaeChild" /> */}
                                             <a className="">
-                                                <span style={{ cursor: 'pointer', color: '20a8d8' }} ><small className="supplyplanformulas">{i18n.t('Show Guidance')}</small></span>
+                                                <span style={{ cursor: 'pointer', color: '20a8d8' }} onClick={() => { this.toggleShowGuidanceNodeData() }} ><small className="supplyplanformulas">{i18n.t('Show Guidance')}</small></span>
 
                                             </a>
                                         </div>
@@ -8977,7 +8995,7 @@ export default class BuildTree extends Component {
                         <div className="row pl-lg-0 pr-lg-3">
                             {/* <SupplyPlanFormulas ref="formulaeChild" /> */}
                             <a className="">
-                                <span style={{ cursor: 'pointer', color: '20a8d8' }} ><small className="supplyplanformulas">{i18n.t('Show Guidance')}</small></span>
+                                <span style={{ cursor: 'pointer', color: '20a8d8' }} onClick={() => { this.toggleShowGuidanceModelingTransfer() }}><small className="supplyplanformulas">{i18n.t('Show Guidance')}</small></span>
 
                             </a>
                         </div>
@@ -10211,6 +10229,9 @@ export default class BuildTree extends Component {
                     <Card className="mb-lg-0">
                         <div className="pb-lg-0">
                             <div className="Card-header-reporticon pb-1" style={{ display: 'grid', float: 'right' }}>
+                            <a style={{marginLeft:'106px'}}>
+                                <span style={{ cursor: 'pointer' }} onClick={() => { this.toggleShowGuidance() }}><small className="supplyplanformulas">{i18n.t('static.common.showGuidance')}</small></span>
+                            </a>
                                 {/* <span className="compareAndSelect-larrow"> <i className="cui-arrow-left icons " > </i></span> */}
                                 {/* <span className="compareAndSelect-rarrow"> <i className="cui-arrow-right icons " > </i></span> */}
                                 <span className="compareAndSelect-larrowText"> {i18n.t('static.common.continueTo')} <a href="/#/validation/modelingValidation" className="supplyplanformulas">{i18n.t('static.dashboard.modelingValidation')}</a>  <span className="compareAndSelect-rarrow"> <i className="cui-arrow-right icons " > </i></span></span>
@@ -10760,6 +10781,359 @@ export default class BuildTree extends Component {
                         </CardBody>
 
                     </Card></Col></Row>
+                    <Modal isOpen={this.state.showGuidanceModelingTransfer}
+                    className={'modal-lg ' + this.props.className} >
+                    <ModalHeader toggle={() => this.toggleShowGuidanceModelingTransfer()} className="ModalHead modal-info-Headher">
+                        <strong className="TextWhite">Show Guidance</strong>
+                    </ModalHeader>
+                    <div>
+                        <ModalBody>
+                           <div>
+                               <h3 className='ShowGuidanceHeading'>Add/Edit Node - Modeling/Transfer </h3>
+                           </div>
+                            <p>
+                                <p style={{fontSize:'14px'}}><span className="UnderLineText">Purpose :</span>If a node changes over time, a user can utilize the Modeling/Transfer tab to model growth/loss within a single node or a transfer from one node to another. Note that this functionality is only available for Number (#) Nodes and Percentage (%) Nodes (including Forecasting Units and Planning Units). </p>
+                           </p>
+
+                           <p>
+                                <p style={{fontSize:'14px'}}><span className="UnderLineText">Using this tab :</span>
+                                <br></br>Modeling and transfer can have four different modeling types: </p>
+                           </p>
+  
+                            <p>
+                        
+                            <div className='pl-lg-4 pr-lg-4'>
+                            <table className="table table-bordered ">
+                                <thead>
+                                <tr>
+                                    <th style={{width:'130px'}}>Modeling Type</th>
+                                    <th># Node Calculation</th>
+                                    <th>% Node Calculation</th>
+                                   
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td>Linear (#)</td>
+                                    <td>+/- a static number each month</td>
+                                    <td>N/A</td>
+                                   
+                                </tr>
+                                <tr>
+                                    <td>Linear (%)</td>
+                                    <td>+/- a static percentage each month, calculated based on the starting month</td>
+                                    <td>N/A</td>
+                                    
+                                </tr>
+                                <tr>
+                                    <td>Exponential (%)</td>
+                                    <td>+/- a percentage each month, calculated on the previous month as a rolling percentage</td>
+                                    <td>N/A</td>
+                                    
+                                </tr>
+                                <tr>
+                                    <td>Linear (% point)</td>
+                                    <td>N/A</td>
+                                    <td>+/- a static percentage each month (e.g. if the starting month is 30% and the change is +1% each month, next month is 31%, the next is 32%, and so on)</td>
+                                   
+                                </tr>
+                               
+                                </tbody>
+                            </table>
+                            </div>
+                             </p>
+                            
+                             <p><b><i class="fa fa-calculator" aria-hidden="true"></i></b> QAT has a modeling calculator tool for users should they need assistance in calculating the month-on-month change over time based on an ending target date & percentage or total percentage change over time. The modelling calculator is only available for a # node and a % node.<br>
+                             </br>Additionally, by clicking on “Show Monthly Data,” users can see how their modelling and transfer inputs have affected the monthly data in both a graphical and tabular form. In the tabular data, users may add a manual change for a specific month or input a seasonality index percentage (only available for % nodes), as needed. If a user checks “Manual Change affects future month,” the manual amount added to the end of the month will carry over to the beginning of the next month. If neither of these fields are relevant, users can uncheck “Show (seasonality &) manual change” to hide these columns. 
+                             </p>
+                            
+                             <p><span  style={{fontSize:'14px'}} className="UnderLineText">Rules for Transfer Nodes:</span>
+                             <ul>
+                                 <li>Transfers must occur between nodes be on the same level</li>
+                                 <li>Users can only transfer to nodes that are of the same type (i.e. a forecasting unit may transfer node data to another forecasting unit, but not a planning unit as they are not the same node type).</li>
+                                 <li>The order of operations for calculating a transfer occurs from the left to the right in the forecast tree. A transfer cannot be made from right to left, thus a user should be careful when designing their tree and determining where each node should be placed. </li>
+                                 <li>Transfers are always negative from the source node and positive to the destination node.</li>
+                             </ul>
+                             </p>
+                             <p><span  style={{fontSize:'14px'}} className="UnderLineText">Examples :</span>
+                             <ul>
+                                 <li><b>Simple Growth</b> (linear #) -the example below shows a population growth each month by XXX/month from January 2022 to December 2024. </li>
+                                 <li><b>Simple Growth</b> (linear %) - the example below shows a steady population growth each month by 0.1% from January 2022 to December 2024. QAT has calculated this change to be increasing the population by XXX each month.</li>
+                                 <li><b>Simple Growth</b> (exponential %) -the example below shows a population growth each month by 0.1% from January 2022 to December 2024. Because the growth is exponential, the change differs each month. 
+                                 <ul>
+                                     <li>QAT calculates this change to be XXX in XXX month</li>
+                                     <li>QAT calculates this change to be XXX in XXX month</li>
+                                 </ul>
+                                 </li>
+                                 <li><b>Multi-year Loss</b> -the example below shows a different rate of attrition (loss) each year. Year 1 (January 2022 to December 2022) decreases the population by 0.01% or XXX each month, Year 2 (January 2023 to December 2023) decreases the population by 0.02% or XXX  each month, etc. QAT utilizes a negative number to denote a decrease or loss.</li>
+                                 <li><b>Transfer </b>- the example below shows a transfer of XXX patients each month for one year, January 2022 to December 2022, from the current node (Adults 1st Line) to another node (Adults 2nd Line). This transfer will also appear on the other node (Adults 2nd Line) greyed-out to signify an non-editable change.</li>
+                             </ul>
+                             </p>
+                       
+                        </ModalBody>
+                    </div>
+                </Modal>
+                    <Modal isOpen={this.state.showGuidanceNodeData}
+                    className={'modal-lg ' + this.props.className} >
+                    <ModalHeader toggle={() => this.toggleShowGuidanceNodeData()} className="ModalHead modal-info-Headher">
+                        <strong className="TextWhite">Show Guidance</strong>
+                    </ModalHeader>
+                    <div>
+                        <ModalBody>
+                           <div>
+                               <h3 className='ShowGuidanceHeading'>Add/Edit Node - Node Data</h3>
+                           </div>
+                            <p>
+                                <p style={{fontSize:'14px'}}><span className="UnderLineText">Purpose :</span>Enable allows user to specify the type of node</p>
+                           </p>
+  
+                            <p>
+                            <p style={{fontSize:'14px',fontWeight:'bold'}}><span className="">Node Type :</span></p>
+                            <div className='pl-lg-4 pr-lg-4'>
+                            <table className="table table-bordered ">
+                                <thead>
+                                <tr>
+                                    <th style={{width:'130px'}}>Node Type</th>
+                                    <th>Value</th>
+                                    <th>Potential Children</th>
+                                    <th>Advanced Functionality</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td className='BgLightBlue'><b>Aggregation ∑</b></td>
+                                    <td>Sum of children</td>
+                                    <td><b style={{color:'#002f6c'}}>∑</b> or Number</td>
+                                    <td>-</td>
+                                </tr>
+                                <tr>
+                                    <td className='BgLightBlue'><b>Number #</b></td>
+                                    <td>Defined at this node</td>
+                                    <td>% or <b style={{background: '#002f6c',color: '#fff',padding: '3px'}}><i class="fa fa-cube" aria-hidden="true"></i></b></td>
+                                    <td><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i>,<i className='fa fa-link'></i>, <i className='fa fa-line-chart'></i></td>
+                                </tr>
+                                <tr>
+                                    <td className='BgLightBlue'><b>Percentage %</b></td>
+                                    <td>Defined as a percentage of the parent</td>
+                                    <td>% or <b style={{background: '#002f6c',color: '#fff',padding: '3px'}}><i class="fa fa-cube" aria-hidden="true"></i></b></td>
+                                    <td><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i>,<i className='fa fa-link'></i></td>
+                                </tr>
+                                <tr>
+                                    <td className='BgDarkBlue'><b>Forecasting Unit <i class="fa fa-cube" aria-hidden="true"></i></b></td>
+                                    <td>Defined as a percentage of the parent and forecasting unit parameters</td>
+                                    <td><b style={{background: '#002f6c',color: '#fff',padding: '3px'}}><i class="fa fa-cubes" aria-hidden="true"></i></b></td>
+                                    <td><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i>,<i className='fa fa-link'></i></td>
+                                </tr>
+                                <tr>
+                                    <td className='BgDarkBlue'><b>Planning Unit <i class="fa fa-cubes" aria-hidden="true"></i></b></td>
+                                    <td>Defined as a percentage of the parent and planning unit parameters</td>
+                                    <td>-</td>
+                                    <td><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i>,<i className='fa fa-link'></i></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                            </div>
+                             </p>
+                            
+                             <p><span  style={{fontSize:'14px',fontWeight:'bold'}}>Changes Over Time</span><br></br>
+                             While the tree structure stays constant throughout time, node percentages and values can change over time.  The three functionalities below are available in each node and allow the user to control how nodes change over time:
+                             <ul>
+                                 <li><b>Modeling/Transfer Tab</b> </li>
+                                 <ul>
+                                 <li><b><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i> Modeling:</b> Allows user to specify the exact rate of change</li>
+                                 <li><b><i className='fa fa-link'></i> Transfer:</b> Allows users to link two nodes together – so the decrease</li>
+                             </ul>
+                             <li><b>Extrapolation Tab</b> (number nodes only)</li>
+                             <ul>
+                                 <li><b><i className='fa fa-line-chart'></i> Extrapolation:</b> Allows users to use historical data to extrapolate future change. , Enable this feature by checking ‘Extrapolation’ box. Note that if you do – the Modeling/Transfer Tab will be hidden as it is only possible to use one at a time. Any data previously entered in the Modeling/Transfer Tab will be cleared/saved.</li>
+                                 </ul>
+                             </ul>
+                             <p>If no change over time is desired, simply do not use the ‘Modeling/Transfer’ and ‘Extrapolation’ tabs, and the node value will equal the value entered or calculated on the ‘Node Data’ tab.</p>
+                             </p>
+                            
+                             <p><span  style={{fontSize:'14px',fontWeight:'bold'}}>Using Scenarios :</span>
+                             Scenarios are used to model different values for the same tree. 
+                             <div className='pl-lg-4 pr-lg-4 pt-lg-4'>
+                            <table className="table table-bordered ">
+                            <thead>
+                                <tr>
+                                    <th style={{width:'130px'}}>Fixed for All Scenarios</th>
+                                    <th style={{width:'230px'}}>Unique to each Scenario</th>
+                                   
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td>Tree structure</td>
+                                    <td>Node value</td>
+                                   
+                                  
+                                </tr>
+                                <tr>
+                                <td>Node Title</td>
+                                <td>Month</td>
+                                
+                                  
+                                </tr>
+                                <tr>
+                                <td>Node Type</td>
+                                <td>Notes</td>
+                                </tr>
+                                <tr>
+                                <td></td>
+                                <td>Modeling/Transfer/Extrapolation</td>
+                                </tr>
+                                </tbody>
+                                </table>
+                                </div>
+                             </p>
+                             <p><span  style={{fontSize:'14px'}} classNames="UnderLineText"><b>Tips for specific use cases:</b></span>
+                             <ul>
+                                 <li><b> Forecasting Node Type :</b> Select "discrete" if this product will be used for limited time, and "continuous" if it will be used indefinitely.</li>
+                                 <li><b> Delayed or phased product usage?</b> Sometimes, the product consumption is delayed in relation the other higher levels of the tree. In the relevant 
+                                 <b>Forecasting Unit </b>node, use the <b>Lag</b> field to indicate this delay.
+                                 <ul>
+                                     <li>For example, if the product usage will begin 2 months after the parent node dates, enter "2" in this field.  </li>
+                                     <li>This field can also be used where the product switches over time for example, if forecasting units A, B, and C are used in secession for two months at a time, you can set up your tree with Forecasting Unit A (discrete for 2 months, lag=0), Forecasting Unit B (discrete for 2 months, lag=2), Forecasting Unit C (discrete for 2 months, lag = 4).</li>
+                                 </ul>
+                                 </li>
+                                 <li><b> Multi-month Consumption Patterns?</b> How often is the product actually "consumed"? is it monthly or every three months? Consumption can be defined at different levels depending on your supply chain. In the <b>Planning Unit Node</b>, use the <b>Consumption Interval</b> field to indicate. For example, if the end user uses a product daily, but only picks up or buys the product every 2 months, enter "2" in the Consumption Interval field to account for a multi-month consumption pattern.  Note that this is only available for Continuous nodes, as product is assumed to be “consumed” at the beginning of the usage period.</li>
+                                 <li><b>Repeating Forecasting Usages?</b> If multiple Forecasting Unit nodes share the same settings, consider using the <a href='/#/usageTemplate/listUsageTemplate'>Usage Template </a>screen to save your common usages, and then using the “Copy from Template”  field to populate the  fields in the forecasting unit nodes. </li>
+                             </ul>
+                             </p>
+                       
+                        </ModalBody>
+                    </div>
+                </Modal>
+                    <Modal isOpen={this.state.showGuidance}
+                    className={'modal-lg ' + this.props.className} >
+                    <ModalHeader toggle={() => this.toggleShowGuidance()} className="ModalHead modal-info-Headher">
+                        <strong className="TextWhite">Show Guidance</strong>
+                    </ModalHeader>
+                    <div>
+                        <ModalBody>
+                           <div>
+                               <h3 className='ShowGuidanceHeading'>Manage Tree – Build Trees</h3>
+                           </div>
+                            <p>
+                                <p style={{fontSize:'14px'}}><span className="UnderLineText">Purpose :</span>Enable users to manage and build forecast tree and scenarios, for any non-consumption forecasts (demographic, morbidity, services, etc). Note that more guidance is available after clicking into any specific node.</p>
+                           </p>
+                            <p>
+                                <p style={{fontSize:'14px'}}><span className="UnderLineText">Using this screen :</span><br></br>
+                               <span style={{fontWeight:'bold'}}>Manage the Tree:</span> Click on the gear icon <i class="fa fa-cog" aria-hidden="true"></i> to show and edit or hide the forecast method, tree name, and region.
+                                </p>
+                                <p><span style={{fontWeight:'bold',fontSize:'14px'}}>Building the Tree:</span> The forecast tree is built from the top down, using different types of “nodes”.  See the Node Types and Node Actions below. Each forecast tree must include one or more Planning Unit Nodes, which form the forecast output, for that tree to be available in the 'Compare and Select' screen. Each Planning Unit Node must stem from a Forecasting Unit Node. </p>
+                                
+                            </p>
+                            <p>
+                                <p style={{fontSize:'14px',fontWeight:'bold'}}><span className="">Node Actions :</span></p>
+                               
+                                <ul className='pl-lg-4'>
+                                    <li><i class="fa fa-trash-o" aria-hidden="true" style={{color:'#002f6c'}}></i> Delete: Deletes the selected node</li>
+                                    <li><i class="fa fa-clone" aria-hidden="true" style={{color:'#002f6c'}}></i> Duplicate: Duplicates the selected node under the same parent</li>
+                                    <li><i class="fa fa-plus-square-o" aria-hidden="true" style={{color:'#002f6c'}}></i> Add: Adds a child to the selected node.</li>
+                                   
+                                </ul>
+                               
+                            </p>
+                            <p>
+                            <p style={{fontSize:'14px',fontWeight:'bold'}}><span className="">Node Type :</span></p>
+                            <div className='pl-lg-4 pr-lg-4'>
+                            <table className="table table-bordered ">
+                                <thead>
+                                <tr>
+                                    <th style={{width:'130px'}}>Node Type</th>
+                                    <th>Value</th>
+                                    <th>Potential Children</th>
+                                    <th>Advanced Functionality</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td className='BgLightBlue'><b>Aggregation ∑</b></td>
+                                    <td>Sum of children</td>
+                                    <td><b style={{color:'#002f6c'}}>∑</b> or Number</td>
+                                    <td>-</td>
+                                </tr>
+                                <tr>
+                                    <td className='BgLightBlue'><b>Number #</b></td>
+                                    <td>Defined at this node</td>
+                                    <td>% or <b style={{background: '#002f6c',color: '#fff',padding: '3px'}}><i class="fa fa-cube" aria-hidden="true"></i></b></td>
+                                    <td><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i>,<i className='fa fa-link'></i>, <i className='fa fa-line-chart'></i></td>
+                                </tr>
+                                <tr>
+                                    <td className='BgLightBlue'><b>Percentage %</b></td>
+                                    <td>Defined as a percentage of the parent</td>
+                                    <td>% or <b style={{background: '#002f6c',color: '#fff',padding: '3px'}}><i class="fa fa-cube" aria-hidden="true"></i></b></td>
+                                    <td><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i>,<i className='fa fa-link'></i></td>
+                                </tr>
+                                <tr>
+                                    <td className='BgDarkBlue'><b>Forecasting Unit <i class="fa fa-cube" aria-hidden="true"></i></b></td>
+                                    <td>Defined as a percentage of the parent and forecasting unit parameters</td>
+                                    <td><b style={{background: '#002f6c',color: '#fff',padding: '3px'}}><i class="fa fa-cubes" aria-hidden="true"></i></b></td>
+                                    <td><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i>,<i className='fa fa-link'></i></td>
+                                </tr>
+                                <tr>
+                                    <td className='BgDarkBlue'><b>Planning Unit <i class="fa fa-cubes" aria-hidden="true"></i></b></td>
+                                    <td>Defined as a percentage of the parent and planning unit parameters</td>
+                                    <td>-</td>
+                                    <td><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i>,<i className='fa fa-link'></i></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                            </div>
+                             </p>
+                            
+                             <p><span  style={{fontSize:'14px',fontWeight:'bold'}}>Changes Over Time</span><br></br>
+                             While the tree structure stays constant throughout time, node percentages and values can change over time. Use the date dropdown to view the tree at any month. The three functionalities below are available in each node and allow the user to control how nodes change over time:
+                             <ul>
+                                 <li><b><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i> Modeling:</b> Allows user to specify the exact rate of change</li>
+                                 <li><b><i className='fa fa-link'></i> Transfer:</b> Allows users to link two nodes together – so the decrease from the source node is linked to the increase of the destination node. Useful for transitions.</li>
+                                 <li><b><i className='fa fa-line-chart'></i> Extrapolation:</b> Allows users to use historical data to extrapolate future change</li>
+                             </ul>
+                             </p>
+                            
+                             <p><span  style={{fontSize:'14px',fontWeight:'bold'}}>Using Scenarios :</span><br></br>
+                             Scenarios are used to model different values for the same tree. To add, edit or delete a scenario, use the <i class="fa fa-cog" aria-hidden="true"></i> icon next to the scenario dropdown. Use the scenario dropdown to select which scenario to view and edit.
+                             <div className='pl-lg-4 pr-lg-4 pt-lg-4'>
+                            <table className="table table-bordered ">
+                            <thead>
+                                <tr>
+                                    <th style={{width:'130px'}}>Fixed for All Scenarios</th>
+                                    <th style={{width:'230px'}}>Unique to each Scenario</th>
+                                   
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td>Tree structure</td>
+                                    <td>Node value</td>
+                                   
+                                  
+                                </tr>
+                                <tr>
+                                <td>Node Title</td>
+                                <td>Month</td>
+                                
+                                  
+                                </tr>
+                                <tr>
+                                <td>Node Type</td>
+                                <td>Notes</td>
+                                </tr>
+                                <tr>
+                                <td></td>
+                                <td>Modeling/Transfer/Extrapolation</td>
+                                </tr>
+                                </tbody>
+                                </table>
+                                </div>
+                             </p>
+                             
+                        </ModalBody>
+                    </div>
+                </Modal> 
+
             {/* tree fields Modal start------------------- */}
             <Draggable handle=".modal-title">
                 <Modal isOpen={this.state.openTreeDataModal}

@@ -633,7 +633,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                 if (y != null) {
                     var elInstance = el.jexcel;
                     var rowData = elInstance.getRowData(y);
-                    if (rowData[1] !== "" && moment(rowData[0]).format("YYYY-MM") < moment(this.state.datasetJson.currentVersion.forecastStartDate).format("YYYY-MM")) {
+                    if (moment(rowData[0]).format("YYYY-MM") < moment(this.state.datasetJson.currentVersion.forecastStartDate).format("YYYY-MM")) {
                         // var cell = elInstance.getCell(("A").concat(parseInt(y) + 1))
                         // cell.classList.add('jexcelBoldCell');
                         var cell = elInstance.getCell(("C").concat(parseInt(y) + 1))
@@ -650,7 +650,8 @@ export default class ExtrapolateDataComponent extends React.Component {
                         cell.classList.add('jexcelPurpleCell');
                         var cell = elInstance.getCell(("I").concat(parseInt(y) + 1))
                         cell.classList.add('jexcelPurpleCell');
-                    } else if (moment(rowData[0]).format("YYYY-MM") >= moment(this.state.datasetJson.currentVersion.forecastStartDate).format("YYYY-MM") && moment(rowData[0]).format("YYYY-MM") <= moment(this.state.datasetJson.currentVersion.forecastStopDate).format("YYYY-MM")) {
+                    } else if (moment(rowData[0]).format("YYYY-MM") >= moment(this.state.datasetJson.currentVersion.forecastStartDate).format("YYYY-MM") && 
+                               moment(rowData[0]).format("YYYY-MM") <= moment(this.state.datasetJson.currentVersion.forecastStopDate).format("YYYY-MM")) {
                         // if (rowData[1] !== "") {
                         //     var cell = elInstance.getCell(("A").concat(parseInt(y) + 1))
                         //     cell.classList.add('jexcelBoldPurpleCell');
