@@ -5,7 +5,7 @@ import {
     Card,
     CardBody,
     Col,
-    Table, FormGroup, Input, InputGroup, Label, Form, Button, CardFooter
+    Table, FormGroup, Input, InputGroup, Label, Form, Button,ModalHeader, ModalBody,Modal, CardFooter
 } from 'reactstrap';
 import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
 import i18n from '../../i18n'
@@ -2980,6 +2980,12 @@ class ForecastSummary extends Component {
             })
     }
 
+    toggleShowGuidance() {
+        this.setState({
+            showGuidance: !this.state.showGuidance
+        })
+    }
+
     render() {
         const { programs } = this.state;
         let programList = programs.length > 0
@@ -3027,6 +3033,13 @@ class ForecastSummary extends Component {
                 <h5 style={{ color: this.state.color }} id="div2">{this.state.message1}</h5>
 
                 <Card>
+                <div className="card-header-actions">
+                            <div className="card-header-action pr-lg-4">
+                            <a style={{float:'right'}}>
+                                <span style={{ cursor: 'pointer' }} onClick={() => { this.toggleShowGuidance() }}><small className="supplyplanformulas">{i18n.t('static.common.showGuidance')}</small></span>
+                            </a>
+                            </div>
+                        </div>
                     <div className="Card-header-reporticon pb-2">
                         {
                             (this.state.dataArray.length > 0 || this.state.summeryData.length > 0) &&
@@ -3522,6 +3535,7 @@ class ForecastSummary extends Component {
                         </FormGroup>
                     </CardFooter>}
                 </Card>
+     
             </div >
         );
     }

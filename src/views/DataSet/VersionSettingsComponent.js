@@ -1410,7 +1410,7 @@ class VersionSettingsComponent extends Component {
                                 <span style={{ cursor: 'pointer' }} onClick={() => { this.toggleShowGuidance() }}><small className="supplyplanformulas">{i18n.t('static.common.showGuidance')}</small></span>
                             </a>
                             </div>
-                            </div>
+                        </div>
 
                     <CardBody className="pb-lg-5 pt-lg-2">
                         <Col md="9 pl-0">
@@ -1506,29 +1506,29 @@ class VersionSettingsComponent extends Component {
                                <h3 className='ShowGuidanceHeading'>Update Version Setting</h3>
                            </div>
                             <p>
-                                <p style={{fontSize:'14px'}}><span className="UnderLineText">Purpose :</span> Enable users to update their program settings and view details about previous versions. For viewing forecast results, use the screens in the Forecast Analysis Output section.</p>
+                                <p style={{fontSize:'13px'}}><span className="UnderLineText">Purpose :</span> Enable users to update their program settings and view details about previous versions. For viewing forecast results, use the screens in the Forecast Analysis Output section.</p>
                             </p>
                             <p>
-                                <p style={{fontSize:'14px'}}><span className="UnderLineText">Using this screen :</span></p>
-                                <p>
+                                <p style={{fontSize:'13px'}}><span className="UnderLineText">Using this screen :</span></p>
+                                <p style={{fontSize:'13px'}}>
                                 <b>Note:</b> A forecast program must be loaded to update version settings. All past versions of each forecast program will be in a read-only format; only the local version is available for updating and editing.
                                 </p>
                             </p>
-                            <p>
+                            <p style={{fontSize:'13px'}}>
                             On this screen, users can:<br></br>
                             <ul style={{listStyle:'none'}}>
                                 <li>1.Update the following program settings for the loaded, local program:
                                 <ul style={{listStyle:'none'}}>
                                     <li>a. <b>Forecast period</b> (start and end date)</li>
                                     <li>b. <b>Freight percentage</b> - used in the <a href="/#/forecastReport/forecastSummary" target="_blank">Forecast Summary</a> screen for estimating total procurement costs</li>
-                                    <li>c. <b>Forecast threshold </b> used in the <a href="/#/report/compareAndSelectScenario" target="_blank">Compare and Select</a> screen. QAT compares available Consumption Forecasts and Tree &nbsp;&nbsp;&nbsp;&nbsp;Forecasts. For any Tree Forecasts, QAT will flag the percentage above the highest or below the lowest Consumption &nbsp;&nbsp;&nbsp;&nbsp;Forecast. The comparison will be highlighted in <span style={{color:'#BA0C2F'}}>red text</span> if it is outside of the threshold percentages set by the user in this &nbsp;&nbsp;&nbsp;&nbsp;screen. Assuming reliable actual consumption data, this comparison helps users determine if their Tree Forecasts are &nbsp;&nbsp;&nbsp;&nbsp;realistic.</li>
+                                    <li>c. <b>Forecast threshold </b> used in the <a href="/#/report/compareAndSelectScenario" target="_blank">Compare and Select</a> screen. QAT compares available Consumption Forecasts and &nbsp;&nbsp;&nbsp;&nbsp;Tree Forecasts. For any Tree Forecasts, QAT will flag the percentage above the highest or below the lowest &nbsp;&nbsp;&nbsp;&nbsp;Consumption Forecast. The comparison will be highlighted in <span style={{color:'#BA0C2F'}}>red text</span> if it is outside of the threshold percentages set &nbsp;&nbsp;&nbsp;&nbsp;by the user in this screen. Assuming reliable actual consumption data, this comparison helps users determine if their &nbsp;&nbsp;&nbsp;&nbsp;Tree Forecasts are realistic.</li>
                                     <li>d. <b>Version notes</b> - also visible and editable when committing a program.</li>
                                 </ul>
                                 </li>
                                 <li>2.See a historical lifecycle of each program through all its versions. 
                                 <ul style={{listStyle:'none'}}>
                                     <li>a. View all version settings above</li>
-                                    <li>b. (Right click) View the Forecast Validation screen (same screen as viewed during the Commit process) - which lists missing &nbsp;&nbsp;&nbsp;&nbsp;forecasts, missing data and all notes. This serves as an easy for users to understand previous forecasts without  &nbsp;&nbsp;&nbsp;&nbsp;downloading them. Use the <a href="/#/forecastReport/forecastOutput" target="_blank">Monthly Forecast</a>, <a href="/#/forecastReport/forecastSummary" target="_blank">Forecast Summary</a> or <a href="/#/report/compareVersion" target="_blank">Version Comparison</a> screens to view the forecast  &nbsp;&nbsp;&nbsp;&nbsp;outputs from other versions.</li>
+                                    <li>b. (Right click) View the Forecast Validation screen (same screen as viewed during the Commit process) - which lists &nbsp;&nbsp;&nbsp;&nbsp;missing forecasts, missing data and all notes. This serves as an easy for users to understand previous forecasts &nbsp;&nbsp;&nbsp;&nbsp;without downloading them. Use the <a href="/#/forecastReport/forecastOutput" target="_blank">Monthly Forecast</a>, <a href="/#/forecastReport/forecastSummary" target="_blank">Forecast Summary</a> or <a href="/#/report/compareVersion" target="_blank">Version Comparison</a> screens to view the  &nbsp;&nbsp;&nbsp;&nbsp;forecast outputs from other versions.</li>
                                     
                                 </ul>
                                 </li>
