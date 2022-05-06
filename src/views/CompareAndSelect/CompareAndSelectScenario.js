@@ -2188,7 +2188,7 @@ class CompareAndSelectScenario extends Component {
                                                             </InputGroup>
                                                         </div>
                                                     </FormGroup>
-                                                    <FormGroup className="col-md-3">
+                                                    <FormGroup className="col-md-2">
                                                         <Input
                                                             className="form-check-input"
                                                             type="checkbox"
@@ -2203,7 +2203,7 @@ class CompareAndSelectScenario extends Component {
                                                             {i18n.t('static.compareAndSelect.showOnlyForecastPeriod')}
                                                         </Label>
                                                     </FormGroup>
-                                                    {!this.state.showForecastPeriod && <FormGroup className="col-md-3">
+                                                    {!this.state.showForecastPeriod && <FormGroup className="col-md-3 compareAndSelectDatePicker">
                                                         <Label htmlFor="appendedInputButton">{i18n.t('static.compareAndSelect.startMonthForGraph')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
                                                         <div className="controls edit">
                                                             <Picker
