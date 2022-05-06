@@ -1767,7 +1767,7 @@ export default class WhatIfReportComponent extends React.Component {
         csvRow.push('')
 
         const header = [...[""], ... (this.state.monthsArray.map(item => (
-            item.monthName.concat(" ").concat(item.monthYear)
+            ("\'").concat(item.monthName).concat(" ").concat(item.monthYear)
         ))
         )]
         var A = [header]
