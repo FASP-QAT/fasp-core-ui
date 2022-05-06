@@ -105,18 +105,17 @@ export default class StepThreeImportMapPlanningUnits extends Component {
     }
     changeColor() {
 
-        var elInstance1 = this.el;
         var elInstance = this.state.languageEl;
 
         var json = elInstance.getJson();
 
-        var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I']
+        var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M']
         for (var j = 0; j < json.length; j++) {
             var rowData = elInstance.getRowData(j);
             var id = rowData[9];
             if (id == true) {
                 for (var i = 0; i < colArr.length; i++) {
-                    elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'background-color', 'transparent');
+                    // elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'background-color', 'transparent');
                     elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'background-color', 'yellow');
                 }
             } else {

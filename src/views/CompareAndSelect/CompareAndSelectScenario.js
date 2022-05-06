@@ -4,7 +4,7 @@ import {
     Card,
     CardBody,
     Col,
-    Table, FormGroup, Input, InputGroup, Label, Form, Button, CardFooter
+    Table, FormGroup, Input, InputGroup, Label, Form, Button, ModalHeader, ModalBody, Modal, CardFooter
 } from 'reactstrap';
 import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
 import i18n from '../../i18n'
@@ -27,6 +27,7 @@ import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunction
 import NumberFormat from 'react-number-format';
 import jsPDF from "jspdf";
 import { LOGO } from '../../CommonComponent/Logo';
+import forcasterror from '../../assets/img/ForecastError-Formula.png';
 
 const ref = React.createRef();
 const pickerLang = {
@@ -1645,6 +1646,12 @@ class CompareAndSelectScenario extends Component {
         this.props.history.push(`/ApplicationDashboard/` + `${id}` + '/red/' + i18n.t('static.message.cancelled', { entityname }))
     }
 
+    toggleShowGuidance() {
+        this.setState({
+            showGuidance: !this.state.showGuidance
+        })
+    }
+
     render() {
         var chartOptions = {
             title: {
@@ -1880,23 +1887,30 @@ class CompareAndSelectScenario extends Component {
                 <h5 className="red" id="div1" className={this.state.color}>{i18n.t(this.state.message)}</h5>
 
                 <Card>
+                <div className="card-header-action pr-lg-4">
+                            <a style={{float:'right'}}>
+                                <span style={{ cursor: 'pointer' }} onClick={() => { this.toggleShowGuidance() }}><small className="supplyplanformulas">{i18n.t('static.common.showGuidance')}</small></span>
+                            </a>
+                            </div>
                     <div className="Card-header-reporticon pb-2">
+                   
                         <span className="compareAndSelect-larrow"> <i className="cui-arrow-left icons " > </i></span>
                         <span className="compareAndSelect-rarrow"> <i className="cui-arrow-right icons " > </i></span>
                         <span className="compareAndSelect-larrowText"> {i18n.t('static.common.backTo')} <a href={this.state.datasetId != -1 && this.state.datasetId != "" && this.state.datasetId != undefined ? "/#/dataSet/buildTree/tree/0/" + this.state.datasetId : "/#/dataSet/buildTree"} className="supplyplanformulas">{i18n.t('static.common.managetree')}</a> {i18n.t('static.tree.or')} <a href="/#/extrapolation/extrapolateData" className='supplyplanformulas'>{i18n.t('static.dashboard.consExtrapolation')}</a></span>
                         <span className="compareAndSelect-rarrowText"> {i18n.t('static.common.continueTo')} <a href={this.state.datasetId != -1 && this.state.datasetId != "" && this.state.datasetId != undefined ? "/#/forecastReport/forecastOutput/" + this.state.datasetId.toString().split("_")[0] + "/" + (this.state.datasetId.toString().split("_")[1]).toString().substring(1) : "/#/forecastReport/forecastOutput/"} className="supplyplanformulas">{i18n.t('static.dashboard.monthlyForecast')}</a></span><br />
                         {
                             this.state.showAllData &&
-                            <div className="card-header-actions">
-                                <a className="card-header-action">
+                            <div className="col-md-12 card-header-actions">
+                                <a className="card-header-action" style={{float:'right'}}>
 
                                     <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t("static.report.exportPdf")} onClick={() => this.exportPDF()} />
 
 
                                 </a>
-                                <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
+                                <img style={{ height: '25px', width: '25px', cursor: 'pointer',float:'right',marginTop:'4px' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
                             </div>
                         }
+                        
                     </div>
                     <CardBody className="pb-lg-2 pt-lg-0 ">
                         <div>
@@ -2174,7 +2188,7 @@ class CompareAndSelectScenario extends Component {
                                                             </InputGroup>
                                                         </div>
                                                     </FormGroup>
-                                                    <FormGroup className="col-md-3">
+                                                    <FormGroup className="col-md-2">
                                                         <Input
                                                             className="form-check-input"
                                                             type="checkbox"
@@ -2189,7 +2203,7 @@ class CompareAndSelectScenario extends Component {
                                                             {i18n.t('static.compareAndSelect.showOnlyForecastPeriod')}
                                                         </Label>
                                                     </FormGroup>
-                                                    {!this.state.showForecastPeriod && <FormGroup className="col-md-3">
+                                                    {!this.state.showForecastPeriod && <FormGroup className="col-md-3 compareAndSelectDatePicker">
                                                         <Label htmlFor="appendedInputButton">{i18n.t('static.compareAndSelect.startMonthForGraph')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
                                                         <div className="controls edit">
                                                             <Picker
@@ -2269,6 +2283,48 @@ class CompareAndSelectScenario extends Component {
                         </FormGroup>
                     </CardFooter>
                 </Card>
+                <Modal isOpen={this.state.showGuidance}
+                    className={'modal-lg ' + this.props.className} >
+                    <ModalHeader toggle={() => this.toggleShowGuidance()} className="ModalHead modal-info-Headher">
+                        <strong className="TextWhite">Show Guidance</strong>
+                    </ModalHeader>
+                    <div>
+                        <ModalBody>
+                           <div>
+                               <h3 className='ShowGuidanceHeading'>Compare and Select</h3>
+                           </div>
+                            <p>
+                                <p style={{fontSize:'14px'}}><span className="UnderLineText">Purpose :</span> Enable users to compare all the available forecasts (from tree and consumption methods), and select their final forecast. In this screen, users select their forecasts one planning unit and region at a time. For selecting forecasts across multiple planning units and regions, use the <a href="/#/forecastReport/forecastSummary" target="_blank" style={{textDecoration:'underline'}}>Forecast Summary</a> screen.</p>
+                            </p>
+                            <p>
+                                <p style={{fontSize:'14px'}}><span className="UnderLineText">Using this screen :</span></p>
+                                <ul style={{listStyle:'none'}}>
+                                   <li>2. Check to make sure all expected forecasts appear in the Compare & Select table. To add forecasts, navigate to the <a href='/#/dataset/listTree' target="_blank" style={{textDecoration:'underline'}}>Manage Tree</a>  &nbsp;&nbsp;&nbsp;&nbsp;screen to build a tree forecast or the <a href='/#/Extrapolation/extrapolateData' target="_blank" style={{textDecoration:'underline'}}>Extrapolation</a> screen to build a consumption-based forecast. The <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> symbol denotes that &nbsp;&nbsp;&nbsp;&nbsp;there is no forecast quantity available; the entire row will be gray and non-editable as there is nothing to display or select.</li>
+                                   <li>3. Review available forecasts using the following information on the screen:
+                                       <ul style={{listStyle:'none'}}>
+                                           <li>a. <b>Forecast Error (%):</b> this error is calculated using the Weighted Absolute Percentage Error (WAPE) calculation. If the &nbsp;&nbsp;&nbsp;&nbsp;forecast error is highlighted in <span style={{color:'rgb(17, 139, 112)'}}>green text</span>, this forecast has the lowest forecast error out of the available forecasts. Example &nbsp;&nbsp;&nbsp;&nbsp;WAPE calculation using the default 6-month time window:
+                                           <img className="img-fluid" src={forcasterror} /><br></br>
+                                           &nbsp;&nbsp;&nbsp;&nbsp;If 6 months of data is not available, QAT will utilize as many months as available and denote it in this column.
+                                           </li>
+                                           <li>b. <b>Compare to Consumption Forecast:</b> QAT compares available Consumption Forecasts and Tree Forecasts. For any Tree &nbsp;&nbsp;&nbsp;&nbsp;Forecasts, QAT will flag the percentage above the highest or below the lowest Consumption Forecast. The comparison will &nbsp;&nbsp;&nbsp;&nbsp;be highlighted in <span style={{color:'#BA0C2F'}}>red text</span> if it is outside of the threshold percentages set by the user in the <a href='/#/dataset/versionSettings' target="_blank" style={{textDecoration:'underline'}}>Version Settings</a> screen. &nbsp;&nbsp;&nbsp;&nbsp;Assuming reliable actual consumption data, this comparison helps users determine if their Tree Forecasts are realistic. </li>
+                                           <li>c. <b>Graph:</b> Visually compare the different forecasts. The selected forecast will appear <b>bolded.</b></li>
+                                           <li>d. <b>Tabular Data Table:</b> Compare the data between forecasts side-by-side by clicking the “Show Data” button below the &nbsp;&nbsp;&nbsp;&nbsp;graph. Any <b>bolded/<span style={{color:'#800080',fontStyle:'italic'}}>bolded italicized purple</span></b> data fall within the forecast period. </li>
+                                       </ul>
+                                   </li>
+                                   <li>4.Select the final forecast in the Compare & Select table. Repeat steps 1-3 for each planning unit and region. Once completed, &nbsp;&nbsp;&nbsp;&nbsp;continue forward to the <a href='/#/forecastReport/forecastOutput' target="_blank" style={{textDecoration:'underline'}}>Monthly Forecasts</a> to verify all planning units together.</li>
+                               </ul>
+                            </p>
+                            <p>
+                            <span className="UnderLineText">Tips on Using the Graph & Tabular Data:</span>
+                            <ul>
+                                <li>By default, QAT will display all available forecasts by Planning Unit and any actuals entered or imported from QAT Supply Planning module; however, a user may deselect the “Display?” checkbox for any forecasts in the top table if they do not wish to view it in the graph.  </li>
+                                <li>A user may view the graph in Forecasting Unit, Equivalency Unit, and for a specific period of time. If a user choses to “Show only Forecast Period,” the graph will display only the period of time the user chose as the forecast period in the <a href='/#/dataset/versionSettings' target="_blank" style={{textDecoration:'underline'}}>Version Settings</a> screen. </li>
+                            </ul>
+                            </p>
+                        </ModalBody>
+                    </div>
+                </Modal>
+                
             </div >
         );
     }
