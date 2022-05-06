@@ -4,6 +4,8 @@ let c = 0;
 export function calculateSemiAverages(inputData, noOfProjectionMonths, props) {
     const data = inputData;
     console.log("InputData@@@",inputData)
+    console.log("data@@@",data)
+    console.log("result@@@",inputData.length % 2)
     if (inputData.length % 2 == 1) {
         inputData.pop();
         noOfProjectionMonths += 1
@@ -25,6 +27,7 @@ export function calculateSemiAverages(inputData, noOfProjectionMonths, props) {
     for (let y = 1; y <= actualMonths + noOfMonthsForProjection; y++) {
         console.log(y + " = " + data[y - 1].forecast);
     }
+    console.log("going to calculate error semi avaraes---",data)
     calculateError(data, "semiAvgError", props);
     console.log("InputData@@@ output tes",data)
     props.updateState("semiAvgData", data);

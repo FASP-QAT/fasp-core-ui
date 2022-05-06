@@ -463,14 +463,16 @@ export default class TreeExtrapolationComponent extends React.Component {
         var tableJson = this.state.dataExtrapolation.getJson(null, false);
         for (var i = 0; i < tableJson.length; i++) {
             var map1 = new Map(Object.entries(tableJson[i]));
-            var json = {
-                month: map1.get("0"),
-                amount: map1.get("1"),
-                reportingRate: map1.get("2") != "" ? map1.get("2").toString().replaceAll("%", "") : map1.get("2"),
-                manualChange: map1.get("10").toString().replaceAll(",", ""),
-                adjustedActuals: (this.state.dataExtrapolation.getValue(`D${parseInt(i) + 1}`, true)) != "" ? (this.state.dataExtrapolation.getValue(`D${parseInt(i) + 1}`, true)).toString().replaceAll(",", "") : (this.state.dataExtrapolation.getValue(`D${parseInt(i) + 1}`, true))
-            };
-            extrapolationDataList.push(json)
+            if (moment(this.state.minMonth).format('YYYY-MM') <= moment(map1.get("0")).format('YYYY-MM')) {
+                var json = {
+                    month: map1.get("0"),
+                    amount: map1.get("1"),
+                    reportingRate: map1.get("2") != "" ? map1.get("2").toString().replaceAll("%", "") : map1.get("2"),
+                    manualChange: map1.get("10").toString().replaceAll(",", ""),
+                    adjustedActuals: (this.state.dataExtrapolation.getValue(`D${parseInt(i) + 1}`, true)) != "" ? (this.state.dataExtrapolation.getValue(`D${parseInt(i) + 1}`, true)).toString().replaceAll(",", "") : (this.state.dataExtrapolation.getValue(`D${parseInt(i) + 1}`, true))
+                };
+                extrapolationDataList.push(json)
+            }
             // (this.state.dataExtrapolation.getValue(`F${parseInt(i) + 1}`, true)).toString().replaceAll(",", "");
             var json2 = {
                 calculatedValue: (this.state.dataExtrapolation.getValue(`L${parseInt(i) + 1}`, true)).toString().replaceAll(",", ""),
@@ -483,72 +485,74 @@ export default class TreeExtrapolationComponent extends React.Component {
                 startValue: this.state.dataExtrapolation.getValue(`D${parseInt(i) + 1}`, true) != "" ? (this.state.dataExtrapolation.getValue(`D${parseInt(i) + 1}`, true)).toString().replaceAll(",", "") : 0
             };
             momList.push(json2);
-            // Moving averages
-            var movingAveragesJson = {
-                month: map1.get("0"),
-                amount: map1.get("4") != "" && map1.get("4") != null ? map1.get("4").toString().replaceAll("%", "") : null,
-            }
-            movingAveragesData.push(movingAveragesJson);
-            // Semi averages
-            var semiAveragesJson = {
-                month: map1.get("0"),
-                amount: map1.get("5") != "" && map1.get("5") != null ? map1.get("5").toString().replaceAll("%", "") : null,
-            }
-            semiAveragesData.push(semiAveragesJson);
-            // Linear Regression
-            var linearRegressionLowerJson = {
-                month: map1.get("0"),
-                amount: map1.get("18") != "" && map1.get("18") != null ? map1.get("18").toString().replaceAll("%", "") : null,
-            }
-            linearRegressionDataLower.push(linearRegressionLowerJson);
+            if (moment(this.state.minMonth).format('YYYY-MM') <= moment(map1.get("0")).format('YYYY-MM')) {
+                // Moving averages
+                var movingAveragesJson = {
+                    month: map1.get("0"),
+                    amount: map1.get("4") != "" && map1.get("4") != null ? map1.get("4").toString().replaceAll("%", "") : null,
+                }
+                movingAveragesData.push(movingAveragesJson);
+                // Semi averages
+                var semiAveragesJson = {
+                    month: map1.get("0"),
+                    amount: map1.get("5") != "" && map1.get("5") != null ? map1.get("5").toString().replaceAll("%", "") : null,
+                }
+                semiAveragesData.push(semiAveragesJson);
+                // Linear Regression
+                var linearRegressionLowerJson = {
+                    month: map1.get("0"),
+                    amount: map1.get("18") != "" && map1.get("18") != null ? map1.get("18").toString().replaceAll("%", "") : null,
+                }
+                linearRegressionDataLower.push(linearRegressionLowerJson);
 
-            var linearRegressionJson = {
-                month: map1.get("0"),
-                amount: map1.get("6") != "" && map1.get("6") != null ? map1.get("6").toString().replaceAll("%", "") : null,
-            }
-            linearRegressionData.push(linearRegressionJson);
+                var linearRegressionJson = {
+                    month: map1.get("0"),
+                    amount: map1.get("6") != "" && map1.get("6") != null ? map1.get("6").toString().replaceAll("%", "") : null,
+                }
+                linearRegressionData.push(linearRegressionJson);
 
-            var linearRegressionUpperJson = {
-                month: map1.get("0"),
-                amount: map1.get("19") != "" && map1.get("19") != null ? map1.get("19").toString().replaceAll("%", "") : null,
-            }
-            linearRegressionDataUpper.push(linearRegressionUpperJson);
-            // TES Data
-            var tesLowerJson = {
-                month: map1.get("0"),
-                amount: map1.get("14") != "" && map1.get("14") != null ? map1.get("14").toString().replaceAll("%", "") : null,
-            }
-            tesDataLower.push(tesLowerJson);
+                var linearRegressionUpperJson = {
+                    month: map1.get("0"),
+                    amount: map1.get("19") != "" && map1.get("19") != null ? map1.get("19").toString().replaceAll("%", "") : null,
+                }
+                linearRegressionDataUpper.push(linearRegressionUpperJson);
+                // TES Data
+                var tesLowerJson = {
+                    month: map1.get("0"),
+                    amount: map1.get("14") != "" && map1.get("14") != null ? map1.get("14").toString().replaceAll("%", "") : null,
+                }
+                tesDataLower.push(tesLowerJson);
 
-            var tesJson = {
-                month: map1.get("0"),
-                amount: map1.get("7") != "" && map1.get("7") != null ? map1.get("7").toString().replaceAll("%", "") : null,
-            }
-            tesData.push(tesJson);
+                var tesJson = {
+                    month: map1.get("0"),
+                    amount: map1.get("7") != "" && map1.get("7") != null ? map1.get("7").toString().replaceAll("%", "") : null,
+                }
+                tesData.push(tesJson);
 
-            var tesUpperJson = {
-                month: map1.get("0"),
-                amount: map1.get("15") != "" && map1.get("15") != null ? map1.get("15").toString().replaceAll("%", "") : null,
-            }
-            tesDataUpper.push(tesUpperJson);
-            //Arima
-            var arimaLowerJson = {
-                month: map1.get("0"),
-                amount: map1.get("16") != "" && map1.get("16") != null ? map1.get("16").toString().replaceAll("%", "") : null,
-            }
-            arimaDataLower.push(arimaLowerJson);
+                var tesUpperJson = {
+                    month: map1.get("0"),
+                    amount: map1.get("15") != "" && map1.get("15") != null ? map1.get("15").toString().replaceAll("%", "") : null,
+                }
+                tesDataUpper.push(tesUpperJson);
+                //Arima
+                var arimaLowerJson = {
+                    month: map1.get("0"),
+                    amount: map1.get("16") != "" && map1.get("16") != null ? map1.get("16").toString().replaceAll("%", "") : null,
+                }
+                arimaDataLower.push(arimaLowerJson);
 
-            var arimaJson = {
-                month: map1.get("0"),
-                amount: map1.get("8") != "" && map1.get("8") != null ? map1.get("8").toString().replaceAll("%", "") : null,
-            }
-            arimaData.push(arimaJson);
+                var arimaJson = {
+                    month: map1.get("0"),
+                    amount: map1.get("8") != "" && map1.get("8") != null ? map1.get("8").toString().replaceAll("%", "") : null,
+                }
+                arimaData.push(arimaJson);
 
-            var arimaUpperJson = {
-                month: map1.get("0"),
-                amount: map1.get("17") != "" && map1.get("17") != null ? map1.get("17").toString().replaceAll("%", "") : null,
+                var arimaUpperJson = {
+                    month: map1.get("0"),
+                    amount: map1.get("17") != "" && map1.get("17") != null ? map1.get("17").toString().replaceAll("%", "") : null,
+                }
+                arimaDataUpper.push(arimaUpperJson);
             }
-            arimaDataUpper.push(arimaUpperJson);
         }
         // console.log("TES lower---", tesLowerJson);
         // console.log("TES ---", tesJson);
@@ -1040,7 +1044,7 @@ export default class TreeExtrapolationComponent extends React.Component {
         const { nodeDataExtrapolation } = this.state;
         console.log("nodeDataExtrapolation check---", nodeDataExtrapolation);
         nodeDataExtrapolation.extrapolationDataList = jexcelDataArr;
-        console.log("jexcel data final---", jexcelDataArr);
+        console.log("jexcel data final data available---", jexcelDataArr);
 
         this.setState({ jexcelDataArr, nodeDataExtrapolation, isChanged: true }, () => {
             // setTimeout(() => {
@@ -1052,7 +1056,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                     .sort(function (a, b) {
                         return new Date(a.month) - new Date(b.month);
                     });
-                console.log("jexcelDataArr with month no---->", jexcelDataArr)
+                console.log("valList---->", valList)
                 this.setState({
                     minMonth: valList[0].month,
                     maxMonth: valList[valList.length - 1].month
@@ -1066,10 +1070,11 @@ export default class TreeExtrapolationComponent extends React.Component {
                             inputDataMovingAvg.push({ "month": inputDataMovingAvg.length + 1, "actual": jexcelDataArr[i].adjustedActuals != "" ? Number(jexcelDataArr[i].adjustedActuals) : null, "forecast": null })
                             // console.log("inputDataSemiAverage 1--->>>", jexcelDataArr[i]);
                             // console.log("inputDataSemiAverage 2--->>>", inputDataSemiAverage.length);
-                            var json = { "month": inputDataSemiAverage.length + 1, "actual": jexcelDataArr[i].adjustedActuals != "" ? Number(jexcelDataArr[i].adjustedActuals) : null, "forecast": null };
+                            inputDataSemiAverage.push({ "month": inputDataSemiAverage.length + 1, "actual": jexcelDataArr[i].adjustedActuals != "" ? Number(jexcelDataArr[i].adjustedActuals) : null, "forecast": null })
+                            // var json = { "month": inputDataSemiAverage.length + 1, "actual": jexcelDataArr[i].adjustedActuals != "" ? Number(jexcelDataArr[i].adjustedActuals) : null, "forecast": null };
                             // console.log("inputDataSemiAverage 4--->>>", json);
                             // console.log("inputDataSemiAverage 5 before--->>>", inputDataSemiAverage);
-                            inputDataSemiAverage.push(json);
+                            // inputDataSemiAverage.push(json);
                             console.log("inputDataSemiAverage 6 after--->>>", inputDataSemiAverage);
                             inputDataLinearRegression.push({ "month": inputDataLinearRegression.length + 1, "actual": jexcelDataArr[i].adjustedActuals != "" ? Number(jexcelDataArr[i].adjustedActuals) : null, "forecast": null })
                             // console.log("inputDataSemiAverage 7--->>>", inputDataLinearRegression);
@@ -1135,6 +1140,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                         }
                     } else {
                         console.log("jexcel build else called")
+                        console.log("this.state.semiAvgData--->>>", this.state.semiAvgData)
                         if (this.state.semiAvgId) {
                             calculateError(this.state.semiAvgData, "semiAvgError", this);
                         }
@@ -1336,6 +1342,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                             console.log("### inside did mount else")
                             var filteredExtrapolationMethodList = [];
                             var nodeDataExtrapolation = this.props.items.currentScenario.nodeDataExtrapolation;
+                            var extrapolationDataList = nodeDataExtrapolation.extrapolationDataList;
                             var nodeDataExtrapolationOptionList = this.props.items.currentScenario.nodeDataExtrapolationOptionList;
                             console.log("nodeDataExtrapolationOptionList----", nodeDataExtrapolationOptionList)
                             console.log("nodeDataExtrapolation----", nodeDataExtrapolation)
@@ -1379,9 +1386,11 @@ export default class TreeExtrapolationComponent extends React.Component {
                                     console.log("movingAvgDataTemp---", movingAvgDataTemp)
                                     if (movingAvgDataTemp.length > 0) {
                                         for (let i = 0; i < movingAvgDataTemp.length; i++) {
+                                            var mvData = extrapolationDataList.filter(x => moment(x.month).format('YYYY-MM') == moment(movingAvgDataTemp[i].month).format('YYYY-MM'));
                                             json = {
                                                 month: i + 1,
-                                                forecast: movingAvgDataTemp[i].amount
+                                                actual: mvData.length > 0 ? mvData[0].amount != "" ? parseFloat(mvData[0].amount) : null : null,
+                                                forecast: movingAvgDataTemp[i].amount == null ? null : parseFloat(movingAvgDataTemp[i].amount)
                                             }
                                             movingAvgData.push(json);
                                         }
@@ -1392,9 +1401,12 @@ export default class TreeExtrapolationComponent extends React.Component {
                                     var semiAvgDataTemp = JSON.parse(JSON.stringify(nodeDataExtrapolationOptionList[i].extrapolationOptionDataList));
                                     if (semiAvgDataTemp.length > 0) {
                                         for (let i = 0; i < semiAvgDataTemp.length; i++) {
+                                            // console
+                                            var saData = extrapolationDataList.filter(x => moment(x.month).format('YYYY-MM') == moment(semiAvgDataTemp[i].month).format('YYYY-MM'));
                                             json = {
                                                 month: i + 1,
-                                                forecast: semiAvgDataTemp[i].amount
+                                                actual: moment(semiAvgDataTemp[semiAvgDataTemp.length - 1].month).format('YYYY-MM') == moment(semiAvgDataTemp[i].month).format('YYYY-MM') ? null : saData.length > 0 ? saData[0].amount != "" ? parseFloat(saData[0].amount) : null : null,
+                                                forecast: parseFloat(semiAvgDataTemp[i].amount)
                                             }
                                             semiAvgData.push(json);
                                         }
@@ -1407,6 +1419,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                         for (let i = 0; i < linearRegressionDataTemp.length; i++) {
                                             json = {
                                                 month: i + 1,
+                                                actual: extrapolationDataList.filter(x => moment(x.month).format('YYYY-MM') == moment(linearRegressionDataTemp[i].month).format('YYYY-MM')).length > 0 ? extrapolationDataList.filter(x => moment(x.month).format('YYYY-MM') == moment(linearRegressionDataTemp[i].month).format('YYYY-MM'))[0].amount : null,
                                                 forecast: linearRegressionDataTemp[i].amount
                                             }
                                             linearRegressionData.push(json);
@@ -1426,6 +1439,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                         for (let i = 0; i < arimaDataTemp.length; i++) {
                                             json = {
                                                 month: i + 1,
+                                                actual: extrapolationDataList.filter(x => moment(x.month).format('YYYY-MM') == moment(arimaDataTemp[i].month).format('YYYY-MM')).length > 0 ? extrapolationDataList.filter(x => moment(x.month).format('YYYY-MM') == moment(arimaDataTemp[i].month).format('YYYY-MM'))[0].amount : null,
                                                 forecast: arimaDataTemp[i].amount
                                             }
                                             arimaData.push(json);
@@ -1444,6 +1458,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                                         for (let i = 0; i < tesDataTemp.length; i++) {
                                             json = {
                                                 month: i + 1,
+                                                actual: extrapolationDataList.filter(x => moment(x.month).format('YYYY-MM') == moment(tesDataTemp[i].month).format('YYYY-MM')).length > 0 ? extrapolationDataList.filter(x => moment(x.month).format('YYYY-MM') == moment(tesDataTemp[i].month).format('YYYY-MM'))[0].amount : null,
                                                 forecast: tesDataTemp[i].amount
                                             }
                                             tesData.push(json);
@@ -4377,36 +4392,36 @@ export default class TreeExtrapolationComponent extends React.Component {
                     </ModalHeader>
                     <div>
                         <ModalBody>
-                        <div>
-                               <h3 className='ShowGuidanceHeading'>Add/Edit Node - Extrapolation Node</h3>
-                           </div>
+                            <div>
+                                <h3 className='ShowGuidanceHeading'>Add/Edit Node - Extrapolation Node</h3>
+                            </div>
                             <p>
-                                <p style={{fontSize:'14px'}}><span className="UnderLineText">Purpose :</span>The extrapolation tab allows users to forecast future
-                                 node values by extrapolating from past values. This functionality only available on
-                                  number nodes, and is similar to the <a href="/#/Extrapolation/extrapolateData" target="_blank">'Extrapolation'</a> screen, but is conducted at a
-                                   tree node instead. View the guidance on that page for more details on extrapolation 
-                                   methods.
-                            </p>
-                               
+                                <p style={{ fontSize: '14px' }}><span className="UnderLineText">Purpose :</span>The extrapolation tab allows users to forecast future
+                                    node values by extrapolating from past values. This functionality only available on
+                                    number nodes, and is similar to the <a href="/#/Extrapolation/extrapolateData" target="_blank">'Extrapolation'</a> screen, but is conducted at a
+                                    tree node instead. View the guidance on that page for more details on extrapolation
+                                    methods.
+                                </p>
+
                             </p>
                             <p>
-                                <p style={{fontSize:'14px'}}><span className="UnderLineText">Using this tab:  </span></p>
+                                <p style={{ fontSize: '14px' }}><span className="UnderLineText">Using this tab:  </span></p>
                                 <p className='pl-lg-4'>
-                                <ul style={{listStyle:'none'}}>
-                                    <li>1. In the table, enter any actual values and reporting rates for your past data. From this input, QAT will calculate adjusted &nbsp;&nbsp;&nbsp;&nbsp;historical values.</li>
-                                    <li>2. If there is missing data, use the green Interpolate button to fill in missing data.</li>
-                                    <li>3. (optional) At the top of the screen, select which forecast methods you wish to display and update the extrapolation &nbsp;&nbsp;&nbsp;&nbsp;parameters.</li>
-                                    <li>4. Click "Extrapolate." All selected forecasts will display in the main table and the graphs. </li>
-                                
-                                <p className="pl-lg-4"><b>NOTE:</b>  The minimum values needed to get correct graphs and reports for the various features are below: <br></br>
-                                    <span className="ml-lg-5">* TES, Holt-Winters:  Needs at least 24 months of actual consumption data<br></br></span>
-                                    <span className="ml-lg-5">* ARIMA:  Needs at least 14 months of actual consumption data<br></br></span>
-                                    <span className="ml-lg-5">* Moving Average, Semi-Averages, and Linear Regression:  Needs at least 3 months of actual consumption data</span>
-                                 </p>
-                                    <li>5. (optional) In the table, add any manual changes (+/-). These changes are added or subtracted on top of the extrapolated &nbsp;&nbsp;&nbsp;&nbsp;values.</li>
-                                    <li>6. After reviewing the main table, the error table, and the graphs, select the desired forecast method at the bottom of the screen &nbsp;&nbsp;&nbsp;&nbsp;and click “Save.”
-</li>
-                                 </ul>
+                                    <ul style={{ listStyle: 'none' }}>
+                                        <li>1. In the table, enter any actual values and reporting rates for your past data. From this input, QAT will calculate adjusted &nbsp;&nbsp;&nbsp;&nbsp;historical values.</li>
+                                        <li>2. If there is missing data, use the green Interpolate button to fill in missing data.</li>
+                                        <li>3. (optional) At the top of the screen, select which forecast methods you wish to display and update the extrapolation &nbsp;&nbsp;&nbsp;&nbsp;parameters.</li>
+                                        <li>4. Click "Extrapolate." All selected forecasts will display in the main table and the graphs. </li>
+
+                                        <p className="pl-lg-4"><b>NOTE:</b>  The minimum values needed to get correct graphs and reports for the various features are below: <br></br>
+                                            <span className="ml-lg-5">* TES, Holt-Winters:  Needs at least 24 months of actual consumption data<br></br></span>
+                                            <span className="ml-lg-5">* ARIMA:  Needs at least 14 months of actual consumption data<br></br></span>
+                                            <span className="ml-lg-5">* Moving Average, Semi-Averages, and Linear Regression:  Needs at least 3 months of actual consumption data</span>
+                                        </p>
+                                        <li>5. (optional) In the table, add any manual changes (+/-). These changes are added or subtracted on top of the extrapolated &nbsp;&nbsp;&nbsp;&nbsp;values.</li>
+                                        <li>6. After reviewing the main table, the error table, and the graphs, select the desired forecast method at the bottom of the screen &nbsp;&nbsp;&nbsp;&nbsp;and click “Save.”
+                                        </li>
+                                    </ul>
                                 </p>
                             </p>
                             <p>
