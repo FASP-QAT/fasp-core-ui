@@ -334,7 +334,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                         paginationOptions: paginationArray,
                         search: searchOption,
                         columnSorting: true,
-                        tableOverflow: true,
+                        // tableOverflow: true,
                         wordWrap: true,
                         allowInsertColumn: false,
                         allowManualInsertColumn: false,
