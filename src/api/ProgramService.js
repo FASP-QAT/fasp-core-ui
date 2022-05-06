@@ -1,5 +1,3 @@
-<<<<<<< HEAD
-=======
 import axios from "axios"
 import { API_URL } from '../Constants.js'
 
@@ -245,4 +243,3 @@ class ProgramService {
 
 }
 export default new ProgramService()
->>>>>>> devMod2Sonal
