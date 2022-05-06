@@ -477,7 +477,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 console.log("tracerCategory--------->1", healthAreaList);
                 console.log("tracerCategory--------->2", tracerCategory);
 
-                ProgramService.getPlanningUnitByProgramTracerCategory(programId, tracerCategory)
+                ProgramService.getPlanningUnitByProgramId(programId, tracerCategory)
                     .then(response => {
                         if (response.status == 200) {
                             console.log("planningUnit------>", response.data);
@@ -698,12 +698,12 @@ export default class StepOneImportMapPlanningUnits extends Component {
         if (papuList.length != 0) {
             for (var j = 0; j < papuList.length; j++) {
 
-                let planningUnitObj = this.state.planningUnitList.filter(c => c.id == papuList[j].planningUnit.id)[0];
+                let planningUnitObj = this.state.planningUnitList.filter(c => c.id == papuList[j].id)[0];
                 data = [];
-                // data[0] = getLabelText(planningUnitObj.planningUnit.forecastingUnit.tracerCategory.label, this.state.lang)
-                data[0] = ""
-                data[1] = papuList[j].planningUnit.id
-                data[2] = getLabelText(papuList[j].planningUnit.label, this.state.lang) + ' | ' + papuList[j].planningUnit.id
+                data[0] = getLabelText(papuList[j].forecastingUnit.tracerCategory.label, this.state.lang)
+                // data[0] = ""
+                data[1] = papuList[j].id
+                data[2] = getLabelText(papuList[j].label, this.state.lang) + ' | ' + papuList[j].id
                 data[3] = papuList[j].multiplier
                 data[4] = papuList[j].forecastingUnit.id
                 data[5] = planningUnitObj != undefined ? planningUnitObj.forecastingUnit.tracerCategory.id : ""
@@ -715,19 +715,19 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 let selectedForecastProgram = this.state.datasetList.filter(c => c.programId == document.getElementById("forecastProgramId").value)[0];
                 let filteredPlanningUnit = selectedForecastProgram.filteredPlanningUnit;
                 // console.log("filteredPlanningUnit---------->", filteredPlanningUnit);
-                let match = filteredPlanningUnit.filter(c => c.id == papuList[j].planningUnit.id);
+                let match = filteredPlanningUnit.filter(c => c.id == papuList[j].id);
 
                 if (match.length > 0) {
-                    data[6] = papuList[j].planningUnit.id
-                    data[7] = getLabelText(papuList[j].planningUnit.label, this.state.lang) + ' | ' + papuList[j].planningUnit.id
+                    data[6] = papuList[j].id
+                    data[7] = getLabelText(papuList[j].label, this.state.lang) + ' | ' + papuList[j].id
                     data[8] = papuList[j].multiplier
                     data[9] = 1
                     data[10] = 1
                     data[11] = planningUnitObj != undefined ? planningUnitObj.forecastingUnit.tracerCategory.id : ""
 
                     forecastPlanignUnitListForNotDuplicate.push({
-                        supplyPlanPlanningUnitId: papuList[j].planningUnit.id,
-                        forecastPlanningUnitId: papuList[j].planningUnit.id
+                        supplyPlanPlanningUnitId: papuList[j].id,
+                        forecastPlanningUnitId: papuList[j].id
                     });
                 } else {
                     data[6] = ''
