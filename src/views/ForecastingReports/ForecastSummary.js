@@ -1204,9 +1204,9 @@ class ForecastSummary extends Component {
                                         //add notes
                                         if (selectedForecastMapObjIn.notes != '') {
                                             if (notes1 == '') {
-                                                notes1 = regionList.filter(c => c.regionId == keys[k])[0].label.label_en + ' : ' + selectedForecastMapObjIn.notes;
+                                                notes1 = regionList.filter(c => c.regionId == keys[k])[0].label.label_en + ': ' + selectedForecastMapObjIn.notes;
                                             } else {
-                                                notes1 = notes1.concat(' | ' + regionList.filter(c => c.regionId == keys[k])[0].label.label_en + ' : ' + selectedForecastMapObjIn.notes);
+                                                notes1 = notes1.concat(' | ' + regionList.filter(c => c.regionId == keys[k])[0].label.label_en + ': ' + selectedForecastMapObjIn.notes);
                                             }
                                         }
 
