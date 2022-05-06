@@ -71,6 +71,9 @@ export function jExcelLoadedFunction(instance, number) {
     filter.classList.add('ml-2');
     jexcel_pagination.appendChild(filter);
 
+    var jexcel_filterFirstdiv1 = document.getElementsByClassName('jss_table_container')[0];
+    jexcel_filterFirstdiv1.firstChild.nextSibling.classList.remove('jss_scrollX')
+
 
 
 

@@ -523,43 +523,43 @@ label.arrow_label:after {
   background-color: #e5edf5;
 }
 
-.jss_selectall {
+.jexcel_selectall {
   background: #fff !important;
 }
-.jss > thead > tr > td {
+.jexcel > thead > tr > td {
   background-color: #fff !important;
   color: #212721 !important;
   font-weight: bold;
   font-style: normal !important;
 }
-.jss > tbody > tr > td:first-child {
+.jexcel > tbody > tr > td:first-child {
   background-color: #fff !important;
 }
-.jss > tbody > tr > td {
+.jexcel > tbody > tr > td {
   padding: 6px !important;
   line-height: 15px;
 }
-.jss > thead > tr > td {
+.jexcel > thead > tr > td {
   padding: 6px !important;
   z-index: 0 !important;
 }
 
-.jss_page {
+.jexcel_page {
   z-index: 1;
   color: 002f6c !important;
 }
 
-:first-child.jss_page {
+:first-child.jexcel_page {
   margin-left: 0;
   border-top-left-radius: 0.25rem;
   border-bottom-left-radius: 0.25rem;
 }
-.jss_page_selected {
+.jexcel_page_selected {
   color: #fff;
   background-color: #002f6c !important;
   border-color: #002f6c !important;
 }
-.jss_pagination > div > div {
+.jexcel_pagination > div > div {
   text-align: center;
   width: 30px !important;
   height: 22px !important;
@@ -570,7 +570,7 @@ label.arrow_label:after {
   cursor: pointer !important;
 }
 
-.jss_pagination_dropdown {
+.jexcel_pagination_dropdown {
   color: #fff !important;
   background-color: #20a8d8 !important;
   border-color: #20a8d8 !important;
@@ -583,7 +583,7 @@ label.arrow_label:after {
   border-radius: 0.2rem;
 }
 
-.jss_search {
+.jexcel_search {
   height: calc(1.5em + 0.5rem + 2px);
   padding: 0.25rem 0.5rem;
   font-size: 0.76562rem;
@@ -595,12 +595,12 @@ label.arrow_label:after {
   border: 1px solid #e4e7ea;
 }
 
-.jss
+.jexcel
 {
   width:100%!important;
 }
 // :first-child.jexcel_filter{position: absolute; bottom: 0px;}
-.jss_pagination_dropdown option {
+.jexcel_pagination_dropdown option {
   position: absolute;
   top: 100%;
   left: 0;
@@ -621,7 +621,7 @@ label.arrow_label:after {
 }
 
 
-.RemoveStriped .jss_content .jss .draggable {
+.RemoveStriped .jexcel_content .jexcel .draggable {
   tr:nth-of-type(odd) {
     background-color: #fff !important;
   }
@@ -646,56 +646,56 @@ label.arrow_label:after {
 .updateTextwhitebtn .btn-info {
   color: #fff !important;
 }
-.jss_search_container div {
+.jexcel_filter div {
   margin-left: auto;
 }
 .f-End {
   padding-right: 18px !important;
 }
 
-.jss_content {
+.jexcel_content {
   overflow-y: auto !important;
   max-height: 100% !important;
   height: 100%;
   // max-height: 540px !important;
   min-height: 70px !important;
 }
-.jss > tbody > tr > td.readonly {
+.jexcel > tbody > tr > td.readonly {
   color: #212721 !important;
 }
 
-.jss > tbody > tr > td.readonly.shipmentEntryEmergency {
+.jexcel > tbody > tr > td.readonly.shipmentEntryEmergency {
   color: #BA0C2F !important;
 }
 
-.jss > tbody > tr > td.readonly.shipmentEntryActive {
+.jexcel > tbody > tr > td.readonly.shipmentEntryActive {
   color: #808080 !important;
   background-color: #808080 !important;
 }
 
-.jss > tbody > tr > td.readonly.shipmentEntryDoNotInclude {
+.jexcel > tbody > tr > td.readonly.shipmentEntryDoNotInclude {
   background-color: #D3D3D3 !important;
 }
 
-.jss > tbody > tr > td.readonly.shipmentEntryDelete {
+.jexcel > tbody > tr > td.readonly.shipmentEntryDelete {
   color: #808080 !important;
   background-color: #808080 !important;
 }
 
-.jss > tbody > tr > td.shipmentEntryEmergency {
+.jexcel > tbody > tr > td.shipmentEntryEmergency {
   color: #BA0C2F !important;
 }
 
-.jss > tbody > tr > td.shipmentEntryActive {
+.jexcel > tbody > tr > td.shipmentEntryActive {
   color: #808080 !important;
   background-color: #808080 !important;
 }
 
-.jss > tbody > tr > td.shipmentEntryDoNotInclude {
+.jexcel > tbody > tr > td.shipmentEntryDoNotInclude {
   background-color: #D3D3D3 !important;
 }
 
-.jss > tbody > tr > td.shipmentEntryDelete {
+.jexcel > tbody > tr > td.shipmentEntryDelete {
   color: #808080 !important;
   background-color: #808080 !important;
 }
@@ -794,7 +794,7 @@ label.arrow_label:after {
     .jexcel_clear_btn {
   
        margin-left: 0px !important; 
-  }   .jss_pagination_dropdown {
+  }   .jexcel_pagination_dropdown {
           
     margin-left: 0px !important;}
 
@@ -802,7 +802,7 @@ label.arrow_label:after {
 .react-bs-table-sizePerPage-dropdown .dropdown-item {
     border-bottom: none;
 }.react-bs-table-sizePerPage-dropdown .dropdown-menu {border-radius: 0px !important;}
-.jss_pagination_dropdown option {
+.jexcel_pagination_dropdown option {
   color: #205493 !important;}
 .react-bs-table-sizePerPage-dropdown .dropdown-menu {
   text-align: center !important;
@@ -904,19 +904,19 @@ label.arrow_label:after {
 }
 
 
-.Consumptionsearchinline .jss_search_container{
+.Consumptionsearchinline .jexcel_filter{
   position: absolute;
   top: -53px;
   right: 0%;
 
 }
-.AddInventorysearchinline .jss_search_container{
+.AddInventorysearchinline .jexcel_filter{
   position: absolute;
   top: -53px;
   right: 0%;
 
 }
-.Shipmentsearchinline .jss_search_container{
+.Shipmentsearchinline .jexcel_filter{
   position: absolute;
   top: -53px;
   right: 0%;
@@ -929,18 +929,18 @@ label.arrow_label:after {
     padding: 0.25rem 0.5rem!important;
 }
 // Readonly background transperant made after conversion
-.jexcelremoveReadonlybackground .jss_content .draggable tr .readonly{
+.jexcelremoveReadonlybackground .jexcel_content .draggable tr .readonly{
   background: transparent!important;
 }
 // supplyplan consumption add new batch tr row height  in table for add batch
-.AddListbatchtrHeight .jss_content .jss tbody.draggable tr{
+.AddListbatchtrHeight .jexcel_content .jexcel tbody.draggable tr{
   height: 30px;
 }
-.RowheightForjexceladdRow .jss_content .jss tbody.draggable tr{ 
+.RowheightForjexceladdRow .jexcel_content .jexcel tbody.draggable tr{ 
   height: 30px;
 }
 
-.RowClickable .jss_content .jss tbody.draggable tr{ 
+.RowClickable .jexcel_content .jexcel tbody.draggable tr{ 
   cursor: pointer;
 }
 
@@ -948,15 +948,15 @@ label.arrow_label:after {
   cursor: pointer;
 }
  
-.RowClickableExpiredInventory  .jss_content .jss tbody.draggable tr td:nth-child(3){
+.RowClickableExpiredInventory  .jexcel_content .jexcel tbody.draggable tr td:nth-child(3){
   cursor: pointer;
 }
 
-.RowClickableExpiredInventory  .jss_content .jss tbody.draggable tr td:nth-child(4){
+.RowClickableExpiredInventory  .jexcel_content .jexcel tbody.draggable tr td:nth-child(4){
   cursor: pointer;
 }
 
-.RowheightForaddprogaddRow .jss_content .jss tbody.draggable tr{ 
+.RowheightForaddprogaddRow .jexcel_content .jexcel tbody.draggable tr{ 
   height: 30px;
 }
 // Multiselect z-index going behind table 
@@ -966,14 +966,14 @@ label.arrow_label:after {
 
 
 // scroller size
-.jss_content::-webkit-scrollbar {
+.jexcel_content::-webkit-scrollbar {
   width: 10px !important;
   height: 10px !important;
 }
 
 // .realmcountrypUnitTd{text-align: right !important;}
 
-.jss > thead > tr > .AsteriskTheadtrTd::after {
+.jexcel > thead.resizable > tr > .AsteriskTheadtrTd::after {
  position: relative;
   width: 3px;
   height: 100%;
@@ -985,7 +985,7 @@ label.arrow_label:after {
 font-size: 14px;
 }
 
-.jss > thead.resizable > tr > .CalculatorTheadtr::after {
+.jexcel > thead.resizable > tr > .CalculatorTheadtr::after {
 //   position: relative;
 //    width: 3px;
 //    height: 100%;
@@ -1690,13 +1690,13 @@ h5,
   padding-right: calc(1.5em + 1.75rem);
 }
 
-.RemoveStriped .jss_content .jss .draggable {
+.RemoveStriped .jexcel_content .jexcel .draggable {
   tr:nth-of-type(odd) {
     background-color: #fff !important;
   }
 }
 
-.jss {
+.jexcel {
   white-space: pre-wrap !important;
 }
 
@@ -3732,32 +3732,8 @@ margin-left: -45px;
     background-position: top right,top left;
 }
 
-// .jss>thead>tr>td.jss_filters_icon{
-//   background-image:url('/src/assets/img/filter.png')!important;
-// }
-
-.jss_search_container {
-  display: flex;
-  justify-content: space-between;
-  background-color: transparent!important;
-  margin-left: 1px;
-  margin-right: 2px;
-  border: none!important;
-  border-bottom: 0;
-}
-
-.jss>thead>tr>td.jss_filters_icon::before{
-  // font-family: "F";
-  // background-image:url('/src/assets/img/filter.png')!important;
-  // content: "\f0b0"!important;
-  font-family: 'FontAwesome'!important;
-  content: '\f0b0'!important;
-  position: absolute;
-  right: 0;
-  font-size: 16px;
-  width: 16px;
-  height: 16px;
-  color: #ccc;
+.jexcel>thead>tr>td.jexcel_filters_icon_active{
+  background-image:url('/src/assets/img/filter.png')!important;
 }
 
 .localProcurementAgent{
@@ -3968,18 +3944,18 @@ background-color: yellow;
   color: #BA0C2F;
 }
 
-.jss_search_container{
+.jexcel_filter{
   border-top: 0px!important;
 }
 
-.jss_content{
+.jexcel_content{
   box-shadow: none!important;
 }
 
-.jtabs{
-  position: inherit!important;
-  max-width: none!important;
-}
+// .jtabs{
+//   position: relative!important;
+//   max-width: none!important;
+// }
 
 /* Global CSS, you probably don't need that */
 
@@ -4107,7 +4083,7 @@ color: #000000!important;
   overflow-x: hidden!important;  
 }
 
-.jss_content::-webkit-scrollbar-thumb {
+.jexcel_content::-webkit-scrollbar-thumb {
   background: #c1c1c1!important;
 }
 
@@ -4169,7 +4145,7 @@ z-index:999;
   overflow: scroll !important;
 }
 
-.jss > tbody > tr > td.readonly > input[type="checkbox"], .jss > tbody > tr > td.readonly > input[type="radio"] {
+.jexcel > tbody > tr > td.readonly > input[type="checkbox"], .jexcel > tbody > tr > td.readonly > input[type="radio"] {
   pointer-events: none;
   opacity: unset !important;
 }
@@ -5174,7 +5150,7 @@ height: 0px;
           font-size: 25px;
           color: #4AB7DE;
       }
-      .jss_pagination_dropdown:hover {
+      .jexcel_pagination_dropdown:hover {
         color: #fff !important;
         background-color: #4AB7DE !important;
         border-color: #4AB7DE !important;
@@ -5487,7 +5463,7 @@ fieldset.scheduler-border {
   line-height: 1.5;
   border-radius: 0.2rem;
 }
-.jss_pagination_dropdown:hover {
+.jexcel_pagination_dropdown:hover {
   color: #fff !important;
   background-color: #4AB7DE !important;
   border-color: #4AB7DE !important;
@@ -5565,7 +5541,7 @@ border: 1px solid #eee;
   color: #212721;
   font-style: italic;
 }
-.jss > thead.resizable > tr > .InfoTr::after {
+.jexcel > thead.resizable > tr > .InfoTr::after {
   font-family: 'FontAwesome';
   content: '\f05a';
     position: relative;
@@ -5608,7 +5584,7 @@ border: 1px solid #eee;
   margin-top: -25px;
 }
 
-  .jss_contextmenu>.header{
+  .jexcel_contextmenu>.header{
     display:none
   }
 
@@ -6054,7 +6030,7 @@ font-style: italic!important;
 //     bottom: 0px;
 //     left:1px;
 // }
-.modelingTransferTable .jexcel_container.with-tabs .jss_search_container{
+.modelingTransferTable .jexcel_container.with-tabs .jexcel_filter{
   margin-top: 0px!important;
     padding-top: 0px!important;
 }
@@ -6370,6 +6346,10 @@ font-style: italic!important;
 .topscroll{
 top: calc(20em + 3px);
 }
+.extrapolateTable .jtabs {
+  position: relative!important;
+  max-width: none !important;
+}
 
 // .usageTemplateDataEntryTable .jtabs-content .jtabs-selected .jexcel_content .jexcel>tbody>tr>td:nth-child(17) {
 //   display:none !important;
@@ -6383,3 +6363,346 @@ top: calc(20em + 3px);
 //   text-align: left !important;
 // }
 
+.ShowGuidanceHeading{
+    color: #002f6c;
+    font-weight: 600;
+    font-size: 19px;
+    
+}
+.UnderLineText{
+  text-decoration:underline;
+  text-decoration-color:#272127;
+  font-weight:bold;
+}
+.BgLightBlue{
+  background:#a7c6ed;
+  color:#002f6c;
+}
+.BgDarkBlue{
+  background:#002f6c;
+  color:#fff;
+}
+
+.jss_search_container {
+  display: flex;
+  justify-content: space-between;
+  background-color: transparent!important;
+  margin-left: 1px;
+  margin-right: 2px;
+  border: none!important;
+  border-bottom: 0;
+}
+
+.jss_search {
+  height: calc(1.5em + 0.5rem + 2px);
+  padding: 0.25rem 0.5rem;
+  font-size: 0.76562rem;
+  line-height: 1.5;
+  border-radius: 0.2rem;
+  width: 130px;
+  background-color: #fff;
+  background-clip: padding-box;
+  border: 1px solid #e4e7ea;
+}
+
+.jss_page_selected {
+  color: #fff;
+  background-color: #002f6c !important;
+  border-color: #002f6c !important;
+}
+.jss_pagination > div > div {
+  text-align: center;
+  width: 30px !important;
+  height: 22px !important;
+  line-height: 22px !important;
+  border: 1px solid #ccc !important;
+  box-sizing: border-box !important;
+  margin-left: 0px !important ;
+  cursor: pointer !important;
+}
+
+.jss_pagination_dropdown {
+  color: #fff !important;
+  background-color: #20a8d8 !important;
+  border-color: #20a8d8 !important;
+  margin-left: 5px;
+  margin-top: -2px;
+  height: calc(1.5em + 0.5rem + 2px);
+  padding: 0.25rem 0.5rem;
+  font-size: 0.76562rem;
+  line-height: 1.5;
+  border-radius: 0.2rem;
+}
+
+.jss_pagination_dropdown option {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 1000;
+
+  float: left;
+  min-width: 10rem;
+  padding: 0 0;
+  margin: 0.125rem 0 0;
+  font-size: 0.875rem;
+  color: #23282c;
+  text-align: left;
+  list-style: none;
+  background-color: #fff;
+  background-clip: padding-box;
+  border: 1px solid #c8ced3 !important;
+  border-radius: 0.25rem;
+}
+
+.jss_pagination_dropdown {
+          
+  margin-left: 0px !important;}
+
+  .jss_pagination_dropdown option {
+    color: #205493 !important;}
+
+    .jss_pagination_dropdown:hover {
+      color: #fff !important;
+      background-color: #4AB7DE !important;
+      border-color: #4AB7DE !important;
+      margin-left: 5px;
+      margin-top: -2px;
+      height: calc(1.5em + 0.5rem + 2px);
+      padding: 0.25rem 0.5rem;
+      font-size: 0.76562rem;
+      line-height: 1.5;
+      border-radius: 0.2rem;
+  }
+
+  .jss_pagination_dropdown:hover {
+    color: #fff !important;
+    background-color: #4AB7DE !important;
+    border-color: #4AB7DE !important;
+    margin-left: 5px;
+    margin-top: -2px;
+    height: calc(1.5em + 0.5rem + 2px);
+    padding: 0.25rem 0.5rem;
+    font-size: 0.76562rem;
+    line-height: 1.5;
+    border-radius: 0.2rem;
+  }
+
+  .jss_search_container div {
+    margin-left: auto;
+  }
+
+  .Consumptionsearchinline .jss_search_container{
+    position: absolute;
+    top: -53px;
+    right: 0%;
+  
+  }
+
+  .jss_search_container{
+    border-top: 0px!important;
+  }
+
+  .jss>thead>tr>td.jss_filters_icon::before{
+    // font-family: "F";
+    // background-image:url('/src/assets/img/filter.png')!important;
+    // content: "\f0b0"!important;
+    font-family: 'FontAwesome'!important;
+    content: '\f0b0'!important;
+    position: absolute;
+    right: 0;
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+    color: #ccc;
+  }
+
+  .jss > thead > tr > td {
+    background-color: #fff !important;
+    color: #212721 !important;
+    font-weight: bold;
+    font-style: normal !important;
+  }
+
+  .jss_selectall {
+    background: #fff !important;
+  }
+
+  .jss > thead > tr > td {
+    padding: 6px !important;
+    z-index: 0 !important;
+  }
+
+  .jss > thead > tr > .AsteriskTheadtrTd::after {
+    position: relative;
+     width: 3px;
+     height: 100%;
+     color: #BA0C2F; 
+     top: 0px;
+     left: 2px;
+     cursor: col-resize;
+     content: "*" !important; 
+   font-size: 14px;
+   }
+   
+   .jss > thead > tr > .CalculatorTheadtr::after {
+   //   position: relative;
+   //    width: 3px;
+   //    height: 100%;
+   //    color: #BA0C2F; 
+   //    top: 0px;
+   //    left: 2px;
+   //    cursor: col-resize;
+   //    content: url('https://images.hindustantimes.com/auto/img/2021/08/14/600x338/xuv700_1628942877448_1628943408032.jpg') !important; 
+   //  font-size: 14px;
+   
+   font-family: 'FontAwesome';
+   content: '\f1ec';
+     position: relative;
+      width: 3px;
+      height: 100%;
+     //  color: #BA0C2F; 
+      top: 0px;
+      left: 2px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .jss > thead > tr > .InfoTr::after {
+      font-family: 'FontAwesome';
+      content: '\f05a';
+        position: relative;
+         width: 3px;
+         height: 100%;
+         top: 0px;
+         left: 2px;
+         cursor: pointer;
+         font-size: 14px;
+         color:#002f6c;
+       }
+
+       .jss > thead > tr > .InfoTrAsteriskTheadtrTd::after {
+        font-family: 'FontAwesome';
+        content: '\f05a';
+          position: relative;
+           width: 3px;
+           height: 100%;
+           top: 0px;
+           left: 15px;
+           cursor: pointer;
+           font-size: 14px;
+           color:#002f6c;
+      }
+      .jss > thead > tr > .InfoTrAsteriskTheadtrTd::before {
+        font-family: 'FontAwesome';
+        content: '*';
+          position: relative;
+           width: 3px;
+           height: 100%;
+           top: 0px;
+           left: 69px;
+           cursor: pointer;
+           font-size: 14px;
+           color:#BA0C2F;
+         }
+
+         .jss > thead > tr > .arrow-down:not(.AsteriskTheadtrTd)::after {
+          content: ""!important;
+        }
+      
+        .jss > thead > tr > .arrow-up:not(.AsteriskTheadtrTd)::after {
+          content: ""!important;
+        }
+
+        .RemoveStriped .jss_content .jexcel .draggable {
+          tr:nth-of-type(odd) {
+            background-color: #fff !important;
+          }
+        }
+
+        .jss_content {
+          overflow-y: auto !important;
+          max-height: 100% !important;
+          height: 100%;
+          // max-height: 540px !important;
+          min-height: 70px !important;
+        }
+
+        .jexcelremoveReadonlybackground .jss_content  tr .readonly{
+          background: transparent!important;
+        }
+
+        // supplyplan consumption add new batch tr row height  in table for add batch
+.AddListbatchtrHeight .jss_content .jss tbody tr{
+  height: 30px;
+}
+.RowheightForjexceladdRow .jss_content .jss tbody tr{ 
+  height: 30px;
+}
+
+.RowClickable .jss_content .jss tbody tr{ 
+  cursor: pointer;
+}
+
+.RowClickableExpiredInventory  .jss_content .jss tbody tr td:nth-child(3){
+  cursor: pointer;
+}
+
+.RowClickableExpiredInventory  .jss_content .jss tbody tr td:nth-child(4){
+  cursor: pointer;
+}
+
+.RowheightForaddprogaddRow .jss_content .jss tbody tr{ 
+  height: 30px;
+}
+
+.jss_content::-webkit-scrollbar {
+  width: 10px !important;
+  height: 10px !important;
+}
+
+.RemoveStriped .jss_content .jexcel {
+  tr:nth-of-type(odd) {
+    background-color: #fff !important;
+  }
+}
+
+.jss_content{
+  box-shadow: none!important;
+  padding-right: 3px;
+    padding-bottom: 3px;
+    max-width: unset!important;
+}
+
+.jss_content::-webkit-scrollbar-thumb {
+  background: #c1c1c1!important;
+}
+
+.consumptionDataEntryTable .jss_content{
+  max-height: calc(100vh - 262px)!important;
+  overflow: scroll !important;
+}
+
+.jss{
+  white-space: pre-wrap !important;
+  margin-right: 0px!important;
+  margin-bottom: 0px!important;
+  outline: 0!important;
+  width: 100% !important;
+}
+
+.jss_content .jss tbody tr:nth-of-type(odd) {
+  background-color: #e5edf5;
+}
+
+.jss>thead>tr>td {
+  line-height: unset!important;
+}
+
+.jss>thead>tr>td.jss_filters_icon {
+  padding-right: 0px!important;
+}
+
+.jss>tbody>tr>td {
+  white-space: pre-wrap!important;
+  text-align: center!important;
+}
