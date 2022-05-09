@@ -113,6 +113,16 @@ export default class StepThreeImportMapPlanningUnits extends Component {
         for (var j = 0; j < json.length; j++) {
             var rowData = elInstance.getRowData(j);
             var id = rowData[9];
+            var forecastConsumption = rowData[4];
+            if (forecastConsumption == 0) {
+                for (var i = 0; i < colArr.length; i++) {
+                    var cell1 = elInstance.getCell(`${colArr[i]}${parseInt(j) + 1}`)
+                    cell1.classList.add('readonly');
+                    elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'background-color', 'transparent');
+                }
+            }
+
+
             if (id == true) {
                 for (var i = 0; i < colArr.length; i++) {
                     // elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'background-color', 'transparent');
@@ -507,7 +517,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                                         v2: selectedSupplyPlanPlanningUnit[0].supplyPlanPlanningUnitDesc,//Supply plan planning unit name
                                         v3: regionFilter[0].supplyPlanRegionName,// Supply plan region name
                                         v4: moment(primaryConsumptionData[i].monthlyForecastData[j].month).format("MMM-YY"), // Month
-                                        v5: Math.round(Number(primaryConsumptionData[i].monthlyForecastData[j].consumptionQty)),//Forecasting module consumption qty
+                                        v5: primaryConsumptionData[i].monthlyForecastData[j].consumptionQty == null ? "" : Math.round(Number(primaryConsumptionData[i].monthlyForecastData[j].consumptionQty)),//Forecasting module consumption qty
                                         v6: Number(selectedSupplyPlanPlanningUnit[0].multiplier),//Multiplier
                                         v7: Math.round((Number(primaryConsumptionData[i].monthlyForecastData[j].consumptionQty) * Number(regionFilter[0].forecastPercentage) / 100) * Number(selectedSupplyPlanPlanningUnit[0].multiplier)),// Multiplication
                                         v8: checkConsumptionData.length > 0 ? checkConsumptionData[0].consumptionRcpuQty : "",//Supply plan module qty
@@ -603,7 +613,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
         if (papuList.length != 0) {
 
             for (var j = 0; j < papuList.length; j++) {
-
+                console.log("papuList[j].v5", papuList[j].v5)
                 data = [];
                 data[0] = papuList[j].v1
                 data[1] = papuList[j].v2
@@ -614,7 +624,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                 data[6] = papuList[j].v6
                 data[7] = papuList[j].v7
                 data[8] = papuList[j].v8
-                data[9] = true;
+                data[9] = papuList[j].v5 != "" ? true : false;
                 data[10] = papuList[j].v9;
                 data[11] = papuList[j].v10;
                 data[12] = papuList[j].v11;
