@@ -3539,7 +3539,7 @@ class ForecastSummary extends Component {
                         </FormGroup>
                     </CardFooter>}
                 </Card>
-     
+               
             </div >
         );
     }

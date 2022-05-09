@@ -501,6 +501,7 @@ export default class BuildTree extends Component {
         this.pickAMonth4 = React.createRef()
         this.pickAMonth5 = React.createRef()
         this.state = {
+            popoverOpenStartValueModelingTool:false,
             showGuidanceModelingTransfer:false,
             showGuidanceNodeData: false,
             showGuidance:false,
@@ -764,6 +765,7 @@ export default class BuildTree extends Component {
             modelingChanged: false
         }
         // this.showGuidanceNodaData = this.showGuidanceNodaData.bind(this);
+        this.toggleStartValueModelingTool = this.toggleStartValueModelingTool.bind(this);
         this.getMomValueForDateRange = this.getMomValueForDateRange.bind(this);
         this.toggleDeropdownSetting = this.toggleDeropdownSetting.bind(this);
         // this.onClick1 = this.onClick1.bind(this);
@@ -1411,6 +1413,11 @@ export default class BuildTree extends Component {
     //     )
 
     //     };
+    toggleStartValueModelingTool() {
+        this.setState({
+             popoverOpenStartValueModelingTool: !this.state.popoverOpenStartValueModelingTool
+         })
+     }
     toggleShowGuidanceNodeData() {
        this.setState({
             showGuidanceNodeData: !this.state.showGuidanceNodeData
@@ -9082,8 +9089,15 @@ export default class BuildTree extends Component {
                                                 <MonthBox value={this.makeText({ year: new Date(this.state.currentCalculatorStopDate.replace(/-/g, '\/')).getFullYear(), month: ("0" + (new Date(this.state.currentCalculatorStopDate.replace(/-/g, '\/')).getMonth() + 1)).slice(-2) })} onClick={this.handleClickMonthBox5} />
                                             </Picker>
                                         </FormGroup>
-                                        {this.state.currentItemConfig.context.payload.nodeType.id <= 2 && <FormGroup className="col-md-6">
-                                            <Label htmlFor="currencyId">{i18n.t('static.tree.startValue')}<span class="red Reqasterisk">*</span></Label>
+                                        {this.state.currentItemConfig.context.payload.nodeType.id <= 2 && 
+                                        <>
+                                        <div>
+                                                    <Popover placement="top" isOpen={this.state.popoverOpenStartValueModelingTool} target="Popover53" trigger="hover" toggle={this.toggleStartValueModelingTool}>
+                                                        <PopoverBody>{i18n.t('static.tooltip.StartValueModelingTool')}</PopoverBody>
+                                                    </Popover>
+                                                </div>
+                                        <FormGroup className="col-md-6">
+                                            <Label htmlFor="currencyId">{i18n.t('static.tree.startValue')}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover53" onClick={this.toggleStartValueModelingTool} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                             <Input type="text"
                                                 id="startValue"
                                                 name="startValue"
@@ -9095,6 +9109,7 @@ export default class BuildTree extends Component {
                                             </Input>
                                             {/* <FormFeedback className="red">{errors.nodeTitle}</FormFeedback> */}
                                         </FormGroup>
+                                        </>
                                         }
                                         {this.state.currentItemConfig.context.payload.nodeType.id > 2 && <FormGroup className="col-md-6">
                                             <Label htmlFor="currencyId">{i18n.t('static.tree.StartPercentage')}<span class="red Reqasterisk">*</span></Label>
