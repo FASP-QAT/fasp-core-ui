@@ -2287,5 +2287,6 @@
     "static.importIntoQATSupplyPlan.conversionFactor": "Conversion Factor (Forecast to Supply Plan)",
     "static.report.versionFinal*": "Version (* indicates Final)",
     "static.importIntoQATSupplyPlan.forecastFinalVersion": "Forecast version (Final Versions Only)",
-    "static.common.person":"Person"
+    "static.common.person":"Person",
+    "static.tooltip.StartValueModelingTool":"If you wish to create multiple rows of modeling in which the ending value of the first row should be the start value of the second row and you are using the modeling calculator, you will need to click the update button before creating the second row, otherwise the start value will be the same as the first row"
 }

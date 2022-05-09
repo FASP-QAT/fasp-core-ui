@@ -248,17 +248,18 @@ export default class ListTreeComponent extends Component {
                 [parameterName]: value
             }, () => {
                 if (parameterName == 'programId' && value != "") {
-                    // console.log("programId---", this.state.datasetList)
+                    console.log("tempTreeId---", this.state.tempTreeId)
                     var programId = this.state.programId;
                     var program = this.state.datasetList.filter(x => x.id == programId)[0];
-                    // console.log("my program---", program);
+                    console.log("my program---", program);
                     let tempProgram = JSON.parse(JSON.stringify(program))
                     let treeList = tempProgram.programData.treeList;
                     var tree = treeList.filter(x => x.treeId == this.state.tempTreeId)[0];
-                    // console.log("my tree---",tree)
+                    console.log("my tree---", tree);
                     var items = tree.tree.flatList;
+                    console.log("my items---", items);
                     var nodeDataMomList = this.state.nodeDataMomList;
-                    // console.log("nodeDataMomList---", nodeDataMomList);
+                    console.log("nodeDataMomList---", nodeDataMomList);
                     if (nodeDataMomList.length > 0) {
                         for (let i = 0; i < nodeDataMomList.length; i++) {
                             // console.log("nodeDataMomList[i]---", nodeDataMomList[i])
@@ -301,7 +302,7 @@ export default class ListTreeComponent extends Component {
                 data = [];
                 // data[0] = missingPUList[j].month
                 // data[1] = missingPUList[j].startValue
-                data[0] = getLabelText(missingPUList[j].tracerCategory.label, this.state.lang)
+                data[0] = getLabelText(missingPUList[j].productCategory.label, this.state.lang)
                 data[1] = getLabelText(missingPUList[j].planningUnit.label, this.state.lang) + " | " + missingPUList[j].planningUnit.id
                 dataArray[count] = data;
                 count++;
@@ -320,7 +321,7 @@ export default class ListTreeComponent extends Component {
             columns: [
                 {
                     // 0
-                    title: i18n.t('static.tracercategory.tracercategory'),
+                    title: i18n.t('static.productCategory.productCategory'),
                     type: 'test',
                     readOnly: true
                 },
@@ -393,7 +394,7 @@ export default class ListTreeComponent extends Component {
                     var parentNodeData = treeTemplate.flatList.filter(x => x.id == puNodeList[i].parent)[0];
                     console.log("parentNodeData---", parentNodeData);
                     json = {
-                        tracerCategory: parentNodeData.payload.nodeDataMap[0][0].fuNode.forecastingUnit.tracerCategory,
+                        productCategory: parentNodeData.payload.nodeDataMap[0][0].fuNode.forecastingUnit.productCategory,
                         planningUnit: puNodeList[i].payload.nodeDataMap[0][0].puNode.planningUnit
                     };
                     missingPUList.push(json);
@@ -436,53 +437,78 @@ export default class ListTreeComponent extends Component {
     }
 
 
-    getRegionList() {
-        var db1;
-        getDatabase();
-        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-        openRequest.onsuccess = function (e) {
-            db1 = e.target.result;
-            var transaction = db1.transaction(['region'], 'readwrite');
-            var program = transaction.objectStore('region');
-            var getRequest = program.getAll();
+    getRegionList(datasetId) {
+        console.log("datasetId details---", datasetId);
 
-            getRequest.onerror = function (event) {
-                // Handle errors!
-            };
-            getRequest.onsuccess = function (event) {
-                var myResult = [];
-                myResult = getRequest.result;
-                var regionList = [];
-                if (this.state.realmCountryId != null && this.state.realmCountryId != "") {
-                    regionList = myResult.filter(x => x.realmCountry.realmCountryId == this.state.realmCountryId);
-                    console.log("filter if regionList---", regionList);
-                }
-                // else {
-                //     regionList = myResult;
-                //     this.setState({
-                //         regionValues: []
-                //     });
-                //     console.log("filter else regionList---", regionList);
-                // }
-                var regionMultiList = []
-                regionList.map(c => {
-                    regionMultiList.push({ label: getLabelText(c.label, this.state.lang), value: c.regionId })
-                })
-                this.setState({
-                    regionList,
-                    regionMultiList,
-                    missingPUList: []
-                }, () => {
-                    if (this.state.treeTemplate != "")
-                        this.findMissingPUs();
-                });
-                for (var i = 0; i < myResult.length; i++) {
-                    console.log("myResult--->", myResult[i])
+        var regionList = [];
+        var regionMultiList = [];
+        if (datasetId != 0 && datasetId != "" && datasetId != null) {
+            var program = (this.state.datasetList.filter(x => x.id == datasetId)[0]);
+            console.log("program details---", program);
+            regionList = program.programData.regionList;
+            console.log("program for display---", program);
+            // realmCountryId = program.programData.realmCountry.realmCountryId;
 
-                }
+            regionList.map(c => {
+                regionMultiList.push({ label: getLabelText(c.label, this.state.lang), value: c.regionId })
+            })
+        }
+        this.setState({
+            regionList,
+            regionMultiList,
+            missingPUList: []
+        }, () => {
+            if (this.state.treeTemplate != "")
+                this.findMissingPUs();
+        });
 
-            }.bind(this);
-        }.bind(this);
+
+        // var db1;
+        // getDatabase();
+        // var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+        // openRequest.onsuccess = function (e) {
+        //     db1 = e.target.result;
+        //     var transaction = db1.transaction(['region'], 'readwrite');
+        //     var program = transaction.objectStore('region');
+        //     var getRequest = program.getAll();
+
+        //     getRequest.onerror = function (event) {
+        //         // Handle errors!
+        //     };
+        //     getRequest.onsuccess = function (event) {
+        //         var myResult = [];
+        //         myResult = getRequest.result;
+        //         var regionList = [];
+        //         if (this.state.realmCountryId != null && this.state.realmCountryId != "") {
+        //             regionList = myResult.filter(x => x.realmCountry.realmCountryId == this.state.realmCountryId);
+        //             console.log("filter if regionList---", regionList);
+        //         }
+        // else {
+        //     regionList = myResult;
+        //     this.setState({
+        //         regionValues: []
+        //     });
+        //     console.log("filter else regionList---", regionList);
+        // }
+        // var regionMultiList = []
+        // regionList.map(c => {
+        //     regionMultiList.push({ label: getLabelText(c.label, this.state.lang), value: c.regionId })
+        // })
+        // this.setState({
+        //     regionList,
+        //     regionMultiList,
+        //     missingPUList: []
+        // }, () => {
+        //     if (this.state.treeTemplate != "")
+        //         this.findMissingPUs();
+        // });
+        // for (var i = 0; i < myResult.length; i++) {
+        //     console.log("myResult--->", myResult[i])
+
+        // }
+
+        // }.bind(this);
+        // }.bind(this);
     }
     getForecastMethodList() {
         const lan = 'en';
@@ -541,14 +567,18 @@ export default class ListTreeComponent extends Component {
 
         console.log("TreeId--------------->", treeId, programId, versionId, operationId);
         var program = this.state.treeFlag ? (this.state.datasetList.filter(x => x.programId == programId && x.version == versionId)[0]) : (this.state.datasetList.filter(x => x.id == programId)[0]);
+        console.log("delete program---", program);
         let tempProgram = JSON.parse(JSON.stringify(program))
         let treeList = program.programData.treeList;
+        console.log("delete treeList---", treeList);
         var treeTemplateId = '';
         if (operationId == 1) {//delete
+            console.log("delete treeId---", treeId);
             const index = treeList.findIndex(c => c.treeId == treeId);
-            if (index > 0) {
-                const result = treeList.splice(index, 1);
-            }
+            console.log("delete index---", index);
+            // if (index > 0) {
+            const result = treeList.splice(index, 1);
+            // }
         } else if (operationId == 2) {//copy
             let treeName = this.state.treeName;
 
@@ -791,7 +821,7 @@ export default class ListTreeComponent extends Component {
         // if (operationId == 3) {
         if (operationId == 3 && treeTemplateId != "" && treeTemplateId != null) {
             console.log("programId 1---", programId);
-            calculateModelingData(programCopy, this, programId, 0, 1, 1, treeId, false,true);
+            calculateModelingData(programCopy, this, programId, 0, 1, 1, treeId, false, true);
         } else {
             this.saveTreeData(operationId, tempProgram, treeTemplateId, programId, treeId, programCopy);
         }
@@ -932,7 +962,7 @@ export default class ListTreeComponent extends Component {
             }, () => {
                 if (this.state.datasetIdModal != "") {
                     console.log("this.state.datasetIdModal---", this.state.datasetIdModal)
-                    this.getRegionList();
+                    this.getRegionList(this.state.datasetIdModal);
                 }
             });
             // this.buildTree();
@@ -956,7 +986,7 @@ export default class ListTreeComponent extends Component {
             }, () => {
                 if (this.state.datasetIdModal != "" && this.state.datasetIdModal != 0) {
                     console.log("this.state.datasetIdModal---", this.state.datasetIdModal)
-                    this.getRegionList();
+                    this.getRegionList(this.state.datasetIdModal);
                 }
             });
             // this.props.history.push({
@@ -1214,17 +1244,18 @@ export default class ListTreeComponent extends Component {
         }
 
         if (event.target.name == "datasetIdModal") {
-            var realmCountryId = "";
+            // var realmCountryId = "";
             if (event.target.value != "") {
-                var program = (this.state.datasetList.filter(x => x.id == event.target.value)[0]);
-                realmCountryId = program.programData.realmCountry.realmCountryId;
+                // var program = (this.state.datasetList.filter(x => x.id == event.target.value)[0]);
+                // console.log("program for display---",program);
+                // realmCountryId = program.programData.realmCountry.realmCountryId;
             }
             this.setState({
-                realmCountryId,
+                // realmCountryId,
                 datasetIdModal: event.target.value,
             }, () => {
                 localStorage.setItem("sesDatasetId", event.target.value);
-                this.getRegionList();
+                this.getRegionList(event.target.value);
                 // if (document.getElementById('templateId').value != "") {
                 //     this.findMissingPUs();
                 // }
@@ -1347,9 +1378,9 @@ export default class ListTreeComponent extends Component {
                         {/* <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong> */}
                         <div className="card-header-actions">
                             <div className="card-header-action">
-                            <a style={{marginLeft:'106px'}}>
-                                <span style={{ cursor: 'pointer' }} onClick={() => { this.toggleShowGuidance() }}><small className="supplyplanformulas">{i18n.t('static.common.showGuidance')}</small></span>
-                            </a>
+                                <a style={{ marginLeft: '106px' }}>
+                                    <span style={{ cursor: 'pointer' }} onClick={() => { this.toggleShowGuidance() }}><small className="supplyplanformulas">{i18n.t('static.common.showGuidance')}</small></span>
+                                </a>
                                 <Col md="12 pl-0 pr-lg-0">
                                     <div className="d-md-flex">
                                         {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_TREE') &&
@@ -1457,42 +1488,42 @@ export default class ListTreeComponent extends Component {
                         </div>
                     </CardBody>
                     <Modal isOpen={this.state.showGuidance}
-                    className={'modal-lg ' + this.props.className} >
-                    <ModalHeader toggle={() => this.toggleShowGuidance()} className="ModalHead modal-info-Headher">
-                        <strong className="TextWhite">Show Guidance</strong>
-                    </ModalHeader>
-                    <div>
-                        <ModalBody>
-                           <div>
-                               <h3 className='ShowGuidanceHeading'>Manage Tree – Tree list</h3>
-                           </div>
-                            <p>
-                                <p style={{fontSize:'14px'}}><span className="UnderLineText">Purpose :</span> Enable users to :</p>
-                                <p className='pl-lg-4'>
-                                1) View a list of their existing trees<br></br>
-                                2) Edit an existing tree by clicking any row <br></br>
-                                3) Delete or duplicate existing trees by right clicking on a row<br></br>
-                                4) Add a new tree to a loaded program by clicking on the 'Add Tree' dropdown in the top right corner of the screen. New trees can be built:<br></br> 
-                                <ul>
-                                    <li>manually - select 'Add Tree'</li>
-                                    <li>from a tree template - select the name of the desired template.</li>
-                                </ul>
+                        className={'modal-lg ' + this.props.className} >
+                        <ModalHeader toggle={() => this.toggleShowGuidance()} className="ModalHead modal-info-Headher">
+                            <strong className="TextWhite">Show Guidance</strong>
+                        </ModalHeader>
+                        <div>
+                            <ModalBody>
+                                <div>
+                                    <h3 className='ShowGuidanceHeading'>Manage Tree – Tree list</h3>
+                                </div>
+                                <p>
+                                    <p style={{ fontSize: '14px' }}><span className="UnderLineText">Purpose :</span> Enable users to :</p>
+                                    <p className='pl-lg-4'>
+                                        1) View a list of their existing trees<br></br>
+                                        2) Edit an existing tree by clicking any row <br></br>
+                                        3) Delete or duplicate existing trees by right clicking on a row<br></br>
+                                        4) Add a new tree to a loaded program by clicking on the 'Add Tree' dropdown in the top right corner of the screen. New trees can be built:<br></br>
+                                        <ul>
+                                            <li>manually - select 'Add Tree'</li>
+                                            <li>from a tree template - select the name of the desired template.</li>
+                                        </ul>
+                                    </p>
                                 </p>
-                            </p>
-                            <p>
-                                <p style={{fontSize:'14px'}}><span className="UnderLineText">Using this screen :</span></p>
-                                <p className='pl-lg-4'>
-                                <ul>
-                                    <li>A forecast program must first be loaded in order to build a tree (either manually or from a tree template.)</li>
-                                    <li>Before building and editing a tree, first add the forecast program's planning units in the <a href='/#/planningUnitSetting/listPlanningUnitSetting'>'Update Planning Units'</a> screen before building</li>
-                                    <li>Building a tree similar to an existing tree? Duplicate an existing tree by right clicking on a row and selecting “duplicate” edit. If you want to keep the structure of the tree constant and only change the numbers, build only one tree and use the scenario feature instead. </li>
-                                    <li>Submit a HelpDesk ticket if there is a missing template that would benefit the QAT community. </li>
-                                </ul>
+                                <p>
+                                    <p style={{ fontSize: '14px' }}><span className="UnderLineText">Using this screen :</span></p>
+                                    <p className='pl-lg-4'>
+                                        <ul>
+                                            <li>A forecast program must first be loaded in order to build a tree (either manually or from a tree template.)</li>
+                                            <li>Before building and editing a tree, first add the forecast program's planning units in the <a href='/#/planningUnitSetting/listPlanningUnitSetting'>'Update Planning Units'</a> screen before building</li>
+                                            <li>Building a tree similar to an existing tree? Duplicate an existing tree by right clicking on a row and selecting “duplicate” edit. If you want to keep the structure of the tree constant and only change the numbers, build only one tree and use the scenario feature instead. </li>
+                                            <li>Submit a HelpDesk ticket if there is a missing template that would benefit the QAT community. </li>
+                                        </ul>
+                                    </p>
                                 </p>
-                            </p>
-                        </ModalBody>
-                    </div>
-                </Modal>
+                            </ModalBody>
+                        </div>
+                    </Modal>
 
 
                     <Modal isOpen={this.state.isModalOpen}
