@@ -860,20 +860,31 @@ class DefaultLayout extends Component {
       this.setState({ businessFunctions: bfunction });
     }
     // console.log("has business function---", this.state.businessFunctions.includes('ROLE_BF_DELETE_LOCAL_PROGARM'));
-
-    let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
-    let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
-    this.setState({
-      activeTab: decryptedUser.defaultModuleId,
-    },
-      () => {
-        if (this.state.activeTab == 2) {
-          // alert("activeTab == 2");
-        } else {
-          // alert("activeTab == 1");
-        }
-      })
-
+    if (localStorage.getItem('curUser') != null && localStorage.getItem('curUser') != '') {
+      let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
+      let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
+      this.setState({
+        activeTab: decryptedUser.defaultModuleId,
+      },
+        () => {
+          if (this.state.activeTab == 2) {
+            // alert("activeTab == 2");
+          } else {
+            // alert("activeTab == 1");
+          }
+        })
+    } else {
+      this.setState({
+        activeTab: 2,
+      },
+        () => {
+          if (this.state.activeTab == 2) {
+            // alert("activeTab == 2");
+          } else {
+            // alert("activeTab == 1");
+          }
+        })
+    }
 
   }
 
@@ -3469,7 +3480,7 @@ class DefaultLayout extends Component {
                         // hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true)
                         // },
                         attributes: {
-                          hidden: ((((this.state.businessFunctions.includes('ROLE_BF_COMPARE_AND_SELECT')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_MONTHLY_FORECAST')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_FORECAST_SUMMARY')) || (this.state.businessFunctions.includes('ROLE_BF_COMPARE_VERSION')) (this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_FORECAST_ERROR'))) && this.state.activeTab == 1) ? false : true)
+                          hidden: ((((this.state.businessFunctions.includes('ROLE_BF_COMPARE_AND_SELECT')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_MONTHLY_FORECAST')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_FORECAST_SUMMARY')) || (this.state.businessFunctions.includes('ROLE_BF_COMPARE_VERSION'))(this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_FORECAST_ERROR'))) && this.state.activeTab == 1) ? false : true)
                         },
                         children: [
                           // {
@@ -4090,8 +4101,8 @@ class DefaultLayout extends Component {
             </Suspense>
             <Row>
               <Col xs="12" md="12">
-              {(AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_FORECASTING_MODULE') && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SUPPLY_PLANNING_MODULE')) &&  <Nav tabs className="marginTopTabs" style={{ flexDirection: "row", borderBottom: "none" }} >
-                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_FORECASTING_MODULE') && <NavItem className="bgColourRemoveItem itemWhidth">
+                {(AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_FORECASTING_MODULE') && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SUPPLY_PLANNING_MODULE')) && <Nav tabs className="marginTopTabs" style={{ flexDirection: "row", borderBottom: "none" }} >
+                  {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_FORECASTING_MODULE') && <NavItem className="bgColourRemoveItem itemWhidth">
                     <NavLink
                       className="bgColourRemoveLink tab1"
                       active={this.state.activeTab === '1'}
