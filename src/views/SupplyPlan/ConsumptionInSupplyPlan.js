@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import jexcel from 'jspreadsheet';
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
@@ -1740,5 +1740,11 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
         }
     }
 
-    render() { return (<div></div>) }
+    render() {
+            jexcel.setDictionary({
+                Show: " ",
+                entries: " ",
+            });
+        return (<div></div>)
+    }
 }
