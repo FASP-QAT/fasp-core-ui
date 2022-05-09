@@ -547,6 +547,9 @@ export default class ExtrapolateDataComponent extends React.Component {
             data[10] = linearRegressionDataFilter.length > 0 && linearRegressionDataFilter[0].forecast != null && linearRegressionDataFilter[0].ci != undefined && linearRegressionDataFilter[0] != null ? (linearRegressionDataFilter[0].forecast + linearRegressionDataFilter[0].ci).toFixed(2) < 0 ? 0 : (linearRegressionDataFilter[0].forecast + linearRegressionDataFilter[0].ci).toFixed(2) : '';
             data[11] = arimaDataFilter.length > 0 && arimaDataFilter[0].forecast != null && arimaDataFilter[0].ci != undefined && arimaDataFilter[0] != null ? (arimaDataFilter[0].forecast - arimaDataFilter[0].ci).toFixed(2) < 0 ? 0 : (arimaDataFilter[0].forecast - arimaDataFilter[0].ci).toFixed(2) : '';
             data[12] = arimaDataFilter.length > 0 && arimaDataFilter[0].forecast != null && arimaDataFilter[0].ci != undefined && arimaDataFilter[0] != null ? (arimaDataFilter[0].forecast + arimaDataFilter[0].ci).toFixed(2) < 0 ? 0 : (arimaDataFilter[0].forecast + arimaDataFilter[0].ci).toFixed(2) : '';
+            data[13] = linearRegressionDataFilter.length > 0 && linearRegressionDataFilter[0].forecast != null && linearRegressionDataFilter[0].ci != undefined && linearRegressionDataFilter[0] != null ? linearRegressionDataFilter[0].ci : null;
+            data[14] = tesDataFilter.length > 0 && tesDataFilter[0].forecast != null && tesDataFilter[0].ci != undefined && tesDataFilter[0] != null ? tesDataFilter[0].ci : null;
+            data[15] = arimaDataFilter.length > 0 && arimaDataFilter[0].forecast != null && arimaDataFilter[0].ci != undefined && arimaDataFilter[0] != null ? arimaDataFilter[0].ci : null;
             // data[8] = '';
             dataArray.push(data)
         }
@@ -619,6 +622,21 @@ export default class ExtrapolateDataComponent extends React.Component {
                     },
                     {
                         title: i18n.t('static.extrapolation.arima') + " H",
+                        type: 'hidden',
+                        mask: '#,##.00', decimal: '.'
+                    },
+                    {
+                        title: i18n.t('static.extrapolation.linearRegression') + " CI",
+                        type: 'hidden',
+                        mask: '#,##.00', decimal: '.'
+                    },
+                    {
+                        title: i18n.t('static.extrapolation.tes') + " CI",
+                        type: 'hidden',
+                        mask: '#,##.00', decimal: '.'
+                    },
+                    {
+                        title: i18n.t('static.extrapolation.arima') + " CI",
                         type: 'hidden',
                         mask: '#,##.00', decimal: '.'
                     },
@@ -859,6 +877,9 @@ export default class ExtrapolateDataComponent extends React.Component {
             //    && c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId)
             console.log("consumptionData--->", consumptionData)
             if (dataFound) {
+                console.log("Month@@@@@@@@@@@",inputDataLinearRegression.length+1);
+                console.log("Data1@@@@@@@@@@@",consumptionData)
+                console.log("Value@@@@@@@@@@@",consumptionData.length > 0 ? Number(consumptionData[0].puAmount) : null);
                 inputDataMovingAvg.push({ "month": inputDataMovingAvg.length + 1, "actual": consumptionData.length > 0 ? Number(consumptionData[0].puAmount) : null, "forecast": null })
                 inputDataSemiAverage.push({ "month": inputDataSemiAverage.length + 1, "actual": consumptionData.length > 0 ? Number(consumptionData[0].puAmount) : null, "forecast": null })
                 inputDataLinearRegression.push({ "month": inputDataLinearRegression.length + 1, "actual": consumptionData.length > 0 ? Number(consumptionData[0].puAmount) : null, "forecast": null })
@@ -1137,7 +1158,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                     if (this.state.semiAvgId) {
                         var data = [];
                         for (var i = 0; i < json.length; i++) {
-                            data.push({ month: moment((json[i])[0]).format("YYYY-MM-DD"), amount: (json[i])[3] })
+                            data.push({ month: moment((json[i])[0]).format("YYYY-MM-DD"), amount: (json[i])[3], ci: null })
                         }
                         consumptionExtrapolationList.push(
                             {
@@ -1166,7 +1187,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                     if (this.state.movingAvgId) {
                         var data = [];
                         for (var i = 0; i < json.length; i++) {
-                            data.push({ month: moment((json[i])[0]).format("YYYY-MM-DD"), amount: (json[i])[2] })
+                            data.push({ month: moment((json[i])[0]).format("YYYY-MM-DD"), amount: (json[i])[2], ci: null })
                         }
                         consumptionExtrapolationList.push(
                             {
@@ -1195,7 +1216,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                         //Linear Regression
                         var data = [];
                         for (var i = 0; i < json.length; i++) {
-                            data.push({ month: moment((json[i])[0]).format("YYYY-MM-DD"), amount: (json[i])[4] })
+                            data.push({ month: moment((json[i])[0]).format("YYYY-MM-DD"), amount: (json[i])[4], ci: (json[i])[13] })
                         }
                         consumptionExtrapolationList.push(
                             {
@@ -1218,99 +1239,14 @@ export default class ExtrapolateDataComponent extends React.Component {
                                 "extrapolationDataList": data
                             })
                         id += 1;
-
-                        //Linear Regression
-                        var data = [];
-                        for (var i = 0; i < json.length; i++) {
-                            data.push({ month: moment((json[i])[0]).format("YYYY-MM-DD"), amount: (json[i])[9] })
-                        }
-                        consumptionExtrapolationList.push(
-                            {
-                                "consumptionExtrapolationId": id,
-                                "planningUnit": planningUnitObj,
-                                "region": {
-                                    id: regionObj.regionId,
-                                    label: regionObj.label
-                                },
-                                "extrapolationMethod": extrapolationMethodList.filter(c => c.id == 10)[0],
-                                "jsonProperties": {
-                                    confidenceLevel: this.state.confidenceLevelIdLinearRegression,
-                                    startDate: moment(startDate).format("YYYY-MM-DD"),
-                                    stopDate: moment(stopDate).format("YYYY-MM-DD")
-                                },
-                                "createdBy": {
-                                    "userId": curUser
-                                },
-                                "createdDate": curDate,
-                                "extrapolationDataList": data
-                            })
-                        id += 1;
-
-                        //Linear Regression
-                        var data = [];
-                        for (var i = 0; i < json.length; i++) {
-                            data.push({ month: moment((json[i])[0]).format("YYYY-MM-DD"), amount: (json[i])[10] })
-                        }
-                        consumptionExtrapolationList.push(
-                            {
-                                "consumptionExtrapolationId": id,
-                                "planningUnit": planningUnitObj,
-                                "region": {
-                                    id: regionObj.regionId,
-                                    label: regionObj.label
-                                },
-                                "extrapolationMethod": extrapolationMethodList.filter(c => c.id == 11)[0],
-                                "jsonProperties": {
-                                    confidenceLevel: this.state.confidenceLevelIdLinearRegression,
-                                    startDate: moment(startDate).format("YYYY-MM-DD"),
-                                    stopDate: moment(stopDate).format("YYYY-MM-DD")
-                                },
-                                "createdBy": {
-                                    "userId": curUser
-                                },
-                                "createdDate": curDate,
-                                "extrapolationDataList": data
-                            })
-                        id += 1;
                     }
                     //TES L
                     if (this.state.smoothingId) {
-                        console.log("consumptionExtrapolationTESL@@@", tesData)
-                        console.log("in if1")
-                        var data = [];
-                        for (var i = 0; i < json.length; i++) {
-                            data.push({ month: moment((json[i])[0]).format("YYYY-MM-DD"), amount: (json[i])[5] })
-                        }
-                        consumptionExtrapolationList.push(
-                            {
-                                "consumptionExtrapolationId": id,
-                                "planningUnit": planningUnitObj,
-                                "region": {
-                                    id: regionObj.regionId,
-                                    label: regionObj.label
-                                },
-                                "extrapolationMethod": extrapolationMethodList.filter(c => c.id == 1)[0],
-                                "jsonProperties": {
-                                    confidenceLevel: this.state.confidenceLevelId,
-                                    seasonality: this.state.noOfMonthsForASeason,
-                                    alpha: this.state.alpha,
-                                    beta: this.state.beta,
-                                    gamma: this.state.gamma,
-                                    startDate: moment(startDate).format("YYYY-MM-DD"),
-                                    stopDate: moment(stopDate).format("YYYY-MM-DD")
-                                },
-                                "createdBy": {
-                                    "userId": curUser
-                                },
-                                "createdDate": curDate,
-                                "extrapolationDataList": data
-                            })
-                        id += 1;
                         //TES M
                         console.log("in if2")
                         var data = [];
                         for (var i = 0; i < json.length; i++) {
-                            data.push({ month: moment((json[i])[0]).format("YYYY-MM-DD"), amount: (json[i])[6] })
+                            data.push({ month: moment((json[i])[0]).format("YYYY-MM-DD"), amount: (json[i])[6], ci: (json[i])[14] })
                         }
                         consumptionExtrapolationList.push(
                             {
@@ -1337,74 +1273,15 @@ export default class ExtrapolateDataComponent extends React.Component {
                                 "extrapolationDataList": data
                             })
                         id += 1;
-                        //TES H
-                        console.log("in if3")
-                        var data = [];
-                        for (var i = 0; i < json.length; i++) {
-                            data.push({ month: moment((json[i])[0]).format("YYYY-MM-DD"), amount: (json[i])[7] })
-                        }
-                        consumptionExtrapolationList.push(
-                            {
-                                "consumptionExtrapolationId": id,
-                                "planningUnit": planningUnitObj,
-                                "region": {
-                                    id: regionObj.regionId,
-                                    label: regionObj.label
-                                },
-                                "extrapolationMethod": extrapolationMethodList.filter(c => c.id == 3)[0],
-                                "jsonProperties": {
-                                    confidenceLevel: this.state.confidenceLevelId,
-                                    seasonality: this.state.noOfMonthsForASeason,
-                                    alpha: this.state.alpha,
-                                    beta: this.state.beta,
-                                    gamma: this.state.gamma,
-                                    startDate: moment(startDate).format("YYYY-MM-DD"),
-                                    stopDate: moment(stopDate).format("YYYY-MM-DD")
-                                },
-                                "createdBy": {
-                                    "userId": curUser
-                                },
-                                "createdDate": curDate,
-                                "extrapolationDataList": data
-                            })
-                        id += 1;
                     }
 
                     //Arima L
                     if (this.state.arimaId) {
-                        var data = [];
-                        for (var i = 0; i < json.length; i++) {
-                            data.push({ month: moment((json[i])[0]).format("YYYY-MM-DD"), amount: (json[i])[11] })
-                        }
-                        consumptionExtrapolationList.push(
-                            {
-                                "consumptionExtrapolationId": id,
-                                "planningUnit": planningUnitObj,
-                                "region": {
-                                    id: regionObj.regionId,
-                                    label: regionObj.label
-                                },
-                                "extrapolationMethod": extrapolationMethodList.filter(c => c.id == 8)[0],
-                                "jsonProperties": {
-                                    confidenceLevel: this.state.confidenceLevelIdArima,
-                                    p: this.state.p,
-                                    d: this.state.d,
-                                    q: this.state.q,
-                                    startDate: moment(startDate).format("YYYY-MM-DD"),
-                                    stopDate: moment(stopDate).format("YYYY-MM-DD")
-                                },
-                                "createdBy": {
-                                    "userId": curUser
-                                },
-                                "createdDate": curDate,
-                                "extrapolationDataList": data
-                            })
-                        id += 1;
                         //TES M
                         console.log("in if2")
                         var data = [];
                         for (var i = 0; i < json.length; i++) {
-                            data.push({ month: moment((json[i])[0]).format("YYYY-MM-DD"), amount: (json[i])[8] })
+                            data.push({ month: moment((json[i])[0]).format("YYYY-MM-DD"), amount: (json[i])[8], ci: (json[i])[15] })
                         }
                         consumptionExtrapolationList.push(
                             {
@@ -1415,36 +1292,6 @@ export default class ExtrapolateDataComponent extends React.Component {
                                     label: regionObj.label
                                 },
                                 "extrapolationMethod": extrapolationMethodList.filter(c => c.id == 4)[0],
-                                "jsonProperties": {
-                                    confidenceLevel: this.state.confidenceLevelIdArima,
-                                    p: this.state.p,
-                                    d: this.state.d,
-                                    q: this.state.q,
-                                    startDate: moment(startDate).format("YYYY-MM-DD"),
-                                    stopDate: moment(stopDate).format("YYYY-MM-DD")
-                                },
-                                "createdBy": {
-                                    "userId": curUser
-                                },
-                                "createdDate": curDate,
-                                "extrapolationDataList": data
-                            })
-                        id += 1;
-                        //TES H
-                        console.log("in if3")
-                        var data = [];
-                        for (var i = 0; i < json.length; i++) {
-                            data.push({ month: moment((json[i])[0]).format("YYYY-MM-DD"), amount: (json[i])[12] })
-                        }
-                        consumptionExtrapolationList.push(
-                            {
-                                "consumptionExtrapolationId": id,
-                                "planningUnit": planningUnitObj,
-                                "region": {
-                                    id: regionObj.regionId,
-                                    label: regionObj.label
-                                },
-                                "extrapolationMethod": extrapolationMethodList.filter(c => c.id == 9)[0],
                                 "jsonProperties": {
                                     confidenceLevel: this.state.confidenceLevelIdArima,
                                     p: this.state.p,
@@ -1727,27 +1574,24 @@ export default class ExtrapolateDataComponent extends React.Component {
                     console.log("Actual for month@@@@@@@@@@@@@@@@", actualConsumptionListForPlanningUnitAndRegion);
                     if (movingAvgId) {
                         var extrapolationDataMovingAvg = consumptionExtrapolationMovingData[0].extrapolationDataList.filter(e => moment(e.month).format("YYYY-MM") == moment(curDate1).format("YYYY-MM"));
-                        inputDataMovingAvg.push({ "month": inputDataMovingAvg.length + 1, "forecast": extrapolationDataMovingAvg.length > 0 && extrapolationDataMovingAvg[0].amount != "" ? Number(Number(extrapolationDataMovingAvg[0].amount).toFixed(2)) : null, "actual": actualForMonth.length > 0 ? Number(actualForMonth[0].puAmount) : null })
+                        inputDataMovingAvg.push({ "month": inputDataMovingAvg.length + 1, "forecast": extrapolationDataMovingAvg.length > 0 && extrapolationDataMovingAvg[0].amount != "" && extrapolationDataMovingAvg[0].amount != null ? Number(Number(extrapolationDataMovingAvg[0].amount).toFixed(2)) : null, "actual": actualForMonth.length > 0 ? Number(actualForMonth[0].puAmount) : null, ci: null })
                     } if (semiAvgId) {
                         var extrapolationDataSemiAvg = consumptionExtrapolationSemiAvg[0].extrapolationDataList.filter(e => moment(e.month).format("YYYY-MM") == moment(curDate1).format("YYYY-MM"));
                         if (moment(curDate1).format("YYYY-MM") == moment(endDate1).format("YYYY-MM") && m % 2 == 0) {
-                            inputDataSemiAverage.push({ "month": inputDataSemiAverage.length + 1, "forecast": (extrapolationDataSemiAvg.length > 0 && extrapolationDataSemiAvg[0].amount != "" ? Number(Number(extrapolationDataSemiAvg[0].amount).toFixed(2)) : null), "actual": (actualForMonth.length > 0 ? null : null) })
+                            inputDataSemiAverage.push({ "month": inputDataSemiAverage.length + 1, "forecast": (extrapolationDataSemiAvg.length > 0 && extrapolationDataSemiAvg[0].amount != "" && extrapolationDataSemiAvg[0].amount != null ? Number(Number(extrapolationDataSemiAvg[0].amount).toFixed(2)) : null), "actual": (actualForMonth.length > 0 ? null : null), ci: null })
                         } else {
-                            inputDataSemiAverage.push({ "month": inputDataSemiAverage.length + 1, "forecast": (extrapolationDataSemiAvg.length > 0 && extrapolationDataSemiAvg[0].amount != "" ? Number(Number(extrapolationDataSemiAvg[0].amount).toFixed(2)) : null), "actual": (actualForMonth.length > 0 ? Number(actualForMonth[0].puAmount) : null) })
+                            inputDataSemiAverage.push({ "month": inputDataSemiAverage.length + 1, "forecast": (extrapolationDataSemiAvg.length > 0 && extrapolationDataSemiAvg[0].amount != "" && extrapolationDataSemiAvg[0].amount != null ? Number(Number(extrapolationDataSemiAvg[0].amount).toFixed(2)) : null), "actual": (actualForMonth.length > 0 ? Number(actualForMonth[0].puAmount) : null), ci: null })
                         }
                     } if (linearRegressionId) {
                         var extrapolationDataLinearRegression = consumptionExtrapolationRegression[0].extrapolationDataList.filter(e => moment(e.month).format("YYYY-MM") == moment(curDate1).format("YYYY-MM"));
-                        var extrapolationDataLinearRegressionL = consumptionExtrapolationRegressionL[0].extrapolationDataList.filter(e => moment(e.month).format("YYYY-MM") == moment(curDate1).format("YYYY-MM"));
-                        inputDataLinearRegression.push({ "month": inputDataLinearRegression.length + 1, "forecast": extrapolationDataLinearRegression.length > 0 && extrapolationDataLinearRegression[0].amount != "" ? Number(Number(extrapolationDataLinearRegression[0].amount).toFixed(2)) : null, "actual": actualForMonth.length > 0 ? Number(actualForMonth[0].puAmount) : null, "ci": extrapolationDataLinearRegressionL.length > 0 && extrapolationDataLinearRegressionL[0].amount != "" && extrapolationDataLinearRegressionL[0].amount != null ? Number(Number(extrapolationDataLinearRegression[0].amount).toFixed(2) - Number(extrapolationDataLinearRegressionL[0].amount).toFixed(2)) : null })
+                        inputDataLinearRegression.push({ "month": inputDataLinearRegression.length + 1, "forecast": extrapolationDataLinearRegression.length > 0 && extrapolationDataLinearRegression[0].amount != "" && extrapolationDataLinearRegression[0].amount != null ? Number(Number(extrapolationDataLinearRegression[0].amount).toFixed(2)) : null, "actual": actualForMonth.length > 0 ? Number(actualForMonth[0].puAmount) : null, "ci": extrapolationDataLinearRegression.length > 0 && extrapolationDataLinearRegression[0].ci != "" && extrapolationDataLinearRegression[0].ci != null ? Number(extrapolationDataLinearRegression[0].ci) : null })
                     } if (smoothingId) {
                         var extrapolationDataInputDataTes = consumptionExtrapolationTESM[0].extrapolationDataList.filter(e => moment(e.month).format("YYYY-MM") == moment(curDate1).format("YYYY-MM"));
-                        var extrapolationDataInputDataTesL = consumptionExtrapolationTESL[0].extrapolationDataList.filter(e => moment(e.month).format("YYYY-MM") == moment(curDate1).format("YYYY-MM"));
-                        inputDataTes.push({ "month": inputDataTes.length + 1, "forecast": extrapolationDataInputDataTes.length > 0 && extrapolationDataInputDataTes[0].amount != "" ? Number(Number(extrapolationDataInputDataTes[0].amount).toFixed(2)) : null, "actual": actualForMonth.length > 0 ? Number(actualForMonth[0].puAmount) : null, "ci": extrapolationDataInputDataTesL.length > 0 && extrapolationDataInputDataTesL[0].amount != "" && extrapolationDataInputDataTesL[0].amount != null ? Number(Number(extrapolationDataInputDataTes[0].amount).toFixed(2) - Number(extrapolationDataInputDataTesL[0].amount).toFixed(2)) : null })
+                        inputDataTes.push({ "month": inputDataTes.length + 1, "forecast": extrapolationDataInputDataTes.length > 0 && extrapolationDataInputDataTes[0].amount != "" && extrapolationDataInputDataTes[0].amount != null ? Number(Number(extrapolationDataInputDataTes[0].amount).toFixed(2)) : null, "actual": actualForMonth.length > 0 ? Number(actualForMonth[0].puAmount) : null, "ci": extrapolationDataInputDataTes.length > 0 && extrapolationDataInputDataTes[0].ci != "" && extrapolationDataInputDataTes[0].ci != null ? Number(extrapolationDataInputDataTes[0].ci) : null })
                     }
                     if (arimaId) {
                         var extrapolationDataInputDataArima = consumptionExtrapolationArima[0].extrapolationDataList.filter(e => moment(e.month).format("YYYY-MM") == moment(curDate1).format("YYYY-MM"));
-                        var extrapolationDataInputDataArimaL = consumptionExtrapolationArimaL[0].extrapolationDataList.filter(e => moment(e.month).format("YYYY-MM") == moment(curDate1).format("YYYY-MM"));
-                        inputDataArima.push({ "month": inputDataArima.length + 1, "forecast": extrapolationDataInputDataArima.length > 0 && extrapolationDataInputDataArima[0].amount != "" ? Number(Number(extrapolationDataInputDataArima[0].amount).toFixed(2)) : null, "actual": actualForMonth.length > 0 ? Number(actualForMonth[0].puAmount) : null, "ci": extrapolationDataInputDataArimaL.length > 0 && extrapolationDataInputDataArimaL[0].amount != "" && extrapolationDataInputDataArimaL[0].amount != null ? Number(Number(extrapolationDataInputDataArima[0].amount).toFixed(2) - Number(extrapolationDataInputDataArimaL[0].amount).toFixed(2)) : null })
+                        inputDataArima.push({ "month": inputDataArima.length + 1, "forecast": extrapolationDataInputDataArima.length > 0 && extrapolationDataInputDataArima[0].amount != "" && extrapolationDataInputDataArima[0].amount != null ? Number(Number(extrapolationDataInputDataArima[0].amount).toFixed(2)) : null, "actual": actualForMonth.length > 0 ? Number(actualForMonth[0].puAmount) : null, "ci": extrapolationDataInputDataArima.length > 0 && extrapolationDataInputDataArima[0].ci != "" && extrapolationDataInputDataArima[0].ci != null ? Number(extrapolationDataInputDataArima[0].ci) : null })
                     }
                 }
                 console.log("@@@@@@@@@@##############", inputDataSemiAverage)
