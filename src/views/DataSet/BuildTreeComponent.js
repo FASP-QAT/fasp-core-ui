@@ -1100,7 +1100,7 @@ export default class BuildTree extends Component {
             levelModal: false,
             curTreeObj,
         }, () => {
-            this.saveTreeData()
+            this.saveTreeData(false)
             // console.log("final tab list---", this.state.items);
             // if (type == 1) {
             //     var maxNodeDataId = temNodeDataMap.length > 0 ? Math.max(...temNodeDataMap.map(o => o.nodeDataId)) : 0;
@@ -1605,10 +1605,18 @@ export default class BuildTree extends Component {
 
             var items = this.state.items;
             if (parameterName == 'currentItemConfig') {
+                console.log("node id for update state 1----",value.context.id);
                 var findNodeIndex = items.findIndex(n => n.id == value.context.id);
                 console.log("findNodeIndex1---", findNodeIndex);
                 items[findNodeIndex] = value.context;
-                this.calculateMOMData(0, 2);
+                console.log("node id for update state 2----",value.context);
+                console.log("node id for update state 3----",items);
+                this.setState({ items }, () => {
+                    console.log("node id for update state 4----",this.state.items);
+                    this.saveTreeData(true);
+                })
+
+
             }
             if (parameterName == 'nodeId' && (value != null && value != 0)) {
                 var nodeDataMomList = this.state.nodeDataMomList;
@@ -1669,7 +1677,9 @@ export default class BuildTree extends Component {
             //     });
 
             // }
-            this.saveTreeData();
+            if (parameterName != 'currentItemConfig') {
+                this.saveTreeData(false);
+            }
             // if (parameterName == 'type' && value == 0) {
             //     this.saveTreeData();
             //     this.updateTreeData();
@@ -1700,7 +1710,7 @@ export default class BuildTree extends Component {
             items,
         })
     }
-    saveTreeData() {
+    saveTreeData(flag) {
         console.log("saving tree data for calculation>>>");
         this.setState({ loading: true }, () => {
             let { curTreeObj } = this.state;
@@ -1796,6 +1806,9 @@ export default class BuildTree extends Component {
                                 console.log("hide pu---", this.state.hidePUNode);
                                 this.handleAMonthDissmis3(this.state.singleValue2, 0);
                                 this.hideSecondComponent();
+                                if (flag) {
+                                    // this.calculateMOMData(0, 2);
+                                }
                             });
                             console.log("Data update success");
                         }.bind(this)
@@ -6366,7 +6379,7 @@ export default class BuildTree extends Component {
                 this.callAfterScenarioChange(scenarioId);
                 // this.updateTreeData();
             }
-            this.saveTreeData();
+            this.saveTreeData(false);
         });
     }
     nodeTypeChange(value) {
@@ -10530,7 +10543,7 @@ export default class BuildTree extends Component {
                                                 }}
                                                 validate={validate(validationSchema)}
                                                 onSubmit={(values, { setSubmitting, setErrors }) => {
-                                                    this.saveTreeData();
+                                                    this.saveTreeData(false);
                                                     // this.createOrUpdateTree();
                                                 }}
                                                 render={
