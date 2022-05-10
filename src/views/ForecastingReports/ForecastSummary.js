@@ -5,7 +5,7 @@ import {
     Card,
     CardBody,
     Col,
-    Table, FormGroup, Input, InputGroup, Label, Form, Button, CardFooter
+    Table, FormGroup, Input, InputGroup, Label, Form, Button,ModalHeader, ModalBody,Modal, CardFooter
 } from 'reactstrap';
 import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
 import i18n from '../../i18n'
@@ -264,11 +264,11 @@ class ForecastSummary extends Component {
     exportCSV() {
         var csvRow = [];
 
-        csvRow.push('"' + (i18n.t('static.supplyPlan.runDate') + ' : ' + moment(new Date()).format(`${DATE_FORMAT_CAP}`)).replaceAll(' ', '%20') + '"')
+        csvRow.push('"' + (i18n.t('static.supplyPlan.runDate') + ' ' + moment(new Date()).format(`${DATE_FORMAT_CAP}`)).replaceAll(' ', '%20') + '"')
         // csvRow.push('')
-        csvRow.push('"' + (i18n.t('static.supplyPlan.runTime') + ' : ' + moment(new Date()).format('hh:mm A')).replaceAll(' ', '%20') + '"')
+        csvRow.push('"' + (i18n.t('static.supplyPlan.runTime') + ' ' + moment(new Date()).format('hh:mm A')).replaceAll(' ', '%20') + '"')
         // csvRow.push('')
-        csvRow.push('"' + (i18n.t('static.user.user') + ' : ' + AuthenticationService.getLoggedInUsername()).replaceAll(' ', '%20') + '"')
+        csvRow.push('"' + (i18n.t('static.user.user') + ': ' + AuthenticationService.getLoggedInUsername()).replaceAll(' ', '%20') + '"')
         // csvRow.push('')
         csvRow.push('"' + (this.state.programs.filter(c => c.programId == this.state.programId)[0].programCode + " " + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text)).replaceAll(' ', '%20') + '"')
         // csvRow.push('')
@@ -279,15 +279,15 @@ class ForecastSummary extends Component {
         // csvRow.push('')
         // csvRow.push('"' + (i18n.t('static.report.versionFinal*') + ' : ' + document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
         // csvRow.push('')
-        csvRow.push('"' + (i18n.t('static.common.forecastPeriod') + ' : ' + document.getElementById("forecastPeriod").value).replaceAll(' ', '%20') + '"')
+        csvRow.push('"' + (i18n.t('static.common.forecastPeriod') + ': ' + document.getElementById("forecastPeriod").value).replaceAll(' ', '%20') + '"')
         // csvRow.push('')
-        csvRow.push('"' + (i18n.t('static.forecastReport.display') + ' : ' + this.state.displayName).replaceAll(' ', '%20') + '"')
+        csvRow.push('"' + (i18n.t('static.forecastReport.display') + ': ' + this.state.displayName).replaceAll(' ', '%20') + '"')
         // csvRow.push('')
 
         let viewById = this.state.displayId;
 
         if (viewById == 1) {//National
-            csvRow.push('"' + (i18n.t('static.forecastReport.hideCalculations') + ' : ' + (this.state.hideCalculation == true ? i18n.t('static.realm.yes') : i18n.t('static.program.no'))).replaceAll(' ', '%20') + '"')
+            csvRow.push('"' + (i18n.t('static.forecastReport.hideCalculations') + ': ' + (this.state.hideCalculation == true ? i18n.t('static.realm.yes') : i18n.t('static.program.no'))).replaceAll(' ', '%20') + '"')
             csvRow.push('')
         }
 
@@ -672,9 +672,11 @@ class ForecastSummary extends Component {
                 doc.setFontSize(8)
                 doc.setFont('helvetica', 'normal')
                 doc.setTextColor("#002f6c");
+                doc.setFont('helvetica', 'bold')
                 doc.text(i18n.t('static.supplyPlan.runDate') + " " + moment(new Date()).format(`${DATE_FORMAT_CAP}`), doc.internal.pageSize.width - 40, 20, {
                     align: 'right'
                 })
+                doc.setFont('helvetica', 'normal')
                 doc.text(i18n.t('static.supplyPlan.runTime') + " " + moment(new Date()).format('hh:mm A'), doc.internal.pageSize.width - 40, 30, {
                     align: 'right'
                 })
@@ -695,22 +697,24 @@ class ForecastSummary extends Component {
                 if (i == 1) {
                     doc.setFontSize(8)
                     doc.setFont('helvetica', 'normal')
-                    // doc.text(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 90, {
+                    // doc.text(i18n.t('static.program.program') + ': ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 90, {
                     //     align: 'left'
                     // })
-                    // doc.text(i18n.t('static.report.versionFinal*') + ' : ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
+                    // doc.text(i18n.t('static.report.versionFinal*') + ': ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
                     //     align: 'left'
                     // })
-                    doc.text(i18n.t('static.report.dateRange') + ' : ' + document.getElementById("forecastPeriod").value, doc.internal.pageSize.width / 8, 90, {
+                    doc.setFont('helvetica', 'bold')
+                    doc.text(i18n.t('static.report.dateRange') + ': ' + document.getElementById("forecastPeriod").value, doc.internal.pageSize.width / 8, 90, {
                         align: 'left'
                     })
-                    doc.text(i18n.t('static.forecastReport.display') + ' : ' + this.state.displayName, doc.internal.pageSize.width / 8, 100, {
+                    doc.setFont('helvetica', 'normal')
+                    doc.text(i18n.t('static.forecastReport.display') + ': ' + this.state.displayName, doc.internal.pageSize.width / 8, 100, {
                         align: 'left'
                     })
 
                     let viewById = this.state.displayId;
                     if (viewById == 1) {//National
-                        doc.text(i18n.t('static.forecastReport.hideCalculations') + ' : ' + (this.state.hideCalculation == true ? i18n.t('static.realm.yes') : i18n.t('static.program.no')), doc.internal.pageSize.width / 8, 110, {
+                        doc.text(i18n.t('static.forecastReport.hideCalculations') + ': ' + (this.state.hideCalculation == true ? i18n.t('static.realm.yes') : i18n.t('static.program.no')), doc.internal.pageSize.width / 8, 110, {
                             align: 'left'
                         })
                     }
@@ -1200,9 +1204,9 @@ class ForecastSummary extends Component {
                                         //add notes
                                         if (selectedForecastMapObjIn.notes != '') {
                                             if (notes1 == '') {
-                                                notes1 = regionList.filter(c => c.regionId == keys[k])[0].label.label_en + ' : ' + selectedForecastMapObjIn.notes;
+                                                notes1 = regionList.filter(c => c.regionId == keys[k])[0].label.label_en + ': ' + selectedForecastMapObjIn.notes;
                                             } else {
-                                                notes1 = notes1.concat(' | ' + regionList.filter(c => c.regionId == keys[k])[0].label.label_en + ' : ' + selectedForecastMapObjIn.notes);
+                                                notes1 = notes1.concat(' | ' + regionList.filter(c => c.regionId == keys[k])[0].label.label_en + ': ' + selectedForecastMapObjIn.notes);
                                             }
                                         }
 
@@ -2980,6 +2984,12 @@ class ForecastSummary extends Component {
             })
     }
 
+    toggleShowGuidance() {
+        this.setState({
+            showGuidance: !this.state.showGuidance
+        })
+    }
+
     render() {
         const { programs } = this.state;
         let programList = programs.length > 0
@@ -3027,6 +3037,13 @@ class ForecastSummary extends Component {
                 <h5 style={{ color: this.state.color }} id="div2">{this.state.message1}</h5>
 
                 <Card>
+                <div className="card-header-actions">
+                            <div className="card-header-action pr-lg-4">
+                            <a style={{float:'right'}}>
+                                <span style={{ cursor: 'pointer' }} onClick={() => { this.toggleShowGuidance() }}><small className="supplyplanformulas">{i18n.t('static.common.showGuidance')}</small></span>
+                            </a>
+                            </div>
+                        </div>
                     <div className="Card-header-reporticon pb-2">
                         {
                             (this.state.dataArray.length > 0 || this.state.summeryData.length > 0) &&
@@ -3283,26 +3300,26 @@ class ForecastSummary extends Component {
                                                                     <th className="BorderNoneSupplyPlan sticky-col first-col clone1"></th>
                                                                     {/* <th className="text-center" style={{}}> Forecasting Unit </th> */}
                                                                     <th className="text-center ForecastSumarydWidth sticky-col first-col clone" style={{ minWidth: '200px' }}>{i18n.t('static.product.product')}</th>
-                                                                    <th className="text-center" title="Need to add info" style={{ minWidth: '120px' }}>{'Total Forecasted Quantity'} <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
+                                                                    <th className="text-center" title={i18n.t('static.Tooltip.TotalForecastedQuantity')} style={{ minWidth: '120px' }}>{'Total Forecasted Quantity'} <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
                                                                     {!this.state.hideColumn &&
                                                                         <>
-                                                                            <th className="text-center" title="Need to add info" style={{ minWidth: '120px' }}>{i18n.t('static.report.stock')} <span className="FontWeightNormal">{i18n.t('static.forecastReport.endOf')} {this.state.beforeEndDateDisplay})</span> <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
-                                                                            <th className="text-center" title="Need to add info" style={{ minWidth: '120px' }}>{i18n.t('static.forecastReport.existingShipments')} <span className="FontWeightNormal">({this.state.startDateDisplay + ' - ' + this.state.endDateDisplay})</span> <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
+                                                                            <th className="text-center" title={i18n.t('static.Tooltip.StockEndOfDec')} style={{ minWidth: '120px' }}>{i18n.t('static.report.stock')} <span className="FontWeightNormal">{i18n.t('static.forecastReport.endOf')} {this.state.beforeEndDateDisplay})</span> <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
+                                                                            <th className="text-center" title={i18n.t('static.Tooltip.ExistingShipments')} style={{ minWidth: '120px' }}>{i18n.t('static.forecastReport.existingShipments')} <span className="FontWeightNormal">({this.state.startDateDisplay + ' - ' + this.state.endDateDisplay})</span> <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
                                                                             {/* <th className="text-center" title={(i18n.t('static.report.stock') + ' ' + i18n.t('static.forecastReport.endOf') + ' ' + this.state.beforeEndDateDisplay) + ' + ' + (i18n.t('static.forecastReport.existingShipments') + '( ' + this.state.startDateDisplay + ' - ' + this.state.endDateDisplay + ' )') + ' - ' + (i18n.t('static.forecastReport.totalForecastQuantity'))} style={{ width: '8%' }}>{i18n.t('static.report.stock')} <span className="FontWeightNormal">{i18n.t('static.forecastReport.endOf')} {this.state.endDateDisplay})</span> <i className="fa fa-info-circle icons ToltipInfoicon"></i></th> */}
                                                                             <th className="text-center" style={{ minWidth: '120px' }} title={(i18n.t('static.report.stock') + ' ' + i18n.t('static.forecastReport.endOf') + ' ' + this.state.beforeEndDateDisplay) + ' + ' + (i18n.t('static.forecastReport.existingShipments') + '( ' + this.state.startDateDisplay + ' - ' + this.state.endDateDisplay + ' )') + ' - ' + (i18n.t('static.forecastReport.totalForecastQuantity'))} >{'Stock or Unmet Demand'} <span className="FontWeightNormal">{i18n.t('static.forecastReport.endOf')} {this.state.endDateDisplay})</span> <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
-                                                                            <th className="text-center" title="Need to add info" style={{ minWidth: '120px' }}>{i18n.t('static.forecastReport.desiredMonthsOfStock')} <span className="FontWeightNormal">{i18n.t('static.forecastReport.endOf')} {this.state.endDateDisplay})</span> <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
+                                                                            <th className="text-center" title={i18n.t('static.Tooltip.desiredMonthsOfStock')} style={{ minWidth: '120px' }}>{i18n.t('static.forecastReport.desiredMonthsOfStock')} <span className="FontWeightNormal">{i18n.t('static.forecastReport.endOf')} {this.state.endDateDisplay})</span> <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
                                                                             <th className="text-center" style={{ minWidth: '120px' }} title={(i18n.t('static.forecastReport.desiredMonthsOfStock') + ' ' + i18n.t('static.forecastReport.endOf') + ' ' + this.state.endDateDisplay) + ') * ' + i18n.t('static.forecastReport.totalForecastQuantity') + ' / ' + 'Difference between months'} >{i18n.t('static.forecastReport.desiredStock')} <span className="FontWeightNormal">{i18n.t('static.forecastReport.endOf')} {this.state.endDateDisplay})</span> <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
                                                                         </>
                                                                     }
                                                                     <th className="text-center" style={{ minWidth: '120px' }} title={i18n.t('static.report.stock') + ' ' + i18n.t('static.forecastReport.endOf') + ' ' + this.state.endDateDisplay + ') - ' + i18n.t('static.forecastReport.desiredStock') + ' ' + i18n.t('static.forecastReport.endOf') + ' ' + this.state.endDateDisplay + ')'} >{i18n.t('static.forecastReport.procurementSurplus')} <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
                                                                     {!this.state.hideColumn &&
                                                                         <>
-                                                                            <th className="text-center" title="Need to add info" style={{ minWidth: '120px' }}>{i18n.t('static.forecastReport.priceType')} <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
-                                                                            <th className="text-center" title="Need to add info" style={{ minWidth: '120px' }}>{i18n.t('static.forecastReport.unitPrice')} <span className="FontWeightNormal">(USD)</span> <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
+                                                                            <th className="text-center" title={i18n.t('static.Tooltip.forecastReportpriceType')} style={{ minWidth: '120px' }}>{i18n.t('static.forecastReport.priceType')} <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
+                                                                            <th className="text-center" title={i18n.t('static.Tooltip.forecastReportUnitPrice')} style={{ minWidth: '120px' }}>{i18n.t('static.forecastReport.unitPrice')} <span className="FontWeightNormal">(USD)</span> <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
                                                                         </>
                                                                     }
-                                                                    <th className="text-center" title="Need to add info" style={{ minWidth: '120px' }}>{i18n.t('static.forecastReport.ProcurementsNeeded')} <span className="FontWeightNormal">(USD)</span> <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
-                                                                    <th className="text-center" title="Need to add info" style={{ minWidth: '140px' }}>{i18n.t('static.program.notes')} <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
+                                                                    <th className="text-center" title={i18n.t('static.Tooltip.ProcurementsNeeded')} style={{ minWidth: '120px' }}>{i18n.t('static.forecastReport.ProcurementsNeeded')} <span className="FontWeightNormal">(USD)</span> <i className="fa fa-info-circle icons ToltipInfoicon"></i></th>
+                                                                    <th className="text-center"  style={{ minWidth: '140px' }}>{i18n.t('static.program.notes')} </th>
 
                                                                 </tr>
                                                             </thead>
@@ -3399,7 +3416,7 @@ class ForecastSummary extends Component {
                                                                         <td style={{ border: 'none' }}></td>
                                                                         <td><b>{i18n.t('static.forecastReport.productCost')}</b></td>
                                                                         <td><b>{'$ ' + (this.state.totalProductCost).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</b></td>
-                                                                        <td></td>
+                                                                        <td style={{ border: 'none' }}></td>
                                                                     </tr>
                                                                     <tr>
                                                                         <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
@@ -3415,7 +3432,7 @@ class ForecastSummary extends Component {
                                                                         <td style={{ border: 'none' }}></td>
                                                                         <td><b>{i18n.t('static.forecastReport.freight')} ({this.state.freightPerc}%)</b></td>
                                                                         <td><b>{'$ ' + (((this.state.freightPerc / 100) * this.state.totalProductCost).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</b></td>
-                                                                        <td></td>
+                                                                        <td style={{ border: 'none' }}></td>
                                                                     </tr>
                                                                     <tr>
                                                                         <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
@@ -3431,7 +3448,7 @@ class ForecastSummary extends Component {
                                                                         <td style={{ border: 'none' }}></td>
                                                                         <td><b>{i18n.t('static.shipment.totalCost')}</b></td>
                                                                         <td><b>{'$ ' + (parseFloat(parseFloat(this.state.totalProductCost) + parseFloat((this.state.freightPerc / 100) * this.state.totalProductCost)).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</b></td>
-                                                                        <td></td>
+                                                                        <td style={{ border: 'none' }}></td>
                                                                     </tr>
                                                                 </tfoot>
                                                             }
@@ -3522,6 +3539,7 @@ class ForecastSummary extends Component {
                         </FormGroup>
                     </CardFooter>}
                 </Card>
+               
             </div >
         );
     }

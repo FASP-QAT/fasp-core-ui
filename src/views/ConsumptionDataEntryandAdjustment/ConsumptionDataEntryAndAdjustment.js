@@ -128,7 +128,8 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       dataEnteredInUnitList: [],
       minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
       singleValue2: localStorage.getItem("sesDataentryDateRange") != "" ? JSON.parse(localStorage.getItem("sesDataentryDateRange")) : { from: { year: Number(moment(startDate).startOf('month').format("YYYY")), month: Number(moment(startDate).startOf('month').format("M")) }, to: { year: Number(moment(stopDate).startOf('month').format("YYYY")), month: Number(moment(stopDate).startOf('month').format("M")) } },
-      maxDate: { year: Number(moment(Date.now()).startOf('month').format("YYYY")), month: Number(moment(Date.now()).startOf('month').format("M")) }
+      maxDate: { year: Number(moment(Date.now()).startOf('month').format("YYYY")), month: Number(moment(Date.now()).startOf('month').format("M")) },
+      planningUnitTotalList: []
     }
     this.loaded = this.loaded.bind(this);
     this.buildDataJexcel = this.buildDataJexcel.bind(this);
@@ -1446,7 +1447,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
               var datasetJson = JSON.parse(datasetData);
               console.log("datasetJson@@@@@@@@@@@@@@", datasetJson);
               var consumptionList = datasetJson.actualConsumptionList;
-              var planningUnitList = datasetJson.planningUnitList.filter(c => c.consuptionForecast);
+              var planningUnitList = datasetJson.planningUnitList.filter(c => c.active && c.consuptionForecast);
               var regionList = datasetJson.regionList;
               regionList.sort((a, b) => {
                 var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase(); // ignore upper and lowercase
@@ -1532,6 +1533,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
               var forecastingUnitList = fuResult.filter(c => tracerCategoryIds.includes(c.tracerCategory.id));
               var forecastingUnitIds = [...new Set(forecastingUnitList.map(ele => (ele.forecastingUnitId)))];
               var allPlanningUnitList = puResult.filter(c => forecastingUnitIds.includes(c.forecastingUnit.forecastingUnitId));
+              console.log("&&planningUnitList------>", planningUnitList)
 
               this.setState({
                 consumptionList: consumptionList,
@@ -2288,7 +2290,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                       <br></br>
                       {this.state.showDetailTable &&
                         <div className="col-md-12">
-                          <div className="chart-wrapper">
+                          <div className="chart-wrapper chart-graph-report">
                             <Bar id="cool-canvas" data={bar} options={chartOptions} />
                             <div>
 

@@ -3330,35 +3330,38 @@ export default class CreateTreeTemplate extends Component {
 
     selected = function (instance, cell, x, y, value) {
         if (y == 8) {
-            this.setState({
-                currentRowIndex: '',
-                // showCalculatorFields: '',
-                currentModelingType: '',
-                currentCalculatorStartDate: '',
-                currentCalculatorStopDate: '',
-                currentCalculatorStartValue: '',
-            }, () => {
-                // console.log("x row data===>", this.el.getRowData(x));
-                var elInstance = this.state.modelingEl;
-                var rowData = elInstance.getRowData(x);
-                var startValue = this.getMomValueForDateRange(rowData[1]);
+            var elInstance = this.state.modelingEl;
+            var rowData = elInstance.getRowData(x);
+            if (rowData[4] != "" && rowData[4] != null) {
                 this.setState({
-                    currentRowIndex: x,
-                    showCalculatorFields: this.state.aggregationNode ? !this.state.showCalculatorFields : false,
-                    currentModelingType: rowData[4],
-                    currentCalculatorStartDate: rowData[1],
-                    currentCalculatorStopDate: rowData[2],
-                    currentCalculatorStartValue: startValue,
-                    currentCalculatedMomChange: '',
-                    currentTargetChangeNumber: '',
-                    currentTargetChangeNumberEdit: false,
-                    currentTargetChangePercentage: '',
-                    currentTargetChangePercentageEdit: false,
-                    currentEndValue: '',
-                    currentEndValueEdit: false
-                });
-            })
-
+                    currentRowIndex: '',
+                    // showCalculatorFields: '',
+                    currentModelingType: '',
+                    currentCalculatorStartDate: '',
+                    currentCalculatorStopDate: '',
+                    currentCalculatorStartValue: '',
+                }, () => {
+                    // console.log("x row data===>", this.el.getRowData(x));
+                    var startValue = this.getMomValueForDateRange(rowData[1]);
+                    this.setState({
+                        currentRowIndex: x,
+                        showCalculatorFields: this.state.aggregationNode ? !this.state.showCalculatorFields : false,
+                        currentModelingType: rowData[4],
+                        currentCalculatorStartDate: rowData[1],
+                        currentCalculatorStopDate: rowData[2],
+                        currentCalculatorStartValue: startValue,
+                        currentCalculatedMomChange: '',
+                        currentTargetChangeNumber: '',
+                        currentTargetChangeNumberEdit: false,
+                        currentTargetChangePercentage: '',
+                        currentTargetChangePercentageEdit: false,
+                        currentEndValue: '',
+                        currentEndValueEdit: false
+                    });
+                })
+            } else {
+                alert("Please select modeling type before proceeding.");
+            }
         }
     }.bind(this)
     changed1 = function (instance, cell, x, y, value) {
@@ -9227,13 +9230,13 @@ export default class CreateTreeTemplate extends Component {
                                                                 </Input>
                                                             </FormGroup>
                                                         </div>
-
+                                                        <CardFooter className="col-md-6 pt-lg-0 pr-lg-0 float-right MarginTopCreateTreeBtn" style={{ backgroundColor: 'transparent', borderTop: '0px solid #c8ced3' }}>
+                                                            {/* <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button> */}
+                                                            <Button type="button" size="md" color="warning" className="float-right mr-1 mb-lg-2" onClick={this.resetTree}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                                                            <Button type="submit" color="success" className="mr-1 mb-lg-2 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"> </i>{i18n.t('static.pipeline.save')}</Button>
+                                                        </CardFooter>
                                                     </CardBody>
-                                                    <CardFooter className="col-md-6 pt-lg-0 pr-lg-0 float-right MarginTopCreateTreeBtn" style={{ backgroundColor: 'transparent', borderTop: '0px solid #c8ced3' }}>
-                                                        {/* <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button> */}
-                                                        <Button type="button" size="md" color="warning" className="float-right mr-1 mb-lg-2" onClick={this.resetTree}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
-                                                        <Button type="submit" color="success" className="mr-1 mb-lg-2 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"> </i>{i18n.t('static.pipeline.save')}</Button>
-                                                    </CardFooter>
+
                                                     <div style={{ display: !this.state.loading ? "block" : "none" }} class="sample">
                                                         <Provider>
                                                             <div className="placeholder TreeTemplateHeight" style={{ clear: 'both', marginTop: '25px', border: '1px solid #a7c6ed' }} >

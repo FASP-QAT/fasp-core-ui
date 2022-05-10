@@ -236,5 +236,10 @@ class ProgramService {
         );
     }
 
+    getPlanningUnitByProgramId(programId, json) {
+        return axios.post(`${API_URL}/api/program/${programId}/tracerCategory/simple/planningUnit`, json, {}
+        );
+    }
+
 }
 export default new ProgramService()

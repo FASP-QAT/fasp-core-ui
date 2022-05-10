@@ -59,7 +59,7 @@ class CompareVersion extends Component {
         localStorage.setItem("sesForecastVersionIdReport", versionId);
         var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
         var userId = userBytes.toString(CryptoJS.enc.Utf8);
-        localStorage.setItem("sesDatasetId", parseInt(localStorage.getItem("sesForecastProgramIdReport")) + '_v' + (versionId).replace('(Local)', '').trim() + '_uId_' + userId);
+        localStorage.setItem("sesDatasetId", parseInt(localStorage.getItem("sesForecastProgramIdReport")) + '_v' + (versionId).toString().replace('(Local)', '').trim() + '_uId_' + userId);
         console.log("In datasetId@@@", localStorage.getItem("sesDatasetId"));
         this.setState({
             versionId: versionId,
@@ -135,7 +135,7 @@ class CompareVersion extends Component {
             });
             var newVList = offlineVersionList.concat(onlineVersionList)
             for (var v = 0; v < newVList.length; v++) {
-                versionList.push({ id: newVList[v].versionId, name: newVList[v].versionId.toString().includes("Local") ? newVList[v].versionId : (newVList[v].versionId + (newVList[v].versionType.id == 2 ? "*" : "") + " (" + moment(newVList[v].createdDate).format(`MMM DD YYYY`) + ")") })
+                versionList.push({ id: newVList[v].versionId, name: newVList[v].versionId.toString().includes("Local") ? newVList[v].versionId : (newVList[v].versionId + (newVList[v].versionType.id == 2 ? "*" : "") + " (" + moment(newVList[v].createdDate).format(`DD-MMM-YYYY`) + ")") })
             }
             var versionId = "";
             var event = {
@@ -219,7 +219,7 @@ class CompareVersion extends Component {
             });
             var newVList = offlineVersionList.concat(onlineVersionList)
             for (var v = 0; v < newVList.length; v++) {
-                versionList.push({ id: newVList[v].versionId, name: newVList[v].versionId.toString().includes("Local") ? newVList[v].versionId : (newVList[v].versionId + (newVList[v].versionType.id == 2 ? "*" : "") + " (" + moment(newVList[v].createdDate).format(`MMM DD YYYY`) + ")") })
+                versionList.push({ id: newVList[v].versionId, name: newVList[v].versionId.toString().includes("Local") ? newVList[v].versionId : (newVList[v].versionId + (newVList[v].versionType.id == 2 ? "*" : "") + " (" + moment(newVList[v].createdDate).format(`DD-MMM-YYYY`) + ")") })
             }
             versionList = versionList.filter(c => c.id != this.state.versionId);
 
