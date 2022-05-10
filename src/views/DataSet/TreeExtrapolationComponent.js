@@ -1575,8 +1575,9 @@ export default class TreeExtrapolationComponent extends React.Component {
 
             data[9] = `=IF(D${parseInt(j) + 1} != "",ROUND(D${parseInt(j) + 1},4),IF(N1 == 4,I${parseInt(j) + 1},IF(N1 == 2,H${parseInt(j) + 1},IF(N1 == 7,E${parseInt(j) + 1},IF(N1==5,G${parseInt(j) + 1},IF(N1 == 6,F${parseInt(j) + 1},''))))))` // J
             data[10] = cellData != null && cellData != "" ? cellData.manualChange : ""
-            // data[11] = `=IF(M1 == true,IF(L${parseInt(j)} == "",'',ROUND((J${parseInt(j + 1)} + K${parseInt(j + 1)})+(J${parseInt(j + 1)} + K${parseInt(j + 1)}) - L${parseInt(j)},4)),IF(J${parseInt(j) + 1} + K${parseInt(j) + 1} == "",'',ROUND(J${parseInt(j) + 1} + K${parseInt(j) + 1},4)))`
-            data[11] = `=IF(M1 == true,IF(J${parseInt(j)} + K${parseInt(j)} == "",'',ROUND((J${parseInt(j + 1)} + K${parseInt(j + 1)})-(J${parseInt(j)} + K${parseInt(j)})+(J${parseInt(j + 1)} + K${parseInt(j + 1)}),4)),IF(J${parseInt(j) + 1} + K${parseInt(j) + 1} == "",'',ROUND(J${parseInt(j) + 1} + K${parseInt(j) + 1},4)))`
+            // data[11] = `=IF(M1 == true,IF(J${parseInt(j)} + K${parseInt(j)} == "",'',ROUND((J${parseInt(j + 1)} + K${parseInt(j + 1)})-(J${parseInt(j)} + K${parseInt(j)})+(J${parseInt(j + 1)} + K${parseInt(j + 1)}),4)),IF(J${parseInt(j) + 1} + K${parseInt(j) + 1} == "",'',ROUND(J${parseInt(j) + 1} + K${parseInt(j) + 1},4)))`
+            // data[11] = `=IF(M1 == true,IF(J${parseInt(j)} + K${parseInt(j)} == "",'',ROUND((J${parseInt(j + 1)} + K${parseInt(j + 1)})-(J${parseInt(j)} + K${parseInt(j)})+(J${parseInt(j + 1)} + K${parseInt(j + 1)}),4)),IF(J${parseInt(j) + 1} + K${parseInt(j) + 1} == "",'',ROUND(J${parseInt(j) + 1} + K${parseInt(j) + 1},4)))`
+            data[11] = `=IF(M1 == true,ROUND((J${parseInt(j + 1)} + SUM(K0:K${parseInt(j) + 1})),4),ROUND((J${parseInt(j + 1)} + K${parseInt(j + 1)}),4))`
             data[12] = this.props.items.currentItemConfig.context.payload.nodeDataMap[this.props.items.selectedScenario][0].manualChangesEffectFuture
             data[13] = this.state.nodeDataExtrapolation.extrapolationMethod.id
             //TES lower
@@ -1596,6 +1597,7 @@ export default class TreeExtrapolationComponent extends React.Component {
             if (count1 >= 0) {
                 count1++;
             }
+            // data[20] = `=SUM(K0:K${parseInt(j) + 1})`
             dataArray[count] = data;
             count++;
         }
@@ -1756,6 +1758,10 @@ export default class TreeExtrapolationComponent extends React.Component {
                     title: 'lrUpper',
                     type: 'hidden'
                 },
+                // {
+                //     title: 'cumulativeManualChange',
+                //     type: 'text'
+                // },
             ],
 
             text: {
