@@ -35,6 +35,13 @@ import "../../../node_modules/jsuites/dist/jsuites.css";
 import { Prompt } from 'react-router';
 import ReportService from '../../api/ReportService';
 import { DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_DATE_FORMAT_SM, JEXCEL_PRO_KEY } from '../../Constants.js';
+import DesiredStockatForecasend from '../../assets/img/DesiredStockatForecasend.png';
+import FreightCost from '../../assets/img/FreightCost.png';
+import ProcurementSurplusGap from '../../assets/img/ProcurementSurplusGap.png';
+import ProductCost from '../../assets/img/ProductCost.png';
+import ProjectStockatForecastend from '../../assets/img/ProjectStockatForecastend.png';
+import TotalCost from '../../assets/img/TotalCost.png';
+
 
 
 const ref = React.createRef();
@@ -3069,13 +3076,15 @@ class ForecastSummary extends Component {
                             </div>
                         } */}
                     </div>
-                    <div className="Card-header-reporticon ">
-                        <div className="card-header-actions BacktoLink">
+                    <div className="card-header-actions">
+                          <div className="Card-header-reporticon">
                             {/* <a className="pr-lg-0 pt-lg-1">
                                 <span style={{ cursor: 'pointer' }} onClick={() => { this.backToMonthlyForecast() }}><i className="fa fa-long-arrow-left" style={{ color: '#20a8d8', fontSize: '13px' }}></i> <small className="supplyplanformulas">{i18n.t('static.forecastReport.returnToMonthlyForecast')}</small></span>
                             </a> */}
                             <span className="compareAndSelect-larrow"> <i className="cui-arrow-left icons " > </i></span>
+                            <span className="compareAndSelect-rarrow"> <i className="cui-arrow-right icons " > </i></span>
                             <span className="compareAndSelect-larrowText"> {i18n.t('static.common.backTo')} <a href="/#/forecastReport/forecastOutput" className='supplyplanformulas'>{'Monthly Forecast'}</a> </span>
+                            <span className="compareAndSelect-rarrowText"> {i18n.t('static.common.continueTo')} <a href="/#/dataset/commitTree" className="supplyplanformulas">{i18n.t('static.commitProgram.commitProgram')}</a></span>
 
                             {/* <a className="card-header-action">
                                 Back to <span style={{ cursor: 'pointer' }} onClick={() => { this.backToMonthlyForecast() }}><small className="supplyplanformulas">Monthly Forecast</small></span>
@@ -3582,9 +3591,12 @@ className={'modal-lg ' + this.props.className} >
         <p style={{fontSize:'13px'}}>
         <b>Calculating the Procurement Surplus/Gap </b>
         <ul>
-            <li>Project Stock at Forecast end = (Starting Stock) + (Existing Shipments) - (Forecasted Quantity) </li>
+            <li><img className="formula-img-mr-showGuidance" src={ProjectStockatForecastend} /><br></br></li>
+            <li><img className="formula-img-mr-showGuidance" src={DesiredStockatForecasend} /><br></br></li>
+            <li><img className="formula-img-mr-showGuidance" src={ProcurementSurplusGap} /><br></br></li>
+            {/* <li>Project Stock at Forecast end = (Starting Stock) + (Existing Shipments) - (Forecasted Quantity) </li>
             <li>Desired Stock at Forecast end = (Forecasted Quantity) / (Forecast Period) * (Desired Months of Stock) </li>
-            <li>Procurement Surplus/Gap = (Projected Stock at Forecast end) - (Desired Stock at Forecast end) </li>
+            <li>Procurement Surplus/Gap = (Projected Stock at Forecast end) - (Desired Stock at Forecast end) </li> */}
         </ul>
         </p>
         <p>
@@ -3621,9 +3633,12 @@ className={'modal-lg ' + this.props.className} >
         Note: the cost is only calculated if there is a procurement gap, not if there is a surplus 
 
         <ul>
-            <li>Product Cost = Procurement Gap * Unit Cost </li>
+        <li><img className="formula-img-mr-showGuidance1 img-fluid" src={ProductCost} /><br></br></li>
+        <li><img className="formula-img-mr-showGuidance1 img-fluid" src={FreightCost} /><br></br></li>
+        <li><img className="formula-img-mr-showGuidance1 img-fluid" src={TotalCost} /><br></br></li>
+            {/* <li>Product Cost = Procurement Gap * Unit Cost </li>
             <li>Freight Cost = Product Cost * Freight Percentage </li>
-            <li>Total Cost = Product Cost + Freight Cost </li>
+            <li>Total Cost = Product Cost + Freight Cost </li> */}
         </ul>
         </p>
         <p>
