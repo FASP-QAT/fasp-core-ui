@@ -1887,12 +1887,8 @@ class CompareAndSelectScenario extends Component {
                 <h5 className="red" id="div1" className={this.state.color}>{i18n.t(this.state.message)}</h5>
 
                 <Card>
-                <div className="card-header-action pr-lg-4">
-                            <a style={{float:'right'}}>
-                                <span style={{ cursor: 'pointer' }} onClick={() => { this.toggleShowGuidance() }}><small className="supplyplanformulas">{i18n.t('static.common.showGuidance')}</small></span>
-                            </a>
-                            </div>
-                    <div className="Card-header-reporticon pb-2">
+               
+                    <div className="Card-header-reporticon pb-0">
                    
                         <span className="compareAndSelect-larrow"> <i className="cui-arrow-left icons " > </i></span>
                         <span className="compareAndSelect-rarrow"> <i className="cui-arrow-right icons " > </i></span>
@@ -1912,6 +1908,11 @@ class CompareAndSelectScenario extends Component {
                         }
                         
                     </div>
+                    <div className="card-header-action pr-lg-4">
+                            <a style={{float:'right'}}>
+                                <span style={{ cursor: 'pointer' }} onClick={() => { this.toggleShowGuidance() }}><small className="supplyplanformulas">{i18n.t('static.common.showGuidance')}</small></span>
+                            </a>
+                            </div>
                     <CardBody className="pb-lg-2 pt-lg-0 ">
                         <div>
                             <div ref={ref}>

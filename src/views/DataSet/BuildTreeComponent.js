@@ -10254,13 +10254,7 @@ export default class BuildTree extends Component {
             <Row>
                 <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
                     <Card className="mb-lg-0">
-                    <div className="row pt-lg-0 pr-lg-4">
-                        <div className="col-md-12">
-                                <a style={{ float: 'right' }}>
-                                    <span style={{ cursor: 'pointer' }} onClick={() => { this.toggleShowGuidance() }}><small className="supplyplanformulas">{i18n.t('static.common.showGuidance')}</small></span>
-                                </a>
-                        </div>
-                     </div>
+
                         <div className="pb-lg-0">
                         <div className="Card-header-reporticon pb-1">
                             <span className="compareAndSelect-larrow"> <i className="cui-arrow-left icons " > </i></span>
@@ -10319,6 +10313,13 @@ export default class BuildTree extends Component {
                                 </div>
                             </div> */}
                         </div>
+                        <div className="row pt-lg-0 pr-lg-4">
+                        <div className="col-md-12">
+                                <a style={{ float: 'right' }}>
+                                    <span style={{ cursor: 'pointer' }} onClick={() => { this.toggleShowGuidance() }}><small className="supplyplanformulas">{i18n.t('static.common.showGuidance')}</small></span>
+                                </a>
+                        </div>
+                     </div>
                         <CardBody className="pt-lg-1 pl-lg-0 pr-lg-0">
                             <div className="container-fluid pl-lg-3 pr-lg-3">
                                 <>
