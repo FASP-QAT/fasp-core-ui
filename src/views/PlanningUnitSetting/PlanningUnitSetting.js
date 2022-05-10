@@ -958,12 +958,12 @@ export default class PlanningUnitSetting extends Component {
         });
 
         if (x == 11) {
-            console.log("Value@@@@@@@@@@@@@",value)
+            console.log("Value@@@@@@@@@@@@@", value)
             //left align
             this.el.setStyle(`A${parseInt(y) + 1}`, 'text-align', 'left');
             this.el.setStyle(`B${parseInt(y) + 1}`, 'text-align', 'left');
 
-            if (value == 1 || value=="") {
+            if (value == 1 || value == "") {
                 var cell = this.el.getCell(("B").concat(parseInt(y) + 1))
                 cell.classList.remove('readonly');
                 var cell = this.el.getCell(("A").concat(parseInt(y) + 1))
@@ -2290,7 +2290,17 @@ export default class PlanningUnitSetting extends Component {
         var json = elInstance.getJson(null, false);
 
         var colArr = ['A', 'B'];
-        for (var j = 0; j < json.length; j++) {
+
+        var jsonLength = (pageNo + 1) * (document.getElementsByClassName("jexcel_pagination_dropdown")[0]).value;
+        if (jsonLength == undefined) {
+            jsonLength = 15
+        }
+        if (json.length < jsonLength) {
+            jsonLength = json.length;
+        }
+        var start = pageNo * (document.getElementsByClassName("jexcel_pagination_dropdown")[0]).value;
+
+        for (var j = start; j < jsonLength; j++) {
             var rowData = elInstance.getRowData(j);
             var programPlanningUnitId = rowData[11];
 
@@ -2338,7 +2348,21 @@ export default class PlanningUnitSetting extends Component {
         var elInstance = instance.jexcel;
         var json = elInstance.getJson();
         var colArr = ['A', 'B'];
-        for (var j = 0; j < json.length; j++) {
+
+        var jsonLength;
+
+        if ((document.getElementsByClassName("jexcel_pagination_dropdown")[0] != undefined)) {
+            jsonLength = 1 * (document.getElementsByClassName("jexcel_pagination_dropdown")[0]).value;
+        }
+
+        if (jsonLength == undefined) {
+            jsonLength = 15
+        }
+        if (json.length < jsonLength) {
+            jsonLength = json.length;
+        }
+
+        for (var j = 0; j < jsonLength; j++) {
             var rowData = elInstance.getRowData(j);
             var programPlanningUnitId = rowData[11];
 
