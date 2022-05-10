@@ -501,8 +501,8 @@ export default class BuildTree extends Component {
         this.pickAMonth4 = React.createRef()
         this.pickAMonth5 = React.createRef()
         this.state = {
-            popoverOpenStartValueModelingTool:false,
-            showGuidanceModelingTransfer:false,
+            popoverOpenStartValueModelingTool: false,
+            showGuidanceModelingTransfer: false,
             showGuidanceModelingTransfer: false,
             showGuidanceNodeData: false,
             showGuidance: false,
@@ -1416,9 +1416,9 @@ export default class BuildTree extends Component {
     //     };
     toggleStartValueModelingTool() {
         this.setState({
-             popoverOpenStartValueModelingTool: !this.state.popoverOpenStartValueModelingTool
-         })
-     }
+            popoverOpenStartValueModelingTool: !this.state.popoverOpenStartValueModelingTool
+        })
+    }
     toggleShowGuidanceNodeData() {
         this.setState({
             showGuidanceNodeData: !this.state.showGuidanceNodeData
@@ -1613,14 +1613,14 @@ export default class BuildTree extends Component {
 
             var items = this.state.items;
             if (parameterName == 'currentItemConfig') {
-                console.log("node id for update state 1----",value.context.id);
+                console.log("node id for update state 1----", value.context.id);
                 var findNodeIndex = items.findIndex(n => n.id == value.context.id);
                 console.log("findNodeIndex1---", findNodeIndex);
                 items[findNodeIndex] = value.context;
-                console.log("node id for update state 2----",value.context);
-                console.log("node id for update state 3----",items);
+                console.log("node id for update state 2----", value.context);
+                console.log("node id for update state 3----", items);
                 this.setState({ items }, () => {
-                    console.log("node id for update state 4----",this.state.items);
+                    console.log("node id for update state 4----", this.state.items);
                     this.saveTreeData(true);
                 })
 
@@ -5284,6 +5284,8 @@ export default class BuildTree extends Component {
     duplicateNode(itemConfig) {
         console.log("duplicate node called 1---", this.state.currentItemConfig);
         console.log("duplicate node called 2---", itemConfig);
+        // var childList = [];
+        var items1 = this.state.items;
         const { items } = this.state;
         var maxNodeId = items.length > 0 ? Math.max(...items.map(o => o.id)) : 0;
         var nodeId = parseInt(maxNodeId + 1);
@@ -5300,20 +5302,15 @@ export default class BuildTree extends Component {
         var maxNodeDataId = this.getMaxNodeDataId();
         (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].nodeDataId = maxNodeDataId;
         var scenarioList = this.state.scenarioList;
+        // var immidiateChilds = items1.filter(x => x.parent == itemConfig.id);
+        // console.log("childList---", childList);
+        // for (let i = 0; i < immidiateChilds.length; i++) {
+        //     childList.push(immidiateChilds[i]);
+        // }
         if (scenarioList.length > 0) {
             for (let i = 0; i < scenarioList.length; i++) {
                 if (scenarioList[i].id != this.state.selectedScenario) {
                     (newItem.payload.nodeDataMap[scenarioList[i].id])[0].nodeDataId = parseInt(maxNodeDataId + 1);
-                    // var tempArray = [];
-                    // var nodeDataMap = {};
-                    // tempArray.push(JSON.parse(JSON.stringify((newItem.payload.nodeDataMap[this.state.selectedScenario])[0])));
-                    // console.log("tempArray---", tempArray);
-                    // nodeDataMap = newItem.payload.nodeDataMap;
-                    // tempArray[0].nodeDataId = this.getMaxNodeDataId();
-                    // nodeDataMap[scenarioList[i].id] = tempArray;
-                    // // nodeDataMap[scenarioList[i].id][0].nodeDataId = scenarioList[i].id;
-                    // newItem.payload.nodeDataMap = nodeDataMap;
-                    // (newItem.payload.nodeDataMap[scenarioList[i].id])[0] = (newItem.payload.nodeDataMap[this.state.selectedScenario]);
                 }
             }
         }
@@ -9127,27 +9124,27 @@ export default class BuildTree extends Component {
                                                 <MonthBox value={this.makeText({ year: new Date(this.state.currentCalculatorStopDate.replace(/-/g, '\/')).getFullYear(), month: ("0" + (new Date(this.state.currentCalculatorStopDate.replace(/-/g, '\/')).getMonth() + 1)).slice(-2) })} onClick={this.handleClickMonthBox5} />
                                             </Picker>
                                         </FormGroup>
-                                        {this.state.currentItemConfig.context.payload.nodeType.id <= 2 && 
-                                        <>
-                                        <div>
+                                        {this.state.currentItemConfig.context.payload.nodeType.id <= 2 &&
+                                            <>
+                                                <div>
                                                     <Popover placement="top" isOpen={this.state.popoverOpenStartValueModelingTool} target="Popover53" trigger="hover" toggle={this.toggleStartValueModelingTool}>
                                                         <PopoverBody>{i18n.t('static.tooltip.StartValueModelingTool')}</PopoverBody>
                                                     </Popover>
                                                 </div>
-                                        <FormGroup className="col-md-6">
-                                            <Label htmlFor="currencyId">{i18n.t('static.tree.startValue')}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover53" onClick={this.toggleStartValueModelingTool} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
-                                            <Input type="text"
-                                                id="startValue"
-                                                name="startValue"
-                                                bsSize="sm"
-                                                readOnly={true}
-                                                value={addCommas(this.state.currentCalculatorStartValue)}
+                                                <FormGroup className="col-md-6">
+                                                    <Label htmlFor="currencyId">{i18n.t('static.tree.startValue')}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover53" onClick={this.toggleStartValueModelingTool} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
+                                                    <Input type="text"
+                                                        id="startValue"
+                                                        name="startValue"
+                                                        bsSize="sm"
+                                                        readOnly={true}
+                                                        value={addCommas(this.state.currentCalculatorStartValue)}
 
-                                            >
-                                            </Input>
-                                            {/* <FormFeedback className="red">{errors.nodeTitle}</FormFeedback> */}
-                                        </FormGroup>
-                                        </>
+                                                    >
+                                                    </Input>
+                                                    {/* <FormFeedback className="red">{errors.nodeTitle}</FormFeedback> */}
+                                                </FormGroup>
+                                            </>
                                         }
                                         {this.state.currentItemConfig.context.payload.nodeType.id > 2 && <FormGroup className="col-md-6">
                                             <Label htmlFor="currencyId">{i18n.t('static.tree.StartPercentage')}<span class="red Reqasterisk">*</span></Label>
