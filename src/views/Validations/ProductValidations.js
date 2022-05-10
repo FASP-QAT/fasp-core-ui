@@ -871,8 +871,8 @@ class ProductValidation extends Component {
                                 }
                                 this.setState({
                                     datasetList: datasetList.sort(function (a, b) {
-                                        a = a.name.toLowerCase();
-                                        b = b.name.toLowerCase();
+                                        a = a.code.toLowerCase();
+                                        b = b.code.toLowerCase();
                                         return a < b ? -1 : a > b ? 1 : 0;
                                     }),
                                     currencyList: currencyList,

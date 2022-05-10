@@ -852,8 +852,8 @@ class ModelingValidation extends Component {
                     }
                     this.setState({
                         datasetList: datasetList.sort(function (a, b) {
-                            a = a.name.toLowerCase();
-                            b = b.name.toLowerCase();
+                            a = a.code.toLowerCase();
+                            b = b.code.toLowerCase();
                             return a < b ? -1 : a > b ? 1 : 0;
                         }),
                         unitList: unitList,
@@ -1292,16 +1292,19 @@ class ModelingValidation extends Component {
                         },
                         ticks: {
                             callback: function (label) {
+                                var monthArrayList = [...new Set(this.state.monthList.map(ele => moment(ele).format("MMM-YYYY")))];
                                 var xAxis2 = label
                                 xAxis2 += '';
                                 var month = xAxis2.split('-')[0];
                                 var year = xAxis2.split('-')[1];
-                                if (month === "Jul") {
+                                var filterByYear = monthArrayList.filter(c => moment(c).format("YYYY") == moment(year).format("YYYY"));
+                                var divideByTwo = Math.floor(filterByYear.length / 2);
+                                if (moment(filterByYear[divideByTwo]).format("MMM") === month) {
                                     return year;
                                 } else {
                                     return "";
                                 }
-                            },
+                            }.bind(this),
                             maxRotation: 0,
                             minRotation: 0,
                             autoSkip: false
