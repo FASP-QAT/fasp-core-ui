@@ -654,22 +654,16 @@ export default class TreeExtrapolationComponent extends React.Component {
             extrapolationLoader: false,
             isChanged: false
         }, () => {
-            console.log("momList 2---", momList);
             var currentItemConfig = this.props.items.currentItemConfig;
             var mom = momList.filter(m => moment(m.month).format('YYYY-MM') == moment(currentItemConfig.context.payload.nodeDataMap[this.props.items.selectedScenario][0].month).format('YYYY-MM'));
-            console.log("this.props.items.selectedScenario---", this.props.items.selectedScenario);
-            console.log("mom---", mom);
             currentItemConfig.context.payload.nodeDataMap[this.props.items.selectedScenario][0].nodeDataExtrapolation = this.state.nodeDataExtrapolation;
-            console.log("momList 3---", momList);
             currentItemConfig.context.payload.nodeDataMap[this.props.items.selectedScenario][0].nodeDataMomList = momList;
-            console.log("extrapolation data 1----", currentItemConfig);
             currentItemConfig.context.payload.nodeDataMap[this.props.items.selectedScenario][0].nodeDataModelingList = [];
             currentItemConfig.context.payload.nodeDataMap[this.props.items.selectedScenario][0].nodeDataExtrapolationOptionList = this.state.nodeDataExtrapolationOptionList;
             // if (currentItemConfig.context.payload.nodeDataMap[this.props.items.selectedScenario][0].dataValue == "" || currentItemConfig.context.payload.nodeDataMap[this.props.items.selectedScenario][0].dataValue == 0) {
             currentItemConfig.context.payload.nodeDataMap[this.props.items.selectedScenario][0].dataValue = mom.length > 0 ? mom[0].calculatedValue : '0';
             currentItemConfig.context.payload.nodeDataMap[this.props.items.selectedScenario][0].calculatedDataValue = mom.length > 0 ? mom[0].calculatedValue : '0';
             // }
-            console.log("extrapolation data- 2---", currentItemConfig);
             this.props.updateState("currentItemConfig", currentItemConfig);
 
         });
