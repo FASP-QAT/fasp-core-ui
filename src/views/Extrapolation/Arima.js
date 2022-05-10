@@ -5,7 +5,7 @@ import { calculateCI } from "./CalculateCI";
 import { calculateError } from "./ErrorCalculations";
 import jexcel from 'jexcel-pro';
 
-export function calculateArima(inputData, p, d, q, confidenceLevel, noOfProjectionMonths, props, minStartDate, isTreeExtrapolation) {
+export function calculateArima(inputData, p, d, q, confidenceLevel, noOfProjectionMonths, props, minStartDate, isTreeExtrapolation, seasonality) {
     console.log("inputData@@@@@@", inputData);
     console.log("@@@@@@@@noOfMonthsForProjection", noOfProjectionMonths)
     var startYear = moment(minStartDate).format("YYYY");
@@ -18,6 +18,31 @@ export function calculateArima(inputData, p, d, q, confidenceLevel, noOfProjecti
     console.log("StartParam@@@@@@", startParam);
     // var date = minStartDate;
     var data = []
+//     inputData=[{"month":1,"actual":10000,"forecast":null},
+// {"month":1,"actual":20500,"forecast":null},
+// {"month":1,"actual":31000,"forecast":null},
+// {"month":1,"actual":41500,"forecast":null},
+// {"month":1,"actual":52000,"forecast":null},
+// {"month":1,"actual":62500,"forecast":null},
+// {"month":1,"actual":73000,"forecast":null},
+// {"month":1,"actual":83500,"forecast":null},
+// {"month":1,"actual":94000,"forecast":null},
+// {"month":1,"actual":104500,"forecast":null},
+// {"month":1,"actual":115000,"forecast":null},
+// {"month":1,"actual":125500,"forecast":null},
+// {"month":1,"actual":136000,"forecast":null},
+// {"month":1,"actual":146500,"forecast":null},
+// {"month":1,"actual":157000,"forecast":null},
+// {"month":1,"actual":167500,"forecast":null},
+// {"month":1,"actual":178000,"forecast":null},
+// {"month":1,"actual":188500,"forecast":null},
+// {"month":1,"actual":199000,"forecast":null},
+// {"month":1,"actual":209500,"forecast":null},
+// {"month":1,"actual":220000,"forecast":null},
+// {"month":1,"actual":230500,"forecast":null},
+// {"month":1,"actual":241000,"forecast":null},
+// {"month":1,"actual":251500,"forecast":null}]
+
     for (var i = 0; i < inputData.length; i++) {
         data.push(Number(inputData[i].actual));
     }
@@ -28,7 +53,11 @@ export function calculateArima(inputData, p, d, q, confidenceLevel, noOfProjecti
         "p": Number(p),
         "d": Number(d),
         "q": Number(q),
-        "n": Number(noOfProjectionMonths)
+        "n": Number(noOfProjectionMonths),
+        "seasonality": seasonality,
+        // "p": 0,
+        // "d": 1,
+        // "q": 1
     }
     console.log("JsonArima@@@@@@", json);
     ExtrapolationService.arima(json)

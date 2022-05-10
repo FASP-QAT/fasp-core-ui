@@ -308,8 +308,8 @@ export default class ExtrapolateDataComponent extends React.Component {
             checkIfAnyMissingActualConsumption: false,
             extrapolateClicked: false,
             showDate: false,
-            seasonality:""
-        }
+            seasonality: 1
+            }
         // this.toggleD = this.toggleD.bind(this);
         this.toggleConfidenceLevel = this.toggleConfidenceLevel.bind(this);
         this.toggleConfidenceLevel1 = this.toggleConfidenceLevel1.bind(this);
@@ -910,8 +910,11 @@ export default class ExtrapolateDataComponent extends React.Component {
                 if (this.state.smoothingId && inputDataMovingAvg.filter(c => c.actual != null).length >= 24) {
                     calculateTES(inputDataTes, this.state.alpha, this.state.beta, this.state.gamma, this.state.confidenceLevelId, noOfMonthsForProjection, this, minStartDate, false);
                 }
+                console.log("inputDataMovingAvg.filter(c => c.actual != null).length >= 14",inputDataMovingAvg.filter(c => c.actual != null).length >= 14)
                 if (this.state.arimaId && inputDataMovingAvg.filter(c => c.actual != null).length >= 14) {
-                    calculateArima(inputDataArima, this.state.p, this.state.d, this.state.q, this.state.confidenceLevelIdArima, noOfMonthsForProjection, this, minStartDate, false);
+                    console.log("calculateArima---",this.state.seasonality)
+
+                    calculateArima(inputDataArima, this.state.p, this.state.d, this.state.q, this.state.confidenceLevelIdArima, noOfMonthsForProjection, this, minStartDate, false,this.state.seasonality);
                 }
                 this.setState({
                     extrapolateClicked: true
@@ -1399,6 +1402,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                     p: this.state.p,
                                     d: this.state.d,
                                     q: this.state.q,
+                                    seasonality: this.state.seasonality,
                                     startDate: moment(startDate).format("YYYY-MM-DD"),
                                     stopDate: moment(stopDate).format("YYYY-MM-DD")
                                 },
@@ -1429,6 +1433,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                     p: this.state.p,
                                     d: this.state.d,
                                     q: this.state.q,
+                                    seasonality: this.state.seasonality,
                                     startDate: moment(startDate).format("YYYY-MM-DD"),
                                     stopDate: moment(stopDate).format("YYYY-MM-DD")
                                 },
@@ -1459,6 +1464,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                     p: this.state.p,
                                     d: this.state.d,
                                     q: this.state.q,
+                                    seasonality: this.state.seasonality,
                                     startDate: moment(startDate).format("YYYY-MM-DD"),
                                     stopDate: moment(stopDate).format("YYYY-MM-DD")
                                 },
@@ -1705,6 +1711,8 @@ export default class ExtrapolateDataComponent extends React.Component {
                 var p = this.state.p;
                 var d = this.state.d;
                 var q = this.state.q;
+                var seasonality = this.state.seasonality;
+                            
                 console.log("smoothingId--->", smoothingId)
 
                 console.log("consumptionExtrapolationTESM--->", consumptionExtrapolationTESM.length)
@@ -1713,6 +1721,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                     p = consumptionExtrapolationArima[0].jsonProperties.p;
                     d = consumptionExtrapolationArima[0].jsonProperties.d;
                     q = consumptionExtrapolationArima[0].jsonProperties.q;
+                    seasonality = consumptionExtrapolationArima[0].jsonProperties.seasonality;                                    
                     arimaId = true;
                 }
                 // let curDate = startDate;
@@ -1932,6 +1941,8 @@ export default class ExtrapolateDataComponent extends React.Component {
                 var p = this.state.p;
                 var d = this.state.d;
                 var q = this.state.q;
+                var seasonality = this.state.seasonality;
+                            
                 // if (smoothingId && consumptionExtrapolationTESL.length > 0) {
                 //     confidenceLevel = consumptionExtrapolationTESL[0].jsonProperties.confidenceLevel;
                 //     seasonality = consumptionExtrapolationTESL[0].jsonProperties.seasonality;
