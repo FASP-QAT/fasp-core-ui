@@ -5,7 +5,7 @@ import { calculateCI } from "./CalculateCI";
 import { calculateError } from "./ErrorCalculations";
 import jexcel from 'jexcel-pro';
 
-export function calculateArima(inputData, p, d, q, confidenceLevel, noOfProjectionMonths, props, minStartDate, isTreeExtrapolation) {
+export function calculateArima(inputData, p, d, q, confidenceLevel, noOfProjectionMonths, props, minStartDate, isTreeExtrapolation, seasonality) {
     console.log("inputData@@@@@@", inputData);
     console.log("@@@@@@@@noOfMonthsForProjection", noOfProjectionMonths)
     var startYear = moment(minStartDate).format("YYYY");
@@ -28,7 +28,8 @@ export function calculateArima(inputData, p, d, q, confidenceLevel, noOfProjecti
         "p": Number(p),
         "d": Number(d),
         "q": Number(q),
-        "n": Number(noOfProjectionMonths)
+        "n": Number(noOfProjectionMonths),
+        "seasonality": seasonality
     }
     console.log("JsonArima@@@@@@", json);
     ExtrapolationService.arima(json)
