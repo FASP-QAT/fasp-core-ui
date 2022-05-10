@@ -5,7 +5,7 @@ import {
     Card,
     CardBody,
     Col,
-    Table, FormGroup, Input, InputGroup, Label, Form
+    CardFooter, Table, FormGroup, Input, InputGroup, Label, Form
 } from 'reactstrap';
 import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
 import getLabelText from '../../CommonComponent/getLabelText';
@@ -60,6 +60,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
             equivalencyUnitList: [],
             programEquivalencyUnitList: [],
             reportConsumptionList: [],
+            show: false,
             rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
             minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
             maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 }
@@ -84,6 +85,8 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
             consumptionUnitShowArr: consumptionUnitShowArr
         })
     }
+    toggledata = () => this.setState((currentState) => ({ show: !currentState.show }));
+
 
     setProgramId(event) {
         this.setState({
@@ -931,29 +934,35 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                             for (var r = 0; r < regionIds.length; r++) {
                                 var consumptionDataForMonth = consumptionList.filter(c => c.region.id == regionIds[r].regionId && moment(c.consumptionDate).format("YYYY-MM") == moment(curDate).format("YYYY-MM"))
                                 reportConsumptionList.push({
+                                    // region:
+                                    // month:
+                                    // value:
+                                    // daysOfStockOut:
+                                    // noOfDays:
+                                    // consumptionQty:
                                     monthArray: monthArray,
                                     consumptionDataForMonth: consumptionDataForMonth,
                                     dayOfStockOut: consumptionDataForMonth.dayOfStockOut,
                                     noOfDays: noOfDays,
                                     region: regionIds
                                 });
-                               
                             }
                         }
-                        console.log("reportConsumptionListregion-------------",reportConsumptionList.region)
+                        console.log("reportConsumptionListregion-------------", reportConsumptionList.region)
 
                         console.log("reportConsumptionList.monthArray-------------", reportConsumptionList.consumptionDataForMonth)
 
                         console.log("monthArray-------------", monthArray)
-
-
                         this.setState({
-                            loading: false,
-                            reportConsumptionList: reportConsumptionList
-                        })
+                            monthArray: monthArray,
+                            // loading: false,
+                            reportConsumptionList: reportConsumptionList,
 
-                    }
-                }
+                        })
+                        console.log("this.state.monthArray-------------", this.state.monthArray)
+
+                    }.bind(this);
+                }.bind(this);
             } else { }
 
         }
@@ -1298,42 +1307,47 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                 </Form>
                                 {/* <Col md="12 pl-0" style={{ display: this.state.loading ? "none" : "block" }}> */}
                                 <Col md="12 pl-0">
-                                    <div className="row">
+                                    <div className="row" style={{ display: this.state.show ? "block" : "none" }}>
                                         <div className="col-md-12">
-                                            {/* {this.state.show && this.state.matricsList.length > 0 && */}
-                                            {/* <Table className="table-bordered text-center mt-2 overflowhide main-table " bordered size="sm" options={this.options}> */}
-                                            <Table className="table-bordered text-center mt-2 overflowhide main-table " bordered size="sm">
-                                                <thead>
-                                                    <tr>
-                                                        <th className="BorderNoneSupplyPlan sticky-col first-col clone1"></th>
-                                                        <th className="dataentryTdWidth sticky-col first-col clone">Average</th>
-                                                        {/* {this.state.reportConsumptionList.monthArray.map((item, count) => {
+                                            {this.state.show && this.state.reportConsumptionList.length > 0 &&
+                                                <Table className="table-bordered text-center mt-2 overflowhide main-table " bordered size="sm">
+                                                    <thead>
+                                                        <tr>
+                                                            <th className="BorderNoneSupplyPlan sticky-col first-col clone1"></th>
+                                                            <th className="dataentryTdWidth sticky-col first-col clone">Average</th>
+                                                            {this.state.monthArray.map((item, count) => {
                                                                 return (<th>{moment(item.date).format(DATE_FORMAT_CAP_WITHOUT_DATE)}</th>)
-                                                            })} */}
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    {this.state.reportConsumptionList.map(item => {
-                                                        return (<>
-                                                            <tr className="hoverTd">
-                                                                <td className="BorderNoneSupplyPlan sticky-col first-col clone1" onClick={() => this.toggleAccordion(item)}>
-                                                                    {this.state.consumptionUnitShowArr.includes(0) ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i>}
-                                                                </td>
-                                                                <td className="sticky-col first-col clone hoverTd" align="left"></td>
-                                                            </tr>
-                                                        </>)
-                                                    }
-                                                    )}
-
-                                                </tbody>
-                                            </Table>
-                                            {/* } */}
+                                                            })}
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        {this.state.reportConsumptionList.map(item => {
+                                                            return <>
+                                                                <tr className="hoverTd">
+                                                                    {/* <td className="BorderNoneSupplyPlan sticky-col first-col clone1" onClick={() => this.toggleAccordion(0)}>
+                                                                        {this.state.consumptionUnitShowArr.includes(0) ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i>}
+                                                                    </td> */}
+                                                                    <td className="sticky-col first-col clone hoverTd" align="left"></td>
+                                                                </tr>
+                                                            </>
+                                                        }
+                                                        )}
+                                                    </tbody>
+                                                </Table>
+                                            }
                                         </div>
                                     </div>
                                 </Col>
                             </div>
                         </div>
                     </CardBody>
+
+                    <CardFooter>
+                        <FormGroup>
+                            {this.state.reportConsumptionList != "" && <button className="mr-1 float-right btn btn-info btn-md" onClick={this.toggledata}>{this.state.show ? i18n.t('static.common.hideData') : i18n.t('static.common.showData')}</button>}
+                            &nbsp;
+                        </FormGroup>
+                    </CardFooter>
                 </Card>
             </div >
         );
