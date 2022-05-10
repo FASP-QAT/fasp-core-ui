@@ -1035,7 +1035,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                         </div>
                     </div>
                     <CardBody className="pb-lg-2 pt-lg-0">
-                        <div className="TableCust" >
+                        <div className="" >
                             <div ref={ref}>
                                 <Form>
                                     <div className=" pl-0">
@@ -1124,8 +1124,8 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                             </FormGroup>
 
                                             <FormGroup className="col-md-3">
-                                                <Label htmlFor="appendedInputButton">Show in:</Label>
-                                                <div className="controls">
+                                                <Label className="P-absltRadio" htmlFor="appendedInputButton">Show in:</Label>
+                                                <FormGroup check inline>
                                                     <Input
                                                         className="form-check-input"
                                                         type="radio"
@@ -1137,12 +1137,13 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                                         onChange={this.setViewById}
                                                     />
                                                     <Label
-                                                        // className="form-check-label"
+                                                        className="form-check-label"
                                                         // check htmlFor="inline-radio1"
                                                         title={i18n.t('static.report.planningUnit')}>
                                                         {i18n.t('static.report.planningUnit')}
                                                     </Label>
-                                                    <br />
+                                                    </FormGroup>
+                                                    <FormGroup check inline>
                                                     <Input
                                                         className="form-check-input"
                                                         type="radio"
@@ -1154,12 +1155,12 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                                         onChange={this.setViewById}
                                                     />
                                                     <Label
-                                                        // className="form-check-label"
+                                                        className="form-check-label"
                                                         // check htmlFor="inline-radio1"
                                                         title={i18n.t('static.dashboard.forecastingunit')}>
                                                         {i18n.t('static.dashboard.forecastingunit')}
                                                     </Label>
-                                                </div>
+                                                </FormGroup>
                                             </FormGroup>
 
                                             <FormGroup className="col-md-3" id="forecastingUnitDiv" style={{ display: "none" }}>
@@ -1217,7 +1218,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                             </FormGroup>
 
                                             <FormGroup className="col-md-3">
-                                                <div className="tab-ml-1 ml-lg-5 ExtraCheckboxFieldWidth" style={{ marginTop: '38px' }}>
+                                                <div className="tab-ml-1" style={{ marginTop: '30px' }}>
                                                     <Input
                                                         className="form-check-input checkboxMargin"
                                                         type="checkbox"
@@ -1256,7 +1257,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                             </FormGroup>
 
                                             <FormGroup className="col-md-3">
-                                                <div className="tab-ml-1 ml-lg-5 ExtraCheckboxFieldWidth" style={{ marginTop: '38px' }}>
+                                                <div className="tab-ml-1 ml-lg-3" style={{ marginTop: '30px' }}>
                                                     <Input
                                                         className="form-check-input checkboxMargin"
                                                         type="checkbox"
