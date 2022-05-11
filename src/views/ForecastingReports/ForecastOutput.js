@@ -3125,7 +3125,7 @@ class ForecastOutput extends Component {
             title: {
                 display: true,
                 // text: (this.state.yaxisEquUnit > 0 ? this.state.equivalencyUnitLabel : 'Monthly Forecast ' + (this.state.viewById == 1 ? '(' + i18n.t('static.product.product') + ')' : '(' + i18n.t('static.forecastingunit.forecastingunit') + ')'))
-                text: 'Monthly Forecast - ' + (this.state.programs.filter(c => c.programId == this.state.programId).length > 0 ? this.state.programs.filter(c => c.programId == this.state.programId)[0].programCode : '') + ' - ' + (this.state.versions.filter(c => c.versionId == this.state.versionId).length > 0 ? this.state.versions.filter(c => c.versionId == this.state.versionId)[0].versionId : '')
+                text: i18n.t('static.dashboard.monthlyForecast')+' - ' + (this.state.programs.filter(c => c.programId == this.state.programId).length > 0 ? this.state.programs.filter(c => c.programId == this.state.programId)[0].programCode : '') + ' - ' + (this.state.versions.filter(c => c.versionId == this.state.versionId).length > 0 ? this.state.versions.filter(c => c.versionId == this.state.versionId)[0].versionId : '')
             },
             scales: {
                 yAxes: [
@@ -3411,7 +3411,7 @@ class ForecastOutput extends Component {
                             <div className="card-header-actions">
                                 <a className="card-header-action">
 
-                                    <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => this.exportPDF()} />
+                                    <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.exportPDF()} />
 
 
                                 </a>
@@ -3441,8 +3441,8 @@ class ForecastOutput extends Component {
 
                             <span className="compareAndSelect-larrow"> <i className="cui-arrow-left icons " > </i></span>
                             <span className="compareAndSelect-rarrow"> <i className="cui-arrow-right icons " > </i></span>
-                            <span className="compareAndSelect-larrowText"> {i18n.t('static.common.backTo')} <a href="/#/report/compareAndSelectScenario" className='supplyplanformulas'>{'Compare And Select Forecast'}</a> </span>
-                            <span className="compareAndSelect-rarrowText"> {i18n.t('static.common.continueTo')} <a href="/#/forecastReport/forecastSummary" className='supplyplanformulas'>{'Forecast Summary'}</a></span><br />
+                            <span className="compareAndSelect-larrowText"> {i18n.t('static.common.backTo')} <a href="/#/report/compareAndSelectScenario" className='supplyplanformulas'>{i18n.t('static.forecastOutput.compareAndSelectForecast')}</a> </span>
+                            <span className="compareAndSelect-rarrowText"> {i18n.t('static.common.continueTo')} <a href="/#/forecastReport/forecastSummary" className='supplyplanformulas'>{i18n.t('static.commitTree.forecastSummary')}</a></span><br />
 
                         </div>
                     </div>
