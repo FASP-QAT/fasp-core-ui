@@ -1625,7 +1625,11 @@ class CompareAndSelectScenario extends Component {
                         message: 'static.compareAndSelect.dataSaved',
                         color: 'green',
                         datasetJson: datasetForEncryption,
-                        planningUnitList: planningUnitList1
+                        planningUnitList: planningUnitList1.sort(function (a, b) {
+                            a = getLabelText(a.planningUnit.label, this.state.lang).toLowerCase();
+                            b = getLabelText(b.planningUnit.label, this.state.lang).toLowerCase();
+                            return a < b ? -1 : a > b ? 1 : 0;
+                        }.bind(this))
                     }, () => {
                         this.hideFirstComponent()
                         this.showData();
