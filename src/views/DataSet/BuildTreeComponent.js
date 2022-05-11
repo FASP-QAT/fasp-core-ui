@@ -4778,7 +4778,9 @@ export default class BuildTree extends Component {
             e.showModelingValidation = this.state.showModelingValidation
             console.log("1------------------->>>>", this.getPayloadData(items1[i], 4))
             console.log("2------------------->>>>", this.getPayloadData(items1[i], 3))
-            e.result = this.getPayloadData(items1[i], 4)
+            e.result = this.getPayloadData(items1[i], 4)//Up
+            e.result1 = this.getPayloadData(items1[i], 6)//Down
+            e.result2 = this.getPayloadData(items1[i], 5)//Link
             var text = this.getPayloadData(items1[i], 3)
             e.text = text;
             newItems.push(e)
