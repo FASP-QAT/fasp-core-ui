@@ -35,7 +35,7 @@ import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../Com
 import SupplyPlanFormulas from '../SupplyPlan/SupplyPlanFormulas';
 import TracerCategoryService from '../../api/TracerCategoryService';
 
-import MultiSelect from 'react-multi-select-component';
+import {MultiSelect} from 'react-multi-select-component';
 const ref = React.createRef();
 export const DEFAULT_MIN_MONTHS_OF_STOCK = 3
 export const DEFAULT_MAX_MONTHS_OF_STOCK = 18
