@@ -5278,7 +5278,7 @@ export default class BuildTree extends Component {
         // newItem.sortOrder = parentSortOrder.concat(".").concat(("0" + (Number(childList.length) + 1)).slice(-2));
         var maxNodeDataId = this.getMaxNodeDataId();
         // (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].nodeDataId = maxNodeDataId;
-
+        console.log("initial maxNodeDataId---", maxNodeDataId);
         var childList = items1.filter(x => x.sortOrder.startsWith(itemConfig.sortOrder));
         var childListArr = [];
         var json;
@@ -5330,7 +5330,7 @@ export default class BuildTree extends Component {
                 for (let i = 0; i < scenarioList.length; i++) {
                     if (scenarioList[i].id != this.state.selectedScenario) {
                         (child.payload.nodeDataMap[scenarioList[i].id])[0].nodeDataId = parseInt(maxNodeDataId + 1);
-                        console.log("maxNodeDataId---", maxNodeDataId)
+                        console.log("maxNodeDataId afetr---", maxNodeDataId)
                     }
                 }
             }
