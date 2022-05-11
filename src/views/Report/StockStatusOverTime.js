@@ -17,7 +17,7 @@ import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
 import RealmCountryService from '../../api/RealmCountryService';
 import ReactMultiSelectCheckboxes from 'react-multiselect-checkboxes';
-import MultiSelect from "react-multi-select-component";
+import {MultiSelect} from "react-multi-select-component";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import CryptoJS from 'crypto-js'
 import { SECRET_KEY, FIRST_DATA_ENTRY_DATE, INDEXED_DB_NAME, INDEXED_DB_VERSION, REPORT_DATEPICKER_START_MONTH, REPORT_DATEPICKER_END_MONTH } from '../../Constants.js'

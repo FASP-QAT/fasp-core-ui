@@ -56,7 +56,7 @@ import ReportService from '../../api/ReportService';
 import ProgramService from '../../api/ProgramService';
 import 'chartjs-plugin-annotation';
 import TracerCategoryService from '../../api/TracerCategoryService';
-import MultiSelect from 'react-multi-select-component';
+import {MultiSelect} from 'react-multi-select-component';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 // const { getToggledOptions } = utils;
 const Widget04 = lazy(() => import('../Widgets/Widget04'));

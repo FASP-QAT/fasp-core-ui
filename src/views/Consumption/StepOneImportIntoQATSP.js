@@ -22,6 +22,9 @@ import { FORECAST_DATEPICKER_START_MONTH, FORECAST_DATEPICKER_MONTH_DIFF, INDEXE
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import csvicon from '../../assets/img/csv.png';
+import ForecastedConsumptionimported from '../../assets/img/ForecastedConsumptionimported.png';
+import ShowGuidanceScreenshot1 from '../../assets/img/importintoqatsupplyplanscreenshot-1.jpg';
+import ShowGuidanceScreenshot2 from '../../assets/img/importintoqatsupplyplanscreenshot-2.jpg';
 
 const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
@@ -1254,7 +1257,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
 
                 <div style={{ display: this.props.items.loading ? "none" : "block" }} >
                     <div className="Card-header-addicon pb-0">
-                        <div className="card-header-actions">
+                        <div className="card-header-actions" style={{marginTop:'-25px'}}>
                             {/* <img style={{ height: '23px', width: '23px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} /> */}
                             <a className="card-header-action">
                                 <span style={{ cursor: 'pointer' }} onClick={() => { this.toggleShowGuidance() }}><small className="supplyplanformulas">{i18n.t('static.common.showGuidance')}</small></span>
@@ -1263,13 +1266,202 @@ export default class StepOneImportMapPlanningUnits extends Component {
                         </div>
                     </div>
                     <Modal isOpen={this.state.showGuidance}
-                        className={'modal-lg ' + this.props.className} >
+                        className={'modal-xl ' + this.props.className} >
                         <ModalHeader toggle={() => this.toggleShowGuidance()} className="ModalHead modal-info-Headher">
                             <strong className="TextWhite">Show Guidance</strong>
                         </ModalHeader>
                         <div>
                             <ModalBody>
-                                <p>Need Data*</p>
+                            <div>
+                               <h3 className='ShowGuidanceHeading'>QAT Forecast Import</h3>
+                           </div>
+                            <p>
+                                <p style={{fontSize:'13px'}}><span className="UnderLineText">Purpose :</span> Enable users to import QAT-created forecasts into supply plan programs. Forecasts are only available for importing if 1) they are committed as a final version and 2) there is a forecast selected for each planning unit.</p>
+                            </p>
+                            <p>
+                                <p style={{fontSize:'13px'}}><span className="UnderLineText">Using this screen :</span></p>
+                                <p><b>(Step 1)</b>
+                                    <ul>
+                                        <li>Select which forecast program to import from (only final forecasts are available)</li>
+                                        <li>Select which supply plan program to import to. </li>
+                                        <li>Select the date range of forecast data to import, which are restricted as follows: 
+                                            <ul>
+                                                <li>Must be within the forecast period</li>
+                                                <li>The oldest forecasted consumption you can import is 6 months before the current month. </li>
+                                                <li>If the entire forecast period is more than 6 months in the past, the forecast cannot be imported, and the version will not appear in the program dropdown </li>
+                                            </ul>
+                                        </li>
+                                        <li>In the table that appears, select and map planning units. 
+                                            <ul>
+                                                <li>For every Forecasting Planning Unit, QAT requires a corresponding Supply Plan Planning Unit and conversion factor. QAT automatically maps exact planning unit matches, but users can override both the planning unit mapping and conversion factor. </li>
+                                                <li>Not all forecast planning units need to be imported, however, all forecast planning units must have a selection in the mapping table. For example, in the below table, even though 2 products are not being imported, you would still need to select 'Do not import'.</li>
+                                                <br></br>
+                                                <img className="img-fluid" src={ShowGuidanceScreenshot1}/>
+                                            </ul>
+                                            
+                                            
+                                        </li>
+                                    </ul>
+                                </p>
+                                <p><b>(Step 2) </b>
+                                For each Forecast region, input how much (%) of that region's forecast you will import and which region the forecasted consumption will be imported into. Below are some use cases:
+                                <ul>
+                                    <li>National forecast to national supply plan
+                                    <table className="table table-bordered ">
+                                <thead>
+                                <tr>
+                                    <th>Forecast Region (s)</th>
+                                    <th>% of Forecast</th>
+                                    <th>Supply Plan Region</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td>National</td>
+                                    <td>100</td>
+                                    <td>National</td>
+                                </tr>
+                                </tbody>
+                                </table>
+                                    </li>
+                                </ul>
+                                <ul>
+                                    <li>Multi-region forecast to multi-region supply plan
+                                    <table className="table table-bordered ">
+                                <thead>
+                                <tr>
+                                    <th>Forecast Region (s)</th>
+                                    <th>% of Forecast</th>
+                                    <th>Supply Plan Region</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td>North</td>
+                                    <td>100</td>
+                                    <td>North</td>
+                                </tr>
+                                <tr>
+                                    <td>East</td>
+                                    <td>100</td>
+                                    <td>East</td>
+                                </tr>
+                                <tr>
+                                    <td>South</td>
+                                    <td>100</td>
+                                    <td>South</td>
+                                </tr>
+                                </tbody>
+                                </table>
+                                    </li>
+                                </ul>
+                                <ul>
+                                    <li>Multi-region forecast to national supply plan – 
+                                    <table className="table table-bordered ">
+                                <thead>
+                                <tr>
+                                    <th>Forecast Region (s)</th>
+                                    <th>% of Forecast</th>
+                                    <th>Supply Plan Region</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td>North</td>
+                                    <td>100</td>
+                                    <td>National</td>
+                                </tr>
+                                <tr>
+                                    <td>East</td>
+                                    <td>100</td>
+                                    <td>National</td>
+                                </tr>
+                                <tr>
+                                    <td>South</td>
+                                    <td>100</td>
+                                    <td>National</td>
+                                </tr>
+                                </tbody>
+                                </table>
+                                    </li>
+                                </ul>
+                                <ul>
+                                    <li>National forecast to multi-region supply plan - note that the import process needs to be repeated for each supply plan region.
+                                    <table className="table table-bordered ">
+                                <thead>
+                                <tr>
+                                    <th>Forecast Region (s)</th>
+                                    <th>% of Forecast</th>
+                                    <th>Supply Plan Region</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td>National</td>
+                                    <td>20</td>
+                                    <td>North</td>
+                                </tr>
+                            </tbody>
+                                </table>
+<br></br>
+                                <table className="table table-bordered ">
+                                <thead>
+                                <tr>
+                                    <th>Forecast Region (s)</th>
+                                    <th>% of Forecast</th>
+                                    <th>Supply Plan Region</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td>National</td>
+                                    <td>45</td>
+                                    <td>South</td>
+                                </tr>
+                            </tbody>
+                                </table>
+<br></br>
+                                <table className="table table-bordered ">
+                                <thead>
+                                <tr>
+                                    <th>Forecast Region (s)</th>
+                                    <th>% of Forecast</th>
+                                    <th>Supply Plan Region</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td>National</td>
+                                    <td>35</td>
+                                    <td>East</td>
+                                </tr>
+                            </tbody>
+                                </table>
+                                    </li>
+                                </ul>
+                                </p>
+                                <p><b>(Step 3) </b><br></br>
+                                QAT will list each forecast record to be imported (one row for each planning unit, region and month combination). 
+                                <ul>
+                                    <li>QAT calculates the Forecasted Consumption to be imported as follows: </li>
+                                    <img className="formula-img-mr img-fluid mb-lg-0" src={ForecastedConsumptionimported} style={{border:'1px solid #fff',marginLeft:'-20px'}}/>
+                                <p>
+                                For the following example:
+                                <ul>
+                                    <li>A national forecast that will be split into two regions of 50% each</li>
+                                    <li>The Forecast Planning Unit is in packs of 3, and the Supply Plan Planning Unit is in packs of 1 (Conversion factor = 3)</li>
+                                    <li>The national forecast for Month X was 100 (packs of 3)</li>
+                                    <li>Forecast of 100 * 50% * 3 = 150  (packs of 1) will be imported into each region for month X</li>
+                                </ul>
+                                </p>
+                                <li>If there is an existing forecasted consumption in the supply plan, the 'Current Forecasted Consumption' cell will be highlighted yellow. </li>
+                                <li>Use the "Import?" column to de-select any forecasts that you do NOT want to import into the supply plan. If checked, the Converted Forecasted Consumption will override the Supply Plan forecast. If unchecked, the current Supply Plan forecast will remain.</li>
+                                <br></br>
+                                <img className="img-fluid" src={ShowGuidanceScreenshot2}/>
+                                </ul>
+                                
+                                </p>
+                            </p>
                             </ModalBody>
                         </div>
                     </Modal>

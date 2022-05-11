@@ -14,7 +14,7 @@ import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
 import paginationFactory from 'react-bootstrap-table2-paginator';
 import jsPDF from "jspdf";
 import AuthenticationService from '../Common/AuthenticationService.js';
-import MultiSelect from 'react-multi-select-component';
+import {MultiSelect} from 'react-multi-select-component';
 import "jspdf-autotable";
 import { Formik } from 'formik';
 import CryptoJS from 'crypto-js'
