@@ -332,7 +332,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                     dataSourceResult = dataSourceRequest.result;
 
                                     for (var k = 0; k < dataSourceResult.length; k++) {
-                                        if ((dataSourceResult[k].program.id == generalProgramJson.programId || dataSourceResult[k].program.id == 0)) {
+                                        if ((dataSourceResult[k].program==null || dataSourceResult[k].program.id == generalProgramJson.programId || dataSourceResult[k].program.id == 0)) {
                                             if (dataSourceResult[k].realm.id == generalProgramJson.realmCountry.realm.realmId && dataSourceResult[k].dataSourceType.id == SHIPMENT_DATA_SOURCE_TYPE) {
                                                 var dataSourceJson = {
                                                     name: getLabelText(dataSourceResult[k].label, this.props.items.lang),
@@ -513,9 +513,9 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                             data[12] = shipmentList[i].fundingSource.id;//M
                                             data[13] = shipmentList[i].budget.id;//N
                                             data[14] = shipmentList[i].currency.currencyId;//O
-                                            data[15] = shipmentList[i].rate;//P
+                                            data[15] = shipmentList[i].rate != undefined ? Number(shipmentList[i].rate).toFixed(2) : "";//P
                                             data[16] = `=ROUND(K${parseInt(i) + 1}*P${parseInt(i) + 1},2)`;//Q
-                                            data[17] = shipmentList[i].freightCost;//R
+                                            data[17] = shipmentList[i].freightCost != undefined ? Number(shipmentList[i].freightCost).toFixed(2) : "";//R
 
                                             data[18] = `=ROUND(ROUND(K${parseInt(i) + 1}*P${parseInt(i) + 1},2)+R${parseInt(i) + 1},2)`;
 

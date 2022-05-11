@@ -58,7 +58,7 @@ import jsPDF from "jspdf";
 import "jspdf-autotable";
 import ReportService from '../../api/ReportService';
 import ProgramService from '../../api/ProgramService';
-import MultiSelect from 'react-multi-select-component';
+import {MultiSelect} from 'react-multi-select-component';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import { isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 import { filter } from 'jszip';
@@ -2402,7 +2402,8 @@ class ShipmentSummery extends Component {
                                                                 && programs.map((item, i) => {
                                                                     return (
                                                                         <option key={i} value={item.programId}>
-                                                                            {getLabelText(item.label, this.state.lang)}
+                                                                            {/* {getLabelText(item.label, this.state.lang)} */}
+                                                                            {(item.programCode)}
                                                                         </option>
                                                                     )
                                                                 }, this)}

@@ -1374,10 +1374,16 @@ export default class ListTreeComponent extends Component {
                 <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5 className={this.state.color} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <Card>
+                <div className="card-header-actions">
+            <div className="Card-header-reporticon">
+              <span className="compareAndSelect-larrow"> <i className="cui-arrow-left icons " > </i></span>
+              <span className="compareAndSelect-larrowText"> {i18n.t('static.common.backTo')} <a href="/#/planningUnitSetting/listPlanningUnitSetting" className="supplyplanformulas">{i18n.t('static.updatePlanningUnit.updatePlanningUnit')}</a></span>
+            </div>
+          </div>
                     <div className="Card-header-addicon">
                         {/* <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong> */}
                         <div className="card-header-actions">
-                            <div className="card-header-action">
+                            <div className="" style={{marginTop:'-19px'}}>
                                 <a style={{ marginLeft: '106px' }}>
                                     <span style={{ cursor: 'pointer' }} onClick={() => { this.toggleShowGuidance() }}><small className="supplyplanformulas">{i18n.t('static.common.showGuidance')}</small></span>
                                 </a>

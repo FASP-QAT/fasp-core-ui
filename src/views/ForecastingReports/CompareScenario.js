@@ -1,6 +1,6 @@
 import React, { Component, lazy } from 'react';
 import { Bar } from 'react-chartjs-2';
-import MultiSelect from "react-multi-select-component";
+import {MultiSelect} from "react-multi-select-component";
 import {
     Card,
     CardBody,

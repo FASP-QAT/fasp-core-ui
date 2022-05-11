@@ -2915,9 +2915,14 @@ export default class PlanningUnitSetting extends Component {
                 {/* <h5 className="red">{i18n.t(this.state.message)}</h5> */}
                 <h5 className={this.state.color} id="div2">{i18n.t(this.state.message)}</h5>
                 <Card>
-                    <div className="Card-header-reporticon">
-
-                    </div>
+                <div className="card-header-actions">
+            <div className="Card-header-reporticon">
+              <span className="compareAndSelect-larrow"> <i className="cui-arrow-left icons " > </i></span>
+              <span className="compareAndSelect-rarrow"> <i className="cui-arrow-right icons " > </i></span>
+              <span className="compareAndSelect-larrowText"> {i18n.t('static.common.backTo')} <a href="/#/dataset/versionSettings" className="supplyplanformulas">{i18n.t('static.UpdateversionSettings.UpdateversionSettings')}</a></span>
+              <span className="compareAndSelect-rarrowText"> {i18n.t('static.common.continueTo')} <a href={this.state.datasetId != -1 && this.state.datasetId != "" && this.state.datasetId != undefined ? "/#/dataSet/buildTree/tree/0/" + this.state.datasetId : "/#/dataSet/buildTree"} className="supplyplanformulas">{i18n.t('static.common.managetree')}</a> {i18n.t('static.tree.or')} <a href="/#/importFromQATSupplyPlan/listImportFromQATSupplyPlan" className='supplyplanformulas'>{i18n.t('static.importFromQATSupplyPlan.importFromQATSupplyPlan')}</a></span>
+            </div>
+          </div>
 
                     <CardBody className="pb-lg-3 pt-lg-0">
                         <div className="" >
