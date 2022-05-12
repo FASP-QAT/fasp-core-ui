@@ -174,7 +174,14 @@ class CompareAndSelectScenario extends Component {
             //     var selectedEquivalencyUnit = this.state.equivalencyUnitList.filter(c => c.equivalencyUnitMappingId == this.state.equivalencyUnitId);
             //     multiplier = selectedEquivalencyUnit.length > 0 ? selectedEquivalencyUnit[0].convertToEu : 1;
             // }
+            
             let startDate = moment.min(datasetJson.actualConsumptionList.filter(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId).map(d => moment(d.month)));
+            let actualMinDate=startDate;
+            let forecastStartDate=moment(datasetJson.currentVersion.forecastStartDate).format("YYYY-MM-DD")
+            if(moment(actualMinDate).format("YYYY-MM")>moment(forecastStartDate).format("YYYY-MM")){
+                actualMinDate=forecastStartDate;
+            }
+
             let stopDate = moment(datasetJson.currentVersion.forecastStopDate).format("YYYY-MM-DD")
             // let curDate = moment(startDate).format("YYYY-MM-DD");
             // let stopDate = this.state.stopDate;
@@ -187,7 +194,7 @@ class CompareAndSelectScenario extends Component {
             // if (this.state.showForecastPeriod) {
             //     monthList1 = this.state.monthList1
             // }
-            var rangeValue = { from: { year: Number(moment(startDate).startOf('month').format("YYYY")), month: Number(moment(startDate).startOf('month').format("M")) }, to: { year: Number(moment(stopDate).startOf('month').format("YYYY")), month: Number(moment(stopDate).startOf('month').format("M")) } }
+            var rangeValue = { from: { year: Number(moment(actualMinDate).startOf('month').format("YYYY")), month: Number(moment(actualMinDate).startOf('month').format("M")) }, to: { year: Number(moment(stopDate).startOf('month').format("YYYY")), month: Number(moment(stopDate).startOf('month').format("M")) } }
 
             var treeScenarioList = [];
             var treeList = datasetJson.treeList.filter(c => c.active.toString() == "true");
@@ -258,7 +265,7 @@ class CompareAndSelectScenario extends Component {
                 selectedTreeScenarioId: selectedTreeScenarioId,
                 forecastNotes: forecastNotes,
                 singleValue2: rangeValue,
-                minDate: { year: Number(moment(startDate).startOf('month').format("YYYY")), month: Number(moment(startDate).startOf('month').format("M")) },
+                minDate: { year: Number(moment(actualMinDate).startOf('month').format("YYYY")), month: Number(moment(actualMinDate).startOf('month').format("M")) },
                 // monthList1: monthList1,
                 showAllData: true,
                 loading: false

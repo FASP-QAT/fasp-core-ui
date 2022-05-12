@@ -3480,7 +3480,7 @@ class DefaultLayout extends Component {
                         // hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY') && this.state.activeTab == 1 ? false : true)
                         // },
                         attributes: {
-                          hidden: ((((this.state.businessFunctions.includes('ROLE_BF_COMPARE_AND_SELECT')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_MONTHLY_FORECAST')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_FORECAST_SUMMARY')) || (this.state.businessFunctions.includes('ROLE_BF_COMPARE_VERSION'))(this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_FORECAST_ERROR'))) && this.state.activeTab == 1) ? false : true)
+                          hidden: ((((this.state.businessFunctions.includes('ROLE_BF_COMPARE_AND_SELECT')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_MONTHLY_FORECAST')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_FORECAST_SUMMARY')) || (this.state.businessFunctions.includes('ROLE_BF_COMPARE_VERSION')) || (this.state.businessFunctions.includes('ROLE_BF_CONSUMPTION_FORECAST_ERROR'))) && this.state.activeTab == 1) ? false : true)
                         },
                         children: [
                           // {
