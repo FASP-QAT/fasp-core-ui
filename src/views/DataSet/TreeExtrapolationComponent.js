@@ -4420,7 +4420,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                             <p>
                                 <p style={{ fontSize: '14px' }}><span className="UnderLineText">Purpose :</span>The extrapolation tab allows users to forecast future
                                     node values by extrapolating from past values. This functionality only available on
-                                    number nodes, and is similar to the <a href="/#/Extrapolation/extrapolateData" target="_blank">'Extrapolation'</a> screen, but is conducted at a
+                                    number nodes, and is similar to the '<a href="/#/Extrapolation/extrapolateData" target="_blank" style={{textDecoration:'underline'}}>Extrapolation</a>' screen, but is conducted at a
                                     tree node instead. View the guidance on that page for more details on extrapolation
                                     methods.
                                 </p>
