@@ -5326,12 +5326,9 @@ export default class BuildTree extends Component {
                 childListArr.push(json);
             }
             if (scenarioList.length > 0) {
-
                 for (let i = 0; i < scenarioList.length; i++) {
-                    if (scenarioList[i].id != this.state.selectedScenario) {
-                        (child.payload.nodeDataMap[scenarioList[i].id])[0].nodeDataId = parseInt(maxNodeDataId + 1);
-                        console.log("maxNodeDataId afetr---", maxNodeDataId)
-                    }
+                    (child.payload.nodeDataMap[scenarioList[i].id])[0].nodeDataId = maxNodeDataId;
+                    maxNodeDataId++;
                 }
             }
             console.log("child after---", child);
@@ -10304,12 +10301,12 @@ export default class BuildTree extends Component {
                     <Card className="mb-lg-0">
 
                         <div className="pb-lg-0">
-                        <div className="Card-header-reporticon pb-1">
-                            <span className="compareAndSelect-larrow"> <i className="cui-arrow-left icons " > </i></span>
+                            <div className="Card-header-reporticon pb-1">
+                                <span className="compareAndSelect-larrow"> <i className="cui-arrow-left icons " > </i></span>
                                 <span className="compareAndSelect-rarrow"> <i className="cui-arrow-right icons " > </i></span>
-                               <span className="compareAndSelect-larrowText" style={{cursor:'pointer'}} onClick={this.cancelClicked}> {i18n.t('static.common.backTo')} <small className="supplyplanformulas">{'Tree List'}</small></span>
+                                <span className="compareAndSelect-larrowText" style={{ cursor: 'pointer' }} onClick={this.cancelClicked}> {i18n.t('static.common.backTo')} <small className="supplyplanformulas">{'Tree List'}</small></span>
                                 <span className="compareAndSelect-rarrowText"> {i18n.t('static.common.continueTo')}  <a href="/#/validation/productValidation" className="supplyplanformulas">{i18n.t('static.dashboard.productValidation')}</a> {i18n.t('static.tree.or')} <a href="/#/validation/modelingValidation" className="supplyplanformulas">{i18n.t('static.dashboard.modelingValidation')}</a> </span>
-                        </div>
+                            </div>
                             {/* <div className="card-header-actions">
                                 <div className="card-header-action pr-4 pt-lg-0">
 
@@ -10336,19 +10333,19 @@ export default class BuildTree extends Component {
                                 </div>
                             </div>  */}
                             {/* <div className="row"> */}
-                                {/* <div className="col-md-12 pl-lg-0"> */}
-                                    {/* <div className='col-md-4 pt-lg-0'>
+                            {/* <div className="col-md-12 pl-lg-0"> */}
+                            {/* <div className='col-md-4 pt-lg-0'>
                                         <a className="pr-lg-0 pt-lg-1 float-left">
                                             <span style={{ cursor: 'pointer' }} onClick={this.cancelClicked}><i className="cui-arrow-left icons" style={{ color: '#002F6C', fontSize: '13px' }}></i> <small className="supplyplanformulas">{'Return To List'}</small></span>
                                         </a>
                                     </div> */}
-                                    {/* <div className="col-md-6">
+                            {/* <div className="col-md-6">
                                         <span className="pr-lg-0 pt-lg-0 float-right">
                                             <h5 style={{ color: '#BA0C2F' }}>{i18n.t('static.tree.pleaseSaveAndDoARecalculateAfterDragAndDrop.')}</h5>
                                         </span>
                                     </div> */}
 
-                                {/* </div> */}
+                            {/* </div> */}
                             {/* </div> */}
                             {/* <div className="row">
                                 <div className="col-md-12 pl-lg-3">
@@ -10362,12 +10359,12 @@ export default class BuildTree extends Component {
                             </div> */}
                         </div>
                         <div className="row pt-lg-0 pr-lg-4">
-                        <div className="col-md-12">
+                            <div className="col-md-12">
                                 <a style={{ float: 'right' }}>
                                     <span style={{ cursor: 'pointer' }} onClick={() => { this.toggleShowGuidance() }}><small className="supplyplanformulas">{i18n.t('static.common.showGuidance')}</small></span>
                                 </a>
+                            </div>
                         </div>
-                     </div>
                         <CardBody className="pt-lg-1 pl-lg-0 pr-lg-0">
                             <div className="container-fluid pl-lg-3 pr-lg-3">
                                 <>
