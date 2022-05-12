@@ -709,7 +709,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
 
                 data = [];
                 data[0] = getLabelText(papuList[j].planningUnit.forecastingUnit.tracerCategory.label, this.state.lang)
-                data[1] = getLabelText(papuList[j].planningUnit.forecastingUnit.label, this.state.lang) + ' | ' + papuList[j].planningUnit.id
+                data[1] = getLabelText(papuList[j].planningUnit.label, this.state.lang) + ' | ' + papuList[j].planningUnit.id
                 data[2] = planningUnitObj != undefined ? (check ? "-2" : (isForecastBlank ? "-3" : planningUnitObj.planningUnit.id)) : ""
                 data[3] = planningUnitObj != undefined ? (check ? "" : (isForecastBlank ? "" : (planningUnitObj.multiplier / papuList[j].planningUnit.multiplier))) : ""
                 data[4] = ""
