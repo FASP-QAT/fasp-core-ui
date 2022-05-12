@@ -1403,6 +1403,16 @@ class VersionSettingsComponent extends Component {
                 <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5 className={this.state.color} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <Card>
+
+                <div className="card-header-actions">
+            <div className="Card-header-reporticon">
+              <span className="compareAndSelect-larrow"> <i className="cui-arrow-left icons " > </i></span>
+              <span className="compareAndSelect-rarrow"> <i className="cui-arrow-right icons " > </i></span>
+              <span className="compareAndSelect-larrowText"> {i18n.t('static.common.backTo')} <a href="/#/dataSet/listDataSet" className="supplyplanformulas">{i18n.t('static.dataset.manageProgramInfo')}</a></span>
+              <span className="compareAndSelect-rarrowText"> {i18n.t('static.common.continueTo')} <a href="/#/planningUnitSetting/listPlanningUnitSetting" className="supplyplanformulas">{i18n.t('static.updatePlanningUnit.updatePlanningUnit')}</a></span><br />
+             
+            </div>
+          </div>
                 
                         <div className="card-header-actions">
                             <div className="card-header-action pr-lg-4">
@@ -1520,15 +1530,15 @@ class VersionSettingsComponent extends Component {
                                 <li>1.Update the following program settings for the loaded, local program:
                                 <ul style={{listStyle:'none'}}>
                                     <li>a. <b>Forecast period</b> (start and end date)</li>
-                                    <li>b. <b>Freight percentage</b> - used in the <a href="/#/forecastReport/forecastSummary" target="_blank">Forecast Summary</a> screen for estimating total procurement costs</li>
-                                    <li>c. <b>Forecast threshold </b> used in the <a href="/#/report/compareAndSelectScenario" target="_blank">Compare and Select</a> screen. QAT compares available Consumption Forecasts and &nbsp;&nbsp;&nbsp;&nbsp;Tree Forecasts. For any Tree Forecasts, QAT will flag the percentage above the highest or below the lowest &nbsp;&nbsp;&nbsp;&nbsp;Consumption Forecast. The comparison will be highlighted in <span style={{color:'#BA0C2F'}}>red text</span> if it is outside of the threshold percentages set &nbsp;&nbsp;&nbsp;&nbsp;by the user in this screen. Assuming reliable actual consumption data, this comparison helps users determine if their &nbsp;&nbsp;&nbsp;&nbsp;Tree Forecasts are realistic.</li>
+                                    <li>b. <b>Freight percentage</b> - used in the <a href="/#/forecastReport/forecastSummary" target="_blank" style={{textDecoration:'underline'}}>Forecast Summary</a> screen for estimating total procurement costs</li>
+                                    <li>c. <b>Forecast threshold </b> used in the <a href="/#/report/compareAndSelectScenario" target="_blank" style={{textDecoration:'underline'}}>Compare and Select</a> screen. QAT compares available Consumption Forecasts and &nbsp;&nbsp;&nbsp;&nbsp;Tree Forecasts. For any Tree Forecasts, QAT will flag the percentage above the highest or below the lowest &nbsp;&nbsp;&nbsp;&nbsp;Consumption Forecast. The comparison will be highlighted in <span style={{color:'#BA0C2F'}}>red text</span> if it is outside of the threshold percentages set &nbsp;&nbsp;&nbsp;&nbsp;by the user in this screen. Assuming reliable actual consumption data, this comparison helps users determine if their &nbsp;&nbsp;&nbsp;&nbsp;Tree Forecasts are realistic.</li>
                                     <li>d. <b>Version notes</b> - also visible and editable when committing a program.</li>
                                 </ul>
                                 </li>
                                 <li>2.See a historical lifecycle of each program through all its versions. 
                                 <ul style={{listStyle:'none'}}>
                                     <li>a. View all version settings above</li>
-                                    <li>b. (Right click) View the Forecast Validation screen (same screen as viewed during the Commit process) - which lists &nbsp;&nbsp;&nbsp;&nbsp;missing forecasts, missing data and all notes. This serves as an easy for users to understand previous forecasts &nbsp;&nbsp;&nbsp;&nbsp;without downloading them. Use the <a href="/#/forecastReport/forecastOutput" target="_blank">Monthly Forecast</a>, <a href="/#/forecastReport/forecastSummary" target="_blank">Forecast Summary</a> or <a href="/#/report/compareVersion" target="_blank">Version Comparison</a> screens to view the  &nbsp;&nbsp;&nbsp;&nbsp;forecast outputs from other versions.</li>
+                                    <li>b. (Right click) View the Forecast Validation screen (same screen as viewed during the Commit process) - which lists &nbsp;&nbsp;&nbsp;&nbsp;missing forecasts, missing data and all notes. This serves as an easy for users to understand previous forecasts &nbsp;&nbsp;&nbsp;&nbsp;without downloading them. Use the <a href="/#/forecastReport/forecastOutput" target="_blank" style={{textDecoration:'underline'}}>Monthly Forecast</a>, <a href="/#/forecastReport/forecastSummary" target="_blank" style={{textDecoration:'underline'}}>Forecast Summary</a> or <a href="/#/report/compareVersion" target="_blank" style={{textDecoration:'underline'}}>Version Comparison</a> screens to view the  &nbsp;&nbsp;&nbsp;&nbsp;forecast outputs from other versions.</li>
                                     
                                 </ul>
                                 </li>

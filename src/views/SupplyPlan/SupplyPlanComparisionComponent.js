@@ -605,6 +605,7 @@ export default class SupplyPlanComponent extends React.Component {
 
 
     componentDidMount() {
+        console.log("@@@@@@#################in component did mount@@@@@@@@@")
         var fields = document.getElementsByClassName("totalShipments1");
         for (var i = 0; i < fields.length; i++) {
             fields[i].style.display = "none";
@@ -709,6 +710,7 @@ export default class SupplyPlanComponent extends React.Component {
                     var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                     var programJson = JSON.parse(programData);
                     var planningUnitDataList = programRequest.result.programData.planningUnitDataList;
+                    console.log("List@@@@@@@@@@@",planningUnitDataList)
                     for (var i = 0; i < programJson.regionList.length; i++) {
                         var regionJson = {
                             // name: // programJson.regionList[i].regionId,
@@ -777,7 +779,7 @@ export default class SupplyPlanComponent extends React.Component {
                                 var dataSourceResult = [];
                                 dataSourceResult = dataSourceRequest.result;
                                 for (var k = 0; k < dataSourceResult.length; k++) {
-                                    if (dataSourceResult[k].program.id == programJson.programId || dataSourceResult[k].program.id == 0 && dataSourceResult[k].active == true) {
+                                    if (dataSourceResult[k].program == null || dataSourceResult[k].program.id == programJson.programId || dataSourceResult[k].program.id == 0 && dataSourceResult[k].active == true) {
                                         if (dataSourceResult[k].realm.id == programJson.realmCountry.realm.realmId) {
                                             dataSourceListAll.push(dataSourceResult[k]);
 

@@ -852,8 +852,8 @@ class ModelingValidation extends Component {
                     }
                     this.setState({
                         datasetList: datasetList.sort(function (a, b) {
-                            a = a.name.toLowerCase();
-                            b = b.name.toLowerCase();
+                            a = a.code.toLowerCase();
+                            b = b.code.toLowerCase();
                             return a < b ? -1 : a > b ? 1 : 0;
                         }),
                         unitList: unitList,
@@ -1292,16 +1292,19 @@ class ModelingValidation extends Component {
                         },
                         ticks: {
                             callback: function (label) {
+                                var monthArrayList = [...new Set(this.state.monthList.map(ele => moment(ele).format("MMM-YYYY")))];
                                 var xAxis2 = label
                                 xAxis2 += '';
                                 var month = xAxis2.split('-')[0];
                                 var year = xAxis2.split('-')[1];
-                                if (month === "Jul") {
+                                var filterByYear = monthArrayList.filter(c => moment(c).format("YYYY") == moment(year).format("YYYY"));
+                                var divideByTwo = Math.floor(filterByYear.length / 2);
+                                if (moment(filterByYear[divideByTwo]).format("MMM") === month) {
                                     return year;
                                 } else {
                                     return "";
                                 }
-                            },
+                            }.bind(this),
                             maxRotation: 0,
                             minRotation: 0,
                             autoSkip: false
@@ -1477,10 +1480,11 @@ class ModelingValidation extends Component {
                 <Card>
                     <div className="Card-header-reporticon pb-2">
                         <span className="compareAndSelect-larrow"> <i className="cui-arrow-left icons " > </i></span>
+                        <span className="compareAndSelect-rarrow"> <i className="cui-arrow-right icons " > </i></span>
                         <span className="compareAndSelect-larrowText"> {i18n.t('static.common.backTo')} <a href={this.state.datasetId != -1 && this.state.datasetId != "" && this.state.datasetId != undefined ? "/#/dataSet/buildTree/tree/0/" + this.state.datasetId : "/#/dataSet/buildTree"} className="supplyplanformulas">{i18n.t('static.common.managetree')}</a> </span>
-
+                        <span className="compareAndSelect-rarrowText"> {i18n.t('static.common.continueTo')} <a href="/#/report/compareAndSelectScenario" className="supplyplanformulas">{i18n.t('static.dashboard.compareAndSelect')}</a> {i18n.t('static.tree.or')} <a href="/#/validation/productValidation" className='supplyplanformulas'>{i18n.t('static.dashboard.productValidation')}</a></span>
                         {/* {this.state.dataList.length > 0 && */}
-                        <div className="card-header-actions">
+                        {/* <div className="card-header-actions">
                             <a className="card-header-action">
 
                                 {this.state.monthList.length > 0 && this.state.dataEl != undefined && this.state.dataEl != "" && <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.exportPDF()} />}
@@ -1488,9 +1492,18 @@ class ModelingValidation extends Component {
 
                             </a>
                             {this.state.monthList.length > 0 && this.state.dataEl != undefined && this.state.dataEl != "" && <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />}
-                        </div>
+                        </div> */}
                         {/* } */}
                     </div>
+                    <div className="card-header-actions pr-lg-3">
+                            <a className="card-header-action" style={{float:'right'}}>
+
+                                {this.state.monthList.length > 0 && this.state.dataEl != undefined && this.state.dataEl != "" && <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.exportPDF()} />}
+
+
+                            </a>
+                            {this.state.monthList.length > 0 && this.state.dataEl != undefined && this.state.dataEl != "" && <img style={{ height: '25px', width: '25px', cursor: 'pointer',float:'right',marginTop:'3px' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />}
+                        </div>
                     <CardBody className="pb-lg-2 pt-lg-0 ">
                         <div>
                             <div ref={ref}>

@@ -321,69 +321,69 @@ export default class CommitTreeComponent extends React.Component {
 
     redirectToDashbaord(commitRequestId) {
         this.setState({ loading: true });
-
-        const sendGetRequest = async () => {
-            try {
-                AuthenticationService.setupAxiosInterceptors();
-                const resp = await ProgramService.sendNotificationAsync(commitRequestId);
-                var curUser = AuthenticationService.getLoggedInUserId();
-                if (resp.data.createdBy.userId == curUser && resp.data.status == 2) {
+        // console.log("method called", commitRequestId);
+        AuthenticationService.setupAxiosInterceptors();
+        ProgramService.sendNotificationAsync(commitRequestId).then(resp => {
+            var curUser = AuthenticationService.getLoggedInUserId();
+            if (resp.data.createdBy.userId == curUser && resp.data.status == 1) {
+                setTimeout(function () {
+                    this.redirectToDashbaord(commitRequestId)
+                }.bind(this), 10000);
+            } else if (resp.data.createdBy.userId == curUser && resp.data.status == 2) {
+                this.setState({
+                    progressPer: 75
+                    , message: i18n.t('static.commitVersion.serverProcessingCompleted'), color: 'green'
+                }, () => {
+                    this.hideFirstComponent();
+                    this.getLatestProgram({ openModal: true, notificationDetails: resp.data });
+                })
+            } else if (resp.data.createdBy.userId == curUser && resp.data.status == 3) {
+                var db1;
+                getDatabase();
+                var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+                openRequest.onerror = function (event) {
                     this.setState({
-                        progressPer: 75
-                        , message: i18n.t('static.commitVersion.serverProcessingCompleted'), color: 'green'
-                    }, () => {
-                        this.hideFirstComponent();
-                        this.getLatestProgram({ openModal: true, notificationDetails: resp.data });
+                        message: i18n.t('static.program.errortext'),
+                        color: 'red'
                     })
-                } else if (resp.data.createdBy.userId == curUser && resp.data.status == 3) {
-                    var db1;
-                    getDatabase();
-                    var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-                    openRequest.onerror = function (event) {
+                    this.hideFirstComponent()
+                }.bind(this);
+                openRequest.onsuccess = function (e) {
+                    db1 = e.target.result;
+                    var transaction = db1.transaction(['datasetDetails'], 'readwrite');
+                    var program = transaction.objectStore('datasetDetails');
+                    var getRequest = program.get((this.state.programId));
+                    getRequest.onerror = function (event) {
                         this.setState({
                             message: i18n.t('static.program.errortext'),
                             color: 'red'
                         })
                         this.hideFirstComponent()
                     }.bind(this);
-                    openRequest.onsuccess = function (e) {
-                        db1 = e.target.result;
-                        var transaction = db1.transaction(['datasetDetails'], 'readwrite');
-                        var program = transaction.objectStore('datasetDetails');
-                        var getRequest = program.get((this.state.programId));
-                        getRequest.onerror = function (event) {
+                    getRequest.onsuccess = function (event) {
+                        var myResult = [];
+                        myResult = getRequest.result;
+                        myResult.readonly = 0;
+                        var transaction1 = db1.transaction(['datasetDetails'], 'readwrite');
+                        var program1 = transaction1.objectStore('datasetDetails');
+                        var getRequest1 = program1.put(myResult);
+                        var message = i18n.t('static.commitTree.commitFailed').concat(" - ").concat(resp.data.failedReason).toString().replaceAll(":", " ");
+                        getRequest1.onsuccess = function (e) {
                             this.setState({
-                                message: i18n.t('static.program.errortext'),
-                                color: 'red'
+                                message: message,
+                                color: 'red',
+                                loading: false
                             })
                             this.hideFirstComponent()
-                        }.bind(this);
-                        getRequest.onsuccess = function (event) {
-                            var myResult = [];
-                            myResult = getRequest.result;
-                            myResult.readonly = 0;
-                            var transaction1 = db1.transaction(['datasetDetails'], 'readwrite');
-                            var program1 = transaction1.objectStore('datasetDetails');
-                            var getRequest1 = program1.put(myResult);
-                            var message = i18n.t('static.commitTree.commitFailed').concat(" - ").concat(resp.data.failedReason).toString().replaceAll(":", " ");
-                            getRequest1.onsuccess = function (e) {
-                                this.setState({
-                                    message: message,
-                                    color: 'red',
-                                    loading: false
-                                })
-                                this.hideFirstComponent()
-                            }.bind(this)
                         }.bind(this)
                     }.bind(this)
-                }
-            } catch (err) {
-                // Handle Error Here
-                console.error("Error+++", err);
-                this.setState({ loading: false });
+                }.bind(this)
             }
-        };
-        sendGetRequest();
+
+        }).catch(
+            error => {
+                this.redirectToDashbaord(commitRequestId)
+            })
     }
 
     getLatestProgram(notificationDetails) {

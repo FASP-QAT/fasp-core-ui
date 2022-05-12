@@ -501,8 +501,8 @@ export default class BuildTree extends Component {
         this.pickAMonth4 = React.createRef()
         this.pickAMonth5 = React.createRef()
         this.state = {
-            popoverOpenStartValueModelingTool:false,
-            showGuidanceModelingTransfer:false,
+            popoverOpenStartValueModelingTool: false,
+            showGuidanceModelingTransfer: false,
             showGuidanceModelingTransfer: false,
             showGuidanceNodeData: false,
             showGuidance: false,
@@ -1229,6 +1229,7 @@ export default class BuildTree extends Component {
         var programData = dataSetObj.programData;
         console.log("program data>>> 1", programData);
         console.log("program data treeData>>> 1.1", treeData);
+        console.log("program data curTreeObj>>> 1.1", curTreeObj);
         programData.treeList = treeData;
         console.log("program data>>> 2", programData);
         // alert("27---")
@@ -1416,9 +1417,9 @@ export default class BuildTree extends Component {
     //     };
     toggleStartValueModelingTool() {
         this.setState({
-             popoverOpenStartValueModelingTool: !this.state.popoverOpenStartValueModelingTool
-         })
-     }
+            popoverOpenStartValueModelingTool: !this.state.popoverOpenStartValueModelingTool
+        })
+    }
     toggleShowGuidanceNodeData() {
         this.setState({
             showGuidanceNodeData: !this.state.showGuidanceNodeData
@@ -1610,21 +1611,19 @@ export default class BuildTree extends Component {
         this.setState({
             [parameterName]: value
         }, () => {
-
             var items = this.state.items;
+            console.log("items before update 1234567---", items);
             if (parameterName == 'currentItemConfig') {
-                console.log("node id for update state 1----",value.context.id);
+                console.log("node id for update state 1----", value.context.id);
                 var findNodeIndex = items.findIndex(n => n.id == value.context.id);
                 console.log("findNodeIndex1---", findNodeIndex);
                 items[findNodeIndex] = value.context;
-                console.log("node id for update state 2----",value.context);
-                console.log("node id for update state 3----",items);
+                console.log("node id for update state 2----", value.context);
+                console.log("node id for update state 3----", items);
                 this.setState({ items }, () => {
-                    console.log("node id for update state 4----",this.state.items);
+                    console.log("node id for update state 4----", this.state.items);
                     this.saveTreeData(true);
                 })
-
-
             }
             if (parameterName == 'nodeId' && (value != null && value != 0)) {
                 var nodeDataMomList = this.state.nodeDataMomList;
@@ -1643,16 +1642,11 @@ export default class BuildTree extends Component {
                         items[findNodeIndex] = node;
                     }
                 }
-                // var node = items.filter(n => n.id == value)[0];
-                // (node.payload.nodeDataMap[this.state.selectedScenario])[0].nodeDataMomList = this.state.nodeDataMomList.length == 1 ? this.state.nodeDataMomList : [];
-                // var findNodeIndex = items.findIndex(n => n.id == value);
-                // console.log("findNodeIndex---", findNodeIndex);
-                // items[findNodeIndex] = node;
                 console.log("items---***", items);
                 this.setState({ items })
             }
-            console.log("this.state.currentItemConfig.context.payload.extrapolation----", this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].extrapolation);
-            if (parameterName == 'type' && (value == 0 || value == 1) && this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].extrapolation != true && this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].extrapolation != "true") {
+            // console.log("this.state.currentItemConfig.context.payload.extrapolation----", this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].extrapolation);
+            if (parameterName == 'type' && (value == 0 || value == 1) && this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].extrapolation != undefined && this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].extrapolation != true && this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].extrapolation != "true") {
                 if (this.state.currentItemConfig.context.payload.nodeType.id == 1 || this.state.currentItemConfig.context.payload.nodeType.id == 2) {
                     console.log("mom list ret---", this.state.nodeDataMomList.filter(x => x.nodeId == this.state.currentItemConfig.context.id));
                     this.setState({ momList: this.state.nodeDataMomList.filter(x => x.nodeId == this.state.currentItemConfig.context.id)[0].nodeDataMomList }, () => {
@@ -1677,36 +1671,15 @@ export default class BuildTree extends Component {
                 }
 
             }
-            // if (parameterName == 'type' && value == 3) {
-            //     var startValue = this.getMomValueForDateRange(this.state.currentCalculatorStartDate);
-            //     console.log("startValue---",startValue);
-            //     this.setState({
-            //         currentCalculatorStartValue: startValue
-            //     });
-
-            // }
             if (parameterName != 'currentItemConfig') {
                 this.saveTreeData(false);
             }
-            // if (parameterName == 'type' && value == 0) {
-            //     this.saveTreeData();
-            //     this.updateTreeData();
-            //     this.calculateValuesForAggregateNode(this.state.items);
-            // }
             console.log("returmed list---", this.state.nodeDataMomList);
 
         })
     }
 
     calculateAfterDragDrop() {
-        // var dataSetObj = this.state.datasetList.filter(c => c.programId == this.state.programId)[0];
-        // var dataEnc = dataSetObj;
-        // var databytes = CryptoJS.AES.decrypt(dataSetObj.programData, SECRET_KEY);
-        // var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
-        // console.log("dataSetObj.programData***>>>", programData);
-        // this.setState({ dataSetObj: dataSetObj, forecastStartDate: programData.currentVersion.forecastStartDate, forecastStopDate: programData.currentVersion.forecastStopDate }, () => {
-
-        // });
         var items = this.state.curTreeObj.tree.flatList;
         console.log("items>>>", items);
         for (let i = 0; i < items.length; i++) {
@@ -1721,7 +1694,7 @@ export default class BuildTree extends Component {
     saveTreeData(flag) {
         console.log("saving tree data for calculation>>>");
         this.setState({ loading: true }, () => {
-            let { curTreeObj } = this.state;
+            var curTreeObj = this.state.curTreeObj;
             let { treeData } = this.state;
             let { dataSetObj } = this.state;
             var items = this.state.items;
@@ -1742,15 +1715,23 @@ export default class BuildTree extends Component {
             // var databytes = CryptoJS.AES.decrypt(dataSetObj.programData, SECRET_KEY);
             // var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
             var programData = tempProgram.programData;
+            console.log("save tree data items 1>>>", items);
             programData.treeList = treeData;
-            console.log("program data>>>", programData);
+            console.log("save tree data items 2>>>", items);
+            console.log("program data 3>>>", programData);
 
             curTreeObj.scenarioList = this.state.scenarioList;
             if (items.length > 0) {
+                console.log("inside if items > 0---", items);
+                console.log("inside if cu tree obj before---", curTreeObj);
                 curTreeObj.tree.flatList = items;
+                console.log("inside if cu tree obj---", curTreeObj);
             }
+            console.log("inside if cur tree obj out---", curTreeObj);
             var findTreeIndex = treeData.findIndex(n => n.treeId == curTreeObj.treeId);
+            console.log("cur tree findTreeIndex---", findTreeIndex);
             treeData[findTreeIndex] = curTreeObj;
+            console.log("treeData before saving---", treeData);
 
             // var databytes = CryptoJS.AES.decrypt(dataSetObj.programData, SECRET_KEY);
             // var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
@@ -1815,7 +1796,7 @@ export default class BuildTree extends Component {
                                 this.handleAMonthDissmis3(this.state.singleValue2, 0);
                                 this.hideSecondComponent();
                                 if (flag) {
-                                    // this.calculateMOMData(0, 2);
+                                    this.calculateMOMData(0, 2);
                                 }
                             });
                             console.log("Data update success");
@@ -4796,7 +4777,9 @@ export default class BuildTree extends Component {
             e.showModelingValidation = this.state.showModelingValidation
             console.log("1------------------->>>>", this.getPayloadData(items1[i], 4))
             console.log("2------------------->>>>", this.getPayloadData(items1[i], 3))
-            e.result = this.getPayloadData(items1[i], 4)
+            e.result = this.getPayloadData(items1[i], 4)//Up
+            e.result1 = this.getPayloadData(items1[i], 6)//Down
+            e.result2 = this.getPayloadData(items1[i], 5)//Link
             var text = this.getPayloadData(items1[i], 3)
             e.text = text;
             newItems.push(e)
@@ -5069,12 +5052,8 @@ export default class BuildTree extends Component {
                 // selectedScenario:0
             }, () => {
                 if (curTreeObj.scenarioList.length == 1) {
-                    // this.setState({ selectedScenario: curTreeObj.scenarioList[0].id })
-
                     var scenarioId = curTreeObj.scenarioList[0].id;
-                    // var scenario = document.getElementById("scenarioId");
                     var selectedText = curTreeObj.scenarioList[0].label.label_en;
-
                     this.setState({
                         selectedScenario: scenarioId,
                         selectedScenarioLabel: selectedText,
@@ -5284,47 +5263,90 @@ export default class BuildTree extends Component {
     duplicateNode(itemConfig) {
         console.log("duplicate node called 1---", this.state.currentItemConfig);
         console.log("duplicate node called 2---", itemConfig);
+        // var childList = [];
+        var items1 = this.state.items;
         const { items } = this.state;
-        var maxNodeId = items.length > 0 ? Math.max(...items.map(o => o.id)) : 0;
-        var nodeId = parseInt(maxNodeId + 1);
-        var newItem = {
-            id: nodeId,
-            level: itemConfig.level,
-            parent: itemConfig.parent,
-            payload: itemConfig.payload
-        };
-        newItem.payload.nodeId = nodeId;
-        var parentSortOrder = items.filter(c => c.id == itemConfig.parent)[0].sortOrder;
-        var childList = items.filter(c => c.parent == itemConfig.parent);
-        newItem.sortOrder = parentSortOrder.concat(".").concat(("0" + (Number(childList.length) + 1)).slice(-2));
+        // var maxNodeId = items.length > 0 ? Math.max(...items.map(o => o.id)) : 0;
+        // var nodeId = parseInt(maxNodeId + 1);
+        // var newItem = {
+        //     id: nodeId,
+        //     level: itemConfig.level,
+        //     parent: itemConfig.parent,
+        //     payload: itemConfig.payload
+        // };
+        // newItem.payload.nodeId = nodeId;
+        // var parentSortOrder = items.filter(c => c.id == itemConfig.parent)[0].sortOrder;
+        // var childList = items.filter(c => c.parent == itemConfig.parent);
+        // newItem.sortOrder = parentSortOrder.concat(".").concat(("0" + (Number(childList.length) + 1)).slice(-2));
         var maxNodeDataId = this.getMaxNodeDataId();
-        (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].nodeDataId = maxNodeDataId;
+        // (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].nodeDataId = maxNodeDataId;
+        console.log("initial maxNodeDataId---", maxNodeDataId);
+        var childList = items1.filter(x => x.sortOrder.startsWith(itemConfig.sortOrder));
+        var childListArr = [];
+        var json;
+        var sortOrder = itemConfig.sortOrder;
+        console.log("childList---", childList);
         var scenarioList = this.state.scenarioList;
-        if (scenarioList.length > 0) {
-            for (let i = 0; i < scenarioList.length; i++) {
-                if (scenarioList[i].id != this.state.selectedScenario) {
-                    (newItem.payload.nodeDataMap[scenarioList[i].id])[0].nodeDataId = parseInt(maxNodeDataId + 1);
-                    // var tempArray = [];
-                    // var nodeDataMap = {};
-                    // tempArray.push(JSON.parse(JSON.stringify((newItem.payload.nodeDataMap[this.state.selectedScenario])[0])));
-                    // console.log("tempArray---", tempArray);
-                    // nodeDataMap = newItem.payload.nodeDataMap;
-                    // tempArray[0].nodeDataId = this.getMaxNodeDataId();
-                    // nodeDataMap[scenarioList[i].id] = tempArray;
-                    // // nodeDataMap[scenarioList[i].id][0].nodeDataId = scenarioList[i].id;
-                    // newItem.payload.nodeDataMap = nodeDataMap;
-                    // (newItem.payload.nodeDataMap[scenarioList[i].id])[0] = (newItem.payload.nodeDataMap[this.state.selectedScenario]);
+        for (let i = 0; i < childList.length; i++) {
+            var child = JSON.parse(JSON.stringify(childList[i]));
+            console.log("child before---", child);
+            var maxNodeId = items.length > 0 ? Math.max(...items.map(o => o.id)) : 0;
+            console.log("maxNodeId---", maxNodeId);
+            var nodeId = parseInt(maxNodeId + 1);
+            console.log("nodeId---", nodeId);
+            if (sortOrder == child.sortOrder) {
+                child.payload.nodeId = nodeId;
+                child.id = nodeId;
+                var parentSortOrder = items.filter(c => c.id == itemConfig.parent)[0].sortOrder;
+                var childList1 = items.filter(c => c.parent == itemConfig.parent);
+                child.sortOrder = parentSortOrder.concat(".").concat(("0" + (Number(childList1.length) + 1)).slice(-2));
+                json = {
+                    oldId: itemConfig.id,
+                    newId: nodeId,
+                    oldSortOrder: itemConfig.sortOrder,
+                    newSortOrder: child.sortOrder
+                }
+                childListArr.push(json);
+            } else {
+                console.log("childListArr---", childListArr + " child.parent---", child.parent);
+                var parentNode = childListArr.filter(x => x.oldId == child.parent)[0];
+                console.log("parentNode---", parentNode)
+                child.payload.nodeId = nodeId;
+                var oldId = child.id;
+                var oldSortOrder = child.sortOrder;
+                child.id = nodeId;
+                child.parent = parentNode.newId;
+                var parentSortOrder = parentNode.newSortOrder;
+                var childList1 = items.filter(c => c.parent == parentNode.newId);
+                child.sortOrder = parentSortOrder.concat(".").concat(("0" + (Number(childList1.length) + 1)).slice(-2));
+                json = {
+                    oldId: oldId,
+                    newId: nodeId,
+                    oldSortOrder: oldSortOrder,
+                    newSortOrder: child.sortOrder
+                }
+                childListArr.push(json);
+            }
+            if (scenarioList.length > 0) {
+                for (let i = 0; i < scenarioList.length; i++) {
+                    (child.payload.nodeDataMap[scenarioList[i].id])[0].nodeDataId = maxNodeDataId;
+                    maxNodeDataId++;
                 }
             }
+            console.log("child after---", child);
+            items.push(child);
+            // childList.push(immidiateChilds[i]);
         }
-        console.log("duplicate button clicked value after update---", newItem);
+
+
+        console.log("duplicate button clicked value after update---", items);
         this.setState({
-            items: [...items, newItem],
+            // items: [...items, newItem],
+            items,
             cursorItem: nodeId
         }, () => {
             console.log("on add items-------", this.state.items);
-            this.calculateMOMData(newItem.id, 2);
-            // this.calculateValuesForAggregateNode(this.state.items);
+            this.calculateMOMData(0, 2);
         });
     }
     cancelClicked() {
@@ -9127,27 +9149,27 @@ export default class BuildTree extends Component {
                                                 <MonthBox value={this.makeText({ year: new Date(this.state.currentCalculatorStopDate.replace(/-/g, '\/')).getFullYear(), month: ("0" + (new Date(this.state.currentCalculatorStopDate.replace(/-/g, '\/')).getMonth() + 1)).slice(-2) })} onClick={this.handleClickMonthBox5} />
                                             </Picker>
                                         </FormGroup>
-                                        {this.state.currentItemConfig.context.payload.nodeType.id <= 2 && 
-                                        <>
-                                        <div>
+                                        {this.state.currentItemConfig.context.payload.nodeType.id <= 2 &&
+                                            <>
+                                                <div>
                                                     <Popover placement="top" isOpen={this.state.popoverOpenStartValueModelingTool} target="Popover53" trigger="hover" toggle={this.toggleStartValueModelingTool}>
                                                         <PopoverBody>{i18n.t('static.tooltip.StartValueModelingTool')}</PopoverBody>
                                                     </Popover>
                                                 </div>
-                                        <FormGroup className="col-md-6">
-                                            <Label htmlFor="currencyId">{i18n.t('static.tree.startValue')}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover53" onClick={this.toggleStartValueModelingTool} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
-                                            <Input type="text"
-                                                id="startValue"
-                                                name="startValue"
-                                                bsSize="sm"
-                                                readOnly={true}
-                                                value={addCommas(this.state.currentCalculatorStartValue)}
+                                                <FormGroup className="col-md-6">
+                                                    <Label htmlFor="currencyId">{i18n.t('static.tree.startValue')}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover53" onClick={this.toggleStartValueModelingTool} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
+                                                    <Input type="text"
+                                                        id="startValue"
+                                                        name="startValue"
+                                                        bsSize="sm"
+                                                        readOnly={true}
+                                                        value={addCommas(this.state.currentCalculatorStartValue)}
 
-                                            >
-                                            </Input>
-                                            {/* <FormFeedback className="red">{errors.nodeTitle}</FormFeedback> */}
-                                        </FormGroup>
-                                        </>
+                                                    >
+                                                    </Input>
+                                                    {/* <FormFeedback className="red">{errors.nodeTitle}</FormFeedback> */}
+                                                </FormGroup>
+                                            </>
                                         }
                                         {this.state.currentItemConfig.context.payload.nodeType.id > 2 && <FormGroup className="col-md-6">
                                             <Label htmlFor="currencyId">{i18n.t('static.tree.StartPercentage')}<span class="red Reqasterisk">*</span></Label>
@@ -9763,7 +9785,7 @@ export default class BuildTree extends Component {
                         <div className={itemConfig.payload.nodeType.id == 5 ||
                             itemConfig.payload.nodeType.id == 4 ? "ContactTitle TitleColorWhite" :
                             "ContactTitle TitleColor"}>
-                            <div title={itemConfig.payload.label.label_en} style={{ fontSize: '13px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', width: '137px', float: 'left', fontWeight: 'bold', }}>
+                            <div title={itemConfig.payload.label.label_en} style={{ fontSize: '13px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', width: '128px', float: 'left', fontWeight: 'bold', }}>
                                 {itemConfig.payload.label.label_en}</div>
                             <div style={{ float: 'right' }}>
                                 {(itemConfig.payload.nodeDataMap[this.state.selectedScenario] != undefined && itemConfig.payload.nodeDataMap[this.state.selectedScenario][0].extrapolation == true) && <i class="fa fa-line-chart" style={{ fontSize: '11px', color: (itemConfig.payload.nodeType.id == 4 || itemConfig.payload.nodeType.id == 5 ? '#fff' : '#002f6c') }}></i>}
@@ -10279,15 +10301,13 @@ export default class BuildTree extends Component {
             <Row>
                 <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
                     <Card className="mb-lg-0">
+
                         <div className="pb-lg-0">
-                            <div className="Card-header-reporticon pb-1" style={{ display: 'grid', float: 'right' }}>
-                                <a style={{ marginLeft: '106px' }}>
-                                    <span style={{ cursor: 'pointer' }} onClick={() => { this.toggleShowGuidance() }}><small className="supplyplanformulas">{i18n.t('static.common.showGuidance')}</small></span>
-                                </a>
-                                {/* <span className="compareAndSelect-larrow"> <i className="cui-arrow-left icons " > </i></span> */}
-                                {/* <span className="compareAndSelect-rarrow"> <i className="cui-arrow-right icons " > </i></span> */}
-                                <span className="compareAndSelect-larrowText"> {i18n.t('static.common.continueTo')} <a href="/#/validation/modelingValidation" className="supplyplanformulas">{i18n.t('static.dashboard.modelingValidation')}</a>  <span className="compareAndSelect-rarrow"> <i className="cui-arrow-right icons " > </i></span></span>
-                                <span className="compareAndSelect-rarrowText"> {i18n.t('static.common.continueTo')}  <a href="/#/validation/productValidation" className="supplyplanformulas">{i18n.t('static.dashboard.productValidation')}</a> <span className="compareAndSelect-rarrow"><i className="cui-arrow-right icons " > </i></span></span>
+                            <div className="Card-header-reporticon pb-1">
+                                <span className="compareAndSelect-larrow"> <i className="cui-arrow-left icons " > </i></span>
+                                <span className="compareAndSelect-rarrow"> <i className="cui-arrow-right icons " > </i></span>
+                                <span className="compareAndSelect-larrowText" style={{ cursor: 'pointer' }} onClick={this.cancelClicked}> {i18n.t('static.common.backTo')} <small className="supplyplanformulas">{'Tree List'}</small></span>
+                                <span className="compareAndSelect-rarrowText"> {i18n.t('static.common.continueTo')}  <a href="/#/validation/productValidation" className="supplyplanformulas">{i18n.t('static.dashboard.productValidation')}</a> {i18n.t('static.tree.or')} <a href="/#/validation/modelingValidation" className="supplyplanformulas">{i18n.t('static.dashboard.modelingValidation')}</a> </span>
                             </div>
                             {/* <div className="card-header-actions">
                                 <div className="card-header-action pr-4 pt-lg-0">
@@ -10314,21 +10334,21 @@ export default class BuildTree extends Component {
                                     </Col>
                                 </div>
                             </div>  */}
-                            <div className="row">
-                                <div className="col-md-12 pl-lg-0">
-                                    <div className='col-md-4 pt-lg-0'>
+                            {/* <div className="row"> */}
+                            {/* <div className="col-md-12 pl-lg-0"> */}
+                            {/* <div className='col-md-4 pt-lg-0'>
                                         <a className="pr-lg-0 pt-lg-1 float-left">
                                             <span style={{ cursor: 'pointer' }} onClick={this.cancelClicked}><i className="cui-arrow-left icons" style={{ color: '#002F6C', fontSize: '13px' }}></i> <small className="supplyplanformulas">{'Return To List'}</small></span>
                                         </a>
-                                    </div>
-                                    {/* <div className="col-md-6">
+                                    </div> */}
+                            {/* <div className="col-md-6">
                                         <span className="pr-lg-0 pt-lg-0 float-right">
                                             <h5 style={{ color: '#BA0C2F' }}>{i18n.t('static.tree.pleaseSaveAndDoARecalculateAfterDragAndDrop.')}</h5>
                                         </span>
                                     </div> */}
 
-                                </div>
-                            </div>
+                            {/* </div> */}
+                            {/* </div> */}
                             {/* <div className="row">
                                 <div className="col-md-12 pl-lg-3">
                                     <div className="col-md-12">
@@ -10339,6 +10359,13 @@ export default class BuildTree extends Component {
 
                                 </div>
                             </div> */}
+                        </div>
+                        <div className="row pt-lg-0 pr-lg-4">
+                            <div className="col-md-12">
+                                <a style={{ float: 'right' }}>
+                                    <span style={{ cursor: 'pointer' }} onClick={() => { this.toggleShowGuidance() }}><small className="supplyplanformulas">{i18n.t('static.common.showGuidance')}</small></span>
+                                </a>
+                            </div>
                         </div>
                         <CardBody className="pt-lg-1 pl-lg-0 pr-lg-0">
                             <div className="container-fluid pl-lg-3 pr-lg-3">
@@ -10961,19 +10988,19 @@ export default class BuildTree extends Component {
                                         <tr>
                                             <td className='BgLightBlue'><b>Number #</b></td>
                                             <td>Defined at this node</td>
-                                            <td>% or <b style={{ background: '#002f6c', color: '#fff', padding: '3px' }}><i class="fa fa-cube" aria-hidden="true"></i></b></td>
+                                            <td>% or <b style={{ background: '#fff', color: '#002f6c', padding: '3px' }}><i class="fa fa-cube" aria-hidden="true"></i></b></td>
                                             <td><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i>,<i className='fa fa-link'></i>, <i className='fa fa-line-chart'></i></td>
                                         </tr>
                                         <tr>
                                             <td className='BgLightBlue'><b>Percentage %</b></td>
                                             <td>Defined as a percentage of the parent</td>
-                                            <td>% or <b style={{ background: '#002f6c', color: '#fff', padding: '3px' }}><i class="fa fa-cube" aria-hidden="true"></i></b></td>
+                                            <td>% or <b style={{ background: '#fff', color: '#002f6c', padding: '3px' }}><i class="fa fa-cube" aria-hidden="true"></i></b></td>
                                             <td><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i>,<i className='fa fa-link'></i></td>
                                         </tr>
                                         <tr>
                                             <td className='BgDarkBlue'><b>Forecasting Unit <i class="fa fa-cube" aria-hidden="true"></i></b></td>
                                             <td>Defined as a percentage of the parent and forecasting unit parameters</td>
-                                            <td><b style={{ background: '#002f6c', color: '#fff', padding: '3px' }}><i class="fa fa-cubes" aria-hidden="true"></i></b></td>
+                                            <td><b style={{ background: '#fff', color: '#002f6c', padding: '3px' }}><i class="fa fa-cubes" aria-hidden="true"></i></b></td>
                                             <td><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i>,<i className='fa fa-link'></i></td>
                                         </tr>
                                         <tr>
@@ -11050,7 +11077,7 @@ export default class BuildTree extends Component {
                                     </ul>
                                 </li>
                                 <li><b> Multi-month Consumption Patterns?</b> How often is the product actually "consumed"? is it monthly or every three months? Consumption can be defined at different levels depending on your supply chain. In the <b>Planning Unit Node</b>, use the <b>Consumption Interval</b> field to indicate. For example, if the end user uses a product daily, but only picks up or buys the product every 2 months, enter "2" in the Consumption Interval field to account for a multi-month consumption pattern.  Note that this is only available for Continuous nodes, as product is assumed to be “consumed” at the beginning of the usage period.</li>
-                                <li><b>Repeating Forecasting Usages?</b> If multiple Forecasting Unit nodes share the same settings, consider using the <a href='/#/usageTemplate/listUsageTemplate'>Usage Template </a>screen to save your common usages, and then using the “Copy from Template”  field to populate the  fields in the forecasting unit nodes. </li>
+                                <li><b>Repeating Forecasting Usages?</b> If multiple Forecasting Unit nodes share the same settings, consider using the <a href='/#/usageTemplate/listUsageTemplate' target="_blank" style={{textDecoration:'underline'}}>Usage Template </a>screen to save your common usages, and then using the “Copy from Template”  field to populate the  fields in the forecasting unit nodes. </li>
                             </ul>
                         </p>
 
@@ -11110,19 +11137,19 @@ export default class BuildTree extends Component {
                                         <tr>
                                             <td className='BgLightBlue'><b>Number #</b></td>
                                             <td>Defined at this node</td>
-                                            <td>% or <b style={{ background: '#002f6c', color: '#fff', padding: '3px' }}><i class="fa fa-cube" aria-hidden="true"></i></b></td>
+                                            <td>% or <b style={{ background: '#fff', color: '#002f6c', padding: '3px' }}><i class="fa fa-cube" aria-hidden="true"></i></b></td>
                                             <td><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i>,<i className='fa fa-link'></i>, <i className='fa fa-line-chart'></i></td>
                                         </tr>
                                         <tr>
                                             <td className='BgLightBlue'><b>Percentage %</b></td>
                                             <td>Defined as a percentage of the parent</td>
-                                            <td>% or <b style={{ background: '#002f6c', color: '#fff', padding: '3px' }}><i class="fa fa-cube" aria-hidden="true"></i></b></td>
+                                            <td>% or <b style={{ background: '#fff', color: '#002f6c', padding: '3px' }}><i class="fa fa-cube" aria-hidden="true"></i></b></td>
                                             <td><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i>,<i className='fa fa-link'></i></td>
                                         </tr>
                                         <tr>
                                             <td className='BgDarkBlue'><b>Forecasting Unit <i class="fa fa-cube" aria-hidden="true"></i></b></td>
                                             <td>Defined as a percentage of the parent and forecasting unit parameters</td>
-                                            <td><b style={{ background: '#002f6c', color: '#fff', padding: '3px' }}><i class="fa fa-cubes" aria-hidden="true"></i></b></td>
+                                            <td><b style={{ background: '#fff', color: '#002f6c', padding: '3px' }}><i class="fa fa-cubes" aria-hidden="true"></i></b></td>
                                             <td><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i>,<i className='fa fa-link'></i></td>
                                         </tr>
                                         <tr>
