@@ -965,30 +965,33 @@ export default class BuildTree extends Component {
         var currentItemConfig = this.state.currentItemConfig;
         var qatCalculatedPUPerVisit = "";
         console.log("currentItemConfig qat cal---", currentItemConfig)
-        if (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.planningUnit.id != "") {
-            var pu = this.state.planningUnitList.filter(x => x.id == currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.planningUnit.id)[0];
-            console.log("pu qat cal 1---", pu.multiplier)
-            console.log("pu qat cal 2---", currentItemConfig.parentItem.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.noOfForecastingUnitsPerPerson);
-            // this.getNoOfMonthsInUsagePeriod();
-            if (currentItemConfig.parentItem.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.usageType.id == 2) {
-                var refillMonths = currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.refillMonths != "" && currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.refillMonths != null ? currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.refillMonths : this.round(parseFloat(pu.multiplier / (currentItemConfig.parentItem.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod)).toFixed(4))
-                console.log("refillMonths qat cal---", refillMonths)
-                console.log("noOfmonths qat cal---", this.state.noOfMonthsInUsagePeriod);
-                qatCalculatedPUPerVisit = this.round(parseFloat(((currentItemConfig.parentItem.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod) * refillMonths) / pu.multiplier).toFixed(4));
-            } else {
-                if (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.sharePlanningUnit == "true" || currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.sharePlanningUnit == true) {
-                    qatCalculatedPUPerVisit = addCommas(this.state.noOfMonthsInUsagePeriod / pu.multiplier);
-                } else {
-                    qatCalculatedPUPerVisit = this.round(this.state.noOfMonthsInUsagePeriod / pu.multiplier);
-                }
-            }
-            console.log("inside qat cal val---", qatCalculatedPUPerVisit)
-
-            if (type == 1) {
+        var planningUnitList = this.state.planningUnitList;
+        if (planningUnitList.length > 0 && currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.planningUnit.id != "") {
+            if (planningUnitList.filter(x => x.id == currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.planningUnit.id).length > 0) {
+                var pu = planningUnitList.filter(x => x.id == currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.planningUnit.id)[0];
+                console.log("pu qat cal 1---", pu.multiplier)
+                console.log("pu qat cal 2---", currentItemConfig.parentItem.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.noOfForecastingUnitsPerPerson);
+                // this.getNoOfMonthsInUsagePeriod();
                 if (currentItemConfig.parentItem.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.usageType.id == 2) {
-                    currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.refillMonths = refillMonths;
+                    var refillMonths = currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.refillMonths != "" && currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.refillMonths != null ? currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.refillMonths : this.round(parseFloat(pu.multiplier / (currentItemConfig.parentItem.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod)).toFixed(4))
+                    console.log("refillMonths qat cal---", refillMonths)
+                    console.log("noOfmonths qat cal---", this.state.noOfMonthsInUsagePeriod);
+                    qatCalculatedPUPerVisit = this.round(parseFloat(((currentItemConfig.parentItem.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod) * refillMonths) / pu.multiplier).toFixed(4));
+                } else {
+                    if (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.sharePlanningUnit == "true" || currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.sharePlanningUnit == true) {
+                        qatCalculatedPUPerVisit = addCommas(this.state.noOfMonthsInUsagePeriod / pu.multiplier);
+                    } else {
+                        qatCalculatedPUPerVisit = this.round(this.state.noOfMonthsInUsagePeriod / pu.multiplier);
+                    }
                 }
-                currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.puPerVisit = qatCalculatedPUPerVisit;
+                console.log("inside qat cal val---", qatCalculatedPUPerVisit)
+
+                if (type == 1) {
+                    if (currentItemConfig.parentItem.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.usageType.id == 2) {
+                        currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.refillMonths = refillMonths;
+                    }
+                    currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.puPerVisit = qatCalculatedPUPerVisit;
+                }
             }
         }
         this.setState({ qatCalculatedPUPerVisit });
@@ -5364,8 +5367,9 @@ export default class BuildTree extends Component {
             // console.log("filtered planning unit list tempPlanningUnitId---", this.state.tempPlanningUnitId);
             if (this.state.planningUnitList.length == 1) {
                 var { currentItemConfig } = this.state;
-                console.log("pl 1---");
-                if ((currentItemConfig.context.payload.nodeType.id == 4 && !this.state.addNodeFlag) || (currentItemConfig.context.payload.nodeType.id == 5 && this.state.addNodeFlag)) {
+                console.log("pl 1---", this.state.planningUnitList);
+                console.log("currentItemConfig pl 1---", currentItemConfig);
+                if ((currentItemConfig.context.payload.nodeType.id == 4 && this.state.addNodeFlag) || (currentItemConfig.context.payload.nodeType.id == 5 && this.state.addNodeFlag)) {
                     currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.planningUnit.id = this.state.planningUnitList[0].id;
                     console.log("pl 2---");
                     currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.planningUnit.label = this.state.planningUnitList[0].label;
