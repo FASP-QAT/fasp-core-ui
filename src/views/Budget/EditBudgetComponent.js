@@ -569,7 +569,7 @@ class EditBudgetComponent extends Component {
                                                         onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                         onBlur={handleBlur}
 
-                                                        value={getLabelText(this.state.budget.program.label, this.state.lang)}
+                                                        value={this.state.budget.program.code}
                                                     >
                                                     </Input>
 
@@ -770,8 +770,8 @@ class EditBudgetComponent extends Component {
                                                     <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i>{i18n.t('static.common.cancel')}</Button>
                                                     <Button type="button" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                                     <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
-                                                        &nbsp;
-                                                    </FormGroup>
+                                                    &nbsp;
+                                                </FormGroup>
                                             </CardFooter>
                                         </Form>
 

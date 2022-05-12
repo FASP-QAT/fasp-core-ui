@@ -427,7 +427,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                         if (dataForExtrapolation.length < 3 || (this.state.smoothingId && dataForExtrapolation.length < 24) || (this.state.arimaId && dataForExtrapolation.length < 14)) {
                             // this.setState({ extrapolationLoader: false }, () => {
                             setTimeout(() => {
-                                alert(i18n.t('static.tree.minDataRequiredToExtrapolate'))
+                                alert(i18n.t('static.tree.minDataRequiredToExtrapolateNote1') + dataForExtrapolation.length + i18n.t('static.tree.minDataRequiredToExtrapolateNote2') + i18n.t('static.tree.minDataRequiredToExtrapolate'))
                             }, 0);
                             // });
                         }

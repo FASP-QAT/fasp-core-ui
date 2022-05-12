@@ -1611,9 +1611,8 @@ export default class BuildTree extends Component {
         this.setState({
             [parameterName]: value
         }, () => {
-
             var items = this.state.items;
-            console.log("items before update 1234567---",items);
+            console.log("items before update 1234567---", items);
             if (parameterName == 'currentItemConfig') {
                 console.log("node id for update state 1----", value.context.id);
                 var findNodeIndex = items.findIndex(n => n.id == value.context.id);
@@ -1646,8 +1645,8 @@ export default class BuildTree extends Component {
                 console.log("items---***", items);
                 this.setState({ items })
             }
-            console.log("this.state.currentItemConfig.context.payload.extrapolation----", this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].extrapolation);
-            if (parameterName == 'type' && (value == 0 || value == 1) && this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].extrapolation != true && this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].extrapolation != "true") {
+            // console.log("this.state.currentItemConfig.context.payload.extrapolation----", this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].extrapolation);
+            if (parameterName == 'type' && (value == 0 || value == 1) && this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].extrapolation != undefined && this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].extrapolation != true && this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].extrapolation != "true") {
                 if (this.state.currentItemConfig.context.payload.nodeType.id == 1 || this.state.currentItemConfig.context.payload.nodeType.id == 2) {
                     console.log("mom list ret---", this.state.nodeDataMomList.filter(x => x.nodeId == this.state.currentItemConfig.context.id));
                     this.setState({ momList: this.state.nodeDataMomList.filter(x => x.nodeId == this.state.currentItemConfig.context.id)[0].nodeDataMomList }, () => {
@@ -1695,7 +1694,7 @@ export default class BuildTree extends Component {
     saveTreeData(flag) {
         console.log("saving tree data for calculation>>>");
         this.setState({ loading: true }, () => {
-            var curTreeObj  = this.state.curTreeObj;
+            var curTreeObj = this.state.curTreeObj;
             let { treeData } = this.state;
             let { dataSetObj } = this.state;
             var items = this.state.items;
@@ -1723,16 +1722,16 @@ export default class BuildTree extends Component {
 
             curTreeObj.scenarioList = this.state.scenarioList;
             if (items.length > 0) {
-                console.log("inside if items > 0---",items);
-                console.log("inside if cu tree obj before---",curTreeObj);
+                console.log("inside if items > 0---", items);
+                console.log("inside if cu tree obj before---", curTreeObj);
                 curTreeObj.tree.flatList = items;
-                console.log("inside if cu tree obj---",curTreeObj);
+                console.log("inside if cu tree obj---", curTreeObj);
             }
-            console.log("inside if cur tree obj out---",curTreeObj);
+            console.log("inside if cur tree obj out---", curTreeObj);
             var findTreeIndex = treeData.findIndex(n => n.treeId == curTreeObj.treeId);
-            console.log("cur tree findTreeIndex---",findTreeIndex);
+            console.log("cur tree findTreeIndex---", findTreeIndex);
             treeData[findTreeIndex] = curTreeObj;
-            console.log("treeData before saving---",treeData);
+            console.log("treeData before saving---", treeData);
 
             // var databytes = CryptoJS.AES.decrypt(dataSetObj.programData, SECRET_KEY);
             // var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
@@ -4778,7 +4777,9 @@ export default class BuildTree extends Component {
             e.showModelingValidation = this.state.showModelingValidation
             console.log("1------------------->>>>", this.getPayloadData(items1[i], 4))
             console.log("2------------------->>>>", this.getPayloadData(items1[i], 3))
-            e.result = this.getPayloadData(items1[i], 4)
+            e.result = this.getPayloadData(items1[i], 4)//Up
+            e.result1 = this.getPayloadData(items1[i], 6)//Down
+            e.result2 = this.getPayloadData(items1[i], 5)//Link
             var text = this.getPayloadData(items1[i], 3)
             e.text = text;
             newItems.push(e)
@@ -5265,41 +5266,87 @@ export default class BuildTree extends Component {
         // var childList = [];
         var items1 = this.state.items;
         const { items } = this.state;
-        var maxNodeId = items.length > 0 ? Math.max(...items.map(o => o.id)) : 0;
-        var nodeId = parseInt(maxNodeId + 1);
-        var newItem = {
-            id: nodeId,
-            level: itemConfig.level,
-            parent: itemConfig.parent,
-            payload: itemConfig.payload
-        };
-        newItem.payload.nodeId = nodeId;
-        var parentSortOrder = items.filter(c => c.id == itemConfig.parent)[0].sortOrder;
-        var childList = items.filter(c => c.parent == itemConfig.parent);
-        newItem.sortOrder = parentSortOrder.concat(".").concat(("0" + (Number(childList.length) + 1)).slice(-2));
+        // var maxNodeId = items.length > 0 ? Math.max(...items.map(o => o.id)) : 0;
+        // var nodeId = parseInt(maxNodeId + 1);
+        // var newItem = {
+        //     id: nodeId,
+        //     level: itemConfig.level,
+        //     parent: itemConfig.parent,
+        //     payload: itemConfig.payload
+        // };
+        // newItem.payload.nodeId = nodeId;
+        // var parentSortOrder = items.filter(c => c.id == itemConfig.parent)[0].sortOrder;
+        // var childList = items.filter(c => c.parent == itemConfig.parent);
+        // newItem.sortOrder = parentSortOrder.concat(".").concat(("0" + (Number(childList.length) + 1)).slice(-2));
         var maxNodeDataId = this.getMaxNodeDataId();
-        (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].nodeDataId = maxNodeDataId;
+        // (newItem.payload.nodeDataMap[this.state.selectedScenario])[0].nodeDataId = maxNodeDataId;
+        console.log("initial maxNodeDataId---", maxNodeDataId);
+        var childList = items1.filter(x => x.sortOrder.startsWith(itemConfig.sortOrder));
+        var childListArr = [];
+        var json;
+        var sortOrder = itemConfig.sortOrder;
+        console.log("childList---", childList);
         var scenarioList = this.state.scenarioList;
-        // var immidiateChilds = items1.filter(x => x.parent == itemConfig.id);
-        // console.log("childList---", childList);
-        // for (let i = 0; i < immidiateChilds.length; i++) {
-        //     childList.push(immidiateChilds[i]);
-        // }
-        if (scenarioList.length > 0) {
-            for (let i = 0; i < scenarioList.length; i++) {
-                if (scenarioList[i].id != this.state.selectedScenario) {
-                    (newItem.payload.nodeDataMap[scenarioList[i].id])[0].nodeDataId = parseInt(maxNodeDataId + 1);
+        for (let i = 0; i < childList.length; i++) {
+            var child = JSON.parse(JSON.stringify(childList[i]));
+            console.log("child before---", child);
+            var maxNodeId = items.length > 0 ? Math.max(...items.map(o => o.id)) : 0;
+            console.log("maxNodeId---", maxNodeId);
+            var nodeId = parseInt(maxNodeId + 1);
+            console.log("nodeId---", nodeId);
+            if (sortOrder == child.sortOrder) {
+                child.payload.nodeId = nodeId;
+                child.id = nodeId;
+                var parentSortOrder = items.filter(c => c.id == itemConfig.parent)[0].sortOrder;
+                var childList1 = items.filter(c => c.parent == itemConfig.parent);
+                child.sortOrder = parentSortOrder.concat(".").concat(("0" + (Number(childList1.length) + 1)).slice(-2));
+                json = {
+                    oldId: itemConfig.id,
+                    newId: nodeId,
+                    oldSortOrder: itemConfig.sortOrder,
+                    newSortOrder: child.sortOrder
+                }
+                childListArr.push(json);
+            } else {
+                console.log("childListArr---", childListArr + " child.parent---", child.parent);
+                var parentNode = childListArr.filter(x => x.oldId == child.parent)[0];
+                console.log("parentNode---", parentNode)
+                child.payload.nodeId = nodeId;
+                var oldId = child.id;
+                var oldSortOrder = child.sortOrder;
+                child.id = nodeId;
+                child.parent = parentNode.newId;
+                var parentSortOrder = parentNode.newSortOrder;
+                var childList1 = items.filter(c => c.parent == parentNode.newId);
+                child.sortOrder = parentSortOrder.concat(".").concat(("0" + (Number(childList1.length) + 1)).slice(-2));
+                json = {
+                    oldId: oldId,
+                    newId: nodeId,
+                    oldSortOrder: oldSortOrder,
+                    newSortOrder: child.sortOrder
+                }
+                childListArr.push(json);
+            }
+            if (scenarioList.length > 0) {
+                for (let i = 0; i < scenarioList.length; i++) {
+                    (child.payload.nodeDataMap[scenarioList[i].id])[0].nodeDataId = maxNodeDataId;
+                    maxNodeDataId++;
                 }
             }
+            console.log("child after---", child);
+            items.push(child);
+            // childList.push(immidiateChilds[i]);
         }
-        console.log("duplicate button clicked value after update---", newItem);
+
+
+        console.log("duplicate button clicked value after update---", items);
         this.setState({
-            items: [...items, newItem],
+            // items: [...items, newItem],
+            items,
             cursorItem: nodeId
         }, () => {
             console.log("on add items-------", this.state.items);
-            this.calculateMOMData(newItem.id, 2);
-            // this.calculateValuesForAggregateNode(this.state.items);
+            this.calculateMOMData(0, 2);
         });
     }
     cancelClicked() {
@@ -10256,12 +10303,12 @@ export default class BuildTree extends Component {
                     <Card className="mb-lg-0">
 
                         <div className="pb-lg-0">
-                        <div className="Card-header-reporticon pb-1">
-                            <span className="compareAndSelect-larrow"> <i className="cui-arrow-left icons " > </i></span>
+                            <div className="Card-header-reporticon pb-1">
+                                <span className="compareAndSelect-larrow"> <i className="cui-arrow-left icons " > </i></span>
                                 <span className="compareAndSelect-rarrow"> <i className="cui-arrow-right icons " > </i></span>
-                               <span className="compareAndSelect-larrowText" style={{cursor:'pointer'}} onClick={this.cancelClicked}> {i18n.t('static.common.backTo')} <small className="supplyplanformulas">{'Tree List'}</small></span>
+                                <span className="compareAndSelect-larrowText" style={{ cursor: 'pointer' }} onClick={this.cancelClicked}> {i18n.t('static.common.backTo')} <small className="supplyplanformulas">{'Tree List'}</small></span>
                                 <span className="compareAndSelect-rarrowText"> {i18n.t('static.common.continueTo')}  <a href="/#/validation/productValidation" className="supplyplanformulas">{i18n.t('static.dashboard.productValidation')}</a> {i18n.t('static.tree.or')} <a href="/#/validation/modelingValidation" className="supplyplanformulas">{i18n.t('static.dashboard.modelingValidation')}</a> </span>
-                        </div>
+                            </div>
                             {/* <div className="card-header-actions">
                                 <div className="card-header-action pr-4 pt-lg-0">
 
@@ -10288,19 +10335,19 @@ export default class BuildTree extends Component {
                                 </div>
                             </div>  */}
                             {/* <div className="row"> */}
-                                {/* <div className="col-md-12 pl-lg-0"> */}
-                                    {/* <div className='col-md-4 pt-lg-0'>
+                            {/* <div className="col-md-12 pl-lg-0"> */}
+                            {/* <div className='col-md-4 pt-lg-0'>
                                         <a className="pr-lg-0 pt-lg-1 float-left">
                                             <span style={{ cursor: 'pointer' }} onClick={this.cancelClicked}><i className="cui-arrow-left icons" style={{ color: '#002F6C', fontSize: '13px' }}></i> <small className="supplyplanformulas">{'Return To List'}</small></span>
                                         </a>
                                     </div> */}
-                                    {/* <div className="col-md-6">
+                            {/* <div className="col-md-6">
                                         <span className="pr-lg-0 pt-lg-0 float-right">
                                             <h5 style={{ color: '#BA0C2F' }}>{i18n.t('static.tree.pleaseSaveAndDoARecalculateAfterDragAndDrop.')}</h5>
                                         </span>
                                     </div> */}
 
-                                {/* </div> */}
+                            {/* </div> */}
                             {/* </div> */}
                             {/* <div className="row">
                                 <div className="col-md-12 pl-lg-3">
@@ -10314,12 +10361,12 @@ export default class BuildTree extends Component {
                             </div> */}
                         </div>
                         <div className="row pt-lg-0 pr-lg-4">
-                        <div className="col-md-12">
+                            <div className="col-md-12">
                                 <a style={{ float: 'right' }}>
                                     <span style={{ cursor: 'pointer' }} onClick={() => { this.toggleShowGuidance() }}><small className="supplyplanformulas">{i18n.t('static.common.showGuidance')}</small></span>
                                 </a>
+                            </div>
                         </div>
-                     </div>
                         <CardBody className="pt-lg-1 pl-lg-0 pr-lg-0">
                             <div className="container-fluid pl-lg-3 pr-lg-3">
                                 <>

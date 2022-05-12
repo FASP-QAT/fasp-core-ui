@@ -2402,7 +2402,8 @@ class ShipmentSummery extends Component {
                                                                 && programs.map((item, i) => {
                                                                     return (
                                                                         <option key={i} value={item.programId}>
-                                                                            {getLabelText(item.label, this.state.lang)}
+                                                                            {/* {getLabelText(item.label, this.state.lang)} */}
+                                                                            {(item.programCode)}
                                                                         </option>
                                                                     )
                                                                 }, this)}
