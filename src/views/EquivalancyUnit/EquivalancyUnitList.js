@@ -2788,6 +2788,12 @@ class EquivalancyUnit extends Component {
         }
     }
 
+    toggleShowGuidance() {
+        this.setState({
+            showGuidance: !this.state.showGuidance
+        })
+    }
+
 
     render() {
 
@@ -2925,7 +2931,124 @@ class EquivalancyUnit extends Component {
 
                     </CardFooter>
 
+                    <Modal isOpen={this.state.showGuidance}
+className={'modal-lg ' + this.props.className} >
+<ModalHeader toggle={() => this.toggleShowGuidance()} className="ModalHead modal-info-Headher">
+    <strong className="TextWhite">Show Guidance</strong>
+</ModalHeader>
+<div>
+    <ModalBody>
+       <div>
+           <h3 className='ShowGuidanceHeading'>Equivalency Unit</h3>
+       </div>
+        <p>
+            <p style={{fontSize:'13px'}}><span className="UnderLineText">Purpose :</span> Enable users manage Equivalency Units. Equivalency Units (EUs) allow users to aggregate data across products that are different, but related. 
+            <ul>
+                <li><b>Regional View:</b>  Use this view to see your forecast across planning units and regions. Directly update the forecast method for every region-planning unit combination and add notes in the table, if desired. Forecast selections can also be updated in the '<a href='/#/report/compareAndSelectScenario' target="_blank" style={{textDecoration:'underline'}}>Compare and Select Forecast</a>' screen.</li>
+                <li><b>National View:</b> Use this view to see your forecast at a <span style={{textDecoration:'underline'}}>national level</span> and evaluate your <span style={{textDecoration:'underline'}}>procurement surplus or gaps</span>. </li>
+            </ul>
+            </p>
+        </p>
+        <p style={{fontSize:'13px'}}>
+            <p style={{fontSize:'13px'}}><span className="UnderLineText">Using this screen:</span><br></br>
+            <b>Mapping equivalency units to forecasting units</b><br></br>
+            Use the main screen to manage mappings between equivalency units and forecasting units. Realm-level mappings are available to all users and are indicated by "All". However, program admins can create program-specific mappings (by adding a row and tagging it to a specific EU). If there are any conflicts, program-specific mappings will take precedence and be used instead of realm-level mappings.
+            </p>
+        </p>
+        <p>
+        For example, a user is forecasting medicines to treat QATitis, a condition where people cannot stop using QAT. The user may forecast by different treatments (different forecasting units) but want to see how they are aggregated together. 
+        <table className="table table-bordered ">
+                                <thead>
+                                <tr>
+                                    <th>Equivalency Unit</th>
+                                    <th>Forecasting Unit</th>
+                                    <th>Conversion to EU</th>
+                                    <th style={{width:'150px'}}>Average Treatment required to cure QATitis</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td>1 Treatment for QATitis </td>
+                                    <td>1 tablet of FASPicillin</td>
+                                    <td>14</td>
+                                    <td>1 tablet a day for 2 weeks</td>
+                                </tr>
+                                <tr>
+                                    <td>1 Treatment for QATitis </td>
+                                    <td>5mL tube of FASPasone (cream)</td>
+                                    <td>1</td>
+                                    <td>0.5mL/day applied on the forehead over 10 days (1 tube total)</td>
+                                </tr>
+                                <tr>
+                                    <td>1 Treatment for QATitis </td>
+                                    <td>2mL vial of FASPicaine (injection)</td>
+                                    <td>0.5</td>
+                                    <td>One injection of 1mL (Two people can share one vial)</td>
+                                </tr>
+                                <tr>
+                                    <td>1 Treatment for QATitis </td>
+                                    <td>1 bar of white chocolate</td>
+                                    <td>2</td>
+                                    <td rowspan="3">2 bars of chocolate. The type of chocolate does not matter, as all chocolate contains the natural form of FASPicillin.  </td>
+                                </tr>
+                                <tr>
+                                    <td>1 Treatment for QATitis  </td>
+                                    <td>1 bar of dark chocolate</td>
+                                    <td>2</td>
+                                    
+                                </tr>
+                                <tr>
+                                    <td>1 Treatment for QATitis </td>
+                                    <td>1 bar of milk chocolate</td>
+                                    <td>2</td>
+                                    
+                                </tr>
+                                </tbody>
+                                </table>
+        </p>
+        <p style={{fontSize:'13px'}}>
+        <b>Creating and managing equivalency units  </b><br></br>
+        If you don't see an equivalency unit that you would like to map or you would like to edit an existing equivalency unit, click on the "Manage Equivalency Unit" button in top right of the screen. 
+         </p>
+        <p>
+        <b>Where are equivalency units used?</b>
+        <ul>
+            <li>In the '<a href="/#/report/compareAndSelectScenario" target="_blank" style={{textDecoration:'underline'}}>Compare and Select</a>' screen, the user can display their forecasts in EUs. Using the example above, a user that forecasts 10,000 bars of dark chocolate per month, could elect to display their forecast in the EU of “Treatments for QATitis” and display their forecast as 5,000 “Treatments for QATitis” per month instead. </li>
+            <li>In the '<a href="/#/forecastReport/forecastOutput" target="_blank" style={{textDecoration:'underline'}}>Monthly Forecast</a>' screen, the user can display their selected forecasts by individual planning units, or aggregate across planning units if they are connected by EUs. For example, if a user forecasted 10,000 bars of dark chocolate, and 10,000 bars of white chocolate and 14,000 per month, QAT would display 7,000 "Treatments for QATitis".</li>
+        </ul>
+        </p>
+        <p>
+        <table className="table table-bordered ">
+                                <thead>
+                                <tr>
+                                    <th>Forecast</th>
+                                    <th>Equivalent in "Treatments for QATitis"</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td>10,000 bars of dark chocolate </td>
+                                    <td style={{textAlign:'center'}}>5,000</td>
+                                </tr>
+                                <tr>
+                                    <td>10,000 bars of white chocolate </td>
+                                    <td style={{textAlign:'center'}}>5,000</td>
+                                </tr>
+                                <tr>
+                                    <td>14,000 tablets of FASPicillin </td>
+                                    <td style={{textAlign:'center'}}>1,000</td>
+                                </tr>
+                                <tr>
+                                    <td style={{textAlign:'right',borderLeft:'1px solid #fff',borderBottom:'1px solid #fff'}}><b>Total</b></td>
+                                    <td style={{textAlign:'center'}}><b>7,000</b></td>
+                                </tr>
+                                </tbody>
+                                </table>
+        </p>
 
+    </ModalBody>
+</div>
+</Modal>
 
                     <Modal isOpen={this.state.isModalOpen}
                         className={'modal-lg ' + this.props.className, "modalWidth"}>

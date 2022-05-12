@@ -1403,6 +1403,16 @@ class VersionSettingsComponent extends Component {
                 <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5 className={this.state.color} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <Card>
+
+                <div className="card-header-actions">
+            <div className="Card-header-reporticon">
+              <span className="compareAndSelect-larrow"> <i className="cui-arrow-left icons " > </i></span>
+              <span className="compareAndSelect-rarrow"> <i className="cui-arrow-right icons " > </i></span>
+              <span className="compareAndSelect-larrowText"> {i18n.t('static.common.backTo')} <a href="/#/dataSet/listDataSet" className="supplyplanformulas">{i18n.t('static.dataset.manageProgramInfo')}</a></span>
+              <span className="compareAndSelect-rarrowText"> {i18n.t('static.common.continueTo')} <a href="/#/planningUnitSetting/listPlanningUnitSetting" className="supplyplanformulas">{i18n.t('static.updatePlanningUnit.updatePlanningUnit')}</a></span><br />
+             
+            </div>
+          </div>
                 
                         <div className="card-header-actions">
                             <div className="card-header-action pr-lg-4">

@@ -30,7 +30,7 @@ import ReportService from '../../api/ReportService';
 import ProcurementAgentService from "../../api/ProcurementAgentService";
 import { Online, Offline } from "react-detect-offline";
 import FundingSourceService from '../../api/FundingSourceService';
-import MultiSelect from 'react-multi-select-component';
+import {MultiSelect} from 'react-multi-select-component';
 import jexcel from 'jexcel-pro';
 import "../../../node_modules/jexcel-pro/dist/jexcel.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
@@ -2620,7 +2620,8 @@ class ProcurementAgentExport extends Component {
                                                     && programs.map((item, i) => {
                                                         return (
                                                             <option key={i} value={item.programId}>
-                                                                {getLabelText(item.label, this.state.lang)}
+                                                                {/* {getLabelText(item.label, this.state.lang)} */}
+                                                                {(item.programCode)}
                                                             </option>
                                                         )
                                                     }, this)}

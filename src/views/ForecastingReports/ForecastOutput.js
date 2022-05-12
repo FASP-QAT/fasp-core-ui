@@ -3399,13 +3399,7 @@ class ForecastOutput extends Component {
                 <h5 className="red">{i18n.t(this.state.message)}</h5>
 
                 <Card>
-                <div className="card-header-actions">
-                            <div className="card-header-action pr-lg-4">
-                            <a style={{float:'right'}}>
-                                <span style={{ cursor: 'pointer' }} onClick={() => { this.toggleShowGuidance() }}><small className="supplyplanformulas">{i18n.t('static.common.showGuidance')}</small></span>
-                            </a>
-                            </div>
-                            </div>
+                
                     <div className="Card-header-reporticon pb-2">
                         {this.state.consumptionData.length > 0 &&
                             <div className="card-header-actions">
@@ -3446,6 +3440,13 @@ class ForecastOutput extends Component {
 
                         </div>
                     </div>
+                    <div className="card-header-actions">
+                            <div className="card-header-action pr-lg-4">
+                            <a style={{float:'right'}}>
+                                <span style={{ cursor: 'pointer' }} onClick={() => { this.toggleShowGuidance() }}><small className="supplyplanformulas">{i18n.t('static.common.showGuidance')}</small></span>
+                            </a>
+                            </div>
+                            </div>
                     <div className='col-md-12 pt-lg-2 pb-lg-3'>
                         <span className="pr-lg-0 pt-lg-1">{i18n.t('static.placeholder.monthlyForecastReport')}</span>
                     </div>

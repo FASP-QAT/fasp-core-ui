@@ -19,7 +19,7 @@ import FundingSourceService from '../../api/FundingSourceService';
 import moment from 'moment';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 
-import MultiSelect from 'react-multi-select-component';
+import {MultiSelect} from 'react-multi-select-component';
 
 import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
@@ -1104,7 +1104,8 @@ class Budgets extends Component {
             && programs.map((item, i) => {
                 return (
                     <option key={i} value={item.programId}>
-                        {getLabelText(item.label, this.state.lang)}
+                        {/* {getLabelText(item.label, this.state.lang)} */}
+                        {(item.programCode)}
                     </option>
                 )
             }, this);

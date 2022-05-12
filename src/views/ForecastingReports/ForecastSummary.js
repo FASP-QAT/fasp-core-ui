@@ -1,6 +1,6 @@
 import React, { Component, lazy } from 'react';
 import { Bar } from 'react-chartjs-2';
-import MultiSelect from "react-multi-select-component";
+import {MultiSelect} from "react-multi-select-component";
 import {
     Card,
     CardBody,
@@ -35,6 +35,13 @@ import "../../../node_modules/jsuites/dist/jsuites.css";
 import { Prompt } from 'react-router';
 import ReportService from '../../api/ReportService';
 import { DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_DATE_FORMAT_SM, JEXCEL_PRO_KEY } from '../../Constants.js';
+import DesiredStockatForecasend from '../../assets/img/DesiredStockatForecasend.png';
+import FreightCost from '../../assets/img/FreightCost.png';
+import ProcurementSurplusGap from '../../assets/img/ProcurementSurplusGap.png';
+import ProductCost from '../../assets/img/ProductCost.png';
+import ProjectStockatForecastend from '../../assets/img/ProjectStockatForecastend.png';
+import TotalCost from '../../assets/img/TotalCost.png';
+
 
 
 const ref = React.createRef();
@@ -3037,13 +3044,7 @@ class ForecastSummary extends Component {
                 <h5 style={{ color: this.state.color }} id="div2">{this.state.message1}</h5>
 
                 <Card>
-                <div className="card-header-actions">
-                            <div className="card-header-action pr-lg-4">
-                            <a style={{float:'right'}}>
-                                <span style={{ cursor: 'pointer' }} onClick={() => { this.toggleShowGuidance() }}><small className="supplyplanformulas">{i18n.t('static.common.showGuidance')}</small></span>
-                            </a>
-                            </div>
-                        </div>
+                
                     <div className="Card-header-reporticon pb-2">
                         {
                             (this.state.dataArray.length > 0 || this.state.summeryData.length > 0) &&
@@ -3069,19 +3070,28 @@ class ForecastSummary extends Component {
                             </div>
                         } */}
                     </div>
-                    <div className="Card-header-reporticon ">
-                        <div className="card-header-actions BacktoLink">
+                    <div className="card-header-actions">
+                          <div className="Card-header-reporticon">
                             {/* <a className="pr-lg-0 pt-lg-1">
                                 <span style={{ cursor: 'pointer' }} onClick={() => { this.backToMonthlyForecast() }}><i className="fa fa-long-arrow-left" style={{ color: '#20a8d8', fontSize: '13px' }}></i> <small className="supplyplanformulas">{i18n.t('static.forecastReport.returnToMonthlyForecast')}</small></span>
                             </a> */}
                             <span className="compareAndSelect-larrow"> <i className="cui-arrow-left icons " > </i></span>
+                            <span className="compareAndSelect-rarrow"> <i className="cui-arrow-right icons " > </i></span>
                             <span className="compareAndSelect-larrowText"> {i18n.t('static.common.backTo')} <a href="/#/forecastReport/forecastOutput" className='supplyplanformulas'>{i18n.t('static.MonthlyForecast.MonthlyForecast')}</a> </span>
+                            <span className="compareAndSelect-rarrowText"> {i18n.t('static.common.continueTo')} <a href="/#/dataset/commitTree" className="supplyplanformulas">{i18n.t('static.commitProgram.commitProgram')}</a></span>
 
                             {/* <a className="card-header-action">
                                 Back to <span style={{ cursor: 'pointer' }} onClick={() => { this.backToMonthlyForecast() }}><small className="supplyplanformulas">Monthly Forecast</small></span>
                             </a> */}
                         </div>
                     </div>
+                    <div className="card-header-actions">
+                            <div className="card-header-action pr-lg-4">
+                            <a style={{float:'right'}}>
+                                <span style={{ cursor: 'pointer' }} onClick={() => { this.toggleShowGuidance() }}><small className="supplyplanformulas">{i18n.t('static.common.showGuidance')}</small></span>
+                            </a>
+                            </div>
+                        </div>
                     <CardBody className="pb-lg-2 pt-lg-1 ">
                         <div>
                             <div ref={ref}>
@@ -3539,7 +3549,111 @@ class ForecastSummary extends Component {
                         </FormGroup>
                     </CardFooter>}
                 </Card>
-               
+                <Modal isOpen={this.state.showGuidance}
+className={'modal-lg ' + this.props.className} >
+<ModalHeader toggle={() => this.toggleShowGuidance()} className="ModalHead modal-info-Headher">
+    <strong className="TextWhite">Show Guidance</strong>
+</ModalHeader>
+<div>
+    <ModalBody>
+       <div>
+           <h3 className='ShowGuidanceHeading'>Forecast Summary</h3>
+       </div>
+        <p>
+            <p style={{fontSize:'13px'}}><span className="UnderLineText">Purpose :</span> Enable users to see a summary of their final (selected) forecasts for the entire forecast period. To view the forecasts by month, use the '<a href='/#/forecastReport/forecastOutput' target="_blank" style={{textDecoration:'underline'}}>Monthly Forecast</a>' screen.
+            <ul>
+                <li><b>Regional View:</b>  Use this view to see your forecast across planning units and regions. Directly update the forecast method for every region-planning unit combination and add notes in the table, if desired. Forecast selections can also be updated in the '<a href='/#/report/compareAndSelectScenario' target="_blank" style={{textDecoration:'underline'}}>Compare and Select Forecast</a>' screen.</li>
+                <li><b>National View:</b> Use this view to see your forecast at a <span style={{textDecoration:'underline'}}>national level</span> and evaluate your <span style={{textDecoration:'underline'}}>procurement surplus or gaps</span>. </li>
+            </ul>
+            </p>
+        </p>
+        <p style={{fontSize:'13px'}}>
+            <p style={{fontSize:'13px'}}><span className="UnderLineText">Using this screen (National View) :</span><br></br>
+            <b>Note:</b> This is not a full supply plan, but a high-level procurement surplus/gap analysis. We recommend importing your forecast into the supply planning module for granular supply planning.
+            </p>
+            <p>For the data to display here properly, enter the following data: 
+                <ul>
+                    <li>Under <a href='/#/planningUnitSetting/listPlanningUnitSetting' target="_blank" style={{textDecoration:'underline'}}>Update Planning Unit</a>:
+                    <ul>
+                        <li><b>Stock</b> - at the beginning of your forecast period</li>
+                        <li><b>Existing shipments</b> - during your forecast period</li>
+                        <li><b>Desired Months of stock</b> - at the end of your forecast period</li>
+                        <li><b>Price Type</b> and <b>Unit Prices</b></li>
+                    </ul>
+                    </li>
+                    <li>Under <a href='/#/dataset/versionSettings' target="_blank" style={{textDecoration:'underline'}}>Update Version Settings</a>:
+                        <ul>
+                            <li><b>Freight %</b> - Freight cost is calculated as a percentage of product cost</li>
+                        </ul>
+                    </li>
+                </ul>
+            </p>
+        </p>
+        <p style={{fontSize:'13px'}}>
+        <b>Calculating the Procurement Surplus/Gap </b>
+        <ul>
+            <li><img className="formula-img-mr-showGuidance" src={ProjectStockatForecastend} /><br></br></li>
+            <li><img className="formula-img-mr-showGuidance" src={DesiredStockatForecasend} /><br></br></li>
+            <li><img className="formula-img-mr-showGuidance" src={ProcurementSurplusGap} /><br></br></li>
+            {/* <li>Project Stock at Forecast end = (Starting Stock) + (Existing Shipments) - (Forecasted Quantity) </li>
+            <li>Desired Stock at Forecast end = (Forecasted Quantity) / (Forecast Period) * (Desired Months of Stock) </li>
+            <li>Procurement Surplus/Gap = (Projected Stock at Forecast end) - (Desired Stock at Forecast end) </li> */}
+        </ul>
+        </p>
+        <p>
+        For example, a forecast from Jan 2021 to Dec 2023 (36 month forecast)
+        <table className="table table-bordered ">
+                                <thead>
+                                <tr>
+                                    <th>Total Forecasted Quantity</th>
+                                    <th>Stock(end of Dec 2020)</th>
+                                    <th>Existing Shipments (Jan 2021 - Dec 2023)</th>
+                                    <th>Stock(end of Dec 2023)</th>
+                                    <th>Desired Months of Stock (end of Dec 2023)</th>
+                                    <th>Desired Stock(end of Dec 2023)</th>
+                                    <th>Procurement Surplus/Gap</th>
+                                   
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td>360,000</td>
+                                    <td>5,000</td>
+                                    <td>20,000</td>
+                                    <td>5,000 + 20,000 - 360,000 = -335,000</td>
+                                    <td>5</td>
+                                    <td>360,000 / 36 * 5 = 50,000</td>
+                                    <td>-335,000 -50,000 = -385,000</td>
+                                   
+                                </tr>
+                                </tbody>
+                                </table>
+        </p>
+        <p style={{fontSize:'13px'}}>
+        <b>Calculating the Procurement Costs  </b><br></br>
+        Note: the cost is only calculated if there is a procurement gap, not if there is a surplus 
+
+        <ul>
+        <li><img className="formula-img-mr-showGuidance1 img-fluid" src={ProductCost} /><br></br></li>
+        <li><img className="formula-img-mr-showGuidance1 img-fluid" src={FreightCost} /><br></br></li>
+        <li><img className="formula-img-mr-showGuidance1 img-fluid" src={TotalCost} /><br></br></li>
+            {/* <li>Product Cost = Procurement Gap * Unit Cost </li>
+            <li>Freight Cost = Product Cost * Freight Percentage </li>
+            <li>Total Cost = Product Cost + Freight Cost </li> */}
+        </ul>
+        </p>
+        <p>
+        For the example above, assuming a unit cost of 0.10 USD and a freight % of 7%:
+        <ul>
+            <li>Product Cost = -385,000 * 0.10 = $38,500</li>
+            <li>Freight Cost = $38,500 * 7% = $2,695</li>
+            <li>Total Cost = $38,500 + $2,695 = $41,195</li>
+        </ul>
+        </p>
+
+    </ModalBody>
+</div>
+</Modal>
             </div >
         );
     }
