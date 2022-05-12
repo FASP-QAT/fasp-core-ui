@@ -302,7 +302,7 @@ export default class ListTreeTemplate extends Component {
                     readOnly: true
                 },
                 {
-                    title: 'Forecast Method',
+                    title: i18n.t('static.forecastMethod.forecastMethod'),
                     type: 'text',
                     readOnly: true
                 },
