@@ -6,7 +6,14 @@ import moment from "moment";
 import React, { Component } from 'react';
 import Picker from 'react-month-picker';
 import {
-    Button, FormGroup, Input, InputGroup, Label, Modal, ModalHeader, ModalBody, ModalFooter
+    Card,
+    CardBody,
+    // CardFooter,
+    CardHeader,
+    Col,
+    Row,
+    CardFooter,
+    Table, FormGroup, Input, InputGroup, InputGroupAddon, Label, Form, Modal, ModalHeader, ModalFooter, ModalBody, Popover, PopoverBody, PopoverHeader, Button
 } from 'reactstrap';
 import "../../../node_modules/jexcel-pro/dist/jexcel.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
@@ -38,6 +45,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
         var dt = new Date();
         dt.setMonth(dt.getMonth() - FORECAST_DATEPICKER_START_MONTH);
         this.state = {
+            popoverOpenProgramSetting: false,
             mapPlanningUnitEl: '',
             lang: localStorage.getItem('lang'),
             rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
@@ -84,7 +92,14 @@ export default class StepOneImportMapPlanningUnits extends Component {
         this.getPlanningUnitList = this.getPlanningUnitList.bind(this);
         this.formSubmit = this.formSubmit.bind(this);
         this.hideSecondComponent = this.hideSecondComponent.bind(this);
+        this.toggleProgramSetting = this.toggleProgramSetting.bind(this);
 
+    }
+
+    toggleProgramSetting() {
+        this.setState({
+            popoverOpenProgramSetting: !this.state.popoverOpenProgramSetting,
+        });
     }
 
     hideSecondComponent() {
@@ -1277,7 +1292,12 @@ export default class StepOneImportMapPlanningUnits extends Component {
             <>
                 <AuthenticationServiceComponent history={this.props.history} />
                 <h5 className="red" id="div12">{this.state.message}</h5>
-
+                <div>
+                    <Popover placement="top" isOpen={this.state.popoverOpenProgramSetting} target="Popover2" trigger="hover" toggle={this.toggleProgramSetting}>
+                        {/* <PopoverBody>{i18n.t('static.tooltip.planningProgramSetting')} </PopoverBody> */}
+                        <PopoverBody>If the last month of your forecast is more than 6 months old, it will not appear in the version dropdown. Please consider importing forecast data for future months.</PopoverBody>
+                    </Popover>
+                </div>
                 <div style={{ display: this.props.items.loading ? "none" : "block" }} >
                     <div className="Card-header-addicon pb-0">
                         <div className="card-header-actions" style={{ marginTop: '-25px' }}>
@@ -1511,7 +1531,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                         </FormGroup>
 
                         <FormGroup className="col-md-4">
-                            <Label htmlFor="appendedInputButton">{i18n.t('static.importIntoQATSupplyPlan.forecastFinalVersion')}</Label>
+                            <Label htmlFor="appendedInputButton">{i18n.t('static.importIntoQATSupplyPlan.forecastFinalVersion')}<i class="fa fa-info-circle icons pl-lg-2" id="Popover2" onClick={this.toggleProgramSetting} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                             {/* <Label htmlFor="appendedInputButton">Forecast version (Final Versions Only)</Label> */}
                             <div className="controls">
                                 <InputGroup>
