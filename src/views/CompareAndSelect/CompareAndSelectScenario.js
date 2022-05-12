@@ -174,7 +174,14 @@ class CompareAndSelectScenario extends Component {
             //     var selectedEquivalencyUnit = this.state.equivalencyUnitList.filter(c => c.equivalencyUnitMappingId == this.state.equivalencyUnitId);
             //     multiplier = selectedEquivalencyUnit.length > 0 ? selectedEquivalencyUnit[0].convertToEu : 1;
             // }
+            
             let startDate = moment.min(datasetJson.actualConsumptionList.filter(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId).map(d => moment(d.month)));
+            let actualMinDate=startDate;
+            let forecastStartDate=moment(datasetJson.currentVersion.forecastStartDate).format("YYYY-MM-DD")
+            if(moment(actualMinDate).format("YYYY-MM")>moment(forecastStartDate).format("YYYY-MM")){
+                actualMinDate=forecastStartDate;
+            }
+
             let stopDate = moment(datasetJson.currentVersion.forecastStopDate).format("YYYY-MM-DD")
             // let curDate = moment(startDate).format("YYYY-MM-DD");
             // let stopDate = this.state.stopDate;
@@ -187,7 +194,7 @@ class CompareAndSelectScenario extends Component {
             // if (this.state.showForecastPeriod) {
             //     monthList1 = this.state.monthList1
             // }
-            var rangeValue = { from: { year: Number(moment(startDate).startOf('month').format("YYYY")), month: Number(moment(startDate).startOf('month').format("M")) }, to: { year: Number(moment(stopDate).startOf('month').format("YYYY")), month: Number(moment(stopDate).startOf('month').format("M")) } }
+            var rangeValue = { from: { year: Number(moment(actualMinDate).startOf('month').format("YYYY")), month: Number(moment(actualMinDate).startOf('month').format("M")) }, to: { year: Number(moment(stopDate).startOf('month').format("YYYY")), month: Number(moment(stopDate).startOf('month').format("M")) } }
 
             var treeScenarioList = [];
             var treeList = datasetJson.treeList.filter(c => c.active.toString() == "true");
@@ -258,7 +265,7 @@ class CompareAndSelectScenario extends Component {
                 selectedTreeScenarioId: selectedTreeScenarioId,
                 forecastNotes: forecastNotes,
                 singleValue2: rangeValue,
-                minDate: { year: Number(moment(startDate).startOf('month').format("YYYY")), month: Number(moment(startDate).startOf('month').format("M")) },
+                minDate: { year: Number(moment(actualMinDate).startOf('month').format("YYYY")), month: Number(moment(actualMinDate).startOf('month').format("M")) },
                 // monthList1: monthList1,
                 showAllData: true,
                 loading: false
@@ -1625,7 +1632,11 @@ class CompareAndSelectScenario extends Component {
                         message: 'static.compareAndSelect.dataSaved',
                         color: 'green',
                         datasetJson: datasetForEncryption,
-                        planningUnitList: planningUnitList1
+                        planningUnitList: planningUnitList1.sort(function (a, b) {
+                            a = getLabelText(a.planningUnit.label, this.state.lang).toLowerCase();
+                            b = getLabelText(b.planningUnit.label, this.state.lang).toLowerCase();
+                            return a < b ? -1 : a > b ? 1 : 0;
+                        }.bind(this))
                     }, () => {
                         this.hideFirstComponent()
                         this.showData();
@@ -1887,12 +1898,8 @@ class CompareAndSelectScenario extends Component {
                 <h5 className="red" id="div1" className={this.state.color}>{i18n.t(this.state.message)}</h5>
 
                 <Card>
-                <div className="card-header-action pr-lg-4">
-                            <a style={{float:'right'}}>
-                                <span style={{ cursor: 'pointer' }} onClick={() => { this.toggleShowGuidance() }}><small className="supplyplanformulas">{i18n.t('static.common.showGuidance')}</small></span>
-                            </a>
-                            </div>
-                    <div className="Card-header-reporticon pb-2">
+               
+                    <div className="Card-header-reporticon pb-0">
                    
                         <span className="compareAndSelect-larrow"> <i className="cui-arrow-left icons " > </i></span>
                         <span className="compareAndSelect-rarrow"> <i className="cui-arrow-right icons " > </i></span>
@@ -1912,6 +1919,11 @@ class CompareAndSelectScenario extends Component {
                         }
                         
                     </div>
+                    <div className="card-header-action pr-lg-4">
+                            <a style={{float:'right'}}>
+                                <span style={{ cursor: 'pointer' }} onClick={() => { this.toggleShowGuidance() }}><small className="supplyplanformulas">{i18n.t('static.common.showGuidance')}</small></span>
+                            </a>
+                            </div>
                     <CardBody className="pb-lg-2 pt-lg-0 ">
                         <div>
                             <div ref={ref}>
