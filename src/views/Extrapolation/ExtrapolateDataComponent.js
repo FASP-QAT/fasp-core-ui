@@ -904,7 +904,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                 //     show: false,
                 //     dataEl: ""
                 // })
-                alert(i18n.t('static.tree.minDataRequiredToExtrapolate'))
+                alert(i18n.t('static.tree.minDataRequiredToExtrapolateNote1') + inputDataMovingAvg.filter(c => c.actual != null).length + i18n.t('static.tree.minDataRequiredToExtrapolateNote2') + i18n.t('static.tree.minDataRequiredToExtrapolate'))
             }
             // } else {
             if (inputDataMovingAvg.filter(c => c.actual != null).length >= 3) {
@@ -1610,6 +1610,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                 if (this.state.arimaId) {
                     calculateError(inputDataArima, "arimaError", this);
                 }
+                console.log("ActualConsumptionList@@@@@@@@@@@@@",actualConsumptionList)
                 this.setState({
                     actualConsumptionList: actualConsumptionList,
                     startDate: startDate1,
@@ -1654,20 +1655,24 @@ export default class ExtrapolateDataComponent extends React.Component {
             } else {
                 var startDate1 = "";
                 var endDate1 = "";
+                var actualConsumptionList=[];
                 if (actualConsumptionListForPlanningUnitAndRegion.length > 1) {
                     startDate1 = moment.min((actualConsumptionListForPlanningUnitAndRegion).map(d => moment(d.month)));
                     endDate1 = moment.max((actualConsumptionListForPlanningUnitAndRegion).map(d => moment(d.month)));
+                    actualConsumptionList = datasetJson.actualConsumptionList.filter(c => moment(c.month).format("YYYY-MM") >= moment(startDate1).format("YYYY-MM") && moment(c.month).format("YYYY-MM") <= moment(endDate1).format("YYYY-MM"));
                     this.setState({
                         rangeValue1: { from: { year: Number(moment(startDate1).startOf('month').format("YYYY")), month: Number(moment(startDate1).startOf('month').format("M")) }, to: { year: Number(moment(endDate1).startOf('month').format("YYYY")), month: Number(moment(endDate1).startOf('month').format("M")) } },
                         minDate: { year: Number(moment(startDate1).startOf('month').format("YYYY")), month: Number(moment(startDate1).startOf('month').format("M")) },
                         maxDate: { year: Number(moment(endDate1).startOf('month').format("YYYY")), month: Number(moment(endDate1).startOf('month').format("M")) },
-                        showDate: true
+                        showDate: true,
+                        actualConsumptionList:actualConsumptionList
                     }, () => {
                         this.getDateDifference()
                     })
                 } else {
                     startDate1 = moment(Date.now()).subtract(24, 'months').startOf('month').format("YYYY-MM-DD");
                     endDate1 = moment(Date.now()).startOf('month').format("YYYY-MM-DD")
+                    actualConsumptionList=[]
                     this.setState({
                         rangeValue1: { from: { year: Number(moment(startDate1).startOf('month').format("YYYY")), month: Number(moment(startDate1).startOf('month').format("M")) }, to: { year: Number(moment(endDate1).startOf('month').format("YYYY")), month: Number(moment(endDate1).startOf('month').format("M")) } },
                         minDate: { year: Number(moment(startDate1).startOf('month').format("YYYY")), month: Number(moment(startDate1).startOf('month').format("M")) },
@@ -1675,7 +1680,8 @@ export default class ExtrapolateDataComponent extends React.Component {
                         showDate: false,
                         dataEl: "",
                         loading: false,
-                        noDataMessage: i18n.t('static.extrapolate.noDataFound')
+                        noDataMessage: i18n.t('static.extrapolate.noDataFound'),
+                        actualConsumptionList:actualConsumptionList
                     }, () => {
                         this.getDateDifference()
                     })
@@ -1794,7 +1800,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                 //     gamma = consumptionExtrapolationTESL[0].jsonProperties.gamma;
                 //     smoothingId = true;
                 // }
-
+                console.log("ActualConsumptionList@@@@@@@@@@@@@",actualConsumptionList)
                 this.setState({
                     actualConsumptionList: actualConsumptionList,
                     startDate: startDate,
@@ -4059,7 +4065,7 @@ The models suggested here are neither exhaustive nor exclusive. QAT enables the 
                                 If you have poorer data (missing data points, variable reporting rates, less than 12 months of data), use simpler forecast methods
                             </p> */}
                             <p>
-                                <b>NOTE:  You have ____ months of acutal consumption data. The minimum values needed for the various features are below: <br></br>
+                                <b>NOTE:  You have {this.state.planningUnitId>0 && this.state.regionId>0 ?this.state.actualConsumptionList.filter(c=>c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId).length:0} months of acutal consumption data. The minimum values needed for the various features are below: <br></br>
                                     <span className="ml-lg-5">* TES, Holt-Winters: At least 24 months of actual consumption data<br></br></span>
                                     <span className="ml-lg-5">* ARIMA:  At least 14 months of actual consumption data<br></br></span>
                                     <span className="ml-lg-5">* Moving Average, Semi-Averages, and Linear Regression: At least 3 months of actual consumption data</span>
