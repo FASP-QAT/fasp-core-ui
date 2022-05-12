@@ -176,6 +176,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
         var minDate = moment(this.props.items.startDate).format("YYYY-MM-DD");
         var curDate = ((moment(Date.now()).utcOffset('-0500').format('YYYY-MM-DD HH:mm:ss')));
         var curUser = AuthenticationService.getLoggedInUserId();
+        var curUserName = AuthenticationService.getLoggedInUsername();
 
         confirmAlert({
             title: i18n.t('static.program.confirmsubmit'),
@@ -252,7 +253,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                                         return a;
                                     }, {}));
 
-                                    // console.log("finalImportQATData===>", finalImportQATData)
+                                    console.log("finalImportQATData===>", finalImportQATData)
 
                                     var finalPuList = []
                                     for (var i = 0; i < finalImportQATData.length; i++) {
@@ -304,6 +305,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
 
                                                 consumptionDataList[index].lastModifiedBy.userId = curUser;
                                                 consumptionDataList[index].lastModifiedDate = curDate;
+                                                // consumptionDataList[index].notes = "Imported " + moment(curDate).format("DD-MMM-YYYY") + " by " + curUserName + " from ";
                                             } else {
 
                                                 var consumptionJson = {
@@ -326,7 +328,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                                                     planningUnit: {
                                                         id: finalImportQATDataFilter[i].v10
                                                     },
-                                                    notes: "",
+                                                    notes: "Imported from QAT " + moment(curDate).format("DD-MMM-YYYY"),
                                                     batchInfoList: [],
                                                     actualFlag: false,
                                                     createdBy: {
@@ -519,7 +521,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                                         v4: moment(primaryConsumptionData[i].monthlyForecastData[j].month).format("MMM-YY"), // Month
                                         v5: primaryConsumptionData[i].monthlyForecastData[j].consumptionQty == null ? "" : Math.round(Number(primaryConsumptionData[i].monthlyForecastData[j].consumptionQty)),//Forecasting module consumption qty
                                         v6: Number(selectedSupplyPlanPlanningUnit[0].multiplier),//Multiplier
-                                        v7: Math.round((Number(primaryConsumptionData[i].monthlyForecastData[j].consumptionQty) * Number(regionFilter[0].forecastPercentage) / 100) * Number(selectedSupplyPlanPlanningUnit[0].multiplier)),// Multiplication
+                                        v7: primaryConsumptionData[i].monthlyForecastData[j].consumptionQty == null ? "" : Math.round((Number(primaryConsumptionData[i].monthlyForecastData[j].consumptionQty) * Number(regionFilter[0].forecastPercentage) / 100) * Number(selectedSupplyPlanPlanningUnit[0].multiplier)),// Multiplication
                                         v8: checkConsumptionData.length > 0 ? checkConsumptionData[0].consumptionRcpuQty : "",//Supply plan module qty
                                         v9: checkConsumptionData.length > 0 ? true : false,// Check
                                         v10: selectedSupplyPlanPlanningUnit[0].supplyPlanPlanningUnitId,// Supply plan planning unit id
