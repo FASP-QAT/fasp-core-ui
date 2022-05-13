@@ -5,7 +5,7 @@ import {
     Card,
     CardBody,
     Col,
-    Table, FormGroup, Input, InputGroup, PopoverBody, Popover, Label,ModalHeader, ModalBody,Modal, Form
+    Table, FormGroup, Input, InputGroup, PopoverBody, Popover, Label, ModalHeader, ModalBody, Modal, Form
 } from 'reactstrap';
 import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
 import i18n from '../../i18n'
@@ -653,19 +653,35 @@ class ForecastOutput extends Component {
                 doc.setFont('helvetica', 'normal')
                 doc.setTextColor("#002f6c");
                 doc.setFont('helvetica', 'bold')
-                doc.text(i18n.t('static.supplyPlan.runDate') + " " + moment(new Date()).format(`${DATE_FORMAT_CAP}`), doc.internal.pageSize.width - 40, 20, {
+
+                doc.text(i18n.t('static.supplyPlan.runDate') + " " + moment(new Date()).format(`${DATE_FORMAT_CAP}`), doc.internal.pageSize.width - 100, 20, {
                     align: 'right'
                 })
                 doc.setFont('helvetica', 'normal')
-                doc.text(i18n.t('static.supplyPlan.runTime') + " " + moment(new Date()).format('hh:mm A'), doc.internal.pageSize.width - 40, 30, {
+                doc.text(i18n.t('static.supplyPlan.runTime') + " " + moment(new Date()).format('hh:mm A'), doc.internal.pageSize.width - 100, 30, {
                     align: 'right'
                 })
-                doc.text(i18n.t('static.user.user') + ': ' + AuthenticationService.getLoggedInUsername(), doc.internal.pageSize.width - 40, 40, {
+                doc.text(i18n.t('static.user.user') + ': ' + AuthenticationService.getLoggedInUsername(), doc.internal.pageSize.width - 100, 40, {
                     align: 'right'
                 })
-                doc.text(this.state.programs.filter(c => c.programId == this.state.programId)[0].programCode + " " + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text), doc.internal.pageSize.width - 40, 50, {
+                doc.text(this.state.programs.filter(c => c.programId == this.state.programId)[0].programCode + " " + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text), doc.internal.pageSize.width - 100, 50, {
                     align: 'right'
                 })
+
+
+                // doc.text(i18n.t('static.supplyPlan.runDate') + " " + moment(new Date()).format(`${DATE_FORMAT_CAP}`), doc.internal.pageSize.width - 40, 20, {
+                //     align: 'right'
+                // })
+                // doc.setFont('helvetica', 'normal')
+                // doc.text(i18n.t('static.supplyPlan.runTime') + " " + moment(new Date()).format('hh:mm A'), doc.internal.pageSize.width - 40, 30, {
+                //     align: 'right'
+                // })
+                // doc.text(i18n.t('static.user.user') + ': ' + AuthenticationService.getLoggedInUsername(), doc.internal.pageSize.width - 40, 40, {
+                //     align: 'right'
+                // })
+                // doc.text(this.state.programs.filter(c => c.programId == this.state.programId)[0].programCode + " " + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text), doc.internal.pageSize.width - 40, 50, {
+                //     align: 'right'
+                // })
                 // doc.text(document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width - 40, 60, {
                 //     align: 'right'
                 // })
@@ -684,17 +700,17 @@ class ForecastOutput extends Component {
                     //     align: 'left'
                     // })
                     doc.setFont('helvetica', 'bold')
-                    doc.text(i18n.t('static.common.forecastPeriod') + ': ' + this.state.forecastPeriod, doc.internal.pageSize.width / 8, 100, {
+                    doc.text(i18n.t('static.common.forecastPeriod') + ': ' + this.state.forecastPeriod, (doc.internal.pageSize.width / 8) - 50, 100, {
                         align: 'left'
                     })
                     doc.setFont('helvetica', 'normal')
-                    doc.text(i18n.t('static.report.dateRange') + ': ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to), doc.internal.pageSize.width / 8, 110, {
+                    doc.text(i18n.t('static.report.dateRange') + ': ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to), (doc.internal.pageSize.width / 8) - 50, 110, {
                         align: 'left'
                     })
-                    doc.text(i18n.t('static.forecastReport.yAxisInEquivalencyUnit') + ': ' + document.getElementById("yaxisEquUnit").selectedOptions[0].text, doc.internal.pageSize.width / 8, 120, {
+                    doc.text(i18n.t('static.forecastReport.yAxisInEquivalencyUnit') + ': ' + document.getElementById("yaxisEquUnit").selectedOptions[0].text, (doc.internal.pageSize.width / 8) - 50, 120, {
                         align: 'left'
                     })
-                    doc.text(i18n.t('static.common.display') + ': ' + document.getElementById("viewById").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130, {
+                    doc.text(i18n.t('static.common.display') + ': ' + document.getElementById("viewById").selectedOptions[0].text, (doc.internal.pageSize.width / 8) - 50, 130, {
                         align: 'left'
                     })
                     // let startY1 = 0;
@@ -711,7 +727,7 @@ class ForecastOutput extends Component {
                     //     align: 'left'
                     // })
 
-                    doc.text(i18n.t('static.forecastReport.xAxisAggregateByYear') + ': ' + document.getElementById("xaxis").selectedOptions[0].text, doc.internal.pageSize.width / 8, 140, {
+                    doc.text(i18n.t('static.forecastReport.xAxisAggregateByYear') + ': ' + document.getElementById("xaxis").selectedOptions[0].text, (doc.internal.pageSize.width / 8) - 50, 140, {
                         align: 'left'
                     })
 
@@ -3125,7 +3141,7 @@ class ForecastOutput extends Component {
             title: {
                 display: true,
                 // text: (this.state.yaxisEquUnit > 0 ? this.state.equivalencyUnitLabel : 'Monthly Forecast ' + (this.state.viewById == 1 ? '(' + i18n.t('static.product.product') + ')' : '(' + i18n.t('static.forecastingunit.forecastingunit') + ')'))
-                text: i18n.t('static.dashboard.monthlyForecast')+' - ' + (this.state.programs.filter(c => c.programId == this.state.programId).length > 0 ? this.state.programs.filter(c => c.programId == this.state.programId)[0].programCode : '') + ' - ' + (this.state.versions.filter(c => c.versionId == this.state.versionId).length > 0 ? this.state.versions.filter(c => c.versionId == this.state.versionId)[0].versionId : '')
+                text: i18n.t('static.dashboard.monthlyForecast') + ' - ' + (this.state.programs.filter(c => c.programId == this.state.programId).length > 0 ? this.state.programs.filter(c => c.programId == this.state.programId)[0].programCode : '') + ' - ' + (this.state.versions.filter(c => c.versionId == this.state.versionId).length > 0 ? this.state.versions.filter(c => c.versionId == this.state.versionId)[0].versionId : '')
             },
             scales: {
                 yAxes: [
@@ -3399,7 +3415,7 @@ class ForecastOutput extends Component {
                 <h5 className="red">{i18n.t(this.state.message)}</h5>
 
                 <Card>
-                
+
                     <div className="Card-header-reporticon pb-2">
                         {this.state.consumptionData.length > 0 &&
                             <div className="card-header-actions">
@@ -3441,12 +3457,12 @@ class ForecastOutput extends Component {
                         </div>
                     </div>
                     <div className="card-header-actions">
-                            <div className="card-header-action pr-lg-4">
-                            <a style={{float:'right'}}>
+                        <div className="card-header-action pr-lg-4">
+                            <a style={{ float: 'right' }}>
                                 <span style={{ cursor: 'pointer' }} onClick={() => { this.toggleShowGuidance() }}><small className="supplyplanformulas">{i18n.t('static.common.showGuidance')}</small></span>
                             </a>
-                            </div>
-                            </div>
+                        </div>
+                    </div>
                     <div className='col-md-12 pt-lg-2 pb-lg-3'>
                         <span className="pr-lg-0 pt-lg-1">{i18n.t('static.placeholder.monthlyForecastReport')}</span>
                     </div>
@@ -3848,32 +3864,32 @@ class ForecastOutput extends Component {
                     </ModalHeader>
                     <div>
                         <ModalBody>
-                           <div>
-                               <h3 className='ShowGuidanceHeading'>Monthly Forecast</h3>
-                           </div>
+                            <div>
+                                <h3 className='ShowGuidanceHeading'>Monthly Forecast</h3>
+                            </div>
                             <p>
-                                <p style={{fontSize:'13px'}}><span className="UnderLineText">Purpose :</span> Enable users to view the final (selected) forecasts for a single program, and displays the forecast by product and month. This output aggregates all regional forecasts into one total forecast. If you want to view disaggregated regional forecasts, you can do so by exporting the output as a CSV.</p>
+                                <p style={{ fontSize: '13px' }}><span className="UnderLineText">Purpose :</span> Enable users to view the final (selected) forecasts for a single program, and displays the forecast by product and month. This output aggregates all regional forecasts into one total forecast. If you want to view disaggregated regional forecasts, you can do so by exporting the output as a CSV.</p>
                             </p>
-                            <p style={{fontSize:'13px'}}>
-                                <p style={{fontSize:'13px'}}><span className="UnderLineText">Using this screen :</span></p>
-                               <p>
-                                   <ul>
-                                       <li>Only selected forecasts will be shown in this output. To select a forecast for a product, go to the '<a href='/#/report/compareAndSelectScenario' target="_blank" style={{textDecoration:'underline'}}>Compare and Select Forecast</a>' screen. To see total forecasts across products, go to the '<a href='/#/forecastReport/forecastSummary' target="_blank" style={{textDecoration:'underline'}}>Forecast Summary</a>' screen.</li>
-                                       <li>The <b>Report Period</b> will be used to determine the period of time that you would like to see in the graphical/tabular output and must be within the forecast period. </li>
-                                       <li>Use the parameters to view the graph/tabular data either by forecasting units or planning units as well as showing the y-axis in equivalency units. </li>
-                                       <li><b>Equivalency Units </b>(EUs) allow users to aggregate data across planning units or forecasting units that are different but have the same equivalency unit. For a further explanation of Equivalency Units, refer to the show guidance in the <a href='/#/equivalancyUnit/listEquivalancyUnit' target="_blank" style={{textDecoration:'underline'}}>Equivalency Units</a> screen.</li>
-                                       <li>The 'X-axis Aggregate By Year' filter allows you to view the data aggregated by year instead of by month.</li>
-                                       <li>For the graph view, there are 3 ways you can hide which products are being displayed: 
-                                            <ul style={{listStyle:'none'}}>
-                                               <li>1. Use the filter at the top to select the product(s). </li>
-                                               <li>2. Click on a product in the legend of the graph. </li>
-                                               <li>3. Uncheck the 'Display' checkbox on the far left of the tabular view.</li>
-                                           </ul>
-                                       </li>
-                                   </ul>
-                               </p>
+                            <p style={{ fontSize: '13px' }}>
+                                <p style={{ fontSize: '13px' }}><span className="UnderLineText">Using this screen :</span></p>
+                                <p>
+                                    <ul>
+                                        <li>Only selected forecasts will be shown in this output. To select a forecast for a product, go to the '<a href='/#/report/compareAndSelectScenario' target="_blank" style={{ textDecoration: 'underline' }}>Compare and Select Forecast</a>' screen. To see total forecasts across products, go to the '<a href='/#/forecastReport/forecastSummary' target="_blank" style={{ textDecoration: 'underline' }}>Forecast Summary</a>' screen.</li>
+                                        <li>The <b>Report Period</b> will be used to determine the period of time that you would like to see in the graphical/tabular output and must be within the forecast period. </li>
+                                        <li>Use the parameters to view the graph/tabular data either by forecasting units or planning units as well as showing the y-axis in equivalency units. </li>
+                                        <li><b>Equivalency Units </b>(EUs) allow users to aggregate data across planning units or forecasting units that are different but have the same equivalency unit. For a further explanation of Equivalency Units, refer to the show guidance in the <a href='/#/equivalancyUnit/listEquivalancyUnit' target="_blank" style={{ textDecoration: 'underline' }}>Equivalency Units</a> screen.</li>
+                                        <li>The 'X-axis Aggregate By Year' filter allows you to view the data aggregated by year instead of by month.</li>
+                                        <li>For the graph view, there are 3 ways you can hide which products are being displayed:
+                                            <ul style={{ listStyle: 'none' }}>
+                                                <li>1. Use the filter at the top to select the product(s). </li>
+                                                <li>2. Click on a product in the legend of the graph. </li>
+                                                <li>3. Uncheck the 'Display' checkbox on the far left of the tabular view.</li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </p>
                             </p>
- 
+
                         </ModalBody>
                     </div>
                 </Modal>

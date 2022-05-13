@@ -297,7 +297,7 @@ export default class ListTreeTemplate extends Component {
                     type: 'hidden',
                 },
                 {
-                    title: 'Template Name',
+                    title: i18n.t('static.listTreeTemp.templateName'),
                     type: 'text',
                     readOnly: true
                 },
@@ -530,7 +530,7 @@ export default class ListTreeTemplate extends Component {
                     <Modal isOpen={this.state.isModalOpen}
                         className={'modal-md ' + this.props.className}>
                         <ModalHeader>
-                            <strong>Template Details</strong>
+                            <strong>{i18n.t('static.listTreeTemp.templateDetails')}</strong>
                         </ModalHeader>
                         <ModalBody className='pb-lg-0'>
                             {/* <h6 className="red" id="div3"></h6> */}
@@ -571,7 +571,7 @@ export default class ListTreeTemplate extends Component {
                                                 <div className="row">
 
                                                     <FormGroup className="col-md-12">
-                                                        <Label for="number1">Template Name<span className="red Reqasterisk">*</span></Label>
+                                                        <Label for="number1">{i18n.t('static.listTreeTemp.templateName')}<span className="red Reqasterisk">*</span></Label>
                                                         <div className="controls">
                                                             <Input type="text"
                                                                 bsSize="sm"
