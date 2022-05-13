@@ -944,7 +944,7 @@ class usageTemplate extends Component {
                     ] //6 G
                 },
                 {
-                    title: '# Person(s)',
+                    title: i18n.t('static.usageTemplate.persons'),
                     type: 'numeric',
                     // readOnly: true
                     textEditor: true, //7 H
@@ -953,7 +953,7 @@ class usageTemplate extends Component {
                     disabledMaskOnEdition: true
                 },
                 {
-                    title: 'Person(s) Unit',
+                    title: i18n.t('static.usageTemplate.personsUnit'),
                     type: 'autocomplete',
                     width: '130',
                     source: this.state.dimensionList, //8 I
@@ -974,7 +974,7 @@ class usageTemplate extends Component {
                 },
                 {
                     // title: i18n.t('static.usageTemplate.usageFrequency'),
-                    title: '# of times/Frequency',
+                    title: i18n.t('static.usageTemplate.timesPerFrequency'),
                     type: 'numeric',
                     width: '130',
                     // readOnly: true
@@ -983,7 +983,7 @@ class usageTemplate extends Component {
                 },
                 {
                     // title: i18n.t('static.usageTemplate.usageFrequency'),
-                    title: 'Frequency',
+                    title: i18n.t('static.usageTemplate.frequency'),
                     type: 'autocomplete',
                     width: '130',
                     source: this.state.usagePeriodList, //12 M
@@ -998,7 +998,7 @@ class usageTemplate extends Component {
                 },
                 {
                     // title: i18n.t('static.usagePeriod.usagePeriod'),
-                    title: 'Period Unit',
+                    title: i18n.t('static.usageTemplate.periodUnit'),
                     type: 'autocomplete',
                     width: '130',
                     source: this.state.usagePeriodList, //14 O
