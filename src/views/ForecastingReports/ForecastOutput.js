@@ -654,19 +654,10 @@ class ForecastOutput extends Component {
                 doc.setTextColor("#002f6c");
                 doc.setFont('helvetica', 'bold')
 
-                doc.text(i18n.t('static.supplyPlan.runDate') + " " + moment(new Date()).format(`${DATE_FORMAT_CAP}`), doc.internal.pageSize.width - 100, 20, {
-                    align: 'right'
-                })
-                doc.setFont('helvetica', 'normal')
-                doc.text(i18n.t('static.supplyPlan.runTime') + " " + moment(new Date()).format('hh:mm A'), doc.internal.pageSize.width - 100, 30, {
-                    align: 'right'
-                })
-                doc.text(i18n.t('static.user.user') + ': ' + AuthenticationService.getLoggedInUsername(), doc.internal.pageSize.width - 100, 40, {
-                    align: 'right'
-                })
-                doc.text(this.state.programs.filter(c => c.programId == this.state.programId)[0].programCode + " " + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text), doc.internal.pageSize.width - 100, 50, {
-                    align: 'right'
-                })
+                doc.fromHTML("<font size = '1' color = '#002f6c'><b>" + i18n.t('static.supplyPlan.runDate') + "</b> " + moment(new Date()).format(`${DATE_FORMAT_CAP}`) + "</font>", doc.internal.pageSize.width - 150, 20)
+                doc.fromHTML("<font size = '1' color = '#002f6c'><b>" + i18n.t('static.supplyPlan.runTime') + "</b> " + moment(new Date()).format('hh:mm A') + "</font>", doc.internal.pageSize.width - 150, 30)
+                doc.fromHTML("<font size = '1' color = '#002f6c'><b>" + i18n.t('static.user.user') + ":</b> " + AuthenticationService.getLoggedInUsername() + "</font>", doc.internal.pageSize.width - 150, 40)
+                doc.fromHTML("<font size = '1' color = '#002f6c'><b>" + this.state.programs.filter(c => c.programId == this.state.programId)[0].programCode + " " + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text) + "</b> " + "</font>", doc.internal.pageSize.width - 150, 50)
 
 
                 // doc.text(i18n.t('static.supplyPlan.runDate') + " " + moment(new Date()).format(`${DATE_FORMAT_CAP}`), doc.internal.pageSize.width - 40, 20, {
@@ -699,20 +690,28 @@ class ForecastOutput extends Component {
                     // doc.text(i18n.t('static.report.version*') + ' : ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 120, {
                     //     align: 'left'
                     // })
-                    doc.setFont('helvetica', 'bold')
-                    doc.text(i18n.t('static.common.forecastPeriod') + ': ' + this.state.forecastPeriod, (doc.internal.pageSize.width / 8) - 50, 100, {
-                        align: 'left'
-                    })
-                    doc.setFont('helvetica', 'normal')
-                    doc.text(i18n.t('static.report.dateRange') + ': ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to), (doc.internal.pageSize.width / 8) - 50, 110, {
-                        align: 'left'
-                    })
-                    doc.text(i18n.t('static.forecastReport.yAxisInEquivalencyUnit') + ': ' + document.getElementById("yaxisEquUnit").selectedOptions[0].text, (doc.internal.pageSize.width / 8) - 50, 120, {
-                        align: 'left'
-                    })
-                    doc.text(i18n.t('static.common.display') + ': ' + document.getElementById("viewById").selectedOptions[0].text, (doc.internal.pageSize.width / 8) - 50, 130, {
-                        align: 'left'
-                    })
+
+                    doc.fromHTML("<font size = '1' color = '#002f6c'><b>" + i18n.t('static.common.forecastPeriod') + ":</b> " + this.state.forecastPeriod + "</font>", (doc.internal.pageSize.width / 8) - 50, 100)
+                    doc.fromHTML("<font size = '1' color = '#002f6c'><b>" + i18n.t('static.report.dateRange') + ":</b> " + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to) + "</font>", (doc.internal.pageSize.width / 8) - 50, 110)
+                    doc.fromHTML("<font size = '1' color = '#002f6c'><b>" + i18n.t('static.forecastReport.yAxisInEquivalencyUnit') + ":</b> " + document.getElementById("yaxisEquUnit").selectedOptions[0].text + "</font>", (doc.internal.pageSize.width / 8) - 50, 120)
+                    doc.fromHTML("<font size = '1' color = '#002f6c'><b>" + i18n.t('static.common.display') + ":</b> " + document.getElementById("viewById").selectedOptions[0].text + "</font>", (doc.internal.pageSize.width / 8) - 50, 130)
+                    doc.fromHTML("<font size = '1' color = '#002f6c'><b>" + i18n.t('static.forecastReport.xAxisAggregateByYear') + ":</b> " + document.getElementById("xaxis").selectedOptions[0].text + "</font>", (doc.internal.pageSize.width / 8) - 50, 140)
+
+
+                    // doc.setFont('helvetica', 'bold')
+                    // doc.text(i18n.t('static.common.forecastPeriod') + ': ' + this.state.forecastPeriod, (doc.internal.pageSize.width / 8) - 50, 100, {
+                    //     align: 'left'
+                    // })
+                    // doc.setFont('helvetica', 'normal')
+                    // doc.text(i18n.t('static.report.dateRange') + ': ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to), (doc.internal.pageSize.width / 8) - 50, 110, {
+                    //     align: 'left'
+                    // })
+                    // doc.text(i18n.t('static.forecastReport.yAxisInEquivalencyUnit') + ': ' + document.getElementById("yaxisEquUnit").selectedOptions[0].text, (doc.internal.pageSize.width / 8) - 50, 120, {
+                    //     align: 'left'
+                    // })
+                    // doc.text(i18n.t('static.common.display') + ': ' + document.getElementById("viewById").selectedOptions[0].text, (doc.internal.pageSize.width / 8) - 50, 130, {
+                    //     align: 'left'
+                    // })
                     // let startY1 = 0;
                     // if (document.getElementById("viewById").value == 1) {
                     //     var planningText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
@@ -727,9 +726,9 @@ class ForecastOutput extends Component {
                     //     align: 'left'
                     // })
 
-                    doc.text(i18n.t('static.forecastReport.xAxisAggregateByYear') + ': ' + document.getElementById("xaxis").selectedOptions[0].text, (doc.internal.pageSize.width / 8) - 50, 140, {
-                        align: 'left'
-                    })
+                    // doc.text(i18n.t('static.forecastReport.xAxisAggregateByYear') + ': ' + document.getElementById("xaxis").selectedOptions[0].text, (doc.internal.pageSize.width / 8) - 50, 140, {
+                    //     align: 'left'
+                    // })
 
                 }
 
