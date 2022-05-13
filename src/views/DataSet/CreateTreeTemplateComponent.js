@@ -429,6 +429,7 @@ export default class CreateTreeTemplate extends Component {
         this.pickAMonth2 = React.createRef()
         this.pickAMonth1 = React.createRef()
         this.state = {
+            percentForOneMonth: '',
             sameLevelNodeList1: [],
             nodeUnitListPlural: [],
             popoverOpenMonthInPast: false,
@@ -5213,6 +5214,7 @@ export default class CreateTreeTemplate extends Component {
                             parent: null,
                             sortOrder: "00",
                             payload: {
+                                nodeId: 1,
                                 label: {
                                     label_en: ''
                                 },
@@ -5288,6 +5290,7 @@ export default class CreateTreeTemplate extends Component {
                         parent: null,
                         sortOrder: "00",
                         payload: {
+                            nodeId: 1,
                             label: {
                                 label_en: ''
                             },
