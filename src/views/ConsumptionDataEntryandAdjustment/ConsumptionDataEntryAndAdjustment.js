@@ -1516,7 +1516,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                       daysOfStockOut = 0;
                       qtyInPU = ""
                     }
-                    planningUnitTotalListRegion.push({ planningUnitId: planningUnitList[cul].planningUnit.id, month: curDate, qty: qty != "" ? Math.round(qty) : "", qtyInPU: qtyInPU != "" ? Math.round(qtyInPU) : "", reportingRate: reportingRate, region: regionList[r], multiplier: multiplier, actualConsumption: actualConsumption, daysOfStockOut: daysOfStockOut, noOfDays: noOfDays })
+                    planningUnitTotalListRegion.push({ planningUnitId: planningUnitList[cul].planningUnit.id, month: curDate, qty: qty != "" ? Math.round(qty) : "", qtyInPU: qty !== "" ? Math.round(qtyInPU) : "", reportingRate: reportingRate, region: regionList[r], multiplier: multiplier, actualConsumption: actualConsumption, daysOfStockOut: daysOfStockOut, noOfDays: noOfDays })
                     console.log("planningUnitTotalListRegion-->", planningUnitTotalListRegion);
                     if (qty !== "") {
                       totalQty = Number(totalQty) + Number(qty);
@@ -1524,7 +1524,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                     }
                   }
                   console.log("&&totalQty--->", totalQty)
-                  planningUnitTotalList.push({ planningUnitId: planningUnitList[cul].planningUnit.id, month: curDate, qty: totalQty !== "" ? Math.round(totalQty) : "", qtyInPU: totalQtyPU != "" ? Math.round(totalQtyPU) : "" })
+                  planningUnitTotalList.push({ planningUnitId: planningUnitList[cul].planningUnit.id, month: curDate, qty: totalQty !== "" ? Math.round(totalQty) : "", qtyInPU: totalQty !== "" ? Math.round(totalQtyPU) : "" })
                   console.log("&&planningUnitTotalList------>", planningUnitTotalList)
                   totalPlanningUnit += totalQty;
                   totalPlanningUnitPU += totalQtyPU;

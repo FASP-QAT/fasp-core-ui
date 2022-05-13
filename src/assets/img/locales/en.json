@@ -2285,7 +2285,7 @@
     "static.tooltip.q": "q or MA (order of the moving average) the size of the moving average window.",
     "static.tooltip.p": "p or AR (lag order) the number of lag observations in the model",
     "static.common.node": "Node",
-    "static.dashboard.Versioncomarition": "Version Camparison",
+    "static.dashboard.Versioncomarition": "Version Comparison",
     "static.supplyPlanFormula.maxStockEx6": "Max stock = AMC * MIN ([ MAX(MIN MONTH OF STOCK ,Min MoS Guardrail) + REORDER FREQUENCY ] ,Max MoS Guardrail)",
     "static.supplyPlanFormula.maxStockEx5": "Min MoS Guardrail = 3(Based on realm)",
     "static.pipeline.pipelineConvertorLinux": "Linux.",
@@ -2301,5 +2301,6 @@
     "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18 )",
     "static.importIntoQATSupplyPlan.conversionFactor": "Conversion Factor (Forecast Planning Unit to Supply Plan)",
     "static.tree.minDataRequiredToExtrapolateNote1":"NOTE: You have ",
-    "static.tree.minDataRequiredToExtrapolateNote2":" month(s) of historical data."
+    "static.tree.minDataRequiredToExtrapolateNote2":" month(s) of historical data.",
+    "static.commitTree.noPUorFUMapping":"You cannot commit tree with PU nodes/FU nodes that do have Planning unit/Forecasting unit mapped to it"
 }
