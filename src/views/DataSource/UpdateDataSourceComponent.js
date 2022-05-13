@@ -349,7 +349,7 @@ export default class UpdateDataSourceComponent extends Component {
                                                         id="programId"
                                                         bsSize="sm"
                                                         readOnly
-                                                        value={this.state.dataSource.program.code}
+                                                        value={this.state.dataSource.program!=null?this.state.dataSource.program.code:null}
                                                     >
                                                     </Input>
                                                 </FormGroup>

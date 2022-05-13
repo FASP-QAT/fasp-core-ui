@@ -427,7 +427,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                         if (dataForExtrapolation.length < 3 || (this.state.smoothingId && dataForExtrapolation.length < 24) || (this.state.arimaId && dataForExtrapolation.length < 14)) {
                             // this.setState({ extrapolationLoader: false }, () => {
                             setTimeout(() => {
-                                alert(i18n.t('static.tree.minDataRequiredToExtrapolate'))
+                                alert(i18n.t('static.tree.minDataRequiredToExtrapolateNote1') + dataForExtrapolation.length + i18n.t('static.tree.minDataRequiredToExtrapolateNote2') + i18n.t('static.tree.minDataRequiredToExtrapolate'))
                             }, 0);
                             // });
                         }
@@ -4420,7 +4420,7 @@ export default class TreeExtrapolationComponent extends React.Component {
                             <p>
                                 <p style={{ fontSize: '14px' }}><span className="UnderLineText">Purpose :</span>The extrapolation tab allows users to forecast future
                                     node values by extrapolating from past values. This functionality only available on
-                                    number nodes, and is similar to the <a href="/#/Extrapolation/extrapolateData" target="_blank">'Extrapolation'</a> screen, but is conducted at a
+                                    number nodes, and is similar to the '<a href="/#/Extrapolation/extrapolateData" target="_blank" style={{textDecoration:'underline'}}>Extrapolation</a>' screen, but is conducted at a
                                     tree node instead. View the guidance on that page for more details on extrapolation
                                     methods.
                                 </p>
@@ -4435,10 +4435,10 @@ export default class TreeExtrapolationComponent extends React.Component {
                                         <li>3. (optional) At the top of the screen, select which forecast methods you wish to display and update the extrapolation &nbsp;&nbsp;&nbsp;&nbsp;parameters.</li>
                                         <li>4. Click "Extrapolate." All selected forecasts will display in the main table and the graphs. </li>
 
-                                        <p className="pl-lg-4"><b>NOTE:</b>  The minimum values needed to get correct graphs and reports for the various features are below: <br></br>
+                                        <p className="pl-lg-4"><b>NOTE:</b>  The minimum values needed for the various features are below:<br></br>
                                             <span className="ml-lg-5">* TES, Holt-Winters:  Needs at least 24 months of actual consumption data<br></br></span>
-                                            <span className="ml-lg-5">* ARIMA:  Needs at least 14 months of actual consumption data<br></br></span>
-                                            <span className="ml-lg-5">* Moving Average, Semi-Averages, and Linear Regression:  Needs at least 3 months of actual consumption data</span>
+                                            <span className="ml-lg-5">* ARIMA: With seasonality : At least 13 months historical data required.Without seasonality : At least 2 months historical data required<br></br></span>
+                                            <span className="ml-lg-5">* Moving Average, Semi-Averages, and Linear Regression: At least 3 months of historical data</span>
                                         </p>
                                         <li>5. (optional) In the table, add any manual changes (+/-). These changes are added or subtracted on top of the extrapolated &nbsp;&nbsp;&nbsp;&nbsp;values.</li>
                                         <li>6. After reviewing the main table, the error table, and the graphs, select the desired forecast method at the bottom of the screen &nbsp;&nbsp;&nbsp;&nbsp;and click “Save.”

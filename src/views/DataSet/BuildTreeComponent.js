@@ -965,30 +965,33 @@ export default class BuildTree extends Component {
         var currentItemConfig = this.state.currentItemConfig;
         var qatCalculatedPUPerVisit = "";
         console.log("currentItemConfig qat cal---", currentItemConfig)
-        if (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.planningUnit.id != "") {
-            var pu = this.state.planningUnitList.filter(x => x.id == currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.planningUnit.id)[0];
-            console.log("pu qat cal 1---", pu.multiplier)
-            console.log("pu qat cal 2---", currentItemConfig.parentItem.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.noOfForecastingUnitsPerPerson);
-            // this.getNoOfMonthsInUsagePeriod();
-            if (currentItemConfig.parentItem.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.usageType.id == 2) {
-                var refillMonths = currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.refillMonths != "" && currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.refillMonths != null ? currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.refillMonths : this.round(parseFloat(pu.multiplier / (currentItemConfig.parentItem.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod)).toFixed(4))
-                console.log("refillMonths qat cal---", refillMonths)
-                console.log("noOfmonths qat cal---", this.state.noOfMonthsInUsagePeriod);
-                qatCalculatedPUPerVisit = this.round(parseFloat(((currentItemConfig.parentItem.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod) * refillMonths) / pu.multiplier).toFixed(4));
-            } else {
-                if (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.sharePlanningUnit == "true" || currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.sharePlanningUnit == true) {
-                    qatCalculatedPUPerVisit = addCommas(this.state.noOfMonthsInUsagePeriod / pu.multiplier);
-                } else {
-                    qatCalculatedPUPerVisit = this.round(this.state.noOfMonthsInUsagePeriod / pu.multiplier);
-                }
-            }
-            console.log("inside qat cal val---", qatCalculatedPUPerVisit)
-
-            if (type == 1) {
+        var planningUnitList = this.state.planningUnitList;
+        if (planningUnitList.length > 0 && currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.planningUnit.id != "") {
+            if (planningUnitList.filter(x => x.id == currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.planningUnit.id).length > 0) {
+                var pu = planningUnitList.filter(x => x.id == currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.planningUnit.id)[0];
+                console.log("pu qat cal 1---", pu.multiplier)
+                console.log("pu qat cal 2---", currentItemConfig.parentItem.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.noOfForecastingUnitsPerPerson);
+                // this.getNoOfMonthsInUsagePeriod();
                 if (currentItemConfig.parentItem.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.usageType.id == 2) {
-                    currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.refillMonths = refillMonths;
+                    var refillMonths = currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.refillMonths != "" && currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.refillMonths != null ? currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.refillMonths : this.round(parseFloat(pu.multiplier / (currentItemConfig.parentItem.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod)).toFixed(4))
+                    console.log("refillMonths qat cal---", refillMonths)
+                    console.log("noOfmonths qat cal---", this.state.noOfMonthsInUsagePeriod);
+                    qatCalculatedPUPerVisit = this.round(parseFloat(((currentItemConfig.parentItem.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.noOfForecastingUnitsPerPerson / this.state.noOfMonthsInUsagePeriod) * refillMonths) / pu.multiplier).toFixed(4));
+                } else {
+                    if (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.sharePlanningUnit == "true" || currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.sharePlanningUnit == true) {
+                        qatCalculatedPUPerVisit = addCommas(this.state.noOfMonthsInUsagePeriod / pu.multiplier);
+                    } else {
+                        qatCalculatedPUPerVisit = this.round(this.state.noOfMonthsInUsagePeriod / pu.multiplier);
+                    }
                 }
-                currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.puPerVisit = qatCalculatedPUPerVisit;
+                console.log("inside qat cal val---", qatCalculatedPUPerVisit)
+
+                if (type == 1) {
+                    if (currentItemConfig.parentItem.payload.nodeDataMap[this.state.selectedScenario][0].fuNode.usageType.id == 2) {
+                        currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.refillMonths = refillMonths;
+                    }
+                    currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.puPerVisit = qatCalculatedPUPerVisit;
+                }
             }
         }
         this.setState({ qatCalculatedPUPerVisit });
@@ -5366,8 +5369,9 @@ export default class BuildTree extends Component {
             // console.log("filtered planning unit list tempPlanningUnitId---", this.state.tempPlanningUnitId);
             if (this.state.planningUnitList.length == 1) {
                 var { currentItemConfig } = this.state;
-                console.log("pl 1---");
-                if ((currentItemConfig.context.payload.nodeType.id == 4 && !this.state.addNodeFlag) || (currentItemConfig.context.payload.nodeType.id == 5 && this.state.addNodeFlag)) {
+                console.log("pl 1---", this.state.planningUnitList);
+                console.log("currentItemConfig pl 1---", currentItemConfig);
+                if ((currentItemConfig.context.payload.nodeType.id == 4 && this.state.addNodeFlag) || (currentItemConfig.context.payload.nodeType.id == 5 && this.state.addNodeFlag)) {
                     currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.planningUnit.id = this.state.planningUnitList[0].id;
                     console.log("pl 2---");
                     currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario][0].puNode.planningUnit.label = this.state.planningUnitList[0].label;
@@ -10988,19 +10992,19 @@ export default class BuildTree extends Component {
                                         <tr>
                                             <td className='BgLightBlue'><b>Number #</b></td>
                                             <td>Defined at this node</td>
-                                            <td>% or <b style={{ background: '#002f6c', color: '#fff', padding: '3px' }}><i class="fa fa-cube" aria-hidden="true"></i></b></td>
+                                            <td>% or <b style={{ background: '#fff', color: '#002f6c', padding: '3px' }}><i class="fa fa-cube" aria-hidden="true"></i></b></td>
                                             <td><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i>,<i className='fa fa-link'></i>, <i className='fa fa-line-chart'></i></td>
                                         </tr>
                                         <tr>
                                             <td className='BgLightBlue'><b>Percentage %</b></td>
                                             <td>Defined as a percentage of the parent</td>
-                                            <td>% or <b style={{ background: '#002f6c', color: '#fff', padding: '3px' }}><i class="fa fa-cube" aria-hidden="true"></i></b></td>
+                                            <td>% or <b style={{ background: '#fff', color: '#002f6c', padding: '3px' }}><i class="fa fa-cube" aria-hidden="true"></i></b></td>
                                             <td><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i>,<i className='fa fa-link'></i></td>
                                         </tr>
                                         <tr>
                                             <td className='BgDarkBlue'><b>Forecasting Unit <i class="fa fa-cube" aria-hidden="true"></i></b></td>
                                             <td>Defined as a percentage of the parent and forecasting unit parameters</td>
-                                            <td><b style={{ background: '#002f6c', color: '#fff', padding: '3px' }}><i class="fa fa-cubes" aria-hidden="true"></i></b></td>
+                                            <td><b style={{ background: '#fff', color: '#002f6c', padding: '3px' }}><i class="fa fa-cubes" aria-hidden="true"></i></b></td>
                                             <td><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i>,<i className='fa fa-link'></i></td>
                                         </tr>
                                         <tr>
@@ -11077,7 +11081,7 @@ export default class BuildTree extends Component {
                                     </ul>
                                 </li>
                                 <li><b> Multi-month Consumption Patterns?</b> How often is the product actually "consumed"? is it monthly or every three months? Consumption can be defined at different levels depending on your supply chain. In the <b>Planning Unit Node</b>, use the <b>Consumption Interval</b> field to indicate. For example, if the end user uses a product daily, but only picks up or buys the product every 2 months, enter "2" in the Consumption Interval field to account for a multi-month consumption pattern.  Note that this is only available for Continuous nodes, as product is assumed to be “consumed” at the beginning of the usage period.</li>
-                                <li><b>Repeating Forecasting Usages?</b> If multiple Forecasting Unit nodes share the same settings, consider using the <a href='/#/usageTemplate/listUsageTemplate'>Usage Template </a>screen to save your common usages, and then using the “Copy from Template”  field to populate the  fields in the forecasting unit nodes. </li>
+                                <li><b>Repeating Forecasting Usages?</b> If multiple Forecasting Unit nodes share the same settings, consider using the <a href='/#/usageTemplate/listUsageTemplate' target="_blank" style={{textDecoration:'underline'}}>Usage Template </a>screen to save your common usages, and then using the “Copy from Template”  field to populate the  fields in the forecasting unit nodes. </li>
                             </ul>
                         </p>
 
@@ -11137,19 +11141,19 @@ export default class BuildTree extends Component {
                                         <tr>
                                             <td className='BgLightBlue'><b>Number #</b></td>
                                             <td>Defined at this node</td>
-                                            <td>% or <b style={{ background: '#002f6c', color: '#fff', padding: '3px' }}><i class="fa fa-cube" aria-hidden="true"></i></b></td>
+                                            <td>% or <b style={{ background: '#fff', color: '#002f6c', padding: '3px' }}><i class="fa fa-cube" aria-hidden="true"></i></b></td>
                                             <td><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i>,<i className='fa fa-link'></i>, <i className='fa fa-line-chart'></i></td>
                                         </tr>
                                         <tr>
                                             <td className='BgLightBlue'><b>Percentage %</b></td>
                                             <td>Defined as a percentage of the parent</td>
-                                            <td>% or <b style={{ background: '#002f6c', color: '#fff', padding: '3px' }}><i class="fa fa-cube" aria-hidden="true"></i></b></td>
+                                            <td>% or <b style={{ background: '#fff', color: '#002f6c', padding: '3px' }}><i class="fa fa-cube" aria-hidden="true"></i></b></td>
                                             <td><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i>,<i className='fa fa-link'></i></td>
                                         </tr>
                                         <tr>
                                             <td className='BgDarkBlue'><b>Forecasting Unit <i class="fa fa-cube" aria-hidden="true"></i></b></td>
                                             <td>Defined as a percentage of the parent and forecasting unit parameters</td>
-                                            <td><b style={{ background: '#002f6c', color: '#fff', padding: '3px' }}><i class="fa fa-cubes" aria-hidden="true"></i></b></td>
+                                            <td><b style={{ background: '#fff', color: '#002f6c', padding: '3px' }}><i class="fa fa-cubes" aria-hidden="true"></i></b></td>
                                             <td><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i>,<i className='fa fa-link'></i></td>
                                         </tr>
                                         <tr>

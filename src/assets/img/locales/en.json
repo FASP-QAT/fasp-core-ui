@@ -1881,7 +1881,7 @@
     "static.report.updateDetails": "Update Details",
     "static.login.passwordtext": "Enter password",
     "static.common.jul": "Jul",
-    "static.tree.minDataRequiredToExtrapolate": "NOTE:  The minimum values needed to get correct graphs and reports for the various features are below:\n* TES, Holt-Winters:  Needs at least 24 months of actual consumption data\n* ARIMA:  Needs at least 14 months of actual consumption data\n* Moving Average, Semi-Averages, and Linear Regression:  Needs at least 3 months of actual consumption data",
+    "static.tree.minDataRequiredToExtrapolate": "The minimum values needed for the various features are below:\n* TES, Holt-Winters: At least 24 months of historical data\n* ARIMA: With seasonality : At least 13 months historical data required.Without seasonality at least 2 months historical data required.\n* Moving Average, Semi-Averages, and Linear Regression: At least 3 months of historical data",
     "static.importIntoQATSupplyPlan.forecastFinalVersion": "Forecast version (Final Versions Only)",
     "static.message.invalidStringLength": "Version Notes should not exceed 1000 characters",
     "static.problemList.problemStatus": "Open / Addressed",
@@ -2285,7 +2285,7 @@
     "static.tooltip.q": "q or MA (order of the moving average) the size of the moving average window.",
     "static.tooltip.p": "p or AR (lag order) the number of lag observations in the model",
     "static.common.node": "Node",
-    "static.dashboard.Versioncomarition": "Version Camparison",
+    "static.dashboard.Versioncomarition": "Version Comparison",
     "static.supplyPlanFormula.maxStockEx6": "Max stock = AMC * MIN ([ MAX(MIN MONTH OF STOCK ,Min MoS Guardrail) + REORDER FREQUENCY ] ,Max MoS Guardrail)",
     "static.supplyPlanFormula.maxStockEx5": "Min MoS Guardrail = 3(Based on realm)",
     "static.pipeline.pipelineConvertorLinux": "Linux.",
@@ -2299,5 +2299,8 @@
     "static.organisation.organisationheader": "Organization",
     "static.supplyPlanFormula.maxMonthOfStockEx5": "Max = 7",
     "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18 )",
-    "static.importIntoQATSupplyPlan.conversionFactor": "Conversion Factor (Forecast Planning Unit to Supply Plan)"
+    "static.importIntoQATSupplyPlan.conversionFactor": "Conversion Factor (Forecast Planning Unit to Supply Plan)",
+    "static.tree.minDataRequiredToExtrapolateNote1":"NOTE: You have ",
+    "static.tree.minDataRequiredToExtrapolateNote2":" month(s) of historical data.",
+    "static.commitTree.noPUorFUMapping":"You cannot commit tree with PU nodes/FU nodes that do have Planning unit/Forecasting unit mapped to it"
 }
