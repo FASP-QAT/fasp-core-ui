@@ -2301,5 +2301,6 @@
     "static.supplyPlanFormula.maxMonthOfStockEx4": "Max = MIN (7,18 )",
     "static.importIntoQATSupplyPlan.conversionFactor": "Conversion Factor (Forecast Planning Unit to Supply Plan)",
     "static.tree.minDataRequiredToExtrapolateNote1":"NOTE: You have ",
-    "static.tree.minDataRequiredToExtrapolateNote2":" month(s) of historical data."
+    "static.tree.minDataRequiredToExtrapolateNote2":" month(s) of historical data.",
+    "static.commitTree.noPUorFUMapping":"You cannot commit tree with PU nodes/FU nodes that do have Planning unit/Forecasting unit mapped to it"
 }
