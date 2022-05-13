@@ -1835,20 +1835,20 @@ export default class CreateTreeTemplate extends Component {
                 elInstance.setValueFromCoords(6, this.state.currentRowIndex, '', true);
                 elInstance.setValueFromCoords(7, this.state.currentRowIndex, parseFloat(this.state.currentTargetChangeNumber) < 0 ? parseFloat(this.state.currentTargetChangeNumber * -1) : parseFloat(this.state.currentTargetChangeNumber), true);
                 elInstance.setValueFromCoords(9, this.state.currentRowIndex, parseFloat(this.state.currentCalculatedMomChange).toFixed(4), true);
-            } else if (this.state.currentModelingType == 3) {
+            } else if (this.state.currentModelingType == 3) { //Linear %
                 elInstance.setValueFromCoords(4, this.state.currentRowIndex, this.state.currentModelingType, true);
-                elInstance.setValueFromCoords(5, this.state.currentRowIndex, parseFloat(this.state.currentTargetChangePercentage) < 0 ? -1 : 1, true);
+                elInstance.setValueFromCoords(5, this.state.currentRowIndex, parseFloat(this.state.percentForOneMonth) < 0 ? -1 : 1, true);
                 elInstance.setValueFromCoords(1, this.state.currentRowIndex, this.state.currentCalculatorStartDate, true);
                 elInstance.setValueFromCoords(2, this.state.currentRowIndex, this.state.currentCalculatorStopDate, true);
-                elInstance.setValueFromCoords(6, this.state.currentRowIndex, parseFloat(this.state.currentTargetChangePercentage) < 0 ? parseFloat(this.state.currentTargetChangePercentage * -1).toFixed(4) : parseFloat(this.state.currentTargetChangePercentage).toFixed(4), true);
+                elInstance.setValueFromCoords(6, this.state.currentRowIndex, parseFloat(this.state.percentForOneMonth) < 0 ? parseFloat(this.state.percentForOneMonth * -1).toFixed(4) : parseFloat(this.state.percentForOneMonth).toFixed(4), true);
                 elInstance.setValueFromCoords(7, this.state.currentRowIndex, '', true);
                 elInstance.setValueFromCoords(9, this.state.currentRowIndex, parseFloat(this.state.currentCalculatedMomChange).toFixed(4), true);
-            } else if (this.state.currentModelingType == 4) {
+            } else if (this.state.currentModelingType == 4) { // Exponential %
                 elInstance.setValueFromCoords(4, this.state.currentRowIndex, this.state.currentModelingType, true);
-                elInstance.setValueFromCoords(5, this.state.currentRowIndex, parseFloat(this.state.currentTargetChangePercentage) < 0 ? -1 : 1, true);
+                elInstance.setValueFromCoords(5, this.state.currentRowIndex, parseFloat(this.state.percentForOneMonth) < 0 ? -1 : 1, true);
                 elInstance.setValueFromCoords(1, this.state.currentRowIndex, this.state.currentCalculatorStartDate, true);
                 elInstance.setValueFromCoords(2, this.state.currentRowIndex, this.state.currentCalculatorStopDate, true);
-                elInstance.setValueFromCoords(6, this.state.currentRowIndex, parseFloat(this.state.currentTargetChangePercentage) < 0 ? parseFloat(this.state.currentTargetChangePercentage * -1).toFixed(4) : parseFloat(this.state.currentTargetChangePercentage).toFixed(4), true);
+                elInstance.setValueFromCoords(6, this.state.currentRowIndex, parseFloat(this.state.percentForOneMonth) < 0 ? parseFloat(this.state.percentForOneMonth * -1).toFixed(4) : parseFloat(this.state.percentForOneMonth).toFixed(4), true);
                 elInstance.setValueFromCoords(7, this.state.currentRowIndex, '', true);
                 elInstance.setValueFromCoords(9, this.state.currentRowIndex, parseFloat(this.state.currentCalculatedMomChange).toFixed(4), true);
             }
@@ -1862,6 +1862,7 @@ export default class CreateTreeTemplate extends Component {
             currentCalculatedMomChange: '',
             currentTargetChangeNumber: '',
             currentTargetChangePercentage: '',
+            percentForOneMonth: ''
         });
         var startDate = this.state.currentCalculatorStartDate;
         var endDate = this.state.currentCalculatorStopDate;
@@ -1869,7 +1870,7 @@ export default class CreateTreeTemplate extends Component {
         // var monthDifference = moment(endDate).startOf('month').diff(startDate, 'months', true);
         var monthDifference = parseInt((monthArr.length > 0 ? parseInt(monthArr.length + 1) : 0) + 1);
         console.log("month diff>>>", monthDifference);
-        var momValue = ''
+        var momValue = '',percentForOneMonth='';
         var getValue = e.target.value.toString().replaceAll(",", "");
         if (this.state.currentModelingType == 2) {
             var momValue = ((parseFloat(getValue - this.state.currentCalculatorStartValue.toString().replaceAll(",", ""))) / monthDifference).toFixed(4);
@@ -1899,19 +1900,22 @@ export default class CreateTreeTemplate extends Component {
         if (this.state.currentItemConfig.context.payload.nodeType.id < 3) {
             targetChangeNumber = (parseFloat(getValue - this.state.currentCalculatorStartValue.toString().replaceAll(",", "")) / monthDifference).toFixed(4);
             targetChangePer = (parseFloat(targetChangeNumber / this.state.currentCalculatorStartValue.toString().replaceAll(",", "")) * 100).toFixed(4);
+            percentForOneMonth = targetChangePer;
         }
         console.log("targetChangeNumber 1---", targetChangeNumber);
         this.setState({
             currentTargetChangeNumber: e.target.value != '' ? targetChangeNumber : '',
             currentTargetChangePercentage: e.target.value != '' ? targetChangePer : '',
-            currentCalculatedMomChange: e.target.value != '' ? momValue : ''
+            currentCalculatedMomChange: e.target.value != '' ? momValue : '',
+            percentForOneMonth
         });
     }
     calculateMomByChangeInPercent(e) {
         this.setState({
             currentEndValue: '',
             currentCalculatedMomChange: '',
-            currentTargetChangeNumber: ''
+            currentTargetChangeNumber: '',
+            percentForOneMonth: ''
         });
         var startDate = this.state.currentCalculatorStartDate;
         var endDate = this.state.currentCalculatorStopDate;
@@ -1930,10 +1934,11 @@ export default class CreateTreeTemplate extends Component {
         var targetEndValue = (parseFloat(this.state.currentCalculatorStartValue.toString().replaceAll(",", "")) + parseFloat(getEndValueFromPercentage)).toFixed(4);
         // }
 
-        var momValue = ''
+        var momValue = '', percentForOneMonth = '';
         if (this.state.currentModelingType == 2) {
             // var momValue = ((parseFloat(targetEndValue - this.state.currentCalculatorStartValue)) / monthDifference).toFixed(4);
-            var momValue = ((parseFloat((this.state.currentCalculatorStartValue.toString().replaceAll(",", "") * getValue) / 100))).toFixed(4);
+            var momValue = ((parseFloat(((this.state.currentCalculatorStartValue.toString().replaceAll(",", "") * getValue) / 100) / monthDifference))).toFixed(4);
+            percentForOneMonth = getValue / monthDifference;
         }
         if (this.state.currentModelingType == 3) {
             if (this.state.currentItemConfig.context.payload.nodeType.id > 2) {
@@ -1944,14 +1949,16 @@ export default class CreateTreeTemplate extends Component {
                 console.log("1 mom------------------->", this.state.currentCalculatorStartValue.toString().replaceAll(",", ""));
                 console.log("2 mom------------------->", getValue);
                 console.log("3 mom------------------->", this.state.currentCalculatorStartValue.toString().replaceAll(",", "") * getValue);
-                var momValue = ((parseFloat((this.state.currentCalculatorStartValue.toString().replaceAll(",", "") * getValue) / 100))).toFixed(4);
+                var momValue = ((parseFloat(((this.state.currentCalculatorStartValue.toString().replaceAll(",", "") * getValue) / 100) / monthDifference))).toFixed(4);
+                percentForOneMonth = getValue / monthDifference;
                 console.log("4 mom------------------->", momValue);
             }
 
         }
         if (this.state.currentModelingType == 4) {
             // var momValue = ((Math.pow(parseFloat(targetEndValue / this.state.currentCalculatorStartValue), parseFloat(1 / monthDifference)) - 1) * 100).toFixed(4);
-            var momValue = ((parseFloat((this.state.currentCalculatorStartValue.toString().replaceAll(",", "") * getValue) / 100))).toFixed(4);
+            var momValue = ((parseFloat(((this.state.currentCalculatorStartValue.toString().replaceAll(",", "") * getValue) / 100) / monthDifference))).toFixed(4);
+            percentForOneMonth = getValue / monthDifference;
 
         }
         if (this.state.currentModelingType == 5) {
@@ -1967,7 +1974,8 @@ export default class CreateTreeTemplate extends Component {
         this.setState({
             currentEndValue: (getValue != '' && this.state.currentModelingType != 3 && this.state.currentModelingType != 5) ? targetEndValue : '',
             currentCalculatedMomChange: getValue != '' ? momValue : '',
-            currentTargetChangeNumber: getValue != '' ? targetChangeNumber : ''
+            currentTargetChangeNumber: getValue != '' ? targetChangeNumber : '',
+            percentForOneMonth
         });
     }
 
@@ -7823,6 +7831,7 @@ export default class CreateTreeTemplate extends Component {
                                                 <PopoverBody>{i18n.t('static.tooltip.TargetChangePercent')}</PopoverBody>
                                             </Popover>
                                         </div>
+                                        <input type="hidden" id="percentForOneMonth" name="percentForOneMonth" value={this.state.percentForOneMonth} />
                                         <FormGroup className="col-md-5">
                                             <Label htmlFor="currencyId">{this.state.currentItemConfig.context.payload.nodeType.id > 2 ? 'Change (% points)' : 'Target change (%)'}<span class="red Reqasterisk">*</span>  <i class="fa fa-info-circle icons pl-lg-2" id="Popover23" onClick={this.toggleTargetChangePercent} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                             <Input type="number"
