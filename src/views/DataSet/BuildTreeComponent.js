@@ -10938,10 +10938,12 @@ export default class BuildTree extends Component {
 
                         <p><span style={{ fontSize: '14px' }} className="UnderLineText">Rules for Transfer Nodes:</span>
                             <ul>
-                                <li>Transfers must occur between nodes be on the same level</li>
+                                {/* <li>Transfers must occur between nodes be on the same level</li>
                                 <li>Users can only transfer to nodes that are of the same type (i.e. a forecasting unit may transfer node data to another forecasting unit, but not a planning unit as they are not the same node type).</li>
                                 <li>The order of operations for calculating a transfer occurs from the left to the right in the forecast tree. A transfer cannot be made from right to left, thus a user should be careful when designing their tree and determining where each node should be placed. </li>
-                                <li>Transfers are always negative from the source node and positive to the destination node.</li>
+                                <li>Transfers are always negative from the source node and positive to the destination node.</li> */}
+                                <li>Number node can transfer to another number only but they should be at the same level</li>
+                                <li>Percentage,FU & PU nodes can transfer to each othet but they should belog to the same parent</li>
                             </ul>
                         </p>
                         <p><span style={{ fontSize: '14px' }} className="UnderLineText">Examples :</span>
@@ -11121,7 +11123,7 @@ export default class BuildTree extends Component {
                 <div>
                     <ModalBody>
                         <div>
-                            <h3 className='ShowGuidanceHeading'>Manage Tree – Build Trees</h3>
+                            <h3 className='ShowGuidanceHeading'>Manage Tree - Build Trees</h3>
                         </div>
                         <p>
                             <p style={{ fontSize: '14px' }}><span className="UnderLineText">Purpose :</span>Enable users to manage and build forecast tree and scenarios, for any non-consumption forecasts (demographic, morbidity, services, etc). Note that more guidance is available after clicking into any specific node.</p>
