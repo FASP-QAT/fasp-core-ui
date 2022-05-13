@@ -1242,14 +1242,14 @@ class ProductValidation extends Component {
                     <div className="Card-header-reporticon pb-2">
                         {/* {this.state.dataList.length > 0 && */}
                         <div className="card-header-actions BacktoLink col-md-12 pl-lg-0 pr-lg-0 pt-lg-3">
-                            {this.state.treeId > 0 && this.state.scenarioId > 0 && this.state.localProgramId != "" &&
+                            {/* {this.state.treeId > 0 && this.state.scenarioId > 0 && this.state.localProgramId != "" && */}
                                 <a className="pr-lg-0 pt-lg-3">
                                      <span className="compareAndSelect-larrow"> <i className="cui-arrow-left icons " > </i></span>
                         <span className="compareAndSelect-rarrow"> <i className="cui-arrow-right icons " > </i></span>
-                        <span className="compareAndSelect-larrowText"> {i18n.t('static.common.backTo')} <a href={this.state.datasetId != -1 && this.state.datasetId != "" && this.state.datasetId != undefined ? "/#/dataSet/buildTree/tree/0/" + this.state.datasetId : "/#/dataSet/buildTree"} className="supplyplanformulas">{i18n.t('static.common.managetree')}</a> </span>
+                        <span className="compareAndSelect-larrowText"> {i18n.t('static.common.backTo')} <a href={this.state.datasetId != -1 && this.state.datasetId != "" && this.state.datasetId != undefined && this.state.localProgramId != "" ? "/#/dataSet/buildTree/tree/0/" + this.state.datasetId : "/#/dataSet/buildTree"} className="supplyplanformulas">{i18n.t('static.common.managetree')}</a> </span>
                         <span className="compareAndSelect-rarrowText"> {i18n.t('static.common.continueTo')} <a href="/#/report/compareAndSelectScenario" className="supplyplanformulas">{i18n.t('static.dashboard.compareAndSelect')}</a> {i18n.t('static.tree.or')} <a href="/#/validation/modelingValidation" className='supplyplanformulas'>{i18n.t('static.dashboard.modelingValidation')}</a></span>
                                 </a>
-                            }
+                            {/* } */}
                             </div>
                             <div className="Card-header-reporticon pb-0">
                             <a className="pr-lg-0 pt-lg-2 float-right">
