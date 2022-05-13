@@ -863,8 +863,16 @@ class DefaultLayout extends Component {
     if (localStorage.getItem('curUser') != null && localStorage.getItem('curUser') != '') {
       let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
       let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
+      var defaultModuleId = 1;
+      if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SUPPLY_PLANNING_MODULE') && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_FORECASTING_MODULE')) {
+        defaultModuleId = decryptedUser.defaultModuleId;
+      } else if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SUPPLY_PLANNING_MODULE')) {
+        defaultModuleId = 2;
+      } else {
+        defaultModuleId = 1;
+      }
       this.setState({
-        activeTab: decryptedUser.defaultModuleId,
+        activeTab: defaultModuleId,
       },
         () => {
           if (this.state.activeTab == 2) {
