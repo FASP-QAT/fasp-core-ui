@@ -114,7 +114,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
             var rowData = elInstance.getRowData(j);
             var id = rowData[9];
             var forecastConsumption = rowData[4];
-            if (forecastConsumption == 0) {
+            if (forecastConsumption === "") {
                 for (var i = 0; i < colArr.length; i++) {
                     var cell1 = elInstance.getCell(`${colArr[i]}${parseInt(j) + 1}`)
                     cell1.classList.add('readonly');
@@ -626,7 +626,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                 data[6] = papuList[j].v6
                 data[7] = papuList[j].v7
                 data[8] = papuList[j].v8
-                data[9] = papuList[j].v5 != "" ? true : false;
+                data[9] = papuList[j].v5 !== "" ? true : false;
                 data[10] = papuList[j].v9;
                 data[11] = papuList[j].v10;
                 data[12] = papuList[j].v11;
