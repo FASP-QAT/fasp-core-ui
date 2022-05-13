@@ -113,6 +113,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
         for (var j = 0; j < json.length; j++) {
             var rowData = elInstance.getRowData(j);
             var id = rowData[9];
+            var currentForecastedValue = rowData[8];
             var forecastConsumption = rowData[4];
             if (forecastConsumption === "") {
                 for (var i = 0; i < colArr.length; i++) {
@@ -123,7 +124,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
             }
 
 
-            if (id == true) {
+            if (id == true && currentForecastedValue !== "") {
                 for (var i = 0; i < colArr.length; i++) {
                     // elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'background-color', 'transparent');
                     elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'background-color', 'yellow');
@@ -615,7 +616,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
         if (papuList.length != 0) {
 
             for (var j = 0; j < papuList.length; j++) {
-                console.log("papuList[j].v5", papuList[j].v5)
+                console.log("papuList[j].v5", papuList[j].v5, " --papuList[j].v8--", papuList[j].v8)
                 data = [];
                 data[0] = papuList[j].v1
                 data[1] = papuList[j].v2
