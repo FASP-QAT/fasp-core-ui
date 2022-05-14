@@ -196,7 +196,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                         for (var i = 0; i < tableJson.length; i++) {
                             var map1 = new Map(Object.entries(tableJson[i]));
 
-                            let selectedPlanningUnitObj = this.props.items.planningUnitList.filter(c => c.planningUnitId == map1.get("1"))[0];
+                            let selectedPlanningUnitObj = this.props.items.planningUnitList.filter(c => c.id == map1.get("1"))[0];
                             var forecastingUnitObj = selectedPlanningUnitObj.forecastingUnit;
                             forecastingUnitObj.multiplier = map1.get("5");
                             if (map1.get("9") == 0 && map1.get("8") == true) { //not pink
@@ -244,19 +244,19 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                                 let tempJson = {
                                     "actualConsumptionId": null,
                                     "planningUnit": {
-                                        "id": selectedPlanningUnitObj.planningUnitId,
+                                        "id": selectedPlanningUnitObj.id,
                                         "label": selectedPlanningUnitObj.label,
                                         "forecastingUnit": {
-                                            "id": forecastingUnitObj.forecastingUnitId,
+                                            "id": forecastingUnitObj.id,
                                             "label": forecastingUnitObj.label,
                                             "productCategory": {
                                                 "id": forecastingUnitObj.productCategory.id,
                                                 "label": forecastingUnitObj.productCategory.label,
                                                 "idString": '' + forecastingUnitObj.productCategory.id
                                             },
-                                            "idString": '' + forecastingUnitObj.forecastingUnitId
+                                            "idString": '' + forecastingUnitObj.id
                                         },
-                                        "idString": '' + selectedPlanningUnitObj.planningUnitId,
+                                        "idString": '' + selectedPlanningUnitObj.id,
                                     },
                                     "puMultiplier": selectedPlanningUnitObj.multiplier,
                                     "region": {
