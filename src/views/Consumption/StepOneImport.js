@@ -808,7 +808,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                     title: i18n.t('static.importFromQATSupplyPlan.forecastPlanningUnit'),
                     type: 'autocomplete',
                     source: this.state.planningUnitListJexcel,
-                    filter: this.filterPlanningUnitBasedOnTracerCategory//7 H
+                    // filter: this.filterPlanningUnitBasedOnTracerCategory//7 H
                 },
                 {
                     title: 'ForecastMultiplier',
@@ -938,7 +938,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
         mylist = mylistTemp;
 
         if (value > 0) {
-            mylist = mylist.filter(c => (c.id == -1 ? c : c.forecastingUnit.tracerCategory.id == value && c.active.toString() == "true"));
+            mylist = mylist.filter(c => (c.id == -1 ? c : c.forecastingUnit.tracerCategory.id == value && c.active == "true"));
         }
         return mylist;
     }.bind(this)
